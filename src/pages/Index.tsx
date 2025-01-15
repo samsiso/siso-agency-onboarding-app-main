@@ -8,9 +8,9 @@ const Index = () => {
   return (
     <div className="flex min-h-screen w-full bg-siso-bg">
       <Sidebar />
-      <div className="flex-1 flex flex-col min-h-screen bg-siso-bg">
-        <main className="flex-1 p-8">
-          <div className="container mx-auto">
+      <div className="flex-1 flex flex-col min-h-screen bg-siso-bg overflow-x-hidden">
+        <main className="flex-1 p-4 sm:p-8">
+          <div className="container mx-auto max-w-7xl">
             <Hero />
             <FeaturedSection />
           </div>
