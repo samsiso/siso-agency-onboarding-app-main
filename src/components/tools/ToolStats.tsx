@@ -18,7 +18,7 @@ export function ToolStats({ tool }: ToolStatsProps) {
       <div className="text-center p-4 rounded-lg bg-siso-text/5 hover:bg-siso-text/10 transition-all duration-300">
         <Download className="h-6 w-6 text-siso-text/60 mx-auto mb-2" />
         <div className="text-xl font-semibold text-siso-text-bold">{tool.downloads_count?.toLocaleString() || '0'}</div>
-        <div className="text-sm text-siso-text/80">Downloads</div>
+        <div className="text-sm text-siso-text/80">Users</div>
       </div>
       <div className="text-center p-4 rounded-lg bg-siso-text/5 hover:bg-siso-text/10 transition-all duration-300">
         <Heart className="h-6 w-6 text-red-500 mx-auto mb-2" />
