@@ -33,9 +33,12 @@ serve(async (req) => {
       );
     }
 
-    // Initialize OpenAI client
+    // Initialize OpenAI client with v2 beta header
     const openai = new OpenAI({
       apiKey,
+      defaultHeaders: {
+        'OpenAI-Beta': 'assistants=v2'
+      }
     });
 
     try {
