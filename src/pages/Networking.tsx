@@ -6,7 +6,7 @@ import { CommunitySearch } from '@/components/community/CommunitySearch';
 import { CommunityMemberCard } from '@/components/community/CommunityMemberCard';
 import { CommunityMemberDetails } from '@/components/community/CommunityMemberDetails';
 import { CommunityMember } from '@/components/community/types';
-import { Database } from '@/integrations/supabase/types';
+import { Sidebar } from '@/components/Sidebar';
 
 const categories = [
   { id: 'all', label: 'All' },
@@ -76,6 +76,7 @@ export default function Networking() {
 
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
+      <Sidebar />
       <div className="flex-1 p-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col space-y-4 mb-8">
