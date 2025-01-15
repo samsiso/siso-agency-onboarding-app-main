@@ -38,8 +38,6 @@ serve(async (req) => {
     // Initialize OpenAI client
     const openai = new OpenAI({
       apiKey,
-      defaultQuery: { 'OpenAI-Beta': 'assistants=v2' },
-      defaultHeaders: { 'OpenAI-Beta': 'assistants=v2' }
     });
 
     try {
@@ -65,6 +63,7 @@ serve(async (req) => {
       console.log('Starting assistant run');
       const run = await openai.beta.threads.runs.create(thread.id, {
         assistant_id: "asst_7f4aHDtKZtJAo1cFtptII7ed",
+        model: "gpt-4o-mini", // Using the recommended model
       });
 
       // Poll for completion
