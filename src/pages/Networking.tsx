@@ -7,6 +7,7 @@ import { CommunitySearch } from '@/components/community/CommunitySearch';
 import { CommunityMemberCard } from '@/components/community/CommunityMemberCard';
 import { CommunityMemberDetails } from '@/components/community/CommunityMemberDetails';
 import { CommunityMember } from '@/components/community/types';
+import { Database } from '@/integrations/supabase/types';
 
 const categories = [
   { id: 'all', label: 'All' },
@@ -43,7 +44,27 @@ export default function Networking() {
       }
       
       console.log('Fetched networking members:', data);
-      return data as CommunityMember[];
+
+      // Transform the data to match CommunityMember type
+      const transformedData: CommunityMember[] = data.map(item => ({
+        id: item.id,
+        name: item.name,
+        description: item.description,
+        member_type: item.member_type,
+        youtube_url: item.youtube_url,
+        youtube_videos: Array.isArray(item.youtube_videos) 
+          ? item.youtube_videos.map((video: any) => ({
+              title: video.title || '',
+              url: video.url || ''
+            }))
+          : null,
+        website_url: item.website_url,
+        specialization: item.specialization,
+        content_themes: item.content_themes,
+        profile_image_url: item.profile_image_url
+      }));
+
+      return transformedData;
     },
   });
 
