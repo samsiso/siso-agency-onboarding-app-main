@@ -19,8 +19,10 @@ export default function Tools() {
       const { data, error } = await supabase
         .from('tools')
         .select('*')
-        .not('category', 'in', '("Community", "Automation", "Assistant", "Chatbots")')
-        .not('assistant_type', 'eq', 'Conversational AI')
+        .not('category', 'eq', 'Assistant')
+        .not('category', 'eq', 'Community')
+        .not('category', 'eq', 'Automation')
+        .not('category', 'eq', 'Chatbots')
         .is('member_type', null);
       
       if (error) {
