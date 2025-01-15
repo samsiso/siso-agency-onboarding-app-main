@@ -31,34 +31,40 @@ export const Hero = () => {
 
   return (
     <div className="relative mb-12">
-      <div className="absolute inset-0 bg-gradient-to-br from-siso-bg via-siso-bg/95 to-siso-bg/90 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-gradient-to-br from-siso-bg via-siso-bg/95 to-siso-bg/90" />
       <div className="relative max-w-4xl mx-auto px-6 py-16 sm:py-24">
         <div className="text-center">
-          <h1 className="text-4xl sm:text-6xl font-bold text-siso-text-bold mb-6 leading-tight animate-fade-in">
-            {userName ? (
-              <>
-                Welcome back,{' '}
-                <span className="bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text animate-glow">
-                  {userName}
-                </span>
-              </>
-            ) : (
-              <>
-                Welcome to{' '}
-                <span className="block bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text animate-glow">
-                  SISO Agency Resources
-                </span>
-              </>
-            )}
-          </h1>
-          <p className="text-xl text-siso-text mb-12 max-w-2xl mx-auto animate-fade-in opacity-90">
+          <div className="relative inline-block">
+            <h1 className="text-4xl sm:text-6xl font-bold text-siso-text-bold mb-6 leading-tight">
+              {userName ? (
+                <>
+                  Welcome back,{' '}
+                  <span className="bg-gradient-to-r from-siso-orange to-siso-red text-transparent bg-clip-text">
+                    {userName}
+                  </span>
+                </>
+              ) : (
+                <>
+                  Welcome to{' '}
+                  <div className="relative mt-2 p-4 rounded-lg bg-black/50">
+                    <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-siso-orange to-siso-red opacity-10" />
+                    <div className="relative bg-gradient-to-r from-siso-orange to-siso-red text-transparent bg-clip-text">
+                      SISO Agency Resources
+                    </div>
+                    <div className="absolute -inset-1 rounded-lg bg-gradient-to-r from-siso-orange to-siso-red opacity-20 blur-lg" />
+                  </div>
+                </>
+              )}
+            </h1>
+          </div>
+          <p className="text-xl text-siso-text mb-12 max-w-2xl mx-auto opacity-90">
             Discover the tools to build your own vision. Your gateway to innovation and success.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <AuthButton />
             <Button 
               variant="outline" 
-              className="min-w-[150px] border-2 border-siso-text/20 text-siso-text-bold hover:bg-gradient-to-r from-siso-red/10 to-siso-orange/10 hover:border-siso-text/40 transition-all duration-300 transform hover:scale-105"
+              className="min-w-[150px] border border-siso-text/20 text-siso-text-bold hover:bg-gradient-to-r from-siso-red/10 to-siso-orange/10 hover:border-siso-text/40 transition-all duration-300"
             >
               Learn More
             </Button>

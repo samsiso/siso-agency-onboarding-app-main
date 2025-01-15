@@ -64,3 +64,27 @@
 .glow-card:hover::before {
   @apply from-siso-red/20 to-siso-orange/20;
 }
+
+.title-glow {
+  text-shadow: 0 0 20px rgba(255, 87, 34, 0.3);
+}
+
+.gradient-border {
+  position: relative;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  border-radius: 0.5rem;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: -2px;
+  border-radius: inherit;
+  background: linear-gradient(to right, #FF5722, #FFA726);
+  z-index: -1;
+}
