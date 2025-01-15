@@ -28,7 +28,7 @@ export const SidebarLogo = ({ collapsed, setCollapsed }: SidebarLogoProps) => {
           <img 
             src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png" 
             alt="Siso Logo" 
-            className="w-8 h-8 group-hover:animate-bounce transition-all duration-300"
+            className="w-8 h-8 transition-all duration-300"
             title="Click to visit our social media!"
           />
           {!collapsed && (
