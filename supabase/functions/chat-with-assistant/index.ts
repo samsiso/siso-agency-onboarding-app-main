@@ -23,6 +23,7 @@ serve(async (req) => {
     const { message, threadId } = await req.json();
     console.log('Request payload:', { message, threadId });
 
+    // Initialize OpenAI client with v2 header
     const openai = new OpenAI({
       apiKey: Deno.env.get('OPENAI_API_KEY'),
       defaultHeaders: {
@@ -30,28 +31,32 @@ serve(async (req) => {
       }
     });
 
-    let thread;
     try {
+      // Create or retrieve thread
+      let thread;
       if (!threadId) {
+        console.log('Creating new thread');
         thread = await openai.beta.threads.create();
         console.log('Created new thread:', thread.id);
       } else {
+        console.log('Using existing thread:', threadId);
         thread = { id: threadId };
-        console.log('Using existing thread:', thread.id);
       }
 
-      // Add the user's message to the thread
+      // Add message to thread
+      console.log('Adding message to thread');
       await openai.beta.threads.messages.create(thread.id, {
         role: "user",
         content: message,
       });
 
       // Run the assistant
+      console.log('Starting assistant run');
       const run = await openai.beta.threads.runs.create(thread.id, {
         assistant_id: "asst_7f4aHDtKZtJAo1cFtptII7ed",
       });
 
-      // Wait for the run to complete
+      // Poll for completion
       let runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
       console.log('Initial run status:', runStatus.status);
       
@@ -64,12 +69,15 @@ serve(async (req) => {
           console.error('Run expired:', runStatus);
           throw new Error("Assistant run expired");
         }
+        
+        // Wait before checking status again
         await new Promise(resolve => setTimeout(resolve, 1000));
         runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
-        console.log('Run status:', runStatus.status);
+        console.log('Updated run status:', runStatus.status);
       }
 
-      // Get the messages
+      // Get messages after completion
+      console.log('Retrieving messages');
       const messages = await openai.beta.threads.messages.list(thread.id);
       const lastMessage = messages.data[0];
       console.log('Retrieved message:', lastMessage.content[0].text.value);
@@ -83,6 +91,7 @@ serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         }
       );
+
     } catch (openaiError) {
       console.error('OpenAI API Error:', openaiError);
       throw new Error(`OpenAI API Error: ${openaiError.message}`);
