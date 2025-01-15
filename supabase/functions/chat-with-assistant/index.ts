@@ -25,6 +25,9 @@ serve(async (req) => {
 
     const openai = new OpenAI({
       apiKey: Deno.env.get('OPENAI_API_KEY'),
+      defaultHeaders: {
+        'OpenAI-Beta': 'assistants=v2'
+      }
     });
 
     let thread;
