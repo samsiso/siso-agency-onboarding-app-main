@@ -12,8 +12,6 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { AuthButton } from './AuthButton';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from './ui/use-toast';
 
 const menuItems = [
   {
@@ -50,28 +48,14 @@ const menuItems = [
 
 export const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
-  const { toast } = useToast();
 
-  const handleItemClick = async (e: React.MouseEvent) => {
+  const handleItemClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/thank-you`,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          },
-        },
-      });
-
-      if (error) throw error;
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Authentication Error",
-        description: "Failed to initiate login. Please try again.",
+    const element = document.querySelector(href);
+    if (element) {
+      element.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
       });
     }
   };
@@ -116,7 +100,7 @@ export const Sidebar = () => {
           <a
             key={item.title}
             href={item.href}
-            onClick={handleItemClick}
+            onClick={(e) => handleItemClick(e, item.href)}
             className="flex items-center gap-3 px-4 py-3 text-siso-text hover:bg-gradient-to-r from-siso-red/10 to-siso-orange/10 rounded-lg transition-all duration-300 group cursor-pointer transform hover:translate-x-1"
           >
             <item.icon className="w-5 h-5 text-siso-text group-hover:text-siso-red transition-colors" />
@@ -132,7 +116,6 @@ export const Sidebar = () => {
         <Link
           to="/settings"
           className="flex items-center gap-3 px-4 py-3 text-siso-text hover:bg-gradient-to-r from-siso-red/10 to-siso-orange/10 rounded-lg transition-all duration-300 group cursor-pointer transform hover:translate-x-1"
-          onClick={handleItemClick}
         >
           <Settings className="w-5 h-5 group-hover:text-siso-red transition-colors" />
           {!collapsed && <span className="text-sm font-medium group-hover:text-siso-text-bold transition-colors">Settings</span>}
