@@ -63,7 +63,7 @@ export function ToolDetail({ tool, onClose }: ToolDetailProps) {
             <ExternalLink className="w-5 h-5 text-siso-orange" />
             Quick Actions
           </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3">
             {tool.website_url && (
               <Button
                 className="w-full justify-start gap-2 bg-gradient-to-r from-siso-red/90 to-siso-orange/90 hover:from-siso-red hover:to-siso-orange transition-all duration-300"
