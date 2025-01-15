@@ -10,13 +10,13 @@ import { Button } from './ui/button';
 export const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showNavigation, setShowNavigation] = useState(true);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
 
   const handleItemClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
     
-    // Check if the href is a route (starts with /)
     if (href.startsWith('/')) {
       navigate(href);
       if (isMobile) {
@@ -25,7 +25,6 @@ export const Sidebar = () => {
       return;
     }
 
-    // Otherwise treat it as an element ID for smooth scrolling
     const element = document.querySelector(href);
     if (element) {
       element.scrollIntoView({
@@ -38,7 +37,6 @@ export const Sidebar = () => {
     }
   };
 
-  // Close mobile menu when route changes
   useEffect(() => {
     if (isMobile) {
       setIsMobileMenuOpen(false);
@@ -74,8 +72,16 @@ export const Sidebar = () => {
         } h-screen bg-gradient-to-b from-siso-bg to-siso-bg/95 border-r border-siso-text/10 shadow-lg`}
         style={{ width: collapsed && !isMobile ? '5rem' : '16rem' }}
       >
-        <SidebarLogo collapsed={collapsed} setCollapsed={setCollapsed} />
-        <SidebarNavigation collapsed={collapsed} onItemClick={handleItemClick} />
+        <SidebarLogo 
+          collapsed={collapsed} 
+          setCollapsed={setCollapsed} 
+          onLogoClick={() => setShowNavigation(!showNavigation)}
+        />
+        <SidebarNavigation 
+          collapsed={collapsed} 
+          onItemClick={handleItemClick}
+          visible={showNavigation}
+        />
         <SidebarFooter collapsed={collapsed} />
       </div>
 

@@ -42,9 +42,12 @@ const menuItems = [
 interface SidebarNavigationProps {
   collapsed: boolean;
   onItemClick: (e: React.MouseEvent<HTMLAnchorElement>, href: string) => void;
+  visible?: boolean;
 }
 
-export const SidebarNavigation = ({ collapsed, onItemClick }: SidebarNavigationProps) => {
+export const SidebarNavigation = ({ collapsed, onItemClick, visible = true }: SidebarNavigationProps) => {
+  if (!visible) return null;
+  
   return (
     <nav className="p-2">
       {menuItems.map((item) => (
