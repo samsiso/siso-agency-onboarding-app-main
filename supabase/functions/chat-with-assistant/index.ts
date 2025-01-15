@@ -5,21 +5,27 @@ import OpenAI from "https://esm.sh/openai@4.20.1";
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
-
-const openai = new OpenAI({
-  apiKey: Deno.env.get('OPENAI_API_KEY'),
-});
 
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    console.log('Handling CORS preflight request');
+    return new Response(null, {
+      status: 204,
+      headers: corsHeaders
+    });
   }
 
   try {
+    console.log('Received request');
     const { message, threadId } = await req.json();
-    console.log('Received request:', { message, threadId });
+    console.log('Request payload:', { message, threadId });
+
+    const openai = new OpenAI({
+      apiKey: Deno.env.get('OPENAI_API_KEY'),
+    });
 
     let thread;
     if (!threadId) {
@@ -43,9 +49,16 @@ serve(async (req) => {
 
     // Wait for the run to complete
     let runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
+    console.log('Initial run status:', runStatus.status);
+    
     while (runStatus.status !== "completed") {
       if (runStatus.status === "failed") {
+        console.error('Run failed:', runStatus);
         throw new Error("Assistant run failed");
+      }
+      if (runStatus.status === "expired") {
+        console.error('Run expired:', runStatus);
+        throw new Error("Assistant run expired");
       }
       await new Promise(resolve => setTimeout(resolve, 1000));
       runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
@@ -55,6 +68,7 @@ serve(async (req) => {
     // Get the messages
     const messages = await openai.beta.threads.messages.list(thread.id);
     const lastMessage = messages.data[0];
+    console.log('Retrieved message:', lastMessage.content[0].text.value);
 
     return new Response(
       JSON.stringify({
