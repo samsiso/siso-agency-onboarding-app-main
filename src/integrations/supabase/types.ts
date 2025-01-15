@@ -38,8 +38,10 @@ export type Database = {
           category: string
           created_at: string
           description: string | null
+          downloads_count: number | null
           icon_url: string | null
           id: string
+          likes_count: number | null
           name: string
           pricing_type: string | null
           rating: number | null
@@ -50,8 +52,10 @@ export type Database = {
           category: string
           created_at?: string
           description?: string | null
+          downloads_count?: number | null
           icon_url?: string | null
           id?: string
+          likes_count?: number | null
           name: string
           pricing_type?: string | null
           rating?: number | null
@@ -62,8 +66,10 @@ export type Database = {
           category?: string
           created_at?: string
           description?: string | null
+          downloads_count?: number | null
           icon_url?: string | null
           id?: string
+          likes_count?: number | null
           name?: string
           pricing_type?: string | null
           rating?: number | null
