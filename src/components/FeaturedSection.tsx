@@ -10,7 +10,7 @@ const featuredItems = [
   },
   {
     id: 'automations',
-    title: 'SISO Automations to Download',
+    title: 'SISO Automations',
     description: 'Save time with ready-to-use workflows and guides.',
     gradient: 'from-blue-500/20 to-cyan-500/20',
   },
@@ -19,6 +19,14 @@ const featuredItems = [
     title: 'The AI Community',
     description: 'Connect on Slack/Discord and other groups.',
     gradient: 'from-emerald-500/20 to-teal-500/20',
+  },
+  {
+    id: 'siso-ai',
+    title: 'SISO AI',
+    description: 'Experience our cutting-edge AI solutions and tools.',
+    gradient: 'from-transparent to-transparent',
+    customBorder: true,
+    highlight: true,
   },
   {
     id: 'assistants',
@@ -32,13 +40,6 @@ const featuredItems = [
     description: 'Find extra reading, success stories, and troubleshooting help.',
     gradient: 'from-rose-500/20 to-pink-500/20',
   },
-  {
-    id: 'siso-ai',
-    title: 'SISO AI',
-    description: 'Experience our cutting-edge AI solutions and tools.',
-    gradient: 'from-transparent to-transparent',
-    customBorder: true,
-  },
 ];
 
 export const FeaturedSection = () => {
@@ -51,9 +52,11 @@ export const FeaturedSection = () => {
             id={item.id}
             className={`group relative overflow-hidden rounded-xl ${
               item.customBorder 
-                ? 'border-2 border-gradient-to-r from-siso-red to-siso-orange' 
+                ? 'border-2 border-gradient-animate bg-gradient-to-br from-transparent to-transparent' 
                 : `bg-gradient-to-br ${item.gradient} border-0`
-            } p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl scroll-mt-24`}
+            } p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl scroll-mt-24 ${
+              item.highlight ? 'animate-glow' : ''
+            }`}
           >
             <div className="relative z-10">
               <h3 className="text-xl font-semibold text-siso-text-bold mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-siso-red group-hover:to-siso-orange">
