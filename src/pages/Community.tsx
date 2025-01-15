@@ -53,7 +53,7 @@ export default function Community() {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col space-y-4 mb-8">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <h1 className="text-4xl font-bold text-siso-text-bold">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
                 The AI Community
               </h1>
               <CommunitySearch 
