@@ -6,7 +6,6 @@ import { CommunitySearch } from '@/components/community/CommunitySearch';
 import { CommunityMemberCard } from '@/components/community/CommunityMemberCard';
 import { CommunityMemberDetails } from '@/components/community/CommunityMemberDetails';
 import { CommunityMember } from '@/components/community/types';
-import { GraduationCap, Brain, Users, School } from 'lucide-react';
 
 export default function SisoEducation() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -67,30 +66,6 @@ export default function SisoEducation() {
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
               />
-            </div>
-
-            {/* Education Features Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="p-6 rounded-lg bg-gradient-to-br from-siso-red/10 to-siso-orange/10 border border-siso-text/10">
-                <GraduationCap className="w-8 h-8 text-siso-red mb-3" />
-                <h3 className="text-lg font-semibold text-siso-text-bold mb-2">Expert Education</h3>
-                <p className="text-sm text-siso-text/80">Learn from industry professionals and AI experts</p>
-              </div>
-              <div className="p-6 rounded-lg bg-gradient-to-br from-siso-red/10 to-siso-orange/10 border border-siso-text/10">
-                <Brain className="w-8 h-8 text-siso-orange mb-3" />
-                <h3 className="text-lg font-semibold text-siso-text-bold mb-2">AI Mastery</h3>
-                <p className="text-sm text-siso-text/80">Master the latest AI tools and technologies</p>
-              </div>
-              <div className="p-6 rounded-lg bg-gradient-to-br from-siso-red/10 to-siso-orange/10 border border-siso-text/10">
-                <Users className="w-8 h-8 text-siso-red mb-3" />
-                <h3 className="text-lg font-semibold text-siso-text-bold mb-2">Community Learning</h3>
-                <p className="text-sm text-siso-text/80">Connect with fellow learners and educators</p>
-              </div>
-              <div className="p-6 rounded-lg bg-gradient-to-br from-siso-red/10 to-siso-orange/10 border border-siso-text/10">
-                <School className="w-8 h-8 text-siso-orange mb-3" />
-                <h3 className="text-lg font-semibold text-siso-text-bold mb-2">Structured Growth</h3>
-                <p className="text-sm text-siso-text/80">Follow our balanced learning approach</p>
-              </div>
             </div>
           </div>
 
