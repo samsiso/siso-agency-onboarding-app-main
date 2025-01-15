@@ -6,6 +6,7 @@ import { CommunitySearch } from '@/components/community/CommunitySearch';
 import { CommunityMemberCard } from '@/components/community/CommunityMemberCard';
 import { CommunityMemberDetails } from '@/components/community/CommunityMemberDetails';
 import { CommunityMember } from '@/components/community/types';
+import { GraduationCap, Brain, Users, School } from 'lucide-react';
 
 export default function SisoEducation() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -49,27 +50,57 @@ export default function SisoEducation() {
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
       <Sidebar />
-      <div className="flex-1 p-8">
+      <div className="flex-1 p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col space-y-4 mb-8">
+          {/* Header Section */}
+          <div className="flex flex-col space-y-6 mb-8">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
-                SISO Education Hub
-              </h1>
+              <div className="text-center md:text-left">
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text mb-2">
+                  SISO Education Hub
+                </h1>
+                <p className="text-siso-text/80 max-w-2xl">
+                  Your gateway to quality AI education and expert insights
+                </p>
+              </div>
               <CommunitySearch 
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
               />
             </div>
-            <p className="text-siso-text/80">
-              Discover quality AI education resources and connect with expert educators in our community.
-            </p>
+
+            {/* Education Features Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="p-6 rounded-lg bg-gradient-to-br from-siso-red/10 to-siso-orange/10 border border-siso-text/10">
+                <GraduationCap className="w-8 h-8 text-siso-red mb-3" />
+                <h3 className="text-lg font-semibold text-siso-text-bold mb-2">Expert Education</h3>
+                <p className="text-sm text-siso-text/80">Learn from industry professionals and AI experts</p>
+              </div>
+              <div className="p-6 rounded-lg bg-gradient-to-br from-siso-red/10 to-siso-orange/10 border border-siso-text/10">
+                <Brain className="w-8 h-8 text-siso-orange mb-3" />
+                <h3 className="text-lg font-semibold text-siso-text-bold mb-2">AI Mastery</h3>
+                <p className="text-sm text-siso-text/80">Master the latest AI tools and technologies</p>
+              </div>
+              <div className="p-6 rounded-lg bg-gradient-to-br from-siso-red/10 to-siso-orange/10 border border-siso-text/10">
+                <Users className="w-8 h-8 text-siso-red mb-3" />
+                <h3 className="text-lg font-semibold text-siso-text-bold mb-2">Community Learning</h3>
+                <p className="text-sm text-siso-text/80">Connect with fellow learners and educators</p>
+              </div>
+              <div className="p-6 rounded-lg bg-gradient-to-br from-siso-red/10 to-siso-orange/10 border border-siso-text/10">
+                <School className="w-8 h-8 text-siso-orange mb-3" />
+                <h3 className="text-lg font-semibold text-siso-text-bold mb-2">Structured Growth</h3>
+                <p className="text-sm text-siso-text/80">Follow our balanced learning approach</p>
+              </div>
+            </div>
           </div>
 
+          {/* Members Grid */}
           {isLoading ? (
-            <div className="text-siso-text">Loading...</div>
+            <div className="flex items-center justify-center min-h-[200px]">
+              <div className="text-siso-text">Loading educational resources...</div>
+            </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {filteredMembers?.map((member) => (
                 <CommunityMemberCard
                   key={member.id}
