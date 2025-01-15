@@ -32,10 +32,10 @@ export const Hero = () => {
   return (
     <div className="relative mb-12">
       <div className="absolute inset-0 bg-gradient-to-br from-siso-bg via-siso-bg/95 to-siso-bg/90" />
-      <div className="relative max-w-4xl mx-auto px-6 py-16 sm:py-24">
+      <div className="relative max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-16 md:py-24">
         <div className="text-center">
           <div className="relative inline-block">
-            <h1 className="text-4xl sm:text-6xl font-bold text-siso-text-bold mb-6 leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-siso-text-bold mb-4 sm:mb-6 leading-tight">
               {userName ? (
                 <>
                   Welcome back,{' '}
@@ -46,7 +46,7 @@ export const Hero = () => {
               ) : (
                 <>
                   Welcome to{' '}
-                  <div className="relative mt-2 p-4 rounded-lg bg-black/50">
+                  <div className="relative mt-2 p-2 sm:p-4 rounded-lg bg-black/50">
                     <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-siso-orange to-siso-red opacity-10" />
                     <div className="relative bg-gradient-to-r from-siso-orange to-siso-red text-transparent bg-clip-text">
                       SISO Agency Resources
@@ -57,14 +57,14 @@ export const Hero = () => {
               )}
             </h1>
           </div>
-          <p className="text-xl text-siso-text mb-12 max-w-2xl mx-auto opacity-90">
+          <p className="text-lg sm:text-xl text-siso-text mb-8 sm:mb-12 max-w-2xl mx-auto opacity-90 px-4">
             Discover the tools to build your own vision. Your gateway to innovation and success.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center px-4">
             <AuthButton />
             <Button 
               variant="outline" 
-              className="min-w-[150px] border border-siso-text/20 text-siso-text-bold hover:bg-gradient-to-r from-siso-red/10 to-siso-orange/10 hover:border-siso-text/40 transition-all duration-300"
+              className="w-full sm:w-auto min-w-[150px] border border-siso-text/20 text-siso-text-bold hover:bg-gradient-to-r from-siso-red/10 to-siso-orange/10 hover:border-siso-text/40 transition-all duration-300"
             >
               Learn More
             </Button>
