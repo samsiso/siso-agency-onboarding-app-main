@@ -53,8 +53,21 @@ export const Sidebar = () => {
       {/* Logo Section */}
       <div className="p-4 border-b border-siso-text/10">
         <div className="flex items-center justify-between">
-          {!collapsed && (
-            <span className="text-xl font-bold text-siso-text-bold">SISO</span>
+          {!collapsed ? (
+            <div className="flex items-center gap-2">
+              <img 
+                src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png" 
+                alt="Siso Logo" 
+                className="w-8 h-8"
+              />
+              <span className="text-xl font-bold text-siso-text-bold">SISO</span>
+            </div>
+          ) : (
+            <img 
+              src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png" 
+              alt="Siso Logo" 
+              className="w-8 h-8"
+            />
           )}
           <button
             onClick={() => setCollapsed(!collapsed)}
