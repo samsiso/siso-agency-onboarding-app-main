@@ -13,14 +13,14 @@ const menuItems = [
     href: '/tools',
   },
   {
+    title: 'The AI Community',
+    icon: Users,
+    href: '/community',
+  },
+  {
     title: 'SISO Automations',
     icon: Download,
     href: '#automations',
-  },
-  {
-    title: 'The AI Community',
-    icon: Users,
-    href: '#community',
   },
   {
     title: 'ChatGPT Assistants',
