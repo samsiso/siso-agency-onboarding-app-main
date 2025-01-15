@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { Sidebar } from '@/components/Sidebar';
 import { CommunitySearch } from '@/components/community/CommunitySearch';
@@ -7,31 +8,42 @@ import { CommunityMemberCard } from '@/components/community/CommunityMemberCard'
 import { CommunityMemberDetails } from '@/components/community/CommunityMemberDetails';
 import { CommunityMember } from '@/components/community/types';
 
+const categories = [
+  { id: 'all', label: 'All' },
+  { id: 'networking-featured', label: 'Featured' },
+  { id: 'networking-school', label: 'School' },
+  { id: 'networking-discord', label: 'Discord' },
+  { id: 'networking-general', label: 'General' },
+];
+
 export default function Networking() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedMember, setSelectedMember] = useState<CommunityMember | null>(null);
 
-  const { data: members, isLoading, error } = useQuery({
-    queryKey: ['networking-members'],
+  const { data: members, isLoading } = useQuery({
+    queryKey: ['networking-members', selectedCategory],
     queryFn: async () => {
       console.log('Fetching networking members...');
-      const { data, error } = await supabase
+      let query = supabase
         .from('tools')
-        .select('*')
-        .eq('category', 'networking');
+        .select('*');
+      
+      if (selectedCategory !== 'all') {
+        query = query.eq('category', selectedCategory);
+      } else {
+        query = query.like('category', 'networking-%');
+      }
+
+      const { data, error } = await query;
       
       if (error) {
         console.error('Error fetching networking members:', error);
         throw error;
       }
       
-      const transformedData = data.map(member => ({
-        ...member,
-        youtube_videos: member.youtube_videos as { title: string; url: string; }[] | null
-      }));
-      
-      console.log('Fetched networking members:', transformedData);
-      return transformedData as CommunityMember[];
+      console.log('Fetched networking members:', data);
+      return data as CommunityMember[];
     },
   });
 
@@ -40,11 +52,6 @@ export default function Networking() {
     member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     member.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  if (error) {
-    console.error('Error in component:', error);
-    return <div className="text-red-500">Error loading networking members. Please try again later.</div>;
-  }
 
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
@@ -62,23 +69,42 @@ export default function Networking() {
               />
             </div>
             <p className="text-siso-text/80">
-              Connect with AI professionals and expand your network in the SISO community.
+              Connect with the best communities and expand your network in the SISO ecosystem.
             </p>
           </div>
 
-          {isLoading ? (
-            <div className="text-siso-text">Loading...</div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {filteredMembers?.map((member) => (
-                <CommunityMemberCard
-                  key={member.id}
-                  member={member}
-                  onClick={setSelectedMember}
-                />
+          <Tabs defaultValue="all" className="w-full">
+            <TabsList className="flex flex-wrap gap-2 h-auto bg-transparent">
+              {categories.map((category) => (
+                <TabsTrigger
+                  key={category.id}
+                  value={category.id}
+                  onClick={() => setSelectedCategory(category.id)}
+                  className="bg-siso-text/10 data-[state=active]:bg-siso-red/20 text-siso-text"
+                >
+                  {category.label}
+                </TabsTrigger>
               ))}
-            </div>
-          )}
+            </TabsList>
+
+            {categories.map((category) => (
+              <TabsContent key={category.id} value={category.id}>
+                {isLoading ? (
+                  <div className="text-siso-text">Loading...</div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {filteredMembers?.map((member) => (
+                      <CommunityMemberCard
+                        key={member.id}
+                        member={member}
+                        onClick={setSelectedMember}
+                      />
+                    ))}
+                  </div>
+                )}
+              </TabsContent>
+            ))}
+          </Tabs>
 
           <CommunityMemberDetails
             member={selectedMember}
