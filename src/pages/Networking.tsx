@@ -29,11 +29,27 @@ export default function Networking() {
       const { data, error } = await query;
       if (error) throw error;
 
-      return data as CommunityMember[];
+      return data.map(item => ({
+        id: item.id,
+        name: item.name,
+        description: item.description,
+        member_type: item.member_type,
+        youtube_url: item.youtube_url,
+        youtube_videos: Array.isArray(item.youtube_videos) 
+          ? item.youtube_videos.map((video: any) => ({
+              title: video.title || '',
+              url: video.url || ''
+            }))
+          : null,
+        website_url: item.website_url,
+        specialization: item.specialization,
+        content_themes: item.content_themes,
+        profile_image_url: item.profile_image_url
+      })) as CommunityMember[];
     },
   });
 
-  // Calculate category counts based on the category field from the database
+  // Calculate category counts based on the member_type field
   const categoryCounts = {
     all: members?.length || 0,
     featured: members?.filter(m => m.member_type === 'featured').length || 0,
