@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Sidebar } from '@/components/Sidebar';
+import { Button } from '@/components/ui/button';
 
 interface Tool {
   id: string;
@@ -18,6 +19,7 @@ interface Tool {
 
 export default function Tools() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const { data: tools, isLoading } = useQuery({
     queryKey: ['tools'],
@@ -31,11 +33,17 @@ export default function Tools() {
     },
   });
 
+  const categories = ['All', 'Featured', 'Automation', 'Database', 'Development', 'Sales'];
+
   const filteredTools = tools?.filter(tool => {
     const matchesSearch = !searchQuery || 
       tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       tool.description?.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesSearch;
+    
+    const matchesCategory = !selectedCategory || selectedCategory === 'All' || 
+      tool.category === selectedCategory;
+
+    return matchesSearch && matchesCategory;
   });
 
   return (
@@ -43,16 +51,34 @@ export default function Tools() {
       <Sidebar />
       <div className="flex-1 p-8">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-            <h1 className="text-4xl font-bold text-siso-text-bold">Core Tools & Platforms</h1>
-            <div className="relative w-full md:w-96">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-siso-text/60" />
-              <Input
-                placeholder="Search tools..."
-                className="pl-10 bg-siso-text/5 border-siso-text/10 focus-visible:ring-siso-orange"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+          <div className="flex flex-col space-y-4 mb-8">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+              <h1 className="text-4xl font-bold text-siso-text-bold">Core Tools & Platforms</h1>
+              <div className="relative w-full md:w-96">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-siso-text/60" />
+                <Input
+                  placeholder="Search tools..."
+                  className="pl-10 bg-siso-text/5 border-siso-text/10 focus-visible:ring-siso-orange"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {categories.map((category) => (
+                <Button
+                  key={category}
+                  variant="outline"
+                  className={`${
+                    selectedCategory === category || (category === 'All' && !selectedCategory)
+                      ? 'bg-siso-orange text-white hover:bg-siso-orange/90'
+                      : 'bg-siso-text/5 hover:bg-siso-text/10'
+                  } text-sm`}
+                  onClick={() => setSelectedCategory(category === 'All' ? null : category)}
+                >
+                  {category}
+                </Button>
+              ))}
             </div>
           </div>
 
