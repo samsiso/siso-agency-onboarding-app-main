@@ -25,7 +25,15 @@ export default function ToolPage() {
         throw error;
       }
       
-      return data as Tool;
+      // Transform the youtube_videos to match the Tool interface
+      const transformedData = {
+        ...data,
+        youtube_videos: data.youtube_videos ? 
+          (data.youtube_videos as { title: string; url: string; }[]) : 
+          null
+      };
+      
+      return transformedData as Tool;
     },
   });
 

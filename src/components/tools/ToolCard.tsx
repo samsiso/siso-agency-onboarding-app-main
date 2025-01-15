@@ -5,16 +5,25 @@ import { Tool } from './types';
 
 interface ToolCardProps {
   tool: Tool;
+  onClick?: () => void;
 }
 
-export function ToolCard({ tool }: ToolCardProps) {
+export function ToolCard({ tool, onClick }: ToolCardProps) {
   const navigate = useNavigate();
+
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    } else {
+      navigate(`/tools/${tool.id}`);
+    }
+  };
 
   if (tool.member_type) {
     return (
       <Card 
         className="group bg-card/50 backdrop-blur border-siso-text/10 hover:border-siso-orange/50 transition-all duration-300 cursor-pointer"
-        onClick={() => navigate(`/tools/${tool.id}`)}
+        onClick={handleClick}
       >
         <CardContent className="p-3">
           <div className="flex items-center gap-3">
@@ -59,7 +68,7 @@ export function ToolCard({ tool }: ToolCardProps) {
   return (
     <Card 
       className="group bg-card/50 backdrop-blur border-siso-text/10 hover:border-siso-orange/50 transition-all duration-300 cursor-pointer"
-      onClick={() => navigate(`/tools/${tool.id}`)}
+      onClick={handleClick}
     >
       <CardContent className="p-3">
         <div className="flex items-center gap-2">

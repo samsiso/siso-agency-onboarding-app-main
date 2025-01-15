@@ -10,10 +10,7 @@ export interface Tool {
   likes_count: number | null;
   member_type: string | null;
   youtube_url: string | null;
-  youtube_videos: {
-    title: string;
-    url: string;
-  }[] | null;
+  youtube_videos: { title: string; url: string; }[] | null;
   website_url: string | null;
   specialization: string[] | null;
   content_themes: string[] | null;
