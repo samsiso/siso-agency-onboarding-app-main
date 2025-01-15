@@ -26,15 +26,20 @@ serve(async (req) => {
     const apiKey = Deno.env.get('OPENAI_API_KEY');
     if (!apiKey) {
       console.error('OpenAI API key is missing');
-      throw new Error('OpenAI API key is missing');
+      return new Response(
+        JSON.stringify({ error: 'OpenAI API key is missing' }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
     }
 
-    // Initialize OpenAI client with v2 header
+    // Initialize OpenAI client
     const openai = new OpenAI({
       apiKey,
-      defaultHeaders: {
-        'OpenAI-Beta': 'assistants=v2'  // Required header for v2 API
-      }
+      defaultQuery: { 'OpenAI-Beta': 'assistants=v2' },
+      defaultHeaders: { 'OpenAI-Beta': 'assistants=v2' }
     });
 
     try {
