@@ -29,33 +29,17 @@ export default function Networking() {
       const { data, error } = await query;
       if (error) throw error;
 
-      return data.map(item => ({
-        id: item.id,
-        name: item.name,
-        description: item.description,
-        member_type: item.member_type,
-        youtube_url: item.youtube_url,
-        youtube_videos: Array.isArray(item.youtube_videos) 
-          ? item.youtube_videos.map((video: any) => ({
-              title: video.title || '',
-              url: video.url || ''
-            }))
-          : null,
-        website_url: item.website_url,
-        specialization: item.specialization,
-        content_themes: item.content_themes,
-        profile_image_url: item.profile_image_url
-      }));
+      return data as CommunityMember[];
     },
   });
 
-  // Calculate category counts
+  // Calculate category counts based on the category field from the database
   const categoryCounts = {
     all: members?.length || 0,
-    featured: members?.filter(m => m.rating >= 4.5).length || 0,
-    school: members?.filter(m => m.category === 'networking-school').length || 0,
-    discord: members?.filter(m => m.category === 'networking-discord').length || 0,
-    general: members?.filter(m => m.category === 'networking-general').length || 0,
+    featured: members?.filter(m => m.member_type === 'featured').length || 0,
+    school: members?.filter(m => m.member_type === 'school').length || 0,
+    discord: members?.filter(m => m.member_type === 'discord').length || 0,
+    general: members?.filter(m => m.member_type === 'general').length || 0,
   };
 
   const filteredMembers = members?.filter(member => 
