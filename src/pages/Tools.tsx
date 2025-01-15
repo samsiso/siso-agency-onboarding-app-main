@@ -64,7 +64,7 @@ export default function Tools() {
       <div className="flex-1 p-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <h1 className="text-4xl font-bold text-siso-text-bold">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
               Core Tools & Platforms
             </h1>
             <div className="relative w-full md:w-96">
