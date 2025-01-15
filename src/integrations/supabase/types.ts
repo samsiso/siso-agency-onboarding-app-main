@@ -52,6 +52,7 @@ export type Database = {
           profile_image_url: string | null
           prompt_template: string | null
           rating: number | null
+          resource_type: string
           response_format: string | null
           reviews_count: number | null
           specialization: string[] | null
@@ -79,6 +80,7 @@ export type Database = {
           profile_image_url?: string | null
           prompt_template?: string | null
           rating?: number | null
+          resource_type: string
           response_format?: string | null
           reviews_count?: number | null
           specialization?: string[] | null
@@ -106,6 +108,7 @@ export type Database = {
           profile_image_url?: string | null
           prompt_template?: string | null
           rating?: number | null
+          resource_type?: string
           response_format?: string | null
           reviews_count?: number | null
           specialization?: string[] | null
