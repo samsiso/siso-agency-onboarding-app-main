@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronRight, Twitter, Linkedin, Instagram, Youtube, ArrowLeft } from 'lucide-react';
+import { ChevronDown, ChevronRight, Link, Users, ShoppingBag, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface SidebarLogoProps {
@@ -10,44 +10,24 @@ interface SidebarLogoProps {
 export const SidebarLogo = ({ collapsed, setCollapsed }: SidebarLogoProps) => {
   const [showAlternateMenu, setShowAlternateMenu] = useState(false);
 
-  const socialLinks = [
+  const businessLinks = [
     {
-      name: 'LinkedIn',
-      icon: <Linkedin className="w-5 h-5" />,
-      url: 'https://www.linkedin.com/company/siso-agency/',
+      name: 'SISO LinkedIn Sales Team',
+      description: 'Automate and earn from LinkedIn B2B deal closing',
+      icon: <Link className="w-5 h-5" />,
+      url: 'https://sisosaas.framer.website/',
     },
     {
-      name: 'Instagram',
-      icon: <Instagram className="w-5 h-5" />,
-      url: 'https://www.instagram.com/siso.agency/',
+      name: 'SISO Sales Partners',
+      description: 'Join our partner program and earn from deal flow',
+      icon: <Users className="w-5 h-5" />,
+      url: 'https://siso-sales-team.framer.website/',
     },
     {
-      name: 'Twitter',
-      icon: <Twitter className="w-5 h-5" />,
-      url: 'https://x.com/AIInnovatorshub',
-    },
-    {
-      name: 'YouTube',
-      icon: <Youtube className="w-5 h-5" />,
-      url: 'https://www.youtube.com/@SISOAGENCY/',
-    },
-  ];
-
-  const landingPages = [
-    {
-      name: 'Resources Hub',
-      description: 'Explore tools, automations, and insights',
-      url: '#',
-    },
-    {
-      name: 'Affiliate Hub',
-      description: 'Join our affiliate program',
-      url: '#',
-    },
-    {
-      name: 'YouTube Channel',
-      description: 'Watch our latest content',
-      url: 'https://www.youtube.com/@SISOAGENCY/',
+      name: 'SISO Apparel',
+      description: 'Exclusive clothing brand for business leaders',
+      icon: <ShoppingBag className="w-5 h-5" />,
+      url: 'https://sisoapparel.framer.website/',
     },
   ];
 
@@ -78,50 +58,33 @@ export const SidebarLogo = ({ collapsed, setCollapsed }: SidebarLogoProps) => {
           <div className="space-y-6">
             {/* Welcome Message */}
             <div className="text-sm text-siso-text">
-              <p className="font-medium mb-2">👋 Hi, We're SISO AGENCY</p>
+              <p className="font-medium mb-2">👋 Welcome to SISO AGENCY</p>
               <p className="text-siso-text/70">
-                Stay tuned for more powerful automation tools and follow us to keep up with our latest innovations!
+                Discover our suite of powerful tools and exclusive offerings for business growth
               </p>
             </div>
 
-            {/* Social Media Links */}
-            <div className="grid grid-cols-4 gap-2">
-              {socialLinks.map((link) => (
-                <Button
-                  key={link.name}
-                  variant="ghost"
-                  size="icon"
-                  className="hover:bg-siso-text/5 group"
-                  asChild
-                >
-                  <a
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    title={link.name}
-                  >
-                    {link.icon}
-                  </a>
-                </Button>
-              ))}
-            </div>
-
-            {/* Landing Pages */}
+            {/* Business Links */}
             <div className="space-y-2">
-              {landingPages.map((page) => (
+              {businessLinks.map((link) => (
                 <a
-                  key={page.name}
-                  href={page.url}
+                  key={link.name}
+                  href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block p-3 rounded-lg hover:bg-siso-text/5 transition-colors group"
+                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-gradient-to-r from-siso-red/10 to-siso-orange/10 transition-all duration-300 group cursor-pointer"
                 >
-                  <h3 className="text-sm font-medium text-siso-text group-hover:text-siso-text-bold">
-                    {page.name}
-                  </h3>
-                  <p className="text-xs text-siso-text/70 mt-1">
-                    {page.description}
-                  </p>
+                  <div className="p-2 rounded-lg bg-gradient-to-r from-siso-red/10 to-siso-orange/10 group-hover:from-siso-red/20 group-hover:to-siso-orange/20 transition-colors">
+                    {link.icon}
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-siso-text group-hover:text-siso-text-bold">
+                      {link.name}
+                    </h3>
+                    <p className="text-xs text-siso-text/70 mt-1">
+                      {link.description}
+                    </p>
+                  </div>
                 </a>
               ))}
             </div>
