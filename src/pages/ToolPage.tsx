@@ -8,16 +8,16 @@ import { Button } from "@/components/ui/button";
 import { Sidebar } from '@/components/Sidebar';
 
 export default function ToolPage() {
-  const { id } = useParams();
+  const { slug } = useParams();
 
   const { data: tool, isLoading, error } = useQuery({
-    queryKey: ['tool', id],
+    queryKey: ['tool', slug],
     queryFn: async () => {
-      console.log('Fetching tool with id:', id);
+      console.log('Fetching tool with slug:', slug);
       const { data, error } = await supabase
         .from('tools')
         .select('*')
-        .eq('id', id)
+        .eq('id', slug)
         .maybeSingle();
       
       if (error) {
@@ -29,15 +29,7 @@ export default function ToolPage() {
         throw new Error('Tool not found');
       }
       
-      // Transform the youtube_videos to match the Tool interface
-      const transformedData = {
-        ...data,
-        youtube_videos: data.youtube_videos ? 
-          (data.youtube_videos as { title: string; url: string; }[]) : 
-          null
-      };
-      
-      return transformedData as Tool;
+      return data as Tool;
     },
   });
 
@@ -259,6 +251,28 @@ export default function ToolPage() {
                       {theme}
                     </span>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* Additional Information Section */}
+            {tool.description && (
+              <div className="space-y-6 mt-8">
+                <h2 className="text-2xl font-semibold text-siso-text-bold">About {tool.name}</h2>
+                <div className="prose prose-invert max-w-none">
+                  <p className="text-lg leading-relaxed">
+                    {tool.description}
+                  </p>
+                  {tool.use_cases && tool.use_cases.length > 0 && (
+                    <>
+                      <h3 className="text-xl font-semibold mt-6 mb-4">Key Use Cases</h3>
+                      <ul className="list-disc pl-6 space-y-2">
+                        {tool.use_cases.map((useCase, index) => (
+                          <li key={index} className="text-siso-text">{useCase}</li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
                 </div>
               </div>
             )}

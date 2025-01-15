@@ -16,7 +16,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/tools" element={<Tools />} />
-        <Route path="/tools/:id" element={<ToolPage />} />
+        <Route path="/tools/:slug" element={<ToolPage />} />
         <Route path="/education" element={<Education />} />
         <Route path="/automations" element={<Automations />} />
         <Route path="/assistants" element={<ChatGPTAssistants />} />
