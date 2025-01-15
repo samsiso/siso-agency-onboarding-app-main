@@ -4,8 +4,6 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from "@/components/ui/input";
 import { Sidebar } from '@/components/Sidebar';
-import { Button } from '@/components/ui/button';
-import { Sheet } from "@/components/ui/sheet";
 import { CategoryFilters } from '@/components/assistants/CategoryFilters';
 import { ToolCard } from '@/components/tools/ToolCard';
 import { ToolDetail } from '@/components/tools/ToolDetail';
@@ -22,7 +20,10 @@ export default function Tools() {
       console.log('Fetching tools...');
       const { data, error } = await supabase
         .from('tools')
-        .select('*');
+        .select('*')
+        // Exclude items that belong in other sections
+        .not('category', 'in', '("Community", "Automation", "Assistant")')
+        .is('member_type', null); // Exclude community members
       
       if (error) {
         console.error('Error fetching tools:', error);
@@ -39,7 +40,7 @@ export default function Tools() {
     },
   });
 
-  const categories = ['All', 'Featured', 'Automation', 'Database', 'Development', 'Sales', 'Community'];
+  const categories = ['All', 'Featured', 'Database', 'Development', 'Sales']; // Removed categories that have their own pages
 
   const filteredTools = tools?.filter(tool => {
     const matchesSearch = !searchQuery || 
@@ -47,7 +48,7 @@ export default function Tools() {
       tool.description?.toLowerCase().includes(searchQuery.toLowerCase());
     
     const matchesCategory = !selectedCategory || selectedCategory === 'All' || 
-      (selectedCategory === 'Community' ? tool.member_type !== null : tool.category === selectedCategory);
+      tool.category === selectedCategory;
 
     return matchesSearch && matchesCategory;
   });
@@ -64,12 +65,12 @@ export default function Tools() {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <h1 className="text-4xl font-bold text-siso-text-bold">
-              {selectedCategory === 'Community' ? 'AI Community Members' : 'Core Tools & Platforms'}
+              Core Tools & Platforms
             </h1>
             <div className="relative w-full md:w-96">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-siso-text/60" />
               <Input
-                placeholder={selectedCategory === 'Community' ? "Search members..." : "Search tools..."}
+                placeholder="Search tools..."
                 className="pl-10 bg-siso-text/5 border-siso-text/10 focus-visible:ring-siso-orange"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -97,14 +98,12 @@ export default function Tools() {
             </div>
           )}
 
-          <Sheet open={!!selectedTool} onOpenChange={() => setSelectedTool(null)}>
-            {selectedTool && (
-              <ToolDetail
-                tool={selectedTool}
-                onClose={() => setSelectedTool(null)}
-              />
-            )}
-          </Sheet>
+          {selectedTool && (
+            <ToolDetail
+              tool={selectedTool}
+              onClose={() => setSelectedTool(null)}
+            />
+          )}
         </div>
       </div>
     </div>
