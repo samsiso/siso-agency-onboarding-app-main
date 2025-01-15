@@ -24,7 +24,7 @@ interface Automation {
   input_variables: string[] | null;
 }
 
-type AutomationCategory = 'all' | 'featured' | 'automa' | 'n8n' | 'make';
+type AutomationCategory = 'all' | 'featured' | 'linkedin' | 'instagram' | 'x' | 'reddit' | 'youtube' | 'tiktok' | 'general';
 
 export default function Automations() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -88,21 +88,33 @@ export default function Automations() {
             </div>
 
             <Tabs defaultValue="all" className="w-full" onValueChange={(value) => setSelectedCategory(value as AutomationCategory)}>
-              <TabsList className="w-full justify-start bg-siso-text/5 border border-siso-text/10">
+              <TabsList className="w-full justify-start bg-siso-text/5 border border-siso-text/10 flex-wrap">
                 <TabsTrigger value="all" className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange">
                   All
                 </TabsTrigger>
                 <TabsTrigger value="featured" className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange">
                   Featured
                 </TabsTrigger>
-                <TabsTrigger value="automa" className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange">
-                  Automa
+                <TabsTrigger value="linkedin" className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange">
+                  LinkedIn
                 </TabsTrigger>
-                <TabsTrigger value="n8n" className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange">
-                  n8n
+                <TabsTrigger value="instagram" className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange">
+                  Instagram
                 </TabsTrigger>
-                <TabsTrigger value="make" className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange">
-                  Make.com
+                <TabsTrigger value="x" className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange">
+                  X
+                </TabsTrigger>
+                <TabsTrigger value="reddit" className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange">
+                  Reddit
+                </TabsTrigger>
+                <TabsTrigger value="youtube" className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange">
+                  YouTube
+                </TabsTrigger>
+                <TabsTrigger value="tiktok" className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange">
+                  TikTok
+                </TabsTrigger>
+                <TabsTrigger value="general" className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange">
+                  General
                 </TabsTrigger>
               </TabsList>
             </Tabs>
