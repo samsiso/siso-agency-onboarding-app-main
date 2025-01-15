@@ -2,11 +2,11 @@ import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Sidebar } from '@/components/Sidebar';
-import { Bot, ExternalLink, Heart, Search, Star, X } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { AssistantCard } from '@/components/assistants/AssistantCard';
+import { AssistantDetails } from '@/components/assistants/AssistantDetails';
+import { CategoryFilters } from '@/components/assistants/CategoryFilters';
 
 interface Assistant {
   id: string;
@@ -89,22 +89,11 @@ export default function ChatGPTAssistants() {
                 />
               </div>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <Button
-                  key={category}
-                  variant="outline"
-                  className={`${
-                    selectedCategory === category || (category === 'All' && !selectedCategory)
-                      ? 'bg-siso-orange text-white hover:bg-siso-orange/90'
-                      : 'bg-siso-text/5 hover:bg-siso-text/10'
-                  } text-sm`}
-                  onClick={() => setSelectedCategory(category === 'All' ? null : category)}
-                >
-                  {category}
-                </Button>
-              ))}
-            </div>
+            <CategoryFilters
+              categories={categories}
+              selectedCategory={selectedCategory}
+              onCategorySelect={setSelectedCategory}
+            />
           </div>
 
           {isLoading ? (
@@ -112,150 +101,19 @@ export default function ChatGPTAssistants() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {filteredAssistants?.map((assistant) => (
-                <Card 
-                  key={assistant.id} 
-                  className="group bg-card/50 backdrop-blur border-siso-text/10 hover:border-siso-orange/50 transition-all duration-300 cursor-pointer"
-                  onClick={() => setSelectedAssistant(assistant)}
-                >
-                  <CardContent className="p-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-siso-red/20 to-siso-orange/20 flex items-center justify-center">
-                        <Bot className="w-4 h-4 text-siso-orange" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-semibold text-siso-text-bold truncate">{assistant.name}</h3>
-                        <p className="text-xs text-siso-text/80">{assistant.assistant_type || 'AI Assistant'}</p>
-                      </div>
-                    </div>
-                    {assistant.description && (
-                      <p className="mt-2 text-xs text-siso-text line-clamp-2">
-                        {assistant.description}
-                      </p>
-                    )}
-                    <div className="flex gap-2 mt-2">
-                      <div className="flex items-center gap-1">
-                        <Star className="w-3 h-3 text-siso-orange" />
-                        <span className="text-xs text-siso-text">
-                          {assistant.rating?.toFixed(1) || '-'}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Heart className="w-3 h-3 text-siso-red" />
-                        <span className="text-xs text-siso-text">{assistant.likes_count || '0'}</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                <AssistantCard
+                  key={assistant.id}
+                  assistant={assistant}
+                  onClick={setSelectedAssistant}
+                />
               ))}
             </div>
           )}
 
-          <Sheet open={!!selectedAssistant} onOpenChange={() => setSelectedAssistant(null)}>
-            <SheetContent className="bg-siso-bg border-l border-siso-text/10 w-full sm:max-w-xl">
-              {selectedAssistant && (
-                <>
-                  <SheetHeader className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-siso-red/20 to-siso-orange/20 flex items-center justify-center">
-                          <Bot className="w-6 h-6 text-siso-orange" />
-                        </div>
-                        <div>
-                          <SheetTitle className="text-2xl font-bold text-siso-text-bold">
-                            {selectedAssistant.name}
-                          </SheetTitle>
-                          <p className="text-sm text-siso-text/80">
-                            {selectedAssistant.assistant_type || 'AI Assistant'}
-                          </p>
-                        </div>
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="rounded-full"
-                        onClick={() => setSelectedAssistant(null)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <SheetDescription className="text-siso-text">
-                      {selectedAssistant.description}
-                    </SheetDescription>
-                  </SheetHeader>
-
-                  <div className="mt-6 space-y-6">
-                    {selectedAssistant.prompt_template && (
-                      <div className="space-y-2">
-                        <h3 className="text-lg font-semibold text-siso-text-bold">Prompt Template</h3>
-                        <pre className="p-4 rounded-lg bg-siso-text/5 text-sm text-siso-text overflow-x-auto">
-                          {selectedAssistant.prompt_template}
-                        </pre>
-                      </div>
-                    )}
-
-                    {selectedAssistant.use_cases && selectedAssistant.use_cases.length > 0 && (
-                      <div className="space-y-2">
-                        <h3 className="text-lg font-semibold text-siso-text-bold">Use Cases</h3>
-                        <div className="flex flex-wrap gap-2">
-                          {selectedAssistant.use_cases.map((useCase, index) => (
-                            <span 
-                              key={index}
-                              className="text-sm px-3 py-1 rounded-full bg-siso-text/10 text-siso-text"
-                            >
-                              {useCase}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {selectedAssistant.input_variables && selectedAssistant.input_variables.length > 0 && (
-                      <div className="space-y-2">
-                        <h3 className="text-lg font-semibold text-siso-text-bold">Input Variables</h3>
-                        <div className="flex flex-wrap gap-2">
-                          {selectedAssistant.input_variables.map((variable, index) => (
-                            <span 
-                              key={index}
-                              className="text-sm px-3 py-1 rounded-full bg-siso-orange/10 text-siso-orange"
-                            >
-                              {variable}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="space-y-2">
-                      <h3 className="text-lg font-semibold text-siso-text-bold">Technical Details</h3>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="p-3 rounded-lg bg-siso-text/5">
-                          <div className="text-sm font-medium text-siso-text-bold">Model</div>
-                          <div className="text-sm text-siso-text">{selectedAssistant.model_type || '-'}</div>
-                        </div>
-                        <div className="p-3 rounded-lg bg-siso-text/5">
-                          <div className="text-sm font-medium text-siso-text-bold">Response Format</div>
-                          <div className="text-sm text-siso-text">{selectedAssistant.response_format || '-'}</div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {selectedAssistant.website_url && (
-                      <div className="space-y-2">
-                        <h3 className="text-lg font-semibold text-siso-text-bold">Quick Actions</h3>
-                        <Button
-                          className="w-full justify-start gap-2"
-                          onClick={() => window.open(selectedAssistant.website_url!, '_blank')}
-                        >
-                          <ExternalLink className="h-4 w-4" />
-                          Try Assistant
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </>
-              )}
-            </SheetContent>
-          </Sheet>
+          <AssistantDetails
+            assistant={selectedAssistant}
+            onClose={() => setSelectedAssistant(null)}
+          />
         </div>
       </div>
     </div>
