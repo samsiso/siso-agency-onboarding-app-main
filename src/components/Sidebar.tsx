@@ -28,7 +28,7 @@ export const Sidebar = () => {
   };
 
   return (
-    <div className={`h-screen bg-gradient-to-b from-siso-bg to-siso-bg/95 border-r border-siso-text/10 transition-all duration-300 ${collapsed ? 'w-20' : 'w-64'}`}>
+    <div className="sticky top-0 h-screen bg-gradient-to-b from-siso-bg to-siso-bg/95 border-r border-siso-text/10 transition-all duration-300 ease-in-out flex flex-col" style={{ width: collapsed ? '5rem' : '16rem' }}>
       <SidebarLogo collapsed={collapsed} setCollapsed={setCollapsed} />
       <SidebarNavigation collapsed={collapsed} onItemClick={handleItemClick} />
       <SidebarFooter collapsed={collapsed} />
