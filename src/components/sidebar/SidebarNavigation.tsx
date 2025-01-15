@@ -25,7 +25,7 @@ const menuItems = [
   {
     title: 'ChatGPT Assistants',
     icon: Bot,
-    href: '#assistants',
+    href: '/assistants',
   },
   {
     title: 'Additional Resources',
