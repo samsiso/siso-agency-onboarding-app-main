@@ -130,12 +130,12 @@ export default function ToolPage() {
                 </div>
               )}
 
+              <ToolTags tool={tool} />
+
               <ToolVideos 
                 tool={tool}
                 getYoutubeEmbedUrl={getYoutubeEmbedUrl}
               />
-
-              <ToolTags tool={tool} />
             </div>
 
             {/* Right Column - Actions & Stats */}
