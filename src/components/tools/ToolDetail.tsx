@@ -26,6 +26,13 @@ export function ToolDetail({ tool, onClose }: ToolDetailProps) {
     window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
   };
 
+  const getYoutubeEmbedUrl = (url: string) => {
+    const videoId = url.includes('watch?v=') 
+      ? url.split('watch?v=')[1].split('&')[0]
+      : url.split('/').pop();
+    return `https://www.youtube.com/embed/${videoId}`;
+  };
+
   return (
     <SheetContent className="bg-siso-bg border-l border-siso-text/10 w-full sm:max-w-xl overflow-y-auto">
       <SheetHeader className="space-y-4">
@@ -119,7 +126,8 @@ export function ToolDetail({ tool, onClose }: ToolDetailProps) {
             <div className="rounded-lg overflow-hidden bg-black/20 ring-1 ring-siso-text/10">
               <AspectRatio ratio={16 / 9}>
                 <iframe
-                  src={tool.youtube_url.replace('watch?v=', 'embed/')}
+                  src={getYoutubeEmbedUrl(tool.youtube_url)}
+                  title={`${tool.name} video`}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                   className="w-full h-full"
