@@ -15,20 +15,27 @@ interface Tool {
   pricing_type: string | null;
   rating: number | null;
   reviews_count: number | null;
+  downloads_count: number | null;
+  likes_count: number | null;
 }
 
 export default function Tools() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  const { data: tools, isLoading } = useQuery({
+  const { data: tools, isLoading, error } = useQuery({
     queryKey: ['tools'],
     queryFn: async () => {
+      console.log('Fetching tools...');
       const { data, error } = await supabase
         .from('tools')
         .select('*');
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching tools:', error);
+        throw error;
+      }
+      console.log('Fetched tools:', data);
       return data as Tool[];
     },
   });
@@ -45,6 +52,11 @@ export default function Tools() {
 
     return matchesSearch && matchesCategory;
   });
+
+  if (error) {
+    console.error('Error in component:', error);
+    return <div className="text-red-500">Error loading tools. Please try again later.</div>;
+  }
 
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
@@ -85,7 +97,7 @@ export default function Tools() {
           {isLoading ? (
             <div className="text-siso-text">Loading tools...</div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
               {filteredTools?.map((tool) => (
                 <Card key={tool.id} className="group bg-card/50 backdrop-blur border-siso-text/10 hover:border-siso-orange/50 transition-all duration-300">
                   <CardContent className="p-3">
@@ -106,11 +118,11 @@ export default function Tools() {
                     <div className="flex gap-2 mt-2">
                       <div className="flex items-center gap-1">
                         <Download className="w-3 h-3 text-siso-text/60" />
-                        <span className="text-xs text-siso-text">2.5k</span>
+                        <span className="text-xs text-siso-text">{tool.downloads_count || '0'}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Heart className="w-3 h-3 text-siso-red" />
-                        <span className="text-xs text-siso-text">1.2k</span>
+                        <span className="text-xs text-siso-text">{tool.likes_count || '0'}</span>
                       </div>
                       {tool.rating && (
                         <div className="flex items-center gap-1">
