@@ -28,8 +28,14 @@ export default function ToolPage() {
       if (!data) {
         throw new Error('Tool not found');
       }
+
+      // Transform the youtube_videos JSON data into the correct type
+      const transformedData: Tool = {
+        ...data,
+        youtube_videos: data.youtube_videos ? data.youtube_videos as { title: string; url: string; }[] : null
+      };
       
-      return data as Tool;
+      return transformedData;
     },
   });
 
