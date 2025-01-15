@@ -6,7 +6,7 @@ import { Search } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { AssistantCard } from '@/components/assistants/AssistantCard';
 import { AssistantDetails } from '@/components/assistants/AssistantDetails';
-import { CategoryFilters } from '@/components/assistants/CategoryFilters';
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Assistant {
   id: string;
@@ -27,9 +27,7 @@ interface Assistant {
 export default function ChatGPTAssistants() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedAssistant, setSelectedAssistant] = useState<Assistant | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-
-  const categories = ['All', 'Featured', 'Software', 'Coding', 'Actions'];
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   const { data: assistants, isLoading, error } = useQuery({
     queryKey: ['assistants'],
@@ -50,16 +48,21 @@ export default function ChatGPTAssistants() {
     },
   });
 
+  // Calculate category counts
+  const categoryCounts = assistants?.reduce((acc, assistant) => {
+    const type = assistant.assistant_type || 'uncategorized';
+    acc[type] = (acc[type] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
   const filteredAssistants = assistants?.filter(assistant => {
     const matchesSearch = !searchQuery || 
       assistant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       assistant.description?.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const matchesCategory = !selectedCategory || selectedCategory === 'All' || 
-      (selectedCategory === 'Software' && assistant.assistant_type === 'software') ||
-      (selectedCategory === 'Coding' && assistant.assistant_type === 'coding') ||
-      (selectedCategory === 'Actions' && assistant.assistant_type === 'actions') ||
-      (selectedCategory === 'Featured' && assistant.rating && assistant.rating >= 4.5);
+    const matchesCategory = selectedCategory === 'all' || 
+      (selectedCategory === 'featured' && assistant.rating && assistant.rating >= 4.5) ||
+      assistant.assistant_type === selectedCategory;
 
     return matchesSearch && matchesCategory;
   });
@@ -69,16 +72,23 @@ export default function ChatGPTAssistants() {
     return <div className="text-red-500">Error loading assistants. Please try again later.</div>;
   }
 
+  const categories = ['all', 'featured', 'software', 'coding', 'actions'];
+
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
       <Sidebar />
       <div className="flex-1 p-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col space-y-4 mb-8">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
               <h1 className="text-4xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
                 ChatGPT Assistants
               </h1>
+              <p className="mt-2 text-lg text-siso-text/80 leading-relaxed max-w-3xl">
+                Discover our curated collection of ChatGPT assistants that help streamline your workflow and boost productivity.
+              </p>
+            </div>
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <div className="relative w-full md:w-96">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-siso-text/60" />
                 <Input
@@ -89,15 +99,38 @@ export default function ChatGPTAssistants() {
                 />
               </div>
             </div>
-            <CategoryFilters
-              categories={categories}
-              selectedCategory={selectedCategory}
-              onCategorySelect={setSelectedCategory}
-            />
+
+            <Tabs defaultValue="all" className="w-full" onValueChange={setSelectedCategory}>
+              <TabsList className="w-full justify-start bg-siso-text/5 border border-siso-text/10 flex-wrap">
+                {categories.map((category) => (
+                  <TabsTrigger
+                    key={category}
+                    value={category}
+                    className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange"
+                  >
+                    {category.charAt(0).toUpperCase() + category.slice(1)}
+                    <span className="ml-2 text-sm text-siso-text/60">
+                      {category === 'all' 
+                        ? assistants?.length || 0 
+                        : category === 'featured'
+                          ? assistants?.filter(a => a.rating && a.rating >= 4.5).length || 0
+                          : categoryCounts?.[category] || 0}
+                    </span>
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
           </div>
 
           {isLoading ? (
-            <div className="text-siso-text">Loading...</div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {[...Array(8)].map((_, i) => (
+                <div 
+                  key={i}
+                  className="h-48 rounded-lg bg-siso-text/5 animate-pulse"
+                />
+              ))}
+            </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {filteredAssistants?.map((assistant) => (
