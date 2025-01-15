@@ -25,15 +25,15 @@ interface Tool {
 const getCategoryIcon = (category: string) => {
   switch (category) {
     case 'Featured':
-      return <Trophy className="w-6 h-6 text-siso-orange" />;
+      return <Trophy className="w-4 h-4 text-siso-orange" />;
     case 'Automation':
-      return <Bot className="w-6 h-6 text-siso-orange" />;
+      return <Bot className="w-4 h-4 text-siso-orange" />;
     case 'Database':
-      return <Database className="w-6 h-6 text-siso-orange" />;
+      return <Database className="w-4 h-4 text-siso-orange" />;
     case 'Development':
-      return <Code className="w-6 h-6 text-siso-orange" />;
+      return <Code className="w-4 h-4 text-siso-orange" />;
     default:
-      return <Star className="w-6 h-6 text-siso-orange" />;
+      return <Star className="w-4 h-4 text-siso-orange" />;
   }
 };
 
@@ -125,62 +125,42 @@ export default function Tools() {
                         {getCategoryIcon(category)}
                         <h2 className="text-2xl font-bold text-siso-text-bold">{category}</h2>
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {categoryTools.map((tool) => (
                           <Card key={tool.id} className="group bg-card/50 backdrop-blur border-siso-text/10 hover:border-siso-orange/50 transition-all duration-300">
-                            <CardContent className="p-6">
-                              <Accordion type="single" collapsible>
-                                <AccordionItem value="item-1" className="border-none">
-                                  <AccordionTrigger className="hover:no-underline">
-                                    <div className="flex items-center gap-4 w-full">
-                                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-siso-red/20 to-siso-orange/20 flex items-center justify-center group-hover:animate-glow">
-                                        {getCategoryIcon(tool.category)}
-                                      </div>
-                                      <div className="text-left flex-1">
-                                        <h3 className="text-lg font-semibold text-siso-text-bold">{tool.name}</h3>
-                                        <p className="text-sm text-siso-text/80">{tool.category}</p>
-                                      </div>
-                                    </div>
-                                  </AccordionTrigger>
-                                  <AccordionContent>
-                                    <div className="mt-4 space-y-4">
-                                      <p className="text-sm text-siso-text">{tool.description}</p>
-                                      
-                                      <div className="flex flex-wrap gap-4">
-                                        <div className="flex items-center gap-2">
-                                          <Download className="w-4 h-4 text-siso-text/60" />
-                                          <span className="text-sm text-siso-text">2.5k downloads</span>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                          <Heart className="w-4 h-4 text-siso-red" />
-                                          <span className="text-sm text-siso-text">1.2k likes</span>
-                                        </div>
-                                        {tool.rating && (
-                                          <div className="flex items-center gap-2">
-                                            <div className="flex items-center">
-                                              <Star className="w-4 h-4 text-siso-orange" />
-                                              <span className="ml-1 text-sm text-siso-text">
-                                                {tool.rating.toFixed(1)}
-                                              </span>
-                                            </div>
-                                            <span className="text-sm text-siso-text/60">
-                                              ({tool.reviews_count} reviews)
-                                            </span>
-                                          </div>
-                                        )}
-                                      </div>
-
-                                      {tool.pricing_type && (
-                                        <div className="flex items-center gap-2 mt-2">
-                                          <span className="px-3 py-1 rounded-full text-xs bg-siso-text/10 text-siso-text">
-                                            {tool.pricing_type}
-                                          </span>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </AccordionContent>
-                                </AccordionItem>
-                              </Accordion>
+                            <CardContent className="p-4">
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-siso-red/20 to-siso-orange/20 flex items-center justify-center group-hover:animate-glow">
+                                  {getCategoryIcon(tool.category)}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <h3 className="text-sm font-semibold text-siso-text-bold truncate">{tool.name}</h3>
+                                  <p className="text-xs text-siso-text/80">{tool.category}</p>
+                                </div>
+                              </div>
+                              {tool.description && (
+                                <p className="mt-2 text-xs text-siso-text line-clamp-2">
+                                  {tool.description}
+                                </p>
+                              )}
+                              <div className="flex gap-3 mt-3">
+                                <div className="flex items-center gap-1">
+                                  <Download className="w-3 h-3 text-siso-text/60" />
+                                  <span className="text-xs text-siso-text">2.5k</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <Heart className="w-3 h-3 text-siso-red" />
+                                  <span className="text-xs text-siso-text">1.2k</span>
+                                </div>
+                                {tool.rating && (
+                                  <div className="flex items-center gap-1">
+                                    <Star className="w-3 h-3 text-siso-orange" />
+                                    <span className="text-xs text-siso-text">
+                                      {tool.rating.toFixed(1)}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
                             </CardContent>
                           </Card>
                         ))}
