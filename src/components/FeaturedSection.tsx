@@ -9,14 +9,8 @@ const featuredItems = [
     gradient: 'from-siso-red/20 to-siso-orange/20',
   },
   {
-    id: 'social',
-    title: 'Social Media Marketing',
-    description: 'Choose your platform to uncover strategies and tools.',
-    gradient: 'from-purple-500/20 to-pink-500/20',
-  },
-  {
     id: 'automations',
-    title: 'Automations & Downloads',
+    title: 'SISO Automations to Download',
     description: 'Save time with ready-to-use workflows and guides.',
     gradient: 'from-blue-500/20 to-cyan-500/20',
   },
@@ -38,6 +32,13 @@ const featuredItems = [
     description: 'Find extra reading, success stories, and troubleshooting help.',
     gradient: 'from-rose-500/20 to-pink-500/20',
   },
+  {
+    id: 'siso-ai',
+    title: 'SISO AI',
+    description: 'Experience our cutting-edge AI solutions and tools.',
+    gradient: 'from-transparent to-transparent',
+    customBorder: true,
+  },
 ];
 
 export const FeaturedSection = () => {
@@ -48,7 +49,11 @@ export const FeaturedSection = () => {
           <Card
             key={item.title}
             id={item.id}
-            className={`group relative overflow-hidden rounded-xl bg-gradient-to-br ${item.gradient} border-0 p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl scroll-mt-24`}
+            className={`group relative overflow-hidden rounded-xl ${
+              item.customBorder 
+                ? 'border-2 border-gradient-to-r from-siso-red to-siso-orange' 
+                : `bg-gradient-to-br ${item.gradient} border-0`
+            } p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl scroll-mt-24`}
           >
             <div className="relative z-10">
               <h3 className="text-xl font-semibold text-siso-text-bold mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-siso-red group-hover:to-siso-orange">
