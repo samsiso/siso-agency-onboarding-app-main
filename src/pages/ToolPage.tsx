@@ -69,7 +69,7 @@ export default function ToolPage() {
       <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
         <Sidebar />
         <div className="flex-1 p-8">
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-5xl mx-auto">
             <div className="animate-pulse space-y-4">
               <div className="h-8 w-48 bg-siso-text/10 rounded" />
               <div className="h-32 w-full bg-siso-text/10 rounded" />
@@ -86,7 +86,7 @@ export default function ToolPage() {
       <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
         <Sidebar />
         <div className="flex-1 p-8">
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-5xl mx-auto">
             <Link 
               to="/tools" 
               className="inline-flex items-center gap-2 text-siso-text hover:text-siso-text-bold transition-colors mb-8"
@@ -105,7 +105,7 @@ export default function ToolPage() {
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
       <Sidebar />
       <div className="flex-1 p-8 overflow-y-auto">
-        <div className="max-w-4xl mx-auto space-y-8">
+        <div className="max-w-5xl mx-auto space-y-12">
           <Link 
             to="/tools" 
             className="inline-flex items-center gap-2 text-siso-text hover:text-siso-text-bold transition-colors"
@@ -114,34 +114,44 @@ export default function ToolPage() {
             Back to Tools
           </Link>
 
-          <div className="space-y-8">
-            <ToolHeader tool={tool} />
-            
-            <ToolActions 
-              tool={tool}
-              onShare={handleShare}
-              onTwitterShare={handleTwitterShare}
-            />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left Column - Main Info */}
+            <div className="lg:col-span-2 space-y-8">
+              <ToolHeader tool={tool} />
+              
+              {tool.description && (
+                <div className="space-y-4 glow-card">
+                  <h2 className="text-2xl font-semibold text-siso-text-bold">About {tool.name}</h2>
+                  <div className="prose prose-invert max-w-none">
+                    <p className="text-lg leading-relaxed text-siso-text whitespace-pre-line">
+                      {tool.description}
+                    </p>
+                  </div>
+                </div>
+              )}
 
-            {tool.description && (
-              <div className="space-y-4">
-                <h2 className="text-2xl font-semibold text-siso-text-bold">About {tool.name}</h2>
-                <div className="prose prose-invert max-w-none">
-                  <p className="text-lg leading-relaxed text-siso-text">
-                    {tool.description}
-                  </p>
+              <ToolVideos 
+                tool={tool}
+                getYoutubeEmbedUrl={getYoutubeEmbedUrl}
+              />
+
+              <ToolTags tool={tool} />
+            </div>
+
+            {/* Right Column - Actions & Stats */}
+            <div className="space-y-8">
+              <div className="sticky top-8">
+                <div className="space-y-8 glow-card">
+                  <ToolActions 
+                    tool={tool}
+                    onShare={handleShare}
+                    onTwitterShare={handleTwitterShare}
+                  />
+
+                  <ToolStats tool={tool} />
                 </div>
               </div>
-            )}
-
-            <ToolStats tool={tool} />
-            
-            <ToolVideos 
-              tool={tool}
-              getYoutubeEmbedUrl={getYoutubeEmbedUrl}
-            />
-
-            <ToolTags tool={tool} />
+            </div>
           </div>
         </div>
       </div>
