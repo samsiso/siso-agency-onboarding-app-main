@@ -1,4 +1,4 @@
-import { Home, Search, Bot, Database, Users, Download } from 'lucide-react';
+import { Home, Search, Bot, Database, Users, Download, MessageSquare } from 'lucide-react';
 import { SidebarMenuItem } from './SidebarMenuItem';
 
 const menuItems = [
@@ -26,6 +26,11 @@ const menuItems = [
     title: 'ChatGPT Assistants',
     icon: Bot,
     href: '/assistants',
+  },
+  {
+    title: 'SISO AI',
+    icon: MessageSquare,
+    href: '/siso-ai',
   },
   {
     title: 'Additional Resources',

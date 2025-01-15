@@ -4,6 +4,7 @@ import Tools from './pages/Tools';
 import Community from './pages/Community';
 import Automations from './pages/Automations';
 import ChatGPTAssistants from './pages/ChatGPTAssistants';
+import SisoAI from './pages/SisoAI';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Terms from './pages/Terms';
 
@@ -16,6 +17,7 @@ function App() {
         <Route path="/community" element={<Community />} />
         <Route path="/automations" element={<Automations />} />
         <Route path="/assistants" element={<ChatGPTAssistants />} />
+        <Route path="/siso-ai" element={<SisoAI />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<Terms />} />
       </Routes>
