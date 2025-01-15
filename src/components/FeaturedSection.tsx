@@ -18,7 +18,7 @@ const featuredItems = [
     id: 'siso-ai',
     title: 'SISO AI',
     description: 'Experience our cutting-edge AI solutions and tools.',
-    gradient: 'from-transparent to-transparent',
+    gradient: 'from-siso-red/20 to-siso-orange/20',
     customBorder: true,
     highlight: true,
   },
@@ -52,7 +52,7 @@ export const FeaturedSection = () => {
             id={item.id}
             className={`group relative overflow-hidden rounded-xl ${
               item.customBorder 
-                ? 'border-2 border-gradient-animate bg-gradient-to-br from-transparent to-transparent' 
+                ? 'border-2 border-gradient-animate bg-gradient-to-br from-siso-red to-siso-orange bg-opacity-10' 
                 : `bg-gradient-to-br ${item.gradient} border-0`
             } p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl scroll-mt-24 ${
               item.highlight ? 'animate-glow' : ''
