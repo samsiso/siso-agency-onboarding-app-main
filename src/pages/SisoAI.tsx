@@ -1,8 +1,63 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Sidebar } from '../components/Sidebar';
-import { MessageSquare } from 'lucide-react';
+import { MessageSquare, Send } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
+
+interface Message {
+  role: 'assistant' | 'user';
+  content: string;
+}
 
 const SisoAI = () => {
+  const [messages, setMessages] = useState<Message[]>([
+    { role: 'assistant', content: 'Hello! I\'m your SISO AI assistant. How can I help you today?' }
+  ]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [threadId, setThreadId] = useState<string | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || isLoading) return;
+
+    const userMessage = input.trim();
+    setInput('');
+    setIsLoading(true);
+    setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('chat-with-assistant', {
+        body: { message: userMessage, threadId },
+      });
+
+      if (error) throw error;
+
+      setThreadId(data.threadId);
+      setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to get response from assistant. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
       <Sidebar />
@@ -14,38 +69,53 @@ const SisoAI = () => {
               <h1 className="text-3xl font-bold text-siso-text-bold">SISO AI Assistant</h1>
             </div>
             
-            {/* Chat container */}
             <div className="bg-black/20 rounded-lg border border-siso-text/10 h-[600px] flex flex-col">
-              {/* Chat messages area */}
               <div className="flex-1 p-4 overflow-y-auto">
                 <div className="space-y-4">
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-full bg-siso-red flex items-center justify-center">
-                      <MessageSquare className="w-5 h-5 text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm text-siso-text-bold mb-1">SISO AI</p>
-                      <div className="bg-siso-text/5 rounded-lg p-3 text-siso-text">
-                        Hello! I'm your SISO AI assistant. How can I help you today?
+                  {messages.map((message, index) => (
+                    <div key={index} className="flex items-start gap-3">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                        message.role === 'assistant' ? 'bg-siso-red' : 'bg-siso-orange'
+                      }`}>
+                        <MessageSquare className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm text-siso-text-bold mb-1">
+                          {message.role === 'assistant' ? 'SISO AI' : 'You'}
+                        </p>
+                        <div className="bg-siso-text/5 rounded-lg p-3 text-siso-text">
+                          {message.content}
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  ))}
+                  <div ref={messagesEndRef} />
                 </div>
               </div>
               
-              {/* Input area */}
-              <div className="border-t border-siso-text/10 p-4">
+              <form onSubmit={handleSubmit} className="border-t border-siso-text/10 p-4">
                 <div className="flex gap-2">
                   <input
                     type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
                     placeholder="Type your message..."
                     className="flex-1 bg-black/20 border border-siso-text/10 rounded-lg px-4 py-2 text-siso-text focus:outline-none focus:ring-2 focus:ring-siso-red/50"
+                    disabled={isLoading}
                   />
-                  <button className="bg-gradient-to-r from-siso-red to-siso-orange text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity">
-                    Send
-                  </button>
+                  <Button 
+                    type="submit"
+                    disabled={isLoading}
+                    className="bg-gradient-to-r from-siso-red to-siso-orange text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
+                  >
+                    {isLoading ? (
+                      <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <Send className="w-5 h-5" />
+                    )}
+                  </Button>
                 </div>
-              </div>
+              </form>
             </div>
           </div>
         </div>
