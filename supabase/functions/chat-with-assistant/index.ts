@@ -23,9 +23,15 @@ serve(async (req) => {
     const { message, threadId } = await req.json();
     console.log('Request payload:', { message, threadId });
 
+    const apiKey = Deno.env.get('OPENAI_API_KEY');
+    if (!apiKey) {
+      console.error('OpenAI API key is missing');
+      throw new Error('OpenAI API key is missing');
+    }
+
     // Initialize OpenAI client with v2 header
     const openai = new OpenAI({
-      apiKey: Deno.env.get('OPENAI_API_KEY'),
+      apiKey,
       defaultHeaders: {
         'OpenAI-Beta': 'assistants=v2'  // Required header for v2 API
       }
@@ -63,7 +69,7 @@ serve(async (req) => {
       while (runStatus.status !== "completed") {
         if (runStatus.status === "failed") {
           console.error('Run failed:', runStatus);
-          throw new Error("Assistant run failed");
+          throw new Error(`Assistant run failed: ${JSON.stringify(runStatus.last_error)}`);
         }
         if (runStatus.status === "expired") {
           console.error('Run expired:', runStatus);
@@ -94,7 +100,16 @@ serve(async (req) => {
 
     } catch (openaiError) {
       console.error('OpenAI API Error:', openaiError);
-      throw new Error(`OpenAI API Error: ${openaiError.message}`);
+      return new Response(
+        JSON.stringify({ 
+          error: `OpenAI API Error: ${openaiError.message}`,
+          details: openaiError.stack
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
     }
   } catch (error) {
     console.error('Error in chat-with-assistant:', error);
