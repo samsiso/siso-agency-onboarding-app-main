@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Database, Download, Heart, Search, Star, Robot, Code, Trophy } from 'lucide-react';
+import { Database, Download, Heart, Search, Star, Bot, Code, Trophy } from 'lucide-react';
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import {
@@ -27,7 +27,7 @@ const getCategoryIcon = (category: string) => {
     case 'Featured':
       return <Trophy className="w-6 h-6 text-siso-orange" />;
     case 'Automation':
-      return <Robot className="w-6 h-6 text-siso-orange" />;
+      return <Bot className="w-6 h-6 text-siso-orange" />;
     case 'Database':
       return <Database className="w-6 h-6 text-siso-orange" />;
     case 'Development':
