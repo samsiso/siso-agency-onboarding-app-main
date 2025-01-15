@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Sidebar } from '@/components/Sidebar';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Automation {
   id: string;
@@ -23,9 +24,12 @@ interface Automation {
   input_variables: string[] | null;
 }
 
+type AutomationCategory = 'all' | 'featured' | 'automa' | 'n8n' | 'make';
+
 export default function Automations() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedAutomation, setSelectedAutomation] = useState<Automation | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<AutomationCategory>('all');
 
   const { data: automations, isLoading, error } = useQuery({
     queryKey: ['automations'],
@@ -40,11 +44,21 @@ export default function Automations() {
     },
   });
 
-  const filteredAutomations = automations?.filter(automation => 
-    !searchQuery || 
-    automation.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    automation.description?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredAutomations = automations?.filter(automation => {
+    const matchesSearch = !searchQuery || 
+      automation.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      automation.description?.toLowerCase().includes(searchQuery.toLowerCase());
+
+    if (selectedCategory === 'all') return matchesSearch;
+    if (selectedCategory === 'featured') {
+      // You can customize the featured logic based on your needs
+      return matchesSearch && (automation.rating || 0) >= 4;
+    }
+    // Filter by tool type (assuming it's stored in the name or description)
+    return matchesSearch && 
+      (automation.name.toLowerCase().includes(selectedCategory) || 
+       automation.description?.toLowerCase().includes(selectedCategory));
+  });
 
   const handleAutomationClick = (automation: Automation) => {
     setSelectedAutomation(automation);
@@ -74,6 +88,26 @@ export default function Automations() {
                 />
               </div>
             </div>
+
+            <Tabs defaultValue="all" className="w-full" onValueChange={(value) => setSelectedCategory(value as AutomationCategory)}>
+              <TabsList className="w-full justify-start bg-siso-text/5 border border-siso-text/10">
+                <TabsTrigger value="all" className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange">
+                  All
+                </TabsTrigger>
+                <TabsTrigger value="featured" className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange">
+                  Featured
+                </TabsTrigger>
+                <TabsTrigger value="automa" className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange">
+                  Automa
+                </TabsTrigger>
+                <TabsTrigger value="n8n" className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange">
+                  n8n
+                </TabsTrigger>
+                <TabsTrigger value="make" className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange">
+                  Make.com
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
           </div>
 
           {isLoading ? (
