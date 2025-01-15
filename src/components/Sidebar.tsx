@@ -52,7 +52,7 @@ export const Sidebar = () => {
         <Button
           variant="ghost"
           size="icon"
-          className="fixed top-4 right-4 z-50"
+          className="fixed top-4 right-4 z-50 bg-siso-bg/80 backdrop-blur-sm"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           {isMobileMenuOpen ? (
@@ -71,7 +71,7 @@ export const Sidebar = () => {
                 isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
               }`
             : 'sticky top-0'
-        } h-screen bg-gradient-to-b from-siso-bg to-siso-bg/95 border-r border-siso-text/10`}
+        } h-screen bg-gradient-to-b from-siso-bg to-siso-bg/95 border-r border-siso-text/10 shadow-lg`}
         style={{ width: collapsed && !isMobile ? '5rem' : '16rem' }}
       >
         <SidebarLogo collapsed={collapsed} setCollapsed={setCollapsed} />
@@ -82,7 +82,7 @@ export const Sidebar = () => {
       {/* Mobile Overlay */}
       {isMobile && isMobileMenuOpen && (
         <div 
-          className="fixed inset-0 bg-black/50 z-30"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}

@@ -1,4 +1,4 @@
-import { Home, Search, Bot, Database, Users, Download, MessageSquare, GraduationCap, Network } from 'lucide-react';
+import { Home, Database, Bot, Download, MessageSquare, GraduationCap, Network } from 'lucide-react';
 import { SidebarMenuItem } from './SidebarMenuItem';
 
 const menuItems = [
