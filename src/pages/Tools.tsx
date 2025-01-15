@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Sidebar } from '@/components/Sidebar';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Json } from '@/integrations/supabase/types';
 
 interface Tool {
   id: string;
@@ -47,8 +48,15 @@ export default function Tools() {
         console.error('Error fetching tools:', error);
         throw error;
       }
-      console.log('Fetched tools:', data);
-      return data as Tool[];
+
+      // Transform the data to match Tool type
+      const transformedData = data.map(tool => ({
+        ...tool,
+        youtube_videos: tool.youtube_videos as { title: string; url: string; }[] | null
+      }));
+      
+      console.log('Fetched tools:', transformedData);
+      return transformedData as Tool[];
     },
   });
 

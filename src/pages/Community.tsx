@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Sidebar } from '@/components/Sidebar';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Json } from '@/integrations/supabase/types';
 
 interface CommunityMember {
   id: string;
@@ -41,8 +42,15 @@ export default function Community() {
         console.error('Error fetching community members:', error);
         throw error;
       }
-      console.log('Fetched community members:', data);
-      return data as CommunityMember[];
+      
+      // Transform the data to match CommunityMember type
+      const transformedData = data.map(member => ({
+        ...member,
+        youtube_videos: member.youtube_videos as { title: string; url: string; }[] | null
+      }));
+      
+      console.log('Fetched community members:', transformedData);
+      return transformedData as CommunityMember[];
     },
   });
 
