@@ -11,6 +11,7 @@ import {
   ChevronDown,
   ChevronRight,
 } from 'lucide-react';
+import { AuthButton } from './AuthButton';
 
 const menuItems = [
   {
@@ -98,8 +99,8 @@ export const Sidebar = () => {
         ))}
       </nav>
 
-      {/* Settings at bottom */}
-      <div className="absolute bottom-0 w-full p-4 border-t border-siso-text/10">
+      {/* Settings and Auth at bottom */}
+      <div className="absolute bottom-0 w-full p-4 border-t border-siso-text/10 space-y-2">
         <Link
           to="/settings"
           className="flex items-center gap-3 px-4 py-3 text-siso-text hover:bg-siso-text/5 rounded-lg transition-colors"
@@ -107,6 +108,7 @@ export const Sidebar = () => {
           <Settings className="w-5 h-5" />
           {!collapsed && <span className="text-sm font-medium">Settings</span>}
         </Link>
+        {!collapsed && <AuthButton />}
       </div>
     </div>
   );
