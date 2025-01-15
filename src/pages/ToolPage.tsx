@@ -68,7 +68,7 @@ export default function ToolPage() {
     return (
       <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
         <Sidebar />
-        <div className="flex-1 p-8">
+        <div className="flex-1 p-4 md:p-8">
           <div className="max-w-5xl mx-auto">
             <div className="animate-pulse space-y-4">
               <div className="h-8 w-48 bg-siso-text/10 rounded" />
@@ -85,7 +85,7 @@ export default function ToolPage() {
     return (
       <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
         <Sidebar />
-        <div className="flex-1 p-8">
+        <div className="flex-1 p-4 md:p-8">
           <div className="max-w-5xl mx-auto">
             <Link 
               to="/tools" 
@@ -104,8 +104,8 @@ export default function ToolPage() {
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
       <Sidebar />
-      <div className="flex-1 p-8 overflow-y-auto">
-        <div className="max-w-5xl mx-auto space-y-12">
+      <div className="flex-1 p-4 md:p-8 overflow-y-auto">
+        <div className="max-w-5xl mx-auto space-y-8 md:space-y-12">
           <Link 
             to="/tools" 
             className="inline-flex items-center gap-2 text-siso-text hover:text-siso-text-bold transition-colors"
@@ -114,16 +114,16 @@ export default function ToolPage() {
             Back to Tools
           </Link>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
             {/* Left Column - Main Info */}
-            <div className="lg:col-span-2 space-y-8">
+            <div className="lg:col-span-2 space-y-6 md:space-y-8">
               <ToolHeader tool={tool} />
               
               {tool.description && (
                 <div className="space-y-4 glow-card">
                   <h2 className="text-2xl font-semibold text-siso-text-bold">About {tool.name}</h2>
                   <div className="prose prose-invert max-w-none">
-                    <p className="text-lg leading-relaxed text-siso-text whitespace-pre-line">
+                    <p className="text-base md:text-lg leading-relaxed text-siso-text whitespace-pre-line">
                       {tool.description}
                     </p>
                   </div>
@@ -139,9 +139,9 @@ export default function ToolPage() {
             </div>
 
             {/* Right Column - Actions & Stats */}
-            <div className="space-y-8">
-              <div className="sticky top-8">
-                <div className="space-y-8 glow-card">
+            <div>
+              <div className="sticky top-8 space-y-6">
+                <div className="glow-card space-y-6">
                   <ToolActions 
                     tool={tool}
                     onShare={handleShare}

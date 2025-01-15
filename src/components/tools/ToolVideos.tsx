@@ -11,7 +11,7 @@ export function ToolVideos({ tool, getYoutubeEmbedUrl }: ToolVideosProps) {
   if (!tool.youtube_url && (!tool.youtube_videos || tool.youtube_videos.length === 0)) return null;
 
   return (
-    <>
+    <div className="space-y-8">
       {tool.youtube_url && (
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold text-siso-text-bold flex items-center gap-2">
@@ -33,11 +33,11 @@ export function ToolVideos({ tool, getYoutubeEmbedUrl }: ToolVideosProps) {
       )}
 
       {tool.youtube_videos && tool.youtube_videos.length > 0 && (
-        <div className="space-y-4">
+        <div className="space-y-6">
           <h2 className="text-2xl font-semibold text-siso-text-bold">Related Videos</h2>
           <div className="grid grid-cols-1 gap-6">
             {tool.youtube_videos.map((video, index) => (
-              <div key={index} className="space-y-2">
+              <div key={index} className="space-y-3 glow-card">
                 <h3 className="text-lg font-medium text-siso-text-bold">{video.title}</h3>
                 <div className="rounded-lg overflow-hidden bg-black/20 ring-1 ring-siso-text/10">
                   <AspectRatio ratio={16 / 9}>
@@ -55,6 +55,6 @@ export function ToolVideos({ tool, getYoutubeEmbedUrl }: ToolVideosProps) {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
