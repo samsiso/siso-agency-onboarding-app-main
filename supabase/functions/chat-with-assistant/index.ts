@@ -12,7 +12,6 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') {
     console.log('Handling CORS preflight request');
     return new Response(null, {
-      status: 204,
       headers: corsHeaders
     });
   }
