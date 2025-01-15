@@ -49,6 +49,7 @@ serve(async (req) => {
       }
       await new Promise(resolve => setTimeout(resolve, 1000));
       runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
+      console.log('Run status:', runStatus.status);
     }
 
     // Get the messages
@@ -65,11 +66,11 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error in chat-with-assistant:', error);
     return new Response(
       JSON.stringify({ 
         error: error.message,
-        details: error.stack
+        details: error.stack,
       }),
       {
         status: 500,
