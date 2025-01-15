@@ -1,5 +1,6 @@
 import { Hero } from '@/components/Hero';
-import { Sidebar, SidebarProvider } from '@/components/ui/sidebar';
+import { Sidebar } from '@/components/Sidebar';
+import { SidebarProvider } from '@/components/ui/sidebar';
 
 const Index = () => {
   return (
