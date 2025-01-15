@@ -1,13 +1,23 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { SidebarLogo } from './sidebar/SidebarLogo';
 import { SidebarNavigation } from './sidebar/SidebarNavigation';
 import { SidebarFooter } from './sidebar/SidebarFooter';
 
 export const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const navigate = useNavigate();
 
   const handleItemClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
+    
+    // Check if the href is a route (starts with /)
+    if (href.startsWith('/')) {
+      navigate(href);
+      return;
+    }
+
+    // Otherwise treat it as an element ID for smooth scrolling
     const element = document.querySelector(href);
     if (element) {
       element.scrollIntoView({
