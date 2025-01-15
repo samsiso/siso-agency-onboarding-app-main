@@ -16,7 +16,7 @@ export function ToolCard({ tool }: ToolCardProps) {
   return (
     <div
       onClick={handleClick}
-      className="group relative flex flex-col gap-4 rounded-lg border border-siso-text/10 bg-siso-text/5 p-6 hover:bg-siso-text/10 transition-all duration-300 cursor-pointer"
+      className="group relative flex flex-col gap-4 rounded-lg border border-siso-text/10 bg-siso-text/5 p-6 hover:bg-siso-text/10 transition-all duration-300 cursor-pointer hover:scale-[1.02]"
     >
       <div className="flex items-center gap-4">
         {tool.profile_image_url ? (
@@ -38,8 +38,11 @@ export function ToolCard({ tool }: ToolCardProps) {
         </div>
       </div>
       {tool.description && (
-        <p className="text-sm text-siso-text/80 line-clamp-2">{tool.description}</p>
+        <p className="text-sm text-siso-text/80 line-clamp-2 leading-relaxed">
+          {tool.description}
+        </p>
       )}
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-siso-red/0 via-siso-orange/0 to-siso-red/0 group-hover:from-siso-red group-hover:via-siso-orange group-hover:to-siso-red transition-all duration-300 rounded-b-lg" />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Search } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from "@/components/ui/input";
 import { Sidebar } from '@/components/Sidebar';
@@ -39,6 +39,15 @@ export default function Tools() {
 
   const categories = ['All', 'Featured', 'Database', 'Development', 'Sales'];
 
+  // Calculate category counts
+  const categoryCounts = useMemo(() => {
+    if (!tools) return {};
+    return tools.reduce((acc, tool) => {
+      acc[tool.category] = (acc[tool.category] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+  }, [tools]);
+
   const filteredTools = tools?.filter(tool => {
     const matchesSearch = !searchQuery || 
       tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -59,19 +68,42 @@ export default function Tools() {
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
       <Sidebar />
       <div className="flex-1 p-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
-              Core Tools & Platforms
-            </h1>
-            <div className="relative w-full md:w-96">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-siso-text/60" />
-              <Input
-                placeholder="Search tools..."
-                className="pl-10 bg-siso-text/5 border-siso-text/10 focus-visible:ring-siso-orange"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+        <div className="max-w-7xl mx-auto space-y-8">
+          <div className="space-y-4">
+            <div>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
+                Core Tools & Platforms
+              </h1>
+              <p className="mt-2 text-lg text-siso-text/80 leading-relaxed max-w-3xl">
+                Discover our curated collection of tools and platforms that power SISO Agency's operations. 
+                These are the trusted solutions we use daily to deliver exceptional results.
+              </p>
+            </div>
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+              <div className="flex flex-wrap gap-4">
+                {categories.map(category => (
+                  <div 
+                    key={category}
+                    className="px-4 py-2 rounded-lg bg-siso-text/5 border border-siso-text/10"
+                  >
+                    <span className="text-siso-text-bold">{category}</span>
+                    {category !== 'All' && (
+                      <span className="ml-2 text-sm text-siso-text/60">
+                        {categoryCounts[category] || 0}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <div className="relative w-full md:w-96">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-siso-text/60" />
+                <Input
+                  placeholder="Search tools..."
+                  className="pl-10 bg-siso-text/5 border-siso-text/10 focus-visible:ring-siso-orange"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
             </div>
           </div>
 
@@ -82,9 +114,16 @@ export default function Tools() {
           />
 
           {isLoading ? (
-            <div className="text-siso-text">Loading...</div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+              {[...Array(10)].map((_, i) => (
+                <div 
+                  key={i}
+                  className="h-48 rounded-lg bg-siso-text/5 animate-pulse"
+                />
+              ))}
+            </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
               {filteredTools?.map((tool) => (
                 <ToolCard
                   key={tool.id}
