@@ -5,6 +5,8 @@ import Community from './pages/Community';
 import Automations from './pages/Automations';
 import ChatGPTAssistants from './pages/ChatGPTAssistants';
 import SisoAI from './pages/SisoAI';
+import SisoEducation from './pages/SisoEducation';
+import Networking from './pages/Networking';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Terms from './pages/Terms';
 
@@ -18,6 +20,8 @@ function App() {
         <Route path="/automations" element={<Automations />} />
         <Route path="/assistants" element={<ChatGPTAssistants />} />
         <Route path="/siso-ai" element={<SisoAI />} />
+        <Route path="/education" element={<SisoEducation />} />
+        <Route path="/networking" element={<Networking />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<Terms />} />
       </Routes>

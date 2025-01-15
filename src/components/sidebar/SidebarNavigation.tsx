@@ -1,4 +1,4 @@
-import { Home, Search, Bot, Database, Users, Download, MessageSquare } from 'lucide-react';
+import { Home, Search, Bot, Database, Users, Download, MessageSquare, GraduationCap, Network } from 'lucide-react';
 import { SidebarMenuItem } from './SidebarMenuItem';
 
 const menuItems = [
@@ -16,6 +16,16 @@ const menuItems = [
     title: 'The AI Community',
     icon: Users,
     href: '/community',
+  },
+  {
+    title: 'SISO Education',
+    icon: GraduationCap,
+    href: '/education',
+  },
+  {
+    title: 'SISO Networking',
+    icon: Network,
+    href: '/networking',
   },
   {
     title: 'SISO Automations',
