@@ -1,14 +1,16 @@
 import { Hero } from '@/components/Hero';
-import { Sidebar } from '@/components/ui/sidebar';
+import { Sidebar, SidebarProvider } from '@/components/ui/sidebar';
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen">
-      <Sidebar />
-      <main className="flex-1 bg-siso-bg">
-        <Hero />
-      </main>
-    </div>
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full">
+        <Sidebar />
+        <main className="flex-1 bg-siso-bg">
+          <Hero />
+        </main>
+      </div>
+    </SidebarProvider>
   );
 };
 
