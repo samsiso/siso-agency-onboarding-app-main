@@ -1,6 +1,6 @@
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, ExternalLink, Heart, Star, Download, Youtube } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Heart, Star, Download, Youtube, Info, Share2, Twitter } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Tool } from '@/components/tools/types';
 import { AspectRatio } from "@/components/ui/aspect-ratio";
@@ -18,11 +18,15 @@ export default function ToolPage() {
         .from('tools')
         .select('*')
         .eq('id', id)
-        .single();
+        .maybeSingle();
       
       if (error) {
         console.error('Error fetching tool:', error);
         throw error;
+      }
+
+      if (!data) {
+        throw new Error('Tool not found');
       }
       
       // Transform the youtube_videos to match the Tool interface
@@ -37,16 +41,39 @@ export default function ToolPage() {
     },
   });
 
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: tool?.name,
+        text: tool?.description || `Check out ${tool?.name}`,
+        url: window.location.href,
+      }).catch((error) => console.log('Error sharing:', error));
+    }
+  };
+
+  const handleTwitterShare = () => {
+    const text = encodeURIComponent(`Check out ${tool?.name}${tool?.description ? `: ${tool.description}` : ''}`);
+    const url = encodeURIComponent(window.location.href);
+    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+  };
+
+  const getYoutubeEmbedUrl = (url: string) => {
+    const videoId = url.includes('watch?v=') 
+      ? url.split('watch?v=')[1].split('&')[0]
+      : url.split('/').pop();
+    return `https://www.youtube.com/embed/${videoId}`;
+  };
+
   if (isLoading) {
     return (
       <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
         <Sidebar />
         <div className="flex-1 p-8">
           <div className="max-w-4xl mx-auto">
-            <div className="animate-pulse">
-              <div className="h-8 w-48 bg-siso-text/10 rounded mb-4" />
-              <div className="h-4 w-full bg-siso-text/10 rounded mb-2" />
-              <div className="h-4 w-3/4 bg-siso-text/10 rounded" />
+            <div className="animate-pulse space-y-4">
+              <div className="h-8 w-48 bg-siso-text/10 rounded" />
+              <div className="h-32 w-full bg-siso-text/10 rounded" />
+              <div className="h-8 w-full bg-siso-text/10 rounded" />
             </div>
           </div>
         </div>
@@ -60,19 +87,19 @@ export default function ToolPage() {
         <Sidebar />
         <div className="flex-1 p-8">
           <div className="max-w-4xl mx-auto">
-            <div className="text-red-500">Error loading tool. Please try again later.</div>
+            <Link 
+              to="/tools" 
+              className="inline-flex items-center gap-2 text-siso-text hover:text-siso-text-bold transition-colors mb-8"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Tools
+            </Link>
+            <div className="text-red-500">Tool not found. Please try again later.</div>
           </div>
         </div>
       </div>
     );
   }
-
-  const getYoutubeEmbedUrl = (url: string) => {
-    const videoId = url.includes('watch?v=') 
-      ? url.split('watch?v=')[1].split('&')[0]
-      : url.split('/').pop();
-    return `https://www.youtube.com/embed/${videoId}`;
-  };
 
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
@@ -138,6 +165,33 @@ export default function ToolPage() {
                   Watch on YouTube
                 </Button>
               )}
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <Button
+                variant="outline"
+                className="w-full justify-center gap-2 border-siso-text/20 hover:bg-siso-text/5"
+                onClick={() => window.open(`https://www.google.com/search?q=${encodeURIComponent(tool.name)}`, '_blank')}
+              >
+                <Info className="h-4 w-4 text-siso-text/80" />
+                Learn More
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full justify-center gap-2 border-siso-text/20 hover:bg-siso-text/5"
+                onClick={handleTwitterShare}
+              >
+                <Twitter className="h-4 w-4 text-blue-400" />
+                Share on X
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full justify-center gap-2 border-siso-text/20 hover:bg-siso-text/5"
+                onClick={handleShare}
+              >
+                <Share2 className="h-4 w-4 text-siso-text/80" />
+                Share
+              </Button>
             </div>
 
             {!tool.member_type && (
