@@ -36,45 +36,66 @@ export type Database = {
       tools: {
         Row: {
           category: string
+          content_themes: string[] | null
           created_at: string
           description: string | null
           downloads_count: number | null
           icon_url: string | null
           id: string
           likes_count: number | null
+          member_type: string | null
           name: string
           pricing_type: string | null
+          profile_image_url: string | null
           rating: number | null
           reviews_count: number | null
+          specialization: string[] | null
           updated_at: string
+          website_url: string | null
+          youtube_url: string | null
+          youtube_videos: Json | null
         }
         Insert: {
           category: string
+          content_themes?: string[] | null
           created_at?: string
           description?: string | null
           downloads_count?: number | null
           icon_url?: string | null
           id?: string
           likes_count?: number | null
+          member_type?: string | null
           name: string
           pricing_type?: string | null
+          profile_image_url?: string | null
           rating?: number | null
           reviews_count?: number | null
+          specialization?: string[] | null
           updated_at?: string
+          website_url?: string | null
+          youtube_url?: string | null
+          youtube_videos?: Json | null
         }
         Update: {
           category?: string
+          content_themes?: string[] | null
           created_at?: string
           description?: string | null
           downloads_count?: number | null
           icon_url?: string | null
           id?: string
           likes_count?: number | null
+          member_type?: string | null
           name?: string
           pricing_type?: string | null
+          profile_image_url?: string | null
           rating?: number | null
           reviews_count?: number | null
+          specialization?: string[] | null
           updated_at?: string
+          website_url?: string | null
+          youtube_url?: string | null
+          youtube_videos?: Json | null
         }
         Relationships: []
       }
