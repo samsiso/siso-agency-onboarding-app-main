@@ -6,13 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Sidebar } from '@/components/Sidebar';
 import { CategoryFilters } from '@/components/assistants/CategoryFilters';
 import { ToolCard } from '@/components/tools/ToolCard';
-import { ToolDetail } from '@/components/tools/ToolDetail';
 import { Tool } from '@/components/tools/types';
 
 export default function Tools() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
 
   const { data: tools, isLoading, error } = useQuery({
     queryKey: ['tools'],
@@ -21,9 +19,8 @@ export default function Tools() {
       const { data, error } = await supabase
         .from('tools')
         .select('*')
-        // Exclude items that belong in other sections
         .not('category', 'in', '("Community", "Automation", "Assistant", "Chatbots")')
-        .is('member_type', null); // Exclude community members
+        .is('member_type', null);
       
       if (error) {
         console.error('Error fetching tools:', error);
@@ -40,7 +37,7 @@ export default function Tools() {
     },
   });
 
-  const categories = ['All', 'Featured', 'Database', 'Development', 'Sales']; // Removed categories that have their own pages
+  const categories = ['All', 'Featured', 'Database', 'Development', 'Sales'];
 
   const filteredTools = tools?.filter(tool => {
     const matchesSearch = !searchQuery || 
@@ -92,17 +89,9 @@ export default function Tools() {
                 <ToolCard
                   key={tool.id}
                   tool={tool}
-                  onClick={() => setSelectedTool(tool)}
                 />
               ))}
             </div>
-          )}
-
-          {selectedTool && (
-            <ToolDetail
-              tool={selectedTool}
-              onClose={() => setSelectedTool(null)}
-            />
           )}
         </div>
       </div>

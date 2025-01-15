@@ -5,18 +5,13 @@ import { Tool } from './types';
 
 interface ToolCardProps {
   tool: Tool;
-  onClick?: () => void;
 }
 
-export function ToolCard({ tool, onClick }: ToolCardProps) {
+export function ToolCard({ tool }: ToolCardProps) {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    if (onClick) {
-      onClick();
-    } else {
-      navigate(`/tools/${tool.id}`);
-    }
+    navigate(`/tools/${tool.id}`);
   };
 
   if (tool.member_type) {
