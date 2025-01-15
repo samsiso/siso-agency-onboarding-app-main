@@ -13,7 +13,7 @@ const menuItems = [
     href: '/tools',
   },
   {
-    title: 'SISO Automations to Download',
+    title: 'SISO Automations',
     icon: Download,
     href: '#automations',
   },
