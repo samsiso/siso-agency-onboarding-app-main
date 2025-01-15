@@ -5,7 +5,7 @@ const menuItems = [
   {
     title: 'Core Tools & Platforms',
     icon: Home,
-    href: '#tools',
+    href: '/tools',
   },
   {
     title: 'Social Media Marketing',

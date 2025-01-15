@@ -33,6 +33,45 @@ export type Database = {
         }
         Relationships: []
       }
+      tools: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          icon_url: string | null
+          id: string
+          name: string
+          pricing_type: string | null
+          rating: number | null
+          reviews_count: number | null
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          icon_url?: string | null
+          id?: string
+          name: string
+          pricing_type?: string | null
+          rating?: number | null
+          reviews_count?: number | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          icon_url?: string | null
+          id?: string
+          name?: string
+          pricing_type?: string | null
+          rating?: number | null
+          reviews_count?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
