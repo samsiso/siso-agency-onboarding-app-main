@@ -15,14 +15,14 @@ export default function SisoEducation() {
   const { data: members, isLoading, error } = useQuery({
     queryKey: ['education-members'],
     queryFn: async () => {
-      console.log('Fetching education members...');
+      console.log('Fetching education and community members...');
       const { data, error } = await supabase
         .from('tools')
         .select('*')
-        .eq('category', 'education');
+        .in('category', ['education', 'community']);
       
       if (error) {
-        console.error('Error fetching education members:', error);
+        console.error('Error fetching members:', error);
         throw error;
       }
       
@@ -31,7 +31,7 @@ export default function SisoEducation() {
         youtube_videos: member.youtube_videos as { title: string; url: string; }[] | null
       }));
       
-      console.log('Fetched education members:', transformedData);
+      console.log('Fetched members:', transformedData);
       return transformedData as CommunityMember[];
     },
   });
@@ -44,7 +44,7 @@ export default function SisoEducation() {
 
   if (error) {
     console.error('Error in component:', error);
-    return <div className="text-red-500">Error loading education members. Please try again later.</div>;
+    return <div className="text-red-500">Error loading members. Please try again later.</div>;
   }
 
   return (

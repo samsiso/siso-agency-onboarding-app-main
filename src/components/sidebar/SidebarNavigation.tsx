@@ -13,12 +13,7 @@ const menuItems = [
     href: '/tools',
   },
   {
-    title: 'The AI Community',
-    icon: Users,
-    href: '/community',
-  },
-  {
-    title: 'SISO Education',
+    title: 'SISO Education Hub',
     icon: GraduationCap,
     href: '/education',
   },
@@ -41,11 +36,6 @@ const menuItems = [
     title: 'SISO AI',
     icon: MessageSquare,
     href: '/siso-ai',
-  },
-  {
-    title: 'Additional Resources',
-    icon: Search,
-    href: '#resources',
   },
 ];
 
