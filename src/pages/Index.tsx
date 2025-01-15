@@ -1,7 +1,7 @@
 import React from 'react';
-import Hero from '../components/Hero';
-import FeaturedSection from '../components/FeaturedSection';
-import Sidebar from '../components/Sidebar';
+import { Hero } from '../components/Hero';
+import { FeaturedSection } from '../components/FeaturedSection';
+import { Sidebar } from '../components/Sidebar';
 import Footer from '../components/Footer';
 
 const Index = () => {
