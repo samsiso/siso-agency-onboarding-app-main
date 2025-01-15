@@ -72,38 +72,38 @@ export default function Community() {
   const renderMemberCard = (member: CommunityMember) => (
     <Card 
       key={member.id} 
-      className="group bg-card/50 backdrop-blur border-siso-text/10 hover:border-siso-orange/50 transition-all duration-300 cursor-pointer"
+      className="group bg-gradient-to-br from-siso-red/10 to-siso-orange/10 border-siso-text/10 hover:border-siso-orange/50 transition-all duration-300 cursor-pointer p-2"
       onClick={() => handleMemberClick(member)}
     >
-      <CardContent className="p-3">
-        <div className="flex items-center gap-3">
+      <CardContent className="p-4">
+        <div className="flex items-center gap-4">
           {member.profile_image_url ? (
             <img 
               src={member.profile_image_url} 
               alt={member.name}
-              className="w-12 h-12 rounded-full object-cover"
+              className="w-16 h-16 rounded-full object-cover"
             />
           ) : (
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-siso-red/20 to-siso-orange/20 flex items-center justify-center">
-              <Users className="w-6 h-6 text-siso-orange" />
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-siso-red/20 to-siso-orange/20 flex items-center justify-center">
+              <Users className="w-8 h-8 text-siso-orange" />
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <h3 className="text-sm font-semibold text-siso-text-bold truncate">{member.name}</h3>
-            <p className="text-xs text-siso-text/80 capitalize">{member.member_type}</p>
+            <h3 className="text-lg font-semibold text-siso-text-bold truncate">{member.name}</h3>
+            <p className="text-sm text-siso-text/80 capitalize">{member.member_type}</p>
           </div>
         </div>
         {member.description && (
-          <p className="mt-2 text-xs text-siso-text line-clamp-2">
+          <p className="mt-3 text-sm text-siso-text line-clamp-2">
             {member.description}
           </p>
         )}
         {member.specialization && (
-          <div className="flex flex-wrap gap-1 mt-2">
+          <div className="flex flex-wrap gap-2 mt-3">
             {member.specialization.slice(0, 2).map((spec, index) => (
               <span 
                 key={index}
-                className="text-xs px-2 py-0.5 rounded-full bg-siso-text/10 text-siso-text"
+                className="text-sm px-3 py-1 rounded-full bg-gradient-to-r from-siso-red/20 to-siso-orange/20 text-siso-text-bold"
               >
                 {spec}
               </span>

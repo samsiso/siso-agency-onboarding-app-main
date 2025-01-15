@@ -35,6 +35,7 @@ export type Database = {
       }
       tools: {
         Row: {
+          assistant_type: string | null
           category: string
           content_themes: string[] | null
           created_at: string
@@ -42,20 +43,26 @@ export type Database = {
           downloads_count: number | null
           icon_url: string | null
           id: string
+          input_variables: string[] | null
           likes_count: number | null
           member_type: string | null
+          model_type: string | null
           name: string
           pricing_type: string | null
           profile_image_url: string | null
+          prompt_template: string | null
           rating: number | null
+          response_format: string | null
           reviews_count: number | null
           specialization: string[] | null
           updated_at: string
+          use_cases: string[] | null
           website_url: string | null
           youtube_url: string | null
           youtube_videos: Json | null
         }
         Insert: {
+          assistant_type?: string | null
           category: string
           content_themes?: string[] | null
           created_at?: string
@@ -63,20 +70,26 @@ export type Database = {
           downloads_count?: number | null
           icon_url?: string | null
           id?: string
+          input_variables?: string[] | null
           likes_count?: number | null
           member_type?: string | null
+          model_type?: string | null
           name: string
           pricing_type?: string | null
           profile_image_url?: string | null
+          prompt_template?: string | null
           rating?: number | null
+          response_format?: string | null
           reviews_count?: number | null
           specialization?: string[] | null
           updated_at?: string
+          use_cases?: string[] | null
           website_url?: string | null
           youtube_url?: string | null
           youtube_videos?: Json | null
         }
         Update: {
+          assistant_type?: string | null
           category?: string
           content_themes?: string[] | null
           created_at?: string
@@ -84,15 +97,20 @@ export type Database = {
           downloads_count?: number | null
           icon_url?: string | null
           id?: string
+          input_variables?: string[] | null
           likes_count?: number | null
           member_type?: string | null
+          model_type?: string | null
           name?: string
           pricing_type?: string | null
           profile_image_url?: string | null
+          prompt_template?: string | null
           rating?: number | null
+          response_format?: string | null
           reviews_count?: number | null
           specialization?: string[] | null
           updated_at?: string
+          use_cases?: string[] | null
           website_url?: string | null
           youtube_url?: string | null
           youtube_videos?: Json | null
