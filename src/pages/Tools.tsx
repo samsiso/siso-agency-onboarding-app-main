@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Sidebar } from '@/components/Sidebar';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
-import { Json } from '@/integrations/supabase/types';
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 interface Tool {
   id: string;
@@ -49,7 +49,6 @@ export default function Tools() {
         throw error;
       }
 
-      // Transform the data to match Tool type
       const transformedData = data.map(tool => ({
         ...tool,
         youtube_videos: tool.youtube_videos as { title: string; url: string; }[] | null
@@ -84,7 +83,6 @@ export default function Tools() {
 
   const renderToolCard = (tool: Tool) => {
     if (tool.member_type) {
-      // Render community member card
       return (
         <Card 
           key={tool.id} 
@@ -131,7 +129,6 @@ export default function Tools() {
       );
     }
 
-    // Render regular tool card
     return (
       <Card 
         key={tool.id} 
@@ -181,37 +178,35 @@ export default function Tools() {
       <Sidebar />
       <div className="flex-1 p-8">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col space-y-4 mb-8">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <h1 className="text-4xl font-bold text-siso-text-bold">
-                {selectedCategory === 'Community' ? 'AI Community Members' : 'Core Tools & Platforms'}
-              </h1>
-              <div className="relative w-full md:w-96">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-siso-text/60" />
-                <Input
-                  placeholder={selectedCategory === 'Community' ? "Search members..." : "Search tools..."}
-                  className="pl-10 bg-siso-text/5 border-siso-text/10 focus-visible:ring-siso-orange"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <h1 className="text-4xl font-bold text-siso-text-bold">
+              {selectedCategory === 'Community' ? 'AI Community Members' : 'Core Tools & Platforms'}
+            </h1>
+            <div className="relative w-full md:w-96">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-siso-text/60" />
+              <Input
+                placeholder={selectedCategory === 'Community' ? "Search members..." : "Search tools..."}
+                className="pl-10 bg-siso-text/5 border-siso-text/10 focus-visible:ring-siso-orange"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
-            <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <Button
-                  key={category}
-                  variant="outline"
-                  className={`${
-                    selectedCategory === category || (category === 'All' && !selectedCategory)
-                      ? 'bg-siso-orange text-white hover:bg-siso-orange/90'
-                      : 'bg-siso-text/5 hover:bg-siso-text/10'
-                  } text-sm`}
-                  onClick={() => setSelectedCategory(category === 'All' ? null : category)}
-                >
-                  {category}
-                </Button>
-              ))}
-            </div>
+          </div>
+          <div className="flex flex-wrap gap-2 mt-4">
+            {categories.map((category) => (
+              <Button
+                key={category}
+                variant="outline"
+                className={`${
+                  selectedCategory === category || (category === 'All' && !selectedCategory)
+                    ? 'bg-siso-orange text-white hover:bg-siso-orange/90'
+                    : 'bg-siso-text/5 hover:bg-siso-text/10'
+                } text-sm`}
+                onClick={() => setSelectedCategory(category === 'All' ? null : category)}
+              >
+                {category}
+              </Button>
+            ))}
           </div>
 
           {isLoading ? (
@@ -223,7 +218,7 @@ export default function Tools() {
           )}
 
           <Sheet open={!!selectedTool} onOpenChange={() => setSelectedTool(null)}>
-            <SheetContent className="bg-siso-bg border-l border-siso-text/10 w-full sm:max-w-xl">
+            <SheetContent className="bg-siso-bg border-l border-siso-text/10 w-full sm:max-w-xl overflow-y-auto">
               {selectedTool && (
                 <>
                   <SheetHeader className="space-y-4">
@@ -235,13 +230,19 @@ export default function Tools() {
                             alt={selectedTool.name}
                             className="w-16 h-16 rounded-full object-cover"
                           />
-                        ) : null}
+                        ) : (
+                          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-siso-red/20 to-siso-orange/20 flex items-center justify-center">
+                            <Star className="w-8 h-8 text-siso-orange" />
+                          </div>
+                        )}
                         <div>
                           <SheetTitle className="text-2xl font-bold text-siso-text-bold">
                             {selectedTool.name}
                           </SheetTitle>
-                          {selectedTool.member_type && (
+                          {selectedTool.member_type ? (
                             <p className="text-sm text-siso-text/80 capitalize">{selectedTool.member_type}</p>
+                          ) : (
+                            <p className="text-sm text-siso-text/80">{selectedTool.category}</p>
                           )}
                         </div>
                       </div>
@@ -260,10 +261,25 @@ export default function Tools() {
                   </SheetHeader>
 
                   <div className="mt-6 space-y-6">
-                    {/* Quick Actions */}
+                    {selectedTool.youtube_url && (
+                      <div className="space-y-2">
+                        <h3 className="text-lg font-semibold text-siso-text-bold">Featured Video</h3>
+                        <div className="rounded-lg overflow-hidden bg-black/20">
+                          <AspectRatio ratio={16 / 9}>
+                            <iframe
+                              src={selectedTool.youtube_url.replace('watch?v=', 'embed/')}
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                              className="w-full h-full"
+                            />
+                          </AspectRatio>
+                        </div>
+                      </div>
+                    )}
+
                     <div className="space-y-2">
                       <h3 className="text-lg font-semibold text-siso-text-bold">Quick Actions</h3>
-                      <div className="flex flex-col gap-2">
+                      <div className="grid grid-cols-2 gap-2">
                         {selectedTool.website_url && (
                           <Button
                             className="w-full justify-start gap-2"
@@ -280,13 +296,12 @@ export default function Tools() {
                             onClick={() => window.open(selectedTool.youtube_url!, '_blank')}
                           >
                             <Youtube className="h-4 w-4 text-red-500" />
-                            Visit YouTube Channel
+                            YouTube Channel
                           </Button>
                         )}
                       </div>
                     </div>
 
-                    {/* Specializations */}
                     {selectedTool.specialization && selectedTool.specialization.length > 0 && (
                       <div className="space-y-2">
                         <h3 className="text-lg font-semibold text-siso-text-bold">Specializations</h3>
@@ -303,7 +318,6 @@ export default function Tools() {
                       </div>
                     )}
 
-                    {/* Content Themes */}
                     {selectedTool.content_themes && selectedTool.content_themes.length > 0 && (
                       <div className="space-y-2">
                         <h3 className="text-lg font-semibold text-siso-text-bold">Content Themes</h3>
@@ -320,7 +334,6 @@ export default function Tools() {
                       </div>
                     )}
 
-                    {/* Stats for regular tools */}
                     {!selectedTool.member_type && (
                       <div className="space-y-2">
                         <h3 className="text-lg font-semibold text-siso-text-bold">Stats</h3>
