@@ -6,15 +6,17 @@ import Footer from '../components/Footer';
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen bg-siso-bg">
+    <div className="flex min-h-screen w-full bg-siso-bg">
       <Sidebar />
-      <main className="flex-1 flex flex-col p-8">
-        <div className="container mx-auto flex-1">
-          <Hero />
-          <FeaturedSection />
-        </div>
+      <div className="flex-1 flex flex-col min-h-screen bg-siso-bg">
+        <main className="flex-1 p-8">
+          <div className="container mx-auto">
+            <Hero />
+            <FeaturedSection />
+          </div>
+        </main>
         <Footer />
-      </main>
+      </div>
     </div>
   );
 };
