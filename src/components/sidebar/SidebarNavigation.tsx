@@ -20,7 +20,7 @@ const menuItems = [
   {
     title: 'SISO Automations',
     icon: Download,
-    href: '#automations',
+    href: '/automations',
   },
   {
     title: 'ChatGPT Assistants',
