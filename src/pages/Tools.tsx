@@ -22,7 +22,7 @@ export default function Tools() {
         .from('tools')
         .select('*')
         // Exclude items that belong in other sections
-        .not('category', 'in', '("Community", "Automation", "Assistant")')
+        .not('category', 'in', '("Community", "Automation", "Assistant", "Chatbots")')
         .is('member_type', null); // Exclude community members
       
       if (error) {
