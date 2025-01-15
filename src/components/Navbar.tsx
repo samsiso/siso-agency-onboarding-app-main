@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Linkedin, Twitter, Youtube, Instagram } from 'lucide-react';
 
 const navItems = [
   { name: 'Discover Tools', href: '#tools' },
@@ -7,6 +7,13 @@ const navItems = [
   { name: 'Automations', href: '#automations' },
   { name: 'Free Resources', href: '#resources' },
   { name: 'Insights', href: '#insights' },
+];
+
+const socialLinks = [
+  { icon: Linkedin, href: '#', label: 'LinkedIn' },
+  { icon: Twitter, href: '#', label: 'Twitter' },
+  { icon: Youtube, href: '#', label: 'YouTube' },
+  { icon: Instagram, href: '#', label: 'Instagram' },
 ];
 
 export const Navbar = () => {
@@ -28,6 +35,22 @@ export const Navbar = () => {
             {navItems.map((item) => (
               <a key={item.name} href={item.href} className="nav-link">
                 {item.name}
+              </a>
+            ))}
+          </div>
+
+          {/* Social Media Icons - Desktop */}
+          <div className="hidden md:flex items-center space-x-4">
+            {socialLinks.map((social) => (
+              <a
+                key={social.label}
+                href={social.href}
+                className="text-siso-text hover:text-siso-text-bold transition-colors"
+                aria-label={social.label}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <social.icon size={20} />
               </a>
             ))}
           </div>
@@ -58,6 +81,20 @@ export const Navbar = () => {
                 {item.name}
               </a>
             ))}
+            <div className="flex items-center space-x-4 px-3 py-2">
+              {socialLinks.map((social) => (
+                <a
+                  key={social.label}
+                  href={social.href}
+                  className="text-siso-text hover:text-siso-text-bold transition-colors"
+                  aria-label={social.label}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <social.icon size={20} />
+                </a>
+              ))}
+            </div>
           </div>
         </div>
       )}

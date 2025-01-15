@@ -13,9 +13,14 @@ export const Hero = () => {
         <p className="text-xl sm:text-2xl text-siso-text max-w-2xl mx-auto mb-8">
           Welcome to the Siso Resource Hub! Your gateway to innovation and success.
         </p>
-        <button className="px-8 py-3 bg-gradient-to-r from-siso-red to-siso-orange text-white rounded-lg font-medium hover:opacity-90 transition-opacity animate-glow">
-          Get Started
-        </button>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <button className="px-8 py-3 bg-gradient-to-r from-siso-red to-siso-orange text-white rounded-lg font-medium hover:opacity-90 transition-opacity animate-glow">
+            Get Started
+          </button>
+          <button className="px-8 py-3 border border-siso-text/20 text-siso-text-bold rounded-lg font-medium hover:bg-siso-text/5 transition-colors">
+            Learn More
+          </button>
+        </div>
       </div>
     </div>
   );
