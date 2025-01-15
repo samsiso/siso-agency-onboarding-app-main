@@ -15,18 +15,18 @@ const featuredItems = [
     gradient: 'from-blue-500/20 to-cyan-500/20',
   },
   {
-    id: 'community',
-    title: 'The AI Community',
-    description: 'Connect on Slack/Discord and other groups.',
-    gradient: 'from-emerald-500/20 to-teal-500/20',
-  },
-  {
     id: 'siso-ai',
     title: 'SISO AI',
     description: 'Experience our cutting-edge AI solutions and tools.',
     gradient: 'from-transparent to-transparent',
     customBorder: true,
     highlight: true,
+  },
+  {
+    id: 'community',
+    title: 'The AI Community',
+    description: 'Connect on Slack/Discord and other groups.',
+    gradient: 'from-emerald-500/20 to-teal-500/20',
   },
   {
     id: 'assistants',
