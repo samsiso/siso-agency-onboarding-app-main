@@ -5,7 +5,6 @@ import OpenAI from "https://esm.sh/openai@4.20.1";
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
 serve(async (req) => {
@@ -63,7 +62,7 @@ serve(async (req) => {
       console.log('Starting assistant run');
       const run = await openai.beta.threads.runs.create(thread.id, {
         assistant_id: "asst_7f4aHDtKZtJAo1cFtptII7ed",
-        model: "gpt-4o-mini", // Using the recommended model
+        model: "gpt-4o-mini",
       });
 
       // Poll for completion
