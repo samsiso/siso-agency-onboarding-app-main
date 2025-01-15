@@ -33,8 +33,11 @@
   * {
     @apply border-border;
   }
+  html, body, #root {
+    @apply min-h-screen bg-siso-bg;
+  }
   body {
-    @apply bg-siso-bg text-siso-text font-['Inter'];
+    @apply text-siso-text font-['Inter'];
   }
 }
 
