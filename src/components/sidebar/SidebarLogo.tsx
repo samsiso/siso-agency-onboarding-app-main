@@ -5,9 +5,10 @@ import { Button } from '@/components/ui/button';
 interface SidebarLogoProps {
   collapsed: boolean;
   setCollapsed: (collapsed: boolean) => void;
+  onLogoClick: () => void;
 }
 
-export const SidebarLogo = ({ collapsed, setCollapsed }: SidebarLogoProps) => {
+export const SidebarLogo = ({ collapsed, setCollapsed, onLogoClick }: SidebarLogoProps) => {
   const [showAlternateMenu, setShowAlternateMenu] = useState(false);
 
   const businessLinks = [
@@ -33,6 +34,7 @@ export const SidebarLogo = ({ collapsed, setCollapsed }: SidebarLogoProps) => {
 
   const toggleMenu = () => {
     setShowAlternateMenu(!showAlternateMenu);
+    onLogoClick();
   };
 
   return (
