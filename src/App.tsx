@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Index from './pages/Index';
 import Tools from './pages/Tools';
+import ToolPage from './pages/ToolPage';
 import Education from './pages/SisoEducation';
 import Automations from './pages/Automations';
 import ChatGPTAssistants from './pages/ChatGPTAssistants';
@@ -15,6 +16,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/tools" element={<Tools />} />
+        <Route path="/tools/:id" element={<ToolPage />} />
         <Route path="/education" element={<Education />} />
         <Route path="/automations" element={<Automations />} />
         <Route path="/assistants" element={<ChatGPTAssistants />} />

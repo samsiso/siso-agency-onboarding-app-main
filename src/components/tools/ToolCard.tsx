@@ -1,18 +1,20 @@
 import { Download, Heart, Star, Users } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from "@/components/ui/card";
 import { Tool } from './types';
 
 interface ToolCardProps {
   tool: Tool;
-  onClick: (tool: Tool) => void;
 }
 
-export function ToolCard({ tool, onClick }: ToolCardProps) {
+export function ToolCard({ tool }: ToolCardProps) {
+  const navigate = useNavigate();
+
   if (tool.member_type) {
     return (
       <Card 
         className="group bg-card/50 backdrop-blur border-siso-text/10 hover:border-siso-orange/50 transition-all duration-300 cursor-pointer"
-        onClick={() => onClick(tool)}
+        onClick={() => navigate(`/tools/${tool.id}`)}
       >
         <CardContent className="p-3">
           <div className="flex items-center gap-3">
@@ -57,7 +59,7 @@ export function ToolCard({ tool, onClick }: ToolCardProps) {
   return (
     <Card 
       className="group bg-card/50 backdrop-blur border-siso-text/10 hover:border-siso-orange/50 transition-all duration-300 cursor-pointer"
-      onClick={() => onClick(tool)}
+      onClick={() => navigate(`/tools/${tool.id}`)}
     >
       <CardContent className="p-3">
         <div className="flex items-center gap-2">
