@@ -29,7 +29,6 @@ export default function ToolPage() {
         throw new Error('Tool not found');
       }
 
-      // Transform the youtube_videos JSON data into the correct type
       const transformedData: Tool = {
         ...data,
         youtube_videos: data.youtube_videos ? data.youtube_videos as { title: string; url: string; }[] : null
@@ -102,11 +101,11 @@ export default function ToolPage() {
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
       <Sidebar />
-      <div className="flex-1 p-8">
-        <div className="max-w-4xl mx-auto">
+      <div className="flex-1 p-8 overflow-y-auto">
+        <div className="max-w-4xl mx-auto space-y-8">
           <Link 
             to="/tools" 
-            className="inline-flex items-center gap-2 text-siso-text hover:text-siso-text-bold transition-colors mb-8"
+            className="inline-flex items-center gap-2 text-siso-text hover:text-siso-text-bold transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Tools
@@ -134,14 +133,6 @@ export default function ToolPage() {
                 </p>
               </div>
             </div>
-
-            {tool.description && (
-              <div className="prose prose-invert max-w-none">
-                <p className="text-siso-text text-lg leading-relaxed">
-                  {tool.description}
-                </p>
-              </div>
-            )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {tool.website_url && (
@@ -192,6 +183,37 @@ export default function ToolPage() {
               </Button>
             </div>
 
+            {tool.youtube_url && (
+              <div className="space-y-4">
+                <h2 className="text-2xl font-semibold text-siso-text-bold flex items-center gap-2">
+                  <Youtube className="w-6 h-6 text-red-500" />
+                  Featured Video
+                </h2>
+                <div className="rounded-lg overflow-hidden bg-black/20 ring-1 ring-siso-text/10">
+                  <AspectRatio ratio={16 / 9}>
+                    <iframe
+                      src={getYoutubeEmbedUrl(tool.youtube_url)}
+                      title={`${tool.name} demo video`}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      className="w-full h-full"
+                    />
+                  </AspectRatio>
+                </div>
+              </div>
+            )}
+
+            {tool.description && (
+              <div className="space-y-4">
+                <h2 className="text-2xl font-semibold text-siso-text-bold">About {tool.name}</h2>
+                <div className="prose prose-invert max-w-none">
+                  <p className="text-lg leading-relaxed text-siso-text">
+                    {tool.description}
+                  </p>
+                </div>
+              </div>
+            )}
+
             {!tool.member_type && (
               <div className="grid grid-cols-3 gap-4">
                 <div className="text-center p-6 rounded-lg bg-siso-text/5 hover:bg-siso-text/10 transition-colors">
@@ -208,23 +230,6 @@ export default function ToolPage() {
                   <Heart className="h-6 w-6 text-siso-red mx-auto mb-2" />
                   <div className="text-lg font-medium text-siso-text-bold">{tool.likes_count || '0'}</div>
                   <div className="text-sm text-siso-text">Likes</div>
-                </div>
-              </div>
-            )}
-
-            {tool.youtube_url && (
-              <div className="space-y-4">
-                <h2 className="text-2xl font-semibold text-siso-text-bold">Demo Video</h2>
-                <div className="rounded-lg overflow-hidden bg-black/20 ring-1 ring-siso-text/10">
-                  <AspectRatio ratio={16 / 9}>
-                    <iframe
-                      src={getYoutubeEmbedUrl(tool.youtube_url)}
-                      title={`${tool.name} demo video`}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      className="w-full h-full"
-                    />
-                  </AspectRatio>
                 </div>
               </div>
             )}
@@ -261,24 +266,37 @@ export default function ToolPage() {
               </div>
             )}
 
-            {/* Additional Information Section */}
-            {tool.description && (
-              <div className="space-y-6 mt-8">
-                <h2 className="text-2xl font-semibold text-siso-text-bold">About {tool.name}</h2>
-                <div className="prose prose-invert max-w-none">
-                  <p className="text-lg leading-relaxed">
-                    {tool.description}
-                  </p>
-                  {tool.use_cases && tool.use_cases.length > 0 && (
-                    <>
-                      <h3 className="text-xl font-semibold mt-6 mb-4">Key Use Cases</h3>
-                      <ul className="list-disc pl-6 space-y-2">
-                        {tool.use_cases.map((useCase, index) => (
-                          <li key={index} className="text-siso-text">{useCase}</li>
-                        ))}
-                      </ul>
-                    </>
-                  )}
+            {tool.use_cases && tool.use_cases.length > 0 && (
+              <div className="space-y-4">
+                <h2 className="text-2xl font-semibold text-siso-text-bold">Use Cases</h2>
+                <ul className="list-disc pl-6 space-y-2">
+                  {tool.use_cases.map((useCase, index) => (
+                    <li key={index} className="text-siso-text">{useCase}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {tool.youtube_videos && tool.youtube_videos.length > 0 && (
+              <div className="space-y-4">
+                <h2 className="text-2xl font-semibold text-siso-text-bold">Related Videos</h2>
+                <div className="grid grid-cols-1 gap-6">
+                  {tool.youtube_videos.map((video, index) => (
+                    <div key={index} className="space-y-2">
+                      <h3 className="text-lg font-medium text-siso-text-bold">{video.title}</h3>
+                      <div className="rounded-lg overflow-hidden bg-black/20 ring-1 ring-siso-text/10">
+                        <AspectRatio ratio={16 / 9}>
+                          <iframe
+                            src={getYoutubeEmbedUrl(video.url)}
+                            title={video.title}
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            className="w-full h-full"
+                          />
+                        </AspectRatio>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
