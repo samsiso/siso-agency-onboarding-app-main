@@ -6,11 +6,11 @@ import Footer from '../components/Footer';
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen w-full bg-siso-bg">
+    <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
       <Sidebar />
-      <div className="flex-1 flex flex-col min-h-screen bg-siso-bg overflow-x-hidden">
-        <main className="flex-1 p-4 sm:p-8">
-          <div className="container mx-auto max-w-7xl">
+      <div className="flex-1 flex flex-col min-h-screen overflow-x-hidden">
+        <main className="flex-1">
+          <div className="container mx-auto">
             <Hero />
             <FeaturedSection />
           </div>
