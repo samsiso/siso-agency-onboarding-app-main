@@ -6,6 +6,8 @@ import { CommunitySearch } from '@/components/community/CommunitySearch';
 import { CommunityMemberCard } from '@/components/community/CommunityMemberCard';
 import { CommunityMemberDetails } from '@/components/community/CommunityMemberDetails';
 import { CommunityMember } from '@/components/community/types';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { ExternalLink } from 'lucide-react';
 
 export default function SisoEducation() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -14,24 +16,17 @@ export default function SisoEducation() {
   const { data: members, isLoading, error } = useQuery({
     queryKey: ['education-members'],
     queryFn: async () => {
-      console.log('Fetching education and community members...');
       const { data, error } = await supabase
         .from('tools')
         .select('*')
         .in('category', ['education', 'community']);
       
-      if (error) {
-        console.error('Error fetching members:', error);
-        throw error;
-      }
+      if (error) throw error;
       
-      const transformedData = data.map(member => ({
+      return data.map(member => ({
         ...member,
         youtube_videos: member.youtube_videos as { title: string; url: string; }[] | null
       }));
-      
-      console.log('Fetched members:', transformedData);
-      return transformedData as CommunityMember[];
     },
   });
 
@@ -41,16 +36,28 @@ export default function SisoEducation() {
     member.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (error) {
-    console.error('Error in component:', error);
-    return <div className="text-red-500">Error loading members. Please try again later.</div>;
-  }
-
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
       <Sidebar />
       <div className="flex-1 p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
+          {/* List Learner Callout Box */}
+          <Alert className="mb-8 border border-[#0FA0CE]/20 bg-[#0FA0CE]/5 text-siso-text">
+            <AlertDescription className="flex items-center justify-between">
+              <span>
+                SISO's educational partner specializes in training employees within B2B and B2B2B businesses. Transform your team with personalized learning.
+              </span>
+              <a 
+                href="https://demo.listlearner.com/?ref=sourcesiso" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="flex items-center gap-2 text-[#0FA0CE] hover:text-[#0FA0CE]/80 transition-colors"
+              >
+                Learn More <ExternalLink size={16} />
+              </a>
+            </AlertDescription>
+          </Alert>
+
           {/* Header Section */}
           <div className="flex flex-col space-y-6 mb-8">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
