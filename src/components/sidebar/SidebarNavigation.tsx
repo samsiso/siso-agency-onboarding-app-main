@@ -3,17 +3,17 @@ import { SidebarMenuItem } from './SidebarMenuItem';
 
 const menuItems = [
   {
-    title: 'Core Tools & Platforms',
+    title: 'Home',
     icon: Home,
+    href: '/',
+  },
+  {
+    title: 'Core Tools & Platforms',
+    icon: Database,
     href: '/tools',
   },
   {
-    title: 'Social Media Marketing',
-    icon: Search,
-    href: '#social',
-  },
-  {
-    title: 'Automations & Downloads',
+    title: 'SISO Automations to Download',
     icon: Download,
     href: '#automations',
   },
@@ -29,7 +29,7 @@ const menuItems = [
   },
   {
     title: 'Additional Resources',
-    icon: Database,
+    icon: Search,
     href: '#resources',
   },
 ];
