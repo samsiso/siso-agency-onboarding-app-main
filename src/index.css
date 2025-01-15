@@ -58,7 +58,7 @@
 }
 
 .glow-card::before {
-  @apply content-[''] absolute inset-0 bg-gradient-to-br from-siso-red/0 to-siso-orange/0 transition-all duration-300;
+  @apply content-[''] absolute inset-0 bg-gradient-to-br from-siso-red/0 to-siso-orange/0 transition-all duration-300 pointer-events-none;
 }
 
 .glow-card:hover::before {

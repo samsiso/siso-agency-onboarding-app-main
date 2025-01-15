@@ -10,7 +10,7 @@ interface ToolActionsProps {
 
 export function ToolActions({ tool, onShare, onTwitterShare }: ToolActionsProps) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10">
       {tool.website_url && (
         <Button
           className="w-full justify-center gap-2 bg-gradient-to-r from-siso-red/90 to-siso-orange/90 hover:from-siso-red hover:to-siso-orange transition-all duration-300"
