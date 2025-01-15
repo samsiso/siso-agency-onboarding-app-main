@@ -139,7 +139,7 @@ export default function ToolPage() {
             </div>
 
             {/* Right Column - Actions & Stats */}
-            <div>
+            <div className="relative">
               <div className="sticky top-8 space-y-6">
                 <div className="glow-card space-y-6">
                   <ToolActions 
