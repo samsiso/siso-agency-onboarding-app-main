@@ -30,9 +30,9 @@ export const Hero = () => {
   }, []);
 
   return (
-    <div className="relative mb-12 p-8 rounded-xl bg-gradient-to-br from-siso-bg/50 to-siso-bg/30 backdrop-blur-sm">
+    <div className="relative mb-12 p-8 rounded-xl bg-gradient-to-br from-siso-bg/50 to-siso-bg/30 backdrop-blur-sm border border-siso-text/5 shadow-lg animate-fade-in">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-5xl sm:text-6xl font-bold text-siso-text-bold mb-8 leading-tight">
+        <h1 className="text-5xl sm:text-6xl font-bold text-siso-text-bold mb-8 leading-tight animate-scale-in">
           {userName ? (
             <>
               Welcome back,{' '}
@@ -49,14 +49,14 @@ export const Hero = () => {
             </>
           )}
         </h1>
-        <p className="text-xl text-siso-text mb-12 max-w-2xl">
+        <p className="text-xl text-siso-text mb-12 max-w-2xl animate-fade-in opacity-90">
           Discover the tools to build your own vision. Your gateway to innovation and success.
         </p>
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex flex-col sm:flex-row gap-4 animate-fade-in">
           <AuthButton />
           <Button 
             variant="outline" 
-            className="border-2 border-siso-text/20 text-siso-text-bold hover:bg-siso-text/5 hover:border-siso-text/40 transition-all duration-300"
+            className="border-2 border-siso-text/20 text-siso-text-bold hover:bg-gradient-to-r from-siso-red/10 to-siso-orange/10 hover:border-siso-text/40 transition-all duration-300 transform hover:scale-105"
           >
             Learn More
           </Button>

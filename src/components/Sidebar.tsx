@@ -77,24 +77,24 @@ export const Sidebar = () => {
   };
 
   return (
-    <div className={`h-screen bg-siso-bg border-r border-siso-text/10 transition-all duration-300 ${collapsed ? 'w-20' : 'w-64'}`}>
+    <div className={`h-screen bg-gradient-to-b from-siso-bg to-siso-bg/95 border-r border-siso-text/10 transition-all duration-300 ${collapsed ? 'w-20' : 'w-64'}`}>
       {/* Logo Section */}
-      <div className="p-4 border-b border-siso-text/10">
+      <div className="p-4 border-b border-siso-text/10 bg-gradient-to-r from-siso-bg to-siso-bg/95">
         <div className="flex items-center justify-between">
           {!collapsed ? (
             <div className="flex items-center gap-2">
               <img 
                 src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png" 
                 alt="Siso Logo" 
-                className="w-8 h-8"
+                className="w-8 h-8 animate-pulse"
               />
-              <span className="text-xl font-bold text-siso-text-bold">SISO</span>
+              <span className="text-xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">SISO</span>
             </div>
           ) : (
             <img 
               src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png" 
               alt="Siso Logo" 
-              className="w-8 h-8"
+              className="w-8 h-8 animate-pulse"
             />
           )}
           <button
@@ -117,25 +117,25 @@ export const Sidebar = () => {
             key={item.title}
             href={item.href}
             onClick={handleItemClick}
-            className="flex items-center gap-3 px-4 py-3 text-siso-text hover:bg-gradient-to-r from-siso-red/10 to-siso-orange/10 rounded-lg transition-colors group cursor-pointer"
+            className="flex items-center gap-3 px-4 py-3 text-siso-text hover:bg-gradient-to-r from-siso-red/10 to-siso-orange/10 rounded-lg transition-all duration-300 group cursor-pointer transform hover:translate-x-1"
           >
             <item.icon className="w-5 h-5 text-siso-text group-hover:text-siso-red transition-colors" />
             {!collapsed && (
-              <span className="text-sm font-medium">{item.title}</span>
+              <span className="text-sm font-medium group-hover:text-siso-text-bold transition-colors">{item.title}</span>
             )}
           </a>
         ))}
       </nav>
 
       {/* Settings and Auth at bottom */}
-      <div className="absolute bottom-0 w-full p-4 border-t border-siso-text/10 space-y-2">
+      <div className="absolute bottom-0 w-full p-4 border-t border-siso-text/10 space-y-2 bg-gradient-to-t from-siso-bg to-transparent">
         <Link
           to="/settings"
-          className="flex items-center gap-3 px-4 py-3 text-siso-text hover:bg-siso-text/5 rounded-lg transition-colors"
+          className="flex items-center gap-3 px-4 py-3 text-siso-text hover:bg-gradient-to-r from-siso-red/10 to-siso-orange/10 rounded-lg transition-all duration-300 group cursor-pointer transform hover:translate-x-1"
           onClick={handleItemClick}
         >
-          <Settings className="w-5 h-5" />
-          {!collapsed && <span className="text-sm font-medium">Settings</span>}
+          <Settings className="w-5 h-5 group-hover:text-siso-red transition-colors" />
+          {!collapsed && <span className="text-sm font-medium group-hover:text-siso-text-bold transition-colors">Settings</span>}
         </Link>
         {!collapsed && <AuthButton />}
       </div>
