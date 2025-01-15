@@ -27,6 +27,9 @@ interface Assistant {
 export default function ChatGPTAssistants() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedAssistant, setSelectedAssistant] = useState<Assistant | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  const categories = ['All', 'Featured', 'Software', 'Coding', 'Actions'];
 
   const { data: assistants, isLoading, error } = useQuery({
     queryKey: ['assistants'],
@@ -47,11 +50,19 @@ export default function ChatGPTAssistants() {
     },
   });
 
-  const filteredAssistants = assistants?.filter(assistant => 
-    !searchQuery || 
-    assistant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    assistant.description?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredAssistants = assistants?.filter(assistant => {
+    const matchesSearch = !searchQuery || 
+      assistant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      assistant.description?.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesCategory = !selectedCategory || selectedCategory === 'All' || 
+      (selectedCategory === 'Software' && assistant.assistant_type === 'software') ||
+      (selectedCategory === 'Coding' && assistant.assistant_type === 'coding') ||
+      (selectedCategory === 'Actions' && assistant.assistant_type === 'actions') ||
+      (selectedCategory === 'Featured' && assistant.rating && assistant.rating >= 4.5);
+
+    return matchesSearch && matchesCategory;
+  });
 
   if (error) {
     console.error('Error in component:', error);
@@ -77,6 +88,22 @@ export default function ChatGPTAssistants() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {categories.map((category) => (
+                <Button
+                  key={category}
+                  variant="outline"
+                  className={`${
+                    selectedCategory === category || (category === 'All' && !selectedCategory)
+                      ? 'bg-siso-orange text-white hover:bg-siso-orange/90'
+                      : 'bg-siso-text/5 hover:bg-siso-text/10'
+                  } text-sm`}
+                  onClick={() => setSelectedCategory(category === 'All' ? null : category)}
+                >
+                  {category}
+                </Button>
+              ))}
             </div>
           </div>
 
