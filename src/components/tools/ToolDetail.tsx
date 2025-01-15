@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Download, ExternalLink, Heart, Star, Youtube, X } from 'lucide-react';
+import { Download, ExternalLink, Heart, Star, Youtube } from 'lucide-react';
 import { Tool } from './types';
 
 interface ToolDetailProps {
@@ -13,38 +13,64 @@ export function ToolDetail({ tool, onClose }: ToolDetailProps) {
   return (
     <SheetContent className="bg-siso-bg border-l border-siso-text/10 w-full sm:max-w-xl overflow-y-auto">
       <SheetHeader className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            {tool.member_type && tool.profile_image_url ? (
-              <img 
-                src={tool.profile_image_url} 
-                alt={tool.name}
-                className="w-16 h-16 rounded-full object-cover"
-              />
-            ) : (
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-siso-red/20 to-siso-orange/20 flex items-center justify-center">
-                <Star className="w-8 h-8 text-siso-orange" />
-              </div>
-            )}
-            <div>
-              <SheetTitle className="text-2xl font-bold text-siso-text-bold">
-                {tool.name}
-              </SheetTitle>
-              {tool.member_type ? (
-                <p className="text-sm text-siso-text/80 capitalize">{tool.member_type}</p>
-              ) : (
-                <p className="text-sm text-siso-text/80">{tool.category}</p>
-              )}
+        <div className="flex items-center">
+          {tool.member_type && tool.profile_image_url ? (
+            <img 
+              src={tool.profile_image_url} 
+              alt={tool.name}
+              className="w-16 h-16 rounded-full object-cover"
+            />
+          ) : (
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-siso-red/20 to-siso-orange/20 flex items-center justify-center">
+              <Star className="w-8 h-8 text-siso-orange" />
             </div>
+          )}
+          <div className="ml-3 flex-1">
+            <SheetTitle className="text-2xl font-bold text-siso-text-bold">
+              {tool.name}
+            </SheetTitle>
+            {tool.member_type ? (
+              <p className="text-sm text-siso-I notice there's an extra close/delete button in the tool detail view. Let me remove that redundant button while keeping the main close functionality.
+
+<lov-code>
+<lov-write file_path="src/components/tools/ToolDetail.tsx">
+import { Button } from "@/components/ui/button";
+import { SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Download, ExternalLink, Heart, Star, Youtube } from 'lucide-react';
+import { Tool } from './types';
+
+interface ToolDetailProps {
+  tool: Tool;
+  onClose: () => void;
+}
+
+export function ToolDetail({ tool, onClose }: ToolDetailProps) {
+  return (
+    <SheetContent className="bg-siso-bg border-l border-siso-text/10 w-full sm:max-w-xl overflow-y-auto">
+      <SheetHeader className="space-y-4">
+        <div className="flex items-center gap-3">
+          {tool.member_type && tool.profile_image_url ? (
+            <img 
+              src={tool.profile_image_url} 
+              alt={tool.name}
+              className="w-16 h-16 rounded-full object-cover"
+            />
+          ) : (
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-siso-red/20 to-siso-orange/20 flex items-center justify-center">
+              <Star className="w-8 h-8 text-siso-orange" />
+            </div>
+          )}
+          <div>
+            <SheetTitle className="text-2xl font-bold text-siso-text-bold">
+              {tool.name}
+            </SheetTitle>
+            {tool.member_type ? (
+              <p className="text-sm text-siso-text/80 capitalize">{tool.member_type}</p>
+            ) : (
+              <p className="text-sm text-siso-text/80">{tool.category}</p>
+            )}
           </div>
-          <Button
-            variant="outline"
-            size="icon"
-            className="rounded-full"
-            onClick={onClose}
-          >
-            <X className="h-4 w-4" />
-          </Button>
         </div>
         <SheetDescription className="text-siso-text">
           {tool.description}
