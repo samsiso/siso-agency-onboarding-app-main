@@ -19,10 +19,7 @@ export default function Tools() {
       const { data, error } = await supabase
         .from('tools')
         .select('*')
-        .not('category', 'eq', 'Assistant')
-        .not('category', 'eq', 'Community')
-        .not('category', 'eq', 'Automation')
-        .not('category', 'eq', 'Chatbots')
+        .eq('assistant_type', null)  // Only get records where assistant_type is null
         .is('member_type', null);
       
       if (error) {
@@ -40,7 +37,6 @@ export default function Tools() {
     },
   });
 
-  // Calculate category counts
   const categoryCounts = useMemo(() => {
     if (!tools) return {};
     return tools.reduce((acc, tool) => {
