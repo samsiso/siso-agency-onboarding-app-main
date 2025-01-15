@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Download, ExternalLink, Heart, Info, Star, Youtube } from 'lucide-react';
+import { Download, ExternalLink, Heart, Info, Share2, Star, Twitter, Youtube } from 'lucide-react';
 import { Tool } from './types';
 
 interface ToolDetailProps {
@@ -10,6 +10,22 @@ interface ToolDetailProps {
 }
 
 export function ToolDetail({ tool, onClose }: ToolDetailProps) {
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: tool.name,
+        text: tool.description || `Check out ${tool.name}`,
+        url: window.location.href,
+      }).catch((error) => console.log('Error sharing:', error));
+    }
+  };
+
+  const handleTwitterShare = () => {
+    const text = encodeURIComponent(`Check out ${tool.name}${tool.description ? `: ${tool.description}` : ''}`);
+    const url = encodeURIComponent(window.location.href);
+    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+  };
+
   return (
     <SheetContent className="bg-siso-bg border-l border-siso-text/10 w-full sm:max-w-xl overflow-y-auto">
       <SheetHeader className="space-y-4">
@@ -74,6 +90,22 @@ export function ToolDetail({ tool, onClose }: ToolDetailProps) {
             >
               <Info className="h-4 w-4 text-siso-text/80" />
               Learn More
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full justify-start gap-2 border-siso-text/20 hover:bg-siso-text/5"
+              onClick={handleTwitterShare}
+            >
+              <Twitter className="h-4 w-4 text-blue-400" />
+              Share on X
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full justify-start gap-2 border-siso-text/20 hover:bg-siso-text/5"
+              onClick={handleShare}
+            >
+              <Share2 className="h-4 w-4 text-siso-text/80" />
+              Share
             </Button>
           </div>
         </div>
