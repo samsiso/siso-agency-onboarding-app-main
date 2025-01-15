@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Youtube, Info, Share2, Twitter } from 'lucide-react';
+import { ExternalLink, Youtube, Info, Share2, Twitter, MessageSquare } from 'lucide-react';
 import { Tool } from './types';
 
 interface ToolActionsProps {
@@ -25,6 +25,15 @@ export function ToolActions({ tool, onShare, onTwitterShare }: ToolActionsProps)
       </div>
 
       <div className="grid grid-cols-1 gap-3">
+        {tool.assistant_type && (
+          <Button
+            className="w-full justify-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-300"
+            onClick={() => window.open('/chat', '_blank')}
+          >
+            <MessageSquare className="h-4 w-4" />
+            GPT Assistant
+          </Button>
+        )}
         {tool.website_url && (
           <Button
             className="w-full justify-center gap-2 bg-gradient-to-r from-siso-red to-siso-orange hover:from-siso-red/90 hover:to-siso-orange/90 transition-all duration-300"
