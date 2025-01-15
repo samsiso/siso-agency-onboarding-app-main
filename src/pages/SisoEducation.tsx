@@ -7,6 +7,7 @@ import { CommunityMemberCard } from '@/components/community/CommunityMemberCard'
 import { CommunityMemberDetails } from '@/components/community/CommunityMemberDetails';
 import { CommunityMember } from '@/components/community/types';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import { ExternalLink } from 'lucide-react';
 
 export default function SisoEducation() {
@@ -43,18 +44,24 @@ export default function SisoEducation() {
         <div className="max-w-7xl mx-auto">
           {/* List Learner Callout Box */}
           <Alert className="mb-8 border border-[#0FA0CE]/20 bg-[#0FA0CE]/5 text-siso-text">
-            <AlertDescription className="flex items-center justify-between">
+            <AlertDescription className="flex items-center justify-between gap-4">
               <span>
-                SISO's educational partner specializes in training employees within B2B and B2B2B businesses. Transform your team with personalized learning.
+                The best way to learn new skills using AI - perfect for agencies, businesses, and individuals looking to grow.
               </span>
-              <a 
-                href="https://demo.listlearner.com/?ref=sourcesiso" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="flex items-center gap-2 text-[#0FA0CE] hover:text-[#0FA0CE]/80 transition-colors"
+              <Button
+                asChild
+                variant="outline"
+                className="shrink-0 border-[#0FA0CE] text-[#0FA0CE] hover:bg-[#0FA0CE]/10 hover:text-[#0FA0CE] transition-all"
               >
-                Learn More <ExternalLink size={16} />
-              </a>
+                <a 
+                  href="https://demo.listlearner.com/?ref=sourcesiso" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="flex items-center gap-2"
+                >
+                  Try it Free <ExternalLink size={16} />
+                </a>
+              </Button>
             </AlertDescription>
           </Alert>
 
