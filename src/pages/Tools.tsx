@@ -26,12 +26,14 @@ export default function Tools() {
         throw error;
       }
 
+      console.log('Raw data from Supabase:', data);
+      
       const transformedData = data.map(tool => ({
         ...tool,
         youtube_videos: tool.youtube_videos as { title: string; url: string; }[] | null
       }));
       
-      console.log('Fetched tools:', transformedData);
+      console.log('Transformed tools data:', transformedData);
       return transformedData as Tool[];
     },
   });
@@ -53,6 +55,8 @@ export default function Tools() {
 
     return matchesSearch && matchesCategory;
   });
+
+  console.log('Filtered tools:', filteredTools);
 
   if (error) {
     console.error('Error in component:', error);
