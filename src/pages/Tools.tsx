@@ -19,8 +19,8 @@ export default function Tools() {
       const { data, error } = await supabase
         .from('tools')
         .select('*')
-        .eq('assistant_type', null)  // Only get records where assistant_type is null
-        .is('member_type', null);
+        .is('assistant_type', null)  // Only get records where assistant_type is null (these are tools)
+        .is('member_type', null);    // Keep this filter as per original requirements
       
       if (error) {
         console.error('Error fetching tools:', error);
