@@ -20,6 +20,7 @@ export default function Tools() {
         .from('tools')
         .select('*')
         .not('category', 'in', '("Community", "Automation", "Assistant", "Chatbots")')
+        .not('assistant_type', 'eq', 'Conversational AI')
         .is('member_type', null);
       
       if (error) {
