@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
-import { Sidebar } from '@/components/Sidebar';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { CommunitySearch } from '@/components/community/CommunitySearch';
 import { CommunityMemberCard } from '@/components/community/CommunityMemberCard';
 import { CommunityMemberDetails } from '@/components/community/CommunityMemberDetails';
@@ -33,7 +32,8 @@ export default function Networking() {
       if (selectedCategory !== 'all') {
         query = query.eq('category', selectedCategory);
       } else {
-        query = query.like('category', 'networking-%');
+        // When 'all' is selected, fetch items from all networking categories
+        query = query.or('category.eq.networking-featured,category.eq.networking-school,category.eq.networking-discord,category.eq.networking-general');
       }
 
       const { data, error } = await query;
@@ -76,7 +76,6 @@ export default function Networking() {
 
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
-      <Sidebar />
       <div className="flex-1 p-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col space-y-4 mb-8">
