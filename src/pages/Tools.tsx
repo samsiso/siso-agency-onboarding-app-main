@@ -1,11 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
-import { Download, Heart, Search, Star } from 'lucide-react';
+import { Download, ExternalLink, Heart, Search, Star, Youtube, X } from 'lucide-react';
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Sidebar } from '@/components/Sidebar';
 import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 
 interface Tool {
   id: string;
@@ -19,9 +20,38 @@ interface Tool {
   likes_count: number | null;
 }
 
+interface ToolDetails extends Tool {
+  website_url?: string;
+  youtube_videos?: {
+    title: string;
+    url: string;
+  }[];
+}
+
+// Mock data for tool details - in production this would come from your database
+const getToolDetails = (tool: Tool): ToolDetails => ({
+  ...tool,
+  website_url: "https://example.com",
+  youtube_videos: [
+    {
+      title: "Getting Started Guide",
+      url: "https://youtube.com/watch?v=example1"
+    },
+    {
+      title: "Advanced Features Tutorial",
+      url: "https://youtube.com/watch?v=example2"
+    },
+    {
+      title: "Pro Tips & Tricks",
+      url: "https://youtube.com/watch?v=example3"
+    }
+  ]
+});
+
 export default function Tools() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedTool, setSelectedTool] = useState<ToolDetails | null>(null);
 
   const { data: tools, isLoading, error } = useQuery({
     queryKey: ['tools'],
@@ -52,6 +82,11 @@ export default function Tools() {
 
     return matchesSearch && matchesCategory;
   });
+
+  const handleToolClick = (tool: Tool) => {
+    const toolDetails = getToolDetails(tool);
+    setSelectedTool(toolDetails);
+  };
 
   if (error) {
     console.error('Error in component:', error);
@@ -99,7 +134,11 @@ export default function Tools() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
               {filteredTools?.map((tool) => (
-                <Card key={tool.id} className="group bg-card/50 backdrop-blur border-siso-text/10 hover:border-siso-orange/50 transition-all duration-300">
+                <Card 
+                  key={tool.id} 
+                  className="group bg-card/50 backdrop-blur border-siso-text/10 hover:border-siso-orange/50 transition-all duration-300 cursor-pointer"
+                  onClick={() => handleToolClick(tool)}
+                >
                   <CardContent className="p-3">
                     <div className="flex items-center gap-2">
                       <div className="w-6 h-6 rounded-full bg-gradient-to-br from-siso-red/20 to-siso-orange/20 flex items-center justify-center group-hover:animate-glow">
@@ -138,6 +177,94 @@ export default function Tools() {
               ))}
             </div>
           )}
+
+          <Sheet open={!!selectedTool} onOpenChange={() => setSelectedTool(null)}>
+            <SheetContent className="bg-siso-bg border-l border-siso-text/10 w-full sm:max-w-xl">
+              {selectedTool && (
+                <>
+                  <SheetHeader className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <SheetTitle className="text-2xl font-bold text-siso-text-bold">
+                        {selectedTool.name}
+                      </SheetTitle>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="rounded-full"
+                        onClick={() => setSelectedTool(null)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <SheetDescription className="text-siso-text">
+                      {selectedTool.description}
+                    </SheetDescription>
+                  </SheetHeader>
+
+                  <div className="mt-6 space-y-6">
+                    <div className="space-y-2">
+                      <h3 className="text-lg font-semibold text-siso-text-bold">Quick Actions</h3>
+                      <div className="flex flex-col gap-2">
+                        <Button
+                          className="w-full justify-start gap-2"
+                          onClick={() => window.open(selectedTool.website_url, '_blank')}
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                          Visit Website
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="w-full justify-start gap-2"
+                          onClick={() => window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(selectedTool.name + ' tutorial')}`, '_blank')}
+                        >
+                          <Youtube className="h-4 w-4 text-red-500" />
+                          Watch Tutorials
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <h3 className="text-lg font-semibold text-siso-text-bold">Featured Videos</h3>
+                      <div className="space-y-2">
+                        {selectedTool.youtube_videos?.map((video, index) => (
+                          <Button
+                            key={index}
+                            variant="outline"
+                            className="w-full justify-start gap-2 text-left"
+                            onClick={() => window.open(video.url, '_blank')}
+                          >
+                            <Youtube className="h-4 w-4 text-red-500 shrink-0" />
+                            <span className="truncate">{video.title}</span>
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <h3 className="text-lg font-semibold text-siso-text-bold">Stats</h3>
+                      <div className="grid grid-cols-3 gap-4">
+                        <div className="text-center p-3 rounded-lg bg-siso-text/5">
+                          <Star className="h-5 w-5 text-siso-orange mx-auto mb-1" />
+                          <div className="text-sm text-siso-text-bold">{selectedTool.rating?.toFixed(1) || '-'}</div>
+                          <div className="text-xs text-siso-text">Rating</div>
+                        </div>
+                        <div className="text-center p-3 rounded-lg bg-siso-text/5">
+                          <Download className="h-5 w-5 text-siso-text/60 mx-auto mb-1" />
+                          <div className="text-sm text-siso-text-bold">{selectedTool.downloads_count || '0'}</div>
+                          <div className="text-xs text-siso-text">Downloads</div>
+                        </div>
+                        <div className="text-center p-3 rounded-lg bg-siso-text/5">
+                          <Heart className="h-5 w-5 text-siso-red mx-auto mb-1" />
+                          <div className="text-sm text-siso-text-bold">{selectedTool.likes_count || '0'}</div>
+                          <div className="text-xs text-siso-text">Likes</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </div>
