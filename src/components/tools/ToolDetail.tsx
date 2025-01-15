@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Download, ExternalLink, Heart, Star, Youtube } from 'lucide-react';
+import { Download, ExternalLink, Heart, Info, Star, Youtube } from 'lucide-react';
 import { Tool } from './types';
 
 interface ToolDetailProps {
@@ -13,20 +13,20 @@ export function ToolDetail({ tool, onClose }: ToolDetailProps) {
   return (
     <SheetContent className="bg-siso-bg border-l border-siso-text/10 w-full sm:max-w-xl overflow-y-auto">
       <SheetHeader className="space-y-4">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           {tool.member_type && tool.profile_image_url ? (
             <img 
               src={tool.profile_image_url} 
               alt={tool.name}
-              className="w-16 h-16 rounded-full object-cover"
+              className="w-20 h-20 rounded-full object-cover ring-2 ring-siso-orange/20"
             />
           ) : (
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-siso-red/20 to-siso-orange/20 flex items-center justify-center">
-              <Star className="w-8 h-8 text-siso-orange" />
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-siso-red/20 to-siso-orange/20 flex items-center justify-center ring-2 ring-siso-orange/20">
+              <Star className="w-10 h-10 text-siso-orange" />
             </div>
           )}
           <div>
-            <SheetTitle className="text-2xl font-bold text-siso-text-bold">
+            <SheetTitle className="text-2xl font-bold text-siso-text-bold mb-1">
               {tool.name}
             </SheetTitle>
             {tool.member_type ? (
@@ -36,16 +36,55 @@ export function ToolDetail({ tool, onClose }: ToolDetailProps) {
             )}
           </div>
         </div>
-        <SheetDescription className="text-siso-text">
+        <SheetDescription className="text-siso-text text-base leading-relaxed">
           {tool.description}
         </SheetDescription>
       </SheetHeader>
 
-      <div className="mt-6 space-y-6">
+      <div className="mt-8 space-y-8">
+        <div className="space-y-3">
+          <h3 className="text-lg font-semibold text-siso-text-bold flex items-center gap-2">
+            <ExternalLink className="w-5 h-5 text-siso-orange" />
+            Quick Actions
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {tool.website_url && (
+              <Button
+                className="w-full justify-start gap-2 bg-gradient-to-r from-siso-red/90 to-siso-orange/90 hover:from-siso-red hover:to-siso-orange transition-all duration-300"
+                onClick={() => window.open(tool.website_url!, '_blank')}
+              >
+                <ExternalLink className="h-4 w-4" />
+                Visit Website
+              </Button>
+            )}
+            {tool.youtube_url && (
+              <Button
+                variant="outline"
+                className="w-full justify-start gap-2 border-siso-text/20 hover:bg-siso-text/5"
+                onClick={() => window.open(tool.youtube_url!, '_blank')}
+              >
+                <Youtube className="h-4 w-4 text-red-500" />
+                Watch Video
+              </Button>
+            )}
+            <Button
+              variant="outline"
+              className="w-full justify-start gap-2 border-siso-text/20 hover:bg-siso-text/5"
+              onClick={() => window.open(`https://www.google.com/search?q=${encodeURIComponent(tool.name)}`, '_blank')}
+            >
+              <Info className="h-4 w-4 text-siso-text/80" />
+              Learn More
+            </Button>
+          </div>
+        </div>
+
         {tool.youtube_url && (
-          <div className="space-y-2">
-            <h3 className="text-lg font-semibold text-siso-text-bold">Featured Video</h3>
-            <div className="rounded-lg overflow-hidden bg-black/20">
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold text-siso-text-bold flex items-center gap-2">
+              <Youtube className="w-5 h-5 text-red-500" />
+              Featured Video
+            </h3>
+            <div className="rounded-lg overflow-hidden bg-black/20 ring-1 ring-siso-text/10">
               <AspectRatio ratio={16 / 9}>
                 <iframe
                   src={tool.youtube_url.replace('watch?v=', 'embed/')}
@@ -58,39 +97,14 @@ export function ToolDetail({ tool, onClose }: ToolDetailProps) {
           </div>
         )}
 
-        <div className="space-y-2">
-          <h3 className="text-lg font-semibold text-siso-text-bold">Quick Actions</h3>
-          <div className="grid grid-cols-2 gap-2">
-            {tool.website_url && (
-              <Button
-                className="w-full justify-start gap-2"
-                onClick={() => window.open(tool.website_url!, '_blank')}
-              >
-                <ExternalLink className="h-4 w-4" />
-                Visit Website
-              </Button>
-            )}
-            {tool.youtube_url && (
-              <Button
-                variant="outline"
-                className="w-full justify-start gap-2"
-                onClick={() => window.open(tool.youtube_url!, '_blank')}
-              >
-                <Youtube className="h-4 w-4 text-red-500" />
-                YouTube Channel
-              </Button>
-            )}
-          </div>
-        </div>
-
         {tool.specialization && tool.specialization.length > 0 && (
-          <div className="space-y-2">
+          <div className="space-y-3">
             <h3 className="text-lg font-semibold text-siso-text-bold">Specializations</h3>
             <div className="flex flex-wrap gap-2">
               {tool.specialization.map((spec, index) => (
                 <span 
                   key={index}
-                  className="text-sm px-3 py-1 rounded-full bg-siso-text/10 text-siso-text"
+                  className="text-sm px-3 py-1 rounded-full bg-siso-text/10 text-siso-text hover:bg-siso-text/20 transition-colors cursor-default"
                 >
                   {spec}
                 </span>
@@ -100,13 +114,13 @@ export function ToolDetail({ tool, onClose }: ToolDetailProps) {
         )}
 
         {tool.content_themes && tool.content_themes.length > 0 && (
-          <div className="space-y-2">
+          <div className="space-y-3">
             <h3 className="text-lg font-semibold text-siso-text-bold">Content Themes</h3>
             <div className="flex flex-wrap gap-2">
               {tool.content_themes.map((theme, index) => (
                 <span 
                   key={index}
-                  className="text-sm px-3 py-1 rounded-full bg-siso-orange/10 text-siso-orange"
+                  className="text-sm px-3 py-1 rounded-full bg-siso-orange/10 text-siso-orange hover:bg-siso-orange/20 transition-colors cursor-default"
                 >
                   {theme}
                 </span>
@@ -116,22 +130,22 @@ export function ToolDetail({ tool, onClose }: ToolDetailProps) {
         )}
 
         {!tool.member_type && (
-          <div className="space-y-2">
+          <div className="space-y-3">
             <h3 className="text-lg font-semibold text-siso-text-bold">Stats</h3>
             <div className="grid grid-cols-3 gap-4">
-              <div className="text-center p-3 rounded-lg bg-siso-text/5">
-                <Star className="h-5 w-5 text-siso-orange mx-auto mb-1" />
-                <div className="text-sm text-siso-text-bold">{tool.rating?.toFixed(1) || '-'}</div>
+              <div className="text-center p-4 rounded-lg bg-siso-text/5 hover:bg-siso-text/10 transition-colors">
+                <Star className="h-5 w-5 text-siso-orange mx-auto mb-2" />
+                <div className="text-sm font-medium text-siso-text-bold">{tool.rating?.toFixed(1) || '-'}</div>
                 <div className="text-xs text-siso-text">Rating</div>
               </div>
-              <div className="text-center p-3 rounded-lg bg-siso-text/5">
-                <Download className="h-5 w-5 text-siso-text/60 mx-auto mb-1" />
-                <div className="text-sm text-siso-text-bold">{tool.downloads_count || '0'}</div>
+              <div className="text-center p-4 rounded-lg bg-siso-text/5 hover:bg-siso-text/10 transition-colors">
+                <Download className="h-5 w-5 text-siso-text/60 mx-auto mb-2" />
+                <div className="text-sm font-medium text-siso-text-bold">{tool.downloads_count || '0'}</div>
                 <div className="text-xs text-siso-text">Downloads</div>
               </div>
-              <div className="text-center p-3 rounded-lg bg-siso-text/5">
-                <Heart className="h-5 w-5 text-siso-red mx-auto mb-1" />
-                <div className="text-sm text-siso-text-bold">{tool.likes_count || '0'}</div>
+              <div className="text-center p-4 rounded-lg bg-siso-text/5 hover:bg-siso-text/10 transition-colors">
+                <Heart className="h-5 w-5 text-siso-red mx-auto mb-2" />
+                <div className="text-sm font-medium text-siso-text-bold">{tool.likes_count || '0'}</div>
                 <div className="text-xs text-siso-text">Likes</div>
               </div>
             </div>
