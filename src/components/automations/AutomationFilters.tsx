@@ -32,7 +32,7 @@ export function AutomationFilters({
       </div>
 
       <Tabs defaultValue={selectedCategory} className="w-full" onValueChange={(value) => onCategoryChange(value as AutomationCategory)}>
-        <TabsList className="w-full justify-start bg-siso-text/5 border border-siso-text/10 flex-wrap">
+        <TabsList className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-1 p-1 bg-siso-text/5 border border-siso-text/10">
           <TabsTrigger value="all" className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange">
             All
             <Badge variant="secondary" className="ml-2 bg-siso-text/10">
