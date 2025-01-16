@@ -15,12 +15,11 @@ export default function SisoEducation() {
   const [selectedMember, setSelectedMember] = useState<CommunityMember | null>(null);
 
   const { data: members, isLoading, error } = useQuery({
-    queryKey: ['education-members'],
+    queryKey: ['education-creators'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('tools')
-        .select('*')
-        .in('category', ['education', 'community']);
+        .from('education_creators')
+        .select('*');
       
       if (error) throw error;
       
@@ -87,6 +86,10 @@ export default function SisoEducation() {
           {isLoading ? (
             <div className="flex items-center justify-center min-h-[200px]">
               <div className="text-siso-text">Loading educational resources...</div>
+            </div>
+          ) : error ? (
+            <div className="flex items-center justify-center min-h-[200px]">
+              <div className="text-red-500">Error loading education creators. Please try again later.</div>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

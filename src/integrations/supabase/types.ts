@@ -153,45 +153,6 @@ export type Database = {
         }
         Relationships: []
       }
-      education_resources: {
-        Row: {
-          category: string
-          content_type: string | null
-          created_at: string
-          description: string | null
-          id: string
-          name: string
-          profile_image_url: string | null
-          resource_url: string | null
-          updated_at: string
-          video_url: string | null
-        }
-        Insert: {
-          category: string
-          content_type?: string | null
-          created_at?: string
-          description?: string | null
-          id?: string
-          name: string
-          profile_image_url?: string | null
-          resource_url?: string | null
-          updated_at?: string
-          video_url?: string | null
-        }
-        Update: {
-          category?: string
-          content_type?: string | null
-          created_at?: string
-          description?: string | null
-          id?: string
-          name?: string
-          profile_image_url?: string | null
-          resource_url?: string | null
-          updated_at?: string
-          video_url?: string | null
-        }
-        Relationships: []
-      }
       gpt_resources: {
         Row: {
           assistant_type: string | null
