@@ -16,15 +16,13 @@ export default function Tools() {
 
   const categories = [
     { id: 'all', label: 'All Tools' },
+    { id: 'featured', label: 'Featured' },
+    { id: 'automation', label: 'Automation' },
+    { id: 'database', label: 'Database' },
+    { id: 'sales', label: 'Sales' },
     { id: 'development', label: 'Development' },
-    { id: 'productivity', label: 'Productivity' },
-    { id: 'content', label: 'Content Creation' },
-    { id: 'business', label: 'Business' },
     { id: 'education', label: 'Education' },
-    { id: 'design', label: 'Design' },
-    { id: 'research', label: 'Research' },
-    { id: 'language', label: 'Language' },
-    { id: 'media', label: 'Media' },
+    { id: 'visual', label: 'Visual' },
   ];
 
   const mapToolToCategory = (originalCategory: string): string => {
@@ -33,10 +31,17 @@ export default function Tools() {
       'page builder': 'development',
       'custom actions': 'development',
       'authentication': 'development',
-      'collect email': 'business',
-      'knowledge files': 'productivity',
-      'ads': 'business',
-      'monetization': 'business'
+      'collect email': 'sales',
+      'knowledge files': 'education',
+      'ads': 'sales',
+      'monetization': 'sales',
+      'visual design': 'visual',
+      'ui/ux': 'visual',
+      'graphics': 'visual',
+      'data management': 'database',
+      'data analytics': 'database',
+      'workflow': 'automation',
+      'task automation': 'automation'
     };
     return categoryMap[originalCategory.toLowerCase()] || originalCategory.toLowerCase();
   };
@@ -49,7 +54,7 @@ export default function Tools() {
         .from('tools')
         .select('*')
         .eq('resource_type', 'tool')
-        .neq('category', 'gpt builder'); // Exclude GPT builder tools
+        .neq('category', 'gpt builder');
       
       if (error) {
         console.error('Error fetching tools:', error);
@@ -83,7 +88,9 @@ export default function Tools() {
       tool.description?.toLowerCase().includes(searchQuery.toLowerCase());
     
     const toolCategory = mapToolToCategory(tool.category);
-    const matchesCategory = selectedCategory === 'all' || toolCategory === selectedCategory;
+    const matchesCategory = selectedCategory === 'all' || 
+      (selectedCategory === 'featured' && tool.rating && tool.rating >= 4.5) ||
+      toolCategory === selectedCategory;
 
     return matchesSearch && matchesCategory;
   });
@@ -114,6 +121,22 @@ export default function Tools() {
                 />
               </div>
             </div>
+
+            <ScrollArea className="w-full">
+              <Tabs defaultValue="all" className="w-full" onValueChange={setSelectedCategory}>
+                <TabsList className="h-auto flex-wrap bg-siso-text/5 p-2">
+                  {categories.map((category) => (
+                    <TabsTrigger
+                      key={category.id}
+                      value={category.id}
+                      className="m-1 data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange"
+                    >
+                      {category.label} {categoryCounts[category.id] ? `(${categoryCounts[category.id]})` : ''}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </Tabs>
+            </ScrollArea>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
               <Alert className="bg-siso-text/5 border border-siso-text/10">
