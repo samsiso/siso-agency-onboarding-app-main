@@ -36,8 +36,13 @@ export default function Tools() {
         throw error;
       }
       
-      console.log('Raw data from Supabase:', data);
-      return data as ToolType[];
+      // Parse youtube_videos JSON for each tool
+      const parsedData = data.map(tool => ({
+        ...tool,
+        youtube_videos: tool.youtube_videos ? (tool.youtube_videos as Array<{ title: string; url: string; }>) : null
+      }));
+      
+      return parsedData as Tool[];
     },
   });
 

@@ -14,7 +14,7 @@ export interface Tool {
   // Adding back fields needed by components
   member_type?: string | null;
   youtube_url?: string | null;
-  youtube_videos?: { title: string; url: string; }[] | null;
+  youtube_videos?: Array<{ title: string; url: string; }> | null;
   specialization?: string[] | null;
   content_themes?: string[] | null;
   use_cases?: string[] | null;

@@ -32,7 +32,13 @@ export default function ToolPage() {
         throw new Error('Tool not found');
       }
       
-      return data as Tool;
+      // Parse youtube_videos JSON if it exists
+      const parsedData = {
+        ...data,
+        youtube_videos: data.youtube_videos ? (data.youtube_videos as Array<{ title: string; url: string; }>) : null
+      };
+      
+      return parsedData as Tool;
     },
   });
 
