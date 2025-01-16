@@ -7,6 +7,8 @@ import { CommunityMemberCard } from '@/components/community/CommunityMemberCard'
 import { CommunityMemberDetails } from '@/components/community/CommunityMemberDetails';
 import { CommunityMember } from '@/components/community/types';
 import { Sidebar } from '@/components/Sidebar';
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Users, Search, Filter, Youtube } from 'lucide-react';
 
 export default function Networking() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -49,7 +51,6 @@ export default function Networking() {
     },
   });
 
-  // Calculate category counts based on the member_type field
   const categoryCounts = {
     all: members?.length || 0,
     featured: members?.filter(m => m.member_type === 'featured').length || 0,
@@ -83,6 +84,30 @@ export default function Networking() {
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
               />
+            </div>
+
+            {/* New Callouts Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+              <Alert className="bg-siso-text/5 border border-siso-text/10">
+                <Users className="h-4 w-4 text-siso-orange" />
+                <AlertDescription className="text-siso-text/80">
+                  <span className="font-semibold text-siso-text">Community Members:</span> Discover and connect with featured creators, educators, and community leaders.
+                </AlertDescription>
+              </Alert>
+              
+              <Alert className="bg-siso-text/5 border border-siso-text/10">
+                <Search className="h-4 w-4 text-siso-orange" />
+                <AlertDescription className="text-siso-text/80">
+                  <span className="font-semibold text-siso-text">Quick Search:</span> Find specific members by name or browse through their specializations.
+                </AlertDescription>
+              </Alert>
+              
+              <Alert className="bg-siso-text/5 border border-siso-text/10">
+                <Youtube className="h-4 w-4 text-siso-orange" />
+                <AlertDescription className="text-siso-text/80">
+                  <span className="font-semibold text-siso-text">Content Access:</span> View member profiles to access their YouTube content, websites, and educational resources.
+                </AlertDescription>
+              </Alert>
             </div>
 
             <Tabs defaultValue="all" className="w-full" onValueChange={setSelectedCategory}>
