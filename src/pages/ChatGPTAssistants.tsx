@@ -134,12 +134,12 @@ export default function ChatGPTAssistants() {
             </div>
 
             <Tabs defaultValue="all" className="w-full" onValueChange={setSelectedCategory}>
-              <TabsList className="w-full justify-start bg-siso-text/5 border border-siso-text/10 flex-wrap">
+              <TabsList className="w-full h-auto flex-wrap justify-start bg-siso-text/5 border border-siso-text/10 p-2">
                 {['all', 'featured', 'software', 'coding', 'actions', 'gpt'].map((category) => (
                   <TabsTrigger
                     key={category}
                     value={category}
-                    className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange"
+                    className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange m-1"
                   >
                     {category.charAt(0).toUpperCase() + category.slice(1)}
                     <span className="ml-2 text-sm text-siso-text/60">
