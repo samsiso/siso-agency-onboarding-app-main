@@ -8,6 +8,7 @@ import { AssistantCard } from '@/components/assistants/AssistantCard';
 import { AssistantDetails } from '@/components/assistants/AssistantDetails';
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Assistant {
   id: string;
@@ -132,28 +133,30 @@ export default function ChatGPTAssistants() {
               </div>
             </div>
 
-            <Tabs defaultValue="all" className="w-full" onValueChange={setSelectedCategory}>
-              <TabsList className="w-full justify-start bg-siso-text/5 border border-siso-text/10 flex-wrap">
-                {categories.map((category) => (
-                  <TabsTrigger
-                    key={category}
-                    value={category}
-                    className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange"
-                  >
-                    {category.charAt(0).toUpperCase() + category.slice(1)}
-                    <span className="ml-2 text-sm text-siso-text/60">
-                      {category === 'all' 
-                        ? assistants?.length || 0 
-                        : category === 'featured'
-                          ? assistants?.filter(a => (a.rating && a.rating >= 4.5) || (a.review_average && a.review_average >= 4.5)).length || 0
-                          : category === 'gpt'
-                            ? assistants?.filter(a => a.category === 'gpt builder').length || 0
-                            : categoryCounts?.[category] || 0}
-                    </span>
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </Tabs>
+            <ScrollArea className="w-full" type="always">
+              <Tabs defaultValue="all" className="w-full" onValueChange={setSelectedCategory}>
+                <TabsList className="w-full h-auto flex-wrap justify-start bg-siso-text/5 border border-siso-text/10 p-2">
+                  {categories.map((category) => (
+                    <TabsTrigger
+                      key={category}
+                      value={category}
+                      className="m-1 data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange"
+                    >
+                      {category.charAt(0).toUpperCase() + category.slice(1)}
+                      <span className="ml-2 text-sm text-siso-text/60">
+                        {category === 'all' 
+                          ? assistants?.length || 0 
+                          : category === 'featured'
+                            ? assistants?.filter(a => (a.rating && a.rating >= 4.5) || (a.review_average && a.review_average >= 4.5)).length || 0
+                            : category === 'gpt'
+                              ? assistants?.filter(a => a.category === 'gpt builder').length || 0
+                              : categoryCounts?.[category] || 0}
+                      </span>
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </Tabs>
+            </ScrollArea>
           </div>
 
           {isLoading ? (
