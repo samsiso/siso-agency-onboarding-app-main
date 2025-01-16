@@ -71,7 +71,8 @@ export default function Tools() {
     'collect email',
     'knowledge files',
     'ads',
-    'monetization'
+    'monetization',
+    'gpt builder'
   ];
 
   return (
@@ -82,11 +83,11 @@ export default function Tools() {
           <div className="space-y-4">
             <div>
               <h1 className="text-4xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
-                Tools for GPT Builders
+                Tools and Platforms
               </h1>
               <p className="mt-2 text-lg text-siso-text/80 leading-relaxed max-w-3xl">
-                Build more powerful custom GPTs with these tailored tools. 
-                Discover the best solutions for authentication, actions, monetization, and more.
+                Discover powerful tools and platforms to enhance your workflow. 
+                Browse through various categories including integrations, page builders, and GPT development tools.
               </p>
             </div>
 
@@ -108,7 +109,7 @@ export default function Tools() {
               <Alert className="bg-siso-text/5 border border-siso-text/10">
                 <Star className="h-4 w-4 text-siso-orange" />
                 <AlertDescription className="text-siso-text/80">
-                  <span className="font-semibold text-siso-text">Featured:</span> Discover top-rated tools for GPT development.
+                  <span className="font-semibold text-siso-text">Featured:</span> Discover top-rated tools for development.
                 </AlertDescription>
               </Alert>
             </div>
