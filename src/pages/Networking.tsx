@@ -19,13 +19,11 @@ export default function Networking() {
     queryKey: ['networking-members', selectedCategory],
     queryFn: async () => {
       let query = supabase
-        .from('tools')
+        .from('networking_resources')
         .select('*');
       
       if (selectedCategory !== 'all') {
         query = query.eq('category', selectedCategory);
-      } else {
-        query = query.or('category.eq.networking-featured,category.eq.networking-school,category.eq.networking-discord,category.eq.networking-general');
       }
 
       const { data, error } = await query;
@@ -35,35 +33,31 @@ export default function Networking() {
         id: item.id,
         name: item.name,
         description: item.description,
-        member_type: item.member_type,
-        youtube_url: item.youtube_url,
-        youtube_videos: Array.isArray(item.youtube_videos) 
-          ? item.youtube_videos.map((video: any) => ({
-              title: video.title || '',
-              url: video.url || ''
-            }))
-          : null,
-        website_url: item.website_url,
-        specialization: item.specialization,
-        content_themes: item.content_themes,
+        member_type: item.category,
+        youtube_url: null,
+        youtube_videos: null,
+        website_url: item.join_url,
+        specialization: null,
+        content_themes: null,
         profile_image_url: item.profile_image_url
       })) as CommunityMember[];
     },
   });
-
-  const categoryCounts = {
-    all: members?.length || 0,
-    featured: members?.filter(m => m.member_type === 'featured').length || 0,
-    school: members?.filter(m => m.member_type === 'school').length || 0,
-    discord: members?.filter(m => m.member_type === 'discord').length || 0,
-    general: members?.filter(m => m.member_type === 'general').length || 0,
-  };
 
   const filteredMembers = members?.filter(member => 
     !searchQuery || 
     member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     member.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const categories = {
+    all: members?.length || 0,
+    business: members?.filter(m => m.member_type === 'Business').length || 0,
+    personal: members?.filter(m => m.member_type === 'Personal Development').length || 0,
+    technology: members?.filter(m => m.member_type === 'Technology').length || 0,
+    finance: members?.filter(m => m.member_type === 'Finance').length || 0,
+    ai: members?.filter(m => m.member_type === 'AI').length || 0,
+  };
 
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
@@ -86,7 +80,6 @@ export default function Networking() {
               />
             </div>
 
-            {/* New Callouts Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
               <Alert className="bg-siso-text/5 border border-siso-text/10">
                 <Users className="h-4 w-4 text-siso-orange" />
@@ -105,7 +98,7 @@ export default function Networking() {
               <Alert className="bg-siso-text/5 border border-siso-text/10">
                 <Youtube className="h-4 w-4 text-siso-orange" />
                 <AlertDescription className="text-siso-text/80">
-                  <span className="font-semibold text-siso-text">Content Access:</span> View member profiles to access their YouTube content, websites, and educational resources.
+                  <span className="font-semibold text-siso-text">Content Access:</span> View member profiles to access their content, websites, and educational resources.
                 </AlertDescription>
               </Alert>
             </div>
@@ -118,43 +111,52 @@ export default function Networking() {
                 >
                   All
                   <span className="ml-2 text-sm text-siso-text/60">
-                    {categoryCounts.all}
+                    {categories.all}
                   </span>
                 </TabsTrigger>
                 <TabsTrigger 
-                  value="featured"
+                  value="business"
                   className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange"
                 >
-                  Featured
+                  Business
                   <span className="ml-2 text-sm text-siso-text/60">
-                    {categoryCounts.featured}
+                    {categories.business}
                   </span>
                 </TabsTrigger>
                 <TabsTrigger 
-                  value="school"
+                  value="personal"
                   className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange"
                 >
-                  School
+                  Personal Development
                   <span className="ml-2 text-sm text-siso-text/60">
-                    {categoryCounts.school}
+                    {categories.personal}
                   </span>
                 </TabsTrigger>
                 <TabsTrigger 
-                  value="discord"
+                  value="technology"
                   className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange"
                 >
-                  Discord
+                  Technology
                   <span className="ml-2 text-sm text-siso-text/60">
-                    {categoryCounts.discord}
+                    {categories.technology}
                   </span>
                 </TabsTrigger>
                 <TabsTrigger 
-                  value="general"
+                  value="finance"
                   className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange"
                 >
-                  General
+                  Finance
                   <span className="ml-2 text-sm text-siso-text/60">
-                    {categoryCounts.general}
+                    {categories.finance}
+                  </span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="ai"
+                  className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange"
+                >
+                  AI
+                  <span className="ml-2 text-sm text-siso-text/60">
+                    {categories.ai}
                   </span>
                 </TabsTrigger>
               </TabsList>
