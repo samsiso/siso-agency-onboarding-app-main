@@ -170,7 +170,7 @@ export default function ChatGPTAssistants() {
                 <AssistantCard
                   key={assistant.id}
                   assistant={assistant}
-                  onClick={setSelectedAssistant}
+                  onClick={() => setSelectedAssistant(assistant)}
                 />
               ))}
             </div>

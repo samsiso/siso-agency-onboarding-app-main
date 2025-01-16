@@ -32,7 +32,7 @@ export function AssistantDetails({ assistant, onClose }: AssistantDetailsProps) 
 
   const isGPTTool = !assistant.assistant_type;
   const displayRating = assistant.review_average || assistant.rating;
-  const displayReviewCount = assistant.review_count || assistant.reviews_count;
+  const displayReviewCount = assistant.review_count;
 
   return (
     <Sheet open={!!assistant} onOpenChange={onClose}>
