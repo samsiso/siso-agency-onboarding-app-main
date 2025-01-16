@@ -13,6 +13,7 @@ interface Assistant {
   id: string;
   name: string;
   description: string | null;
+  category: string;
   assistant_type: string | null;
   prompt_template: string | null;
   use_cases: string[] | null;
