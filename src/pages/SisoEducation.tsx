@@ -25,8 +25,11 @@ export default function SisoEducation() {
       
       return data.map(member => ({
         ...member,
-        youtube_videos: member.youtube_videos as { title: string; url: string; }[] | null
-      }));
+        youtube_videos: member.youtube_videos as { title: string; url: string; }[] | null,
+        member_count: member.member_count || null,
+        join_url: member.join_url || null,
+        platform: member.platform || null
+      })) as CommunityMember[];
     },
   });
 

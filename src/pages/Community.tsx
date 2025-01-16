@@ -27,11 +27,14 @@ export default function Community() {
       
       const transformedData = data.map(member => ({
         ...member,
-        youtube_videos: member.youtube_videos as { title: string; url: string; }[] | null
-      }));
+        youtube_videos: member.youtube_videos as { title: string; url: string; }[] | null,
+        member_count: member.member_count || null,
+        join_url: member.join_url || null,
+        platform: member.platform || null
+      })) as CommunityMember[];
       
       console.log('Fetched community members:', transformedData);
-      return transformedData as CommunityMember[];
+      return transformedData;
     },
   });
 
