@@ -14,6 +14,34 @@ export default function Tools() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
+  const categories = [
+    { id: 'all', label: 'All Tools' },
+    { id: 'development', label: 'Development' },
+    { id: 'productivity', label: 'Productivity' },
+    { id: 'content', label: 'Content Creation' },
+    { id: 'business', label: 'Business' },
+    { id: 'education', label: 'Education' },
+    { id: 'design', label: 'Design' },
+    { id: 'research', label: 'Research' },
+    { id: 'language', label: 'Language' },
+    { id: 'media', label: 'Media' },
+  ];
+
+  const mapToolToCategory = (originalCategory: string): string => {
+    const categoryMap: Record<string, string> = {
+      'integration': 'development',
+      'page builder': 'development',
+      'custom actions': 'development',
+      'gpt builder': 'development',
+      'authentication': 'development',
+      'collect email': 'business',
+      'knowledge files': 'productivity',
+      'ads': 'business',
+      'monetization': 'business'
+    };
+    return categoryMap[originalCategory.toLowerCase()] || originalCategory.toLowerCase();
+  };
+
   const { data: tools, isLoading, error } = useQuery({
     queryKey: ['tools'],
     queryFn: async () => {
@@ -40,19 +68,6 @@ export default function Tools() {
     },
   });
 
-  const categories = [
-    { id: 'all', label: 'All Tools' },
-    { id: 'development', label: 'Development' },
-    { id: 'productivity', label: 'Productivity' },
-    { id: 'content', label: 'Content Creation' },
-    { id: 'business', label: 'Business' },
-    { id: 'education', label: 'Education' },
-    { id: 'design', label: 'Design' },
-    { id: 'research', label: 'Research' },
-    { id: 'language', label: 'Language' },
-    { id: 'media', label: 'Media' },
-  ];
-
   const categoryCounts = useMemo(() => {
     if (!tools) return {};
     return tools.reduce((acc, tool) => {
@@ -61,21 +76,6 @@ export default function Tools() {
       return acc;
     }, {} as Record<string, number>);
   }, [tools]);
-
-  const mapToolToCategory = (originalCategory: string): string => {
-    const categoryMap: Record<string, string> = {
-      'integration': 'development',
-      'page builder': 'development',
-      'custom actions': 'development',
-      'gpt builder': 'development',
-      'authentication': 'development',
-      'collect email': 'business',
-      'knowledge files': 'productivity',
-      'ads': 'business',
-      'monetization': 'business'
-    };
-    return categoryMap[originalCategory.toLowerCase()] || originalCategory.toLowerCase();
-  };
 
   const filteredTools = tools?.filter(tool => {
     const matchesSearch = !searchQuery || 
