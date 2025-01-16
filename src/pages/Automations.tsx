@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Download, ExternalLink, Heart, Search, Star } from 'lucide-react';
+import { Download, ExternalLink, Heart, Search, Star, Bot, Zap, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,6 +8,7 @@ import { Sidebar } from '@/components/Sidebar';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface Automation {
   id: string;
@@ -85,6 +86,30 @@ export default function Automations() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
+            </div>
+
+            {/* New Callouts Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+              <Alert className="bg-siso-text/5 border border-siso-text/10">
+                <Bot className="h-4 w-4 text-siso-orange" />
+                <AlertDescription className="text-siso-text/80">
+                  <span className="font-semibold text-siso-text">Automation Library:</span> Browse our collection of pre-built automations for various social media platforms and general tasks.
+                </AlertDescription>
+              </Alert>
+              
+              <Alert className="bg-siso-text/5 border border-siso-text/10">
+                <Zap className="h-4 w-4 text-siso-orange" />
+                <AlertDescription className="text-siso-text/80">
+                  <span className="font-semibold text-siso-text">Quick Setup:</span> Click on any automation to view details, use cases, and setup instructions.
+                </AlertDescription>
+              </Alert>
+              
+              <Alert className="bg-siso-text/5 border border-siso-text/10">
+                <ArrowRight className="h-4 w-4 text-siso-orange" />
+                <AlertDescription className="text-siso-text/80">
+                  <span className="font-semibold text-siso-text">Get Started:</span> Filter by platform, browse featured automations, or search for specific tasks you want to automate.
+                </AlertDescription>
+              </Alert>
             </div>
 
             <Tabs defaultValue="all" className="w-full" onValueChange={(value) => setSelectedCategory(value as AutomationCategory)}>
