@@ -9,6 +9,240 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      automations: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          integration_url: string | null
+          name: string
+          platform: string | null
+          profile_image_url: string | null
+          setup_guide: string | null
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          integration_url?: string | null
+          name: string
+          platform?: string | null
+          profile_image_url?: string | null
+          setup_guide?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          integration_url?: string | null
+          name?: string
+          platform?: string | null
+          profile_image_url?: string | null
+          setup_guide?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      core_tools: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          downloads_count: number | null
+          icon_url: string | null
+          id: string
+          likes_count: number | null
+          name: string
+          pricing_type: string | null
+          profile_image_url: string | null
+          rating: number | null
+          reviews_count: number | null
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          downloads_count?: number | null
+          icon_url?: string | null
+          id?: string
+          likes_count?: number | null
+          name: string
+          pricing_type?: string | null
+          profile_image_url?: string | null
+          rating?: number | null
+          reviews_count?: number | null
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          downloads_count?: number | null
+          icon_url?: string | null
+          id?: string
+          likes_count?: number | null
+          name?: string
+          pricing_type?: string | null
+          profile_image_url?: string | null
+          rating?: number | null
+          reviews_count?: number | null
+          updated_at?: string
+          website_url?: string | null
+        }
+        Relationships: []
+      }
+      education_resources: {
+        Row: {
+          category: string
+          content_type: string | null
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          profile_image_url: string | null
+          resource_url: string | null
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          category: string
+          content_type?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          profile_image_url?: string | null
+          resource_url?: string | null
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          category?: string
+          content_type?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          profile_image_url?: string | null
+          resource_url?: string | null
+          updated_at?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
+      gpt_resources: {
+        Row: {
+          assistant_type: string | null
+          category: string
+          created_at: string
+          description: string | null
+          downloads_count: number | null
+          gpt_id: string | null
+          gpt_url: string | null
+          id: string
+          input_variables: string[] | null
+          likes_count: number | null
+          model_type: string | null
+          name: string
+          profile_image_url: string | null
+          prompt_template: string | null
+          rating: number | null
+          response_format: string | null
+          reviews_count: number | null
+          updated_at: string
+          use_cases: string[] | null
+        }
+        Insert: {
+          assistant_type?: string | null
+          category: string
+          created_at?: string
+          description?: string | null
+          downloads_count?: number | null
+          gpt_id?: string | null
+          gpt_url?: string | null
+          id?: string
+          input_variables?: string[] | null
+          likes_count?: number | null
+          model_type?: string | null
+          name: string
+          profile_image_url?: string | null
+          prompt_template?: string | null
+          rating?: number | null
+          response_format?: string | null
+          reviews_count?: number | null
+          updated_at?: string
+          use_cases?: string[] | null
+        }
+        Update: {
+          assistant_type?: string | null
+          category?: string
+          created_at?: string
+          description?: string | null
+          downloads_count?: number | null
+          gpt_id?: string | null
+          gpt_url?: string | null
+          id?: string
+          input_variables?: string[] | null
+          likes_count?: number | null
+          model_type?: string | null
+          name?: string
+          profile_image_url?: string | null
+          prompt_template?: string | null
+          rating?: number | null
+          response_format?: string | null
+          reviews_count?: number | null
+          updated_at?: string
+          use_cases?: string[] | null
+        }
+        Relationships: []
+      }
+      networking_resources: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          join_url: string | null
+          member_count: number | null
+          name: string
+          platform: string | null
+          profile_image_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          join_url?: string | null
+          member_count?: number | null
+          name: string
+          platform?: string | null
+          profile_image_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          join_url?: string | null
+          member_count?: number | null
+          name?: string
+          platform?: string | null
+          profile_image_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

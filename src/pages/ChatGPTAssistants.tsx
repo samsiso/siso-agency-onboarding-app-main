@@ -40,9 +40,8 @@ export default function ChatGPTAssistants() {
     queryFn: async () => {
       console.log('Fetching assistants...');
       const { data, error } = await supabase
-        .from('tools')
-        .select('*')
-        .or('category.eq.assistant,category.eq.gpt builder,category.in.(integration,page builder,custom actions,authentication,collect email,knowledge files,ads)');
+        .from('gpt_resources')
+        .select('*');
       
       if (error) {
         console.error('Error fetching assistants:', error);
@@ -79,8 +78,6 @@ export default function ChatGPTAssistants() {
     console.error('Error in component:', error);
     return <div className="text-red-500">Error loading assistants. Please try again later.</div>;
   }
-
-  const categories = ['all', 'featured', 'software', 'coding', 'actions', 'gpt'];
 
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
@@ -134,7 +131,7 @@ export default function ChatGPTAssistants() {
 
             <Tabs defaultValue="all" className="w-full" onValueChange={setSelectedCategory}>
               <TabsList className="w-full justify-start bg-siso-text/5 border border-siso-text/10 flex-wrap">
-                {categories.map((category) => (
+                {['all', 'featured', 'software', 'coding', 'actions', 'gpt'].map((category) => (
                   <TabsTrigger
                     key={category}
                     value={category}
