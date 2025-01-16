@@ -143,12 +143,12 @@ export default function Tools() {
 
           <ScrollArea className="w-full" type="always">
             <Tabs defaultValue="all" className="w-full" onValueChange={(value) => setSelectedCategory(value)}>
-              <TabsList className="w-full justify-start bg-siso-text/5 border border-siso-text/10 mb-6">
+              <TabsList className="w-full h-auto flex-wrap justify-start bg-siso-text/5 border border-siso-text/10 mb-6 p-2">
                 {categories.map(({ id, label }) => (
                   <TabsTrigger
                     key={id}
                     value={id}
-                    className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange"
+                    className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange m-1"
                   >
                     {label}
                     <span className="ml-2 text-sm text-siso-text/60">
