@@ -12,4 +12,7 @@ export interface CommunityMember {
   specialization: string[] | null;
   content_themes: string[] | null;
   profile_image_url: string | null;
+  member_count: number | null;
+  join_url: string | null;
+  platform: string | null;
 }
