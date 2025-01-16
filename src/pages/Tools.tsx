@@ -32,7 +32,6 @@ export default function Tools() {
       'integration': 'development',
       'page builder': 'development',
       'custom actions': 'development',
-      'gpt builder': 'development',
       'authentication': 'development',
       'collect email': 'business',
       'knowledge files': 'productivity',
@@ -49,7 +48,8 @@ export default function Tools() {
       const { data, error } = await supabase
         .from('tools')
         .select('*')
-        .eq('resource_type', 'tool');
+        .eq('resource_type', 'tool')
+        .neq('category', 'gpt builder'); // Exclude GPT builder tools
       
       if (error) {
         console.error('Error fetching tools:', error);
