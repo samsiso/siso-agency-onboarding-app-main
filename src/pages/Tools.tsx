@@ -94,14 +94,25 @@ export default function Tools() {
       <div className="flex-1 p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           <div className="space-y-4">
-            <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
-                Tools and Platforms
-              </h1>
-              <p className="mt-2 text-lg text-siso-text/80 leading-relaxed max-w-3xl">
-                Discover powerful tools and platforms to enhance your workflow. 
-                Browse through various categories including development, productivity, and business tools.
-              </p>
+            <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+              <div>
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
+                  Tools and Platforms
+                </h1>
+                <p className="mt-2 text-lg text-siso-text/80 leading-relaxed max-w-3xl">
+                  Discover powerful tools and platforms to enhance your workflow. 
+                  Browse through various categories including development, productivity, and business tools.
+                </p>
+              </div>
+              <div className="relative w-full md:w-96">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-siso-text/60" />
+                <Input
+                  placeholder="Search tools..."
+                  className="pl-10 bg-siso-text/5 border-siso-text/10 focus-visible:ring-siso-orange"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
@@ -126,38 +137,7 @@ export default function Tools() {
                 </AlertDescription>
               </Alert>
             </div>
-
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <div className="relative w-full md:w-96">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-siso-text/60" />
-                <Input
-                  placeholder="Search tools..."
-                  className="pl-10 bg-siso-text/5 border-siso-text/10 focus-visible:ring-siso-orange"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-            </div>
           </div>
-
-          <ScrollArea className="w-full" type="always">
-            <Tabs defaultValue="all" className="w-full" onValueChange={(value) => setSelectedCategory(value)}>
-              <TabsList className="w-full justify-start bg-siso-text/5 border border-siso-text/10 mb-6">
-                {categories.map(({ id, label }) => (
-                  <TabsTrigger
-                    key={id}
-                    value={id}
-                    className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange"
-                  >
-                    {label}
-                    <span className="ml-2 text-sm text-siso-text/60">
-                      {id === 'all' ? tools?.length || 0 : categoryCounts[id] || 0}
-                    </span>
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </Tabs>
-          </ScrollArea>
 
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

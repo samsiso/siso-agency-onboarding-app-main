@@ -55,7 +55,6 @@ export default function ChatGPTAssistants() {
     },
   });
 
-  // Calculate category counts
   const categoryCounts = assistants?.reduce((acc, assistant) => {
     const category = assistant.category === 'gpt builder' ? 'gpt' : (assistant.assistant_type || 'gpt');
     acc[category] = (acc[category] || 0) + 1;
@@ -89,13 +88,24 @@ export default function ChatGPTAssistants() {
       <div className="flex-1 p-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col space-y-4 mb-8">
-            <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
-                ChatGPT Assistants & Tools
-              </h1>
-              <p className="mt-2 text-lg text-siso-text/80 leading-relaxed max-w-3xl">
-                Discover our curated collection of ChatGPT assistants and GPT builder tools that help streamline your workflow and boost productivity.
-              </p>
+            <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+              <div>
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
+                  ChatGPT Assistants & Tools
+                </h1>
+                <p className="mt-2 text-lg text-siso-text/80 leading-relaxed max-w-3xl">
+                  Discover our curated collection of ChatGPT assistants and GPT builder tools that help streamline your workflow and boost productivity.
+                </p>
+              </div>
+              <div className="relative w-full md:w-96">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-siso-text/60" />
+                <Input
+                  placeholder="Search assistants..."
+                  className="pl-10 bg-siso-text/5 border-siso-text/10 focus-visible:ring-siso-orange"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
@@ -119,18 +129,6 @@ export default function ChatGPTAssistants() {
                   <span className="font-semibold text-siso-text">Quick Access:</span> Filter by type, browse featured assistants, or search for specific capabilities to find the perfect AI helper.
                 </AlertDescription>
               </Alert>
-            </div>
-
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <div className="relative w-full md:w-96">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-siso-text/60" />
-                <Input
-                  placeholder="Search assistants..."
-                  className="pl-10 bg-siso-text/5 border-siso-text/10 focus-visible:ring-siso-orange"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
             </div>
 
             <ScrollArea className="w-full" type="always">
