@@ -18,8 +18,8 @@ serve(async (req) => {
 
   try {
     console.log('Received request');
-    const { message, threadId } = await req.json();
-    console.log('Request payload:', { message, threadId });
+    const { message } = await req.json();
+    console.log('Request payload:', { message });
 
     const apiKey = Deno.env.get('OPENAI_API_KEY');
     if (!apiKey) {
@@ -33,76 +33,31 @@ serve(async (req) => {
       );
     }
 
-    // Initialize OpenAI client with v2 header
-    const openai = new OpenAI({
-      apiKey,
-      defaultHeaders: {
-        'OpenAI-Beta': 'assistants=v2'
-      }
-    });
+    const openai = new OpenAI({ apiKey });
 
     try {
-      // Create or retrieve thread
-      let thread;
-      if (!threadId) {
-        console.log('Creating new thread');
-        thread = await openai.beta.threads.create({
-          messages: [{ 
-            role: "user", 
-            content: message,
-            file_ids: [] 
-          }]
-        });
-        console.log('Created new thread:', thread.id);
-      } else {
-        console.log('Using existing thread:', threadId);
-        thread = { id: threadId };
-        // Add message to existing thread
-        await openai.beta.threads.messages.create(thread.id, {
-          role: "user",
-          content: message,
-          file_ids: []
-        });
-      }
-
-      // Run the assistant with v2 configuration
-      console.log('Starting assistant run');
-      const run = await openai.beta.threads.runs.create(thread.id, {
-        assistant_id: "asst_7f4aHDtKZtJAo1cFtptII7ed",
-        model: "gpt-4",
-        tools: [{ type: "code_interpreter" }],
+      console.log('Sending message to OpenAI');
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: "You are SISO AI, a helpful assistant focused on providing information about social media, content creation, and online business growth."
+          },
+          {
+            role: "user",
+            content: message
+          }
+        ],
       });
 
-      // Poll for completion
-      let runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
-      console.log('Initial run status:', runStatus.status);
-      
-      while (runStatus.status !== "completed") {
-        if (runStatus.status === "failed") {
-          console.error('Run failed:', runStatus);
-          throw new Error(`Assistant run failed: ${JSON.stringify(runStatus.last_error)}`);
-        }
-        if (runStatus.status === "expired") {
-          console.error('Run expired:', runStatus);
-          throw new Error("Assistant run expired");
-        }
-        
-        // Wait before checking status again
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
-        console.log('Updated run status:', runStatus.status);
-      }
-
-      // Get messages after completion
-      console.log('Retrieving messages');
-      const messages = await openai.beta.threads.messages.list(thread.id);
-      const lastMessage = messages.data[0];
-      console.log('Retrieved message:', lastMessage.content[0].text.value);
+      console.log('Received response from OpenAI');
+      const response = completion.choices[0].message.content;
 
       return new Response(
         JSON.stringify({
-          response: lastMessage.content[0].text.value,
-          threadId: thread.id,
+          response,
+          threadId: null, // No thread ID needed for regular chat
         }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
