@@ -6,6 +6,7 @@ interface Assistant {
   id: string;
   name: string;
   description: string | null;
+  category: string;
   assistant_type: string | null;
   prompt_template: string | null;
   use_cases: string[] | null;
@@ -30,7 +31,7 @@ interface AssistantDetailsProps {
 export function AssistantDetails({ assistant, onClose }: AssistantDetailsProps) {
   if (!assistant) return null;
 
-  const isGPTTool = !assistant.assistant_type;
+  const isGPTTool = assistant.category === 'gpt builder';
   const displayRating = assistant.review_average || assistant.rating;
   const displayReviewCount = assistant.review_count;
 
