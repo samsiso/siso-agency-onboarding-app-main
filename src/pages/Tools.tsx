@@ -26,28 +26,6 @@ export default function Tools() {
     { id: 'gpt builder', label: 'GPT Builder' },
   ];
 
-  const mapToolToCategory = (originalCategory: string): string => {
-    const categoryMap: Record<string, string> = {
-      'integration': 'development',
-      'page builder': 'development',
-      'custom actions': 'development',
-      'authentication': 'development',
-      'collect email': 'sales',
-      'knowledge files': 'education',
-      'ads': 'sales',
-      'monetization': 'sales',
-      'visual design': 'visual',
-      'ui/ux': 'visual',
-      'graphics': 'visual',
-      'data management': 'database',
-      'data analytics': 'database',
-      'workflow': 'automation',
-      'task automation': 'automation',
-      'gpt builder': 'gpt builder'
-    };
-    return categoryMap[originalCategory.toLowerCase()] || originalCategory.toLowerCase();
-  };
-
   const { data: tools, isLoading, error } = useQuery({
     queryKey: ['tools'],
     queryFn: async () => {
@@ -77,11 +55,20 @@ export default function Tools() {
 
   const categoryCounts = useMemo(() => {
     if (!tools) return {};
-    return tools.reduce((acc, tool) => {
-      const category = mapToolToCategory(tool.category);
+    
+    const counts = tools.reduce((acc, tool) => {
+      const category = tool.category.toLowerCase();
       acc[category] = (acc[category] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
+    
+    // Add count for "all" category
+    counts['all'] = tools.length;
+    
+    // Add count for "featured" category (tools with rating >= 4.5)
+    counts['featured'] = tools.filter(tool => tool.rating && tool.rating >= 4.5).length;
+    
+    return counts;
   }, [tools]);
 
   const filteredTools = tools?.filter(tool => {
@@ -89,10 +76,10 @@ export default function Tools() {
       tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       tool.description?.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const toolCategory = mapToolToCategory(tool.category);
-    const matchesCategory = selectedCategory === 'all' || 
+    const matchesCategory = 
+      selectedCategory === 'all' || 
       (selectedCategory === 'featured' && tool.rating && tool.rating >= 4.5) ||
-      toolCategory === selectedCategory;
+      tool.category.toLowerCase() === selectedCategory.toLowerCase();
 
     return matchesSearch && matchesCategory;
   });
@@ -124,22 +111,6 @@ export default function Tools() {
               </div>
             </div>
 
-            <ScrollArea className="w-full">
-              <Tabs defaultValue="all" className="w-full" onValueChange={setSelectedCategory}>
-                <TabsList className="h-auto flex-wrap bg-siso-text/5 p-2">
-                  {categories.map((category) => (
-                    <TabsTrigger
-                      key={category.id}
-                      value={category.id}
-                      className="m-1 data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange"
-                    >
-                      {category.label} {categoryCounts[category.id] ? `(${categoryCounts[category.id]})` : ''}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-              </Tabs>
-            </ScrollArea>
-
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
               <Alert className="bg-siso-text/5 border border-siso-text/10">
                 <Wrench className="h-4 w-4 text-siso-orange" />
@@ -163,6 +134,25 @@ export default function Tools() {
               </Alert>
             </div>
           </div>
+
+          <ScrollArea className="w-full">
+            <Tabs defaultValue="all" className="w-full" onValueChange={setSelectedCategory}>
+              <TabsList className="h-auto flex-wrap bg-siso-text/5 p-2">
+                {categories.map((category) => (
+                  <TabsTrigger
+                    key={category.id}
+                    value={category.id}
+                    className="m-1 data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange"
+                  >
+                    {category.label}
+                    <span className="ml-2 text-sm text-siso-text/60">
+                      ({categoryCounts[category.id] || 0})
+                    </span>
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
+          </ScrollArea>
 
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
