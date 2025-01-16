@@ -17,6 +17,7 @@ interface Assistant {
   downloads_count: number | null;
   gpt_url: string | null;
   gpt_id: string | null;
+  profile_image_url: string | null;
   review_average: number | null;
   review_count: number | null;
   num_conversations_str: string | null;
