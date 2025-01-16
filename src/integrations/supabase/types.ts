@@ -152,11 +152,16 @@ export type Database = {
           likes_count: number | null
           model_type: string | null
           name: string
+          num_conversations_str: string | null
           profile_image_url: string | null
           prompt_template: string | null
           rating: number | null
           response_format: string | null
+          review_average: number | null
+          review_count: number | null
+          review_total: number | null
           reviews_count: number | null
+          short_url: string | null
           updated_at: string
           use_cases: string[] | null
         }
@@ -173,11 +178,16 @@ export type Database = {
           likes_count?: number | null
           model_type?: string | null
           name: string
+          num_conversations_str?: string | null
           profile_image_url?: string | null
           prompt_template?: string | null
           rating?: number | null
           response_format?: string | null
+          review_average?: number | null
+          review_count?: number | null
+          review_total?: number | null
           reviews_count?: number | null
+          short_url?: string | null
           updated_at?: string
           use_cases?: string[] | null
         }
@@ -194,11 +204,16 @@ export type Database = {
           likes_count?: number | null
           model_type?: string | null
           name?: string
+          num_conversations_str?: string | null
           profile_image_url?: string | null
           prompt_template?: string | null
           rating?: number | null
           response_format?: string | null
+          review_average?: number | null
+          review_count?: number | null
+          review_total?: number | null
           reviews_count?: number | null
+          short_url?: string | null
           updated_at?: string
           use_cases?: string[] | null
         }
