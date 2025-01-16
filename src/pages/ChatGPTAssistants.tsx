@@ -23,12 +23,12 @@ interface Assistant {
   rating: number | null;
   likes_count: number | null;
   downloads_count: number | null;
+  website_url: string | null;
   gpt_url: string | null;
   gpt_id: string | null;
   review_average: number | null;
   review_count: number | null;
   num_conversations_str: string | null;
-  website_url: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -148,7 +148,7 @@ export default function ChatGPTAssistants() {
                           ? assistants?.filter(a => (a.rating && a.rating >= 4.5) || (a.review_average && a.review_average >= 4.5)).length || 0
                           : category === 'gpt'
                             ? assistants?.filter(a => a.category === 'gpt builder').length || 0
-                            : categoryCounts?.[category] || 0}
+                            : assistants?.filter(a => a.assistant_type === category).length || 0}
                     </span>
                   </TabsTrigger>
                 ))}
