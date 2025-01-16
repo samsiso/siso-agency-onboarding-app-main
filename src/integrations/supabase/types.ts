@@ -63,7 +63,10 @@ export type Database = {
           rating: number | null
           reviews_count: number | null
           updated_at: string
+          use_cases: string[] | null
           website_url: string | null
+          youtube_url: string | null
+          youtube_videos: Json | null
         }
         Insert: {
           category: string
@@ -79,7 +82,10 @@ export type Database = {
           rating?: number | null
           reviews_count?: number | null
           updated_at?: string
+          use_cases?: string[] | null
           website_url?: string | null
+          youtube_url?: string | null
+          youtube_videos?: Json | null
         }
         Update: {
           category?: string
@@ -95,7 +101,10 @@ export type Database = {
           rating?: number | null
           reviews_count?: number | null
           updated_at?: string
+          use_cases?: string[] | null
           website_url?: string | null
+          youtube_url?: string | null
+          youtube_videos?: Json | null
         }
         Relationships: []
       }
