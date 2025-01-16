@@ -23,6 +23,7 @@ export default function Tools() {
     { id: 'development', label: 'Development' },
     { id: 'education', label: 'Education' },
     { id: 'visual', label: 'Visual' },
+    { id: 'gpt builder', label: 'GPT Builder' },
   ];
 
   const mapToolToCategory = (originalCategory: string): string => {
@@ -41,7 +42,8 @@ export default function Tools() {
       'data management': 'database',
       'data analytics': 'database',
       'workflow': 'automation',
-      'task automation': 'automation'
+      'task automation': 'automation',
+      'gpt builder': 'gpt builder'
     };
     return categoryMap[originalCategory.toLowerCase()] || originalCategory.toLowerCase();
   };
