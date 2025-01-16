@@ -41,6 +41,7 @@ export type Database = {
           created_at: string
           description: string | null
           downloads_count: number | null
+          gpt_url: string | null
           icon_url: string | null
           id: string
           input_variables: string[] | null
@@ -48,13 +49,18 @@ export type Database = {
           member_type: string | null
           model_type: string | null
           name: string
+          num_conversations_str: string | null
           pricing_type: string | null
           profile_image_url: string | null
           prompt_template: string | null
           rating: number | null
           resource_type: string
           response_format: string | null
+          review_average: number | null
+          review_count: number | null
+          review_total: number | null
           reviews_count: number | null
+          short_url: string | null
           specialization: string[] | null
           updated_at: string
           use_cases: string[] | null
@@ -69,6 +75,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           downloads_count?: number | null
+          gpt_url?: string | null
           icon_url?: string | null
           id?: string
           input_variables?: string[] | null
@@ -76,13 +83,18 @@ export type Database = {
           member_type?: string | null
           model_type?: string | null
           name: string
+          num_conversations_str?: string | null
           pricing_type?: string | null
           profile_image_url?: string | null
           prompt_template?: string | null
           rating?: number | null
-          resource_type: string
+          resource_type?: string
           response_format?: string | null
+          review_average?: number | null
+          review_count?: number | null
+          review_total?: number | null
           reviews_count?: number | null
+          short_url?: string | null
           specialization?: string[] | null
           updated_at?: string
           use_cases?: string[] | null
@@ -97,6 +109,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           downloads_count?: number | null
+          gpt_url?: string | null
           icon_url?: string | null
           id?: string
           input_variables?: string[] | null
@@ -104,13 +117,18 @@ export type Database = {
           member_type?: string | null
           model_type?: string | null
           name?: string
+          num_conversations_str?: string | null
           pricing_type?: string | null
           profile_image_url?: string | null
           prompt_template?: string | null
           rating?: number | null
           resource_type?: string
           response_format?: string | null
+          review_average?: number | null
+          review_count?: number | null
+          review_total?: number | null
           reviews_count?: number | null
+          short_url?: string | null
           specialization?: string[] | null
           updated_at?: string
           use_cases?: string[] | null
