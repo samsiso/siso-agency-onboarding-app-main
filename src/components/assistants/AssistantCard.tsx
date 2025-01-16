@@ -56,7 +56,7 @@ export function AssistantCard({ assistant, onClick }: AssistantCardProps) {
           <div className="flex items-center gap-1">
             <Star className="w-3 h-3 text-siso-orange" />
             <span className="text-xs text-siso-text">
-              {assistant.rating?.toFixed(1) || '-'}
+              {assistant.review_average?.toFixed(1) || assistant.rating?.toFixed(1) || '-'}
             </span>
           </div>
           <div className="flex items-center gap-1">
