@@ -25,6 +25,8 @@ interface ToolCardProps {
 
 export function ToolCard({ tool }: ToolCardProps) {
   const navigate = useNavigate();
+  console.log('Tool data:', tool); // Debug log to see what data we're receiving
+  console.log('Profile image URL:', tool.profile_image_url); // Debug log for profile image URL
 
   const handleClick = () => {
     navigate(`/tools/${tool.id}`);
@@ -113,21 +115,13 @@ export function ToolCard({ tool }: ToolCardProps) {
     }
   };
 
-  const customLogo = getCustomLogoUrl(tool.name);
-
   return (
     <div
       onClick={handleClick}
       className="group relative flex flex-col gap-4 rounded-lg border border-siso-text/10 bg-siso-text/5 p-6 hover:bg-siso-text/10 transition-all duration-300 cursor-pointer hover:scale-[1.02]"
     >
       <div className="flex items-center gap-4">
-        {customLogo ? (
-          <img
-            src={customLogo}
-            alt={tool.name}
-            className="h-12 w-12 rounded-full object-cover ring-2 ring-siso-orange/20"
-          />
-        ) : tool.profile_image_url ? (
+        {tool.profile_image_url ? (
           <img
             src={tool.profile_image_url}
             alt={tool.name}
