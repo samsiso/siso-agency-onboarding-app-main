@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Search } from 'lucide-react';
+import { Search, Info, Filter, Star } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,7 @@ import { Sidebar } from '@/components/Sidebar';
 import { ToolCard } from '@/components/tools/ToolCard';
 import { Tool } from '@/components/tools/types';
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function Tools() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -19,7 +20,7 @@ export default function Tools() {
       const { data, error } = await supabase
         .from('tools')
         .select('*')
-        .eq('resource_type', 'tool');  // Only get records that are tools
+        .eq('resource_type', 'tool');
       
       if (error) {
         console.error('Error fetching tools:', error);
@@ -56,8 +57,6 @@ export default function Tools() {
     return matchesSearch && matchesCategory;
   });
 
-  console.log('Filtered tools:', filteredTools);
-
   if (error) {
     console.error('Error in component:', error);
     return <div className="text-red-500">Error loading tools. Please try again later.</div>;
@@ -80,6 +79,31 @@ export default function Tools() {
                 These are the trusted solutions we use daily to deliver exceptional results.
               </p>
             </div>
+
+            {/* New Callouts Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+              <Alert className="bg-siso-text/5 border border-siso-text/10">
+                <Info className="h-4 w-4 text-siso-orange" />
+                <AlertDescription className="text-siso-text/80">
+                  <span className="font-semibold text-siso-text">Quick Search:</span> Use the search bar to find specific tools by name or description.
+                </AlertDescription>
+              </Alert>
+              
+              <Alert className="bg-siso-text/5 border border-siso-text/10">
+                <Filter className="h-4 w-4 text-siso-orange" />
+                <AlertDescription className="text-siso-text/80">
+                  <span className="font-semibold text-siso-text">Categories:</span> Filter tools by category using the tabs below to find what you need.
+                </AlertDescription>
+              </Alert>
+              
+              <Alert className="bg-siso-text/5 border border-siso-text/10">
+                <Star className="h-4 w-4 text-siso-orange" />
+                <AlertDescription className="text-siso-text/80">
+                  <span className="font-semibold text-siso-text">Tool Details:</span> Click any tool card to view detailed information, tutorials, and resources.
+                </AlertDescription>
+              </Alert>
+            </div>
+
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <div className="relative w-full md:w-96">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-siso-text/60" />
