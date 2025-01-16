@@ -64,7 +64,7 @@ serve(async (req) => {
       console.log('Starting assistant run');
       const run = await openai.beta.threads.runs.create(thread.id, {
         assistant_id: "asst_7f4aHDtKZtJAo1cFtptII7ed",
-        model: "gpt-4o-mini",
+        model: "gpt-4",
       });
 
       // Poll for completion
