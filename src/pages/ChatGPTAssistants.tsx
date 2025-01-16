@@ -2,11 +2,12 @@ import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Sidebar } from '@/components/Sidebar';
-import { Search } from 'lucide-react';
+import { Search, Bot, Sparkles, Filter } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { AssistantCard } from '@/components/assistants/AssistantCard';
 import { AssistantDetails } from '@/components/assistants/AssistantDetails';
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface Assistant {
   id: string;
@@ -88,6 +89,31 @@ export default function ChatGPTAssistants() {
                 Discover our curated collection of ChatGPT assistants that help streamline your workflow and boost productivity.
               </p>
             </div>
+
+            {/* New Callouts Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+              <Alert className="bg-siso-text/5 border border-siso-text/10">
+                <Bot className="h-4 w-4 text-siso-orange" />
+                <AlertDescription className="text-siso-text/80">
+                  <span className="font-semibold text-siso-text">AI Assistants:</span> Browse specialized AI assistants designed for tasks like code generation, workflow optimization, and system design.
+                </AlertDescription>
+              </Alert>
+              
+              <Alert className="bg-siso-text/5 border border-siso-text/10">
+                <Sparkles className="h-4 w-4 text-siso-orange" />
+                <AlertDescription className="text-siso-text/80">
+                  <span className="font-semibold text-siso-text">Features:</span> Each assistant comes with a customizable prompt template, defined use cases, and specific input variables.
+                </AlertDescription>
+              </Alert>
+              
+              <Alert className="bg-siso-text/5 border border-siso-text/10">
+                <Filter className="h-4 w-4 text-siso-orange" />
+                <AlertDescription className="text-siso-text/80">
+                  <span className="font-semibold text-siso-text">Quick Access:</span> Filter by type, browse featured assistants, or search for specific capabilities to find the perfect AI helper.
+                </AlertDescription>
+              </Alert>
+            </div>
+
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <div className="relative w-full md:w-96">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-siso-text/60" />
