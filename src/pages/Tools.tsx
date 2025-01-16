@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Input } from "@/components/ui/input";
 import { Sidebar } from '@/components/Sidebar';
 import { ToolCard } from '@/components/tools/ToolCard';
-import { Tool as ToolType } from '@/components/tools/types';
+import { Tool } from '@/components/tools/types';
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ScrollArea } from "@/components/ui/scroll-area";
