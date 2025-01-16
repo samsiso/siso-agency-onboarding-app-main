@@ -8,6 +8,7 @@ import { ToolCard } from '@/components/tools/ToolCard';
 import { Tool as ToolType } from '@/components/tools/types';
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function Tools() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -26,7 +27,7 @@ export default function Tools() {
         console.error('Error fetching tools:', error);
         throw error;
       }
-
+      
       console.log('Raw data from Supabase:', data);
       
       const transformedData = data.map(tool => ({
@@ -39,41 +40,53 @@ export default function Tools() {
     },
   });
 
+  const categories = [
+    { id: 'all', label: 'All Tools' },
+    { id: 'development', label: 'Development' },
+    { id: 'productivity', label: 'Productivity' },
+    { id: 'content', label: 'Content Creation' },
+    { id: 'business', label: 'Business' },
+    { id: 'education', label: 'Education' },
+    { id: 'design', label: 'Design' },
+    { id: 'research', label: 'Research' },
+    { id: 'language', label: 'Language' },
+    { id: 'media', label: 'Media' },
+  ];
+
   const categoryCounts = useMemo(() => {
     if (!tools) return {};
     return tools.reduce((acc, tool) => {
-      acc[tool.category] = (acc[tool.category] || 0) + 1;
+      const category = mapToolToCategory(tool.category);
+      acc[category] = (acc[category] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
   }, [tools]);
+
+  const mapToolToCategory = (originalCategory: string): string => {
+    const categoryMap: Record<string, string> = {
+      'integration': 'development',
+      'page builder': 'development',
+      'custom actions': 'development',
+      'gpt builder': 'development',
+      'authentication': 'development',
+      'collect email': 'business',
+      'knowledge files': 'productivity',
+      'ads': 'business',
+      'monetization': 'business'
+    };
+    return categoryMap[originalCategory.toLowerCase()] || originalCategory.toLowerCase();
+  };
 
   const filteredTools = tools?.filter(tool => {
     const matchesSearch = !searchQuery || 
       tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       tool.description?.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const matchesCategory = selectedCategory === 'all' || tool.category === selectedCategory;
+    const toolCategory = mapToolToCategory(tool.category);
+    const matchesCategory = selectedCategory === 'all' || toolCategory === selectedCategory;
 
     return matchesSearch && matchesCategory;
   });
-
-  if (error) {
-    console.error('Error in component:', error);
-    return <div className="text-red-500">Error loading tools. Please try again later.</div>;
-  }
-
-  const categories = [
-    'all',
-    'integration',
-    'page builder',
-    'custom actions',
-    'authentication',
-    'collect email',
-    'knowledge files',
-    'ads',
-    'monetization',
-    'gpt builder'
-  ];
 
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
@@ -87,29 +100,29 @@ export default function Tools() {
               </h1>
               <p className="mt-2 text-lg text-siso-text/80 leading-relaxed max-w-3xl">
                 Discover powerful tools and platforms to enhance your workflow. 
-                Browse through various categories including integrations, page builders, and GPT development tools.
+                Browse through various categories including development, productivity, and business tools.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
               <Alert className="bg-siso-text/5 border border-siso-text/10">
                 <Wrench className="h-4 w-4 text-siso-orange" />
                 <AlertDescription className="text-siso-text/80">
-                  <span className="font-semibold text-siso-text">Custom Actions:</span> Integrate external services and APIs with your GPTs.
+                  <span className="font-semibold text-siso-text">Development:</span> Tools for coding, integration, and technical tasks.
                 </AlertDescription>
               </Alert>
               
               <Alert className="bg-siso-text/5 border border-siso-text/10">
                 <Filter className="h-4 w-4 text-siso-orange" />
                 <AlertDescription className="text-siso-text/80">
-                  <span className="font-semibold text-siso-text">Categories:</span> Browse tools by category to find what you need.
+                  <span className="font-semibold text-siso-text">Productivity:</span> Enhance your workflow efficiency.
                 </AlertDescription>
               </Alert>
               
               <Alert className="bg-siso-text/5 border border-siso-text/10">
                 <Star className="h-4 w-4 text-siso-orange" />
                 <AlertDescription className="text-siso-text/80">
-                  <span className="font-semibold text-siso-text">Featured:</span> Discover top-rated tools for development.
+                  <span className="font-semibold text-siso-text">Business:</span> Tools for growth and monetization.
                 </AlertDescription>
               </Alert>
             </div>
@@ -127,22 +140,24 @@ export default function Tools() {
             </div>
           </div>
 
-          <Tabs defaultValue="all" className="w-full" onValueChange={(value) => setSelectedCategory(value)}>
-            <TabsList className="w-full justify-start bg-siso-text/5 border border-siso-text/10 flex-wrap">
-              {categories.map((category) => (
-                <TabsTrigger
-                  key={category}
-                  value={category}
-                  className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange capitalize"
-                >
-                  {category.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
-                  <span className="ml-2 text-sm text-siso-text/60">
-                    {category === 'all' ? tools?.length || 0 : categoryCounts[category] || 0}
-                  </span>
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
+          <ScrollArea className="w-full" type="always">
+            <Tabs defaultValue="all" className="w-full" onValueChange={(value) => setSelectedCategory(value)}>
+              <TabsList className="w-full justify-start bg-siso-text/5 border border-siso-text/10 mb-6">
+                {categories.map(({ id, label }) => (
+                  <TabsTrigger
+                    key={id}
+                    value={id}
+                    className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange"
+                  >
+                    {label}
+                    <span className="ml-2 text-sm text-siso-text/60">
+                      {id === 'all' ? tools?.length || 0 : categoryCounts[id] || 0}
+                    </span>
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
+          </ScrollArea>
 
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
