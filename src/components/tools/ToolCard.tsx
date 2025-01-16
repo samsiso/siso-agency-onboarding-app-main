@@ -32,26 +32,26 @@ export function ToolCard({ tool }: ToolCardProps) {
 
   const getCustomLogoUrl = (toolName: string): string | null => {
     const logoMap: Record<string, string> = {
-      'Anthropic': '/lovable-uploads/5ec1265d-9c09-4681-939b-a60fd4d06152.png',
-      'Make.com': '/lovable-uploads/3b1f63ad-3a17-48a3-aac2-e827e77393c1.png',
-      'Automa': '/lovable-uploads/66b63935-28a0-4212-8e2a-ab375279b188.png',
-      'Rabbit': '/lovable-uploads/10c752e6-33e8-40f9-9076-a5689232e11a.png',
-      'Cursor AI': '/lovable-uploads/a5a9f5ad-aef3-4379-890d-fb6cef603cce.png',
-      'Replicate': '/lovable-uploads/19ca8c73-3736-4506-bfb2-de867b272e12.png',
-      'OpenAI': '/lovable-uploads/e33090cc-0117-46ec-9e84-7dde6a93d0d3.png',
-      '11Labs': '/lovable-uploads/90c0de54-b6ba-4500-8bac-ec508dd51cf8.png',
-      'ElevenLabs': '/lovable-uploads/5ba92f91-0e4b-4f5d-9ed2-ae6e93c895a4.png',
-      'Firebase': '/lovable-uploads/b5e8df80-d454-4a06-839a-19bf78371b0c.png',
-      'Framer': '/lovable-uploads/11a3454b-9de6-49c7-83b3-80f258d0ff53.png',
-      'Gantry': '/lovable-uploads/41a75add-6a28-4244-90ee-687082cba5cd.png',
-      'GCP': '/lovable-uploads/4e18e593-8bef-45b1-b23a-95257d71bb9d.png',
-      'Hugging Face': '/lovable-uploads/22b72d61-de06-441e-aef7-edd61bd7cc56.png',
-      'Together AI': '/lovable-uploads/5debc3cd-29a5-4b65-a577-32749c7917c7.png',
-      'n8n': '/lovable-uploads/c482563a-42db-4f47-83f2-c2e7771400b7.png',
-      'Midjourney': '/lovable-uploads/8e5ff417-0826-4bc1-8afb-09cc8b6912c4.png',
-      'RunPod': '/lovable-uploads/18fac9e2-df8b-44a8-9ac3-2f9c0d1ce312.png',
-      'Supabase': '/lovable-uploads/1f9eba1e-c2af-4ed8-84e7-a375872c9182.png',
-      'Perplexity': '/lovable-uploads/6bd048bf-9e6e-49e5-b028-62cac9c81038.png'
+      'Anthropic': '/lovable-uploads/b20703bf-3b0b-49b8-8490-1be4bd00df96.png',
+      'Make.com': '/lovable-uploads/ff0e4ec1-921e-4c8f-831d-86f8fac07052.png',
+      'Automa': '/lovable-uploads/1ac50508-b249-4bd4-9cc5-97b99aa642d1.png',
+      'Rabbit': '/lovable-uploads/92028479-a553-4ac9-9e39-0f873d2a8480.png',
+      'Cursor AI': '/lovable-uploads/afba683e-7707-4663-b478-1409c00526b0.png',
+      'Replicate': '/lovable-uploads/ec8e134a-f3ab-4cb6-ba76-ed7f2b291537.png',
+      'OpenAI': '/lovable-uploads/d99f6770-7516-4213-9844-127aee18be83.png',
+      '11Labs': '/lovable-uploads/f73e8498-21fd-4bf0-aeb9-4b5cd905d93c.png',
+      'ElevenLabs': '/lovable-uploads/081b4ec6-9a2d-406a-bd52-55395784754a.png',
+      'Firebase': '/lovable-uploads/0c4f0920-5f53-40c9-81bc-c81ea886d292.png',
+      'Framer': '/lovable-uploads/d53455e1-00b9-4187-b3de-8a27012c6227.png',
+      'Gantry': '/lovable-uploads/1d736dcc-8143-4ce7-847a-ee550725c708.png',
+      'GCP': '/lovable-uploads/7c244ac8-7305-40c7-b8f7-33a92fac7bc4.png',
+      'Hugging Face': '/lovable-uploads/3c3971c1-be81-477f-97b6-655fcbdf4eb6.png',
+      'Together AI': '/lovable-uploads/c9d84a03-c788-413c-8701-53881daf6476.png',
+      'n8n': '/lovable-uploads/c7ac43fd-bc3e-478d-8b4f-809beafb6838.png',
+      'Midjourney': '/lovable-uploads/b269df74-3740-4134-8618-2c941cda5a5a.png',
+      'RunPod': '/lovable-uploads/706d021e-208d-4bab-910c-f552468c2ada.png',
+      'Supabase': '/lovable-uploads/67e004ed-6861-4d6a-b05e-d885a03e5c1e.png',
+      'Perplexity': '/lovable-uploads/8172f415-c43b-4d18-9c8e-5c6da3de2f24.png'
     };
 
     return logoMap[toolName] || null;
