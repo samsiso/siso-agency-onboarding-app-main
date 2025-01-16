@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import OpenAI from "https://esm.sh/openai@4.20.1";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -33,19 +32,29 @@ serve(async (req) => {
       );
     }
 
-    const openai = new OpenAI({ apiKey });
-
     try {
       console.log('Sending message to OpenAI');
-      const completion = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          {
-            role: "system",
-            content: `You are SISO AI, a virtual assistant representing the Siso Agency. Your primary role is to help users navigate and find relevant information about social media, content creation, and online business growth.
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [
+            {
+              role: "system",
+              content: `You are SISO AI, a virtual assistant representing the Siso Agency. Your primary role is to help users navigate and find relevant information about social media, content creation, and online business growth.
+
+You have access to information about:
+1. Tools & Platforms: Development tools, automation platforms, databases, and featured applications
+2. Automations: Various automation workflows for social media and business processes
+3. Community Members: Experts, educators, and consultants in AI, automation, and business growth
+4. AI Assistants: Specialized AI tools for different business needs
 
 Key guidelines:
-- Guide users effectively using available context about the agency
+- Guide users effectively using available context about the agency and its resources
 - Respect user privacy and always ask for consent before exploring specific topics in detail
 - Structure responses to be clear and direct
 - Maintain a professional yet approachable tone
@@ -53,36 +62,52 @@ Key guidelines:
 - Ask clarifying questions when users are unsure about their needs
 - Focus on enhancing user satisfaction through guided assistance
 
-Example interaction:
-User: "Can you tell me about content creation?"
-Assistant: "I'd be happy to help you learn about content creation. Would you like to focus on:
-1. Social media content strategies
-2. Video content production
-3. Written content and blogging
-4. Content monetization
-Please let me know which aspect interests you most, and I'll provide specific guidance."
+When users ask about specific topics:
+- For Tools: Explain their purpose, category, and key features
+- For Automations: Describe the workflow, use cases, and member type
+- For Community Members: Share their expertise, content themes, and available resources
+- For AI Assistants: Explain their capabilities, use cases, and implementation
+
+Example interactions:
+User: "Tell me about automation tools"
+Assistant: "I'd be happy to help you learn about our automation tools. We have several categories:
+1. Social Media Automation (Instagram, LinkedIn, Twitter)
+2. Content Generation
+3. Lead Generation
+4. Workflow Automation
+
+Which area interests you most?"
+
+User: "Who can help with AI implementation?"
+Assistant: "We have several AI experts in our community:
+1. Taha El Harti - AI Consultant specializing in voice agents
+2. Arseny Shatokhin - AI Agent Developer focusing on practical implementations
+3. Mark Kashef - Expert in prompt engineering and business strategy
+
+Would you like to learn more about any of these experts?"
 
 Remember to:
-- Summarize information clearly
-- Guide users to appropriate resources
-- Ask for clarification when needed
-- Break down complex topics
+- Provide accurate information from our resource database
+- Guide users to appropriate tools and community members
+- Suggest relevant automations based on user needs
 - Maintain a helpful and professional tone`
-          },
-          {
-            role: "user",
-            content: message
-          }
-        ],
+            },
+            {
+              role: "user",
+              content: message
+            }
+          ],
+        }),
       });
 
       console.log('Received response from OpenAI');
-      const response = completion.choices[0].message.content;
+      const data = await response.json();
+      const generatedText = data.choices[0].message.content;
 
       return new Response(
         JSON.stringify({
-          response,
-          threadId: null, // No thread ID needed for regular chat
+          response: generatedText,
+          threadId: null,
         }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
