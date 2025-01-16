@@ -38,7 +38,7 @@ export function ToolDetail({ tool, onClose }: ToolDetailProps) {
       <SheetContent className="bg-siso-bg border-l border-siso-text/10 w-full sm:max-w-xl overflow-y-auto">
         <SheetHeader className="space-y-4">
           <div className="flex items-center gap-4">
-            {tool.member_type && tool.profile_image_url ? (
+            {tool.profile_image_url ? (
               <img 
                 src={tool.profile_image_url} 
                 alt={tool.name}
