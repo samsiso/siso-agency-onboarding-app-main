@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { ExternalLink, Users, X, Youtube } from "lucide-react";
+import { ExternalLink, Users, X, Youtube, Crown, Lock } from "lucide-react";
 import { CommunityMember } from "./types";
 
 interface CommunityMemberDetailsProps {
@@ -17,6 +17,12 @@ export const CommunityMemberDetails = ({ member, onClose }: CommunityMemberDetai
       ? url.split('watch?v=')[1].split('&')[0]
       : url.split('/').pop();
     return `https://www.youtube.com/embed/${videoId}`;
+  };
+
+  const formatMemberCount = (count: number) => {
+    if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
+    if (count >= 1000) return `${(count / 1000).toFixed(1)}k`;
+    return count.toString();
   };
 
   return (
@@ -37,12 +43,21 @@ export const CommunityMemberDetails = ({ member, onClose }: CommunityMemberDetai
                 </div>
               )}
               <div>
-                <SheetTitle className="text-2xl font-bold text-siso-text-bold">
-                  {member.name}
-                </SheetTitle>
-                {member.member_type && (
-                  <p className="text-sm text-siso-text/80 capitalize">{member.member_type}</p>
-                )}
+                <div className="flex items-center gap-2">
+                  <SheetTitle className="text-2xl font-bold text-siso-text-bold">
+                    {member.name}
+                  </SheetTitle>
+                  {member.member_type === "Personal Development" && (
+                    <Crown className="w-5 h-5 text-yellow-500" />
+                  )}
+                </div>
+                <div className="flex items-center gap-2 text-sm text-siso-text/80">
+                  {member.member_type && (
+                    <span className="capitalize">{member.member_type}</span>
+                  )}
+                  <Lock className="w-4 h-4" />
+                  <span>Private group</span>
+                </div>
               </div>
             </div>
             <Button
@@ -54,12 +69,35 @@ export const CommunityMemberDetails = ({ member, onClose }: CommunityMemberDetai
               <X className="h-4 w-4" />
             </Button>
           </div>
-          <SheetDescription className="text-siso-text text-base leading-relaxed">
-            {member.description}
-          </SheetDescription>
         </SheetHeader>
 
         <div className="mt-6 space-y-6">
+          {/* Community Stats */}
+          <div className="grid grid-cols-3 gap-4">
+            <div className="bg-siso-text/5 rounded-lg p-4 text-center">
+              <div className="text-xl font-bold text-siso-text-bold">
+                {formatMemberCount(member.member_count || 0)}
+              </div>
+              <div className="text-sm text-siso-text/80">Members</div>
+            </div>
+            <div className="bg-siso-text/5 rounded-lg p-4 text-center">
+              <div className="text-xl font-bold text-siso-text-bold">237</div>
+              <div className="text-sm text-siso-text/80">Online</div>
+            </div>
+            <div className="bg-siso-text/5 rounded-lg p-4 text-center">
+              <div className="text-xl font-bold text-siso-text-bold">12</div>
+              <div className="text-sm text-siso-text/80">Admins</div>
+            </div>
+          </div>
+
+          {/* Description */}
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold text-siso-text-bold">About</h3>
+            <div className="text-siso-text space-y-4 whitespace-pre-line">
+              {member.description}
+            </div>
+          </div>
+
           {/* Quick Actions */}
           <div className="space-y-3">
             <h3 className="text-lg font-semibold text-siso-text-bold flex items-center gap-2">
@@ -67,13 +105,13 @@ export const CommunityMemberDetails = ({ member, onClose }: CommunityMemberDetai
               Quick Actions
             </h3>
             <div className="grid grid-cols-1 gap-2">
-              {member.website_url && (
+              {member.join_url && (
                 <Button
                   className="w-full justify-start gap-2 bg-gradient-to-r from-siso-red/90 to-siso-orange/90 hover:from-siso-red hover:to-siso-orange transition-all duration-300"
-                  onClick={() => window.open(member.website_url!, '_blank')}
+                  onClick={() => window.open(member.join_url!, '_blank')}
                 >
                   <ExternalLink className="h-4 w-4" />
-                  Visit Website
+                  Join Community
                 </Button>
               )}
               {member.youtube_url && (
@@ -135,39 +173,14 @@ export const CommunityMemberDetails = ({ member, onClose }: CommunityMemberDetai
             </div>
           )}
 
-          {/* Specializations */}
-          {member.specialization && member.specialization.length > 0 && (
-            <div className="space-y-3">
-              <h3 className="text-lg font-semibold text-siso-text-bold">Specializations</h3>
-              <div className="flex flex-wrap gap-2">
-                {member.specialization.map((spec, index) => (
-                  <span 
-                    key={index}
-                    className="text-sm px-3 py-1 rounded-full bg-siso-text/10 text-siso-text hover:bg-siso-text/20 transition-colors cursor-default"
-                  >
-                    {spec}
-                  </span>
-                ))}
-              </div>
+          {/* Platform Info */}
+          <div className="pt-4 border-t border-siso-text/10 text-sm text-siso-text/60 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span>Platform:</span>
+              <span className="text-siso-text">{member.platform}</span>
             </div>
-          )}
-
-          {/* Content Themes */}
-          {member.content_themes && member.content_themes.length > 0 && (
-            <div className="space-y-3">
-              <h3 className="text-lg font-semibold text-siso-text-bold">Content Themes</h3>
-              <div className="flex flex-wrap gap-2">
-                {member.content_themes.map((theme, index) => (
-                  <span 
-                    key={index}
-                    className="text-sm px-3 py-1 rounded-full bg-siso-orange/10 text-siso-orange hover:bg-siso-orange/20 transition-colors cursor-default"
-                  >
-                    {theme}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
+            <span>Powered by Skool</span>
+          </div>
         </div>
       </SheetContent>
     </Sheet>
