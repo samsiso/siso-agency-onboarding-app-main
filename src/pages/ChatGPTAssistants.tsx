@@ -23,11 +23,14 @@ interface Assistant {
   rating: number | null;
   likes_count: number | null;
   downloads_count: number | null;
-  website_url: string | null;
   gpt_url: string | null;
+  gpt_id: string | null;
   review_average: number | null;
   review_count: number | null;
   num_conversations_str: string | null;
+  website_url: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export default function ChatGPTAssistants() {
