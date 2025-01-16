@@ -13,7 +13,10 @@ import {
   Cloud,
   Terminal,
   Table,
-  Blocks
+  Blocks,
+  Rabbit,
+  Heart,
+  Share2
 } from 'lucide-react';
 
 interface ToolCardProps {
@@ -29,25 +32,41 @@ export function ToolCard({ tool }: ToolCardProps) {
 
   const getIconForTool = (tool: Tool) => {
     // First check specific tools
-    switch (tool.name) {
-      case 'Supabase':
+    switch (tool.name.toLowerCase()) {
+      case 'supabase':
         return <Database className="h-6 w-6 text-emerald-500" />;
-      case 'Firebase':
+      case 'firebase':
         return <Database className="h-6 w-6 text-amber-500" />;
-      case 'ElevenLabs':
+      case 'elevenlabs':
         return <Bot className="h-6 w-6 text-blue-500" />;
-      case 'HuggingFace':
+      case 'huggingface':
         return <Brain className="h-6 w-6 text-yellow-500" />;
-      case 'GCP':
+      case 'gcp':
         return <Cloud className="h-6 w-6 text-blue-400" />;
-      case 'Cursor AI':
+      case 'cursor ai':
         return <Terminal className="h-6 w-6 text-purple-500" />;
-      case 'Airtable':
+      case 'airtable':
         return <Table className="h-6 w-6 text-teal-500" />;
       case 'n8n':
         return <Workflow className="h-6 w-6 text-green-500" />;
-      case 'Make.com':
+      case 'make.com':
         return <Blocks className="h-6 w-6 text-indigo-500" />;
+      case 'anthropic':
+        return <Brain className="h-6 w-6 text-pink-500" />;
+      case 'framer':
+        return <Paintbrush className="h-6 w-6 text-blue-600" />;
+      case 'midjourney':
+        return <Paintbrush className="h-6 w-6 text-indigo-600" />;
+      case 'runpod':
+        return <Cloud className="h-6 w-6 text-purple-600" />;
+      case 'replicate':
+        return <Share2 className="h-6 w-6 text-gray-500" />;
+      case 'rabbit':
+        return <Rabbit className="h-6 w-6 text-orange-500" />;
+      case 'perplexity':
+        return <Brain className="h-6 w-6 text-blue-500" />;
+      case 'together ai':
+        return <Heart className="h-6 w-6 text-red-500" />;
     }
 
     // Then fall back to category-based icons
