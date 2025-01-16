@@ -46,25 +46,31 @@ serve(async (req) => {
       let thread;
       if (!threadId) {
         console.log('Creating new thread');
-        thread = await openai.beta.threads.create();
+        thread = await openai.beta.threads.create({
+          messages: [{ 
+            role: "user", 
+            content: message,
+            file_ids: [] 
+          }]
+        });
         console.log('Created new thread:', thread.id);
       } else {
         console.log('Using existing thread:', threadId);
         thread = { id: threadId };
+        // Add message to existing thread
+        await openai.beta.threads.messages.create(thread.id, {
+          role: "user",
+          content: message,
+          file_ids: []
+        });
       }
 
-      // Add message to thread
-      console.log('Adding message to thread');
-      await openai.beta.threads.messages.create(thread.id, {
-        role: "user",
-        content: message,
-      });
-
-      // Run the assistant
+      // Run the assistant with v2 configuration
       console.log('Starting assistant run');
       const run = await openai.beta.threads.runs.create(thread.id, {
         assistant_id: "asst_7f4aHDtKZtJAo1cFtptII7ed",
         model: "gpt-4",
+        tools: [{ type: "code_interpreter" }],
       });
 
       // Poll for completion
