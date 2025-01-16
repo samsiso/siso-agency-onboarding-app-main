@@ -15,14 +15,10 @@ interface Automation {
   name: string;
   description: string | null;
   category: string;
-  pricing_type: string | null;
-  rating: number | null;
-  reviews_count: number | null;
-  downloads_count: number | null;
-  likes_count: number | null;
-  website_url: string | null;
-  use_cases: string[] | null;
-  input_variables: string[] | null;
+  platform: string | null;
+  setup_guide: string | null;
+  integration_url: string | null;
+  profile_image_url: string | null;
 }
 
 type AutomationCategory = 'all' | 'featured' | 'linkedin' | 'instagram' | 'x' | 'reddit' | 'youtube' | 'tiktok' | 'general';
@@ -36,9 +32,8 @@ export default function Automations() {
     queryKey: ['automations'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('tools')
-        .select('*')
-        .eq('category', 'automation');
+        .from('automations')  // Changed from 'tools' to 'automations'
+        .select('*');
       
       if (error) throw error;
       return data as Automation[];
@@ -52,11 +47,10 @@ export default function Automations() {
 
     if (selectedCategory === 'all') return matchesSearch;
     if (selectedCategory === 'featured') {
-      return matchesSearch && (automation.rating || 0) >= 4;
+      return matchesSearch && automation.platform === 'Multiple';
     }
     return matchesSearch && 
-      (automation.name.toLowerCase().includes(selectedCategory) || 
-       automation.description?.toLowerCase().includes(selectedCategory));
+      (automation.platform?.toLowerCase() === selectedCategory);
   });
 
   const handleAutomationClick = (automation: Automation) => {
@@ -88,7 +82,7 @@ export default function Automations() {
               </div>
             </div>
 
-            {/* New Callouts Section */}
+            {/* Callouts Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
               <Alert className="bg-siso-text/5 border border-siso-text/10">
                 <Bot className="h-4 w-4 text-siso-orange" />
@@ -162,7 +156,7 @@ export default function Automations() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="text-sm font-semibold text-siso-text-bold truncate">{automation.name}</h3>
-                        <p className="text-xs text-siso-text/80">{automation.pricing_type || 'Free'}</p>
+                        <p className="text-xs text-siso-text/80">{automation.platform || 'General'}</p>
                       </div>
                     </div>
                     {automation.description && (
@@ -170,24 +164,6 @@ export default function Automations() {
                         {automation.description}
                       </p>
                     )}
-                    <div className="flex gap-2 mt-2">
-                      <div className="flex items-center gap-1">
-                        <Download className="w-3 h-3 text-siso-text/60" />
-                        <span className="text-xs text-siso-text">{automation.downloads_count || '0'}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Heart className="w-3 h-3 text-siso-red" />
-                        <span className="text-xs text-siso-text">{automation.likes_count || '0'}</span>
-                      </div>
-                      {automation.rating && (
-                        <div className="flex items-center gap-1">
-                          <Star className="w-3 h-3 text-siso-orange" />
-                          <span className="text-xs text-siso-text">
-                            {automation.rating.toFixed(1)}
-                          </span>
-                        </div>
-                      )}
-                    </div>
                   </CardContent>
                 </Card>
               ))}
@@ -208,47 +184,29 @@ export default function Automations() {
                   </SheetHeader>
 
                   <div className="mt-6 space-y-6">
-                    {selectedAutomation.website_url && (
+                    {selectedAutomation.integration_url && (
                       <Button
                         className="w-full justify-start gap-2"
-                        onClick={() => window.open(selectedAutomation.website_url!, '_blank')}
+                        onClick={() => window.open(selectedAutomation.integration_url!, '_blank')}
                       >
                         <ExternalLink className="h-4 w-4" />
-                        Visit Website
+                        View Integration
                       </Button>
                     )}
 
-                    {selectedAutomation.use_cases && selectedAutomation.use_cases.length > 0 && (
+                    {selectedAutomation.setup_guide && (
                       <div className="space-y-2">
-                        <h3 className="text-lg font-semibold text-siso-text-bold">Use Cases</h3>
-                        <div className="flex flex-wrap gap-2">
-                          {selectedAutomation.use_cases.map((useCase, index) => (
-                            <span 
-                              key={index}
-                              className="text-sm px-3 py-1 rounded-full bg-blue-500/10 text-blue-500"
-                            >
-                              {useCase}
-                            </span>
-                          ))}
-                        </div>
+                        <h3 className="text-lg font-semibold text-siso-text-bold">Setup Guide</h3>
+                        <p className="text-sm text-siso-text whitespace-pre-line">
+                          {selectedAutomation.setup_guide}
+                        </p>
                       </div>
                     )}
 
-                    <div className="grid grid-cols-3 gap-4">
-                      <div className="text-center p-3 rounded-lg bg-siso-text/5">
-                        <Star className="h-5 w-5 text-siso-orange mx-auto mb-1" />
-                        <div className="text-sm text-siso-text-bold">{selectedAutomation.rating?.toFixed(1) || '-'}</div>
-                        <div className="text-xs text-siso-text">Rating</div>
-                      </div>
-                      <div className="text-center p-3 rounded-lg bg-siso-text/5">
-                        <Download className="h-5 w-5 text-siso-text/60 mx-auto mb-1" />
-                        <div className="text-sm text-siso-text-bold">{selectedAutomation.downloads_count || '0'}</div>
-                        <div className="text-xs text-siso-text">Downloads</div>
-                      </div>
-                      <div className="text-center p-3 rounded-lg bg-siso-text/5">
-                        <Heart className="h-5 w-5 text-siso-red mx-auto mb-1" />
-                        <div className="text-sm text-siso-text-bold">{selectedAutomation.likes_count || '0'}</div>
-                        <div className="text-xs text-siso-text">Likes</div>
+                    <div className="p-4 rounded-lg bg-siso-text/5">
+                      <h3 className="text-sm font-semibold text-siso-text-bold mb-2">Platform</h3>
+                      <div className="text-sm text-siso-text">
+                        {selectedAutomation.platform || 'General'}
                       </div>
                     </div>
                   </div>
