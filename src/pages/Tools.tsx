@@ -20,6 +20,7 @@ export default function Tools() {
     { id: 'development', label: 'Development' },
     { id: 'database', label: 'Database' },
     { id: 'automation', label: 'Automation' },
+    { id: 'GPT Builder', label: 'GPT Builder' },
   ];
 
   const { data: tools, isLoading, error } = useQuery({
@@ -133,7 +134,7 @@ export default function Tools() {
                   >
                     {category.label}
                     <span className="ml-2 text-sm text-siso-text/60">
-                      ({categoryCounts[category.id] || 0})
+                      ({categoryCounts[category.id.toLowerCase()] || 0})
                     </span>
                   </TabsTrigger>
                 ))}
