@@ -108,6 +108,51 @@ export type Database = {
         }
         Relationships: []
       }
+      education_creators: {
+        Row: {
+          content_themes: string[] | null
+          created_at: string
+          description: string | null
+          id: string
+          member_type: string | null
+          name: string
+          profile_image_url: string | null
+          specialization: string[] | null
+          updated_at: string
+          website_url: string | null
+          youtube_url: string | null
+          youtube_videos: Json | null
+        }
+        Insert: {
+          content_themes?: string[] | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          member_type?: string | null
+          name: string
+          profile_image_url?: string | null
+          specialization?: string[] | null
+          updated_at?: string
+          website_url?: string | null
+          youtube_url?: string | null
+          youtube_videos?: Json | null
+        }
+        Update: {
+          content_themes?: string[] | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          member_type?: string | null
+          name?: string
+          profile_image_url?: string | null
+          specialization?: string[] | null
+          updated_at?: string
+          website_url?: string | null
+          youtube_url?: string | null
+          youtube_videos?: Json | null
+        }
+        Relationships: []
+      }
       education_resources: {
         Row: {
           category: string
