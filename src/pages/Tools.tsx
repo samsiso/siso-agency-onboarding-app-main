@@ -17,39 +17,26 @@ export default function Tools() {
   const categories = [
     { id: 'all', label: 'All Tools' },
     { id: 'featured', label: 'Featured' },
-    { id: 'automation', label: 'Automation' },
-    { id: 'database', label: 'Database' },
-    { id: 'sales', label: 'Sales' },
     { id: 'development', label: 'Development' },
-    { id: 'education', label: 'Education' },
-    { id: 'visual', label: 'Visual' },
-    { id: 'gpt builder', label: 'GPT Builder' },
+    { id: 'database', label: 'Database' },
+    { id: 'automation', label: 'Automation' },
   ];
 
   const { data: tools, isLoading, error } = useQuery({
-    queryKey: ['tools'],
+    queryKey: ['core-tools'],
     queryFn: async () => {
-      console.log('Fetching tools...');
+      console.log('Fetching core tools...');
       const { data, error } = await supabase
-        .from('tools')
-        .select('*')
-        .eq('resource_type', 'tool')
-        .neq('category', 'gpt builder');
+        .from('core_tools')
+        .select('*');
       
       if (error) {
-        console.error('Error fetching tools:', error);
+        console.error('Error fetching core tools:', error);
         throw error;
       }
       
       console.log('Raw data from Supabase:', data);
-      
-      const transformedData = data.map(tool => ({
-        ...tool,
-        youtube_videos: tool.youtube_videos as { title: string; url: string; }[] | null
-      }));
-      
-      console.log('Transformed tools data:', transformedData);
-      return transformedData as ToolType[];
+      return data as ToolType[];
     },
   });
 
@@ -97,7 +84,7 @@ export default function Tools() {
                 </h1>
                 <p className="mt-2 text-lg text-siso-text/80 leading-relaxed max-w-3xl">
                   Discover powerful tools and platforms to enhance your workflow. 
-                  Browse through various categories including development, productivity, and business tools.
+                  Browse through various categories including development, database, and automation tools.
                 </p>
               </div>
               <div className="relative w-full md:w-96">
@@ -115,21 +102,21 @@ export default function Tools() {
               <Alert className="bg-siso-text/5 border border-siso-text/10">
                 <Wrench className="h-4 w-4 text-siso-orange" />
                 <AlertDescription className="text-siso-text/80">
-                  <span className="font-semibold text-siso-text">Development:</span> Tools for coding, integration, and technical tasks.
+                  <span className="font-semibold text-siso-text">Development:</span> Tools for coding, AI, and technical tasks.
                 </AlertDescription>
               </Alert>
               
               <Alert className="bg-siso-text/5 border border-siso-text/10">
                 <Filter className="h-4 w-4 text-siso-orange" />
                 <AlertDescription className="text-siso-text/80">
-                  <span className="font-semibold text-siso-text">Productivity:</span> Enhance your workflow efficiency.
+                  <span className="font-semibold text-siso-text">Database:</span> Data storage and management solutions.
                 </AlertDescription>
               </Alert>
               
               <Alert className="bg-siso-text/5 border border-siso-text/10">
                 <Star className="h-4 w-4 text-siso-orange" />
                 <AlertDescription className="text-siso-text/80">
-                  <span className="font-semibold text-siso-text">Business:</span> Tools for growth and monetization.
+                  <span className="font-semibold text-siso-text">Automation:</span> Workflow automation tools.
                 </AlertDescription>
               </Alert>
             </div>
