@@ -18,7 +18,7 @@ export default function ToolPage() {
     queryFn: async () => {
       console.log('Fetching tool with slug:', slug);
       const { data, error } = await supabase
-        .from('tools')
+        .from('core_tools')
         .select('*')
         .eq('id', slug)
         .maybeSingle();
@@ -31,13 +31,8 @@ export default function ToolPage() {
       if (!data) {
         throw new Error('Tool not found');
       }
-
-      const transformedData: Tool = {
-        ...data,
-        youtube_videos: data.youtube_videos ? data.youtube_videos as { title: string; url: string; }[] : null
-      };
       
-      return transformedData;
+      return data as Tool;
     },
   });
 
@@ -119,7 +114,7 @@ export default function ToolPage() {
             <div className="lg:col-span-2 space-y-6 md:space-y-8">
               <ToolHeader tool={tool} />
               
-              {tool.description && (
+              {tool?.description && (
                 <div className="space-y-4 glow-card">
                   <h2 className="text-2xl font-semibold text-siso-text-bold">About {tool.name}</h2>
                   <div className="prose prose-invert max-w-none">
