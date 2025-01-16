@@ -23,15 +23,11 @@ interface Assistant {
   rating: number | null;
   likes_count: number | null;
   downloads_count: number | null;
+  website_url: string | null;
   gpt_url: string | null;
-  gpt_id: string | null;
-  profile_image_url: string | null;
   review_average: number | null;
   review_count: number | null;
   num_conversations_str: string | null;
-  website_url: string | null;
-  created_at: string;
-  updated_at: string;
 }
 
 export default function ChatGPTAssistants() {
@@ -44,8 +40,9 @@ export default function ChatGPTAssistants() {
     queryFn: async () => {
       console.log('Fetching assistants...');
       const { data, error } = await supabase
-        .from('gpt_resources')
-        .select('*');
+        .from('tools')
+        .select('*')
+        .or('category.eq.assistant,category.eq.gpt builder');
       
       if (error) {
         console.error('Error fetching assistants:', error);
@@ -82,6 +79,8 @@ export default function ChatGPTAssistants() {
     console.error('Error in component:', error);
     return <div className="text-red-500">Error loading assistants. Please try again later.</div>;
   }
+
+  const categories = ['all', 'featured', 'software', 'coding', 'actions', 'gpt'];
 
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
@@ -134,12 +133,12 @@ export default function ChatGPTAssistants() {
             </div>
 
             <Tabs defaultValue="all" className="w-full" onValueChange={setSelectedCategory}>
-              <TabsList className="w-full h-auto flex-wrap justify-start bg-siso-text/5 border border-siso-text/10 p-2">
-                {['all', 'featured', 'software', 'coding', 'actions', 'gpt'].map((category) => (
+              <TabsList className="w-full justify-start bg-siso-text/5 border border-siso-text/10 flex-wrap">
+                {categories.map((category) => (
                   <TabsTrigger
                     key={category}
                     value={category}
-                    className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange m-1"
+                    className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange"
                   >
                     {category.charAt(0).toUpperCase() + category.slice(1)}
                     <span className="ml-2 text-sm text-siso-text/60">
@@ -149,7 +148,7 @@ export default function ChatGPTAssistants() {
                           ? assistants?.filter(a => (a.rating && a.rating >= 4.5) || (a.review_average && a.review_average >= 4.5)).length || 0
                           : category === 'gpt'
                             ? assistants?.filter(a => a.category === 'gpt builder').length || 0
-                            : assistants?.filter(a => a.assistant_type === category).length || 0}
+                            : categoryCounts?.[category] || 0}
                     </span>
                   </TabsTrigger>
                 ))}

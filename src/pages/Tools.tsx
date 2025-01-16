@@ -49,8 +49,7 @@ export default function Tools() {
         .from('tools')
         .select('*')
         .eq('resource_type', 'tool')
-        .neq('category', 'gpt builder')
-        .not('category', 'in', '(\'integration\',\'page builder\',\'custom actions\',\'authentication\',\'collect email\',\'knowledge files\',\'ads\')');
+        .neq('category', 'gpt builder'); // Exclude GPT builder tools
       
       if (error) {
         console.error('Error fetching tools:', error);
@@ -143,12 +142,12 @@ export default function Tools() {
 
           <ScrollArea className="w-full" type="always">
             <Tabs defaultValue="all" className="w-full" onValueChange={(value) => setSelectedCategory(value)}>
-              <TabsList className="w-full h-auto flex-wrap justify-start bg-siso-text/5 border border-siso-text/10 mb-6 p-2">
+              <TabsList className="w-full justify-start bg-siso-text/5 border border-siso-text/10 mb-6">
                 {categories.map(({ id, label }) => (
                   <TabsTrigger
                     key={id}
                     value={id}
-                    className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange m-1"
+                    className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange"
                   >
                     {label}
                     <span className="ml-2 text-sm text-siso-text/60">

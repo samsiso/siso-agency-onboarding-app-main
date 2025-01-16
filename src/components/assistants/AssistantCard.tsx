@@ -15,15 +15,11 @@ interface Assistant {
   rating: number | null;
   likes_count: number | null;
   downloads_count: number | null;
+  website_url: string | null;
   gpt_url: string | null;
-  gpt_id: string | null;
-  profile_image_url: string | null;
   review_average: number | null;
   review_count: number | null;
   num_conversations_str: string | null;
-  website_url: string | null;
-  created_at: string;
-  updated_at: string;
 }
 
 interface AssistantCardProps {
@@ -56,7 +52,7 @@ export function AssistantCard({ assistant, onClick }: AssistantCardProps) {
           <div className="flex items-center gap-1">
             <Star className="w-3 h-3 text-siso-orange" />
             <span className="text-xs text-siso-text">
-              {assistant.review_average?.toFixed(1) || assistant.rating?.toFixed(1) || '-'}
+              {assistant.rating?.toFixed(1) || '-'}
             </span>
           </div>
           <div className="flex items-center gap-1">
