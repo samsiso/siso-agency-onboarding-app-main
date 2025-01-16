@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Search, Info, Filter, Star, Tool } from 'lucide-react';
+import { Search, Info, Filter, Star, Wrench } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from "@/components/ui/input";
@@ -92,7 +92,7 @@ export default function Tools() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
               <Alert className="bg-siso-text/5 border border-siso-text/10">
-                <Tool className="h-4 w-4 text-siso-orange" />
+                <Wrench className="h-4 w-4 text-siso-orange" />
                 <AlertDescription className="text-siso-text/80">
                   <span className="font-semibold text-siso-text">Custom Actions:</span> Integrate external services and APIs with your GPTs.
                 </AlertDescription>
