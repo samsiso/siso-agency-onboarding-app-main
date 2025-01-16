@@ -49,7 +49,8 @@ export default function Tools() {
         .from('tools')
         .select('*')
         .eq('resource_type', 'tool')
-        .neq('category', 'gpt builder'); // Exclude GPT builder tools
+        .neq('category', 'gpt builder')
+        .not('category', 'in', '(\'integration\',\'page builder\',\'custom actions\',\'authentication\',\'collect email\',\'knowledge files\',\'ads\')');
       
       if (error) {
         console.error('Error fetching tools:', error);

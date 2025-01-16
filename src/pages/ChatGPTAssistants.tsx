@@ -42,7 +42,7 @@ export default function ChatGPTAssistants() {
       const { data, error } = await supabase
         .from('tools')
         .select('*')
-        .or('category.eq.assistant,category.eq.gpt builder');
+        .or('category.eq.assistant,category.eq.gpt builder,category.in.(integration,page builder,custom actions,authentication,collect email,knowledge files,ads)');
       
       if (error) {
         console.error('Error fetching assistants:', error);
