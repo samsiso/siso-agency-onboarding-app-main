@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
-import { Search, Info, Filter, Star } from 'lucide-react';
+import { Search, Info, Filter, Star, Tool } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from "@/components/ui/input";
 import { Sidebar } from '@/components/Sidebar';
 import { ToolCard } from '@/components/tools/ToolCard';
-import { Tool } from '@/components/tools/types';
+import { Tool as ToolType } from '@/components/tools/types';
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
@@ -35,7 +35,7 @@ export default function Tools() {
       }));
       
       console.log('Transformed tools data:', transformedData);
-      return transformedData as Tool[];
+      return transformedData as ToolType[];
     },
   });
 
@@ -62,7 +62,17 @@ export default function Tools() {
     return <div className="text-red-500">Error loading tools. Please try again later.</div>;
   }
 
-  const categories = ['all', 'featured', 'database', 'development', 'sales'];
+  const categories = [
+    'all',
+    'integration',
+    'page builder',
+    'custom actions',
+    'authentication',
+    'collect email',
+    'knowledge files',
+    'ads',
+    'monetization'
+  ];
 
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
@@ -72,34 +82,33 @@ export default function Tools() {
           <div className="space-y-4">
             <div>
               <h1 className="text-4xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
-                Core Tools & Platforms
+                Tools for GPT Builders
               </h1>
               <p className="mt-2 text-lg text-siso-text/80 leading-relaxed max-w-3xl">
-                Discover our curated collection of tools and platforms that power SISO Agency's operations. 
-                These are the trusted solutions we use daily to deliver exceptional results.
+                Build more powerful custom GPTs with these tailored tools. 
+                Discover the best solutions for authentication, actions, monetization, and more.
               </p>
             </div>
 
-            {/* New Callouts Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
               <Alert className="bg-siso-text/5 border border-siso-text/10">
-                <Info className="h-4 w-4 text-siso-orange" />
+                <Tool className="h-4 w-4 text-siso-orange" />
                 <AlertDescription className="text-siso-text/80">
-                  <span className="font-semibold text-siso-text">Quick Search:</span> Use the search bar to find specific tools by name or description.
+                  <span className="font-semibold text-siso-text">Custom Actions:</span> Integrate external services and APIs with your GPTs.
                 </AlertDescription>
               </Alert>
               
               <Alert className="bg-siso-text/5 border border-siso-text/10">
                 <Filter className="h-4 w-4 text-siso-orange" />
                 <AlertDescription className="text-siso-text/80">
-                  <span className="font-semibold text-siso-text">Categories:</span> Filter tools by category using the tabs below to find what you need.
+                  <span className="font-semibold text-siso-text">Categories:</span> Browse tools by category to find what you need.
                 </AlertDescription>
               </Alert>
               
               <Alert className="bg-siso-text/5 border border-siso-text/10">
                 <Star className="h-4 w-4 text-siso-orange" />
                 <AlertDescription className="text-siso-text/80">
-                  <span className="font-semibold text-siso-text">Tool Details:</span> Click any tool card to view detailed information, tutorials, and resources.
+                  <span className="font-semibold text-siso-text">Featured:</span> Discover top-rated tools for GPT development.
                 </AlertDescription>
               </Alert>
             </div>
@@ -123,9 +132,9 @@ export default function Tools() {
                 <TabsTrigger
                   key={category}
                   value={category}
-                  className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange"
+                  className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange capitalize"
                 >
-                  {category.charAt(0).toUpperCase() + category.slice(1)}
+                  {category.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
                   <span className="ml-2 text-sm text-siso-text/60">
                     {category === 'all' ? tools?.length || 0 : categoryCounts[category] || 0}
                   </span>
@@ -135,7 +144,7 @@ export default function Tools() {
           </Tabs>
 
           {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {[...Array(10)].map((_, i) => (
                 <div 
                   key={i}
@@ -144,7 +153,7 @@ export default function Tools() {
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {filteredTools?.map((tool) => (
                 <ToolCard
                   key={tool.id}
