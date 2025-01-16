@@ -81,16 +81,6 @@ export function ToolDetail({ tool, onClose }: ToolDetailProps) {
                   Visit Website
                 </Button>
               )}
-              {tool.youtube_url && (
-                <Button
-                  variant="outline"
-                  className="w-full justify-start gap-2 border-siso-text/20 hover:bg-siso-text/5"
-                  onClick={() => window.open(tool.youtube_url!, '_blank')}
-                >
-                  <Youtube className="h-4 w-4 text-red-500" />
-                  Watch Video
-                </Button>
-              )}
               <Button
                 variant="outline"
                 className="w-full justify-start gap-2 border-siso-text/20 hover:bg-siso-text/5"
@@ -118,12 +108,13 @@ export function ToolDetail({ tool, onClose }: ToolDetailProps) {
             </div>
           </div>
 
-          {tool.youtube_url && (
-            <div className="space-y-3">
-              <h3 className="text-lg font-semibold text-siso-text-bold flex items-center gap-2">
-                <Youtube className="w-5 h-5 text-red-500" />
-                Featured Video
-              </h3>
+          {/* Video Section - Always show even if empty */}
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold text-siso-text-bold flex items-center gap-2">
+              <Youtube className="w-5 h-5 text-red-500" />
+              Featured Video
+            </h3>
+            {tool.youtube_url ? (
               <div className="rounded-lg overflow-hidden bg-black/20 ring-1 ring-siso-text/10">
                 <AspectRatio ratio={16 / 9}>
                   <iframe
@@ -135,8 +126,16 @@ export function ToolDetail({ tool, onClose }: ToolDetailProps) {
                   />
                 </AspectRatio>
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="rounded-lg overflow-hidden bg-black/20 ring-1 ring-siso-text/10 flex items-center justify-center">
+                <AspectRatio ratio={16 / 9}>
+                  <div className="w-full h-full flex items-center justify-center text-siso-text/60">
+                    <p>No video available</p>
+                  </div>
+                </AspectRatio>
+              </div>
+            )}
+          </div>
 
           {tool.specialization && tool.specialization.length > 0 && (
             <div className="space-y-3">
