@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Sidebar } from '../components/Sidebar';
-import { MessageSquare, Send } from 'lucide-react';
+import { MessageSquare, Send, Brain, Sparkles, Bot } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface Message {
   role: 'assistant' | 'user';
@@ -67,6 +68,30 @@ const SisoAI = () => {
             <div className="flex items-center gap-3 mb-8">
               <MessageSquare className="w-8 h-8 text-siso-red" />
               <h1 className="text-3xl font-bold text-siso-text-bold">SISO AI Assistant</h1>
+            </div>
+
+            {/* New Callouts Section */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+              <Alert className="bg-siso-text/5 border border-siso-text/10">
+                <Brain className="h-4 w-4 text-siso-red" />
+                <AlertDescription className="text-siso-text/80">
+                  <span className="font-semibold text-siso-text">Smart Navigation:</span> Get instant guidance on finding tools, resources, and community members across the SISO platform.
+                </AlertDescription>
+              </Alert>
+              
+              <Alert className="bg-siso-text/5 border border-siso-text/10">
+                <Bot className="h-4 w-4 text-siso-orange" />
+                <AlertDescription className="text-siso-text/80">
+                  <span className="font-semibold text-siso-text">Personalized Help:</span> Ask questions about tools, automations, or get recommendations tailored to your needs.
+                </AlertDescription>
+              </Alert>
+              
+              <Alert className="bg-siso-text/5 border border-siso-text/10">
+                <Sparkles className="h-4 w-4 text-siso-red" />
+                <AlertDescription className="text-siso-text/80">
+                  <span className="font-semibold text-siso-text">Expert Knowledge:</span> Access detailed information about SISO's features, community resources, and best practices.
+                </AlertDescription>
+              </Alert>
             </div>
             
             <div className="bg-black/20 rounded-lg border border-siso-text/10 h-[600px] flex flex-col">
