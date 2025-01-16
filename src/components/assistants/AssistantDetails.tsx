@@ -16,6 +16,10 @@ interface Assistant {
   likes_count: number | null;
   downloads_count: number | null;
   website_url: string | null;
+  gpt_url: string | null;
+  review_average: number | null;
+  review_count: number | null;
+  num_conversations_str: string | null;
 }
 
 interface AssistantDetailsProps {
@@ -25,6 +29,10 @@ interface AssistantDetailsProps {
 
 export function AssistantDetails({ assistant, onClose }: AssistantDetailsProps) {
   if (!assistant) return null;
+
+  const isGPTTool = !assistant.assistant_type;
+  const displayRating = assistant.review_average || assistant.rating;
+  const displayReviewCount = assistant.review_count || assistant.reviews_count;
 
   return (
     <Sheet open={!!assistant} onOpenChange={onClose}>
@@ -40,7 +48,7 @@ export function AssistantDetails({ assistant, onClose }: AssistantDetailsProps) 
                   {assistant.name}
                 </SheetTitle>
                 <p className="text-sm text-siso-text/80">
-                  {assistant.assistant_type || 'AI Assistant'}
+                  {isGPTTool ? 'GPT Builder Tool' : assistant.assistant_type || 'AI Assistant'}
                 </p>
               </div>
             </div>
@@ -59,6 +67,24 @@ export function AssistantDetails({ assistant, onClose }: AssistantDetailsProps) 
         </SheetHeader>
 
         <div className="mt-6 space-y-6">
+          {isGPTTool && (
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold text-siso-text-bold">Usage Statistics</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-3 rounded-lg bg-siso-text/5">
+                  <div className="text-sm font-medium text-siso-text-bold">Conversations</div>
+                  <div className="text-sm text-siso-text">{assistant.num_conversations_str || '-'}</div>
+                </div>
+                <div className="p-3 rounded-lg bg-siso-text/5">
+                  <div className="text-sm font-medium text-siso-text-bold">Rating</div>
+                  <div className="text-sm text-siso-text">
+                    {displayRating ? `${displayRating.toFixed(1)} (${displayReviewCount} reviews)` : '-'}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {assistant.prompt_template && (
             <div className="space-y-2">
               <h3 className="text-lg font-semibold text-siso-text-bold">Prompt Template</h3>
@@ -100,32 +126,32 @@ export function AssistantDetails({ assistant, onClose }: AssistantDetailsProps) 
             </div>
           )}
 
-          <div className="space-y-2">
-            <h3 className="text-lg font-semibold text-siso-text-bold">Technical Details</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-3 rounded-lg bg-siso-text/5">
-                <div className="text-sm font-medium text-siso-text-bold">Model</div>
-                <div className="text-sm text-siso-text">{assistant.model_type || '-'}</div>
-              </div>
-              <div className="p-3 rounded-lg bg-siso-text/5">
-                <div className="text-sm font-medium text-siso-text-bold">Response Format</div>
-                <div className="text-sm text-siso-text">{assistant.response_format || '-'}</div>
-              </div>
-            </div>
-          </div>
-
-          {assistant.website_url && (
+          {!isGPTTool && (
             <div className="space-y-2">
-              <h3 className="text-lg font-semibold text-siso-text-bold">Quick Actions</h3>
-              <Button
-                className="w-full justify-start gap-2"
-                onClick={() => window.open(assistant.website_url!, '_blank')}
-              >
-                <ExternalLink className="h-4 w-4" />
-                Try Assistant
-              </Button>
+              <h3 className="text-lg font-semibold text-siso-text-bold">Technical Details</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-3 rounded-lg bg-siso-text/5">
+                  <div className="text-sm font-medium text-siso-text-bold">Model</div>
+                  <div className="text-sm text-siso-text">{assistant.model_type || '-'}</div>
+                </div>
+                <div className="p-3 rounded-lg bg-siso-text/5">
+                  <div className="text-sm font-medium text-siso-text-bold">Response Format</div>
+                  <div className="text-sm text-siso-text">{assistant.response_format || '-'}</div>
+                </div>
+              </div>
             </div>
           )}
+
+          <div className="space-y-2">
+            <h3 className="text-lg font-semibold text-siso-text-bold">Quick Actions</h3>
+            <Button
+              className="w-full justify-start gap-2"
+              onClick={() => window.open(assistant.gpt_url || assistant.website_url || '#', '_blank')}
+            >
+              <ExternalLink className="h-4 w-4" />
+              Try {isGPTTool ? 'GPT' : 'Assistant'}
+            </Button>
+          </div>
         </div>
       </SheetContent>
     </Sheet>

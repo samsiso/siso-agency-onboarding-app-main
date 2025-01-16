@@ -41,6 +41,7 @@ export type Database = {
           created_at: string
           description: string | null
           downloads_count: number | null
+          gpt_id: string | null
           gpt_url: string | null
           icon_url: string | null
           id: string
@@ -75,6 +76,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           downloads_count?: number | null
+          gpt_id?: string | null
           gpt_url?: string | null
           icon_url?: string | null
           id?: string
@@ -109,6 +111,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           downloads_count?: number | null
+          gpt_id?: string | null
           gpt_url?: string | null
           icon_url?: string | null
           id?: string

@@ -23,6 +23,10 @@ interface Assistant {
   likes_count: number | null;
   downloads_count: number | null;
   website_url: string | null;
+  gpt_url: string | null;
+  review_average: number | null;
+  review_count: number | null;
+  num_conversations_str: string | null;
 }
 
 export default function ChatGPTAssistants() {
@@ -37,7 +41,7 @@ export default function ChatGPTAssistants() {
       const { data, error } = await supabase
         .from('tools')
         .select('*')
-        .eq('category', 'assistant');
+        .or('category.eq.assistant,category.eq.gpt builder');
       
       if (error) {
         console.error('Error fetching assistants:', error);
@@ -51,7 +55,7 @@ export default function ChatGPTAssistants() {
 
   // Calculate category counts
   const categoryCounts = assistants?.reduce((acc, assistant) => {
-    const type = assistant.assistant_type || 'uncategorized';
+    const type = assistant.assistant_type || 'gpt';
     acc[type] = (acc[type] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
@@ -62,8 +66,9 @@ export default function ChatGPTAssistants() {
       assistant.description?.toLowerCase().includes(searchQuery.toLowerCase());
     
     const matchesCategory = selectedCategory === 'all' || 
-      (selectedCategory === 'featured' && assistant.rating && assistant.rating >= 4.5) ||
-      assistant.assistant_type === selectedCategory;
+      (selectedCategory === 'featured' && (assistant.rating >= 4.5 || assistant.review_average >= 4.5)) ||
+      assistant.assistant_type === selectedCategory ||
+      (selectedCategory === 'gpt' && !assistant.assistant_type);
 
     return matchesSearch && matchesCategory;
   });
@@ -73,7 +78,7 @@ export default function ChatGPTAssistants() {
     return <div className="text-red-500">Error loading assistants. Please try again later.</div>;
   }
 
-  const categories = ['all', 'featured', 'software', 'coding', 'actions'];
+  const categories = ['all', 'featured', 'software', 'coding', 'actions', 'gpt'];
 
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
@@ -83,10 +88,10 @@ export default function ChatGPTAssistants() {
           <div className="flex flex-col space-y-4 mb-8">
             <div>
               <h1 className="text-4xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
-                ChatGPT Assistants
+                ChatGPT Assistants & Tools
               </h1>
               <p className="mt-2 text-lg text-siso-text/80 leading-relaxed max-w-3xl">
-                Discover our curated collection of ChatGPT assistants that help streamline your workflow and boost productivity.
+                Discover our curated collection of ChatGPT assistants and GPT builder tools that help streamline your workflow and boost productivity.
               </p>
             </div>
 
@@ -102,7 +107,7 @@ export default function ChatGPTAssistants() {
               <Alert className="bg-siso-text/5 border border-siso-text/10">
                 <Sparkles className="h-4 w-4 text-siso-orange" />
                 <AlertDescription className="text-siso-text/80">
-                  <span className="font-semibold text-siso-text">Features:</span> Each assistant comes with a customizable prompt template, defined use cases, and specific input variables.
+                  <span className="font-semibold text-siso-text">GPT Tools:</span> Explore popular GPT builder tools with millions of conversations and high user ratings.
                 </AlertDescription>
               </Alert>
               
@@ -139,7 +144,9 @@ export default function ChatGPTAssistants() {
                       {category === 'all' 
                         ? assistants?.length || 0 
                         : category === 'featured'
-                          ? assistants?.filter(a => a.rating && a.rating >= 4.5).length || 0
+                          ? assistants?.filter(a => (a.rating && a.rating >= 4.5) || (a.review_average && a.review_average >= 4.5)).length || 0
+                          : category === 'gpt'
+                            ? assistants?.filter(a => !a.assistant_type).length || 0
                           : categoryCounts?.[category] || 0}
                     </span>
                   </TabsTrigger>
