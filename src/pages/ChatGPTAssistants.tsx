@@ -55,8 +55,8 @@ export default function ChatGPTAssistants() {
 
   // Calculate category counts
   const categoryCounts = assistants?.reduce((acc, assistant) => {
-    const type = assistant.assistant_type || 'gpt';
-    acc[type] = (acc[type] || 0) + 1;
+    const category = assistant.category === 'gpt builder' ? 'gpt' : (assistant.assistant_type || 'gpt');
+    acc[category] = (acc[category] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 
@@ -65,10 +65,11 @@ export default function ChatGPTAssistants() {
       assistant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       assistant.description?.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const matchesCategory = selectedCategory === 'all' || 
+    const matchesCategory = 
+      selectedCategory === 'all' || 
       (selectedCategory === 'featured' && (assistant.rating >= 4.5 || assistant.review_average >= 4.5)) ||
-      assistant.assistant_type === selectedCategory ||
-      (selectedCategory === 'gpt' && !assistant.assistant_type);
+      (selectedCategory === 'gpt' && assistant.category === 'gpt builder') ||
+      (selectedCategory !== 'gpt' && assistant.assistant_type === selectedCategory);
 
     return matchesSearch && matchesCategory;
   });
@@ -95,7 +96,6 @@ export default function ChatGPTAssistants() {
               </p>
             </div>
 
-            {/* New Callouts Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
               <Alert className="bg-siso-text/5 border border-siso-text/10">
                 <Bot className="h-4 w-4 text-siso-orange" />
@@ -146,8 +146,8 @@ export default function ChatGPTAssistants() {
                         : category === 'featured'
                           ? assistants?.filter(a => (a.rating && a.rating >= 4.5) || (a.review_average && a.review_average >= 4.5)).length || 0
                           : category === 'gpt'
-                            ? assistants?.filter(a => !a.assistant_type).length || 0
-                          : categoryCounts?.[category] || 0}
+                            ? assistants?.filter(a => a.category === 'gpt builder').length || 0
+                            : categoryCounts?.[category] || 0}
                     </span>
                   </TabsTrigger>
                 ))}
