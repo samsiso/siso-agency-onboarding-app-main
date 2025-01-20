@@ -14,7 +14,7 @@ serve(async (req) => {
   }
 
   try {
-    const { message } = await req.json();
+    const { message, systemPrompt } = await req.json();
     
     const apiKey = Deno.env.get('OPENAI_API_KEY');
     if (!apiKey) {
@@ -32,7 +32,7 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: "You are a helpful assistant for the SISO platform. You help users find and understand various tools, automations, and resources available on the platform. Keep your responses concise and friendly."
+            content: systemPrompt || "You are a helpful assistant for the SISO platform. You help users find and understand various tools, automations, and resources available on the platform. Keep your responses concise and friendly."
           },
           {
             role: "user",

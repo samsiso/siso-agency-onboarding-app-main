@@ -9,7 +9,30 @@ interface Message {
   content: string;
 }
 
-export const ChatBot = () => {
+interface ChatBotProps {
+  agentType: 'general' | 'tools' | 'education' | 'automations' | 'assistants' | 'ai' | 'networking';
+}
+
+const getAgentPrompt = (agentType: ChatBotProps['agentType']) => {
+  switch (agentType) {
+    case 'tools':
+      return "You are a SISO Tools expert. Help users find and understand various tools, their features, pricing, and best use cases. Focus on providing practical advice about tool selection and implementation.";
+    case 'education':
+      return "You are a SISO Education specialist. Guide users through available courses, educational content, and learning paths. Help them find the most relevant educational resources for their needs.";
+    case 'automations':
+      return "You are a SISO Automation expert. Help users understand different automation workflows, integration possibilities, and best practices for implementing automations in their business.";
+    case 'assistants':
+      return "You are a SISO AI Assistants specialist. Guide users in selecting and implementing the right AI assistants for their specific needs, explaining capabilities and use cases.";
+    case 'networking':
+      return "You are a SISO Networking expert. Help users connect with relevant communities, find networking opportunities, and make the most of SISO's networking resources.";
+    case 'ai':
+      return "You are SISO's AI Implementation specialist. Guide users in leveraging AI technologies, understanding AI capabilities, and implementing AI solutions in their business.";
+    default:
+      return "You are SISO's general assistant. Help users navigate the platform, find resources, and answer general questions about SISO's services and features.";
+  }
+};
+
+export const ChatBot = ({ agentType }: ChatBotProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -24,12 +47,14 @@ export const ChatBot = () => {
     setInput('');
     setIsLoading(true);
     
-    // Add user message immediately
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
 
     try {
       const { data, error } = await supabase.functions.invoke('chat-with-bot', {
-        body: { message: userMessage },
+        body: { 
+          message: userMessage,
+          systemPrompt: getAgentPrompt(agentType)
+        },
       });
 
       if (error) throw error;
@@ -47,6 +72,18 @@ export const ChatBot = () => {
     }
   };
 
+  const getAgentTitle = () => {
+    switch (agentType) {
+      case 'tools': return 'Tools Expert';
+      case 'education': return 'Education Guide';
+      case 'automations': return 'Automation Specialist';
+      case 'assistants': return 'AI Assistant Expert';
+      case 'networking': return 'Networking Guide';
+      case 'ai': return 'AI Specialist';
+      default: return 'SISO Assistant';
+    }
+  };
+
   return (
     <div className="fixed bottom-4 right-4 z-50">
       {!isOpen ? (
@@ -59,7 +96,7 @@ export const ChatBot = () => {
       ) : (
         <div className="w-[350px] h-[500px] bg-siso-bg border border-siso-text/10 rounded-lg shadow-lg flex flex-col">
           <div className="p-4 border-b border-siso-text/10 flex justify-between items-center bg-gradient-to-r from-siso-red/10 to-siso-orange/10">
-            <h3 className="font-semibold text-siso-text">SISO Assistant</h3>
+            <h3 className="font-semibold text-siso-text">{getAgentTitle()}</h3>
             <Button
               variant="ghost"
               size="icon"
@@ -71,6 +108,11 @@ export const ChatBot = () => {
           </div>
           
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {messages.length === 0 && (
+              <div className="text-center text-siso-text/70 mt-4">
+                👋 Hi! I'm your {getAgentTitle()}. How can I help you today?
+              </div>
+            )}
             {messages.map((message, index) => (
               <div
                 key={index}
