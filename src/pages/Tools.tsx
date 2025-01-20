@@ -169,7 +169,7 @@ export default function Tools() {
           )}
         </div>
       </div>
-      <ChatBot />
+      <ChatBot agentType="tools" />
     </div>
   );
 }
