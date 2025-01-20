@@ -9,6 +9,7 @@ import { Tool } from '@/components/tools/types';
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { ChatBot } from '@/components/ChatBot';
 
 export default function Tools() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -168,6 +169,7 @@ export default function Tools() {
           )}
         </div>
       </div>
+      <ChatBot />
     </div>
   );
 }
