@@ -34,7 +34,7 @@ function App() {
         <Route path="/terms" element={<Terms />} />
         <Route path="/thank-you" element={<ThankYou />} />
       </Routes>
-      <Toaster />
+      <Toaster position="top-right" />
     </Router>
   );
 }
