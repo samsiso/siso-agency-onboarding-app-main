@@ -135,7 +135,7 @@ const AINews = () => {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen bg-background">
+      <div className="flex min-h-screen bg-siso-bg">
         <Sidebar />
         <div className="flex-1 p-4 md:p-6 lg:p-8 max-h-screen overflow-y-auto">
           <motion.div
