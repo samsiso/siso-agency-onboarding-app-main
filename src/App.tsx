@@ -27,7 +27,7 @@ function App() {
             <Route path="/" element={<Index />} />
             <Route path="/ai-news" element={<AINews />} />
             <Route path="/tools" element={<Tools />} />
-            <Route path="/tool/:id" element={<ToolPage />} />
+            <Route path="/tools/:id" element={<ToolPage />} />
             <Route path="/siso-education" element={<SisoEducation />} />
             <Route path="/automations" element={<Automations />} />
             <Route path="/networking" element={<Networking />} />

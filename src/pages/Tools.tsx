@@ -10,6 +10,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChatBot } from '@/components/ChatBot';
+import { toast } from 'react-hot-toast';
 
 export default function Tools() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -34,53 +35,53 @@ export default function Tools() {
       
       if (error) {
         console.error('Error fetching core tools:', error);
+        toast.error('Failed to load tools. Please try again later.');
         throw error;
       }
+      
+      console.log('Fetched tools:', data);
       
       // Parse youtube_videos JSON for each tool
       const parsedData = data.map(tool => ({
         ...tool,
-        youtube_videos: tool.youtube_videos ? (tool.youtube_videos as Array<{ title: string; url: string; }>) : null
+        youtube_videos: tool.youtube_videos ? JSON.parse(JSON.stringify(tool.youtube_videos)) : null
       }));
       
       return parsedData as Tool[];
     },
   });
 
-  const categoryCounts = useMemo(() => {
-    if (!tools) return {};
-    
-    const counts = tools.reduce((acc, tool) => {
-      const category = tool.category.toLowerCase();
-      acc[category] = (acc[category] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-    
-    // Add count for "all" category
-    counts['all'] = tools.length;
-    
-    // Add count for "featured" category (tools with rating >= 4.5)
-    counts['featured'] = tools.filter(tool => tool.rating && tool.rating >= 4.5).length;
-    
-    return counts;
-  }, [tools]);
+  const filteredTools = useMemo(() => {
+    console.log('Filtering tools:', tools);
+    return tools?.filter(tool => {
+      const matchesSearch = !searchQuery || 
+        tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        tool.description?.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      const matchesCategory = 
+        selectedCategory === 'all' || 
+        (selectedCategory === 'featured' && tool.rating && tool.rating >= 4.5) ||
+        tool.category.toLowerCase() === selectedCategory.toLowerCase();
 
-  const filteredTools = tools?.filter(tool => {
-    const matchesSearch = !searchQuery || 
-      tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      tool.description?.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesCategory = 
-      selectedCategory === 'all' || 
-      (selectedCategory === 'featured' && tool.rating && tool.rating >= 4.5) ||
-      tool.category.toLowerCase() === selectedCategory.toLowerCase();
+      return matchesSearch && matchesCategory;
+    });
+  }, [tools, searchQuery, selectedCategory]);
 
-    return matchesSearch && matchesCategory;
-  });
+  if (error) {
+    console.error('Render error:', error);
+    return (
+      <div className="p-8">
+        <Alert variant="destructive">
+          <AlertDescription>
+            Failed to load tools. Please try again later.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
-      <Sidebar />
       <div className="flex-1 p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           <div className="space-y-4">
@@ -140,7 +141,11 @@ export default function Tools() {
                   >
                     {category.label}
                     <span className="ml-2 text-sm text-siso-text/60">
-                      ({categoryCounts[category.id.toLowerCase()] || 0})
+                      ({tools?.filter(t => 
+                        category.id === 'all' ? true : 
+                        category.id === 'featured' ? (t.rating && t.rating >= 4.5) :
+                        t.category.toLowerCase() === category.id.toLowerCase()
+                      ).length || 0})
                     </span>
                   </TabsTrigger>
                 ))}
@@ -150,7 +155,7 @@ export default function Tools() {
 
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {[...Array(10)].map((_, i) => (
+              {[...Array(8)].map((_, i) => (
                 <div 
                   key={i}
                   className="h-48 rounded-lg bg-siso-text/5 animate-pulse"
