@@ -24,13 +24,13 @@ function App() {
       <SidebarProvider>
         <div className="flex min-h-screen bg-siso-bg">
           <Sidebar />
-          <div className="flex-1 flex flex-col">
+          <div className="flex-1">
             <header className="sticky top-0 z-50 w-full border-b border-siso-border bg-siso-bg/95 backdrop-blur">
               <div className="flex h-14 items-center justify-end px-4">
                 <AuthButton />
               </div>
             </header>
-            <main className="flex-1">
+            <main className="flex-1 p-4">
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/ai-news" element={<AINews />} />
