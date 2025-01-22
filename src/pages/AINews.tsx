@@ -74,6 +74,33 @@ const AINews = () => {
   const [loadingSummaries, setLoadingSummaries] = useState<Record<number, boolean>>({});
   const { toast } = useToast();
 
+  const handleAskAI = async () => {
+    if (!chatInput.trim() || isLoading) return;
+
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('chat-with-bot', {
+        body: { 
+          message: chatInput,
+          systemPrompt: "You are an AI news analyst. Provide concise, factual analysis of AI industry news and developments."
+        },
+      });
+
+      if (error) throw error;
+
+      setChatResponse(data.response);
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to get AI response. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const generateSummary = async (id: number) => {
     if (summaries[id]) return; // Don't generate if we already have it
     
