@@ -12,7 +12,7 @@ import {
   DollarSign,
   Trophy,
   Coins,
-  Exchange
+  ArrowRightLeft
 } from 'lucide-react';
 
 interface SidebarNavigationProps {
@@ -40,7 +40,7 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
 
   const economySubItems = [
     { href: '/how-to-earn', icon: Coins, label: 'Earn SISO' },
-    { href: '/crypto', icon: Exchange, label: 'Crypto Exchange' },
+    { href: '/crypto', icon: ArrowRightLeft, label: 'Crypto Exchange' },
     { href: '/leaderboard', icon: Trophy, label: 'Leaderboards' },
   ];
 
