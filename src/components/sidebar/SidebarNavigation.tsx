@@ -67,6 +67,12 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
       ]
     },
     {
+      type: 'main',
+      href: '/economy/earn',
+      icon: Coins,
+      label: 'Economy',
+    },
+    {
       type: 'section',
       items: [
         {
