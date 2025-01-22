@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Twitter, Share2, Instagram } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from "@/integrations/supabase/client";
 
 interface ShareButtonsProps {
   summary: string;
@@ -10,25 +11,63 @@ interface ShareButtonsProps {
 export const ShareButtons = ({ summary, title }: ShareButtonsProps) => {
   const { toast } = useToast();
 
-  const handleShare = (platform: string) => {
+  const awardPoints = async (userId: string, action: string, points: number) => {
+    try {
+      const { error } = await supabase
+        .from('points_log')
+        .insert([
+          {
+            user_id: userId,
+            action: action,
+            points_earned: points
+          }
+        ]);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error awarding points:', error);
+    }
+  };
+
+  const handleShare = async (platform: string) => {
     const text = `${title}\n\n${summary}`;
     const url = window.location.href;
 
-    switch (platform) {
-      case 'twitter':
-        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
-        break;
-      case 'whatsapp':
-        window.open(`https://wa.me/?text=${encodeURIComponent(text + '\n' + url)}`, '_blank');
-        break;
-      case 'instagram':
-      case 'skool':
-        navigator.clipboard.writeText(text + '\n' + url);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session) {
+        // Award points for sharing (10 points)
+        await awardPoints(session.user.id, `share_${platform}`, 10);
         toast({
-          title: "Copied to clipboard",
-          description: `You can now paste this in ${platform}`,
+          title: "Points awarded!",
+          description: `You earned 10 points for sharing on ${platform}!`,
         });
-        break;
+      }
+
+      switch (platform) {
+        case 'twitter':
+          window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+          break;
+        case 'whatsapp':
+          window.open(`https://wa.me/?text=${encodeURIComponent(text + '\n' + url)}`, '_blank');
+          break;
+        case 'instagram':
+        case 'skool':
+          navigator.clipboard.writeText(text + '\n' + url);
+          toast({
+            title: "Copied to clipboard",
+            description: `You can now paste this in ${platform}`,
+          });
+          break;
+      }
+    } catch (error: any) {
+      console.error('Error handling share:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to process sharing action",
+      });
     }
   };
 

@@ -23,6 +23,24 @@ export const NewsCardComments = ({ newsId, comments }: NewsCardCommentsProps) =>
   const [newComment, setNewComment] = useState('');
   const { toast } = useToast();
 
+  const awardPoints = async (userId: string, action: string, points: number) => {
+    try {
+      const { error } = await supabase
+        .from('points_log')
+        .insert([
+          {
+            user_id: userId,
+            action: action,
+            points_earned: points
+          }
+        ]);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error awarding points:', error);
+    }
+  };
+
   const handleAddComment = async () => {
     if (!newComment.trim()) {
       toast({
@@ -34,24 +52,38 @@ export const NewsCardComments = ({ newsId, comments }: NewsCardCommentsProps) =>
     }
 
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        toast({
+          variant: "destructive",
+          title: "Authentication required",
+          description: "Please sign in to comment.",
+        });
+        return;
+      }
+
       const { error } = await supabase
         .from('news_comments')
         .insert([
           {
             news_id: newsId,
             content: newComment.trim(),
-            user_email: 'anonymous@example.com' // This would be replaced with actual user email when auth is implemented
+            user_email: session.user.email
           }
         ]);
 
       if (error) throw error;
 
+      // Award points for commenting (5 points)
+      await awardPoints(session.user.id, 'add_comment', 5);
+
       setNewComment('');
       toast({
         title: "Comment added successfully",
-        description: "Your comment has been posted.",
+        description: "Your comment has been posted and you earned 5 points!",
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Error adding comment",
