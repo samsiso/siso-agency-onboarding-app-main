@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { SidebarProvider } from '@/components/ui/sidebar';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Brain, Globe, Newspaper, Sparkles, Calendar, MessageSquare, Send, Share2, Twitter, Instagram } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Brain, Calendar, MessageSquare, Share2, Twitter, Instagram } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
@@ -90,11 +90,14 @@ const AINews = () => {
     }
 
     try {
-      const { data: existingSummary } = await supabase
+      // First try to fetch an existing summary
+      const { data: existingSummary, error: fetchError } = await supabase
         .from('ai_news_summaries')
         .select('summary')
         .eq('news_id', id)
-        .single();
+        .maybeSingle();
+
+      if (fetchError) throw fetchError;
 
       if (existingSummary) {
         setSummaries(prev => ({ ...prev, [id]: existingSummary.summary }));
@@ -102,6 +105,7 @@ const AINews = () => {
         return;
       }
 
+      // If no existing summary, generate a new one
       const { data, error } = await supabase.functions.invoke('chat-with-bot', {
         body: { 
           message: `Please provide a brief 2-3 sentence summary of this news: ${newsItem.title}. ${newsItem.description}`,
@@ -113,9 +117,12 @@ const AINews = () => {
 
       const summary = data.response;
 
-      await supabase
+      // Store the new summary
+      const { error: insertError } = await supabase
         .from('ai_news_summaries')
         .insert([{ news_id: id, summary }]);
+
+      if (insertError) throw insertError;
 
       setSummaries(prev => ({ ...prev, [id]: summary }));
     } catch (error) {
@@ -129,6 +136,8 @@ const AINews = () => {
       setLoadingSummaries(prev => ({ ...prev, [id]: false }));
     }
   };
+
+  // ... keep existing code (JSX for the component layout)
 
   return (
     <SidebarProvider>
