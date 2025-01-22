@@ -13,7 +13,7 @@ interface NewsCardProps {
   onGenerateSummary: (id: string) => void;
 }
 
-export const NewsCard = ({ 
+const NewsCard = ({ 
   item, 
   summaries, 
   loadingSummaries, 
@@ -97,3 +97,5 @@ export const NewsCard = ({
     </motion.div>
   );
 };
+
+export default NewsCard;

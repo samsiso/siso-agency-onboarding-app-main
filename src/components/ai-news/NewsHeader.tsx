@@ -7,7 +7,7 @@ interface NewsHeaderProps {
   onYearChange: (value: string) => void;
 }
 
-export const NewsHeader = ({ 
+const NewsHeader = ({ 
   selectedMonth, 
   selectedYear, 
   onMonthChange, 
@@ -42,3 +42,5 @@ export const NewsHeader = ({
     </div>
   );
 };
+
+export default NewsHeader;

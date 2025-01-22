@@ -14,7 +14,7 @@ const Networking = lazy(() => import('./pages/Networking'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const Terms = lazy(() => import('./pages/Terms'));
 const AINews = lazy(() => import('./pages/AINews'));
-const { ChatBot } = await import('./components/ChatBot');
+const ChatBot = lazy(() => import('./components/ChatBot').then(module => ({ default: module.ChatBot })));
 
 // Loading component
 const LoadingSpinner = () => (
