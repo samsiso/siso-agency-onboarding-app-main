@@ -1,10 +1,9 @@
-import { Trophy, Star, Calendar, Share2, MessageSquare, Wrench, GraduationCap, Bot, Heart, Award, Gem } from 'lucide-react';
+import { Trophy, Star, Calendar, Share2, MessageSquare, Wrench, GraduationCap, Bot, Heart, Award, Gem, DollarSign, Coins, Users, Newspaper, Gift } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Sidebar } from '@/components/Sidebar';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Json } from '@/integrations/supabase/types';
 
 interface NFTCollection {
   tier: string;
@@ -148,6 +147,36 @@ const HowToEarn = () => {
         { action: 'Expert Answer', points: '25 points' },
         { action: 'Knowledge Base Contribution', points: '50 points' }
       ]
+    },
+    {
+      title: 'News & Updates',
+      icon: Newspaper,
+      description: 'Stay engaged with platform news and updates.',
+      items: [
+        { action: 'Read News Article', points: '5 points' },
+        { action: 'News Comment', points: '5 points' },
+        { action: 'News Share', points: '10 points' }
+      ]
+    },
+    {
+      title: 'Referral Program',
+      icon: Users,
+      description: 'Invite others to join the community.',
+      items: [
+        { action: 'Successful Referral', points: '100 points' },
+        { action: "Referral's First Post", points: '50 points bonus' },
+        { action: 'Monthly Referral Champion', points: '500 points bonus' }
+      ]
+    },
+    {
+      title: 'Crypto & NFTs',
+      icon: Coins,
+      description: 'Engage with our Web3 features.',
+      items: [
+        { action: 'First NFT Purchase', points: '200 points' },
+        { action: 'Connect Wallet', points: '50 points' },
+        { action: 'Token Holder Bonus', points: '25 points/week' }
+      ]
     }
   ];
 
@@ -190,38 +219,6 @@ const HowToEarn = () => {
                 </Card>
               ))}
             </div>
-
-            <Card className="mt-8 bg-black/20 border-siso-text/10 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-siso-text-bold flex items-center gap-2">
-                  <Star className="w-5 h-5 text-siso-orange" />
-                  Ranks and Achievements
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <p className="text-sm text-siso-text/90">
-                  As you earn points, you'll progress through different ranks. Each rank unlocks new features and benefits:
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                  {[
-                    { name: 'Bronze', threshold: '0-99,999 points', benefits: 'Basic features access' },
-                    { name: 'Silver', threshold: '100,000-249,999 points', benefits: 'Enhanced tools access' },
-                    { name: 'Gold', threshold: '250,000-499,999 points', benefits: 'Premium features + custom badge' },
-                    { name: 'Platinum', threshold: '500,000-999,999 points', benefits: 'VIP access + special events' },
-                    { name: 'Diamond', threshold: '1,000,000+ points', benefits: 'Elite status + all perks' }
-                  ].map((rank) => (
-                    <div key={rank.name} className="flex flex-col gap-2 p-4 rounded-lg bg-gradient-to-br from-siso-text/5 to-siso-text/10 border border-siso-text/10 hover:border-siso-text/20 transition-all duration-300">
-                      <div className="flex items-center gap-2">
-                        <Star className="w-4 h-4 text-siso-orange" />
-                        <span className="text-sm font-medium text-siso-text-bold">{rank.name}</span>
-                      </div>
-                      <span className="text-xs text-siso-orange/90">{rank.threshold}</span>
-                      <span className="text-xs text-siso-text/60">{rank.benefits}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
 
             <Card className="mt-8 bg-black/20 border-siso-text/10 backdrop-blur-sm">
               <CardHeader>
