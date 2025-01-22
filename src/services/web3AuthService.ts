@@ -67,14 +67,14 @@ export const authenticateWithMetamask = async () => {
     const authResult: AuthResult = {
       id: result.result.id,
       profileId: result.result.profileId,
-      address: result.result.address.lowercase(), // Using lowercase() from Moralis EvmAddress type
+      address: result.result.address.toLowerCase(), // Use toLowerCase() instead of lowercase
       domain: result.result.domain,
       statement: result.result.statement || '',
       uri: result.result.uri,
       version: result.result.version,
       nonce: result.result.nonce,
       chain: {
-        id: parseInt(result.result.chain.hex, 16), // Convert hex to number
+        id: parseInt(result.result.chain.hex, 16),
         hex: result.result.chain.hex,
       },
       expirationTime: result.result.expirationTime,
