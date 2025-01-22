@@ -98,11 +98,13 @@ export const SidebarLogo = ({ collapsed, setCollapsed, onLogoClick }: SidebarLog
             className="flex items-center gap-2 cursor-pointer group" 
             onClick={toggleMenu}
           >
-            <img 
-              src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png" 
-              alt="Siso Logo" 
-              className="w-8 h-8"
-            />
+            {!collapsed && (
+              <img 
+                src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png" 
+                alt="Siso Logo" 
+                className="w-8 h-8"
+              />
+            )}
             {!collapsed && (
               <span className="text-xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
                 SISO
