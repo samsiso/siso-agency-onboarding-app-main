@@ -14,9 +14,12 @@ export const Sidebar = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
 
-  const handleItemClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  const handleItemClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
+    const href = e.currentTarget.getAttribute('href');
     
+    if (!href) return;
+
     if (href.startsWith('/')) {
       navigate(href);
       if (isMobile) {
