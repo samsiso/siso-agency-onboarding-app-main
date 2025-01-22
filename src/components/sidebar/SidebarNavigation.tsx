@@ -14,7 +14,9 @@ import {
   Wrench,
   Trophy,
   Wallet,
-  BarChart
+  BarChart,
+  List,
+  Folder
 } from 'lucide-react';
 
 interface SidebarNavigationProps {
@@ -59,6 +61,7 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
     {
       type: 'section',
       title: 'Learn & Network',
+      icon: Folder,
       items: [
         {
           href: '/education',
@@ -85,6 +88,7 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
     {
       type: 'section',
       title: 'Economy',
+      icon: List,
       items: [
         {
           href: '/economy/earn',
@@ -149,11 +153,12 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
             ) : (
               <div className="space-y-1">
                 {section.title && !collapsed && (
-                  <div className="px-3 py-2 text-sm font-semibold text-siso-text-bold">
+                  <div className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-siso-text-bold">
+                    <section.icon className="w-4 h-4 text-siso-text-muted" />
                     {section.title}
                   </div>
                 )}
-                <div className="pl-3 space-y-1">
+                <div className="pl-3 space-y-1 border-l-2 border-siso-border ml-4">
                   {section.items?.map((item, subIndex) => (
                     <SidebarMenuItem
                       key={subIndex}
