@@ -40,7 +40,16 @@ export default function Tools() {
       }
       
       console.log('Fetched tools from core_tools:', data);
-      return data as Tool[];
+      
+      // Parse youtube_videos JSON for each tool
+      const parsedData = data.map(tool => ({
+        ...tool,
+        youtube_videos: tool.youtube_videos 
+          ? (JSON.parse(JSON.stringify(tool.youtube_videos)) as Array<{ title: string; url: string; }>)
+          : null
+      }));
+      
+      return parsedData as Tool[];
     },
   });
 
@@ -163,7 +172,18 @@ export default function Tools() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {filteredTools?.map((tool) => (
+              {tools?.filter(tool => {
+                const matchesSearch = !searchQuery || 
+                  tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                  tool.description?.toLowerCase().includes(searchQuery.toLowerCase());
+                
+                const matchesCategory = 
+                  selectedCategory === 'all' || 
+                  (selectedCategory === 'featured' && tool.rating && tool.rating >= 4.5) ||
+                  tool.category.toLowerCase() === selectedCategory.toLowerCase();
+
+                return matchesSearch && matchesCategory;
+              }).map((tool) => (
                 <ToolCard
                   key={tool.id}
                   tool={tool}
