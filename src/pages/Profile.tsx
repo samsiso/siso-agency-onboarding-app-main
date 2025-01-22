@@ -9,6 +9,8 @@ import { ProfileInfo } from '@/components/profile/ProfileInfo';
 import { PointsHistory } from '@/components/profile/PointsHistory';
 import { NFTStatus } from '@/components/profile/NFTStatus';
 import { AuthButton } from '@/components/AuthButton';
+import { LoginStreakTracker } from '@/components/points/LoginStreakTracker';
+import { PointsDisplay } from '@/components/points/PointsDisplay';
 
 const Profile = () => {
   const [user, setUser] = useState<any>(null);
@@ -101,6 +103,14 @@ const Profile = () => {
               onLogout={handleLogout}
               onBackToHome={handleBackToHome}
             />
+
+            {user && <LoginStreakTracker userId={user.id} />}
+            
+            {user && (
+              <div className="mb-6">
+                <PointsDisplay userId={user.id} />
+              </div>
+            )}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <ProfileInfo
