@@ -20,13 +20,6 @@ interface NewsCardProps {
   isFeatured?: boolean;
 }
 
-interface Comment {
-  id: string;
-  content: string;
-  created_at: string;
-  user_email: string;
-}
-
 const NewsCard = ({ 
   item, 
   summaries, 
@@ -108,13 +101,18 @@ const NewsCard = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
+      className={isFeatured ? 'col-span-full' : ''}
     >
-      <Card className={`hover:bg-card/60 transition-colors duration-200 border-siso-border hover:border-siso-border-hover ${isFeatured ? 'h-full' : ''}`}>
-        <CardContent className="p-4 sm:p-6">
-          <div className={`flex ${isFeatured ? 'flex-col sm:flex-row' : 'flex-col'} gap-4 sm:gap-6`}>
-            <NewsCardMedia imageUrl={item.image_url} title={item.title} />
+      <Card className={`group hover:bg-card/60 transition-all duration-200 border-siso-border hover:border-siso-border-hover hover:shadow-lg ${isFeatured ? 'h-full' : ''}`}>
+        <CardContent className={`p-4 sm:p-6 ${isFeatured ? 'space-y-6' : 'space-y-4'}`}>
+          <div className={`flex ${isFeatured ? 'flex-col lg:flex-row' : 'flex-col'} gap-4 sm:gap-6`}>
+            <NewsCardMedia 
+              imageUrl={item.image_url} 
+              title={item.title} 
+              isFeatured={isFeatured}
+            />
             
-            <div className="flex-1 space-y-3 sm:space-y-4">
+            <div className="flex-1 space-y-4">
               <NewsCardContent
                 title={item.title}
                 description={item.description}
@@ -129,42 +127,40 @@ const NewsCard = ({
                 comments={comments}
               />
 
-              <div className="flex flex-wrap gap-2 sm:gap-4 pt-2">
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => !summaries[item.id] && onGenerateSummary(item.id)}
-                      className="text-xs sm:text-sm hover:bg-siso-red/10 hover:text-siso-red transition-colors w-full sm:w-auto"
-                    >
-                      {loadingSummaries[item.id] ? (
-                        "Generating Summary..."
-                      ) : (
-                        summaries[item.id] ? "View AI Summary" : "Generate AI Summary"
-                      )}
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[600px] w-[95vw] max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                      <DialogTitle>AI Summary & Share Options</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4 sm:space-y-6 py-4">
-                      {summaries[item.id] ? (
-                        <div className="bg-card p-3 sm:p-4 rounded-lg border border-siso-red/20">
-                          <p className="text-sm sm:text-base">{summaries[item.id]}</p>
-                        </div>
-                      ) : (
-                        <div className="text-center text-muted-foreground">
-                          {loadingSummaries[item.id] ? "Generating summary..." : "Click the button to generate a summary"}
-                        </div>
-                      )}
-                      
-                      <ShareButtons summary={summaries[item.id] || ''} title={item.title} />
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => !summaries[item.id] && onGenerateSummary(item.id)}
+                    className="text-xs sm:text-sm hover:bg-siso-red/10 hover:text-siso-red transition-colors w-full sm:w-auto"
+                  >
+                    {loadingSummaries[item.id] ? (
+                      "Generating Summary..."
+                    ) : (
+                      summaries[item.id] ? "View AI Summary" : "Generate AI Summary"
+                    )}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[600px] w-[95vw] max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>AI Summary & Share Options</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 sm:space-y-6 py-4">
+                    {summaries[item.id] ? (
+                      <div className="bg-card p-3 sm:p-4 rounded-lg border border-siso-red/20">
+                        <p className="text-sm sm:text-base">{summaries[item.id]}</p>
+                      </div>
+                    ) : (
+                      <div className="text-center text-muted-foreground">
+                        {loadingSummaries[item.id] ? "Generating summary..." : "Click the button to generate a summary"}
+                      </div>
+                    )}
+                    
+                    <ShareButtons summary={summaries[item.id] || ''} title={item.title} />
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
         </CardContent>
