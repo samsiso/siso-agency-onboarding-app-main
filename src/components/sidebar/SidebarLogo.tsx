@@ -58,7 +58,6 @@ export const SidebarLogo = ({ collapsed, setCollapsed, onLogoClick }: SidebarLog
           </div>
 
           <div className="space-y-6">
-            {/* Welcome Message */}
             <div className="text-sm text-siso-text">
               <p className="font-medium mb-2">👋 Welcome to SISO AGENCY</p>
               <p className="text-siso-text/70">
@@ -66,7 +65,6 @@ export const SidebarLogo = ({ collapsed, setCollapsed, onLogoClick }: SidebarLog
               </p>
             </div>
 
-            {/* Business Links */}
             <div className="space-y-2">
               {businessLinks.map((link) => (
                 <a
