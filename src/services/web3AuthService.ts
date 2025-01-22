@@ -2,13 +2,17 @@ import Moralis from 'moralis';
 import { supabase } from '@/integrations/supabase/client';
 
 export const initializeMoralis = async () => {
+  if (!process.env.MORALIS_API_KEY) {
+    throw new Error('Moralis API key not configured');
+  }
+  
   await Moralis.start({
     apiKey: process.env.MORALIS_API_KEY,
   });
 };
 
 export const authenticateWithMetamask = async () => {
-  if (!window.ethereum) {
+  if (typeof window === 'undefined' || !window.ethereum) {
     throw new Error('Please install MetaMask');
   }
 

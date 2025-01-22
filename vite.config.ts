@@ -28,9 +28,11 @@ export default defineConfig(({ mode }) => ({
           'utils-vendor': ['clsx', 'tailwind-merge', 'lucide-react'],
         },
       },
+      external: ['moralis'], // Add Moralis as external dependency
     },
   },
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-router-dom'],
+    exclude: ['moralis'], // Exclude Moralis from optimization
   },
 }));
