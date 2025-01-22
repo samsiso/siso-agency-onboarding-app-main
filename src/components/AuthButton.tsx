@@ -1,130 +1,75 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Mail } from 'lucide-react';
+import { Wallet } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/components/ui/use-toast';
-import { AuthError, AuthApiError } from '@supabase/supabase-js';
-import { PointsDisplay } from './points/PointsDisplay';
-import { LoginStreakTracker } from './points/LoginStreakTracker';
+import { useToast } from '@/hooks/use-toast';
+import { authenticateWithMetamask } from '@/services/web3AuthService';
 
 export const AuthButton = () => {
-  const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
   const { toast } = useToast();
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      // Only navigate to profile on initial sign in
-      if (_event === 'SIGNED_IN' && location.pathname === '/') {
-        navigate('/profile');
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [navigate, location.pathname]);
-
-  const getErrorMessage = (error: AuthError) => {
-    if (error instanceof AuthApiError) {
-      switch (error.status) {
-        case 400:
-          return 'Invalid credentials or request';
-        case 401:
-          return 'Unauthorized - please check your login details';
-        case 403:
-          return 'Access forbidden - please check your permissions';
-        case 404:
-          return 'User not found';
-        default:
-          return error.message;
-      }
-    }
-    return error.message;
-  };
-
-  const handleLogin = async () => {
+  const handleGoogleSignIn = async () => {
     try {
-      setIsLoading(true);
+      setLoading(true);
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          },
+          redirectTo: `${window.location.origin}/thank-you`,
         },
       });
-
       if (error) throw error;
-    } catch (error) {
-      const e = error as AuthError;
-      console.error('Auth error:', e);
+    } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Authentication Error",
-        description: getErrorMessage(e),
+        title: "Error",
+        description: error.message,
       });
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  const handleLogout = async () => {
+  const handleMetamaskSignIn = async () => {
     try {
-      setIsLoading(true);
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      navigate('/');
-    } catch (error) {
-      const e = error as AuthError;
+      setLoading(true);
+      await authenticateWithMetamask();
+      navigate('/thank-you');
+      toast({
+        title: "Success",
+        description: "Successfully connected with MetaMask",
+      });
+    } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Error signing out",
-        description: getErrorMessage(e),
+        title: "Error",
+        description: error.message || "Failed to connect with MetaMask",
       });
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center gap-4">
-      {user && (
-        <>
-          <PointsDisplay userId={user.id} variant="compact" />
-          <LoginStreakTracker userId={user.id} />
-        </>
-      )}
-      {user ? (
-        <Button
-          variant="outline"
-          className="w-full sm:w-auto border-siso-red text-siso-text hover:bg-siso-red hover:text-white transition-colors"
-          onClick={handleLogout}
-          disabled={isLoading}
-        >
-          {isLoading ? 'Processing...' : 'Logout'}
-        </Button>
-      ) : (
-        <Button
-          variant="outline"
-          className="w-full sm:w-auto bg-white border-siso-red text-[#121212] hover:bg-siso-red hover:text-white transition-colors"
-          onClick={handleLogin}
-          disabled={isLoading}
-        >
-          <Mail className="mr-2 h-4 w-4" />
-          {isLoading ? 'Processing...' : 'Login with Gmail'}
-        </Button>
-      )}
+    <div className="flex gap-2">
+      <Button
+        onClick={handleGoogleSignIn}
+        disabled={loading}
+        className="bg-white text-black hover:bg-gray-100"
+      >
+        Sign in with Google
+      </Button>
+      <Button
+        onClick={handleMetamaskSignIn}
+        disabled={loading}
+        variant="outline"
+        className="flex items-center gap-2"
+      >
+        <Wallet className="w-4 h-4" />
+        Connect Wallet
+      </Button>
     </div>
   );
 };

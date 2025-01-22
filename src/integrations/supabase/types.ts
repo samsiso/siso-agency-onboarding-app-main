@@ -572,11 +572,14 @@ export type Database = {
           instagram_url: string | null
           interests: string[] | null
           linkedin_url: string | null
+          moralis_provider_id: string | null
           points: number | null
           professional_role: string | null
           rank: string | null
           twitter_url: string | null
           updated_at: string
+          wallet_address: string | null
+          web3_metadata: Json | null
           website_url: string | null
           youtube_url: string | null
         }
@@ -593,11 +596,14 @@ export type Database = {
           instagram_url?: string | null
           interests?: string[] | null
           linkedin_url?: string | null
+          moralis_provider_id?: string | null
           points?: number | null
           professional_role?: string | null
           rank?: string | null
           twitter_url?: string | null
           updated_at?: string
+          wallet_address?: string | null
+          web3_metadata?: Json | null
           website_url?: string | null
           youtube_url?: string | null
         }
@@ -614,11 +620,14 @@ export type Database = {
           instagram_url?: string | null
           interests?: string[] | null
           linkedin_url?: string | null
+          moralis_provider_id?: string | null
           points?: number | null
           professional_role?: string | null
           rank?: string | null
           twitter_url?: string | null
           updated_at?: string
+          wallet_address?: string | null
+          web3_metadata?: Json | null
           website_url?: string | null
           youtube_url?: string | null
         }
