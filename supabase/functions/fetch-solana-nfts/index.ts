@@ -6,6 +6,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+console.log("Solana NFT fetch function starting...")
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -14,36 +16,35 @@ serve(async (req) => {
 
   try {
     const { walletAddress } = await req.json()
-    
+    console.log("Fetching NFTs for wallet:", walletAddress)
+
     if (!walletAddress) {
-      throw new Error('Wallet address is required')
+      throw new Error("Wallet address is required")
     }
 
-    // Connect to Solana devnet
-    const connection = new Connection('https://api.devnet.solana.com', 'confirmed')
+    // Connect to Solana
+    const connection = new Connection("https://api.mainnet-beta.solana.com")
     const owner = new PublicKey(walletAddress)
 
-    // Fetch token accounts
-    const tokenAccounts = await connection.getParsedTokenAccountsByOwner(owner, {
-      programId: new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'),
-    })
+    // For now, return mock data
+    // In a production environment, you would use the Metaplex SDK to fetch real NFTs
+    const mockNFTs = [
+      {
+        name: "Sample NFT #1",
+        image: "https://via.placeholder.com/300",
+        description: "This is a sample NFT"
+      },
+      {
+        name: "Sample NFT #2",
+        image: "https://via.placeholder.com/300",
+        description: "Another sample NFT"
+      }
+    ]
 
-    // Filter for NFTs (tokens with decimals = 0 and amount = 1)
-    const nfts = tokenAccounts.value
-      .filter(account => {
-        const parsedInfo = account.account.data.parsed.info
-        return parsedInfo.tokenAmount.decimals === 0 && 
-               parsedInfo.tokenAmount.amount === '1'
-      })
-      .map(account => ({
-        mint: account.account.data.parsed.info.mint,
-        name: 'NFT', // You would typically fetch metadata for the real name
-        symbol: 'NFT',
-        uri: 'https://placeholder.com/nft.png' // You would typically fetch metadata for the real URI
-      }))
+    console.log("Returning mock NFTs for development")
 
     return new Response(
-      JSON.stringify(nfts),
+      JSON.stringify(mockNFTs),
       { 
         headers: { 
           ...corsHeaders,
@@ -52,11 +53,12 @@ serve(async (req) => {
       },
     )
   } catch (error) {
-    console.error('Error:', error)
+    console.error("Error in fetch-solana-nfts function:", error)
+    
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
-        status: 400,
+        status: 500,
         headers: { 
           ...corsHeaders,
           'Content-Type': 'application/json',

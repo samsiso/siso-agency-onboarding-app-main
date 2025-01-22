@@ -1,70 +1,67 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 
 interface NFT {
   name: string;
-  uri: string;
-  symbol: string;
+  image: string;
+  description?: string;
 }
 
 export const NFTGallery = () => {
   const [nfts, setNfts] = useState<NFT[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
-    const fetchNFTs = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) return;
-
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('solana_wallet_address')
-          .eq('id', session.user.id)
-          .single();
-
-        if (profileError) throw profileError;
-
-        if (!profile?.solana_wallet_address) {
-          setLoading(false);
-          return;
-        }
-
-        // Here we'll call our edge function to fetch NFTs
-        const { data, error } = await supabase.functions.invoke('fetch-solana-nfts', {
-          body: { walletAddress: profile.solana_wallet_address }
-        });
-
-        if (error) throw error;
-        setNfts(data);
-      } catch (error: any) {
-        console.error('Error fetching NFTs:', error);
+  const fetchNFTs = async () => {
+    try {
+      setLoading(true);
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
         toast({
           variant: "destructive",
-          title: "Error fetching NFTs",
-          description: error.message,
+          title: "Authentication required",
+          description: "Please sign in to view your NFTs.",
         });
-      } finally {
-        setLoading(false);
+        return;
       }
-    };
 
-    fetchNFTs();
-  }, []);
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('solana_wallet_address')
+        .eq('id', session.user.id)
+        .single();
 
-  if (loading) {
-    return (
-      <Card className="bg-black/20 border-siso-text/10">
-        <CardContent className="flex items-center justify-center p-8">
-          <Loader2 className="h-6 w-6 animate-spin text-siso-red" />
-        </CardContent>
-      </Card>
-    );
-  }
+      if (!profile?.solana_wallet_address) {
+        toast({
+          variant: "destructive",
+          title: "Wallet not connected",
+          description: "Please connect your Solana wallet to view your NFTs.",
+        });
+        return;
+      }
+
+      const { data: nftData, error } = await supabase.functions.invoke('fetch-solana-nfts', {
+        body: { walletAddress: profile.solana_wallet_address }
+      });
+
+      if (error) throw error;
+      setNfts(nftData || []);
+    } catch (error: any) {
+      console.error('Error fetching NFTs:', error);
+      toast({
+        variant: "destructive",
+        title: "Error fetching NFTs",
+        description: error.message,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Card className="bg-black/20 border-siso-text/10">
@@ -72,26 +69,38 @@ export const NFTGallery = () => {
         <CardTitle className="text-siso-text-bold">Your NFT Collection</CardTitle>
       </CardHeader>
       <CardContent>
-        {nfts.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {loading ? (
+          <div className="flex justify-center p-8">
+            <Loader2 className="h-6 w-6 animate-spin text-siso-red" />
+          </div>
+        ) : nfts.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {nfts.map((nft, index) => (
-              <Card key={index} className="bg-background/50 border-siso-text/10">
+              <Card key={index} className="bg-background/50">
                 <CardContent className="p-4">
                   <img
-                    src={nft.uri}
+                    src={nft.image}
                     alt={nft.name}
-                    className="w-full h-48 object-cover rounded-lg mb-2"
+                    className="w-full aspect-square object-cover rounded-lg mb-4"
                   />
-                  <h3 className="font-medium text-siso-text-bold">{nft.name}</h3>
-                  <p className="text-sm text-siso-text/60">{nft.symbol}</p>
+                  <h3 className="font-semibold text-siso-text-bold">{nft.name}</h3>
+                  {nft.description && (
+                    <p className="text-sm text-siso-text/80 mt-2">{nft.description}</p>
+                  )}
                 </CardContent>
               </Card>
             ))}
           </div>
         ) : (
-          <p className="text-center text-siso-text/60 py-8">
-            No NFTs found in your wallet. Make sure your wallet address is connected in your profile.
-          </p>
+          <div className="text-center py-8">
+            <p className="text-siso-text/60 mb-4">No NFTs found in your wallet</p>
+            <Button
+              onClick={fetchNFTs}
+              className="bg-siso-red hover:bg-siso-red/90"
+            >
+              Refresh NFTs
+            </Button>
+          </div>
         )}
       </CardContent>
     </Card>
