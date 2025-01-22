@@ -24,13 +24,13 @@ const ALLOWED_ORIGINS = [
   'http://localhost:3000',
   'https://lovable.dev',
   'https://www.siso.agency',
-  'https://siso.agency' // Added this
+  'https://siso.agency'
 ];
 
 // Set allowed origins on window object
 window.ALLOWED_ORIGINS = ALLOWED_ORIGINS;
 
-// Wrap the entire app with StrictMode and QueryClientProvider
+// Create root and render app with correct provider order
 const root = ReactDOM.createRoot(document.getElementById('root')!);
 
 root.render(
