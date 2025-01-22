@@ -1,5 +1,5 @@
 import { Suspense, lazy } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 
 // Lazy load all pages with chunk names for better code splitting
@@ -40,6 +40,8 @@ function App() {
         <Route path="/siso-ai" element={<SisoAI />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/how-to-earn" element={<HowToEarn />} />
+        {/* Catch all route for 404s */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Suspense>
   );
