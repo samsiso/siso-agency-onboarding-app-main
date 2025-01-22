@@ -1,37 +1,65 @@
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AuthButton } from '../AuthButton';
-import { Link, useNavigate } from 'react-router-dom';
-import { UserRound } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { ProfileSection } from './ProfileSection';
 
 interface SidebarFooterProps {
   collapsed: boolean;
 }
 
 export const SidebarFooter = ({ collapsed }: SidebarFooterProps) => {
-  const navigate = useNavigate();
+  const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
 
-  const handleProfileClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    navigate('/profile');
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setUser(session.user);
+        fetchProfile(session.user.id);
+      }
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        setUser(session.user);
+        fetchProfile(session.user.id);
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
+        setProfile(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const fetchProfile = async (userId: string) => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+
+    if (!error && data) {
+      setProfile(data);
+    }
   };
 
   return (
     <div className="absolute bottom-0 w-full p-4 border-t border-siso-text/10 space-y-3 bg-gradient-to-t from-siso-bg to-transparent">
-      <button 
-        onClick={handleProfileClick}
-        className="flex items-center justify-center w-full gap-2 p-2.5 rounded-lg bg-gradient-to-r from-siso-red/10 to-siso-orange/10 
-          hover:from-siso-red/20 hover:to-siso-orange/20 border border-siso-text/10 hover:border-siso-text/20 
-          transition-all duration-300"
-      >
-        <UserRound className="w-5 h-5 text-siso-red transition-colors duration-300" />
-        {!collapsed && (
-          <span className="text-sm font-medium bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent">
-            Profile
-          </span>
-        )}
-      </button>
-      <div className="w-full">
+      {user ? (
+        <ProfileSection
+          userId={user.id}
+          userEmail={user.email}
+          fullName={profile?.full_name}
+          avatarUrl={profile?.avatar_url}
+          collapsed={collapsed}
+        />
+      ) : (
         <AuthButton />
-      </div>
+      )}
     </div>
   );
 };
