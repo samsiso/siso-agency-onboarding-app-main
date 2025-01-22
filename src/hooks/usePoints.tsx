@@ -2,47 +2,44 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import { Database } from '@/integrations/supabase/types';
+import { useQuery } from '@tanstack/react-query';
 
 type PointActionType = Database['public']['Enums']['point_action_type'];
 
 export const usePoints = (userId: string | undefined) => {
-  const [points, setPoints] = useState(0);
-  const [rank, setRank] = useState('Newbie');
-  const [isLoading, setIsLoading] = useState(true);
+  console.log('usePoints hook called with userId:', userId);
   const { toast } = useToast();
+
+  const { data: pointsData, isLoading, error } = useQuery({
+    queryKey: ['points', userId],
+    queryFn: async () => {
+      console.log('Fetching points data for userId:', userId);
+      if (!userId) throw new Error('No user ID provided');
+      
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('points, rank')
+        .eq('id', userId)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching points:', error);
+        throw error;
+      }
+
+      console.log('Points data fetched:', profile);
+      return profile;
+    },
+    enabled: !!userId,
+  });
+
+  const points = pointsData?.points || 0;
+  const rank = pointsData?.rank || 'Newbie';
 
   useEffect(() => {
     if (!userId) return;
+    console.log('Setting up realtime subscription for points');
 
-    const fetchPoints = async () => {
-      try {
-        const { data: profile, error } = await supabase
-          .from('profiles')
-          .select('points, rank')
-          .eq('id', userId)
-          .single();
-
-        if (error) throw error;
-
-        if (profile) {
-          setPoints(profile.points || 0);
-          setRank(profile.rank || 'Newbie');
-        }
-      } catch (error: any) {
-        console.error('Error fetching points:', error);
-        toast({
-          variant: "destructive",
-          title: "Error fetching points",
-          description: error.message,
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchPoints();
-
-    // Subscribe to realtime points updates
     const channel = supabase
       .channel('points-changes')
       .on(
@@ -54,20 +51,19 @@ export const usePoints = (userId: string | undefined) => {
           filter: `id=eq.${userId}`,
         },
         (payload: any) => {
-          if (payload.new) {
-            setPoints(payload.new.points || 0);
-            setRank(payload.new.rank || 'Newbie');
-          }
+          console.log('Realtime points update received:', payload);
         }
       )
       .subscribe();
 
     return () => {
+      console.log('Cleaning up points subscription');
       supabase.removeChannel(channel);
     };
   }, [userId]);
 
   const awardPoints = async (action: PointActionType) => {
+    console.log('Awarding points for action:', action);
     if (!userId) return;
 
     try {

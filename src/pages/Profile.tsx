@@ -11,6 +11,7 @@ import { LoginStreakTracker } from '@/components/points/LoginStreakTracker';
 import { PointsDisplay } from '@/components/points/PointsDisplay';
 
 const Profile = () => {
+  console.log('Profile component rendering');
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -18,6 +19,7 @@ const Profile = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    console.log('Profile useEffect running');
     const getProfile = async () => {
       try {
         // First, check if we have a session
