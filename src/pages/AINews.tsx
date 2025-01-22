@@ -184,9 +184,9 @@ const AINews = () => {
                   ))}
                 </div>
 
-                {/* Regular Posts - 3 columns grid */}
+                {/* Regular Posts - 2 columns grid */}
                 {regularPosts.map((item) => (
-                  <div key={item.id} className="lg:col-span-4">
+                  <div key={item.id} className="lg:col-span-6">
                     <NewsCard
                       item={item}
                       summaries={summaries}
