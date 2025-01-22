@@ -37,11 +37,11 @@
   }
 
   html, body, #root {
-    @apply min-h-screen bg-siso-bg;
+    @apply min-h-screen bg-siso-bg text-siso-text;
   }
 
   body {
-    @apply text-siso-text font-['Inter'] antialiased;
+    @apply font-['Inter'] antialiased;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
