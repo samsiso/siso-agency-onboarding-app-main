@@ -305,6 +305,33 @@ export type Database = {
         }
         Relationships: []
       }
+      leaderboard: {
+        Row: {
+          created_at: string
+          id: string
+          points: number | null
+          rank: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          points?: number | null
+          rank?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          points?: number | null
+          rank?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       networking_resources: {
         Row: {
           category: string
@@ -412,12 +439,41 @@ export type Database = {
         }
         Relationships: []
       }
+      points_log: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          points_earned: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          points_earned: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          points_earned?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
           email: string | null
           full_name: string | null
           id: string
+          points: number | null
+          rank: string | null
           updated_at: string
         }
         Insert: {
@@ -425,6 +481,8 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id: string
+          points?: number | null
+          rank?: string | null
           updated_at?: string
         }
         Update: {
@@ -432,6 +490,8 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          points?: number | null
+          rank?: string | null
           updated_at?: string
         }
         Relationships: []
