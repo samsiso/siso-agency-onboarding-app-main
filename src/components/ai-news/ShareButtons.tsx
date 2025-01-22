@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Twitter, Share2, Instagram } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from "@/integrations/supabase/client";
+import { usePoints } from '@/hooks/usePoints';
 
 interface ShareButtonsProps {
   summary: string;
@@ -10,24 +11,7 @@ interface ShareButtonsProps {
 
 export const ShareButtons = ({ summary, title }: ShareButtonsProps) => {
   const { toast } = useToast();
-
-  const awardPoints = async (userId: string, action: string, points: number) => {
-    try {
-      const { error } = await supabase
-        .from('points_log')
-        .insert([
-          {
-            user_id: userId,
-            action: action,
-            points_earned: points
-          }
-        ]);
-
-      if (error) throw error;
-    } catch (error) {
-      console.error('Error awarding points:', error);
-    }
-  };
+  const { awardPoints } = usePoints(supabase.auth.getUser()?.data?.user?.id);
 
   const handleShare = async (platform: string) => {
     const text = `${title}\n\n${summary}`;
@@ -37,8 +21,8 @@ export const ShareButtons = ({ summary, title }: ShareButtonsProps) => {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session) {
-        // Award points for sharing (5 points)
-        await awardPoints(session.user.id, 'share_article', 5);
+        // Award points for sharing
+        await awardPoints('share_article', 5);
         toast({
           title: "Points awarded!",
           description: `You earned 5 points for sharing on ${platform}!`,

@@ -5,6 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from '@/components/ui/input';
 import { motion, AnimatePresence } from 'framer-motion';
+import { usePoints } from '@/hooks/usePoints';
 
 interface Comment {
   id: string;
@@ -22,24 +23,7 @@ export const NewsCardComments = ({ newsId, comments }: NewsCardCommentsProps) =>
   const [isCommenting, setIsCommenting] = useState(false);
   const [newComment, setNewComment] = useState('');
   const { toast } = useToast();
-
-  const awardPoints = async (userId: string, action: string, points: number) => {
-    try {
-      const { error } = await supabase
-        .from('points_log')
-        .insert([
-          {
-            user_id: userId,
-            action: action,
-            points_earned: points
-          }
-        ]);
-
-      if (error) throw error;
-    } catch (error) {
-      console.error('Error awarding points:', error);
-    }
-  };
+  const { awardPoints } = usePoints(supabase.auth.getUser()?.data?.user?.id);
 
   const handleAddComment = async () => {
     if (!newComment.trim()) {
@@ -75,8 +59,8 @@ export const NewsCardComments = ({ newsId, comments }: NewsCardCommentsProps) =>
 
       if (error) throw error;
 
-      // Award points for commenting (5 points)
-      await awardPoints(session.user.id, 'add_comment', 5);
+      // Award points for commenting
+      await awardPoints('add_comment', 5);
 
       setNewComment('');
       toast({

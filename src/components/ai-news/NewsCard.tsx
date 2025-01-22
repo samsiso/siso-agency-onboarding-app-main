@@ -10,6 +10,7 @@ import { NewsCardComments } from './NewsCardComments';
 import { ShareButtons } from './ShareButtons';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
+import { usePoints } from '@/hooks/usePoints';
 
 interface NewsCardProps {
   item: any;
@@ -35,6 +36,7 @@ const NewsCard = ({
   const [isLoading, setIsLoading] = useState(true);
   const [hasReadArticle, setHasReadArticle] = useState(false);
   const { toast } = useToast();
+  const { awardPoints } = usePoints(supabase.auth.getUser()?.data?.user?.id);
 
   useEffect(() => {
     const channel = supabase
@@ -76,24 +78,6 @@ const NewsCard = ({
     }
   };
 
-  const awardPoints = async (userId: string, action: string, points: number) => {
-    try {
-      const { error } = await supabase
-        .from('points_log')
-        .insert([
-          {
-            user_id: userId,
-            action: action,
-            points_earned: points
-          }
-        ]);
-
-      if (error) throw error;
-    } catch (error) {
-      console.error('Error awarding points:', error);
-    }
-  };
-
   const handleReadArticle = async () => {
     if (hasReadArticle) return;
     
@@ -101,7 +85,7 @@ const NewsCard = ({
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session) {
-        await awardPoints(session.user.id, 'read_article', 2);
+        await awardPoints('read_article', 2);
         setHasReadArticle(true);
         toast({
           title: "Points awarded!",
