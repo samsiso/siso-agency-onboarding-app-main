@@ -446,34 +446,58 @@ export type Database = {
       }
       nft_collections: {
         Row: {
+          benefits: Json
           chain_id: string
           contract_address: string
           created_at: string
+          crypto_cost: number
           description: string | null
           id: string
           image_url: string | null
           name: string
+          opensea_url: string
+          points_cost: number
+          points_multiplier: number
+          quantity: number
+          tier: Database["public"]["Enums"]["nft_tier"]
           updated_at: string
+          weekly_bonus: number
         }
         Insert: {
+          benefits: Json
           chain_id: string
           contract_address: string
           created_at?: string
+          crypto_cost: number
           description?: string | null
           id?: string
           image_url?: string | null
           name: string
+          opensea_url: string
+          points_cost: number
+          points_multiplier: number
+          quantity: number
+          tier: Database["public"]["Enums"]["nft_tier"]
           updated_at?: string
+          weekly_bonus: number
         }
         Update: {
+          benefits?: Json
           chain_id?: string
           contract_address?: string
           created_at?: string
+          crypto_cost?: number
           description?: string | null
           id?: string
           image_url?: string | null
           name?: string
+          opensea_url?: string
+          points_cost?: number
+          points_multiplier?: number
+          quantity?: number
+          tier?: Database["public"]["Enums"]["nft_tier"]
           updated_at?: string
+          weekly_bonus?: number
         }
         Relationships: []
       }
@@ -707,41 +731,42 @@ export type Database = {
           collection_id: string | null
           created_at: string
           id: string
+          points_multiplier: number | null
           rank: Database["public"]["Enums"]["user_rank"]
+          tier: Database["public"]["Enums"]["nft_tier"] | null
           token_id: string
           updated_at: string
           user_id: string | null
           verified_at: string | null
+          weekly_bonus: number | null
         }
         Insert: {
           collection_id?: string | null
           created_at?: string
           id?: string
+          points_multiplier?: number | null
           rank?: Database["public"]["Enums"]["user_rank"]
+          tier?: Database["public"]["Enums"]["nft_tier"] | null
           token_id: string
           updated_at?: string
           user_id?: string | null
           verified_at?: string | null
+          weekly_bonus?: number | null
         }
         Update: {
           collection_id?: string | null
           created_at?: string
           id?: string
+          points_multiplier?: number | null
           rank?: Database["public"]["Enums"]["user_rank"]
+          tier?: Database["public"]["Enums"]["nft_tier"] | null
           token_id?: string
           updated_at?: string
           user_id?: string | null
           verified_at?: string | null
+          weekly_bonus?: number | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "user_nfts_collection_id_fkey"
-            columns: ["collection_id"]
-            isOneToOne: false
-            referencedRelation: "nft_collections"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
     }
     Views: {
@@ -751,6 +776,11 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      nft_tier:
+        | "ai_artist"
+        | "system_synthesizer"
+        | "algo_architect"
+        | "code_crafter"
       point_action_type:
         | "daily_login"
         | "login_streak"

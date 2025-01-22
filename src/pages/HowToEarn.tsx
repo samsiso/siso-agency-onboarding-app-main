@@ -1,9 +1,46 @@
-import { Trophy, Star, Calendar, Share2, MessageSquare, Wrench, GraduationCap, Target, Bot, Network, Heart, Award } from 'lucide-react';
+import { Trophy, Star, Calendar, Share2, MessageSquare, Wrench, GraduationCap, Bot, Heart, Award, Gem } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Sidebar } from '@/components/Sidebar';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+
+interface NFTCollection {
+  tier: string;
+  name: string;
+  description: string;
+  points_cost: number;
+  crypto_cost: number;
+  points_multiplier: number;
+  weekly_bonus: number;
+  benefits: string[];
+  image_url: string | null;
+}
 
 const HowToEarn = () => {
+  const [nftCollections, setNftCollections] = useState<NFTCollection[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchNFTCollections = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('nft_collections')
+          .select('*')
+          .order('points_cost', { ascending: true });
+
+        if (error) throw error;
+        setNftCollections(data || []);
+      } catch (error) {
+        console.error('Error fetching NFT collections:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNFTCollections();
+  }, []);
+
   const earningSections = [
     {
       title: 'Daily Activity',
@@ -102,7 +139,6 @@ const HowToEarn = () => {
   return (
     <SidebarProvider>
       <div className="flex min-h-screen bg-gradient-to-b from-siso-bg to-siso-bg/95 relative overflow-hidden">
-        {/* Animated background orbs */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute w-[500px] h-[500px] rounded-full bg-gradient-to-br from-siso-red/20 to-transparent blur-3xl animate-float-slow left-[-20%] top-[10%]" />
           <div className="absolute w-[600px] h-[600px] rounded-full bg-gradient-to-br from-siso-orange/20 to-transparent blur-3xl animate-float-slower right-[-30%] top-[40%]" />
@@ -168,6 +204,70 @@ const HowToEarn = () => {
                       <span className="text-xs text-siso-text/60">{rank.benefits}</span>
                     </div>
                   ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="mt-8 bg-black/20 border-siso-text/10 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="text-siso-text-bold flex items-center gap-2">
+                  <Gem className="w-5 h-5 text-siso-orange" />
+                  NFT Membership Tiers
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <p className="text-sm text-siso-text/90">
+                  Unlock exclusive benefits and boost your earning potential with our NFT membership tiers:
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {loading ? (
+                    Array(4).fill(0).map((_, index) => (
+                      <div key={index} className="animate-pulse">
+                        <div className="h-48 bg-siso-text/5 rounded-lg mb-4"></div>
+                        <div className="h-4 bg-siso-text/5 rounded w-3/4 mb-2"></div>
+                        <div className="h-4 bg-siso-text/5 rounded w-1/2"></div>
+                      </div>
+                    ))
+                  ) : (
+                    nftCollections.map((nft) => (
+                      <div key={nft.tier} className="flex flex-col gap-4 p-6 rounded-lg bg-gradient-to-br from-siso-text/5 to-siso-text/10 border border-siso-text/10 hover:border-siso-text/20 transition-all duration-300">
+                        <div className="flex items-center gap-2">
+                          <Gem className="w-5 h-5 text-siso-orange" />
+                          <h3 className="text-lg font-semibold text-siso-text-bold">{nft.name}</h3>
+                        </div>
+                        <p className="text-sm text-siso-text/80">{nft.description}</p>
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-siso-text/70">Points Cost</span>
+                            <span className="text-siso-orange font-medium">{nft.points_cost.toLocaleString()} SISO</span>
+                          </div>
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-siso-text/70">Crypto Cost</span>
+                            <span className="text-siso-orange font-medium">{nft.crypto_cost.toLocaleString()} MATIC</span>
+                          </div>
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-siso-text/70">Points Multiplier</span>
+                            <span className="text-siso-orange font-medium">x{nft.points_multiplier}</span>
+                          </div>
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-siso-text/70">Weekly Bonus</span>
+                            <span className="text-siso-orange font-medium">+{nft.weekly_bonus} points</span>
+                          </div>
+                        </div>
+                        <div className="mt-4">
+                          <h4 className="text-sm font-medium text-siso-text-bold mb-2">Benefits:</h4>
+                          <ul className="space-y-1">
+                            {nft.benefits.map((benefit, index) => (
+                              <li key={index} className="text-xs text-siso-text/70 flex items-start gap-2">
+                                <Star className="w-3 h-3 text-siso-orange shrink-0 mt-0.5" />
+                                <span>{benefit}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
               </CardContent>
             </Card>
