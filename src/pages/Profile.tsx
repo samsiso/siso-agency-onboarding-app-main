@@ -101,6 +101,10 @@ const Profile = () => {
     }
   };
 
+  const handleBackToHome = () => {
+    navigate('/');
+  };
+
   return (
     <div className="flex min-h-screen bg-gradient-to-b from-siso-bg to-siso-bg/95">
       <Sidebar />
@@ -130,7 +134,7 @@ const Profile = () => {
               <Button 
                 variant="outline" 
                 className="border-siso-text/20 text-siso-text-bold hover:bg-siso-text/10"
-                onClick={() => navigate('/')}
+                onClick={handleBackToHome}
               >
                 Back to Home
               </Button>
