@@ -72,7 +72,7 @@ export const ProfileHeader = ({
         <div className="relative group">
           {avatarUrl ? (
             <img 
-              src={`${supabase.storageUrl}/object/public/avatars/${avatarUrl}`}
+              src={supabase.storage.from('avatars').getPublicUrl(avatarUrl).data.publicUrl}
               alt="Profile"
               className="h-16 w-16 rounded-full object-cover"
             />
