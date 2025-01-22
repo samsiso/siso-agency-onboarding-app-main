@@ -569,10 +569,16 @@ export type Database = {
           full_name: string | null
           id: string
           industry: string | null
+          instagram_url: string | null
           interests: string[] | null
+          linkedin_url: string | null
           points: number | null
+          professional_role: string | null
           rank: string | null
+          twitter_url: string | null
           updated_at: string
+          website_url: string | null
+          youtube_url: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -584,10 +590,16 @@ export type Database = {
           full_name?: string | null
           id: string
           industry?: string | null
+          instagram_url?: string | null
           interests?: string[] | null
+          linkedin_url?: string | null
           points?: number | null
+          professional_role?: string | null
           rank?: string | null
+          twitter_url?: string | null
           updated_at?: string
+          website_url?: string | null
+          youtube_url?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -599,10 +611,16 @@ export type Database = {
           full_name?: string | null
           id?: string
           industry?: string | null
+          instagram_url?: string | null
           interests?: string[] | null
+          linkedin_url?: string | null
           points?: number | null
+          professional_role?: string | null
           rank?: string | null
+          twitter_url?: string | null
           updated_at?: string
+          website_url?: string | null
+          youtube_url?: string | null
         }
         Relationships: []
       }

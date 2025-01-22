@@ -1,4 +1,4 @@
-import { Shield, Trophy, Star, Building2, Briefcase, GraduationCap } from 'lucide-react';
+import { Shield, Trophy, Star, Building2, Briefcase, GraduationCap, Linkedin, Globe, Youtube, Instagram, Twitter } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,6 +17,12 @@ interface ProfileInfoProps {
   industry?: string | null;
   interests?: string[] | null;
   bio?: string | null;
+  linkedinUrl?: string | null;
+  websiteUrl?: string | null;
+  youtubeUrl?: string | null;
+  instagramUrl?: string | null;
+  twitterUrl?: string | null;
+  professionalRole?: string | null;
 }
 
 export const ProfileInfo = ({ 
@@ -28,7 +34,13 @@ export const ProfileInfo = ({
   businessType,
   industry,
   interests,
-  bio 
+  bio,
+  linkedinUrl,
+  websiteUrl,
+  youtubeUrl,
+  instagramUrl,
+  twitterUrl,
+  professionalRole
 }: ProfileInfoProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -37,7 +49,13 @@ export const ProfileInfo = ({
     businessType: businessType || '',
     industry: industry || '',
     interests: interests?.join(', ') || '',
-    bio: bio || ''
+    bio: bio || '',
+    linkedinUrl: linkedinUrl || '',
+    websiteUrl: websiteUrl || '',
+    youtubeUrl: youtubeUrl || '',
+    instagramUrl: instagramUrl || '',
+    twitterUrl: twitterUrl || '',
+    professionalRole: professionalRole || ''
   });
   const { toast } = useToast();
 
@@ -54,7 +72,13 @@ export const ProfileInfo = ({
           business_type: formData.businessType,
           industry: formData.industry,
           interests: formData.interests.split(',').map(i => i.trim()),
-          bio: formData.bio
+          bio: formData.bio,
+          linkedin_url: formData.linkedinUrl,
+          website_url: formData.websiteUrl,
+          youtube_url: formData.youtubeUrl,
+          instagram_url: formData.instagramUrl,
+          twitter_url: formData.twitterUrl,
+          professional_role: formData.professionalRole
         })
         .eq('id', user.id);
 
@@ -123,6 +147,19 @@ export const ProfileInfo = ({
             />
           ) : (
             <p className="text-siso-text">{fullName || 'Not set'}</p>
+          )}
+        </div>
+        <div>
+          <p className="text-sm text-siso-text/70">Professional Role</p>
+          {isEditing ? (
+            <Input
+              value={formData.professionalRole}
+              onChange={(e) => setFormData(prev => ({ ...prev, professionalRole: e.target.value }))}
+              className="mt-1"
+              placeholder="e.g., Software Engineer, Product Manager"
+            />
+          ) : (
+            <p className="text-siso-text">{professionalRole || 'Not set'}</p>
           )}
         </div>
         <div>
@@ -197,6 +234,92 @@ export const ProfileInfo = ({
             />
           ) : (
             <p className="text-siso-text">{bio || 'No bio set'}</p>
+          )}
+        </div>
+        <div>
+          <p className="text-sm text-siso-text/70 flex items-center gap-2">
+            <Briefcase className="w-4 h-4" />
+            Social Media & Links
+          </p>
+          {isEditing ? (
+            <div className="space-y-2 mt-1">
+              <div className="flex items-center gap-2">
+                <Linkedin className="w-4 h-4 text-siso-text/70" />
+                <Input
+                  placeholder="LinkedIn URL"
+                  value={formData.linkedinUrl}
+                  onChange={(e) => setFormData(prev => ({ ...prev, linkedinUrl: e.target.value }))}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <Globe className="w-4 h-4 text-siso-text/70" />
+                <Input
+                  placeholder="Website URL"
+                  value={formData.websiteUrl}
+                  onChange={(e) => setFormData(prev => ({ ...prev, websiteUrl: e.target.value }))}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <Youtube className="w-4 h-4 text-siso-text/70" />
+                <Input
+                  placeholder="YouTube URL"
+                  value={formData.youtubeUrl}
+                  onChange={(e) => setFormData(prev => ({ ...prev, youtubeUrl: e.target.value }))}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <Instagram className="w-4 h-4 text-siso-text/70" />
+                <Input
+                  placeholder="Instagram URL"
+                  value={formData.instagramUrl}
+                  onChange={(e) => setFormData(prev => ({ ...prev, instagramUrl: e.target.value }))}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <Twitter className="w-4 h-4 text-siso-text/70" />
+                <Input
+                  placeholder="Twitter URL"
+                  value={formData.twitterUrl}
+                  onChange={(e) => setFormData(prev => ({ ...prev, twitterUrl: e.target.value }))}
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {linkedinUrl && (
+                <a href={linkedinUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-siso-text hover:text-siso-red transition-colors">
+                  <Linkedin className="w-4 h-4" />
+                  LinkedIn
+                </a>
+              )}
+              {websiteUrl && (
+                <a href={websiteUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-siso-text hover:text-siso-red transition-colors">
+                  <Globe className="w-4 h-4" />
+                  Website
+                </a>
+              )}
+              {youtubeUrl && (
+                <a href={youtubeUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-siso-text hover:text-siso-red transition-colors">
+                  <Youtube className="w-4 h-4" />
+                  YouTube
+                </a>
+              )}
+              {instagramUrl && (
+                <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-siso-text hover:text-siso-red transition-colors">
+                  <Instagram className="w-4 h-4" />
+                  Instagram
+                </a>
+              )}
+              {twitterUrl && (
+                <a href={twitterUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-siso-text hover:text-siso-red transition-colors">
+                  <Twitter className="w-4 h-4" />
+                  Twitter
+                </a>
+              )}
+              {!linkedinUrl && !websiteUrl && !youtubeUrl && !instagramUrl && !twitterUrl && (
+                <p className="text-siso-text/70">No social media links set</p>
+              )}
+            </div>
           )}
         </div>
       </CardContent>

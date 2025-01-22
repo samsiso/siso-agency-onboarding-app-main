@@ -112,6 +112,12 @@ const Profile = () => {
                 industry={profile?.industry}
                 interests={profile?.interests}
                 bio={profile?.bio}
+                linkedinUrl={profile?.linkedin_url}
+                websiteUrl={profile?.website_url}
+                youtubeUrl={profile?.youtube_url}
+                instagramUrl={profile?.instagram_url}
+                twitterUrl={profile?.twitter_url}
+                professionalRole={profile?.professional_role}
               />
               <PointsHistory userId={user?.id} />
             </div>
