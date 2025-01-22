@@ -1,6 +1,5 @@
 import { useState, useEffect, Suspense, lazy } from 'react';
 import { Sidebar } from '@/components/Sidebar';
-import { SidebarProvider } from '@/components/ui/sidebar';
 import { motion } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -134,40 +133,38 @@ const AINews = () => {
   };
 
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen bg-siso-bg">
-        <Sidebar />
-        <div className="flex-1 p-4 md:p-6 lg:p-8 max-h-screen overflow-y-auto">
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="show"
-            className="space-y-6"
-          >
-            <Suspense fallback={<LoadingSpinner />}>
-              <NewsHeader
-                selectedMonth={selectedMonth}
-                selectedYear={selectedYear}
-                onMonthChange={setSelectedMonth}
-                onYearChange={setSelectedYear}
-              />
+    <>
+      <Sidebar />
+      <div className="flex-1 p-4 md:p-6 lg:p-8 max-h-screen overflow-y-auto">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
+          className="space-y-6"
+        >
+          <Suspense fallback={<LoadingSpinner />}>
+            <NewsHeader
+              selectedMonth={selectedMonth}
+              selectedYear={selectedYear}
+              onMonthChange={setSelectedMonth}
+              onYearChange={setSelectedYear}
+            />
 
-              <div className="grid grid-cols-1 gap-4 sm:gap-6">
-                {newsItems.map((item) => (
-                  <NewsCard
-                    key={item.id}
-                    item={item}
-                    summaries={summaries}
-                    loadingSummaries={loadingSummaries}
-                    onGenerateSummary={generateSummary}
-                  />
-                ))}
-              </div>
-            </Suspense>
-          </motion.div>
-        </div>
+            <div className="grid grid-cols-1 gap-4 sm:gap-6">
+              {newsItems.map((item) => (
+                <NewsCard
+                  key={item.id}
+                  item={item}
+                  summaries={summaries}
+                  loadingSummaries={loadingSummaries}
+                  onGenerateSummary={generateSummary}
+                />
+              ))}
+            </div>
+          </Suspense>
+        </motion.div>
       </div>
-    </SidebarProvider>
+    </>
   );
 };
 

@@ -14,26 +14,31 @@ import Profile from './pages/Profile';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Terms from './pages/Terms';
 import ThankYou from './pages/ThankYou';
+import { SidebarProvider } from './components/ui/sidebar';
 
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/ai-news" element={<AINews />} />
-        <Route path="/tools" element={<Tools />} />
-        <Route path="/tool/:id" element={<ToolPage />} />
-        <Route path="/siso-education" element={<SisoEducation />} />
-        <Route path="/automations" element={<Automations />} />
-        <Route path="/networking" element={<Networking />} />
-        <Route path="/chat-gpt-assistants" element={<ChatGPTAssistants />} />
-        <Route path="/community" element={<Community />} />
-        <Route path="/siso-ai" element={<SisoAI />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        <Route path="/terms" element={<Terms />} />
-        <Route path="/thank-you" element={<ThankYou />} />
-      </Routes>
+      <SidebarProvider>
+        <div className="flex min-h-screen bg-siso-bg">
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/ai-news" element={<AINews />} />
+            <Route path="/tools" element={<Tools />} />
+            <Route path="/tool/:id" element={<ToolPage />} />
+            <Route path="/siso-education" element={<SisoEducation />} />
+            <Route path="/automations" element={<Automations />} />
+            <Route path="/networking" element={<Networking />} />
+            <Route path="/chat-gpt-assistants" element={<ChatGPTAssistants />} />
+            <Route path="/community" element={<Community />} />
+            <Route path="/siso-ai" element={<SisoAI />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/thank-you" element={<ThankYou />} />
+          </Routes>
+        </div>
+      </SidebarProvider>
       <Toaster position="top-right" />
     </Router>
   );
