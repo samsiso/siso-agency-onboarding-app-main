@@ -22,7 +22,7 @@ export const authenticateWithMetamask = async () => {
     const address = accounts[0];
 
     // Get the message to sign
-    const { data } = await Moralis.Auth.requestMessage({
+    const response = await Moralis.Auth.requestMessage({
       address,
       chain: 1, // ETH mainnet
       networkType: 'evm',
@@ -35,15 +35,31 @@ export const authenticateWithMetamask = async () => {
     // Request signature
     const signature = await window.ethereum.request({
       method: 'personal_sign',
-      params: [data.message, address],
+      params: [response.raw.message, address],
     });
 
     // Verify the signature
     const result = await Moralis.Auth.verify({
       networkType: 'evm',
-      message: data.message,
+      message: response.raw.message,
       signature,
     });
+
+    // Convert the result to a JSON-safe object
+    const metadataJson = {
+      id: result.result.id,
+      profileId: result.result.profileId,
+      address: result.result.address,
+      domain: result.result.domain,
+      statement: result.result.statement,
+      uri: result.result.uri,
+      version: result.result.version,
+      nonce: result.result.nonce,
+      chainId: result.result.chain.hex,
+      expirationTime: result.result.expirationTime.toISOString(),
+      notBefore: result.result.notBefore.toISOString(),
+      resources: result.result.resources
+    };
 
     // Update user profile with Web3 credentials
     const { data: { user } } = await supabase.auth.getUser();
@@ -53,7 +69,7 @@ export const authenticateWithMetamask = async () => {
         .update({
           wallet_address: address,
           moralis_provider_id: result.result.profileId,
-          web3_metadata: result.result
+          web3_metadata: metadataJson
         })
         .eq('id', user.id);
 
@@ -63,7 +79,7 @@ export const authenticateWithMetamask = async () => {
     return { 
       address, 
       moralisId: result.result.profileId, 
-      metadata: result.result 
+      metadata: metadataJson 
     };
   } catch (error) {
     console.error('Web3 authentication error:', error);
