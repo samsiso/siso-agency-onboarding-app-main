@@ -26,15 +26,15 @@ export default function Tools() {
   ];
 
   const { data: tools, isLoading, error } = useQuery({
-    queryKey: ['core-tools'],
+    queryKey: ['tools'],
     queryFn: async () => {
-      console.log('Fetching core tools...');
+      console.log('Fetching tools...');
       const { data, error } = await supabase
-        .from('core_tools')
+        .from('tools')  // Changed from 'core_tools' to 'tools'
         .select('*');
       
       if (error) {
-        console.error('Error fetching core tools:', error);
+        console.error('Error fetching tools:', error);
         toast.error('Failed to load tools. Please try again later.');
         throw error;
       }
