@@ -179,6 +179,39 @@ export type Database = {
         }
         Relationships: []
       }
+      crypto_transactions: {
+        Row: {
+          created_at: string
+          id: string
+          points_exchanged: number
+          status: string | null
+          tokens_received: number
+          transaction_hash: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          points_exchanged: number
+          status?: string | null
+          tokens_received: number
+          transaction_hash?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          points_exchanged?: number
+          status?: string | null
+          tokens_received?: number
+          transaction_hash?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       education_creators: {
         Row: {
           content_themes: string[] | null
@@ -576,6 +609,7 @@ export type Database = {
           points: number | null
           professional_role: string | null
           rank: string | null
+          solana_wallet_address: string | null
           twitter_url: string | null
           updated_at: string
           wallet_address: string | null
@@ -600,6 +634,7 @@ export type Database = {
           points?: number | null
           professional_role?: string | null
           rank?: string | null
+          solana_wallet_address?: string | null
           twitter_url?: string | null
           updated_at?: string
           wallet_address?: string | null
@@ -624,6 +659,7 @@ export type Database = {
           points?: number | null
           professional_role?: string | null
           rank?: string | null
+          solana_wallet_address?: string | null
           twitter_url?: string | null
           updated_at?: string
           wallet_address?: string | null
