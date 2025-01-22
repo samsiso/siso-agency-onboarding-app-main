@@ -1,6 +1,7 @@
 import { Calendar, ExternalLink } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
 
 interface NewsCardContentProps {
   title: string;
@@ -38,9 +39,16 @@ export const NewsCardContent = ({
       className="space-y-3 sm:space-y-4"
     >
       <div>
-        <h2 className="text-xl sm:text-2xl font-bold mb-2 text-siso-text-bold hover:text-siso-red transition-colors line-clamp-2">
-          {title}
-        </h2>
+        <a 
+          href={source}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group block"
+        >
+          <h2 className="text-xl sm:text-2xl font-bold mb-2 text-siso-text-bold group-hover:text-siso-red transition-colors line-clamp-2">
+            {title}
+          </h2>
+        </a>
         <p className="text-sm sm:text-base text-siso-text/80 line-clamp-2">
           {description}
         </p>
@@ -56,15 +64,15 @@ export const NewsCardContent = ({
           })}
         </span>
         
-        <a 
-          href={source}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-1 text-xs sm:text-sm text-siso-text/60 hover:text-siso-red transition-colors"
+        <Button 
+          variant="ghost"
+          size="sm"
+          className="h-8 px-2 text-xs sm:text-sm text-siso-text/60 hover:text-siso-red hover:bg-siso-red/10 transition-colors"
+          onClick={() => window.open(source, '_blank', 'noopener,noreferrer')}
         >
-          <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4" />
-          Source
-        </a>
+          <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+          Read Article
+        </Button>
 
         <Badge 
           variant="outline" 
