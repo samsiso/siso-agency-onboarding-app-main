@@ -9,8 +9,6 @@ import { ProfileInfo } from '@/components/profile/ProfileInfo';
 import { PointsHistory } from '@/components/profile/PointsHistory';
 import { NFTStatus } from '@/components/profile/NFTStatus';
 import { AuthButton } from '@/components/AuthButton';
-import { LoginStreakTracker } from '@/components/points/LoginStreakTracker';
-import { PointsDisplay } from '@/components/points/PointsDisplay';
 
 const Profile = () => {
   const [user, setUser] = useState<any>(null);
@@ -97,35 +95,19 @@ const Profile = () => {
             <ProfileHeader
               fullName={profile?.full_name}
               email={user?.email}
-              points={profile?.points}
-              rank={profile?.rank}
+              points={profile?.points || 0}
+              rank={profile?.rank || 'Bronze'}
               avatarUrl={profile?.avatar_url}
               onLogout={handleLogout}
               onBackToHome={handleBackToHome}
             />
 
-            {user && <LoginStreakTracker userId={user.id} />}
-            
-            {user && (
-              <div className="mb-6">
-                <PointsDisplay userId={user.id} />
-              </div>
-            )}
-
-            {!profile?.wallet_address && (
-              <div className="bg-black/20 border border-siso-text/10 rounded-lg p-6">
-                <h2 className="text-xl font-semibold text-siso-text-bold mb-4">Connect Your Wallet</h2>
-                <p className="text-siso-text/70 mb-4">Connect your wallet to access Web3 features and earn additional rewards.</p>
-                <AuthButton />
-              </div>
-            )}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <ProfileInfo
                 email={user?.email}
                 fullName={profile?.full_name}
-                points={profile?.points}
-                rank={profile?.rank}
+                points={profile?.points || 0}
+                rank={profile?.rank || 'Bronze'}
                 businessName={profile?.business_name}
                 businessType={profile?.business_type}
                 industry={profile?.industry}
@@ -140,6 +122,14 @@ const Profile = () => {
               />
               <PointsHistory userId={user?.id} />
             </div>
+
+            {!profile?.wallet_address && (
+              <div className="bg-black/20 border border-siso-text/10 rounded-lg p-6">
+                <h2 className="text-xl font-semibold text-siso-text-bold mb-4">Connect Your Wallet</h2>
+                <p className="text-siso-text/70 mb-4">Connect your wallet to access Web3 features and earn additional rewards.</p>
+                <AuthButton />
+              </div>
+            )}
 
             <NFTStatus nfts={[]} />
           </div>

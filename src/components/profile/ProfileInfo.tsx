@@ -77,7 +77,7 @@ export const ProfileInfo = ({
           business_name: formData.businessName,
           business_type: formData.businessType,
           industry: formData.industry,
-          interests: formData.interests.split(',').map(i => i.trim()),
+          interests: formData.interests.split(',').map(i => i.trim()).filter(Boolean),
           bio: formData.bio,
           linkedin_url: formData.linkedinUrl,
           website_url: formData.websiteUrl,
@@ -116,6 +116,7 @@ export const ProfileInfo = ({
             variant="outline" 
             size="sm"
             onClick={() => setIsEditing(true)}
+            className="border-siso-red text-siso-text hover:bg-siso-red hover:text-white"
           >
             Edit Profile
           </Button>
@@ -125,6 +126,7 @@ export const ProfileInfo = ({
               variant="outline" 
               size="sm"
               onClick={() => setIsEditing(false)}
+              className="border-siso-text/20 text-siso-text hover:bg-siso-text/10"
             >
               Cancel
             </Button>
@@ -132,6 +134,7 @@ export const ProfileInfo = ({
               variant="default" 
               size="sm"
               onClick={handleSave}
+              className="bg-siso-red hover:bg-siso-red/90 text-white"
             >
               Save
             </Button>
