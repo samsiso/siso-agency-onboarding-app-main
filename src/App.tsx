@@ -20,8 +20,8 @@ import { AuthButton } from './components/AuthButton';
 
 function App() {
   return (
-    <Router>
-      <SidebarProvider>
+    <SidebarProvider>
+      <Router>
         <div className="flex min-h-screen bg-siso-bg">
           <Sidebar />
           <div className="flex-1">
@@ -50,9 +50,9 @@ function App() {
             </main>
           </div>
         </div>
-      </SidebarProvider>
-      <Toaster position="top-right" />
-    </Router>
+        <Toaster position="top-right" />
+      </Router>
+    </SidebarProvider>
   );
 }
 
