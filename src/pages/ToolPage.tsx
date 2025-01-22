@@ -11,16 +11,18 @@ import { ToolVideos } from '@/components/tools/ToolVideos';
 import { ToolTags } from '@/components/tools/ToolTags';
 
 export default function ToolPage() {
-  const { slug } = useParams();
+  const { id } = useParams();
 
   const { data: tool, isLoading, error } = useQuery({
-    queryKey: ['tool', slug],
+    queryKey: ['tool', id],
     queryFn: async () => {
-      console.log('Fetching tool with slug:', slug);
+      if (!id) throw new Error('Tool ID is required');
+      
+      console.log('Fetching tool with ID:', id);
       const { data, error } = await supabase
         .from('core_tools')
         .select('*')
-        .eq('id', slug)
+        .eq('id', id)
         .maybeSingle();
       
       if (error) {
@@ -35,11 +37,12 @@ export default function ToolPage() {
       // Parse youtube_videos JSON if it exists
       const parsedData = {
         ...data,
-        youtube_videos: data.youtube_videos ? (data.youtube_videos as Array<{ title: string; url: string; }>) : null
+        youtube_videos: data.youtube_videos ? JSON.parse(JSON.stringify(data.youtube_videos)) : null
       };
       
       return parsedData as Tool;
     },
+    enabled: !!id, // Only run query if we have an ID
   });
 
   const handleShare = () => {
