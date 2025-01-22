@@ -379,6 +379,39 @@ export type Database = {
           },
         ]
       }
+      nft_collections: {
+        Row: {
+          chain_id: string
+          contract_address: string
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          chain_id: string
+          contract_address: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          chain_id?: string
+          contract_address?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -511,6 +544,47 @@ export type Database = {
         }
         Relationships: []
       }
+      user_nfts: {
+        Row: {
+          collection_id: string | null
+          created_at: string
+          id: string
+          rank: Database["public"]["Enums"]["user_rank"]
+          token_id: string
+          updated_at: string
+          user_id: string | null
+          verified_at: string | null
+        }
+        Insert: {
+          collection_id?: string | null
+          created_at?: string
+          id?: string
+          rank?: Database["public"]["Enums"]["user_rank"]
+          token_id: string
+          updated_at?: string
+          user_id?: string | null
+          verified_at?: string | null
+        }
+        Update: {
+          collection_id?: string | null
+          created_at?: string
+          id?: string
+          rank?: Database["public"]["Enums"]["user_rank"]
+          token_id?: string
+          updated_at?: string
+          user_id?: string | null
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_nfts_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "nft_collections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -519,7 +593,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      user_rank: "bronze" | "silver" | "gold" | "diamond"
     }
     CompositeTypes: {
       [_ in never]: never

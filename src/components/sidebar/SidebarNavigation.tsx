@@ -1,66 +1,52 @@
-import { Home, Database, Bot, Download, MessageSquare, GraduationCap, Network, Newspaper } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 import { SidebarMenuItem } from './SidebarMenuItem';
-
-const menuItems = [
-  {
-    title: 'Home',
-    icon: Home,
-    href: '/',
-  },
-  {
-    title: 'Core Tools & Platforms',
-    icon: Database,
-    href: '/tools',
-  },
-  {
-    title: 'SISO Education Hub',
-    icon: GraduationCap,
-    href: '/education',
-  },
-  {
-    title: 'SISO Networking',
-    icon: Network,
-    href: '/networking',
-  },
-  {
-    title: 'SISO Automations',
-    icon: Download,
-    href: '/automations',
-  },
-  {
-    title: 'ChatGPT Assistants',
-    icon: Bot,
-    href: '/assistants',
-  },
-  {
-    title: 'SISO AI',
-    icon: MessageSquare,
-    href: '/siso-ai',
-  },
-  {
-    title: 'AI News',
-    icon: Newspaper,
-    href: '/ai-news',
-  },
-];
+import { 
+  Home, 
+  Newspaper, 
+  Wrench, 
+  GraduationCap, 
+  Bot, 
+  Network, 
+  Users,
+  UserRound,
+  MessageSquare 
+} from 'lucide-react';
 
 interface SidebarNavigationProps {
   collapsed: boolean;
   onItemClick: (e: React.MouseEvent<HTMLAnchorElement>, href: string) => void;
-  visible?: boolean;
+  visible: boolean;
 }
 
-export const SidebarNavigation = ({ collapsed, onItemClick, visible = true }: SidebarNavigationProps) => {
+export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNavigationProps) => {
+  const location = useLocation();
+
   if (!visible) return null;
-  
+
+  const menuItems = [
+    { href: '/', icon: Home, label: 'Home' },
+    { href: '/ai-news', icon: Newspaper, label: 'AI News' },
+    { href: '/tools', icon: Wrench, label: 'Tools' },
+    { href: '/siso-education', icon: GraduationCap, label: 'Education' },
+    { href: '/automations', icon: Bot, label: 'Automations' },
+    { href: '/networking', icon: Network, label: 'Networking' },
+    { href: '/chat-gpt-assistants', icon: MessageSquare, label: 'Assistants' },
+    { href: '/community', icon: Users, label: 'Community' },
+    { href: '/siso-ai', icon: Bot, label: 'SISO AI' },
+    { href: '/profile', icon: UserRound, label: 'Profile' },
+  ];
+
   return (
-    <nav className="p-2">
+    <nav className="p-4 space-y-2">
       {menuItems.map((item) => (
         <SidebarMenuItem
-          key={item.title}
-          {...item}
+          key={item.href}
+          href={item.href}
+          icon={item.icon}
+          label={item.label}
+          active={location.pathname === item.href}
           collapsed={collapsed}
-          onClick={onItemClick}
+          onClick={(e) => onItemClick(e, item.href)}
         />
       ))}
     </nav>
