@@ -1,5 +1,6 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { SidebarMenuItem } from './SidebarMenuItem';
+import { cn } from '@/lib/utils';
 import { 
   Home,
   GraduationCap,
@@ -13,8 +14,11 @@ import {
   Wrench,
   Trophy,
   Wallet,
-  BarChart
+  BarChart,
+  ChevronDown,
+  ChevronRight
 } from 'lucide-react';
+import { useState } from 'react';
 
 interface SidebarNavigationProps {
   collapsed: boolean;
@@ -22,8 +26,23 @@ interface SidebarNavigationProps {
   visible: boolean;
 }
 
+interface MenuSection {
+  type: 'main' | 'section';
+  title?: string;
+  href?: string;
+  icon?: any;
+  label?: string;
+  items?: {
+    href: string;
+    icon: any;
+    label: string;
+  }[];
+}
+
 export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNavigationProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [expandedSections, setExpandedSections] = useState<string[]>(['learn', 'economy']);
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
@@ -34,7 +53,15 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
     }
   };
 
-  const menuItems = [
+  const toggleSection = (section: string) => {
+    setExpandedSections(prev => 
+      prev.includes(section) 
+        ? prev.filter(s => s !== section)
+        : [...prev, section]
+    );
+  };
+
+  const menuSections: MenuSection[] = [
     {
       type: 'main',
       href: '/',
@@ -43,6 +70,7 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
     },
     {
       type: 'section',
+      title: 'Learn & Network',
       items: [
         {
           href: '/education',
@@ -67,13 +95,8 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
       ]
     },
     {
-      type: 'main',
-      href: '/economy/earn',
-      icon: Coins,
-      label: 'Economy',
-    },
-    {
       type: 'section',
+      title: 'Economy',
       items: [
         {
           href: '/economy/earn',
@@ -117,29 +140,54 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
   return (
     <nav className="px-3 py-4">
       <div className="space-y-4">
-        {menuItems.map((item, index) => (
-          <div key={index} className="space-y-1">
-            {item.type === 'main' ? (
+        {menuSections.map((section, index) => (
+          <div 
+            key={index} 
+            className={cn(
+              "space-y-1",
+              section.type === 'section' && "border-b border-siso-border pb-4"
+            )}
+          >
+            {section.type === 'main' ? (
               <SidebarMenuItem
-                href={item.href}
-                icon={item.icon}
-                label={item.label}
+                href={section.href!}
+                icon={section.icon}
+                label={section.label!}
                 collapsed={collapsed}
                 onClick={handleClick}
                 isMain={true}
+                isActive={location.pathname === section.href}
               />
             ) : (
               <div className="space-y-1">
-                {item.items?.map((subItem, subIndex) => (
-                  <SidebarMenuItem
-                    key={subIndex}
-                    href={subItem.href}
-                    icon={subItem.icon}
-                    label={subItem.label}
-                    collapsed={collapsed}
-                    onClick={handleClick}
-                  />
-                ))}
+                {section.title && !collapsed && (
+                  <button
+                    onClick={() => toggleSection(section.title!.toLowerCase())}
+                    className="w-full flex items-center justify-between px-3 py-2 text-sm font-semibold text-siso-text-bold hover:text-siso-text transition-colors"
+                  >
+                    {section.title}
+                    {expandedSections.includes(section.title.toLowerCase()) ? (
+                      <ChevronDown className="w-4 h-4" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4" />
+                    )}
+                  </button>
+                )}
+                {(!collapsed && expandedSections.includes(section.title!.toLowerCase())) && (
+                  <div className="pl-3 space-y-1 animate-accordion-down">
+                    {section.items?.map((item, subIndex) => (
+                      <SidebarMenuItem
+                        key={subIndex}
+                        href={item.href}
+                        icon={item.icon}
+                        label={item.label}
+                        collapsed={collapsed}
+                        onClick={handleClick}
+                        isActive={location.pathname === item.href}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>
