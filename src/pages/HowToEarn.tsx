@@ -4,6 +4,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { Sidebar } from '@/components/Sidebar';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { Json } from '@/integrations/supabase/types';
 
 interface NFTCollection {
   tier: string;
@@ -15,6 +16,9 @@ interface NFTCollection {
   weekly_bonus: number;
   benefits: string[];
   image_url: string | null;
+  opensea_url: string;
+  contract_address: string;
+  chain_id: string;
 }
 
 const HowToEarn = () => {
@@ -30,7 +34,18 @@ const HowToEarn = () => {
           .order('points_cost', { ascending: true });
 
         if (error) throw error;
-        setNftCollections(data || []);
+        
+        // Transform the data to ensure benefits is a string array
+        const transformedData = data?.map(collection => ({
+          ...collection,
+          benefits: Array.isArray(collection.benefits) 
+            ? collection.benefits 
+            : typeof collection.benefits === 'string' 
+              ? JSON.parse(collection.benefits)
+              : []
+        })) || [];
+
+        setNftCollections(transformedData);
       } catch (error) {
         console.error('Error fetching NFT collections:', error);
       } finally {
