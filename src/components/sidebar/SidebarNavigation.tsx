@@ -42,14 +42,8 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
       label: 'Home',
     },
     {
-      type: 'header',
-      label: 'Learn & Network',
+      type: 'section',
       items: [
-        {
-          href: '/learn-network',
-          icon: Network,
-          label: 'Overview',
-        },
         {
           href: '/education',
           icon: GraduationCap,
@@ -73,14 +67,8 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
       ]
     },
     {
-      type: 'header',
-      label: 'Economy',
+      type: 'section',
       items: [
-        {
-          href: '/economy',
-          icon: Coins,
-          label: 'Overview',
-        },
         {
           href: '/economy/earn',
           icon: Trophy,
@@ -135,12 +123,7 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
                 isMain={true}
               />
             ) : (
-              <>
-                <div className="px-3 py-2">
-                  <h2 className="text-sm font-semibold text-siso-text-muted">
-                    {item.label}
-                  </h2>
-                </div>
+              <div className="space-y-1">
                 {item.items?.map((subItem, subIndex) => (
                   <SidebarMenuItem
                     key={subIndex}
@@ -151,7 +134,7 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
                     onClick={handleClick}
                   />
                 ))}
-              </>
+              </div>
             )}
           </div>
         ))}

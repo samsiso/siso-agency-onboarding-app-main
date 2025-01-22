@@ -10,15 +10,12 @@ import SisoEducation from './pages/SisoEducation';
 import Automations from './pages/Automations';
 import ChatGPTAssistants from './pages/ChatGPTAssistants';
 import Networking from './pages/Networking';
-import Crypto from './pages/Crypto';
 import HowToEarn from './pages/HowToEarn';
 import Terms from './pages/Terms';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import ThankYou from './pages/ThankYou';
-import LearnNetwork from './pages/LearnNetwork';
-import Economy from './pages/Economy';
-import Leaderboards from './pages/Leaderboards';
 import CryptoExchange from './pages/CryptoExchange';
+import Leaderboards from './pages/Leaderboards';
 import './App.css';
 
 function App() {
@@ -26,7 +23,6 @@ function App() {
     <Routes>
       <Route path="/" element={<Index />} />
       <Route path="/profile" element={<Profile />} />
-      <Route path="/learn-network" element={<LearnNetwork />} />
       <Route path="/tools" element={<Tools />} />
       <Route path="/tool/:id" element={<ToolPage />} />
       <Route path="/siso-ai" element={<SisoAI />} />
@@ -35,7 +31,6 @@ function App() {
       <Route path="/education" element={<SisoEducation />} />
       <Route path="/automations" element={<Automations />} />
       <Route path="/assistants" element={<ChatGPTAssistants />} />
-      <Route path="/economy" element={<Economy />} />
       <Route path="/economy/earn" element={<HowToEarn />} />
       <Route path="/economy/crypto-exchange" element={<CryptoExchange />} />
       <Route path="/economy/leaderboards" element={<Leaderboards />} />
