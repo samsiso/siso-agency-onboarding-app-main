@@ -479,6 +479,7 @@ export type Database = {
       }
       point_configurations: {
         Row: {
+          action: string
           created_at: string
           description: string | null
           id: string
@@ -487,6 +488,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          action: string
           created_at?: string
           description?: string | null
           id?: string
@@ -495,6 +497,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          action?: string
           created_at?: string
           description?: string | null
           id?: string
