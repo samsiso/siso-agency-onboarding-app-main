@@ -10,7 +10,7 @@ interface Message {
 }
 
 interface ChatBotProps {
-  agentType: 'general' | 'tools' | 'education' | 'automations' | 'assistants' | 'ai' | 'networking';
+  agentType: 'general' | 'tools' | 'education' | 'automations' | 'assistants' | 'ai' | 'networking' | 'news';
 }
 
 const getAgentPrompt = (agentType: ChatBotProps['agentType']) => {
@@ -27,6 +27,8 @@ const getAgentPrompt = (agentType: ChatBotProps['agentType']) => {
       return "You are a SISO Networking expert. Help users connect with relevant communities, find networking opportunities, and make the most of SISO's networking resources.";
     case 'ai':
       return "You are SISO's AI Implementation specialist. Guide users in leveraging AI technologies, understanding AI capabilities, and implementing AI solutions in their business.";
+    case 'news':
+      return "You are SISO's AI News specialist. Help users stay updated with the latest AI news, explain recent developments, and provide context about AI industry trends and breakthroughs.";
     default:
       return "You are SISO's general assistant. Help users navigate the platform, find resources, and answer general questions about SISO's services and features.";
   }
