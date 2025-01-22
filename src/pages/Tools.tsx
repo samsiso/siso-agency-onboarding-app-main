@@ -30,7 +30,7 @@ export default function Tools() {
     queryFn: async () => {
       console.log('Fetching tools...');
       const { data, error } = await supabase
-        .from('tools')  // Changed from 'core_tools' to 'tools'
+        .from('tools')
         .select('*');
       
       if (error) {
