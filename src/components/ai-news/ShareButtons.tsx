@@ -11,7 +11,7 @@ interface ShareButtonsProps {
 
 export const ShareButtons = ({ summary, title }: ShareButtonsProps) => {
   const { toast } = useToast();
-  const { awardPoints } = usePoints();
+  const { awardPoints } = usePoints(undefined); // We'll get the user ID from the session
 
   const handleShare = async (platform: string) => {
     const text = `${title}\n\n${summary}`;

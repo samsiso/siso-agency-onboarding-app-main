@@ -23,7 +23,7 @@ export const NewsCardComments = ({ newsId, comments }: NewsCardCommentsProps) =>
   const [isCommenting, setIsCommenting] = useState(false);
   const [newComment, setNewComment] = useState('');
   const { toast } = useToast();
-  const { awardPoints } = usePoints();
+  const { awardPoints } = usePoints(undefined); // We'll get the user ID from the session
 
   const handleAddComment = async () => {
     if (!newComment.trim()) {
@@ -60,7 +60,7 @@ export const NewsCardComments = ({ newsId, comments }: NewsCardCommentsProps) =>
       if (error) throw error;
 
       // Award points for commenting
-      await awardPoints('add_comment');
+      await awardPoints('comment_article');
 
       setNewComment('');
       toast({

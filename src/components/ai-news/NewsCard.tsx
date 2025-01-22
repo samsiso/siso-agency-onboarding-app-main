@@ -36,7 +36,7 @@ const NewsCard = ({
   const [isLoading, setIsLoading] = useState(true);
   const [hasReadArticle, setHasReadArticle] = useState(false);
   const { toast } = useToast();
-  const { awardPoints } = usePoints();
+  const { awardPoints } = usePoints(undefined); // We'll get the user ID from the session
 
   useEffect(() => {
     const channel = supabase
