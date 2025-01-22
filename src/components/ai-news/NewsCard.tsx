@@ -9,6 +9,7 @@ import { NewsCardContent } from './NewsCardContent';
 import { NewsCardComments } from './NewsCardComments';
 import { ShareButtons } from './ShareButtons';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useToast } from '@/hooks/use-toast';
 
 interface NewsCardProps {
   item: any;
@@ -32,6 +33,8 @@ const NewsCard = ({
 }: NewsCardProps) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasReadArticle, setHasReadArticle] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     const channel = supabase
@@ -73,6 +76,43 @@ const NewsCard = ({
     }
   };
 
+  const awardPoints = async (userId: string, action: string, points: number) => {
+    try {
+      const { error } = await supabase
+        .from('points_log')
+        .insert([
+          {
+            user_id: userId,
+            action: action,
+            points_earned: points
+          }
+        ]);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error awarding points:', error);
+    }
+  };
+
+  const handleReadArticle = async () => {
+    if (hasReadArticle) return;
+    
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session) {
+        await awardPoints(session.user.id, 'read_article', 2);
+        setHasReadArticle(true);
+        toast({
+          title: "Points awarded!",
+          description: "You earned 2 points for reading this article!",
+        });
+      }
+    } catch (error) {
+      console.error('Error handling article read:', error);
+    }
+  };
+
   if (isLoading) {
     return <Skeleton className="w-full h-[200px] rounded-lg" />;
   }
@@ -95,6 +135,7 @@ const NewsCard = ({
                 date={item.date}
                 source={item.source}
                 impact={item.impact}
+                onReadArticle={handleReadArticle}
               />
 
               <NewsCardComments

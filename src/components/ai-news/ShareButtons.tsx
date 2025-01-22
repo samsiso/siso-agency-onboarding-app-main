@@ -37,11 +37,11 @@ export const ShareButtons = ({ summary, title }: ShareButtonsProps) => {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session) {
-        // Award points for sharing (10 points)
-        await awardPoints(session.user.id, `share_${platform}`, 10);
+        // Award points for sharing (5 points)
+        await awardPoints(session.user.id, 'share_article', 5);
         toast({
           title: "Points awarded!",
-          description: `You earned 10 points for sharing on ${platform}!`,
+          description: `You earned 5 points for sharing on ${platform}!`,
         });
       }
 

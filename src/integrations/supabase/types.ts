@@ -479,7 +479,6 @@ export type Database = {
       }
       point_configurations: {
         Row: {
-          action: Database["public"]["Enums"]["point_action_type"]
           created_at: string
           description: string | null
           id: string
@@ -488,7 +487,6 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          action: Database["public"]["Enums"]["point_action_type"]
           created_at?: string
           description?: string | null
           id?: string
@@ -497,7 +495,6 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          action?: Database["public"]["Enums"]["point_action_type"]
           created_at?: string
           description?: string | null
           id?: string

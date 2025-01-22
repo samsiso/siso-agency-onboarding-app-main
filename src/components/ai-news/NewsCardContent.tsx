@@ -9,6 +9,7 @@ interface NewsCardContentProps {
   date: string;
   source: string;
   impact: string;
+  onReadArticle?: () => void;
 }
 
 export const NewsCardContent = ({ 
@@ -16,7 +17,8 @@ export const NewsCardContent = ({
   description, 
   date, 
   source, 
-  impact 
+  impact,
+  onReadArticle 
 }: NewsCardContentProps) => {
   const getImpactColor = (impact: string) => {
     switch (impact.toLowerCase()) {
@@ -31,6 +33,13 @@ export const NewsCardContent = ({
     }
   };
 
+  const handleClick = () => {
+    if (onReadArticle) {
+      onReadArticle();
+    }
+    window.open(source, '_blank', 'noopener,noreferrer');
+  };
+
   return (
     <motion.div 
       initial={{ opacity: 0 }}
@@ -39,16 +48,14 @@ export const NewsCardContent = ({
       className="space-y-3 sm:space-y-4"
     >
       <div>
-        <a 
-          href={source}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group block"
+        <button 
+          onClick={handleClick}
+          className="group block w-full text-left"
         >
           <h2 className="text-xl sm:text-2xl font-bold mb-2 text-siso-text-bold group-hover:text-siso-red transition-colors line-clamp-2">
             {title}
           </h2>
-        </a>
+        </button>
         <p className="text-sm sm:text-base text-siso-text/80 line-clamp-2">
           {description}
         </p>
@@ -68,7 +75,7 @@ export const NewsCardContent = ({
           variant="ghost"
           size="sm"
           className="h-8 px-2 text-xs sm:text-sm text-siso-text/60 hover:text-siso-red hover:bg-siso-red/10 transition-colors"
-          onClick={() => window.open(source, '_blank', 'noopener,noreferrer')}
+          onClick={handleClick}
         >
           <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
           Read Article
