@@ -8,6 +8,7 @@ import { NewsCardMedia } from './NewsCardMedia';
 import { NewsCardContent } from './NewsCardContent';
 import { NewsCardComments } from './NewsCardComments';
 import { ShareButtons } from './ShareButtons';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface NewsCardProps {
   item: any;
@@ -30,6 +31,7 @@ const NewsCard = ({
   onGenerateSummary 
 }: NewsCardProps) => {
   const [comments, setComments] = useState<Comment[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const channel = supabase
@@ -58,14 +60,22 @@ const NewsCard = ({
   }, [item.id]);
 
   const fetchComments = async () => {
-    const { data } = await supabase
-      .from('news_comments')
-      .select('*')
-      .eq('news_id', item.id)
-      .order('created_at', { ascending: true });
+    try {
+      const { data } = await supabase
+        .from('news_comments')
+        .select('*')
+        .eq('news_id', item.id)
+        .order('created_at', { ascending: true });
 
-    setComments(data || []);
+      setComments(data || []);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  if (isLoading) {
+    return <Skeleton className="w-full h-[200px] rounded-lg" />;
+  }
 
   return (
     <motion.div
@@ -73,7 +83,7 @@ const NewsCard = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <Card className="hover:bg-card/60 transition-colors duration-200">
+      <Card className="hover:bg-card/60 transition-colors duration-200 border-siso-border hover:border-siso-border-hover">
         <CardContent className="p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
             <NewsCardMedia imageUrl={item.image_url} title={item.title} />
@@ -104,7 +114,7 @@ const NewsCard = ({
                       {loadingSummaries[item.id] ? (
                         "Generating Summary..."
                       ) : (
-                        "View AI Summary"
+                        summaries[item.id] ? "View AI Summary" : "Generate AI Summary"
                       )}
                     </Button>
                   </DialogTrigger>
@@ -119,7 +129,7 @@ const NewsCard = ({
                         </div>
                       ) : (
                         <div className="text-center text-muted-foreground">
-                          Generating summary...
+                          {loadingSummaries[item.id] ? "Generating summary..." : "Click the button to generate a summary"}
                         </div>
                       )}
                       
