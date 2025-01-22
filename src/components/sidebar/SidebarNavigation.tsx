@@ -8,7 +8,8 @@ import {
   Bot, 
   Network,
   UserRound,
-  MessageSquare 
+  MessageSquare,
+  Trophy 
 } from 'lucide-react';
 
 interface SidebarNavigationProps {
@@ -33,6 +34,7 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
     { href: '/siso-education', icon: GraduationCap, label: 'Education' },
     { href: '/networking', icon: Network, label: 'Networking' },
     { href: '/chat-gpt-assistants', icon: MessageSquare, label: 'Assistants' },
+    { href: '/how-to-earn', icon: Trophy, label: 'Earn SISO' },
   ];
 
   const additionalMenuItems = [
