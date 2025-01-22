@@ -20,7 +20,10 @@ const Profile = () => {
   useEffect(() => {
     const getProfile = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        // First, check if we have a session
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) throw sessionError;
         
         if (!session) {
           navigate('/');
@@ -28,17 +31,24 @@ const Profile = () => {
         }
 
         setUser(session.user);
+        console.log('Session user:', session.user); // Debug log
 
+        // Then fetch the profile data
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', session.user.id)
           .single();
 
-        if (profileError) throw profileError;
+        if (profileError) {
+          console.error('Profile fetch error:', profileError); // Debug log
+          throw profileError;
+        }
+
+        console.log('Profile data:', profileData); // Debug log
         setProfile(profileData);
       } catch (error: any) {
-        console.error('Error fetching profile:', error);
+        console.error('Error in getProfile:', error);
         toast({
           variant: "destructive",
           title: "Error",
