@@ -38,7 +38,7 @@ export const Hero = () => {
   }, []);
 
   return (
-    <div className="relative min-h-screen">
+    <div className="flex-1 relative">
       {/* Background with improved gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-siso-bg via-siso-bg/95 to-siso-bg/90" />
       
