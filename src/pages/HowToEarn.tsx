@@ -11,86 +11,90 @@ const HowToEarn = () => {
       description: 'Login daily and maintain streaks to earn points.',
       items: [
         { action: 'Daily Login', points: '5 points' },
-        { action: '7-Day Login Streak', points: '50 points bonus' }
+        { action: '7-Day Login Streak', points: '50 points bonus' },
+        { action: '30-Day Login Streak', points: '250 points bonus' }
       ]
     },
     {
-      title: 'Content Interaction',
+      title: 'Content Creation',
       icon: MessageSquare,
-      description: 'Engage with articles and content.',
+      description: 'Create and share valuable content with the community.',
       items: [
-        { action: 'Read Article', points: '2 points' },
+        { action: 'Write Article', points: '50 points' },
+        { action: 'Create Tutorial', points: '100 points' },
+        { action: 'Share Workflow', points: '25 points' },
+        { action: 'Submit Tool', points: '75 points' }
+      ]
+    },
+    {
+      title: 'Community Engagement',
+      icon: Heart,
+      description: 'Interact with other members and content.',
+      items: [
         { action: 'Comment on Article', points: '5 points' },
-        { action: 'Share Article', points: '10 points' },
-        { action: 'Suggest Article', points: '15 points' }
-      ]
-    },
-    {
-      title: 'Tools & Resources',
-      icon: Wrench,
-      description: 'Contribute and interact with tools.',
-      items: [
-        { action: 'Use Tool', points: '5 points' },
-        { action: 'Submit Tool', points: '20 points' },
-        { action: 'Write Tool Review', points: '10 points' },
-        { action: 'Receive Tool Like', points: '2 points' },
-        { action: 'Receive Tool Star', points: '5 points' }
-      ]
-    },
-    {
-      title: 'Educational Content',
-      icon: GraduationCap,
-      description: 'Learn and share knowledge.',
-      items: [
-        { action: 'Watch Tutorial', points: '10 points' },
-        { action: 'Submit Education Content', points: '25 points' },
-        { action: 'Create Tutorial', points: '30 points' },
-        { action: 'Receive Education Like', points: '2 points' },
-        { action: 'Receive Education Star', points: '5 points' }
-      ]
-    },
-    {
-      title: 'Automation & AI',
-      icon: Bot,
-      description: 'Contribute to automation ecosystem.',
-      items: [
-        { action: 'Use Automation', points: '5 points' },
-        { action: 'Submit Automation', points: '20 points' },
-        { action: 'Share Workflow', points: '10 points' },
-        { action: 'Use Assistant', points: '5 points' },
-        { action: 'Train Assistant', points: '15 points' },
-        { action: 'Assistant Feedback', points: '5 points' }
-      ]
-    },
-    {
-      title: 'Community & Network',
-      icon: Network,
-      description: 'Build connections and contribute.',
-      items: [
         { action: 'Network Reply', points: '5 points' },
         { action: 'Network Discussion', points: '10 points' },
-        { action: 'Network Referral', points: '25 points' },
-        { action: 'Host Event', points: '50 points' }
+        { action: 'Host Event', points: '100 points' }
       ]
     },
     {
-      title: 'Special Activities',
-      icon: Award,
-      description: 'Participate in special events and testing.',
+      title: 'Educational Progress',
+      icon: GraduationCap,
+      description: 'Learn and grow with educational content.',
+      items: [
+        { action: 'Watch Tutorial', points: '10 points' },
+        { action: 'Complete Course', points: '50 points' },
+        { action: 'Pass Assessment', points: '25 points' }
+      ]
+    },
+    {
+      title: 'Tool Mastery',
+      icon: Wrench,
+      description: 'Utilize and contribute to the tools ecosystem.',
+      items: [
+        { action: 'Use Tool', points: '5 points' },
+        { action: 'Tool Review', points: '10 points' },
+        { action: 'Tool Integration', points: '25 points' }
+      ]
+    },
+    {
+      title: 'AI Contributions',
+      icon: Bot,
+      description: 'Help improve AI systems and assistants.',
+      items: [
+        { action: 'Train Assistant', points: '15 points' },
+        { action: 'Assistant Feedback', points: '5 points' },
+        { action: 'AI Model Testing', points: '20 points' }
+      ]
+    },
+    {
+      title: 'Social Sharing',
+      icon: Share2,
+      description: 'Spread the word and grow the community.',
+      items: [
+        { action: 'Share Article', points: '10 points' },
+        { action: 'Social Media Post', points: '5 points' },
+        { action: 'Referral Signup', points: '50 points' }
+      ]
+    },
+    {
+      title: 'Special Achievements',
+      icon: Trophy,
+      description: 'Complete special tasks and challenges.',
       items: [
         { action: 'Complete Challenge', points: '25-100 points' },
         { action: 'Beta Testing', points: '50 points' },
-        { action: 'Report Bug', points: '15 points' },
-        { action: 'Promotional Share', points: '10 points' }
+        { action: 'Bug Report', points: '15 points' }
       ]
     },
     {
-      title: 'Referral Program',
-      icon: Heart,
-      description: 'Grow the community.',
+      title: 'Expert Recognition',
+      icon: Award,
+      description: 'Achieve expert status and recognition.',
       items: [
-        { action: 'Referral Signup', points: '50 points' },
-        { action: 'Referral Milestone', points: '100 points' }
+        { action: 'Become Verified Expert', points: '500 points' },
+        { action: 'Expert Answer', points: '25 points' },
+        { action: 'Knowledge Base Contribution', points: '50 points' }
       ]
     }
   ];
@@ -139,7 +143,7 @@ const HowToEarn = () => {
             <Card className="mt-8 bg-black/20 border-siso-text/10 backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="text-siso-text-bold flex items-center gap-2">
-                  <Trophy className="w-5 h-5 text-siso-orange" />
+                  <Star className="w-5 h-5 text-siso-orange" />
                   Ranks and Achievements
                 </CardTitle>
               </CardHeader>
