@@ -14,6 +14,7 @@ const Automations = lazy(() => import(/* webpackChunkName: "automations" */ './p
 const SisoAI = lazy(() => import(/* webpackChunkName: "siso-ai" */ './pages/SisoAI'));
 const Profile = lazy(() => import(/* webpackChunkName: "profile" */ './pages/Profile'));
 const HowToEarn = lazy(() => import(/* webpackChunkName: "how-to-earn" */ './pages/HowToEarn'));
+const Crypto = lazy(() => import(/* webpackChunkName: "crypto" */ './pages/Crypto'));
 
 // Optimized loading fallback with better UX
 const LoadingFallback = () => (
@@ -40,6 +41,7 @@ function App() {
         <Route path="/siso-ai" element={<SisoAI />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/how-to-earn" element={<HowToEarn />} />
+        <Route path="/crypto" element={<Crypto />} />
         {/* Catch all route for 404s */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
