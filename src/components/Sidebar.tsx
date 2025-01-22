@@ -73,8 +73,8 @@ export const Sidebar = () => {
         style={{ width: collapsed && !isMobile ? '5rem' : '16rem' }}
       >
         <SidebarLogo 
-          collapsed={collapsed}
-          setCollapsed={setCollapsed}
+          collapsed={collapsed} 
+          setCollapsed={setCollapsed} 
           onLogoClick={() => setShowNavigation(!showNavigation)}
         />
         <SidebarNavigation 
