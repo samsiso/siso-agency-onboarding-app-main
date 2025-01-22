@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { SidebarMenuItem } from './SidebarMenuItem';
 import { 
   Home, 
@@ -14,15 +15,25 @@ import {
 
 interface SidebarNavigationProps {
   collapsed: boolean;
-  onItemClick: (e: React.MouseEvent<HTMLAnchorElement>, href: string) => void;
+  onItemClick: (e: React.MouseEvent<HTMLAnchorElement>) => void;
   visible: boolean;
 }
 
 export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNavigationProps) => {
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const toggleSection = (section: string) => {
     setExpandedSection(expandedSection === section ? null : section);
+  };
+
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const href = e.currentTarget.getAttribute('href');
+    if (href) {
+      onItemClick(e);
+      navigate(href);
+    }
   };
 
   if (!visible) return null;
@@ -125,7 +136,7 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
                         icon={subItem.icon}
                         label={subItem.label}
                         collapsed={collapsed}
-                        onClick={onItemClick}
+                        onClick={handleClick}
                       />
                     ))}
                   </div>
@@ -140,7 +151,7 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
               icon={item.icon}
               label={item.label}
               collapsed={collapsed}
-              onClick={onItemClick}
+              onClick={handleClick}
             />
           );
         })}
