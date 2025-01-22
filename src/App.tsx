@@ -7,6 +7,8 @@ import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Profile from './pages/Profile';
 import NotFound from './pages/NotFound';
+import Tools from './pages/Tools';
+import SisoEducation from './pages/SisoEducation';
 
 const App = () => {
   return (
@@ -23,6 +25,8 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/tools" element={<Tools />} />
+              <Route path="/siso-education" element={<SisoEducation />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
