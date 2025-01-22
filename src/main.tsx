@@ -19,12 +19,15 @@ const queryClient = new QueryClient({
 })
 
 // Configure allowed origins for postMessage
-window.ALLOWED_ORIGINS = [
+const ALLOWED_ORIGINS = [
   'https://gptengineer.app',
   'http://localhost:3000',
   'https://lovable.dev',
   'https://www.siso.agency'
 ];
+
+// Set allowed origins on window object
+window.ALLOWED_ORIGINS = ALLOWED_ORIGINS;
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
