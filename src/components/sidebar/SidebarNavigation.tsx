@@ -14,11 +14,8 @@ import {
   Wrench,
   Trophy,
   Wallet,
-  BarChart,
-  ChevronDown,
-  ChevronRight
+  BarChart
 } from 'lucide-react';
-import { useState } from 'react';
 
 interface SidebarNavigationProps {
   collapsed: boolean;
@@ -42,7 +39,6 @@ interface MenuSection {
 export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNavigationProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [expandedSections, setExpandedSections] = useState<string[]>(['learn', 'economy']);
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
@@ -51,14 +47,6 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
       onItemClick(e);
       navigate(href);
     }
-  };
-
-  const toggleSection = (section: string) => {
-    setExpandedSections(prev => 
-      prev.includes(section) 
-        ? prev.filter(s => s !== section)
-        : [...prev, section]
-    );
   };
 
   const menuSections: MenuSection[] = [
@@ -161,33 +149,23 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
             ) : (
               <div className="space-y-1">
                 {section.title && !collapsed && (
-                  <button
-                    onClick={() => toggleSection(section.title!.toLowerCase())}
-                    className="w-full flex items-center justify-between px-3 py-2 text-sm font-semibold text-siso-text-bold hover:text-siso-text transition-colors"
-                  >
+                  <div className="px-3 py-2 text-sm font-semibold text-siso-text-bold">
                     {section.title}
-                    {expandedSections.includes(section.title.toLowerCase()) ? (
-                      <ChevronDown className="w-4 h-4" />
-                    ) : (
-                      <ChevronRight className="w-4 h-4" />
-                    )}
-                  </button>
-                )}
-                {(!collapsed && expandedSections.includes(section.title!.toLowerCase())) && (
-                  <div className="pl-3 space-y-1 animate-accordion-down">
-                    {section.items?.map((item, subIndex) => (
-                      <SidebarMenuItem
-                        key={subIndex}
-                        href={item.href}
-                        icon={item.icon}
-                        label={item.label}
-                        collapsed={collapsed}
-                        onClick={handleClick}
-                        isActive={location.pathname === item.href}
-                      />
-                    ))}
                   </div>
                 )}
+                <div className="pl-3 space-y-1">
+                  {section.items?.map((item, subIndex) => (
+                    <SidebarMenuItem
+                      key={subIndex}
+                      href={item.href}
+                      icon={item.icon}
+                      label={item.label}
+                      collapsed={collapsed}
+                      onClick={handleClick}
+                      isActive={location.pathname === item.href}
+                    />
+                  ))}
+                </div>
               </div>
             )}
           </div>
