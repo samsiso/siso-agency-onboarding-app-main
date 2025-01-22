@@ -88,13 +88,19 @@ export const Sidebar = () => {
         <SidebarFooter collapsed={collapsed} />
       </div>
 
-      {/* Mobile Overlay */}
-      {isMobile && isMobileMenuOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30"
-          onClick={() => setIsMobileMenuOpen(false)}
-        />
-      )}
+      {/* Main Content Wrapper */}
+      <div 
+        className={`min-h-screen ${!isMobile ? 'ml-[16rem]' : ''} transition-all duration-300`}
+        style={{ marginLeft: !isMobile && collapsed ? '5rem' : undefined }}
+      >
+        {/* Mobile Overlay */}
+        {isMobile && isMobileMenuOpen && (
+          <div 
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+        )}
+      </div>
     </>
   );
 };
