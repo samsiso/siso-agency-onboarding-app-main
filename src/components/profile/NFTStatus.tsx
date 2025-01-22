@@ -3,11 +3,23 @@ import { Diamond } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 
+interface NFTCollection {
+  name: string;
+  image_url?: string;
+  tier?: string;
+  points_multiplier?: number;
+  weekly_bonus?: number;
+}
+
+interface UserNFT {
+  id: string;
+  nft_collections?: NFTCollection | null;
+}
+
 interface NFT {
   id: string;
   name: string;
   imageUrl?: string;
-  rank?: string;
   tier?: string;
   points_multiplier?: number;
   weekly_bonus?: number;
@@ -30,7 +42,7 @@ export const NFTStatus = ({ nfts }: NFTStatusProps) => {
         const { data, error } = await supabase
           .from('user_nfts')
           .select(`
-            *,
+            id,
             nft_collections (
               name,
               image_url,
@@ -43,11 +55,11 @@ export const NFTStatus = ({ nfts }: NFTStatusProps) => {
 
         if (error) throw error;
 
-        const transformedNfts = data?.map(nft => ({
+        const transformedNfts = (data as UserNFT[])?.map(nft => ({
           id: nft.id,
           name: nft.nft_collections?.name || 'Unknown NFT',
-          imageUrl: nft.nft_collections?.image_url || undefined,
-          tier: nft.nft_collections?.tier || undefined,
+          imageUrl: nft.nft_collections?.image_url,
+          tier: nft.nft_collections?.tier,
           points_multiplier: nft.nft_collections?.points_multiplier,
           weekly_bonus: nft.nft_collections?.weekly_bonus
         })) || [];
