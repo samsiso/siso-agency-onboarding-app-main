@@ -10,6 +10,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChatBot } from '@/components/ChatBot';
 import { toast } from 'react-hot-toast';
+import { Sidebar } from '@/components/Sidebar';
 
 export default function Tools() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -29,7 +30,7 @@ export default function Tools() {
     queryFn: async () => {
       console.log('Fetching tools from Supabase...');
       const { data, error } = await supabase
-        .from('core_tools')  // Changed from 'tools' to 'core_tools'
+        .from('core_tools')
         .select('*');
       
       if (error) {
@@ -71,18 +72,22 @@ export default function Tools() {
   if (error) {
     console.error('Render error:', error);
     return (
-      <div className="p-8">
-        <Alert variant="destructive">
-          <AlertDescription>
-            Failed to load tools. Please try again later.
-          </AlertDescription>
-        </Alert>
+      <div className="flex min-h-screen">
+        <Sidebar />
+        <div className="p-8">
+          <Alert variant="destructive">
+            <AlertDescription>
+              Failed to load tools. Please try again later.
+            </AlertDescription>
+          </Alert>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
+    <div className="flex min-h-screen">
+      <Sidebar />
       <div className="flex-1 p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           <div className="space-y-4">
