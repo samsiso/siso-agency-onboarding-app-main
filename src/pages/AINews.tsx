@@ -146,7 +146,7 @@ const AINews = () => {
             variants={containerVariants}
             initial="hidden"
             animate="show"
-            className="space-y-6"
+            className="space-y-6 max-w-[1600px] mx-auto"
           >
             <Suspense fallback={<LoadingSpinner />}>
               <NewsHeader
@@ -156,10 +156,10 @@ const AINews = () => {
                 onYearChange={setSelectedYear}
               />
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-                {/* Featured Post - Full Width on Mobile, 2 Columns on Desktop */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
+                {/* Featured Post - 8 columns on desktop */}
                 {featuredPost && (
-                  <div className="lg:col-span-2">
+                  <div className="lg:col-span-8">
                     <NewsCard
                       key={featuredPost.id}
                       item={featuredPost}
@@ -171,8 +171,8 @@ const AINews = () => {
                   </div>
                 )}
 
-                {/* Side Posts - Stack on Mobile, Single Column on Desktop */}
-                <div className="space-y-4">
+                {/* Side Posts - 4 columns on desktop */}
+                <div className="lg:col-span-4 space-y-4 sm:space-y-6">
                   {sidePosts.map((item) => (
                     <NewsCard
                       key={item.id}
@@ -184,15 +184,16 @@ const AINews = () => {
                   ))}
                 </div>
 
-                {/* Regular Posts - 3 Columns Grid */}
+                {/* Regular Posts - 3 columns grid */}
                 {regularPosts.map((item) => (
-                  <NewsCard
-                    key={item.id}
-                    item={item}
-                    summaries={summaries}
-                    loadingSummaries={loadingSummaries}
-                    onGenerateSummary={generateSummary}
-                  />
+                  <div key={item.id} className="lg:col-span-4">
+                    <NewsCard
+                      item={item}
+                      summaries={summaries}
+                      loadingSummaries={loadingSummaries}
+                      onGenerateSummary={generateSummary}
+                    />
+                  </div>
                 ))}
               </div>
             </Suspense>
