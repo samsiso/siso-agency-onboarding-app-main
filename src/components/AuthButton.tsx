@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Mail } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -10,6 +10,7 @@ export const AuthButton = () => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -21,13 +22,14 @@ export const AuthButton = () => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
-      if (session?.user) {
+      // Only navigate to profile on initial sign in
+      if (_event === 'SIGNED_IN' && location.pathname === '/') {
         navigate('/profile');
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, location.pathname]);
 
   const getErrorMessage = (error: AuthError) => {
     if (error instanceof AuthApiError) {
