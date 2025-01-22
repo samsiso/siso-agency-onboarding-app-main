@@ -16,12 +16,15 @@ export default function ToolPage() {
   const { data: tool, isLoading, error } = useQuery({
     queryKey: ['tool', id],
     queryFn: async () => {
-      if (!id) throw new Error('Tool ID is required');
+      if (!id) {
+        console.error('No tool ID provided');
+        throw new Error('Tool ID is required');
+      }
       
       console.log('Fetching tool with ID:', id);
       const { data, error } = await supabase
         .from('core_tools')
-        .select('*')
+        .select()
         .eq('id', id)
         .maybeSingle();
       
@@ -31,6 +34,7 @@ export default function ToolPage() {
       }
 
       if (!data) {
+        console.error('Tool not found with ID:', id);
         throw new Error('Tool not found');
       }
       
@@ -98,7 +102,9 @@ export default function ToolPage() {
               <ArrowLeft className="w-4 h-4" />
               Back to Tools
             </Link>
-            <div className="text-red-500">Tool not found. Please try again later.</div>
+            <div className="text-red-500">
+              {error instanceof Error ? error.message : 'Tool not found. Please try again later.'}
+            </div>
           </div>
         </div>
       </div>
