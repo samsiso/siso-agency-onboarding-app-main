@@ -2,10 +2,13 @@ import { useLocation } from 'react-router-dom';
 import { SidebarMenuItem } from './SidebarMenuItem';
 import { 
   Home, 
+  Newspaper, 
   Wrench, 
   GraduationCap, 
+  Bot, 
   Network,
-  MessageSquare,
+  UserRound,
+  MessageSquare 
 } from 'lucide-react';
 
 interface SidebarNavigationProps {
@@ -32,8 +35,15 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
     { href: '/chat-gpt-assistants', icon: MessageSquare, label: 'Assistants' },
   ];
 
+  const additionalMenuItems = [
+    { href: '/ai-news', icon: Newspaper, label: 'AI News' },
+    { href: '/automations', icon: Bot, label: 'Automations' },
+    { href: '/siso-ai', icon: Bot, label: 'SISO AI' },
+    { href: '/profile', icon: UserRound, label: 'Profile' },
+  ];
+
   return (
-    <nav className="p-4 space-y-2">
+    <nav className="p-4 space-y-4">
       {/* Main menu item */}
       <div className="mb-4">
         <SidebarMenuItem
@@ -44,6 +54,7 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
           active={location.pathname === mainMenuItem.href}
           collapsed={collapsed}
           onClick={(e) => onItemClick(e, mainMenuItem.href)}
+          className="font-medium"
         />
       </div>
 
@@ -59,6 +70,21 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
             collapsed={collapsed}
             onClick={(e) => onItemClick(e, item.href)}
             className="text-sm"
+          />
+        ))}
+      </div>
+
+      {/* Additional menu items */}
+      <div className="space-y-1 pt-4 mt-4 border-t border-siso-border">
+        {additionalMenuItems.map((item) => (
+          <SidebarMenuItem
+            key={item.href}
+            href={item.href}
+            icon={item.icon}
+            label={item.label}
+            active={location.pathname === item.href}
+            collapsed={collapsed}
+            onClick={(e) => onItemClick(e, item.href)}
           />
         ))}
       </div>
