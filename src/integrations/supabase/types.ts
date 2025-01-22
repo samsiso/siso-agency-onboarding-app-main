@@ -813,6 +813,33 @@ export type Database = {
         }
         Relationships: []
       }
+      web3_users: {
+        Row: {
+          created_at: string
+          id: string
+          metadata: Json
+          moralis_provider_id: string
+          updated_at: string
+          wallet_address: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metadata?: Json
+          moralis_provider_id: string
+          updated_at?: string
+          wallet_address: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metadata?: Json
+          moralis_provider_id?: string
+          updated_at?: string
+          wallet_address?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

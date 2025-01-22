@@ -1,6 +1,26 @@
 import Moralis from 'moralis';
 import { supabase } from '@/integrations/supabase/client';
 
+interface AuthResult {
+  id: string;
+  profileId: string;
+  address: {
+    lowercase: () => string;
+  };
+  domain: string;
+  statement: string;
+  uri: string;
+  version: string;
+  nonce: string;
+  chain: {
+    id: number;
+    hex: string;
+  };
+  expirationTime: Date;
+  notBefore: Date;
+  resources: string[];
+}
+
 export const initializeMoralis = async () => {
   if (!process.env.MORALIS_API_KEY) {
     throw new Error('Moralis API key not configured');
@@ -45,40 +65,57 @@ export const authenticateWithMetamask = async () => {
       signature,
     });
 
+    const authResult = result.result as AuthResult;
+
     // Convert the result to a JSON-safe object
     const metadataJson = {
-      id: result.result.id,
-      profileId: result.result.profileId,
-      address: result.result.address.lowercase(), // Using lowercase() instead of toLowerCase()
-      domain: result.result.domain,
-      statement: result.result.statement,
-      uri: result.result.uri,
-      version: result.result.version,
-      nonce: result.result.nonce,
-      chainId: result.result.chain.hex,
-      expirationTime: result.result.expirationTime.toISOString(),
-      notBefore: result.result.notBefore.toISOString(),
-      resources: result.result.resources
+      id: authResult.id,
+      profileId: authResult.profileId,
+      address: authResult.address.lowercase(),
+      domain: authResult.domain,
+      statement: authResult.statement,
+      uri: authResult.uri,
+      version: authResult.version,
+      nonce: authResult.nonce,
+      chainId: authResult.chain.hex,
+      expirationTime: authResult.expirationTime.toISOString(),
+      notBefore: authResult.notBefore.toISOString(),
+      resources: authResult.resources
     };
 
     // Update user profile with Web3 credentials
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
-      const { error } = await supabase
+      // First, create or update web3_users entry
+      const { error: web3Error } = await supabase
+        .from('web3_users')
+        .upsert({
+          id: user.id,
+          moralis_provider_id: authResult.profileId,
+          wallet_address: address,
+          metadata: metadataJson
+        }, {
+          onConflict: 'id'
+        });
+
+      if (web3Error) throw web3Error;
+
+      // Then, update the profiles table
+      const { error: profileError } = await supabase
         .from('profiles')
         .update({
           wallet_address: address,
-          moralis_provider_id: result.result.profileId,
+          moralis_provider_id: authResult.profileId,
           web3_metadata: metadataJson
         })
         .eq('id', user.id);
 
-      if (error) throw error;
+      if (profileError) throw profileError;
     }
 
     return { 
       address, 
-      moralisId: result.result.profileId, 
+      moralisId: authResult.profileId, 
       metadata: metadataJson 
     };
   } catch (error) {
