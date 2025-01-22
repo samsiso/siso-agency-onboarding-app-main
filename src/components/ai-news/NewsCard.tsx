@@ -36,7 +36,7 @@ const NewsCard = ({
   const [isLoading, setIsLoading] = useState(true);
   const [hasReadArticle, setHasReadArticle] = useState(false);
   const { toast } = useToast();
-  const { awardPoints } = usePoints(supabase.auth.getUser()?.data?.user?.id);
+  const { awardPoints } = usePoints();
 
   useEffect(() => {
     const channel = supabase
@@ -85,7 +85,7 @@ const NewsCard = ({
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session) {
-        await awardPoints('read_article', 2);
+        await awardPoints('read_article');
         setHasReadArticle(true);
         toast({
           title: "Points awarded!",

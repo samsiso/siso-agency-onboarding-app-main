@@ -11,7 +11,7 @@ interface ShareButtonsProps {
 
 export const ShareButtons = ({ summary, title }: ShareButtonsProps) => {
   const { toast } = useToast();
-  const { awardPoints } = usePoints(supabase.auth.getUser()?.data?.user?.id);
+  const { awardPoints } = usePoints();
 
   const handleShare = async (platform: string) => {
     const text = `${title}\n\n${summary}`;
@@ -22,7 +22,7 @@ export const ShareButtons = ({ summary, title }: ShareButtonsProps) => {
       
       if (session) {
         // Award points for sharing
-        await awardPoints('share_article', 5);
+        await awardPoints('share_article');
         toast({
           title: "Points awarded!",
           description: `You earned 5 points for sharing on ${platform}!`,
