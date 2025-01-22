@@ -1,4 +1,4 @@
-import { Trophy, Star, Calendar, Share2, MessageSquare, Wrench, GraduationCap, Target } from 'lucide-react';
+import { Trophy, Star, Calendar, Share2, MessageSquare, Wrench, GraduationCap, Target, Bot, Network, Heart, Award } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Sidebar } from '@/components/Sidebar';
@@ -6,40 +6,92 @@ import { Sidebar } from '@/components/Sidebar';
 const HowToEarn = () => {
   const earningSections = [
     {
-      title: 'Daily Login',
+      title: 'Daily Activity',
       icon: Calendar,
-      description: 'Earn 5 points for logging in daily. Get bonus points for maintaining login streaks!',
-      points: '5 points/day'
+      description: 'Login daily and maintain streaks to earn points.',
+      items: [
+        { action: 'Daily Login', points: '5 points' },
+        { action: '7-Day Login Streak', points: '50 points bonus' }
+      ]
     },
     {
-      title: 'Using Tools',
+      title: 'Content Interaction',
+      icon: MessageSquare,
+      description: 'Engage with articles and content.',
+      items: [
+        { action: 'Read Article', points: '2 points' },
+        { action: 'Comment on Article', points: '5 points' },
+        { action: 'Share Article', points: '10 points' },
+        { action: 'Suggest Article', points: '15 points' }
+      ]
+    },
+    {
+      title: 'Tools & Resources',
       icon: Wrench,
-      description: 'Earn points by exploring and using our curated tools and platforms.',
-      points: '10 points/tool'
+      description: 'Contribute and interact with tools.',
+      items: [
+        { action: 'Use Tool', points: '5 points' },
+        { action: 'Submit Tool', points: '20 points' },
+        { action: 'Write Tool Review', points: '10 points' },
+        { action: 'Receive Tool Like', points: '2 points' },
+        { action: 'Receive Tool Star', points: '5 points' }
+      ]
     },
     {
       title: 'Educational Content',
       icon: GraduationCap,
-      description: 'Watch tutorials and engage with educational content to earn points.',
-      points: '15 points/video'
+      description: 'Learn and share knowledge.',
+      items: [
+        { action: 'Watch Tutorial', points: '10 points' },
+        { action: 'Submit Education Content', points: '25 points' },
+        { action: 'Create Tutorial', points: '30 points' },
+        { action: 'Receive Education Like', points: '2 points' },
+        { action: 'Receive Education Star', points: '5 points' }
+      ]
     },
     {
-      title: 'Social Sharing',
-      icon: Share2,
-      description: 'Share articles and tools with your network to earn bonus points.',
-      points: '20 points/share'
+      title: 'Automation & AI',
+      icon: Bot,
+      description: 'Contribute to automation ecosystem.',
+      items: [
+        { action: 'Use Automation', points: '5 points' },
+        { action: 'Submit Automation', points: '20 points' },
+        { action: 'Share Workflow', points: '10 points' },
+        { action: 'Use Assistant', points: '5 points' },
+        { action: 'Train Assistant', points: '15 points' },
+        { action: 'Assistant Feedback', points: '5 points' }
+      ]
     },
     {
-      title: 'Community Engagement',
-      icon: MessageSquare,
-      description: 'Comment on articles and participate in discussions.',
-      points: '10 points/comment'
+      title: 'Community & Network',
+      icon: Network,
+      description: 'Build connections and contribute.',
+      items: [
+        { action: 'Network Reply', points: '5 points' },
+        { action: 'Network Discussion', points: '10 points' },
+        { action: 'Network Referral', points: '25 points' },
+        { action: 'Host Event', points: '50 points' }
+      ]
     },
     {
-      title: 'Challenges',
-      icon: Target,
-      description: 'Complete special challenges to earn significant point bonuses.',
-      points: '50+ points'
+      title: 'Special Activities',
+      icon: Award,
+      description: 'Participate in special events and testing.',
+      items: [
+        { action: 'Complete Challenge', points: '25-100 points' },
+        { action: 'Beta Testing', points: '50 points' },
+        { action: 'Report Bug', points: '15 points' },
+        { action: 'Promotional Share', points: '10 points' }
+      ]
+    },
+    {
+      title: 'Referral Program',
+      icon: Heart,
+      description: 'Grow the community.',
+      items: [
+        { action: 'Referral Signup', points: '50 points' },
+        { action: 'Referral Milestone', points: '100 points' }
+      ]
     }
   ];
 
@@ -63,11 +115,15 @@ const HowToEarn = () => {
                       {section.title}
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-2">
+                  <CardContent className="space-y-4">
                     <p className="text-sm text-siso-text/90">{section.description}</p>
-                    <div className="flex items-center gap-1 text-siso-red">
-                      <Star className="w-4 h-4" />
-                      <span className="font-medium">{section.points}</span>
+                    <div className="space-y-2">
+                      {section.items.map((item, itemIndex) => (
+                        <div key={itemIndex} className="flex items-center justify-between text-sm">
+                          <span className="text-siso-text/80">{item.action}</span>
+                          <span className="text-siso-red font-medium">{item.points}</span>
+                        </div>
+                      ))}
                     </div>
                   </CardContent>
                 </Card>
@@ -86,10 +142,19 @@ const HowToEarn = () => {
                   As you earn points, you'll progress through different ranks:
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                  {['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond'].map((rank, index) => (
-                    <div key={rank} className="flex items-center gap-2 p-3 rounded-lg bg-siso-text/5 border border-siso-text/10">
-                      <Star className="w-4 h-4 text-siso-orange" />
-                      <span className="text-sm font-medium text-siso-text-bold">{rank}</span>
+                  {[
+                    { name: 'Bronze', threshold: '0-99 points' },
+                    { name: 'Silver', threshold: '100-249 points' },
+                    { name: 'Gold', threshold: '250-499 points' },
+                    { name: 'Platinum', threshold: '500-999 points' },
+                    { name: 'Diamond', threshold: '1000+ points' }
+                  ].map((rank) => (
+                    <div key={rank.name} className="flex flex-col gap-1 p-3 rounded-lg bg-siso-text/5 border border-siso-text/10">
+                      <div className="flex items-center gap-2">
+                        <Star className="w-4 h-4 text-siso-orange" />
+                        <span className="text-sm font-medium text-siso-text-bold">{rank.name}</span>
+                      </div>
+                      <span className="text-xs text-siso-text/60">{rank.threshold}</span>
                     </div>
                   ))}
                 </div>
