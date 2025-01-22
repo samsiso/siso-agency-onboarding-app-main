@@ -71,8 +71,8 @@ export const Sidebar = () => {
             ? `fixed inset-y-0 left-0 z-40 transform transition-transform duration-300 ease-in-out ${
                 isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
               }`
-            : 'sticky top-0'
-        } h-screen bg-gradient-to-b from-siso-bg to-siso-bg/95 border-r border-siso-text/10 shadow-lg`}
+            : 'fixed top-0 h-screen overflow-y-auto'
+        } bg-gradient-to-b from-siso-bg to-siso-bg/95 border-r border-siso-text/10 shadow-lg`}
         style={{ width: collapsed && !isMobile ? '5rem' : '16rem' }}
       >
         <SidebarLogo 
