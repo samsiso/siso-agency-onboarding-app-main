@@ -4,18 +4,18 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from './ui/button';
 import { ScrollArea } from './ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 export const Hero = () => {
   const [userName, setUserName] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const getProfile = async () => {
       try {
-        console.log('Fetching session...');
         const { data: { session } } = await supabase.auth.getSession();
-        console.log('Session:', session);
         
         if (session?.user) {
           console.log('Fetching profile for user:', session.user.id);
@@ -35,8 +35,9 @@ export const Hero = () => {
             return;
           }
           
-          console.log('Profile data:', profile);
           setUserName(profile?.full_name || session.user.email?.split('@')[0]);
+          // Redirect to profile if user is authenticated
+          navigate('/profile');
         }
       } catch (error) {
         console.error('Error in getProfile:', error);
@@ -54,11 +55,15 @@ export const Hero = () => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log('Auth state changed:', event, session?.user?.id);
-      getProfile();
+      if (event === 'SIGNED_IN') {
+        getProfile();
+      } else if (event === 'SIGNED_OUT') {
+        setUserName(null);
+      }
     });
 
     return () => subscription.unsubscribe();
-  }, [toast]);
+  }, [toast, navigate]);
 
   return (
     <div className="relative min-h-screen">
