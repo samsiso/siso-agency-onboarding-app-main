@@ -18,11 +18,17 @@ export default function Automations() {
   const { data: automations, isLoading, error } = useQuery({
     queryKey: ['automations'],
     queryFn: async () => {
+      console.log('Fetching automations...');
       const { data, error } = await supabase
         .from('automations')
         .select('*');
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching automations:', error);
+        throw error;
+      }
+      
+      console.log('Fetched automations:', data);
       return data as Automation[];
     },
   });
@@ -51,7 +57,19 @@ export default function Automations() {
   };
 
   if (error) {
-    return <div className="text-red-500">Error loading automations. Please try again later.</div>;
+    console.error('Error in Automations component:', error);
+    return (
+      <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
+        <Sidebar />
+        <div className="flex-1 p-8">
+          <Alert variant="destructive">
+            <AlertDescription>
+              Error loading automations. Please try again later. {error.message}
+            </AlertDescription>
+          </Alert>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -98,7 +116,9 @@ export default function Automations() {
           </div>
 
           {isLoading ? (
-            <div className="text-siso-text">Loading...</div>
+            <div className="text-siso-text flex items-center justify-center p-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-siso-orange"></div>
+            </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {filteredAutomations?.map((automation) => (
@@ -108,6 +128,11 @@ export default function Automations() {
                   onClick={setSelectedAutomation}
                 />
               ))}
+              {filteredAutomations?.length === 0 && (
+                <div className="col-span-full text-center text-siso-text/80 py-8">
+                  No automations found matching your criteria.
+                </div>
+              )}
             </div>
           )}
 
