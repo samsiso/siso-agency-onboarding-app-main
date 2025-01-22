@@ -17,32 +17,13 @@
   filter: drop-shadow(0 0 2em rgba(255, 87, 34, 0.5));
 }
 
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #9E9E9E;
-}
-
-/* Smooth scrolling for the whole app */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Better focus styles */
-:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(255, 87, 34, 0.5);
-}
-
 /* Improved selection color */
 ::selection {
   background-color: rgba(255, 87, 34, 0.2);
   color: #FFFFFF;
 }
 
-/* Scrollbar styling */
+/* Optimized scrollbar styling */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;

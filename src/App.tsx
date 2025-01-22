@@ -2,20 +2,20 @@ import { Suspense, lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 
-// Lazy load all pages
-const Index = lazy(() => import('./pages/Index'));
-const Tools = lazy(() => import('./pages/Tools'));
-const ToolPage = lazy(() => import('./pages/ToolPage'));
-const SisoEducation = lazy(() => import('./pages/SisoEducation'));
-const Networking = lazy(() => import('./pages/Networking'));
-const ChatGPTAssistants = lazy(() => import('./pages/ChatGPTAssistants'));
-const AINews = lazy(() => import('./pages/AINews'));
-const Automations = lazy(() => import('./pages/Automations'));
-const SisoAI = lazy(() => import('./pages/SisoAI'));
-const Profile = lazy(() => import('./pages/Profile'));
-const HowToEarn = lazy(() => import('./pages/HowToEarn'));
+// Lazy load all pages with chunk names for better code splitting
+const Index = lazy(() => import(/* webpackChunkName: "index" */ './pages/Index'));
+const Tools = lazy(() => import(/* webpackChunkName: "tools" */ './pages/Tools'));
+const ToolPage = lazy(() => import(/* webpackChunkName: "tool-page" */ './pages/ToolPage'));
+const SisoEducation = lazy(() => import(/* webpackChunkName: "siso-education" */ './pages/SisoEducation'));
+const Networking = lazy(() => import(/* webpackChunkName: "networking" */ './pages/Networking'));
+const ChatGPTAssistants = lazy(() => import(/* webpackChunkName: "chat-gpt" */ './pages/ChatGPTAssistants'));
+const AINews = lazy(() => import(/* webpackChunkName: "ai-news" */ './pages/AINews'));
+const Automations = lazy(() => import(/* webpackChunkName: "automations" */ './pages/Automations'));
+const SisoAI = lazy(() => import(/* webpackChunkName: "siso-ai" */ './pages/SisoAI'));
+const Profile = lazy(() => import(/* webpackChunkName: "profile" */ './pages/Profile'));
+const HowToEarn = lazy(() => import(/* webpackChunkName: "how-to-earn" */ './pages/HowToEarn'));
 
-// Loading fallback component
+// Optimized loading fallback with better UX
 const LoadingFallback = () => (
   <div className="min-h-screen flex items-center justify-center bg-siso-bg">
     <div className="flex flex-col items-center gap-4">
