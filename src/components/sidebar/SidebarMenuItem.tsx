@@ -26,7 +26,7 @@ export const SidebarMenuItem = ({
       to={href}
       onClick={onClick}
       className={cn(
-        'flex items-center gap-3 rounded-lg px-3 py-2 text-siso-text transition-all hover:text-siso-text-bold',
+        'flex items-center gap-3 rounded-lg px-3 py-2 text-siso-text transition-all hover:text-siso-text-bold hover:bg-siso-text/5',
         isMain ? 'text-lg font-semibold' : 'text-sm pl-6',
         className
       )}

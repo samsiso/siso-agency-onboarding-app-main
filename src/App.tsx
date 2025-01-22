@@ -15,6 +15,10 @@ import HowToEarn from './pages/HowToEarn';
 import Terms from './pages/Terms';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import ThankYou from './pages/ThankYou';
+import LearnNetwork from './pages/LearnNetwork';
+import Economy from './pages/Economy';
+import Leaderboards from './pages/Leaderboards';
+import CryptoExchange from './pages/CryptoExchange';
 import './App.css';
 
 function App() {
@@ -22,17 +26,19 @@ function App() {
     <Routes>
       <Route path="/" element={<Index />} />
       <Route path="/profile" element={<Profile />} />
+      <Route path="/learn-network" element={<LearnNetwork />} />
       <Route path="/tools" element={<Tools />} />
       <Route path="/tool/:id" element={<ToolPage />} />
       <Route path="/siso-ai" element={<SisoAI />} />
-      <Route path="/community" element={<Community />} />
+      <Route path="/networking" element={<Networking />} />
       <Route path="/ai-news" element={<AINews />} />
       <Route path="/education" element={<SisoEducation />} />
       <Route path="/automations" element={<Automations />} />
       <Route path="/assistants" element={<ChatGPTAssistants />} />
-      <Route path="/networking" element={<Networking />} />
-      <Route path="/crypto" element={<Crypto />} />
-      <Route path="/how-to-earn" element={<HowToEarn />} />
+      <Route path="/economy" element={<Economy />} />
+      <Route path="/economy/earn" element={<HowToEarn />} />
+      <Route path="/economy/crypto-exchange" element={<CryptoExchange />} />
+      <Route path="/economy/leaderboards" element={<Leaderboards />} />
       <Route path="/terms" element={<Terms />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/thank-you" element={<ThankYou />} />
