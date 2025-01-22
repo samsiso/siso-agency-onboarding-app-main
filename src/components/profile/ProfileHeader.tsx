@@ -55,6 +55,9 @@ export const ProfileHeader = ({
         title: "Success",
         description: "Profile photo updated successfully",
       });
+
+      // Force a page reload to show the new avatar
+      window.location.reload();
     } catch (error: any) {
       toast({
         variant: "destructive",
