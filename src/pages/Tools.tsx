@@ -26,9 +26,9 @@ export default function Tools() {
   ];
 
   const { data: tools, isLoading, error } = useQuery({
-    queryKey: ['tools'],
+    queryKey: ['core_tools'],
     queryFn: async () => {
-      console.log('Fetching tools from Supabase...');
+      console.log('Fetching tools from core_tools table...');
       const { data, error } = await supabase
         .from('core_tools')
         .select('*');
@@ -39,15 +39,8 @@ export default function Tools() {
         throw error;
       }
       
-      console.log('Fetched tools:', data);
-      
-      // Parse youtube_videos JSON for each tool
-      const parsedData = data.map(tool => ({
-        ...tool,
-        youtube_videos: tool.youtube_videos ? JSON.parse(JSON.stringify(tool.youtube_videos)) : null
-      }));
-      
-      return parsedData as Tool[];
+      console.log('Fetched tools from core_tools:', data);
+      return data as Tool[];
     },
   });
 
