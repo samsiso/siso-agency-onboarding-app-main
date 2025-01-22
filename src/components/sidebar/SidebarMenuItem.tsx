@@ -6,9 +6,8 @@ export interface SidebarMenuItemProps {
   href: string;
   icon: LucideIcon;
   label: string;
-  active: boolean;
   collapsed: boolean;
-  onClick: (e: React.MouseEvent<HTMLAnchorElement>) => void;
+  onClick: (e: React.MouseEvent<HTMLAnchorElement>, href: string) => void;
   className?: string;
 }
 
@@ -16,7 +15,6 @@ export const SidebarMenuItem = ({
   href,
   icon: Icon,
   label,
-  active,
   collapsed,
   onClick,
   className
@@ -24,10 +22,9 @@ export const SidebarMenuItem = ({
   return (
     <Link
       to={href}
-      onClick={onClick}
+      onClick={(e) => onClick(e, href)}
       className={cn(
         'flex items-center gap-3 rounded-lg px-3 py-2 text-siso-text transition-all hover:text-siso-text-bold',
-        active && 'bg-siso-text/5 text-siso-text-bold',
         className
       )}
     >
