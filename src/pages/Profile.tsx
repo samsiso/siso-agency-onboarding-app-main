@@ -40,38 +40,14 @@ const Profile = () => {
           .from('profiles')
           .select('*')
           .eq('id', session.user.id)
-          .maybeSingle();
+          .single();
 
         if (profileError) {
           console.error('[Profile] Profile fetch error:', profileError);
           throw profileError;
         }
 
-        if (!profileData) {
-          console.log('[Profile] No profile found, creating new profile');
-          const { error: insertError } = await supabase
-            .from('profiles')
-            .insert([{ 
-              id: session.user.id, 
-              email: session.user.email,
-              full_name: session.user.user_metadata?.full_name || null
-            }]);
-
-          if (insertError) {
-            console.error('[Profile] Profile creation error:', insertError);
-            throw insertError;
-          }
-
-          const { data: newProfile, error: newProfileError } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .single();
-
-          if (newProfileError) throw newProfileError;
-          console.log('[Profile] New profile created:', newProfile);
-          setProfile(newProfile);
-        } else {
+        if (profileData) {
           console.log('[Profile] Profile data found:', profileData);
           setProfile(profileData);
         }
@@ -82,6 +58,8 @@ const Profile = () => {
           title: "Error",
           description: "Failed to load profile data",
         });
+        // Redirect to home on error
+        navigate('/');
       } finally {
         setLoading(false);
       }
@@ -99,6 +77,23 @@ const Profile = () => {
             <div className="animate-pulse space-y-4">
               <div className="h-12 bg-siso-text/10 rounded w-1/4"></div>
               <div className="h-32 bg-siso-text/10 rounded"></div>
+            </div>
+          </div>
+        </div>
+      </SidebarProvider>
+    );
+  }
+
+  // If no user or profile, show error state
+  if (!user || !profile) {
+    return (
+      <SidebarProvider>
+        <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
+          <Sidebar />
+          <div className="flex-1 container mx-auto px-4 py-8">
+            <div className="text-center text-siso-text">
+              <h1 className="text-2xl font-bold mb-4">Profile Not Found</h1>
+              <p>Unable to load profile data. Please try again later.</p>
             </div>
           </div>
         </div>
