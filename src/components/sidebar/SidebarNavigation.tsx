@@ -5,12 +5,9 @@ import {
   Home, 
   GraduationCap, 
   Wrench, 
-  Bot, 
-  Users, 
-  Newspaper,
-  Wallet,
-  Trophy,
-  DollarSign
+  Users,
+  Bot,
+  Trophy
 } from 'lucide-react';
 
 interface SidebarNavigationProps {
@@ -20,12 +17,7 @@ interface SidebarNavigationProps {
 }
 
 export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNavigationProps) => {
-  const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const navigate = useNavigate();
-
-  const toggleSection = (section: string) => {
-    setExpandedSection(expandedSection === section ? null : section);
-  };
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
@@ -55,106 +47,35 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
       label: 'Tools',
     },
     {
-      href: '/siso-ai',
-      icon: Bot,
-      label: 'SISO AI',
-    },
-    {
-      href: '/community',
+      href: '/networking',
       icon: Users,
-      label: 'Community',
+      label: 'Networking',
     },
     {
-      href: '/ai-news',
-      icon: Newspaper,
-      label: 'AI News',
+      href: '/assistants',
+      icon: Bot,
+      label: 'GPT Assistants',
     },
     {
-      section: 'Economy',
-      icon: Wallet,
-      items: [
-        {
-          href: '/how-to-earn',
-          icon: Trophy,
-          label: 'Earn SISO',
-        },
-        {
-          href: '/crypto',
-          icon: DollarSign,
-          label: 'Crypto Exchange',
-        },
-      ],
-    },
+      href: '/how-to-earn',
+      icon: Trophy,
+      label: 'Earn SISO',
+    }
   ];
 
   return (
     <nav className="px-3 py-4">
       <div className="space-y-1">
-        {menuItems.map((item, index) => {
-          if ('section' in item) {
-            const isExpanded = expandedSection === item.section;
-            return (
-              <div key={index} className="space-y-1">
-                <button
-                  onClick={() => toggleSection(item.section)}
-                  className={`
-                    w-full flex items-center gap-3 px-3 py-2 text-sm 
-                    transition-colors rounded-md
-                    hover:bg-siso-text/10
-                    ${collapsed ? 'justify-center' : 'justify-between'}
-                    text-siso-text
-                  `}
-                >
-                  <div className="flex items-center gap-3">
-                    <item.icon className="w-4 h-4" />
-                    {!collapsed && <span>{item.section}</span>}
-                  </div>
-                  {!collapsed && (
-                    <svg
-                      className={`w-4 h-4 transition-transform ${
-                        isExpanded ? 'transform rotate-180' : ''
-                      }`}
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
-                  )}
-                </button>
-                {(isExpanded || collapsed) && (
-                  <div className={`space-y-1 ${collapsed ? 'mt-1' : 'ml-4'}`}>
-                    {item.items.map((subItem, subIndex) => (
-                      <SidebarMenuItem
-                        key={subIndex}
-                        href={subItem.href}
-                        icon={subItem.icon}
-                        label={subItem.label}
-                        collapsed={collapsed}
-                        onClick={handleClick}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          }
-          return (
-            <SidebarMenuItem
-              key={index}
-              href={item.href}
-              icon={item.icon}
-              label={item.label}
-              collapsed={collapsed}
-              onClick={handleClick}
-            />
-          );
-        })}
+        {menuItems.map((item, index) => (
+          <SidebarMenuItem
+            key={index}
+            href={item.href}
+            icon={item.icon}
+            label={item.label}
+            collapsed={collapsed}
+            onClick={handleClick}
+          />
+        ))}
       </div>
     </nav>
   );
