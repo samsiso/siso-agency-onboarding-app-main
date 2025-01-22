@@ -14,43 +14,26 @@ import Profile from './pages/Profile';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Terms from './pages/Terms';
 import ThankYou from './pages/ThankYou';
-import { SidebarProvider } from './components/ui/sidebar';
-import { Sidebar } from './components/Sidebar';
-import { AuthButton } from './components/AuthButton';
 
 function App() {
   return (
     <Router>
-      <SidebarProvider>
-        <div className="flex min-h-screen bg-siso-bg">
-          <Sidebar />
-          <div className="flex-1 flex flex-col">
-            <header className="sticky top-0 z-50 w-full border-b border-siso-border bg-siso-bg/95 backdrop-blur">
-              <div className="flex h-14 items-center justify-end px-4">
-                <AuthButton />
-              </div>
-            </header>
-            <main className="flex-1">
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/ai-news" element={<AINews />} />
-                <Route path="/tools" element={<Tools />} />
-                <Route path="/tool/:id" element={<ToolPage />} />
-                <Route path="/siso-education" element={<SisoEducation />} />
-                <Route path="/automations" element={<Automations />} />
-                <Route path="/networking" element={<Networking />} />
-                <Route path="/chat-gpt-assistants" element={<ChatGPTAssistants />} />
-                <Route path="/community" element={<Community />} />
-                <Route path="/siso-ai" element={<SisoAI />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                <Route path="/terms" element={<Terms />} />
-                <Route path="/thank-you" element={<ThankYou />} />
-              </Routes>
-            </main>
-          </div>
-        </div>
-      </SidebarProvider>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/ai-news" element={<AINews />} />
+        <Route path="/tools" element={<Tools />} />
+        <Route path="/tool/:id" element={<ToolPage />} />
+        <Route path="/siso-education" element={<SisoEducation />} />
+        <Route path="/automations" element={<Automations />} />
+        <Route path="/networking" element={<Networking />} />
+        <Route path="/chat-gpt-assistants" element={<ChatGPTAssistants />} />
+        <Route path="/community" element={<Community />} />
+        <Route path="/siso-ai" element={<SisoAI />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/thank-you" element={<ThankYou />} />
+      </Routes>
       <Toaster position="top-right" />
     </Router>
   );

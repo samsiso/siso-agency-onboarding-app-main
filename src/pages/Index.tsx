@@ -6,12 +6,14 @@ import { Leaderboard } from '@/components/leaderboard/Leaderboard';
 const Index = () => {
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full">
+      <div className="flex min-h-screen w-full flex-col md:flex-row">
         <Sidebar />
-        <main className="flex-1 flex flex-col bg-siso-bg w-full">
-          <Hero />
-          <div className="px-4 py-8">
-            <Leaderboard />
+        <main className="flex-1 bg-siso-bg w-full">
+          <div className="container mx-auto px-4 py-8">
+            <Hero />
+            <div className="mt-8">
+              <Leaderboard />
+            </div>
           </div>
         </main>
       </div>
