@@ -1,11 +1,13 @@
-import { Shield, Trophy, Star, Building2, Briefcase, GraduationCap, Linkedin, Globe, Youtube, Instagram, Twitter } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Shield } from 'lucide-react';
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useState } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { BasicInfo } from './BasicInfo';
+import { BusinessInfo } from './BusinessInfo';
+import { InterestsBio } from './InterestsBio';
+import { SocialMediaLinks } from './SocialMediaLinks';
 
 interface ProfileInfoProps {
   email: string | null;
@@ -58,6 +60,10 @@ export const ProfileInfo = ({
     professionalRole: professionalRole || ''
   });
   const { toast } = useToast();
+
+  const handleFormChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
 
   const handleSave = async () => {
     try {
@@ -132,197 +138,41 @@ export const ProfileInfo = ({
           </div>
         )}
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div>
-          <p className="text-sm text-siso-text/70">Email</p>
-          <p className="text-siso-text">{email}</p>
-        </div>
-        <div>
-          <p className="text-sm text-siso-text/70">Full Name</p>
-          {isEditing ? (
-            <Input
-              value={formData.fullName}
-              onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
-              className="mt-1"
-            />
-          ) : (
-            <p className="text-siso-text">{fullName || 'Not set'}</p>
-          )}
-        </div>
-        <div>
-          <p className="text-sm text-siso-text/70">Professional Role</p>
-          {isEditing ? (
-            <Input
-              value={formData.professionalRole}
-              onChange={(e) => setFormData(prev => ({ ...prev, professionalRole: e.target.value }))}
-              className="mt-1"
-              placeholder="e.g., Software Engineer, Product Manager"
-            />
-          ) : (
-            <p className="text-siso-text">{professionalRole || 'Not set'}</p>
-          )}
-        </div>
-        <div>
-          <p className="text-sm text-siso-text/70">Points</p>
-          <p className="text-siso-text flex items-center gap-2">
-            <Trophy className="w-4 h-4 text-siso-orange" />
-            {points || 0}
-          </p>
-        </div>
-        <div>
-          <p className="text-sm text-siso-text/70">Rank</p>
-          <p className="text-siso-text flex items-center gap-2">
-            <Star className="w-4 h-4 text-siso-orange" />
-            {rank || 'Newbie'}
-          </p>
-        </div>
-        <div>
-          <p className="text-sm text-siso-text/70 flex items-center gap-2">
-            <Building2 className="w-4 h-4" />
-            Business Information
-          </p>
-          {isEditing ? (
-            <div className="space-y-2 mt-1">
-              <Input
-                placeholder="Business Name"
-                value={formData.businessName}
-                onChange={(e) => setFormData(prev => ({ ...prev, businessName: e.target.value }))}
-              />
-              <Input
-                placeholder="Business Type"
-                value={formData.businessType}
-                onChange={(e) => setFormData(prev => ({ ...prev, businessType: e.target.value }))}
-              />
-              <Input
-                placeholder="Industry"
-                value={formData.industry}
-                onChange={(e) => setFormData(prev => ({ ...prev, industry: e.target.value }))}
-              />
-            </div>
-          ) : (
-            <div className="space-y-1">
-              <p className="text-siso-text">{businessName || 'No business name set'}</p>
-              <p className="text-siso-text/70 text-sm">{businessType || 'No business type set'}</p>
-              <p className="text-siso-text/70 text-sm">{industry || 'No industry set'}</p>
-            </div>
-          )}
-        </div>
-        <div>
-          <p className="text-sm text-siso-text/70 flex items-center gap-2">
-            <GraduationCap className="w-4 h-4" />
-            Interests
-          </p>
-          {isEditing ? (
-            <Input
-              placeholder="Interests (comma-separated)"
-              value={formData.interests}
-              onChange={(e) => setFormData(prev => ({ ...prev, interests: e.target.value }))}
-              className="mt-1"
-            />
-          ) : (
-            <p className="text-siso-text">{interests?.join(', ') || 'No interests set'}</p>
-          )}
-        </div>
-        <div>
-          <p className="text-sm text-siso-text/70">Bio</p>
-          {isEditing ? (
-            <Textarea
-              placeholder="Tell us about yourself..."
-              value={formData.bio}
-              onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
-              className="mt-1"
-            />
-          ) : (
-            <p className="text-siso-text">{bio || 'No bio set'}</p>
-          )}
-        </div>
-        <div>
-          <p className="text-sm text-siso-text/70 flex items-center gap-2">
-            <Briefcase className="w-4 h-4" />
-            Social Media & Links
-          </p>
-          {isEditing ? (
-            <div className="space-y-2 mt-1">
-              <div className="flex items-center gap-2">
-                <Linkedin className="w-4 h-4 text-siso-text/70" />
-                <Input
-                  placeholder="LinkedIn URL"
-                  value={formData.linkedinUrl}
-                  onChange={(e) => setFormData(prev => ({ ...prev, linkedinUrl: e.target.value }))}
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <Globe className="w-4 h-4 text-siso-text/70" />
-                <Input
-                  placeholder="Website URL"
-                  value={formData.websiteUrl}
-                  onChange={(e) => setFormData(prev => ({ ...prev, websiteUrl: e.target.value }))}
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <Youtube className="w-4 h-4 text-siso-text/70" />
-                <Input
-                  placeholder="YouTube URL"
-                  value={formData.youtubeUrl}
-                  onChange={(e) => setFormData(prev => ({ ...prev, youtubeUrl: e.target.value }))}
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <Instagram className="w-4 h-4 text-siso-text/70" />
-                <Input
-                  placeholder="Instagram URL"
-                  value={formData.instagramUrl}
-                  onChange={(e) => setFormData(prev => ({ ...prev, instagramUrl: e.target.value }))}
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <Twitter className="w-4 h-4 text-siso-text/70" />
-                <Input
-                  placeholder="Twitter URL"
-                  value={formData.twitterUrl}
-                  onChange={(e) => setFormData(prev => ({ ...prev, twitterUrl: e.target.value }))}
-                />
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {linkedinUrl && (
-                <a href={linkedinUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-siso-text hover:text-siso-red transition-colors">
-                  <Linkedin className="w-4 h-4" />
-                  LinkedIn
-                </a>
-              )}
-              {websiteUrl && (
-                <a href={websiteUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-siso-text hover:text-siso-red transition-colors">
-                  <Globe className="w-4 h-4" />
-                  Website
-                </a>
-              )}
-              {youtubeUrl && (
-                <a href={youtubeUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-siso-text hover:text-siso-red transition-colors">
-                  <Youtube className="w-4 h-4" />
-                  YouTube
-                </a>
-              )}
-              {instagramUrl && (
-                <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-siso-text hover:text-siso-red transition-colors">
-                  <Instagram className="w-4 h-4" />
-                  Instagram
-                </a>
-              )}
-              {twitterUrl && (
-                <a href={twitterUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-siso-text hover:text-siso-red transition-colors">
-                  <Twitter className="w-4 h-4" />
-                  Twitter
-                </a>
-              )}
-              {!linkedinUrl && !websiteUrl && !youtubeUrl && !instagramUrl && !twitterUrl && (
-                <p className="text-siso-text/70">No social media links set</p>
-              )}
-            </div>
-          )}
-        </div>
-      </CardContent>
+      <BasicInfo
+        email={email}
+        fullName={fullName}
+        points={points}
+        rank={rank}
+        professionalRole={professionalRole}
+        isEditing={isEditing}
+        formData={formData}
+        onFormChange={handleFormChange}
+      />
+      <BusinessInfo
+        businessName={businessName}
+        businessType={businessType}
+        industry={industry}
+        isEditing={isEditing}
+        formData={formData}
+        onFormChange={handleFormChange}
+      />
+      <InterestsBio
+        interests={interests}
+        bio={bio}
+        isEditing={isEditing}
+        formData={formData}
+        onFormChange={handleFormChange}
+      />
+      <SocialMediaLinks
+        linkedinUrl={linkedinUrl}
+        websiteUrl={websiteUrl}
+        youtubeUrl={youtubeUrl}
+        instagramUrl={instagramUrl}
+        twitterUrl={twitterUrl}
+        isEditing={isEditing}
+        formData={formData}
+        onFormChange={handleFormChange}
+      />
     </Card>
   );
 };
