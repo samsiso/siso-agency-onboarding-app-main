@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Sidebar } from '@/components/Sidebar';
-import { User, Shield, Award, Badge } from 'lucide-react';
+import { User, Shield, Award, Badge, Trophy, Star } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import {
@@ -34,7 +34,7 @@ const Profile = () => {
 
         setUser(session.user);
 
-        // Fetch profile data
+        // Fetch profile data including points and rank
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('*')
@@ -124,7 +124,12 @@ const Profile = () => {
                   <h1 className="text-3xl font-bold text-siso-text-bold">
                     {profile?.full_name || user?.email?.split('@')[0]}
                   </h1>
-                  <p className="text-siso-text/70">Member since {new Date(user?.created_at).toLocaleDateString()}</p>
+                  <div className="flex items-center gap-2 text-siso-text/70">
+                    <Trophy className="w-4 h-4 text-siso-orange" />
+                    <span>{profile?.points || 0} points</span>
+                    <Star className="w-4 h-4 text-siso-orange ml-2" />
+                    <span>{profile?.rank || 'Newbie'}</span>
+                  </div>
                 </div>
               </div>
               <div className="flex gap-4">
@@ -162,6 +167,20 @@ const Profile = () => {
                   <div>
                     <p className="text-sm text-siso-text/70">Full Name</p>
                     <p className="text-siso-text">{profile?.full_name || 'Not set'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-siso-text/70">Points</p>
+                    <p className="text-siso-text flex items-center gap-2">
+                      <Trophy className="w-4 h-4 text-siso-orange" />
+                      {profile?.points || 0}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-siso-text/70">Rank</p>
+                    <p className="text-siso-text flex items-center gap-2">
+                      <Star className="w-4 h-4 text-siso-orange" />
+                      {profile?.rank || 'Newbie'}
+                    </p>
                   </div>
                 </CardContent>
               </Card>
