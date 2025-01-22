@@ -163,20 +163,20 @@ const AINews = () => {
     <SidebarProvider>
       <div className="flex min-h-screen bg-background">
         <Sidebar />
-        <div className="flex-1 p-8">
+        <div className="flex-1 p-4 md:p-6 lg:p-8 max-h-screen overflow-y-auto">
           <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="show"
-            className="space-y-8"
+            className="space-y-6"
           >
-            <div className="flex justify-between items-center mb-8">
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent">
                 Latest AI News
               </h1>
-              <div className="flex gap-4">
+              <div className="flex flex-wrap gap-2 sm:gap-4 w-full sm:w-auto">
                 <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-                  <SelectTrigger className="w-32">
+                  <SelectTrigger className="w-[120px]">
                     <SelectValue placeholder="Month" />
                   </SelectTrigger>
                   <SelectContent>
@@ -186,7 +186,7 @@ const AINews = () => {
                   </SelectContent>
                 </Select>
                 <Select value={selectedYear} onValueChange={setSelectedYear}>
-                  <SelectTrigger className="w-32">
+                  <SelectTrigger className="w-[120px]">
                     <SelectValue placeholder="Year" />
                   </SelectTrigger>
                   <SelectContent>
@@ -197,46 +197,46 @@ const AINews = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-6">
+            <div className="grid grid-cols-1 gap-4 sm:gap-6">
               {newsItems.map((item) => (
                 <motion.div key={item.id} variants={itemVariants}>
                   <Card className="hover:bg-card/60 transition-colors duration-200">
-                    <CardContent className="p-6">
-                      <div className="flex gap-6">
-                        <div className="w-1/4">
+                    <CardContent className="p-4 sm:p-6">
+                      <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+                        <div className="w-full sm:w-1/4 max-w-[300px] mx-auto sm:mx-0">
                           <img
                             src={item.image_url}
                             alt={item.title}
                             className="rounded-lg object-cover w-full aspect-video"
                           />
                         </div>
-                        <div className="flex-1 space-y-4">
+                        <div className="flex-1 space-y-3 sm:space-y-4">
                           <div>
-                            <h2 className="text-2xl font-bold mb-2 text-siso-text-bold hover:text-siso-red transition-colors">
+                            <h2 className="text-xl sm:text-2xl font-bold mb-2 text-siso-text-bold hover:text-siso-red transition-colors line-clamp-2">
                               {item.title}
                             </h2>
-                            <p className="text-siso-text/80 line-clamp-2">{item.description}</p>
+                            <p className="text-sm sm:text-base text-siso-text/80 line-clamp-2">{item.description}</p>
                           </div>
                           
-                          <div className="flex items-center gap-4 text-sm text-siso-text/60">
+                          <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-siso-text/60">
                             <span className="flex items-center gap-1">
-                              <Calendar className="h-4 w-4" />
+                              <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
                               {new Date(item.date).toLocaleDateString()}
                             </span>
                             <span>{item.source}</span>
-                            <span className="bg-siso-red/10 text-siso-red px-2 py-1 rounded">
+                            <span className="bg-siso-red/10 text-siso-red px-2 py-1 rounded text-xs">
                               {item.impact} Impact
                             </span>
                           </div>
 
-                          <div className="flex gap-4 pt-2">
+                          <div className="flex flex-wrap gap-2 sm:gap-4 pt-2">
                             <Dialog>
                               <DialogTrigger asChild>
                                 <Button
                                   variant="outline"
                                   size="sm"
                                   onClick={() => !summaries[item.id] && generateSummary(item.id)}
-                                  className="hover:bg-siso-red/10 hover:text-siso-red transition-colors"
+                                  className="text-xs sm:text-sm hover:bg-siso-red/10 hover:text-siso-red transition-colors w-full sm:w-auto"
                                 >
                                   {loadingSummaries[item.id] ? (
                                     "Generating Summary..."
@@ -245,14 +245,14 @@ const AINews = () => {
                                   )}
                                 </Button>
                               </DialogTrigger>
-                              <DialogContent className="sm:max-w-[600px]">
+                              <DialogContent className="sm:max-w-[600px] w-[95vw] max-h-[90vh] overflow-y-auto">
                                 <DialogHeader>
                                   <DialogTitle>AI Summary & Share Options</DialogTitle>
                                 </DialogHeader>
-                                <div className="space-y-6 py-4">
+                                <div className="space-y-4 sm:space-y-6 py-4">
                                   {summaries[item.id] ? (
-                                    <div className="bg-card p-4 rounded-lg border border-siso-red/20">
-                                      <p>{summaries[item.id]}</p>
+                                    <div className="bg-card p-3 sm:p-4 rounded-lg border border-siso-red/20">
+                                      <p className="text-sm sm:text-base">{summaries[item.id]}</p>
                                     </div>
                                   ) : (
                                     <div className="text-center text-muted-foreground">
@@ -260,41 +260,41 @@ const AINews = () => {
                                     </div>
                                   )}
                                   
-                                  <div className="flex flex-wrap gap-4 justify-center">
+                                  <div className="flex flex-wrap gap-2 sm:gap-4 justify-center">
                                     <Button
                                       variant="outline"
                                       size="sm"
                                       onClick={() => handleShare('twitter', summaries[item.id] || '', item.title)}
-                                      className="hover:bg-siso-red/10 hover:text-siso-red transition-colors"
+                                      className="text-xs sm:text-sm hover:bg-siso-red/10 hover:text-siso-red transition-colors"
                                     >
-                                      <Twitter className="h-4 w-4 mr-2" />
+                                      <Twitter className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                                       Share on X
                                     </Button>
                                     <Button
                                       variant="outline"
                                       size="sm"
                                       onClick={() => handleShare('whatsapp', summaries[item.id] || '', item.title)}
-                                      className="hover:bg-siso-red/10 hover:text-siso-red transition-colors"
+                                      className="text-xs sm:text-sm hover:bg-siso-red/10 hover:text-siso-red transition-colors"
                                     >
-                                      <Share2 className="h-4 w-4 mr-2" />
+                                      <Share2 className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                                       Share on WhatsApp
                                     </Button>
                                     <Button
                                       variant="outline"
                                       size="sm"
                                       onClick={() => handleShare('instagram', summaries[item.id] || '', item.title)}
-                                      className="hover:bg-siso-red/10 hover:text-siso-red transition-colors"
+                                      className="text-xs sm:text-sm hover:bg-siso-red/10 hover:text-siso-red transition-colors"
                                     >
-                                      <Instagram className="h-4 w-4 mr-2" />
+                                      <Instagram className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                                       Share on Instagram
                                     </Button>
                                     <Button
                                       variant="outline"
                                       size="sm"
                                       onClick={() => handleShare('skool', summaries[item.id] || '', item.title)}
-                                      className="hover:bg-siso-red/10 hover:text-siso-red transition-colors"
+                                      className="text-xs sm:text-sm hover:bg-siso-red/10 hover:text-siso-red transition-colors"
                                     >
-                                      <Share2 className="h-4 w-4 mr-2" />
+                                      <Share2 className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                                       Share on Skool
                                     </Button>
                                   </div>
