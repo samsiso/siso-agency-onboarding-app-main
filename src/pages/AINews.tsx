@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Brain, Globe, Newspaper, Sparkles, Calendar, MessageSquare, Send } from 'lucide-react';
+import { Brain, Globe, Newspaper, Sparkles, Calendar, MessageSquare, Send, Share2, Twitter, Instagram, Share } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
@@ -104,6 +104,34 @@ const AINews = () => {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleShare = (platform: string, summary: string, title: string) => {
+    const text = `${title}\n\n${summary}`;
+    const url = window.location.href;
+
+    switch (platform) {
+      case 'twitter':
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+        break;
+      case 'whatsapp':
+        window.open(`https://wa.me/?text=${encodeURIComponent(text + '\n' + url)}`, '_blank');
+        break;
+      case 'instagram':
+        navigator.clipboard.writeText(text + '\n' + url);
+        toast({
+          title: "Copied to clipboard",
+          description: "You can now paste this in Instagram",
+        });
+        break;
+      case 'skool':
+        navigator.clipboard.writeText(text + '\n' + url);
+        toast({
+          title: "Copied to clipboard",
+          description: "You can now paste this in Skool",
+        });
+        break;
     }
   };
 
@@ -211,18 +239,78 @@ const AINews = () => {
                             </span>
                           </div>
                           <div className="flex gap-4">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => generateSummary(item.id)}
-                              disabled={loadingSummaries[item.id]}
-                            >
-                              {loadingSummaries[item.id] ? (
-                                "Generating Summary..."
-                              ) : (
-                                "Generate AI Summary"
-                              )}
-                            </Button>
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => !summaries[item.id] && generateSummary(item.id)}
+                                  disabled={loadingSummaries[item.id]}
+                                >
+                                  {loadingSummaries[item.id] ? (
+                                    "Generating Summary..."
+                                  ) : (
+                                    "View AI Summary"
+                                  )}
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="sm:max-w-[600px]">
+                                <DialogHeader>
+                                  <DialogTitle>AI Summary & Share Options</DialogTitle>
+                                </DialogHeader>
+                                <div className="space-y-6 py-4">
+                                  {summaries[item.id] ? (
+                                    <div className="bg-primary/10 p-4 rounded-lg">
+                                      <p>{summaries[item.id]}</p>
+                                    </div>
+                                  ) : (
+                                    <div className="text-center text-muted-foreground">
+                                      Generating summary...
+                                    </div>
+                                  )}
+                                  
+                                  <div className="flex flex-wrap gap-4 justify-center">
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => handleShare('twitter', summaries[item.id] || '', item.title)}
+                                      className="flex items-center gap-2"
+                                    >
+                                      <Twitter className="h-4 w-4" />
+                                      Share on X
+                                    </Button>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => handleShare('whatsapp', summaries[item.id] || '', item.title)}
+                                      className="flex items-center gap-2"
+                                    >
+                                      <Share className="h-4 w-4" />
+                                      Share on WhatsApp
+                                    </Button>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => handleShare('instagram', summaries[item.id] || '', item.title)}
+                                      className="flex items-center gap-2"
+                                    >
+                                      <Instagram className="h-4 w-4" />
+                                      Share on Instagram
+                                    </Button>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => handleShare('skool', summaries[item.id] || '', item.title)}
+                                      className="flex items-center gap-2"
+                                    >
+                                      <Share2 className="h-4 w-4" />
+                                      Share on Skool
+                                    </Button>
+                                  </div>
+                                </div>
+                              </DialogContent>
+                            </Dialog>
+                            
                             <Dialog>
                               <DialogTrigger asChild>
                                 <Button
