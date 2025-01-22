@@ -11,4 +11,5 @@ interface Window {
       disconnect: () => Promise<void>;
     };
   };
+  ALLOWED_ORIGINS?: string[];
 }
