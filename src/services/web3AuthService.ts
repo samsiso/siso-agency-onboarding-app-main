@@ -1,6 +1,6 @@
 import { default as Moralis } from 'moralis';
 import { supabase } from '@/integrations/supabase/client';
-import BN from 'bn.js';
+import { BN } from 'bn.js';  // Changed from default import to named import
 
 interface AuthResult {
   id: string;
