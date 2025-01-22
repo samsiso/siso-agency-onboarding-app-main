@@ -4,9 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 interface AuthResult {
   id: string;
   profileId: string;
-  address: {
-    lowercase: () => string;
-  };
+  address: string;  // Changed from object to string
   domain: string;
   statement: string;
   uri: string;
@@ -65,13 +63,30 @@ export const authenticateWithMetamask = async () => {
       signature,
     });
 
-    const authResult = result.result as AuthResult;
+    // Convert the Moralis result to our AuthResult type
+    const authResult: AuthResult = {
+      id: result.result.id,
+      profileId: result.result.profileId,
+      address: result.result.address.toLowerCase(), // Using toLowerCase() for string
+      domain: result.result.domain,
+      statement: result.result.statement || '',
+      uri: result.result.uri,
+      version: result.result.version,
+      nonce: result.result.nonce,
+      chain: {
+        id: Number(result.result.chain.id),
+        hex: result.result.chain.hex,
+      },
+      expirationTime: result.result.expirationTime,
+      notBefore: result.result.notBefore,
+      resources: result.result.resources || [],
+    };
 
     // Convert the result to a JSON-safe object
     const metadataJson = {
       id: authResult.id,
       profileId: authResult.profileId,
-      address: authResult.address.lowercase(),
+      address: authResult.address,
       domain: authResult.domain,
       statement: authResult.statement,
       uri: authResult.uri,
