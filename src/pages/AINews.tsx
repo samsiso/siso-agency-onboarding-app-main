@@ -39,21 +39,43 @@ const AINews = () => {
   }, [selectedMonth, selectedYear]);
 
   const fetchNews = async () => {
-    const { data, error } = await supabase
-      .from('ai_news')
-      .select('*')
-      .order('date', { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from('ai_news')
+        .select('*')
+        .order('date', { ascending: false });
 
-    if (error) {
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Error fetching news",
+          description: error.message,
+        });
+        return;
+      }
+
+      setNewsItems(data || []);
+
+      // Fetch existing summaries
+      const { data: summariesData, error: summariesError } = await supabase
+        .from('ai_news_summaries')
+        .select('news_id, summary');
+
+      if (!summariesError && summariesData) {
+        const summariesMap = summariesData.reduce((acc: Record<string, string>, curr) => {
+          acc[curr.news_id] = curr.summary;
+          return acc;
+        }, {});
+        setSummaries(summariesMap);
+      }
+    } catch (error) {
+      console.error('Error:', error);
       toast({
         variant: "destructive",
-        title: "Error fetching news",
-        description: error.message,
+        title: "Error",
+        description: "Failed to fetch news items",
       });
-      return;
     }
-
-    setNewsItems(data || []);
   };
 
   const handleShare = (platform: string, summary: string, title: string) => {
@@ -136,8 +158,6 @@ const AINews = () => {
       setLoadingSummaries(prev => ({ ...prev, [id]: false }));
     }
   };
-
-  // ... keep existing code (JSX for the component layout)
 
   return (
     <SidebarProvider>
