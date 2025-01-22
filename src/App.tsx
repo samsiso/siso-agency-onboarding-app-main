@@ -30,7 +30,7 @@ function App() {
                 <AuthButton />
               </div>
             </header>
-            <main className="flex-1 p-4">
+            <main className="flex-1">
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/ai-news" element={<AINews />} />
