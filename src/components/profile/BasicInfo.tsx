@@ -1,5 +1,5 @@
 import { Shield, Trophy, Star } from 'lucide-react';
-import { Card, CardContent } from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
 interface BasicInfoProps {
