@@ -9,6 +9,7 @@ export interface SidebarMenuItemProps {
   active: boolean;
   collapsed: boolean;
   onClick: (e: React.MouseEvent<HTMLAnchorElement>) => void;
+  className?: string;
 }
 
 export const SidebarMenuItem = ({
@@ -17,7 +18,8 @@ export const SidebarMenuItem = ({
   label,
   active,
   collapsed,
-  onClick
+  onClick,
+  className
 }: SidebarMenuItemProps) => {
   return (
     <Link
@@ -25,15 +27,12 @@ export const SidebarMenuItem = ({
       onClick={onClick}
       className={cn(
         'flex items-center gap-3 rounded-lg px-3 py-2 text-siso-text transition-all hover:text-siso-text-bold',
-        active && 'bg-siso-text/5 text-siso-text-bold'
+        active && 'bg-siso-text/5 text-siso-text-bold',
+        className
       )}
     >
-      {!label.includes('Profile') && (
-        <>
-          <Icon className="h-5 w-5" />
-          {!collapsed && <span>{label}</span>}
-        </>
-      )}
+      <Icon className="h-5 w-5" />
+      {!collapsed && <span>{label}</span>}
     </Link>
   );
 };

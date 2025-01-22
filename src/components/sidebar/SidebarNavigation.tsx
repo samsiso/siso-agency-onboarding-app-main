@@ -2,13 +2,10 @@ import { useLocation } from 'react-router-dom';
 import { SidebarMenuItem } from './SidebarMenuItem';
 import { 
   Home, 
-  Newspaper, 
   Wrench, 
   GraduationCap, 
-  Bot, 
   Network,
-  UserRound,
-  MessageSquare 
+  MessageSquare,
 } from 'lucide-react';
 
 interface SidebarNavigationProps {
@@ -22,31 +19,49 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
 
   if (!visible) return null;
 
-  const menuItems = [
-    { href: '/', icon: Home, label: 'Home' },
-    { href: '/ai-news', icon: Newspaper, label: 'AI News' },
+  const mainMenuItem = {
+    href: '/',
+    icon: Home,
+    label: 'Home',
+  };
+
+  const subMenuItems = [
     { href: '/tools', icon: Wrench, label: 'Tools' },
     { href: '/siso-education', icon: GraduationCap, label: 'Education' },
-    { href: '/automations', icon: Bot, label: 'Automations' },
     { href: '/networking', icon: Network, label: 'Networking' },
     { href: '/chat-gpt-assistants', icon: MessageSquare, label: 'Assistants' },
-    { href: '/siso-ai', icon: Bot, label: 'SISO AI' },
-    { href: '/profile', icon: UserRound, label: 'Profile' },
   ];
 
   return (
     <nav className="p-4 space-y-2">
-      {menuItems.map((item) => (
+      {/* Main menu item */}
+      <div className="mb-4">
         <SidebarMenuItem
-          key={item.href}
-          href={item.href}
-          icon={item.icon}
-          label={item.label}
-          active={location.pathname === item.href}
+          key={mainMenuItem.href}
+          href={mainMenuItem.href}
+          icon={mainMenuItem.icon}
+          label={mainMenuItem.label}
+          active={location.pathname === mainMenuItem.href}
           collapsed={collapsed}
-          onClick={(e) => onItemClick(e, item.href)}
+          onClick={(e) => onItemClick(e, mainMenuItem.href)}
         />
-      ))}
+      </div>
+
+      {/* Sub menu items */}
+      <div className="pl-2 space-y-1 border-l border-siso-border">
+        {subMenuItems.map((item) => (
+          <SidebarMenuItem
+            key={item.href}
+            href={item.href}
+            icon={item.icon}
+            label={item.label}
+            active={location.pathname === item.href}
+            collapsed={collapsed}
+            onClick={(e) => onItemClick(e, item.href)}
+            className="text-sm"
+          />
+        ))}
+      </div>
     </nav>
   );
 };
