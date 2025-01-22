@@ -5,16 +5,23 @@ import { PointsExchange } from "@/components/crypto/PointsExchange";
 import { NFTGallery } from "@/components/crypto/NFTGallery";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const CryptoExchange = () => {
   const [userPoints, setUserPoints] = useState<number>(0);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchUserPoints = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) {
+          toast({
+            variant: "destructive",
+            title: "Authentication required",
+            description: "Please sign in to access this page.",
+          });
           setLoading(false);
           return;
         }
@@ -27,8 +34,13 @@ const CryptoExchange = () => {
 
         if (error) throw error;
         setUserPoints(profile?.points || 0);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching user points:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load user points. Please try again later.",
+        });
       } finally {
         setLoading(false);
       }
