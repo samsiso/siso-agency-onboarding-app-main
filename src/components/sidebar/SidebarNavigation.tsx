@@ -9,7 +9,10 @@ import {
   Network,
   UserRound,
   MessageSquare,
-  Trophy 
+  DollarSign,
+  Trophy,
+  Coins,
+  Exchange
 } from 'lucide-react';
 
 interface SidebarNavigationProps {
@@ -29,12 +32,23 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
     label: 'Home',
   };
 
+  const economyMenuItem = {
+    href: '/how-to-earn',
+    icon: DollarSign,
+    label: 'Economy',
+  };
+
+  const economySubItems = [
+    { href: '/how-to-earn', icon: Coins, label: 'Earn SISO' },
+    { href: '/crypto', icon: Exchange, label: 'Crypto Exchange' },
+    { href: '/leaderboard', icon: Trophy, label: 'Leaderboards' },
+  ];
+
   const subMenuItems = [
     { href: '/tools', icon: Wrench, label: 'Tools' },
     { href: '/siso-education', icon: GraduationCap, label: 'Education' },
     { href: '/networking', icon: Network, label: 'Networking' },
     { href: '/chat-gpt-assistants', icon: MessageSquare, label: 'Assistants' },
-    { href: '/how-to-earn', icon: Trophy, label: 'Earn SISO' },
   ];
 
   const additionalMenuItems = [
@@ -58,6 +72,34 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
           onClick={(e) => onItemClick(e, mainMenuItem.href)}
           className="font-medium"
         />
+      </div>
+
+      {/* Economy section */}
+      <div className="mb-4">
+        <SidebarMenuItem
+          key={economyMenuItem.href}
+          href={economyMenuItem.href}
+          icon={economyMenuItem.icon}
+          label={economyMenuItem.label}
+          active={economySubItems.some(item => location.pathname === item.href)}
+          collapsed={collapsed}
+          onClick={(e) => onItemClick(e, economyMenuItem.href)}
+          className="font-medium"
+        />
+        <div className="pl-2 space-y-1 border-l border-siso-border mt-1">
+          {economySubItems.map((item) => (
+            <SidebarMenuItem
+              key={item.href}
+              href={item.href}
+              icon={item.icon}
+              label={item.label}
+              active={location.pathname === item.href}
+              collapsed={collapsed}
+              onClick={(e) => onItemClick(e, item.href)}
+              className="text-sm"
+            />
+          ))}
+        </div>
       </div>
 
       {/* Sub menu items */}
