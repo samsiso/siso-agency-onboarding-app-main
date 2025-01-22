@@ -39,7 +39,8 @@ const newsItems = [
 ];
 
 const AINews = () => {
-  const container = {
+  // Animation variants for the container
+  const containerVariants = {
     hidden: { opacity: 0 },
     show: {
       opacity: 1,
@@ -49,7 +50,8 @@ const AINews = () => {
     }
   };
 
-  const item = {
+  // Animation variants for individual items
+  const itemVariants = {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0 }
   };
@@ -71,14 +73,17 @@ const AINews = () => {
             
             <motion.div 
               className="grid gap-6"
-              variants={container}
+              variants={containerVariants}
               initial="hidden"
               animate="show"
             >
               {newsItems.map((item) => {
                 const Icon = item.icon;
                 return (
-                  <motion.div key={item.id} variants={item}>
+                  <motion.div 
+                    key={item.id} 
+                    variants={itemVariants}
+                  >
                     <Card className="glow-card group hover:scale-[1.01] transition-all duration-300 border-siso-text/5">
                       <CardHeader className="flex flex-row items-start gap-4">
                         <div className="p-3 rounded-xl bg-gradient-to-br from-siso-red/10 to-siso-orange/10 group-hover:from-siso-red/20 group-hover:to-siso-orange/20 transition-colors">
