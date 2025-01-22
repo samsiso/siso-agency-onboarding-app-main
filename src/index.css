@@ -37,7 +37,7 @@
   }
 
   html, body, #root {
-    @apply min-h-screen bg-siso-bg text-siso-text;
+    @apply min-h-screen bg-gradient-to-b from-gray-900 to-black text-gray-100;
   }
 
   body {
