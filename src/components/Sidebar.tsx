@@ -2,17 +2,46 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SidebarLogo } from './sidebar/SidebarLogo';
 import { SidebarNavigation } from './sidebar/SidebarNavigation';
-import { SidebarFooter } from './sidebar/SidebarFooter';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Trophy, Star } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from './ui/button';
+import { AuthButton } from './AuthButton';
+import { supabase } from '@/integrations/supabase/client';
 
 export const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showNavigation, setShowNavigation] = useState(true);
+  const [userPoints, setUserPoints] = useState<number>(0);
+  const [userRank, setUserRank] = useState<string>('');
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+
+  useEffect(() => {
+    const getProfile = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('points, rank')
+          .eq('id', session.user.id)
+          .single();
+        
+        if (profile) {
+          setUserPoints(profile.points || 0);
+          setUserRank(profile.rank || 'Newbie');
+        }
+      }
+    };
+
+    getProfile();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+      getProfile();
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleItemClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
@@ -37,14 +66,21 @@ export const Sidebar = () => {
     }
   };
 
-  useEffect(() => {
-    if (isMobile) {
-      setIsMobileMenuOpen(false);
-    }
-  }, [location.pathname]);
-
   return (
     <>
+      {/* Top Bar with Auth and Points */}
+      <div className="fixed top-0 right-0 z-50 p-4 flex items-center gap-4">
+        {userPoints > 0 && (
+          <div className="hidden md:flex items-center gap-2 text-siso-text bg-black/20 p-2 rounded-lg">
+            <Trophy className="w-4 h-4 text-siso-orange" />
+            <span>{userPoints} points</span>
+            <Star className="w-4 h-4 text-siso-orange ml-2" />
+            <span>{userRank}</span>
+          </div>
+        )}
+        <AuthButton />
+      </div>
+
       {/* Mobile Menu Button */}
       {isMobile && (
         <Button
@@ -82,7 +118,6 @@ export const Sidebar = () => {
           onItemClick={handleItemClick}
           visible={showNavigation}
         />
-        <SidebarFooter collapsed={collapsed} />
       </div>
 
       {/* Mobile Overlay */}
