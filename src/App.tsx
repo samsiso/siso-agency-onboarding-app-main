@@ -20,11 +20,11 @@ import { AuthButton } from './components/AuthButton';
 
 function App() {
   return (
-    <SidebarProvider>
-      <Router>
+    <Router>
+      <SidebarProvider>
         <div className="flex min-h-screen bg-siso-bg">
           <Sidebar />
-          <div className="flex-1">
+          <div className="flex-1 flex flex-col">
             <header className="sticky top-0 z-50 w-full border-b border-siso-border bg-siso-bg/95 backdrop-blur">
               <div className="flex h-14 items-center justify-end px-4">
                 <AuthButton />
@@ -50,9 +50,9 @@ function App() {
             </main>
           </div>
         </div>
-        <Toaster position="top-right" />
-      </Router>
-    </SidebarProvider>
+      </SidebarProvider>
+      <Toaster position="top-right" />
+    </Router>
   );
 }
 

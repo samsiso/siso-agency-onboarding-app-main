@@ -1,10 +1,10 @@
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, lazy } from 'react';
 import { motion } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Skeleton } from '@/components/ui/skeleton';
-import NewsHeader from '@/components/ai-news/NewsHeader';
-import NewsCard from '@/components/ai-news/NewsCard';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { NewsHeader } from '@/components/ai-news/NewsHeader';
+import { NewsCard } from '@/components/ai-news/NewsCard';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -131,7 +131,7 @@ const AINews = () => {
         animate="show"
         className="space-y-6"
       >
-        <Suspense fallback={<Skeleton className="w-full h-[200px]" />}>
+        <Suspense fallback={<LoadingSpinner />}>
           <NewsHeader
             selectedMonth={selectedMonth}
             selectedYear={selectedYear}
