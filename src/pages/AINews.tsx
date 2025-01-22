@@ -66,7 +66,6 @@ const newsItems = [
 const AINews = () => {
   const [selectedMonth, setSelectedMonth] = useState<string>('03');
   const [selectedYear, setSelectedYear] = useState<string>('2024');
-  const [isAIChatOpen, setIsAIChatOpen] = useState(false);
   const [chatInput, setChatInput] = useState('');
   const [chatResponse, setChatResponse] = useState('');
   const [isLoading, setIsLoading] = useState(false);
