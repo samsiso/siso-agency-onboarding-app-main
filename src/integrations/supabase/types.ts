@@ -9,6 +9,77 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      ai_news: {
+        Row: {
+          category: string
+          created_at: string
+          date: string
+          description: string
+          id: string
+          image_url: string | null
+          impact: string
+          source: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          date: string
+          description: string
+          id?: string
+          image_url?: string | null
+          impact: string
+          source: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          date?: string
+          description?: string
+          id?: string
+          image_url?: string | null
+          impact?: string
+          source?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ai_news_summaries: {
+        Row: {
+          created_at: string
+          id: string
+          news_id: string
+          summary: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          news_id: string
+          summary: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          news_id?: string
+          summary?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_news_summaries_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: true
+            referencedRelation: "ai_news"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       automations: {
         Row: {
           category: string
