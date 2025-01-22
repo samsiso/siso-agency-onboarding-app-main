@@ -5,6 +5,8 @@ import { Mail } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import { AuthError, AuthApiError } from '@supabase/supabase-js';
+import { PointsDisplay } from './points/PointsDisplay';
+import { LoginStreakTracker } from './points/LoginStreakTracker';
 
 export const AuthButton = () => {
   const [user, setUser] = useState(null);
@@ -95,24 +97,34 @@ export const AuthButton = () => {
     }
   };
 
-  return user ? (
-    <Button
-      variant="outline"
-      className="w-full sm:w-auto border-siso-red text-siso-text hover:bg-siso-red hover:text-white transition-colors"
-      onClick={handleLogout}
-      disabled={isLoading}
-    >
-      {isLoading ? 'Processing...' : 'Logout'}
-    </Button>
-  ) : (
-    <Button
-      variant="outline"
-      className="w-full sm:w-auto bg-white border-siso-red text-[#121212] hover:bg-siso-red hover:text-white transition-colors"
-      onClick={handleLogin}
-      disabled={isLoading}
-    >
-      <Mail className="mr-2 h-4 w-4" />
-      {isLoading ? 'Processing...' : 'Login with Gmail'}
-    </Button>
+  return (
+    <div className="flex items-center gap-4">
+      {user && (
+        <>
+          <PointsDisplay userId={user.id} variant="compact" />
+          <LoginStreakTracker userId={user.id} />
+        </>
+      )}
+      {user ? (
+        <Button
+          variant="outline"
+          className="w-full sm:w-auto border-siso-red text-siso-text hover:bg-siso-red hover:text-white transition-colors"
+          onClick={handleLogout}
+          disabled={isLoading}
+        >
+          {isLoading ? 'Processing...' : 'Logout'}
+        </Button>
+      ) : (
+        <Button
+          variant="outline"
+          className="w-full sm:w-auto bg-white border-siso-red text-[#121212] hover:bg-siso-red hover:text-white transition-colors"
+          onClick={handleLogin}
+          disabled={isLoading}
+        >
+          <Mail className="mr-2 h-4 w-4" />
+          {isLoading ? 'Processing...' : 'Login with Gmail'}
+        </Button>
+      )}
+    </div>
   );
 };

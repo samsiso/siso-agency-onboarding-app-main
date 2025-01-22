@@ -340,6 +340,36 @@ export type Database = {
           },
         ]
       }
+      login_streaks: {
+        Row: {
+          created_at: string
+          current_streak: number | null
+          id: string
+          last_login: string | null
+          longest_streak: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_streak?: number | null
+          id?: string
+          last_login?: string | null
+          longest_streak?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_streak?: number | null
+          id?: string
+          last_login?: string | null
+          longest_streak?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       networking_resources: {
         Row: {
           category: string
@@ -447,6 +477,36 @@ export type Database = {
         }
         Relationships: []
       }
+      point_configurations: {
+        Row: {
+          action: Database["public"]["Enums"]["point_action_type"]
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean | null
+          points: number
+          updated_at: string
+        }
+        Insert: {
+          action: Database["public"]["Enums"]["point_action_type"]
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          points: number
+          updated_at?: string
+        }
+        Update: {
+          action?: Database["public"]["Enums"]["point_action_type"]
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          points?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       points_log: {
         Row: {
           action: string
@@ -500,6 +560,36 @@ export type Database = {
           id?: string
           points?: number | null
           rank?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          created_at: string
+          id: string
+          milestone_reached: boolean | null
+          referred_id: string
+          referrer_id: string
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          milestone_reached?: boolean | null
+          referred_id: string
+          referrer_id: string
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          milestone_reached?: boolean | null
+          referred_id?: string
+          referrer_id?: string
+          status?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -661,6 +751,42 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      point_action_type:
+        | "daily_login"
+        | "login_streak"
+        | "referral_signup"
+        | "referral_milestone"
+        | "read_article"
+        | "share_article"
+        | "comment_article"
+        | "suggest_article"
+        | "use_tool"
+        | "submit_tool"
+        | "receive_tool_like"
+        | "receive_tool_star"
+        | "write_tool_review"
+        | "watch_tutorial"
+        | "submit_education"
+        | "receive_education_like"
+        | "receive_education_star"
+        | "create_tutorial"
+        | "use_automation"
+        | "submit_automation"
+        | "receive_automation_like"
+        | "receive_automation_star"
+        | "share_workflow"
+        | "network_reply"
+        | "network_discussion"
+        | "network_referral"
+        | "host_event"
+        | "use_assistant"
+        | "suggest_assistant"
+        | "assistant_feedback"
+        | "train_assistant"
+        | "complete_challenge"
+        | "beta_testing"
+        | "report_bug"
+        | "promotional_share"
       user_rank: "bronze" | "silver" | "gold" | "diamond"
     }
     CompositeTypes: {
