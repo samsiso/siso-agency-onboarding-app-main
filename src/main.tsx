@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import App from './App'
 import './index.css'
 
-// Create a client
+// Create a client with proper configuration
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -17,6 +17,14 @@ const queryClient = new QueryClient({
     },
   },
 })
+
+// Configure allowed origins for postMessage
+window.ALLOWED_ORIGINS = [
+  'https://gptengineer.app',
+  'http://localhost:3000',
+  'https://lovable.dev',
+  'https://www.siso.agency'
+];
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
