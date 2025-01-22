@@ -88,7 +88,7 @@ export function ToolCard({ tool }: ToolCardProps) {
   return (
     <div
       onClick={handleClick}
-      className="group relative flex flex-col gap-4 rounded-lg border border-siso-text/10 bg-siso-text/5 p-6 hover:bg-siso-text/10 transition-all duration-300 cursor-pointer hover:scale-[1.02] h-full"
+      className="group relative flex flex-col gap-4 rounded-lg border border-siso-text/10 bg-siso-text/5 p-6 hover:bg-siso-text/10 transition-all duration-300 cursor-pointer hover:scale-[1.02] h-[200px]"
     >
       <div className="flex items-start gap-4">
         {tool.profile_image_url ? (
@@ -102,15 +102,15 @@ export function ToolCard({ tool }: ToolCardProps) {
             {getIconForTool(tool)}
           </div>
         )}
-        <div className="flex-1">
-          <h3 className="font-semibold text-siso-text-bold group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-siso-red group-hover:to-siso-orange transition-all duration-300 break-words">
+        <div className="flex-1 min-w-0">
+          <h3 className="font-semibold text-siso-text-bold group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-siso-red group-hover:to-siso-orange transition-all duration-300 truncate">
             {tool.name}
           </h3>
-          <p className="text-sm text-siso-text/80">{tool.category}</p>
+          <p className="text-sm text-siso-text/80 truncate">{tool.category}</p>
         </div>
       </div>
       {tool.description && (
-        <p className="text-sm text-siso-text/80 leading-relaxed mt-auto">
+        <p className="text-sm text-siso-text/80 line-clamp-2 leading-relaxed mt-auto">
           {tool.description}
         </p>
       )}
