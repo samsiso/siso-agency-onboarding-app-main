@@ -53,13 +53,13 @@ export const Sidebar = () => {
         <Button
           variant="ghost"
           size="icon"
-          className="fixed top-4 right-4 z-50 bg-siso-bg/80 backdrop-blur-sm"
+          className="fixed top-4 right-4 z-50 bg-siso-bg/80 backdrop-blur-sm transition-transform duration-300 ease-in-out"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           {isMobileMenuOpen ? (
-            <X className="h-6 w-6 text-siso-text" />
+            <X className="h-6 w-6 text-siso-text transition-opacity duration-300" />
           ) : (
-            <Menu className="h-6 w-6 text-siso-text" />
+            <Menu className="h-6 w-6 text-siso-text transition-opacity duration-300" />
           )}
         </Button>
       )}
@@ -68,11 +68,11 @@ export const Sidebar = () => {
       <div 
         className={`${
           isMobile 
-            ? `fixed inset-y-0 left-0 z-40 transform transition-transform duration-300 ease-in-out ${
+            ? `fixed inset-y-0 left-0 z-40 transform transition-transform duration-500 ease-in-out ${
                 isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
               }`
             : 'fixed top-0 h-screen overflow-y-auto'
-        } bg-gradient-to-b from-siso-bg to-siso-bg/95 border-r border-siso-text/10 shadow-lg`}
+        } bg-gradient-to-b from-siso-bg to-siso-bg/95 border-r border-siso-text/10 shadow-lg transition-all duration-500 ease-in-out`}
         style={{ width: collapsed && !isMobile ? '5rem' : '16rem' }}
       >
         <SidebarLogo 
@@ -90,13 +90,13 @@ export const Sidebar = () => {
 
       {/* Main Content Wrapper */}
       <div 
-        className={`min-h-screen ${!isMobile ? 'ml-[16rem]' : ''} transition-all duration-300`}
+        className={`min-h-screen transition-all duration-500 ease-in-out ${!isMobile ? 'ml-[16rem]' : ''}`}
         style={{ marginLeft: !isMobile && collapsed ? '5rem' : undefined }}
       >
         {/* Mobile Overlay */}
         {isMobile && isMobileMenuOpen && (
           <div 
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 transition-opacity duration-500 ease-in-out"
             onClick={() => setIsMobileMenuOpen(false)}
           />
         )}
