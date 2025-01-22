@@ -6,7 +6,6 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 
-// Lazy load components
 const NewsHeader = lazy(() => import('@/components/ai-news/NewsHeader'));
 const NewsCard = lazy(() => import('@/components/ai-news/NewsCard'));
 
@@ -133,6 +132,11 @@ const AINews = () => {
     }
   };
 
+  // Split news items into featured, side, and regular posts
+  const featuredPost = newsItems[0];
+  const sidePosts = newsItems.slice(1, 4);
+  const regularPosts = newsItems.slice(4);
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen bg-background">
@@ -152,8 +156,35 @@ const AINews = () => {
                 onYearChange={setSelectedYear}
               />
 
-              <div className="grid grid-cols-1 gap-4 sm:gap-6">
-                {newsItems.map((item) => (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+                {/* Featured Post - Full Width on Mobile, 2 Columns on Desktop */}
+                {featuredPost && (
+                  <div className="lg:col-span-2">
+                    <NewsCard
+                      key={featuredPost.id}
+                      item={featuredPost}
+                      summaries={summaries}
+                      loadingSummaries={loadingSummaries}
+                      onGenerateSummary={generateSummary}
+                    />
+                  </div>
+                )}
+
+                {/* Side Posts - Stack on Mobile, Single Column on Desktop */}
+                <div className="space-y-4">
+                  {sidePosts.map((item) => (
+                    <NewsCard
+                      key={item.id}
+                      item={item}
+                      summaries={summaries}
+                      loadingSummaries={loadingSummaries}
+                      onGenerateSummary={generateSummary}
+                    />
+                  ))}
+                </div>
+
+                {/* Regular Posts - 3 Columns Grid */}
+                {regularPosts.map((item) => (
                   <NewsCard
                     key={item.id}
                     item={item}

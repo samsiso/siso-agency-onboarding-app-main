@@ -17,6 +17,7 @@ interface NewsCardProps {
   summaries: Record<string, string>;
   loadingSummaries: Record<string, boolean>;
   onGenerateSummary: (id: string) => void;
+  isFeatured?: boolean;
 }
 
 interface Comment {
@@ -30,13 +31,14 @@ const NewsCard = ({
   item, 
   summaries, 
   loadingSummaries, 
-  onGenerateSummary 
+  onGenerateSummary,
+  isFeatured = false
 }: NewsCardProps) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hasReadArticle, setHasReadArticle] = useState(false);
   const { toast } = useToast();
-  const { awardPoints } = usePoints(undefined); // We'll get the user ID from the session
+  const { awardPoints } = usePoints(undefined);
 
   useEffect(() => {
     const channel = supabase
@@ -107,9 +109,9 @@ const NewsCard = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <Card className="hover:bg-card/60 transition-colors duration-200 border-siso-border hover:border-siso-border-hover">
+      <Card className={`hover:bg-card/60 transition-colors duration-200 border-siso-border hover:border-siso-border-hover ${isFeatured ? 'h-full' : ''}`}>
         <CardContent className="p-4 sm:p-6">
-          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+          <div className={`flex ${isFeatured ? 'flex-col sm:flex-row' : 'flex-col'} gap-4 sm:gap-6`}>
             <NewsCardMedia imageUrl={item.image_url} title={item.title} />
             
             <div className="flex-1 space-y-3 sm:space-y-4">
