@@ -1,5 +1,6 @@
 import Moralis from 'moralis';
 import { supabase } from '@/integrations/supabase/client';
+import BN from 'bn.js';
 
 interface AuthResult {
   id: string;
