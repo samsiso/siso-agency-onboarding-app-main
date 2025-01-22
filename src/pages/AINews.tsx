@@ -1,11 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense, lazy } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { motion } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { NewsHeader } from '@/components/ai-news/NewsHeader';
-import { NewsCard } from '@/components/ai-news/NewsCard';
+import { Loader2 } from 'lucide-react';
+
+// Lazy load components
+const NewsHeader = lazy(() => import('@/components/ai-news/NewsHeader'));
+const NewsCard = lazy(() => import('@/components/ai-news/NewsCard'));
+
+const LoadingSpinner = () => (
+  <div className="flex items-center justify-center p-8">
+    <Loader2 className="h-6 w-6 animate-spin text-siso-red" />
+  </div>
+);
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -135,24 +144,26 @@ const AINews = () => {
             animate="show"
             className="space-y-6"
           >
-            <NewsHeader
-              selectedMonth={selectedMonth}
-              selectedYear={selectedYear}
-              onMonthChange={setSelectedMonth}
-              onYearChange={setSelectedYear}
-            />
+            <Suspense fallback={<LoadingSpinner />}>
+              <NewsHeader
+                selectedMonth={selectedMonth}
+                selectedYear={selectedYear}
+                onMonthChange={setSelectedMonth}
+                onYearChange={setSelectedYear}
+              />
 
-            <div className="grid grid-cols-1 gap-4 sm:gap-6">
-              {newsItems.map((item) => (
-                <NewsCard
-                  key={item.id}
-                  item={item}
-                  summaries={summaries}
-                  loadingSummaries={loadingSummaries}
-                  onGenerateSummary={generateSummary}
-                />
-              ))}
-            </div>
+              <div className="grid grid-cols-1 gap-4 sm:gap-6">
+                {newsItems.map((item) => (
+                  <NewsCard
+                    key={item.id}
+                    item={item}
+                    summaries={summaries}
+                    loadingSummaries={loadingSummaries}
+                    onGenerateSummary={generateSummary}
+                  />
+                ))}
+              </div>
+            </Suspense>
           </motion.div>
         </div>
       </div>

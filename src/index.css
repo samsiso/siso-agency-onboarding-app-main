@@ -27,9 +27,7 @@
     --ring: 16 100% 50%;
     --radius: 0.5rem;
   }
-}
 
-@layer base {
   * {
     @apply border-border;
   }
@@ -57,6 +55,11 @@
   }
   p {
     @apply leading-relaxed;
+  }
+
+  /* Add preload class for images */
+  img.preload {
+    content-visibility: auto;
   }
 }
 
