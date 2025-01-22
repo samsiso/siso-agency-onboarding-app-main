@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SidebarMenuItem } from './SidebarMenuItem';
 import { 
@@ -28,13 +27,12 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
     }
   };
 
-  if (!visible) return null;
-
   const menuItems = [
     {
       href: '/',
       icon: Home,
       label: 'Home',
+      isMain: true
     },
     {
       href: '/education',
@@ -63,6 +61,8 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
     }
   ];
 
+  if (!visible) return null;
+
   return (
     <nav className="px-3 py-4">
       <div className="space-y-1">
@@ -74,6 +74,7 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
             label={item.label}
             collapsed={collapsed}
             onClick={handleClick}
+            isMain={item.isMain}
           />
         ))}
       </div>

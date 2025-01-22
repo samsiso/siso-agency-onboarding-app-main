@@ -9,6 +9,7 @@ interface SidebarMenuItemProps {
   collapsed: boolean;
   onClick: (e: React.MouseEvent<HTMLAnchorElement>) => void;
   className?: string;
+  isMain?: boolean;
 }
 
 export const SidebarMenuItem = ({
@@ -17,7 +18,8 @@ export const SidebarMenuItem = ({
   label,
   collapsed,
   onClick,
-  className
+  className,
+  isMain
 }: SidebarMenuItemProps) => {
   return (
     <Link
@@ -25,10 +27,11 @@ export const SidebarMenuItem = ({
       onClick={onClick}
       className={cn(
         'flex items-center gap-3 rounded-lg px-3 py-2 text-siso-text transition-all hover:text-siso-text-bold',
+        isMain ? 'text-lg font-semibold' : 'text-sm pl-6',
         className
       )}
     >
-      <Icon className="h-4 w-4" />
+      <Icon className={cn("w-4 h-4", isMain && "w-5 h-5")} />
       {!collapsed && <span>{label}</span>}
     </Link>
   );
