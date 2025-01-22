@@ -22,25 +22,27 @@ export const authenticateWithMetamask = async () => {
     const address = accounts[0];
 
     // Get the message to sign
-    const { message } = await Moralis.Auth.requestMessage({
+    const { data } = await Moralis.Auth.requestMessage({
       address,
       chain: 1, // ETH mainnet
-      network: 'evm',
+      networkType: 'evm',
       domain: window.location.host,
       statement: 'Please sign this message to authenticate with SISO Resource Hub.',
+      uri: window.location.origin,
+      timeout: 60,
     });
 
     // Request signature
     const signature = await window.ethereum.request({
       method: 'personal_sign',
-      params: [message, address],
+      params: [data.message, address],
     });
 
     // Verify the signature
-    const { id: moralisId, profileId, metadata } = await Moralis.Auth.verify({
-      message,
-      signature,
+    const result = await Moralis.Auth.verify({
       networkType: 'evm',
+      message: data.message,
+      signature,
     });
 
     // Update user profile with Web3 credentials
@@ -50,15 +52,19 @@ export const authenticateWithMetamask = async () => {
         .from('profiles')
         .update({
           wallet_address: address,
-          moralis_provider_id: moralisId,
-          web3_metadata: metadata
+          moralis_provider_id: result.result.profileId,
+          web3_metadata: result.result
         })
         .eq('id', user.id);
 
       if (error) throw error;
     }
 
-    return { address, moralisId, metadata };
+    return { 
+      address, 
+      moralisId: result.result.profileId, 
+      metadata: result.result 
+    };
   } catch (error) {
     console.error('Web3 authentication error:', error);
     throw error;
