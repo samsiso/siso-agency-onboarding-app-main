@@ -23,13 +23,17 @@ const ALLOWED_ORIGINS = [
   'https://gptengineer.app',
   'http://localhost:3000',
   'https://lovable.dev',
-  'https://www.siso.agency'
+  'https://www.siso.agency',
+  'https://siso.agency' // Added this
 ];
 
 // Set allowed origins on window object
 window.ALLOWED_ORIGINS = ALLOWED_ORIGINS;
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+// Wrap the entire app with StrictMode and QueryClientProvider
+const root = ReactDOM.createRoot(document.getElementById('root')!);
+
+root.render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
