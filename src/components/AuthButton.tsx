@@ -93,7 +93,7 @@ export const AuthButton = () => {
   return user ? (
     <Button
       variant="outline"
-      className="border-siso-red text-siso-text hover:bg-siso-red hover:text-white transition-colors"
+      className="w-full border-siso-red text-siso-text hover:bg-siso-red hover:text-white transition-colors"
       onClick={handleLogout}
       disabled={isLoading}
     >
@@ -102,7 +102,7 @@ export const AuthButton = () => {
   ) : (
     <Button
       variant="outline"
-      className="bg-white border-siso-red text-[#121212] hover:bg-siso-red hover:text-white transition-colors"
+      className="w-full bg-white border-siso-red text-[#121212] hover:bg-siso-red hover:text-white transition-colors"
       onClick={handleLogin}
       disabled={isLoading}
     >

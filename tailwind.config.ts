@@ -71,17 +71,17 @@ export default {
         },
         glow: {
           "0%, 100%": {
-            boxShadow: "0 0 15px rgba(255, 87, 34, 0.5)",
+            boxShadow: "0 0 15px rgba(255, 87, 34, 0.3)",
           },
           "50%": {
-            boxShadow: "0 0 30px rgba(255, 167, 38, 0.8)",
+            boxShadow: "0 0 25px rgba(255, 167, 38, 0.5)",
           },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        glow: "glow 2s ease-in-out infinite",
+        glow: "glow 3s ease-in-out infinite",
       },
     },
   },
