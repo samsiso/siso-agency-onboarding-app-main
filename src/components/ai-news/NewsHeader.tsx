@@ -29,7 +29,7 @@ export const NewsHeader = ({
             <SelectItem value="01">January</SelectItem>
           </SelectContent>
         </Select>
-        <Select value={selectedYear} onValueChange={setSelectedYear}>
+        <Select value={selectedYear} onValueChange={onYearChange}>
           <SelectTrigger className="w-[120px]">
             <SelectValue placeholder="Year" />
           </SelectTrigger>
