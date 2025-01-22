@@ -23,8 +23,8 @@ export default function ToolPage() {
       
       console.log('Fetching tool with ID:', id);
       const { data, error } = await supabase
-        .from('tools')  // Changed from 'core_tools' to 'tools'
-        .select()
+        .from('tools')
+        .select('*')
         .eq('id', id)
         .maybeSingle();
       
@@ -46,7 +46,7 @@ export default function ToolPage() {
       
       return parsedData as Tool;
     },
-    enabled: !!id,
+    enabled: !!id && id !== ':id', // Only run query if we have a valid ID
   });
 
   const handleShare = () => {
