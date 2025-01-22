@@ -21,10 +21,14 @@ export default {
       colors: {
         siso: {
           bg: "#121212",
+          "bg-alt": "#1A1A1A",
           red: "#FF5722",
           orange: "#FFA726",
           text: "#E0E0E0",
           "text-bold": "#FFFFFF",
+          "text-muted": "#9E9E9E",
+          border: "#2A2A2A",
+          "border-hover": "#3A3A3A",
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -77,11 +81,42 @@ export default {
             boxShadow: "0 0 25px rgba(255, 167, 38, 0.5)",
           },
         },
+        fadeIn: {
+          "0%": { opacity: "0", transform: "translateY(10px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         glow: "glow 3s ease-in-out infinite",
+        fadeIn: "fadeIn 0.5s ease-out forwards",
+      },
+      typography: {
+        DEFAULT: {
+          css: {
+            maxWidth: '65ch',
+            color: '#E0E0E0',
+            h1: {
+              color: '#FFFFFF',
+            },
+            h2: {
+              color: '#FFFFFF',
+            },
+            h3: {
+              color: '#FFFFFF',
+            },
+            strong: {
+              color: '#FFFFFF',
+            },
+            a: {
+              color: '#FF5722',
+              '&:hover': {
+                color: '#FFA726',
+              },
+            },
+          },
+        },
       },
     },
   },
