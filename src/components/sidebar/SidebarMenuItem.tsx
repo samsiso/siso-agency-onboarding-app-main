@@ -34,7 +34,7 @@ export const SidebarMenuItem = ({
       to={href}
       onClick={onClick}
       className={cn(
-        'flex items-center gap-3 rounded-lg px-3 py-2 text-siso-text transition-all relative group',
+        'flex items-center gap-3 rounded-lg px-3 py-2 text-siso-text',
         isActive && 'bg-siso-text/5 text-siso-text-bold',
         !isActive && 'hover:text-siso-text-bold hover:bg-siso-text/5',
         isMain ? 'text-lg font-semibold' : 'text-sm pl-6',
@@ -43,13 +43,12 @@ export const SidebarMenuItem = ({
     >
       <Icon 
         className={cn(
-          "transition-colors duration-200",
           isMain ? "w-5 h-5" : "w-4 h-4",
           isActive ? "text-siso-orange" : "text-siso-text group-hover:text-siso-orange"
         )} 
       />
       {!collapsed && (
-        <span className="transition-colors duration-200">{label}</span>
+        <span>{label}</span>
       )}
       {isActive && (
         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-siso-orange rounded-r-full" />
