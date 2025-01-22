@@ -1,4 +1,4 @@
-import Moralis from 'moralis';
+import { default as Moralis } from 'moralis';
 import { supabase } from '@/integrations/supabase/client';
 import BN from 'bn.js';
 
@@ -68,7 +68,7 @@ export const authenticateWithMetamask = async () => {
     const authResult: AuthResult = {
       id: result.result.id,
       profileId: result.result.profileId,
-      address: String(result.result.address).toLowerCase(), // Convert to string and then lowercase
+      address: String(result.result.address).toLowerCase(),
       domain: result.result.domain,
       statement: result.result.statement || '',
       uri: result.result.uri,

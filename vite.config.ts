@@ -15,7 +15,11 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-    },
+    }
+  },
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'react-router-dom'],
+    exclude: ['moralis']
   },
   build: {
     target: 'esnext',
@@ -28,11 +32,6 @@ export default defineConfig(({ mode }) => ({
           'utils-vendor': ['clsx', 'tailwind-merge', 'lucide-react'],
         },
       },
-      external: ['moralis'], // Add Moralis as external dependency
     },
-  },
-  optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom'],
-    exclude: ['moralis'], // Exclude Moralis from optimization
   },
 }));
