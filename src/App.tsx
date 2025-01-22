@@ -9,6 +9,7 @@ import SisoAI from './pages/SisoAI';
 import Networking from './pages/Networking';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Terms from './pages/Terms';
+import AINews from './pages/AINews';
 import { ChatBot } from './components/ChatBot';
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
         <Route path="/assistants" element={<><ChatGPTAssistants /><ChatBot agentType="assistants" /></>} />
         <Route path="/siso-ai" element={<><SisoAI /><ChatBot agentType="ai" /></>} />
         <Route path="/networking" element={<><Networking /><ChatBot agentType="networking" /></>} />
+        <Route path="/ai-news" element={<><AINews /><ChatBot agentType="news" /></>} />
         <Route path="/privacy-policy" element={<><PrivacyPolicy /><ChatBot agentType="general" /></>} />
         <Route path="/terms" element={<><Terms /><ChatBot agentType="general" /></>} />
       </Routes>
