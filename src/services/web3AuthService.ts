@@ -49,7 +49,7 @@ export const authenticateWithMetamask = async () => {
     const metadataJson = {
       id: result.result.id,
       profileId: result.result.profileId,
-      address: result.result.address,
+      address: result.result.address.toLowerCase(), // Convert EvmAddress to string
       domain: result.result.domain,
       statement: result.result.statement,
       uri: result.result.uri,
