@@ -23,30 +23,57 @@ const Profile = () => {
         // First, check if we have a session
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
-        if (sessionError) throw sessionError;
+        if (sessionError) {
+          console.error('Session error:', sessionError);
+          throw sessionError;
+        }
         
         if (!session) {
+          console.log('No session found, redirecting to home');
           navigate('/');
           return;
         }
 
         setUser(session.user);
-        console.log('Session user:', session.user); // Debug log
+        console.log('Session user:', session.user);
 
         // Then fetch the profile data
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', session.user.id)
-          .single();
+          .maybeSingle();
 
         if (profileError) {
-          console.error('Profile fetch error:', profileError); // Debug log
+          console.error('Profile fetch error:', profileError);
           throw profileError;
         }
 
-        console.log('Profile data:', profileData); // Debug log
-        setProfile(profileData);
+        if (!profileData) {
+          console.log('No profile found for user');
+          // Handle case where profile doesn't exist
+          const { error: insertError } = await supabase
+            .from('profiles')
+            .insert([{ id: session.user.id, email: session.user.email }]);
+
+          if (insertError) {
+            console.error('Profile creation error:', insertError);
+            throw insertError;
+          }
+
+          // Fetch the newly created profile
+          const { data: newProfile, error: newProfileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+
+          if (newProfileError) throw newProfileError;
+          setProfile(newProfile);
+        } else {
+          console.log('Profile data:', profileData);
+          setProfile(profileData);
+        }
       } catch (error: any) {
         console.error('Error in getProfile:', error);
         toast({
@@ -61,24 +88,6 @@ const Profile = () => {
 
     getProfile();
   }, [navigate]);
-
-  const handleLogout = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      navigate('/');
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Error signing out",
-        description: error.message,
-      });
-    }
-  };
-
-  const handleBackToHome = () => {
-    navigate('/');
-  };
 
   if (loading) {
     return (
@@ -108,8 +117,20 @@ const Profile = () => {
               points={profile?.points || 0}
               rank={profile?.rank || 'Bronze'}
               avatarUrl={profile?.avatar_url}
-              onLogout={handleLogout}
-              onBackToHome={handleBackToHome}
+              onLogout={async () => {
+                try {
+                  const { error } = await supabase.auth.signOut();
+                  if (error) throw error;
+                  navigate('/');
+                } catch (error: any) {
+                  toast({
+                    variant: "destructive",
+                    title: "Error signing out",
+                    description: error.message,
+                  });
+                }
+              }}
+              onBackToHome={() => navigate('/')}
             />
 
             {user && <LoginStreakTracker userId={user.id} />}
