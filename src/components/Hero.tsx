@@ -6,18 +6,25 @@ import { ScrollArea } from './ui/scroll-area';
 
 export const Hero = () => {
   const [userName, setUserName] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const getProfile = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('full_name')
-          .eq('id', session.user.id)
-          .single();
-        
-        setUserName(profile?.full_name || session.user.email?.split('@')[0]);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('full_name')
+            .eq('id', session.user.id)
+            .single();
+          
+          setUserName(profile?.full_name || session.user.email?.split('@')[0]);
+        }
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -31,7 +38,7 @@ export const Hero = () => {
   }, []);
 
   return (
-    <div className="relative">
+    <div className="relative min-h-screen">
       {/* Background with improved gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-siso-bg via-siso-bg/95 to-siso-bg/90" />
       
@@ -40,7 +47,7 @@ export const Hero = () => {
           {/* Welcome Message */}
           <div className="space-y-6">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-siso-text-bold leading-tight">
-              {userName ? (
+              {!loading && userName ? (
                 <>
                   Welcome back,{' '}
                   <span className="bg-gradient-to-r from-siso-orange to-siso-red text-transparent bg-clip-text animate-gradient">
