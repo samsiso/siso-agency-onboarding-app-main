@@ -1,13 +1,10 @@
-import React from 'react';
+import { Hero } from '@/components/Hero';
 
 const Home = () => {
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-4xl font-bold text-siso-text mb-8">Welcome to SISO</h1>
-      <p className="text-siso-text/80">
-        Discover our suite of powerful tools and exclusive offerings for business growth.
-      </p>
-    </div>
+    <main className="min-h-screen bg-gradient-to-b from-siso-bg to-siso-bg/95">
+      <Hero />
+    </main>
   );
 };
 
