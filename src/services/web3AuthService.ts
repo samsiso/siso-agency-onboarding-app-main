@@ -67,7 +67,7 @@ export const authenticateWithMetamask = async () => {
     const authResult: AuthResult = {
       id: result.result.id,
       profileId: result.result.profileId,
-      address: result.result.address.toLowerCase(), // Use toLowerCase() instead of lowercase
+      address: String(result.result.address).toLowerCase(), // Convert to string and then lowercase
       domain: result.result.domain,
       statement: result.result.statement || '',
       uri: result.result.uri,
