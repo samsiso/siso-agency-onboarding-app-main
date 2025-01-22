@@ -3,26 +3,48 @@ import { AuthButton } from './AuthButton';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from './ui/button';
 import { ScrollArea } from './ui/scroll-area';
+import { useToast } from '@/hooks/use-toast';
 
 export const Hero = () => {
   const [userName, setUserName] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     const getProfile = async () => {
       try {
+        console.log('Fetching session...');
         const { data: { session } } = await supabase.auth.getSession();
+        console.log('Session:', session);
+        
         if (session?.user) {
-          const { data: profile } = await supabase
+          console.log('Fetching profile for user:', session.user.id);
+          const { data: profile, error } = await supabase
             .from('profiles')
             .select('full_name')
             .eq('id', session.user.id)
             .single();
           
+          if (error) {
+            console.error('Error fetching profile:', error);
+            toast({
+              title: "Error loading profile",
+              description: "Please try refreshing the page",
+              variant: "destructive",
+            });
+            return;
+          }
+          
+          console.log('Profile data:', profile);
           setUserName(profile?.full_name || session.user.email?.split('@')[0]);
         }
       } catch (error) {
-        console.error('Error fetching profile:', error);
+        console.error('Error in getProfile:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load user data",
+          variant: "destructive",
+        });
       } finally {
         setLoading(false);
       }
@@ -30,12 +52,13 @@ export const Hero = () => {
 
     getProfile();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state changed:', event, session?.user?.id);
       getProfile();
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [toast]);
 
   return (
     <div className="relative min-h-screen">
