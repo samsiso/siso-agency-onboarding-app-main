@@ -7,6 +7,7 @@ import {
   GraduationCap, 
   Bot, 
   Network,
+  UserRound,
   MessageSquare 
 } from 'lucide-react';
 
@@ -38,6 +39,7 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
     { href: '/ai-news', icon: Newspaper, label: 'AI News' },
     { href: '/automations', icon: Bot, label: 'Automations' },
     { href: '/siso-ai', icon: Bot, label: 'SISO AI' },
+    { href: '/profile', icon: UserRound, label: 'Profile' },
   ];
 
   return (
