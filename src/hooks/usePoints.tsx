@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
+import { Database } from '@/integrations/supabase/types';
+
+type PointActionType = Database['public']['Enums']['point_action_type'];
 
 export const usePoints = (userId: string | undefined) => {
   const [points, setPoints] = useState(0);
@@ -64,7 +67,7 @@ export const usePoints = (userId: string | undefined) => {
     };
   }, [userId]);
 
-  const awardPoints = async (action: string) => {
+  const awardPoints = async (action: PointActionType) => {
     if (!userId) return;
 
     try {

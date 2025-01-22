@@ -63,7 +63,7 @@ export const LoginStreakTracker = ({ userId }: { userId: string }) => {
               .update({ 
                 current_streak: newStreak,
                 longest_streak: newLongestStreak,
-                last_login: now
+                last_login: now.toISOString()  // Convert Date to ISO string
               })
               .eq('user_id', userId);
 
@@ -112,7 +112,7 @@ export const LoginStreakTracker = ({ userId }: { userId: string }) => {
               .from('login_streaks')
               .update({ 
                 current_streak: 1,
-                last_login: now
+                last_login: now.toISOString()  // Convert Date to ISO string
               })
               .eq('user_id', userId);
 
