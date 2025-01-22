@@ -1,14 +1,30 @@
+import { useState } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Brain, Globe, Newspaper, Sparkles, Calendar, MessageSquare } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0 }
+};
 
 // Mock data for now - in a real app, this would come from an API or database
 const newsItems = [
@@ -54,48 +70,39 @@ const AINews = () => {
   const [chatInput, setChatInput] = useState('');
   const [chatResponse, setChatResponse] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [summaries, setSummaries] = useState<Record<number, string>>({});
+  const [loadingSummaries, setLoadingSummaries] = useState<Record<number, boolean>>({});
   const { toast } = useToast();
 
-  // Animation variants for the container
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  // Animation variants for individual items
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 }
-  };
-
-  const handleAskAI = async () => {
-    if (!chatInput.trim() || isLoading) return;
+  const generateSummary = async (id: number) => {
+    if (summaries[id]) return; // Don't generate if we already have it
     
-    setIsLoading(true);
+    setLoadingSummaries(prev => ({ ...prev, [id]: true }));
+    const newsItem = newsItems.find(item => item.id === id);
+    
     try {
       const { data, error } = await supabase.functions.invoke('chat-with-bot', {
         body: { 
-          message: chatInput,
-          systemPrompt: "You are an AI news analyst. Summarize and analyze AI news, providing insights and context about recent developments in artificial intelligence."
+          message: `Please provide a very concise 2-sentence summary of this news: ${newsItem?.title} - ${newsItem?.description}`,
+          systemPrompt: "You are a news summarizer. Provide extremely concise, factual summaries in 2 sentences maximum."
         },
       });
 
       if (error) throw error;
-      setChatResponse(data.response);
+
+      // Artificial delay for UX
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      setSummaries(prev => ({ ...prev, [id]: data.response }));
     } catch (error) {
       console.error('Error:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to get AI response. Please try again.",
+        description: "Failed to generate summary. Please try again.",
       });
     } finally {
-      setIsLoading(false);
+      setLoadingSummaries(prev => ({ ...prev, [id]: false }));
     }
   };
 
@@ -156,32 +163,30 @@ const AINews = () => {
                     <DialogTitle className="text-siso-text-bold">AI News Analysis</DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4">
-                    <div className="space-y-4">
-                      {chatResponse && (
-                        <div className="p-4 rounded-lg bg-siso-text/5 text-siso-text">
-                          {chatResponse}
-                        </div>
-                      )}
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          value={chatInput}
-                          onChange={(e) => setChatInput(e.target.value)}
-                          placeholder="Ask about recent AI news..."
-                          className="flex-1 bg-siso-text/5 border border-siso-text/10 rounded-lg px-4 py-2 text-siso-text placeholder:text-siso-text/50 focus:outline-none focus:ring-2 focus:ring-siso-orange/50"
-                        />
-                        <Button 
-                          onClick={handleAskAI}
-                          disabled={isLoading}
-                          className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90"
-                        >
-                          {isLoading ? (
-                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          ) : (
-                            "Ask"
-                          )}
-                        </Button>
+                    {chatResponse && (
+                      <div className="p-4 rounded-lg bg-siso-text/5 text-siso-text">
+                        {chatResponse}
                       </div>
+                    )}
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={chatInput}
+                        onChange={(e) => setChatInput(e.target.value)}
+                        placeholder="Ask about recent AI news..."
+                        className="flex-1 bg-siso-text/5 border border-siso-text/10 rounded-lg px-4 py-2 text-siso-text placeholder:text-siso-text/50 focus:outline-none focus:ring-2 focus:ring-siso-orange/50"
+                      />
+                      <Button 
+                        onClick={handleAskAI}
+                        disabled={isLoading}
+                        className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90"
+                      >
+                        {isLoading ? (
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          "Ask"
+                        )}
+                      </Button>
                     </div>
                   </div>
                 </DialogContent>
@@ -201,7 +206,7 @@ const AINews = () => {
                     key={item.id} 
                     variants={itemVariants}
                   >
-                    <Card className="glow-card group hover:scale-[1.01] transition-all duration-300 border-siso-text/5">
+                    <Card className="group hover:scale-[1.01] transition-all duration-300 border-siso-text/5">
                       <CardHeader className="flex flex-row items-start gap-6">
                         <div className="flex-1 space-y-4">
                           <div className="flex items-center justify-between">
@@ -227,14 +232,38 @@ const AINews = () => {
                         </div>
                       </CardHeader>
                       <CardContent className="space-y-4">
-                        <div className="aspect-video rounded-lg overflow-hidden">
-                          <img 
-                            src={item.imageUrl} 
-                            alt={item.title}
-                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                          />
+                        <div className="flex gap-6">
+                          <div className="w-1/4">
+                            <img 
+                              src={item.imageUrl} 
+                              alt={item.title}
+                              className="w-full h-32 object-cover rounded-lg"
+                            />
+                          </div>
+                          <div className="w-3/4 space-y-4">
+                            <p className="text-siso-text/90 leading-relaxed">{item.description}</p>
+                            <div className="space-y-2">
+                              <Button
+                                onClick={() => generateSummary(item.id)}
+                                disabled={loadingSummaries[item.id]}
+                                variant="outline"
+                                className="w-full justify-start"
+                              >
+                                {loadingSummaries[item.id] ? (
+                                  <div className="w-4 h-4 border-2 border-siso-orange border-t-transparent rounded-full animate-spin mr-2" />
+                                ) : (
+                                  <Brain className="w-4 h-4 mr-2 text-siso-orange" />
+                                )}
+                                {summaries[item.id] ? "View AI Summary" : "Generate AI Summary"}
+                              </Button>
+                              {summaries[item.id] && (
+                                <div className="p-3 rounded-lg bg-siso-text/5 text-sm text-siso-text/90">
+                                  {summaries[item.id]}
+                                </div>
+                              )}
+                            </div>
+                          </div>
                         </div>
-                        <p className="text-siso-text/90 leading-relaxed">{item.description}</p>
                       </CardContent>
                     </Card>
                   </motion.div>
