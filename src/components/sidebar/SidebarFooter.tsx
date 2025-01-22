@@ -1,6 +1,6 @@
-import { Settings } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import { AuthButton } from '../AuthButton';
+import { Link } from 'react-router-dom';
+import { Bot } from 'lucide-react';
 
 interface SidebarFooterProps {
   collapsed: boolean;
@@ -9,14 +9,20 @@ interface SidebarFooterProps {
 export const SidebarFooter = ({ collapsed }: SidebarFooterProps) => {
   return (
     <div className="absolute bottom-0 w-full p-4 border-t border-siso-text/10 space-y-2 bg-gradient-to-t from-siso-bg to-transparent">
-      <Link
-        to="/settings"
-        className="flex items-center gap-3 px-4 py-3 text-siso-text hover:bg-gradient-to-r from-siso-red/10 to-siso-orange/10 rounded-lg transition-all duration-300 group cursor-pointer transform hover:translate-x-1"
+      <Link 
+        to="/siso-ai"
+        className="flex items-center gap-2 p-2 rounded-lg bg-gradient-to-r from-siso-red/10 to-siso-orange/10 
+          hover:from-siso-red/20 hover:to-siso-orange/20 border border-siso-text/10 hover:border-siso-text/20 
+          transition-all duration-300 animate-glow group"
       >
-        <Settings className="w-5 h-5 group-hover:text-siso-red transition-colors" />
-        {!collapsed && <span className="text-sm font-medium group-hover:text-siso-text-bold transition-colors">Settings</span>}
+        <Bot className="w-5 h-5 text-siso-red group-hover:text-siso-orange transition-colors" />
+        {!collapsed && (
+          <span className="text-sm font-medium bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent">
+            SISO AI Assistant
+          </span>
+        )}
       </Link>
-      {!collapsed && <AuthButton />}
+      <AuthButton />
     </div>
   );
 };
