@@ -5,15 +5,15 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface NFTCollection {
   name: string;
-  image_url?: string;
-  tier?: string;
-  points_multiplier?: number;
-  weekly_bonus?: number;
+  image_url?: string | null;
+  tier?: string | null;
+  points_multiplier?: number | null;
+  weekly_bonus?: number | null;
 }
 
-interface UserNFT {
+interface UserNFTData {
   id: string;
-  nft_collections?: NFTCollection | null;
+  nft_collections: NFTCollection | null;
 }
 
 interface NFT {
@@ -55,13 +55,16 @@ export const NFTStatus = ({ nfts }: NFTStatusProps) => {
 
         if (error) throw error;
 
-        const transformedNfts = (data as UserNFT[])?.map(nft => ({
+        // First cast to unknown, then to our expected type
+        const typedData = (data as unknown) as UserNFTData[];
+        
+        const transformedNfts = typedData?.map(nft => ({
           id: nft.id,
           name: nft.nft_collections?.name || 'Unknown NFT',
-          imageUrl: nft.nft_collections?.image_url,
-          tier: nft.nft_collections?.tier,
-          points_multiplier: nft.nft_collections?.points_multiplier,
-          weekly_bonus: nft.nft_collections?.weekly_bonus
+          imageUrl: nft.nft_collections?.image_url || undefined,
+          tier: nft.nft_collections?.tier || undefined,
+          points_multiplier: nft.nft_collections?.points_multiplier || undefined,
+          weekly_bonus: nft.nft_collections?.weekly_bonus || undefined
         })) || [];
 
         setUserNfts(transformedNfts);
