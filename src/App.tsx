@@ -1,48 +1,46 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
-import { SidebarProvider } from './components/ui/sidebar';
-import { Sidebar } from './components/Sidebar';
-import Index from './pages/Index';
-import AINews from './pages/AINews';
-import Tools from './pages/Tools';
-import ToolPage from './pages/ToolPage';
-import SisoEducation from './pages/SisoEducation';
-import Automations from './pages/Automations';
-import Networking from './pages/Networking';
-import ChatGPTAssistants from './pages/ChatGPTAssistants';
-import Community from './pages/Community';
-import SisoAI from './pages/SisoAI';
-import Profile from './pages/Profile';
-import PrivacyPolicy from './pages/PrivacyPolicy';
-import Terms from './pages/Terms';
-import ThankYou from './pages/ThankYou';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from '@/components/ui/toaster';
+import { Routes, Route } from 'react-router-dom';
+import { Home } from '@/pages/Home';
+import { Profile } from '@/pages/Profile';
+import { Tools } from '@/pages/Tools';
+import { Automations } from '@/pages/Automations';
+import { Education } from '@/pages/Education';
+import { Networking } from '@/pages/Networking';
+import { Assistants } from '@/pages/Assistants';
+import { News } from '@/pages/News';
+import { SisoAI } from '@/pages/SisoAI';
+import './App.css';
+
+// Create a client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      retry: 1,
+    },
+  },
+});
 
 function App() {
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen">
-        <Sidebar />
-        <main className="flex-1">
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/ai-news" element={<AINews />} />
-            <Route path="/tools" element={<Tools />} />
-            <Route path="/tools/:id" element={<ToolPage />} />
-            <Route path="/siso-education" element={<SisoEducation />} />
-            <Route path="/automations" element={<Automations />} />
-            <Route path="/networking" element={<Networking />} />
-            <Route path="/chat-gpt-assistants" element={<ChatGPTAssistants />} />
-            <Route path="/community" element={<Community />} />
-            <Route path="/siso-ai" element={<SisoAI />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/thank-you" element={<ThankYou />} />
-          </Routes>
-        </main>
-      </div>
-      <Toaster position="top-right" />
-    </SidebarProvider>
+    <QueryClientProvider client={queryClient}>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/tools" element={<Tools />} />
+          <Route path="/automations" element={<Automations />} />
+          <Route path="/education" element={<Education />} />
+          <Route path="/networking" element={<Networking />} />
+          <Route path="/assistants" element={<Assistants />} />
+          <Route path="/news" element={<News />} />
+          <Route path="/ai" element={<SisoAI />} />
+        </Routes>
+        <Toaster />
+      </Router>
+    </QueryClientProvider>
   );
 }
 
