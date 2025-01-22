@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Sidebar } from '@/components/Sidebar';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import { ProfileInfo } from '@/components/profile/ProfileInfo';
@@ -96,6 +96,7 @@ const Profile = () => {
               email={user?.email}
               points={profile?.points}
               rank={profile?.rank}
+              avatarUrl={profile?.avatar_url}
               onLogout={handleLogout}
               onBackToHome={handleBackToHome}
             />
@@ -106,6 +107,11 @@ const Profile = () => {
                 fullName={profile?.full_name}
                 points={profile?.points}
                 rank={profile?.rank}
+                businessName={profile?.business_name}
+                businessType={profile?.business_type}
+                industry={profile?.industry}
+                interests={profile?.interests}
+                bio={profile?.bio}
               />
               <PointsHistory userId={user?.id} />
             </div>
