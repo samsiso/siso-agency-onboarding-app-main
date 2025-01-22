@@ -3,7 +3,6 @@ import { Search, Info, Filter, Star, Wrench } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from "@/components/ui/input";
-import { Sidebar } from '@/components/Sidebar';
 import { ToolCard } from '@/components/tools/ToolCard';
 import { Tool } from '@/components/tools/types';
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -28,7 +27,7 @@ export default function Tools() {
   const { data: tools, isLoading, error } = useQuery({
     queryKey: ['tools'],
     queryFn: async () => {
-      console.log('Fetching tools...');
+      console.log('Fetching tools from Supabase...');
       const { data, error } = await supabase
         .from('tools')
         .select('*');
@@ -53,7 +52,9 @@ export default function Tools() {
 
   const filteredTools = useMemo(() => {
     console.log('Filtering tools:', tools);
-    return tools?.filter(tool => {
+    if (!tools) return [];
+    
+    return tools.filter(tool => {
       const matchesSearch = !searchQuery || 
         tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         tool.description?.toLowerCase().includes(searchQuery.toLowerCase());
