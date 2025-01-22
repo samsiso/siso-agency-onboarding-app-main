@@ -1,51 +1,44 @@
-import { Suspense, lazy } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
-
-// Lazy load all pages with chunk names for better code splitting
-const Index = lazy(() => import(/* webpackChunkName: "index" */ './pages/Index'));
-const Tools = lazy(() => import(/* webpackChunkName: "tools" */ './pages/Tools'));
-const ToolPage = lazy(() => import(/* webpackChunkName: "tool-page" */ './pages/ToolPage'));
-const SisoEducation = lazy(() => import(/* webpackChunkName: "siso-education" */ './pages/SisoEducation'));
-const Networking = lazy(() => import(/* webpackChunkName: "networking" */ './pages/Networking'));
-const ChatGPTAssistants = lazy(() => import(/* webpackChunkName: "chat-gpt" */ './pages/ChatGPTAssistants'));
-const AINews = lazy(() => import(/* webpackChunkName: "ai-news" */ './pages/AINews'));
-const Automations = lazy(() => import(/* webpackChunkName: "automations" */ './pages/Automations'));
-const SisoAI = lazy(() => import(/* webpackChunkName: "siso-ai" */ './pages/SisoAI'));
-const Profile = lazy(() => import(/* webpackChunkName: "profile" */ './pages/Profile'));
-const HowToEarn = lazy(() => import(/* webpackChunkName: "how-to-earn" */ './pages/HowToEarn'));
-const Crypto = lazy(() => import(/* webpackChunkName: "crypto" */ './pages/Crypto'));
-
-// Optimized loading fallback with better UX
-const LoadingFallback = () => (
-  <div className="min-h-screen flex items-center justify-center bg-siso-bg">
-    <div className="flex flex-col items-center gap-4">
-      <Loader2 className="w-8 h-8 text-siso-red animate-spin" />
-      <p className="text-siso-text">Loading...</p>
-    </div>
-  </div>
-);
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Index from './pages/Index';
+import Profile from './pages/Profile';
+import Tools from './pages/Tools';
+import ToolPage from './pages/ToolPage';
+import SisoAI from './pages/SisoAI';
+import Community from './pages/Community';
+import AINews from './pages/AINews';
+import SisoEducation from './pages/SisoEducation';
+import Automations from './pages/Automations';
+import ChatGPTAssistants from './pages/ChatGPTAssistants';
+import Networking from './pages/Networking';
+import Crypto from './pages/Crypto';
+import HowToEarn from './pages/HowToEarn';
+import Terms from './pages/Terms';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import ThankYou from './pages/ThankYou';
+import './App.css';
 
 function App() {
   return (
-    <Suspense fallback={<LoadingFallback />}>
+    <Router>
       <Routes>
         <Route path="/" element={<Index />} />
-        <Route path="/tools" element={<Tools />} />
-        <Route path="/tools/:id" element={<ToolPage />} />
-        <Route path="/siso-education" element={<SisoEducation />} />
-        <Route path="/networking" element={<Networking />} />
-        <Route path="/chat-gpt-assistants" element={<ChatGPTAssistants />} />
-        <Route path="/ai-news" element={<AINews />} />
-        <Route path="/automations" element={<Automations />} />
-        <Route path="/siso-ai" element={<SisoAI />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/how-to-earn" element={<HowToEarn />} />
+        <Route path="/tools" element={<Tools />} />
+        <Route path="/tool/:id" element={<ToolPage />} />
+        <Route path="/siso-ai" element={<SisoAI />} />
+        <Route path="/community" element={<Community />} />
+        <Route path="/ai-news" element={<AINews />} />
+        <Route path="/education" element={<SisoEducation />} />
+        <Route path="/automations" element={<Automations />} />
+        <Route path="/assistants" element={<ChatGPTAssistants />} />
+        <Route path="/networking" element={<Networking />} />
         <Route path="/crypto" element={<Crypto />} />
-        {/* Catch all route for 404s */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="/how-to-earn" element={<HowToEarn />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/thank-you" element={<ThankYou />} />
       </Routes>
-    </Suspense>
+    </Router>
   );
 }
 

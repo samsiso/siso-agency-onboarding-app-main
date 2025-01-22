@@ -11,7 +11,6 @@ import { LoginStreakTracker } from '@/components/points/LoginStreakTracker';
 import { PointsDisplay } from '@/components/points/PointsDisplay';
 
 const Profile = () => {
-  console.log('[Profile] Component rendering');
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -19,10 +18,8 @@ const Profile = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    console.log('[Profile] useEffect running');
     const getProfile = async () => {
       try {
-        console.log('[Profile] Checking session');
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
@@ -39,8 +36,6 @@ const Profile = () => {
         console.log('[Profile] Session found:', session.user.id);
         setUser(session.user);
 
-        // Then fetch the profile data
-        console.log('[Profile] Fetching profile data');
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('*')
@@ -67,7 +62,6 @@ const Profile = () => {
             throw insertError;
           }
 
-          console.log('[Profile] Fetching newly created profile');
           const { data: newProfile, error: newProfileError } = await supabase
             .from('profiles')
             .select('*')
@@ -89,7 +83,6 @@ const Profile = () => {
           description: "Failed to load profile data",
         });
       } finally {
-        console.log('[Profile] Setting loading to false');
         setLoading(false);
       }
     };
@@ -100,7 +93,7 @@ const Profile = () => {
   if (loading) {
     return (
       <SidebarProvider>
-        <div className="flex min-h-screen bg-gradient-to-b from-siso-bg to-siso-bg/95">
+        <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
           <Sidebar />
           <div className="flex-1 p-8">
             <div className="animate-pulse space-y-4">
@@ -115,7 +108,7 @@ const Profile = () => {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen bg-gradient-to-b from-siso-bg to-siso-bg/95">
+      <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
         <Sidebar />
         <div className="flex-1 container mx-auto px-4 py-8">
           <div className="space-y-8">
@@ -167,7 +160,7 @@ const Profile = () => {
                 twitterUrl={profile?.twitter_url}
                 professionalRole={profile?.professional_role}
               />
-              <PointsHistory userId={user?.id} />
+              {user && <PointsHistory userId={user.id} />}
             </div>
           </div>
         </div>
