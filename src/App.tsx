@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import Index from './pages/Index';
 import Profile from './pages/Profile';
 import Tools from './pages/Tools';
@@ -19,26 +19,24 @@ import './App.css';
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/tools" element={<Tools />} />
-        <Route path="/tool/:id" element={<ToolPage />} />
-        <Route path="/siso-ai" element={<SisoAI />} />
-        <Route path="/community" element={<Community />} />
-        <Route path="/ai-news" element={<AINews />} />
-        <Route path="/education" element={<SisoEducation />} />
-        <Route path="/automations" element={<Automations />} />
-        <Route path="/assistants" element={<ChatGPTAssistants />} />
-        <Route path="/networking" element={<Networking />} />
-        <Route path="/crypto" element={<Crypto />} />
-        <Route path="/how-to-earn" element={<HowToEarn />} />
-        <Route path="/terms" element={<Terms />} />
-        <Route path="/privacy" element={<PrivacyPolicy />} />
-        <Route path="/thank-you" element={<ThankYou />} />
-      </Routes>
-    </Router>
+    <Routes>
+      <Route path="/" element={<Index />} />
+      <Route path="/profile" element={<Profile />} />
+      <Route path="/tools" element={<Tools />} />
+      <Route path="/tool/:id" element={<ToolPage />} />
+      <Route path="/siso-ai" element={<SisoAI />} />
+      <Route path="/community" element={<Community />} />
+      <Route path="/ai-news" element={<AINews />} />
+      <Route path="/education" element={<SisoEducation />} />
+      <Route path="/automations" element={<Automations />} />
+      <Route path="/assistants" element={<ChatGPTAssistants />} />
+      <Route path="/networking" element={<Networking />} />
+      <Route path="/crypto" element={<Crypto />} />
+      <Route path="/how-to-earn" element={<HowToEarn />} />
+      <Route path="/terms" element={<Terms />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/thank-you" element={<ThankYou />} />
+    </Routes>
   );
 }
 
