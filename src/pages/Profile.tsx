@@ -50,11 +50,15 @@ const Profile = () => {
         }
 
         if (!profileData) {
-          console.log('No profile found for user');
+          console.log('No profile found, creating new profile');
           // Handle case where profile doesn't exist
           const { error: insertError } = await supabase
             .from('profiles')
-            .insert([{ id: session.user.id, email: session.user.email }]);
+            .insert([{ 
+              id: session.user.id, 
+              email: session.user.email,
+              full_name: session.user.user_metadata?.full_name || null
+            }]);
 
           if (insertError) {
             console.error('Profile creation error:', insertError);
@@ -69,6 +73,7 @@ const Profile = () => {
             .single();
 
           if (newProfileError) throw newProfileError;
+          console.log('New profile created:', newProfile);
           setProfile(newProfile);
         } else {
           console.log('Profile data:', profileData);
