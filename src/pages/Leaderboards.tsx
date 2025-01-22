@@ -1,7 +1,8 @@
+import { useQuery } from '@tanstack/react-query';
 import { Card } from "@/components/ui/card";
-import { useQuery } from "@tanstack/react-query";
+import { Trophy, Medal } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
-import { Trophy, Loader2 } from 'lucide-react';
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Leaderboards = () => {
   const { data: leaderboardData, isLoading } = useQuery({
@@ -11,7 +12,7 @@ const Leaderboards = () => {
         .from('leaderboard')
         .select(`
           *,
-          profiles:profiles(full_name, avatar_url)
+          profiles:profiles(full_name, email)
         `)
         .order('points', { ascending: false })
         .limit(10);
@@ -27,21 +28,33 @@ const Leaderboards = () => {
         <Trophy className="w-8 h-8 text-siso-orange" />
         <h1 className="text-3xl font-bold text-siso-text-bold">Leaderboards</h1>
       </div>
+
       <div className="space-y-4">
         {isLoading ? (
-          <div className="flex items-center justify-center p-8">
-            <Loader2 className="w-8 h-8 animate-spin text-siso-orange" />
-          </div>
+          Array(5).fill(0).map((_, i) => (
+            <Skeleton key={i} className="h-20 w-full" />
+          ))
         ) : (
           leaderboardData?.map((entry, index) => (
-            <Card key={entry.id} className="p-4 bg-black/20 border-siso-text/10 backdrop-blur-sm">
-              <div className="flex items-center gap-4">
-                <span className="text-2xl font-bold text-siso-orange">{index + 1}</span>
-                <div className="flex-1">
-                  <p className="font-semibold text-siso-text-bold">{entry.profiles?.full_name || 'Anonymous'}</p>
-                  <p className="text-siso-text/80">{entry.points.toLocaleString()} points</p>
-                </div>
-                <span className="text-sm px-2 py-1 bg-siso-text/5 rounded text-siso-text/80">{entry.rank}</span>
+            <Card key={entry.id} className="p-4 flex items-center gap-4 bg-black/20 border-siso-text/10">
+              <div className="flex items-center justify-center w-8 h-8">
+                {index < 3 ? (
+                  <Medal className={`w-6 h-6 ${
+                    index === 0 ? 'text-yellow-500' :
+                    index === 1 ? 'text-gray-400' :
+                    'text-amber-600'
+                  }`} />
+                ) : (
+                  <span className="text-lg font-bold text-siso-text/60">{index + 1}</span>
+                )}
+              </div>
+              <div className="flex-1">
+                <p className="font-semibold text-siso-text-bold">{entry.profiles?.full_name || 'Anonymous'}</p>
+                <p className="text-sm text-siso-text/60">{entry.profiles?.email}</p>
+              </div>
+              <div className="text-right">
+                <p className="font-bold text-siso-orange">{entry.points} points</p>
+                <p className="text-xs text-siso-text/60">{entry.rank}</p>
               </div>
             </Card>
           ))
