@@ -8,6 +8,7 @@ import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import { ProfileInfo } from '@/components/profile/ProfileInfo';
 import { PointsHistory } from '@/components/profile/PointsHistory';
 import { NFTStatus } from '@/components/profile/NFTStatus';
+import { AuthButton } from '@/components/AuthButton';
 
 const Profile = () => {
   const [user, setUser] = useState<any>(null);
@@ -100,6 +101,14 @@ const Profile = () => {
               onLogout={handleLogout}
               onBackToHome={handleBackToHome}
             />
+
+            {!profile?.wallet_address && (
+              <div className="bg-black/20 border border-siso-text/10 rounded-lg p-6">
+                <h2 className="text-xl font-semibold text-siso-text-bold mb-4">Connect Your Wallet</h2>
+                <p className="text-siso-text/70 mb-4">Connect your wallet to access Web3 features and earn additional rewards.</p>
+                <AuthButton />
+              </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <ProfileInfo
