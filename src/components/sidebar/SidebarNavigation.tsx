@@ -6,7 +6,10 @@ import {
   Wrench, 
   GraduationCap, 
   Bot, 
-  Network
+  Network, 
+  Users,
+  UserRound,
+  MessageSquare 
 } from 'lucide-react';
 
 interface SidebarNavigationProps {
@@ -27,6 +30,10 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
     { href: '/siso-education', icon: GraduationCap, label: 'Education' },
     { href: '/automations', icon: Bot, label: 'Automations' },
     { href: '/networking', icon: Network, label: 'Networking' },
+    { href: '/chat-gpt-assistants', icon: MessageSquare, label: 'Assistants' },
+    { href: '/community', icon: Users, label: 'Community' },
+    { href: '/siso-ai', icon: Bot, label: 'SISO AI' },
+    { href: '/profile', icon: UserRound, label: 'Profile' },
   ];
 
   return (
