@@ -7,13 +7,13 @@ import { useQuery } from '@tanstack/react-query';
 type PointActionType = Database['public']['Enums']['point_action_type'];
 
 export const usePoints = (userId: string | undefined) => {
-  console.log('usePoints hook called with userId:', userId);
+  console.log('[usePoints] Hook called with userId:', userId);
   const { toast } = useToast();
 
   const { data: pointsData, isLoading, error } = useQuery({
     queryKey: ['points', userId],
     queryFn: async () => {
-      console.log('Fetching points data for userId:', userId);
+      console.log('[usePoints] Fetching points data for userId:', userId);
       if (!userId) throw new Error('No user ID provided');
       
       const { data: profile, error } = await supabase
@@ -23,11 +23,11 @@ export const usePoints = (userId: string | undefined) => {
         .maybeSingle();
 
       if (error) {
-        console.error('Error fetching points:', error);
+        console.error('[usePoints] Error fetching points:', error);
         throw error;
       }
 
-      console.log('Points data fetched:', profile);
+      console.log('[usePoints] Points data fetched:', profile);
       return profile;
     },
     enabled: !!userId,
@@ -38,7 +38,7 @@ export const usePoints = (userId: string | undefined) => {
 
   useEffect(() => {
     if (!userId) return;
-    console.log('Setting up realtime subscription for points');
+    console.log('[usePoints] Setting up realtime subscription for points');
 
     const channel = supabase
       .channel('points-changes')
@@ -51,19 +51,19 @@ export const usePoints = (userId: string | undefined) => {
           filter: `id=eq.${userId}`,
         },
         (payload: any) => {
-          console.log('Realtime points update received:', payload);
+          console.log('[usePoints] Realtime points update received:', payload);
         }
       )
       .subscribe();
 
     return () => {
-      console.log('Cleaning up points subscription');
+      console.log('[usePoints] Cleaning up points subscription');
       supabase.removeChannel(channel);
     };
   }, [userId]);
 
   const awardPoints = async (action: PointActionType) => {
-    console.log('Awarding points for action:', action);
+    console.log('[usePoints] Awarding points for action:', action);
     if (!userId) return;
 
     try {
@@ -94,7 +94,7 @@ export const usePoints = (userId: string | undefined) => {
         });
       }
     } catch (error: any) {
-      console.error('Error awarding points:', error);
+      console.error('[usePoints] Error awarding points:', error);
       toast({
         variant: "destructive",
         title: "Error awarding points",

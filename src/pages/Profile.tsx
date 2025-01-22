@@ -11,7 +11,7 @@ import { LoginStreakTracker } from '@/components/points/LoginStreakTracker';
 import { PointsDisplay } from '@/components/points/PointsDisplay';
 
 const Profile = () => {
-  console.log('Profile component rendering');
+  console.log('[Profile] Component rendering');
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -19,27 +19,28 @@ const Profile = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    console.log('Profile useEffect running');
+    console.log('[Profile] useEffect running');
     const getProfile = async () => {
       try {
-        // First, check if we have a session
+        console.log('[Profile] Checking session');
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
-          console.error('Session error:', sessionError);
+          console.error('[Profile] Session error:', sessionError);
           throw sessionError;
         }
         
         if (!session) {
-          console.log('No session found, redirecting to home');
+          console.log('[Profile] No session found, redirecting to home');
           navigate('/');
           return;
         }
 
+        console.log('[Profile] Session found:', session.user.id);
         setUser(session.user);
-        console.log('Session user:', session.user);
 
         // Then fetch the profile data
+        console.log('[Profile] Fetching profile data');
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('*')
@@ -47,13 +48,12 @@ const Profile = () => {
           .maybeSingle();
 
         if (profileError) {
-          console.error('Profile fetch error:', profileError);
+          console.error('[Profile] Profile fetch error:', profileError);
           throw profileError;
         }
 
         if (!profileData) {
-          console.log('No profile found, creating new profile');
-          // Handle case where profile doesn't exist
+          console.log('[Profile] No profile found, creating new profile');
           const { error: insertError } = await supabase
             .from('profiles')
             .insert([{ 
@@ -63,11 +63,11 @@ const Profile = () => {
             }]);
 
           if (insertError) {
-            console.error('Profile creation error:', insertError);
+            console.error('[Profile] Profile creation error:', insertError);
             throw insertError;
           }
 
-          // Fetch the newly created profile
+          console.log('[Profile] Fetching newly created profile');
           const { data: newProfile, error: newProfileError } = await supabase
             .from('profiles')
             .select('*')
@@ -75,20 +75,21 @@ const Profile = () => {
             .single();
 
           if (newProfileError) throw newProfileError;
-          console.log('New profile created:', newProfile);
+          console.log('[Profile] New profile created:', newProfile);
           setProfile(newProfile);
         } else {
-          console.log('Profile data:', profileData);
+          console.log('[Profile] Profile data found:', profileData);
           setProfile(profileData);
         }
       } catch (error: any) {
-        console.error('Error in getProfile:', error);
+        console.error('[Profile] Error in getProfile:', error);
         toast({
           variant: "destructive",
           title: "Error",
           description: "Failed to load profile data",
         });
       } finally {
+        console.log('[Profile] Setting loading to false');
         setLoading(false);
       }
     };
