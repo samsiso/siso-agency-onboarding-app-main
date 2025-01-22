@@ -166,6 +166,7 @@ const AINews = () => {
                       summaries={summaries}
                       loadingSummaries={loadingSummaries}
                       onGenerateSummary={generateSummary}
+                      isFeatured={true}
                     />
                   </div>
                 )}
