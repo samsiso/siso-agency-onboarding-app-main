@@ -20,7 +20,7 @@ const NewsHeader = ({
       </h1>
       <div className="flex flex-wrap gap-2 sm:gap-4 w-full sm:w-auto">
         <Select value={selectedMonth} onValueChange={onMonthChange}>
-          <SelectTrigger className="w-[120px]">
+          <SelectTrigger className="w-[120px] h-9 sm:h-10">
             <SelectValue placeholder="Month" />
           </SelectTrigger>
           <SelectContent>
@@ -30,7 +30,7 @@ const NewsHeader = ({
           </SelectContent>
         </Select>
         <Select value={selectedYear} onValueChange={onYearChange}>
-          <SelectTrigger className="w-[120px]">
+          <SelectTrigger className="w-[120px] h-9 sm:h-10">
             <SelectValue placeholder="Year" />
           </SelectTrigger>
           <SelectContent>

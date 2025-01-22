@@ -33,7 +33,7 @@ export const ShareButtons = ({ summary, title }: ShareButtonsProps) => {
   };
 
   return (
-    <div className="flex flex-wrap gap-2 sm:gap-4 justify-center">
+    <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-4 justify-center">
       <Button
         variant="outline"
         size="sm"
@@ -41,7 +41,7 @@ export const ShareButtons = ({ summary, title }: ShareButtonsProps) => {
         className="text-xs sm:text-sm hover:bg-siso-red/10 hover:text-siso-red transition-colors"
       >
         <Twitter className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
-        Share on X
+        <span className="hidden sm:inline">Share on</span> X
       </Button>
       <Button
         variant="outline"
@@ -50,7 +50,7 @@ export const ShareButtons = ({ summary, title }: ShareButtonsProps) => {
         className="text-xs sm:text-sm hover:bg-siso-red/10 hover:text-siso-red transition-colors"
       >
         <Share2 className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
-        Share on WhatsApp
+        <span className="hidden sm:inline">Share on</span> WhatsApp
       </Button>
       <Button
         variant="outline"
@@ -59,7 +59,7 @@ export const ShareButtons = ({ summary, title }: ShareButtonsProps) => {
         className="text-xs sm:text-sm hover:bg-siso-red/10 hover:text-siso-red transition-colors"
       >
         <Instagram className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
-        Share on Instagram
+        <span className="hidden sm:inline">Share on</span> Instagram
       </Button>
       <Button
         variant="outline"
@@ -68,7 +68,7 @@ export const ShareButtons = ({ summary, title }: ShareButtonsProps) => {
         className="text-xs sm:text-sm hover:bg-siso-red/10 hover:text-siso-red transition-colors"
       >
         <Share2 className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
-        Share on Skool
+        <span className="hidden sm:inline">Share on</span> Skool
       </Button>
     </div>
   );
