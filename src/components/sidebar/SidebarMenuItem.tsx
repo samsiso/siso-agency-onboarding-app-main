@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 export interface SidebarMenuItemProps {
   href: string;
   icon: LucideIcon;
-  label: string;  // Added this prop to the interface
+  label: string;
   active: boolean;
   collapsed: boolean;
   onClick: (e: React.MouseEvent<HTMLAnchorElement>) => void;
@@ -28,8 +28,12 @@ export const SidebarMenuItem = ({
         active && 'bg-siso-text/5 text-siso-text-bold'
       )}
     >
-      <Icon className="h-5 w-5" />
-      {!collapsed && !label.includes('Profile') && <span>{label}</span>}
+      {!label.includes('Profile') && (
+        <>
+          <Icon className="h-5 w-5" />
+          {!collapsed && <span>{label}</span>}
+        </>
+      )}
     </Link>
   );
 };
