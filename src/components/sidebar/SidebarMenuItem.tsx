@@ -29,7 +29,7 @@ export const SidebarMenuItem = ({
       )}
     >
       <Icon className="h-5 w-5" />
-      {!collapsed && <span>{label}</span>}
+      {!collapsed && !label.includes('Profile') && <span>{label}</span>}
     </Link>
   );
 };
