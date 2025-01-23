@@ -5,7 +5,7 @@ interface NewsCategoriesProps {
   onCategoryChange: (category: string | null) => void;
 }
 
-export const NewsCategories = ({ selectedCategory, onCategoryChange }: NewsCategoriesProps) => {
+const NewsCategories = ({ selectedCategory, onCategoryChange }: NewsCategoriesProps) => {
   const categories = [
     "All",
     "Tech Giants",
@@ -31,3 +31,5 @@ export const NewsCategories = ({ selectedCategory, onCategoryChange }: NewsCateg
     </div>
   );
 };
+
+export default NewsCategories;
