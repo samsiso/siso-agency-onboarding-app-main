@@ -20,15 +20,36 @@ export default {
     extend: {
       colors: {
         siso: {
-          bg: "#121212",
-          "bg-alt": "#1A1A1A",
+          bg: {
+            DEFAULT: "#121212",
+            light: "#ffffff",
+          },
+          "bg-alt": {
+            DEFAULT: "#1A1A1A",
+            light: "#f8f9fa",
+          },
           red: "#FF5722",
           orange: "#FFA726",
-          text: "#E0E0E0",
-          "text-bold": "#FFFFFF",
-          "text-muted": "#9E9E9E",
-          border: "#2A2A2A",
-          "border-hover": "#3A3A3A",
+          text: {
+            DEFAULT: "#E0E0E0",
+            light: "#2D3748",
+          },
+          "text-bold": {
+            DEFAULT: "#FFFFFF",
+            light: "#1A202C",
+          },
+          "text-muted": {
+            DEFAULT: "#9E9E9E",
+            light: "#718096",
+          },
+          border: {
+            DEFAULT: "#2A2A2A",
+            light: "#E2E8F0",
+          },
+          "border-hover": {
+            DEFAULT: "#3A3A3A",
+            light: "#CBD5E0",
+          },
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

@@ -6,26 +6,48 @@
 
 @layer base {
   :root {
-    --background: 0 0% 7%;
-    --foreground: 0 0% 88%;
-    --card: 0 0% 3%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 16 100% 50%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 33 100% 50%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 65%;
-    --accent: 16 100% 50%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 85% 60%;
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 346.8 77.2% 49.8%;
+    --primary-foreground: 355.7 100% 97.3%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 15%;
-    --input: 0 0% 15%;
-    --ring: 16 100% 50%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 346.8 77.2% 49.8%;
     --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 20 14.3% 4.1%;
+    --foreground: 0 0% 95%;
+    --card: 24 9.8% 10%;
+    --card-foreground: 0 0% 95%;
+    --popover: 0 0% 9%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 346.8 77.2% 49.8%;
+    --primary-foreground: 355.7 100% 97.3%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 12 6.5% 15.1%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 85.7% 97.3%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 346.8 77.2% 49.8%;
   }
 
   * {
@@ -37,7 +59,7 @@
   }
 
   html, body, #root {
-    @apply min-h-screen bg-gradient-to-b from-gray-900 to-black text-gray-100;
+    @apply min-h-screen bg-gradient-to-b from-siso-bg to-siso-bg-alt dark:from-siso-bg dark:to-siso-bg text-siso-text dark:text-siso-text;
   }
 
   body {
@@ -62,7 +84,7 @@
 }
 
 .nav-link {
-  @apply relative px-4 py-2.5 text-siso-text hover:text-siso-text-bold transition-colors duration-300;
+  @apply relative px-4 py-2.5 text-siso-text dark:text-siso-text hover:text-siso-text-bold dark:hover:text-siso-text-bold transition-colors duration-300;
 }
 
 .nav-link::after {
@@ -75,7 +97,7 @@
 
 .glow-card {
   @apply relative overflow-hidden rounded-lg bg-gradient-to-br from-siso-red/5 to-siso-orange/5 
-    hover:from-siso-red/10 hover:to-siso-orange/10 border border-siso-border hover:border-siso-border-hover
+    hover:from-siso-red/10 hover:to-siso-orange/10 border border-siso-border dark:border-siso-border hover:border-siso-border-hover dark:hover:border-siso-border-hover
     p-6 transition-all duration-300 backdrop-blur-sm;
 }
 
@@ -92,13 +114,13 @@
 }
 
 .card {
-  @apply rounded-lg border border-siso-border bg-siso-bg-alt p-6 shadow-sm transition-all duration-300
-    hover:border-siso-border-hover hover:shadow-md;
+  @apply rounded-lg border border-siso-border dark:border-siso-border bg-siso-bg-alt dark:bg-siso-bg-alt p-6 shadow-sm transition-all duration-300
+    hover:border-siso-border-hover dark:hover:border-siso-border-hover hover:shadow-md;
 }
 
 .button-base {
   @apply rounded-lg px-4 py-2 font-medium transition-all duration-300 disabled:opacity-50 
-    disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-siso-bg;
+    disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-siso-bg dark:focus:ring-offset-siso-bg;
 }
 
 .button-primary {
@@ -107,12 +129,12 @@
 }
 
 .button-secondary {
-  @apply button-base border border-siso-border bg-transparent text-siso-text 
-    hover:bg-siso-bg-alt hover:border-siso-border-hover focus:ring-siso-text;
+  @apply button-base border border-siso-border dark:border-siso-border bg-transparent text-siso-text dark:text-siso-text 
+    hover:bg-siso-bg-alt dark:hover:bg-siso-bg-alt hover:border-siso-border-hover dark:hover:border-siso-border-hover focus:ring-siso-text;
 }
 
 .input-base {
-  @apply rounded-lg border border-siso-border bg-siso-bg-alt px-4 py-2 text-siso-text 
-    placeholder:text-siso-text-muted focus:border-siso-red focus:outline-none focus:ring-1 
+  @apply rounded-lg border border-siso-border dark:border-siso-border bg-siso-bg-alt dark:bg-siso-bg-alt px-4 py-2 text-siso-text dark:text-siso-text 
+    placeholder:text-siso-text-muted dark:placeholder:text-siso-text-muted focus:border-siso-red focus:outline-none focus:ring-1 
     focus:ring-siso-red transition-all duration-300;
 }
