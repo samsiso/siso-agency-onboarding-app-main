@@ -47,11 +47,11 @@ export const CommunityMemberCard = ({ member, onClick }: CommunityMemberCardProp
             <img 
               src={member.profile_image_url} 
               alt={member.name}
-              className="w-16 h-16 rounded-full object-cover border-2 border-siso-orange/20 group-hover:border-siso-orange/50 transition-colors shrink-0"
+              className="w-12 h-12 rounded-full object-cover border-2 border-siso-orange/20 group-hover:border-siso-orange/50 transition-colors shrink-0"
             />
           ) : (
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-siso-red/20 to-siso-orange/20 flex items-center justify-center group-hover:from-siso-red/30 group-hover:to-siso-orange/30 transition-colors shrink-0">
-              <Users className="w-8 h-8 text-siso-orange" />
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-siso-red/20 to-siso-orange/20 flex items-center justify-center group-hover:from-siso-red/30 group-hover:to-siso-orange/30 transition-colors shrink-0">
+              <Users className="w-6 h-6 text-siso-orange" />
             </div>
           )}
           <div className="flex-1 min-w-0 space-y-1">
@@ -59,42 +59,44 @@ export const CommunityMemberCard = ({ member, onClick }: CommunityMemberCardProp
               <h3 className="text-lg font-semibold text-siso-text-bold group-hover:text-siso-orange transition-colors line-clamp-2 leading-tight" title={member.name}>
                 {member.name}
               </h3>
-              <Dialog>
-                <DialogTrigger asChild onClick={(e) => e.stopPropagation()}>
-                  <Button 
-                    variant="ghost" 
-                    size="icon"
-                    className="shrink-0 hover:bg-siso-orange/10 hover:text-siso-orange transition-colors"
-                  >
-                    <Brain className="w-4 h-4" />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="bg-siso-bg border-siso-text/10">
-                  <DialogHeader>
-                    <DialogTitle className="text-xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
-                      AI Analysis: {member.name}
-                    </DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4 mt-4">
-                    <div className="space-y-2">
-                      <h4 className="font-semibold text-siso-text">Expertise Level</h4>
-                      <p className="text-siso-text/80">{analysis.expertise}</p>
+              <div className="flex items-center gap-2">
+                <Dialog>
+                  <DialogTrigger asChild onClick={(e) => e.stopPropagation()}>
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      className="h-8 w-8 shrink-0 hover:bg-siso-orange/10 hover:text-siso-orange transition-colors"
+                    >
+                      <Brain className="w-4 h-4" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="bg-siso-bg border-siso-text/10">
+                    <DialogHeader>
+                      <DialogTitle className="text-xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
+                        AI Analysis: {member.name}
+                      </DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 mt-4">
+                      <div className="space-y-2">
+                        <h4 className="font-semibold text-siso-text">Expertise Level</h4>
+                        <p className="text-siso-text/80">{analysis.expertise}</p>
+                      </div>
+                      <div className="space-y-2">
+                        <h4 className="font-semibold text-siso-text">Target Audience</h4>
+                        <p className="text-siso-text/80">{analysis.audience}</p>
+                      </div>
+                      <div className="space-y-2">
+                        <h4 className="font-semibold text-siso-text">Unique Value</h4>
+                        <p className="text-siso-text/80">{analysis.uniqueValue}</p>
+                      </div>
+                      <div className="space-y-2">
+                        <h4 className="font-semibold text-siso-text">Engagement</h4>
+                        <p className="text-siso-text/80">{analysis.engagement}</p>
+                      </div>
                     </div>
-                    <div className="space-y-2">
-                      <h4 className="font-semibold text-siso-text">Target Audience</h4>
-                      <p className="text-siso-text/80">{analysis.audience}</p>
-                    </div>
-                    <div className="space-y-2">
-                      <h4 className="font-semibold text-siso-text">Unique Value</h4>
-                      <p className="text-siso-text/80">{analysis.uniqueValue}</p>
-                    </div>
-                    <div className="space-y-2">
-                      <h4 className="font-semibold text-siso-text">Engagement</h4>
-                      <p className="text-siso-text/80">{analysis.engagement}</p>
-                    </div>
-                  </div>
-                </DialogContent>
-              </Dialog>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </div>
             <p className="text-sm text-siso-text/80 capitalize">{member.member_type}</p>
           </div>
@@ -117,9 +119,12 @@ export const CommunityMemberCard = ({ member, onClick }: CommunityMemberCardProp
           ))}
         </div>
 
-        <div className="flex gap-2 mt-3 text-siso-text/60">
+        <div className="flex items-center gap-2 mt-3 text-siso-text/60">
           {member.website_url && (
-            <Link className="w-4 h-4 hover:text-siso-orange transition-colors" />
+            <div className="flex items-center gap-1 hover:text-siso-orange transition-colors">
+              <Link className="w-4 h-4" />
+              <Brain className="w-4 h-4" />
+            </div>
           )}
           {member.youtube_url && (
             <Youtube className="w-4 h-4 hover:text-siso-orange transition-colors" />
