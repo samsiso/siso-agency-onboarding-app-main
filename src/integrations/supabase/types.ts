@@ -338,6 +338,7 @@ export type Database = {
         }
         Relationships: []
       }
+
       leaderboard: {
         Row: {
           achievements: Json | null
@@ -353,6 +354,8 @@ export type Database = {
           updated_at: string
           user_id: string
           wins: number | null
+          contribution_count: number | null
+          referral_count: number | null
         }
         Insert: {
           achievements?: Json | null
@@ -368,6 +371,8 @@ export type Database = {
           updated_at?: string
           user_id: string
           wins?: number | null
+          contribution_count?: number | null
+          referral_count?: number | null
         }
         Update: {
           achievements?: Json | null
@@ -383,6 +388,8 @@ export type Database = {
           updated_at?: string
           user_id?: string
           wins?: number | null
+          contribution_count?: number | null
+          referral_count?: number | null
         }
         Relationships: [
           {
@@ -391,9 +398,10 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
+
       login_streaks: {
         Row: {
           created_at: string
