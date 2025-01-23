@@ -25,6 +25,17 @@ export const ConnectWalletButton = () => {
     try {
       console.log("[Wallet] Starting connection process");
       
+      // First check if user is logged in
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) {
+        toast({
+          variant: "destructive",
+          title: "Authentication Required",
+          description: "Please log in to connect your wallet",
+        });
+        return;
+      }
+      
       // Step 1: Connect to Phantom Wallet
       const publicKey = await connectPhantom();
       
@@ -64,6 +75,9 @@ export const ConnectWalletButton = () => {
           publicKey, 
           signature, 
           nonce: nonceData.nonce 
+        },
+        headers: {
+          'x-user-id': session.user.id
         }
       });
       
