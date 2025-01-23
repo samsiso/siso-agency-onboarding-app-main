@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface NewsCardMediaProps {
   imageUrl: string;
@@ -16,6 +16,30 @@ export const NewsCardMedia = ({
   isCompact = false 
 }: NewsCardMediaProps) => {
   const [isLoading, setIsLoading] = useState(true);
+  const [isIntersecting, setIsIntersecting] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsIntersecting(entry.isIntersecting);
+      },
+      {
+        rootMargin: '50px',
+        threshold: 0.1
+      }
+    );
+
+    const element = document.getElementById(`news-image-${title.replace(/\s+/g, '-')}`);
+    if (element) {
+      observer.observe(element);
+    }
+
+    return () => {
+      if (element) {
+        observer.unobserve(element);
+      }
+    };
+  }, [title]);
 
   return (
     <motion.div 
@@ -24,19 +48,26 @@ export const NewsCardMedia = ({
       transition={{ duration: 0.3 }}
       className={`${isCompact ? 'w-1/3 max-w-[200px]' : 'w-full'}`}
     >
-      <div className={`relative ${isCompact ? 'aspect-[4/3]' : 'aspect-video'} overflow-hidden rounded-lg border border-siso-border group`}>
+      <div 
+        id={`news-image-${title.replace(/\s+/g, '-')}`}
+        className={`relative ${isCompact ? 'aspect-[4/3]' : 'aspect-video'} overflow-hidden rounded-lg border border-siso-border group`}
+      >
         <div className={`absolute inset-0 bg-siso-bg-alt animate-pulse ${isLoading ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`} />
-        <img
-          src={imageUrl || '/placeholder.svg'}
-          alt={title}
-          className={`
-            object-cover w-full h-full transition-all duration-300 
-            group-hover:scale-105 group-hover:brightness-110
-            ${isLoading ? 'opacity-0' : 'opacity-100'}
-          `}
-          onLoad={() => setIsLoading(false)}
-          onError={() => setIsLoading(false)}
-        />
+        {isIntersecting && (
+          <img
+            src={imageUrl || '/placeholder.svg'}
+            alt={title}
+            className={`
+              object-cover w-full h-full transition-all duration-300 
+              group-hover:scale-105 group-hover:brightness-110
+              ${isLoading ? 'opacity-0' : 'opacity-100'}
+            `}
+            loading="lazy"
+            decoding="async"
+            onLoad={() => setIsLoading(false)}
+            onError={() => setIsLoading(false)}
+          />
+        )}
         {isFeatured && (
           <div className="absolute top-2 left-2 z-10">
             <Badge 

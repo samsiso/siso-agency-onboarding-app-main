@@ -5,10 +5,11 @@ import { motion } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
-import { NewsCategories } from '@/components/ai-news/NewsCategories';
 
+// Lazy load components
 const NewsHeader = lazy(() => import('@/components/ai-news/NewsHeader'));
 const NewsCard = lazy(() => import('@/components/ai-news/NewsCard'));
+const NewsCategories = lazy(() => import('@/components/ai-news/NewsCategories'));
 
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center p-8">
@@ -164,7 +165,6 @@ const AINews = () => {
                 onCategoryChange={setSelectedCategory}
               />
 
-              {/* Simple 2-column grid layout */}
               {newsItems.length > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                   {newsItems.map((item) => (
