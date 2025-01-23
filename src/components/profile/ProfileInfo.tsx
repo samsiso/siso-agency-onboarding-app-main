@@ -1,4 +1,4 @@
-import { Shield } from 'lucide-react';
+import { Shield, Trophy, Star } from 'lucide-react';
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useState } from 'react';
@@ -8,6 +8,7 @@ import { BasicInfo } from './BasicInfo';
 import { BusinessInfo } from './BusinessInfo';
 import { InterestsBio } from './InterestsBio';
 import { SocialMediaLinks } from './SocialMediaLinks';
+import { ConnectWalletButton } from '../crypto/ConnectWalletButton';
 
 interface ProfileInfoProps {
   email: string | null;
@@ -25,6 +26,7 @@ interface ProfileInfoProps {
   instagramUrl?: string | null;
   twitterUrl?: string | null;
   professionalRole?: string | null;
+  solanaWalletAddress?: string | null;
 }
 
 export const ProfileInfo = ({ 
@@ -42,7 +44,8 @@ export const ProfileInfo = ({
   youtubeUrl,
   instagramUrl,
   twitterUrl,
-  professionalRole
+  professionalRole,
+  solanaWalletAddress
 }: ProfileInfoProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -111,35 +114,38 @@ export const ProfileInfo = ({
           <Shield className="w-5 h-5 text-siso-red" />
           Profile Information
         </CardTitle>
-        {!isEditing ? (
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => setIsEditing(true)}
-            className="border-siso-red text-siso-text hover:bg-siso-red hover:text-white"
-          >
-            Edit Profile
-          </Button>
-        ) : (
-          <div className="flex gap-2">
+        <div className="flex gap-2">
+          {!solanaWalletAddress && <ConnectWalletButton />}
+          {!isEditing ? (
             <Button 
               variant="outline" 
               size="sm"
-              onClick={() => setIsEditing(false)}
-              className="border-siso-text/20 text-siso-text hover:bg-siso-text/10"
+              onClick={() => setIsEditing(true)}
+              className="border-siso-red text-siso-text hover:bg-siso-red hover:text-white"
             >
-              Cancel
+              Edit Profile
             </Button>
-            <Button 
-              variant="default" 
-              size="sm"
-              onClick={handleSave}
-              className="bg-siso-red hover:bg-siso-red/90 text-white"
-            >
-              Save
-            </Button>
-          </div>
-        )}
+          ) : (
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setIsEditing(false)}
+                className="border-siso-text/20 text-siso-text hover:bg-siso-text/10"
+              >
+                Cancel
+              </Button>
+              <Button 
+                variant="default" 
+                size="sm"
+                onClick={handleSave}
+                className="bg-siso-red hover:bg-siso-red/90 text-white"
+              >
+                Save
+              </Button>
+            </div>
+          )}
+        </div>
       </CardHeader>
       <BasicInfo
         email={email}
