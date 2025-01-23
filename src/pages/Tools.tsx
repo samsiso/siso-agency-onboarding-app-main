@@ -10,6 +10,7 @@ import { toast } from 'react-hot-toast';
 import { ToolsHeader } from '@/components/tools/ToolsHeader';
 import { ToolsCategories } from '@/components/tools/ToolsCategories';
 import { ToolsGrid } from '@/components/tools/ToolsGrid';
+import { motion } from 'framer-motion';
 
 export default function Tools() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -80,8 +81,13 @@ export default function Tools() {
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <div className="flex-1 p-8">
-        <div className="max-w-7xl mx-auto space-y-8">
+      <div className="flex-1 p-8 overflow-y-auto">
+        <motion.div 
+          className="max-w-7xl mx-auto space-y-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
           <ToolsHeader 
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
@@ -90,13 +96,17 @@ export default function Tools() {
           <ToolsCategories />
 
           <ScrollArea className="w-full">
-            <Tabs defaultValue="all" className="w-full" onValueChange={setSelectedCategory}>
-              <TabsList className="h-auto flex-wrap bg-siso-text/5 p-2">
+            <Tabs 
+              defaultValue="all" 
+              className="w-full" 
+              onValueChange={setSelectedCategory}
+            >
+              <TabsList className="h-auto flex-wrap bg-siso-text/5 p-2 mb-6 border border-siso-text/10 rounded-xl">
                 {categories.map((category) => (
                   <TabsTrigger
                     key={category.id}
                     value={category.id}
-                    className="m-1 data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange transition-all duration-300"
+                    className="m-1 data-[state=active]:bg-gradient-to-r data-[state=active]:from-siso-red/20 data-[state=active]:to-siso-orange/20 data-[state=active]:text-siso-orange transition-all duration-300 hover:text-siso-orange/80"
                   >
                     {category.label}
                     <span className="ml-2 text-sm text-siso-text/60">
@@ -115,7 +125,7 @@ export default function Tools() {
           <Suspense fallback={<ToolsGrid tools={[]} isLoading={true} />}>
             <ToolsGrid tools={filteredTools} isLoading={isLoading} />
           </Suspense>
-        </div>
+        </motion.div>
       </div>
       <ChatBot agentType="tools" />
     </div>
