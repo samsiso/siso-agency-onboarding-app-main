@@ -340,6 +340,7 @@ export type Database = {
       }
       leaderboard: {
         Row: {
+          achievements: Json | null
           avatar_url: string | null
           created_at: string
           id: string
@@ -348,11 +349,13 @@ export type Database = {
           points: number | null
           rank: string | null
           season_rank: string | null
+          siso_tokens: number | null
           updated_at: string
           user_id: string
           wins: number | null
         }
         Insert: {
+          achievements?: Json | null
           avatar_url?: string | null
           created_at?: string
           id?: string
@@ -361,11 +364,13 @@ export type Database = {
           points?: number | null
           rank?: string | null
           season_rank?: string | null
+          siso_tokens?: number | null
           updated_at?: string
           user_id: string
           wins?: number | null
         }
         Update: {
+          achievements?: Json | null
           avatar_url?: string | null
           created_at?: string
           id?: string
@@ -374,6 +379,7 @@ export type Database = {
           points?: number | null
           rank?: string | null
           season_rank?: string | null
+          siso_tokens?: number | null
           updated_at?: string
           user_id?: string
           wins?: number | null
