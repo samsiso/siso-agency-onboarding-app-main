@@ -8,6 +8,13 @@ export const ConnectWalletButton = () => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
+  const generateNonce = () => {
+    // Generate a random string for the nonce
+    return Array.from(crypto.getRandomValues(new Uint8Array(32)))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+  };
+
   const handleConnect = async () => {
     try {
       setLoading(true);
@@ -31,18 +38,22 @@ export const ConnectWalletButton = () => {
       const publicKey = response.publicKey.toString();
       console.log("[Wallet] Connected to wallet:", publicKey);
 
-      // Get a nonce
-      const { data: nonce, error: nonceError } = await supabase
+      // Generate and insert nonce
+      const nonce = generateNonce();
+      const { data: nonceData, error: nonceError } = await supabase
         .from('wallet_nonces')
-        .insert({ public_key: publicKey })
+        .insert({ 
+          public_key: publicKey,
+          nonce: nonce
+        })
         .select()
         .single();
 
       if (nonceError) throw nonceError;
-      console.log("[Wallet] Generated nonce:", nonce);
+      console.log("[Wallet] Generated nonce:", nonceData);
 
       // Sign the nonce
-      const encodedMessage = new TextEncoder().encode(nonce.nonce);
+      const encodedMessage = new TextEncoder().encode(nonce);
       const signedMessage = await solana.signMessage(encodedMessage, "utf8");
       console.log("[Wallet] Signed message:", signedMessage);
 
@@ -53,7 +64,7 @@ export const ConnectWalletButton = () => {
           body: {
             publicKey,
             signature: signedMessage.signature,
-            nonce: nonce.nonce,
+            nonce: nonce,
             userId: session.user.id
           }
         }
