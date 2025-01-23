@@ -5,11 +5,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface ToolsGridProps {
   tools: Tool[];
   isLoading: boolean;
-  selectedCategory?: string;
-  searchQuery?: string;
 }
 
-export function ToolsGrid({ tools, isLoading, selectedCategory, searchQuery }: ToolsGridProps) {
+export function ToolsGrid({ tools, isLoading }: ToolsGridProps) {
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

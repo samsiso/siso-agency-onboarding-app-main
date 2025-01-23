@@ -23,6 +23,4 @@ export interface Tool {
   input_variables?: string[] | null;
   model_type?: string | null;
   response_format?: string | null;
-  gpt_url?: string | null;
-  gpt_id?: string | null;
 }
