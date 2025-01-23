@@ -82,7 +82,8 @@ export const Leaderboard = () => {
   const fetchLeaderboard = async () => {
     try {
       console.log('Fetching leaderboard data...');
-      const { data, error } = await supabase
+      // First, get all profiles with points
+      const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select(`
           id,
@@ -90,47 +91,45 @@ export const Leaderboard = () => {
           email,
           points,
           rank,
-          updated_at,
-          leaderboard!inner (
-            contribution_count,
-            referral_count,
-            siso_tokens,
-            achievements
-          )
+          updated_at
         `)
         .gt('points', 0)
         .order('points', { ascending: false })
         .limit(100);
 
-      if (error) {
-        console.error('Error fetching leaderboard:', error);
-        throw error;
-      }
+      if (profilesError) throw profilesError;
 
-      if (data) {
-        console.log('Fetched leaderboard data:', data);
-        const transformedData: LeaderboardEntry[] = data.map(entry => ({
-          id: entry.id,
-          user_id: entry.id,
-          points: entry.points,
-          rank: entry.rank,
-          achievements: Array.isArray(entry.leaderboard.achievements) 
-            ? entry.leaderboard.achievements.map((achievement: any) => ({
-                name: achievement.name || '',
-                icon: achievement.icon || ''
-              }))
-            : [],
-          siso_tokens: entry.leaderboard.siso_tokens || 0,
-          updated_at: entry.updated_at,
-          contribution_count: entry.leaderboard.contribution_count || 0,
-          referral_count: entry.leaderboard.referral_count || 0,
+      // Then, get the leaderboard data for these profiles
+      const profileIds = profilesData?.map(profile => profile.id) || [];
+      const { data: leaderboardData, error: leaderboardError } = await supabase
+        .from('leaderboard')
+        .select('*')
+        .in('user_id', profileIds);
+
+      if (leaderboardError) throw leaderboardError;
+
+      // Combine the data
+      const combinedData = profilesData?.map(profile => {
+        const leaderboardEntry = leaderboardData?.find(entry => entry.user_id === profile.id);
+        return {
+          id: profile.id,
+          user_id: profile.id,
+          points: profile.points,
+          rank: profile.rank,
+          achievements: leaderboardEntry?.achievements || [],
+          siso_tokens: leaderboardEntry?.siso_tokens || 0,
+          updated_at: profile.updated_at,
+          contribution_count: leaderboardEntry?.contribution_count || 0,
+          referral_count: leaderboardEntry?.referral_count || 0,
           profile: {
-            full_name: entry.full_name,
-            email: entry.email
+            full_name: profile.full_name,
+            email: profile.email
           }
-        }));
-        setLeaderboardData(transformedData);
-      }
+        };
+      }) || [];
+
+      console.log('Combined leaderboard data:', combinedData);
+      setLeaderboardData(combinedData);
     } catch (error) {
       console.error('Error fetching leaderboard:', error);
       toast({
