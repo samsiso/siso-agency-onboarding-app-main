@@ -10,6 +10,7 @@ import { PointsHistory } from '@/components/profile/PointsHistory';
 import { LoginStreakTracker } from '@/components/points/LoginStreakTracker';
 import { PointsDisplay } from '@/components/points/PointsDisplay';
 import { MintNFTButton } from '@/components/crypto/MintNFTButton';
+import { FloatingOrbs } from '@/components/effects/FloatingOrbs';
 
 const Profile = () => {
   const [user, setUser] = useState<any>(null);
@@ -59,7 +60,6 @@ const Profile = () => {
           title: "Error",
           description: "Failed to load profile data",
         });
-        // Redirect to home on error
         navigate('/');
       } finally {
         setLoading(false);
@@ -85,7 +85,6 @@ const Profile = () => {
     );
   }
 
-  // If no user or profile, show error state
   if (!user || !profile) {
     return (
       <SidebarProvider>
@@ -106,63 +105,79 @@ const Profile = () => {
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
         <Sidebar />
-        <div className="flex-1 container mx-auto px-4 py-8">
-          <div className="space-y-8">
-            <ProfileHeader
-              fullName={profile?.full_name}
-              email={user?.email}
-              points={profile?.points || 0}
-              rank={profile?.rank || 'Bronze'}
-              avatarUrl={profile?.avatar_url}
-              onLogout={async () => {
-                try {
-                  const { error } = await supabase.auth.signOut();
-                  if (error) throw error;
-                  navigate('/');
-                } catch (error: any) {
-                  toast({
-                    variant: "destructive",
-                    title: "Error signing out",
-                    description: error.message,
-                  });
-                }
-              }}
-              onBackToHome={() => navigate('/')}
-            />
-
-            {user && <LoginStreakTracker userId={user.id} />}
-            
-            {user && (
-              <div className="mb-6">
-                <PointsDisplay userId={user.id} />
+        <div className="flex-1 relative">
+          <FloatingOrbs />
+          <div className="container mx-auto px-4 py-8 relative z-10">
+            <div className="space-y-8 max-w-7xl mx-auto">
+              <div className="bg-black/20 rounded-xl p-6 backdrop-blur-sm border border-siso-text/10">
+                <ProfileHeader
+                  fullName={profile?.full_name}
+                  email={user?.email}
+                  points={profile?.points || 0}
+                  rank={profile?.rank || 'Bronze'}
+                  avatarUrl={profile?.avatar_url}
+                  onLogout={async () => {
+                    try {
+                      const { error } = await supabase.auth.signOut();
+                      if (error) throw error;
+                      navigate('/');
+                    } catch (error: any) {
+                      toast({
+                        variant: "destructive",
+                        title: "Error signing out",
+                        description: error.message,
+                      });
+                    }
+                  }}
+                  onBackToHome={() => navigate('/')}
+                />
               </div>
-            )}
 
-            {profile?.solana_wallet_address && (
-              <div className="mb-6">
-                <MintNFTButton />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {user && (
+                  <div className="md:col-span-3">
+                    <LoginStreakTracker userId={user.id} />
+                  </div>
+                )}
+                
+                {user && (
+                  <div className="md:col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="bg-black/20 rounded-xl p-6 backdrop-blur-sm border border-siso-text/10 hover:border-siso-orange/50 transition-colors">
+                      <PointsDisplay userId={user.id} />
+                    </div>
+                    
+                    {profile?.solana_wallet_address && (
+                      <div className="bg-black/20 rounded-xl p-6 backdrop-blur-sm border border-siso-text/10 hover:border-siso-orange/50 transition-colors">
+                        <MintNFTButton />
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div className="md:col-span-2">
+                  <ProfileInfo
+                    email={user?.email}
+                    fullName={profile?.full_name}
+                    points={profile?.points || 0}
+                    rank={profile?.rank || 'Bronze'}
+                    businessName={profile?.business_name}
+                    businessType={profile?.business_type}
+                    industry={profile?.industry}
+                    interests={profile?.interests}
+                    bio={profile?.bio}
+                    linkedinUrl={profile?.linkedin_url}
+                    websiteUrl={profile?.website_url}
+                    youtubeUrl={profile?.youtube_url}
+                    instagramUrl={profile?.instagram_url}
+                    twitterUrl={profile?.twitter_url}
+                    professionalRole={profile?.professional_role}
+                  />
+                </div>
+                
+                <div className="md:col-span-1">
+                  {user && <PointsHistory userId={user.id} />}
+                </div>
               </div>
-            )}
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <ProfileInfo
-                email={user?.email}
-                fullName={profile?.full_name}
-                points={profile?.points || 0}
-                rank={profile?.rank || 'Bronze'}
-                businessName={profile?.business_name}
-                businessType={profile?.business_type}
-                industry={profile?.industry}
-                interests={profile?.interests}
-                bio={profile?.bio}
-                linkedinUrl={profile?.linkedin_url}
-                websiteUrl={profile?.website_url}
-                youtubeUrl={profile?.youtube_url}
-                instagramUrl={profile?.instagram_url}
-                twitterUrl={profile?.twitter_url}
-                professionalRole={profile?.professional_role}
-              />
-              {user && <PointsHistory userId={user.id} />}
             </div>
           </div>
         </div>
