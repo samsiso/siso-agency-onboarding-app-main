@@ -9,127 +9,81 @@ import { useNavigate } from 'react-router-dom';
 
 const earningSections = [
   {
-    title: "Daily Activity",
+    title: "Daily Engagement",
     icon: Calendar,
-    description: "Login daily and maintain streaks to earn points.",
+    description: "Regular platform activities and streaks.",
     items: [
       { action: "Daily Login", points: "5 points" },
       { action: "7-Day Login Streak", points: "50 points bonus" },
-      { action: "30-Day Login Streak", points: "250 points bonus" }
+      { action: "30-Day Login Streak", points: "250 points bonus" },
+      { action: "Read News Article", points: "5 points" },
+      { action: "News Comment", points: "5 points" },
+      { action: "Use Tool", points: "5 points" }
     ]
   },
   {
-    title: "Content Creation",
+    title: "Content & Learning",
     icon: MessageSquare,
-    description: "Create and share valuable content with the community.",
+    description: "Create, share, and learn from content.",
     items: [
       { action: "Write Article", points: "50 points" },
       { action: "Create Tutorial", points: "100 points" },
       { action: "Share Workflow", points: "25 points" },
+      { action: "Watch Tutorial", points: "10 points" },
+      { action: "Complete Course", points: "50 points" },
+      { action: "Pass Assessment", points: "25 points" },
+      { action: "Knowledge Base Contribution", points: "50 points" }
+    ]
+  },
+  {
+    title: "Community Building",
+    icon: Users,
+    description: "Grow and engage with the community.",
+    items: [
+      { action: "Comment on Article", points: "5 points" },
+      { action: "Network Reply", points: "5 points" },
+      { action: "Network Discussion", points: "10 points" },
+      { action: "Host Event", points: "100 points" },
+      { action: "Social Media Post", points: "5 points" },
+      { action: "Successful Referral", points: "100 points" },
+      { action: "Monthly Referral Champion", points: "500 points bonus" }
+    ]
+  },
+  {
+    title: "AI & Tools",
+    icon: Bot,
+    description: "Contribute to AI and tool development.",
+    items: [
+      { action: "Train Assistant", points: "15 points" },
+      { action: "Assistant Feedback", points: "5 points" },
+      { action: "AI Model Testing", points: "20 points" },
+      { action: "Tool Review", points: "10 points" },
+      { action: "Tool Integration", points: "25 points" },
       { action: "Submit Tool", points: "75 points" }
     ]
   },
-    {
-      title: 'Community Engagement',
-      icon: Heart,
-      description: 'Interact with other members and content.',
-      items: [
-        { action: 'Comment on Article', points: '5 points' },
-        { action: 'Network Reply', points: '5 points' },
-        { action: 'Network Discussion', points: '10 points' },
-        { action: 'Host Event', points: '100 points' }
-      ]
-    },
-    {
-      title: 'Educational Progress',
-      icon: GraduationCap,
-      description: 'Learn and grow with educational content.',
-      items: [
-        { action: 'Watch Tutorial', points: '10 points' },
-        { action: 'Complete Course', points: '50 points' },
-        { action: 'Pass Assessment', points: '25 points' }
-      ]
-    },
-    {
-      title: 'Tool Mastery',
-      icon: Wrench,
-      description: 'Utilize and contribute to the tools ecosystem.',
-      items: [
-        { action: 'Use Tool', points: '5 points' },
-        { action: 'Tool Review', points: '10 points' },
-        { action: 'Tool Integration', points: '25 points' }
-      ]
-    },
-    {
-      title: 'AI Contributions',
-      icon: Bot,
-      description: 'Help improve AI systems and assistants.',
-      items: [
-        { action: 'Train Assistant', points: '15 points' },
-        { action: 'Assistant Feedback', points: '5 points' },
-        { action: 'AI Model Testing', points: '20 points' }
-      ]
-    },
-    {
-      title: 'Social Sharing',
-      icon: Share2,
-      description: 'Spread the word and grow the community.',
-      items: [
-        { action: 'Share Article', points: '10 points' },
-        { action: 'Social Media Post', points: '5 points' },
-        { action: 'Referral Signup', points: '50 points' }
-      ]
-    },
-    {
-      title: 'Special Achievements',
-      icon: Trophy,
-      description: 'Complete special tasks and challenges.',
-      items: [
-        { action: 'Complete Challenge', points: '25-100 points' },
-        { action: 'Beta Testing', points: '50 points' },
-        { action: 'Bug Report', points: '15 points' }
-      ]
-    },
-    {
-      title: 'Expert Recognition',
-      icon: Award,
-      description: 'Achieve expert status and recognition.',
-      items: [
-        { action: 'Become Verified Expert', points: '500 points' },
-        { action: 'Expert Answer', points: '25 points' },
-        { action: 'Knowledge Base Contribution', points: '50 points' }
-      ]
-    },
-    {
-      title: 'News & Updates',
-      icon: Newspaper,
-      description: 'Stay engaged with platform news and updates.',
-      items: [
-        { action: 'Read News Article', points: '5 points' },
-        { action: 'News Comment', points: '5 points' },
-        { action: 'News Share', points: '10 points' }
-      ]
-    },
-    {
-      title: 'Referral Program',
-      icon: Users,
-      description: 'Invite others to join the community.',
-      items: [
-        { action: 'Successful Referral', points: '100 points' },
-        { action: "Referral's First Post", points: '50 points bonus' },
-        { action: 'Monthly Referral Champion', points: '500 points bonus' }
-      ]
-    },
-    {
-      title: 'Crypto & NFTs',
-      icon: Coins,
-      description: 'Engage with our Web3 features.',
-      items: [
-        { action: 'First NFT Purchase', points: '200 points' },
-        { action: 'Connect Wallet', points: '50 points' },
-        { action: 'Token Holder Bonus', points: '25 points/week' }
-      ]
-    }
+  {
+    title: "Expert Achievements",
+    icon: Award,
+    description: "Recognition and special accomplishments.",
+    items: [
+      { action: "Become Verified Expert", points: "500 points" },
+      { action: "Expert Answer", points: "25 points" },
+      { action: "Complete Challenge", points: "25-100 points" },
+      { action: "Beta Testing", points: "50 points" },
+      { action: "Bug Report", points: "15 points" }
+    ]
+  },
+  {
+    title: "Web3 Integration",
+    icon: Coins,
+    description: "Engage with crypto and NFT features.",
+    items: [
+      { action: "First NFT Purchase", points: "200 points" },
+      { action: "Connect Wallet", points: "50 points" },
+      { action: "Token Holder Bonus", points: "25 points/week" }
+    ]
+  }
 ];
 
 const HowToEarn = () => {
