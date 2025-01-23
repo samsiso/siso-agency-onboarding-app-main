@@ -33,6 +33,49 @@ export const Leaderboard = () => {
 
   useEffect(() => {
     fetchLeaderboard();
+
+    // Set up real-time subscription
+    const channel = supabase
+      .channel('leaderboard-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Listen to all changes (INSERT, UPDATE, DELETE)
+          schema: 'public',
+          table: 'leaderboard'
+        },
+        (payload) => {
+          console.log('Real-time leaderboard update received:', payload);
+          // Refresh the leaderboard data when any change occurs
+          fetchLeaderboard();
+        }
+      )
+      .subscribe((status) => {
+        console.log('Leaderboard subscription status:', status);
+      });
+
+    // Also listen for profile changes
+    const profileChannel = supabase
+      .channel('profile-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'profiles'
+        },
+        (payload) => {
+          console.log('Profile update received:', payload);
+          // Refresh the leaderboard data when profiles change
+          fetchLeaderboard();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+      supabase.removeChannel(profileChannel);
+    };
   }, []);
 
   const fetchLeaderboard = async () => {
