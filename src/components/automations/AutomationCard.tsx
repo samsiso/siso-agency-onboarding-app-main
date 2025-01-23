@@ -1,4 +1,4 @@
-import { Download } from 'lucide-react';
+import { Flame } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Automation } from './types';
 
@@ -13,15 +13,15 @@ export function AutomationCard({ automation, onClick }: AutomationCardProps) {
       className="group relative overflow-hidden bg-gradient-to-br from-siso-text/5 to-siso-text/10 backdrop-blur-lg border-siso-text/10 hover:border-siso-orange/50 transition-all duration-500 cursor-pointer hover:shadow-lg hover:shadow-siso-orange/20"
       onClick={() => onClick(automation)}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="absolute inset-0 bg-gradient-to-br from-siso-red/5 to-siso-orange/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       
       <CardContent className="relative p-4 z-10">
         <div className="flex items-center gap-3">
           <div className="relative">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center group-hover:animate-glow">
-              <Download className="w-4 h-4 text-blue-500" />
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-siso-red/20 to-siso-orange/20 flex items-center justify-center group-hover:animate-glow">
+              <Flame className="w-4 h-4 text-siso-red" />
             </div>
-            <div className="absolute inset-0 rounded-full bg-blue-500/20 animate-ping opacity-0 group-hover:opacity-75" />
+            <div className="absolute inset-0 rounded-full bg-siso-red/20 animate-ping opacity-0 group-hover:opacity-75" />
           </div>
           
           <div className="flex-1 min-w-0">

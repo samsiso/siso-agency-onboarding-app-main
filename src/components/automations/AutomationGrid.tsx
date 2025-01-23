@@ -20,7 +20,7 @@ export const AutomationGrid = memo(({
         {[...Array(8)].map((_, i) => (
           <div key={i} className="relative group">
             <Skeleton className="h-32 bg-gradient-to-br from-siso-text/5 to-siso-text/10 border border-siso-text/10 rounded-lg overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-siso-text/10 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-siso-text/10 to-transparent -translate-x-full animate-shimmer" />
             </Skeleton>
           </div>
         ))}
