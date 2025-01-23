@@ -1,12 +1,33 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Wallet } from 'lucide-react';
+import { Loader2, Wallet, Check } from 'lucide-react';
 
 export const ConnectWalletButton = () => {
   const [loading, setLoading] = useState(false);
+  const [connectedAddress, setConnectedAddress] = useState<string | null>(null);
   const { toast } = useToast();
+
+  // Check if wallet is already connected on component mount
+  useEffect(() => {
+    const checkWalletConnection = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('solana_wallet_address')
+          .eq('id', session.user.id)
+          .single();
+        
+        if (profile?.solana_wallet_address) {
+          setConnectedAddress(profile.solana_wallet_address);
+        }
+      }
+    };
+
+    checkWalletConnection();
+  }, []);
 
   const generateNonce = () => {
     // Generate a random string for the nonce
@@ -82,6 +103,7 @@ export const ConnectWalletButton = () => {
 
       if (updateError) throw updateError;
 
+      setConnectedAddress(publicKey);
       toast({
         title: "Success!",
         description: "Wallet connected successfully",
@@ -99,6 +121,19 @@ export const ConnectWalletButton = () => {
       setLoading(false);
     }
   };
+
+  if (connectedAddress) {
+    return (
+      <Button 
+        variant="outline"
+        className="bg-green-500/10 text-green-500 hover:bg-green-500/20 border-green-500/20"
+        disabled
+      >
+        <Check className="mr-2 h-4 w-4" />
+        Connected: {connectedAddress.slice(0, 4)}...{connectedAddress.slice(-4)}
+      </Button>
+    );
+  }
 
   return (
     <Button 
