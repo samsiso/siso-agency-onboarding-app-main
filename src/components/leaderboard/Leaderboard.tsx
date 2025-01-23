@@ -24,20 +24,18 @@ import { Badge } from "@/components/ui/badge";
 interface LeaderboardEntry {
   id: string;
   user_id: string;
-  points: number;
-  rank: string;
-  wins: number;
-  losses: number;
-  kda: number;
-  season_rank: string;
+  points: number | null;
+  rank: string | null;
+  wins: number | null;
+  losses: number | null;
+  kda: number | null;
+  season_rank: string | null;
   avatar_url: string | null;
-  last_active: string | null;
   profiles: {
     full_name: string | null;
     email: string | null;
-    country: string | null;
     professional_role: string | null;
-  };
+  } | null;
 }
 
 export const Leaderboard = () => {
@@ -49,6 +47,7 @@ export const Leaderboard = () => {
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
+        console.log('Fetching leaderboard data...');
         const { data, error } = await supabase
           .from('leaderboard')
           .select(`
@@ -56,14 +55,18 @@ export const Leaderboard = () => {
             profiles (
               full_name,
               email,
-              country,
               professional_role
             )
           `)
           .order('points', { ascending: false })
           .limit(50);
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error fetching leaderboard:', error);
+          throw error;
+        }
+
+        console.log('Leaderboard data:', data);
         setLeaderboardData(data || []);
       } catch (error: any) {
         console.error('Error fetching leaderboard:', error);
@@ -78,9 +81,10 @@ export const Leaderboard = () => {
     };
 
     fetchLeaderboard();
-  }, [timeRange]);
+  }, [timeRange, toast]);
 
-  const getInitials = (name: string) => {
+  const getInitials = (name: string | null | undefined) => {
+    if (!name) return 'U';
     return name
       .split(' ')
       .map(n => n[0])
@@ -88,10 +92,12 @@ export const Leaderboard = () => {
       .toUpperCase();
   };
 
-  const getWinRate = (wins: number, losses: number) => {
-    const total = wins + losses;
+  const getWinRate = (wins: number | null, losses: number | null) => {
+    const w = wins || 0;
+    const l = losses || 0;
+    const total = w + l;
     if (total === 0) return 0;
-    return Math.round((wins / total) * 100);
+    return Math.round((w / total) * 100);
   };
 
   const getStatColor = (value: number, type: 'winRate' | 'kda') => {
@@ -106,7 +112,8 @@ export const Leaderboard = () => {
     }
   };
 
-  const getRankBadgeColor = (rank: string) => {
+  const getRankBadgeColor = (rank: string | null) => {
+    if (!rank) return 'bg-orange-500/10 text-orange-500';
     switch (rank.toLowerCase()) {
       case 'diamond': return 'bg-blue-500/10 text-blue-500';
       case 'platinum': return 'bg-cyan-500/10 text-cyan-500';
@@ -141,8 +148,7 @@ export const Leaderboard = () => {
       {/* Header Section */}
       <div className="flex items-center justify-between">
         <div className="space-y-1">
-          <h1 className="text-3xl font-bold text-siso-text-bold flex items-center gap-2">
-            <Trophy className="w-8 h-8 text-siso-orange" />
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent">
             Global Rankings
           </h1>
           <p className="text-siso-text/70">
@@ -177,28 +183,28 @@ export const Leaderboard = () => {
                 <Avatar className="w-20 h-20 mx-auto border-4 border-siso-orange">
                   <AvatarImage src={player.avatar_url || undefined} />
                   <AvatarFallback>
-                    {getInitials(player.profiles.full_name || player.profiles.email?.split('@')[0] || 'User')}
+                    {getInitials(player.profiles?.full_name || player.profiles?.email)}
                   </AvatarFallback>
                 </Avatar>
               </div>
               <h3 className="text-xl font-bold text-siso-text-bold mb-1">
-                {player.profiles.full_name || player.profiles.email?.split('@')[0] || 'Anonymous'}
+                {player.profiles?.full_name || player.profiles?.email?.split('@')[0] || 'Anonymous'}
               </h3>
               <div className="flex items-center justify-center gap-2 mb-4">
                 <Badge variant="outline" className={getRankBadgeColor(player.season_rank)}>
-                  {player.season_rank}
+                  {player.season_rank || 'Unranked'}
                 </Badge>
-                {player.profiles.country && (
+                {player.profiles?.professional_role && (
                   <Badge variant="outline" className="bg-siso-text/5">
                     <MapPin className="w-3 h-3 mr-1" />
-                    {player.profiles.country}
+                    {player.profiles.professional_role}
                   </Badge>
                 )}
               </div>
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
                   <p className="text-sm text-siso-text/70">Points</p>
-                  <p className="font-bold text-siso-text-bold">{player.points}</p>
+                  <p className="font-bold text-siso-text-bold">{player.points || 0}</p>
                 </div>
                 <div>
                   <p className="text-sm text-siso-text/70">Win Rate</p>
@@ -208,8 +214,8 @@ export const Leaderboard = () => {
                 </div>
                 <div>
                   <p className="text-sm text-siso-text/70">KDA</p>
-                  <p className={`font-bold ${getStatColor(player.kda, 'kda')}`}>
-                    {player.kda.toFixed(2)}
+                  <p className={`font-bold ${getStatColor(player.kda || 0, 'kda')}`}>
+                    {(player.kda || 0).toFixed(2)}
                   </p>
                 </div>
               </div>
@@ -242,32 +248,32 @@ export const Leaderboard = () => {
                       <Avatar className="w-8 h-8">
                         <AvatarImage src={player.avatar_url || undefined} />
                         <AvatarFallback>
-                          {getInitials(player.profiles.full_name || player.profiles.email?.split('@')[0] || 'User')}
+                          {getInitials(player.profiles?.full_name || player.profiles?.email)}
                         </AvatarFallback>
                       </Avatar>
                       <div>
                         <div className="flex items-center gap-2">
                           <p className="font-medium text-siso-text-bold">
-                            {player.profiles.full_name || player.profiles.email?.split('@')[0] || 'Anonymous'}
+                            {player.profiles?.full_name || player.profiles?.email?.split('@')[0] || 'Anonymous'}
                           </p>
                           <Badge variant="outline" className={getRankBadgeColor(player.season_rank)}>
-                            {player.season_rank}
+                            {player.season_rank || 'Unranked'}
                           </Badge>
                         </div>
-                        {player.profiles.country && (
+                        {player.profiles?.professional_role && (
                           <p className="text-sm text-siso-text/70 flex items-center gap-1">
                             <MapPin className="w-3 h-3" />
-                            {player.profiles.country}
+                            {player.profiles.professional_role}
                           </p>
                         )}
                       </div>
                     </div>
                   </TableCell>
                   <TableCell className="text-center font-bold text-siso-orange">
-                    {player.points}
+                    {player.points || 0}
                   </TableCell>
                   <TableCell className="text-center">
-                    {player.wins} - {player.losses}
+                    {player.wins || 0} - {player.losses || 0}
                   </TableCell>
                   <TableCell className="text-center">
                     <span className={getStatColor(getWinRate(player.wins, player.losses), 'winRate')}>
@@ -275,12 +281,12 @@ export const Leaderboard = () => {
                     </span>
                   </TableCell>
                   <TableCell className="text-center">
-                    <span className={getStatColor(player.kda, 'kda')}>
-                      {player.kda.toFixed(2)}
+                    <span className={getStatColor(player.kda || 0, 'kda')}>
+                      {(player.kda || 0).toFixed(2)}
                     </span>
                   </TableCell>
                   <TableCell className="text-right text-sm text-siso-text/70">
-                    {player.profiles.professional_role || '-'}
+                    {player.profiles?.professional_role || '-'}
                   </TableCell>
                 </TableRow>
               ))}
@@ -291,3 +297,5 @@ export const Leaderboard = () => {
     </div>
   );
 };
+
+export default Leaderboard;
