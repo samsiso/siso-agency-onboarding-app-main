@@ -4,7 +4,7 @@ import { Trophy, ChevronDown, ChevronUp, Clock, Users, UserPlus } from 'lucide-r
 import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { format } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 
 interface Achievement {
   name: string;
@@ -21,6 +21,10 @@ interface LeaderboardEntry {
   updated_at: string;
   contribution_count: number | null;
   referral_count: number | null;
+  profile?: {
+    full_name: string | null;
+    email: string | null;
+  };
 }
 
 export const Leaderboard = () => {
@@ -35,7 +39,7 @@ export const Leaderboard = () => {
     try {
       const { data, error } = await supabase
         .from('leaderboard')
-        .select('*')
+        .select('*, profile:profiles(full_name, email)')
         .order('points', { ascending: false });
 
       if (error) throw error;
@@ -63,6 +67,12 @@ export const Leaderboard = () => {
     }
   };
 
+  const getDisplayName = (entry: LeaderboardEntry) => {
+    if (entry.profile?.full_name) return entry.profile.full_name;
+    if (entry.profile?.email) return entry.profile.email.split('@')[0];
+    return 'Anonymous User';
+  };
+
   return (
     <div>
       <Card>
@@ -74,17 +84,19 @@ export const Leaderboard = () => {
             <TableHeader>
               <TableRow>
                 <TableHead className="w-[80px] text-center">#</TableHead>
+                <TableHead>Name</TableHead>
                 <TableHead className="text-center">Points</TableHead>
                 <TableHead className="text-center">Contributions</TableHead>
                 <TableHead className="text-center">Referrals</TableHead>
                 <TableHead className="text-center">SISO Tokens</TableHead>
-                <TableHead className="text-center">Days Active</TableHead>
+                <TableHead className="text-center">Last Active</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {leaderboardData.map((entry, index) => (
                 <TableRow key={entry.id}>
                   <TableCell className="text-center font-medium">{index + 1}</TableCell>
+                  <TableCell>{getDisplayName(entry)}</TableCell>
                   <TableCell className="text-center">
                     <div className="flex items-center justify-center gap-2">
                       <Trophy className="h-4 w-4 text-yellow-500" />
@@ -109,7 +121,7 @@ export const Leaderboard = () => {
                   <TableCell className="text-center">
                     <div className="flex items-center justify-center gap-2">
                       <Clock className="h-4 w-4 text-muted-foreground" />
-                      {Math.floor((new Date().getTime() - new Date(entry.updated_at).getTime()) / (1000 * 60 * 60 * 24))}
+                      {formatDistanceToNow(new Date(entry.updated_at), { addSuffix: true })}
                     </div>
                   </TableCell>
                 </TableRow>
