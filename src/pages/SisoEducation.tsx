@@ -8,7 +8,23 @@ import { CommunityMemberDetails } from '@/components/community/CommunityMemberDe
 import { CommunityMember } from '@/components/community/types';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, GraduationCap, Users, Trophy, BookOpen } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const item = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0 }
+};
 
 export default function SisoEducation() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -51,13 +67,55 @@ export default function SisoEducation() {
     member.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const stats = [
+    { icon: Users, label: 'Active Educators', value: members?.length || 0 },
+    { icon: Trophy, label: 'Learning Paths', value: '12+' },
+    { icon: BookOpen, label: 'Resources', value: '500+' },
+  ];
+
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
       <Sidebar />
       <div className="flex-1 p-4 md:p-8">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto space-y-8">
+          {/* Hero Section */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-siso-red/10 to-siso-orange/10 p-8 border border-siso-border"
+          >
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-4">
+                <GraduationCap className="w-8 h-8 text-siso-orange" />
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
+                  SISO Education Hub
+                </h1>
+              </div>
+              <p className="text-siso-text/80 max-w-2xl mb-8">
+                Access quality AI education and expert insights. Learn from industry leaders and stay ahead in the rapidly evolving world of artificial intelligence.
+              </p>
+              
+              {/* Stats Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {stats.map((stat, index) => (
+                  <motion.div
+                    key={index}
+                    variants={item}
+                    className="flex items-center gap-4 p-4 rounded-lg bg-black/20 border border-siso-border"
+                  >
+                    <stat.icon className="w-8 h-8 text-siso-orange" />
+                    <div>
+                      <div className="text-2xl font-bold text-siso-text-bold">{stat.value}</div>
+                      <div className="text-sm text-siso-text/70">{stat.label}</div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+
           {/* List Learner Callout Box */}
-          <Alert className="mb-8 border border-[#0FA0CE]/20 bg-[#0FA0CE]/5 text-siso-text">
+          <Alert className="border border-[#0FA0CE]/20 bg-[#0FA0CE]/5 text-siso-text">
             <AlertDescription className="flex items-center justify-between gap-4">
               <span>
                 The best way to learn new skills using AI - perfect for agencies, businesses, and individuals looking to grow.
@@ -79,44 +137,43 @@ export default function SisoEducation() {
             </AlertDescription>
           </Alert>
 
-          {/* Header Section */}
-          <div className="flex flex-col space-y-6 mb-8">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <div className="text-center md:text-left">
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text mb-2">
-                  SISO Education Hub
-                </h1>
-                <p className="text-siso-text/80 max-w-2xl">
-                  Your gateway to quality AI education and expert insights
-                </p>
-              </div>
-              <CommunitySearch 
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-              />
-            </div>
+          {/* Search and Filters */}
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <CommunitySearch 
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+            />
           </div>
 
           {/* Members Grid */}
-          {isLoading ? (
-            <div className="flex items-center justify-center min-h-[200px]">
-              <div className="text-siso-text">Loading educational resources...</div>
-            </div>
-          ) : error ? (
-            <div className="flex items-center justify-center min-h-[200px]">
-              <div className="text-red-500">Error loading education creators. Please try again later.</div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {filteredMembers?.map((member) => (
-                <CommunityMemberCard
-                  key={member.id}
-                  member={member}
-                  onClick={setSelectedMember}
-                />
-              ))}
-            </div>
-          )}
+          <motion.div
+            variants={container}
+            initial="hidden"
+            animate="show" 
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+          >
+            {isLoading ? (
+              // Loading skeletons
+              [...Array(8)].map((_, i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="h-48 bg-siso-bg-alt rounded-lg"></div>
+                </div>
+              ))
+            ) : error ? (
+              <div className="col-span-full flex items-center justify-center min-h-[200px]">
+                <div className="text-red-500">Error loading education creators. Please try again later.</div>
+              </div>
+            ) : (
+              filteredMembers?.map((member) => (
+                <motion.div key={member.id} variants={item}>
+                  <CommunityMemberCard
+                    member={member}
+                    onClick={setSelectedMember}
+                  />
+                </motion.div>
+              ))
+            )}
+          </motion.div>
 
           <CommunityMemberDetails
             member={selectedMember}
