@@ -1,6 +1,9 @@
 import { Star } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { usePoints } from '@/hooks/usePoints';
+import { useToast } from '@/components/ui/use-toast';
+import { useAuth } from '@supabase/auth-helpers-react';
 
 interface EarningTask {
   action: string;
@@ -14,6 +17,29 @@ interface EarningDetailsProps {
 }
 
 export const EarningDetails = ({ title, description, items }: EarningDetailsProps) => {
+  const { awardPoints } = usePoints(useAuth()?.user?.id);
+  const { toast } = useToast();
+
+  const handleTaskClick = async (action: string) => {
+    try {
+      // Convert the display action to the database action type
+      const dbAction = action.toLowerCase().replace(/ /g, '_') as any;
+      await awardPoints(dbAction);
+      
+      toast({
+        title: "Points Awarded!",
+        description: `You've earned points for ${action}`,
+      });
+    } catch (error) {
+      console.error('Error awarding points:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Unable to award points at this time",
+      });
+    }
+  };
+
   return (
     <div className="space-y-6 animate-fadeIn">
       <div className="space-y-4">
@@ -29,6 +55,7 @@ export const EarningDetails = ({ title, description, items }: EarningDetailsProp
         {items.map((item, index) => (
           <Card 
             key={index}
+            onClick={() => handleTaskClick(item.action)}
             className={cn(
               "p-4 border-siso-border hover:border-siso-border-hover",
               "bg-gradient-to-r from-siso-text/5 to-transparent",
