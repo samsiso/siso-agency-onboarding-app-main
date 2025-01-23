@@ -17,6 +17,8 @@ export interface CommunityMember {
   rank: string | null;
   contribution_count: number | null;
   referral_count: number | null;
+  // Adding created_at property to match Supabase schema
+  created_at?: string;
   profile?: {
     full_name: string | null;
     email: string | null;
