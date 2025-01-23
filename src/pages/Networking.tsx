@@ -1,14 +1,13 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CommunitySearch } from '@/components/community/CommunitySearch';
+import { Tabs } from '@/components/ui/tabs';
 import { CommunityMemberCard } from '@/components/community/CommunityMemberCard';
 import { CommunityMemberDetails } from '@/components/community/CommunityMemberDetails';
 import { CommunityMember } from '@/components/community/types';
 import { Sidebar } from '@/components/Sidebar';
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Users, Search, Filter, Youtube } from 'lucide-react';
+import { NetworkingHeader } from '@/components/networking/NetworkingHeader';
+import { NetworkingCategories } from '@/components/networking/NetworkingCategories';
 
 export default function Networking() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -19,11 +18,12 @@ export default function Networking() {
     queryKey: ['networking-members', selectedCategory],
     queryFn: async () => {
       let query = supabase
-        .from('networking_resources')
-        .select('*');
+        .from('tools')
+        .select('*')
+        .eq('category', 'community');
       
       if (selectedCategory !== 'all') {
-        query = query.eq('category', selectedCategory);
+        query = query.eq('member_type', selectedCategory);
       }
 
       const { data, error } = await query;
@@ -33,12 +33,12 @@ export default function Networking() {
         id: item.id,
         name: item.name,
         description: item.description,
-        member_type: item.category,
-        youtube_url: null,
-        youtube_videos: null,
-        website_url: item.join_url,
-        specialization: null,
-        content_themes: null,
+        member_type: item.member_type,
+        youtube_url: item.youtube_url,
+        youtube_videos: item.youtube_videos as { title: string; url: string; }[] | null,
+        website_url: item.website_url,
+        specialization: item.specialization,
+        content_themes: item.content_themes,
         profile_image_url: item.profile_image_url,
         member_count: null,
         join_url: null,
@@ -71,107 +71,20 @@ export default function Networking() {
       <Sidebar />
       <div className="flex-1 p-8">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col space-y-4 mb-8">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
-                  SISO Networking Hub
-                </h1>
-                <p className="mt-2 text-lg text-siso-text/80">
-                  Connect with the best communities and expand your network in the SISO ecosystem.
-                </p>
-              </div>
-              <CommunitySearch 
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-              />
-            </div>
+          <NetworkingHeader 
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+          />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
-              <Alert className="bg-siso-text/5 border border-siso-text/10">
-                <Users className="h-4 w-4 text-siso-orange" />
-                <AlertDescription className="text-siso-text/80">
-                  <span className="font-semibold text-siso-text">Community Members:</span> Discover and connect with featured creators, educators, and community leaders.
-                </AlertDescription>
-              </Alert>
-              
-              <Alert className="bg-siso-text/5 border border-siso-text/10">
-                <Search className="h-4 w-4 text-siso-orange" />
-                <AlertDescription className="text-siso-text/80">
-                  <span className="font-semibold text-siso-text">Quick Search:</span> Find specific members by name or browse through their specializations.
-                </AlertDescription>
-              </Alert>
-              
-              <Alert className="bg-siso-text/5 border border-siso-text/10">
-                <Youtube className="h-4 w-4 text-siso-orange" />
-                <AlertDescription className="text-siso-text/80">
-                  <span className="font-semibold text-siso-text">Content Access:</span> View member profiles to access their content, websites, and educational resources.
-                </AlertDescription>
-              </Alert>
-            </div>
-
-            <Tabs defaultValue="all" className="w-full" onValueChange={setSelectedCategory}>
-              <TabsList className="w-full justify-start bg-siso-text/5 border border-siso-text/10 flex-wrap">
-                <TabsTrigger 
-                  value="all"
-                  className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange"
-                >
-                  All
-                  <span className="ml-2 text-sm text-siso-text/60">
-                    {categories.all}
-                  </span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="business"
-                  className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange"
-                >
-                  Business
-                  <span className="ml-2 text-sm text-siso-text/60">
-                    {categories.business}
-                  </span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="personal"
-                  className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange"
-                >
-                  Personal Development
-                  <span className="ml-2 text-sm text-siso-text/60">
-                    {categories.personal}
-                  </span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="technology"
-                  className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange"
-                >
-                  Technology
-                  <span className="ml-2 text-sm text-siso-text/60">
-                    {categories.technology}
-                  </span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="finance"
-                  className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange"
-                >
-                  Finance
-                  <span className="ml-2 text-sm text-siso-text/60">
-                    {categories.finance}
-                  </span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="ai"
-                  className="data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange"
-                >
-                  AI
-                  <span className="ml-2 text-sm text-siso-text/60">
-                    {categories.ai}
-                  </span>
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-          </div>
+          <Tabs defaultValue="all" className="w-full" onValueChange={setSelectedCategory}>
+            <NetworkingCategories 
+              categories={categories}
+              selectedCategory={selectedCategory}
+            />
+          </Tabs>
 
           {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
               {[...Array(8)].map((_, i) => (
                 <div 
                   key={i}
@@ -180,7 +93,7 @@ export default function Networking() {
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
               {filteredMembers?.map((member) => (
                 <CommunityMemberCard
                   key={member.id}
