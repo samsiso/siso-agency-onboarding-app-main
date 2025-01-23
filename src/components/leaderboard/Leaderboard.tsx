@@ -111,14 +111,21 @@ export const Leaderboard = () => {
       // Combine the data with proper type handling for achievements
       const combinedData: LeaderboardEntry[] = profilesData?.map(profile => {
         const leaderboardEntry = leaderboardData?.find(entry => entry.user_id === profile.id);
+        
+        // Transform the achievements data to match the Achievement interface
+        const achievements: Achievement[] = Array.isArray(leaderboardEntry?.achievements) 
+          ? (leaderboardEntry.achievements as any[]).map(achievement => ({
+              name: achievement.name || 'Unknown Achievement',
+              icon: achievement.icon || '🏆'
+            }))
+          : [];
+
         return {
           id: profile.id,
           user_id: profile.id,
           points: profile.points,
           rank: profile.rank,
-          achievements: Array.isArray(leaderboardEntry?.achievements) 
-            ? (leaderboardEntry.achievements as Achievement[])
-            : [],
+          achievements: achievements,
           siso_tokens: leaderboardEntry?.siso_tokens || 0,
           updated_at: profile.updated_at,
           contribution_count: leaderboardEntry?.contribution_count || 0,
