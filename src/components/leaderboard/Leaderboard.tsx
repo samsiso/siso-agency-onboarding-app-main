@@ -99,7 +99,8 @@ export const Leaderboard = () => {
           )
         `)
         .gt('points', 0)
-        .order('points', { ascending: false });
+        .order('points', { ascending: false })
+        .limit(100);
 
       if (error) {
         console.error('Error fetching leaderboard:', error);
