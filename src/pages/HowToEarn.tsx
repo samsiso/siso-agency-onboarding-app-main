@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Trophy, Calendar, MessageSquare, Heart, GraduationCap, Wrench, Bot, Share2, Award, Star } from 'lucide-react';
+import { Trophy, Calendar, MessageSquare, Heart, GraduationCap, Wrench, Bot, Share2, Award, Star, Newspaper, Users, Coins } from 'lucide-react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Sidebar } from '@/components/Sidebar';
 import { EarningCategory } from '@/components/earn/EarningCategory';
