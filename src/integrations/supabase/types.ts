@@ -340,28 +340,43 @@ export type Database = {
       }
       leaderboard: {
         Row: {
+          avatar_url: string | null
           created_at: string
           id: string
+          kda: number | null
+          losses: number | null
           points: number | null
           rank: string | null
+          season_rank: string | null
           updated_at: string
           user_id: string
+          wins: number | null
         }
         Insert: {
+          avatar_url?: string | null
           created_at?: string
           id?: string
+          kda?: number | null
+          losses?: number | null
           points?: number | null
           rank?: string | null
+          season_rank?: string | null
           updated_at?: string
           user_id: string
+          wins?: number | null
         }
         Update: {
+          avatar_url?: string | null
           created_at?: string
           id?: string
+          kda?: number | null
+          losses?: number | null
           points?: number | null
           rank?: string | null
+          season_rank?: string | null
           updated_at?: string
           user_id?: string
+          wins?: number | null
         }
         Relationships: [
           {
