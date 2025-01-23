@@ -1,9 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
-import { useState, useMemo, Suspense } from 'react';
+import { useState, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Tool } from '@/components/tools/types';
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ChatBot } from '@/components/ChatBot';
 import { Sidebar } from '@/components/Sidebar';
 import { toast } from 'react-hot-toast';
@@ -15,6 +22,7 @@ import { motion } from 'framer-motion';
 export default function Tools() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<string>('rating');
 
   const categories = useMemo(() => [
     { id: 'all', label: 'All Tools' },
@@ -48,10 +56,27 @@ export default function Tools() {
     },
   });
 
+  const sortTools = (tools: Tool[]) => {
+    return [...tools].sort((a, b) => {
+      switch (sortBy) {
+        case 'rating':
+          return (b.rating || 0) - (a.rating || 0);
+        case 'name':
+          return a.name.localeCompare(b.name);
+        case 'newest':
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        case 'popular':
+          return (b.downloads_count || 0) - (a.downloads_count || 0);
+        default:
+          return 0;
+      }
+    });
+  };
+
   const filteredTools = useMemo(() => {
     if (!tools) return [];
     
-    return tools.filter(tool => {
+    let filtered = tools.filter(tool => {
       const matchesSearch = !searchQuery || 
         tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         tool.description?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -63,7 +88,14 @@ export default function Tools() {
 
       return matchesSearch && matchesCategory;
     });
-  }, [tools, searchQuery, selectedCategory]);
+
+    return sortTools(filtered);
+  }, [tools, searchQuery, selectedCategory, sortBy]);
+
+  const featuredTools = useMemo(() => {
+    if (!tools) return [];
+    return tools.filter(tool => tool.rating && tool.rating >= 4.5).slice(0, 4);
+  }, [tools]);
 
   if (error) {
     return (
@@ -94,7 +126,41 @@ export default function Tools() {
             totalTools={tools?.length}
           />
 
-          <ToolsCategories />
+          <div className="flex items-center justify-between">
+            <ToolsCategories />
+            <Select
+              value={sortBy}
+              onValueChange={setSortBy}
+            >
+              <SelectTrigger className="w-[180px] bg-siso-text/5 border-siso-text/10">
+                <SelectValue placeholder="Sort by..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="rating">Highest Rated</SelectItem>
+                <SelectItem value="name">Alphabetical</SelectItem>
+                <SelectItem value="newest">Newest First</SelectItem>
+                <SelectItem value="popular">Most Popular</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {featuredTools.length > 0 && selectedCategory === 'all' && !searchQuery && (
+            <div className="space-y-4">
+              <h2 className="text-2xl font-semibold text-siso-text-bold">Featured Tools</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {featuredTools.map((tool) => (
+                  <motion.div
+                    key={tool.id}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <ToolCard tool={tool} />
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <ScrollArea className="w-full">
             <Tabs 
@@ -123,9 +189,7 @@ export default function Tools() {
             </Tabs>
           </ScrollArea>
 
-          <Suspense fallback={<ToolsGrid tools={[]} isLoading={true} />}>
-            <ToolsGrid tools={filteredTools} isLoading={isLoading} />
-          </Suspense>
+          <ToolsGrid tools={filteredTools} isLoading={isLoading} />
         </motion.div>
       </div>
       <ChatBot agentType="tools" />

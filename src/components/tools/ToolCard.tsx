@@ -89,7 +89,7 @@ export function ToolCard({ tool }: ToolCardProps) {
   return (
     <motion.div
       onClick={handleClick}
-      className="group relative flex flex-col gap-4 rounded-lg border border-siso-text/10 bg-siso-text/5 p-6 transition-all duration-300 cursor-pointer h-[200px] hover:border-siso-orange/30 focus:outline-none focus:ring-2 focus:ring-siso-orange/50 shadow-sm"
+      className="group relative flex flex-col gap-4 rounded-lg border border-siso-text/10 bg-siso-text/5 p-6 transition-all duration-300 cursor-pointer h-[200px] hover:border-siso-orange/30 focus:outline-none focus:ring-2 focus:ring-siso-orange/50 shadow-sm backdrop-blur-sm"
       whileHover={{ 
         scale: 1.02,
         backgroundColor: 'rgba(255, 255, 255, 0.08)',
@@ -106,11 +106,11 @@ export function ToolCard({ tool }: ToolCardProps) {
           <img
             src={tool.profile_image_url}
             alt={`${tool.name} logo`}
-            className="h-12 w-12 shrink-0 rounded-lg object-cover ring-2 ring-siso-orange/20"
+            className="h-12 w-12 shrink-0 rounded-lg object-cover ring-2 ring-siso-orange/20 transition-all duration-300 group-hover:ring-siso-orange/40"
             loading="lazy"
           />
         ) : (
-          <div className="h-12 w-12 shrink-0 rounded-lg bg-gradient-to-br from-siso-red/20 to-siso-orange/20 flex items-center justify-center ring-2 ring-siso-orange/20">
+          <div className="h-12 w-12 shrink-0 rounded-lg bg-gradient-to-br from-siso-red/20 to-siso-orange/20 flex items-center justify-center ring-2 ring-siso-orange/20 transition-all duration-300 group-hover:ring-siso-orange/40">
             {getIconForTool(tool)}
           </div>
         )}
@@ -119,6 +119,12 @@ export function ToolCard({ tool }: ToolCardProps) {
             {tool.name}
           </h3>
           <p className="text-sm text-siso-text/80 truncate">{tool.category}</p>
+          {tool.rating && (
+            <div className="flex items-center gap-1 mt-1">
+              <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+              <span className="text-sm text-siso-text/80">{tool.rating.toFixed(1)}</span>
+            </div>
+          )}
         </div>
       </div>
       {tool.description && (
