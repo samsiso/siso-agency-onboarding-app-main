@@ -44,10 +44,10 @@ export const Leaderboard = () => {
         {
           event: '*',
           schema: 'public',
-          table: 'leaderboard'
+          table: 'profiles'  // Changed from 'leaderboard' to 'profiles'
         },
         (payload) => {
-          console.log('Real-time leaderboard update received:', payload);
+          console.log('Real-time profile update received:', payload);
           fetchLeaderboard();
           fetchTotalUsersWithPoints();
         }
@@ -56,27 +56,8 @@ export const Leaderboard = () => {
         console.log('Leaderboard subscription status:', status);
       });
 
-    // Also listen for profile changes
-    const profileChannel = supabase
-      .channel('profile-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'profiles'
-        },
-        (payload) => {
-          console.log('Profile update received:', payload);
-          fetchLeaderboard();
-          fetchTotalUsersWithPoints();
-        }
-      )
-      .subscribe();
-
     return () => {
       supabase.removeChannel(channel);
-      supabase.removeChannel(profileChannel);
     };
   }, []);
 
@@ -101,12 +82,20 @@ export const Leaderboard = () => {
   const fetchLeaderboard = async () => {
     try {
       console.log('Fetching leaderboard data...');
+      // Changed query to fetch directly from profiles table
       const { data, error } = await supabase
-        .from('leaderboard')
+        .from('profiles')
         .select(`
-          *,
-          profile:profiles(full_name, email)
+          id,
+          full_name,
+          email,
+          points,
+          rank,
+          updated_at,
+          contribution_count,
+          referral_count
         `)
+        .gt('points', 0)  // Only fetch users with points
         .order('points', { ascending: false });
 
       if (error) {
@@ -117,14 +106,19 @@ export const Leaderboard = () => {
       if (data) {
         console.log('Fetched leaderboard data:', data);
         const transformedData: LeaderboardEntry[] = data.map(entry => ({
-          ...entry,
-          achievements: Array.isArray(entry.achievements) 
-            ? entry.achievements 
-            : typeof entry.achievements === 'string'
-              ? JSON.parse(entry.achievements)
-              : entry.achievements || [],
+          id: entry.id,
+          user_id: entry.id,
+          points: entry.points,
+          rank: entry.rank,
+          achievements: [],
+          siso_tokens: 0,
+          updated_at: entry.updated_at,
           contribution_count: entry.contribution_count || 0,
           referral_count: entry.referral_count || 0,
+          profile: {
+            full_name: entry.full_name,
+            email: entry.email
+          }
         }));
         setLeaderboardData(transformedData);
       }
