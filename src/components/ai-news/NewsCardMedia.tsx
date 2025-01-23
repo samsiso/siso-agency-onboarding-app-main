@@ -22,7 +22,7 @@ export const NewsCardMedia = ({
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3 }}
-      className={`relative ${isCompact ? 'w-1/3' : isFeatured ? 'w-full' : 'w-full lg:w-[400px]'} ${isCompact ? 'max-w-[200px]' : 'max-w-[600px]'}`}
+      className={`relative ${isCompact ? 'w-1/3' : isFeatured ? 'w-full' : 'w-full'} ${isCompact ? 'max-w-[200px]' : 'max-w-full'}`}
     >
       <div className={`relative ${isCompact ? 'aspect-[4/3]' : 'aspect-video'} overflow-hidden rounded-lg border border-siso-border group`}>
         <div className={`absolute inset-0 bg-siso-bg-alt animate-pulse ${isLoading ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`} />

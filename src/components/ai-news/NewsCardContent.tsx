@@ -47,7 +47,7 @@ export const NewsCardContent = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className={`space-y-3 sm:space-y-4 ${isCompact ? 'pl-0' : 'px-4'}`}
+      className={`flex flex-col h-full ${isCompact ? 'pl-0' : 'px-4'}`}
     >
       <div className="space-y-2 sm:space-y-3">
         <button 
@@ -73,7 +73,7 @@ export const NewsCardContent = ({
         )}
       </div>
       
-      <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
+      <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm mt-auto">
         <span className="text-siso-text/60">
           {source}
         </span>
