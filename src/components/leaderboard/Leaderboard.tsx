@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Trophy, Medal, Star, Users, ArrowUp, ArrowDown } from 'lucide-react';
+import { Trophy, Medal, Star, Users, ArrowUp, ArrowDown, MapPin, Clock } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import {
   Card,
@@ -19,6 +19,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 
 interface LeaderboardEntry {
   id: string;
@@ -30,9 +31,12 @@ interface LeaderboardEntry {
   kda: number;
   season_rank: string;
   avatar_url: string | null;
+  last_active: string | null;
   profiles: {
     full_name: string | null;
     email: string | null;
+    country: string | null;
+    professional_role: string | null;
   };
 }
 
@@ -51,7 +55,9 @@ export const Leaderboard = () => {
             *,
             profiles (
               full_name,
-              email
+              email,
+              country,
+              professional_role
             )
           `)
           .order('points', { ascending: false })
@@ -100,6 +106,16 @@ export const Leaderboard = () => {
     }
   };
 
+  const getRankBadgeColor = (rank: string) => {
+    switch (rank.toLowerCase()) {
+      case 'diamond': return 'bg-blue-500/10 text-blue-500';
+      case 'platinum': return 'bg-cyan-500/10 text-cyan-500';
+      case 'gold': return 'bg-yellow-500/10 text-yellow-500';
+      case 'silver': return 'bg-gray-500/10 text-gray-400';
+      default: return 'bg-orange-500/10 text-orange-500';
+    }
+  };
+
   if (loading) {
     return (
       <Card className="bg-black/20 border-siso-text/10">
@@ -127,10 +143,10 @@ export const Leaderboard = () => {
         <div className="space-y-1">
           <h1 className="text-3xl font-bold text-siso-text-bold flex items-center gap-2">
             <Trophy className="w-8 h-8 text-siso-orange" />
-            Leaderboard Rankings
+            Global Rankings
           </h1>
           <p className="text-siso-text/70">
-            Compete with other players and climb the ranks
+            Compete with players worldwide and climb the ranks
           </p>
         </div>
         <Button variant="outline" className="gap-2">
@@ -168,11 +184,21 @@ export const Leaderboard = () => {
               <h3 className="text-xl font-bold text-siso-text-bold mb-1">
                 {player.profiles.full_name || player.profiles.email?.split('@')[0] || 'Anonymous'}
               </h3>
-              <p className="text-sm text-siso-text/70 mb-4">{player.season_rank}</p>
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <Badge variant="outline" className={getRankBadgeColor(player.season_rank)}>
+                  {player.season_rank}
+                </Badge>
+                {player.profiles.country && (
+                  <Badge variant="outline" className="bg-siso-text/5">
+                    <MapPin className="w-3 h-3 mr-1" />
+                    {player.profiles.country}
+                  </Badge>
+                )}
+              </div>
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
-                  <p className="text-sm text-siso-text/70">W/L</p>
-                  <p className="font-bold text-siso-text-bold">{player.wins} - {player.losses}</p>
+                  <p className="text-sm text-siso-text/70">Points</p>
+                  <p className="font-bold text-siso-text-bold">{player.points}</p>
                 </div>
                 <div>
                   <p className="text-sm text-siso-text/70">Win Rate</p>
@@ -200,10 +226,11 @@ export const Leaderboard = () => {
               <TableRow>
                 <TableHead className="w-16">Rank</TableHead>
                 <TableHead>Player</TableHead>
+                <TableHead className="text-center">Points</TableHead>
                 <TableHead className="text-center">W/L</TableHead>
                 <TableHead className="text-center">Win Rate</TableHead>
                 <TableHead className="text-center">KDA</TableHead>
-                <TableHead className="text-right">Points</TableHead>
+                <TableHead className="text-right">Role</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -219,12 +246,25 @@ export const Leaderboard = () => {
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-medium text-siso-text-bold">
-                          {player.profiles.full_name || player.profiles.email?.split('@')[0] || 'Anonymous'}
-                        </p>
-                        <p className="text-sm text-siso-text/70">{player.season_rank}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium text-siso-text-bold">
+                            {player.profiles.full_name || player.profiles.email?.split('@')[0] || 'Anonymous'}
+                          </p>
+                          <Badge variant="outline" className={getRankBadgeColor(player.season_rank)}>
+                            {player.season_rank}
+                          </Badge>
+                        </div>
+                        {player.profiles.country && (
+                          <p className="text-sm text-siso-text/70 flex items-center gap-1">
+                            <MapPin className="w-3 h-3" />
+                            {player.profiles.country}
+                          </p>
+                        )}
                       </div>
                     </div>
+                  </TableCell>
+                  <TableCell className="text-center font-bold text-siso-orange">
+                    {player.points}
                   </TableCell>
                   <TableCell className="text-center">
                     {player.wins} - {player.losses}
@@ -239,8 +279,8 @@ export const Leaderboard = () => {
                       {player.kda.toFixed(2)}
                     </span>
                   </TableCell>
-                  <TableCell className="text-right font-bold text-siso-orange">
-                    {player.points}
+                  <TableCell className="text-right text-sm text-siso-text/70">
+                    {player.profiles.professional_role || '-'}
                   </TableCell>
                 </TableRow>
               ))}
