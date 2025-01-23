@@ -1,5 +1,6 @@
 import { Tool } from './types';
 import { ToolCard } from './ToolCard';
+import { ToolSkeleton } from './ToolSkeleton';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface ToolsGridProps {
@@ -17,10 +18,24 @@ export function ToolsGrid({ tools, isLoading }: ToolsGridProps) {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: i * 0.05, duration: 0.3 }}
-            className="h-[200px] rounded-lg bg-siso-text/5 animate-pulse border border-siso-text/10 shadow-sm"
-          />
+          >
+            <ToolSkeleton />
+          </motion.div>
         ))}
       </div>
+    );
+  }
+
+  if (tools.length === 0) {
+    return (
+      <motion.div 
+        className="text-center py-12"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+      >
+        <p className="text-xl text-siso-text/60">No tools found matching your search criteria.</p>
+      </motion.div>
     );
   }
 

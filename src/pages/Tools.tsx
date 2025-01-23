@@ -91,6 +91,7 @@ export default function Tools() {
           <ToolsHeader 
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
+            totalTools={tools?.length}
           />
 
           <ToolsCategories />
