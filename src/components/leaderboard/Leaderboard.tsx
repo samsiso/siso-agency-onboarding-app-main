@@ -6,6 +6,7 @@ import { LeaderboardStats } from './LeaderboardStats';
 import { LeaderboardTable } from './LeaderboardTable';
 import { CommunityMemberDetails } from '../community/CommunityMemberDetails';
 import type { LeaderboardEntry } from './types';
+import type { Achievement } from '../community/types';
 
 export const Leaderboard = () => {
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
