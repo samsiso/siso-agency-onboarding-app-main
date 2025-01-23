@@ -1,0 +1,4 @@
+project_id = "fzuwsjxjymwcjsbpwfsl"
+
+[functions.verify-wallet-signature]
+verify_jwt = true
