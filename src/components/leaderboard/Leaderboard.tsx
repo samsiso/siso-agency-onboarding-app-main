@@ -4,7 +4,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LeaderboardStats } from './LeaderboardStats';
 import { LeaderboardTable } from './LeaderboardTable';
-import type { LeaderboardEntry } from './types';
+import type { LeaderboardEntry, Achievement } from './types';
 
 export const Leaderboard = () => {
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
