@@ -105,6 +105,23 @@ export default {
           "0%": { transform: "translateX(100%)", opacity: "0" },
           "100%": { transform: "translateX(0)", opacity: "1" },
         },
+        shimmer: {
+          "100%": { transform: "translateX(100%)" }
+        },
+        ping: {
+          "75%, 100%": {
+            transform: "scale(2)",
+            opacity: "0"
+          }
+        },
+        float: {
+          "0%, 100%": {
+            transform: "translateY(0)"
+          },
+          "50%": {
+            transform: "translateY(-10px)"
+          }
+        }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -114,6 +131,9 @@ export default {
         "float-slow": "float-slow 20s ease-in-out infinite",
         "float-slower": "float-slower 25s ease-in-out infinite",
         "slide-in-right": "slide-in-right 0.3s ease-out forwards",
+        shimmer: "shimmer 2s linear infinite",
+        ping: "ping 2s cubic-bezier(0, 0, 0.2, 1) infinite",
+        float: "float 3s ease-in-out infinite"
       },
       typography: {
         DEFAULT: {

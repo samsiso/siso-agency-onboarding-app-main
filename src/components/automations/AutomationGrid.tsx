@@ -16,9 +16,13 @@ export const AutomationGrid = memo(({
 }: AutomationGridProps) => {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 animate-fade-in">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {[...Array(8)].map((_, i) => (
-          <Skeleton key={i} className="h-32 bg-siso-text/5 rounded-lg border border-siso-text/10" />
+          <div key={i} className="relative group">
+            <Skeleton className="h-32 bg-gradient-to-br from-siso-text/5 to-siso-text/10 border border-siso-text/10 rounded-lg overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-siso-text/10 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+            </Skeleton>
+          </div>
         ))}
       </div>
     );
