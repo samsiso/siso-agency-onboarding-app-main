@@ -16,8 +16,25 @@ const Profile = () => {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Add form state
+  const [formData, setFormData] = useState({
+    fullName: '',
+    businessName: '',
+    businessType: '',
+    industry: '',
+    interests: '',
+    bio: '',
+    linkedinUrl: '',
+    websiteUrl: '',
+    youtubeUrl: '',
+    instagramUrl: '',
+    twitterUrl: '',
+    professionalRole: '',
+  });
 
   useEffect(() => {
     const getProfile = async () => {
@@ -52,6 +69,21 @@ const Profile = () => {
         if (profileData) {
           console.log('[Profile] Profile data found:', profileData);
           setProfile(profileData);
+          // Update form data with profile data
+          setFormData({
+            fullName: profileData.full_name || '',
+            businessName: profileData.business_name || '',
+            businessType: profileData.business_type || '',
+            industry: profileData.industry || '',
+            interests: Array.isArray(profileData.interests) ? profileData.interests.join(', ') : '',
+            bio: profileData.bio || '',
+            linkedinUrl: profileData.linkedin_url || '',
+            websiteUrl: profileData.website_url || '',
+            youtubeUrl: profileData.youtube_url || '',
+            instagramUrl: profileData.instagram_url || '',
+            twitterUrl: profileData.twitter_url || '',
+            professionalRole: profileData.professional_role || '',
+          });
         }
       } catch (error: any) {
         console.error('[Profile] Error in getProfile:', error);
@@ -68,6 +100,13 @@ const Profile = () => {
 
     getProfile();
   }, [navigate]);
+
+  const handleFormChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
 
   if (loading) {
     return (
@@ -171,6 +210,9 @@ const Profile = () => {
                     instagramUrl={profile?.instagram_url}
                     twitterUrl={profile?.twitter_url}
                     professionalRole={profile?.professional_role}
+                    isEditing={isEditing}
+                    formData={formData}
+                    onFormChange={handleFormChange}
                   />
                 </div>
                 
