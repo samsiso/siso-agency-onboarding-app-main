@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Trophy, ChevronDown, ChevronUp, Clock } from 'lucide-react';
+import { Trophy, ChevronDown, ChevronUp, Clock, Linkedin, Globe, Youtube, Instagram, Twitter } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -26,6 +26,11 @@ interface LeaderboardEntry {
     full_name: string | null;
     email: string | null;
     professional_role: string | null;
+    linkedin_url: string | null;
+    website_url: string | null;
+    youtube_url: string | null;
+    instagram_url: string | null;
+    twitter_url: string | null;
   } | null;
 }
 
@@ -47,7 +52,12 @@ export const Leaderboard = () => {
           profiles (
             full_name,
             email,
-            professional_role
+            professional_role,
+            linkedin_url,
+            website_url,
+            youtube_url,
+            instagram_url,
+            twitter_url
           )
         `)
         .order('points', { ascending: false });
@@ -120,9 +130,68 @@ export const Leaderboard = () => {
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="font-medium">
-                            {entry.profiles?.full_name || entry.profiles?.email?.split('@')[0] || 'Anonymous User'}
-                          </p>
+                          <div className="flex items-center gap-2">
+                            <p className="font-medium">
+                              {entry.profiles?.full_name || entry.profiles?.email?.split('@')[0] || 'Anonymous User'}
+                            </p>
+                            <div className="flex gap-1">
+                              {entry.profiles?.linkedin_url && (
+                                <a 
+                                  href={entry.profiles.linkedin_url} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="text-muted-foreground hover:text-primary transition-colors"
+                                >
+                                  <Linkedin className="h-4 w-4" />
+                                </a>
+                              )}
+                              {entry.profiles?.website_url && (
+                                <a 
+                                  href={entry.profiles.website_url} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="text-muted-foreground hover:text-primary transition-colors"
+                                >
+                                  <Globe className="h-4 w-4" />
+                                </a>
+                              )}
+                              {entry.profiles?.youtube_url && (
+                                <a 
+                                  href={entry.profiles.youtube_url} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="text-muted-foreground hover:text-primary transition-colors"
+                                >
+                                  <Youtube className="h-4 w-4" />
+                                </a>
+                              )}
+                              {entry.profiles?.instagram_url && (
+                                <a 
+                                  href={entry.profiles.instagram_url} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="text-muted-foreground hover:text-primary transition-colors"
+                                >
+                                  <Instagram className="h-4 w-4" />
+                                </a>
+                              )}
+                              {entry.profiles?.twitter_url && (
+                                <a 
+                                  href={entry.profiles.twitter_url} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="text-muted-foreground hover:text-primary transition-colors"
+                                >
+                                  <Twitter className="h-4 w-4" />
+                                </a>
+                              )}
+                            </div>
+                          </div>
                           <p className="text-sm text-muted-foreground">{entry.profiles?.professional_role}</p>
                         </div>
                       </div>
