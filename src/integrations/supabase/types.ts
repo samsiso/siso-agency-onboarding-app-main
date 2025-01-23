@@ -342,12 +342,14 @@ export type Database = {
         Row: {
           achievements: Json | null
           avatar_url: string | null
+          contribution_count: number | null
           created_at: string
           id: string
           kda: number | null
           losses: number | null
           points: number | null
           rank: string | null
+          referral_count: number | null
           season_rank: string | null
           siso_tokens: number | null
           updated_at: string
@@ -357,12 +359,14 @@ export type Database = {
         Insert: {
           achievements?: Json | null
           avatar_url?: string | null
+          contribution_count?: number | null
           created_at?: string
           id?: string
           kda?: number | null
           losses?: number | null
           points?: number | null
           rank?: string | null
+          referral_count?: number | null
           season_rank?: string | null
           siso_tokens?: number | null
           updated_at?: string
@@ -372,12 +376,14 @@ export type Database = {
         Update: {
           achievements?: Json | null
           avatar_url?: string | null
+          contribution_count?: number | null
           created_at?: string
           id?: string
           kda?: number | null
           losses?: number | null
           points?: number | null
           rank?: string | null
+          referral_count?: number | null
           season_rank?: string | null
           siso_tokens?: number | null
           updated_at?: string
