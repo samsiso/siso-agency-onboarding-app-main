@@ -1,12 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Sidebar } from '../components/Sidebar';
-import { MessageSquare, Send, Brain, Sparkles, Bot, Wrench, GraduationCap, Network } from 'lucide-react';
+import { MessageSquare, Brain, Sparkles, Bot, Wrench, GraduationCap, Network } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { ChatMessage } from '@/components/chat/ChatMessage';
+import { ChatInput } from '@/components/chat/ChatInput';
+import { useToast } from '@/hooks/use-toast';
 
 interface Message {
   role: 'assistant' | 'user';
@@ -51,7 +50,6 @@ const SisoAI = () => {
   const [messages, setMessages] = useState<Message[]>([
     { role: 'assistant', content: 'Hello! I\'m your SISO AI assistant. How can I help you today?' }
   ]);
-  const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedAssistant, setSelectedAssistant] = useState<AssistantType>('general');
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -65,19 +63,16 @@ const SisoAI = () => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
+  const handleSubmit = async (message: string) => {
+    if (isLoading) return;
 
-    const userMessage = input.trim();
-    setInput('');
     setIsLoading(true);
-    setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+    setMessages(prev => [...prev, { role: 'user', content: message }]);
 
     try {
       const { data, error } = await supabase.functions.invoke('chat-with-assistant', {
         body: { 
-          message: userMessage,
+          message,
           systemPrompt: getAssistantPrompt(selectedAssistant)
         },
       });
@@ -106,10 +101,9 @@ const SisoAI = () => {
           <ScrollArea className="h-[calc(100vh-8rem)]">
             <div className="space-y-2">
               {assistantTypes.map(({ id, label, icon: Icon }) => (
-                <Button
+                <button
                   key={id}
-                  variant="ghost"
-                  className={`w-full justify-start gap-2 ${
+                  className={`w-full flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
                     selectedAssistant === id 
                       ? 'bg-siso-text/10 text-siso-text-bold'
                       : 'text-siso-text hover:bg-siso-text/5'
@@ -124,7 +118,7 @@ const SisoAI = () => {
                 >
                   <Icon className="w-4 h-4" />
                   <span className="text-sm">{label}</span>
-                </Button>
+                </button>
               ))}
             </div>
           </ScrollArea>
@@ -148,54 +142,22 @@ const SisoAI = () => {
               </div>
               
               <div className="bg-black/20 rounded-xl border border-siso-text/10 flex-1 flex flex-col">
-                <div className="flex-1 p-6 overflow-y-auto">
+                <ScrollArea className="flex-1 p-6">
                   <div className="space-y-6">
                     {messages.map((message, index) => (
-                      <div key={index} className="flex items-start gap-4">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                          message.role === 'assistant' 
-                            ? 'bg-gradient-to-br from-siso-red to-siso-orange' 
-                            : 'bg-gradient-to-br from-siso-text/20 to-siso-text/30'
-                        }`}>
-                          <MessageSquare className="w-5 h-5 text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-siso-text-bold mb-2">
-                            {message.role === 'assistant' ? assistantTypes.find(a => a.id === selectedAssistant)?.label : 'You'}
-                          </p>
-                          <div className="bg-siso-text/5 rounded-lg p-4 text-siso-text">
-                            {message.content}
-                          </div>
-                        </div>
-                      </div>
+                      <ChatMessage
+                        key={index}
+                        role={message.role}
+                        content={message.content}
+                        assistantType={assistantTypes.find(a => a.id === selectedAssistant)?.label}
+                        isLoading={isLoading && index === messages.length - 1 && message.role === 'assistant'}
+                      />
                     ))}
                     <div ref={messagesEndRef} />
                   </div>
-                </div>
+                </ScrollArea>
                 
-                <form onSubmit={handleSubmit} className="border-t border-siso-text/10 p-4">
-                  <div className="flex gap-3">
-                    <input
-                      type="text"
-                      value={input}
-                      onChange={(e) => setInput(e.target.value)}
-                      placeholder="Type your message..."
-                      className="flex-1 bg-black/20 border border-siso-text/10 rounded-lg px-4 py-3 text-siso-text placeholder:text-siso-text/50 focus:outline-none focus:ring-2 focus:ring-siso-red/50 transition-all"
-                      disabled={isLoading}
-                    />
-                    <Button 
-                      type="submit"
-                      disabled={isLoading}
-                      className="bg-gradient-to-r from-siso-red to-siso-orange text-white px-6 py-3 rounded-lg hover:opacity-90 transition-all"
-                    >
-                      {isLoading ? (
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      ) : (
-                        <Send className="w-5 h-5" />
-                      )}
-                    </Button>
-                  </div>
-                </form>
+                <ChatInput onSubmit={handleSubmit} isLoading={isLoading} />
               </div>
             </div>
           </div>
