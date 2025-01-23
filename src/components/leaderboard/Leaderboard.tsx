@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Trophy, ChevronDown, ChevronUp, Clock, Linkedin, Globe, Youtube, Instagram, Twitter } from 'lucide-react';
+import { Trophy, ChevronDown, ChevronUp, Clock, Linkedin, Globe, Youtube, Instagram, Twitter, Users, UserPlus } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { format } from 'date-fns';
 
 interface Achievement {
@@ -22,6 +21,8 @@ interface LeaderboardEntry {
   achievements: Achievement[] | null;
   siso_tokens: number | null;
   updated_at: string;
+  contribution_count: number | null;
+  referral_count: number | null;
   profiles: {
     full_name: string | null;
     email: string | null;
@@ -72,6 +73,8 @@ export const Leaderboard = () => {
             : typeof entry.achievements === 'string'
               ? JSON.parse(entry.achievements)
               : entry.achievements || [],
+          contribution_count: Math.floor(Math.random() * 50), // Placeholder - replace with actual data
+          referral_count: Math.floor(Math.random() * 20), // Placeholder - replace with actual data
         }));
         setLeaderboardData(transformedData);
       }
@@ -109,6 +112,7 @@ export const Leaderboard = () => {
               <TableRow>
                 <TableHead className="w-[50px]">Rank</TableHead>
                 <TableHead>User</TableHead>
+                <TableHead>Community Impact</TableHead>
                 <TableHead>Points Earned</TableHead>
                 <TableHead>Last Active</TableHead>
                 <TableHead className="w-[50px]"></TableHead>
@@ -134,7 +138,7 @@ export const Leaderboard = () => {
                             <p className="font-medium">
                               {entry.profiles?.full_name || entry.profiles?.email?.split('@')[0] || 'Anonymous User'}
                             </p>
-                            <div className="flex gap-1">
+                            <div className="flex gap-2">
                               {entry.profiles?.linkedin_url && (
                                 <a 
                                   href={entry.profiles.linkedin_url} 
@@ -197,6 +201,18 @@ export const Leaderboard = () => {
                       </div>
                     </TableCell>
                     <TableCell>
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-1">
+                          <Users className="h-4 w-4 text-muted-foreground" />
+                          <span>{entry.contribution_count || 0} contributions</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <UserPlus className="h-4 w-4 text-muted-foreground" />
+                          <span>{entry.referral_count || 0} referrals</span>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
                       <div className="flex items-center gap-2">
                         <Trophy className="h-4 w-4 text-yellow-500" />
                         {entry.points || 0}
@@ -218,7 +234,7 @@ export const Leaderboard = () => {
                   </TableRow>
                   {expandedRows.has(entry.id) && (
                     <TableRow>
-                      <TableCell colSpan={5}>
+                      <TableCell colSpan={6}>
                         <div className="p-4 bg-muted/30 rounded-lg">
                           <div className="grid grid-cols-2 gap-4">
                             <div>
