@@ -564,29 +564,35 @@ export type Database = {
       point_configurations: {
         Row: {
           action: string
+          cooldown_minutes: number | null
           created_at: string
           description: string | null
           id: string
           is_active: boolean | null
           points: number
+          requirements: Json | null
           updated_at: string
         }
         Insert: {
           action: string
+          cooldown_minutes?: number | null
           created_at?: string
           description?: string | null
           id?: string
           is_active?: boolean | null
           points: number
+          requirements?: Json | null
           updated_at?: string
         }
         Update: {
           action?: string
+          cooldown_minutes?: number | null
           created_at?: string
           description?: string | null
           id?: string
           is_active?: boolean | null
           points?: number
+          requirements?: Json | null
           updated_at?: string
         }
         Relationships: []
