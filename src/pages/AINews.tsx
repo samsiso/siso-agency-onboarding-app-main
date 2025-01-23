@@ -169,49 +169,51 @@ const AINews = () => {
                 onCategoryChange={setSelectedCategory}
               />
 
-              {/* Top Posts Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
-                {/* Hero Post - 7 columns */}
-                {heroPost && (
-                  <div className="lg:col-span-7">
+              {/* Top Section with Hero and Side Posts */}
+              {newsItems.length > 0 && (
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
+                  {/* Hero Post - 8 columns */}
+                  <div className="lg:col-span-8">
                     <NewsCard
-                      key={heroPost.id}
-                      item={heroPost}
+                      key={newsItems[0].id}
+                      item={newsItems[0]}
                       summaries={summaries}
                       loadingSummaries={loadingSummaries}
                       onGenerateSummary={generateSummary}
                       isFeatured={true}
                     />
                   </div>
-                )}
 
-                {/* Side Posts - 5 columns */}
-                <div className="lg:col-span-5 space-y-4">
-                  {sidePosts.map((item) => (
+                  {/* Side Posts - 4 columns */}
+                  <div className="lg:col-span-4 space-y-4 sm:space-y-6">
+                    {newsItems.slice(1, 4).map((item) => (
+                      <NewsCard
+                        key={item.id}
+                        item={item}
+                        summaries={summaries}
+                        loadingSummaries={loadingSummaries}
+                        onGenerateSummary={generateSummary}
+                        isCompact={true}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Regular Posts Grid - 2 columns */}
+              {newsItems.length > 4 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                  {newsItems.slice(4).map((item) => (
                     <NewsCard
                       key={item.id}
                       item={item}
                       summaries={summaries}
                       loadingSummaries={loadingSummaries}
                       onGenerateSummary={generateSummary}
-                      isCompact={true}
                     />
                   ))}
                 </div>
-              </div>
-
-              {/* Regular Posts - 2 columns grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-6">
-                {regularPosts.map((item) => (
-                  <NewsCard
-                    key={item.id}
-                    item={item}
-                    summaries={summaries}
-                    loadingSummaries={loadingSummaries}
-                    onGenerateSummary={generateSummary}
-                  />
-                ))}
-              </div>
+              )}
             </Suspense>
           </motion.div>
         </div>
