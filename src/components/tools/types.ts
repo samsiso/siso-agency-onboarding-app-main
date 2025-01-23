@@ -11,6 +11,8 @@ export interface Tool {
   website_url: string | null;
   profile_image_url: string | null;
   icon_url: string | null;
+  created_at: string;
+  updated_at: string;
   // Adding back fields needed by components
   member_type?: string | null;
   youtube_url?: string | null;

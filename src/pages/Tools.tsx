@@ -17,6 +17,7 @@ import { toast } from 'react-hot-toast';
 import { ToolsHeader } from '@/components/tools/ToolsHeader';
 import { ToolsCategories } from '@/components/tools/ToolsCategories';
 import { ToolsGrid } from '@/components/tools/ToolsGrid';
+import { ToolCard } from '@/components/tools/ToolCard';
 import { motion } from 'framer-motion';
 
 export default function Tools() {
