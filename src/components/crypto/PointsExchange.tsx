@@ -124,7 +124,7 @@ export const PointsExchange = ({ userPoints }: { userPoints: number }) => {
         <div className="bg-siso-bg-alt rounded-lg p-4 border border-siso-text/10 hover:border-siso-text/20 transition-colors">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-siso-red to-siso-orange flex items-center justify-center">
                 <span className="text-white font-semibold text-sm">ST</span>
               </div>
               <span className="font-semibold text-siso-text-bold">SISO Tokens</span>
@@ -149,7 +149,7 @@ export const PointsExchange = ({ userPoints }: { userPoints: number }) => {
       <Button
         onClick={handleExchange}
         disabled={loading || !pointsToExchange}
-        className="w-full h-12 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-lg transition-all duration-200"
+        className="w-full h-12 bg-gradient-to-r from-siso-red to-siso-orange hover:from-siso-red/90 hover:to-siso-orange/90 text-white font-semibold rounded-lg transition-all duration-200"
       >
         {loading ? (
           <Loader2 className="w-5 h-5 animate-spin" />
