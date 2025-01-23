@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Card } from "@/components/ui/card";
 import { ArrowRightLeft } from 'lucide-react';
 import { PointsExchange } from "@/components/crypto/PointsExchange";
 import { NFTGallery } from "@/components/crypto/NFTGallery";
@@ -64,7 +63,7 @@ const CryptoExchange = () => {
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <div className="flex-1">
+      <div className="flex-1 bg-gradient-to-b from-gray-900 to-black">
         <div className="container mx-auto p-6">
           <div className="flex items-center gap-3 mb-8">
             <ArrowRightLeft className="w-8 h-8 text-siso-orange" />
@@ -72,15 +71,14 @@ const CryptoExchange = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <Card className="p-6 bg-black/20 border-siso-text/10">
-              <h2 className="text-xl font-semibold text-siso-text-bold mb-6">Points Exchange</h2>
+            <div className="flex items-center justify-center p-6">
               <PointsExchange userPoints={userPoints} />
-            </Card>
+            </div>
 
-            <Card className="p-6 bg-black/20 border-siso-text/10">
+            <div className="bg-black/20 rounded-xl border border-siso-text/10 p-6">
               <h2 className="text-xl font-semibold text-siso-text-bold mb-6">Your NFT Gallery</h2>
               <NFTGallery />
-            </Card>
+            </div>
           </div>
         </div>
       </div>
