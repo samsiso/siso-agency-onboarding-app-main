@@ -8,8 +8,11 @@ import { CommunityMemberDetails } from '@/components/community/CommunityMemberDe
 import { CommunityMember } from '@/components/community/types';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, GraduationCap, Users, Trophy, BookOpen } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { ExternalLink, GraduationCap, Users, Trophy, BookOpen, Search, Filter } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 
 const container = {
   hidden: { opacity: 0 },
@@ -26,9 +29,22 @@ const item = {
   show: { opacity: 1, y: 0 }
 };
 
+const contentThemes = [
+  'AI Development',
+  'Machine Learning',
+  'Data Science',
+  'Web Development',
+  'Blockchain',
+  'Cloud Computing',
+  'DevOps',
+  'Security'
+];
+
 export default function SisoEducation() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMember, setSelectedMember] = useState<CommunityMember | null>(null);
+  const [selectedThemes, setSelectedThemes] = useState<string[]>([]);
+  const [activeTab, setActiveTab] = useState('all');
 
   const { data: members, isLoading, error } = useQuery({
     queryKey: ['education-creators'],
@@ -61,11 +77,28 @@ export default function SisoEducation() {
     },
   });
 
-  const filteredMembers = members?.filter(member => 
-    !searchQuery || 
-    member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    member.description?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const toggleTheme = (theme: string) => {
+    setSelectedThemes(prev => 
+      prev.includes(theme) 
+        ? prev.filter(t => t !== theme)
+        : [...prev, theme]
+    );
+  };
+
+  const filteredMembers = members?.filter(member => {
+    const matchesSearch = !searchQuery || 
+      member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      member.description?.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesThemes = selectedThemes.length === 0 || 
+      selectedThemes.some(theme => member.content_themes?.includes(theme));
+
+    const matchesTab = activeTab === 'all' || 
+      (activeTab === 'featured' && member.specialization?.includes('Featured')) ||
+      (activeTab === 'new' && new Date(member.created_at || '').getTime() > Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+    return matchesSearch && matchesThemes && matchesTab;
+  });
 
   const stats = [
     { icon: Users, label: 'Active Educators', value: members?.length || 0 },
@@ -138,42 +171,89 @@ export default function SisoEducation() {
           </Alert>
 
           {/* Search and Filters */}
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <CommunitySearch 
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-            />
+          <div className="space-y-4">
+            <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+              <div className="relative w-full md:w-96">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-siso-text/50" />
+                <Input
+                  type="text"
+                  placeholder="Search educators..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 bg-siso-bg-alt border-siso-border"
+                />
+              </div>
+              <Button
+                variant="outline"
+                className="w-full md:w-auto flex items-center gap-2"
+                onClick={() => setSelectedThemes([])}
+              >
+                <Filter className="w-4 h-4" />
+                Clear Filters
+              </Button>
+            </div>
+
+            {/* Content Theme Filters */}
+            <div className="flex flex-wrap gap-2">
+              {contentThemes.map((theme) => (
+                <Badge
+                  key={theme}
+                  variant={selectedThemes.includes(theme) ? "default" : "outline"}
+                  className="cursor-pointer hover:bg-siso-red/10"
+                  onClick={() => toggleTheme(theme)}
+                >
+                  {theme}
+                </Badge>
+              ))}
+            </div>
+
+            {/* Tabs */}
+            <Tabs defaultValue="all" className="w-full" value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="bg-siso-bg-alt border border-siso-border">
+                <TabsTrigger value="all">All Educators</TabsTrigger>
+                <TabsTrigger value="featured">Featured</TabsTrigger>
+                <TabsTrigger value="new">Recently Added</TabsTrigger>
+              </TabsList>
+            </Tabs>
           </div>
 
           {/* Members Grid */}
-          <motion.div
-            variants={container}
-            initial="hidden"
-            animate="show" 
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
-          >
-            {isLoading ? (
-              // Loading skeletons
-              [...Array(8)].map((_, i) => (
-                <div key={i} className="animate-pulse">
-                  <div className="h-48 bg-siso-bg-alt rounded-lg"></div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab + selectedThemes.join() + searchQuery}
+              variants={container}
+              initial="hidden"
+              animate="show" 
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+            >
+              {isLoading ? (
+                // Loading skeletons
+                [...Array(8)].map((_, i) => (
+                  <div key={i} className="animate-pulse">
+                    <div className="h-48 bg-siso-bg-alt rounded-lg"></div>
+                  </div>
+                ))
+              ) : error ? (
+                <div className="col-span-full flex items-center justify-center min-h-[200px]">
+                  <div className="text-red-500">Error loading education creators. Please try again later.</div>
                 </div>
-              ))
-            ) : error ? (
-              <div className="col-span-full flex items-center justify-center min-h-[200px]">
-                <div className="text-red-500">Error loading education creators. Please try again later.</div>
-              </div>
-            ) : (
-              filteredMembers?.map((member) => (
-                <motion.div key={member.id} variants={item}>
-                  <CommunityMemberCard
-                    member={member}
-                    onClick={setSelectedMember}
-                  />
-                </motion.div>
-              ))
-            )}
-          </motion.div>
+              ) : filteredMembers?.length === 0 ? (
+                <div className="col-span-full flex flex-col items-center justify-center min-h-[200px] text-siso-text/70">
+                  <div className="text-lg mb-2">No educators found</div>
+                  <div className="text-sm">Try adjusting your search or filters</div>
+                </div>
+              ) : (
+                filteredMembers?.map((member) => (
+                  <motion.div key={member.id} variants={item} layout>
+                    <CommunityMemberCard
+                      member={member}
+                      onClick={setSelectedMember}
+                    />
+                  </motion.div>
+                ))
+              )}
+            </motion.div>
+          </AnimatePresence>
 
           <CommunityMemberDetails
             member={selectedMember}
