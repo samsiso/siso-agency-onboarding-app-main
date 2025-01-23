@@ -37,14 +37,22 @@ export const Leaderboard = () => {
 
   const fetchLeaderboard = async () => {
     try {
+      console.log('Fetching leaderboard data...');
       const { data, error } = await supabase
         .from('leaderboard')
-        .select('*, profile:profiles(full_name, email)')
+        .select(`
+          *,
+          profile:profiles(full_name, email)
+        `)
         .order('points', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching leaderboard:', error);
+        throw error;
+      }
 
       if (data) {
+        console.log('Fetched leaderboard data:', data);
         const transformedData: LeaderboardEntry[] = data.map(entry => ({
           ...entry,
           achievements: Array.isArray(entry.achievements) 
@@ -69,7 +77,10 @@ export const Leaderboard = () => {
 
   const getDisplayName = (entry: LeaderboardEntry) => {
     if (entry.profile?.full_name) return entry.profile.full_name;
-    if (entry.profile?.email) return entry.profile.email.split('@')[0];
+    if (entry.profile?.email) {
+      const emailParts = entry.profile.email.split('@');
+      return emailParts[0];
+    }
     return 'Anonymous User';
   };
 
