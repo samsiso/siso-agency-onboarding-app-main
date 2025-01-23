@@ -24,10 +24,18 @@ export const ConnectWalletButton = () => {
       // Step 1: Connect to Phantom Wallet
       const publicKey = await connectPhantom();
       
-      // Step 2: Fetch nonce from Supabase
+      // Step 2: Generate nonce client-side
+      const nonce = Array.from(crypto.getRandomValues(new Uint8Array(32)))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+      
+      // Step 3: Insert nonce into Supabase
       const { data: nonceData, error: nonceError } = await supabase
         .from('wallet_nonces')
-        .insert({ public_key: publicKey })
+        .insert({
+          public_key: publicKey,
+          nonce: nonce
+        })
         .select()
         .maybeSingle();
       
@@ -35,11 +43,11 @@ export const ConnectWalletButton = () => {
         throw new Error("Failed to generate nonce");
       }
 
-      // Step 3: Sign nonce with Phantom
+      // Step 4: Sign nonce with Phantom
       const message = new TextEncoder().encode(nonceData.nonce);
       const { signature } = await (window as any).solana.signMessage(message, 'utf8');
       
-      // Step 4: Verify signature via Edge Function
+      // Step 5: Verify signature via Edge Function
       const { data: verifyData, error: verifyError } = await supabase.functions.invoke('verify-wallet-signature', {
         body: { 
           publicKey, 
