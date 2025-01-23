@@ -6,6 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChatMessage } from '@/components/chat/ChatMessage';
 import { ChatInput } from '@/components/chat/ChatInput';
 import { useToast } from '@/hooks/use-toast';
+import { motion } from 'framer-motion';
 
 interface Message {
   role: 'assistant' | 'user';
