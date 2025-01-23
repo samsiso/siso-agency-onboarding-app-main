@@ -4,16 +4,29 @@ import { Gift, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
+interface NFTMetadata {
+  name: string;
+  description: string;
+  image: string;
+  mint_address: string;
+}
+
 interface WelcomeNFTStatus {
   status: 'pending' | 'completed' | 'failed';
   error_message?: string;
-  metadata?: {
-    name: string;
-    description: string;
-    image: string;
-    mint_address: string;
-  };
+  metadata?: NFTMetadata;
 }
+
+// Type guard to check if metadata has the correct shape
+const isValidNFTMetadata = (metadata: any): metadata is NFTMetadata => {
+  return (
+    metadata &&
+    typeof metadata.name === 'string' &&
+    typeof metadata.description === 'string' &&
+    typeof metadata.image === 'string' &&
+    typeof metadata.mint_address === 'string'
+  );
+};
 
 export const WelcomeNFTStatus = () => {
   const [status, setStatus] = useState<WelcomeNFTStatus | null>(null);
@@ -33,10 +46,18 @@ export const WelcomeNFTStatus = () => {
           .single();
 
         if (error) throw error;
-        setStatus(data);
+
+        // Transform the data to match our expected type
+        const nftStatus: WelcomeNFTStatus = {
+          status: data.status,
+          error_message: data.error_message,
+          metadata: isValidNFTMetadata(data.metadata) ? data.metadata : undefined
+        };
+
+        setStatus(nftStatus);
 
         // If completed, show success toast
-        if (data?.status === 'completed' && data?.metadata?.mint_address) {
+        if (data?.status === 'completed' && isValidNFTMetadata(data.metadata)) {
           toast({
             title: "Welcome NFT Minted!",
             description: "Your welcome NFT has been successfully minted.",
@@ -63,9 +84,16 @@ export const WelcomeNFTStatus = () => {
           filter: `user_id=eq.${supabase.auth.getUser()}`
         },
         (payload) => {
-          setStatus(payload.new as WelcomeNFTStatus);
+          const newData = payload.new;
+          const nftStatus: WelcomeNFTStatus = {
+            status: newData.status,
+            error_message: newData.error_message,
+            metadata: isValidNFTMetadata(newData.metadata) ? newData.metadata : undefined
+          };
           
-          if (payload.new.status === 'completed') {
+          setStatus(nftStatus);
+          
+          if (newData.status === 'completed' && isValidNFTMetadata(newData.metadata)) {
             toast({
               title: "Welcome NFT Minted!",
               description: "Your welcome NFT has been successfully minted.",
