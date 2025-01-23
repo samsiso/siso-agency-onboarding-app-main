@@ -89,45 +89,50 @@ export function ToolCard({ tool }: ToolCardProps) {
   return (
     <motion.div
       onClick={handleClick}
-      className="group relative flex flex-col gap-4 rounded-lg border border-siso-text/10 bg-siso-text/5 p-6 transition-all duration-300 cursor-pointer h-[200px]"
+      className="group relative flex flex-col gap-4 rounded-lg border border-siso-text/10 bg-siso-text/5 p-6 transition-all duration-300 cursor-pointer h-[200px] hover:border-siso-orange/30 focus:outline-none focus:ring-2 focus:ring-siso-orange/50"
       whileHover={{ 
         scale: 1.02,
-        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        backgroundColor: 'rgba(255, 255, 255, 0.08)',
       }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
+      tabIndex={0}
+      role="button"
+      aria-label={`View details for ${tool.name}`}
     >
       <div className="flex items-start gap-4">
         {tool.profile_image_url ? (
           <img
             src={tool.profile_image_url}
-            alt={tool.name}
-            className="h-12 w-12 shrink-0 rounded-full object-cover ring-2 ring-siso-orange/20"
+            alt={`${tool.name} logo`}
+            className="h-12 w-12 shrink-0 rounded-lg object-cover ring-2 ring-siso-orange/20"
             loading="lazy"
           />
         ) : (
-          <div className="h-12 w-12 shrink-0 rounded-full bg-gradient-to-br from-siso-red/20 to-siso-orange/20 flex items-center justify-center ring-2 ring-siso-orange/20">
+          <div className="h-12 w-12 shrink-0 rounded-lg bg-gradient-to-br from-siso-red/20 to-siso-orange/20 flex items-center justify-center ring-2 ring-siso-orange/20">
             {getIconForTool(tool)}
           </div>
         )}
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-siso-text-bold group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-siso-red group-hover:to-siso-orange transition-all duration-300 truncate">
+          <h3 className="font-semibold text-lg text-siso-text-bold group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-siso-red group-hover:to-siso-orange transition-all duration-300 truncate">
             {tool.name}
           </h3>
           <p className="text-sm text-siso-text/80 truncate">{tool.category}</p>
         </div>
       </div>
       {tool.description && (
-        <p className="text-sm text-siso-text/80 line-clamp-2 leading-relaxed mt-auto">
+        <p className="text-sm text-siso-text/80 line-clamp-2 leading-relaxed mt-auto group-hover:text-siso-text/90 transition-colors duration-300">
           {tool.description}
         </p>
       )}
       <motion.div 
-        className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-siso-red/0 via-siso-orange/0 to-siso-red/0"
+        className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-siso-red/0 via-siso-orange/0 to-siso-red/0 transform origin-left"
         whileHover={{
+          scaleX: 1,
           background: 'linear-gradient(to right, var(--siso-red), var(--siso-orange), var(--siso-red))',
         }}
+        initial={{ scaleX: 0 }}
         transition={{ duration: 0.3 }}
       />
     </motion.div>

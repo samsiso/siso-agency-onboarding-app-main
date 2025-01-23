@@ -10,11 +10,11 @@ interface ToolsGridProps {
 export function ToolsGrid({ tools, isLoading }: ToolsGridProps) {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {[...Array(8)].map((_, i) => (
           <div 
             key={i}
-            className="h-48 rounded-lg bg-siso-text/5 animate-pulse"
+            className="h-[200px] rounded-lg bg-siso-text/5 animate-pulse border border-siso-text/10"
           />
         ))}
       </div>
@@ -22,7 +22,7 @@ export function ToolsGrid({ tools, isLoading }: ToolsGridProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {tools.map((tool, index) => (
         <motion.div
           key={tool.id}
