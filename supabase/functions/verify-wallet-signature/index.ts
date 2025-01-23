@@ -14,9 +14,11 @@ serve(async (req) => {
 
   try {
     const { publicKey, signature, nonce } = await req.json()
+    console.log("[Edge] Received request with:", { publicKey, nonce, signatureLength: signature?.length })
     
     // Validate input
     if (!publicKey || !signature || !nonce) {
+      console.error("[Edge] Missing required fields:", { publicKey, signature, nonce })
       return new Response(
         JSON.stringify({ error: 'Missing required fields' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -29,6 +31,8 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
+    console.log("[Edge] Verifying nonce existence")
+
     // Verify nonce exists and hasn't expired
     const { data: storedNonce, error: nonceError } = await supabaseClient
       .from('wallet_nonces')
@@ -37,13 +41,23 @@ serve(async (req) => {
       .gt('expires_at', new Date().toISOString())
       .maybeSingle()
 
-    if (nonceError || !storedNonce) {
-      console.error('Nonce verification failed:', nonceError)
+    if (nonceError) {
+      console.error('[Edge] Database error when fetching nonce:', nonceError)
+      return new Response(
+        JSON.stringify({ error: 'Database error' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    if (!storedNonce) {
+      console.error('[Edge] No valid nonce found for:', publicKey)
       return new Response(
         JSON.stringify({ error: 'Invalid or expired nonce' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
+
+    console.log("[Edge] Verifying signature")
 
     // Verify signature using native crypto
     try {
@@ -70,18 +84,21 @@ serve(async (req) => {
       )
 
       if (!isValid) {
+        console.error('[Edge] Invalid signature')
         return new Response(
           JSON.stringify({ error: 'Invalid signature' }),
           { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         )
       }
     } catch (verifyError) {
-      console.error('Signature verification failed:', verifyError)
+      console.error('[Edge] Signature verification failed:', verifyError)
       return new Response(
         JSON.stringify({ error: 'Signature verification failed' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
+
+    console.log("[Edge] Updating user profile")
 
     // Update user profile with wallet address
     const { error: updateError } = await supabaseClient
@@ -90,12 +107,14 @@ serve(async (req) => {
       .eq('id', req.headers.get('x-user-id'))
 
     if (updateError) {
-      console.error('Profile update failed:', updateError)
+      console.error('[Edge] Profile update failed:', updateError)
       return new Response(
         JSON.stringify({ error: 'Failed to update profile' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
+
+    console.log("[Edge] Deleting used nonce")
 
     // Delete used nonce
     await supabaseClient
@@ -103,13 +122,15 @@ serve(async (req) => {
       .delete()
       .eq('id', storedNonce.id)
 
+    console.log("[Edge] Success!")
+
     return new Response(
       JSON.stringify({ success: true }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
 
   } catch (error) {
-    console.error('Verification error:', error)
+    console.error('[Edge] Verification error:', error)
     return new Response(
       JSON.stringify({ error: 'Internal server error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
