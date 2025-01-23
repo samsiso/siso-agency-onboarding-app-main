@@ -1,14 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Users, Link, Youtube, Brain } from 'lucide-react';
+import { Users, Link, Youtube } from 'lucide-react';
 import { CommunityMember } from "./types";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 
 interface CommunityMemberCardProps {
   member: CommunityMember;
@@ -16,23 +8,6 @@ interface CommunityMemberCardProps {
 }
 
 export const CommunityMemberCard = ({ member, onClick }: CommunityMemberCardProps) => {
-  const generateAIAnalysis = () => {
-    return {
-      expertise: "Based on the content and specialization, this creator shows strong expertise in " + 
-                (member.specialization?.[0] || "their field"),
-      audience: "Their content appears to be most suitable for " +
-                (member.member_type === "Business" ? "business professionals and entrepreneurs" : 
-                 member.member_type === "Technology" ? "tech enthusiasts and developers" :
-                 "individuals interested in personal growth"),
-      uniqueValue: "Their unique value proposition lies in " +
-                  (member.content_themes?.length ? `their focus on ${member.content_themes[0]}` : "their specialized content"),
-      engagement: member.youtube_url ? "They maintain an active YouTube presence with regular content updates" : 
-                 "They provide valuable insights through their platform",
-    };
-  };
-
-  const analysis = generateAIAnalysis();
-
   return (
     <Card 
       className="group bg-gradient-to-br from-siso-red/10 to-siso-orange/10 border-siso-text/10 hover:border-siso-orange/50 transition-all duration-300 cursor-pointer hover:scale-105 animate-fade-in focus:outline-none focus:ring-2 focus:ring-siso-orange/50"
@@ -59,44 +34,6 @@ export const CommunityMemberCard = ({ member, onClick }: CommunityMemberCardProp
               <h3 className="text-lg font-semibold text-siso-text-bold group-hover:text-siso-orange transition-colors line-clamp-2 leading-tight" title={member.name}>
                 {member.name}
               </h3>
-              <div className="flex items-center gap-2">
-                <Dialog>
-                  <DialogTrigger asChild onClick={(e) => e.stopPropagation()}>
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      className="h-8 w-8 shrink-0 hover:bg-siso-orange/10 hover:text-siso-orange transition-colors"
-                    >
-                      <Brain className="w-4 h-4" />
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="bg-siso-bg border-siso-text/10">
-                    <DialogHeader>
-                      <DialogTitle className="text-xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
-                        AI Analysis: {member.name}
-                      </DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4 mt-4">
-                      <div className="space-y-2">
-                        <h4 className="font-semibold text-siso-text">Expertise Level</h4>
-                        <p className="text-siso-text/80">{analysis.expertise}</p>
-                      </div>
-                      <div className="space-y-2">
-                        <h4 className="font-semibold text-siso-text">Target Audience</h4>
-                        <p className="text-siso-text/80">{analysis.audience}</p>
-                      </div>
-                      <div className="space-y-2">
-                        <h4 className="font-semibold text-siso-text">Unique Value</h4>
-                        <p className="text-siso-text/80">{analysis.uniqueValue}</p>
-                      </div>
-                      <div className="space-y-2">
-                        <h4 className="font-semibold text-siso-text">Engagement</h4>
-                        <p className="text-siso-text/80">{analysis.engagement}</p>
-                      </div>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
             </div>
             <p className="text-sm text-siso-text/80 capitalize">{member.member_type}</p>
           </div>
@@ -121,10 +58,7 @@ export const CommunityMemberCard = ({ member, onClick }: CommunityMemberCardProp
 
         <div className="flex items-center gap-2 mt-3 text-siso-text/60">
           {member.website_url && (
-            <div className="flex items-center gap-1 hover:text-siso-orange transition-colors">
-              <Link className="w-4 h-4" />
-              <Brain className="w-4 h-4" />
-            </div>
+            <Link className="w-4 h-4 hover:text-siso-orange transition-colors" />
           )}
           {member.youtube_url && (
             <Youtube className="w-4 h-4 hover:text-siso-orange transition-colors" />
