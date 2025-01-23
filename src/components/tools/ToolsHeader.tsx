@@ -12,13 +12,13 @@ export function ToolsHeader({ searchQuery, onSearchChange, totalTools }: ToolsHe
   return (
     <div className="space-y-8">
       <motion.div 
-        className="flex flex-col items-start gap-6"
+        className="flex flex-col items-center text-center gap-6"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="w-full">
-          <div className="flex items-center justify-between">
+        <div className="w-full max-w-4xl">
+          <div className="flex flex-col items-center justify-center gap-2">
             <h1 className="text-5xl sm:text-6xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text tracking-tight">
               Tools and Platforms
             </h1>
@@ -28,7 +28,7 @@ export function ToolsHeader({ searchQuery, onSearchChange, totalTools }: ToolsHe
               </span>
             )}
           </div>
-          <p className="mt-6 text-lg sm:text-xl text-siso-text/80 leading-relaxed max-w-3xl">
+          <p className="mt-6 text-lg sm:text-xl text-siso-text/80 leading-relaxed text-center">
             Discover powerful tools and platforms to enhance your workflow. 
             Browse through various categories including development, database, and automation tools.
           </p>
