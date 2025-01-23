@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { NewsCardMedia } from './NewsCardMedia';
 import { NewsCardContent } from './NewsCardContent';
-import { NewsCardComments } from './NewsCardComments';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { usePoints } from '@/hooks/usePoints';
@@ -133,16 +132,9 @@ const NewsCard = ({
                 summary={summaries[item.id]}
                 loadingSummary={loadingSummaries[item.id]}
                 onGenerateSummary={() => onGenerateSummary(item.id)}
+                newsId={item.id}
+                comments={comments}
               />
-
-              {!isCompact && (
-                <div className="mt-auto pt-4">
-                  <NewsCardComments
-                    newsId={item.id}
-                    comments={comments}
-                  />
-                </div>
-              )}
             </div>
           </div>
         </CardContent>

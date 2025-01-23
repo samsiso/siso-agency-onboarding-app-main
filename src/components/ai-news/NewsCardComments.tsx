@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { MessageCircle, Send } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from "@/integrations/supabase/client";
@@ -87,12 +87,12 @@ export const NewsCardComments = ({ newsId, comments }: NewsCardCommentsProps) =>
   };
 
   return (
-    <div className="space-y-2">
+    <>
       <Button
         variant="ghost"
         size="sm"
         onClick={() => setIsCommenting(!isCommenting)}
-        className="text-xs sm:text-sm hover:bg-siso-red/10 hover:text-siso-red transition-colors px-2"
+        className="h-8 px-2 text-xs sm:text-sm text-siso-text/60 hover:text-siso-red hover:bg-siso-red/10 transition-colors"
       >
         <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4" />
         <span className="ml-1">{comments.length}</span>
@@ -105,46 +105,48 @@ export const NewsCardComments = ({ newsId, comments }: NewsCardCommentsProps) =>
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="space-y-4 bg-card/60 p-4 rounded-lg border border-siso-border"
+            className="absolute top-full left-0 right-0 mt-2 z-10"
           >
-            <div className="space-y-3">
-              {comments.map((comment) => (
-                <motion.div
-                  key={comment.id}
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-background p-3 rounded-lg border border-siso-border"
+            <div className="space-y-4 bg-card/60 p-4 rounded-lg border border-siso-border">
+              <div className="space-y-3">
+                {comments.map((comment) => (
+                  <motion.div
+                    key={comment.id}
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-background p-3 rounded-lg border border-siso-border"
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <p className="text-xs text-siso-text-muted">{comment.user_email}</p>
+                      <p className="text-xs text-siso-text-muted">{formatDate(comment.created_at)}</p>
+                    </div>
+                    <p className="text-sm text-siso-text">{comment.content}</p>
+                  </motion.div>
+                ))}
+              </div>
+              
+              <div className="flex gap-2">
+                <Input
+                  type="text"
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="Add a comment..."
+                  className="flex-1 bg-background text-sm"
+                  onKeyPress={(e) => e.key === 'Enter' && handleAddComment()}
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleAddComment}
+                  className="text-xs hover:bg-siso-red/10 hover:text-siso-red transition-colors"
                 >
-                  <div className="flex justify-between items-start mb-2">
-                    <p className="text-xs text-siso-text-muted">{comment.user_email}</p>
-                    <p className="text-xs text-siso-text-muted">{formatDate(comment.created_at)}</p>
-                  </div>
-                  <p className="text-sm text-siso-text">{comment.content}</p>
-                </motion.div>
-              ))}
-            </div>
-            
-            <div className="flex gap-2">
-              <Input
-                type="text"
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                placeholder="Add a comment..."
-                className="flex-1 bg-background text-sm"
-                onKeyPress={(e) => e.key === 'Enter' && handleAddComment()}
-              />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleAddComment}
-                className="text-xs hover:bg-siso-red/10 hover:text-siso-red transition-colors"
-              >
-                <Send className="h-4 w-4" />
-              </Button>
+                  <MessageCircle className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </>
   );
 };

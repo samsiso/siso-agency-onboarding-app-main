@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ShareButtons } from './ShareButtons';
+import { NewsCardComments } from './NewsCardComments';
 
 interface NewsCardContentProps {
   title: string;
@@ -16,6 +17,8 @@ interface NewsCardContentProps {
   summary?: string;
   loadingSummary?: boolean;
   onGenerateSummary?: () => void;
+  newsId?: string;
+  comments?: any[];
 }
 
 export const NewsCardContent = ({ 
@@ -28,7 +31,9 @@ export const NewsCardContent = ({
   isCompact = false,
   summary,
   loadingSummary,
-  onGenerateSummary
+  onGenerateSummary,
+  newsId,
+  comments = []
 }: NewsCardContentProps) => {
   const getImpactColor = (impact: string) => {
     switch (impact.toLowerCase()) {
@@ -107,16 +112,23 @@ export const NewsCardContent = ({
         </span>
 
         {!isCompact && (
-          <>
+          <div className="flex items-center gap-2 ml-auto">
             <Button 
               variant="ghost"
               size="sm"
-              className="h-8 px-2 text-xs sm:text-sm text-siso-text/60 hover:text-siso-red hover:bg-siso-red/10 transition-colors ml-auto"
+              className="h-8 px-2 text-xs sm:text-sm text-siso-text/60 hover:text-siso-red hover:bg-siso-red/10 transition-colors"
               onClick={handleClick}
             >
               <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
               Read
             </Button>
+
+            {newsId && comments && (
+              <NewsCardComments
+                newsId={newsId}
+                comments={comments}
+              />
+            )}
 
             <Dialog>
               <DialogTrigger asChild>
@@ -124,7 +136,7 @@ export const NewsCardContent = ({
                   variant="outline"
                   size="sm"
                   onClick={() => !summary && onGenerateSummary?.()}
-                  className="text-xs sm:text-sm hover:bg-siso-red/10 hover:text-siso-red transition-colors h-8 px-2"
+                  className="h-8 px-2 text-xs sm:text-sm hover:bg-siso-red/10 hover:text-siso-red transition-colors"
                 >
                   {loadingSummary ? (
                     "Generating..."
@@ -152,7 +164,7 @@ export const NewsCardContent = ({
                 </div>
               </DialogContent>
             </Dialog>
-          </>
+          </div>
         )}
       </div>
     </motion.div>
