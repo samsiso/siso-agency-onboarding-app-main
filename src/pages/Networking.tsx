@@ -17,37 +17,40 @@ export default function Networking() {
   const { data: members, isLoading } = useQuery({
     queryKey: ['networking-members', selectedCategory],
     queryFn: async () => {
+      console.log('Fetching networking resources...');
       let query = supabase
-        .from('tools')
-        .select('*')
-        .eq('category', 'community');
+        .from('networking_resources')
+        .select('*');
       
       if (selectedCategory !== 'all') {
-        query = query.eq('member_type', selectedCategory);
+        query = query.eq('category', selectedCategory);
       }
 
       const { data, error } = await query;
-      if (error) throw error;
-
-      return data.map(item => ({
-        id: item.id,
-        name: item.name,
-        description: item.description,
-        member_type: item.member_type,
-        youtube_url: item.youtube_url,
-        youtube_videos: item.youtube_videos as { title: string; url: string; }[] | null,
-        website_url: item.website_url,
-        specialization: item.specialization,
-        content_themes: item.content_themes,
-        profile_image_url: item.profile_image_url,
-        member_count: null,
-        join_url: null,
-        platform: null,
-        points: 0,
-        rank: null,
-        contribution_count: 0,
-        referral_count: 0
+      
+      if (error) {
+        console.error('Error fetching networking resources:', error);
+        throw error;
+      }
+      
+      const transformedData = data.map(resource => ({
+        id: resource.id,
+        name: resource.name,
+        description: resource.description,
+        member_type: resource.category,
+        platform: resource.platform,
+        join_url: resource.join_url,
+        member_count: resource.member_count,
+        profile_image_url: resource.profile_image_url,
+        youtube_url: null,
+        youtube_videos: null,
+        website_url: null,
+        specialization: null,
+        content_themes: null,
       })) as CommunityMember[];
+      
+      console.log('Fetched networking resources:', transformedData);
+      return transformedData;
     },
   });
 
@@ -60,8 +63,8 @@ export default function Networking() {
   const categories = {
     all: members?.length || 0,
     business: members?.filter(m => m.member_type === 'Business').length || 0,
-    personal: members?.filter(m => m.member_type === 'Personal Development').length || 0,
     technology: members?.filter(m => m.member_type === 'Technology').length || 0,
+    'personal development': members?.filter(m => m.member_type === 'Personal Development').length || 0,
     finance: members?.filter(m => m.member_type === 'Finance').length || 0,
     ai: members?.filter(m => m.member_type === 'AI').length || 0,
   };

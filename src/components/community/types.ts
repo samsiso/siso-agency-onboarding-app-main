@@ -12,28 +12,8 @@ export interface CommunityMember {
   member_count: number | null;
   join_url: string | null;
   platform: string | null;
-  // Adding missing properties from the leaderboard integration
-  points: number | null;
-  rank: string | null;
-  contribution_count: number | null;
-  referral_count: number | null;
-  // Adding created_at property to match Supabase schema
-  created_at?: string;
-  profile?: {
-    full_name: string | null;
-    email: string | null;
-    bio: string | null;
-    avatar_url: string | null;
-    linkedin_url: string | null;
-    website_url: string | null;
-    youtube_url: string | null;
-    instagram_url: string | null;
-    twitter_url: string | null;
-    professional_role: string | null;
-  };
-}
-
-export interface Achievement {
-  name: string;
-  icon: string;
+  points?: number;
+  rank?: string | null;
+  contribution_count?: number;
+  referral_count?: number;
 }
