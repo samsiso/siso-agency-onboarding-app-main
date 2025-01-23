@@ -4,6 +4,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LeaderboardStats } from './LeaderboardStats';
 import { LeaderboardTable } from './LeaderboardTable';
+import { CommunityMemberDetails } from '../community/CommunityMemberDetails';
 import type { LeaderboardEntry, Achievement } from './types';
 
 export const Leaderboard = () => {
@@ -11,6 +12,7 @@ export const Leaderboard = () => {
   const [totalUsersWithPoints, setTotalUsersWithPoints] = useState<number>(0);
   const [totalPoints, setTotalPoints] = useState<number>(0);
   const [activeUsers, setActiveUsers] = useState<number>(0);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -72,7 +74,15 @@ export const Leaderboard = () => {
           email,
           points,
           rank,
-          updated_at
+          updated_at,
+          bio,
+          avatar_url,
+          linkedin_url,
+          website_url,
+          youtube_url,
+          instagram_url,
+          twitter_url,
+          professional_role
         `)
         .gt('points', 0)
         .order('points', { ascending: false })
@@ -90,7 +100,7 @@ export const Leaderboard = () => {
       if (leaderboardError) throw leaderboardError;
 
       // Combine the data
-      const combinedData: LeaderboardEntry[] = profilesData?.map(profile => {
+      const combinedData = profilesData?.map(profile => {
         const leaderboardEntry = leaderboardData?.find(entry => entry.user_id === profile.id);
         
         const achievements: Achievement[] = Array.isArray(leaderboardEntry?.achievements) 
@@ -112,7 +122,15 @@ export const Leaderboard = () => {
           referral_count: leaderboardEntry?.referral_count || 0,
           profile: {
             full_name: profile.full_name,
-            email: profile.email
+            email: profile.email,
+            bio: profile.bio,
+            avatar_url: profile.avatar_url,
+            linkedin_url: profile.linkedin_url,
+            website_url: profile.website_url,
+            youtube_url: profile.youtube_url,
+            instagram_url: profile.instagram_url,
+            twitter_url: profile.twitter_url,
+            professional_role: profile.professional_role
           }
         };
       }) || [];
@@ -127,6 +145,10 @@ export const Leaderboard = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleUserClick = (user: any) => {
+    setSelectedUser(user);
   };
 
   return (
@@ -147,9 +169,17 @@ export const Leaderboard = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <LeaderboardTable leaderboardData={leaderboardData} />
+          <LeaderboardTable 
+            leaderboardData={leaderboardData} 
+            onUserClick={handleUserClick}
+          />
         </CardContent>
       </Card>
+
+      <CommunityMemberDetails
+        member={selectedUser}
+        onClose={() => setSelectedUser(null)}
+      />
     </div>
   );
 };

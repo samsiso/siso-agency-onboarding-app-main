@@ -6,9 +6,10 @@ import { LeaderboardEntry } from './types';
 
 interface LeaderboardTableProps {
   leaderboardData: LeaderboardEntry[];
+  onUserClick: (entry: LeaderboardEntry) => void;
 }
 
-export const LeaderboardTable = ({ leaderboardData }: LeaderboardTableProps) => {
+export const LeaderboardTable = ({ leaderboardData, onUserClick }: LeaderboardTableProps) => {
   const getDisplayName = (entry: LeaderboardEntry) => {
     if (entry.profile?.full_name) return entry.profile.full_name;
     if (entry.profile?.email) {
@@ -67,9 +68,10 @@ export const LeaderboardTable = ({ leaderboardData }: LeaderboardTableProps) => 
             <TableRow 
               key={entry.id}
               className={cn(
-                "transition-all duration-200",
+                "transition-all duration-200 cursor-pointer",
                 getRowClassName(index)
               )}
+              onClick={() => onUserClick(entry)}
             >
               <TableCell className="text-center font-medium">
                 <div className="flex items-center justify-center gap-2">
