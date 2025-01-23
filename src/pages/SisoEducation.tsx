@@ -36,7 +36,11 @@ export default function SisoEducation() {
         profile_image_url: member.profile_image_url,
         member_count: null,
         join_url: null,
-        platform: null
+        platform: null,
+        points: 0,
+        rank: null,
+        contribution_count: 0,
+        referral_count: 0
       })) as CommunityMember[];
     },
   });

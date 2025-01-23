@@ -39,7 +39,14 @@ export default function Networking() {
         website_url: item.join_url,
         specialization: null,
         content_themes: null,
-        profile_image_url: item.profile_image_url
+        profile_image_url: item.profile_image_url,
+        member_count: null,
+        join_url: null,
+        platform: null,
+        points: 0,
+        rank: null,
+        contribution_count: 0,
+        referral_count: 0
       })) as CommunityMember[];
     },
   });
