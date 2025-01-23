@@ -44,7 +44,7 @@ export const Leaderboard = () => {
         {
           event: '*',
           schema: 'public',
-          table: 'profiles'  // Changed from 'leaderboard' to 'profiles'
+          table: 'profiles'
         },
         (payload) => {
           console.log('Real-time profile update received:', payload);
@@ -82,7 +82,6 @@ export const Leaderboard = () => {
   const fetchLeaderboard = async () => {
     try {
       console.log('Fetching leaderboard data...');
-      // Changed query to fetch directly from profiles table
       const { data, error } = await supabase
         .from('profiles')
         .select(`
@@ -92,10 +91,14 @@ export const Leaderboard = () => {
           points,
           rank,
           updated_at,
-          contribution_count,
-          referral_count
+          leaderboard!inner (
+            contribution_count,
+            referral_count,
+            siso_tokens,
+            achievements
+          )
         `)
-        .gt('points', 0)  // Only fetch users with points
+        .gt('points', 0)
         .order('points', { ascending: false });
 
       if (error) {
@@ -110,11 +113,11 @@ export const Leaderboard = () => {
           user_id: entry.id,
           points: entry.points,
           rank: entry.rank,
-          achievements: [],
-          siso_tokens: 0,
+          achievements: entry.leaderboard.achievements || [],
+          siso_tokens: entry.leaderboard.siso_tokens || 0,
           updated_at: entry.updated_at,
-          contribution_count: entry.contribution_count || 0,
-          referral_count: entry.referral_count || 0,
+          contribution_count: entry.leaderboard.contribution_count || 0,
+          referral_count: entry.leaderboard.referral_count || 0,
           profile: {
             full_name: entry.full_name,
             email: entry.email
