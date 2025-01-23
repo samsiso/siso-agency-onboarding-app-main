@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { Database } from '@/integrations/supabase/types';
 import { useQuery } from '@tanstack/react-query';
+import { showPointsEarnedToast } from '@/components/points/PointsEarnedToast';
 
 type PointActionType = Database['public']['Enums']['point_action_type'];
 
@@ -47,11 +48,17 @@ export const usePoints = (userId: string | undefined) => {
         {
           event: '*',
           schema: 'public',
-          table: 'profiles',
-          filter: `id=eq.${userId}`,
+          table: 'points_log',
+          filter: `user_id=eq.${userId}`,
         },
         (payload: any) => {
           console.log('[usePoints] Realtime points update received:', payload);
+          if (payload.new) {
+            showPointsEarnedToast({
+              points: payload.new.points_earned,
+              action: payload.new.action.replace(/_/g, ' ').toLowerCase(),
+            });
+          }
         }
       )
       .subscribe();
@@ -87,11 +94,6 @@ export const usePoints = (userId: string | undefined) => {
           ]);
 
         if (logError) throw logError;
-
-        toast({
-          title: "Points awarded!",
-          description: `You earned ${config.points} points for ${action.replace(/_/g, ' ')}!`,
-        });
       }
     } catch (error: any) {
       console.error('[usePoints] Error awarding points:', error);
