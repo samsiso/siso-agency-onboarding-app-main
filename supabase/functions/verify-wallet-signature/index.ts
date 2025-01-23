@@ -1,6 +1,5 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4'
-import * as ed from 'https://deno.land/x/ed25519@1.6.0/mod.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -46,16 +45,40 @@ serve(async (req) => {
       )
     }
 
-    // Verify signature
-    const message = new TextEncoder().encode(storedNonce.nonce)
-    const signatureBytes = new Uint8Array(Buffer.from(signature, 'hex'))
-    const publicKeyBytes = new Uint8Array(Buffer.from(publicKey, 'hex'))
+    // Verify signature using native crypto
+    try {
+      const signatureBytes = new Uint8Array(Buffer.from(signature, 'hex'))
+      const messageBytes = new TextEncoder().encode(storedNonce.nonce)
+      const publicKeyBytes = new Uint8Array(Buffer.from(publicKey, 'hex'))
 
-    const isValid = ed.verify(signatureBytes, message, publicKeyBytes)
+      const key = await crypto.subtle.importKey(
+        'raw',
+        publicKeyBytes,
+        {
+          name: 'Ed25519',
+          namedCurve: 'Ed25519'
+        },
+        false,
+        ['verify']
+      )
 
-    if (!isValid) {
+      const isValid = await crypto.subtle.verify(
+        'Ed25519',
+        key,
+        signatureBytes,
+        messageBytes
+      )
+
+      if (!isValid) {
+        return new Response(
+          JSON.stringify({ error: 'Invalid signature' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+    } catch (verifyError) {
+      console.error('Signature verification failed:', verifyError)
       return new Response(
-        JSON.stringify({ error: 'Invalid signature' }),
+        JSON.stringify({ error: 'Signature verification failed' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
