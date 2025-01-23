@@ -2,6 +2,8 @@ import { Calendar, ExternalLink } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { ShareButtons } from './ShareButtons';
 
 interface NewsCardContentProps {
   title: string;
@@ -11,6 +13,9 @@ interface NewsCardContentProps {
   impact: string;
   onReadArticle?: () => void;
   isCompact?: boolean;
+  summary?: string;
+  loadingSummary?: boolean;
+  onGenerateSummary?: () => void;
 }
 
 export const NewsCardContent = ({ 
@@ -20,7 +25,10 @@ export const NewsCardContent = ({
   source, 
   impact,
   onReadArticle,
-  isCompact = false 
+  isCompact = false,
+  summary,
+  loadingSummary,
+  onGenerateSummary
 }: NewsCardContentProps) => {
   const getImpactColor = (impact: string) => {
     switch (impact.toLowerCase()) {
@@ -99,15 +107,52 @@ export const NewsCardContent = ({
         </span>
 
         {!isCompact && (
-          <Button 
-            variant="ghost"
-            size="sm"
-            className="h-8 px-2 text-xs sm:text-sm text-siso-text/60 hover:text-siso-red hover:bg-siso-red/10 transition-colors ml-auto"
-            onClick={handleClick}
-          >
-            <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-            Read Article
-          </Button>
+          <>
+            <Button 
+              variant="ghost"
+              size="sm"
+              className="h-8 px-2 text-xs sm:text-sm text-siso-text/60 hover:text-siso-red hover:bg-siso-red/10 transition-colors ml-auto"
+              onClick={handleClick}
+            >
+              <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+              Read
+            </Button>
+
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => !summary && onGenerateSummary?.()}
+                  className="text-xs sm:text-sm hover:bg-siso-red/10 hover:text-siso-red transition-colors h-8 px-2"
+                >
+                  {loadingSummary ? (
+                    "Generating..."
+                  ) : (
+                    summary ? "View AI Summary" : "Generate AI Summary"
+                  )}
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[600px] w-[95vw] max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>AI Summary & Share Options</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 sm:space-y-6 py-4">
+                  {summary ? (
+                    <div className="bg-card p-3 sm:p-4 rounded-lg border border-siso-red/20">
+                      <p className="text-sm sm:text-base">{summary}</p>
+                    </div>
+                  ) : (
+                    <div className="text-center text-muted-foreground">
+                      {loadingSummary ? "Generating summary..." : "Click the button to generate a summary"}
+                    </div>
+                  )}
+                  
+                  <ShareButtons summary={summary || ''} title={title} />
+                </div>
+              </DialogContent>
+            </Dialog>
+          </>
         )}
       </div>
     </motion.div>

@@ -61,13 +61,11 @@ export const NewsCardComments = ({ newsId, comments }: NewsCardCommentsProps) =>
 
       if (error) throw error;
 
-      // Award points for commenting
       await awardPoints('comment_article');
-
       setNewComment('');
       toast({
         title: "Comment added successfully",
-        description: "Your comment has been posted and you earned 5 points!",
+        description: "You earned 5 points for commenting!",
       });
     } catch (error: any) {
       toast({
@@ -94,10 +92,10 @@ export const NewsCardComments = ({ newsId, comments }: NewsCardCommentsProps) =>
         variant="ghost"
         size="sm"
         onClick={() => setIsCommenting(!isCommenting)}
-        className="text-xs sm:text-sm hover:bg-siso-red/10 hover:text-siso-red transition-colors"
+        className="text-xs sm:text-sm hover:bg-siso-red/10 hover:text-siso-red transition-colors px-2"
       >
-        <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-        {comments.length} {comments.length === 1 ? 'Comment' : 'Comments'}
+        <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4" />
+        <span className="ml-1">{comments.length}</span>
       </Button>
 
       <AnimatePresence>

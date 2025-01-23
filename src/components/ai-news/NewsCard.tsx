@@ -1,13 +1,10 @@
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { NewsCardMedia } from './NewsCardMedia';
 import { NewsCardContent } from './NewsCardContent';
 import { NewsCardComments } from './NewsCardComments';
-import { ShareButtons } from './ShareButtons';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { usePoints } from '@/hooks/usePoints';
@@ -133,6 +130,9 @@ const NewsCard = ({
                 impact={item.impact}
                 onReadArticle={handleReadArticle}
                 isCompact={isCompact}
+                summary={summaries[item.id]}
+                loadingSummary={loadingSummaries[item.id]}
+                onGenerateSummary={() => onGenerateSummary(item.id)}
               />
 
               {!isCompact && (
@@ -141,41 +141,6 @@ const NewsCard = ({
                     newsId={item.id}
                     comments={comments}
                   />
-
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => !summaries[item.id] && onGenerateSummary(item.id)}
-                        className="text-xs sm:text-sm hover:bg-siso-red/10 hover:text-siso-red transition-colors w-full mt-4"
-                      >
-                        {loadingSummaries[item.id] ? (
-                          "Generating Summary..."
-                        ) : (
-                          summaries[item.id] ? "View AI Summary" : "Generate AI Summary"
-                        )}
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[600px] w-[95vw] max-h-[90vh] overflow-y-auto">
-                      <DialogHeader>
-                        <DialogTitle>AI Summary & Share Options</DialogTitle>
-                      </DialogHeader>
-                      <div className="space-y-4 sm:space-y-6 py-4">
-                        {summaries[item.id] ? (
-                          <div className="bg-card p-3 sm:p-4 rounded-lg border border-siso-red/20">
-                            <p className="text-sm sm:text-base">{summaries[item.id]}</p>
-                          </div>
-                        ) : (
-                          <div className="text-center text-muted-foreground">
-                            {loadingSummaries[item.id] ? "Generating summary..." : "Click the button to generate a summary"}
-                          </div>
-                        )}
-                        
-                        <ShareButtons summary={summaries[item.id] || ''} title={item.title} />
-                      </div>
-                    </DialogContent>
-                  </Dialog>
                 </div>
               )}
             </div>
