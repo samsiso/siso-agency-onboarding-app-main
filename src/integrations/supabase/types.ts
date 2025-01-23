@@ -504,6 +504,45 @@ export type Database = {
           },
         ]
       }
+      news_sources: {
+        Row: {
+          api_key: string | null
+          created_at: string
+          fetch_frequency_minutes: number | null
+          id: string
+          is_active: boolean | null
+          last_fetched_at: string | null
+          name: string
+          source_type: Database["public"]["Enums"]["news_source_type"]
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          api_key?: string | null
+          created_at?: string
+          fetch_frequency_minutes?: number | null
+          id?: string
+          is_active?: boolean | null
+          last_fetched_at?: string | null
+          name: string
+          source_type: Database["public"]["Enums"]["news_source_type"]
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          api_key?: string | null
+          created_at?: string
+          fetch_frequency_minutes?: number | null
+          id?: string
+          is_active?: boolean | null
+          last_fetched_at?: string | null
+          name?: string
+          source_type?: Database["public"]["Enums"]["news_source_type"]
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
       nft_collections: {
         Row: {
           benefits: Json
@@ -1043,6 +1082,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      news_source_type: "rss" | "api" | "manual"
       nft_mint_status: "pending" | "completed" | "failed"
       nft_tier:
         | "ai_artist"
