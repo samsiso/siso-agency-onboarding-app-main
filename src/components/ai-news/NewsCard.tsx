@@ -112,11 +112,11 @@ const NewsCard = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className={`h-full w-full ${isFeatured ? 'h-full' : ''}`}
+      className="h-full w-full"
     >
-      <Card className={`group h-full hover:bg-card/60 transition-all duration-200 border-siso-border hover:border-siso-border-hover hover:shadow-lg`}>
-        <CardContent className={`p-4 sm:p-6 ${isFeatured ? 'space-y-6' : 'space-y-4'}`}>
-          <div className={`flex ${isCompact ? 'flex-row' : isFeatured ? 'flex-col' : 'flex-col lg:flex-row'} gap-4 sm:gap-6`}>
+      <Card className="group h-full w-full hover:bg-card/60 transition-all duration-200 border-siso-border hover:border-siso-border-hover hover:shadow-lg">
+        <CardContent className={`h-full p-4 sm:p-6 ${isFeatured ? 'space-y-6' : 'space-y-4'}`}>
+          <div className={`h-full flex ${isCompact ? 'flex-row' : isFeatured ? 'flex-col' : 'flex-col'} gap-4 sm:gap-6`}>
             <NewsCardMedia 
               imageUrl={item.image_url} 
               title={item.title} 
@@ -124,7 +124,7 @@ const NewsCard = ({
               isCompact={isCompact}
             />
             
-            <div className="flex-1 min-w-0 space-y-4">
+            <div className="flex-1 min-w-0 flex flex-col h-full">
               <NewsCardContent
                 title={item.title}
                 description={item.description}
@@ -136,7 +136,7 @@ const NewsCard = ({
               />
 
               {!isCompact && (
-                <>
+                <div className="mt-auto space-y-4">
                   <NewsCardComments
                     newsId={item.id}
                     comments={comments}
@@ -176,7 +176,7 @@ const NewsCard = ({
                       </div>
                     </DialogContent>
                   </Dialog>
-                </>
+                </div>
               )}
             </div>
           </div>
