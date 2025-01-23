@@ -103,8 +103,8 @@ export const Leaderboard = () => {
             : typeof entry.achievements === 'string'
               ? JSON.parse(entry.achievements)
               : entry.achievements || [],
-          contribution_count: Math.floor(Math.random() * 50), // Placeholder - replace with actual data
-          referral_count: Math.floor(Math.random() * 20), // Placeholder - replace with actual data
+          contribution_count: entry.contribution_count || 0,
+          referral_count: entry.referral_count || 0,
         }));
         setLeaderboardData(transformedData);
       }
