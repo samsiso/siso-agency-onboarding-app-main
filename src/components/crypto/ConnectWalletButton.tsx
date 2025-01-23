@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Wallet } from 'lucide-react';
 
 export const ConnectWalletButton = () => {
   const [loading, setLoading] = useState(false);
@@ -12,6 +12,7 @@ export const ConnectWalletButton = () => {
     console.log("[Wallet] Attempting to connect to Phantom");
     const { solana } = window as any;
     if (!solana?.isPhantom) {
+      window.open("https://phantom.app/", "_blank");
       throw new Error("Please install Phantom Wallet");
     }
     
@@ -109,7 +110,7 @@ export const ConnectWalletButton = () => {
     <Button 
       onClick={handleConnect} 
       disabled={loading}
-      className="bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800"
+      className="bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 transition-all duration-300 animate-shimmer"
     >
       {loading ? (
         <>
@@ -117,7 +118,10 @@ export const ConnectWalletButton = () => {
           Connecting...
         </>
       ) : (
-        'Connect Phantom Wallet'
+        <>
+          <Wallet className="mr-2 h-4 w-4" />
+          Connect Phantom Wallet
+        </>
       )}
     </Button>
   );
