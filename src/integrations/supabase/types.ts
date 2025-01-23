@@ -927,6 +927,30 @@ export type Database = {
         }
         Relationships: []
       }
+      wallet_nonces: {
+        Row: {
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          nonce: string
+          public_key: string
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          nonce: string
+          public_key: string
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          nonce?: string
+          public_key?: string
+        }
+        Relationships: []
+      }
       web3_users: {
         Row: {
           created_at: string
