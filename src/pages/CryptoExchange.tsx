@@ -5,6 +5,7 @@ import { NFTGallery } from "@/components/crypto/NFTGallery";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from '@/hooks/use-toast';
 import { Sidebar } from '@/components/Sidebar';
+import { FloatingOrbs } from '@/components/effects/FloatingOrbs';
 
 const CryptoExchange = () => {
   const [userPoints, setUserPoints] = useState<number>(0);
@@ -63,13 +64,8 @@ const CryptoExchange = () => {
     <div className="flex min-h-screen">
       <Sidebar />
       <div className="flex-1 bg-gradient-to-b from-siso-bg via-black to-siso-bg relative overflow-hidden">
-        {/* Enhanced Background Orbs */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-siso-red/20 to-siso-orange/20 rounded-full blur-3xl animate-float-slow"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-siso-orange/20 to-siso-red/20 rounded-full blur-3xl animate-float-slower"></div>
-          <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-gradient-to-br from-siso-red/10 to-siso-orange/10 rounded-full blur-2xl animate-float-slower"></div>
-        </div>
-
+        <FloatingOrbs />
+        
         {/* Content */}
         <div className="container mx-auto p-6 space-y-8 relative z-10">
           {/* Enhanced Header Section */}
