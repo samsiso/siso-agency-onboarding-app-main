@@ -113,10 +113,16 @@ export const Leaderboard = () => {
                       <div className="flex items-center gap-2">
                         <Avatar>
                           <AvatarImage src={entry.avatar_url || ''} />
-                          <AvatarFallback>{entry.profiles?.full_name?.charAt(0)}</AvatarFallback>
+                          <AvatarFallback>
+                            {entry.profiles?.full_name 
+                              ? entry.profiles.full_name.charAt(0).toUpperCase()
+                              : entry.profiles?.email?.charAt(0).toUpperCase() || 'U'}
+                          </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="font-medium">{entry.profiles?.full_name}</p>
+                          <p className="font-medium">
+                            {entry.profiles?.full_name || entry.profiles?.email?.split('@')[0] || 'Anonymous User'}
+                          </p>
                           <p className="text-sm text-muted-foreground">{entry.profiles?.professional_role}</p>
                         </div>
                       </div>
