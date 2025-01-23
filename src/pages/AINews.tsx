@@ -143,44 +143,46 @@ const AINews = () => {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen bg-background">
+      <div className="flex h-screen bg-background">
         <Sidebar />
-        <div className="flex-1 p-4 md:p-6 lg:p-8 max-h-screen overflow-y-auto">
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="show"
-            className="space-y-6 max-w-[1600px] mx-auto"
-          >
-            <Suspense fallback={<LoadingSpinner />}>
-              <NewsHeader
-                selectedMonth={selectedMonth}
-                selectedYear={selectedYear}
-                onMonthChange={setSelectedMonth}
-                onYearChange={setSelectedYear}
-              />
+        <main className="flex-1 overflow-hidden">
+          <div className="h-full overflow-y-auto px-4 md:px-6 lg:px-8 py-6">
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="show"
+              className="space-y-6 max-w-[1600px] mx-auto"
+            >
+              <Suspense fallback={<LoadingSpinner />}>
+                <NewsHeader
+                  selectedMonth={selectedMonth}
+                  selectedYear={selectedYear}
+                  onMonthChange={setSelectedMonth}
+                  onYearChange={setSelectedYear}
+                />
 
-              <NewsCategories
-                selectedCategory={selectedCategory}
-                onCategoryChange={setSelectedCategory}
-              />
+                <NewsCategories
+                  selectedCategory={selectedCategory}
+                  onCategoryChange={setSelectedCategory}
+                />
 
-              {newsItems.length > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                  {newsItems.map((item) => (
-                    <NewsCard
-                      key={item.id}
-                      item={item}
-                      summaries={summaries}
-                      loadingSummaries={loadingSummaries}
-                      onGenerateSummary={generateSummary}
-                    />
-                  ))}
-                </div>
-              )}
-            </Suspense>
-          </motion.div>
-        </div>
+                {newsItems.length > 0 && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                    {newsItems.map((item) => (
+                      <NewsCard
+                        key={item.id}
+                        item={item}
+                        summaries={summaries}
+                        loadingSummaries={loadingSummaries}
+                        onGenerateSummary={generateSummary}
+                      />
+                    ))}
+                  </div>
+                )}
+              </Suspense>
+            </motion.div>
+          </div>
+        </main>
       </div>
     </SidebarProvider>
   );
