@@ -174,7 +174,7 @@ export const Leaderboard = () => {
   const getRankBadge = (position: number) => {
     switch (position) {
       case 0:
-        return <Award className="h-5 w-5 text-yellow-500" />;
+        return <Award className="h-5 w-5 text-yellow-500 animate-pulse" />;
       case 1:
         return <Medal className="h-5 w-5 text-gray-300" />;
       case 2:
@@ -185,26 +185,26 @@ export const Leaderboard = () => {
   };
 
   const getRowClassName = (index: number) => {
-    if (index === 0) return "bg-gradient-to-r from-yellow-500/10 to-transparent";
-    if (index === 1) return "bg-gradient-to-r from-gray-500/10 to-transparent";
-    if (index === 2) return "bg-gradient-to-r from-amber-500/10 to-transparent";
-    if (index < 10) return "bg-gradient-to-r from-siso-bg-alt/50 to-transparent";
-    return "";
+    if (index === 0) return "bg-gradient-to-r from-yellow-500/10 to-transparent hover:from-yellow-500/20";
+    if (index === 1) return "bg-gradient-to-r from-gray-500/10 to-transparent hover:from-gray-500/20";
+    if (index === 2) return "bg-gradient-to-r from-amber-500/10 to-transparent hover:from-amber-500/20";
+    if (index < 10) return "bg-gradient-to-r from-siso-bg-alt/50 to-transparent hover:from-siso-bg-alt/70";
+    return "hover:bg-siso-bg-alt/30";
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fadeIn">
       <LeaderboardStats 
         totalUsers={totalUsersWithPoints}
         totalPoints={totalPoints}
         activeUsers={activeUsers}
       />
       
-      <Card>
+      <Card className="border-siso-border">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-            <span>Leaderboard Rankings</span>
-            <span className="text-sm font-normal text-muted-foreground">
+            <span className="text-siso-text-bold">Leaderboard Rankings</span>
+            <span className="text-sm font-normal text-siso-text-muted">
               Top {Math.min(leaderboardData.length, 100)} Users
             </span>
           </CardTitle>
@@ -213,7 +213,7 @@ export const Leaderboard = () => {
           <div className="relative overflow-x-auto">
             <Table>
               <TableHeader className="sticky top-0 bg-siso-bg z-10">
-                <TableRow>
+                <TableRow className="border-b border-siso-border">
                   <TableHead className="w-[80px] text-center">Rank</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead className="text-center">Points</TableHead>
@@ -228,42 +228,49 @@ export const Leaderboard = () => {
                   <TableRow 
                     key={entry.id}
                     className={cn(
-                      "transition-colors hover:bg-siso-bg-alt/50",
+                      "transition-all duration-200",
                       getRowClassName(index)
                     )}
                   >
                     <TableCell className="text-center font-medium">
                       <div className="flex items-center justify-center gap-2">
                         {getRankBadge(index)}
-                        {index + 1}
+                        <span className={cn(
+                          "font-bold",
+                          index < 3 ? "text-siso-text-bold" : "text-siso-text"
+                        )}>
+                          {index + 1}
+                        </span>
                       </div>
                     </TableCell>
-                    <TableCell>{getDisplayName(entry)}</TableCell>
+                    <TableCell className="font-medium text-siso-text-bold">
+                      {getDisplayName(entry)}
+                    </TableCell>
                     <TableCell className="text-center">
                       <div className="flex items-center justify-center gap-2">
                         <Trophy className="h-4 w-4 text-yellow-500" />
-                        {entry.points || 0}
+                        <span className="font-medium">{entry.points || 0}</span>
                       </div>
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="flex items-center justify-center gap-2">
                         <Users className="h-4 w-4 text-siso-text/70" />
-                        {entry.contribution_count || 0}
+                        <span>{entry.contribution_count || 0}</span>
                       </div>
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="flex items-center justify-center gap-2">
                         <UserPlus className="h-4 w-4 text-siso-text/70" />
-                        {entry.referral_count || 0}
+                        <span>{entry.referral_count || 0}</span>
                       </div>
                     </TableCell>
-                    <TableCell className="text-center">
+                    <TableCell className="text-center font-medium">
                       {entry.siso_tokens || 0}
                     </TableCell>
-                    <TableCell className="text-center">
+                    <TableCell className="text-center text-siso-text/70">
                       <div className="flex items-center justify-center gap-2">
-                        <Clock className="h-4 w-4 text-siso-text/70" />
-                        {formatLastActive(entry.updated_at)}
+                        <Clock className="h-4 w-4" />
+                        <span>{formatLastActive(entry.updated_at)}</span>
                       </div>
                     </TableCell>
                   </TableRow>

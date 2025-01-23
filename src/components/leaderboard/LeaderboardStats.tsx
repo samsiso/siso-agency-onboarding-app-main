@@ -10,7 +10,7 @@ interface LeaderboardStatsProps {
 export const LeaderboardStats = ({ totalUsers, totalPoints, activeUsers }: LeaderboardStatsProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-      <Card className="bg-siso-bg-alt">
+      <Card className="bg-siso-bg-alt hover:border-siso-border-hover transition-colors">
         <CardContent className="pt-6">
           <div className="flex items-center justify-between">
             <div>
@@ -22,7 +22,7 @@ export const LeaderboardStats = ({ totalUsers, totalPoints, activeUsers }: Leade
         </CardContent>
       </Card>
       
-      <Card className="bg-siso-bg-alt">
+      <Card className="bg-siso-bg-alt hover:border-siso-border-hover transition-colors">
         <CardContent className="pt-6">
           <div className="flex items-center justify-between">
             <div>
@@ -34,7 +34,7 @@ export const LeaderboardStats = ({ totalUsers, totalPoints, activeUsers }: Leade
         </CardContent>
       </Card>
       
-      <Card className="bg-siso-bg-alt">
+      <Card className="bg-siso-bg-alt hover:border-siso-border-hover transition-colors">
         <CardContent className="pt-6">
           <div className="flex items-center justify-between">
             <div>
