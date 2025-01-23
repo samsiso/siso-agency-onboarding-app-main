@@ -1,6 +1,6 @@
-import { User, Trophy, Star, Upload, Sun, Moon } from 'lucide-react';
+import { User, Trophy, Star, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -24,38 +24,7 @@ export const ProfileHeader = ({
   onBackToHome 
 }: ProfileHeaderProps) => {
   const [uploading, setUploading] = useState(false);
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const { toast } = useToast();
-
-  useEffect(() => {
-    // Check system preference
-    if (window.matchMedia('(prefers-color-scheme: light)').matches) {
-      setTheme('light');
-      document.documentElement.classList.remove('dark');
-    }
-
-    // Load saved preference
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark';
-    if (savedTheme) {
-      setTheme(savedTheme);
-      if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
-    if (newTheme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  };
 
   const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
@@ -87,6 +56,7 @@ export const ProfileHeader = ({
         description: "Profile photo updated successfully",
       });
 
+      // Force a page reload to show the new avatar
       window.location.reload();
     } catch (error: any) {
       toast({
@@ -100,7 +70,7 @@ export const ProfileHeader = ({
   };
 
   return (
-    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-siso-border dark:border-siso-border pb-6">
+    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-siso-text/10 pb-6">
       <div className="flex items-center gap-4">
         <div className="relative group">
           {avatarUrl ? (
@@ -126,10 +96,10 @@ export const ProfileHeader = ({
           </label>
         </div>
         <div>
-          <h1 className="text-3xl font-bold text-siso-text-bold dark:text-siso-text-bold">
+          <h1 className="text-3xl font-bold text-siso-text-bold">
             {fullName || email?.split('@')[0]}
           </h1>
-          <div className="flex items-center gap-2 text-siso-text/70 dark:text-siso-text/70">
+          <div className="flex items-center gap-2 text-siso-text/70">
             <Trophy className="w-4 h-4 text-siso-orange" />
             <span>{points || 0} points</span>
             <Star className="w-4 h-4 text-siso-orange ml-2" />
@@ -138,28 +108,16 @@ export const ProfileHeader = ({
         </div>
       </div>
       <div className="flex gap-4">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={toggleTheme}
-          className="rounded-full"
-        >
-          {theme === 'light' ? (
-            <Moon className="h-4 w-4" />
-          ) : (
-            <Sun className="h-4 w-4" />
-          )}
-        </Button>
         <Button 
           variant="outline" 
-          className="border-siso-red text-siso-text dark:text-siso-text hover:bg-siso-red hover:text-white transition-colors"
+          className="border-siso-red text-siso-text hover:bg-siso-red hover:text-white transition-colors"
           onClick={onLogout}
         >
           Logout
         </Button>
         <Button 
           variant="outline" 
-          className="border-siso-text/20 text-siso-text-bold dark:text-siso-text-bold hover:bg-siso-text/10"
+          className="border-siso-text/20 text-siso-text-bold hover:bg-siso-text/10"
           onClick={onBackToHome}
         >
           Back to Home

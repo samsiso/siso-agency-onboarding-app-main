@@ -626,38 +626,23 @@ export type Database = {
       }
       profiles: {
         Row: {
-          ai_budget_range: string | null
-          ai_expertise_level: string | null
-          ai_implementation_priorities: string[] | null
-          annual_revenue_range: string | null
-          automation_priorities: string[] | null
           avatar_url: string | null
           bio: string | null
-          business_challenges: string[] | null
           business_name: string | null
-          business_size: string | null
           business_type: string | null
           created_at: string
-          current_tools_used: string[] | null
-          departments: string[] | null
           email: string | null
           full_name: string | null
-          geographic_markets: string[] | null
-          growth_targets: Json | null
           id: string
           industry: string | null
           instagram_url: string | null
           interests: string[] | null
           linkedin_url: string | null
-          long_term_goals: string[] | null
           moralis_provider_id: string | null
           points: number | null
           professional_role: string | null
           rank: string | null
-          short_term_goals: string[] | null
           solana_wallet_address: string | null
-          target_market: string[] | null
-          team_size: number | null
           twitter_url: string | null
           updated_at: string
           wallet_address: string | null
@@ -666,38 +651,23 @@ export type Database = {
           youtube_url: string | null
         }
         Insert: {
-          ai_budget_range?: string | null
-          ai_expertise_level?: string | null
-          ai_implementation_priorities?: string[] | null
-          annual_revenue_range?: string | null
-          automation_priorities?: string[] | null
           avatar_url?: string | null
           bio?: string | null
-          business_challenges?: string[] | null
           business_name?: string | null
-          business_size?: string | null
           business_type?: string | null
           created_at?: string
-          current_tools_used?: string[] | null
-          departments?: string[] | null
           email?: string | null
           full_name?: string | null
-          geographic_markets?: string[] | null
-          growth_targets?: Json | null
           id: string
           industry?: string | null
           instagram_url?: string | null
           interests?: string[] | null
           linkedin_url?: string | null
-          long_term_goals?: string[] | null
           moralis_provider_id?: string | null
           points?: number | null
           professional_role?: string | null
           rank?: string | null
-          short_term_goals?: string[] | null
           solana_wallet_address?: string | null
-          target_market?: string[] | null
-          team_size?: number | null
           twitter_url?: string | null
           updated_at?: string
           wallet_address?: string | null
@@ -706,38 +676,23 @@ export type Database = {
           youtube_url?: string | null
         }
         Update: {
-          ai_budget_range?: string | null
-          ai_expertise_level?: string | null
-          ai_implementation_priorities?: string[] | null
-          annual_revenue_range?: string | null
-          automation_priorities?: string[] | null
           avatar_url?: string | null
           bio?: string | null
-          business_challenges?: string[] | null
           business_name?: string | null
-          business_size?: string | null
           business_type?: string | null
           created_at?: string
-          current_tools_used?: string[] | null
-          departments?: string[] | null
           email?: string | null
           full_name?: string | null
-          geographic_markets?: string[] | null
-          growth_targets?: Json | null
           id?: string
           industry?: string | null
           instagram_url?: string | null
           interests?: string[] | null
           linkedin_url?: string | null
-          long_term_goals?: string[] | null
           moralis_provider_id?: string | null
           points?: number | null
           professional_role?: string | null
           rank?: string | null
-          short_term_goals?: string[] | null
           solana_wallet_address?: string | null
-          target_market?: string[] | null
-          team_size?: number | null
           twitter_url?: string | null
           updated_at?: string
           wallet_address?: string | null
