@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Tool } from './types';
+import { motion } from 'framer-motion';
 import { 
   Star, 
   Code, 
@@ -86,9 +87,16 @@ export function ToolCard({ tool }: ToolCardProps) {
   };
 
   return (
-    <div
+    <motion.div
       onClick={handleClick}
-      className="group relative flex flex-col gap-4 rounded-lg border border-siso-text/10 bg-siso-text/5 p-6 hover:bg-siso-text/10 transition-all duration-300 cursor-pointer hover:scale-[1.02] h-[200px]"
+      className="group relative flex flex-col gap-4 rounded-lg border border-siso-text/10 bg-siso-text/5 p-6 transition-all duration-300 cursor-pointer h-[200px]"
+      whileHover={{ 
+        scale: 1.02,
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+      }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
     >
       <div className="flex items-start gap-4">
         {tool.profile_image_url ? (
@@ -96,6 +104,7 @@ export function ToolCard({ tool }: ToolCardProps) {
             src={tool.profile_image_url}
             alt={tool.name}
             className="h-12 w-12 shrink-0 rounded-full object-cover ring-2 ring-siso-orange/20"
+            loading="lazy"
           />
         ) : (
           <div className="h-12 w-12 shrink-0 rounded-full bg-gradient-to-br from-siso-red/20 to-siso-orange/20 flex items-center justify-center ring-2 ring-siso-orange/20">
@@ -114,7 +123,13 @@ export function ToolCard({ tool }: ToolCardProps) {
           {tool.description}
         </p>
       )}
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-siso-red/0 via-siso-orange/0 to-siso-red/0 group-hover:from-siso-red group-hover:via-siso-orange group-hover:to-siso-red transition-all duration-300 rounded-b-lg" />
-    </div>
+      <motion.div 
+        className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-siso-red/0 via-siso-orange/0 to-siso-red/0"
+        whileHover={{
+          background: 'linear-gradient(to right, var(--siso-red), var(--siso-orange), var(--siso-red))',
+        }}
+        transition={{ duration: 0.3 }}
+      />
+    </motion.div>
   );
 }
