@@ -2,8 +2,9 @@ import { Star } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { usePoints } from '@/hooks/usePoints';
-import { useToast } from '@/components/ui/use-toast';
-import { useAuth } from '@supabase/auth-helpers-react';
+import { useToast } from '@/hooks/use-toast';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface EarningTask {
   action: string;
@@ -17,10 +18,34 @@ interface EarningDetailsProps {
 }
 
 export const EarningDetails = ({ title, description, items }: EarningDetailsProps) => {
-  const { awardPoints } = usePoints(useAuth()?.user?.id);
+  const [userId, setUserId] = useState<string | null>(null);
+  const { awardPoints } = usePoints(userId || undefined);
   const { toast } = useToast();
 
+  useEffect(() => {
+    // Get the current user's ID
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUserId(session?.user?.id || null);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUserId(session?.user?.id || null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   const handleTaskClick = async (action: string) => {
+    if (!userId) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please sign in to earn points",
+      });
+      return;
+    }
+
     try {
       // Convert the display action to the database action type
       const dbAction = action.toLowerCase().replace(/ /g, '_') as any;
