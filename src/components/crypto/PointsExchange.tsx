@@ -74,11 +74,11 @@ export const PointsExchange = ({ userPoints }: { userPoints: number }) => {
   const tokensToReceive = pointsToExchange ? parseInt(pointsToExchange) / 1000 : 0;
 
   return (
-    <div className="w-full max-w-md mx-auto bg-black/40 backdrop-blur-lg rounded-xl border border-siso-text/10 p-6 space-y-6">
+    <div className="w-full max-w-md mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold text-siso-text-bold">Swap</h2>
-        <button className="p-2 hover:bg-siso-text/5 rounded-lg transition-colors">
+        <button className="p-2 hover:bg-siso-text/5 rounded-lg transition-colors" title="Exchange Settings">
           <Settings className="w-5 h-5 text-siso-text/60" />
         </button>
       </div>
@@ -86,7 +86,7 @@ export const PointsExchange = ({ userPoints }: { userPoints: number }) => {
       {/* From Section */}
       <div className="space-y-2">
         <div className="text-sm text-siso-text/60 uppercase tracking-wider">From</div>
-        <div className="bg-siso-bg-alt rounded-lg p-4 border border-siso-text/10">
+        <div className="bg-siso-bg-alt rounded-lg p-4 border border-siso-text/10 hover:border-siso-text/20 transition-colors">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-siso-red to-siso-orange flex items-center justify-center">
@@ -95,7 +95,7 @@ export const PointsExchange = ({ userPoints }: { userPoints: number }) => {
               <span className="font-semibold text-siso-text-bold">SISO Points</span>
             </div>
             <div className="text-sm text-siso-text/60">
-              Balance: {userPoints}
+              Balance: {userPoints.toLocaleString()}
             </div>
           </div>
           <Input
@@ -118,7 +118,7 @@ export const PointsExchange = ({ userPoints }: { userPoints: number }) => {
       {/* To Section */}
       <div className="space-y-2">
         <div className="text-sm text-siso-text/60 uppercase tracking-wider">To</div>
-        <div className="bg-siso-bg-alt rounded-lg p-4 border border-siso-text/10">
+        <div className="bg-siso-bg-alt rounded-lg p-4 border border-siso-text/10 hover:border-siso-text/20 transition-colors">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
@@ -129,7 +129,7 @@ export const PointsExchange = ({ userPoints }: { userPoints: number }) => {
           </div>
           <Input
             type="text"
-            value={tokensToReceive ? `${tokensToReceive}` : ''}
+            value={tokensToReceive ? tokensToReceive.toLocaleString() : ''}
             readOnly
             placeholder="0.0"
             className="bg-transparent border-none text-2xl font-bold text-siso-text-bold placeholder:text-siso-text/30 focus-visible:ring-0"
@@ -139,7 +139,7 @@ export const PointsExchange = ({ userPoints }: { userPoints: number }) => {
 
       {/* Exchange Rate Info */}
       <div className="text-sm text-siso-text/60 text-center">
-        1 SISO Token = 1000 SISO Points
+        1 SISO Token = 1,000 SISO Points
       </div>
 
       {/* Swap Button */}

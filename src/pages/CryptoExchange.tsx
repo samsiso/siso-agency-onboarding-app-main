@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
-import { ArrowRightLeft } from 'lucide-react';
+import { ArrowRightLeft, Loader2 } from 'lucide-react';
 import { PointsExchange } from "@/components/crypto/PointsExchange";
 import { NFTGallery } from "@/components/crypto/NFTGallery";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Sidebar } from '@/components/Sidebar';
 
@@ -63,21 +62,33 @@ const CryptoExchange = () => {
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <div className="flex-1 bg-gradient-to-b from-gray-900 to-black">
-        <div className="container mx-auto p-6">
+      <div className="flex-1 bg-gradient-to-b from-gray-900 via-gray-800 to-black">
+        <div className="container mx-auto p-6 space-y-8">
+          {/* Header Section */}
           <div className="flex items-center gap-3 mb-8">
             <ArrowRightLeft className="w-8 h-8 text-siso-orange" />
             <h1 className="text-3xl font-bold text-siso-text-bold">Crypto Exchange</h1>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="flex items-center justify-center p-6">
-              <PointsExchange userPoints={userPoints} />
+            {/* Swap Section */}
+            <div className="flex flex-col space-y-4">
+              <h2 className="text-xl font-semibold text-siso-text-bold">
+                Swap Your Points
+              </h2>
+              <div className="bg-black/40 backdrop-blur-lg rounded-xl border border-siso-text/10 p-6">
+                <PointsExchange userPoints={userPoints} />
+              </div>
             </div>
 
-            <div className="bg-black/20 rounded-xl border border-siso-text/10 p-6">
-              <h2 className="text-xl font-semibold text-siso-text-bold mb-6">Your NFT Gallery</h2>
-              <NFTGallery />
+            {/* NFT Gallery Section */}
+            <div className="flex flex-col space-y-4">
+              <h2 className="text-xl font-semibold text-siso-text-bold">
+                Your NFT Gallery
+              </h2>
+              <div className="bg-black/40 backdrop-blur-lg rounded-xl border border-siso-text/10 p-6">
+                <NFTGallery />
+              </div>
             </div>
           </div>
         </div>
