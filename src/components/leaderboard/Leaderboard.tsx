@@ -16,7 +16,7 @@ interface LeaderboardEntry {
   user_id: string;
   points: number | null;
   rank: string | null;
-  achievements: Achievement[] | null;
+  achievements: Achievement[];
   siso_tokens: number | null;
   updated_at: string;
   contribution_count: number | null;
@@ -113,7 +113,12 @@ export const Leaderboard = () => {
           user_id: entry.id,
           points: entry.points,
           rank: entry.rank,
-          achievements: entry.leaderboard.achievements || [],
+          achievements: Array.isArray(entry.leaderboard.achievements) 
+            ? entry.leaderboard.achievements.map((achievement: any) => ({
+                name: achievement.name || '',
+                icon: achievement.icon || ''
+              }))
+            : [],
           siso_tokens: entry.leaderboard.siso_tokens || 0,
           updated_at: entry.updated_at,
           contribution_count: entry.leaderboard.contribution_count || 0,
