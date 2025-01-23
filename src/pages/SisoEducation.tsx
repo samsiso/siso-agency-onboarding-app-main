@@ -151,7 +151,7 @@ export default function SisoEducation() {
           <Alert className="border border-[#0FA0CE]/20 bg-[#0FA0CE]/5 text-siso-text">
             <AlertDescription className="flex items-center justify-between gap-4">
               <span>
-                The best way to learn new skills using AI - perfect for agencies, businesses, and individuals looking to grow.
+                List Learner is a powerful B2B education infrastructure platform - perfect for agencies, businesses, and individuals looking to scale their learning programs.
               </span>
               <Button
                 asChild
