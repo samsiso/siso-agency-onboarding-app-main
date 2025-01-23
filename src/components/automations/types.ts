@@ -9,4 +9,16 @@ export interface Automation {
   profile_image_url: string | null;
 }
 
-export type AutomationCategory = 'all' | 'featured' | 'linkedin' | 'instagram' | 'x' | 'reddit' | 'youtube' | 'tiktok' | 'general';
+export type AutomationCategory = 
+  | 'all' 
+  | 'featured' 
+  | 'zapier'
+  | 'make'
+  | 'n8n'
+  | 'linkedin'
+  | 'instagram'
+  | 'x'
+  | 'reddit'
+  | 'youtube'
+  | 'tiktok'
+  | 'general';
