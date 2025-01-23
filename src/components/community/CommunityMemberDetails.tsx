@@ -31,10 +31,10 @@ export const CommunityMemberDetails = ({ member, onClose }: CommunityMemberDetai
         <SheetHeader className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              {member.profile?.avatar_url ? (
+              {member.profile_image_url ? (
                 <img 
-                  src={member.profile.avatar_url} 
-                  alt={member.profile?.full_name || 'User'}
+                  src={member.profile_image_url} 
+                  alt={member.name}
                   className="w-16 h-16 rounded-full object-cover ring-2 ring-siso-orange/20"
                 />
               ) : (
@@ -45,18 +45,18 @@ export const CommunityMemberDetails = ({ member, onClose }: CommunityMemberDetai
               <div>
                 <div className="flex items-center gap-2">
                   <SheetTitle className="text-2xl font-bold text-siso-text-bold">
-                    {member.profile?.full_name || member.profile?.email?.split('@')[0] || 'Anonymous User'}
+                    {member.name}
                   </SheetTitle>
                   {member.rank === "Diamond" && (
                     <Crown className="w-5 h-5 text-yellow-500" />
                   )}
                 </div>
                 <div className="flex items-center gap-2 text-sm text-siso-text/80">
-                  <span className="capitalize">{member.rank || 'Newbie'}</span>
-                  {member.profile?.professional_role && (
+                  <span className="capitalize">{member.member_type || 'Member'}</span>
+                  {member.platform && (
                     <>
                       <span>•</span>
-                      <span>{member.profile.professional_role}</span>
+                      <span>{member.platform}</span>
                     </>
                   )}
                 </div>
@@ -74,111 +74,97 @@ export const CommunityMemberDetails = ({ member, onClose }: CommunityMemberDetai
         </SheetHeader>
 
         <div className="mt-6 space-y-6">
-          {/* User Stats */}
-          <div className="grid grid-cols-3 gap-4">
-            <div className="bg-siso-text/5 rounded-lg p-4 text-center">
-              <div className="text-xl font-bold text-siso-text-bold">
-                {member.points || 0}
-              </div>
-              <div className="text-sm text-siso-text/80">Points</div>
+          {/* Stats */}
+          {(member.points !== undefined || member.contribution_count !== undefined || member.referral_count !== undefined) && (
+            <div className="grid grid-cols-3 gap-4">
+              {member.points !== undefined && (
+                <div className="bg-siso-text/5 rounded-lg p-4 text-center">
+                  <div className="text-xl font-bold text-siso-text-bold">
+                    {member.points}
+                  </div>
+                  <div className="text-sm text-siso-text/80">Points</div>
+                </div>
+              )}
+              {member.contribution_count !== undefined && (
+                <div className="bg-siso-text/5 rounded-lg p-4 text-center">
+                  <div className="text-xl font-bold text-siso-text-bold">
+                    {member.contribution_count}
+                  </div>
+                  <div className="text-sm text-siso-text/80">Contributions</div>
+                </div>
+              )}
+              {member.referral_count !== undefined && (
+                <div className="bg-siso-text/5 rounded-lg p-4 text-center">
+                  <div className="text-xl font-bold text-siso-text-bold">
+                    {member.referral_count}
+                  </div>
+                  <div className="text-sm text-siso-text/80">Referrals</div>
+                </div>
+              )}
             </div>
-            <div className="bg-siso-text/5 rounded-lg p-4 text-center">
-              <div className="text-xl font-bold text-siso-text-bold">
-                {member.contribution_count || 0}
-              </div>
-              <div className="text-sm text-siso-text/80">Contributions</div>
-            </div>
-            <div className="bg-siso-text/5 rounded-lg p-4 text-center">
-              <div className="text-xl font-bold text-siso-text-bold">
-                {member.referral_count || 0}
-              </div>
-              <div className="text-sm text-siso-text/80">Referrals</div>
-            </div>
-          </div>
+          )}
 
-          {/* Bio */}
-          {member.profile?.bio && (
+          {/* Description */}
+          {member.description && (
             <div className="space-y-3">
               <h3 className="text-lg font-semibold text-siso-text-bold">About</h3>
               <div className="text-siso-text space-y-4 whitespace-pre-line">
-                {member.profile.bio}
+                {member.description}
               </div>
             </div>
           )}
 
-          {/* Social Links */}
-          {(member.profile?.linkedin_url || 
-            member.profile?.website_url || 
-            member.profile?.youtube_url || 
-            member.profile?.instagram_url || 
-            member.profile?.twitter_url) && (
+          {/* Links */}
+          {(member.website_url || member.youtube_url || member.join_url) && (
             <div className="space-y-3">
               <h3 className="text-lg font-semibold text-siso-text-bold flex items-center gap-2">
                 <ExternalLink className="w-5 h-5 text-siso-orange" />
-                Social Links
+                Links
               </h3>
               <div className="grid grid-cols-1 gap-2">
-                {member.profile?.linkedin_url && (
+                {member.website_url && (
                   <Button
                     variant="outline"
                     className="w-full justify-start gap-2 border-siso-text/20 hover:bg-siso-text/5"
-                    onClick={() => window.open(member.profile?.linkedin_url!, '_blank')}
-                  >
-                    <Linkedin className="h-4 w-4 text-blue-500" />
-                    LinkedIn Profile
-                  </Button>
-                )}
-                {member.profile?.website_url && (
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start gap-2 border-siso-text/20 hover:bg-siso-text/5"
-                    onClick={() => window.open(member.profile?.website_url!, '_blank')}
+                    onClick={() => window.open(member.website_url!, '_blank')}
                   >
                     <Globe className="h-4 w-4 text-green-500" />
                     Website
                   </Button>
                 )}
-                {member.profile?.youtube_url && (
+                {member.youtube_url && (
                   <Button
                     variant="outline"
                     className="w-full justify-start gap-2 border-siso-text/20 hover:bg-siso-text/5"
-                    onClick={() => window.open(member.profile?.youtube_url!, '_blank')}
+                    onClick={() => window.open(member.youtube_url!, '_blank')}
                   >
                     <Youtube className="h-4 w-4 text-red-500" />
                     YouTube Channel
                   </Button>
                 )}
-                {member.profile?.instagram_url && (
+                {member.join_url && (
                   <Button
                     variant="outline"
                     className="w-full justify-start gap-2 border-siso-text/20 hover:bg-siso-text/5"
-                    onClick={() => window.open(member.profile?.instagram_url!, '_blank')}
+                    onClick={() => window.open(member.join_url!, '_blank')}
                   >
-                    <Instagram className="h-4 w-4 text-pink-500" />
-                    Instagram
-                  </Button>
-                )}
-                {member.profile?.twitter_url && (
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start gap-2 border-siso-text/20 hover:bg-siso-text/5"
-                    onClick={() => window.open(member.profile?.twitter_url!, '_blank')}
-                  >
-                    <Twitter className="h-4 w-4 text-blue-400" />
-                    Twitter
+                    <Users className="h-4 w-4 text-blue-500" />
+                    Join Community
                   </Button>
                 )}
               </div>
             </div>
           )}
 
-          {/* Platform Info */}
+          {/* Footer */}
           <div className="pt-4 border-t border-siso-text/10 text-sm text-siso-text/60 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span>Rank:</span>
-              <span className="text-siso-text capitalize">{member.rank || 'Newbie'}</span>
+              <span>Type:</span>
+              <span className="text-siso-text capitalize">{member.member_type || 'Community'}</span>
             </div>
-            <span>SISO Member</span>
+            {member.member_count && (
+              <span>{formatMemberCount(member.member_count)} members</span>
+            )}
           </div>
         </div>
       </SheetContent>
