@@ -4,6 +4,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { Sidebar } from '@/components/Sidebar';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { Link } from 'react-router-dom';
 
 interface NFTCollection {
   tier: string;
@@ -34,7 +35,6 @@ const HowToEarn = () => {
 
         if (error) throw error;
         
-        // Transform the data to ensure benefits is a string array
         const transformedData = data?.map(collection => ({
           ...collection,
           benefits: Array.isArray(collection.benefits) 
@@ -191,27 +191,57 @@ const HowToEarn = () => {
         <Sidebar />
         <div className="flex-1 container mx-auto px-4 py-8">
           <div className="space-y-6 relative z-10">
-            <div className="flex items-center gap-3 mb-8">
-              <Trophy className="w-8 h-8 text-siso-orange" />
-              <h1 className="text-3xl font-bold text-siso-text-bold">How to Earn SISO Points</h1>
+            {/* Header Section with Introduction */}
+            <div className="text-center mb-12">
+              <div className="flex items-center justify-center gap-3 mb-4">
+                <Trophy className="w-12 h-12 text-siso-orange animate-bounce" />
+                <h1 className="text-4xl font-bold text-siso-text-bold">How to Earn SISO Points</h1>
+              </div>
+              <p className="text-lg text-siso-text/80 max-w-2xl mx-auto">
+                Maximize your points by completing daily activities and contributing to the community. 
+                Every action counts towards your progress!
+              </p>
+              <div className="mt-6">
+                <Link 
+                  to="/leaderboards"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-siso-red to-siso-orange 
+                    rounded-lg text-white font-semibold hover:opacity-90 transition-all duration-300 animate-glow"
+                >
+                  <Trophy className="w-5 h-5" />
+                  View Leaderboard
+                </Link>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Earning Sections Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {earningSections.map((section, index) => (
-                <Card key={index} className="bg-black/20 border-siso-text/10 backdrop-blur-sm hover:border-siso-text/20 transition-all duration-300">
+                <Card 
+                  key={index} 
+                  className="group hover:scale-[1.02] transition-all duration-300 bg-black/20 
+                    border-siso-text/10 backdrop-blur-sm hover:border-siso-text/20 hover:shadow-lg"
+                >
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-siso-text-bold">
-                      <section.icon className="w-5 h-5 text-siso-orange" />
+                    <CardTitle className="flex items-center gap-3 text-2xl text-siso-text-bold">
+                      <section.icon className="w-8 h-8 text-siso-orange group-hover:scale-110 transition-transform duration-300" />
                       {section.title}
                     </CardTitle>
+                    <p className="text-siso-text/80 mt-2">{section.description}</p>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <p className="text-sm text-siso-text/90">{section.description}</p>
-                    <div className="space-y-2">
+                  <CardContent>
+                    <div className="space-y-4">
                       {section.items.map((item, itemIndex) => (
-                        <div key={itemIndex} className="flex items-center justify-between text-sm">
-                          <span className="text-siso-text/80">{item.action}</span>
-                          <span className="text-siso-red font-medium">{item.points}</span>
+                        <div 
+                          key={itemIndex} 
+                          className="flex items-center justify-between p-3 rounded-lg
+                            bg-gradient-to-r from-siso-text/5 to-transparent
+                            hover:from-siso-text/10 transition-colors duration-300"
+                        >
+                          <span className="text-siso-text flex items-center gap-2">
+                            <Star className="w-4 h-4 text-siso-orange" />
+                            {item.action}
+                          </span>
+                          <span className="text-siso-orange font-semibold">{item.points}</span>
                         </div>
                       ))}
                     </div>
@@ -220,17 +250,18 @@ const HowToEarn = () => {
               ))}
             </div>
 
-            <Card className="mt-8 bg-black/20 border-siso-text/10 backdrop-blur-sm">
+            {/* NFT Membership Tiers Section */}
+            <Card className="mt-12 bg-black/20 border-siso-text/10 backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="text-siso-text-bold flex items-center gap-2">
-                  <Gem className="w-5 h-5 text-siso-orange" />
+                  <Gem className="w-8 h-8 text-siso-orange" />
                   NFT Membership Tiers
                 </CardTitle>
+                <p className="text-siso-text/80">
+                  Unlock exclusive benefits and boost your earning potential with our NFT membership tiers
+                </p>
               </CardHeader>
               <CardContent className="space-y-6">
-                <p className="text-sm text-siso-text/90">
-                  Unlock exclusive benefits and boost your earning potential with our NFT membership tiers:
-                </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   {loading ? (
                     Array(4).fill(0).map((_, index) => (
@@ -242,9 +273,15 @@ const HowToEarn = () => {
                     ))
                   ) : (
                     nftCollections.map((nft) => (
-                      <div key={nft.tier} className="flex flex-col gap-4 p-6 rounded-lg bg-gradient-to-br from-siso-text/5 to-siso-text/10 border border-siso-text/10 hover:border-siso-text/20 transition-all duration-300">
+                      <div 
+                        key={nft.tier} 
+                        className="group flex flex-col gap-4 p-6 rounded-lg 
+                          bg-gradient-to-br from-siso-text/5 to-siso-text/10 
+                          border border-siso-text/10 hover:border-siso-text/20 
+                          transition-all duration-300 hover:scale-[1.02]"
+                      >
                         <div className="flex items-center gap-2">
-                          <Gem className="w-5 h-5 text-siso-orange" />
+                          <Gem className="w-5 h-5 text-siso-orange group-hover:scale-110 transition-transform duration-300" />
                           <h3 className="text-lg font-semibold text-siso-text-bold">{nft.name}</h3>
                         </div>
                         <p className="text-sm text-siso-text/80">{nft.description}</p>
