@@ -6,9 +6,15 @@ interface NewsCardMediaProps {
   imageUrl: string;
   title: string;
   isFeatured?: boolean;
+  isCompact?: boolean;
 }
 
-export const NewsCardMedia = ({ imageUrl, title, isFeatured = false }: NewsCardMediaProps) => {
+export const NewsCardMedia = ({ 
+  imageUrl, 
+  title, 
+  isFeatured = false,
+  isCompact = false 
+}: NewsCardMediaProps) => {
   const [isLoading, setIsLoading] = useState(true);
 
   return (
@@ -16,9 +22,9 @@ export const NewsCardMedia = ({ imageUrl, title, isFeatured = false }: NewsCardM
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3 }}
-      className={`relative w-full ${isFeatured ? 'lg:w-[600px]' : 'sm:w-full'} max-w-[600px] mx-auto sm:mx-0`}
+      className={`relative ${isCompact ? 'w-1/3' : isFeatured ? 'w-full' : 'w-full lg:w-[400px]'} ${isCompact ? 'max-w-[200px]' : 'max-w-[600px]'}`}
     >
-      <div className="relative aspect-video overflow-hidden rounded-lg border border-siso-border group">
+      <div className={`relative ${isCompact ? 'aspect-[4/3]' : 'aspect-video'} overflow-hidden rounded-lg border border-siso-border group`}>
         <div className={`absolute inset-0 bg-siso-bg-alt animate-pulse ${isLoading ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`} />
         <img
           src={imageUrl || '/placeholder.svg'}

@@ -141,7 +141,7 @@ const AINews = () => {
   };
 
   // Split news items into featured, side, and regular posts
-  const featuredPost = newsItems[0];
+  const heroPost = newsItems[0];
   const sidePosts = newsItems.slice(1, 4);
   const regularPosts = newsItems.slice(4);
 
@@ -169,13 +169,14 @@ const AINews = () => {
                 onCategoryChange={setSelectedCategory}
               />
 
+              {/* Top Posts Grid */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
-                {/* Featured Post - 8 columns on desktop */}
-                {featuredPost && (
-                  <div className="lg:col-span-8">
+                {/* Hero Post - 7 columns */}
+                {heroPost && (
+                  <div className="lg:col-span-7">
                     <NewsCard
-                      key={featuredPost.id}
-                      item={featuredPost}
+                      key={heroPost.id}
+                      item={heroPost}
                       summaries={summaries}
                       loadingSummaries={loadingSummaries}
                       onGenerateSummary={generateSummary}
@@ -184,8 +185,8 @@ const AINews = () => {
                   </div>
                 )}
 
-                {/* Side Posts - 4 columns on desktop */}
-                <div className="lg:col-span-4 space-y-4 sm:space-y-6">
+                {/* Side Posts - 5 columns */}
+                <div className="lg:col-span-5 space-y-4">
                   {sidePosts.map((item) => (
                     <NewsCard
                       key={item.id}
@@ -193,6 +194,7 @@ const AINews = () => {
                       summaries={summaries}
                       loadingSummaries={loadingSummaries}
                       onGenerateSummary={generateSummary}
+                      isCompact={true}
                     />
                   ))}
                 </div>
