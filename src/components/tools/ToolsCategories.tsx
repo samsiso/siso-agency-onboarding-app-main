@@ -18,8 +18,9 @@ export function ToolsCategories() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.1, duration: 0.3 }}
+          whileHover={{ scale: 1.02 }}
         >
-          <Alert className="bg-siso-text/5 border border-siso-text/10 transition-all duration-300 hover:bg-siso-text/10 hover:border-siso-text/20 cursor-pointer group">
+          <Alert className="bg-siso-text/5 border border-siso-text/10 transition-all duration-300 hover:bg-siso-text/10 hover:border-siso-text/20 cursor-pointer group shadow-sm">
             {category.icon}
             <AlertDescription className="text-siso-text/80">
               <span className="font-semibold text-siso-text group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-siso-red group-hover:to-siso-orange transition-all duration-300">

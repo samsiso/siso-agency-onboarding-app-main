@@ -17,10 +17,10 @@ export function ToolsHeader({ searchQuery, onSearchChange }: ToolsHeaderProps) {
         transition={{ duration: 0.5 }}
       >
         <div className="w-full">
-          <h1 className="text-6xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
+          <h1 className="text-5xl sm:text-6xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text tracking-tight">
             Tools and Platforms
           </h1>
-          <p className="mt-6 text-xl text-siso-text/80 leading-relaxed max-w-3xl">
+          <p className="mt-6 text-lg sm:text-xl text-siso-text/80 leading-relaxed max-w-3xl">
             Discover powerful tools and platforms to enhance your workflow. 
             Browse through various categories including development, database, and automation tools.
           </p>
@@ -34,7 +34,7 @@ export function ToolsHeader({ searchQuery, onSearchChange }: ToolsHeaderProps) {
           <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-siso-text/60 w-5 h-5" />
           <Input
             placeholder="Search tools..."
-            className="pl-12 h-14 bg-siso-text/5 border-siso-text/10 hover:border-siso-text/20 focus-visible:ring-siso-orange transition-all duration-300 text-lg rounded-xl"
+            className="pl-12 h-14 bg-siso-text/5 border-siso-text/10 hover:border-siso-text/20 focus-visible:ring-siso-orange transition-all duration-300 text-lg rounded-xl shadow-sm"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
           />

@@ -89,7 +89,7 @@ export function ToolCard({ tool }: ToolCardProps) {
   return (
     <motion.div
       onClick={handleClick}
-      className="group relative flex flex-col gap-4 rounded-lg border border-siso-text/10 bg-siso-text/5 p-6 transition-all duration-300 cursor-pointer h-[200px] hover:border-siso-orange/30 focus:outline-none focus:ring-2 focus:ring-siso-orange/50"
+      className="group relative flex flex-col gap-4 rounded-lg border border-siso-text/10 bg-siso-text/5 p-6 transition-all duration-300 cursor-pointer h-[200px] hover:border-siso-orange/30 focus:outline-none focus:ring-2 focus:ring-siso-orange/50 shadow-sm"
       whileHover={{ 
         scale: 1.02,
         backgroundColor: 'rgba(255, 255, 255, 0.08)',
