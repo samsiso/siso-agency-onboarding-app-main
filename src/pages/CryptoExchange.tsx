@@ -62,8 +62,16 @@ const CryptoExchange = () => {
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <div className="flex-1 bg-gradient-to-b from-gray-900 via-gray-800 to-black">
-        <div className="container mx-auto p-6 space-y-8">
+      <div className="flex-1 bg-gradient-to-b from-gray-900 via-gray-800 to-black relative overflow-hidden">
+        {/* Background Orbs */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-siso-red/20 rounded-full blur-3xl animate-float-slow"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-siso-orange/20 rounded-full blur-3xl animate-float-slower"></div>
+          <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-siso-red/10 rounded-full blur-2xl animate-float-slower"></div>
+        </div>
+
+        {/* Content */}
+        <div className="container mx-auto p-6 space-y-8 relative z-10">
           {/* Header Section */}
           <div className="flex flex-col space-y-2">
             <div className="flex items-center gap-3">
