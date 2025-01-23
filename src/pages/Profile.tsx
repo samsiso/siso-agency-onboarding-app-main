@@ -11,6 +11,7 @@ import { LoginStreakTracker } from '@/components/points/LoginStreakTracker';
 import { PointsDisplay } from '@/components/points/PointsDisplay';
 import { MintNFTButton } from '@/components/crypto/MintNFTButton';
 import { FloatingOrbs } from '@/components/effects/FloatingOrbs';
+import { ConnectWalletButton } from '@/components/crypto/ConnectWalletButton';
 
 const Profile = () => {
   const [user, setUser] = useState<any>(null);
@@ -185,6 +186,10 @@ const Profile = () => {
                       <PointsDisplay userId={user.id} />
                     </div>
                     
+                    <div className="bg-black/20 rounded-xl p-6 backdrop-blur-sm border border-siso-text/10 hover:border-siso-orange/50 transition-colors">
+                      <ConnectWalletButton />
+                    </div>
+
                     {profile?.solana_wallet_address && (
                       <div className="bg-black/20 rounded-xl p-6 backdrop-blur-sm border border-siso-text/10 hover:border-siso-orange/50 transition-colors">
                         <MintNFTButton />
