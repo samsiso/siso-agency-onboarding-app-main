@@ -7,23 +7,25 @@ import { Input } from '@/components/ui/input';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePoints } from '@/hooks/usePoints';
 
-interface Comment {
+interface NewsComment {
   id: string;
   content: string;
   created_at: string;
   user_email: string;
+  news_id: string;
+  updated_at: string;
 }
 
 interface NewsCardCommentsProps {
   newsId: string;
-  comments: Comment[];
+  comments: NewsComment[];
 }
 
 export const NewsCardComments = ({ newsId, comments }: NewsCardCommentsProps) => {
   const [isCommenting, setIsCommenting] = useState(false);
   const [newComment, setNewComment] = useState('');
   const { toast } = useToast();
-  const { awardPoints } = usePoints(undefined); // We'll get the user ID from the session
+  const { awardPoints } = usePoints(undefined);
 
   const handleAddComment = async () => {
     if (!newComment.trim()) {

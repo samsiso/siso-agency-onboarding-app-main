@@ -12,6 +12,15 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { usePoints } from '@/hooks/usePoints';
 
+interface NewsComment {
+  id: string;
+  content: string;
+  created_at: string;
+  user_email: string;
+  news_id: string;
+  updated_at: string;
+}
+
 interface NewsCardProps {
   item: any;
   summaries: Record<string, string>;
@@ -27,7 +36,7 @@ const NewsCard = ({
   onGenerateSummary,
   isFeatured = false
 }: NewsCardProps) => {
-  const [comments, setComments] = useState<Comment[]>([]);
+  const [comments, setComments] = useState<NewsComment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hasReadArticle, setHasReadArticle] = useState(false);
   const { toast } = useToast();
@@ -46,7 +55,7 @@ const NewsCard = ({
         },
         (payload) => {
           if (payload.eventType === 'INSERT') {
-            setComments(prev => [...prev, payload.new as Comment]);
+            setComments(prev => [...prev, payload.new as NewsComment]);
           }
         }
       )
