@@ -7,12 +7,12 @@ interface NetworkingCategoriesProps {
 
 export const NetworkingCategories = ({ categories, selectedCategory }: NetworkingCategoriesProps) => {
   return (
-    <TabsList className="w-full justify-start bg-siso-text/5 border border-siso-text/10 flex-wrap">
+    <TabsList className="w-full justify-start bg-siso-text/5 border border-siso-text/10 flex-wrap h-auto p-1">
       {Object.entries(categories).map(([category, count]) => (
         <TabsTrigger 
           key={category}
           value={category}
-          className="group data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange transition-all duration-200 hover:bg-siso-text/10"
+          className="group data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange transition-all duration-200 hover:bg-siso-text/10 focus:ring-2 focus:ring-siso-orange/50 focus:outline-none"
         >
           {category.charAt(0).toUpperCase() + category.slice(1)}
           <span className="ml-2 text-sm text-siso-text/60 group-data-[state=active]:text-siso-orange/60">

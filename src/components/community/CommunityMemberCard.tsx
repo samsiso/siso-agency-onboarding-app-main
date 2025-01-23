@@ -10,19 +10,22 @@ interface CommunityMemberCardProps {
 export const CommunityMemberCard = ({ member, onClick }: CommunityMemberCardProps) => {
   return (
     <Card 
-      className="group bg-gradient-to-br from-siso-red/10 to-siso-orange/10 border-siso-text/10 hover:border-siso-orange/50 transition-all duration-300 cursor-pointer hover:scale-105 p-2"
+      className="group bg-gradient-to-br from-siso-red/10 to-siso-orange/10 border-siso-text/10 hover:border-siso-orange/50 transition-all duration-300 cursor-pointer hover:scale-105 animate-fade-in focus:outline-none focus:ring-2 focus:ring-siso-orange/50"
       onClick={() => onClick(member)}
+      tabIndex={0}
+      role="button"
+      onKeyDown={(e) => e.key === 'Enter' && onClick(member)}
     >
-      <CardContent className="p-4">
+      <CardContent className="p-6">
         <div className="flex items-center gap-4">
           {member.profile_image_url ? (
             <img 
               src={member.profile_image_url} 
               alt={member.name}
-              className="w-16 h-16 rounded-full object-cover border-2 border-siso-orange/20"
+              className="w-16 h-16 rounded-full object-cover border-2 border-siso-orange/20 group-hover:border-siso-orange/50 transition-colors"
             />
           ) : (
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-siso-red/20 to-siso-orange/20 flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-siso-red/20 to-siso-orange/20 flex items-center justify-center group-hover:from-siso-red/30 group-hover:to-siso-orange/30 transition-colors">
               <Users className="w-8 h-8 text-siso-orange" />
             </div>
           )}
@@ -44,7 +47,7 @@ export const CommunityMemberCard = ({ member, onClick }: CommunityMemberCardProp
           {member.specialization?.slice(0, 2).map((spec, index) => (
             <span 
               key={index}
-              className="text-sm px-3 py-1 rounded-full bg-gradient-to-r from-siso-red/20 to-siso-orange/20 text-siso-text-bold"
+              className="text-xs px-3 py-1 rounded-full bg-gradient-to-r from-siso-red/20 to-siso-orange/20 text-siso-text-bold"
             >
               {spec}
             </span>
