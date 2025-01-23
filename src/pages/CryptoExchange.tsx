@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { ArrowRightLeft, Loader2 } from 'lucide-react';
 import { PointsExchange } from "@/components/crypto/PointsExchange";
 import { NFTGallery } from "@/components/crypto/NFTGallery";
+import { WelcomeNFTStatus } from "@/components/crypto/WelcomeNFTStatus";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from '@/hooks/use-toast';
 import { Sidebar } from '@/components/Sidebar';
@@ -66,9 +67,7 @@ const CryptoExchange = () => {
       <div className="flex-1 bg-gradient-to-b from-siso-bg via-black to-siso-bg relative overflow-hidden">
         <FloatingOrbs />
         
-        {/* Content */}
         <div className="container mx-auto p-6 space-y-8 relative z-10">
-          {/* Enhanced Header Section */}
           <div className="flex flex-col space-y-2 bg-black/20 p-6 rounded-lg backdrop-blur-sm border border-siso-text/5">
             <div className="flex items-center gap-3">
               <ArrowRightLeft className="w-8 h-8 text-gradient bg-gradient-to-r from-siso-red to-siso-orange" />
@@ -82,7 +81,6 @@ const CryptoExchange = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Enhanced Swap Section */}
             <div className="flex flex-col space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold text-siso-text-bold">
@@ -95,9 +93,10 @@ const CryptoExchange = () => {
               <div className="bg-black/40 backdrop-blur-lg rounded-xl border border-siso-text/10 p-6 hover:border-siso-text/20 transition-all duration-300 shadow-lg">
                 <PointsExchange userPoints={userPoints} />
               </div>
+              
+              <WelcomeNFTStatus />
             </div>
 
-            {/* Enhanced NFT Gallery Section */}
             <div className="flex flex-col space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold text-siso-text-bold">

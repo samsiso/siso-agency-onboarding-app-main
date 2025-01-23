@@ -1005,6 +1005,36 @@ export type Database = {
         }
         Relationships: []
       }
+      welcome_nft_mints: {
+        Row: {
+          attempted_at: string | null
+          completed_at: string | null
+          error_message: string | null
+          id: string
+          metadata: Json | null
+          status: Database["public"]["Enums"]["nft_mint_status"] | null
+          user_id: string
+        }
+        Insert: {
+          attempted_at?: string | null
+          completed_at?: string | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          status?: Database["public"]["Enums"]["nft_mint_status"] | null
+          user_id: string
+        }
+        Update: {
+          attempted_at?: string | null
+          completed_at?: string | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          status?: Database["public"]["Enums"]["nft_mint_status"] | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -1013,6 +1043,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      nft_mint_status: "pending" | "completed" | "failed"
       nft_tier:
         | "ai_artist"
         | "system_synthesizer"
