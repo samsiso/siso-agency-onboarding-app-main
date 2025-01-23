@@ -62,27 +62,31 @@ const CryptoExchange = () => {
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <div className="flex-1 bg-gradient-to-b from-gray-900 via-gray-800 to-black relative overflow-hidden">
-        {/* Background Orbs */}
+      <div className="flex-1 bg-gradient-to-b from-siso-bg via-black to-siso-bg relative overflow-hidden">
+        {/* Enhanced Background Orbs */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-siso-red/20 rounded-full blur-3xl animate-float-slow"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-siso-orange/20 rounded-full blur-3xl animate-float-slower"></div>
-          <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-siso-red/10 rounded-full blur-2xl animate-float-slower"></div>
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-siso-red/20 to-siso-orange/20 rounded-full blur-3xl animate-float-slow"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-siso-orange/20 to-siso-red/20 rounded-full blur-3xl animate-float-slower"></div>
+          <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-gradient-to-br from-siso-red/10 to-siso-orange/10 rounded-full blur-2xl animate-float-slower"></div>
         </div>
 
         {/* Content */}
         <div className="container mx-auto p-6 space-y-8 relative z-10">
-          {/* Header Section */}
-          <div className="flex flex-col space-y-2">
+          {/* Enhanced Header Section */}
+          <div className="flex flex-col space-y-2 bg-black/20 p-6 rounded-lg backdrop-blur-sm border border-siso-text/5">
             <div className="flex items-center gap-3">
-              <ArrowRightLeft className="w-8 h-8 text-siso-orange" />
-              <h1 className="text-3xl font-bold text-siso-text-bold">Crypto Exchange</h1>
+              <ArrowRightLeft className="w-8 h-8 text-gradient bg-gradient-to-r from-siso-red to-siso-orange" />
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent">
+                Crypto Exchange
+              </h1>
             </div>
-            <p className="text-siso-text/80 ml-11">Convert your SISO Points to SISO Tokens and manage your NFTs</p>
+            <p className="text-siso-text/80 ml-11">
+              Convert your SISO Points to SISO Tokens and manage your NFTs
+            </p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Swap Section */}
+            {/* Enhanced Swap Section */}
             <div className="flex flex-col space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold text-siso-text-bold">
@@ -92,12 +96,12 @@ const CryptoExchange = () => {
                   Balance: {userPoints.toLocaleString()} Points
                 </div>
               </div>
-              <div className="bg-black/40 backdrop-blur-lg rounded-xl border border-siso-text/10 p-6 hover:border-siso-text/20 transition-all duration-300">
+              <div className="bg-black/40 backdrop-blur-lg rounded-xl border border-siso-text/10 p-6 hover:border-siso-text/20 transition-all duration-300 shadow-lg">
                 <PointsExchange userPoints={userPoints} />
               </div>
             </div>
 
-            {/* NFT Gallery Section */}
+            {/* Enhanced NFT Gallery Section */}
             <div className="flex flex-col space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold text-siso-text-bold">
@@ -107,7 +111,7 @@ const CryptoExchange = () => {
                   Connected to Solana
                 </div>
               </div>
-              <div className="bg-black/40 backdrop-blur-lg rounded-xl border border-siso-text/10 p-6 hover:border-siso-text/20 transition-all duration-300">
+              <div className="bg-black/40 backdrop-blur-lg rounded-xl border border-siso-text/10 p-6 hover:border-siso-text/20 transition-all duration-300 shadow-lg">
                 <NFTGallery />
               </div>
             </div>
