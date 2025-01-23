@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Trophy, ChevronDown, ChevronUp, Clock, Users, UserPlus } from 'lucide-react';
+import { Trophy, ChevronDown, ChevronUp, Clock, Users, UserPlus, Medal, Award } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatDistanceToNow } from 'date-fns';
+import { LeaderboardStats } from './LeaderboardStats';
+import { cn } from '@/lib/utils';
 
 interface Achievement {
   name: string;
@@ -30,6 +32,8 @@ interface LeaderboardEntry {
 export const Leaderboard = () => {
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
   const [totalUsersWithPoints, setTotalUsersWithPoints] = useState<number>(0);
+  const [totalPoints, setTotalPoints] = useState<number>(0);
+  const [activeUsers, setActiveUsers] = useState<number>(0);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -167,66 +171,106 @@ export const Leaderboard = () => {
     }
   };
 
+  const getRankBadge = (position: number) => {
+    switch (position) {
+      case 0:
+        return <Award className="h-5 w-5 text-yellow-500" />;
+      case 1:
+        return <Medal className="h-5 w-5 text-gray-300" />;
+      case 2:
+        return <Medal className="h-5 w-5 text-amber-600" />;
+      default:
+        return null;
+    }
+  };
+
+  const getRowClassName = (index: number) => {
+    if (index === 0) return "bg-gradient-to-r from-yellow-500/10 to-transparent";
+    if (index === 1) return "bg-gradient-to-r from-gray-500/10 to-transparent";
+    if (index === 2) return "bg-gradient-to-r from-amber-500/10 to-transparent";
+    if (index < 10) return "bg-gradient-to-r from-siso-bg-alt/50 to-transparent";
+    return "";
+  };
+
   return (
-    <div>
+    <div className="space-y-6">
+      <LeaderboardStats 
+        totalUsers={totalUsersWithPoints}
+        totalPoints={totalPoints}
+        activeUsers={activeUsers}
+      />
+      
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-            <span>Leaderboard Statistics</span>
+            <span>Leaderboard Rankings</span>
             <span className="text-sm font-normal text-muted-foreground">
-              Total Users with Points: {totalUsersWithPoints}
+              Top {Math.min(leaderboardData.length, 100)} Users
             </span>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[80px] text-center">#</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead className="text-center">Points</TableHead>
-                <TableHead className="text-center">Contributions</TableHead>
-                <TableHead className="text-center">Referrals</TableHead>
-                <TableHead className="text-center">SISO Tokens</TableHead>
-                <TableHead className="text-center">Last Active</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {leaderboardData.map((entry, index) => (
-                <TableRow key={entry.id}>
-                  <TableCell className="text-center font-medium">{index + 1}</TableCell>
-                  <TableCell>{getDisplayName(entry)}</TableCell>
-                  <TableCell className="text-center">
-                    <div className="flex items-center justify-center gap-2">
-                      <Trophy className="h-4 w-4 text-yellow-500" />
-                      {entry.points || 0}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <div className="flex items-center justify-center gap-2">
-                      <Users className="h-4 w-4 text-muted-foreground" />
-                      {entry.contribution_count || 0}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <div className="flex items-center justify-center gap-2">
-                      <UserPlus className="h-4 w-4 text-muted-foreground" />
-                      {entry.referral_count || 0}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-center">
-                    {entry.siso_tokens || 0}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <div className="flex items-center justify-center gap-2">
-                      <Clock className="h-4 w-4 text-muted-foreground" />
-                      {formatLastActive(entry.updated_at)}
-                    </div>
-                  </TableCell>
+          <div className="relative overflow-x-auto">
+            <Table>
+              <TableHeader className="sticky top-0 bg-siso-bg z-10">
+                <TableRow>
+                  <TableHead className="w-[80px] text-center">Rank</TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead className="text-center">Points</TableHead>
+                  <TableHead className="text-center">Contributions</TableHead>
+                  <TableHead className="text-center">Referrals</TableHead>
+                  <TableHead className="text-center">SISO Tokens</TableHead>
+                  <TableHead className="text-center">Last Active</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {leaderboardData.map((entry, index) => (
+                  <TableRow 
+                    key={entry.id}
+                    className={cn(
+                      "transition-colors hover:bg-siso-bg-alt/50",
+                      getRowClassName(index)
+                    )}
+                  >
+                    <TableCell className="text-center font-medium">
+                      <div className="flex items-center justify-center gap-2">
+                        {getRankBadge(index)}
+                        {index + 1}
+                      </div>
+                    </TableCell>
+                    <TableCell>{getDisplayName(entry)}</TableCell>
+                    <TableCell className="text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <Trophy className="h-4 w-4 text-yellow-500" />
+                        {entry.points || 0}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <Users className="h-4 w-4 text-siso-text/70" />
+                        {entry.contribution_count || 0}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <UserPlus className="h-4 w-4 text-siso-text/70" />
+                        {entry.referral_count || 0}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {entry.siso_tokens || 0}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <Clock className="h-4 w-4 text-siso-text/70" />
+                        {formatLastActive(entry.updated_at)}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </div>
