@@ -199,7 +199,7 @@ export const Leaderboard = () => {
       />
       
       <Link 
-        to="/how-to-earn"
+        to="/economy/earn"
         className="block w-full p-4 mb-6 bg-gradient-to-r from-siso-red/10 to-siso-orange/10 
           border border-siso-border hover:border-siso-border-hover rounded-lg 
           transition-all duration-300 group hover:shadow-lg"
