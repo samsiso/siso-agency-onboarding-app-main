@@ -96,38 +96,51 @@ const SisoAI = () => {
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
       <Sidebar />
       <div className="flex-1 flex">
-        <div className="w-64 border-r border-siso-text/10 p-4 bg-black/20">
-          <h2 className="text-lg font-semibold text-siso-text mb-4">Choose Assistant</h2>
-          <ScrollArea className="h-[calc(100vh-8rem)]">
-            <div className="space-y-2">
-              {assistantTypes.map(({ id, label, icon: Icon }) => (
-                <button
-                  key={id}
-                  className={`w-full flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
-                    selectedAssistant === id 
-                      ? 'bg-siso-text/10 text-siso-text-bold'
-                      : 'text-siso-text hover:bg-siso-text/5'
-                  }`}
-                  onClick={() => {
-                    setSelectedAssistant(id as AssistantType);
-                    setMessages([{ 
-                      role: 'assistant', 
-                      content: `Hello! I'm your ${label}. How can I help you today?` 
-                    }]);
-                  }}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span className="text-sm">{label}</span>
-                </button>
-              ))}
-            </div>
-          </ScrollArea>
+        <div className="w-64 border-r border-siso-text/10 p-4 bg-black/20 overflow-hidden transition-all duration-300">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <h2 className="text-lg font-semibold text-siso-text mb-4">Choose Assistant</h2>
+            <ScrollArea className="h-[calc(100vh-8rem)]">
+              <div className="space-y-2">
+                {assistantTypes.map(({ id, label, icon: Icon }) => (
+                  <motion.button
+                    key={id}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className={`w-full flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+                      selectedAssistant === id 
+                        ? 'bg-gradient-to-r from-siso-red/20 to-siso-orange/20 text-siso-text-bold'
+                        : 'text-siso-text hover:bg-siso-text/5'
+                    }`}
+                    onClick={() => {
+                      setSelectedAssistant(id as AssistantType);
+                      setMessages([{ 
+                        role: 'assistant', 
+                        content: `Hello! I'm your ${label}. How can I help you today?` 
+                      }]);
+                    }}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span className="text-sm">{label}</span>
+                  </motion.button>
+                ))}
+              </div>
+            </ScrollArea>
+          </motion.div>
         </div>
 
         <div className="flex-1 flex flex-col">
           <div className="container mx-auto px-4 py-6 max-w-7xl flex-1 flex flex-col">
             <div className="space-y-6 flex-1 flex flex-col">
-              <div className="flex items-center gap-4 border-b border-siso-text/10 pb-6">
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className="flex items-center gap-4 border-b border-siso-text/10 pb-6"
+              >
                 <div className="h-12 w-12 rounded-full bg-gradient-to-br from-siso-red/20 to-siso-orange/20 flex items-center justify-center">
                   <MessageSquare className="w-6 h-6 text-siso-red" />
                 </div>
@@ -139,11 +152,16 @@ const SisoAI = () => {
                     Ask me anything about {selectedAssistant === 'general' ? 'SISO' : selectedAssistant}
                   </p>
                 </div>
-              </div>
+              </motion.div>
               
-              <div className="bg-black/20 rounded-xl border border-siso-text/10 flex-1 flex flex-col">
-                <ScrollArea className="flex-1 p-6">
-                  <div className="space-y-6">
+              <div className="bg-black/20 rounded-xl border border-siso-text/10 flex-1 flex flex-col overflow-hidden">
+                <ScrollArea className="flex-1 px-2">
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                    className="space-y-2 py-4"
+                  >
                     {messages.map((message, index) => (
                       <ChatMessage
                         key={index}
@@ -154,7 +172,7 @@ const SisoAI = () => {
                       />
                     ))}
                     <div ref={messagesEndRef} />
-                  </div>
+                  </motion.div>
                 </ScrollArea>
                 
                 <ChatInput onSubmit={handleSubmit} isLoading={isLoading} />

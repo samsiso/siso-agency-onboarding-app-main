@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Send } from 'lucide-react';
+import { Send, Mic, MicOff } from 'lucide-react';
 import { Button } from '../ui/button';
+import { motion } from 'framer-motion';
 
 interface ChatInputProps {
   onSubmit: (message: string) => void;
@@ -9,6 +10,7 @@ interface ChatInputProps {
 
 export const ChatInput = ({ onSubmit, isLoading }: ChatInputProps) => {
   const [input, setInput] = useState('');
+  const [isRecording, setIsRecording] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,21 +19,50 @@ export const ChatInput = ({ onSubmit, isLoading }: ChatInputProps) => {
     setInput('');
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e as unknown as React.FormEvent);
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="border-t border-siso-text/10 p-4">
+    <motion.form
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      onSubmit={handleSubmit}
+      className="border-t border-siso-text/10 bg-black/20 p-4"
+    >
       <div className="flex gap-3">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Type your message..."
-          className="flex-1 bg-black/20 border border-siso-text/10 rounded-lg px-4 py-3 text-siso-text placeholder:text-siso-text/50 focus:outline-none focus:ring-2 focus:ring-siso-red/50 transition-all"
-          disabled={isLoading}
-        />
+        <div className="relative flex-1">
+          <textarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Type your message..."
+            className="min-h-[52px] w-full resize-none rounded-lg bg-black/20 border border-siso-text/10 px-4 py-3 text-siso-text placeholder:text-siso-text/50 focus:outline-none focus:ring-2 focus:ring-siso-red/50 transition-all pr-12"
+            disabled={isLoading}
+            rows={1}
+          />
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-siso-text/50 hover:text-siso-text transition-colors"
+            onClick={() => setIsRecording(!isRecording)}
+          >
+            {isRecording ? (
+              <MicOff className="h-5 w-5 text-siso-red" />
+            ) : (
+              <Mic className="h-5 w-5" />
+            )}
+          </Button>
+        </div>
         <Button 
           type="submit"
           disabled={isLoading}
-          className="bg-gradient-to-r from-siso-red to-siso-orange text-white px-6 py-3 rounded-lg hover:opacity-90 transition-all"
+          className="bg-gradient-to-r from-siso-red to-siso-orange text-white px-6 py-3 rounded-lg hover:opacity-90 transition-all min-h-[52px] w-[52px]"
         >
           {isLoading ? (
             <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -40,6 +71,6 @@ export const ChatInput = ({ onSubmit, isLoading }: ChatInputProps) => {
           )}
         </Button>
       </div>
-    </form>
+    </motion.form>
   );
 };
