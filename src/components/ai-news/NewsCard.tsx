@@ -112,9 +112,9 @@ const NewsCard = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className={isFeatured ? 'h-full' : ''}
+      className={`h-full w-full ${isFeatured ? 'h-full' : ''}`}
     >
-      <Card className={`group hover:bg-card/60 transition-all duration-200 border-siso-border hover:border-siso-border-hover hover:shadow-lg ${isFeatured ? 'h-full' : ''}`}>
+      <Card className={`group h-full hover:bg-card/60 transition-all duration-200 border-siso-border hover:border-siso-border-hover hover:shadow-lg`}>
         <CardContent className={`p-4 sm:p-6 ${isFeatured ? 'space-y-6' : 'space-y-4'}`}>
           <div className={`flex ${isCompact ? 'flex-row' : isFeatured ? 'flex-col' : 'flex-col lg:flex-row'} gap-4 sm:gap-6`}>
             <NewsCardMedia 
