@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Trophy, Medal, Star, Users, ArrowUp, ArrowDown, MapPin, Clock, Award, Coins } from 'lucide-react';
+import { Trophy, ChevronDown, ChevronUp, Clock } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
+import { format } from 'date-fns';
 
 interface Achievement {
   name: string;
@@ -19,13 +18,10 @@ interface LeaderboardEntry {
   user_id: string;
   points: number | null;
   rank: string | null;
-  wins: number | null;
-  losses: number | null;
-  kda: number | null;
-  season_rank: string | null;
   avatar_url: string | null;
   achievements: Achievement[] | null;
   siso_tokens: number | null;
+  updated_at: string;
   profiles: {
     full_name: string | null;
     email: string | null;
@@ -35,6 +31,7 @@ interface LeaderboardEntry {
 
 export const Leaderboard = () => {
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const { toast } = useToast();
 
   useEffect(() => {
@@ -58,7 +55,6 @@ export const Leaderboard = () => {
       if (error) throw error;
 
       if (data) {
-        // Transform the data to ensure achievements is properly typed
         const transformedData: LeaderboardEntry[] = data.map(entry => ({
           ...entry,
           achievements: Array.isArray(entry.achievements) 
@@ -79,6 +75,18 @@ export const Leaderboard = () => {
     }
   };
 
+  const toggleRow = (id: string) => {
+    setExpandedRows(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
+
   return (
     <div>
       <Card>
@@ -89,30 +97,75 @@ export const Leaderboard = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Rank</TableHead>
+                <TableHead className="w-[50px]">Rank</TableHead>
                 <TableHead>User</TableHead>
-                <TableHead>Points</TableHead>
-                <TableHead>Wins</TableHead>
-                <TableHead>Losses</TableHead>
-                <TableHead>KDA</TableHead>
+                <TableHead>Points Earned</TableHead>
+                <TableHead>Last Active</TableHead>
+                <TableHead className="w-[50px]"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {leaderboardData.map((entry, index) => (
-                <TableRow key={entry.id}>
-                  <TableCell>{index + 1}</TableCell>
-                  <TableCell>
-                    <Avatar>
-                      <AvatarImage src={entry.avatar_url || ''} />
-                      <AvatarFallback>{entry.profiles?.full_name?.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    {entry.profiles?.full_name}
-                  </TableCell>
-                  <TableCell>{entry.points}</TableCell>
-                  <TableCell>{entry.wins}</TableCell>
-                  <TableCell>{entry.losses}</TableCell>
-                  <TableCell>{entry.kda}</TableCell>
-                </TableRow>
+                <>
+                  <TableRow key={entry.id} className="cursor-pointer hover:bg-muted/50" onClick={() => toggleRow(entry.id)}>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Avatar>
+                          <AvatarImage src={entry.avatar_url || ''} />
+                          <AvatarFallback>{entry.profiles?.full_name?.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-medium">{entry.profiles?.full_name}</p>
+                          <p className="text-sm text-muted-foreground">{entry.profiles?.professional_role}</p>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Trophy className="h-4 w-4 text-yellow-500" />
+                        {entry.points || 0}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        {format(new Date(entry.updated_at), 'MMM d, yyyy')}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {expandedRows.has(entry.id) ? (
+                        <ChevronUp className="h-4 w-4" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4" />
+                      )}
+                    </TableCell>
+                  </TableRow>
+                  {expandedRows.has(entry.id) && (
+                    <TableRow>
+                      <TableCell colSpan={5}>
+                        <div className="p-4 bg-muted/30 rounded-lg">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <h4 className="font-medium mb-2">Achievements</h4>
+                              <div className="flex flex-wrap gap-2">
+                                {entry.achievements?.map((achievement, i) => (
+                                  <div key={i} className="flex items-center gap-1 text-sm bg-muted px-2 py-1 rounded">
+                                    {achievement.name}
+                                  </div>
+                                )) || 'No achievements yet'}
+                              </div>
+                            </div>
+                            <div>
+                              <h4 className="font-medium mb-2">SISO Tokens</h4>
+                              <p>{entry.siso_tokens || 0} tokens</p>
+                            </div>
+                          </div>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </>
               ))}
             </TableBody>
           </Table>
