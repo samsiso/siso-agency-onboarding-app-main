@@ -82,48 +82,50 @@ export const CommunityMemberCard = ({ member, onClick }: CommunityMemberCardProp
         </div>
 
         <div className="flex items-center gap-2 mt-3 text-siso-text/60">
-          {member.website_url && (
-            <Link className="w-4 h-4 hover:text-siso-orange transition-colors" />
-          )}
-          {member.youtube_url && (
-            <Youtube className="w-4 h-4 hover:text-siso-orange transition-colors" />
-          )}
-          <Dialog>
-            <DialogTrigger asChild onClick={(e) => e.stopPropagation()}>
-              <Button 
-                variant="ghost" 
-                size="icon"
-                className="h-8 w-8 p-0 hover:bg-siso-orange/10 hover:text-siso-orange transition-colors"
-              >
-                <Brain className="w-4 h-4" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="bg-siso-bg border-siso-text/10">
-              <DialogHeader>
-                <DialogTitle className="text-xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
-                  AI Analysis: {member.name}
-                </DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4 mt-4">
-                <div className="space-y-2">
-                  <h4 className="font-semibold text-siso-text">Expertise Level</h4>
-                  <p className="text-siso-text/80">{analysis.expertise}</p>
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-2">
+            {member.website_url && (
+              <Link className="w-4 h-4 hover:text-siso-orange transition-colors" />
+            )}
+            {member.youtube_url && (
+              <Youtube className="w-4 h-4 hover:text-siso-orange transition-colors" />
+            )}
+            <Dialog>
+              <DialogTrigger asChild onClick={(e) => e.stopPropagation()}>
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  className="h-8 w-8 p-0 hover:bg-siso-orange/10 hover:text-siso-orange transition-colors"
+                >
+                  <Brain className="w-4 h-4" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-siso-bg border-siso-text/10">
+                <DialogHeader>
+                  <DialogTitle className="text-xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
+                    AI Analysis: {member.name}
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 mt-4">
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-siso-text">Expertise Level</h4>
+                    <p className="text-siso-text/80">{analysis.expertise}</p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-siso-text">Target Audience</h4>
+                    <p className="text-siso-text/80">{analysis.audience}</p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-siso-text">Unique Value</h4>
+                    <p className="text-siso-text/80">{analysis.uniqueValue}</p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-siso-text">Engagement</h4>
+                    <p className="text-siso-text/80">{analysis.engagement}</p>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <h4 className="font-semibold text-siso-text">Target Audience</h4>
-                  <p className="text-siso-text/80">{analysis.audience}</p>
-                </div>
-                <div className="space-y-2">
-                  <h4 className="font-semibold text-siso-text">Unique Value</h4>
-                  <p className="text-siso-text/80">{analysis.uniqueValue}</p>
-                </div>
-                <div className="space-y-2">
-                  <h4 className="font-semibold text-siso-text">Engagement</h4>
-                  <p className="text-siso-text/80">{analysis.engagement}</p>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
       </CardContent>
     </Card>
