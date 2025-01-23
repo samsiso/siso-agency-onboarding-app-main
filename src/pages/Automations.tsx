@@ -1,14 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
-import { Bot, Zap, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Sidebar } from '@/components/Sidebar';
-import { AutomationCard } from '@/components/automations/AutomationCard';
 import { AutomationDetails } from '@/components/automations/AutomationDetails';
-import { AutomationFilters } from '@/components/automations/AutomationFilters';
 import { Automation, AutomationCategory } from '@/components/automations/types';
+import { AutomationHeader } from '@/components/automations/AutomationHeader';
+import { AutomationList } from '@/components/automations/AutomationList';
 
 export default function Automations() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -65,61 +63,19 @@ export default function Automations() {
         </div>
 
         <div className="max-w-7xl mx-auto relative">
-          <div className="flex flex-col space-y-4 mb-8">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
-                SISO Automations
-              </h1>
-              <AutomationFilters
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
-                selectedCategory={selectedCategory}
-                onCategoryChange={setSelectedCategory}
-                getCategoryCount={getCategoryCount}
-              />
-            </div>
+          <AutomationHeader 
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            selectedCategory={selectedCategory}
+            onCategoryChange={setSelectedCategory}
+            getCategoryCount={getCategoryCount}
+          />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
-              <Alert className="bg-siso-text/5 border border-siso-text/10 backdrop-blur-sm">
-                <Bot className="h-4 w-4 text-siso-orange" />
-                <AlertDescription className="text-siso-text/80">
-                  <span className="font-semibold text-siso-text">Automation Library:</span> Browse our collection of pre-built automations for various social media platforms and general tasks.
-                </AlertDescription>
-              </Alert>
-              
-              <Alert className="bg-siso-text/5 border border-siso-text/10 backdrop-blur-sm">
-                <Zap className="h-4 w-4 text-siso-orange" />
-                <AlertDescription className="text-siso-text/80">
-                  <span className="font-semibold text-siso-text">Quick Setup:</span> Click on any automation to view details, use cases, and setup instructions.
-                </AlertDescription>
-              </Alert>
-              
-              <Alert className="bg-siso-text/5 border border-siso-text/10 backdrop-blur-sm">
-                <ArrowRight className="h-4 w-4 text-siso-orange" />
-                <AlertDescription className="text-siso-text/80">
-                  <span className="font-semibold text-siso-text">Get Started:</span> Filter by platform, browse featured automations, or search for specific tasks you want to automate.
-                </AlertDescription>
-              </Alert>
-            </div>
-          </div>
-
-          {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 animate-pulse">
-              {[...Array(8)].map((_, i) => (
-                <div key={i} className="h-32 bg-siso-text/5 rounded-lg border border-siso-text/10" />
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {filteredAutomations?.map((automation) => (
-                <AutomationCard
-                  key={automation.id}
-                  automation={automation}
-                  onClick={setSelectedAutomation}
-                />
-              ))}
-            </div>
-          )}
+          <AutomationList
+            automations={filteredAutomations}
+            isLoading={isLoading}
+            onSelectAutomation={setSelectedAutomation}
+          />
 
           <Sheet open={!!selectedAutomation} onOpenChange={() => setSelectedAutomation(null)}>
             <SheetContent className="bg-siso-bg border-l border-siso-text/10 w-full sm:max-w-xl backdrop-blur-xl bg-opacity-95">
