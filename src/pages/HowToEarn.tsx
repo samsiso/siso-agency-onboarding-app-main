@@ -4,6 +4,8 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { Sidebar } from '@/components/Sidebar';
 import { EarningCategory } from '@/components/earn/EarningCategory';
 import { EarningDetails } from '@/components/earn/EarningDetails';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 const earningSections = [
   {
@@ -132,6 +134,7 @@ const earningSections = [
 
 const HowToEarn = () => {
   const [selectedCategory, setSelectedCategory] = useState(0);
+  const navigate = useNavigate();
 
   return (
     <SidebarProvider>
@@ -143,18 +146,28 @@ const HowToEarn = () => {
             <div className="text-center mb-12">
               <div className="flex items-center justify-center gap-3 mb-4">
                 <Trophy className="w-12 h-12 text-siso-orange animate-bounce" />
-                <h1 className="text-4xl font-bold text-siso-text-bold">How to Earn SISO Points</h1>
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent">
+                  How to Earn SISO Points
+                </h1>
               </div>
-              <p className="text-lg text-siso-text/80 max-w-2xl mx-auto">
+              <p className="text-lg text-siso-text/80 max-w-2xl mx-auto mb-6">
                 Maximize your points by completing daily activities and contributing to the community. 
                 Every action counts towards your progress!
               </p>
+              <Button
+                onClick={() => navigate('/economy/leaderboards')}
+                className="bg-gradient-to-r from-siso-red to-siso-orange hover:from-siso-red/90 hover:to-siso-orange/90 
+                  text-white font-semibold px-6 py-2 rounded-lg transition-all duration-300"
+              >
+                View Leaderboard
+              </Button>
             </div>
 
             {/* Main Content */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
               {/* Left Panel - Categories */}
-              <div className="lg:col-span-4 space-y-4">
+              <div className="lg:col-span-4 space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto pr-4 
+                scrollbar-thin scrollbar-thumb-siso-border scrollbar-track-transparent">
                 {earningSections.map((section, index) => (
                   <EarningCategory
                     key={index}
@@ -164,6 +177,7 @@ const HowToEarn = () => {
                     items={section.items}
                     isSelected={selectedCategory === index}
                     onClick={() => setSelectedCategory(index)}
+                    progress={{ completed: 1, total: section.items.length }}
                   />
                 ))}
               </div>
