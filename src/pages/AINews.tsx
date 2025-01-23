@@ -140,11 +140,6 @@ const AINews = () => {
     }
   };
 
-  // Split news items into featured, side, and regular posts
-  const heroPost = newsItems[0];
-  const sidePosts = newsItems.slice(1, 4);
-  const regularPosts = newsItems.slice(4);
-
   return (
     <SidebarProvider>
       <div className="flex min-h-screen bg-background">
@@ -169,41 +164,10 @@ const AINews = () => {
                 onCategoryChange={setSelectedCategory}
               />
 
-              {/* Top Section with Hero and Side Posts */}
+              {/* Simple 2-column grid layout */}
               {newsItems.length > 0 && (
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
-                  {/* Hero Post - 8 columns */}
-                  <div className="lg:col-span-8">
-                    <NewsCard
-                      key={newsItems[0].id}
-                      item={newsItems[0]}
-                      summaries={summaries}
-                      loadingSummaries={loadingSummaries}
-                      onGenerateSummary={generateSummary}
-                      isFeatured={true}
-                    />
-                  </div>
-
-                  {/* Side Posts - 4 columns */}
-                  <div className="lg:col-span-4 space-y-4 sm:space-y-6">
-                    {newsItems.slice(1, 4).map((item) => (
-                      <NewsCard
-                        key={item.id}
-                        item={item}
-                        summaries={summaries}
-                        loadingSummaries={loadingSummaries}
-                        onGenerateSummary={generateSummary}
-                        isCompact={true}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Regular Posts Grid - 2 columns */}
-              {newsItems.length > 4 && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                  {newsItems.slice(4).map((item) => (
+                  {newsItems.map((item) => (
                     <NewsCard
                       key={item.id}
                       item={item}
