@@ -65,28 +65,41 @@ const CryptoExchange = () => {
       <div className="flex-1 bg-gradient-to-b from-gray-900 via-gray-800 to-black">
         <div className="container mx-auto p-6 space-y-8">
           {/* Header Section */}
-          <div className="flex items-center gap-3 mb-8">
-            <ArrowRightLeft className="w-8 h-8 text-siso-orange" />
-            <h1 className="text-3xl font-bold text-siso-text-bold">Crypto Exchange</h1>
+          <div className="flex flex-col space-y-2">
+            <div className="flex items-center gap-3">
+              <ArrowRightLeft className="w-8 h-8 text-siso-orange" />
+              <h1 className="text-3xl font-bold text-siso-text-bold">Crypto Exchange</h1>
+            </div>
+            <p className="text-siso-text/80 ml-11">Convert your SISO Points to SISO Tokens and manage your NFTs</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Swap Section */}
             <div className="flex flex-col space-y-4">
-              <h2 className="text-xl font-semibold text-siso-text-bold">
-                Swap Your Points
-              </h2>
-              <div className="bg-black/40 backdrop-blur-lg rounded-xl border border-siso-text/10 p-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold text-siso-text-bold">
+                  Swap Your Points
+                </h2>
+                <div className="text-sm text-siso-text/60">
+                  Balance: {userPoints.toLocaleString()} Points
+                </div>
+              </div>
+              <div className="bg-black/40 backdrop-blur-lg rounded-xl border border-siso-text/10 p-6 hover:border-siso-text/20 transition-all duration-300">
                 <PointsExchange userPoints={userPoints} />
               </div>
             </div>
 
             {/* NFT Gallery Section */}
             <div className="flex flex-col space-y-4">
-              <h2 className="text-xl font-semibold text-siso-text-bold">
-                Your NFT Gallery
-              </h2>
-              <div className="bg-black/40 backdrop-blur-lg rounded-xl border border-siso-text/10 p-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold text-siso-text-bold">
+                  Your NFT Gallery
+                </h2>
+                <div className="text-sm text-siso-text/60">
+                  Connected to Solana
+                </div>
+              </div>
+              <div className="bg-black/40 backdrop-blur-lg rounded-xl border border-siso-text/10 p-6 hover:border-siso-text/20 transition-all duration-300">
                 <NFTGallery />
               </div>
             </div>

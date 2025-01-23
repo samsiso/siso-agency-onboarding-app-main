@@ -78,7 +78,10 @@ export const PointsExchange = ({ userPoints }: { userPoints: number }) => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold text-siso-text-bold">Swap</h2>
-        <button className="p-2 hover:bg-siso-text/5 rounded-lg transition-colors" title="Exchange Settings">
+        <button 
+          className="p-2 hover:bg-siso-text/5 rounded-lg transition-colors" 
+          title="Exchange Settings"
+        >
           <Settings className="w-5 h-5 text-siso-text/60" />
         </button>
       </div>
