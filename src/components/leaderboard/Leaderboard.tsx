@@ -108,15 +108,17 @@ export const Leaderboard = () => {
 
       if (leaderboardError) throw leaderboardError;
 
-      // Combine the data
-      const combinedData = profilesData?.map(profile => {
+      // Combine the data with proper type handling for achievements
+      const combinedData: LeaderboardEntry[] = profilesData?.map(profile => {
         const leaderboardEntry = leaderboardData?.find(entry => entry.user_id === profile.id);
         return {
           id: profile.id,
           user_id: profile.id,
           points: profile.points,
           rank: profile.rank,
-          achievements: leaderboardEntry?.achievements || [],
+          achievements: Array.isArray(leaderboardEntry?.achievements) 
+            ? (leaderboardEntry.achievements as Achievement[])
+            : [],
           siso_tokens: leaderboardEntry?.siso_tokens || 0,
           updated_at: profile.updated_at,
           contribution_count: leaderboardEntry?.contribution_count || 0,
