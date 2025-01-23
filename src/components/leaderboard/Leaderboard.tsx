@@ -5,19 +5,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LeaderboardStats } from './LeaderboardStats';
 import { LeaderboardTable } from './LeaderboardTable';
 import { CommunityMemberDetails } from '../community/CommunityMemberDetails';
-import type { LeaderboardEntry, Achievement } from './types';
+import type { LeaderboardEntry } from './types';
 
 export const Leaderboard = () => {
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
   const [totalUsersWithPoints, setTotalUsersWithPoints] = useState<number>(0);
   const [totalPoints, setTotalPoints] = useState<number>(0);
-  const [activeUsers, setActiveUsers] = useState<number>(0);
+  const [totalSisoTokens, setTotalSisoTokens] = useState<number>(0);
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const { toast } = useToast();
 
   useEffect(() => {
     fetchLeaderboard();
     fetchTotalUsersWithPoints();
+    fetchTotalPoints();
+    fetchTotalSisoTokens();
 
     // Set up real-time subscription
     const channel = supabase
@@ -33,6 +35,8 @@ export const Leaderboard = () => {
           console.log('Real-time profile update received:', payload);
           fetchLeaderboard();
           fetchTotalUsersWithPoints();
+          fetchTotalPoints();
+          fetchTotalSisoTokens();
         }
       )
       .subscribe((status) => {
@@ -43,6 +47,38 @@ export const Leaderboard = () => {
       supabase.removeChannel(channel);
     };
   }, []);
+
+  const fetchTotalPoints = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('points')
+        .not('points', 'is', null);
+
+      if (error) throw error;
+
+      const total = data.reduce((sum, profile) => sum + (profile.points || 0), 0);
+      setTotalPoints(total);
+    } catch (error) {
+      console.error('Error fetching total points:', error);
+    }
+  };
+
+  const fetchTotalSisoTokens = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('leaderboard')
+        .select('siso_tokens')
+        .not('siso_tokens', 'is', null);
+
+      if (error) throw error;
+
+      const total = data.reduce((sum, entry) => sum + (entry.siso_tokens || 0), 0);
+      setTotalSisoTokens(total);
+    } catch (error) {
+      console.error('Error fetching total SISO tokens:', error);
+    }
+  };
 
   const fetchTotalUsersWithPoints = async () => {
     try {
@@ -156,7 +192,7 @@ export const Leaderboard = () => {
       <LeaderboardStats 
         totalUsers={totalUsersWithPoints}
         totalPoints={totalPoints}
-        activeUsers={activeUsers}
+        totalSisoTokens={totalSisoTokens}
       />
       
       <Card className="border-siso-border">
