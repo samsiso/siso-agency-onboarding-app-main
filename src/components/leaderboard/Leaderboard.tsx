@@ -29,10 +29,12 @@ interface LeaderboardEntry {
 
 export const Leaderboard = () => {
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
+  const [totalUsersWithPoints, setTotalUsersWithPoints] = useState<number>(0);
   const { toast } = useToast();
 
   useEffect(() => {
     fetchLeaderboard();
+    fetchTotalUsersWithPoints();
 
     // Set up real-time subscription
     const channel = supabase
@@ -40,14 +42,14 @@ export const Leaderboard = () => {
       .on(
         'postgres_changes',
         {
-          event: '*', // Listen to all changes (INSERT, UPDATE, DELETE)
+          event: '*',
           schema: 'public',
           table: 'leaderboard'
         },
         (payload) => {
           console.log('Real-time leaderboard update received:', payload);
-          // Refresh the leaderboard data when any change occurs
           fetchLeaderboard();
+          fetchTotalUsersWithPoints();
         }
       )
       .subscribe((status) => {
@@ -66,8 +68,8 @@ export const Leaderboard = () => {
         },
         (payload) => {
           console.log('Profile update received:', payload);
-          // Refresh the leaderboard data when profiles change
           fetchLeaderboard();
+          fetchTotalUsersWithPoints();
         }
       )
       .subscribe();
@@ -77,6 +79,24 @@ export const Leaderboard = () => {
       supabase.removeChannel(profileChannel);
     };
   }, []);
+
+  const fetchTotalUsersWithPoints = async () => {
+    try {
+      const { count, error } = await supabase
+        .from('profiles')
+        .select('*', { count: 'exact', head: true })
+        .gt('points', 0);
+
+      if (error) throw error;
+      
+      if (count !== null) {
+        console.log('Total users with points:', count);
+        setTotalUsersWithPoints(count);
+      }
+    } catch (error) {
+      console.error('Error fetching total users count:', error);
+    }
+  };
 
   const fetchLeaderboard = async () => {
     try {
@@ -131,7 +151,12 @@ export const Leaderboard = () => {
     <div>
       <Card>
         <CardHeader>
-          <CardTitle>Leaderboard Statistics</CardTitle>
+          <CardTitle className="flex items-center justify-between">
+            <span>Leaderboard Statistics</span>
+            <span className="text-sm font-normal text-muted-foreground">
+              Total Users with Points: {totalUsersWithPoints}
+            </span>
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
