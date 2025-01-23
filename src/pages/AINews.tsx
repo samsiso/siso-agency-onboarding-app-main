@@ -198,17 +198,18 @@ const AINews = () => {
                     />
                   ))}
                 </div>
+              </div>
 
-                {/* Regular Posts - 2 columns grid */}
+              {/* Regular Posts - 2 columns grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-6">
                 {regularPosts.map((item) => (
-                  <div key={item.id} className="lg:col-span-6">
-                    <NewsCard
-                      item={item}
-                      summaries={summaries}
-                      loadingSummaries={loadingSummaries}
-                      onGenerateSummary={generateSummary}
-                    />
-                  </div>
+                  <NewsCard
+                    key={item.id}
+                    item={item}
+                    summaries={summaries}
+                    loadingSummaries={loadingSummaries}
+                    onGenerateSummary={generateSummary}
+                  />
                 ))}
               </div>
             </Suspense>
