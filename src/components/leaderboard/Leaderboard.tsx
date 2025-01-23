@@ -150,6 +150,15 @@ export const Leaderboard = () => {
     return 'Anonymous User';
   };
 
+  const formatLastActive = (date: string) => {
+    try {
+      return formatDistanceToNow(new Date(date), { addSuffix: true });
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return 'Unknown';
+    }
+  };
+
   return (
     <div>
       <Card>
@@ -203,7 +212,7 @@ export const Leaderboard = () => {
                   <TableCell className="text-center">
                     <div className="flex items-center justify-center gap-2">
                       <Clock className="h-4 w-4 text-muted-foreground" />
-                      {formatDistanceToNow(new Date(entry.updated_at), { addSuffix: true })}
+                      {formatLastActive(entry.updated_at)}
                     </div>
                   </TableCell>
                 </TableRow>
