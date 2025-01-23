@@ -9,6 +9,7 @@ import { AssistantDetails } from '@/components/assistants/AssistantDetails';
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { motion } from 'framer-motion';
 
 interface Assistant {
   id: string;
@@ -75,70 +76,91 @@ export default function ChatGPTAssistants() {
     return matchesSearch && matchesCategory;
   });
 
-  if (error) {
-    console.error('Error in component:', error);
-    return <div className="text-red-500">Error loading assistants. Please try again later.</div>;
-  }
-
   const categories = ['all', 'featured', 'software', 'coding', 'actions', 'gpt'];
 
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
       <Sidebar />
-      <div className="flex-1 p-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col space-y-4 mb-8">
-            <div className="flex flex-col md:flex-row justify-between items-start gap-4">
-              <div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
+      <div className="flex-1 p-8 overflow-y-auto">
+        <div className="max-w-7xl mx-auto space-y-8">
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="space-y-6"
+          >
+            <div className="flex flex-col md:flex-row justify-between items-start gap-6">
+              <div className="flex-1">
+                <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
                   ChatGPT Assistants & Tools
                 </h1>
-                <p className="mt-2 text-lg text-siso-text/80 leading-relaxed max-w-3xl">
-                  Discover our curated collection of ChatGPT assistants and GPT builder tools that help streamline your workflow and boost productivity.
+                <p className="mt-4 text-lg text-siso-text/80 leading-relaxed max-w-3xl">
+                  Discover our curated collection of ChatGPT assistants and GPT builder tools 
+                  that help streamline your workflow and boost productivity.
                 </p>
               </div>
-              <div className="relative w-full md:w-96">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-siso-text/60" />
-                <Input
-                  placeholder="Search assistants..."
-                  className="pl-10 bg-siso-text/5 border-siso-text/10 focus-visible:ring-siso-orange"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
+              <div className="w-full md:w-72">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-siso-text/60" />
+                  <Input
+                    placeholder="Search assistants..."
+                    className="pl-10 bg-siso-text/5 border-siso-text/10 focus-visible:ring-siso-orange transition-all duration-300"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
-              <Alert className="bg-siso-text/5 border border-siso-text/10">
-                <Bot className="h-4 w-4 text-siso-orange" />
-                <AlertDescription className="text-siso-text/80">
-                  <span className="font-semibold text-siso-text">AI Assistants:</span> Browse specialized AI assistants designed for tasks like code generation, workflow optimization, and system design.
-                </AlertDescription>
-              </Alert>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <motion.div 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+              >
+                <Alert className="bg-gradient-to-br from-siso-text/5 to-transparent border border-siso-text/10 backdrop-blur-sm">
+                  <Bot className="h-4 w-4 text-siso-orange" />
+                  <AlertDescription className="text-siso-text/90">
+                    <span className="font-semibold text-siso-text">AI Assistants:</span> Browse specialized AI assistants for tasks like code generation and workflow optimization.
+                  </AlertDescription>
+                </Alert>
+              </motion.div>
               
-              <Alert className="bg-siso-text/5 border border-siso-text/10">
-                <Sparkles className="h-4 w-4 text-siso-orange" />
-                <AlertDescription className="text-siso-text/80">
-                  <span className="font-semibold text-siso-text">GPT Tools:</span> Explore popular GPT builder tools with millions of conversations and high user ratings.
-                </AlertDescription>
-              </Alert>
+              <motion.div 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+              >
+                <Alert className="bg-gradient-to-br from-siso-text/5 to-transparent border border-siso-text/10 backdrop-blur-sm">
+                  <Sparkles className="h-4 w-4 text-siso-orange" />
+                  <AlertDescription className="text-siso-text/90">
+                    <span className="font-semibold text-siso-text">GPT Tools:</span> Explore popular GPT builder tools with millions of conversations.
+                  </AlertDescription>
+                </Alert>
+              </motion.div>
               
-              <Alert className="bg-siso-text/5 border border-siso-text/10">
-                <Filter className="h-4 w-4 text-siso-orange" />
-                <AlertDescription className="text-siso-text/80">
-                  <span className="font-semibold text-siso-text">Quick Access:</span> Filter by type, browse featured assistants, or search for specific capabilities to find the perfect AI helper.
-                </AlertDescription>
-              </Alert>
+              <motion.div 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              >
+                <Alert className="bg-gradient-to-br from-siso-text/5 to-transparent border border-siso-text/10 backdrop-blur-sm">
+                  <Filter className="h-4 w-4 text-siso-orange" />
+                  <AlertDescription className="text-siso-text/90">
+                    <span className="font-semibold text-siso-text">Quick Access:</span> Filter by type or browse featured assistants to find the perfect AI helper.
+                  </AlertDescription>
+                </Alert>
+              </motion.div>
             </div>
 
-            <ScrollArea className="w-full" type="always">
+            <ScrollArea className="w-full">
               <Tabs defaultValue="all" className="w-full" onValueChange={setSelectedCategory}>
-                <TabsList className="w-full h-auto flex-wrap justify-start bg-siso-text/5 border border-siso-text/10 p-2">
+                <TabsList className="h-auto flex-wrap bg-gradient-to-r from-siso-text/5 to-siso-text/10 border border-siso-text/10 p-2 rounded-xl">
                   {categories.map((category) => (
                     <TabsTrigger
                       key={category}
                       value={category}
-                      className="m-1 data-[state=active]:bg-siso-orange/20 data-[state=active]:text-siso-orange"
+                      className="m-1 data-[state=active]:bg-gradient-to-r data-[state=active]:from-siso-red/20 data-[state=active]:to-siso-orange/20 data-[state=active]:text-siso-orange transition-all duration-300"
                     >
                       {category.charAt(0).toUpperCase() + category.slice(1)}
                       <span className="ml-2 text-sm text-siso-text/60">
@@ -146,33 +168,35 @@ export default function ChatGPTAssistants() {
                           ? assistants?.length || 0 
                           : category === 'featured'
                             ? assistants?.filter(a => (a.rating && a.rating >= 4.5) || (a.review_average && a.review_average >= 4.5)).length || 0
-                            : category === 'gpt'
-                              ? assistants?.filter(a => a.category === 'gpt builder').length || 0
-                              : categoryCounts?.[category] || 0}
+                            : categoryCounts?.[category] || 0}
                       </span>
                     </TabsTrigger>
                   ))}
                 </TabsList>
               </Tabs>
             </ScrollArea>
-          </div>
+          </motion.div>
 
           {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {[...Array(8)].map((_, i) => (
-                <div 
+                <motion.div
                   key={i}
-                  className="h-48 rounded-lg bg-siso-text/5 animate-pulse"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3, delay: i * 0.05 }}
+                  className="h-[200px] rounded-lg bg-gradient-to-br from-siso-text/5 to-transparent animate-pulse"
                 />
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {filteredAssistants?.map((assistant) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredAssistants?.map((assistant, index) => (
                 <AssistantCard
                   key={assistant.id}
                   assistant={assistant}
                   onClick={() => setSelectedAssistant(assistant)}
+                  index={index}
                 />
               ))}
             </div>
