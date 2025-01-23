@@ -9,6 +9,7 @@ import { ProfileInfo } from '@/components/profile/ProfileInfo';
 import { PointsHistory } from '@/components/profile/PointsHistory';
 import { LoginStreakTracker } from '@/components/points/LoginStreakTracker';
 import { PointsDisplay } from '@/components/points/PointsDisplay';
+import { MintNFTButton } from '@/components/crypto/MintNFTButton';
 
 const Profile = () => {
   const [user, setUser] = useState<any>(null);
@@ -134,6 +135,12 @@ const Profile = () => {
             {user && (
               <div className="mb-6">
                 <PointsDisplay userId={user.id} />
+              </div>
+            )}
+
+            {profile?.solana_wallet_address && (
+              <div className="mb-6">
+                <MintNFTButton />
               </div>
             )}
 

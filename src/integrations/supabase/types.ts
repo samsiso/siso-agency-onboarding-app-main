@@ -561,6 +561,33 @@ export type Database = {
         }
         Relationships: []
       }
+      nfts: {
+        Row: {
+          created_at: string
+          id: string
+          metadata: Json
+          mint_address: string
+          owner_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metadata: Json
+          mint_address: string
+          owner_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metadata?: Json
+          mint_address?: string
+          owner_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       point_configurations: {
         Row: {
           action: string
