@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
+import { NewsCategories } from '@/components/ai-news/NewsCategories';
 
 const NewsHeader = lazy(() => import('@/components/ai-news/NewsHeader'));
 const NewsCard = lazy(() => import('@/components/ai-news/NewsCard'));
@@ -28,6 +29,7 @@ const containerVariants = {
 const AINews = () => {
   const [selectedMonth, setSelectedMonth] = useState<string>('03');
   const [selectedYear, setSelectedYear] = useState<string>('2024');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [newsItems, setNewsItems] = useState<any[]>([]);
   const [summaries, setSummaries] = useState<Record<string, string>>({});
   const [loadingSummaries, setLoadingSummaries] = useState<Record<string, boolean>>({});
@@ -35,14 +37,20 @@ const AINews = () => {
 
   useEffect(() => {
     fetchNews();
-  }, [selectedMonth, selectedYear]);
+  }, [selectedMonth, selectedYear, selectedCategory]);
 
   const fetchNews = async () => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('ai_news')
         .select('*')
         .order('date', { ascending: false });
+
+      if (selectedCategory) {
+        query = query.eq('category', selectedCategory);
+      }
+
+      const { data, error } = await query;
 
       if (error) {
         toast({
@@ -154,6 +162,11 @@ const AINews = () => {
                 selectedYear={selectedYear}
                 onMonthChange={setSelectedMonth}
                 onYearChange={setSelectedYear}
+              />
+
+              <NewsCategories
+                selectedCategory={selectedCategory}
+                onCategoryChange={setSelectedCategory}
               />
 
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
