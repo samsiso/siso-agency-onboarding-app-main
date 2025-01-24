@@ -11,23 +11,21 @@ export const AuthButton = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check current auth status
+    // Initial session check
     const checkAuth = async () => {
       try {
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
-          console.error('Session check error:', sessionError);
+          console.error('Initial session check error:', sessionError);
           return;
         }
 
-        console.log('Session check result:', session);
-        
         if (session?.user) {
-          console.log('Active session found for user:', session.user.id);
+          console.log('Initial session found for user:', session.user.id);
           setUser(session.user);
           
-          // Check if user has a profile
+          // Check if profile exists
           const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('*')
@@ -39,28 +37,33 @@ export const AuthButton = () => {
             return;
           }
 
-          console.log('Profile found:', profile);
-          navigate('/profile');
-        } else {
-          console.log('No active session found');
-          setUser(null);
+          if (profile) {
+            console.log('Profile exists, redirecting to profile page');
+            navigate('/profile');
+          }
         }
       } catch (error) {
-        console.error('Error checking auth status:', error);
+        console.error('Error in initial auth check:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
     checkAuth();
 
-    // Listen for auth changes
+    // Auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state changed:', event, session?.user?.id);
       
       if (event === 'SIGNED_IN' && session?.user) {
         try {
-          console.log('Sign in detected, checking profile...');
+          setUser(session.user);
           
-          // Check for existing profile
+          // Wait for profile to be created by trigger
+          console.log('Waiting for profile creation...');
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          // Verify profile exists
           const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('*')
@@ -72,20 +75,23 @@ export const AuthButton = () => {
             return;
           }
 
-          console.log('Profile after sign in:', profile);
-          setUser(session.user);
-          
-          toast({
-            title: "Successfully signed in",
-            description: "Welcome to SISO Resource Hub!",
-          });
-          
-          // Ensure we're using window.location.origin for the current domain
-          const redirectUrl = `${window.location.origin}/profile`;
-          console.log('Redirecting to:', redirectUrl);
-          navigate('/profile');
+          if (profile) {
+            console.log('Profile verified, proceeding with redirect');
+            toast({
+              title: "Successfully signed in",
+              description: "Welcome to SISO Resource Hub!",
+            });
+            navigate('/profile');
+          } else {
+            console.error('Profile not found after waiting');
+          }
         } catch (error) {
-          console.error('Error in auth state change handler:', error);
+          console.error('Error in sign in handler:', error);
+          toast({
+            variant: "destructive",
+            title: "Error signing in",
+            description: "There was a problem signing you in. Please try again.",
+          });
         }
       } else if (event === 'SIGNED_OUT') {
         console.log('Sign out detected');
@@ -125,13 +131,13 @@ export const AuthButton = () => {
         throw error;
       }
 
-      console.log('Google sign in response:', data);
+      console.log('Google sign in initiated:', data);
     } catch (error: any) {
       console.error('Sign in error:', error);
       toast({
         variant: "destructive",
         title: "Error signing in",
-        description: error.message,
+        description: error.message || "There was a problem signing in with Google",
       });
     } finally {
       setLoading(false);
@@ -156,7 +162,7 @@ export const AuthButton = () => {
       toast({
         variant: "destructive",
         title: "Error signing out",
-        description: error.message,
+        description: error.message || "There was a problem signing out",
       });
     } finally {
       setLoading(false);
