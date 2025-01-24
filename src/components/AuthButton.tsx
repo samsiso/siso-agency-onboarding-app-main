@@ -17,6 +17,7 @@ export const AuthButton = () => {
         const { data: { session } } = await supabase.auth.getSession();
         setUser(session?.user ?? null);
         if (session?.user) {
+          console.log('Session found, navigating to profile');
           navigate('/profile');
         }
       } catch (error) {
@@ -30,6 +31,11 @@ export const AuthButton = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log('Auth state changed:', event, session);
       setUser(session?.user ?? null);
+      
+      if (event === 'SIGNED_IN' && session?.user) {
+        console.log('User signed in, navigating to profile');
+        navigate('/profile');
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -42,6 +48,10 @@ export const AuthButton = () => {
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/profile`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
         },
       });
       if (error) throw error;
