@@ -105,12 +105,13 @@ export const AuthButton = () => {
   };
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="relative z-50">
       {user ? (
         <Button
           onClick={handleSignOutClick}
           disabled={loading}
           variant="destructive"
+          className="cursor-pointer"
         >
           Sign Out
         </Button>
@@ -118,7 +119,7 @@ export const AuthButton = () => {
         <Button
           onClick={handleGoogleSignIn}
           disabled={loading}
-          className="bg-white text-black hover:bg-gray-100"
+          className="bg-white text-black hover:bg-gray-100 cursor-pointer"
         >
           Sign in with Google
         </Button>
