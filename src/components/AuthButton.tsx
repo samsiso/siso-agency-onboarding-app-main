@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { initiateGoogleSignIn, signOut } from '@/utils/authUtils';
+import { useToast } from '@/hooks/use-toast';
 
 export const AuthButton = () => {
   const {
@@ -13,6 +14,7 @@ export const AuthButton = () => {
     handleSignIn,
     handleSignOut
   } = useAuthSession();
+  const { toast } = useToast();
 
   useEffect(() => {
     // Initial session check
