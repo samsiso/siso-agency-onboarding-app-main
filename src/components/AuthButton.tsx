@@ -20,6 +20,7 @@ export const AuthButton = () => {
     // Initial session check
     const checkAuth = async () => {
       try {
+        console.log('Checking initial auth session...');
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
@@ -45,8 +46,10 @@ export const AuthButton = () => {
       console.log('Auth state changed:', event, session?.user?.id);
       
       if (event === 'SIGNED_IN' && session) {
+        console.log('User signed in, handling sign in...');
         await handleSignIn(session);
       } else if (event === 'SIGNED_OUT') {
+        console.log('User signed out, handling sign out...');
         handleSignOut();
       }
     });
@@ -63,7 +66,10 @@ export const AuthButton = () => {
       console.log('Initiating Google sign in...');
       
       const { error } = await initiateGoogleSignIn();
-      if (error) throw error;
+      if (error) {
+        console.error('Google sign in error:', error);
+        throw error;
+      }
 
     } catch (error: any) {
       console.error('Sign in error:', error);
@@ -99,12 +105,13 @@ export const AuthButton = () => {
   };
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="relative z-50 flex flex-wrap gap-2">
       {user ? (
         <Button
           onClick={handleSignOutClick}
           disabled={loading}
           variant="destructive"
+          className="cursor-pointer"
         >
           Sign Out
         </Button>
@@ -112,7 +119,7 @@ export const AuthButton = () => {
         <Button
           onClick={handleGoogleSignIn}
           disabled={loading}
-          className="bg-white text-black hover:bg-gray-100"
+          className="bg-white text-black hover:bg-gray-100 cursor-pointer"
         >
           Sign in with Google
         </Button>

@@ -10,21 +10,29 @@ export const useAuthSession = () => {
   const { toast } = useToast();
 
   const checkProfile = async (userId: string) => {
-    const { data: profile, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-      
-    if (error) {
-      console.error('Error checking profile:', error);
+    try {
+      console.log('Checking profile for user:', userId);
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+        
+      if (error) {
+        console.error('Error checking profile:', error);
+        return null;
+      }
+      console.log('Profile found:', profile);
+      return profile;
+    } catch (error) {
+      console.error('Error in checkProfile:', error);
       return null;
     }
-    return profile;
   };
 
   const handleSignIn = async (session: any) => {
     try {
+      console.log('Handling sign in for session:', session);
       setUser(session.user);
       
       // Wait for profile creation
@@ -55,6 +63,7 @@ export const useAuthSession = () => {
   };
 
   const handleSignOut = () => {
+    console.log('Handling sign out');
     setUser(null);
     toast({
       title: "Signed out",
