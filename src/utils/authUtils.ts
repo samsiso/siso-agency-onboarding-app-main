@@ -19,3 +19,14 @@ export const initiateGoogleSignIn = async () => {
 export const signOut = async () => {
   return await supabase.auth.signOut();
 };
+
+// Add new helper function to check and handle auth state
+export const handleAuthCallback = async () => {
+  const params = new URLSearchParams(window.location.hash);
+  if (params.get('access_token')) {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if (session && !error) {
+      window.location.href = '/profile';
+    }
+  }
+};

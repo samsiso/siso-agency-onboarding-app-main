@@ -5,6 +5,7 @@ import { Button } from './ui/button';
 import { ScrollArea } from './ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { handleAuthCallback } from '@/utils/authUtils';
 
 export const Hero = () => {
   const [userName, setUserName] = useState<string | null>(null);
@@ -13,6 +14,11 @@ export const Hero = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Handle OAuth callback if present
+    if (window.location.hash) {
+      handleAuthCallback();
+    }
+
     // Check for existing session on mount
     const checkSession = async () => {
       try {
