@@ -17,9 +17,12 @@ export const AuthButton = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    let mounted = true;
+
     // Initial session check
     const checkAuth = async () => {
       try {
+        setLoading(true);
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
@@ -27,14 +30,16 @@ export const AuthButton = () => {
           return;
         }
 
-        if (session?.user) {
+        if (session?.user && mounted) {
           console.log('Initial session found for user:', session.user.id);
-          handleSignIn(session);
+          await handleSignIn(session);
         }
       } catch (error) {
         console.error('Error in initial auth check:', error);
       } finally {
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     };
 
@@ -52,6 +57,7 @@ export const AuthButton = () => {
     });
 
     return () => {
+      mounted = false;
       console.log('Cleaning up auth subscriptions');
       subscription.unsubscribe();
     };
