@@ -12,32 +12,28 @@ export const AuthButton = () => {
 
   useEffect(() => {
     // Check current auth status
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-    });
+    const checkAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        setUser(session?.user ?? null);
+        if (session?.user) {
+          navigate('/profile');
+        }
+      } catch (error) {
+        console.error('Error checking auth status:', error);
+      }
+    };
+
+    checkAuth();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log('Auth state changed:', event, session);
       setUser(session?.user ?? null);
-      
-      if (event === 'SIGNED_IN') {
-        toast({
-          title: "Successfully signed in",
-          description: "Welcome to SISO Resource Hub!",
-        });
-        navigate('/profile');
-      } else if (event === 'SIGNED_OUT') {
-        toast({
-          title: "Signed out",
-          description: "Come back soon!",
-        });
-        navigate('/');
-      }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, toast]);
+  }, [navigate]);
 
   const handleGoogleSignIn = async () => {
     try {
@@ -50,9 +46,10 @@ export const AuthButton = () => {
       });
       if (error) throw error;
     } catch (error: any) {
+      console.error('Sign in error:', error);
       toast({
         variant: "destructive",
-        title: "Error",
+        title: "Error signing in",
         description: error.message,
       });
     } finally {
@@ -65,7 +62,9 @@ export const AuthButton = () => {
       setLoading(true);
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
+      navigate('/');
     } catch (error: any) {
+      console.error('Sign out error:', error);
       toast({
         variant: "destructive",
         title: "Error signing out",

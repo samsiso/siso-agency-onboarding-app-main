@@ -13,12 +13,12 @@ export const Hero = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const getProfile = async () => {
+    // Check for existing session on mount
+    const checkSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        
         if (session?.user) {
-          console.log('Fetching profile for user:', session.user.id);
+          console.log('Found existing session for user:', session.user.id);
           const { data: profile, error } = await supabase
             .from('profiles')
             .select('full_name')
@@ -27,47 +27,66 @@ export const Hero = () => {
           
           if (error) {
             console.error('Error fetching profile:', error);
-            toast({
-              title: "Error loading profile",
-              description: "Please try refreshing the page",
-              variant: "destructive",
-            });
             return;
           }
           
           setUserName(profile?.full_name || session.user.email?.split('@')[0]);
-          // Redirect to profile if user is authenticated
           navigate('/profile');
         }
       } catch (error) {
-        console.error('Error in getProfile:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load user data",
-          variant: "destructive",
-        });
+        console.error('Error checking session:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    getProfile();
+    checkSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state changed:', event, session?.user?.id);
-      if (event === 'SIGNED_IN') {
-        getProfile();
+      
+      if (event === 'SIGNED_IN' && session?.user) {
+        try {
+          const { data: profile, error } = await supabase
+            .from('profiles')
+            .select('full_name')
+            .eq('id', session.user.id)
+            .single();
+          
+          if (error) {
+            console.error('Error fetching profile:', error);
+            return;
+          }
+          
+          setUserName(profile?.full_name || session.user.email?.split('@')[0]);
+          toast({
+            title: "Successfully signed in",
+            description: "Welcome to SISO Resource Hub!",
+          });
+          navigate('/profile');
+        } catch (error) {
+          console.error('Error in auth state change handler:', error);
+        }
       } else if (event === 'SIGNED_OUT') {
         setUserName(null);
+        toast({
+          title: "Signed out",
+          description: "Come back soon!",
+        });
+        navigate('/');
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [toast, navigate]);
+
+  // ... keep existing code (Resource Guide JSX)
 
   return (
     <div className="relative min-h-screen">
-      {/* Background with improved gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-siso-bg via-siso-bg/95 to-siso-bg/90" />
       
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
