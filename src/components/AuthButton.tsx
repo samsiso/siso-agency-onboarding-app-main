@@ -17,12 +17,9 @@ export const AuthButton = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    let mounted = true;
-
     // Initial session check
     const checkAuth = async () => {
       try {
-        setLoading(true);
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
@@ -30,16 +27,14 @@ export const AuthButton = () => {
           return;
         }
 
-        if (session?.user && mounted) {
+        if (session?.user) {
           console.log('Initial session found for user:', session.user.id);
-          await handleSignIn(session);
+          handleSignIn(session);
         }
       } catch (error) {
         console.error('Error in initial auth check:', error);
       } finally {
-        if (mounted) {
-          setLoading(false);
-        }
+        setLoading(false);
       }
     };
 
@@ -57,7 +52,6 @@ export const AuthButton = () => {
     });
 
     return () => {
-      mounted = false;
       console.log('Cleaning up auth subscriptions');
       subscription.unsubscribe();
     };
@@ -105,13 +99,12 @@ export const AuthButton = () => {
   };
 
   return (
-    <div className="relative z-50">
+    <div className="flex flex-wrap gap-2">
       {user ? (
         <Button
           onClick={handleSignOutClick}
           disabled={loading}
           variant="destructive"
-          className="cursor-pointer"
         >
           Sign Out
         </Button>
@@ -119,7 +112,7 @@ export const AuthButton = () => {
         <Button
           onClick={handleGoogleSignIn}
           disabled={loading}
-          className="bg-white text-black hover:bg-gray-100 cursor-pointer"
+          className="bg-white text-black hover:bg-gray-100"
         >
           Sign in with Google
         </Button>
