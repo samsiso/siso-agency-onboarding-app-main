@@ -1,10 +1,13 @@
 import { supabase } from '@/integrations/supabase/client';
 
 export const initiateGoogleSignIn = async () => {
+  const currentUrl = window.location.origin;
+  console.log('Current origin:', currentUrl);
+  
   return await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${window.location.origin}/profile`,
+      redirectTo: `${currentUrl}/profile`,
       queryParams: {
         access_type: 'offline',
         prompt: 'consent',
