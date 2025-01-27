@@ -6,12 +6,14 @@ import { ScrollArea } from './ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { handleAuthCallback } from '@/utils/authUtils';
+import { useSidebar } from './ui/sidebar';
 
 export const Hero = () => {
   const [userName, setUserName] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { setOpen } = useSidebar();
 
   useEffect(() => {
     // Handle OAuth callback if present
@@ -89,7 +91,49 @@ export const Hero = () => {
     };
   }, [toast, navigate]);
 
-  // ... keep existing code (Resource Guide JSX)
+  const handleResourceClick = (path: string) => {
+    setOpen(true); // Open the sidebar when clicking a resource
+    navigate(path);
+  };
+
+  const resourceGuideItems = [
+    {
+      icon: "🔧",
+      title: "Core Tools & Platforms",
+      desc: "Access our curated list of daily tools, complete with how-to videos and integration guides.",
+      path: "/tools"
+    },
+    {
+      icon: "📚",
+      title: "SISO Education Hub",
+      desc: "Learn from top educators and creators, with access to valuable templates and workflows.",
+      path: "/education"
+    },
+    {
+      icon: "🌐",
+      title: "SISO Networking",
+      desc: "Connect with professional communities and experts to accelerate your growth.",
+      path: "/networking"
+    },
+    {
+      icon: "🤖",
+      title: "SISO Automations",
+      desc: "Leverage our custom-built automations for client management, lead generation, and workflows.",
+      path: "/automations"
+    },
+    {
+      icon: "💬",
+      title: "ChatGPT Assistants",
+      desc: "Get AI-powered guidance tailored to your specific needs and challenges.",
+      path: "/assistants"
+    },
+    {
+      icon: "🧠",
+      title: "SISO AI",
+      desc: "Receive personalized recommendations from your AI consultant based on your business context.",
+      path: "/siso-ai"
+    }
+  ];
 
   return (
     <div className="relative min-h-screen">
@@ -134,6 +178,7 @@ export const Hero = () => {
               className="w-full sm:w-auto min-w-[150px] border border-siso-text/20 text-siso-text-bold 
                 hover:bg-gradient-to-r from-siso-red/10 to-siso-orange/10 hover:border-siso-text/40 
                 transition-all duration-300"
+              onClick={() => handleResourceClick('/tools')}
             >
               Learn More
             </Button>
@@ -152,40 +197,14 @@ export const Hero = () => {
               
               <ScrollArea className="h-[450px] rounded-lg px-2">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
-                  {[
-                    {
-                      icon: "🔧",
-                      title: "Core Tools & Platforms",
-                      desc: "Access our curated list of daily tools, complete with how-to videos and integration guides."
-                    },
-                    {
-                      icon: "📚",
-                      title: "SISO Education Hub",
-                      desc: "Learn from top educators and creators, with access to valuable templates and workflows."
-                    },
-                    {
-                      icon: "🌐",
-                      title: "SISO Networking",
-                      desc: "Connect with professional communities and experts to accelerate your growth."
-                    },
-                    {
-                      icon: "🤖",
-                      title: "SISO Automations",
-                      desc: "Leverage our custom-built automations for client management, lead generation, and workflows."
-                    },
-                    {
-                      icon: "💬",
-                      title: "ChatGPT Assistants",
-                      desc: "Get AI-powered guidance tailored to your specific needs and challenges."
-                    },
-                    {
-                      icon: "🧠",
-                      title: "SISO AI",
-                      desc: "Receive personalized recommendations from your AI consultant based on your business context."
-                    }
-                  ].map((item, i) => (
-                    <div key={i} className="group p-4 rounded-lg bg-siso-bg/50 hover:bg-siso-bg/70 
-                      border border-siso-text/10 hover:border-siso-text/20 transition-all duration-300">
+                  {resourceGuideItems.map((item, i) => (
+                    <div
+                      key={i}
+                      className="group p-4 rounded-lg bg-siso-bg/50 hover:bg-siso-bg/70 
+                        border border-siso-text/10 hover:border-siso-text/20 transition-all duration-300
+                        cursor-pointer"
+                      onClick={() => handleResourceClick(item.path)}
+                    >
                       <div className="flex items-start gap-3">
                         <span className="text-2xl group-hover:scale-110 transition-transform duration-300">
                           {item.icon}
