@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { handleAuthCallback } from '@/utils/authUtils';
 import { useSidebar } from './ui/sidebar';
+import { Sidebar } from './Sidebar';
 
 export const Hero = () => {
   const [userName, setUserName] = useState<string | null>(null);
@@ -137,6 +138,7 @@ export const Hero = () => {
 
   return (
     <div className="relative min-h-screen">
+      <Sidebar />
       <div className="absolute inset-0 bg-gradient-to-br from-siso-bg via-siso-bg/95 to-siso-bg/90" />
       
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
