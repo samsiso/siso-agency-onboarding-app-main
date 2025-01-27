@@ -47,7 +47,7 @@ export const handleAuthCallback = async () => {
         window.location.replace('/profile');
       } else {
         console.log('No session found after callback');
-        window.location.replace('/');
+        window.location.replace('/?error=no_session');
       }
     }
   } catch (error) {

@@ -20,20 +20,26 @@ export const AuthButton = () => {
     // Initial session check
     const checkAuth = async () => {
       try {
+        setLoading(true);
         console.log('Checking initial auth session...');
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
           console.error('Initial session check error:', sessionError);
-          return;
+          throw sessionError;
         }
 
         if (session?.user) {
           console.log('Initial session found for user:', session.user.id);
-          handleSignIn(session);
+          await handleSignIn(session);
         }
       } catch (error) {
         console.error('Error in initial auth check:', error);
+        toast({
+          variant: "destructive",
+          title: "Authentication Error",
+          description: "There was a problem checking your session. Please try logging in again.",
+        });
       } finally {
         setLoading(false);
       }
@@ -46,11 +52,33 @@ export const AuthButton = () => {
       console.log('Auth state changed:', event, session?.user?.id);
       
       if (event === 'SIGNED_IN' && session) {
-        console.log('User signed in, handling sign in...');
-        await handleSignIn(session);
+        try {
+          console.log('User signed in, handling sign in...');
+          setLoading(true);
+          await handleSignIn(session);
+          
+          // Show success toast
+          toast({
+            title: "Successfully signed in",
+            description: "Welcome to SISO Resource Hub!",
+          });
+        } catch (error) {
+          console.error('Error handling sign in:', error);
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "There was a problem completing your sign in.",
+          });
+        } finally {
+          setLoading(false);
+        }
       } else if (event === 'SIGNED_OUT') {
         console.log('User signed out, handling sign out...');
         handleSignOut();
+        toast({
+          title: "Signed out",
+          description: "Come back soon!",
+        });
       }
     });
 
@@ -58,7 +86,7 @@ export const AuthButton = () => {
       console.log('Cleaning up auth subscriptions');
       subscription.unsubscribe();
     };
-  }, [handleSignIn, handleSignOut, setLoading]);
+  }, [handleSignIn, handleSignOut, setLoading, toast]);
 
   const handleGoogleSignIn = async () => {
     try {
