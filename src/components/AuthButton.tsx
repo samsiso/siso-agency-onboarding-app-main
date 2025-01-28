@@ -161,13 +161,13 @@ export const AuthButton = () => {
 
   return (
     <>
-      <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50">
+      <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-[100] pointer-events-auto">
         {user ? (
           <Button
             onClick={handleSignOutClick}
             disabled={loading}
             variant="destructive"
-            className="cursor-pointer transition-all duration-200 hover:bg-red-600 hover:scale-105 relative"
+            className="cursor-pointer transition-all duration-200 hover:bg-red-600 hover:scale-105 shadow-lg"
           >
             Sign Out
           </Button>
@@ -175,7 +175,7 @@ export const AuthButton = () => {
           <Button
             onClick={handleGoogleSignIn}
             disabled={loading}
-            className="bg-white text-black hover:bg-gray-100 cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg relative"
+            className="bg-white text-black hover:bg-gray-100 cursor-pointer transition-all duration-200 hover:scale-105 shadow-lg"
           >
             Sign in with Google
           </Button>
