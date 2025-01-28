@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { AuthButton } from './AuthButton';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from './ui/button';
 import { ScrollArea } from './ui/scroll-area';
@@ -172,9 +171,8 @@ export const Hero = () => {
             </p>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <AuthButton />
+          {/* Action Button */}
+          <div className="flex justify-center">
             <Button 
               variant="outline" 
               className="w-full sm:w-auto min-w-[150px] border border-siso-text/20 text-siso-text-bold 
