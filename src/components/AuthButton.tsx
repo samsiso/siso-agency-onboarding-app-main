@@ -167,7 +167,7 @@ export const AuthButton = () => {
             onClick={handleSignOutClick}
             disabled={loading}
             variant="destructive"
-            className="cursor-pointer transition-all duration-200 hover:bg-red-600 hover:scale-105"
+            className="cursor-pointer transition-all duration-200 hover:bg-red-600 hover:scale-105 relative"
           >
             Sign Out
           </Button>
