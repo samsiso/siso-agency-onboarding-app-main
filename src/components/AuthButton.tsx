@@ -175,7 +175,7 @@ export const AuthButton = () => {
           <Button
             onClick={handleGoogleSignIn}
             disabled={loading}
-            className="bg-white text-black hover:bg-gray-100 cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg"
+            className="bg-white text-black hover:bg-gray-100 cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg relative"
           >
             Sign in with Google
           </Button>
