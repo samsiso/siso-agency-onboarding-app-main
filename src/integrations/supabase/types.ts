@@ -710,6 +710,7 @@ export type Database = {
           full_name: string | null
           geographic_markets: string[] | null
           growth_targets: Json | null
+          has_completed_social_info: boolean | null
           id: string
           industry: string | null
           instagram_url: string | null
@@ -721,6 +722,7 @@ export type Database = {
           professional_role: string | null
           rank: string | null
           short_term_goals: string[] | null
+          social_info_completed_at: string | null
           solana_wallet_address: string | null
           target_market: string[] | null
           team_size: number | null
@@ -750,6 +752,7 @@ export type Database = {
           full_name?: string | null
           geographic_markets?: string[] | null
           growth_targets?: Json | null
+          has_completed_social_info?: boolean | null
           id: string
           industry?: string | null
           instagram_url?: string | null
@@ -761,6 +764,7 @@ export type Database = {
           professional_role?: string | null
           rank?: string | null
           short_term_goals?: string[] | null
+          social_info_completed_at?: string | null
           solana_wallet_address?: string | null
           target_market?: string[] | null
           team_size?: number | null
@@ -790,6 +794,7 @@ export type Database = {
           full_name?: string | null
           geographic_markets?: string[] | null
           growth_targets?: Json | null
+          has_completed_social_info?: boolean | null
           id?: string
           industry?: string | null
           instagram_url?: string | null
@@ -801,6 +806,7 @@ export type Database = {
           professional_role?: string | null
           rank?: string | null
           short_term_goals?: string[] | null
+          social_info_completed_at?: string | null
           solana_wallet_address?: string | null
           target_market?: string[] | null
           team_size?: number | null
