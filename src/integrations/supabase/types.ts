@@ -999,6 +999,79 @@ export type Database = {
         }
         Relationships: []
       }
+      video_discussions: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          sentiment_score: number | null
+          updated_at: string
+          user_id: string | null
+          video_id: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          sentiment_score?: number | null
+          updated_at?: string
+          user_id?: string | null
+          video_id?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          sentiment_score?: number | null
+          updated_at?: string
+          user_id?: string | null
+          video_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_discussions_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "youtube_videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      video_summaries: {
+        Row: {
+          created_at: string
+          id: string
+          key_points: string[] | null
+          summary: string
+          updated_at: string
+          video_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key_points?: string[] | null
+          summary: string
+          updated_at?: string
+          video_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key_points?: string[] | null
+          summary?: string
+          updated_at?: string
+          video_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_summaries_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "youtube_videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       wallet_nonces: {
         Row: {
           created_at: string | null
@@ -1079,6 +1152,104 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      youtube_channels: {
+        Row: {
+          channel_id: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          profile_image_url: string | null
+          subscriber_count: number | null
+          updated_at: string
+        }
+        Insert: {
+          channel_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          profile_image_url?: string | null
+          subscriber_count?: number | null
+          updated_at?: string
+        }
+        Update: {
+          channel_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          profile_image_url?: string | null
+          subscriber_count?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      youtube_videos: {
+        Row: {
+          channel_id: string | null
+          comment_count: number | null
+          created_at: string
+          description: string | null
+          difficulty_level: string | null
+          duration: string | null
+          id: string
+          like_count: number | null
+          published_at: string | null
+          tags: string[] | null
+          thumbnail_url: string | null
+          title: string
+          topics: string[] | null
+          updated_at: string
+          video_id: string
+          view_count: number | null
+        }
+        Insert: {
+          channel_id?: string | null
+          comment_count?: number | null
+          created_at?: string
+          description?: string | null
+          difficulty_level?: string | null
+          duration?: string | null
+          id?: string
+          like_count?: number | null
+          published_at?: string | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          title: string
+          topics?: string[] | null
+          updated_at?: string
+          video_id: string
+          view_count?: number | null
+        }
+        Update: {
+          channel_id?: string | null
+          comment_count?: number | null
+          created_at?: string
+          description?: string | null
+          difficulty_level?: string | null
+          duration?: string | null
+          id?: string
+          like_count?: number | null
+          published_at?: string | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          title?: string
+          topics?: string[] | null
+          updated_at?: string
+          video_id?: string
+          view_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "youtube_videos_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "youtube_channels"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
