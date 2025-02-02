@@ -1,8 +1,5 @@
 import { Twitter, Linkedin, Instagram, Youtube } from "lucide-react";
 import { RainbowButton } from "./ui/rainbow-button";
-import { SplineScene } from "./ui/splite";
-import { Card } from "./ui/card";
-import { Spotlight } from "./ui/spotlight";
 
 const Footer = () => {
   const socialLinks = [
@@ -33,52 +30,35 @@ const Footer = () => {
       />
 
       <div className="relative container mx-auto px-4 py-20">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Left Side - 3D Scene */}
-          <Card className="w-full h-[400px] bg-gradient-to-br from-black/30 to-black/10 backdrop-blur-sm relative overflow-hidden border-siso-text/10">
-            <Spotlight
-              className="-top-40 left-0 md:left-60 md:-top-20"
-              size={400}
-            />
-            <div className="relative h-full">
-              <SplineScene 
-                scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-                className="w-full h-full"
-              />
-            </div>
-          </Card>
+        <div className="max-w-3xl mx-auto text-center">
+          <h3 className="text-4xl md:text-5xl font-bold text-white mb-6 font-display tracking-tight">
+            Ready to transform your business with AI?
+          </h3>
+          <p className="text-gray-300 text-lg mb-10 font-light">
+            Connect with our experts today and discover how our innovative solutions can drive your success.
+          </p>
+          <RainbowButton 
+            className="text-lg px-10 py-6 font-semibold mb-8"
+            onClick={() => window.location.href = '/auth'}
+          >
+            Start Free Trial
+          </RainbowButton>
 
-          {/* Right Side - CTA and Social Links */}
-          <div className="text-center lg:text-left">
-            <h3 className="text-4xl md:text-5xl font-bold text-white mb-6 font-display tracking-tight">
-              Ready to transform your business with AI?
-            </h3>
-            <p className="text-gray-300 text-lg mb-10 max-w-2xl mx-auto lg:mx-0 font-light">
-              Connect with our experts today and discover how our innovative solutions can drive your success.
-            </p>
-            <RainbowButton 
-              className="text-lg px-10 py-6 font-semibold mb-8"
-              onClick={() => window.location.href = '/auth'}
-            >
-              Start Free Trial
-            </RainbowButton>
-
-            {/* Social Links */}
-            <div className="flex gap-6 justify-center lg:justify-start mt-8">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-[#0A0A0A] p-3 rounded-full hover:bg-gray-900 transition-all duration-300 group
-                    hover:shadow-lg hover:shadow-orange-500/10"
-                  aria-label={social.label}
-                >
-                  <social.icon className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors duration-300" />
-                </a>
-              ))}
-            </div>
+          {/* Social Links */}
+          <div className="flex gap-6 justify-center mt-8">
+            {socialLinks.map((social) => (
+              <a
+                key={social.label}
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-[#0A0A0A] p-3 rounded-full hover:bg-gray-900 transition-all duration-300 group
+                  hover:shadow-lg hover:shadow-orange-500/10"
+                aria-label={social.label}
+              >
+                <social.icon className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors duration-300" />
+              </a>
+            ))}
           </div>
         </div>
 
