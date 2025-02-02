@@ -9,12 +9,12 @@ const headingVariants = cva(
     variants: {
       variant: {
         default: "bg-gradient-to-r from-siso-red via-siso-orange to-siso-red",
-        pink: "bg-gradient-to-r from-[#9b87f5] via-[#D946EF] to-[#9b87f5]",
-        light: "bg-gradient-to-r from-[#FEC6A1] via-[#F97316] to-[#FEC6A1]",
-        secondary: "bg-gradient-to-r from-[#7E69AB] via-[#6E59A5] to-[#7E69AB]",
-        rainbow: "bg-gradient-to-r from-siso-red via-siso-orange via-[#9b87f5] via-[#D946EF] to-siso-red",
-        sunset: "bg-gradient-to-r from-siso-orange via-siso-red to-[#9b87f5]",
-        ocean: "bg-gradient-to-r from-[#8B5CF6] via-[#D946EF] to-[#8B5CF6]",
+        pink: "bg-gradient-to-r from-siso-orange via-siso-red to-siso-orange",
+        light: "bg-gradient-to-r from-siso-red via-[#FF7043] to-siso-red",
+        secondary: "bg-gradient-to-r from-siso-orange via-[#FF7043] to-siso-orange",
+        rainbow: "bg-gradient-to-r from-siso-red via-siso-orange to-siso-red",
+        sunset: "bg-gradient-to-r from-siso-orange via-siso-red to-siso-orange",
+        ocean: "bg-gradient-to-r from-siso-red via-siso-orange to-siso-red",
       },
       size: {
         default: "text-2xl sm:text-3xl lg:text-4xl",
