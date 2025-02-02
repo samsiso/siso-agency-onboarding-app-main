@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SocialMediaModal } from '@/components/auth/SocialMediaModal';
 import { useToast } from '@/hooks/use-toast';
@@ -6,13 +6,26 @@ import { supabase } from '@/integrations/supabase/client';
 
 export default function SocialOnboarding() {
   const [isModalOpen, setIsModalOpen] = useState(true);
+  const [userId, setUserId] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate('/auth');
+        return;
+      }
+      setUserId(user.id);
+    };
+
+    checkUser();
+  }, [navigate]);
+
   const handleSkip = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user?.id) {
+      if (!userId) {
         throw new Error('No user found');
       }
 
@@ -23,7 +36,7 @@ export default function SocialOnboarding() {
           has_completed_social_info: true,
           social_info_completed_at: new Date().toISOString()
         })
-        .eq('id', user.id);
+        .eq('id', userId);
 
       if (error) throw error;
 
@@ -49,12 +62,17 @@ export default function SocialOnboarding() {
     navigate('/onboarding/chat');
   };
 
+  if (!userId) {
+    return null; // Or a loading state
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-siso-red/5 to-siso-orange/5 flex items-center justify-center">
       <SocialMediaModal
         isOpen={isModalOpen}
         onClose={handleModalClose}
         onSkip={handleSkip}
+        userId={userId}
       />
     </div>
   );
