@@ -47,15 +47,6 @@ export const LandingPage = () => {
     }
   }, [user, navigate]);
 
-  const handleSignInClick = () => {
-    console.log('Sign in button clicked');
-    navigate('/auth');
-    toast({
-      title: "Navigating to sign in",
-      description: "Opening authentication page...",
-    });
-  };
-
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-black via-gray-900 to-[#0A0A0A]">
       <ScrollNav />
@@ -133,21 +124,6 @@ export const LandingPage = () => {
         {/* Testimonials Section */}
         <section id="testimonials" className="min-h-screen py-20">
           <TestimonialSection />
-        </section>
-
-        {/* Final CTA Section */}
-        <section id="cta" className="min-h-screen py-20">
-          <div className="text-center py-24">
-            <h2 className="text-4xl font-bold text-white mb-4">Ready to Transform Your Business?</h2>
-            <p className="text-gray-400 mb-8">Join thousands of successful agencies already using our platform</p>
-            <button
-              onClick={handleSignInClick}
-              className="px-8 py-3 bg-gradient-to-r from-siso-red to-siso-orange text-white rounded-lg font-medium
-                transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-siso-red/20"
-            >
-              Get Started Now
-            </button>
-          </div>
         </section>
 
         {/* Footer */}
