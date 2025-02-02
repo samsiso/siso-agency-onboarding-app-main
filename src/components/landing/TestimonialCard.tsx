@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { Dialog } from '@/components/ui/dialog';
-import { Play, Volume2 } from 'lucide-react';
+import { Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -25,14 +24,16 @@ export function TestimonialCard({
   videoUrl,
   audioReview 
 }: TestimonialCardProps) {
-  const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioContent, setAudioContent] = useState<string | null>(null);
 
-  // [Analysis] Extract video ID from YouTube URL for thumbnail
-  const getYouTubeThumbnail = (url: string) => {
+  // [Analysis] Extract video ID from YouTube URL for thumbnail and direct link
+  const getYouTubeInfo = (url: string) => {
     const videoId = url.split('embed/')[1]?.split('?')[0];
-    return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+    return {
+      thumbnailUrl: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+      directUrl: `https://www.youtube.com/watch?v=${videoId}`
+    };
   };
 
   const handlePlayAudio = async () => {
@@ -103,21 +104,18 @@ export function TestimonialCard({
       {/* Media Section */}
       {videoUrl ? (
         <div className="relative rounded-lg overflow-hidden bg-black/20 aspect-video">
-          <img
-            src={getYouTubeThumbnail(videoUrl)}
-            alt="Video thumbnail"
-            className="w-full h-full object-cover"
-          />
-          <button
-            onClick={() => setIsVideoOpen(true)}
-            className="absolute inset-0 flex items-center justify-center bg-black/50 
-              group-hover:bg-black/60 transition-colors duration-300"
+          <a
+            href={getYouTubeInfo(videoUrl).directUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-full h-full"
           >
-            <div className="bg-white/10 p-3 rounded-full backdrop-blur-sm 
-              group-hover:bg-white/20 transition-all duration-300">
-              <Play className="w-6 h-6 text-white" />
-            </div>
-          </button>
+            <img
+              src={getYouTubeInfo(videoUrl).thumbnailUrl}
+              alt="Video thumbnail"
+              className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+            />
+          </a>
         </div>
       ) : audioReview ? (
         <div className="mt-4">
@@ -134,21 +132,6 @@ export function TestimonialCard({
           </Button>
         </div>
       ) : null}
-
-      {/* Video Modal */}
-      <Dialog 
-        open={isVideoOpen} 
-        onOpenChange={setIsVideoOpen}
-      >
-        {videoUrl && (
-          <iframe
-            src={videoUrl}
-            className="w-full aspect-video rounded-lg"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
-        )}
-      </Dialog>
     </div>
   );
 }
