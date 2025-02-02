@@ -8,6 +8,7 @@ import Footer from '@/components/Footer';
 import { Hero } from '@/components/ui/animated-hero';
 import { Waves } from '@/components/ui/waves-background';
 import { ScrollNav } from '@/components/ui/scroll-nav';
+import { Feature108 } from '@/components/blocks/shadcnblocks-com-feature108';
 
 export const LandingPage = () => {
   const { user } = useAuthSession();
@@ -62,7 +63,12 @@ export const LandingPage = () => {
         </section>
 
         {/* Features Section */}
-        <section id="features" className="min-h-screen py-20">
+        <section id="features" className="min-h-screen">
+          <Feature108 />
+        </section>
+
+        {/* Features Section */}
+        <section id="pricing" className="min-h-screen py-20">
           <TierSection />
         </section>
 
