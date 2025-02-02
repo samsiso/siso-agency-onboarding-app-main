@@ -25,7 +25,7 @@ function Hero() {
     <div className="w-full">
       <div className="container mx-auto">
         <div className="flex gap-8 py-20 lg:py-40 items-center justify-center flex-col">
-          <div className="flex gap-4 flex-col">
+          <div className="flex gap-4 flex-col items-center">
             <h1 className="text-6xl md:text-8xl max-w-5xl tracking-tighter text-center font-regular">
               <span className="text-siso-text-bold whitespace-nowrap">Built for Agencies to</span>
               <div className="relative h-[150px] md:h-[200px] flex w-full justify-center overflow-hidden text-center">
@@ -53,7 +53,7 @@ function Hero() {
               </div>
             </h1>
 
-            <p className="text-lg md:text-xl leading-relaxed tracking-tight text-siso-text max-w-2xl text-center">
+            <p className="text-lg md:text-xl leading-relaxed tracking-tight text-siso-text max-w-2xl text-center mx-auto">
               Your gateway to tools, education, networking, and AI-powered innovation—crafted 
               to help your agency thrive in the digital age. Access our curated collection 
               of resources designed for modern business growth.
