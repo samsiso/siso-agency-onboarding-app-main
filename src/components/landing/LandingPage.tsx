@@ -82,13 +82,13 @@ export const LandingPage = () => {
         </section>
 
         {/* Features Section */}
-        <section id="features" className="min-h-screen py-20">
+        <section id="features" className="py-20">
           <Feature108 />
         </section>
 
-        {/* Trusted by Thousands Section */}
-        <section className="py-16">
-          <Case />
+        {/* Testimonials Section - Moved up */}
+        <section id="testimonials" className="py-16">
+          <TestimonialSection />
         </section>
 
         {/* Call to Action Section */}
@@ -111,8 +111,8 @@ export const LandingPage = () => {
           </div>
         </section>
 
-        {/* Logo Carousel Section */}
-        <section className="py-20 overflow-hidden">
+        {/* Logo Carousel Section - Moved down */}
+        <section className="py-16 overflow-hidden">
           <div className="container mx-auto">
             <div className="text-center mb-12">
               <GradientHeading 
@@ -164,11 +164,6 @@ export const LandingPage = () => {
             buttonText="Start Enterprise Trial"
             onButtonClick={handleGetStarted}
           />
-        </section>
-
-        {/* Testimonials Section */}
-        <section id="testimonials" className="py-20">
-          <TestimonialSection />
         </section>
 
         {/* Footer */}
