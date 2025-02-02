@@ -6,6 +6,7 @@ import { Waves } from '@/components/ui/waves-background';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ButtonCta } from '@/components/ui/button-shiny';
+import { GradientText } from '@/components/ui/gradient-text';
 import { Input } from '@/components/ui/input';
 import { Users, ArrowRight, Linkedin, Globe, Youtube, Instagram, Sparkles, Brain, Bot } from 'lucide-react';
 
@@ -101,9 +102,13 @@ export default function SocialOnboarding() {
             <Users className="w-6 h-6 text-siso-orange" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent">
+            <GradientText
+              colors={["#FF5722", "#FFA726", "#FF5722"]}
+              animationSpeed={6}
+              className="text-2xl font-bold"
+            >
               Unlock Personalized AI Insights
-            </h2>
+            </GradientText>
           </div>
         </div>
 
