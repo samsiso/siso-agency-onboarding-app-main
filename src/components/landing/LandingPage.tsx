@@ -2,6 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { TierSection } from './TierSection';
+import { TestimonialSection } from './TestimonialSection';
 
 export const LandingPage = () => {
   const { user } = useAuthSession();
@@ -109,94 +111,59 @@ export const LandingPage = () => {
               Watch Demo
             </button>
           </div>
-
-          {/* Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-24">
-            {[
-              {
-                icon: "🔧",
-                title: "AI Tools & Resources",
-                desc: "Access our curated collection of AI-powered tools and platforms"
-              },
-              {
-                icon: "📚",
-                title: "Expert Education",
-                desc: "Learn from industry leaders and stay ahead of the curve"
-              },
-              {
-                icon: "🌐",
-                title: "Global Network",
-                desc: "Connect with professionals and grow your business network"
-              }
-            ].map((feature, i) => (
-              <div
-                key={i}
-                className="p-6 bg-black/30 backdrop-blur-sm rounded-lg border border-white/10 transition-all duration-300
-                  hover:bg-white/5 group cursor-pointer"
-              >
-                <span className="text-3xl mb-4 block group-hover:scale-110 transition-transform duration-300">
-                  {feature.icon}
-                </span>
-                <h3 className="text-xl font-semibold text-white mb-2">{feature.title}</h3>
-                <p className="text-gray-400">{feature.desc}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Testimonials Section */}
-          <div className="mt-32">
-            <h2 className="text-4xl font-bold text-white mb-4">What Our Members Say</h2>
-            <p className="text-gray-400 mb-12">Real stories from businesses that have transformed with our resources</p>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {[
-                {
-                  name: "Sarah K.",
-                  role: "Digital Marketing Director",
-                  company: "Growth Co",
-                  text: "The AI tools have revolutionized how we approach client campaigns. Our efficiency has increased by 300%."
-                },
-                {
-                  name: "Michael R.",
-                  role: "Agency Owner",
-                  company: "Digital Spark",
-                  text: "SISO's resource hub has been a game-changer. The ROI from implementing these tools has been incredible."
-                },
-                {
-                  name: "Lisa M.",
-                  role: "Operations Manager",
-                  company: "Tech Solutions",
-                  text: "The educational resources and community support have helped us scale our agency beyond expectations."
-                }
-              ].map((testimonial, i) => (
-                <div key={i} className="p-6 bg-black/30 backdrop-blur-sm rounded-lg border border-white/10">
-                  <p className="text-gray-300 mb-4">"{testimonial.text}"</p>
-                  <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-full bg-gradient-to-br from-siso-orange to-siso-red" />
-                    <div>
-                      <h4 className="text-white font-medium">{testimonial.name}</h4>
-                      <p className="text-gray-400 text-sm">{testimonial.role}</p>
-                      <p className="text-gray-400 text-sm">{testimonial.company}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Final CTA Section */}
-          <div className="mt-32 mb-16">
-            <h2 className="text-4xl font-bold text-white mb-4">Ready to Transform Your Business?</h2>
-            <p className="text-gray-400 mb-8">Join thousands of successful agencies already using our platform</p>
-            <button
-              onClick={handleSignInClick}
-              className="px-8 py-3 bg-gradient-to-r from-siso-orange to-siso-red text-white rounded-lg font-medium
-                transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-orange-500/20"
-            >
-              Get Started Now
-            </button>
-          </div>
         </div>
+      </div>
+
+      {/* Features Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+        {[
+          {
+            icon: "🔧",
+            title: "AI Tools & Resources",
+            desc: "Access our curated collection of AI-powered tools and platforms"
+          },
+          {
+            icon: "📚",
+            title: "Expert Education",
+            desc: "Learn from industry leaders and stay ahead of the curve"
+          },
+          {
+            icon: "🌐",
+            title: "Global Network",
+            desc: "Connect with professionals and grow your business network"
+          }
+        ].map((feature, i) => (
+          <div
+            key={i}
+            className="p-6 bg-black/30 backdrop-blur-sm rounded-lg border border-white/10 transition-all duration-300
+              hover:bg-white/5 group cursor-pointer"
+          >
+            <span className="text-3xl mb-4 block group-hover:scale-110 transition-transform duration-300">
+              {feature.icon}
+            </span>
+            <h3 className="text-xl font-semibold text-white mb-2">{feature.title}</h3>
+            <p className="text-gray-400">{feature.desc}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Tier Section */}
+      <TierSection />
+
+      {/* Testimonials Section */}
+      <TestimonialSection />
+
+      {/* Final CTA Section */}
+      <div className="text-center py-24 px-4">
+        <h2 className="text-4xl font-bold text-white mb-4">Ready to Transform Your Business?</h2>
+        <p className="text-gray-400 mb-8">Join thousands of successful agencies already using our platform</p>
+        <button
+          onClick={handleSignInClick}
+          className="px-8 py-3 bg-gradient-to-r from-siso-orange to-siso-red text-white rounded-lg font-medium
+            transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-orange-500/20"
+        >
+          Get Started Now
+        </button>
       </div>
     </div>
   );
