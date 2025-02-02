@@ -10,9 +10,14 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="relative w-full">
-      {/* Radial Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-radial from-orange-950/30 via-gray-900/80 to-black pointer-events-none" />
+    <footer className="relative w-full overflow-hidden">
+      {/* Circular Gradient Background */}
+      <div className="absolute inset-0">
+        <div 
+          className="absolute w-[800px] h-[800px] left-1/2 bottom-0 -translate-x-1/2 translate-y-1/2
+            bg-gradient-radial from-orange-500/20 via-orange-900/10 to-transparent"
+        />
+      </div>
 
       {/* Grid Background Pattern */}
       <div 
@@ -78,13 +83,13 @@ const Footer = () => {
 
         {/* Product Hunt Badge */}
         <a 
-          href="https://www.producthunt.com/"
+          href="https://www.producthunt.com/posts/siso-ai-resource-hub"
           target="_blank"
           rel="noopener noreferrer"
           className="absolute bottom-8 right-8 opacity-90 hover:opacity-100 transition-opacity duration-300"
         >
           <img 
-            src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=undefined&theme=dark" 
+            src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=123456&theme=dark" 
             alt="SISO on Product Hunt" 
             className="h-12"
           />

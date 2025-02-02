@@ -28,12 +28,12 @@ export const LandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-black via-gray-900 to-orange-900/20">
+    <div className="min-h-screen w-full bg-gradient-to-b from-black via-gray-900 to-orange-950/10">
       {/* Background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 -left-1/4 w-[500px] h-[500px] bg-orange-500/10 rounded-full filter blur-[100px] animate-float-slow"></div>
-        <div className="absolute bottom-1/4 -right-1/4 w-[500px] h-[500px] bg-siso-orange/10 rounded-full filter blur-[100px] animate-float-slower"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-siso-red/5 rounded-full filter blur-[120px]"></div>
+        <div className="absolute bottom-1/4 -right-1/4 w-[500px] h-[500px] bg-orange-600/10 rounded-full filter blur-[100px] animate-float-slower"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-orange-500/5 rounded-full filter blur-[120px]"></div>
       </div>
 
       {/* Navigation */}
