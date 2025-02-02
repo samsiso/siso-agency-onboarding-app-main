@@ -3,10 +3,12 @@ import { AuthButton } from '../AuthButton';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 
 export const LandingPage = () => {
   const { user } = useAuthSession();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     console.log('LandingPage mounted');
@@ -17,25 +19,29 @@ export const LandingPage = () => {
 
   const handleTestClick = () => {
     console.log('Test button clicked');
+    toast({
+      title: "Test Button Clicked",
+      description: "The test button is working correctly!",
+    });
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center p-4 bg-gradient-to-br from-siso-bg via-siso-bg/95 to-siso-bg/90">
-      {/* Test Button */}
+    <div className="min-h-screen w-full flex flex-col items-center justify-center p-4">
+      {/* Test Button - Now with visual feedback */}
       <Button
         onClick={handleTestClick}
-        className="fixed top-4 left-4 z-[9999] bg-blue-500 hover:bg-blue-600 text-white"
+        className="fixed top-4 left-4 z-[100] bg-blue-500 hover:bg-blue-600 text-white"
       >
         Test Button
       </Button>
 
-      {/* Top Right Auth Button */}
-      <div className="fixed top-4 right-4">
+      {/* Auth Button - Positioned in top right */}
+      <div className="fixed top-4 right-4 z-[100]">
         <AuthButton />
       </div>
 
-      {/* Hero Section */}
-      <div className="max-w-4xl mx-auto text-center space-y-8">
+      {/* Main Content */}
+      <div className="max-w-4xl mx-auto text-center space-y-8 relative z-[1]">
         <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold">
           Welcome to{' '}
           <span className="bg-gradient-to-r from-siso-orange to-siso-red text-transparent bg-clip-text">
@@ -79,7 +85,7 @@ export const LandingPage = () => {
         </div>
 
         {/* CTA Section */}
-        <div className="mt-12 space-y-4">
+        <div className="mt-12 space-y-4 relative z-[100]">
           <p className="text-lg text-siso-text/90 mb-4">
             Get started by signing in with your Google account
           </p>
