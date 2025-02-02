@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Dialog } from '@/components/ui/dialog';
-import { Play } from 'lucide-react';
+import { Play, Volume2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
 
 interface TestimonialCardProps {
   name: string;
@@ -10,6 +12,7 @@ interface TestimonialCardProps {
   quote: string;
   linkedinUrl?: string;
   videoUrl?: string;
+  audioReview?: boolean;
 }
 
 export function TestimonialCard({ 
@@ -19,14 +22,51 @@ export function TestimonialCard({
   image, 
   quote, 
   linkedinUrl, 
-  videoUrl 
+  videoUrl,
+  audioReview 
 }: TestimonialCardProps) {
   const [isVideoOpen, setIsVideoOpen] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [audioContent, setAudioContent] = useState<string | null>(null);
 
   // [Analysis] Extract video ID from YouTube URL for thumbnail
   const getYouTubeThumbnail = (url: string) => {
     const videoId = url.split('embed/')[1]?.split('?')[0];
     return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+  };
+
+  const handlePlayAudio = async () => {
+    if (isPlaying) {
+      setIsPlaying(false);
+      setAudioContent(null);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase.functions.invoke('text-to-speech', {
+        body: { text: quote, voice: 'alloy' }
+      });
+
+      if (error) throw error;
+
+      if (data.audioContent) {
+        setAudioContent(data.audioContent);
+        setIsPlaying(true);
+        
+        // Create and play audio
+        const audio = new Audio(`data:audio/mp3;base64,${data.audioContent}`);
+        audio.play();
+        
+        // Reset state when audio ends
+        audio.onended = () => {
+          setIsPlaying(false);
+          setAudioContent(null);
+        };
+      }
+    } catch (error) {
+      console.error('Error playing audio:', error);
+      setIsPlaying(false);
+    }
   };
 
   return (
@@ -60,8 +100,8 @@ export function TestimonialCard({
       {/* Quote */}
       <p className="text-gray-300 italic text-sm text-left mb-3">{quote}</p>
 
-      {/* Video Thumbnail Section */}
-      {videoUrl && (
+      {/* Media Section */}
+      {videoUrl ? (
         <div className="relative rounded-lg overflow-hidden bg-black/20 aspect-video">
           <img
             src={getYouTubeThumbnail(videoUrl)}
@@ -79,7 +119,21 @@ export function TestimonialCard({
             </div>
           </button>
         </div>
-      )}
+      ) : audioReview ? (
+        <div className="mt-4">
+          <Button
+            variant="outline"
+            size="sm"
+            className={`w-full flex items-center justify-center gap-2 ${
+              isPlaying ? 'bg-siso-orange/20' : ''
+            }`}
+            onClick={handlePlayAudio}
+          >
+            <Volume2 className="w-4 h-4" />
+            {isPlaying ? 'Stop Audio' : 'Play Voice Review'}
+          </Button>
+        </div>
+      ) : null}
 
       {/* Video Modal */}
       <Dialog 

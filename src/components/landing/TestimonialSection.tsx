@@ -17,7 +17,8 @@ const testimonials = [
     company: "Digital Spark",
     image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
     quote: "Lovable's resource hub has been a game-changer. The ROI from implementing these tools has been incredible.",
-    linkedinUrl: "https://linkedin.com"
+    linkedinUrl: "https://linkedin.com",
+    audioReview: true
   },
   {
     name: "Lisa M.",
@@ -34,7 +35,8 @@ const testimonials = [
     company: "Innovate Digital",
     image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
     quote: "The automation capabilities have transformed our workflow. We're seeing incredible results with minimal effort.",
-    linkedinUrl: "https://linkedin.com"
+    linkedinUrl: "https://linkedin.com",
+    audioReview: true
   },
   {
     name: "Emily T.",
@@ -51,7 +53,8 @@ const testimonials = [
     company: "Growth Accelerator",
     image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
     quote: "Since implementing Lovable, we've seen a 250% increase in client satisfaction and retention rates.",
-    linkedinUrl: "https://linkedin.com"
+    linkedinUrl: "https://linkedin.com",
+    audioReview: true
   },
   {
     name: "Christina M.",
@@ -68,7 +71,8 @@ const testimonials = [
     company: "Digital Ventures",
     image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
     quote: "Lovable has streamlined our entire operation. The ROI has exceeded all our expectations.",
-    linkedinUrl: "https://linkedin.com"
+    linkedinUrl: "https://linkedin.com",
+    audioReview: true
   }
 ];
 
