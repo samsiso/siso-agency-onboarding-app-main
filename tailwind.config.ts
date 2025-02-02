@@ -128,7 +128,11 @@ export default {
           "50%": {
             transform: "translateY(-10px)"
           }
-        }
+        },
+        'wave-pulse': {
+          '0%, 100%': { opacity: 0.4 },
+          '50%': { opacity: 0.7 },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -140,7 +144,8 @@ export default {
         "slide-in-right": "slide-in-right 0.3s ease-out forwards",
         shimmer: "shimmer 2s linear infinite",
         ping: "ping 2s cubic-bezier(0, 0, 0.2, 1) infinite",
-        float: "float 3s ease-in-out infinite"
+        float: "float 3s ease-in-out infinite",
+        'wave-pulse': 'wave-pulse 4s ease-in-out infinite',
       },
       typography: {
         DEFAULT: {

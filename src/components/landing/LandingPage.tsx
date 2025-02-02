@@ -6,6 +6,7 @@ import { TierSection } from './TierSection';
 import { TestimonialSection } from './TestimonialSection';
 import Footer from '@/components/Footer';
 import { Hero } from '@/components/ui/animated-hero';
+import { Waves } from '@/components/ui/waves-background';
 
 export const LandingPage = () => {
   const { user } = useAuthSession();
@@ -30,11 +31,24 @@ export const LandingPage = () => {
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-black via-gray-900 to-[#0A0A0A]">
-      {/* Background elements */}
+      {/* Background elements with waves */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 -left-1/4 w-[500px] h-[500px] bg-siso-red/10 rounded-full filter blur-[100px] animate-float-slow"></div>
         <div className="absolute bottom-1/4 -right-1/4 w-[500px] h-[500px] bg-siso-orange/10 rounded-full filter blur-[100px] animate-float-slower"></div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-siso-red/5 rounded-full filter blur-[120px]"></div>
+        <Waves 
+          lineColor="rgba(255, 87, 34, 0.1)"
+          backgroundColor="transparent"
+          waveSpeedX={0.015}
+          waveSpeedY={0.01}
+          waveAmpX={50}
+          waveAmpY={25}
+          friction={0.9}
+          tension={0.01}
+          maxCursorMove={150}
+          xGap={15}
+          yGap={40}
+        />
       </div>
 
       {/* Main Content */}
