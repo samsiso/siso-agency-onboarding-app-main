@@ -35,13 +35,6 @@ export const LandingPage = () => {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-siso-red/5 rounded-full filter blur-[120px]"></div>
       </div>
 
-      {/* Light boxes in background */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-20 left-20 w-32 h-32 bg-white/5 rounded-lg backdrop-blur-sm border border-white/10 animate-float"></div>
-        <div className="absolute top-40 right-40 w-24 h-24 bg-orange-500/5 rounded-lg backdrop-blur-sm border border-orange-500/10 animate-float-delayed"></div>
-        <div className="absolute bottom-32 left-1/3 w-40 h-40 bg-siso-red/5 rounded-lg backdrop-blur-sm border border-siso-red/10 animate-float"></div>
-      </div>
-
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-black/50 backdrop-blur-sm border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -68,7 +61,7 @@ export const LandingPage = () => {
 
       {/* Hero Section */}
       <div className="relative pt-32 pb-16">
-        <div className="text-center space-y-8 relative z-10">
+        <div className="text-center relative z-10">
           {/* Stats Bar */}
           <div className="flex justify-center gap-8 mb-12">
             <div className="text-gray-300 flex items-center gap-2">
@@ -81,24 +74,20 @@ export const LandingPage = () => {
             </div>
           </div>
 
-          {/* Main Headline */}
+          {/* Main Content */}
           <div className="max-w-5xl mx-auto px-4">
             <h1 className="text-5xl md:text-7xl font-bold tracking-tight animate-fade-in">
               <span className="text-white">Transform Your Agency with </span>
-              <span className="title-glow">
-                AI-Powered
-              </span>
+              <span className="title-glow">AI-Powered</span>
               <br />
               <span className="text-white">Resources</span>
             </h1>
 
-            {/* Subheadline */}
             <p className="mt-6 max-w-2xl mx-auto text-xl text-gray-400 animate-fade-in">
               Join our AI-powered resource hub and supercharge your agency's growth. 
               Access cutting-edge tools, education, and networking—all in one place.
             </p>
 
-            {/* CTA Buttons */}
             <div className="flex justify-center gap-6 pt-8 animate-fade-in">
               <button
                 onClick={handleSignInClick}
@@ -156,7 +145,7 @@ export const LandingPage = () => {
       <TestimonialSection />
 
       {/* Final CTA Section */}
-      <div className="text-center py-24 px-4">
+      <div className="text-center py-24">
         <h2 className="text-4xl font-bold text-white mb-4">Ready to Transform Your Business?</h2>
         <p className="text-gray-400 mb-8">Join thousands of successful agencies already using our platform</p>
         <button
