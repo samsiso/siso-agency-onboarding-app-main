@@ -1,39 +1,76 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SocialMediaModal } from '@/components/auth/SocialMediaModal';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Waves } from '@/components/ui/waves-background';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Users, ArrowRight, Linkedin, Globe, Youtube, Instagram, Sparkles, Brain, Bot } from 'lucide-react';
 
 export default function SocialOnboarding() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null);
+  const [linkedinUrl, setLinkedinUrl] = useState('');
+  const [websiteUrl, setWebsiteUrl] = useState('');
+  const [youtubeUrl, setYoutubeUrl] = useState('');
+  const [instagramUrl, setInstagramUrl] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSkip = async () => {
+  const getFilledLinksCount = () => {
+    return [linkedinUrl, websiteUrl, youtubeUrl, instagramUrl]
+      .filter(url => url.trim().length > 0).length;
+  };
+
+  const handleSubmit = async () => {
     try {
+      setIsSubmitting(true);
+      
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user?.id) {
+        throw new Error('No user ID found');
+      }
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          linkedin_url: linkedinUrl || null,
+          website_url: websiteUrl || null,
+          youtube_url: youtubeUrl || null,
+          instagram_url: instagramUrl || null,
+          has_completed_social_info: true,
+          social_info_completed_at: new Date().toISOString()
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
       toast({
-        title: "Step skipped",
-        description: "You can always add your social media links later in your profile.",
+        title: "Profile updated successfully",
+        description: "Thank you for providing your social media information!",
       });
-      navigate('/onboarding/chat');
+      
+      // Navigate to the next step (you can change this to the appropriate route)
+      navigate('/tools');
     } catch (error: any) {
-      console.error('Error skipping step:', error);
+      console.error('Error updating profile:', error);
       toast({
         variant: "destructive",
-        title: "Error skipping step",
+        title: "Error updating profile",
         description: error.message,
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-    navigate('/onboarding/chat');
+  const handleSkip = () => {
+    toast({
+      title: "Step skipped",
+      description: "You can always add your social media links later in your profile.",
+    });
+    navigate('/tools');
   };
 
   return (
@@ -96,22 +133,70 @@ export default function SocialOnboarding() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div onClick={() => setIsModalOpen(true)} className="flex items-center space-x-3 p-4 rounded-lg bg-[#0A66C2]/10 hover:bg-[#0A66C2]/20 transition-all duration-300 cursor-pointer hover:scale-105">
-              <Linkedin className="w-6 h-6 text-[#0A66C2]" />
-              <span className="text-siso-text">LinkedIn</span>
+          <div className="space-y-4">
+            <div className="relative group">
+              <div className="flex items-center gap-2">
+                <Linkedin className="w-5 h-5 text-[#0A66C2] transition-colors group-hover:text-[#0A66C2]/80" />
+                <Input
+                  placeholder="LinkedIn URL"
+                  value={linkedinUrl}
+                  onChange={(e) => setLinkedinUrl(e.target.value)}
+                  className="bg-siso-bg-alt border-siso-border text-siso-text flex-1 transition-all focus:ring-1 focus:ring-siso-red/50"
+                />
+              </div>
+              <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-siso-red/10 to-siso-orange/10 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
             </div>
-            <div onClick={() => setIsModalOpen(true)} className="flex items-center space-x-3 p-4 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 transition-all duration-300 cursor-pointer hover:scale-105">
-              <Globe className="w-6 h-6 text-emerald-500" />
-              <span className="text-siso-text">Website</span>
+            
+            <div className="relative group">
+              <div className="flex items-center gap-2">
+                <Globe className="w-5 h-5 text-emerald-500 transition-colors group-hover:text-emerald-400" />
+                <Input
+                  placeholder="Website URL"
+                  value={websiteUrl}
+                  onChange={(e) => setWebsiteUrl(e.target.value)}
+                  className="bg-siso-bg-alt border-siso-border text-siso-text flex-1 transition-all focus:ring-1 focus:ring-siso-red/50"
+                />
+              </div>
+              <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-siso-red/10 to-siso-orange/10 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
             </div>
-            <div onClick={() => setIsModalOpen(true)} className="flex items-center space-x-3 p-4 rounded-lg bg-red-600/10 hover:bg-red-600/20 transition-all duration-300 cursor-pointer hover:scale-105">
-              <Youtube className="w-6 h-6 text-red-600" />
-              <span className="text-siso-text">YouTube</span>
+            
+            <div className="relative group">
+              <div className="flex items-center gap-2">
+                <Youtube className="w-5 h-5 text-red-600 transition-colors group-hover:text-red-500" />
+                <Input
+                  placeholder="YouTube URL"
+                  value={youtubeUrl}
+                  onChange={(e) => setYoutubeUrl(e.target.value)}
+                  className="bg-siso-bg-alt border-siso-border text-siso-text flex-1 transition-all focus:ring-1 focus:ring-siso-red/50"
+                />
+              </div>
+              <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-siso-red/10 to-siso-orange/10 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
             </div>
-            <div onClick={() => setIsModalOpen(true)} className="flex items-center space-x-3 p-4 rounded-lg bg-pink-500/10 hover:bg-pink-500/20 transition-all duration-300 cursor-pointer hover:scale-105">
-              <Instagram className="w-6 h-6 text-pink-500" />
-              <span className="text-siso-text">Instagram</span>
+            
+            <div className="relative group">
+              <div className="flex items-center gap-2">
+                <Instagram className="w-5 h-5 text-pink-500 transition-colors group-hover:text-pink-400" />
+                <Input
+                  placeholder="Instagram URL"
+                  value={instagramUrl}
+                  onChange={(e) => setInstagramUrl(e.target.value)}
+                  className="bg-siso-bg-alt border-siso-border text-siso-text flex-1 transition-all focus:ring-1 focus:ring-siso-red/50"
+                />
+              </div>
+              <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-siso-red/10 to-siso-orange/10 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
+            </div>
+
+            <div className="mt-2">
+              <div className="flex justify-between text-sm text-siso-text/70 mb-1">
+                <span>Profile completion</span>
+                <span>{Math.min(25 * getFilledLinksCount(), 100)}%</span>
+              </div>
+              <div className="h-2 bg-siso-bg-alt rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-siso-red to-siso-orange transition-all duration-500 ease-out"
+                  style={{ width: `${Math.min(25 * getFilledLinksCount(), 100)}%` }}
+                />
+              </div>
             </div>
           </div>
 
@@ -121,10 +206,11 @@ export default function SocialOnboarding() {
 
           <div className="flex flex-col items-center space-y-4">
             <Button
-              onClick={() => setIsModalOpen(true)}
+              onClick={handleSubmit}
+              disabled={isSubmitting}
               className="w-full bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-white"
             >
-              Connect Profiles
+              {isSubmitting ? "Saving..." : "Continue"}
               <ArrowRight className="ml-2 w-4 h-4" />
             </Button>
             <Button
@@ -137,13 +223,6 @@ export default function SocialOnboarding() {
           </div>
         </div>
       </Card>
-
-      <SocialMediaModal
-        isOpen={isModalOpen}
-        onClose={handleModalClose}
-        onSkip={handleSkip}
-        userId={userId || 'demo-user'}
-      />
     </div>
   );
 }
