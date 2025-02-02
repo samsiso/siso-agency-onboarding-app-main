@@ -20,6 +20,7 @@ import { TailwindCSSIcon } from '@/components/ui/icons/TailwindCSSIcon';
 import { NextjsIcon } from '@/components/ui/icons/NextjsIcon';
 import { UpstashIcon } from '@/components/ui/icons/UpstashIcon';
 import { StripeIcon } from '@/components/ui/icons/StripeIcon';
+import { Case } from '@/components/ui/cases-with-infinite-scroll';
 
 const allLogos = [
   { name: "OpenAI", id: 1, img: OpenAIIconBlack },
@@ -83,6 +84,11 @@ export const LandingPage = () => {
         {/* Hero Section */}
         <section id="hero" className="min-h-screen">
           <Hero />
+        </section>
+
+        {/* Infinite Scroll Case Section */}
+        <section className="relative py-20">
+          <Case />
         </section>
 
         {/* Logo Carousel Section */}
