@@ -104,7 +104,6 @@ const Feature108 = ({
   ],
 }: Feature108Props) => {
   const [activeTab, setActiveTab] = useState(tabs[0].value);
-
   const activeContent = tabs.find(tab => tab.value === activeTab)?.content;
 
   return (
@@ -112,7 +111,8 @@ const Feature108 = ({
       <div className="absolute inset-0 bg-gradient-radial from-siso-orange/10 via-transparent to-transparent opacity-30" />
 
       <div className="relative">
-        <div className="container flex flex-col items-center gap-4 text-center">
+        {/* Center content with adjusted margins */}
+        <div className="container max-w-7xl mx-auto px-6 lg:px-8 flex flex-col items-center gap-4 text-center">
           <Badge variant="outline" className="bg-black/50 backdrop-blur-sm border-siso-orange/20">
             {badge}
           </Badge>
@@ -125,7 +125,8 @@ const Feature108 = ({
         </div>
 
         <div className="mt-12">
-          <div className="container">
+          {/* Adjust container width and padding */}
+          <div className="container max-w-7xl mx-auto px-6 lg:px-8">
             {/* Tab Triggers */}
             <div className="flex flex-wrap items-center justify-center gap-4 sm:flex-row md:gap-8 mb-8">
               {tabs.map((tab) => (
@@ -144,9 +145,9 @@ const Feature108 = ({
               ))}
             </div>
 
-            {/* Content Display */}
+            {/* Content Display with adjusted spacing */}
             {activeContent && (
-              <div className="mt-8">
+              <div className="mt-8 px-4">
                 <div className="rounded-lg border border-siso-border bg-black/90 backdrop-blur-sm p-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                     <div className="flex flex-col gap-4">
