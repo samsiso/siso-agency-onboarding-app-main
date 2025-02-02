@@ -1,4 +1,4 @@
-import { BookOpen, Users, BarChart, Zap, Newspaper } from "lucide-react";
+import { BookOpen, Users, BarChart, Zap, Newspaper, Globe } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -111,18 +111,26 @@ const Feature108 = ({
       <div className="absolute inset-0 bg-gradient-radial from-siso-orange/10 via-transparent to-transparent opacity-30" />
 
       <div className="relative">
-        {/* Center content with adjusted margins */}
-        <div className="container max-w-7xl mx-auto px-6 lg:px-8 flex flex-col items-center gap-4 text-center">
-          <Badge variant="outline" className="bg-black/50 backdrop-blur-sm border-siso-orange/20">
-            {badge}
-          </Badge>
-          <h2 className="max-w-2xl text-3xl font-bold md:text-4xl lg:text-5xl bg-gradient-to-r from-siso-orange to-siso-red text-transparent bg-clip-text">
-            {heading}
-          </h2>
-          <p className="max-w-xl text-lg text-siso-text/80">
-            {description}
-          </p>
-        </div>
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="flex flex-col items-center justify-center space-y-4 text-center">
+            <Badge className="bg-siso-bg-alt text-siso-text px-4 py-2 rounded-full">
+              {badge}
+            </Badge>
+            
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-siso-text-bold">
+              {heading}
+            </h2>
+
+            {/* Added subtitle with Globe icon */}
+            <div className="flex items-center gap-2 text-siso-text/80 text-lg">
+              <Globe className="w-5 h-5" />
+              <p>Powered by thousands of innovators worldwide</p>
+            </div>
+
+            <p className="mx-auto max-w-[700px] text-siso-text/80 md:text-xl">
+              {description}
+            </p>
+          </div>
 
         <div className="mt-12">
           {/* Adjust container width and padding */}
@@ -179,6 +187,8 @@ const Feature108 = ({
               </div>
             )}
           </div>
+        </div>
+      </div>
         </div>
       </div>
     </section>
