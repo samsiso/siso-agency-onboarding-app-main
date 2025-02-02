@@ -34,7 +34,21 @@ const Footer = () => {
 
       <div className="relative container mx-auto px-4 py-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Left Side - CTA and Social Links */}
+          {/* Left Side - 3D Scene */}
+          <Card className="w-full h-[400px] bg-black/40 backdrop-blur-sm relative overflow-hidden">
+            <Spotlight
+              className="-top-40 left-0 md:left-60 md:-top-20"
+              size={400}
+            />
+            <div className="relative h-full">
+              <SplineScene 
+                scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+                className="w-full h-full"
+              />
+            </div>
+          </Card>
+
+          {/* Right Side - CTA and Social Links */}
           <div className="text-center lg:text-left">
             <h3 className="text-4xl md:text-5xl font-bold text-white mb-6 font-display tracking-tight">
               Ready to transform your business with AI?
@@ -66,20 +80,6 @@ const Footer = () => {
               ))}
             </div>
           </div>
-
-          {/* Right Side - 3D Scene */}
-          <Card className="w-full h-[400px] bg-black/[0.96] relative overflow-hidden">
-            <Spotlight
-              className="-top-40 left-0 md:left-60 md:-top-20"
-              size={400}
-            />
-            <div className="relative h-full">
-              <SplineScene 
-                scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-                className="w-full h-full"
-              />
-            </div>
-          </Card>
         </div>
 
         {/* Divider */}
