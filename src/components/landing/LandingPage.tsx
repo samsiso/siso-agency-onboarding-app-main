@@ -15,6 +15,11 @@ export const LandingPage = () => {
 
   return (
     <div className="min-h-screen w-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-siso-bg via-siso-bg/95 to-siso-bg/90 relative">
+      {/* Top Right Auth Button */}
+      <div className="fixed top-4 right-4 z-[100]">
+        <AuthButton />
+      </div>
+
       {/* Hero Section */}
       <div className="max-w-4xl mx-auto text-center space-y-8 relative">
         <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold">
@@ -64,7 +69,7 @@ export const LandingPage = () => {
           <p className="text-lg text-siso-text/90 mb-4">
             Get started by signing in with your Google account
           </p>
-          <div className="relative pointer-events-auto" style={{ zIndex: 9999 }}>
+          <div className="relative z-[100] pointer-events-auto">
             <AuthButton />
           </div>
         </div>
