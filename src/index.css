@@ -33,15 +33,15 @@
   }
 
   html {
-    @apply scroll-smooth;
+    @apply scroll-smooth h-full;
   }
 
   html, body, #root {
-    @apply min-h-screen bg-gradient-to-b from-gray-900 to-black text-gray-100;
+    @apply min-h-screen h-full w-full bg-gradient-to-b from-gray-900 to-black text-gray-100 overflow-x-hidden;
   }
 
   body {
-    @apply font-['Inter'] antialiased;
+    @apply font-['Inter'] antialiased h-full;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

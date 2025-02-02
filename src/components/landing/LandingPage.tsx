@@ -7,7 +7,6 @@ export const LandingPage = () => {
   const { user } = useAuthSession();
   const navigate = useNavigate();
 
-  // [Analysis] Redirect authenticated users to main app
   useEffect(() => {
     if (user) {
       navigate('/app');
@@ -15,7 +14,7 @@ export const LandingPage = () => {
   }, [user, navigate]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-siso-bg via-siso-bg/95 to-siso-bg/90 flex flex-col items-center justify-center p-4">
+    <div className="h-screen w-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-siso-bg via-siso-bg/95 to-siso-bg/90">
       {/* Hero Section */}
       <div className="max-w-4xl mx-auto text-center space-y-8">
         <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold">
