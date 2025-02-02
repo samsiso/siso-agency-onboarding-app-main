@@ -1,11 +1,14 @@
-import { Case } from "@/components/ui/cases-with-infinite-scroll";
+import React from "react";
+import { FeaturesSectionWithHoverEffects } from "@/components/blocks/feature-section-with-hover-effects";
 
-function CaseDemo() {
+function FeaturesSectionWithHoverEffectsDemo() {
   return (
-    <div className="block">
-      <Case />
+    <div className="min-h-screen w-full">
+      <div className="absolute top-0 left-0 w-full">
+        <FeaturesSectionWithHoverEffects />
+      </div>
     </div>
   );
 }
 
-export { CaseDemo };
+export { FeaturesSectionWithHoverEffectsDemo };
