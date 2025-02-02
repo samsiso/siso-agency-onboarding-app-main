@@ -18,6 +18,13 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+        display: ['Inter', 'sans-serif'],
+      },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(circle at bottom center, var(--tw-gradient-stops))',
+      },
       colors: {
         siso: {
           bg: "#121212",

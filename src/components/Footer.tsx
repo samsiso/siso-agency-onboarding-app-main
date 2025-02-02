@@ -10,7 +10,10 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="relative w-full bg-gradient-to-b from-black via-gray-900/80 to-orange-950/30">
+    <footer className="relative w-full">
+      {/* Radial Gradient Background */}
+      <div className="absolute inset-0 bg-gradient-radial from-orange-950/30 via-gray-900/80 to-black pointer-events-none" />
+
       {/* Grid Background Pattern */}
       <div 
         className="absolute inset-0 opacity-[0.03]" 
@@ -31,15 +34,15 @@ const Footer = () => {
 
         {/* CTA Section */}
         <div className="text-center mb-12">
-          <h3 className="text-4xl md:text-5xl font-bold text-white mb-6">
+          <h3 className="text-4xl md:text-5xl font-bold text-white mb-6 font-display tracking-tight">
             Ready to transform your business with AI?
           </h3>
-          <p className="text-gray-300 text-lg mb-10 max-w-2xl mx-auto">
+          <p className="text-gray-300 text-lg mb-10 max-w-2xl mx-auto font-light">
             Connect with our experts today and discover how our innovative solutions can drive your success.
           </p>
           <Button 
             className="bg-gradient-to-r from-orange-500 to-orange-600 hover:opacity-90 transform hover:scale-105 
-              transition-all duration-300 text-white px-8 py-6 rounded-lg font-medium text-lg group"
+              transition-all duration-300 text-white px-8 py-6 rounded-lg font-medium text-lg group shadow-lg shadow-orange-500/20"
           >
             Start Free Trial
             <span className="inline-block transition-transform group-hover:translate-x-1 ml-2">
@@ -56,7 +59,8 @@ const Footer = () => {
               href={social.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-gray-950/80 p-4 rounded-full hover:bg-gray-900 transition-all duration-300 group"
+              className="bg-gray-950/80 p-4 rounded-full hover:bg-gray-900 transition-all duration-300 group
+                hover:shadow-lg hover:shadow-orange-500/10"
               aria-label={social.label}
             >
               <social.icon className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors duration-300" />
@@ -68,7 +72,7 @@ const Footer = () => {
         <div className="w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent mb-8" />
 
         {/* Copyright */}
-        <div className="text-gray-500 text-sm mb-16">
+        <div className="text-gray-500 text-sm mb-16 font-light">
           ©SISO 2024, All rights reserved.
         </div>
 
