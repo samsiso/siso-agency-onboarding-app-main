@@ -21,15 +21,6 @@ const testimonials = [
     audioReview: true
   },
   {
-    name: "Lisa M.",
-    role: "Operations Manager",
-    company: "Tech Solutions",
-    image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
-    quote: "The educational resources and community support have helped us scale our agency beyond expectations.",
-    linkedinUrl: "https://linkedin.com",
-    videoUrl: "https://www.youtube.com/embed/jNQXAC9IVRw?autoplay=1&mute=1"
-  },
-  {
     name: "David W.",
     role: "Marketing Strategist",
     company: "Innovate Digital",
@@ -46,15 +37,6 @@ const testimonials = [
     quote: "The level of personalization we achieve with Lovable is incredible. Our engagement rates have skyrocketed.",
     linkedinUrl: "https://linkedin.com",
     videoUrl: "https://www.youtube.com/embed/y8Yv4pnO7qc?autoplay=1&mute=1"
-  },
-  {
-    name: "James H.",
-    role: "CEO",
-    company: "Growth Accelerator",
-    image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
-    quote: "Since implementing Lovable, we've seen a 250% increase in client satisfaction and retention rates.",
-    linkedinUrl: "https://linkedin.com",
-    audioReview: true
   },
   {
     name: "Christina M.",
