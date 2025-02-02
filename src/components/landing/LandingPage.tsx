@@ -26,18 +26,31 @@ export const LandingPage = () => {
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-black via-gray-900 to-orange-900/20">
-      {/* Sign In Button - Positioned in top right */}
-      <div className="fixed top-4 right-4 z-[100]">
-        <button
-          onClick={handleSignInClick}
-          className="bg-white text-black hover:bg-gray-100 active:bg-gray-200 px-6 py-3 rounded-lg font-medium transition-all duration-200 hover:scale-105"
-        >
-          Sign In to Hub
-        </button>
-      </div>
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-black/50 backdrop-blur-sm border-b border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center gap-8">
+              <img src="/logo.png" alt="SISO" className="h-8 w-8" />
+              <div className="hidden md:flex items-center gap-6">
+                <a href="#features" className="text-gray-300 hover:text-white transition-colors">Features</a>
+                <a href="#tools" className="text-gray-300 hover:text-white transition-colors">Tools</a>
+                <a href="#resources" className="text-gray-300 hover:text-white transition-colors">Resources</a>
+                <a href="#education" className="text-gray-300 hover:text-white transition-colors">Education</a>
+              </div>
+            </div>
+            <button
+              onClick={handleSignInClick}
+              className="bg-white text-black hover:bg-gray-100 active:bg-gray-200 px-6 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105"
+            >
+              Sign In to Hub
+            </button>
+          </div>
+        </div>
+      </nav>
 
       {/* Hero Section */}
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-16">
         <div className="text-center space-y-8 relative z-10">
           {/* Stats Bar */}
           <div className="flex justify-center gap-8 mb-12">
@@ -115,6 +128,60 @@ export const LandingPage = () => {
                 <p className="text-gray-400">{feature.desc}</p>
               </div>
             ))}
+          </div>
+
+          {/* Testimonials Section */}
+          <div className="mt-32">
+            <h2 className="text-4xl font-bold text-white mb-4">What Our Members Say</h2>
+            <p className="text-gray-400 mb-12">Real stories from businesses that have transformed with our resources</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                {
+                  name: "Sarah K.",
+                  role: "Digital Marketing Director",
+                  company: "Growth Co",
+                  text: "The AI tools have revolutionized how we approach client campaigns. Our efficiency has increased by 300%."
+                },
+                {
+                  name: "Michael R.",
+                  role: "Agency Owner",
+                  company: "Digital Spark",
+                  text: "SISO's resource hub has been a game-changer. The ROI from implementing these tools has been incredible."
+                },
+                {
+                  name: "Lisa M.",
+                  role: "Operations Manager",
+                  company: "Tech Solutions",
+                  text: "The educational resources and community support have helped us scale our agency beyond expectations."
+                }
+              ].map((testimonial, i) => (
+                <div key={i} className="p-6 rounded-xl bg-white/5 backdrop-blur-sm border border-gray-800">
+                  <p className="text-gray-300 mb-4">"{testimonial.text}"</p>
+                  <div className="flex items-center gap-4">
+                    <div className="h-12 w-12 rounded-full bg-gradient-to-br from-siso-orange to-siso-red" />
+                    <div>
+                      <h4 className="text-white font-medium">{testimonial.name}</h4>
+                      <p className="text-gray-400 text-sm">{testimonial.role}</p>
+                      <p className="text-gray-400 text-sm">{testimonial.company}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Final CTA Section */}
+          <div className="mt-32 mb-16">
+            <h2 className="text-4xl font-bold text-white mb-4">Ready to Transform Your Business?</h2>
+            <p className="text-gray-400 mb-8">Join thousands of successful agencies already using our platform</p>
+            <button
+              onClick={handleSignInClick}
+              className="bg-gradient-to-r from-siso-orange to-siso-red text-white px-12 py-4 rounded-lg font-medium text-lg
+                hover:opacity-90 transition-all duration-200 hover:scale-105"
+            >
+              Get Started Now
+            </button>
           </div>
         </div>
 
