@@ -128,15 +128,17 @@ export function LogoCarousel({ columnCount = 2, logos }: LogoCarouselProps) {
   }, [logos, columnCount])
 
   return (
-    <div className="flex space-x-4">
-      {logoSets.map((logos, index) => (
-        <LogoColumn
-          key={index}
-          logos={logos}
-          index={index}
-          currentTime={currentTime}
-        />
-      ))}
+    <div className="w-full flex justify-center items-center">
+      <div className="flex justify-center items-center gap-8 md:gap-12 lg:gap-16">
+        {logoSets.map((logos, index) => (
+          <LogoColumn
+            key={index}
+            logos={logos}
+            index={index}
+            currentTime={currentTime}
+          />
+        ))}
+      </div>
     </div>
   )
 }
