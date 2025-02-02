@@ -71,7 +71,9 @@ export const SocialMediaModal = ({ isOpen, onClose, onSkip, userId }: SocialMedi
       <DialogContent className="sm:max-w-[425px] bg-siso-bg border-siso-border">
         <DialogHeader>
           <div className="absolute -top-10 left-0 w-full flex justify-center text-siso-text/70">
-            <span>Step 2 of 3</span>
+            <span className="px-4 py-1 rounded-full bg-siso-bg-alt border border-siso-border text-sm">
+              Step 2 of 3
+            </span>
           </div>
           <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent">
             Enhance Your Profile
@@ -133,7 +135,6 @@ export const SocialMediaModal = ({ isOpen, onClose, onSkip, userId }: SocialMedi
             <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-siso-red/10 to-siso-orange/10 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
           </div>
 
-          {/* Progress indicator */}
           <div className="mt-2">
             <div className="flex justify-between text-sm text-siso-text/70 mb-1">
               <span>Profile completion</span>
