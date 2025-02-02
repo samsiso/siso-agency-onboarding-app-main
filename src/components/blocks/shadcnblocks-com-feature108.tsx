@@ -1,7 +1,7 @@
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { BookOpen, Users, BarChart, Zap, Newspaper } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 interface TabContent {
   badge: string;
@@ -103,6 +103,10 @@ const Feature108 = ({
     },
   ],
 }: Feature108Props) => {
+  const [activeTab, setActiveTab] = useState(tabs[0].value);
+
+  const activeContent = tabs.find(tab => tab.value === activeTab)?.content;
+
   return (
     <section className="relative py-24">
       <div className="absolute inset-0 bg-gradient-radial from-siso-orange/10 via-transparent to-transparent opacity-30" />
@@ -121,48 +125,58 @@ const Feature108 = ({
         </div>
 
         <div className="mt-12">
-          <div className="container flex flex-wrap items-center justify-center gap-4 sm:flex-row md:gap-8">
-            {tabs.map((tab) => (
-              <Popover key={tab.value}>
-                <PopoverTrigger asChild>
-                  <button className="flex items-center gap-2 rounded-xl px-6 py-4 text-sm font-semibold 
-                    text-siso-text transition-all duration-300 hover:text-siso-text-bold
-                    hover:bg-gradient-to-r hover:from-siso-red/20 hover:to-siso-orange/20
-                    hover:shadow-lg hover:shadow-siso-red/10">
-                    {tab.icon} {tab.label}
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent className="w-[400px] p-0" sideOffset={10}>
-                  <div className="rounded-lg border border-siso-border bg-black/90 backdrop-blur-sm p-6">
+          <div className="container">
+            {/* Tab Triggers */}
+            <div className="flex flex-wrap items-center justify-center gap-4 sm:flex-row md:gap-8 mb-8">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.value}
+                  onClick={() => setActiveTab(tab.value)}
+                  className={`flex items-center gap-2 rounded-xl px-6 py-4 text-sm font-semibold 
+                    transition-all duration-300
+                    ${activeTab === tab.value 
+                      ? 'text-siso-text-bold bg-gradient-to-r from-siso-red/20 to-siso-orange/20 shadow-lg shadow-siso-red/10' 
+                      : 'text-siso-text hover:text-siso-text-bold hover:bg-gradient-to-r hover:from-siso-red/20 hover:to-siso-orange/20'
+                    }`}
+                >
+                  {tab.icon} {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Content Display */}
+            {activeContent && (
+              <div className="mt-8">
+                <div className="rounded-lg border border-siso-border bg-black/90 backdrop-blur-sm p-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                     <div className="flex flex-col gap-4">
                       <Badge variant="outline" className="w-fit bg-black/50 backdrop-blur-sm border-siso-orange/20">
-                        {tab.content.badge}
+                        {activeContent.badge}
                       </Badge>
-                      <h3 className="text-xl font-bold bg-gradient-to-r from-siso-orange to-siso-red text-transparent bg-clip-text">
-                        {tab.content.title}
+                      <h3 className="text-2xl font-bold bg-gradient-to-r from-siso-orange to-siso-red text-transparent bg-clip-text">
+                        {activeContent.title}
                       </h3>
-                      <p className="text-sm text-siso-text/80">
-                        {tab.content.description}
+                      <p className="text-siso-text/80">
+                        {activeContent.description}
                       </p>
-                      <div className="w-full h-[150px] rounded-lg overflow-hidden shadow-xl shadow-black/20">
-                        <img
-                          src={tab.content.imageSrc}
-                          alt={tab.content.imageAlt}
-                          className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
-                        />
-                      </div>
                       <Button 
-                        size="sm"
                         className="w-fit bg-gradient-to-r from-siso-red to-siso-orange hover:from-siso-red/90 hover:to-siso-orange/90 
                           text-white shadow-lg shadow-siso-red/20 transition-all duration-300 hover:shadow-xl hover:shadow-siso-orange/30"
                       >
-                        {tab.content.buttonText}
+                        {activeContent.buttonText}
                       </Button>
                     </div>
+                    <div className="w-full h-[300px] rounded-lg overflow-hidden shadow-xl shadow-black/20">
+                      <img
+                        src={activeContent.imageSrc}
+                        alt={activeContent.imageAlt}
+                        className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
+                      />
+                    </div>
                   </div>
-                </PopoverContent>
-              </Popover>
-            ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
