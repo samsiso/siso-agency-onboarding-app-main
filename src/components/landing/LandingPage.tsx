@@ -27,9 +27,9 @@ export const LandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen w-full relative bg-gradient-to-b from-black via-gray-900 to-orange-900/20">
+    <div className="min-h-screen w-full bg-gradient-to-b from-black via-gray-900 to-orange-900/20">
       {/* Background elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 -left-1/4 w-[500px] h-[500px] bg-orange-500/10 rounded-full filter blur-[100px] animate-float-slow"></div>
         <div className="absolute bottom-1/4 -right-1/4 w-[500px] h-[500px] bg-siso-orange/10 rounded-full filter blur-[100px] animate-float-slower"></div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-siso-red/5 rounded-full filter blur-[120px]"></div>
@@ -60,9 +60,9 @@ export const LandingPage = () => {
       </nav>
 
       {/* Main Content */}
-      <main className="relative">
+      <div className="relative z-10">
         {/* Hero Section */}
-        <section className="relative pt-32 pb-16">
+        <section className="pt-32 pb-16">
           <div className="text-center">
             {/* Stats Bar */}
             <div className="flex justify-center gap-8 mb-12">
@@ -160,7 +160,7 @@ export const LandingPage = () => {
             Get Started Now
           </button>
         </section>
-      </main>
+      </div>
     </div>
   );
 };

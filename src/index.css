@@ -33,18 +33,18 @@
   }
 
   html {
-    @apply scroll-smooth h-full;
-  }
-
-  html, body, #root {
-    @apply min-h-screen h-full w-full bg-gradient-to-b from-gray-900 to-black text-gray-100 overflow-x-hidden;
+    @apply scroll-smooth;
   }
 
   body {
-    @apply font-['Inter'] antialiased h-full;
+    @apply font-['Inter'] antialiased bg-gradient-to-b from-gray-900 to-black text-gray-100;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  #root {
+    @apply min-h-screen;
   }
 
   img {
