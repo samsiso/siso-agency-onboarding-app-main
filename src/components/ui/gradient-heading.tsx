@@ -8,14 +8,13 @@ const headingVariants = cva(
   {
     variants: {
       variant: {
-        default:
-          "bg-gradient-to-t from-neutral-700 to-neutral-800 dark:from-stone-200 dark:to-neutral-200",
-        pink: "bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500",
-        light: "bg-gradient-to-r from-blue-400 via-teal-400 to-blue-400",
-        secondary: "bg-gradient-to-r from-violet-500 via-fuchsia-500 to-violet-500",
-        rainbow: "bg-gradient-to-r from-[#FF5722] via-[#FFA726] via-[#FFD54F] via-[#4CAF50] to-[#2196F3]",
-        sunset: "bg-gradient-to-r from-orange-500 via-rose-500 to-purple-500",
-        ocean: "bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500",
+        default: "bg-gradient-to-r from-siso-red via-siso-orange to-siso-red",
+        pink: "bg-gradient-to-r from-[#9b87f5] via-[#D946EF] to-[#9b87f5]",
+        light: "bg-gradient-to-r from-[#FEC6A1] via-[#F97316] to-[#FEC6A1]",
+        secondary: "bg-gradient-to-r from-[#7E69AB] via-[#6E59A5] to-[#7E69AB]",
+        rainbow: "bg-gradient-to-r from-siso-red via-siso-orange via-[#9b87f5] via-[#D946EF] to-siso-red",
+        sunset: "bg-gradient-to-r from-siso-orange via-siso-red to-[#9b87f5]",
+        ocean: "bg-gradient-to-r from-[#8B5CF6] via-[#D946EF] to-[#8B5CF6]",
       },
       size: {
         default: "text-2xl sm:text-3xl lg:text-4xl",
