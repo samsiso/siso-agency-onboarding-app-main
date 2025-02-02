@@ -89,12 +89,12 @@ export function TestimonialSection() {
           </p>
         </div>
 
-        {/* Testimonials Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* Masonry Grid */}
+        <div className="columns-1 md:columns-2 lg:columns-3 gap-4">
           {testimonials.map((testimonial, index) => (
             <div
               key={testimonial.name}
-              className="animate-fade-in"
+              className="break-inside-avoid mb-4 animate-fade-in"
               style={{ animationDelay: `${index * 150}ms` }}
             >
               <TestimonialCard {...testimonial} />

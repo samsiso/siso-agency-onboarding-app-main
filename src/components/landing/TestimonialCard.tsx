@@ -31,9 +31,8 @@ export function TestimonialCard({
 
   return (
     <div 
-      className={`group relative p-4 rounded-xl backdrop-blur-sm border-2 border-siso-orange/40 
-        bg-black/30 transition-all duration-300 hover:scale-105 hover:border-siso-orange
-        ${videoUrl ? 'h-full' : 'h-auto'}`}
+      className="group relative p-4 rounded-xl backdrop-blur-sm border-2 border-siso-orange/40 
+        bg-black/30 transition-all duration-300 hover:scale-105 hover:border-siso-orange"
     >
       {/* Profile Section */}
       <div className="flex items-center gap-3 mb-3">
