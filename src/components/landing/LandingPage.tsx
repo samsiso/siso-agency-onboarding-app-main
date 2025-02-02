@@ -21,6 +21,7 @@ import { StripeIcon } from '@/components/ui/icons/StripeIcon';
 import { Case } from '@/components/ui/cases-with-infinite-scroll';
 import { StackedCircularFooter } from '@/components/ui/stacked-circular-footer';
 import { RainbowButton } from '@/components/ui/rainbow-button';
+import { PricingCard } from '@/components/ui/pricing-card';
 
 const allLogos = [
   { name: "OpenAI", id: 1, img: OpenAIIconBlack },
@@ -115,7 +116,34 @@ export const LandingPage = () => {
 
         {/* Pricing Section */}
         <section id="pricing" className="min-h-screen py-20">
-          <TierSection />
+          <PricingCard
+            title="Enterprise AI Suite"
+            description="Complete AI transformation toolkit for established agencies"
+            price={999}
+            originalPrice={1999}
+            features={[
+              {
+                title: "AI Integration Features",
+                items: [
+                  "Custom AI Model Development",
+                  "Advanced Automation Workflows",
+                  "Real-time AI Analytics",
+                  "Multi-platform Integration",
+                ],
+              },
+              {
+                title: "Business Benefits",
+                items: [
+                  "24/7 Priority Support",
+                  "Dedicated Success Manager",
+                  "Custom Development Support",
+                  "Strategic AI Consulting",
+                ],
+              },
+            ]}
+            buttonText="Start Enterprise Trial"
+            onButtonClick={handleGetStarted}
+          />
         </section>
 
         {/* Testimonials Section */}
