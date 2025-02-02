@@ -3,7 +3,6 @@ import { useAuthSession } from '@/hooks/useAuthSession';
 import { useEffect } from 'react';
 import { TierSection } from './TierSection';
 import { TestimonialSection } from './TestimonialSection';
-import Footer from '@/components/Footer';
 import { Hero } from '@/components/ui/animated-hero';
 import { Waves } from '@/components/ui/waves-background';
 import { ScrollNav } from '@/components/ui/scroll-nav';
@@ -20,6 +19,7 @@ import { NextjsIcon } from '@/components/ui/icons/NextjsIcon';
 import { UpstashIcon } from '@/components/ui/icons/UpstashIcon';
 import { StripeIcon } from '@/components/ui/icons/StripeIcon';
 import { Case } from '@/components/ui/cases-with-infinite-scroll';
+import { StackedCircularFooter } from '@/components/ui/stacked-circular-footer';
 
 const allLogos = [
   { name: "OpenAI", id: 1, img: OpenAIIconBlack },
@@ -118,8 +118,8 @@ export const LandingPage = () => {
           <TestimonialSection />
         </section>
 
-        {/* Footer */}
-        <Footer />
+        {/* New Stacked Circular Footer */}
+        <StackedCircularFooter />
       </div>
     </div>
   );
