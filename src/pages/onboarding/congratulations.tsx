@@ -9,6 +9,7 @@ import { ButtonCta } from '@/components/ui/button-shiny';
 import { GradientText } from '@/components/ui/gradient-text';
 import { Confetti } from '@/components/ui/confetti';
 import type { ConfettiRef } from '@/components/ui/confetti';
+import confetti from 'canvas-confetti';
 
 export default function Congratulations() {
   const navigate = useNavigate();
