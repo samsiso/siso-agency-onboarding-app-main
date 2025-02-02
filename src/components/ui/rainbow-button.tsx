@@ -2,14 +2,11 @@ import React from "react";
 import { cn } from "@/lib/utils";
 
 interface RainbowButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'default' | 'outline';
-}
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
 
 export function RainbowButton({
   children,
   className,
-  variant = 'default',
   ...props
 }: RainbowButtonProps) {
   return (
@@ -20,13 +17,8 @@ export function RainbowButton({
         // before styles - glow effect
         "before:absolute before:bottom-[-20%] before:left-1/2 before:z-0 before:h-1/5 before:w-3/5 before:-translate-x-1/2 before:animate-rainbow before:bg-[linear-gradient(90deg,#FF5722,#FFA726,#FFB74D)] before:bg-[length:200%] before:[filter:blur(calc(0.8*1rem))]",
 
-        // variant styles
-        variant === 'default' ? 
-          "bg-[linear-gradient(#121213,#121213),linear-gradient(#121213_50%,rgba(18,18,19,0.6)_80%,rgba(18,18,19,0)),linear-gradient(90deg,#FF5722,#FFA726,#FFB74D)]" :
-          "bg-transparent hover:bg-[linear-gradient(#121213,#121213),linear-gradient(#121213_50%,rgba(18,18,19,0.6)_80%,rgba(18,18,19,0)),linear-gradient(90deg,#FF5722,#FFA726,#FFB74D)]",
-
-        // outline variant specific styles
-        variant === 'outline' && "border border-[#FF5722] text-[#FF5722] hover:text-white",
+        // gradient background
+        "bg-[linear-gradient(#121213,#121213),linear-gradient(#121213_50%,rgba(18,18,19,0.6)_80%,rgba(18,18,19,0)),linear-gradient(90deg,#FF5722,#FFA726,#FFB74D)]",
 
         className,
       )}
