@@ -10,7 +10,6 @@ export const Hero = () => {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    // [Analysis] Adding debug logging to track component lifecycle
     console.log('Hero component mounted');
     setIsLoaded(true);
     return () => {
@@ -23,7 +22,6 @@ export const Hero = () => {
     navigate(path);
   };
 
-  // [Analysis] Adding debug check for render
   console.log('Hero rendering, isLoaded:', isLoaded);
 
   const resourceGuideItems = [
@@ -48,14 +46,14 @@ export const Hero = () => {
   ];
 
   return (
-    <div className="flex-1 relative min-h-[calc(100vh-4rem)]">
+    <div className="flex-1 relative">
       <Sidebar />
       <div className="absolute inset-0 bg-gradient-to-br from-siso-bg via-siso-bg/95 to-siso-bg/90" />
       
-      <div className="relative h-full flex flex-col justify-start max-w-6xl mx-auto px-4 sm:px-6 pt-16">
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-8">
         <div className="text-center">
           {/* Welcome Message */}
-          <div className="space-y-6 mb-8">
+          <div className="space-y-6">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-siso-text-bold leading-tight">
               Welcome to{' '}
               <span className="relative inline-block">
@@ -102,12 +100,6 @@ export const Hero = () => {
                     </div>
                   </div>
                 ))}
-              </div>
-
-              <div className="mt-6 text-center">
-                <p className="text-siso-text/80 text-sm">
-                  Sign in to access all features and start exploring the SISO Resource Hub
-                </p>
               </div>
             </div>
           </div>
