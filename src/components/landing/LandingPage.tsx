@@ -25,7 +25,21 @@ export const LandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-black via-gray-900 to-orange-900/20">
+    <div className="min-h-screen w-full bg-gradient-to-b from-black via-gray-900 to-orange-900/20 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 -left-1/4 w-[500px] h-[500px] bg-orange-500/10 rounded-full filter blur-[100px] animate-float-slow"></div>
+        <div className="absolute bottom-1/4 -right-1/4 w-[500px] h-[500px] bg-siso-orange/10 rounded-full filter blur-[100px] animate-float-slower"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-siso-red/5 rounded-full filter blur-[120px]"></div>
+      </div>
+
+      {/* Light boxes in background */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-20 left-20 w-32 h-32 bg-white/5 rounded-lg backdrop-blur-sm border border-white/10 animate-float"></div>
+        <div className="absolute top-40 right-40 w-24 h-24 bg-orange-500/5 rounded-lg backdrop-blur-sm border border-orange-500/10 animate-float-delayed"></div>
+        <div className="absolute bottom-32 left-1/3 w-40 h-40 bg-siso-red/5 rounded-lg backdrop-blur-sm border border-siso-red/10 animate-float"></div>
+      </div>
+
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-black/50 backdrop-blur-sm border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -33,15 +47,16 @@ export const LandingPage = () => {
             <div className="flex items-center gap-8">
               <img src="/logo.png" alt="SISO" className="h-8 w-8" />
               <div className="hidden md:flex items-center gap-6">
-                <a href="#features" className="text-gray-300 hover:text-white transition-colors">Features</a>
-                <a href="#tools" className="text-gray-300 hover:text-white transition-colors">Tools</a>
-                <a href="#resources" className="text-gray-300 hover:text-white transition-colors">Resources</a>
-                <a href="#education" className="text-gray-300 hover:text-white transition-colors">Education</a>
+                <a href="#features" className="nav-link">Features</a>
+                <a href="#tools" className="nav-link">Tools</a>
+                <a href="#resources" className="nav-link">Resources</a>
+                <a href="#education" className="nav-link">Education</a>
               </div>
             </div>
             <button
               onClick={handleSignInClick}
-              className="bg-white text-black hover:bg-gray-100 active:bg-gray-200 px-6 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105"
+              className="bg-gradient-to-r from-siso-orange to-siso-red text-white px-6 py-2 rounded-lg font-medium
+                transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-orange-500/20"
             >
               Sign In to Hub
             </button>
@@ -54,20 +69,20 @@ export const LandingPage = () => {
         <div className="text-center space-y-8 relative z-10">
           {/* Stats Bar */}
           <div className="flex justify-center gap-8 mb-12">
-            <div className="bg-white/10 backdrop-blur-sm px-6 py-2 rounded-full">
+            <div className="glow-card">
               <span className="text-siso-orange">⭐️⭐️⭐️⭐️⭐️</span>{' '}
               <span className="text-gray-300">Reviews from 200+ users</span>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm px-6 py-2 rounded-full">
+            <div className="glow-card">
               <span className="text-siso-orange">🚀</span>{' '}
               <span className="text-gray-300">10,000+ active members</span>
             </div>
           </div>
 
           {/* Main Headline */}
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight">
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tight animate-fade-in">
             <span className="text-white">Transform Your Agency with </span>
-            <span className="bg-gradient-to-r from-siso-orange to-siso-red text-transparent bg-clip-text">
+            <span className="title-glow">
               AI-Powered
             </span>
             <br />
@@ -75,24 +90,20 @@ export const LandingPage = () => {
           </h1>
 
           {/* Subheadline */}
-          <p className="max-w-2xl mx-auto text-xl text-gray-400">
+          <p className="max-w-2xl mx-auto text-xl text-gray-400 animate-fade-in">
             Join our AI-powered resource hub and supercharge your agency's growth. 
             Access cutting-edge tools, education, and networking—all in one place.
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex justify-center gap-6 pt-8">
+          <div className="flex justify-center gap-6 pt-8 animate-fade-in">
             <button
               onClick={handleSignInClick}
-              className="bg-gradient-to-r from-siso-orange to-siso-red text-white px-8 py-4 rounded-lg font-medium text-lg
-                hover:opacity-90 transition-all duration-200 hover:scale-105"
+              className="button-primary"
             >
               Get Started Now
             </button>
-            <button
-              className="border border-gray-600 text-white px-8 py-4 rounded-lg font-medium text-lg
-                hover:bg-white/5 transition-all duration-200"
-            >
+            <button className="button-secondary">
               Watch Demo
             </button>
           </div>
@@ -118,8 +129,7 @@ export const LandingPage = () => {
             ].map((feature, i) => (
               <div
                 key={i}
-                className="group p-6 rounded-xl bg-white/5 backdrop-blur-sm border border-gray-800
-                  hover:border-siso-orange/50 transition-all duration-300"
+                className="glow-card group cursor-pointer"
               >
                 <span className="text-3xl mb-4 block group-hover:scale-110 transition-transform duration-300">
                   {feature.icon}
@@ -156,7 +166,7 @@ export const LandingPage = () => {
                   text: "The educational resources and community support have helped us scale our agency beyond expectations."
                 }
               ].map((testimonial, i) => (
-                <div key={i} className="p-6 rounded-xl bg-white/5 backdrop-blur-sm border border-gray-800">
+                <div key={i} className="glow-card">
                   <p className="text-gray-300 mb-4">"{testimonial.text}"</p>
                   <div className="flex items-center gap-4">
                     <div className="h-12 w-12 rounded-full bg-gradient-to-br from-siso-orange to-siso-red" />
@@ -177,18 +187,11 @@ export const LandingPage = () => {
             <p className="text-gray-400 mb-8">Join thousands of successful agencies already using our platform</p>
             <button
               onClick={handleSignInClick}
-              className="bg-gradient-to-r from-siso-orange to-siso-red text-white px-12 py-4 rounded-lg font-medium text-lg
-                hover:opacity-90 transition-all duration-200 hover:scale-105"
+              className="button-primary"
             >
               Get Started Now
             </button>
           </div>
-        </div>
-
-        {/* Background Gradient Effects */}
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-siso-orange/20 rounded-full filter blur-3xl"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-siso-red/20 rounded-full filter blur-3xl"></div>
         </div>
       </div>
     </div>
