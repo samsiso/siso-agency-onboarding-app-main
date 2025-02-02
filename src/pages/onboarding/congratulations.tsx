@@ -16,11 +16,49 @@ export default function Congratulations() {
   const confettiRef = useRef<ConfettiRef>(null);
 
   useEffect(() => {
+    // Fire multiple confetti bursts for a more dramatic effect
+    const fireCelebration = () => {
+      const duration = 3 * 1000;
+      const animationEnd = Date.now() + duration;
+      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+      const randomInRange = (min: number, max: number) => 
+        Math.random() * (max - min) + min;
+
+      const interval = setInterval(() => {
+        const timeLeft = animationEnd - Date.now();
+
+        if (timeLeft <= 0) {
+          return clearInterval(interval);
+        }
+
+        const particleCount = 50 * (timeLeft / duration);
+        
+        // Confetti from multiple origins
+        confetti({
+          ...defaults,
+          particleCount,
+          origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
+        });
+        confetti({
+          ...defaults,
+          particleCount,
+          origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
+        });
+        confetti({
+          ...defaults,
+          particleCount,
+          origin: { x: 0.5, y: 0.5 }
+        });
+      }, 250);
+    };
+
+    fireCelebration();
+
     const handleOnboardingCompletion = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         
-        // Only attempt to award points if user is logged in
         if (user?.id) {
           const { error } = await supabase.rpc('handle_onboarding_completion', {
             user_id: user.id
@@ -60,9 +98,11 @@ export default function Congratulations() {
         ref={confettiRef}
         className="fixed inset-0 pointer-events-none z-50"
         options={{
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 }
+          particleCount: 150,
+          spread: 180,
+          origin: { y: 0.5, x: 0.5 },
+          colors: ['#FF5722', '#FFA726', '#FFD54F', '#4CAF50', '#2196F3'],
+          disableForReducedMotion: true
         }}
       />
       
