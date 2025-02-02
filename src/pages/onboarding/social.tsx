@@ -90,18 +90,18 @@ export default function SocialOnboarding() {
         yGap={36}
       />
       
-      <Card className="relative z-10 w-full max-w-2xl p-8 space-y-8 bg-siso-bg/80 backdrop-blur-lg border-siso-border animate-fadeIn">
+      <Card className="relative z-10 w-full max-w-2xl p-8 space-y-6 bg-siso-bg/80 backdrop-blur-lg border-siso-border animate-fadeIn">
         <div className="absolute -top-10 left-0 w-full flex justify-center text-siso-text/70">
           <span className="px-4 py-1 rounded-full bg-siso-bg-alt border border-siso-border text-sm">
             Step 2 of 3
           </span>
         </div>
 
-        <div className="flex items-center justify-center space-x-4">
-          <div className="p-3 rounded-full bg-gradient-to-br from-siso-red/10 to-siso-orange/10">
-            <Users className="w-6 h-6 text-siso-orange" />
-          </div>
-          <div>
+        <div className="text-center space-y-4">
+          <div className="flex items-center justify-center space-x-4 mb-2">
+            <div className="p-3 rounded-full bg-gradient-to-br from-siso-red/10 to-siso-orange/10">
+              <Users className="w-6 h-6 text-siso-orange" />
+            </div>
             <GradientText
               colors={["#FF5722", "#FFA726", "#FF5722"]}
               animationSpeed={6}
@@ -110,123 +110,117 @@ export default function SocialOnboarding() {
               Unlock Personalized AI Insights
             </GradientText>
           </div>
+          
+          <p className="text-siso-text/80 leading-relaxed max-w-xl mx-auto">
+            By sharing your social media profiles, you're enabling our advanced AI to understand your business needs better.
+          </p>
+          
+          <div className="grid grid-cols-2 gap-4 mt-6">
+            <div className="flex flex-col items-center p-4 rounded-lg bg-black/20 border border-siso-border/20">
+              <Sparkles className="w-8 h-8 text-siso-orange mb-2" />
+              <h3 className="font-semibold text-siso-text-bold">Tailored Tools</h3>
+              <p className="text-sm text-siso-text/70 text-center">AI-curated tool recommendations</p>
+            </div>
+            
+            <div className="flex flex-col items-center p-4 rounded-lg bg-black/20 border border-siso-border/20">
+              <Brain className="w-8 h-8 text-siso-orange mb-2" />
+              <h3 className="font-semibold text-siso-text-bold">Smart Networking</h3>
+              <p className="text-sm text-siso-text/70 text-center">Connect with relevant communities</p>
+            </div>
+            
+            <div className="flex flex-col items-center p-4 rounded-lg bg-black/20 border border-siso-border/20">
+              <Bot className="w-8 h-8 text-siso-orange mb-2" />
+              <h3 className="font-semibold text-siso-text-bold">LLM Insights</h3>
+              <p className="text-sm text-siso-text/70 text-center">Personalized growth analysis</p>
+            </div>
+            
+            <div className="flex flex-col items-center p-4 rounded-lg bg-black/20 border border-siso-border/20">
+              <Users className="w-8 h-8 text-siso-orange mb-2" />
+              <h3 className="font-semibold text-siso-text-bold">Community</h3>
+              <p className="text-sm text-siso-text/70 text-center">Connect with like-minded users</p>
+            </div>
+          </div>
         </div>
 
-        <div className="space-y-6">
-          <div className="text-center space-y-4">
-            <p className="text-siso-text/80 leading-relaxed">
-              By sharing your social media profiles, you're enabling our advanced AI to understand your business needs better. We'll analyze your digital presence to provide:
-            </p>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-              <div className="flex flex-col items-center p-4 rounded-lg bg-black/20 border border-siso-border/20">
-                <Sparkles className="w-8 h-8 text-siso-orange mb-2" />
-                <h3 className="font-semibold text-siso-text-bold">Tailored Tools</h3>
-                <p className="text-sm text-siso-text/70 text-center">AI-curated tool recommendations based on your business profile</p>
-              </div>
-              
-              <div className="flex flex-col items-center p-4 rounded-lg bg-black/20 border border-siso-border/20">
-                <Brain className="w-8 h-8 text-siso-orange mb-2" />
-                <h3 className="font-semibold text-siso-text-bold">Smart Networking</h3>
-                <p className="text-sm text-siso-text/70 text-center">Connect with relevant communities and resources</p>
-              </div>
-              
-              <div className="flex flex-col items-center p-4 rounded-lg bg-black/20 border border-siso-border/20">
-                <Bot className="w-8 h-8 text-siso-orange mb-2" />
-                <h3 className="font-semibold text-siso-text-bold">LLM Insights</h3>
-                <p className="text-sm text-siso-text/70 text-center">Personalized AI analysis of growth opportunities</p>
-              </div>
+        <div className="space-y-4">
+          <div className="relative group">
+            <div className="flex items-center gap-2">
+              <Linkedin className="w-5 h-5 text-[#0A66C2] transition-colors group-hover:text-[#0A66C2]/80" />
+              <Input
+                placeholder="LinkedIn URL"
+                value={linkedinUrl}
+                onChange={(e) => setLinkedinUrl(e.target.value)}
+                className="bg-siso-bg-alt border-siso-border text-siso-text flex-1 transition-all focus:ring-1 focus:ring-siso-red/50"
+              />
+            </div>
+          </div>
+          
+          <div className="relative group">
+            <div className="flex items-center gap-2">
+              <Globe className="w-5 h-5 text-emerald-500 transition-colors group-hover:text-emerald-400" />
+              <Input
+                placeholder="Website URL"
+                value={websiteUrl}
+                onChange={(e) => setWebsiteUrl(e.target.value)}
+                className="bg-siso-bg-alt border-siso-border text-siso-text flex-1 transition-all focus:ring-1 focus:ring-siso-red/50"
+              />
+            </div>
+          </div>
+          
+          <div className="relative group">
+            <div className="flex items-center gap-2">
+              <Youtube className="w-5 h-5 text-red-600 transition-colors group-hover:text-red-500" />
+              <Input
+                placeholder="YouTube URL"
+                value={youtubeUrl}
+                onChange={(e) => setYoutubeUrl(e.target.value)}
+                className="bg-siso-bg-alt border-siso-border text-siso-text flex-1 transition-all focus:ring-1 focus:ring-siso-red/50"
+              />
+            </div>
+          </div>
+          
+          <div className="relative group">
+            <div className="flex items-center gap-2">
+              <Instagram className="w-5 h-5 text-pink-500 transition-colors group-hover:text-pink-400" />
+              <Input
+                placeholder="Instagram URL"
+                value={instagramUrl}
+                onChange={(e) => setInstagramUrl(e.target.value)}
+                className="bg-siso-bg-alt border-siso-border text-siso-text flex-1 transition-all focus:ring-1 focus:ring-siso-red/50"
+              />
             </div>
           </div>
 
-          <div className="space-y-4">
-            <div className="relative group">
-              <div className="flex items-center gap-2">
-                <Linkedin className="w-5 h-5 text-[#0A66C2] transition-colors group-hover:text-[#0A66C2]/80" />
-                <Input
-                  placeholder="LinkedIn URL"
-                  value={linkedinUrl}
-                  onChange={(e) => setLinkedinUrl(e.target.value)}
-                  className="bg-siso-bg-alt border-siso-border text-siso-text flex-1 transition-all focus:ring-1 focus:ring-siso-red/50"
-                />
-              </div>
-              <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-siso-red/10 to-siso-orange/10 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
+          <div className="mt-2">
+            <div className="flex justify-between text-sm text-siso-text/70 mb-1">
+              <span>Profile completion</span>
+              <span>{Math.min(25 * getFilledLinksCount(), 100)}%</span>
             </div>
-            
-            <div className="relative group">
-              <div className="flex items-center gap-2">
-                <Globe className="w-5 h-5 text-emerald-500 transition-colors group-hover:text-emerald-400" />
-                <Input
-                  placeholder="Website URL"
-                  value={websiteUrl}
-                  onChange={(e) => setWebsiteUrl(e.target.value)}
-                  className="bg-siso-bg-alt border-siso-border text-siso-text flex-1 transition-all focus:ring-1 focus:ring-siso-red/50"
-                />
-              </div>
-              <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-siso-red/10 to-siso-orange/10 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
-            </div>
-            
-            <div className="relative group">
-              <div className="flex items-center gap-2">
-                <Youtube className="w-5 h-5 text-red-600 transition-colors group-hover:text-red-500" />
-                <Input
-                  placeholder="YouTube URL"
-                  value={youtubeUrl}
-                  onChange={(e) => setYoutubeUrl(e.target.value)}
-                  className="bg-siso-bg-alt border-siso-border text-siso-text flex-1 transition-all focus:ring-1 focus:ring-siso-red/50"
-                />
-              </div>
-              <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-siso-red/10 to-siso-orange/10 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
-            </div>
-            
-            <div className="relative group">
-              <div className="flex items-center gap-2">
-                <Instagram className="w-5 h-5 text-pink-500 transition-colors group-hover:text-pink-400" />
-                <Input
-                  placeholder="Instagram URL"
-                  value={instagramUrl}
-                  onChange={(e) => setInstagramUrl(e.target.value)}
-                  className="bg-siso-bg-alt border-siso-border text-siso-text flex-1 transition-all focus:ring-1 focus:ring-siso-red/50"
-                />
-              </div>
-              <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-siso-red/10 to-siso-orange/10 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
-            </div>
-
-            <div className="mt-2">
-              <div className="flex justify-between text-sm text-siso-text/70 mb-1">
-                <span>Profile completion</span>
-                <span>{Math.min(25 * getFilledLinksCount(), 100)}%</span>
-              </div>
-              <div className="h-2 bg-siso-bg-alt rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-gradient-to-r from-siso-red to-siso-orange transition-all duration-500 ease-out"
-                  style={{ width: `${Math.min(25 * getFilledLinksCount(), 100)}%` }}
-                />
-              </div>
+            <div className="h-2 bg-siso-bg-alt rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-siso-red to-siso-orange transition-all duration-500 ease-out"
+                style={{ width: `${Math.min(25 * getFilledLinksCount(), 100)}%` }}
+              />
             </div>
           </div>
+        </div>
 
-          <div className="text-center text-sm text-siso-text/60 mt-4">
-            <p>We only collect public information to enhance your experience. No passwords or private data required.</p>
-          </div>
-
-          <div className="flex flex-col items-center space-y-4">
-            <ButtonCta
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-              label={isSubmitting ? "Saving..." : "Continue"}
-              className="w-full flex items-center justify-center gap-2"
-            >
-              <ArrowRight className="ml-2 w-4 h-4" />
-            </ButtonCta>
-            <Button
-              variant="ghost"
-              onClick={handleSkip}
-              className="text-siso-text/70 hover:text-siso-text"
-            >
-              Skip for now
-            </Button>
-          </div>
+        <div className="flex flex-col items-center space-y-4">
+          <ButtonCta
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+            label={isSubmitting ? "Saving..." : "Continue"}
+            className="w-full flex items-center justify-center gap-2"
+          >
+            <ArrowRight className="ml-2 w-4 h-4" />
+          </ButtonCta>
+          <Button
+            variant="ghost"
+            onClick={handleSkip}
+            className="text-siso-text/70 hover:text-siso-text"
+          >
+            Skip for now
+          </Button>
         </div>
       </Card>
     </div>
