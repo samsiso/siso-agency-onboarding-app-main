@@ -21,12 +21,14 @@ import SisoEducation from '@/pages/SisoEducation'
 import Terms from '@/pages/Terms'
 import ThankYou from '@/pages/ThankYou'
 import ToolPage from '@/pages/ToolPage'
+import Auth from '@/pages/Auth'
 
 function App() {
   return (
     <SidebarProvider>
       <Routes>
         <Route path="/" element={<Index />} />
+        <Route path="/auth" element={<Auth />} />
         <Route path="/tools" element={<Tools />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/ai-news" element={<AINews />} />
