@@ -20,7 +20,6 @@ import { NextjsIcon } from '@/components/ui/icons/NextjsIcon';
 import { UpstashIcon } from '@/components/ui/icons/UpstashIcon';
 import { StripeIcon } from '@/components/ui/icons/StripeIcon';
 import { Case } from '@/components/ui/cases-with-infinite-scroll';
-import { FeaturesSectionWithBentoGrid } from '@/components/ui/feature-section-with-bento-grid';
 
 const allLogos = [
   { name: "OpenAI", id: 1, img: OpenAIIconBlack },
@@ -103,7 +102,7 @@ export const LandingPage = () => {
             </div>
             <div className="flex justify-center items-center w-full">
               <div className="max-w-5xl w-full">
-                <LogoCarousel columnCount={3} logos={allLogos} />
+                <LogoCarousel columnCount={5} logos={allLogos} />
               </div>
             </div>
           </div>
