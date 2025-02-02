@@ -82,17 +82,17 @@ export const LandingPage = () => {
         </section>
 
         {/* Features Section */}
-        <section id="features" className="min-h-screen">
+        <section id="features" className="min-h-screen py-20">
           <Feature108 />
         </section>
 
         {/* Trusted by Thousands Section */}
-        <section className="relative -mt-32 mb-20">
+        <section className="py-16">
           <Case />
         </section>
 
-        {/* Call to Action Section - Moved here */}
-        <section className="relative py-20">
+        {/* Call to Action Section */}
+        <section className="py-12">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center">
               <h3 className="text-4xl md:text-5xl font-bold text-white mb-6 font-display tracking-tight">
@@ -112,7 +112,7 @@ export const LandingPage = () => {
         </section>
 
         {/* Logo Carousel Section */}
-        <section className="relative py-20 overflow-hidden">
+        <section className="py-20 overflow-hidden">
           <div className="container mx-auto">
             <div className="text-center mb-12">
               <GradientHeading 
@@ -135,7 +135,7 @@ export const LandingPage = () => {
         </section>
 
         {/* Pricing Section */}
-        <section id="pricing" className="min-h-screen py-20">
+        <section id="pricing" className="py-20">
           <PricingCard
             title="Enterprise AI Suite"
             description="Complete AI transformation toolkit for established agencies"
@@ -167,11 +167,11 @@ export const LandingPage = () => {
         </section>
 
         {/* Testimonials Section */}
-        <section id="testimonials" className="min-h-screen py-20">
+        <section id="testimonials" className="py-20">
           <TestimonialSection />
         </section>
 
-        {/* New Stacked Circular Footer */}
+        {/* Footer */}
         <StackedCircularFooter />
       </div>
     </div>

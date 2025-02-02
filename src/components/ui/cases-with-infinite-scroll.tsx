@@ -32,11 +32,11 @@ function Case() {
   }, [api, current]);
 
   return (
-    <div className="w-full py-20 lg:py-40">
+    <div className="w-full py-12">
       <div className="container mx-auto">
-        <div className="flex flex-col gap-10">
-          <h2 className="text-xl md:text-3xl md:text-5xl tracking-tighter lg:max-w-xl font-regular text-left text-white">
-            Trusted by thousands of businesses worldwide
+        <div className="flex flex-col gap-8">
+          <h2 className="text-xl md:text-3xl lg:text-5xl tracking-tighter lg:max-w-xl font-regular text-left text-white ml-[5rem]">
+            Powered by thousands of innovators worldwide
           </h2>
           <Carousel 
             setApi={setApi} 
