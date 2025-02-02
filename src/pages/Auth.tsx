@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { useGoogleAuth } from '@/hooks/useGoogleAuth';
 import { useToast } from '@/hooks/use-toast';
+import { FloatingOrbs } from '@/components/effects/FloatingOrbs';
 
 export default function Auth() {
   const { user } = useAuthSession();
@@ -28,11 +29,15 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-gray-900 to-black p-4">
-      <div className="w-full max-w-md bg-white/10 backdrop-blur-lg rounded-lg shadow-xl p-8 space-y-6">
+    <div className="relative min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-siso-bg to-black p-4 overflow-hidden">
+      <FloatingOrbs />
+      
+      <div className="w-full max-w-md bg-black/20 backdrop-blur-lg rounded-lg shadow-xl p-8 space-y-6 border border-siso-border relative z-10">
         <div className="text-center space-y-2">
-          <h1 className="text-2xl font-bold text-white">Welcome to SISO Agency</h1>
-          <p className="text-gray-300">Sign in to access your account</p>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent">
+            Welcome to SISO Agency
+          </h1>
+          <p className="text-siso-text">Sign in to access your account</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -40,19 +45,19 @@ export default function Auth() {
             <Input
               type="email"
               placeholder="Email"
-              className="w-full bg-white/20 border-white/20 text-white placeholder:text-gray-400"
+              className="w-full bg-white/5 border-siso-border text-siso-text placeholder:text-siso-text-muted focus:border-siso-red"
             />
           </div>
           <div className="space-y-2">
             <Input
               type="password"
               placeholder="Password"
-              className="w-full bg-white/20 border-white/20 text-white placeholder:text-gray-400"
+              className="w-full bg-white/5 border-siso-border text-siso-text placeholder:text-siso-text-muted focus:border-siso-red"
             />
           </div>
           <Button 
             type="submit"
-            className="w-full bg-white text-black hover:bg-gray-100"
+            className="w-full bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-white"
           >
             Sign In with Email
           </Button>
@@ -60,10 +65,10 @@ export default function Auth() {
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-white/20" />
+            <span className="w-full border-t border-siso-border" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-black px-2 text-gray-400">Or continue with</span>
+            <span className="bg-black/20 px-2 text-siso-text-muted">Or continue with</span>
           </div>
         </div>
 
