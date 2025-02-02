@@ -16,7 +16,7 @@ export const LandingPage = () => {
   return (
     <div className="min-h-screen w-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-siso-bg via-siso-bg/95 to-siso-bg/90 relative">
       {/* Hero Section */}
-      <div className="max-w-4xl mx-auto text-center space-y-8 relative z-40">
+      <div className="max-w-4xl mx-auto text-center space-y-8 relative">
         <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold">
           Welcome to{' '}
           <span className="bg-gradient-to-r from-siso-orange to-siso-red text-transparent bg-clip-text">
@@ -50,7 +50,7 @@ export const LandingPage = () => {
             <div 
               key={i}
               className="p-6 rounded-lg bg-siso-bg-alt/50 border border-siso-border 
-                hover:border-siso-border-hover transition-all duration-300 relative z-30"
+                hover:border-siso-border-hover transition-all duration-300"
             >
               <span className="text-3xl mb-4 block">{feature.icon}</span>
               <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
@@ -60,11 +60,11 @@ export const LandingPage = () => {
         </div>
 
         {/* CTA Section */}
-        <div className="mt-12 space-y-4 relative z-50">
+        <div className="mt-12 space-y-4 relative">
           <p className="text-lg text-siso-text/90 mb-4">
             Get started by signing in with your Google account
           </p>
-          <div className="relative z-50">
+          <div className="relative pointer-events-auto" style={{ zIndex: 9999 }}>
             <AuthButton />
           </div>
         </div>

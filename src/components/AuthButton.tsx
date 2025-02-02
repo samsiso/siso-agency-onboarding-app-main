@@ -85,28 +85,29 @@ export const AuthButton = () => {
   }, [handleSignIn, setLoading, toast, navigate]);
 
   return (
-    <>
-      <div className="relative z-50">
-        {user ? (
-          <Button
-            onClick={handleSignOut}
-            disabled={loading}
-            variant="outline"
-            className="bg-white/10 text-white hover:bg-white/20 active:bg-white/30 cursor-pointer"
-          >
-            Sign Out
-          </Button>
-        ) : (
-          <Button
-            onClick={handleGoogleSignIn}
-            disabled={loading}
-            className="bg-white text-black hover:bg-gray-100 active:bg-gray-200 cursor-pointer flex items-center gap-2 shadow-lg relative z-50"
-          >
-            <GoogleIcon />
-            Sign in with Google
-          </Button>
-        )}
-      </div>
+    <div className="relative z-[100] pointer-events-auto">
+      {user ? (
+        <Button
+          onClick={handleSignOut}
+          disabled={loading}
+          variant="outline"
+          className="bg-white/10 text-white hover:bg-white/20 active:bg-white/30 cursor-pointer pointer-events-auto"
+        >
+          Sign Out
+        </Button>
+      ) : (
+        <Button
+          onClick={(e) => {
+            e.stopPropagation();
+            handleGoogleSignIn();
+          }}
+          disabled={loading}
+          className="bg-white text-black hover:bg-gray-100 active:bg-gray-200 cursor-pointer pointer-events-auto flex items-center gap-2 shadow-lg relative z-[100]"
+        >
+          <GoogleIcon />
+          Sign in with Google
+        </Button>
+      )}
       
       {user && showSocialModal && (
         <SocialMediaModal
@@ -118,7 +119,7 @@ export const AuthButton = () => {
           userId={user.id}
         />
       )}
-    </>
+    </div>
   );
 };
 
