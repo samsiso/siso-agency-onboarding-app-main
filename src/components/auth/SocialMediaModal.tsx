@@ -4,14 +4,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { Linkedin, Globe, Youtube, Instagram } from 'lucide-react';
 
 interface SocialMediaModalProps {
   isOpen: boolean;
   onClose: () => void;
-  userId: string;
+  onSkip?: () => void;
 }
 
-export const SocialMediaModal = ({ isOpen, onClose, userId }: SocialMediaModalProps) => {
+export const SocialMediaModal = ({ isOpen, onClose, onSkip }: SocialMediaModalProps) => {
   const [linkedinUrl, setLinkedinUrl] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');
   const [youtubeUrl, setYoutubeUrl] = useState('');
@@ -26,13 +27,9 @@ export const SocialMediaModal = ({ isOpen, onClose, userId }: SocialMediaModalPr
 
   const handleSubmit = async () => {
     try {
-      if (getFilledLinksCount() < 2) {
-        toast({
-          variant: "destructive",
-          title: "Please provide at least 2 social media links",
-          description: "This helps us optimize your search experience.",
-        });
-        return;
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) {
+        throw new Error('No user found');
       }
 
       setIsSubmitting(true);
@@ -47,7 +44,7 @@ export const SocialMediaModal = ({ isOpen, onClose, userId }: SocialMediaModalPr
           has_completed_social_info: true,
           social_info_completed_at: new Date().toISOString()
         })
-        .eq('id', userId);
+        .eq('id', user.id);
 
       if (error) throw error;
 
@@ -73,60 +70,75 @@ export const SocialMediaModal = ({ isOpen, onClose, userId }: SocialMediaModalPr
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[425px] bg-siso-bg border-siso-border">
         <DialogHeader>
-          <DialogTitle className="text-siso-text">Complete Your Profile</DialogTitle>
+          <DialogTitle className="text-siso-text">Connect Your Social Media</DialogTitle>
           <DialogDescription className="text-siso-text/70">
-            Please provide at least 2 social media links to help us optimize your search experience and connect you with relevant resources.
+            Add your social media links to enhance your profile and connect with others. You can always update these later.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
-          <div className="grid gap-2">
+          <div className="flex items-center gap-2">
+            <Linkedin className="w-5 h-5 text-siso-text/70" />
             <Input
               placeholder="LinkedIn URL"
               value={linkedinUrl}
               onChange={(e) => setLinkedinUrl(e.target.value)}
-              className="bg-siso-bg-alt border-siso-border text-siso-text"
+              className="bg-siso-bg-alt border-siso-border text-siso-text flex-1"
             />
           </div>
-          <div className="grid gap-2">
+          <div className="flex items-center gap-2">
+            <Globe className="w-5 h-5 text-siso-text/70" />
             <Input
               placeholder="Website URL"
               value={websiteUrl}
               onChange={(e) => setWebsiteUrl(e.target.value)}
-              className="bg-siso-bg-alt border-siso-border text-siso-text"
+              className="bg-siso-bg-alt border-siso-border text-siso-text flex-1"
             />
           </div>
-          <div className="grid gap-2">
+          <div className="flex items-center gap-2">
+            <Youtube className="w-5 h-5 text-siso-text/70" />
             <Input
               placeholder="YouTube URL"
               value={youtubeUrl}
               onChange={(e) => setYoutubeUrl(e.target.value)}
-              className="bg-siso-bg-alt border-siso-border text-siso-text"
+              className="bg-siso-bg-alt border-siso-border text-siso-text flex-1"
             />
           </div>
-          <div className="grid gap-2">
+          <div className="flex items-center gap-2">
+            <Instagram className="w-5 h-5 text-siso-text/70" />
             <Input
               placeholder="Instagram URL"
               value={instagramUrl}
               onChange={(e) => setInstagramUrl(e.target.value)}
-              className="bg-siso-bg-alt border-siso-border text-siso-text"
+              className="bg-siso-bg-alt border-siso-border text-siso-text flex-1"
             />
           </div>
         </div>
-        <div className="flex justify-end gap-3">
-          <Button
-            variant="outline"
-            onClick={onClose}
-            className="border-siso-border text-siso-text"
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            disabled={isSubmitting || getFilledLinksCount() < 2}
-            className="bg-siso-red hover:bg-siso-red/90 text-white"
-          >
-            {isSubmitting ? "Saving..." : "Save"}
-          </Button>
+        <div className="flex justify-between gap-3">
+          {onSkip && (
+            <Button
+              variant="ghost"
+              onClick={onSkip}
+              className="text-siso-text/70 hover:text-siso-text"
+            >
+              Skip for now
+            </Button>
+          )}
+          <div className="flex gap-3 ml-auto">
+            <Button
+              variant="outline"
+              onClick={onClose}
+              className="border-siso-border text-siso-text"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              className="bg-siso-red hover:bg-siso-red/90 text-white"
+            >
+              {isSubmitting ? "Saving..." : "Continue"}
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
