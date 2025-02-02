@@ -16,16 +16,26 @@ export default function Auth() {
   // Redirect if already authenticated
   useEffect(() => {
     if (user) {
-      navigate('/');
+      navigate('/profile');
     }
   }, [user, navigate]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // Skip validation and just proceed
     toast({
-      title: "Coming Soon",
-      description: "Email/password onboarding will be available soon!",
+      title: "Welcome aboard!",
+      description: "Proceeding to the next step...",
     });
+    navigate('/onboarding/social'); // We'll create this route next
+  };
+
+  const handleDemoGoogleSignIn = () => {
+    toast({
+      title: "Demo Mode",
+      description: "Proceeding with demo account...",
+    });
+    navigate('/onboarding/social');
   };
 
   return (
@@ -75,7 +85,7 @@ export default function Auth() {
             type="submit"
             className="w-full bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-white"
           >
-            Create Account
+            Continue to Next Step
           </Button>
         </form>
 
@@ -90,7 +100,7 @@ export default function Auth() {
 
         <div className="space-y-3">
           <Button
-            onClick={() => handleGoogleSignIn()}
+            onClick={handleDemoGoogleSignIn}
             disabled={loading}
             className="w-full bg-white text-black hover:bg-gray-100 flex items-center justify-center gap-2"
           >
@@ -101,9 +111,10 @@ export default function Auth() {
           <Button
             onClick={() => {
               toast({
-                title: "Coming Soon",
-                description: "GitHub authentication will be available soon!",
+                title: "Demo Mode",
+                description: "Proceeding with demo account...",
               });
+              navigate('/onboarding/social');
             }}
             className="w-full bg-[#24292F] text-white hover:bg-[#24292F]/90 flex items-center justify-center gap-2"
           >
