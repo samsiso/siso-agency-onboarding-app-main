@@ -95,7 +95,7 @@ export default function SocialOnboarding() {
         yGap={36}
       />
       
-      <Card className="relative z-10 w-full max-w-md p-8 space-y-6 bg-siso-bg/80 backdrop-blur-lg border-siso-border">
+      <Card className="relative z-10 w-full max-w-md p-8 space-y-6 bg-siso-bg/80 backdrop-blur-lg border-siso-border animate-fadeIn">
         <div className="flex items-center justify-center space-x-4">
           <div className="p-3 rounded-full bg-gradient-to-br from-siso-red/10 to-siso-orange/10">
             <Users className="w-6 h-6 text-siso-orange" />
@@ -114,19 +114,19 @@ export default function SocialOnboarding() {
           </p>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="flex items-center space-x-3 p-4 rounded-lg bg-[#0A66C2]/10 hover:bg-[#0A66C2]/20 transition-colors cursor-pointer">
+            <div onClick={() => setIsModalOpen(true)} className="flex items-center space-x-3 p-4 rounded-lg bg-[#0A66C2]/10 hover:bg-[#0A66C2]/20 transition-all duration-300 cursor-pointer hover:scale-105">
               <Linkedin className="w-6 h-6 text-[#0A66C2]" />
               <span className="text-siso-text">LinkedIn</span>
             </div>
-            <div className="flex items-center space-x-3 p-4 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 transition-colors cursor-pointer">
+            <div onClick={() => setIsModalOpen(true)} className="flex items-center space-x-3 p-4 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 transition-all duration-300 cursor-pointer hover:scale-105">
               <Globe className="w-6 h-6 text-emerald-500" />
               <span className="text-siso-text">Website</span>
             </div>
-            <div className="flex items-center space-x-3 p-4 rounded-lg bg-red-600/10 hover:bg-red-600/20 transition-colors cursor-pointer">
+            <div onClick={() => setIsModalOpen(true)} className="flex items-center space-x-3 p-4 rounded-lg bg-red-600/10 hover:bg-red-600/20 transition-all duration-300 cursor-pointer hover:scale-105">
               <Youtube className="w-6 h-6 text-red-600" />
               <span className="text-siso-text">YouTube</span>
             </div>
-            <div className="flex items-center space-x-3 p-4 rounded-lg bg-pink-500/10 hover:bg-pink-500/20 transition-colors cursor-pointer">
+            <div onClick={() => setIsModalOpen(true)} className="flex items-center space-x-3 p-4 rounded-lg bg-pink-500/10 hover:bg-pink-500/20 transition-all duration-300 cursor-pointer hover:scale-105">
               <Instagram className="w-6 h-6 text-pink-500" />
               <span className="text-siso-text">Instagram</span>
             </div>
