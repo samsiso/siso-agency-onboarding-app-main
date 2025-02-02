@@ -20,6 +20,7 @@ import { UpstashIcon } from '@/components/ui/icons/UpstashIcon';
 import { StripeIcon } from '@/components/ui/icons/StripeIcon';
 import { Case } from '@/components/ui/cases-with-infinite-scroll';
 import { StackedCircularFooter } from '@/components/ui/stacked-circular-footer';
+import { RainbowButton } from '@/components/ui/rainbow-button';
 
 const allLogos = [
   { name: "OpenAI", id: 1, img: OpenAIIconBlack },
@@ -43,6 +44,10 @@ export const LandingPage = () => {
       navigate('/app');
     }
   }, [user, navigate]);
+
+  const handleGetStarted = () => {
+    navigate('/auth');
+  };
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-black via-gray-900 to-[#0A0A0A]">
@@ -80,7 +85,7 @@ export const LandingPage = () => {
           <Feature108 />
         </section>
 
-        {/* Trusted by Thousands Section - Adjusted spacing */}
+        {/* Trusted by Thousands Section */}
         <section className="relative -mt-32 mb-20">
           <Case />
         </section>
@@ -116,6 +121,26 @@ export const LandingPage = () => {
         {/* Testimonials Section */}
         <section id="testimonials" className="min-h-screen py-20">
           <TestimonialSection />
+        </section>
+
+        {/* Call to Action Section */}
+        <section className="relative py-20">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto text-center">
+              <h3 className="text-4xl md:text-5xl font-bold text-white mb-6 font-display tracking-tight">
+                Ready to transform your business with AI?
+              </h3>
+              <p className="text-gray-300 text-lg mb-10 font-light">
+                Connect with our experts today and discover how our innovative solutions can drive your success.
+              </p>
+              <RainbowButton 
+                className="text-lg px-10 py-6 font-semibold"
+                onClick={handleGetStarted}
+              >
+                Start Free Trial
+              </RainbowButton>
+            </div>
+          </div>
         </section>
 
         {/* New Stacked Circular Footer */}
