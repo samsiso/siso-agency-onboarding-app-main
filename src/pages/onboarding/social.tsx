@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { ButtonCta } from '@/components/ui/button-shiny';
 import { GradientText } from '@/components/ui/gradient-text';
 import { Input } from '@/components/ui/input';
-import { Users, ArrowRight, Linkedin, Globe, Twitter, Sparkles, Brain, Bot } from 'lucide-react';
+import { Users, ArrowRight, Linkedin, Globe, Twitter, Search, Database, Rocket } from 'lucide-react';
 
 export default function SocialOnboarding() {
   const [linkedinUrl, setLinkedinUrl] = useState('');
@@ -112,17 +112,23 @@ export default function SocialOnboarding() {
             Share your professional links to unlock personalized AI insights and networking opportunities.
           </p>
           
-          <div className="grid grid-cols-2 gap-4 mt-6">
+          <div className="grid grid-cols-3 gap-4 mt-6">
             <div className="flex flex-col items-center p-4 rounded-lg bg-black/20 border border-siso-border/20">
-              <Brain className="w-8 h-8 text-siso-orange mb-2" />
-              <h3 className="font-semibold text-siso-text-bold">Smart Networking</h3>
-              <p className="text-sm text-siso-text/70 text-center">Connect with relevant communities</p>
+              <Search className="w-8 h-8 text-siso-orange mb-2" />
+              <h3 className="font-semibold text-siso-text-bold">Smart Matching</h3>
+              <p className="text-sm text-siso-text/70 text-center">Find tools tailored to your agency's needs</p>
             </div>
             
             <div className="flex flex-col items-center p-4 rounded-lg bg-black/20 border border-siso-border/20">
-              <Bot className="w-8 h-8 text-siso-orange mb-2" />
-              <h3 className="font-semibold text-siso-text-bold">LLM Insights</h3>
-              <p className="text-sm text-siso-text/70 text-center">Personalized growth analysis</p>
+              <Database className="w-8 h-8 text-siso-orange mb-2" />
+              <h3 className="font-semibold text-siso-text-bold">Tool Library</h3>
+              <p className="text-sm text-siso-text/70 text-center">Access curated resources for agencies</p>
+            </div>
+
+            <div className="flex flex-col items-center p-4 rounded-lg bg-black/20 border border-siso-border/20">
+              <Rocket className="w-8 h-8 text-siso-orange mb-2" />
+              <h3 className="font-semibold text-siso-text-bold">Growth Boost</h3>
+              <p className="text-sm text-siso-text/70 text-center">Scale your agency with the right tools</p>
             </div>
           </div>
         </div>
