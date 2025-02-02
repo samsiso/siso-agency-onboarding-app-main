@@ -85,6 +85,11 @@ export const AuthButton = () => {
     };
   }, [handleSignIn, setLoading, toast, navigate]);
 
+  const handleAuthClick = () => {
+    console.log('Auth button clicked');
+    navigate('/auth');
+  };
+
   return (
     <div className="fixed top-4 right-4 z-[100]">
       {user ? (
@@ -98,7 +103,7 @@ export const AuthButton = () => {
         </Button>
       ) : (
         <Button 
-          onClick={() => navigate('/auth')}
+          onClick={handleAuthClick}
           className="bg-white text-black hover:bg-gray-100 active:bg-gray-200"
           disabled={loading}
         >
