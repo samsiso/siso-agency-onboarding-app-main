@@ -105,7 +105,6 @@ const Feature108 = ({
 }: Feature108Props) => {
   return (
     <section className="relative py-24">
-      {/* Background Elements - Simplified */}
       <div className="absolute inset-0 bg-gradient-radial from-siso-orange/10 via-transparent to-transparent opacity-30" />
 
       <div className="relative">
@@ -123,7 +122,7 @@ const Feature108 = ({
 
         <div className="mt-12">
           <Tabs defaultValue={tabs[0].value} className="w-full">
-            <TabsList className="container flex flex-wrap items-center justify-center gap-4 sm:flex-row md:gap-8 hidden">
+            <TabsList className="container flex flex-wrap items-center justify-center gap-4 sm:flex-row md:gap-8 bg-transparent">
               {tabs.map((tab) => (
                 <TabsTrigger
                   key={tab.value}
