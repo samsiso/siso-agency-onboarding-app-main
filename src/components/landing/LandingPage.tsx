@@ -86,14 +86,14 @@ export const LandingPage = () => {
           <Hero />
         </section>
 
+        {/* Trusted by Thousands Section */}
+        <section className="relative py-20">
+          <Case />
+        </section>
+
         {/* Features Section */}
         <section id="features" className="min-h-screen">
           <Feature108 />
-        </section>
-
-        {/* Industry Leaders Section - Moved here */}
-        <section className="relative py-20">
-          <Case />
         </section>
 
         {/* Logo Carousel Section */}
