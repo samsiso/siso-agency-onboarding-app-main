@@ -8,19 +8,18 @@ import { Button } from '@/components/ui/button';
 import { ButtonCta } from '@/components/ui/button-shiny';
 import { GradientText } from '@/components/ui/gradient-text';
 import { Input } from '@/components/ui/input';
-import { Users, ArrowRight, Linkedin, Globe, Youtube, Instagram, Sparkles, Brain, Bot } from 'lucide-react';
+import { Users, ArrowRight, Linkedin, Globe, Twitter, Sparkles, Brain, Bot } from 'lucide-react';
 
 export default function SocialOnboarding() {
   const [linkedinUrl, setLinkedinUrl] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');
-  const [youtubeUrl, setYoutubeUrl] = useState('');
-  const [instagramUrl, setInstagramUrl] = useState('');
+  const [twitterUrl, setTwitterUrl] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const getFilledLinksCount = () => {
-    return [linkedinUrl, websiteUrl, youtubeUrl, instagramUrl]
+    return [linkedinUrl, websiteUrl, twitterUrl]
       .filter(url => url.trim().length > 0).length;
   };
 
@@ -39,8 +38,7 @@ export default function SocialOnboarding() {
         .update({
           linkedin_url: linkedinUrl || null,
           website_url: websiteUrl || null,
-          youtube_url: youtubeUrl || null,
-          instagram_url: instagramUrl || null,
+          twitter_url: twitterUrl || null,
           has_completed_social_info: true,
           social_info_completed_at: new Date().toISOString()
         })
@@ -53,7 +51,6 @@ export default function SocialOnboarding() {
         description: "Thank you for providing your social media information!",
       });
       
-      // Navigate to the next step (you can change this to the appropriate route)
       navigate('/tools');
     } catch (error: any) {
       console.error('Error updating profile:', error);
@@ -107,21 +104,15 @@ export default function SocialOnboarding() {
               animationSpeed={6}
               className="text-2xl font-bold"
             >
-              Unlock Personalized AI Insights
+              Connect Your Online Presence
             </GradientText>
           </div>
           
           <p className="text-siso-text/80 leading-relaxed max-w-xl mx-auto">
-            By sharing your social media profiles, you're enabling our advanced AI to understand your business needs better.
+            Share your professional links to unlock personalized AI insights and networking opportunities.
           </p>
           
           <div className="grid grid-cols-2 gap-4 mt-6">
-            <div className="flex flex-col items-center p-4 rounded-lg bg-black/20 border border-siso-border/20">
-              <Sparkles className="w-8 h-8 text-siso-orange mb-2" />
-              <h3 className="font-semibold text-siso-text-bold">Tailored Tools</h3>
-              <p className="text-sm text-siso-text/70 text-center">AI-curated tool recommendations</p>
-            </div>
-            
             <div className="flex flex-col items-center p-4 rounded-lg bg-black/20 border border-siso-border/20">
               <Brain className="w-8 h-8 text-siso-orange mb-2" />
               <h3 className="font-semibold text-siso-text-bold">Smart Networking</h3>
@@ -132,12 +123,6 @@ export default function SocialOnboarding() {
               <Bot className="w-8 h-8 text-siso-orange mb-2" />
               <h3 className="font-semibold text-siso-text-bold">LLM Insights</h3>
               <p className="text-sm text-siso-text/70 text-center">Personalized growth analysis</p>
-            </div>
-            
-            <div className="flex flex-col items-center p-4 rounded-lg bg-black/20 border border-siso-border/20">
-              <Users className="w-8 h-8 text-siso-orange mb-2" />
-              <h3 className="font-semibold text-siso-text-bold">Community</h3>
-              <p className="text-sm text-siso-text/70 text-center">Connect with like-minded users</p>
             </div>
           </div>
         </div>
@@ -169,23 +154,11 @@ export default function SocialOnboarding() {
           
           <div className="relative group">
             <div className="flex items-center gap-2">
-              <Youtube className="w-5 h-5 text-red-600 transition-colors group-hover:text-red-500" />
+              <Twitter className="w-5 h-5 text-[#1DA1F2] transition-colors group-hover:text-[#1DA1F2]/80" />
               <Input
-                placeholder="YouTube URL"
-                value={youtubeUrl}
-                onChange={(e) => setYoutubeUrl(e.target.value)}
-                className="bg-siso-bg-alt border-siso-border text-siso-text flex-1 transition-all focus:ring-1 focus:ring-siso-red/50"
-              />
-            </div>
-          </div>
-          
-          <div className="relative group">
-            <div className="flex items-center gap-2">
-              <Instagram className="w-5 h-5 text-pink-500 transition-colors group-hover:text-pink-400" />
-              <Input
-                placeholder="Instagram URL"
-                value={instagramUrl}
-                onChange={(e) => setInstagramUrl(e.target.value)}
+                placeholder="Twitter URL"
+                value={twitterUrl}
+                onChange={(e) => setTwitterUrl(e.target.value)}
                 className="bg-siso-bg-alt border-siso-border text-siso-text flex-1 transition-all focus:ring-1 focus:ring-siso-red/50"
               />
             </div>
@@ -194,12 +167,12 @@ export default function SocialOnboarding() {
           <div className="mt-2">
             <div className="flex justify-between text-sm text-siso-text/70 mb-1">
               <span>Profile completion</span>
-              <span>{Math.min(25 * getFilledLinksCount(), 100)}%</span>
+              <span>{Math.min(33.33 * getFilledLinksCount(), 100)}%</span>
             </div>
             <div className="h-2 bg-siso-bg-alt rounded-full overflow-hidden">
               <div 
                 className="h-full bg-gradient-to-r from-siso-red to-siso-orange transition-all duration-500 ease-out"
-                style={{ width: `${Math.min(25 * getFilledLinksCount(), 100)}%` }}
+                style={{ width: `${Math.min(33.33 * getFilledLinksCount(), 100)}%` }}
               />
             </div>
           </div>
