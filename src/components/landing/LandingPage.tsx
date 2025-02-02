@@ -28,7 +28,7 @@ export const LandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-black via-gray-900 to-orange-950/10">
+    <div className="min-h-screen w-full bg-gradient-to-b from-black via-gray-900 to-[#0A0A0A]">
       {/* Background elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 -left-1/4 w-[500px] h-[500px] bg-orange-500/10 rounded-full filter blur-[100px] animate-float-slow"></div>
@@ -155,7 +155,7 @@ export const LandingPage = () => {
           <p className="text-gray-400 mb-8">Join thousands of successful agencies already using our platform</p>
           <button
             onClick={handleSignInClick}
-            className="px-8 py-3 bg-gradient-to-r from-siso-orange to-siso-red text-white rounded-lg font-medium
+            className="px-8 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg font-medium
               transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-orange-500/20"
           >
             Get Started Now

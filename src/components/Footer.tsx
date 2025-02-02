@@ -15,7 +15,7 @@ const Footer = () => {
       <div className="absolute inset-0">
         <div 
           className="absolute w-[800px] h-[800px] left-1/2 bottom-0 -translate-x-1/2 translate-y-1/2
-            bg-gradient-radial from-orange-500/20 via-orange-900/10 to-transparent"
+            bg-gradient-radial from-orange-500/30 via-orange-900/20 to-transparent"
         />
       </div>
 
@@ -64,7 +64,7 @@ const Footer = () => {
               href={social.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-gray-950/80 p-4 rounded-full hover:bg-gray-900 transition-all duration-300 group
+              className="bg-[#0A0A0A] p-4 rounded-full hover:bg-gray-900 transition-all duration-300 group
                 hover:shadow-lg hover:shadow-orange-500/10"
               aria-label={social.label}
             >
@@ -83,7 +83,7 @@ const Footer = () => {
 
         {/* Product Hunt Badge */}
         <a 
-          href="https://www.producthunt.com/posts/siso-ai-resource-hub"
+          href="https://www.producthunt.com/posts/siso-ai-resource-hub?utm_source=badge-featured"
           target="_blank"
           rel="noopener noreferrer"
           className="absolute bottom-8 right-8 opacity-90 hover:opacity-100 transition-opacity duration-300"
