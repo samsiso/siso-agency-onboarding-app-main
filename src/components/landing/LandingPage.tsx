@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { useEffect } from 'react';
-import { useToast } from '@/hooks/use-toast';
 import { TierSection } from './TierSection';
 import { TestimonialSection } from './TestimonialSection';
 import Footer from '@/components/Footer';
@@ -38,7 +37,6 @@ const allLogos = [
 export const LandingPage = () => {
   const { user } = useAuthSession();
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   useEffect(() => {
     console.log('LandingPage mounted');
@@ -78,19 +76,14 @@ export const LandingPage = () => {
           <Hero />
         </section>
 
-        {/* Trusted by Thousands Section */}
-        <section className="relative py-20">
-          <Case />
-        </section>
-
         {/* Features Section */}
         <section id="features" className="min-h-screen">
           <Feature108 />
         </section>
 
-        {/* Bento Grid Features Section */}
-        <section className="relative py-20">
-          <FeaturesSectionWithBentoGrid />
+        {/* Trusted by Thousands Section - Adjusted spacing */}
+        <section className="relative -mt-32 mb-20">
+          <Case />
         </section>
 
         {/* Logo Carousel Section */}
