@@ -5,7 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { TierSection } from './TierSection';
 import { TestimonialSection } from './TestimonialSection';
 import Footer from '@/components/Footer';
-import { Hero } from '@/components/ui/animated-hero';
+import { AnimatedHero } from '@/components/ui/animated-hero';
 import { Waves } from '@/components/ui/waves-background';
 import { ScrollNav } from '@/components/ui/scroll-nav';
 
@@ -58,7 +58,7 @@ export const LandingPage = () => {
       <div className="relative z-10">
         {/* Hero Section */}
         <section id="hero" className="min-h-screen">
-          <Hero />
+          <AnimatedHero />
         </section>
 
         {/* Features Section */}

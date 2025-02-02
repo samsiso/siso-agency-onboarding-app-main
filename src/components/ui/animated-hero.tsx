@@ -66,3 +66,6 @@ export const AnimatedHero = () => {
     </div>
   );
 };
+
+// Also export as Hero for backward compatibility
+export const Hero = AnimatedHero;
