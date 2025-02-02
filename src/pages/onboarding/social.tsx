@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,8 +15,22 @@ export default function SocialOnboarding() {
   const [websiteUrl, setWebsiteUrl] = useState('');
   const [twitterUrl, setTwitterUrl] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) {
+        navigate('/auth');
+        return;
+      }
+      setUserId(session.user.id);
+    };
+
+    checkAuth();
+  }, [navigate]);
 
   const getFilledLinksCount = () => {
     return [linkedinUrl, websiteUrl, twitterUrl]
@@ -25,14 +39,16 @@ export default function SocialOnboarding() {
 
   const handleSubmit = async () => {
     try {
-      setIsSubmitting(true);
-      
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user?.id) {
-        throw new Error('No user ID found');
+      if (!userId) {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user?.id) {
+          throw new Error('No user ID found');
+        }
+        setUserId(session.user.id);
       }
 
+      setIsSubmitting(true);
+      
       const { error } = await supabase
         .from('profiles')
         .update({
@@ -42,7 +58,7 @@ export default function SocialOnboarding() {
           has_completed_social_info: true,
           social_info_completed_at: new Date().toISOString()
         })
-        .eq('id', user.id);
+        .eq('id', userId);
 
       if (error) throw error;
 
