@@ -86,13 +86,13 @@ export const AuthButton = () => {
 
   return (
     <>
-      <div className="relative">
+      <div className="relative z-50">
         {user ? (
           <Button
             onClick={handleSignOut}
             disabled={loading}
             variant="outline"
-            className="bg-white/10 text-white hover:bg-white/20 active:bg-white/30"
+            className="bg-white/10 text-white hover:bg-white/20 active:bg-white/30 cursor-pointer"
           >
             Sign Out
           </Button>
@@ -100,7 +100,7 @@ export const AuthButton = () => {
           <Button
             onClick={handleGoogleSignIn}
             disabled={loading}
-            className="bg-white text-black hover:bg-gray-100 active:bg-gray-200 flex items-center gap-2 shadow-lg"
+            className="bg-white text-black hover:bg-gray-100 active:bg-gray-200 cursor-pointer flex items-center gap-2 shadow-lg relative z-50"
           >
             <GoogleIcon />
             Sign in with Google
