@@ -48,17 +48,17 @@ export const Hero = () => {
   ];
 
   return (
-    <div className="relative min-h-screen w-full">
+    <div className="flex-1 relative">
       <Sidebar />
       <div className="absolute inset-0 bg-gradient-to-br from-siso-bg via-siso-bg/95 to-siso-bg/90" />
       
-      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
-        <div className="text-center space-y-8 sm:space-y-12">
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-8">
+        <div className="text-center">
           {/* Welcome Message */}
-          <div className="space-y-6">
+          <div className="space-y-6 mb-12">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-siso-text-bold leading-tight">
               Welcome to{' '}
-              <span className="relative inline-block mt-4">
+              <span className="relative inline-block">
                 <span className="relative p-3 sm:p-4 rounded-lg bg-black/30 backdrop-blur-sm border border-siso-text/10">
                   <span className="relative bg-gradient-to-r from-siso-orange to-siso-red text-transparent bg-clip-text">
                     SISO Agency Resources
@@ -72,7 +72,7 @@ export const Hero = () => {
           </div>
 
           {/* Resource Guide */}
-          <div className="mt-20">
+          <div className="mt-8">
             <div className="relative p-6 rounded-xl bg-black/30 backdrop-blur-sm border border-siso-text/10 
               hover:border-siso-text/20 transition-all duration-300">
               <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-siso-orange/5 to-siso-red/5" />
