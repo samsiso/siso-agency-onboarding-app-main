@@ -132,63 +132,61 @@ const Feature108 = ({
             </p>
           </div>
 
-        <div className="mt-12">
-          {/* Adjust container width and padding */}
-          <div className="container max-w-7xl mx-auto px-6 lg:px-8">
-            {/* Tab Triggers */}
-            <div className="flex flex-wrap items-center justify-center gap-4 sm:flex-row md:gap-8 mb-8">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.value}
-                  onClick={() => setActiveTab(tab.value)}
-                  className={`flex items-center gap-2 rounded-xl px-6 py-4 text-sm font-semibold 
-                    transition-all duration-300
-                    ${activeTab === tab.value 
-                      ? 'text-siso-text-bold bg-gradient-to-r from-siso-red/20 to-siso-orange/20 shadow-lg shadow-siso-red/10' 
-                      : 'text-siso-text hover:text-siso-text-bold hover:bg-gradient-to-r hover:from-siso-red/20 hover:to-siso-orange/20'
-                    }`}
-                >
-                  {tab.icon} {tab.label}
-                </button>
-              ))}
-            </div>
+          <div className="mt-12">
+            <div className="container max-w-7xl mx-auto px-6 lg:px-8">
+              {/* Tab Triggers */}
+              <div className="flex flex-wrap items-center justify-center gap-4 sm:flex-row md:gap-8 mb-8">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.value}
+                    onClick={() => setActiveTab(tab.value)}
+                    className={`flex items-center gap-2 rounded-xl px-6 py-4 text-sm font-semibold 
+                      transition-all duration-300
+                      ${activeTab === tab.value 
+                        ? 'text-siso-text-bold bg-gradient-to-r from-siso-red/20 to-siso-orange/20 shadow-lg shadow-siso-red/10' 
+                        : 'text-siso-text hover:text-siso-text-bold hover:bg-gradient-to-r hover:from-siso-red/20 hover:to-siso-orange/20'
+                      }`}
+                  >
+                    {tab.icon} {tab.label}
+                  </button>
+                ))}
+              </div>
 
-            {/* Content Display with adjusted spacing */}
-            {activeContent && (
-              <div className="mt-8 px-4">
-                <div className="rounded-lg border border-siso-border bg-black/90 backdrop-blur-sm p-8">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                    <div className="flex flex-col gap-4">
-                      <Badge variant="outline" className="w-fit bg-black/50 backdrop-blur-sm border-siso-orange/20">
-                        {activeContent.badge}
-                      </Badge>
-                      <h3 className="text-2xl font-bold bg-gradient-to-r from-siso-orange to-siso-red text-transparent bg-clip-text">
-                        {activeContent.title}
-                      </h3>
-                      <p className="text-siso-text/80">
-                        {activeContent.description}
-                      </p>
-                      <Button 
-                        className="w-fit bg-gradient-to-r from-siso-red to-siso-orange hover:from-siso-red/90 hover:to-siso-orange/90 
-                          text-white shadow-lg shadow-siso-red/20 transition-all duration-300 hover:shadow-xl hover:shadow-siso-orange/30"
-                      >
-                        {activeContent.buttonText}
-                      </Button>
-                    </div>
-                    <div className="w-full h-[300px] rounded-lg overflow-hidden shadow-xl shadow-black/20">
-                      <img
-                        src={activeContent.imageSrc}
-                        alt={activeContent.imageAlt}
-                        className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
-                      />
+              {/* Content Display */}
+              {activeContent && (
+                <div className="mt-8 px-4">
+                  <div className="rounded-lg border border-siso-border bg-black/90 backdrop-blur-sm p-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                      <div className="flex flex-col gap-4">
+                        <Badge variant="outline" className="w-fit bg-black/50 backdrop-blur-sm border-siso-orange/20">
+                          {activeContent.badge}
+                        </Badge>
+                        <h3 className="text-2xl font-bold bg-gradient-to-r from-siso-orange to-siso-red text-transparent bg-clip-text">
+                          {activeContent.title}
+                        </h3>
+                        <p className="text-siso-text/80">
+                          {activeContent.description}
+                        </p>
+                        <Button 
+                          className="w-fit bg-gradient-to-r from-siso-red to-siso-orange hover:from-siso-red/90 hover:to-siso-orange/90 
+                            text-white shadow-lg shadow-siso-red/20 transition-all duration-300 hover:shadow-xl hover:shadow-siso-orange/30"
+                        >
+                          {activeContent.buttonText}
+                        </Button>
+                      </div>
+                      <div className="w-full h-[300px] rounded-lg overflow-hidden shadow-xl shadow-black/20">
+                        <img
+                          src={activeContent.imageSrc}
+                          alt={activeContent.imageAlt}
+                          className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
-      </div>
         </div>
       </div>
     </section>
