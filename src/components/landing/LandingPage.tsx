@@ -69,18 +69,18 @@ export const LandingPage = () => {
         <div className="text-center space-y-8 relative z-10">
           {/* Stats Bar */}
           <div className="flex justify-center gap-8 mb-12">
-            <div className="px-6 py-3 bg-black/30 backdrop-blur-sm rounded-lg border border-white/10">
-              <span className="text-siso-orange">⭐️⭐️⭐️⭐️⭐️</span>{' '}
-              <span className="text-gray-300">Reviews from 200+ users</span>
+            <div className="inline-flex items-center gap-2 text-gray-300">
+              <span className="text-siso-orange">⭐️⭐️⭐️⭐️⭐️</span>
+              Reviews from 200+ users
             </div>
-            <div className="px-6 py-3 bg-black/30 backdrop-blur-sm rounded-lg border border-white/10">
-              <span className="text-siso-orange">🚀</span>{' '}
-              <span className="text-gray-300">10,000+ active members</span>
+            <div className="inline-flex items-center gap-2 text-gray-300">
+              <span className="text-siso-orange">🚀</span>
+              10,000+ active members
             </div>
           </div>
 
           {/* Main Headline */}
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight animate-fade-in">
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tight animate-fade-in max-w-5xl mx-auto">
             <span className="text-white">Transform Your Agency with </span>
             <span className="title-glow">
               AI-Powered
