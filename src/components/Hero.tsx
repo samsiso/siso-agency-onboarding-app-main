@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from './ui/button';
+import { RainbowButton } from './ui/rainbow-button';
 import { useSidebar } from './ui/sidebar';
 import { Sidebar } from './Sidebar';
 
@@ -67,6 +67,16 @@ export const Hero = () => {
             <p className="text-xl sm:text-2xl text-siso-text max-w-3xl mx-auto leading-relaxed">
               Your gateway to tools, education, networking, and AI-powered innovation—crafted to help your agency thrive.
             </p>
+            
+            {/* CTA Button */}
+            <div className="mt-8">
+              <RainbowButton
+                onClick={() => handleResourceClick('/tools')}
+                className="text-lg px-10 py-6 font-semibold"
+              >
+                Explore Resources
+              </RainbowButton>
+            </div>
           </div>
 
           {/* Resource Guide */}

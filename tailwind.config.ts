@@ -133,6 +133,10 @@ export default {
           '0%, 100%': { opacity: 0.4 },
           '50%': { opacity: 0.7 },
         },
+        rainbow: {
+          "0%": { "background-position": "0%" },
+          "100%": { "background-position": "200%" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -146,6 +150,7 @@ export default {
         ping: "ping 2s cubic-bezier(0, 0, 0.2, 1) infinite",
         float: "float 3s ease-in-out infinite",
         'wave-pulse': 'wave-pulse 4s ease-in-out infinite',
+        rainbow: "rainbow 3s infinite linear",
       },
       typography: {
         DEFAULT: {
