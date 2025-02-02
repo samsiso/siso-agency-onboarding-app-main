@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { useGoogleAuth } from '@/hooks/useGoogleAuth';
 import { useToast } from '@/hooks/use-toast';
-import { FloatingOrbs } from '@/components/effects/FloatingOrbs';
+import { Waves } from '@/components/ui/waves-background';
 
 export default function Auth() {
   const { user } = useAuthSession();
@@ -30,7 +30,18 @@ export default function Auth() {
 
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-siso-bg to-black p-4 overflow-hidden">
-      <FloatingOrbs />
+      <Waves 
+        lineColor="rgba(255, 87, 34, 0.2)"
+        waveSpeedX={0.02}
+        waveSpeedY={0.01}
+        waveAmpX={40}
+        waveAmpY={20}
+        friction={0.9}
+        tension={0.01}
+        maxCursorMove={120}
+        xGap={12}
+        yGap={36}
+      />
       
       <div className="w-full max-w-md bg-black/20 backdrop-blur-lg rounded-lg shadow-xl p-8 space-y-6 border border-siso-border relative z-10">
         <div className="text-center space-y-2">
