@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { MoveRight, PhoneCall } from "lucide-react";
+import { PhoneCall, MoveRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 function Hero() {
@@ -25,15 +25,10 @@ function Hero() {
     <div className="w-full">
       <div className="container mx-auto">
         <div className="flex gap-8 py-20 lg:py-40 items-center justify-center flex-col">
-          <div>
-            <Button variant="secondary" size="sm" className="gap-4">
-              Explore our Resource Hub <MoveRight className="w-4 h-4" />
-            </Button>
-          </div>
           <div className="flex gap-4 flex-col">
-            <h1 className="text-5xl md:text-7xl max-w-2xl tracking-tighter text-center font-regular">
-              <span className="text-siso-text-bold">Built for Agencies</span>
-              <div className="relative h-[120px] md:h-[160px] flex w-full justify-center overflow-hidden text-center">
+            <h1 className="text-6xl md:text-8xl max-w-3xl tracking-tighter text-center font-regular">
+              <span className="text-siso-text-bold">Built for Agencies to</span>
+              <div className="relative h-[150px] md:h-[200px] flex w-full justify-center overflow-hidden text-center">
                 {titles.map((title, index) => (
                   <motion.span
                     key={index}
