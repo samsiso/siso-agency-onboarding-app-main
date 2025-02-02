@@ -14,7 +14,7 @@ export const LandingPage = () => {
   }, [user, navigate]);
 
   return (
-    <div className="h-screen w-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-siso-bg via-siso-bg/95 to-siso-bg/90">
+    <div className="relative min-h-screen w-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-siso-bg via-siso-bg/95 to-siso-bg/90">
       {/* Hero Section */}
       <div className="max-w-4xl mx-auto text-center space-y-8">
         <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold">
@@ -60,7 +60,7 @@ export const LandingPage = () => {
         </div>
 
         {/* CTA Section */}
-        <div className="mt-12 space-y-4">
+        <div className="relative z-50 mt-12 space-y-4">
           <p className="text-lg text-siso-text/90 mb-4">
             Get started by signing in with your Google account
           </p>

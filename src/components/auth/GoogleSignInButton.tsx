@@ -10,7 +10,7 @@ export const GoogleSignInButton = ({ onClick, disabled }: GoogleSignInButtonProp
     <Button
       onClick={onClick}
       disabled={disabled}
-      className="bg-white text-black hover:bg-gray-100 cursor-pointer transition-all duration-200 hover:scale-105 shadow-lg flex items-center gap-2"
+      className="relative z-50 bg-white text-black hover:bg-gray-100 active:bg-gray-200 cursor-pointer transition-all duration-200 hover:scale-105 shadow-lg flex items-center gap-2"
     >
       <GoogleIcon />
       Sign in with Google

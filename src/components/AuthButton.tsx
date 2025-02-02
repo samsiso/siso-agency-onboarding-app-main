@@ -87,7 +87,7 @@ export const AuthButton = () => {
 
   return (
     <>
-      <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-[100] cursor-pointer">
+      <div className="relative z-50">
         {user ? (
           <SignOutButton onClick={handleSignOut} disabled={loading} />
         ) : (
