@@ -31,13 +31,13 @@ export function TestimonialCard({
 
   return (
     <div 
-      className={`group relative p-6 rounded-xl backdrop-blur-sm border-2 border-siso-orange/40 
+      className={`group relative p-4 rounded-xl backdrop-blur-sm border-2 border-siso-orange/40 
         bg-black/30 transition-all duration-300 hover:scale-105 hover:border-siso-orange
-        ${videoUrl ? 'h-auto' : 'h-min'}`}
+        ${videoUrl ? 'h-full' : 'h-auto'}`}
     >
       {/* Profile Section */}
-      <div className="flex items-center gap-4 mb-4">
-        <div className="relative h-12 w-12">
+      <div className="flex items-center gap-3 mb-3">
+        <div className="relative h-10 w-10">
           <a 
             href={linkedinUrl} 
             target="_blank" 
@@ -47,23 +47,23 @@ export function TestimonialCard({
             <img
               src={image}
               alt={name}
-              className="h-12 w-12 rounded-full object-cover border-2 border-siso-orange/40"
+              className="h-10 w-10 rounded-full object-cover border-2 border-siso-orange/40"
             />
           </a>
         </div>
         <div className="text-left">
-          <h4 className="text-white font-medium">{name}</h4>
-          <p className="text-gray-400 text-sm">{role}</p>
-          <p className="text-gray-400 text-sm">{company}</p>
+          <h4 className="text-white font-medium text-sm">{name}</h4>
+          <p className="text-gray-400 text-xs">{role}</p>
+          <p className="text-gray-400 text-xs">{company}</p>
         </div>
       </div>
 
       {/* Quote */}
-      <p className="text-gray-300 italic text-left mb-4">{quote}</p>
+      <p className="text-gray-300 italic text-sm text-left mb-3">{quote}</p>
 
       {/* Video Thumbnail Section */}
       {videoUrl && (
-        <div className="relative rounded-lg overflow-hidden bg-black/20 aspect-video mt-4">
+        <div className="relative rounded-lg overflow-hidden bg-black/20 aspect-video">
           <img
             src={getYouTubeThumbnail(videoUrl)}
             alt="Video thumbnail"
@@ -74,9 +74,9 @@ export function TestimonialCard({
             className="absolute inset-0 flex items-center justify-center bg-black/50 
               group-hover:bg-black/60 transition-colors duration-300"
           >
-            <div className="bg-white/10 p-4 rounded-full backdrop-blur-sm 
+            <div className="bg-white/10 p-3 rounded-full backdrop-blur-sm 
               group-hover:bg-white/20 transition-all duration-300">
-              <Play className="w-8 h-8 text-white" />
+              <Play className="w-6 h-6 text-white" />
             </div>
           </button>
         </div>
