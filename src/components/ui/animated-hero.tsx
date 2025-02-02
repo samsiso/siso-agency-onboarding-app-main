@@ -32,7 +32,7 @@ function Hero() {
           </div>
           <div className="flex gap-4 flex-col">
             <h1 className="text-5xl md:text-7xl max-w-2xl tracking-tighter text-center font-regular">
-              <span className="text-siso-text-bold">Built by Agencies</span>
+              <span className="text-siso-text-bold">Built for Agencies</span>
               <div className="relative h-[120px] md:h-[160px] flex w-full justify-center overflow-hidden text-center">
                 {titles.map((title, index) => (
                   <motion.span
