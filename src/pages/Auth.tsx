@@ -22,12 +22,11 @@ export default function Auth() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Skip validation and just proceed
     toast({
       title: "Welcome aboard!",
       description: "Proceeding to the next step...",
     });
-    navigate('/onboarding/social'); // We'll create this route next
+    navigate('/onboarding/social');
   };
 
   const handleDemoGoogleSignIn = () => {
@@ -56,7 +55,9 @@ export default function Auth() {
       <div className="w-full max-w-md bg-black/20 backdrop-blur-lg rounded-lg shadow-xl p-8 space-y-6 border border-siso-border relative z-10">
         {/* Progress Indicator */}
         <div className="absolute -top-10 left-0 w-full flex justify-center text-siso-text/70">
-          <span>Step 1 of 3</span>
+          <span className="px-4 py-1 rounded-full bg-siso-bg-alt border border-siso-border text-sm">
+            Step 1 of 3
+          </span>
         </div>
 
         <div className="text-center space-y-2">
