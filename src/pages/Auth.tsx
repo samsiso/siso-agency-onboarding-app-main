@@ -24,7 +24,7 @@ export default function Auth() {
     e.preventDefault();
     toast({
       title: "Coming Soon",
-      description: "Email/password authentication will be available soon!",
+      description: "Email/password onboarding will be available soon!",
     });
   };
 
@@ -46,23 +46,23 @@ export default function Auth() {
       <div className="w-full max-w-md bg-black/20 backdrop-blur-lg rounded-lg shadow-xl p-8 space-y-6 border border-siso-border relative z-10">
         <div className="text-center space-y-2">
           <h1 className="text-2xl font-bold bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent">
-            Welcome to SISO Agency
+            Get Started with SISO Agency
           </h1>
-          <p className="text-siso-text">Sign in to access your account</p>
+          <p className="text-siso-text">Create your account to access the resource hub</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Input
               type="email"
-              placeholder="Email"
+              placeholder="Work Email"
               className="w-full bg-white/5 border-siso-border text-siso-text placeholder:text-siso-text-muted focus:border-siso-red"
             />
           </div>
           <div className="space-y-2">
             <Input
               type="password"
-              placeholder="Password"
+              placeholder="Create Password"
               className="w-full bg-white/5 border-siso-border text-siso-text placeholder:text-siso-text-muted focus:border-siso-red"
             />
           </div>
@@ -70,7 +70,7 @@ export default function Auth() {
             type="submit"
             className="w-full bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-white"
           >
-            Sign In with Email
+            Create Account
           </Button>
         </form>
 
@@ -90,7 +90,7 @@ export default function Auth() {
             className="w-full bg-white text-black hover:bg-gray-100 flex items-center justify-center gap-2"
           >
             <GoogleIcon />
-            Sign in with Google
+            Continue with Google
           </Button>
           
           <Button
@@ -103,7 +103,7 @@ export default function Auth() {
             className="w-full bg-[#24292F] text-white hover:bg-[#24292F]/90 flex items-center justify-center gap-2"
           >
             <GitHubIcon />
-            Sign in with GitHub
+            Continue with GitHub
           </Button>
         </div>
       </div>
