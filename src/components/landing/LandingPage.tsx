@@ -2,26 +2,40 @@ import { useNavigate } from 'react-router-dom';
 import { AuthButton } from '../AuthButton';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { useEffect } from 'react';
+import { Button } from '@/components/ui/button';
 
 export const LandingPage = () => {
   const { user } = useAuthSession();
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log('LandingPage mounted');
     if (user) {
       navigate('/app');
     }
   }, [user, navigate]);
 
+  const handleTestClick = () => {
+    console.log('Test button clicked');
+  };
+
   return (
-    <div className="min-h-screen w-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-siso-bg via-siso-bg/95 to-siso-bg/90 relative">
+    <div className="min-h-screen w-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-siso-bg via-siso-bg/95 to-siso-bg/90">
+      {/* Test Button */}
+      <Button
+        onClick={handleTestClick}
+        className="fixed top-4 left-4 z-[9999] bg-blue-500 hover:bg-blue-600 text-white"
+      >
+        Test Button
+      </Button>
+
       {/* Top Right Auth Button */}
-      <div className="fixed top-4 right-4 z-[100]">
+      <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
         <AuthButton />
       </div>
 
       {/* Hero Section */}
-      <div className="max-w-4xl mx-auto text-center space-y-8 relative">
+      <div className="max-w-4xl mx-auto text-center space-y-8">
         <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold">
           Welcome to{' '}
           <span className="bg-gradient-to-r from-siso-orange to-siso-red text-transparent bg-clip-text">
@@ -65,11 +79,11 @@ export const LandingPage = () => {
         </div>
 
         {/* CTA Section */}
-        <div className="mt-12 space-y-4 relative">
+        <div className="mt-12 space-y-4">
           <p className="text-lg text-siso-text/90 mb-4">
             Get started by signing in with your Google account
           </p>
-          <div className="relative z-[100] pointer-events-auto">
+          <div className="relative z-[9999] pointer-events-auto">
             <AuthButton />
           </div>
         </div>

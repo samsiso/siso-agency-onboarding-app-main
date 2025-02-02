@@ -15,6 +15,7 @@ export const AuthButton = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    console.log('AuthButton mounted');
     const checkAuth = async () => {
       try {
         setLoading(true);
@@ -84,25 +85,31 @@ export const AuthButton = () => {
     };
   }, [handleSignIn, setLoading, toast, navigate]);
 
+  const handleClick = (e: React.MouseEvent) => {
+    console.log('Button clicked');
+    e.stopPropagation();
+    e.preventDefault();
+    if (!loading) {
+      handleGoogleSignIn();
+    }
+  };
+
   return (
-    <div className="relative z-[100] pointer-events-auto">
+    <div className="relative z-[9999] pointer-events-auto">
       {user ? (
         <Button
           onClick={handleSignOut}
           disabled={loading}
           variant="outline"
-          className="bg-white/10 text-white hover:bg-white/20 active:bg-white/30 cursor-pointer pointer-events-auto"
+          className="bg-white/10 text-white hover:bg-white/20 active:bg-white/30 cursor-pointer"
         >
           Sign Out
         </Button>
       ) : (
         <Button
-          onClick={(e) => {
-            e.stopPropagation();
-            handleGoogleSignIn();
-          }}
+          onClick={handleClick}
           disabled={loading}
-          className="bg-white text-black hover:bg-gray-100 active:bg-gray-200 cursor-pointer pointer-events-auto flex items-center gap-2 shadow-lg relative z-[100]"
+          className="bg-white text-black hover:bg-gray-100 active:bg-gray-200 cursor-pointer flex items-center gap-2 shadow-lg"
         >
           <GoogleIcon />
           Sign in with Google
