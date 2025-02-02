@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { useEffect } from 'react';
-import { TierSection } from './TierSection';
 import { TestimonialSection } from './TestimonialSection';
 import { Hero } from '@/components/ui/animated-hero';
 import { Waves } from '@/components/ui/waves-background';
@@ -18,7 +17,6 @@ import { TailwindCSSIcon } from '@/components/ui/icons/TailwindCSSIcon';
 import { NextjsIcon } from '@/components/ui/icons/NextjsIcon';
 import { UpstashIcon } from '@/components/ui/icons/UpstashIcon';
 import { StripeIcon } from '@/components/ui/icons/StripeIcon';
-import { Case } from '@/components/ui/cases-with-infinite-scroll';
 import { StackedCircularFooter } from '@/components/ui/stacked-circular-footer';
 import { RainbowButton } from '@/components/ui/rainbow-button';
 import { PricingCard } from '@/components/ui/pricing-card';
@@ -86,56 +84,8 @@ export const LandingPage = () => {
           <Feature108 />
         </section>
 
-        {/* Testimonials Section - Moved up */}
-        <section id="testimonials" className="py-16">
-          <TestimonialSection />
-        </section>
-
-        {/* Call to Action Section */}
-        <section className="py-12">
-          <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto text-center">
-              <h3 className="text-4xl md:text-5xl font-bold text-white mb-6 font-display tracking-tight">
-                Ready to transform your business with AI?
-              </h3>
-              <p className="text-gray-300 text-lg mb-10 font-light">
-                Connect with our experts today and discover how our innovative solutions can drive your success.
-              </p>
-              <RainbowButton 
-                className="text-lg px-10 py-6 font-semibold"
-                onClick={handleGetStarted}
-              >
-                Start Free Trial
-              </RainbowButton>
-            </div>
-          </div>
-        </section>
-
-        {/* Logo Carousel Section - Moved down */}
-        <section className="py-16 overflow-hidden">
-          <div className="container mx-auto">
-            <div className="text-center mb-12">
-              <GradientHeading 
-                variant="secondary" 
-                size="lg"
-                className="mb-4"
-              >
-                Powered by Industry Leaders
-              </GradientHeading>
-              <p className="text-siso-text-muted text-lg max-w-2xl mx-auto">
-                Join thousands of agencies leveraging cutting-edge AI tools and resources
-              </p>
-            </div>
-            <div className="flex justify-center items-center w-full">
-              <div className="max-w-5xl w-full">
-                <LogoCarousel columnCount={5} logos={allLogos} />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Pricing Section */}
-        <section id="pricing" className="py-20">
+        {/* Pricing Section - Moved right after features */}
+        <section id="pricing" className="py-16">
           <PricingCard
             title="Enterprise AI Suite"
             description="Complete AI transformation toolkit for established agencies"
@@ -164,6 +114,54 @@ export const LandingPage = () => {
             buttonText="Start Enterprise Trial"
             onButtonClick={handleGetStarted}
           />
+        </section>
+
+        {/* Testimonials Section */}
+        <section id="testimonials" className="py-16">
+          <TestimonialSection />
+        </section>
+
+        {/* Call to Action Section */}
+        <section className="py-12">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto text-center">
+              <h3 className="text-4xl md:text-5xl font-bold text-white mb-6 font-display tracking-tight">
+                Ready to transform your business with AI?
+              </h3>
+              <p className="text-gray-300 text-lg mb-10 font-light">
+                Connect with our experts today and discover how our innovative solutions can drive your success.
+              </p>
+              <RainbowButton 
+                className="text-lg px-10 py-6 font-semibold"
+                onClick={handleGetStarted}
+              >
+                Start Free Trial
+              </RainbowButton>
+            </div>
+          </div>
+        </section>
+
+        {/* Logo Carousel Section */}
+        <section className="py-16 overflow-hidden">
+          <div className="container mx-auto">
+            <div className="text-center mb-12">
+              <GradientHeading 
+                variant="secondary" 
+                size="lg"
+                className="mb-4"
+              >
+                Powered by Industry Leaders
+              </GradientHeading>
+              <p className="text-siso-text-muted text-lg max-w-2xl mx-auto">
+                Join thousands of agencies leveraging cutting-edge AI tools and resources
+              </p>
+            </div>
+            <div className="flex justify-center items-center w-full">
+              <div className="max-w-5xl w-full">
+                <LogoCarousel columnCount={5} logos={allLogos} />
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* Footer */}
