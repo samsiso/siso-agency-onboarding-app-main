@@ -2,13 +2,7 @@ import { useRef, useEffect } from "react"
 import { cn } from "@/lib/utils"
 
 interface WavesProps {
-  /**
-   * Color of the wave lines
-   */
   lineColor?: string
-  /**
-   * Background color of the container
-   */
   backgroundColor?: string
   waveSpeedX?: number
   waveSpeedY?: number
@@ -23,16 +17,27 @@ interface WavesProps {
 }
 
 class Grad {
-  constructor(x, y, z) {
+  x: number
+  y: number 
+  z: number
+
+  constructor(x: number, y: number, z: number) {
     this.x = x
     this.y = y
     this.z = z
   }
-  dot2(x, y) {
+
+  dot2(x: number, y: number) {
     return this.x * x + this.y * y
   }
 }
+
 class Noise {
+  grad3: Grad[]
+  p: number[]
+  perm: number[]
+  gradP: Grad[]
+
   constructor(seed = 0) {
     this.grad3 = [
       new Grad(1, 1, 0),
@@ -70,6 +75,7 @@ class Noise {
     this.gradP = new Array(512)
     this.seed(seed)
   }
+
   seed(seed) {
     if (seed > 0 && seed < 1) seed *= 65536
     seed = Math.floor(seed)
