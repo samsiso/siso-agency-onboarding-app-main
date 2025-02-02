@@ -1,5 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Layout, Pointer, Zap } from "lucide-react";
+import { BookOpen, Users, BarChart, Zap, Newspaper } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -28,102 +28,156 @@ interface Feature108Props {
 
 const Feature108 = ({
   badge = "SISO Agency",
-  heading = "Empowering Agencies with AI-Driven Solutions",
-  description = "Access curated tools, education, and networking resources to scale your agency.",
+  heading = "Empower Your Business with Intelligent Tools & Community-Driven Insights",
+  description = "From cutting-edge AI analysis to educational resources and a thriving network, we deliver the tools and insights you need.",
   tabs = [
     {
-      value: "tab-1",
+      value: "ai-tools",
       icon: <Zap className="h-auto w-4 shrink-0" />,
-      label: "AI Tools",
+      label: "AI-Powered Analysis",
       content: {
-        badge: "Modern Solutions",
-        title: "Supercharge Your Agency Growth",
+        badge: "Smart Solutions",
+        title: "Transform Your Agency with AI",
         description:
-          "Access our curated collection of AI tools and platforms designed specifically for agency needs, helping you automate tasks and scale operations efficiently.",
+          "Get tailored insights by cross-referencing industry videos and your agency needs. Our AI-powered tools help you make data-driven decisions and stay ahead of the competition.",
         buttonText: "Explore Tools",
-        imageSrc: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7",
-        imageAlt: "AI Tools for Agencies",
+        imageSrc: "https://images.unsplash.com/photo-1677442136019-21780ecad995",
+        imageAlt: "AI Analysis Dashboard",
       },
     },
     {
-      value: "tab-2",
-      icon: <Pointer className="h-auto w-4 shrink-0" />,
+      value: "education",
+      icon: <BookOpen className="h-auto w-4 shrink-0" />,
       label: "Education Hub",
       content: {
-        badge: "Expert Knowledge",
-        title: "Learn from Industry Leaders",
+        badge: "Learn & Grow",
+        title: "Access Premium Educational Content",
         description:
-          "Get access to exclusive educational content, tutorials, and best practices from successful agency owners and digital marketing experts.",
+          "Dive into our curated collection of YouTube videos, expert analysis, and top video recommendations tailored to your business needs. Stay ahead with continuous learning.",
         buttonText: "Start Learning",
-        imageSrc: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d",
+        imageSrc: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3",
         imageAlt: "Education Resources",
       },
     },
     {
-      value: "tab-3",
-      icon: <Layout className="h-auto w-4 shrink-0" />,
-      label: "Network & Grow",
+      value: "community",
+      icon: <Users className="h-auto w-4 shrink-0" />,
+      label: "Community & Network",
       content: {
-        badge: "Community Power",
-        title: "Connect with Agency Leaders",
+        badge: "Connect & Collaborate",
+        title: "Join a Thriving Community",
         description:
-          "Join our thriving community of agency owners, share experiences, and build valuable partnerships that drive growth and innovation.",
+          "Engage with industry experts, get personalized GP assistance, and become part of a vibrant community of agency owners and professionals sharing insights and opportunities.",
         buttonText: "Join Network",
-        imageSrc: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
-        imageAlt: "Networking",
+        imageSrc: "https://images.unsplash.com/photo-1522071820081-009f0129c71c",
+        imageAlt: "Community Network",
+      },
+    },
+    {
+      value: "economy",
+      icon: <BarChart className="h-auto w-4 shrink-0" />,
+      label: "Economy Insights",
+      content: {
+        badge: "Market Intelligence",
+        title: "Navigate Economic Trends",
+        description:
+          "Access powerful tools and visualizations to understand economic trends and make informed decisions. Stay ahead of market changes with our comprehensive analysis.",
+        buttonText: "View Insights",
+        imageSrc: "https://images.unsplash.com/photo-1642543492481-44e81e3914a7",
+        imageAlt: "Economic Analysis",
+      },
+    },
+    {
+      value: "news",
+      icon: <Newspaper className="h-auto w-4 shrink-0" />,
+      label: "AI News",
+      content: {
+        badge: "Stay Updated",
+        title: "Latest AI Industry News",
+        description:
+          "Keep up with the rapidly evolving AI landscape through our curated news feed. Get insights on the latest developments, trends, and innovations in the AI industry.",
+        buttonText: "Read News",
+        imageSrc: "https://images.unsplash.com/photo-1655720828018-edd2daec9349",
+        imageAlt: "AI News Feed",
       },
     },
   ],
 }: Feature108Props) => {
   return (
-    <section className="py-32">
-      <div>
+    <section className="relative py-32 overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute inset-0 bg-gradient-radial from-siso-orange/10 via-transparent to-transparent opacity-30" />
+      <div className="absolute inset-0 bg-grid-white/5" style={{
+        backgroundImage: `linear-gradient(to right, rgb(255 255 255 / 0.05) 1px, transparent 1px),
+          linear-gradient(to bottom, rgb(255 255 255 / 0.05) 1px, transparent 1px)`,
+        backgroundSize: '24px 24px'
+      }} />
+
+      <div className="relative">
         <div className="container flex flex-col items-center gap-4 text-center">
-          <Badge variant="outline">{badge}</Badge>
-          <h1 className="max-w-2xl text-3xl font-semibold md:text-4xl">
+          <Badge variant="outline" className="bg-black/50 backdrop-blur-sm border-siso-orange/20">
+            {badge}
+          </Badge>
+          <h2 className="max-w-3xl text-4xl font-bold md:text-5xl lg:text-6xl bg-gradient-to-r from-siso-orange to-siso-red text-transparent bg-clip-text">
             {heading}
-          </h1>
-          <p className="text-muted-foreground">{description}</p>
+          </h2>
+          <p className="max-w-2xl text-lg text-siso-text/80 md:text-xl">
+            {description}
+          </p>
         </div>
-        <div>
-          <Tabs defaultValue={tabs[0].value} className="mt-8">
-            <TabsList className="container flex flex-col items-center justify-center gap-4 sm:flex-row md:gap-10">
+
+        <div className="mt-16">
+          <Tabs defaultValue={tabs[0].value} className="w-full">
+            <TabsList className="container flex flex-wrap items-center justify-center gap-4 sm:flex-row md:gap-8">
               {tabs.map((tab) => (
                 <TabsTrigger
                   key={tab.value}
                   value={tab.value}
-                  className="flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-muted-foreground data-[state=active]:bg-muted data-[state=active]:text-primary"
+                  className="flex items-center gap-2 rounded-xl px-6 py-4 text-sm font-semibold 
+                    text-siso-text transition-all duration-300 hover:text-siso-text-bold
+                    data-[state=active]:bg-gradient-to-r data-[state=active]:from-siso-red/20 
+                    data-[state=active]:to-siso-orange/20 data-[state=active]:text-siso-text-bold
+                    data-[state=active]:shadow-lg data-[state=active]:shadow-siso-red/10"
                 >
                   {tab.icon} {tab.label}
                 </TabsTrigger>
               ))}
             </TabsList>
-            <div className="container mt-8 max-w-screen-xl rounded-2xl bg-muted/70 p-6 lg:p-16">
+
+            <div className="container mt-12 max-w-screen-xl">
               {tabs.map((tab) => (
                 <TabsContent
                   key={tab.value}
                   value={tab.value}
-                  className="grid place-items-center gap-20 lg:grid-cols-2 lg:gap-10"
+                  className="rounded-2xl border border-siso-border bg-black/40 backdrop-blur-sm p-8 lg:p-12"
                 >
-                  <div className="flex flex-col gap-5">
-                    <Badge variant="outline" className="w-fit bg-background">
-                      {tab.content.badge}
-                    </Badge>
-                    <h3 className="text-3xl font-semibold lg:text-5xl">
-                      {tab.content.title}
-                    </h3>
-                    <p className="text-muted-foreground lg:text-lg">
-                      {tab.content.description}
-                    </p>
-                    <Button className="mt-2.5 w-fit gap-2" size="lg">
-                      {tab.content.buttonText}
-                    </Button>
+                  <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 place-items-center">
+                    <div className="flex flex-col gap-6 lg:order-1">
+                      <Badge variant="outline" className="w-fit bg-black/50 backdrop-blur-sm border-siso-orange/20">
+                        {tab.content.badge}
+                      </Badge>
+                      <h3 className="text-3xl font-bold lg:text-4xl xl:text-5xl bg-gradient-to-r from-siso-orange to-siso-red text-transparent bg-clip-text">
+                        {tab.content.title}
+                      </h3>
+                      <p className="text-lg text-siso-text/80">
+                        {tab.content.description}
+                      </p>
+                      <Button 
+                        size="lg"
+                        className="w-fit bg-gradient-to-r from-siso-red to-siso-orange hover:from-siso-red/90 hover:to-siso-orange/90 
+                          text-white shadow-lg shadow-siso-red/20 transition-all duration-300 hover:shadow-xl hover:shadow-siso-orange/30"
+                      >
+                        {tab.content.buttonText}
+                      </Button>
+                    </div>
+                    <div className="w-full h-[300px] lg:h-[400px] rounded-xl overflow-hidden shadow-2xl shadow-black/20 lg:order-2">
+                      <img
+                        src={tab.content.imageSrc}
+                        alt={tab.content.imageAlt}
+                        className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
+                      />
+                    </div>
                   </div>
-                  <img
-                    src={tab.content.imageSrc}
-                    alt={tab.content.imageAlt}
-                    className="rounded-xl object-cover w-full h-[400px]"
-                  />
                 </TabsContent>
               ))}
             </div>
