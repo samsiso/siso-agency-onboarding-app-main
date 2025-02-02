@@ -45,7 +45,7 @@ export const LandingPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-8">
-              <img src="/logo.png" alt="SISO" className="h-8 w-8" />
+              <img src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png" alt="SISO" className="h-8 w-8" />
               <div className="hidden md:flex items-center gap-6">
                 <a href="#features" className="nav-link">Features</a>
                 <a href="#tools" className="nav-link">Tools</a>
@@ -69,11 +69,11 @@ export const LandingPage = () => {
         <div className="text-center space-y-8 relative z-10">
           {/* Stats Bar */}
           <div className="flex justify-center gap-8 mb-12">
-            <div className="glow-card">
+            <div className="px-6 py-3 bg-black/30 backdrop-blur-sm rounded-lg border border-white/10">
               <span className="text-siso-orange">⭐️⭐️⭐️⭐️⭐️</span>{' '}
               <span className="text-gray-300">Reviews from 200+ users</span>
             </div>
-            <div className="glow-card">
+            <div className="px-6 py-3 bg-black/30 backdrop-blur-sm rounded-lg border border-white/10">
               <span className="text-siso-orange">🚀</span>{' '}
               <span className="text-gray-300">10,000+ active members</span>
             </div>
@@ -99,11 +99,13 @@ export const LandingPage = () => {
           <div className="flex justify-center gap-6 pt-8 animate-fade-in">
             <button
               onClick={handleSignInClick}
-              className="button-primary"
+              className="px-8 py-3 bg-gradient-to-r from-siso-orange to-siso-red text-white rounded-lg font-medium
+                transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-orange-500/20"
             >
               Get Started Now
             </button>
-            <button className="button-secondary">
+            <button className="px-8 py-3 bg-white/5 backdrop-blur-sm text-white rounded-lg font-medium
+              border border-white/10 transition-all duration-300 hover:bg-white/10">
               Watch Demo
             </button>
           </div>
@@ -129,7 +131,8 @@ export const LandingPage = () => {
             ].map((feature, i) => (
               <div
                 key={i}
-                className="glow-card group cursor-pointer"
+                className="p-6 bg-black/30 backdrop-blur-sm rounded-lg border border-white/10 transition-all duration-300
+                  hover:bg-white/5 group cursor-pointer"
               >
                 <span className="text-3xl mb-4 block group-hover:scale-110 transition-transform duration-300">
                   {feature.icon}
@@ -166,7 +169,7 @@ export const LandingPage = () => {
                   text: "The educational resources and community support have helped us scale our agency beyond expectations."
                 }
               ].map((testimonial, i) => (
-                <div key={i} className="glow-card">
+                <div key={i} className="p-6 bg-black/30 backdrop-blur-sm rounded-lg border border-white/10">
                   <p className="text-gray-300 mb-4">"{testimonial.text}"</p>
                   <div className="flex items-center gap-4">
                     <div className="h-12 w-12 rounded-full bg-gradient-to-br from-siso-orange to-siso-red" />
@@ -187,7 +190,8 @@ export const LandingPage = () => {
             <p className="text-gray-400 mb-8">Join thousands of successful agencies already using our platform</p>
             <button
               onClick={handleSignInClick}
-              className="button-primary"
+              className="px-8 py-3 bg-gradient-to-r from-siso-orange to-siso-red text-white rounded-lg font-medium
+                transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-orange-500/20"
             >
               Get Started Now
             </button>
