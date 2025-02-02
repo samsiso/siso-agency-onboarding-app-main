@@ -81,9 +81,14 @@ export default {
           to: { height: "0" },
         },
         gradient: {
-          "0%": { backgroundPosition: "0% 50%" },
-          "50%": { backgroundPosition: "100% 50%" },
-          "100%": { backgroundPosition: "0% 50%" },
+          "0%, 100%": {
+            backgroundSize: "200% 200%",
+            backgroundPosition: "left center",
+          },
+          "50%": {
+            backgroundSize: "200% 200%",
+            backgroundPosition: "right center",
+          },
         },
         glow: {
           "0%, 100%": {
@@ -97,7 +102,7 @@ export default {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        gradient: "gradient var(--animation-duration, 8s) linear infinite",
+        gradient: "gradient 8s linear infinite",
         glow: "glow 3s ease-in-out infinite",
         fadeIn: "fadeIn 0.5s ease-out forwards",
         "float-slow": "float-slow 20s ease-in-out infinite",
