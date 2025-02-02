@@ -1,13 +1,19 @@
 import { Twitter, Linkedin, Instagram, Youtube } from "lucide-react";
 import { RainbowButton } from "./ui/rainbow-button";
+import { useNavigate } from 'react-router-dom';
 
 const Footer = () => {
+  const navigate = useNavigate();
   const socialLinks = [
     { icon: Twitter, href: "https://twitter.com/sisoai", label: "Twitter" },
     { icon: Linkedin, href: "https://linkedin.com/company/sisoai", label: "LinkedIn" },
     { icon: Instagram, href: "https://instagram.com/sisoai", label: "Instagram" },
     { icon: Youtube, href: "https://youtube.com/@sisoai", label: "YouTube" },
   ];
+
+  const handleGetStarted = () => {
+    navigate('/auth');
+  };
 
   return (
     <footer className="relative w-full overflow-hidden">
@@ -39,7 +45,7 @@ const Footer = () => {
           </p>
           <RainbowButton 
             className="text-lg px-10 py-6 font-semibold mb-8"
-            onClick={() => window.location.href = '/auth'}
+            onClick={handleGetStarted}
           >
             Start Free Trial
           </RainbowButton>

@@ -22,6 +22,10 @@ export const Hero = () => {
     navigate(path);
   };
 
+  const handleGetStarted = () => {
+    navigate('/auth');
+  };
+
   console.log('Hero rendering, isLoaded:', isLoaded);
 
   const resourceGuideItems = [
@@ -71,10 +75,10 @@ export const Hero = () => {
             {/* CTA Button */}
             <div className="mt-8">
               <RainbowButton
-                onClick={() => handleResourceClick('/tools')}
+                onClick={handleGetStarted}
                 className="text-lg px-10 py-6 font-semibold"
               >
-                Explore Resources
+                Get Started
               </RainbowButton>
             </div>
           </div>
