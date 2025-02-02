@@ -21,7 +21,7 @@ const Footer = () => {
 
       {/* Grid Background Pattern */}
       <div 
-        className="absolute inset-0 opacity-[0.03]" 
+        className="absolute inset-0 opacity-[0.15]" 
         style={{
           backgroundImage: `linear-gradient(to right, rgb(255 255 255 / 0.1) 1px, transparent 1px),
             linear-gradient(to bottom, rgb(255 255 255 / 0.1) 1px, transparent 1px)`,
