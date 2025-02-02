@@ -28,8 +28,8 @@ interface Feature108Props {
 
 const Feature108 = ({
   badge = "SISO Agency",
-  heading = "Empower Your Business with Intelligent Tools & Community-Driven Insights",
-  description = "From cutting-edge AI analysis to educational resources and a thriving network, we deliver the tools and insights you need.",
+  heading = "Resource Hub Features",
+  description = "Discover powerful tools and insights designed to help your business grow.",
   tabs = [
     {
       value: "ai-tools",
@@ -104,29 +104,24 @@ const Feature108 = ({
   ],
 }: Feature108Props) => {
   return (
-    <section className="relative py-32 overflow-hidden">
-      {/* Background Elements */}
+    <section className="relative py-24">
+      {/* Background Elements - Simplified */}
       <div className="absolute inset-0 bg-gradient-radial from-siso-orange/10 via-transparent to-transparent opacity-30" />
-      <div className="absolute inset-0 bg-grid-white/5" style={{
-        backgroundImage: `linear-gradient(to right, rgb(255 255 255 / 0.05) 1px, transparent 1px),
-          linear-gradient(to bottom, rgb(255 255 255 / 0.05) 1px, transparent 1px)`,
-        backgroundSize: '24px 24px'
-      }} />
 
       <div className="relative">
         <div className="container flex flex-col items-center gap-4 text-center">
           <Badge variant="outline" className="bg-black/50 backdrop-blur-sm border-siso-orange/20">
             {badge}
           </Badge>
-          <h2 className="max-w-3xl text-4xl font-bold md:text-5xl lg:text-6xl bg-gradient-to-r from-siso-orange to-siso-red text-transparent bg-clip-text">
+          <h2 className="max-w-2xl text-3xl font-bold md:text-4xl lg:text-5xl bg-gradient-to-r from-siso-orange to-siso-red text-transparent bg-clip-text">
             {heading}
           </h2>
-          <p className="max-w-2xl text-lg text-siso-text/80 md:text-xl">
+          <p className="max-w-xl text-lg text-siso-text/80">
             {description}
           </p>
         </div>
 
-        <div className="mt-16">
+        <div className="mt-12">
           <Tabs defaultValue={tabs[0].value} className="w-full">
             <TabsList className="container flex flex-wrap items-center justify-center gap-4 sm:flex-row md:gap-8">
               {tabs.map((tab) => (
@@ -144,22 +139,22 @@ const Feature108 = ({
               ))}
             </TabsList>
 
-            <div className="container mt-12 max-w-screen-xl">
+            <div className="container mt-8 max-w-screen-xl">
               {tabs.map((tab) => (
                 <TabsContent
                   key={tab.value}
                   value={tab.value}
-                  className="rounded-2xl border border-siso-border bg-black/40 backdrop-blur-sm p-8 lg:p-12"
+                  className="rounded-2xl border border-siso-border bg-black/40 backdrop-blur-sm p-6 lg:p-8"
                 >
-                  <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 place-items-center">
-                    <div className="flex flex-col gap-6 lg:order-1">
+                  <div className="grid gap-8 lg:grid-cols-2 lg:gap-12 place-items-center">
+                    <div className="flex flex-col gap-4 lg:order-1">
                       <Badge variant="outline" className="w-fit bg-black/50 backdrop-blur-sm border-siso-orange/20">
                         {tab.content.badge}
                       </Badge>
-                      <h3 className="text-3xl font-bold lg:text-4xl xl:text-5xl bg-gradient-to-r from-siso-orange to-siso-red text-transparent bg-clip-text">
+                      <h3 className="text-2xl font-bold lg:text-3xl bg-gradient-to-r from-siso-orange to-siso-red text-transparent bg-clip-text">
                         {tab.content.title}
                       </h3>
-                      <p className="text-lg text-siso-text/80">
+                      <p className="text-base text-siso-text/80">
                         {tab.content.description}
                       </p>
                       <Button 
@@ -170,7 +165,7 @@ const Feature108 = ({
                         {tab.content.buttonText}
                       </Button>
                     </div>
-                    <div className="w-full h-[300px] lg:h-[400px] rounded-xl overflow-hidden shadow-2xl shadow-black/20 lg:order-2">
+                    <div className="w-full h-[250px] lg:h-[300px] rounded-xl overflow-hidden shadow-2xl shadow-black/20 lg:order-2">
                       <img
                         src={tab.content.imageSrc}
                         alt={tab.content.imageAlt}
