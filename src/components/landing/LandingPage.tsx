@@ -2,7 +2,6 @@ import { useNavigate } from 'react-router-dom';
 import { AuthButton } from '../AuthButton';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 
 export const LandingPage = () => {
@@ -17,24 +16,17 @@ export const LandingPage = () => {
     }
   }, [user, navigate]);
 
-  const handleTestClick = () => {
-    console.log('Test button clicked');
+  const handleSignInClick = () => {
+    console.log('Sign in button clicked');
+    navigate('/auth');
     toast({
-      title: "Test Button Clicked",
-      description: "The test button is working correctly!",
+      title: "Navigating to sign in",
+      description: "Opening authentication page...",
     });
   };
 
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center p-4">
-      {/* Test Button - Now with visual feedback */}
-      <Button
-        onClick={handleTestClick}
-        className="fixed top-4 left-4 z-[100] bg-blue-500 hover:bg-blue-600 text-white"
-      >
-        Test Button
-      </Button>
-
       {/* Auth Button - Positioned in top right */}
       <div className="fixed top-4 right-4 z-[100]">
         <AuthButton />
@@ -87,11 +79,14 @@ export const LandingPage = () => {
         {/* CTA Section */}
         <div className="mt-12 space-y-4 relative z-[100]">
           <p className="text-lg text-siso-text/90 mb-4">
-            Get started by signing in with your Google account
+            Get started by signing in with your account
           </p>
-          <div className="inline-block">
-            <AuthButton />
-          </div>
+          <button
+            onClick={handleSignInClick}
+            className="bg-white text-black hover:bg-gray-100 active:bg-gray-200 px-6 py-3 rounded-lg font-medium transition-all duration-200 hover:scale-105"
+          >
+            Sign In to Hub
+          </button>
         </div>
       </div>
     </div>
