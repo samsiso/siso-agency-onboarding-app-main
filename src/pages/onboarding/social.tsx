@@ -6,10 +6,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { Waves } from '@/components/ui/waves-background';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Users } from 'lucide-react';
+import { Users, ArrowRight, Linkedin, Globe, Youtube, Instagram } from 'lucide-react';
 
 export default function SocialOnboarding() {
-  const [isModalOpen, setIsModalOpen] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -66,7 +66,7 @@ export default function SocialOnboarding() {
 
   if (!userId) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-siso-red/5 to-siso-orange/5 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-siso-red/5 to-siso-orange/5 flex items-center justify-center p-4">
         <Card className="w-full max-w-md p-8 space-y-4 animate-fadeIn">
           <div className="animate-pulse flex space-x-4">
             <div className="rounded-full bg-siso-red/10 h-12 w-12"></div>
@@ -108,18 +108,46 @@ export default function SocialOnboarding() {
           </div>
         </div>
 
-        <p className="text-center text-siso-text/80">
-          Link your social media accounts to unlock additional features and earn points
-        </p>
+        <div className="space-y-6">
+          <p className="text-center text-siso-text/80">
+            Link your social media accounts to unlock additional features and earn points
+          </p>
 
-        <div className="flex justify-center">
-          <Button
-            onClick={() => setIsModalOpen(true)}
-            className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-white"
-          >
-            Connect Profiles
-            <ArrowRight className="ml-2 w-4 h-4" />
-          </Button>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex items-center space-x-3 p-4 rounded-lg bg-[#0A66C2]/10 hover:bg-[#0A66C2]/20 transition-colors cursor-pointer">
+              <Linkedin className="w-6 h-6 text-[#0A66C2]" />
+              <span className="text-siso-text">LinkedIn</span>
+            </div>
+            <div className="flex items-center space-x-3 p-4 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 transition-colors cursor-pointer">
+              <Globe className="w-6 h-6 text-emerald-500" />
+              <span className="text-siso-text">Website</span>
+            </div>
+            <div className="flex items-center space-x-3 p-4 rounded-lg bg-red-600/10 hover:bg-red-600/20 transition-colors cursor-pointer">
+              <Youtube className="w-6 h-6 text-red-600" />
+              <span className="text-siso-text">YouTube</span>
+            </div>
+            <div className="flex items-center space-x-3 p-4 rounded-lg bg-pink-500/10 hover:bg-pink-500/20 transition-colors cursor-pointer">
+              <Instagram className="w-6 h-6 text-pink-500" />
+              <span className="text-siso-text">Instagram</span>
+            </div>
+          </div>
+
+          <div className="flex flex-col items-center space-y-4">
+            <Button
+              onClick={() => setIsModalOpen(true)}
+              className="w-full bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-white"
+            >
+              Connect Profiles
+              <ArrowRight className="ml-2 w-4 h-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={handleSkip}
+              className="text-siso-text/70 hover:text-siso-text"
+            >
+              Skip for now
+            </Button>
+          </div>
         </div>
       </Card>
 
