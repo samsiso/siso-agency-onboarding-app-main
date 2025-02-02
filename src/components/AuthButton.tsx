@@ -6,11 +6,20 @@ import { useToast } from '@/hooks/use-toast';
 import { SocialMediaModal } from './auth/SocialMediaModal';
 import { Button } from '@/components/ui/button';
 import { useGoogleAuth } from '@/hooks/useGoogleAuth';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export const AuthButton = () => {
   const { user, setUser, loading, setLoading, handleSignIn } = useAuthSession();
   const { handleGoogleSignIn, handleSignOut } = useGoogleAuth();
   const [showSocialModal, setShowSocialModal] = useState(false);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -85,12 +94,11 @@ export const AuthButton = () => {
     };
   }, [handleSignIn, setLoading, toast, navigate]);
 
-  const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    console.log('Button clicked');
+  const handleClick = () => {
+    console.log('Google sign in clicked');
     if (!loading) {
       handleGoogleSignIn();
+      setShowAuthDialog(false);
     }
   };
 
@@ -101,19 +109,40 @@ export const AuthButton = () => {
           onClick={handleSignOut}
           disabled={loading}
           variant="outline"
-          className="bg-white/10 text-white hover:bg-white/20 active:bg-white/30 pointer-events-auto"
+          className="bg-white/10 text-white hover:bg-white/20 active:bg-white/30"
         >
           Sign Out
         </Button>
       ) : (
-        <Button
-          onClick={handleClick}
-          disabled={loading}
-          className="bg-white text-black hover:bg-gray-100 active:bg-gray-200 flex items-center gap-2 shadow-lg pointer-events-auto"
-        >
-          <GoogleIcon />
-          Sign in with Google
-        </Button>
+        <Dialog open={showAuthDialog} onOpenChange={setShowAuthDialog}>
+          <DialogTrigger asChild>
+            <Button 
+              className="bg-white text-black hover:bg-gray-100 active:bg-gray-200"
+              disabled={loading}
+            >
+              Sign In
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Welcome to SISO Agency</DialogTitle>
+              <DialogDescription>
+                Choose your preferred sign in method below
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex flex-col gap-4 py-4">
+              <Button
+                onClick={handleClick}
+                disabled={loading}
+                className="bg-white text-black hover:bg-gray-100 active:bg-gray-200 flex items-center gap-2"
+              >
+                <GoogleIcon />
+                Continue with Google
+              </Button>
+              {/* Add more sign-in options here if needed */}
+            </div>
+          </DialogContent>
+        </Dialog>
       )}
       
       {user && showSocialModal && (
