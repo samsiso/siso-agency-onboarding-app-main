@@ -10,59 +10,66 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="relative w-full bg-gradient-to-b from-black via-gray-900 to-orange-900/20 overflow-hidden">
+    <footer className="relative w-full bg-gradient-to-b from-black via-gray-900/80 to-orange-950/30">
       {/* Grid Background Pattern */}
       <div 
-        className="absolute inset-0 opacity-[0.05]" 
+        className="absolute inset-0 opacity-[0.03]" 
         style={{
           backgroundImage: `linear-gradient(to right, rgb(255 255 255 / 0.1) 1px, transparent 1px),
             linear-gradient(to bottom, rgb(255 255 255 / 0.1) 1px, transparent 1px)`,
-          backgroundSize: '40px 40px'
+          backgroundSize: '24px 24px'
         }}
       />
 
-      <div className="relative container mx-auto px-4 py-16 flex flex-col items-center">
+      <div className="relative container mx-auto px-4 py-20 flex flex-col items-center">
         {/* Logo */}
         <img 
           src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png" 
           alt="SISO" 
-          className="h-12 w-12 mb-8 animate-float"
+          className="h-16 w-16 mb-12 animate-float"
         />
 
         {/* CTA Section */}
         <div className="text-center mb-12">
-          <h3 className="text-3xl font-bold text-white mb-4">
+          <h3 className="text-4xl md:text-5xl font-bold text-white mb-6">
             Ready to transform your business with AI?
           </h3>
-          <p className="text-gray-300 mb-8 max-w-2xl mx-auto">
-            Connect with our experts today to drive your success with cutting-edge AI solutions tailored for your agency.
+          <p className="text-gray-300 text-lg mb-10 max-w-2xl mx-auto">
+            Connect with our experts today and discover how our innovative solutions can drive your success.
           </p>
           <Button 
-            className="bg-gradient-to-r from-siso-orange to-siso-red hover:opacity-90 transform hover:scale-105 transition-all duration-300 text-white px-8 py-6 rounded-lg font-medium text-lg"
+            className="bg-gradient-to-r from-orange-500 to-orange-600 hover:opacity-90 transform hover:scale-105 
+              transition-all duration-300 text-white px-8 py-6 rounded-lg font-medium text-lg group"
           >
             Start Free Trial
+            <span className="inline-block transition-transform group-hover:translate-x-1 ml-2">
+              →
+            </span>
           </Button>
         </div>
 
         {/* Social Links */}
-        <div className="flex gap-6 mb-12">
+        <div className="flex gap-8 mb-16">
           {socialLinks.map((social) => (
             <a
               key={social.label}
               href={social.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-gray-900/50 p-3 rounded-full hover:bg-gray-800/50 transition-colors duration-300 group"
+              className="bg-gray-950/80 p-4 rounded-full hover:bg-gray-900 transition-all duration-300 group"
               aria-label={social.label}
             >
-              <social.icon className="w-5 h-5 text-gray-300 group-hover:text-white transition-colors duration-300" />
+              <social.icon className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors duration-300" />
             </a>
           ))}
         </div>
 
+        {/* Divider */}
+        <div className="w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent mb-8" />
+
         {/* Copyright */}
-        <div className="text-gray-400 text-sm">
-          © 2024 SISO Resource Hub. All rights reserved.
+        <div className="text-gray-500 text-sm mb-16">
+          ©SISO 2024, All rights reserved.
         </div>
 
         {/* Product Hunt Badge */}
@@ -70,12 +77,12 @@ const Footer = () => {
           href="https://www.producthunt.com/"
           target="_blank"
           rel="noopener noreferrer"
-          className="absolute bottom-4 right-4 opacity-90 hover:opacity-100 transition-opacity duration-300"
+          className="absolute bottom-8 right-8 opacity-90 hover:opacity-100 transition-opacity duration-300"
         >
           <img 
             src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=undefined&theme=dark" 
             alt="SISO on Product Hunt" 
-            className="h-10"
+            className="h-12"
           />
         </a>
       </div>
