@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SocialMediaModal } from '@/components/auth/SocialMediaModal';
 import { useToast } from '@/hooks/use-toast';
@@ -14,40 +14,15 @@ export default function SocialOnboarding() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  useEffect(() => {
-    const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        navigate('/auth');
-        return;
-      }
-      setUserId(user.id);
-    };
-
-    checkUser();
-  }, [navigate]);
+  // [Analysis] Removed the automatic auth check and redirect to allow demo flow
+  // [Plan] Add proper auth check after connecting auth flow
 
   const handleSkip = async () => {
     try {
-      if (!userId) {
-        throw new Error('No user found');
-      }
-
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          has_completed_social_info: true,
-          social_info_completed_at: new Date().toISOString()
-        })
-        .eq('id', userId);
-
-      if (error) throw error;
-
       toast({
         title: "Step skipped",
         description: "You can always add your social media links later in your profile.",
       });
-
       navigate('/onboarding/chat');
     } catch (error: any) {
       console.error('Error skipping step:', error);
@@ -63,22 +38,6 @@ export default function SocialOnboarding() {
     setIsModalOpen(false);
     navigate('/onboarding/chat');
   };
-
-  if (!userId) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-siso-red/5 to-siso-orange/5 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md p-8 space-y-4 animate-fadeIn">
-          <div className="animate-pulse flex space-x-4">
-            <div className="rounded-full bg-siso-red/10 h-12 w-12"></div>
-            <div className="space-y-3 flex-1">
-              <div className="h-4 bg-siso-red/10 rounded w-3/4"></div>
-              <div className="h-4 bg-siso-orange/10 rounded w-1/2"></div>
-            </div>
-          </div>
-        </Card>
-      </div>
-    );
-  }
 
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-siso-bg to-black p-4 overflow-hidden">
@@ -96,6 +55,12 @@ export default function SocialOnboarding() {
       />
       
       <Card className="relative z-10 w-full max-w-md p-8 space-y-6 bg-siso-bg/80 backdrop-blur-lg border-siso-border animate-fadeIn">
+        <div className="absolute -top-10 left-0 w-full flex justify-center text-siso-text/70">
+          <span className="px-4 py-1 rounded-full bg-siso-bg-alt border border-siso-border text-sm">
+            Step 2 of 3
+          </span>
+        </div>
+
         <div className="flex items-center justify-center space-x-4">
           <div className="p-3 rounded-full bg-gradient-to-br from-siso-red/10 to-siso-orange/10">
             <Users className="w-6 h-6 text-siso-orange" />
@@ -104,7 +69,6 @@ export default function SocialOnboarding() {
             <h2 className="text-2xl font-bold bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent">
               Connect Your Profiles
             </h2>
-            <p className="text-siso-text/70">Step 2 of 3</p>
           </div>
         </div>
 
@@ -151,14 +115,12 @@ export default function SocialOnboarding() {
         </div>
       </Card>
 
-      {userId && (
-        <SocialMediaModal
-          isOpen={isModalOpen}
-          onClose={handleModalClose}
-          onSkip={handleSkip}
-          userId={userId}
-        />
-      )}
+      <SocialMediaModal
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        onSkip={handleSkip}
+        userId={userId || 'demo-user'} // Provide a fallback for demo mode
+      />
     </div>
   );
 }
