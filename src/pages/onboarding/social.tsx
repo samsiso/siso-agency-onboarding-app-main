@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Waves } from '@/components/ui/waves-background';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users, ArrowRight, Linkedin, Globe, Youtube, Instagram, Sparkles, Brain, Robot } from 'lucide-react';
+import { Users, ArrowRight, Linkedin, Globe, Youtube, Instagram, Sparkles, Brain, Bot } from 'lucide-react';
 
 export default function SocialOnboarding() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -89,7 +89,7 @@ export default function SocialOnboarding() {
               </div>
               
               <div className="flex flex-col items-center p-4 rounded-lg bg-black/20 border border-siso-border/20">
-                <Robot className="w-8 h-8 text-siso-orange mb-2" />
+                <Bot className="w-8 h-8 text-siso-orange mb-2" />
                 <h3 className="font-semibold text-siso-text-bold">LLM Insights</h3>
                 <p className="text-sm text-siso-text/70 text-center">Personalized AI analysis of growth opportunities</p>
               </div>
