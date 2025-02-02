@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { SocialMediaModal } from '@/components/auth/SocialMediaModal';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { Waves } from '@/components/ui/waves-background';
 
 export default function SocialOnboarding() {
   const [isModalOpen, setIsModalOpen] = useState(true);
@@ -63,11 +64,33 @@ export default function SocialOnboarding() {
   };
 
   if (!userId) {
-    return null; // Or a loading state
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-siso-red/5 to-siso-orange/5 flex items-center justify-center">
+        <div className="animate-pulse flex space-x-4">
+          <div className="rounded-full bg-siso-red/10 h-12 w-12"></div>
+          <div className="space-y-3">
+            <div className="h-4 bg-siso-red/10 rounded w-32"></div>
+            <div className="h-4 bg-siso-orange/10 rounded w-24"></div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-siso-red/5 to-siso-orange/5 flex items-center justify-center">
+    <div className="relative min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-siso-bg to-black p-4 overflow-hidden">
+      <Waves 
+        lineColor="rgba(255, 87, 34, 0.2)"
+        waveSpeedX={0.02}
+        waveSpeedY={0.01}
+        waveAmpX={40}
+        waveAmpY={20}
+        friction={0.9}
+        tension={0.01}
+        maxCursorMove={120}
+        xGap={12}
+        yGap={36}
+      />
       <SocialMediaModal
         isOpen={isModalOpen}
         onClose={handleModalClose}

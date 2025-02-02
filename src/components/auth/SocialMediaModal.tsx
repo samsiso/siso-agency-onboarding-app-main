@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,7 +10,7 @@ interface SocialMediaModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSkip?: () => void;
-  userId: string;  // Added this line to fix the type error
+  userId: string;
 }
 
 export const SocialMediaModal = ({ isOpen, onClose, onSkip, userId }: SocialMediaModalProps) => {
@@ -70,47 +70,81 @@ export const SocialMediaModal = ({ isOpen, onClose, onSkip, userId }: SocialMedi
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[425px] bg-siso-bg border-siso-border">
         <DialogHeader>
-          <DialogTitle className="text-siso-text">Connect Your Social Media</DialogTitle>
+          <div className="absolute -top-10 left-0 w-full flex justify-center text-siso-text/70">
+            <span>Step 2 of 3</span>
+          </div>
+          <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent">
+            Enhance Your Profile
+          </DialogTitle>
           <DialogDescription className="text-siso-text/70">
-            Add your social media links to enhance your profile and connect with others. You can always update these later.
+            Connect your social media accounts to unlock additional features and earn points. You can always update these later.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
-          <div className="flex items-center gap-2">
-            <Linkedin className="w-5 h-5 text-siso-text/70" />
-            <Input
-              placeholder="LinkedIn URL"
-              value={linkedinUrl}
-              onChange={(e) => setLinkedinUrl(e.target.value)}
-              className="bg-siso-bg-alt border-siso-border text-siso-text flex-1"
-            />
+          <div className="relative group">
+            <div className="flex items-center gap-2">
+              <Linkedin className="w-5 h-5 text-[#0A66C2] transition-colors group-hover:text-[#0A66C2]/80" />
+              <Input
+                placeholder="LinkedIn URL"
+                value={linkedinUrl}
+                onChange={(e) => setLinkedinUrl(e.target.value)}
+                className="bg-siso-bg-alt border-siso-border text-siso-text flex-1 transition-all focus:ring-1 focus:ring-siso-red/50"
+              />
+            </div>
+            <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-siso-red/10 to-siso-orange/10 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
           </div>
-          <div className="flex items-center gap-2">
-            <Globe className="w-5 h-5 text-siso-text/70" />
-            <Input
-              placeholder="Website URL"
-              value={websiteUrl}
-              onChange={(e) => setWebsiteUrl(e.target.value)}
-              className="bg-siso-bg-alt border-siso-border text-siso-text flex-1"
-            />
+          
+          <div className="relative group">
+            <div className="flex items-center gap-2">
+              <Globe className="w-5 h-5 text-emerald-500 transition-colors group-hover:text-emerald-400" />
+              <Input
+                placeholder="Website URL"
+                value={websiteUrl}
+                onChange={(e) => setWebsiteUrl(e.target.value)}
+                className="bg-siso-bg-alt border-siso-border text-siso-text flex-1 transition-all focus:ring-1 focus:ring-siso-red/50"
+              />
+            </div>
+            <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-siso-red/10 to-siso-orange/10 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
           </div>
-          <div className="flex items-center gap-2">
-            <Youtube className="w-5 h-5 text-siso-text/70" />
-            <Input
-              placeholder="YouTube URL"
-              value={youtubeUrl}
-              onChange={(e) => setYoutubeUrl(e.target.value)}
-              className="bg-siso-bg-alt border-siso-border text-siso-text flex-1"
-            />
+          
+          <div className="relative group">
+            <div className="flex items-center gap-2">
+              <Youtube className="w-5 h-5 text-red-600 transition-colors group-hover:text-red-500" />
+              <Input
+                placeholder="YouTube URL"
+                value={youtubeUrl}
+                onChange={(e) => setYoutubeUrl(e.target.value)}
+                className="bg-siso-bg-alt border-siso-border text-siso-text flex-1 transition-all focus:ring-1 focus:ring-siso-red/50"
+              />
+            </div>
+            <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-siso-red/10 to-siso-orange/10 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
           </div>
-          <div className="flex items-center gap-2">
-            <Instagram className="w-5 h-5 text-siso-text/70" />
-            <Input
-              placeholder="Instagram URL"
-              value={instagramUrl}
-              onChange={(e) => setInstagramUrl(e.target.value)}
-              className="bg-siso-bg-alt border-siso-border text-siso-text flex-1"
-            />
+          
+          <div className="relative group">
+            <div className="flex items-center gap-2">
+              <Instagram className="w-5 h-5 text-pink-500 transition-colors group-hover:text-pink-400" />
+              <Input
+                placeholder="Instagram URL"
+                value={instagramUrl}
+                onChange={(e) => setInstagramUrl(e.target.value)}
+                className="bg-siso-bg-alt border-siso-border text-siso-text flex-1 transition-all focus:ring-1 focus:ring-siso-red/50"
+              />
+            </div>
+            <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-siso-red/10 to-siso-orange/10 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
+          </div>
+
+          {/* Progress indicator */}
+          <div className="mt-2">
+            <div className="flex justify-between text-sm text-siso-text/70 mb-1">
+              <span>Profile completion</span>
+              <span>{Math.min(25 * getFilledLinksCount(), 100)}%</span>
+            </div>
+            <div className="h-2 bg-siso-bg-alt rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-siso-red to-siso-orange transition-all duration-500 ease-out"
+                style={{ width: `${Math.min(25 * getFilledLinksCount(), 100)}%` }}
+              />
+            </div>
           </div>
         </div>
         <div className="flex justify-between gap-3">
@@ -118,7 +152,7 @@ export const SocialMediaModal = ({ isOpen, onClose, onSkip, userId }: SocialMedi
             <Button
               variant="ghost"
               onClick={onSkip}
-              className="text-siso-text/70 hover:text-siso-text"
+              className="text-siso-text/70 hover:text-siso-text hover:bg-siso-bg-alt"
             >
               Skip for now
             </Button>
@@ -127,14 +161,14 @@ export const SocialMediaModal = ({ isOpen, onClose, onSkip, userId }: SocialMedi
             <Button
               variant="outline"
               onClick={onClose}
-              className="border-siso-border text-siso-text"
+              className="border-siso-border text-siso-text hover:bg-siso-bg-alt"
             >
               Cancel
             </Button>
             <Button
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="bg-siso-red hover:bg-siso-red/90 text-white"
+              className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-white"
             >
               {isSubmitting ? "Saving..." : "Continue"}
             </Button>
