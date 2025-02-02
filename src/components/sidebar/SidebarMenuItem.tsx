@@ -34,10 +34,11 @@ export const SidebarMenuItem = ({
       to={href}
       onClick={onClick}
       className={cn(
-        'flex items-center gap-3 rounded-lg px-3 py-2 text-siso-text',
+        'relative flex items-center gap-3 rounded-lg px-3 py-2 text-siso-text transition-colors',
         isActive && 'bg-siso-text/5 text-siso-text-bold',
         !isActive && 'hover:text-siso-text-bold hover:bg-siso-text/5',
-        isMain ? 'text-lg font-semibold' : 'text-sm pl-6',
+        isMain ? 'text-lg font-semibold' : 'text-sm',
+        collapsed ? 'justify-center' : '',
         className
       )}
     >
@@ -48,9 +49,9 @@ export const SidebarMenuItem = ({
         )} 
       />
       {!collapsed && (
-        <span>{label}</span>
+        <span className="truncate">{label}</span>
       )}
-      {isActive && (
+      {isActive && !collapsed && (
         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-siso-orange rounded-r-full" />
       )}
     </Link>

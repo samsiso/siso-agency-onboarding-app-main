@@ -110,14 +110,14 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
   if (!visible) return null;
 
   return (
-    <nav className="px-3 py-4">
-      <div className="space-y-4">
+    <nav className={cn("px-2 py-4", collapsed && "px-1")}>
+      <div className="space-y-2">
         {menuSections.map((section, index) => (
           <div 
             key={index} 
             className={cn(
               "space-y-1",
-              section.type === 'section' && "border-b border-siso-border pb-4"
+              section.type === 'section' && "border-b border-siso-border pb-2"
             )}
           >
             {section.type === 'main' ? (
@@ -138,7 +138,10 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
                     {section.title}
                   </div>
                 )}
-                <div className="pl-3 space-y-1 border-l-2 border-siso-border ml-4">
+                <div className={cn(
+                  "space-y-1",
+                  !collapsed && "pl-3 border-l-2 border-siso-border ml-4"
+                )}>
                   {section.items?.map((item, subIndex) => (
                     <SidebarMenuItem
                       key={subIndex}
