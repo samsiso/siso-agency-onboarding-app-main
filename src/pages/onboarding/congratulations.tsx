@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trophy, Star, Rocket } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -7,10 +7,13 @@ import { Waves } from '@/components/ui/waves-background';
 import { Card } from '@/components/ui/card';
 import { ButtonCta } from '@/components/ui/button-shiny';
 import { GradientText } from '@/components/ui/gradient-text';
+import { Confetti } from '@/components/ui/confetti';
+import type { ConfettiRef } from '@/components/ui/confetti';
 
 export default function Congratulations() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const confettiRef = useRef<ConfettiRef>(null);
 
   useEffect(() => {
     const handleOnboardingCompletion = async () => {
@@ -51,6 +54,16 @@ export default function Congratulations() {
         maxCursorMove={120}
         xGap={12}
         yGap={36}
+      />
+      
+      <Confetti
+        ref={confettiRef}
+        className="fixed inset-0 pointer-events-none z-50"
+        options={{
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 }
+        }}
       />
       
       <Card className="relative z-10 w-full max-w-2xl p-8 space-y-8 bg-siso-bg/80 backdrop-blur-lg border-siso-border animate-fadeIn">
