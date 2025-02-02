@@ -86,14 +86,19 @@ export const LandingPage = () => {
           <Hero />
         </section>
 
-        {/* Infinite Scroll Case Section */}
+        {/* Features Section */}
+        <section id="features" className="min-h-screen">
+          <Feature108 />
+        </section>
+
+        {/* Industry Leaders Section - Moved here */}
         <section className="relative py-20">
           <Case />
         </section>
 
         {/* Logo Carousel Section */}
         <section className="relative py-20 overflow-hidden">
-          <div className="container mx-auto px-4">
+          <div className="container mx-auto">
             <div className="text-center mb-12">
               <GradientHeading 
                 variant="secondary" 
@@ -114,12 +119,7 @@ export const LandingPage = () => {
           </div>
         </section>
 
-        {/* Features Section */}
-        <section id="features" className="min-h-screen">
-          <Feature108 />
-        </section>
-
-        {/* Features Section */}
+        {/* Pricing Section */}
         <section id="pricing" className="min-h-screen py-20">
           <TierSection />
         </section>
