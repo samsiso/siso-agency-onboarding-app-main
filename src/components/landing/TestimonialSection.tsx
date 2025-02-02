@@ -9,7 +9,7 @@ const testimonials = [
     image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
     quote: "The AI tools have revolutionized how we approach client campaigns. Our efficiency has increased by 300%.",
     linkedinUrl: "https://linkedin.com",
-    videoUrl: "https://example.com/video1.mp4"
+    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1"
   },
   {
     name: "Michael R.",
@@ -26,7 +26,7 @@ const testimonials = [
     image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
     quote: "The educational resources and community support have helped us scale our agency beyond expectations.",
     linkedinUrl: "https://linkedin.com",
-    videoUrl: "https://example.com/video2.mp4"
+    videoUrl: "https://www.youtube.com/embed/jNQXAC9IVRw?autoplay=1&mute=1"
   },
   {
     name: "David W.",
@@ -43,7 +43,7 @@ const testimonials = [
     image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
     quote: "The level of personalization we achieve with Lovable is incredible. Our engagement rates have skyrocketed.",
     linkedinUrl: "https://linkedin.com",
-    videoUrl: "https://example.com/video3.mp4"
+    videoUrl: "https://www.youtube.com/embed/y8Yv4pnO7qc?autoplay=1&mute=1"
   },
   {
     name: "James H.",
@@ -60,7 +60,7 @@ const testimonials = [
     image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
     quote: "The AI-powered insights have given us a competitive edge in the market. Simply outstanding.",
     linkedinUrl: "https://linkedin.com",
-    videoUrl: "https://example.com/video4.mp4"
+    videoUrl: "https://www.youtube.com/embed/M7lc1UVf-VE?autoplay=1&mute=1"
   },
   {
     name: "Robert P.",

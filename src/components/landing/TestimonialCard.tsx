@@ -26,8 +26,8 @@ export function TestimonialCard({
 
   return (
     <div 
-      className="group relative p-6 rounded-xl backdrop-blur-sm border border-siso-orange/20 
-        bg-black/30 transition-all duration-300 hover:scale-105 hover:border-siso-orange/40"
+      className="group relative p-6 rounded-xl backdrop-blur-sm border-2 border-siso-orange/40 
+        bg-black/30 transition-all duration-300 hover:scale-105 hover:border-siso-orange"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -43,7 +43,7 @@ export function TestimonialCard({
             <img
               src={image}
               alt={name}
-              className="h-12 w-12 rounded-full object-cover border-2 border-siso-orange/20"
+              className="h-12 w-12 rounded-full object-cover border-2 border-siso-orange/40"
             />
           </a>
         </div>
@@ -59,14 +59,12 @@ export function TestimonialCard({
 
       {/* Video Section */}
       {videoUrl && (
-        <div className="relative rounded-lg overflow-hidden bg-black/20 ring-1 ring-white/10">
-          <video
-            src={videoUrl}
-            className="w-full aspect-video object-cover"
-            autoPlay={isHovered}
-            loop
-            muted
-            playsInline
+        <div className="relative rounded-lg overflow-hidden bg-black/20 aspect-video">
+          <iframe
+            src={isHovered ? videoUrl : videoUrl.replace('autoplay=1', 'autoplay=0')}
+            className="w-full h-full"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
           />
           <button
             onClick={() => setIsVideoOpen(true)}
@@ -84,11 +82,11 @@ export function TestimonialCard({
         onOpenChange={setIsVideoOpen}
       >
         {videoUrl && (
-          <video
+          <iframe
             src={videoUrl}
             className="w-full aspect-video rounded-lg"
-            controls
-            autoPlay
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
           />
         )}
       </Dialog>
