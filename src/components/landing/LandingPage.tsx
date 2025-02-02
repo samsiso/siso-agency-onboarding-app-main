@@ -20,7 +20,7 @@ export const LandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen w-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-siso-bg via-siso-bg/95 to-siso-bg/90">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center p-4 bg-gradient-to-br from-siso-bg via-siso-bg/95 to-siso-bg/90">
       {/* Test Button */}
       <Button
         onClick={handleTestClick}
@@ -30,7 +30,7 @@ export const LandingPage = () => {
       </Button>
 
       {/* Top Right Auth Button */}
-      <div className="fixed top-4 right-4 z-[9999] pointer-events-auto">
+      <div className="fixed top-4 right-4">
         <AuthButton />
       </div>
 
@@ -83,7 +83,7 @@ export const LandingPage = () => {
           <p className="text-lg text-siso-text/90 mb-4">
             Get started by signing in with your Google account
           </p>
-          <div className="relative z-[9999] pointer-events-auto">
+          <div className="inline-block">
             <AuthButton />
           </div>
         </div>

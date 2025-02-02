@@ -87,21 +87,19 @@ export const AuthButton = () => {
 
   const handleClick = (e: React.MouseEvent) => {
     console.log('Button clicked');
-    e.stopPropagation();
-    e.preventDefault();
     if (!loading) {
       handleGoogleSignIn();
     }
   };
 
   return (
-    <div className="relative z-[9999] pointer-events-auto">
+    <div className="inline-block">
       {user ? (
         <Button
           onClick={handleSignOut}
           disabled={loading}
           variant="outline"
-          className="bg-white/10 text-white hover:bg-white/20 active:bg-white/30 cursor-pointer"
+          className="bg-white/10 text-white hover:bg-white/20 active:bg-white/30"
         >
           Sign Out
         </Button>
@@ -109,7 +107,7 @@ export const AuthButton = () => {
         <Button
           onClick={handleClick}
           disabled={loading}
-          className="bg-white text-black hover:bg-gray-100 active:bg-gray-200 cursor-pointer flex items-center gap-2 shadow-lg"
+          className="bg-white text-black hover:bg-gray-100 active:bg-gray-200 flex items-center gap-2 shadow-lg"
         >
           <GoogleIcon />
           Sign in with Google
