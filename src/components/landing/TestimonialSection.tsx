@@ -98,18 +98,14 @@ export const TestimonialSection = () => {
           open={!!selectedVideo} 
           onOpenChange={() => setSelectedVideo(null)}
         >
-          <div className="fixed inset-0 flex items-center justify-center z-50">
-            <div className="bg-black/95 p-4 rounded-lg w-full max-w-4xl">
-              {selectedVideo && (
-                <iframe
-                  src={selectedVideo}
-                  className="w-full aspect-video rounded-lg"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              )}
-            </div>
-          </div>
+          {selectedVideo && (
+            <iframe
+              src={selectedVideo}
+              className="w-full aspect-video rounded-lg"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          )}
         </Dialog>
       </div>
     </section>
