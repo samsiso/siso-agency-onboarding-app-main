@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Waves } from '@/components/ui/waves-background';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { ButtonCta } from '@/components/ui/button-shiny';
 import { Input } from '@/components/ui/input';
 import { Users, ArrowRight, Linkedin, Globe, Youtube, Instagram, Sparkles, Brain, Bot } from 'lucide-react';
 
@@ -205,14 +206,14 @@ export default function SocialOnboarding() {
           </div>
 
           <div className="flex flex-col items-center space-y-4">
-            <Button
+            <ButtonCta
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="w-full bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-white"
+              label={isSubmitting ? "Saving..." : "Continue"}
+              className="w-full flex items-center justify-center gap-2"
             >
-              {isSubmitting ? "Saving..." : "Continue"}
               <ArrowRight className="ml-2 w-4 h-4" />
-            </Button>
+            </ButtonCta>
             <Button
               variant="ghost"
               onClick={handleSkip}
