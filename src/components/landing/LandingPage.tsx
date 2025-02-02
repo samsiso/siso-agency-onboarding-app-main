@@ -9,6 +9,29 @@ import { Hero } from '@/components/ui/animated-hero';
 import { Waves } from '@/components/ui/waves-background';
 import { ScrollNav } from '@/components/ui/scroll-nav';
 import { Feature108 } from '@/components/blocks/shadcnblocks-com-feature108';
+import { LogoCarousel } from '@/components/ui/logo-carousel';
+import { GradientHeading } from '@/components/ui/gradient-heading';
+import { OpenAIIconBlack } from '@/components/ui/icons/OpenAIIcon';
+import { ClaudeAIIcon } from '@/components/ui/icons/ClaudeAIIcon';
+import { SupabaseIcon } from '@/components/ui/icons/SupabaseIcon';
+import { VercelIcon } from '@/components/ui/icons/VercelIcon';
+import { TypeScriptIcon } from '@/components/ui/icons/TypeScriptIcon';
+import { TailwindCSSIcon } from '@/components/ui/icons/TailwindCSSIcon';
+import { NextjsIcon } from '@/components/ui/icons/NextjsIcon';
+import { UpstashIcon } from '@/components/ui/icons/UpstashIcon';
+import { StripeIcon } from '@/components/ui/icons/StripeIcon';
+
+const allLogos = [
+  { name: "OpenAI", id: 1, img: OpenAIIconBlack },
+  { name: "Claude AI", id: 2, img: ClaudeAIIcon },
+  { name: "Supabase", id: 3, img: SupabaseIcon },
+  { name: "Vercel", id: 4, img: VercelIcon },
+  { name: "TypeScript", id: 5, img: TypeScriptIcon },
+  { name: "TailwindCSS", id: 6, img: TailwindCSSIcon },
+  { name: "Nextjs", id: 7, img: NextjsIcon },
+  { name: "Upstash", id: 8, img: UpstashIcon },
+  { name: "Stripe", id: 9, img: StripeIcon }
+];
 
 export const LandingPage = () => {
   const { user } = useAuthSession();
@@ -60,6 +83,25 @@ export const LandingPage = () => {
         {/* Hero Section */}
         <section id="hero" className="min-h-screen">
           <Hero />
+        </section>
+
+        {/* Logo Carousel Section */}
+        <section className="py-20 relative overflow-hidden">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <GradientHeading 
+                variant="secondary" 
+                size="lg"
+                className="mb-4"
+              >
+                Powered by Industry Leaders
+              </GradientHeading>
+              <p className="text-siso-text-muted text-lg max-w-2xl mx-auto">
+                Join thousands of agencies leveraging cutting-edge AI tools and resources
+              </p>
+            </div>
+            <LogoCarousel columnCount={3} logos={allLogos} />
+          </div>
         </section>
 
         {/* Features Section */}
