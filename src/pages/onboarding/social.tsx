@@ -6,16 +6,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { Waves } from '@/components/ui/waves-background';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users, ArrowRight, Linkedin, Globe, Youtube, Instagram } from 'lucide-react';
+import { Users, ArrowRight, Linkedin, Globe, Youtube, Instagram, Sparkles, Brain, Robot } from 'lucide-react';
 
 export default function SocialOnboarding() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
-
-  // [Analysis] Removed the automatic auth check and redirect to allow demo flow
-  // [Plan] Add proper auth check after connecting auth flow
 
   const handleSkip = async () => {
     try {
@@ -54,7 +51,7 @@ export default function SocialOnboarding() {
         yGap={36}
       />
       
-      <Card className="relative z-10 w-full max-w-md p-8 space-y-6 bg-siso-bg/80 backdrop-blur-lg border-siso-border animate-fadeIn">
+      <Card className="relative z-10 w-full max-w-2xl p-8 space-y-8 bg-siso-bg/80 backdrop-blur-lg border-siso-border animate-fadeIn">
         <div className="absolute -top-10 left-0 w-full flex justify-center text-siso-text/70">
           <span className="px-4 py-1 rounded-full bg-siso-bg-alt border border-siso-border text-sm">
             Step 2 of 3
@@ -67,15 +64,37 @@ export default function SocialOnboarding() {
           </div>
           <div>
             <h2 className="text-2xl font-bold bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent">
-              Connect Your Profiles
+              Unlock Personalized AI Insights
             </h2>
           </div>
         </div>
 
         <div className="space-y-6">
-          <p className="text-center text-siso-text/80">
-            Link your social media accounts to unlock additional features and earn points
-          </p>
+          <div className="text-center space-y-4">
+            <p className="text-siso-text/80 leading-relaxed">
+              By sharing your social media profiles, you're enabling our advanced AI to understand your business needs better. We'll analyze your digital presence to provide:
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+              <div className="flex flex-col items-center p-4 rounded-lg bg-black/20 border border-siso-border/20">
+                <Sparkles className="w-8 h-8 text-siso-orange mb-2" />
+                <h3 className="font-semibold text-siso-text-bold">Tailored Tools</h3>
+                <p className="text-sm text-siso-text/70 text-center">AI-curated tool recommendations based on your business profile</p>
+              </div>
+              
+              <div className="flex flex-col items-center p-4 rounded-lg bg-black/20 border border-siso-border/20">
+                <Brain className="w-8 h-8 text-siso-orange mb-2" />
+                <h3 className="font-semibold text-siso-text-bold">Smart Networking</h3>
+                <p className="text-sm text-siso-text/70 text-center">Connect with relevant communities and resources</p>
+              </div>
+              
+              <div className="flex flex-col items-center p-4 rounded-lg bg-black/20 border border-siso-border/20">
+                <Robot className="w-8 h-8 text-siso-orange mb-2" />
+                <h3 className="font-semibold text-siso-text-bold">LLM Insights</h3>
+                <p className="text-sm text-siso-text/70 text-center">Personalized AI analysis of growth opportunities</p>
+              </div>
+            </div>
+          </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div onClick={() => setIsModalOpen(true)} className="flex items-center space-x-3 p-4 rounded-lg bg-[#0A66C2]/10 hover:bg-[#0A66C2]/20 transition-all duration-300 cursor-pointer hover:scale-105">
@@ -94,6 +113,10 @@ export default function SocialOnboarding() {
               <Instagram className="w-6 h-6 text-pink-500" />
               <span className="text-siso-text">Instagram</span>
             </div>
+          </div>
+
+          <div className="text-center text-sm text-siso-text/60 mt-4">
+            <p>We only collect public information to enhance your experience. No passwords or private data required.</p>
           </div>
 
           <div className="flex flex-col items-center space-y-4">
@@ -119,7 +142,7 @@ export default function SocialOnboarding() {
         isOpen={isModalOpen}
         onClose={handleModalClose}
         onSkip={handleSkip}
-        userId={userId || 'demo-user'} // Provide a fallback for demo mode
+        userId={userId || 'demo-user'}
       />
     </div>
   );
