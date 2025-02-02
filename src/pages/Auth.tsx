@@ -44,11 +44,16 @@ export default function Auth() {
       />
       
       <div className="w-full max-w-md bg-black/20 backdrop-blur-lg rounded-lg shadow-xl p-8 space-y-6 border border-siso-border relative z-10">
+        {/* Progress Indicator */}
+        <div className="absolute -top-10 left-0 w-full flex justify-center text-siso-text/70">
+          <span>Step 1 of 3</span>
+        </div>
+
         <div className="text-center space-y-2">
           <h1 className="text-2xl font-bold bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent">
-            Get Started with SISO Agency
+            Welcome to SISO Agency
           </h1>
-          <p className="text-siso-text">Create your account to access the resource hub</p>
+          <p className="text-siso-text">Let's get started with your account setup</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -105,6 +110,16 @@ export default function Auth() {
             <GitHubIcon />
             Continue with GitHub
           </Button>
+        </div>
+
+        <div className="text-center text-sm text-siso-text/70">
+          Already have an account?{" "}
+          <button 
+            onClick={() => navigate('/login')} 
+            className="text-siso-red hover:text-siso-orange transition-colors"
+          >
+            Sign in
+          </button>
         </div>
       </div>
     </div>
