@@ -1,5 +1,8 @@
 import { Twitter, Linkedin, Instagram, Youtube } from "lucide-react";
-import { Button } from "./ui/button";
+import { RainbowButton } from "./ui/rainbow-button";
+import { SplineScene } from "./ui/splite";
+import { Card } from "./ui/card";
+import { Spotlight } from "./ui/spotlight";
 
 const Footer = () => {
   const socialLinks = [
@@ -29,71 +32,78 @@ const Footer = () => {
         }}
       />
 
-      <div className="relative container mx-auto px-4 py-20 flex flex-col items-center">
-        {/* Logo */}
-        <img 
-          src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png" 
-          alt="SISO" 
-          className="h-16 w-16 mb-12 animate-float"
-        />
-
-        {/* CTA Section */}
-        <div className="text-center mb-12">
-          <h3 className="text-4xl md:text-5xl font-bold text-white mb-6 font-display tracking-tight">
-            Ready to transform your business with AI?
-          </h3>
-          <p className="text-gray-300 text-lg mb-10 max-w-2xl mx-auto font-light">
-            Connect with our experts today and discover how our innovative solutions can drive your success.
-          </p>
-          <Button 
-            className="bg-gradient-to-r from-orange-500 to-orange-600 hover:opacity-90 transform hover:scale-105 
-              transition-all duration-300 text-white px-8 py-6 rounded-lg font-medium text-lg group shadow-lg shadow-orange-500/20"
-          >
-            Start Free Trial
-            <span className="inline-block transition-transform group-hover:translate-x-1 ml-2">
-              →
-            </span>
-          </Button>
-        </div>
-
-        {/* Social Links */}
-        <div className="flex gap-8 mb-16">
-          {socialLinks.map((social) => (
-            <a
-              key={social.label}
-              href={social.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-[#0A0A0A] p-4 rounded-full hover:bg-gray-900 transition-all duration-300 group
-                hover:shadow-lg hover:shadow-orange-500/10"
-              aria-label={social.label}
+      <div className="relative container mx-auto px-4 py-20">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Left Side - CTA and Social Links */}
+          <div className="text-center lg:text-left">
+            <h3 className="text-4xl md:text-5xl font-bold text-white mb-6 font-display tracking-tight">
+              Ready to transform your business with AI?
+            </h3>
+            <p className="text-gray-300 text-lg mb-10 max-w-2xl mx-auto lg:mx-0 font-light">
+              Connect with our experts today and discover how our innovative solutions can drive your success.
+            </p>
+            <RainbowButton 
+              className="text-lg px-10 py-6 font-semibold mb-8"
+              onClick={() => window.location.href = '/auth'}
             >
-              <social.icon className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors duration-300" />
-            </a>
-          ))}
+              Start Free Trial
+            </RainbowButton>
+
+            {/* Social Links */}
+            <div className="flex gap-6 justify-center lg:justify-start mt-8">
+              {socialLinks.map((social) => (
+                <a
+                  key={social.label}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-[#0A0A0A] p-3 rounded-full hover:bg-gray-900 transition-all duration-300 group
+                    hover:shadow-lg hover:shadow-orange-500/10"
+                  aria-label={social.label}
+                >
+                  <social.icon className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors duration-300" />
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Right Side - 3D Scene */}
+          <Card className="w-full h-[400px] bg-black/[0.96] relative overflow-hidden">
+            <Spotlight
+              className="-top-40 left-0 md:left-60 md:-top-20"
+              size={400}
+            />
+            <div className="relative h-full">
+              <SplineScene 
+                scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+                className="w-full h-full"
+              />
+            </div>
+          </Card>
         </div>
 
         {/* Divider */}
-        <div className="w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent mb-8" />
+        <div className="w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent my-12 mx-auto" />
 
-        {/* Copyright */}
-        <div className="text-gray-500 text-sm mb-16 font-light">
-          ©SISO 2024, All rights reserved.
+        {/* Copyright and Product Hunt Badge */}
+        <div className="flex flex-col md:flex-row justify-between items-center">
+          <div className="text-gray-500 text-sm font-light mb-4 md:mb-0">
+            ©SISO 2024, All rights reserved.
+          </div>
+          
+          <a 
+            href="https://www.producthunt.com/posts/siso-ai-resource-hub?utm_source=badge-featured"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="opacity-90 hover:opacity-100 transition-opacity duration-300"
+          >
+            <img 
+              src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=123456&theme=dark" 
+              alt="SISO on Product Hunt" 
+              className="h-12"
+            />
+          </a>
         </div>
-
-        {/* Product Hunt Badge */}
-        <a 
-          href="https://www.producthunt.com/posts/siso-ai-resource-hub?utm_source=badge-featured"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="absolute bottom-8 right-8 opacity-90 hover:opacity-100 transition-opacity duration-300"
-        >
-          <img 
-            src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=123456&theme=dark" 
-            alt="SISO on Product Hunt" 
-            className="h-12"
-          />
-        </a>
       </div>
     </footer>
   );
