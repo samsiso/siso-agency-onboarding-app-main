@@ -32,9 +32,9 @@ export const LandingPage = () => {
     <div className="min-h-screen w-full bg-gradient-to-b from-black via-gray-900 to-[#0A0A0A]">
       {/* Background elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 -left-1/4 w-[500px] h-[500px] bg-orange-500/10 rounded-full filter blur-[100px] animate-float-slow"></div>
-        <div className="absolute bottom-1/4 -right-1/4 w-[500px] h-[500px] bg-orange-600/10 rounded-full filter blur-[100px] animate-float-slower"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-orange-500/5 rounded-full filter blur-[120px]"></div>
+        <div className="absolute top-1/4 -left-1/4 w-[500px] h-[500px] bg-siso-red/10 rounded-full filter blur-[100px] animate-float-slow"></div>
+        <div className="absolute bottom-1/4 -right-1/4 w-[500px] h-[500px] bg-siso-orange/10 rounded-full filter blur-[100px] animate-float-slower"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-siso-red/5 rounded-full filter blur-[120px]"></div>
       </div>
 
       {/* Main Content */}
@@ -54,8 +54,8 @@ export const LandingPage = () => {
           <p className="text-gray-400 mb-8">Join thousands of successful agencies already using our platform</p>
           <button
             onClick={handleSignInClick}
-            className="px-8 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg font-medium
-              transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-orange-500/20"
+            className="px-8 py-3 bg-gradient-to-r from-siso-red to-siso-orange text-white rounded-lg font-medium
+              transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-siso-red/20"
           >
             Get Started Now
           </button>
