@@ -27,8 +27,8 @@ export const LandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-black via-gray-900 to-orange-900/20 overflow-y-auto">
-      {/* Animated background elements */}
+    <div className="min-h-screen w-full relative bg-gradient-to-b from-black via-gray-900 to-orange-900/20">
+      {/* Background elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 -left-1/4 w-[500px] h-[500px] bg-orange-500/10 rounded-full filter blur-[100px] animate-float-slow"></div>
         <div className="absolute bottom-1/4 -right-1/4 w-[500px] h-[500px] bg-siso-orange/10 rounded-full filter blur-[100px] animate-float-slower"></div>
@@ -59,11 +59,11 @@ export const LandingPage = () => {
         </div>
       </nav>
 
-      {/* Content Container */}
-      <div className="relative">
+      {/* Main Content */}
+      <main className="relative">
         {/* Hero Section */}
-        <div className="relative pt-32 pb-16">
-          <div className="text-center relative z-10">
+        <section className="relative pt-32 pb-16">
+          <div className="text-center">
             {/* Stats Bar */}
             <div className="flex justify-center gap-8 mb-12">
               <div className="text-gray-300 flex items-center gap-2">
@@ -105,40 +105,42 @@ export const LandingPage = () => {
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
         {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-          {[
-            {
-              icon: "🔧",
-              title: "AI Tools & Resources",
-              desc: "Access our curated collection of AI-powered tools and platforms"
-            },
-            {
-              icon: "📚",
-              title: "Expert Education",
-              desc: "Learn from industry leaders and stay ahead of the curve"
-            },
-            {
-              icon: "🌐",
-              title: "Global Network",
-              desc: "Connect with professionals and grow your business network"
-            }
-          ].map((feature, i) => (
-            <div
-              key={i}
-              className="p-6 bg-black/30 backdrop-blur-sm rounded-lg border border-white/10 transition-all duration-300
-                hover:bg-white/5 group cursor-pointer"
-            >
-              <span className="text-3xl mb-4 block group-hover:scale-110 transition-transform duration-300">
-                {feature.icon}
-              </span>
-              <h3 className="text-xl font-semibold text-white mb-2">{feature.title}</h3>
-              <p className="text-gray-400">{feature.desc}</p>
-            </div>
-          ))}
-        </div>
+        <section className="py-24">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {[
+              {
+                icon: "🔧",
+                title: "AI Tools & Resources",
+                desc: "Access our curated collection of AI-powered tools and platforms"
+              },
+              {
+                icon: "📚",
+                title: "Expert Education",
+                desc: "Learn from industry leaders and stay ahead of the curve"
+              },
+              {
+                icon: "🌐",
+                title: "Global Network",
+                desc: "Connect with professionals and grow your business network"
+              }
+            ].map((feature, i) => (
+              <div
+                key={i}
+                className="p-6 bg-black/30 backdrop-blur-sm rounded-lg border border-white/10 transition-all duration-300
+                  hover:bg-white/5 group cursor-pointer"
+              >
+                <span className="text-3xl mb-4 block group-hover:scale-110 transition-transform duration-300">
+                  {feature.icon}
+                </span>
+                <h3 className="text-xl font-semibold text-white mb-2">{feature.title}</h3>
+                <p className="text-gray-400">{feature.desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
 
         {/* Tier Section */}
         <TierSection />
@@ -147,7 +149,7 @@ export const LandingPage = () => {
         <TestimonialSection />
 
         {/* Final CTA Section */}
-        <div className="text-center py-24">
+        <section className="text-center py-24">
           <h2 className="text-4xl font-bold text-white mb-4">Ready to Transform Your Business?</h2>
           <p className="text-gray-400 mb-8">Join thousands of successful agencies already using our platform</p>
           <button
@@ -157,8 +159,8 @@ export const LandingPage = () => {
           >
             Get Started Now
           </button>
-        </div>
-      </div>
+        </section>
+      </main>
     </div>
   );
 };
