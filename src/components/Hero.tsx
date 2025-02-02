@@ -4,95 +4,17 @@ import { Button } from './ui/button';
 import { ScrollArea } from './ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { handleAuthCallback } from '@/utils/authUtils';
 import { useSidebar } from './ui/sidebar';
 import { Sidebar } from './Sidebar';
 
 export const Hero = () => {
-  const [userName, setUserName] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { setOpen } = useSidebar();
 
-  useEffect(() => {
-    // Handle OAuth callback if present
-    if (window.location.hash) {
-      handleAuthCallback();
-    }
-
-    // Check for existing session on mount
-    const checkSession = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          console.log('Found existing session for user:', session.user.id);
-          const { data: profile, error } = await supabase
-            .from('profiles')
-            .select('full_name')
-            .eq('id', session.user.id)
-            .single();
-          
-          if (error) {
-            console.error('Error fetching profile:', error);
-            return;
-          }
-          
-          setUserName(profile?.full_name || session.user.email?.split('@')[0]);
-          navigate('/profile');
-        }
-      } catch (error) {
-        console.error('Error checking session:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkSession();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state changed:', event, session?.user?.id);
-      
-      if (event === 'SIGNED_IN' && session?.user) {
-        try {
-          const { data: profile, error } = await supabase
-            .from('profiles')
-            .select('full_name')
-            .eq('id', session.user.id)
-            .single();
-          
-          if (error) {
-            console.error('Error fetching profile:', error);
-            return;
-          }
-          
-          setUserName(profile?.full_name || session.user.email?.split('@')[0]);
-          toast({
-            title: "Successfully signed in",
-            description: "Welcome to SISO Resource Hub!",
-          });
-          navigate('/profile');
-        } catch (error) {
-          console.error('Error in auth state change handler:', error);
-        }
-      } else if (event === 'SIGNED_OUT') {
-        setUserName(null);
-        toast({
-          title: "Signed out",
-          description: "Come back soon!",
-        });
-        navigate('/');
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [toast, navigate]);
-
   const handleResourceClick = (path: string) => {
-    setOpen(true); // Open the sidebar when clicking a resource
+    setOpen(true);
     navigate(path);
   };
 
@@ -114,24 +36,6 @@ export const Hero = () => {
       title: "SISO Networking",
       desc: "Connect with professional communities and experts to accelerate your growth.",
       path: "/networking"
-    },
-    {
-      icon: "🤖",
-      title: "SISO Automations",
-      desc: "Leverage our custom-built automations for client management, lead generation, and workflows.",
-      path: "/automations"
-    },
-    {
-      icon: "💬",
-      title: "ChatGPT Assistants",
-      desc: "Get AI-powered guidance tailored to your specific needs and challenges.",
-      path: "/assistants"
-    },
-    {
-      icon: "🧠",
-      title: "SISO AI",
-      desc: "Receive personalized recommendations from your AI consultant based on your business context.",
-      path: "/siso-ai"
     }
   ];
 
@@ -145,43 +49,19 @@ export const Hero = () => {
           {/* Welcome Message */}
           <div className="space-y-6">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-siso-text-bold leading-tight">
-              {!loading && userName ? (
-                <>
-                  Welcome back,{' '}
-                  <span className="bg-gradient-to-r from-siso-orange to-siso-red text-transparent bg-clip-text animate-gradient">
-                    {userName}
+              Welcome to{' '}
+              <div className="relative inline-block mt-4">
+                <div className="relative p-3 sm:p-4 rounded-lg bg-black/30 backdrop-blur-sm border border-siso-text/10">
+                  <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-siso-orange to-siso-red opacity-10 animate-pulse" />
+                  <span className="relative bg-gradient-to-r from-siso-orange to-siso-red text-transparent bg-clip-text">
+                    SISO Agency Resources
                   </span>
-                </>
-              ) : (
-                <>
-                  Welcome to{' '}
-                  <div className="relative inline-block mt-4">
-                    <div className="relative p-3 sm:p-4 rounded-lg bg-black/30 backdrop-blur-sm border border-siso-text/10">
-                      <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-siso-orange to-siso-red opacity-10 animate-pulse" />
-                      <span className="relative bg-gradient-to-r from-siso-orange to-siso-red text-transparent bg-clip-text">
-                        SISO Agency Resources
-                      </span>
-                    </div>
-                  </div>
-                </>
-              )}
+                </div>
+              </div>
             </h1>
             <p className="text-xl sm:text-2xl text-siso-text max-w-3xl mx-auto leading-relaxed">
               Your gateway to tools, education, networking, and AI-powered innovation—crafted to help your agency thrive.
             </p>
-          </div>
-
-          {/* Action Button */}
-          <div className="flex justify-center">
-            <Button 
-              variant="outline" 
-              className="w-full sm:w-auto min-w-[150px] border border-siso-text/20 text-siso-text-bold 
-                hover:bg-gradient-to-r from-siso-red/10 to-siso-orange/10 hover:border-siso-text/40 
-                transition-all duration-300"
-              onClick={() => handleResourceClick('/tools')}
-            >
-              Learn More
-            </Button>
           </div>
 
           {/* Resource Guide */}
@@ -195,56 +75,33 @@ export const Hero = () => {
                 Resource Hub Guide
               </h2>
               
-              <ScrollArea className="h-[450px] rounded-lg px-2">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
-                  {resourceGuideItems.map((item, i) => (
-                    <div
-                      key={i}
-                      className="group p-4 rounded-lg bg-siso-bg/50 hover:bg-siso-bg/70 
-                        border border-siso-text/10 hover:border-siso-text/20 transition-all duration-300
-                        cursor-pointer"
-                      onClick={() => handleResourceClick(item.path)}
-                    >
-                      <div className="flex items-start gap-3">
-                        <span className="text-2xl group-hover:scale-110 transition-transform duration-300">
-                          {item.icon}
-                        </span>
-                        <div>
-                          <h3 className="text-lg font-semibold text-siso-text-bold mb-2">{item.title}</h3>
-                          <p className="text-sm text-siso-text/90 leading-relaxed">{item.desc}</p>
-                        </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {resourceGuideItems.map((item, i) => (
+                  <div
+                    key={i}
+                    className="group p-4 rounded-lg bg-siso-bg/50 hover:bg-siso-bg/70 
+                      border border-siso-text/10 hover:border-siso-text/20 transition-all duration-300
+                      cursor-pointer"
+                    onClick={() => handleResourceClick(item.path)}
+                  >
+                    <div className="flex items-start gap-3">
+                      <span className="text-2xl group-hover:scale-110 transition-transform duration-300">
+                        {item.icon}
+                      </span>
+                      <div>
+                        <h3 className="text-lg font-semibold text-siso-text-bold mb-2">{item.title}</h3>
+                        <p className="text-sm text-siso-text/90 leading-relaxed">{item.desc}</p>
                       </div>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
+              </div>
 
-                <div className="mt-12 space-y-8 border-t border-siso-text/10 pt-8">
-                  <section>
-                    <h3 className="text-xl font-semibold text-siso-text-bold mb-4">Why Choose SISO Resource Hub?</h3>
-                    <ul className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      {[
-                        "Built and tested by industry experts",
-                        "Regularly updated with latest tools",
-                        "Free access to valuable content"
-                      ].map((item, i) => (
-                        <li key={i} className="p-3 rounded-lg bg-siso-bg/50 border border-siso-text/10 
-                          text-sm text-siso-text/90 hover:bg-siso-bg/70 hover:border-siso-text/20 
-                          transition-all duration-300">
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </section>
-
-                  <section className="pb-4">
-                    <h3 className="text-xl font-semibold text-siso-text-bold mb-4">Get Started Today</h3>
-                    <p className="text-sm text-siso-text/90 leading-relaxed">
-                      Begin with Core Tools & Platforms, explore the Education Hub, and leverage our Networking 
-                      and Automations sections to scale your agency effectively.
-                    </p>
-                  </section>
-                </div>
-              </ScrollArea>
+              <div className="mt-8 text-center">
+                <p className="text-siso-text/80 text-sm">
+                  Sign in to access all features and start exploring the SISO Resource Hub
+                </p>
+              </div>
             </div>
           </div>
         </div>
