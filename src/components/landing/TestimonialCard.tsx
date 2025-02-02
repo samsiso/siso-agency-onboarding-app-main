@@ -26,8 +26,8 @@ export function TestimonialCard({
 
   return (
     <div 
-      className="group relative p-6 rounded-xl backdrop-blur-sm border border-white/10 
-        bg-black/30 transition-all duration-300 hover:scale-105 hover:border-white/20"
+      className="group relative p-6 rounded-xl backdrop-blur-sm border border-siso-orange/20 
+        bg-black/30 transition-all duration-300 hover:scale-105 hover:border-siso-orange/40"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -43,7 +43,7 @@ export function TestimonialCard({
             <img
               src={image}
               alt={name}
-              className="h-12 w-12 rounded-full object-cover border-2 border-orange-500/20"
+              className="h-12 w-12 rounded-full object-cover border-2 border-siso-orange/20"
             />
           </a>
         </div>

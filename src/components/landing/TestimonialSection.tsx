@@ -27,13 +27,58 @@ const testimonials = [
     quote: "The educational resources and community support have helped us scale our agency beyond expectations.",
     linkedinUrl: "https://linkedin.com",
     videoUrl: "https://example.com/video2.mp4"
+  },
+  {
+    name: "David W.",
+    role: "Marketing Strategist",
+    company: "Innovate Digital",
+    image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
+    quote: "The automation capabilities have transformed our workflow. We're seeing incredible results with minimal effort.",
+    linkedinUrl: "https://linkedin.com"
+  },
+  {
+    name: "Emily T.",
+    role: "Lead Strategist",
+    company: "Pipeline Analytics",
+    image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
+    quote: "The level of personalization we achieve with Lovable is incredible. Our engagement rates have skyrocketed.",
+    linkedinUrl: "https://linkedin.com",
+    videoUrl: "https://example.com/video3.mp4"
+  },
+  {
+    name: "James H.",
+    role: "CEO",
+    company: "Growth Accelerator",
+    image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
+    quote: "Since implementing Lovable, we've seen a 250% increase in client satisfaction and retention rates.",
+    linkedinUrl: "https://linkedin.com"
+  },
+  {
+    name: "Christina M.",
+    role: "Digital Operations Lead",
+    company: "Tech Innovations",
+    image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
+    quote: "The AI-powered insights have given us a competitive edge in the market. Simply outstanding.",
+    linkedinUrl: "https://linkedin.com",
+    videoUrl: "https://example.com/video4.mp4"
+  },
+  {
+    name: "Robert P.",
+    role: "Agency Director",
+    company: "Digital Ventures",
+    image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
+    quote: "Lovable has streamlined our entire operation. The ROI has exceeded all our expectations.",
+    linkedinUrl: "https://linkedin.com"
   }
 ];
 
 export function TestimonialSection() {
   return (
-    <section className="py-24 relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-24 relative overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute inset-0 bg-gradient-radial from-siso-orange/5 via-transparent to-transparent opacity-30" />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-white mb-4">
