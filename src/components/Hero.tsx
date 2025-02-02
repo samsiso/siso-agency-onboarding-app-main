@@ -48,14 +48,14 @@ export const Hero = () => {
   ];
 
   return (
-    <div className="flex-1 relative">
+    <div className="flex-1 relative min-h-[calc(100vh-4rem)]">
       <Sidebar />
       <div className="absolute inset-0 bg-gradient-to-br from-siso-bg via-siso-bg/95 to-siso-bg/90" />
       
-      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-8">
+      <div className="relative h-full flex flex-col justify-start max-w-6xl mx-auto px-4 sm:px-6 pt-16">
         <div className="text-center">
           {/* Welcome Message */}
-          <div className="space-y-6 mb-12">
+          <div className="space-y-6 mb-8">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-siso-text-bold leading-tight">
               Welcome to{' '}
               <span className="relative inline-block">
@@ -82,7 +82,7 @@ export const Hero = () => {
                 Resource Hub Guide
               </h2>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {resourceGuideItems.map((item, i) => (
                   <div
                     key={i}
@@ -104,7 +104,7 @@ export const Hero = () => {
                 ))}
               </div>
 
-              <div className="mt-8 text-center">
+              <div className="mt-6 text-center">
                 <p className="text-siso-text/80 text-sm">
                   Sign in to access all features and start exploring the SISO Resource Hub
                 </p>
