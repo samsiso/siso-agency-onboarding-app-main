@@ -17,28 +17,26 @@ export default function Congratulations() {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         
-        if (!user?.id) {
-          navigate('/auth');
-          return;
+        // Only attempt to award points if user is logged in
+        if (user?.id) {
+          const { error } = await supabase.rpc('handle_onboarding_completion', {
+            user_id: user.id
+          });
+
+          if (error) throw error;
+
+          toast({
+            title: "Points Awarded!",
+            description: "You've earned 500 points for completing onboarding",
+          });
         }
-
-        const { error } = await supabase.rpc('handle_onboarding_completion', {
-          user_id: user.id
-        });
-
-        if (error) throw error;
-
-        toast({
-          title: "Points Awarded!",
-          description: "You've earned 500 points for completing onboarding",
-        });
       } catch (error) {
         console.error('Error completing onboarding:', error);
       }
     };
 
     handleOnboardingCompletion();
-  }, [navigate, toast]);
+  }, [toast]);
 
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-siso-bg to-black p-4 overflow-hidden">

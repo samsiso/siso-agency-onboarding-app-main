@@ -23,6 +23,7 @@ import ThankYou from '@/pages/ThankYou'
 import ToolPage from '@/pages/ToolPage'
 import Auth from '@/pages/Auth'
 import SocialOnboarding from '@/pages/onboarding/social'
+import Congratulations from '@/pages/onboarding/congratulations'
 
 function App() {
   return (
@@ -50,6 +51,7 @@ function App() {
         <Route path="/thank-you" element={<ThankYou />} />
         <Route path="/tool/:id" element={<ToolPage />} />
         <Route path="/onboarding/social" element={<SocialOnboarding />} />
+        <Route path="/onboarding/congratulations" element={<Congratulations />} />
       </Routes>
       <Toaster />
     </SidebarProvider>
