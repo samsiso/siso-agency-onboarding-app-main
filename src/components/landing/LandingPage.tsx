@@ -86,7 +86,7 @@ export const LandingPage = () => {
         </section>
 
         {/* Logo Carousel Section */}
-        <section className="py-20 relative overflow-hidden">
+        <section className="relative py-20 overflow-hidden">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <GradientHeading 
@@ -100,7 +100,11 @@ export const LandingPage = () => {
                 Join thousands of agencies leveraging cutting-edge AI tools and resources
               </p>
             </div>
-            <LogoCarousel columnCount={3} logos={allLogos} />
+            <div className="flex justify-center items-center w-full">
+              <div className="max-w-5xl w-full">
+                <LogoCarousel columnCount={3} logos={allLogos} />
+              </div>
+            </div>
           </div>
         </section>
 
