@@ -26,8 +26,8 @@ function Hero() {
       <div className="container mx-auto">
         <div className="flex gap-8 py-20 lg:py-40 items-center justify-center flex-col">
           <div className="flex gap-4 flex-col">
-            <h1 className="text-6xl md:text-8xl max-w-3xl tracking-tighter text-center font-regular">
-              <span className="text-siso-text-bold">Built for Agencies to</span>
+            <h1 className="text-6xl md:text-8xl max-w-5xl tracking-tighter text-center font-regular">
+              <span className="text-siso-text-bold whitespace-nowrap">Built for Agencies to</span>
               <div className="relative h-[150px] md:h-[200px] flex w-full justify-center overflow-hidden text-center">
                 {titles.map((title, index) => (
                   <motion.span
