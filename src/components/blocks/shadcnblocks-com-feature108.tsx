@@ -123,7 +123,7 @@ const Feature108 = ({
 
         <div className="mt-12">
           <Tabs defaultValue={tabs[0].value} className="w-full">
-            <TabsList className="container flex flex-wrap items-center justify-center gap-4 sm:flex-row md:gap-8">
+            <TabsList className="container flex flex-wrap items-center justify-center gap-4 sm:flex-row md:gap-8 hidden">
               {tabs.map((tab) => (
                 <TabsTrigger
                   key={tab.value}
