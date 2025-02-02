@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 function Hero() {
   const [titleNumber, setTitleNumber] = useState(0);
   const titles = useMemo(
-    () => ["innovative", "powerful", "intelligent", "automated", "transformative"],
+    () => ["Innovate, Scale, Succeed", "Collaborate with 1M+ Agencies", "Future-Proof Your Agency"],
     []
   );
 
@@ -32,7 +32,7 @@ function Hero() {
           </div>
           <div className="flex gap-4 flex-col">
             <h1 className="text-5xl md:text-7xl max-w-2xl tracking-tighter text-center font-regular">
-              <span className="text-siso-text-bold">Discover</span>
+              <span className="text-siso-text-bold">Built by Agencies</span>
               <span className="relative flex w-full justify-center overflow-hidden text-center md:pb-4 md:pt-1">
                 &nbsp;
                 {titles.map((title, index) => (
