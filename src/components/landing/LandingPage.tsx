@@ -86,6 +86,11 @@ export const LandingPage = () => {
           <Feature108 />
         </section>
 
+        {/* Trusted by Thousands Section */}
+        <section className="relative -mt-32 mb-20">
+          <Case />
+        </section>
+
         {/* Call to Action Section - Moved here */}
         <section className="relative py-20">
           <div className="container mx-auto px-4">
@@ -104,11 +109,6 @@ export const LandingPage = () => {
               </RainbowButton>
             </div>
           </div>
-        </section>
-
-        {/* Trusted by Thousands Section */}
-        <section className="relative -mt-32 mb-20">
-          <Case />
         </section>
 
         {/* Logo Carousel Section */}
