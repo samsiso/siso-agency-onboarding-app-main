@@ -158,7 +158,7 @@ export const AuthButton = () => {
 
   return (
     <>
-      <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-[100] pointer-events-auto">
+      <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-[100]">
         {user ? (
           <Button
             onClick={handleSignOutClick}
