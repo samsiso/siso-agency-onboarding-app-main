@@ -31,11 +31,12 @@ export function TestimonialCard({
 
   return (
     <div 
-      className="group h-full relative p-6 rounded-xl backdrop-blur-sm border-2 border-siso-orange/40 
-        bg-black/30 transition-all duration-300 hover:scale-105 hover:border-siso-orange flex flex-col"
+      className={`group relative p-6 rounded-xl backdrop-blur-sm border-2 border-siso-orange/40 
+        bg-black/30 transition-all duration-300 hover:scale-105 hover:border-siso-orange
+        ${videoUrl ? 'h-auto' : 'h-min'}`}
     >
       {/* Profile Section */}
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-center gap-4 mb-4">
         <div className="relative h-12 w-12">
           <a 
             href={linkedinUrl} 
@@ -58,11 +59,11 @@ export function TestimonialCard({
       </div>
 
       {/* Quote */}
-      <p className="text-gray-300 italic text-left mb-4 flex-grow">{quote}</p>
+      <p className="text-gray-300 italic text-left mb-4">{quote}</p>
 
       {/* Video Thumbnail Section */}
       {videoUrl && (
-        <div className="relative rounded-lg overflow-hidden bg-black/20 aspect-video mt-auto">
+        <div className="relative rounded-lg overflow-hidden bg-black/20 aspect-video mt-4">
           <img
             src={getYouTubeThumbnail(videoUrl)}
             alt="Video thumbnail"
