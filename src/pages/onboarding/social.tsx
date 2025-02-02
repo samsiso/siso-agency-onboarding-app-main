@@ -189,7 +189,7 @@ export default function SocialOnboarding() {
             onClick={handleSubmit}
             disabled={isSubmitting}
             label={isSubmitting ? "Saving..." : "Continue"}
-            className="w-full flex items-center justify-center gap-2"
+            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#FF5722] to-[#FFA726]"
           >
             <ArrowRight className="ml-2 w-4 h-4" />
           </ButtonCta>
