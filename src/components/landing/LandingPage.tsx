@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom';
-import { AuthButton } from '../AuthButton';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
@@ -27,9 +26,14 @@ export const LandingPage = () => {
 
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center p-4">
-      {/* Auth Button - Positioned in top right */}
+      {/* Sign In Button - Positioned in top right */}
       <div className="fixed top-4 right-4 z-[100]">
-        <AuthButton />
+        <button
+          onClick={handleSignInClick}
+          className="bg-white text-black hover:bg-gray-100 active:bg-gray-200 px-6 py-3 rounded-lg font-medium transition-all duration-200 hover:scale-105"
+        >
+          Sign In to Hub
+        </button>
       </div>
 
       {/* Main Content */}
@@ -74,19 +78,6 @@ export const LandingPage = () => {
               <p className="text-siso-text/80">{feature.desc}</p>
             </div>
           ))}
-        </div>
-
-        {/* CTA Section */}
-        <div className="mt-12 space-y-4 relative z-[100]">
-          <p className="text-lg text-siso-text/90 mb-4">
-            Get started by signing in with your account
-          </p>
-          <button
-            onClick={handleSignInClick}
-            className="bg-white text-black hover:bg-gray-100 active:bg-gray-200 px-6 py-3 rounded-lg font-medium transition-all duration-200 hover:scale-105"
-          >
-            Sign In to Hub
-          </button>
         </div>
       </div>
     </div>
