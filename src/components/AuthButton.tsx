@@ -86,7 +86,8 @@ export const AuthButton = () => {
   }, [handleSignIn, setLoading, toast, navigate]);
 
   const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent event bubbling
+    e.stopPropagation();
+    e.preventDefault();
     console.log('Button clicked');
     if (!loading) {
       handleGoogleSignIn();
@@ -94,7 +95,7 @@ export const AuthButton = () => {
   };
 
   return (
-    <div className="relative z-[100] pointer-events-auto">
+    <div className="fixed top-4 right-4 z-[100]">
       {user ? (
         <Button
           onClick={handleSignOut}
