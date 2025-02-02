@@ -21,6 +21,7 @@ import { NextjsIcon } from '@/components/ui/icons/NextjsIcon';
 import { UpstashIcon } from '@/components/ui/icons/UpstashIcon';
 import { StripeIcon } from '@/components/ui/icons/StripeIcon';
 import { Case } from '@/components/ui/cases-with-infinite-scroll';
+import { FeaturesSectionWithBentoGrid } from '@/components/ui/feature-section-with-bento-grid';
 
 const allLogos = [
   { name: "OpenAI", id: 1, img: OpenAIIconBlack },
@@ -94,6 +95,11 @@ export const LandingPage = () => {
         {/* Features Section */}
         <section id="features" className="min-h-screen">
           <Feature108 />
+        </section>
+
+        {/* Bento Grid Features Section */}
+        <section className="relative py-20">
+          <FeaturesSectionWithBentoGrid />
         </section>
 
         {/* Logo Carousel Section */}
