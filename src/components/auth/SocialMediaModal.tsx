@@ -10,9 +10,10 @@ interface SocialMediaModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSkip?: () => void;
+  userId: string;  // Added this line to fix the type error
 }
 
-export const SocialMediaModal = ({ isOpen, onClose, onSkip }: SocialMediaModalProps) => {
+export const SocialMediaModal = ({ isOpen, onClose, onSkip, userId }: SocialMediaModalProps) => {
   const [linkedinUrl, setLinkedinUrl] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');
   const [youtubeUrl, setYoutubeUrl] = useState('');
@@ -27,9 +28,8 @@ export const SocialMediaModal = ({ isOpen, onClose, onSkip }: SocialMediaModalPr
 
   const handleSubmit = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user?.id) {
-        throw new Error('No user found');
+      if (!userId) {
+        throw new Error('No user ID provided');
       }
 
       setIsSubmitting(true);
@@ -44,7 +44,7 @@ export const SocialMediaModal = ({ isOpen, onClose, onSkip }: SocialMediaModalPr
           has_completed_social_info: true,
           social_info_completed_at: new Date().toISOString()
         })
-        .eq('id', user.id);
+        .eq('id', userId);
 
       if (error) throw error;
 
