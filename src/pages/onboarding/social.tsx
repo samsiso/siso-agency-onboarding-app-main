@@ -51,7 +51,7 @@ export default function SocialOnboarding() {
         description: "Thank you for providing your social media information!",
       });
       
-      navigate('/tools');
+      navigate('/onboarding/congratulations');
     } catch (error: any) {
       console.error('Error updating profile:', error);
       toast({
@@ -69,7 +69,7 @@ export default function SocialOnboarding() {
       title: "Step skipped",
       description: "You can always add your social media links later in your profile.",
     });
-    navigate('/tools');
+    navigate('/onboarding/congratulations');
   };
 
   return (
