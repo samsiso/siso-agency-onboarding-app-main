@@ -8,7 +8,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from './ui/button';
 
 export const Sidebar = () => {
-  const [collapsed, setCollapsed] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showNavigation, setShowNavigation] = useState(true);
   const navigate = useNavigate();
@@ -72,26 +72,30 @@ export const Sidebar = () => {
                 isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
               }`
             : 'fixed top-0 h-screen overflow-y-auto'
-        } bg-gradient-to-b from-siso-bg to-siso-bg/95 border-r border-siso-text/10 shadow-lg transition-all duration-500 ease-in-out`}
-        style={{ width: collapsed && !isMobile ? '5rem' : '16rem' }}
+        } bg-gradient-to-b from-siso-bg to-siso-bg/95 border-r border-siso-text/10 shadow-lg transition-all duration-300 ease-in-out`}
+        style={{ 
+          width: isMobile ? '16rem' : isExpanded ? '16rem' : '4rem'
+        }}
+        onMouseEnter={() => !isMobile && setIsExpanded(true)}
+        onMouseLeave={() => !isMobile && setIsExpanded(false)}
       >
         <SidebarLogo 
-          collapsed={collapsed} 
-          setCollapsed={setCollapsed} 
+          collapsed={!isExpanded} 
+          setCollapsed={() => setIsExpanded(!isExpanded)}
           onLogoClick={() => setShowNavigation(!showNavigation)}
         />
         <SidebarNavigation 
-          collapsed={collapsed} 
+          collapsed={!isExpanded} 
           onItemClick={handleItemClick}
           visible={showNavigation}
         />
-        <SidebarFooter collapsed={collapsed} />
+        <SidebarFooter collapsed={!isExpanded} />
       </div>
 
       {/* Main Content Wrapper */}
       <div 
-        className={`min-h-screen transition-all duration-500 ease-in-out ${!isMobile ? 'ml-[16rem]' : ''}`}
-        style={{ marginLeft: !isMobile && collapsed ? '5rem' : undefined }}
+        className={`min-h-screen transition-all duration-300 ease-in-out ${!isMobile ? 'ml-16' : ''}`}
+        style={{ marginLeft: !isMobile ? (isExpanded ? '16rem' : '4rem') : undefined }}
       >
         {/* Mobile Overlay */}
         {isMobile && isMobileMenuOpen && (

@@ -5,11 +5,8 @@ import {
   Home,
   GraduationCap,
   Network,
-  Bot,
   Coins,
-  Zap,
   Newspaper,
-  Brain,
   Users,
   Wrench,
   Trophy,
@@ -78,11 +75,6 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
           icon: Users,
           label: 'Networking',
         },
-        {
-          href: '/assistants',
-          icon: Bot,
-          label: 'GPT Assistants',
-        },
       ]
     },
     {
@@ -109,21 +101,9 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
     },
     {
       type: 'main',
-      href: '/automations',
-      icon: Zap,
-      label: 'SISO Automations',
-    },
-    {
-      type: 'main',
       href: '/ai-news',
       icon: Newspaper,
       label: 'SISO News',
-    },
-    {
-      type: 'main',
-      href: '/siso-ai',
-      icon: Brain,
-      label: 'SISO AI',
     },
   ];
 
