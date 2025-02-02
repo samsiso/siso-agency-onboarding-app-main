@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { TierSection } from './TierSection';
 import { TestimonialSection } from './TestimonialSection';
+import { Footer } from '@/components/Footer';
 
 export const LandingPage = () => {
   const { user } = useAuthSession();
@@ -160,6 +161,9 @@ export const LandingPage = () => {
             Get Started Now
           </button>
         </section>
+
+        {/* Footer */}
+        <Footer />
       </div>
     </div>
   );
