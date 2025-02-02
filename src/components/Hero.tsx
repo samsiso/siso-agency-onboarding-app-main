@@ -1,22 +1,30 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { Button } from './ui/button';
-import { ScrollArea } from './ui/scroll-area';
-import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { Button } from './ui/button';
 import { useSidebar } from './ui/sidebar';
 import { Sidebar } from './Sidebar';
 
 export const Hero = () => {
-  const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
   const navigate = useNavigate();
   const { setOpen } = useSidebar();
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    // [Analysis] Adding debug logging to track component lifecycle
+    console.log('Hero component mounted');
+    setIsLoaded(true);
+    return () => {
+      console.log('Hero component unmounted');
+    };
+  }, []);
 
   const handleResourceClick = (path: string) => {
     setOpen(true);
     navigate(path);
   };
+
+  // [Analysis] Adding debug check for render
+  console.log('Hero rendering, isLoaded:', isLoaded);
 
   const resourceGuideItems = [
     {
@@ -40,7 +48,7 @@ export const Hero = () => {
   ];
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen w-full">
       <Sidebar />
       <div className="absolute inset-0 bg-gradient-to-br from-siso-bg via-siso-bg/95 to-siso-bg/90" />
       
@@ -50,14 +58,13 @@ export const Hero = () => {
           <div className="space-y-6">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-siso-text-bold leading-tight">
               Welcome to{' '}
-              <div className="relative inline-block mt-4">
-                <div className="relative p-3 sm:p-4 rounded-lg bg-black/30 backdrop-blur-sm border border-siso-text/10">
-                  <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-siso-orange to-siso-red opacity-10 animate-pulse" />
+              <span className="relative inline-block mt-4">
+                <span className="relative p-3 sm:p-4 rounded-lg bg-black/30 backdrop-blur-sm border border-siso-text/10">
                   <span className="relative bg-gradient-to-r from-siso-orange to-siso-red text-transparent bg-clip-text">
                     SISO Agency Resources
                   </span>
-                </div>
-              </div>
+                </span>
+              </span>
             </h1>
             <p className="text-xl sm:text-2xl text-siso-text max-w-3xl mx-auto leading-relaxed">
               Your gateway to tools, education, networking, and AI-powered innovation—crafted to help your agency thrive.
