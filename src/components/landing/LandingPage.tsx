@@ -67,49 +67,51 @@ export const LandingPage = () => {
       </nav>
 
       {/* Hero Section */}
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-16">
+      <div className="relative pt-32 pb-16">
         <div className="text-center space-y-8 relative z-10">
           {/* Stats Bar */}
           <div className="flex justify-center gap-8 mb-12">
-            <div className="inline-flex items-center gap-2 text-gray-300">
+            <div className="text-gray-300 flex items-center gap-2">
               <span className="text-siso-orange">⭐️⭐️⭐️⭐️⭐️</span>
               Reviews from 200+ users
             </div>
-            <div className="inline-flex items-center gap-2 text-gray-300">
+            <div className="text-gray-300 flex items-center gap-2">
               <span className="text-siso-orange">🚀</span>
               10,000+ active members
             </div>
           </div>
 
           {/* Main Headline */}
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight animate-fade-in max-w-5xl mx-auto">
-            <span className="text-white">Transform Your Agency with </span>
-            <span className="title-glow">
-              AI-Powered
-            </span>
-            <br />
-            <span className="text-white">Resources</span>
-          </h1>
+          <div className="max-w-5xl mx-auto px-4">
+            <h1 className="text-5xl md:text-7xl font-bold tracking-tight animate-fade-in">
+              <span className="text-white">Transform Your Agency with </span>
+              <span className="title-glow">
+                AI-Powered
+              </span>
+              <br />
+              <span className="text-white">Resources</span>
+            </h1>
 
-          {/* Subheadline */}
-          <p className="max-w-2xl mx-auto text-xl text-gray-400 animate-fade-in">
-            Join our AI-powered resource hub and supercharge your agency's growth. 
-            Access cutting-edge tools, education, and networking—all in one place.
-          </p>
+            {/* Subheadline */}
+            <p className="mt-6 max-w-2xl mx-auto text-xl text-gray-400 animate-fade-in">
+              Join our AI-powered resource hub and supercharge your agency's growth. 
+              Access cutting-edge tools, education, and networking—all in one place.
+            </p>
 
-          {/* CTA Buttons */}
-          <div className="flex justify-center gap-6 pt-8 animate-fade-in">
-            <button
-              onClick={handleSignInClick}
-              className="px-8 py-3 bg-gradient-to-r from-siso-orange to-siso-red text-white rounded-lg font-medium
-                transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-orange-500/20"
-            >
-              Get Started Now
-            </button>
-            <button className="px-8 py-3 bg-white/5 backdrop-blur-sm text-white rounded-lg font-medium
-              border border-white/10 transition-all duration-300 hover:bg-white/10">
-              Watch Demo
-            </button>
+            {/* CTA Buttons */}
+            <div className="flex justify-center gap-6 pt-8 animate-fade-in">
+              <button
+                onClick={handleSignInClick}
+                className="px-8 py-3 bg-gradient-to-r from-siso-orange to-siso-red text-white rounded-lg font-medium
+                  transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-orange-500/20"
+              >
+                Get Started Now
+              </button>
+              <button className="px-8 py-3 bg-white/5 backdrop-blur-sm text-white rounded-lg font-medium
+                border border-white/10 transition-all duration-300 hover:bg-white/10">
+                Watch Demo
+              </button>
+            </div>
           </div>
         </div>
       </div>
