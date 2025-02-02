@@ -35,7 +35,7 @@ const Footer = () => {
       <div className="relative container mx-auto px-4 py-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left Side - 3D Scene */}
-          <Card className="w-full h-[400px] bg-black/40 backdrop-blur-sm relative overflow-hidden">
+          <Card className="w-full h-[400px] bg-gradient-to-br from-black/30 to-black/10 backdrop-blur-sm relative overflow-hidden border-siso-text/10">
             <Spotlight
               className="-top-40 left-0 md:left-60 md:-top-20"
               size={400}
