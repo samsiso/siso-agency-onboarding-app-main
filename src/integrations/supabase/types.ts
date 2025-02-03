@@ -1199,6 +1199,7 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          input_channel_url: string | null
           is_verified: boolean | null
           joined_date: string | null
           location: string | null
@@ -1217,6 +1218,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          input_channel_url?: string | null
           is_verified?: boolean | null
           joined_date?: string | null
           location?: string | null
@@ -1235,6 +1237,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          input_channel_url?: string | null
           is_verified?: boolean | null
           joined_date?: string | null
           location?: string | null
@@ -1288,10 +1291,16 @@ export type Database = {
           description: string | null
           difficulty_level: string | null
           duration: string | null
+          from_channel_list_page: boolean | null
+          from_ytu: boolean | null
           id: string
+          input: string | null
           is_age_restricted: boolean | null
           like_count: number | null
+          order: number | null
           progress_key: string | null
+          progress_key_label: string | null
+          progress_key_url: string | null
           published_at: string | null
           standardized_url: string | null
           tags: string[] | null
@@ -1310,10 +1319,16 @@ export type Database = {
           description?: string | null
           difficulty_level?: string | null
           duration?: string | null
+          from_channel_list_page?: boolean | null
+          from_ytu?: boolean | null
           id?: string
+          input?: string | null
           is_age_restricted?: boolean | null
           like_count?: number | null
+          order?: number | null
           progress_key?: string | null
+          progress_key_label?: string | null
+          progress_key_url?: string | null
           published_at?: string | null
           standardized_url?: string | null
           tags?: string[] | null
@@ -1332,10 +1347,16 @@ export type Database = {
           description?: string | null
           difficulty_level?: string | null
           duration?: string | null
+          from_channel_list_page?: boolean | null
+          from_ytu?: boolean | null
           id?: string
+          input?: string | null
           is_age_restricted?: boolean | null
           like_count?: number | null
+          order?: number | null
           progress_key?: string | null
+          progress_key_label?: string | null
+          progress_key_url?: string | null
           published_at?: string | null
           standardized_url?: string | null
           tags?: string[] | null
