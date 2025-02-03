@@ -14,6 +14,7 @@ import {
 interface CommunityMemberCardProps {
   member: CommunityMember;
   onClick: (member: CommunityMember) => void;
+  viewMode?: 'grid' | 'list';
 }
 
 export const CommunityMemberCard = ({ member, onClick }: CommunityMemberCardProps) => {

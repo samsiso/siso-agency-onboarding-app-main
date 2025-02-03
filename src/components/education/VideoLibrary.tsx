@@ -10,6 +10,8 @@ import { supabase } from '@/integrations/supabase/client';
 interface VideoLibraryProps {
   isLoading?: boolean;
   selectedEducator?: string;
+  viewMode?: 'grid' | 'list';
+  searchQuery?: string;
 }
 
 const ITEMS_PER_PAGE = 12;

@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Tooltip } from '@/components/ui/tooltip';
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 
 const popularCategories = ['AI & ML', 'Web Development', 'Data Science', 'Business', 'Design'];
 
@@ -167,36 +167,61 @@ export default function SisoEducation() {
             </Tabs>
 
             <div className="flex items-center gap-2">
-              <Tooltip content="Grid View">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setViewMode('grid')}
-                  className={viewMode === 'grid' ? 'text-siso-orange' : 'text-siso-text/50'}
-                >
-                  <Grid className="w-4 h-4" />
-                </Button>
-              </Tooltip>
-              <Tooltip content="List View">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setViewMode('list')}
-                  className={viewMode === 'list' ? 'text-siso-orange' : 'text-siso-text/50'}
-                >
-                  <List className="w-4 h-4" />
-                </Button>
-              </Tooltip>
-              <Tooltip content="Filter">
-                <Button variant="outline" size="icon">
-                  <Filter className="w-4 h-4" />
-                </Button>
-              </Tooltip>
-              <Tooltip content="Sort">
-                <Button variant="outline" size="icon">
-                  <SlidersHorizontal className="w-4 h-4" />
-                </Button>
-              </Tooltip>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setViewMode('grid')}
+                      className={viewMode === 'grid' ? 'text-siso-orange' : 'text-siso-text/50'}
+                    >
+                      <Grid className="w-4 h-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Grid View</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setViewMode('list')}
+                      className={viewMode === 'list' ? 'text-siso-orange' : 'text-siso-text/50'}
+                    >
+                      <List className="w-4 h-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>List View</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" size="icon">
+                      <Filter className="w-4 h-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Filter</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" size="icon">
+                      <SlidersHorizontal className="w-4 h-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Sort</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           </div>
 
