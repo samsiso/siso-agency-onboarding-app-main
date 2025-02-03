@@ -80,7 +80,7 @@ export const Hero = () => {
                 onClick={handleGetStarted}
                 className="text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-3 font-semibold"
               >
-                Get Started
+                Start Onboarding
               </RainbowButton>
             </div>
           </div>

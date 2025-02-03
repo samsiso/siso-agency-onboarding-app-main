@@ -19,7 +19,7 @@ export const CallToActionSection = () => {
             className="text-lg px-10 py-6 font-semibold"
             onClick={handleGetStarted}
           >
-            Start Free Trial
+            Start Onboarding
           </RainbowButton>
         </div>
       </div>
