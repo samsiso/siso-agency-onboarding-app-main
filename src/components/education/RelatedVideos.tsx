@@ -12,12 +12,20 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
   const { data: relatedVideos, isLoading } = useQuery({
     queryKey: ['related-videos', currentVideoId, topics],
     queryFn: async () => {
-      // [Analysis] Specify the exact foreign key to use in the relationship
+      // [Analysis] Using the correct foreign key relationship and adding error handling
       const { data: videos, error } = await supabase
         .from('youtube_videos')
         .select(`
-          *,
-          channel:youtube_channels!youtube_videos_channel_id_fkey(*)
+          id,
+          title,
+          url,
+          duration,
+          thumbnailUrl,
+          viewCount,
+          channel:youtube_channels!youtube_videos_channel_id_fkey (
+            name,
+            profile_image_url
+          )
         `)
         .neq('id', currentVideoId)
         .limit(10);
@@ -42,12 +50,12 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
         },
         metrics: {
           views: video.viewCount || 0,
-          likes: 0, // We don't have this in the simplified schema
+          likes: 0,
           sentiment_score: 0.8,
           difficulty: "Intermediate" as const,
           impact_score: 8.5
         },
-        topics: [], // We don't have this in the simplified schema
+        topics: [],
         ai_analysis: {
           key_takeaways: ['Coming soon...'],
           implementation_steps: ['Coming soon...']

@@ -22,12 +22,19 @@ export const VideoLibrary = ({ isLoading: externalLoading, selectedEducator }: V
   const { data: videos, isLoading: videosLoading } = useQuery({
     queryKey: ['video-library', currentPage, selectedEducator],
     queryFn: async () => {
-      // [Analysis] Specify the exact foreign key to use in the relationship
       let query = supabase
         .from('youtube_videos')
         .select(`
-          *,
-          channel:youtube_channels!youtube_videos_channel_id_fkey(*)
+          id,
+          title,
+          url,
+          duration,
+          thumbnailUrl,
+          viewCount,
+          channel:youtube_channels!youtube_videos_channel_id_fkey (
+            name,
+            profile_image_url
+          )
         `)
         .order('order', { ascending: true });
 
@@ -57,12 +64,12 @@ export const VideoLibrary = ({ isLoading: externalLoading, selectedEducator }: V
         },
         metrics: {
           views: video.viewCount || 0,
-          likes: 0, // Not available in simplified schema
+          likes: 0,
           sentiment_score: 0.8,
           difficulty: "Intermediate" as const,
           impact_score: 8.5
         },
-        topics: [], // Not available in simplified schema
+        topics: [],
         ai_analysis: {
           key_takeaways: ['Coming soon...'],
           implementation_steps: ['Coming soon...']
