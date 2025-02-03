@@ -1189,6 +1189,63 @@ export type Database = {
         }
         Relationships: []
       }
+      youtube_channel_details: {
+        Row: {
+          avatar_url: string | null
+          banner_url: string | null
+          channel_id: string
+          channel_name: string
+          channel_url: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_verified: boolean | null
+          joined_date: string | null
+          location: string | null
+          subscriber_count: number | null
+          total_videos: number | null
+          total_views: number | null
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          banner_url?: string | null
+          channel_id: string
+          channel_name: string
+          channel_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_verified?: boolean | null
+          joined_date?: string | null
+          location?: string | null
+          subscriber_count?: number | null
+          total_videos?: number | null
+          total_views?: number | null
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          banner_url?: string | null
+          channel_id?: string
+          channel_name?: string
+          channel_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_verified?: boolean | null
+          joined_date?: string | null
+          location?: string | null
+          subscriber_count?: number | null
+          total_videos?: number | null
+          total_views?: number | null
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
       youtube_channels: {
         Row: {
           channel_id: string
@@ -1224,6 +1281,7 @@ export type Database = {
       }
       youtube_videos: {
         Row: {
+          channel_details_id: string | null
           channel_id: string | null
           comment_count: number | null
           created_at: string
@@ -1231,8 +1289,11 @@ export type Database = {
           difficulty_level: string | null
           duration: string | null
           id: string
+          is_age_restricted: boolean | null
           like_count: number | null
+          progress_key: string | null
           published_at: string | null
+          standardized_url: string | null
           tags: string[] | null
           thumbnail_url: string | null
           title: string
@@ -1242,6 +1303,7 @@ export type Database = {
           view_count: number | null
         }
         Insert: {
+          channel_details_id?: string | null
           channel_id?: string | null
           comment_count?: number | null
           created_at?: string
@@ -1249,8 +1311,11 @@ export type Database = {
           difficulty_level?: string | null
           duration?: string | null
           id?: string
+          is_age_restricted?: boolean | null
           like_count?: number | null
+          progress_key?: string | null
           published_at?: string | null
+          standardized_url?: string | null
           tags?: string[] | null
           thumbnail_url?: string | null
           title: string
@@ -1260,6 +1325,7 @@ export type Database = {
           view_count?: number | null
         }
         Update: {
+          channel_details_id?: string | null
           channel_id?: string | null
           comment_count?: number | null
           created_at?: string
@@ -1267,8 +1333,11 @@ export type Database = {
           difficulty_level?: string | null
           duration?: string | null
           id?: string
+          is_age_restricted?: boolean | null
           like_count?: number | null
+          progress_key?: string | null
           published_at?: string | null
+          standardized_url?: string | null
           tags?: string[] | null
           thumbnail_url?: string | null
           title?: string
@@ -1278,6 +1347,13 @@ export type Database = {
           view_count?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "youtube_videos_channel_details_id_fkey"
+            columns: ["channel_details_id"]
+            isOneToOne: false
+            referencedRelation: "youtube_channel_details"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "youtube_videos_channel_id_fkey"
             columns: ["channel_id"]
