@@ -85,7 +85,7 @@ export const TierSection = () => {
                     : 'bg-white/10 hover:bg-white/20'
                 }`}
               >
-                Get Started
+                Start Onboarding
               </Button>
             </div>
           ))}

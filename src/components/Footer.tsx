@@ -47,7 +47,7 @@ const Footer = () => {
             className="text-lg px-10 py-6 font-semibold mb-8"
             onClick={handleGetStarted}
           >
-            Start Free Trial
+            Start Onboarding
           </RainbowButton>
 
           {/* Social Links */}

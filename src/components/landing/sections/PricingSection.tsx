@@ -32,7 +32,7 @@ export const PricingSection = () => {
             ],
           },
         ]}
-        buttonText="Start Enterprise Trial"
+        buttonText="Start Onboarding"
         onButtonClick={handleGetStarted}
       />
     </section>
