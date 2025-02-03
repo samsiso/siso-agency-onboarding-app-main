@@ -112,8 +112,8 @@ export default function SisoEducation() {
             {activeSection === 'videos' ? (
               <VideoLibrary
                 key="video-library"
-                members={members}
                 isLoading={isLoading}
+                selectedEducator={null}
               />
             ) : (
               <EducatorsDirectory
