@@ -14,13 +14,40 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('youtube_videos')
-        .select('*')
+        .select(`
+          *,
+          channel:youtube_channels(*)
+        `)
         .neq('id', currentVideoId)
         .contains('topics', topics)
         .limit(10);
       
       if (error) throw error;
-      return data;
+
+      // Transform the data to match the expected ToolVideoCard props
+      return data.map(video => ({
+        id: video.id,
+        title: video.title,
+        url: `https://youtube.com/watch?v=${video.video_id}`,
+        duration: video.duration || '0:00',
+        thumbnail_url: video.thumbnail_url || '',
+        educator: {
+          name: video.channel?.name || 'Unknown Creator',
+          avatar_url: video.channel?.profile_image_url || ''
+        },
+        metrics: {
+          views: video.view_count || 0,
+          likes: video.like_count || 0,
+          sentiment_score: 0.8, // Default value since we don't have this in the DB yet
+          difficulty: (video.difficulty_level as "Beginner" | "Intermediate" | "Advanced") || "Intermediate",
+          impact_score: 8.5 // Default value since we don't have this in the DB yet
+        },
+        topics: video.topics || [],
+        ai_analysis: {
+          key_takeaways: ['Coming soon...'],
+          implementation_steps: ['Coming soon...']
+        }
+      }));
     },
   });
 
