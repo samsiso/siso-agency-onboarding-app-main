@@ -10,6 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useNavigate } from 'react-router-dom';
 
 interface CommunityMemberCardProps {
   member: CommunityMember;
@@ -17,7 +18,17 @@ interface CommunityMemberCardProps {
   viewMode?: 'grid' | 'list';
 }
 
-export const CommunityMemberCard = ({ member, onClick }: CommunityMemberCardProps) => {
+export const CommunityMemberCard = ({ member, onClick, viewMode }: CommunityMemberCardProps) => {
+  const navigate = useNavigate();
+  
+  const handleClick = () => {
+    if (member.slug) {
+      navigate(`/education/educators/${member.slug}`);
+    } else {
+      onClick(member);
+    }
+  };
+
   const generateAIAnalysis = () => {
     return {
       expertise: "Based on the content and specialization, this creator shows strong expertise in " + 
@@ -45,10 +56,10 @@ export const CommunityMemberCard = ({ member, onClick }: CommunityMemberCardProp
     >
       <Card 
         className="group bg-gradient-to-br from-siso-red/10 to-siso-orange/10 border-siso-text/10 hover:border-siso-orange/50 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-siso-orange/50 relative overflow-hidden"
-        onClick={() => onClick(member)}
+        onClick={handleClick}
         tabIndex={0}
         role="button"
-        onKeyDown={(e) => e.key === 'Enter' && onClick(member)}
+        onKeyDown={(e) => e.key === 'Enter' && handleClick()}
       >
         <CardContent className="p-6">
           <div className="flex items-start gap-4">

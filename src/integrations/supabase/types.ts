@@ -281,6 +281,7 @@ export type Database = {
           number_of_subscribers: number | null
           profile_image_url: string | null
           relevant: string | null
+          slug: string
           social_links: Json | null
           specialization: string[] | null
           tools_covered: string[] | null
@@ -314,6 +315,7 @@ export type Database = {
           number_of_subscribers?: number | null
           profile_image_url?: string | null
           relevant?: string | null
+          slug: string
           social_links?: Json | null
           specialization?: string[] | null
           tools_covered?: string[] | null
@@ -347,6 +349,7 @@ export type Database = {
           number_of_subscribers?: number | null
           profile_image_url?: string | null
           relevant?: string | null
+          slug?: string
           social_links?: Json | null
           specialization?: string[] | null
           tools_covered?: string[] | null
