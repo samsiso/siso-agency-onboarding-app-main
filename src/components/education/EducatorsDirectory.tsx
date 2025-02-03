@@ -10,18 +10,29 @@ import { usePagination } from '@/hooks/use-pagination';
 interface EducatorsDirectoryProps {
   members?: CommunityMember[];
   isLoading: boolean;
+  viewMode: 'grid' | 'list';
+  searchQuery: string;
 }
 
-const ITEMS_PER_PAGE = 8;
+const ITEMS_PER_PAGE = 20; // Updated to show 20 items per page
 
-export const EducatorsDirectory = ({ members, isLoading }: EducatorsDirectoryProps) => {
+export const EducatorsDirectory = ({ members, isLoading, viewMode, searchQuery }: EducatorsDirectoryProps) => {
   const [selectedMember, setSelectedMember] = useState<CommunityMember | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const totalPages = Math.ceil((members?.length || 0) / ITEMS_PER_PAGE);
+  // Filter members based on search query
+  const filteredMembers = members?.filter(member => 
+    searchQuery ? 
+      member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      member.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      member.specialization?.some(spec => spec.toLowerCase().includes(searchQuery.toLowerCase()))
+    : true
+  );
+
+  const totalPages = Math.ceil((filteredMembers?.length || 0) / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
-  const currentMembers = members?.slice(startIndex, endIndex) || [];
+  const currentMembers = filteredMembers?.slice(startIndex, endIndex) || [];
 
   const { pages, showLeftEllipsis, showRightEllipsis } = usePagination({
     currentPage,
@@ -38,7 +49,7 @@ export const EducatorsDirectory = ({ members, isLoading }: EducatorsDirectoryPro
     >
       <AnimatePresence mode="wait">
         <motion.div
-          key="educators-grid"
+          key={`educators-${viewMode}`}
           variants={{
             hidden: { opacity: 0 },
             show: {
@@ -50,12 +61,16 @@ export const EducatorsDirectory = ({ members, isLoading }: EducatorsDirectoryPro
           }}
           initial="hidden"
           animate="show"
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+          className={
+            viewMode === 'grid' 
+              ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+              : "flex flex-col gap-4"
+          }
         >
           {isLoading ? (
-            [...Array(8)].map((_, i) => (
+            [...Array(20)].map((_, i) => (
               <div key={i} className="animate-pulse">
-                <div className="h-48 bg-siso-bg-alt rounded-lg"></div>
+                <div className={`${viewMode === 'grid' ? 'h-48' : 'h-24'} bg-siso-bg-alt rounded-lg`}></div>
               </div>
             ))
           ) : currentMembers?.map((member) => (
@@ -65,10 +80,12 @@ export const EducatorsDirectory = ({ members, isLoading }: EducatorsDirectoryPro
                 hidden: { opacity: 0, y: 20 },
                 show: { opacity: 1, y: 0 }
               }}
+              className={viewMode === 'list' ? 'w-full' : ''}
             >
               <CommunityMemberCard
                 member={member}
                 onClick={setSelectedMember}
+                viewMode={viewMode}
               />
             </motion.div>
           ))}

@@ -2,15 +2,25 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Sidebar } from '@/components/Sidebar';
-import { GraduationCap } from 'lucide-react';
+import { GraduationCap, Search, Grid, List, TrendingUp, Star, Clock, Filter, SlidersHorizontal } from 'lucide-react';
 import { GradientText } from '@/components/ui/gradient-text';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { EducationNav } from '@/components/education/EducationNav';
 import { VideoLibrary } from '@/components/education/VideoLibrary';
 import { EducatorsDirectory } from '@/components/education/EducatorsDirectory';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { Tooltip } from '@/components/ui/tooltip';
+
+const popularCategories = ['AI & ML', 'Web Development', 'Data Science', 'Business', 'Design'];
 
 export default function SisoEducation() {
   const [activeSection, setActiveSection] = useState<'videos' | 'educators'>('videos');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const { data: members, isLoading } = useQuery({
     queryKey: ['education-creators'],
@@ -21,12 +31,11 @@ export default function SisoEducation() {
       
       if (error) throw error;
       
-      // [Analysis] Mapping database fields to match UI component expectations
       return data.map(member => ({
         id: member.id,
         name: member.name,
         description: member.channel_description,
-        member_type: member.member_type || 'Creator', // Provide default if null
+        member_type: member.member_type || 'Creator',
         youtube_url: member.youtube_url,
         youtube_videos: Array.isArray(member.youtube_videos) 
           ? member.youtube_videos.map((video: any) => ({
@@ -49,15 +58,25 @@ export default function SisoEducation() {
     },
   });
 
+  const stats = {
+    totalEducators: members?.length || 0,
+    totalVideos: members?.reduce((acc, member) => acc + (member.contribution_count || 0), 0) || 0,
+    totalStudents: members?.reduce((acc, member) => acc + (member.member_count || 0), 0) || 0
+  };
+
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
       <Sidebar />
       <div className="flex-1 p-4 md:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
-          {/* Hero Section */}
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-siso-red/10 to-siso-orange/10 p-8 border border-siso-border shadow-lg backdrop-blur-sm">
+          {/* Enhanced Hero Section */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-siso-red/10 to-siso-orange/10 p-8 border border-siso-border shadow-lg backdrop-blur-sm"
+          >
             <div className="relative z-10">
-              <div className="flex items-center gap-3 mb-4">
+              <div className="flex items-center gap-3 mb-6">
                 <GraduationCap className="w-8 h-8 text-siso-orange" />
                 <GradientText
                   colors={["#FF5722", "#FFA726", "#FF5722"]}
@@ -67,17 +86,119 @@ export default function SisoEducation() {
                   SISO EDUCATION HUB
                 </GradientText>
               </div>
-              <p className="text-siso-text/80 max-w-2xl mb-8 text-lg">
-                Access quality AI education and expert insights. Learn from industry leaders and stay ahead in the rapidly evolving world of artificial intelligence.
-              </p>
+              
+              {/* Stats Section */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <motion.div 
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.1 }}
+                  className="bg-white/5 rounded-lg p-4 backdrop-blur-sm border border-white/10"
+                >
+                  <div className="text-2xl font-bold text-siso-orange">{stats.totalEducators}</div>
+                  <div className="text-siso-text/80">Educators</div>
+                </motion.div>
+                <motion.div 
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="bg-white/5 rounded-lg p-4 backdrop-blur-sm border border-white/10"
+                >
+                  <div className="text-2xl font-bold text-siso-orange">{stats.totalVideos}</div>
+                  <div className="text-siso-text/80">Total Videos</div>
+                </motion.div>
+                <motion.div 
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="bg-white/5 rounded-lg p-4 backdrop-blur-sm border border-white/10"
+                >
+                  <div className="text-2xl font-bold text-siso-orange">{stats.totalStudents}</div>
+                  <div className="text-siso-text/80">Total Students</div>
+                </motion.div>
+              </div>
+
+              {/* Search and Filters */}
+              <div className="space-y-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-siso-text/50" />
+                  <Input
+                    type="text"
+                    placeholder="Search educators, topics, or videos..."
+                    className="w-full pl-10 bg-white/5 border-white/10"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {popularCategories.map((category) => (
+                    <Badge
+                      key={category}
+                      variant="secondary"
+                      className="hover:bg-siso-orange/20 cursor-pointer transition-colors"
+                    >
+                      {category}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Enhanced Navigation */}
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <Tabs defaultValue={activeSection} className="w-full md:w-auto">
+              <TabsList className="bg-white/5 border border-white/10">
+                <TabsTrigger 
+                  value="videos"
+                  onClick={() => setActiveSection('videos')}
+                  className="data-[state=active]:bg-siso-orange"
+                >
+                  Videos
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="educators"
+                  onClick={() => setActiveSection('educators')}
+                  className="data-[state=active]:bg-siso-orange"
+                >
+                  Educators
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+
+            <div className="flex items-center gap-2">
+              <Tooltip content="Grid View">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setViewMode('grid')}
+                  className={viewMode === 'grid' ? 'text-siso-orange' : 'text-siso-text/50'}
+                >
+                  <Grid className="w-4 h-4" />
+                </Button>
+              </Tooltip>
+              <Tooltip content="List View">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setViewMode('list')}
+                  className={viewMode === 'list' ? 'text-siso-orange' : 'text-siso-text/50'}
+                >
+                  <List className="w-4 h-4" />
+                </Button>
+              </Tooltip>
+              <Tooltip content="Filter">
+                <Button variant="outline" size="icon">
+                  <Filter className="w-4 h-4" />
+                </Button>
+              </Tooltip>
+              <Tooltip content="Sort">
+                <Button variant="outline" size="icon">
+                  <SlidersHorizontal className="w-4 h-4" />
+                </Button>
+              </Tooltip>
             </div>
           </div>
-
-          {/* Navigation */}
-          <EducationNav
-            activeSection={activeSection}
-            onSectionChange={setActiveSection}
-          />
 
           {/* Content Sections */}
           <AnimatePresence mode="wait">
@@ -86,12 +207,16 @@ export default function SisoEducation() {
                 key="video-library"
                 isLoading={isLoading}
                 selectedEducator={null}
+                viewMode={viewMode}
+                searchQuery={searchQuery}
               />
             ) : (
               <EducatorsDirectory
                 key="educators-directory"
                 members={members}
                 isLoading={isLoading}
+                viewMode={viewMode}
+                searchQuery={searchQuery}
               />
             )}
           </AnimatePresence>
