@@ -118,7 +118,7 @@ export default function SisoEducation() {
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-siso-red/10 to-siso-orange/10 p-8 border border-siso-border"
+            className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-siso-red/10 to-siso-orange/10 p-8 border border-siso-border shadow-lg backdrop-blur-sm"
           >
             <div className="relative z-10">
               <div className="flex items-center gap-3 mb-4">
@@ -128,10 +128,10 @@ export default function SisoEducation() {
                   animationSpeed={6}
                   className="text-4xl font-bold"
                 >
-                  SISO Education Hub
+                  SISO EDUCATION HUB
                 </GradientText>
               </div>
-              <p className="text-siso-text/80 max-w-2xl mb-8">
+              <p className="text-siso-text/80 max-w-2xl mb-8 text-lg">
                 Access quality AI education and expert insights. Learn from industry leaders and stay ahead in the rapidly evolving world of artificial intelligence.
               </p>
               
@@ -141,7 +141,7 @@ export default function SisoEducation() {
                   <motion.div
                     key={index}
                     variants={item}
-                    className="flex items-center gap-4 p-4 rounded-lg bg-black/20 border border-siso-border"
+                    className="flex items-center gap-4 p-4 rounded-lg bg-black/20 border border-siso-border hover:border-siso-border-hover transition-colors"
                   >
                     <stat.icon className="w-8 h-8 text-siso-orange" />
                     <div>
@@ -150,45 +150,23 @@ export default function SisoEducation() {
                     </div>
                   </motion.div>
                 ))}
-                <motion.div
-                  variants={item}
-                  className="flex items-center gap-4 p-4 rounded-lg bg-black/20 border border-siso-border cursor-pointer hover:bg-black/30 transition-colors"
-                  onClick={() => setShowDocs(!showDocs)}
-                >
-                  <FileText className="w-8 h-8 text-siso-orange" />
-                  <div>
-                    <div className="text-2xl font-bold text-siso-text-bold">Docs</div>
-                    <div className="text-sm text-siso-text/70">Project Documentation</div>
-                  </div>
-                </motion.div>
               </div>
             </div>
           </motion.div>
 
-          {/* Documentation Section */}
-          <AnimatePresence>
-            {showDocs && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="overflow-hidden"
-              >
-                <ProjectDocumentation />
-              </motion.div>
-            )}
-          </AnimatePresence>
-
           {/* List Learner Callout Box */}
-          <Alert className="border border-[#0FA0CE]/20 bg-[#0FA0CE]/5 text-siso-text">
-            <AlertDescription className="flex items-center justify-between gap-4">
-              <span>
-                List Learner is a powerful B2B education infrastructure platform - perfect for agencies, businesses, and individuals looking to scale their learning programs.
-              </span>
+          <Alert className="border border-[#0FA0CE]/20 bg-gradient-to-r from-[#0FA0CE]/5 to-transparent backdrop-blur-sm rounded-xl shadow-lg">
+            <AlertDescription className="flex items-center justify-between gap-4 p-2">
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-[#0FA0CE] mb-1">Scale Your Learning Programs</h3>
+                <p className="text-siso-text/90">
+                  List Learner is a powerful B2B education infrastructure platform - perfect for agencies, businesses, and individuals looking to scale their learning programs.
+                </p>
+              </div>
               <Button
                 asChild
                 variant="outline"
-                className="shrink-0 border-[#0FA0CE] text-[#0FA0CE] hover:bg-[#0FA0CE]/10 hover:text-[#0FA0CE] transition-all"
+                className="shrink-0 border-[#0FA0CE] text-[#0FA0CE] hover:bg-[#0FA0CE]/10 hover:text-[#0FA0CE] transition-all shadow-sm"
               >
                 <a 
                   href="https://demo.listlearner.com/?ref=sourcesiso" 
