@@ -12,17 +12,21 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
   const { data: relatedVideos, isLoading } = useQuery({
     queryKey: ['related-videos', currentVideoId, topics],
     queryFn: async () => {
-      // Get videos with proper join
+      // [Analysis] Specify the exact foreign key to use in the relationship
       const { data: videos, error } = await supabase
         .from('youtube_videos')
         .select(`
           *,
-          channel:youtube_channels(*)
+          channel:youtube_channels!youtube_videos_channel_id_fkey(*)
         `)
         .neq('id', currentVideoId)
         .limit(10);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching related videos:', error);
+        throw error;
+      }
+      
       if (!videos) return [];
 
       // Transform the data to match the expected ToolVideoCard props
