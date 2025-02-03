@@ -2,19 +2,24 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft, MessageCircle, Brain, ListChecks } from 'lucide-react';
+import { ChevronLeft, MessageCircle, Brain, ListChecks, Eye, ThumbsUp, Calendar } from 'lucide-react';
 import { VideoAnalysis } from '@/components/education/VideoAnalysis';
 import { VideoChat } from '@/components/education/VideoChat';
 import { VideoTakeaways } from '@/components/education/VideoTakeaways';
 import { RelatedVideos } from '@/components/education/RelatedVideos';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { extractVideoIdFromSlug } from '@/utils/slugUtils';
+import { format } from 'date-fns';
+import { Helmet } from 'react-helmet';
 
 export default function VideoDetail() {
-  const { videoId } = useParams();
+  const { slug } = useParams();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') || 'analysis';
+  
+  const videoId = slug ? extractVideoIdFromSlug(slug) : '';
 
   const { data: video, isLoading } = useQuery({
     queryKey: ['video', videoId],
@@ -34,81 +39,150 @@ export default function VideoDetail() {
   });
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-siso-bg to-siso-bg/95 p-4 md:p-8 flex items-center justify-center">
+        <div className="animate-pulse text-siso-text">Loading video...</div>
+      </div>
+    );
   }
 
   if (!video) {
-    return <div>Video not found</div>;
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-siso-bg to-siso-bg/95 p-4 md:p-8 flex items-center justify-center">
+        <div className="text-siso-text">Video not found</div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-siso-bg to-siso-bg/95 p-4 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Navigation Bar */}
-        <div className="flex items-center gap-4 mb-6">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate('/education')}
-            className="gap-2"
-          >
-            <ChevronLeft className="h-4 w-4" />
-            Back to Library
-          </Button>
-          <div>
-            <h1 className="text-xl font-semibold text-siso-text-bold">{video.title}</h1>
-            <p className="text-sm text-siso-text/70">{video.channel?.name}</p>
+    <>
+      <Helmet>
+        <title>{`${video.title} | ${video.channel?.name} | SISO Education`}</title>
+        <meta name="description" content={video.description} />
+        <meta property="og:title" content={video.title} />
+        <meta property="og:description" content={video.description} />
+        <meta property="og:image" content={video.thumbnail_url} />
+        <meta property="og:type" content="video.other" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "VideoObject",
+            "name": video.title,
+            "description": video.description,
+            "thumbnailUrl": video.thumbnail_url,
+            "uploadDate": video.published_at,
+            "duration": video.duration,
+            "interactionStatistic": [
+              {
+                "@type": "InteractionCounter",
+                "interactionType": "http://schema.org/WatchAction",
+                "userInteractionCount": video.view_count
+              },
+              {
+                "@type": "InteractionCounter",
+                "interactionType": "http://schema.org/LikeAction",
+                "userInteractionCount": video.like_count
+              }
+            ]
+          })}
+        </script>
+      </Helmet>
+
+      <div className="min-h-screen bg-gradient-to-b from-siso-bg to-siso-bg/95 p-4 md:p-8">
+        <div className="max-w-7xl mx-auto space-y-6">
+          {/* Navigation Bar */}
+          <div className="flex items-center gap-4 mb-6">
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/education')}
+              className="gap-2"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Back to Library
+            </Button>
+            <div className="flex-1">
+              <h1 className="text-xl font-semibold text-siso-text-bold">{video.title}</h1>
+              <div className="flex items-center gap-2 mt-1">
+                {video.channel?.profile_image_url && (
+                  <img 
+                    src={video.channel.profile_image_url} 
+                    alt={video.channel?.name}
+                    className="w-6 h-6 rounded-full"
+                  />
+                )}
+                <p className="text-sm text-siso-text/70">{video.channel?.name}</p>
+              </div>
+            </div>
           </div>
+
+          {/* Video Player */}
+          <div className="rounded-lg overflow-hidden bg-black/20 ring-1 ring-siso-text/10">
+            <AspectRatio ratio={16 / 9}>
+              <iframe
+                src={`https://www.youtube.com/embed/${video.video_id}`}
+                title={video.title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full"
+              />
+            </AspectRatio>
+          </div>
+
+          {/* Video Info */}
+          <div className="flex items-center gap-6 text-sm text-siso-text/70">
+            <div className="flex items-center gap-2">
+              <Eye className="h-4 w-4" />
+              <span>{video.view_count.toLocaleString()} views</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <ThumbsUp className="h-4 w-4" />
+              <span>{video.like_count.toLocaleString()} likes</span>
+            </div>
+            {video.published_at && (
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4" />
+                <span>{format(new Date(video.published_at), 'MMM d, yyyy')}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Interaction Panel */}
+          <Tabs defaultValue={activeTab} className="space-y-4">
+            <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
+              <TabsTrigger value="analysis" className="gap-2">
+                <Brain className="h-4 w-4" />
+                AI Analysis
+              </TabsTrigger>
+              <TabsTrigger value="chat" className="gap-2">
+                <MessageCircle className="h-4 w-4" />
+                Chat
+              </TabsTrigger>
+              <TabsTrigger value="takeaways" className="gap-2">
+                <ListChecks className="h-4 w-4" />
+                Key Takeaways
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="analysis">
+              <VideoAnalysis videoId={video.id} />
+            </TabsContent>
+
+            <TabsContent value="chat">
+              <VideoChat videoId={video.id} />
+            </TabsContent>
+
+            <TabsContent value="takeaways">
+              <VideoTakeaways videoId={video.id} />
+            </TabsContent>
+          </Tabs>
+
+          {/* Related Videos */}
+          <RelatedVideos 
+            currentVideoId={video.id} 
+            topics={video.topics || []} 
+          />
         </div>
-
-        {/* Video Player */}
-        <div className="rounded-lg overflow-hidden bg-black/20 ring-1 ring-siso-text/10">
-          <AspectRatio ratio={16 / 9}>
-            <iframe
-              src={`https://www.youtube.com/embed/${video.video_id}`}
-              title={video.title}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="w-full h-full"
-            />
-          </AspectRatio>
-        </div>
-
-        {/* Interaction Panel */}
-        <Tabs defaultValue={activeTab} className="space-y-4">
-          <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
-            <TabsTrigger value="analysis" className="gap-2">
-              <Brain className="h-4 w-4" />
-              AI Analysis
-            </TabsTrigger>
-            <TabsTrigger value="chat" className="gap-2">
-              <MessageCircle className="h-4 w-4" />
-              Chat
-            </TabsTrigger>
-            <TabsTrigger value="takeaways" className="gap-2">
-              <ListChecks className="h-4 w-4" />
-              Key Takeaways
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="analysis">
-            <VideoAnalysis videoId={video.id} />
-          </TabsContent>
-
-          <TabsContent value="chat">
-            <VideoChat videoId={video.id} />
-          </TabsContent>
-
-          <TabsContent value="takeaways">
-            <VideoTakeaways videoId={video.id} />
-          </TabsContent>
-        </Tabs>
-
-        {/* Related Videos */}
-        <RelatedVideos 
-          currentVideoId={video.id} 
-          topics={video.topics || []} 
-        />
       </div>
-    </div>
+    </>
   );
 }

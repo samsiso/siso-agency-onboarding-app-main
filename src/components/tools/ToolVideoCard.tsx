@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useNavigate } from 'react-router-dom';
+import { generateVideoSlug } from '@/utils/slugUtils';
 
 interface ToolVideoCardProps {
   video: {
@@ -37,7 +38,8 @@ export function ToolVideoCard({ video, featured = false }: ToolVideoCardProps) {
   const navigate = useNavigate();
 
   const handleVideoClick = () => {
-    navigate(`/education/videos/${video.id}`);
+    const slug = generateVideoSlug(video.title, video.id);
+    navigate(`/education/videos/${slug}`);
   };
 
   return (
