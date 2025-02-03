@@ -15,7 +15,7 @@ export function VideoAnalysis({ videoId }: VideoAnalysisProps) {
         .from('video_summaries')
         .select('*')
         .eq('video_id', videoId)
-        .single();
+        .maybeSingle();
       
       if (error) throw error;
       return data;
@@ -24,6 +24,16 @@ export function VideoAnalysis({ videoId }: VideoAnalysisProps) {
 
   if (isLoading) {
     return <div>Loading analysis...</div>;
+  }
+
+  if (!analysis) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card className="p-6">
+          <p className="text-siso-text">No analysis available for this video yet.</p>
+        </Card>
+      </div>
+    );
   }
 
   return (
