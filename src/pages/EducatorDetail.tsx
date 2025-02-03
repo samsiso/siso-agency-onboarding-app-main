@@ -8,6 +8,38 @@ import { motion } from 'framer-motion';
 import { GradientText } from '@/components/ui/gradient-text';
 import { VideoLibrary } from '@/components/education/VideoLibrary';
 
+interface SocialLinks {
+  twitter?: string;
+  linkedin?: string;
+  [key: string]: string | undefined;
+}
+
+interface EducatorData {
+  id: string;
+  name: string;
+  description: string | null;
+  member_type: string | null;
+  youtube_url: string | null;
+  youtube_videos: Array<{
+    title: string;
+    url: string;
+    thumbnailUrl?: string;
+    date?: string;
+    duration?: string;
+    viewCount?: number;
+  }> | null;
+  website_url: string | null;
+  specialization: string[] | null;
+  content_themes: string[] | null;
+  profile_image_url: string | null;
+  channel_avatar_url: string | null;
+  channel_description: string | null;
+  number_of_subscribers: number | null;
+  video_count: number | null;
+  channel_total_views: number | null;
+  social_links: SocialLinks | null;
+}
+
 export default function EducatorDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -25,7 +57,7 @@ export default function EducatorDetail() {
         .single();
       
       if (error) throw error;
-      return data;
+      return data as EducatorData;
     },
   });
 
@@ -64,7 +96,6 @@ export default function EducatorDetail() {
       <Sidebar />
       <div className="flex-1 p-4 md:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
-          {/* Back Button */}
           <Button
             variant="ghost"
             onClick={() => navigate('/education')}
@@ -74,14 +105,12 @@ export default function EducatorDetail() {
             Back to Education Hub
           </Button>
 
-          {/* Educator Hero Section */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-siso-red/10 to-siso-orange/10 p-8 border border-siso-border shadow-lg backdrop-blur-sm"
           >
             <div className="flex flex-col md:flex-row gap-6 items-start">
-              {/* Profile Image */}
               <motion.img
                 src={educator.profile_image_url || educator.channel_avatar_url}
                 alt={educator.name}
@@ -91,7 +120,6 @@ export default function EducatorDetail() {
                 transition={{ delay: 0.2 }}
               />
 
-              {/* Educator Info */}
               <div className="flex-1 space-y-4">
                 <GradientText
                   colors={["#FF5722", "#FFA726", "#FF5722"]}
@@ -105,7 +133,6 @@ export default function EducatorDetail() {
                   {educator.description || educator.channel_description}
                 </p>
 
-                {/* Stats */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="bg-white/5 rounded-lg p-4">
                     <div className="text-2xl font-bold text-siso-orange">
@@ -127,7 +154,6 @@ export default function EducatorDetail() {
                   </div>
                 </div>
 
-                {/* Social Links */}
                 <div className="flex gap-2">
                   {educator.youtube_url && (
                     <Button variant="outline" size="icon" asChild>
@@ -162,7 +188,6 @@ export default function EducatorDetail() {
             </div>
           </motion.div>
 
-          {/* Videos Section */}
           <div className="space-y-4">
             <h2 className="text-2xl font-bold text-siso-text">Latest Videos</h2>
             <VideoLibrary
