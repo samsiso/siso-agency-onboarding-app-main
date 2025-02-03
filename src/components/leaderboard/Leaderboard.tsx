@@ -8,7 +8,7 @@ import { CommunityMemberDetails } from '../community/CommunityMemberDetails';
 import { Trophy, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { LeaderboardEntry } from './types';
-import type { Achievement } from '../community/types';
+import type { Achievement } from './types';
 
 export const Leaderboard = () => {
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
