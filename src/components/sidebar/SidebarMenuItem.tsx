@@ -79,7 +79,7 @@ export const SidebarMenuItem = ({
             {menuItem}
           </TooltipTrigger>
           <TooltipContent side="right">
-            {label}
+            <p>{label}</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>

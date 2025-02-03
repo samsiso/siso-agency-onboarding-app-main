@@ -17,9 +17,3 @@ export interface CommunityMember {
   contribution_count: number;
   referral_count: number;
 }
-
-export interface CommunityMemberCardProps {
-  member: CommunityMember;
-  onClick: (member: CommunityMember) => void;
-  viewMode?: 'grid' | 'list';
-}

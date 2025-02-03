@@ -14,12 +14,9 @@ import {
 interface CommunityMemberCardProps {
   member: CommunityMember;
   onClick: (member: CommunityMember) => void;
-  viewMode?: 'grid' | 'list';
 }
 
-// ... keep existing code (generateAIAnalysis and other functions)
-
-export const CommunityMemberCard = ({ member, onClick, viewMode = 'grid' }: CommunityMemberCardProps) => {
+export const CommunityMemberCard = ({ member, onClick }: CommunityMemberCardProps) => {
   const generateAIAnalysis = () => {
     return {
       expertise: "Based on the content and specialization, this creator shows strong expertise in " + 
@@ -44,18 +41,15 @@ export const CommunityMemberCard = ({ member, onClick, viewMode = 'grid' }: Comm
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ scale: 1.02 }}
       transition={{ duration: 0.3 }}
-      className={viewMode === 'list' ? 'w-full' : ''}
     >
       <Card 
-        className={`group bg-gradient-to-br from-siso-red/10 to-siso-orange/10 border-siso-text/10 hover:border-siso-orange/50 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-siso-orange/50 relative overflow-hidden ${
-          viewMode === 'list' ? 'flex flex-row items-start' : ''
-        }`}
+        className="group bg-gradient-to-br from-siso-red/10 to-siso-orange/10 border-siso-text/10 hover:border-siso-orange/50 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-siso-orange/50 relative overflow-hidden"
         onClick={() => onClick(member)}
         tabIndex={0}
         role="button"
         onKeyDown={(e) => e.key === 'Enter' && onClick(member)}
       >
-        <CardContent className={`p-6 ${viewMode === 'list' ? 'flex-1' : ''}`}>
+        <CardContent className="p-6">
           <div className="flex items-start gap-4">
             {member.profile_image_url ? (
               <motion.img 

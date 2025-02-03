@@ -7,11 +7,9 @@ import { usePagination } from '@/hooks/use-pagination';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-export interface VideoLibraryProps {
+interface VideoLibraryProps {
   isLoading?: boolean;
   selectedEducator?: string;
-  viewMode: 'grid' | 'list';
-  searchQuery: string;
 }
 
 const ITEMS_PER_PAGE = 12;

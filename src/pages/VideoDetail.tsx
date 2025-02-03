@@ -13,18 +13,16 @@ import { extractVideoIdFromSlug } from '@/utils/slugUtils';
 import { format, parseISO } from 'date-fns';
 import { Helmet } from 'react-helmet';
 import { motion } from 'framer-motion';
-import { useToast } from '@/components/ui/use-toast';
 
 export default function VideoDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') || 'analysis';
-  const { toast } = useToast();
   
   const videoId = slug ? extractVideoIdFromSlug(slug) : '';
 
-  const { data: video, isLoading, error } = useQuery({
+  const { data: video, isLoading } = useQuery({
     queryKey: ['video', videoId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -34,18 +32,10 @@ export default function VideoDetail() {
           channel:youtube_channels(*)
         `)
         .eq('id', videoId)
-        .maybeSingle();
+        .single();
       
       if (error) throw error;
-      if (!data) {
-        toast({
-          title: "Video not found",
-          description: "The requested video could not be found.",
-          variant: "destructive"
-        });
-        navigate('/education');
-        return null;
-      }
+      if (!data) throw new Error('Video not found');
       return data;
     },
   });
@@ -60,11 +50,8 @@ export default function VideoDetail() {
 
   if (!video) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-siso-bg to-siso-bg/95 p-4 md:p-8 flex flex-col items-center justify-center gap-4">
-        <div className="text-siso-text text-xl">Video not found</div>
-        <Button onClick={() => navigate('/education')}>
-          Return to Education Hub
-        </Button>
+      <div className="min-h-screen bg-gradient-to-b from-siso-bg to-siso-bg/95 p-4 md:p-8 flex items-center justify-center">
+        <div className="text-siso-text">Video not found</div>
       </div>
     );
   }
@@ -252,4 +239,4 @@ export default function VideoDetail() {
       </div>
     </>
   );
-};
+}
