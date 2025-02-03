@@ -16,9 +16,10 @@ const categories = [
 interface ToolVideoGridProps {
   videos: any[];
   featuredVideos?: any[];
+  isLoading?: boolean; // Added isLoading prop
 }
 
-export function ToolVideoGrid({ videos = [], featuredVideos = [] }: ToolVideoGridProps) {
+export function ToolVideoGrid({ videos = [], featuredVideos = [], isLoading = false }: ToolVideoGridProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState('recent');
@@ -37,6 +38,18 @@ export function ToolVideoGrid({ videos = [], featuredVideos = [] }: ToolVideoGri
       video.topics.some((topic: string) => selectedCategories.includes(topic));
     return matchesSearch && matchesCategories;
   });
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {[...Array(8)].map((_, i) => (
+          <div key={i} className="animate-pulse">
+            <div className="h-48 bg-siso-bg-alt rounded-lg"></div>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

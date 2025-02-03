@@ -30,7 +30,12 @@ export default function SisoEducation() {
         description: member.description,
         member_type: member.member_type,
         youtube_url: member.youtube_url,
-        youtube_videos: member.youtube_videos,
+        youtube_videos: Array.isArray(member.youtube_videos) 
+          ? member.youtube_videos.map((video: any) => ({
+              title: video.title || '',
+              url: video.url || ''
+            }))
+          : [],
         website_url: member.website_url,
         specialization: member.specialization,
         content_themes: member.content_themes,
