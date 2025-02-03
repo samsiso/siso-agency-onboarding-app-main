@@ -48,16 +48,16 @@ export const LandingPage = () => {
   }, [user, navigate]);
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-black via-gray-900 to-[#0A0A0A]">
+    <div className="min-h-screen w-full bg-gradient-to-b from-black via-gray-900 to-[#0A0A0A] overflow-x-hidden">
       <Suspense fallback={<LoadingFallback />}>
         <ScrollNav />
       </Suspense>
       
       {/* Background elements - Optimized with reduced opacity and complexity for mobile */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 -left-1/4 w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-siso-red/5 rounded-full filter blur-[40px] md:blur-[80px] animate-float-slow"></div>
-        <div className="absolute bottom-1/4 -right-1/4 w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-siso-orange/5 rounded-full filter blur-[40px] md:blur-[80px] animate-float-slower"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] md:w-[800px] h-[400px] md:h-[800px] bg-siso-red/3 rounded-full filter blur-[50px] md:blur-[100px]"></div>
+        <div className="absolute top-1/4 -left-1/4 w-[200px] md:w-[500px] h-[200px] md:h-[500px] bg-siso-red/5 rounded-full filter blur-[40px] md:blur-[80px] animate-float-slow"></div>
+        <div className="absolute bottom-1/4 -right-1/4 w-[200px] md:w-[500px] h-[200px] md:h-[500px] bg-siso-orange/5 rounded-full filter blur-[40px] md:blur-[80px] animate-float-slower"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] md:w-[800px] h-[300px] md:h-[800px] bg-siso-red/3 rounded-full filter blur-[50px] md:blur-[100px]"></div>
       </div>
 
       {/* Main Content with Intersection Observer based loading */}
