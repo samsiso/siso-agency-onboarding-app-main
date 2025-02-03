@@ -67,9 +67,13 @@ export const Hero = () => {
                 </span>
               </span>
             </h1>
-            <p className="text-xs sm:text-sm md:text-base text-siso-text max-w-[80vw] mx-auto leading-relaxed px-2">
-              Tools, education & networking for agency growth.
-            </p>
+            <div className="relative h-[120px] sm:h-[140px] md:h-[160px] flex w-full justify-center overflow-hidden text-center">
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-sm sm:text-base md:text-lg text-siso-text max-w-[80vw] mx-auto leading-relaxed px-2">
+                  Tools, education & networking for agency growth.
+                </span>
+              </div>
+            </div>
             
             <div className="mt-2 sm:mt-3 md:mt-4">
               <RainbowButton
