@@ -2,7 +2,7 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft, MessageCircle, Brain, ListChecks, Eye, ThumbsUp, Calendar } from 'lucide-react';
+import { ChevronLeft, MessageCircle, Brain, ListChecks, Eye, ThumbsUp, Calendar, Users } from 'lucide-react';
 import { VideoAnalysis } from '@/components/education/VideoAnalysis';
 import { VideoChat } from '@/components/education/VideoChat';
 import { VideoTakeaways } from '@/components/education/VideoTakeaways';
@@ -12,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { extractVideoIdFromSlug } from '@/utils/slugUtils';
 import { format } from 'date-fns';
 import { Helmet } from 'react-helmet';
+import { motion } from 'framer-motion';
 
 export default function VideoDetail() {
   const { slug } = useParams();
@@ -91,29 +92,47 @@ export default function VideoDetail() {
       <div className="min-h-screen bg-gradient-to-b from-siso-bg to-siso-bg/95 p-4 md:p-8">
         <div className="max-w-7xl mx-auto space-y-6">
           {/* Navigation Bar */}
-          <div className="flex items-center gap-4 mb-6">
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center justify-between gap-4 sticky top-0 z-10 bg-siso-bg/80 backdrop-blur-sm border-b border-siso-border p-4"
+          >
             <Button 
               variant="ghost" 
               onClick={() => navigate('/education')}
-              className="gap-2"
+              className="gap-2 group"
             >
-              <ChevronLeft className="h-4 w-4" />
-              Back to Library
+              <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+              <span className="hidden md:inline">Back to Library</span>
             </Button>
-            <div className="flex-1">
-              <h1 className="text-xl font-semibold text-siso-text-bold">{video.title}</h1>
-              <div className="flex items-center gap-2 mt-1">
-                {video.channel?.profile_image_url && (
-                  <img 
-                    src={video.channel.profile_image_url} 
-                    alt={video.channel?.name}
-                    className="w-6 h-6 rounded-full"
-                  />
-                )}
-                <p className="text-sm text-siso-text/70">{video.channel?.name}</p>
-              </div>
+
+            <div className="flex-1 flex items-center justify-center gap-3 px-4">
+              <h1 className="text-lg md:text-xl font-semibold text-siso-text-bold line-clamp-1">
+                {video.title}
+              </h1>
+              {video.channel && (
+                <div className="hidden md:flex items-center gap-2">
+                  {video.channel.profile_image_url && (
+                    <img 
+                      src={video.channel.profile_image_url} 
+                      alt={video.channel.name}
+                      className="w-6 h-6 rounded-full"
+                    />
+                  )}
+                  <span className="text-sm text-siso-text/70">{video.channel.name}</span>
+                </div>
+              )}
             </div>
-          </div>
+
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/education', { state: { section: 'educators' } })}
+              className="hidden md:flex gap-2"
+            >
+              <Users className="h-4 w-4" />
+              <span>View Educators</span>
+            </Button>
+          </motion.div>
 
           {/* Video Player */}
           <div className="rounded-lg overflow-hidden bg-black/20 ring-1 ring-siso-text/10">

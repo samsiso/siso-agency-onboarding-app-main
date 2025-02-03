@@ -1,166 +1,102 @@
-import { Play, MessageCircle, Brain, ListChecks, Eye, ThumbsUp } from 'lucide-react';
-import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
-import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
 import { useNavigate } from 'react-router-dom';
-import { generateVideoSlug } from '@/utils/slugUtils';
+import { motion } from 'framer-motion';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
+import { cn } from '@/lib/utils';
 
 interface ToolVideoCardProps {
   video: {
-    id: string;
     title: string;
     url: string;
-    duration: string;
-    thumbnail_url: string;
-    educator: {
+    thumbnail_url?: string;
+    educator?: {
       name: string;
-      avatar_url: string;
+      avatar_url?: string;
     };
-    metrics: {
-      views: number;
-      likes: number;
-      sentiment_score: number;
-      difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
-      impact_score: number;
-    };
-    topics: string[];
-    ai_analysis: {
-      key_takeaways: string[];
-      implementation_steps: string[];
+    metrics?: {
+      views?: number;
+      likes?: number;
+      sentiment_score?: number;
+      difficulty?: string;
+      impact_score?: number;
     };
   };
+  className?: string;
   featured?: boolean;
 }
 
-export function ToolVideoCard({ video, featured = false }: ToolVideoCardProps) {
+export const ToolVideoCard = ({ video, className, featured = false }: ToolVideoCardProps) => {
   const navigate = useNavigate();
 
-  const handleVideoClick = () => {
-    const slug = generateVideoSlug(video.title, video.id);
-    navigate(`/education/videos/${slug}`);
+  const handleClick = () => {
+    const slug = video.title
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .substring(0, 60);
+    
+    const videoId = video.url.split('v=')[1] || '';
+    navigate(`/education/videos/${slug}-${videoId}`);
   };
 
   return (
-    <Card className={cn(
-      "group relative overflow-hidden transition-all duration-300 hover:shadow-lg",
-      "border border-siso-border hover:border-siso-border-hover",
-      featured ? "bg-gradient-to-br from-siso-red/5 to-siso-orange/5" : "bg-siso-bg-alt"
-    )}>
-      <div className="relative">
-        <AspectRatio ratio={16 / 9}>
-          <img 
-            src={video.thumbnail_url} 
-            alt={video.title}
-            className="object-cover rounded-t-lg cursor-pointer"
-            onClick={handleVideoClick}
-          />
-          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-            <Play className="w-12 h-12 text-white" />
-          </div>
-          
-          {/* Action Buttons */}
-          <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button 
-                    className="p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/education/videos/${video.id}?tab=analysis`);
-                    }}
-                  >
-                    <Brain className="w-4 h-4" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent>AI Analysis</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button 
-                    className="p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/education/videos/${video.id}?tab=chat`);
-                    }}
-                  >
-                    <MessageCircle className="w-4 h-4" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent>Chat about this video</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button 
-                    className="p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/education/videos/${video.id}?tab=takeaways`);
-                    }}
-                  >
-                    <ListChecks className="w-4 h-4" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent>Key Takeaways</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
+    <motion.div
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      onClick={handleClick}
+      className={cn(
+        "group cursor-pointer rounded-lg border border-siso-border bg-siso-bg-alt p-3 transition-all duration-300 hover:border-siso-orange/30 hover:bg-siso-text/5",
+        featured ? "col-span-2 md:col-span-3" : "col-span-1",
+        className
+      )}
+    >
+      <div className="space-y-3">
+        <AspectRatio ratio={16 / 9} className="overflow-hidden rounded-lg bg-siso-bg">
+          {video.thumbnail_url ? (
+            <img
+              src={video.thumbnail_url}
+              alt={video.title}
+              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+          ) : (
+            <div className="flex h-full items-center justify-center bg-siso-bg">
+              <span className="text-siso-text-muted">No thumbnail</span>
+            </div>
+          )}
         </AspectRatio>
-        <div className="absolute bottom-2 right-2 flex items-center gap-1 bg-black/70 text-white text-sm px-2 py-1 rounded-md">
-          <span>{video.duration}</span>
-        </div>
-        {featured && (
-          <Badge className="absolute top-2 left-2 bg-siso-red text-white">
-            Featured
-          </Badge>
-        )}
-      </div>
 
-      <div className="p-4 space-y-3">
-        <h3 className="font-semibold text-siso-text-bold line-clamp-2 cursor-pointer hover:text-siso-red transition-colors" onClick={handleVideoClick}>
-          {video.title}
-        </h3>
+        <div className="space-y-1">
+          <h3 className="line-clamp-2 font-semibold text-siso-text-bold group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-siso-red group-hover:to-siso-orange">
+            {video.title}
+          </h3>
+          
+          {video.educator && (
+            <div className="flex items-center gap-2">
+              {video.educator.avatar_url && (
+                <img
+                  src={video.educator.avatar_url}
+                  alt={video.educator.name}
+                  className="h-6 w-6 rounded-full"
+                />
+              )}
+              <p className="text-sm text-siso-text/70">{video.educator.name}</p>
+            </div>
+          )}
 
-        <div className="flex items-center gap-2">
-          <img
-            src={video.educator.avatar_url}
-            alt={video.educator.name}
-            className="w-8 h-8 rounded-full"
-          />
-          <span className="text-sm text-siso-text">{video.educator.name}</span>
-        </div>
-
-        <div className="flex items-center gap-4 text-sm text-siso-text-muted">
-          <div className="flex items-center gap-1">
-            <Eye className="w-4 h-4" />
-            <span>{video.metrics.views.toLocaleString()}</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <ThumbsUp className="w-4 h-4" />
-            <span>{video.metrics.likes.toLocaleString()}</span>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap gap-1">
-          {video.topics.map((topic, index) => (
-            <Badge
-              key={index}
-              variant="secondary"
-              className="bg-siso-bg text-siso-text-muted"
-            >
-              {topic}
-            </Badge>
-          ))}
+          {video.metrics && (
+            <div className="flex items-center gap-4 text-xs text-siso-text/60">
+              {video.metrics.views !== undefined && (
+                <span>{video.metrics.views.toLocaleString()} views</span>
+              )}
+              {video.metrics.likes !== undefined && (
+                <span>{video.metrics.likes.toLocaleString()} likes</span>
+              )}
+              {video.metrics.difficulty && (
+                <span className="capitalize">{video.metrics.difficulty}</span>
+              )}
+            </div>
+          )}
         </div>
       </div>
-    </Card>
+    </motion.div>
   );
-}
+};

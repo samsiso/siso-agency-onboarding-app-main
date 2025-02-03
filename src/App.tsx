@@ -24,6 +24,7 @@ import ToolPage from '@/pages/ToolPage'
 import Auth from '@/pages/Auth'
 import SocialOnboarding from '@/pages/onboarding/social'
 import Congratulations from '@/pages/onboarding/congratulations'
+import VideoDetail from '@/pages/VideoDetail'
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/siso-ai" element={<SisoAI />} />
         <Route path="/education" element={<SisoEducation />} />
+        <Route path="/education/videos/:slug" element={<VideoDetail />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/thank-you" element={<ThankYou />} />
         <Route path="/tool/:id" element={<ToolPage />} />
