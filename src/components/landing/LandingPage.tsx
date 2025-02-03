@@ -53,15 +53,27 @@ export const LandingPage = () => {
         <ScrollNav />
       </Suspense>
       
-      {/* Background elements - Enhanced wave visibility */}
+      {/* Background elements - Enhanced for mobile */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 -left-1/4 w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-siso-red/10 rounded-full filter blur-[60px] md:blur-[100px] animate-float-slow"></div>
-        <div className="absolute bottom-1/4 -right-1/4 w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-siso-orange/10 rounded-full filter blur-[60px] md:blur-[100px] animate-float-slower"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] md:w-[1000px] h-[400px] md:h-[1000px] bg-siso-red/5 rounded-full filter blur-[80px] md:blur-[120px]"></div>
+        {/* Top gradient - Optimized for mobile */}
+        <div className="absolute top-1/4 -left-1/4 w-[250px] md:w-[600px] h-[250px] md:h-[600px] 
+          bg-siso-red/15 rounded-full filter blur-[80px] md:blur-[120px] 
+          animate-float-slow transform-gpu"
+        />
+        {/* Bottom gradient - Optimized for mobile */}
+        <div className="absolute bottom-1/4 -right-1/4 w-[250px] md:w-[600px] h-[250px] md:h-[600px] 
+          bg-siso-orange/15 rounded-full filter blur-[80px] md:blur-[120px] 
+          animate-float-slower transform-gpu"
+        />
+        {/* Center gradient - Enhanced visibility */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
+          w-[350px] md:w-[1000px] h-[350px] md:h-[1000px] 
+          bg-siso-red/8 rounded-full filter blur-[100px] md:blur-[150px] transform-gpu"
+        />
       </div>
 
-      {/* Main Content with Intersection Observer based loading */}
-      <div className="relative z-10 px-4 md:px-0">
+      {/* Main Content - Mobile optimized spacing */}
+      <div className="relative z-10 px-4 md:px-0 space-y-12 md:space-y-0">
         <Suspense fallback={<LoadingFallback />}>
           <HeroSection />
         </Suspense>
