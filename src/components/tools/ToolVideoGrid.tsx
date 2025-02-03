@@ -16,7 +16,7 @@ const categories = [
 interface ToolVideoGridProps {
   videos: any[];
   featuredVideos?: any[];
-  isLoading?: boolean; // Added isLoading prop
+  isLoading?: boolean;
 }
 
 export function ToolVideoGrid({ videos = [], featuredVideos = [], isLoading = false }: ToolVideoGridProps) {
@@ -93,10 +93,28 @@ export function ToolVideoGrid({ videos = [], featuredVideos = [], isLoading = fa
       {featuredVideos.length > 0 && (
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold text-siso-text-bold">Featured Videos</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredVideos.map((video, index) => (
-              <ToolVideoCard key={index} video={video} featured />
-            ))}
+          <div className="grid gap-4">
+            {/* Top row: Two featured videos side by side */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {featuredVideos.slice(0, 2).map((video, index) => (
+                <ToolVideoCard 
+                  key={index} 
+                  video={video} 
+                  featured 
+                  className="h-full"
+                />
+              ))}
+            </div>
+            {/* Bottom row: One larger featured video */}
+            {featuredVideos[2] && (
+              <div className="md:col-span-2">
+                <ToolVideoCard 
+                  video={featuredVideos[2]} 
+                  featured 
+                  className="md:max-w-3xl mx-auto"
+                />
+              </div>
+            )}
           </div>
         </div>
       )}

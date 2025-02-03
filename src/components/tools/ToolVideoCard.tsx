@@ -44,8 +44,8 @@ export const ToolVideoCard = ({ video, className, featured = false }: ToolVideoC
       whileTap={{ scale: 0.98 }}
       onClick={handleClick}
       className={cn(
-        "group cursor-pointer rounded-lg border border-siso-border bg-siso-bg-alt p-3 transition-all duration-300 hover:border-siso-orange/30 hover:bg-siso-text/5",
-        featured ? "col-span-2 md:col-span-3" : "col-span-1",
+        "group cursor-pointer rounded-lg border border-siso-border bg-siso-bg-alt transition-all duration-300 hover:border-siso-orange/30 hover:bg-siso-text/5",
+        featured ? "p-4" : "p-3",
         className
       )}
     >
@@ -64,8 +64,11 @@ export const ToolVideoCard = ({ video, className, featured = false }: ToolVideoC
           )}
         </AspectRatio>
 
-        <div className="space-y-1">
-          <h3 className="line-clamp-2 font-semibold text-siso-text-bold group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-siso-red group-hover:to-siso-orange">
+        <div className="space-y-2">
+          <h3 className={cn(
+            "line-clamp-2 font-semibold text-siso-text-bold group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-siso-red group-hover:to-siso-orange",
+            featured ? "text-lg" : "text-base"
+          )}>
             {video.title}
           </h3>
           
@@ -75,10 +78,18 @@ export const ToolVideoCard = ({ video, className, featured = false }: ToolVideoC
                 <img
                   src={video.educator.avatar_url}
                   alt={video.educator.name}
-                  className="h-6 w-6 rounded-full"
+                  className={cn(
+                    "rounded-full",
+                    featured ? "h-8 w-8" : "h-6 w-6"
+                  )}
                 />
               )}
-              <p className="text-sm text-siso-text/70">{video.educator.name}</p>
+              <p className={cn(
+                "text-siso-text/70",
+                featured ? "text-base" : "text-sm"
+              )}>
+                {video.educator.name}
+              </p>
             </div>
           )}
 
