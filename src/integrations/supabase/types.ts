@@ -1238,7 +1238,6 @@ export type Database = {
           channel_id: string
           created_at: string
           description: string | null
-          id: string
           name: string
           profile_image_url: string | null
           subscriber_count: number | null
@@ -1248,7 +1247,6 @@ export type Database = {
           channel_id: string
           created_at?: string
           description?: string | null
-          id?: string
           name: string
           profile_image_url?: string | null
           subscriber_count?: number | null
@@ -1258,7 +1256,6 @@ export type Database = {
           channel_id?: string
           created_at?: string
           description?: string | null
-          id?: string
           name?: string
           profile_image_url?: string | null
           subscriber_count?: number | null
@@ -1283,43 +1280,20 @@ export type Database = {
           "aboutChannelInfo/isAgeRestricted": boolean | null
           "aboutChannelInfo/isChannelVerified": boolean | null
           "aboutChannelInfo/numberOfSubscribers": number | null
-          channel_ref_id: string | null
-          channelAvatarUrl: string | null
-          channelBannerUrl: string | null
-          channelDescription: string | null
-          channelId: string | null
-          channelJoinedDate: string | null
-          channelLocation: string | null
-          channelName: string | null
-          channelTotalVideos: number | null
-          channelTotalViews: number | null
-          channelUrl: string | null
-          channelUsername: string | null
+          channel_id: string | null
           created_at: string
           date: string | null
+          description: string | null
           difficulty_level: string | null
           duration: string | null
-          fromChannelListPage: boolean | null
-          fromYTUrl: boolean | null
-          id: string
-          input: string | null
-          inputChannelUrl: string | null
-          isAgeRestricted: boolean | null
-          isChannelVerified: boolean | null
           like_count: number | null
-          numberOfSubscribers: number | null
-          order: number | null
-          "progressKey/label": string | null
-          "progressKey/url": string | null
-          standardizedUrl: string | null
-          thumbnailUrl: string | null
+          thumbnailurl: string | null
           title: string | null
           topics: string[] | null
-          type: string | null
           updated_at: string
           url: string | null
-          video_id: string | null
-          viewCount: number | null
+          video_id: string
+          viewcount: number | null
         }
         Insert: {
           "aboutChannelInfo/channelAvatarUrl"?: string | null
@@ -1337,43 +1311,20 @@ export type Database = {
           "aboutChannelInfo/isAgeRestricted"?: boolean | null
           "aboutChannelInfo/isChannelVerified"?: boolean | null
           "aboutChannelInfo/numberOfSubscribers"?: number | null
-          channel_ref_id?: string | null
-          channelAvatarUrl?: string | null
-          channelBannerUrl?: string | null
-          channelDescription?: string | null
-          channelId?: string | null
-          channelJoinedDate?: string | null
-          channelLocation?: string | null
-          channelName?: string | null
-          channelTotalVideos?: number | null
-          channelTotalViews?: number | null
-          channelUrl?: string | null
-          channelUsername?: string | null
+          channel_id?: string | null
           created_at?: string
           date?: string | null
+          description?: string | null
           difficulty_level?: string | null
           duration?: string | null
-          fromChannelListPage?: boolean | null
-          fromYTUrl?: boolean | null
-          id?: string
-          input?: string | null
-          inputChannelUrl?: string | null
-          isAgeRestricted?: boolean | null
-          isChannelVerified?: boolean | null
           like_count?: number | null
-          numberOfSubscribers?: number | null
-          order?: number | null
-          "progressKey/label"?: string | null
-          "progressKey/url"?: string | null
-          standardizedUrl?: string | null
-          thumbnailUrl?: string | null
+          thumbnailurl?: string | null
           title?: string | null
           topics?: string[] | null
-          type?: string | null
           updated_at?: string
           url?: string | null
-          video_id?: string | null
-          viewCount?: number | null
+          video_id: string
+          viewcount?: number | null
         }
         Update: {
           "aboutChannelInfo/channelAvatarUrl"?: string | null
@@ -1391,51 +1342,28 @@ export type Database = {
           "aboutChannelInfo/isAgeRestricted"?: boolean | null
           "aboutChannelInfo/isChannelVerified"?: boolean | null
           "aboutChannelInfo/numberOfSubscribers"?: number | null
-          channel_ref_id?: string | null
-          channelAvatarUrl?: string | null
-          channelBannerUrl?: string | null
-          channelDescription?: string | null
-          channelId?: string | null
-          channelJoinedDate?: string | null
-          channelLocation?: string | null
-          channelName?: string | null
-          channelTotalVideos?: number | null
-          channelTotalViews?: number | null
-          channelUrl?: string | null
-          channelUsername?: string | null
+          channel_id?: string | null
           created_at?: string
           date?: string | null
+          description?: string | null
           difficulty_level?: string | null
           duration?: string | null
-          fromChannelListPage?: boolean | null
-          fromYTUrl?: boolean | null
-          id?: string
-          input?: string | null
-          inputChannelUrl?: string | null
-          isAgeRestricted?: boolean | null
-          isChannelVerified?: boolean | null
           like_count?: number | null
-          numberOfSubscribers?: number | null
-          order?: number | null
-          "progressKey/label"?: string | null
-          "progressKey/url"?: string | null
-          standardizedUrl?: string | null
-          thumbnailUrl?: string | null
+          thumbnailurl?: string | null
           title?: string | null
           topics?: string[] | null
-          type?: string | null
           updated_at?: string
           url?: string | null
-          video_id?: string | null
-          viewCount?: number | null
+          video_id?: string
+          viewcount?: number | null
         }
         Relationships: [
           {
-            foreignKeyName: "youtube_videos_channel_ref_id_fkey"
-            columns: ["channel_ref_id"]
+            foreignKeyName: "youtube_videos_channel_id_fkey"
+            columns: ["channel_id"]
             isOneToOne: false
             referencedRelation: "youtube_channels"
-            referencedColumns: ["id"]
+            referencedColumns: ["channel_id"]
           },
         ]
       }
