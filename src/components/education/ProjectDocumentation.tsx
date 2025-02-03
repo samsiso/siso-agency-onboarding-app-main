@@ -37,7 +37,7 @@ export function ProjectDocumentation() {
     );
   }
 
-  const renderJsonContent = (content: Record<string, any>, depth = 0): JSX.Element => {
+  const renderJsonContent = (content: Record<string, any>, depth = 0) => {
     return (
       <div className="space-y-2" style={{ marginLeft: `${depth * 16}px` }}>
         {Object.entries(content).map(([key, value]) => {
@@ -70,7 +70,7 @@ export function ProjectDocumentation() {
         })}
       </div>
     );
-  });
+  };
 
   return (
     <Card className="w-full">
