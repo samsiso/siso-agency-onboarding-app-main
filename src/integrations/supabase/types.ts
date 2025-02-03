@@ -1240,7 +1240,6 @@ export type Database = {
           description: string | null
           name: string
           profile_image_url: string | null
-          subscriber_count: number | null
           updated_at: string
         }
         Insert: {
@@ -1249,7 +1248,6 @@ export type Database = {
           description?: string | null
           name: string
           profile_image_url?: string | null
-          subscriber_count?: number | null
           updated_at?: string
         }
         Update: {
@@ -1258,104 +1256,52 @@ export type Database = {
           description?: string | null
           name?: string
           profile_image_url?: string | null
-          subscriber_count?: number | null
           updated_at?: string
         }
         Relationships: []
       }
       youtube_videos: {
         Row: {
-          "aboutChannelInfo/channelAvatarUrl": string | null
-          "aboutChannelInfo/channelBannerUrl": string | null
-          "aboutChannelInfo/channelDescription": string | null
-          "aboutChannelInfo/channelId": string | null
-          "aboutChannelInfo/channelJoinedDate": string | null
-          "aboutChannelInfo/channelLocation": string | null
-          "aboutChannelInfo/channelName": string | null
-          "aboutChannelInfo/channelTotalVideos": number | null
-          "aboutChannelInfo/channelTotalViews": number | null
-          "aboutChannelInfo/channelUrl": string | null
-          "aboutChannelInfo/channelUsername": string | null
-          "aboutChannelInfo/inputChannelUrl": string | null
-          "aboutChannelInfo/isAgeRestricted": boolean | null
-          "aboutChannelInfo/isChannelVerified": boolean | null
-          "aboutChannelInfo/numberOfSubscribers": number | null
           channel_id: string | null
+          channelId: string | null
           created_at: string
           date: string | null
-          description: string | null
-          difficulty_level: string | null
           duration: string | null
-          like_count: number | null
-          thumbnailurl: string | null
+          id: string
+          order: number | null
+          thumbnailUrl: string | null
           title: string | null
-          topics: string[] | null
           updated_at: string
           url: string | null
-          video_id: string
-          viewcount: number | null
+          viewCount: number | null
         }
         Insert: {
-          "aboutChannelInfo/channelAvatarUrl"?: string | null
-          "aboutChannelInfo/channelBannerUrl"?: string | null
-          "aboutChannelInfo/channelDescription"?: string | null
-          "aboutChannelInfo/channelId"?: string | null
-          "aboutChannelInfo/channelJoinedDate"?: string | null
-          "aboutChannelInfo/channelLocation"?: string | null
-          "aboutChannelInfo/channelName"?: string | null
-          "aboutChannelInfo/channelTotalVideos"?: number | null
-          "aboutChannelInfo/channelTotalViews"?: number | null
-          "aboutChannelInfo/channelUrl"?: string | null
-          "aboutChannelInfo/channelUsername"?: string | null
-          "aboutChannelInfo/inputChannelUrl"?: string | null
-          "aboutChannelInfo/isAgeRestricted"?: boolean | null
-          "aboutChannelInfo/isChannelVerified"?: boolean | null
-          "aboutChannelInfo/numberOfSubscribers"?: number | null
           channel_id?: string | null
+          channelId?: string | null
           created_at?: string
           date?: string | null
-          description?: string | null
-          difficulty_level?: string | null
           duration?: string | null
-          like_count?: number | null
-          thumbnailurl?: string | null
+          id: string
+          order?: number | null
+          thumbnailUrl?: string | null
           title?: string | null
-          topics?: string[] | null
           updated_at?: string
           url?: string | null
-          video_id: string
-          viewcount?: number | null
+          viewCount?: number | null
         }
         Update: {
-          "aboutChannelInfo/channelAvatarUrl"?: string | null
-          "aboutChannelInfo/channelBannerUrl"?: string | null
-          "aboutChannelInfo/channelDescription"?: string | null
-          "aboutChannelInfo/channelId"?: string | null
-          "aboutChannelInfo/channelJoinedDate"?: string | null
-          "aboutChannelInfo/channelLocation"?: string | null
-          "aboutChannelInfo/channelName"?: string | null
-          "aboutChannelInfo/channelTotalVideos"?: number | null
-          "aboutChannelInfo/channelTotalViews"?: number | null
-          "aboutChannelInfo/channelUrl"?: string | null
-          "aboutChannelInfo/channelUsername"?: string | null
-          "aboutChannelInfo/inputChannelUrl"?: string | null
-          "aboutChannelInfo/isAgeRestricted"?: boolean | null
-          "aboutChannelInfo/isChannelVerified"?: boolean | null
-          "aboutChannelInfo/numberOfSubscribers"?: number | null
           channel_id?: string | null
+          channelId?: string | null
           created_at?: string
           date?: string | null
-          description?: string | null
-          difficulty_level?: string | null
           duration?: string | null
-          like_count?: number | null
-          thumbnailurl?: string | null
+          id?: string
+          order?: number | null
+          thumbnailUrl?: string | null
           title?: string | null
-          topics?: string[] | null
           updated_at?: string
           url?: string | null
-          video_id?: string
-          viewcount?: number | null
+          viewCount?: number | null
         }
         Relationships: [
           {
