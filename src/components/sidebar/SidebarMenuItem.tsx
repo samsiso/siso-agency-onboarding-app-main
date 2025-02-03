@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { LucideIcon } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import {
   Tooltip,
@@ -34,7 +35,7 @@ export const SidebarMenuItem = ({
       to={href}
       onClick={onClick}
       className={cn(
-        'relative flex items-center gap-3 rounded-lg px-3 py-2 text-siso-text transition-colors',
+        'relative flex items-center gap-3 rounded-lg px-3 py-2 text-siso-text transition-all duration-300',
         isActive && 'bg-siso-text/5 text-siso-text-bold',
         !isActive && 'hover:text-siso-text-bold hover:bg-siso-text/5',
         isMain ? 'text-lg font-semibold' : 'text-sm',
@@ -51,8 +52,21 @@ export const SidebarMenuItem = ({
       {!collapsed && (
         <span className="truncate">{label}</span>
       )}
-      {isActive && !collapsed && (
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-siso-orange rounded-r-full" />
+      {isActive && (
+        <motion.div
+          layoutId="sidebar-highlight"
+          className="absolute inset-0 rounded-lg bg-gradient-to-r from-siso-red/5 to-siso-orange/5 -z-10"
+          initial={false}
+          transition={{
+            type: "spring",
+            stiffness: 300,
+            damping: 30,
+          }}
+        >
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-siso-red to-siso-orange rounded-r-full">
+            <div className="absolute w-6 h-6 bg-siso-orange/20 rounded-full blur-md -left-2" />
+          </div>
+        </motion.div>
       )}
     </Link>
   );
