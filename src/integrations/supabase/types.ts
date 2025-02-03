@@ -179,6 +179,51 @@ export type Database = {
         }
         Relationships: []
       }
+      creator_tool_links: {
+        Row: {
+          created_at: string
+          creator_id: string | null
+          expertise_level: string | null
+          id: string
+          tool_id: string | null
+          tutorial_count: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          creator_id?: string | null
+          expertise_level?: string | null
+          id?: string
+          tool_id?: string | null
+          tutorial_count?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string | null
+          expertise_level?: string | null
+          id?: string
+          tool_id?: string | null
+          tutorial_count?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_tool_links_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "education_creators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "creator_tool_links_tool_id_fkey"
+            columns: ["tool_id"]
+            isOneToOne: false
+            referencedRelation: "core_tools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       crypto_transactions: {
         Row: {
           created_at: string
@@ -217,12 +262,16 @@ export type Database = {
           content_themes: string[] | null
           created_at: string
           description: string | null
+          expertise_level: string | null
           id: string
           member_type: string | null
           name: string
           profile_image_url: string | null
+          social_links: Json | null
           specialization: string[] | null
+          tools_covered: string[] | null
           updated_at: string
+          video_count: number | null
           website_url: string | null
           youtube_url: string | null
           youtube_videos: Json | null
@@ -231,12 +280,16 @@ export type Database = {
           content_themes?: string[] | null
           created_at?: string
           description?: string | null
+          expertise_level?: string | null
           id?: string
           member_type?: string | null
           name: string
           profile_image_url?: string | null
+          social_links?: Json | null
           specialization?: string[] | null
+          tools_covered?: string[] | null
           updated_at?: string
+          video_count?: number | null
           website_url?: string | null
           youtube_url?: string | null
           youtube_videos?: Json | null
@@ -245,12 +298,16 @@ export type Database = {
           content_themes?: string[] | null
           created_at?: string
           description?: string | null
+          expertise_level?: string | null
           id?: string
           member_type?: string | null
           name?: string
           profile_image_url?: string | null
+          social_links?: Json | null
           specialization?: string[] | null
+          tools_covered?: string[] | null
           updated_at?: string
+          video_count?: number | null
           website_url?: string | null
           youtube_url?: string | null
           youtube_videos?: Json | null
