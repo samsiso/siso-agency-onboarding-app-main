@@ -54,13 +54,13 @@ export const Hero = () => {
   return (
     <div className="flex-1 relative">
       <Sidebar />
-      {/* Background layer - pointer-events-none to allow clicks through */}
+      {/* Background layer */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-br from-siso-bg via-siso-bg/95 to-siso-bg/90" />
       </div>
       
       {/* Content layer - explicit z-index and pointer-events-auto */}
-      <div className="relative z-20 max-w-6xl mx-auto px-2 sm:px-4 py-3 sm:py-4 md:py-6">
+      <div className="relative z-30 max-w-6xl mx-auto px-2 sm:px-4 py-3 sm:py-4 md:py-6">
         <div className="text-center">
           <div className="space-y-2 sm:space-y-3">
             <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-siso-text-bold leading-tight max-w-[85vw] mx-auto">
@@ -84,14 +84,14 @@ export const Hero = () => {
             <div className="relative mt-2 sm:mt-3 md:mt-4">
               <RainbowButton
                 onClick={handleGetStarted}
-                className="relative z-30 text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-3 font-semibold"
+                className="relative z-30 text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-3 font-semibold pointer-events-auto"
               >
                 Start Onboarding
               </RainbowButton>
             </div>
           </div>
 
-          <div className="relative z-20 mt-3 sm:mt-4 md:mt-6">
+          <div className="relative z-30 mt-3 sm:mt-4 md:mt-6">
             <div className="relative p-2 sm:p-3 rounded-xl bg-black/30 backdrop-blur-sm border border-siso-text/10 
               hover:border-siso-text/20 transition-all duration-300">
               <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-siso-orange/5 to-siso-red/5 pointer-events-none" />
@@ -107,7 +107,7 @@ export const Hero = () => {
                     key={i}
                     className="group relative z-30 p-1.5 sm:p-2 rounded-lg bg-siso-bg/50 hover:bg-siso-bg/70 
                       border border-siso-text/10 hover:border-siso-text/20 transition-all duration-300
-                      cursor-pointer"
+                      cursor-pointer pointer-events-auto"
                     onClick={() => handleResourceClick(item.path)}
                   >
                     <div className="flex items-start gap-1.5">

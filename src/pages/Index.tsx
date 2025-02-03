@@ -13,14 +13,22 @@ export default function Index() {
     return <LandingPage />;
   }
 
-  // [Analysis] Show main app for authenticated users
+  // [Analysis] Show main app for authenticated users with proper event handling
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full">
-        <Hero key="main-hero" />
-        <AuthButton />
-        <Footer />
-      </div>
-    </SidebarProvider>
+    <div className="relative min-h-screen w-full overflow-x-hidden">
+      <SidebarProvider>
+        <div className="relative min-h-screen flex flex-col">
+          <div className="flex-grow relative z-10">
+            <Hero key="main-hero" />
+          </div>
+          <div className="relative z-20">
+            <AuthButton />
+          </div>
+          <div className="relative z-10">
+            <Footer />
+          </div>
+        </div>
+      </SidebarProvider>
+    </div>
   );
 }
