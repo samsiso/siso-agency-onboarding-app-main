@@ -10,7 +10,7 @@ import { RelatedVideos } from '@/components/education/RelatedVideos';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { extractVideoIdFromSlug } from '@/utils/slugUtils';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { Helmet } from 'react-helmet';
 import { motion } from 'framer-motion';
 
@@ -60,7 +60,7 @@ export default function VideoDetail() {
   const channelAvatar = video.channel?.profile_image_url;
   const videoDescription = video.channel?.description || '';
   const thumbnailUrl = video.thumbnailUrl || '';
-  const publishDate = video.date ? new Date(video.date) : null;
+  const publishDate = video.date ? parseISO(video.date) : null;
   const viewCount = video.viewCount || 0;
   const likeCount = 0; // We don't have this in the simplified schema
 
