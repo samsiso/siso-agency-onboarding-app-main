@@ -56,7 +56,6 @@ export default function VideoDetail() {
 
       return data;
     },
-    retry: 1,
     meta: {
       onSettled: (data, error) => {
         if (error) {
@@ -95,14 +94,14 @@ export default function VideoDetail() {
     );
   }
 
-  const channelName = video.channel?.name || 'Unknown Creator';
-  const channelAvatar = video.channel?.profile_image_url;
-  const videoDescription = video.channel?.description || '';
-  const thumbnailUrl = video.thumbnailUrl || '';
+  const channelName = video?.channel?.name || 'Unknown Creator';
+  const channelAvatar = video?.channel?.profile_image_url;
+  const videoDescription = video?.channel?.description || '';
+  const thumbnailUrl = video?.thumbnailUrl || '';
   
   let publishDate = null;
   try {
-    if (video.date && typeof video.date === 'string') {
+    if (video?.date && typeof video.date === 'string') {
       publishDate = parseISO(video.date);
       if (isNaN(publishDate.getTime())) {
         publishDate = null;
@@ -113,7 +112,7 @@ export default function VideoDetail() {
     publishDate = null;
   }
   
-  const viewCount = video.viewCount || 0;
+  const viewCount = video?.viewCount || 0;
 
   return (
     <>
