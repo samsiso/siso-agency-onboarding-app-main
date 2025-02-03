@@ -24,8 +24,12 @@ export const Hero = () => {
   };
 
   const handleGetStarted = () => {
-    console.log('Get Started clicked');
-    navigate('/auth');
+    console.log('Get Started clicked - attempting navigation to /auth');
+    try {
+      navigate('/auth');
+    } catch (error) {
+      console.error('Navigation error:', error);
+    }
   };
 
   console.log('Hero rendering, isLoaded:', isLoaded);

@@ -11,7 +11,8 @@ export function RainbowButton({
   ...props
 }: RainbowButtonProps) {
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation(); // Prevent event bubbling
+    // Remove stopPropagation to allow event bubbling
+    console.log('RainbowButton clicked');
     if (onClick) {
       onClick(e);
     }

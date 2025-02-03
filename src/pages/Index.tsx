@@ -7,6 +7,7 @@ import { useAuthSession } from '@/hooks/useAuthSession';
 
 export default function Index() {
   const { user } = useAuthSession();
+  console.log('Index page rendering, user:', user ? 'logged in' : 'not logged in');
 
   // [Analysis] Show landing page for non-authenticated users
   if (!user) {
