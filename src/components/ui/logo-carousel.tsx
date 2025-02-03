@@ -19,6 +19,7 @@ interface LogoColumnProps {
   logos: Logo[]
   index: number
   currentTime: number
+  speed?: number
 }
 
 const shuffleArray = <T,>(array: T[]): T[] => {
@@ -49,8 +50,8 @@ const distributeLogos = (allLogos: Logo[], columnCount: number): Logo[][] => {
 }
 
 const LogoColumn: React.FC<LogoColumnProps> = React.memo(
-  ({ logos, index, currentTime }) => {
-    const cycleInterval = 2000
+  ({ logos, index, currentTime, speed = 20 }) => {
+    const cycleInterval = 2000 / (speed / 20) // Adjust interval based on speed
     const columnDelay = index * 200
     const adjustedTime = (currentTime + columnDelay) % (cycleInterval * logos.length)
     const currentIndex = Math.floor(adjustedTime / cycleInterval)
@@ -107,9 +108,10 @@ const LogoColumn: React.FC<LogoColumnProps> = React.memo(
 interface LogoCarouselProps {
   columnCount?: number
   logos: Logo[]
+  speed?: number
 }
 
-export function LogoCarousel({ columnCount = 2, logos }: LogoCarouselProps) {
+export function LogoCarousel({ columnCount = 2, logos, speed = 20 }: LogoCarouselProps) {
   const [logoSets, setLogoSets] = useState<Logo[][]>([])
   const [currentTime, setCurrentTime] = useState(0)
 
@@ -136,6 +138,7 @@ export function LogoCarousel({ columnCount = 2, logos }: LogoCarouselProps) {
             logos={logos}
             index={index}
             currentTime={currentTime}
+            speed={speed}
           />
         ))}
       </div>
