@@ -1,4 +1,5 @@
 export const extractVideoIdFromSlug = (slug: string): string => {
-  const parts = slug.split('-');
-  return parts[parts.length - 1] || '';
+  // [Analysis] YouTube IDs are always after the last double dash
+  const matches = slug.match(/--([^-]+)$/);
+  return matches ? matches[1] : '';
 };

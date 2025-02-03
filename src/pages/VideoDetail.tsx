@@ -23,25 +23,48 @@ export default function VideoDetail() {
   const { toast } = useToast();
   
   const videoId = slug ? extractVideoIdFromSlug(slug) : '';
+  console.log('Extracted Video ID:', videoId); // Debug log
 
   const { data: video, isLoading, error } = useQuery({
     queryKey: ['video', videoId],
     queryFn: async () => {
+      console.log('Fetching video with ID:', videoId); // Debug log
+      
+      if (!videoId) {
+        throw new Error('Invalid video ID');
+      }
+
       const { data, error } = await supabase
         .from('youtube_videos')
         .select(`
           *,
-          channel:youtube_channels(*)
+          channel:youtube_channels!youtube_videos_channel_id_fkey(*)
         `)
         .eq('id', videoId)
         .maybeSingle();
       
-      if (error) throw error;
+      console.log('Query response:', { data, error }); // Debug log
+      
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+      
       if (!data) {
         throw new Error('Video not found');
       }
+
       return data;
     },
+    retry: 1,
+    onError: (error) => {
+      console.error('Query error:', error);
+      toast({
+        title: "Error loading video",
+        description: "The requested video could not be found or accessed.",
+        variant: "destructive"
+      });
+    }
   });
 
   if (isLoading) {
@@ -52,23 +75,7 @@ export default function VideoDetail() {
     );
   }
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-siso-bg to-siso-bg/95 p-4 md:p-8 flex flex-col items-center justify-center gap-4">
-        <div className="text-xl text-siso-text">Video not found</div>
-        <Button 
-          variant="ghost" 
-          onClick={() => navigate('/education')}
-          className="flex items-center gap-2"
-        >
-          <ChevronLeft className="w-5 h-5" />
-          Back to Videos
-        </Button>
-      </div>
-    );
-  }
-
-  if (!video) {
+  if (error || !video) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-siso-bg to-siso-bg/95 p-4 md:p-8 flex flex-col items-center justify-center gap-4">
         <div className="text-xl text-siso-text">Video not found</div>
@@ -103,7 +110,6 @@ export default function VideoDetail() {
   }
   
   const viewCount = video.viewCount || 0;
-  const likeCount = 0; // We don't have this in the simplified schema
 
   return (
     <>
