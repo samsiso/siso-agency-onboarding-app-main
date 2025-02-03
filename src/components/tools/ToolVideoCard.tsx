@@ -2,7 +2,7 @@ import { Play, Clock, ThumbsUp, Eye, Brain } from 'lucide-react';
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Tooltip } from "@/components/ui/tooltip";
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 interface ToolVideoCardProps {
@@ -65,9 +65,16 @@ export function ToolVideoCard({ video, featured = false }: ToolVideoCardProps) {
           <h3 className="font-semibold text-siso-text-bold line-clamp-2">
             {video.title}
           </h3>
-          <Tooltip content="AI Analysis Available">
-            <Brain className="w-5 h-5 text-siso-orange flex-shrink-0" />
-          </Tooltip>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Brain className="w-5 h-5 text-siso-orange flex-shrink-0" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>AI Analysis Available</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
 
         <div className="flex items-center gap-2">

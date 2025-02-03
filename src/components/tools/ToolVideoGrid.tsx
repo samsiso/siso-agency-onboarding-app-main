@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { ToolVideoCard } from './ToolVideoCard';
 import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Search, Filter } from 'lucide-react';
+import { Search } from 'lucide-react';
 
 const categories = [
   'Business Strategy',
@@ -18,7 +18,7 @@ interface ToolVideoGridProps {
   featuredVideos?: any[];
 }
 
-export function ToolVideoGrid({ videos, featuredVideos = [] }: ToolVideoGridProps) {
+export function ToolVideoGrid({ videos = [], featuredVideos = [] }: ToolVideoGridProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState('recent');
@@ -51,15 +51,16 @@ export function ToolVideoGrid({ videos, featuredVideos = [] }: ToolVideoGridProp
             className="pl-10"
           />
         </div>
-        <Select
-          value={sortBy}
-          onValueChange={setSortBy}
-          className="w-full md:w-48"
-        >
-          <option value="recent">Most Recent</option>
-          <option value="views">Most Viewed</option>
-          <option value="rating">Highest Rated</option>
-          <option value="ai_score">AI Insight Score</option>
+        <Select value={sortBy} onValueChange={setSortBy}>
+          <SelectTrigger className="w-full md:w-48">
+            <SelectValue placeholder="Sort by" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="recent">Most Recent</SelectItem>
+            <SelectItem value="views">Most Viewed</SelectItem>
+            <SelectItem value="rating">Highest Rated</SelectItem>
+            <SelectItem value="ai_score">AI Insight Score</SelectItem>
+          </SelectContent>
         </Select>
       </div>
 
