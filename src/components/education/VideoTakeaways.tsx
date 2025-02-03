@@ -15,7 +15,7 @@ export function VideoTakeaways({ videoId }: VideoTakeawaysProps) {
         .from('video_summaries')
         .select('*')
         .eq('video_id', videoId)
-        .single();
+        .maybeSingle();
       
       if (error) throw error;
       return data;
@@ -24,6 +24,17 @@ export function VideoTakeaways({ videoId }: VideoTakeawaysProps) {
 
   if (isLoading) {
     return <div>Loading takeaways...</div>;
+  }
+
+  if (!takeaways) {
+    return (
+      <Card className="p-6">
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-siso-text-bold">Key Takeaways</h3>
+          <p className="text-siso-text">No takeaways available for this video yet.</p>
+        </div>
+      </Card>
+    );
   }
 
   return (
