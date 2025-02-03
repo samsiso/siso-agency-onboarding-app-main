@@ -29,12 +29,13 @@ export default function VideoDetail() {
         .from('youtube_videos')
         .select(`
           *,
-          channel:youtube_channels!youtube_videos_channel_id_fkey(*)
+          channel:youtube_channels!youtube_videos_channel_ref_id_fkey(*)
         `)
         .eq('video_id', videoId)
-        .single();
+        .maybeSingle();
       
       if (error) throw error;
+      if (!data) throw new Error('Video not found');
       return data;
     },
   });

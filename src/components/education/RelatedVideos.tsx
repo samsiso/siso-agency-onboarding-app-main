@@ -12,21 +12,28 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
   const { data: relatedVideos, isLoading } = useQuery({
     queryKey: ['related-videos', currentVideoId, topics],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // First, get the channel data
+      const { data: channels } = await supabase
+        .from('youtube_channels')
+        .select('*');
+
+      // Then get the videos with a proper join
+      const { data: videos, error } = await supabase
         .from('youtube_videos')
         .select(`
           *,
-          channel:youtube_channels!youtube_videos_channel_id_fkey(*)
+          channel:youtube_channels!youtube_videos_channel_ref_id_fkey(*)
         `)
         .neq('video_id', currentVideoId)
         .limit(10);
       
       if (error) throw error;
+      if (!videos) return [];
 
       // Transform the data to match the expected ToolVideoCard props
-      return data.map(video => ({
-        id: video.video_id,
-        title: video.title,
+      return videos.map(video => ({
+        id: video.video_id || '',
+        title: video.title || '',
         url: `https://youtube.com/watch?v=${video.video_id}`,
         duration: video.duration || '0:00',
         thumbnail_url: video.thumbnailUrl || '',
@@ -37,9 +44,9 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
         metrics: {
           views: video.viewCount || 0,
           likes: video.like_count || 0,
-          sentiment_score: 0.8, // Default value since we don't have this in the DB yet
+          sentiment_score: 0.8,
           difficulty: video.difficulty_level as "Beginner" | "Intermediate" | "Advanced" || "Intermediate",
-          impact_score: 8.5 // Default value since we don't have this in the DB yet
+          impact_score: 8.5
         },
         topics: video.topics || [],
         ai_analysis: {
