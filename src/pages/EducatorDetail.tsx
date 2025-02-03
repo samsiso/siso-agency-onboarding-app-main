@@ -7,6 +7,7 @@ import { ArrowLeft, Youtube, Globe, Twitter, Linkedin } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { GradientText } from '@/components/ui/gradient-text';
 import { VideoLibrary } from '@/components/education/VideoLibrary';
+import { toast } from 'sonner';
 
 interface SocialLinks {
   twitter?: string;
@@ -47,16 +48,30 @@ export default function EducatorDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
 
-  const { data: educator, isLoading } = useQuery({
+  console.log('Attempting to fetch educator with slug:', slug); // Debug log
+
+  const { data: educator, isLoading, error } = useQuery({
     queryKey: ['educator', slug],
     queryFn: async () => {
+      console.log('Executing query for slug:', slug); // Debug log
+      
       const { data, error } = await supabase
         .from('education_creators')
         .select('*')
         .eq('slug', slug)
-        .single();
+        .maybeSingle(); // Using maybeSingle instead of single to handle not found case
       
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase query error:', error); // Debug log
+        throw error;
+      }
+      
+      if (!data) {
+        console.log('No educator found with slug:', slug); // Debug log
+        throw new Error('Educator not found');
+      }
+      
+      console.log('Found educator data:', data); // Debug log
       
       // Transform the data to match our EducatorData interface
       const transformedData: EducatorData = {
@@ -76,7 +91,30 @@ export default function EducatorDetail() {
       
       return transformedData;
     },
+    retry: 1, // Only retry once
+    onError: (error) => {
+      console.error('Query error:', error);
+      toast.error('Failed to load educator profile');
+    }
   });
+
+  if (error) {
+    return (
+      <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
+        <Sidebar />
+        <div className="flex-1 p-4 md:p-8 flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <h1 className="text-2xl font-bold text-siso-text">
+              {error instanceof Error ? error.message : 'Failed to load educator profile'}
+            </h1>
+            <Button onClick={() => navigate('/education')}>
+              Back to Education Hub
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
