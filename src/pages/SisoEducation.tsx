@@ -28,7 +28,12 @@ export default function SisoEducation() {
         description: member.channel_description,
         member_type: member.member_type || 'Creator', // Provide default if null
         youtube_url: member.youtube_url,
-        youtube_videos: member.youtube_videos || [],
+        youtube_videos: Array.isArray(member.youtube_videos) 
+          ? member.youtube_videos.map((video: any) => ({
+              title: typeof video.title === 'string' ? video.title : '',
+              url: typeof video.url === 'string' ? video.url : ''
+            }))
+          : [],
         website_url: member.website_url,
         specialization: member.specialization || [],
         content_themes: member.content_themes || [],
