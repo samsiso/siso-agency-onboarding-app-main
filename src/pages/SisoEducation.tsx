@@ -9,10 +9,11 @@ import { CommunityMember } from '@/components/community/types';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { ExternalLink, GraduationCap, Users, Trophy, BookOpen, Search, Filter } from 'lucide-react';
+import { ExternalLink, GraduationCap, Users, Trophy, BookOpen, Search, Filter, FileText } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { ProjectDocumentation } from '@/components/education/ProjectDocumentation';
 
 const container = {
   hidden: { opacity: 0 },
@@ -45,6 +46,7 @@ export default function SisoEducation() {
   const [selectedMember, setSelectedMember] = useState<CommunityMember | null>(null);
   const [selectedThemes, setSelectedThemes] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState('all');
+  const [showDocs, setShowDocs] = useState(false);
 
   const { data: members, isLoading, error } = useQuery({
     queryKey: ['education-creators'],
@@ -129,7 +131,7 @@ export default function SisoEducation() {
               </p>
               
               {/* Stats Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 {stats.map((stat, index) => (
                   <motion.div
                     key={index}
@@ -143,9 +145,34 @@ export default function SisoEducation() {
                     </div>
                   </motion.div>
                 ))}
+                <motion.div
+                  variants={item}
+                  className="flex items-center gap-4 p-4 rounded-lg bg-black/20 border border-siso-border cursor-pointer hover:bg-black/30 transition-colors"
+                  onClick={() => setShowDocs(!showDocs)}
+                >
+                  <FileText className="w-8 h-8 text-siso-orange" />
+                  <div>
+                    <div className="text-2xl font-bold text-siso-text-bold">Docs</div>
+                    <div className="text-sm text-siso-text/70">Project Documentation</div>
+                  </div>
+                </motion.div>
               </div>
             </div>
           </motion.div>
+
+          {/* Documentation Section */}
+          <AnimatePresence>
+            {showDocs && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="overflow-hidden"
+              >
+                <ProjectDocumentation />
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* List Learner Callout Box */}
           <Alert className="border border-[#0FA0CE]/20 bg-[#0FA0CE]/5 text-siso-text">

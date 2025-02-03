@@ -819,6 +819,42 @@ export type Database = {
         }
         Relationships: []
       }
+      project_documentation: {
+        Row: {
+          content: Json
+          created_at: string
+          id: string
+          implementation_status: string | null
+          priority: number | null
+          related_components: string[] | null
+          section: Database["public"]["Enums"]["doc_section_type"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          id?: string
+          implementation_status?: string | null
+          priority?: number | null
+          related_components?: string[] | null
+          section: Database["public"]["Enums"]["doc_section_type"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          id?: string
+          implementation_status?: string | null
+          priority?: number | null
+          related_components?: string[] | null
+          section?: Database["public"]["Enums"]["doc_section_type"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       referrals: {
         Row: {
           created_at: string
@@ -1264,6 +1300,14 @@ export type Database = {
       }
     }
     Enums: {
+      doc_section_type:
+        | "overview"
+        | "features"
+        | "backend_design"
+        | "data_flow"
+        | "ai_integration"
+        | "implementation"
+        | "technical_specs"
       news_source_type: "rss" | "api" | "manual"
       nft_mint_status: "pending" | "completed" | "failed"
       nft_tier:
