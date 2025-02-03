@@ -1284,6 +1284,21 @@ export type Database = {
       }
       youtube_videos: {
         Row: {
+          "aboutChannelInfo/channelAvatarUrl": string | null
+          "aboutChannelInfo/channelBannerUrl": string | null
+          "aboutChannelInfo/channelDescription": string | null
+          "aboutChannelInfo/channelId": string | null
+          "aboutChannelInfo/channelJoinedDate": string | null
+          "aboutChannelInfo/channelLocation": string | null
+          "aboutChannelInfo/channelName": string | null
+          "aboutChannelInfo/channelTotalVideos": number | null
+          "aboutChannelInfo/channelTotalViews": number | null
+          "aboutChannelInfo/channelUrl": string | null
+          "aboutChannelInfo/channelUsername": string | null
+          "aboutChannelInfo/inputChannelUrl": string | null
+          "aboutChannelInfo/isAgeRestricted": boolean | null
+          "aboutChannelInfo/isChannelVerified": boolean | null
+          "aboutChannelInfo/numberOfSubscribers": number | null
           channel_details_id: string | null
           channel_id: string | null
           comment_count: number | null
@@ -1293,6 +1308,8 @@ export type Database = {
           duration: string | null
           from_channel_list_page: boolean | null
           from_ytu: boolean | null
+          fromChannelListPage: boolean | null
+          fromYTUrl: boolean | null
           id: string
           input: string | null
           is_age_restricted: boolean | null
@@ -1301,17 +1318,37 @@ export type Database = {
           progress_key: string | null
           progress_key_label: string | null
           progress_key_url: string | null
+          "progressKey/label": string | null
+          "progressKey/url": string | null
           published_at: string | null
           standardized_url: string | null
+          standardizedUrl: string | null
           tags: string[] | null
           thumbnail_url: string | null
           title: string
           topics: string[] | null
+          type: string | null
           updated_at: string
+          url: string | null
           video_id: string
           view_count: number | null
         }
         Insert: {
+          "aboutChannelInfo/channelAvatarUrl"?: string | null
+          "aboutChannelInfo/channelBannerUrl"?: string | null
+          "aboutChannelInfo/channelDescription"?: string | null
+          "aboutChannelInfo/channelId"?: string | null
+          "aboutChannelInfo/channelJoinedDate"?: string | null
+          "aboutChannelInfo/channelLocation"?: string | null
+          "aboutChannelInfo/channelName"?: string | null
+          "aboutChannelInfo/channelTotalVideos"?: number | null
+          "aboutChannelInfo/channelTotalViews"?: number | null
+          "aboutChannelInfo/channelUrl"?: string | null
+          "aboutChannelInfo/channelUsername"?: string | null
+          "aboutChannelInfo/inputChannelUrl"?: string | null
+          "aboutChannelInfo/isAgeRestricted"?: boolean | null
+          "aboutChannelInfo/isChannelVerified"?: boolean | null
+          "aboutChannelInfo/numberOfSubscribers"?: number | null
           channel_details_id?: string | null
           channel_id?: string | null
           comment_count?: number | null
@@ -1321,6 +1358,8 @@ export type Database = {
           duration?: string | null
           from_channel_list_page?: boolean | null
           from_ytu?: boolean | null
+          fromChannelListPage?: boolean | null
+          fromYTUrl?: boolean | null
           id?: string
           input?: string | null
           is_age_restricted?: boolean | null
@@ -1329,17 +1368,37 @@ export type Database = {
           progress_key?: string | null
           progress_key_label?: string | null
           progress_key_url?: string | null
+          "progressKey/label"?: string | null
+          "progressKey/url"?: string | null
           published_at?: string | null
           standardized_url?: string | null
+          standardizedUrl?: string | null
           tags?: string[] | null
           thumbnail_url?: string | null
           title: string
           topics?: string[] | null
+          type?: string | null
           updated_at?: string
+          url?: string | null
           video_id: string
           view_count?: number | null
         }
         Update: {
+          "aboutChannelInfo/channelAvatarUrl"?: string | null
+          "aboutChannelInfo/channelBannerUrl"?: string | null
+          "aboutChannelInfo/channelDescription"?: string | null
+          "aboutChannelInfo/channelId"?: string | null
+          "aboutChannelInfo/channelJoinedDate"?: string | null
+          "aboutChannelInfo/channelLocation"?: string | null
+          "aboutChannelInfo/channelName"?: string | null
+          "aboutChannelInfo/channelTotalVideos"?: number | null
+          "aboutChannelInfo/channelTotalViews"?: number | null
+          "aboutChannelInfo/channelUrl"?: string | null
+          "aboutChannelInfo/channelUsername"?: string | null
+          "aboutChannelInfo/inputChannelUrl"?: string | null
+          "aboutChannelInfo/isAgeRestricted"?: boolean | null
+          "aboutChannelInfo/isChannelVerified"?: boolean | null
+          "aboutChannelInfo/numberOfSubscribers"?: number | null
           channel_details_id?: string | null
           channel_id?: string | null
           comment_count?: number | null
@@ -1349,6 +1408,8 @@ export type Database = {
           duration?: string | null
           from_channel_list_page?: boolean | null
           from_ytu?: boolean | null
+          fromChannelListPage?: boolean | null
+          fromYTUrl?: boolean | null
           id?: string
           input?: string | null
           is_age_restricted?: boolean | null
@@ -1357,13 +1418,18 @@ export type Database = {
           progress_key?: string | null
           progress_key_label?: string | null
           progress_key_url?: string | null
+          "progressKey/label"?: string | null
+          "progressKey/url"?: string | null
           published_at?: string | null
           standardized_url?: string | null
+          standardizedUrl?: string | null
           tags?: string[] | null
           thumbnail_url?: string | null
           title?: string
           topics?: string[] | null
+          type?: string | null
           updated_at?: string
+          url?: string | null
           video_id?: string
           view_count?: number | null
         }
