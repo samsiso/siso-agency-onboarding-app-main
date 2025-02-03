@@ -15,10 +15,7 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
       // Get videos with proper join
       const { data: videos, error } = await supabase
         .from('youtube_videos')
-        .select(`
-          *,
-          channel:youtube_channels!youtube_videos_channel_id_fkey(*)
-        `)
+        .select('*')
         .neq('video_id', currentVideoId)
         .limit(10);
       
