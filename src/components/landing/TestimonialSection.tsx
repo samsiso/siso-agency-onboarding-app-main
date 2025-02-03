@@ -28,59 +28,32 @@ const testimonials = [
     quote: "The automation capabilities have transformed our workflow. We're seeing incredible results with minimal effort.",
     linkedinUrl: "https://linkedin.com",
     audioReview: true
-  },
-  {
-    name: "Emily T.",
-    role: "Lead Strategist",
-    company: "Pipeline Analytics",
-    image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
-    quote: "The level of personalization we achieve with Lovable is incredible. Our engagement rates have skyrocketed.",
-    linkedinUrl: "https://linkedin.com",
-    videoUrl: "https://www.youtube.com/embed/y8Yv4pnO7qc?autoplay=1&mute=1"
-  },
-  {
-    name: "Christina M.",
-    role: "Digital Operations Lead",
-    company: "Tech Innovations",
-    image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
-    quote: "The AI-powered insights have given us a competitive edge in the market. Simply outstanding.",
-    linkedinUrl: "https://linkedin.com",
-    videoUrl: "https://www.youtube.com/embed/M7lc1UVf-VE?autoplay=1&mute=1"
-  },
-  {
-    name: "Robert P.",
-    role: "Agency Director",
-    company: "Digital Ventures",
-    image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
-    quote: "Lovable has streamlined our entire operation. The ROI has exceeded all our expectations.",
-    linkedinUrl: "https://linkedin.com",
-    audioReview: true
   }
 ];
 
 export function TestimonialSection() {
   return (
-    <section className="py-24 relative overflow-hidden">
+    <section className="py-16 md:py-24 relative overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0 bg-gradient-radial from-siso-orange/5 via-transparent to-transparent opacity-30" />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         {/* Section Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-white mb-4">
+        <div className="text-center mb-8 md:mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             What Our Partners Say About Lovable
           </h2>
-          <p className="text-xl text-gray-400">
+          <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto">
             Real stories from businesses that have grown with Lovable's solutions
           </p>
         </div>
 
-        {/* Masonry Grid */}
-        <div className="columns-1 md:columns-2 lg:columns-3 gap-4">
+        {/* Mobile-optimized Masonry Grid */}
+        <div className="grid grid-cols-1 md:columns-2 lg:columns-3 gap-4 md:gap-6 auto-rows-max">
           {testimonials.map((testimonial, index) => (
             <div
               key={testimonial.name}
-              className="break-inside-avoid mb-4 animate-fade-in"
+              className="break-inside-avoid mb-4 md:mb-6 animate-fade-in"
               style={{ animationDelay: `${index * 150}ms` }}
             >
               <TestimonialCard {...testimonial} />

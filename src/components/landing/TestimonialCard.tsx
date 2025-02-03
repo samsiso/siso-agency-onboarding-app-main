@@ -54,11 +54,9 @@ export function TestimonialCard({
         setAudioContent(data.audioContent);
         setIsPlaying(true);
         
-        // Create and play audio
         const audio = new Audio(`data:audio/mp3;base64,${data.audioContent}`);
         audio.play();
         
-        // Reset state when audio ends
         audio.onended = () => {
           setIsPlaying(false);
           setAudioContent(null);
@@ -72,12 +70,12 @@ export function TestimonialCard({
 
   return (
     <div 
-      className="group relative p-4 rounded-xl backdrop-blur-sm border-2 border-siso-orange/40 
-        bg-black/30 transition-all duration-300 hover:scale-105 hover:border-siso-orange"
+      className="group relative p-4 md:p-6 rounded-xl backdrop-blur-sm border border-siso-orange/40 
+        bg-black/30 transition-all duration-300 hover:scale-[1.02] hover:border-siso-orange"
     >
       {/* Profile Section */}
       <div className="flex items-center gap-3 mb-3">
-        <div className="relative h-10 w-10">
+        <div className="relative h-10 w-10 flex-shrink-0">
           <a 
             href={linkedinUrl} 
             target="_blank" 
@@ -88,18 +86,19 @@ export function TestimonialCard({
               src={image}
               alt={name}
               className="h-10 w-10 rounded-full object-cover border-2 border-siso-orange/40"
+              loading="lazy"
             />
           </a>
         </div>
-        <div className="text-left">
-          <h4 className="text-white font-medium text-sm">{name}</h4>
-          <p className="text-gray-400 text-xs">{role}</p>
-          <p className="text-gray-400 text-xs">{company}</p>
+        <div className="text-left min-w-0">
+          <h4 className="text-white font-medium text-sm truncate">{name}</h4>
+          <p className="text-gray-400 text-xs truncate">{role}</p>
+          <p className="text-gray-400 text-xs truncate">{company}</p>
         </div>
       </div>
 
       {/* Quote */}
-      <p className="text-gray-300 italic text-sm text-left mb-3">{quote}</p>
+      <p className="text-gray-300 italic text-sm text-left mb-3 line-clamp-4 md:line-clamp-none">{quote}</p>
 
       {/* Media Section */}
       {videoUrl ? (
@@ -114,6 +113,7 @@ export function TestimonialCard({
               src={getYouTubeInfo(videoUrl).thumbnailUrl}
               alt="Video thumbnail"
               className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+              loading="lazy"
             />
           </a>
         </div>
