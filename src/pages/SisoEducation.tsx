@@ -53,7 +53,8 @@ export default function SisoEducation() {
         points: 0,
         rank: null,
         contribution_count: member.channel_total_videos || 0,
-        referral_count: 0
+        referral_count: 0,
+        slug: member.slug
       }));
     },
   });

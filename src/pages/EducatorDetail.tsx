@@ -20,14 +20,7 @@ interface EducatorData {
   description: string | null;
   member_type: string | null;
   youtube_url: string | null;
-  youtube_videos: Array<{
-    title: string;
-    url: string;
-    thumbnailUrl?: string;
-    date?: string;
-    duration?: string;
-    viewCount?: number;
-  }> | null;
+  youtube_videos: any[] | null; // Changed to handle Json type from database
   website_url: string | null;
   specialization: string[] | null;
   content_themes: string[] | null;
@@ -38,6 +31,7 @@ interface EducatorData {
   video_count: number | null;
   channel_total_views: number | null;
   social_links: SocialLinks | null;
+  slug: string | null;
 }
 
 export default function EducatorDetail() {
@@ -49,15 +43,20 @@ export default function EducatorDetail() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('education_creators')
-        .select(`
-          *,
-          youtube_videos
-        `)
+        .select('*')
         .eq('slug', slug)
         .single();
       
       if (error) throw error;
-      return data as EducatorData;
+      
+      // Transform the data to match our EducatorData interface
+      const transformedData: EducatorData = {
+        ...data,
+        youtube_videos: Array.isArray(data.youtube_videos) ? data.youtube_videos : [],
+        social_links: typeof data.social_links === 'object' ? data.social_links : null
+      };
+      
+      return transformedData;
     },
   });
 
@@ -112,8 +111,8 @@ export default function EducatorDetail() {
           >
             <div className="flex flex-col md:flex-row gap-6 items-start">
               <motion.img
-                src={educator.profile_image_url || educator.channel_avatar_url}
-                alt={educator.name}
+                src={educator?.profile_image_url || educator?.channel_avatar_url}
+                alt={educator?.name}
                 className="w-32 h-32 rounded-full object-cover border-4 border-siso-orange/20"
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -126,57 +125,57 @@ export default function EducatorDetail() {
                   animationSpeed={6}
                   className="text-4xl font-bold"
                 >
-                  {educator.name}
+                  {educator?.name}
                 </GradientText>
                 
                 <p className="text-siso-text/80 text-lg">
-                  {educator.description || educator.channel_description}
+                  {educator?.description || educator?.channel_description}
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="bg-white/5 rounded-lg p-4">
                     <div className="text-2xl font-bold text-siso-orange">
-                      {educator.number_of_subscribers?.toLocaleString() || '0'}
+                      {educator?.number_of_subscribers?.toLocaleString() || '0'}
                     </div>
                     <div className="text-siso-text/80">Subscribers</div>
                   </div>
                   <div className="bg-white/5 rounded-lg p-4">
                     <div className="text-2xl font-bold text-siso-orange">
-                      {educator.video_count?.toLocaleString() || '0'}
+                      {educator?.video_count?.toLocaleString() || '0'}
                     </div>
                     <div className="text-siso-text/80">Videos</div>
                   </div>
                   <div className="bg-white/5 rounded-lg p-4">
                     <div className="text-2xl font-bold text-siso-orange">
-                      {educator.channel_total_views?.toLocaleString() || '0'}
+                      {educator?.channel_total_views?.toLocaleString() || '0'}
                     </div>
                     <div className="text-siso-text/80">Total Views</div>
                   </div>
                 </div>
 
                 <div className="flex gap-2">
-                  {educator.youtube_url && (
+                  {educator?.youtube_url && (
                     <Button variant="outline" size="icon" asChild>
                       <a href={educator.youtube_url} target="_blank" rel="noopener noreferrer">
                         <Youtube className="w-4 h-4" />
                       </a>
                     </Button>
                   )}
-                  {educator.website_url && (
+                  {educator?.website_url && (
                     <Button variant="outline" size="icon" asChild>
                       <a href={educator.website_url} target="_blank" rel="noopener noreferrer">
                         <Globe className="w-4 h-4" />
                       </a>
                     </Button>
                   )}
-                  {educator.social_links?.twitter && (
+                  {educator?.social_links?.twitter && (
                     <Button variant="outline" size="icon" asChild>
                       <a href={educator.social_links.twitter} target="_blank" rel="noopener noreferrer">
                         <Twitter className="w-4 h-4" />
                       </a>
                     </Button>
                   )}
-                  {educator.social_links?.linkedin && (
+                  {educator?.social_links?.linkedin && (
                     <Button variant="outline" size="icon" asChild>
                       <a href={educator.social_links.linkedin} target="_blank" rel="noopener noreferrer">
                         <Linkedin className="w-4 h-4" />
