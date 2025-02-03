@@ -1,47 +1,76 @@
 import { motion } from 'framer-motion';
 import { ToolVideoGrid } from '../tools/ToolVideoGrid';
-import { CommunityMember } from '../community/types';
 import { useState } from 'react';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import { usePagination } from '@/hooks/use-pagination';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 interface VideoLibraryProps {
-  members?: CommunityMember[];
-  isLoading: boolean;
+  isLoading?: boolean;
   selectedEducator?: string;
 }
 
 const ITEMS_PER_PAGE = 12;
 
-export const VideoLibrary = ({ members, isLoading, selectedEducator }: VideoLibraryProps) => {
+export const VideoLibrary = ({ isLoading: externalLoading, selectedEducator }: VideoLibraryProps) => {
   const [currentPage, setCurrentPage] = useState(1);
 
-  const videos = members?.flatMap(member => 
-    member.youtube_videos?.map(video => ({
-      ...video,
-      educator: {
-        name: member.name,
-        avatar_url: member.profile_image_url
-      },
-      metrics: {
-        views: Math.floor(Math.random() * 10000),
-        likes: Math.floor(Math.random() * 1000),
-        sentiment_score: Math.random(),
-        difficulty: ['Beginner', 'Intermediate', 'Advanced'][
-          Math.floor(Math.random() * 3)
-        ],
-        impact_score: Math.random() * 10
-      },
-      topics: member.content_themes || [],
-      ai_analysis: {
-        key_takeaways: ['Sample takeaway 1', 'Sample takeaway 2'],
-        implementation_steps: ['Step 1', 'Step 2']
-      }
-    })) || []
-  );
+  const { data: videos, isLoading: videosLoading } = useQuery({
+    queryKey: ['video-library', currentPage, selectedEducator],
+    queryFn: async () => {
+      let query = supabase
+        .from('youtube_videos')
+        .select(`
+          *,
+          channel:youtube_channels(*)
+        `)
+        .order('order', { ascending: true });
 
-  const totalPages = Math.ceil((videos?.length || 0) / ITEMS_PER_PAGE);
+      if (selectedEducator) {
+        query = query.eq('channel.name', selectedEducator);
+      }
+
+      const { data: videos, error } = await query;
+      
+      if (error) throw error;
+      if (!videos) return [];
+
+      // Transform the data to match the expected format
+      return videos.map(video => ({
+        id: video.id,
+        title: video.title || '',
+        url: `https://youtube.com/watch?v=${video.id}`,
+        duration: video.duration || '0:00',
+        thumbnail_url: video.thumbnailUrl || '',
+        educator: {
+          name: video.channel?.name || 'Unknown Creator',
+          avatar_url: video.channel?.profile_image_url || ''
+        },
+        metrics: {
+          views: video.viewCount || 0,
+          likes: 0, // Not available in simplified schema
+          sentiment_score: 0.8,
+          difficulty: "Intermediate" as const,
+          impact_score: 8.5
+        },
+        topics: [], // Not available in simplified schema
+        ai_analysis: {
+          key_takeaways: ['Coming soon...'],
+          implementation_steps: ['Coming soon...']
+        }
+      }));
+    },
+  });
+
+  const isLoading = externalLoading || videosLoading;
+
+  // Get featured videos (first 3 videos)
+  const featuredVideos = videos?.slice(0, 3) || [];
+
+  const totalVideos = videos?.length || 0;
+  const totalPages = Math.ceil(totalVideos / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
   const currentVideos = videos?.slice(startIndex, endIndex) || [];
@@ -51,28 +80,6 @@ export const VideoLibrary = ({ members, isLoading, selectedEducator }: VideoLibr
     totalPages,
     paginationItemsToDisplay: 7,
   });
-
-  const featuredVideos = members?.slice(0, 3).flatMap(member =>
-    (member.youtube_videos || []).slice(0, 1).map(video => ({
-      ...video,
-      educator: {
-        name: member.name,
-        avatar_url: member.profile_image_url
-      },
-      metrics: {
-        views: Math.floor(Math.random() * 50000),
-        likes: Math.floor(Math.random() * 5000),
-        sentiment_score: 0.8 + Math.random() * 0.2,
-        difficulty: 'Intermediate',
-        impact_score: 8 + Math.random() * 2
-      },
-      topics: member.content_themes || [],
-      ai_analysis: {
-        key_takeaways: ['Featured takeaway 1', 'Featured takeaway 2'],
-        implementation_steps: ['Step 1', 'Step 2', 'Step 3']
-      }
-    }))
-  );
 
   return (
     <motion.div
