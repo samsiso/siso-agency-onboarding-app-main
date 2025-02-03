@@ -2,7 +2,7 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft, MessageCircle, Brain, ListChecks, Eye, ThumbsUp, Calendar, Users, Share2, Download } from 'lucide-react';
+import { ChevronLeft, MessageCircle, Brain, ListChecks, Eye, Calendar, Users, Share2, Download } from 'lucide-react';
 import { VideoAnalysis } from '@/components/education/VideoAnalysis';
 import { VideoChat } from '@/components/education/VideoChat';
 import { VideoTakeaways } from '@/components/education/VideoTakeaways';
@@ -57,13 +57,17 @@ export default function VideoDetail() {
       return data;
     },
     retry: 1,
-    onError: (error) => {
-      console.error('Query error:', error);
-      toast({
-        title: "Error loading video",
-        description: "The requested video could not be found or accessed.",
-        variant: "destructive"
-      });
+    meta: {
+      onSettled: (data, error) => {
+        if (error) {
+          console.error('Query error:', error);
+          toast({
+            title: "Error loading video",
+            description: "The requested video could not be found or accessed.",
+            variant: "destructive"
+          });
+        }
+      }
     }
   });
 
@@ -192,10 +196,6 @@ export default function VideoDetail() {
                     <Download className="w-4 h-4" />
                     Download
                   </Button>
-                  <Button variant="secondary" size="sm" className="gap-2 bg-white/5 hover:bg-white/10">
-                    <ThumbsUp className="w-4 h-4" />
-                    Like
-                  </Button>
                 </div>
               </div>
 
@@ -204,10 +204,6 @@ export default function VideoDetail() {
                 <div className="flex items-center gap-2">
                   <Eye className="h-4 w-4" />
                   <span>{viewCount.toLocaleString()} views</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <ThumbsUp className="h-4 w-4" />
-                  <span>{likeCount.toLocaleString()} likes</span>
                 </div>
                 {publishDate && (
                   <div className="flex items-center gap-2">
