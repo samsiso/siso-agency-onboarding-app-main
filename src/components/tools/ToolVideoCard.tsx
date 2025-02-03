@@ -1,12 +1,14 @@
-import { Play, Clock, ThumbsUp, Eye, Brain } from 'lucide-react';
+import { Play, MessageCircle, Brain, ListChecks, Eye, ThumbsUp } from 'lucide-react';
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { useNavigate } from 'react-router-dom';
 
 interface ToolVideoCardProps {
   video: {
+    id: string;
     title: string;
     url: string;
     duration: string;
@@ -32,6 +34,12 @@ interface ToolVideoCardProps {
 }
 
 export function ToolVideoCard({ video, featured = false }: ToolVideoCardProps) {
+  const navigate = useNavigate();
+
+  const handleVideoClick = () => {
+    navigate(`/education/videos/${video.id}`);
+  };
+
   return (
     <Card className={cn(
       "group relative overflow-hidden transition-all duration-300 hover:shadow-lg",
@@ -43,14 +51,68 @@ export function ToolVideoCard({ video, featured = false }: ToolVideoCardProps) {
           <img 
             src={video.thumbnail_url} 
             alt={video.title}
-            className="object-cover rounded-t-lg"
+            className="object-cover rounded-t-lg cursor-pointer"
+            onClick={handleVideoClick}
           />
           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
             <Play className="w-12 h-12 text-white" />
           </div>
+          
+          {/* Action Buttons */}
+          <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button 
+                    className="p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/education/videos/${video.id}?tab=analysis`);
+                    }}
+                  >
+                    <Brain className="w-4 h-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>AI Analysis</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button 
+                    className="p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/education/videos/${video.id}?tab=chat`);
+                    }}
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>Chat about this video</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button 
+                    className="p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/education/videos/${video.id}?tab=takeaways`);
+                    }}
+                  >
+                    <ListChecks className="w-4 h-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>Key Takeaways</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
         </AspectRatio>
         <div className="absolute bottom-2 right-2 flex items-center gap-1 bg-black/70 text-white text-sm px-2 py-1 rounded-md">
-          <Clock className="w-4 h-4" />
           <span>{video.duration}</span>
         </div>
         {featured && (
@@ -61,21 +123,9 @@ export function ToolVideoCard({ video, featured = false }: ToolVideoCardProps) {
       </div>
 
       <div className="p-4 space-y-3">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="font-semibold text-siso-text-bold line-clamp-2">
-            {video.title}
-          </h3>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <Brain className="w-5 h-5 text-siso-orange flex-shrink-0" />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>AI Analysis Available</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
+        <h3 className="font-semibold text-siso-text-bold line-clamp-2 cursor-pointer hover:text-siso-red transition-colors" onClick={handleVideoClick}>
+          {video.title}
+        </h3>
 
         <div className="flex items-center gap-2">
           <img
