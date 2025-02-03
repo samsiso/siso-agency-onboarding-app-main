@@ -1284,36 +1284,33 @@ export type Database = {
       }
       youtube_videos: {
         Row: {
-          "aboutChannelInfo/channelAvatarUrl": string | null
-          "aboutChannelInfo/channelBannerUrl": string | null
-          "aboutChannelInfo/channelDescription": string | null
-          "aboutChannelInfo/channelId": string | null
-          "aboutChannelInfo/channelJoinedDate": string | null
-          "aboutChannelInfo/channelLocation": string | null
-          "aboutChannelInfo/channelName": string | null
-          "aboutChannelInfo/channelTotalVideos": number | null
-          "aboutChannelInfo/channelTotalViews": number | null
-          "aboutChannelInfo/channelUrl": string | null
-          "aboutChannelInfo/channelUsername": string | null
-          "aboutChannelInfo/inputChannelUrl": string | null
-          "aboutChannelInfo/isAgeRestricted": boolean | null
-          "aboutChannelInfo/isChannelVerified": boolean | null
-          "aboutChannelInfo/numberOfSubscribers": number | null
+          channel_avatar_url: string | null
+          channel_banner_url: string | null
+          channel_description: string | null
           channel_details_id: string | null
           channel_id: string | null
+          channel_joined_date: string | null
+          channel_location: string | null
+          channel_total_videos: number | null
+          channel_total_views: number | null
+          channel_username: string | null
           comment_count: number | null
           created_at: string
           description: string | null
           difficulty_level: string | null
           duration: string | null
           from_channel_list_page: boolean | null
+          from_yt_url: boolean | null
           from_ytu: boolean | null
           fromChannelListPage: boolean | null
           fromYTUrl: boolean | null
           id: string
           input: string | null
+          input_channel_url: string | null
           is_age_restricted: boolean | null
+          is_channel_verified: boolean | null
           like_count: number | null
+          number_of_subscribers: number | null
           order: number | null
           progress_key: string | null
           progress_key_label: string | null
@@ -1331,39 +1328,38 @@ export type Database = {
           updated_at: string
           url: string | null
           video_id: string
+          video_order: number | null
+          video_type: string | null
           view_count: number | null
         }
         Insert: {
-          "aboutChannelInfo/channelAvatarUrl"?: string | null
-          "aboutChannelInfo/channelBannerUrl"?: string | null
-          "aboutChannelInfo/channelDescription"?: string | null
-          "aboutChannelInfo/channelId"?: string | null
-          "aboutChannelInfo/channelJoinedDate"?: string | null
-          "aboutChannelInfo/channelLocation"?: string | null
-          "aboutChannelInfo/channelName"?: string | null
-          "aboutChannelInfo/channelTotalVideos"?: number | null
-          "aboutChannelInfo/channelTotalViews"?: number | null
-          "aboutChannelInfo/channelUrl"?: string | null
-          "aboutChannelInfo/channelUsername"?: string | null
-          "aboutChannelInfo/inputChannelUrl"?: string | null
-          "aboutChannelInfo/isAgeRestricted"?: boolean | null
-          "aboutChannelInfo/isChannelVerified"?: boolean | null
-          "aboutChannelInfo/numberOfSubscribers"?: number | null
+          channel_avatar_url?: string | null
+          channel_banner_url?: string | null
+          channel_description?: string | null
           channel_details_id?: string | null
           channel_id?: string | null
+          channel_joined_date?: string | null
+          channel_location?: string | null
+          channel_total_videos?: number | null
+          channel_total_views?: number | null
+          channel_username?: string | null
           comment_count?: number | null
           created_at?: string
           description?: string | null
           difficulty_level?: string | null
           duration?: string | null
           from_channel_list_page?: boolean | null
+          from_yt_url?: boolean | null
           from_ytu?: boolean | null
           fromChannelListPage?: boolean | null
           fromYTUrl?: boolean | null
           id?: string
           input?: string | null
+          input_channel_url?: string | null
           is_age_restricted?: boolean | null
+          is_channel_verified?: boolean | null
           like_count?: number | null
+          number_of_subscribers?: number | null
           order?: number | null
           progress_key?: string | null
           progress_key_label?: string | null
@@ -1381,39 +1377,38 @@ export type Database = {
           updated_at?: string
           url?: string | null
           video_id: string
+          video_order?: number | null
+          video_type?: string | null
           view_count?: number | null
         }
         Update: {
-          "aboutChannelInfo/channelAvatarUrl"?: string | null
-          "aboutChannelInfo/channelBannerUrl"?: string | null
-          "aboutChannelInfo/channelDescription"?: string | null
-          "aboutChannelInfo/channelId"?: string | null
-          "aboutChannelInfo/channelJoinedDate"?: string | null
-          "aboutChannelInfo/channelLocation"?: string | null
-          "aboutChannelInfo/channelName"?: string | null
-          "aboutChannelInfo/channelTotalVideos"?: number | null
-          "aboutChannelInfo/channelTotalViews"?: number | null
-          "aboutChannelInfo/channelUrl"?: string | null
-          "aboutChannelInfo/channelUsername"?: string | null
-          "aboutChannelInfo/inputChannelUrl"?: string | null
-          "aboutChannelInfo/isAgeRestricted"?: boolean | null
-          "aboutChannelInfo/isChannelVerified"?: boolean | null
-          "aboutChannelInfo/numberOfSubscribers"?: number | null
+          channel_avatar_url?: string | null
+          channel_banner_url?: string | null
+          channel_description?: string | null
           channel_details_id?: string | null
           channel_id?: string | null
+          channel_joined_date?: string | null
+          channel_location?: string | null
+          channel_total_videos?: number | null
+          channel_total_views?: number | null
+          channel_username?: string | null
           comment_count?: number | null
           created_at?: string
           description?: string | null
           difficulty_level?: string | null
           duration?: string | null
           from_channel_list_page?: boolean | null
+          from_yt_url?: boolean | null
           from_ytu?: boolean | null
           fromChannelListPage?: boolean | null
           fromYTUrl?: boolean | null
           id?: string
           input?: string | null
+          input_channel_url?: string | null
           is_age_restricted?: boolean | null
+          is_channel_verified?: boolean | null
           like_count?: number | null
+          number_of_subscribers?: number | null
           order?: number | null
           progress_key?: string | null
           progress_key_label?: string | null
@@ -1431,6 +1426,8 @@ export type Database = {
           updated_at?: string
           url?: string | null
           video_id?: string
+          video_order?: number | null
+          video_type?: string | null
           view_count?: number | null
         }
         Relationships: [
