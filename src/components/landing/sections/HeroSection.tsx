@@ -10,17 +10,17 @@ export const HeroSection = memo(() => {
     <section id="hero" className="min-h-screen">
       <Hero />
       <Waves 
-        lineColor="rgba(255, 87, 34, 0.05)"
+        lineColor="rgba(255, 87, 34, 0.15)"
         backgroundColor="transparent"
-        waveSpeedX={0.01}
-        waveSpeedY={0.008}
-        waveAmpX={40}
-        waveAmpY={20}
-        friction={0.95}
-        tension={0.008}
-        maxCursorMove={100}
-        xGap={20}
-        yGap={50}
+        waveSpeedX={0.015}
+        waveSpeedY={0.012}
+        waveAmpX={60}
+        waveAmpY={30}
+        friction={0.92}
+        tension={0.01}
+        maxCursorMove={150}
+        xGap={25}
+        yGap={60}
       />
     </section>
   );
