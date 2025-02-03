@@ -27,9 +27,12 @@ export default function VideoDetail() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('youtube_videos')
-        .select('*')
-        .eq('video_id', videoId)
-        .maybeSingle();
+        .select(`
+          *,
+          channel:youtube_channels(*)
+        `)
+        .eq('id', videoId)
+        .single();
       
       if (error) throw error;
       if (!data) throw new Error('Video not found');
@@ -53,13 +56,13 @@ export default function VideoDetail() {
     );
   }
 
-  const channelName = video["aboutChannelInfo/channelName"] || 'Unknown Creator';
-  const channelAvatar = video["aboutChannelInfo/channelAvatarUrl"];
-  const videoDescription = video["aboutChannelInfo/channelDescription"] || '';
-  const thumbnailUrl = video.thumbnailurl || '';
+  const channelName = video.channel?.name || 'Unknown Creator';
+  const channelAvatar = video.channel?.profile_image_url;
+  const videoDescription = video.channel?.description || '';
+  const thumbnailUrl = video.thumbnailUrl || '';
   const publishDate = video.date ? new Date(video.date) : null;
-  const viewCount = video.viewcount || 0;
-  const likeCount = video.like_count || 0;
+  const viewCount = video.viewCount || 0;
+  const likeCount = 0; // We don't have this in the simplified schema
 
   return (
     <>
@@ -142,7 +145,7 @@ export default function VideoDetail() {
           <div className="rounded-lg overflow-hidden bg-black/20 ring-1 ring-siso-text/10">
             <AspectRatio ratio={16 / 9}>
               <iframe
-                src={`https://www.youtube.com/embed/${video.video_id}`}
+                src={`https://www.youtube.com/embed/${video.id}`}
                 title={video.title}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
@@ -187,22 +190,22 @@ export default function VideoDetail() {
             </TabsList>
 
             <TabsContent value="analysis">
-              <VideoAnalysis videoId={video.video_id} />
+              <VideoAnalysis videoId={video.id} />
             </TabsContent>
 
             <TabsContent value="chat">
-              <VideoChat videoId={video.video_id} />
+              <VideoChat videoId={video.id} />
             </TabsContent>
 
             <TabsContent value="takeaways">
-              <VideoTakeaways videoId={video.video_id} />
+              <VideoTakeaways videoId={video.id} />
             </TabsContent>
           </Tabs>
 
           {/* Related Videos */}
           <RelatedVideos 
-            currentVideoId={video.video_id} 
-            topics={video.topics || []} 
+            currentVideoId={video.id} 
+            topics={[]} // We don't have topics in the simplified schema
           />
         </div>
       </div>

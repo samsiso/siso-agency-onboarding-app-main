@@ -15,8 +15,11 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
       // Get videos with proper join
       const { data: videos, error } = await supabase
         .from('youtube_videos')
-        .select('*')
-        .neq('video_id', currentVideoId)
+        .select(`
+          *,
+          channel:youtube_channels(*)
+        `)
+        .neq('id', currentVideoId)
         .limit(10);
       
       if (error) throw error;
@@ -24,23 +27,23 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
 
       // Transform the data to match the expected ToolVideoCard props
       return videos.map(video => ({
-        id: video.video_id || '',
+        id: video.id,
         title: video.title || '',
-        url: `https://youtube.com/watch?v=${video.video_id}`,
+        url: `https://youtube.com/watch?v=${video.id}`,
         duration: video.duration || '0:00',
-        thumbnail_url: video.thumbnailurl || '',
+        thumbnail_url: video.thumbnailUrl || '',
         educator: {
-          name: video["aboutChannelInfo/channelName"] || 'Unknown Creator',
-          avatar_url: video["aboutChannelInfo/channelAvatarUrl"] || ''
+          name: video.channel?.name || 'Unknown Creator',
+          avatar_url: video.channel?.profile_image_url || ''
         },
         metrics: {
-          views: video.viewcount || 0,
-          likes: video.like_count || 0,
+          views: video.viewCount || 0,
+          likes: 0, // We don't have this in the simplified schema
           sentiment_score: 0.8,
-          difficulty: video.difficulty_level as "Beginner" | "Intermediate" | "Advanced" || "Intermediate",
+          difficulty: "Intermediate" as const,
           impact_score: 8.5
         },
-        topics: video.topics || [],
+        topics: [], // We don't have this in the simplified schema
         ai_analysis: {
           key_takeaways: ['Coming soon...'],
           implementation_steps: ['Coming soon...']
