@@ -259,6 +259,17 @@ export type Database = {
       }
       education_creators: {
         Row: {
+          channel_avatar_url: string | null
+          channel_banner_url: string | null
+          channel_description: string | null
+          channel_description_links: Json | null
+          channel_id: string | null
+          channel_joined_date: string | null
+          channel_location: string | null
+          channel_name: string | null
+          channel_total_videos: number | null
+          channel_total_views: number | null
+          channel_url: string | null
           content_themes: string[] | null
           created_at: string
           description: string | null
@@ -266,17 +277,32 @@ export type Database = {
           id: string
           member_type: string | null
           name: string
+          niche: string | null
+          number_of_subscribers: number | null
           profile_image_url: string | null
+          relevant: string | null
           social_links: Json | null
           specialization: string[] | null
           tools_covered: string[] | null
           updated_at: string
+          url: string | null
           video_count: number | null
           website_url: string | null
           youtube_url: string | null
           youtube_videos: Json | null
         }
         Insert: {
+          channel_avatar_url?: string | null
+          channel_banner_url?: string | null
+          channel_description?: string | null
+          channel_description_links?: Json | null
+          channel_id?: string | null
+          channel_joined_date?: string | null
+          channel_location?: string | null
+          channel_name?: string | null
+          channel_total_videos?: number | null
+          channel_total_views?: number | null
+          channel_url?: string | null
           content_themes?: string[] | null
           created_at?: string
           description?: string | null
@@ -284,17 +310,32 @@ export type Database = {
           id?: string
           member_type?: string | null
           name: string
+          niche?: string | null
+          number_of_subscribers?: number | null
           profile_image_url?: string | null
+          relevant?: string | null
           social_links?: Json | null
           specialization?: string[] | null
           tools_covered?: string[] | null
           updated_at?: string
+          url?: string | null
           video_count?: number | null
           website_url?: string | null
           youtube_url?: string | null
           youtube_videos?: Json | null
         }
         Update: {
+          channel_avatar_url?: string | null
+          channel_banner_url?: string | null
+          channel_description?: string | null
+          channel_description_links?: Json | null
+          channel_id?: string | null
+          channel_joined_date?: string | null
+          channel_location?: string | null
+          channel_name?: string | null
+          channel_total_videos?: number | null
+          channel_total_views?: number | null
+          channel_url?: string | null
           content_themes?: string[] | null
           created_at?: string
           description?: string | null
@@ -302,11 +343,15 @@ export type Database = {
           id?: string
           member_type?: string | null
           name?: string
+          niche?: string | null
+          number_of_subscribers?: number | null
           profile_image_url?: string | null
+          relevant?: string | null
           social_links?: Json | null
           specialization?: string[] | null
           tools_covered?: string[] | null
           updated_at?: string
+          url?: string | null
           video_count?: number | null
           website_url?: string | null
           youtube_url?: string | null
