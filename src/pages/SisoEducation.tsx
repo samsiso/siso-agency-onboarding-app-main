@@ -14,6 +14,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ProjectDocumentation } from '@/components/education/ProjectDocumentation';
+import { GradientText } from '@/components/ui/gradient-text';
 
 const container = {
   hidden: { opacity: 0 },
@@ -122,9 +123,13 @@ export default function SisoEducation() {
             <div className="relative z-10">
               <div className="flex items-center gap-3 mb-4">
                 <GraduationCap className="w-8 h-8 text-siso-orange" />
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
+                <GradientText
+                  colors={["#FF5722", "#FFA726", "#FF5722"]}
+                  animationSpeed={6}
+                  className="text-4xl font-bold"
+                >
                   SISO Education Hub
-                </h1>
+                </GradientText>
               </div>
               <p className="text-siso-text/80 max-w-2xl mb-8">
                 Access quality AI education and expert insights. Learn from industry leaders and stay ahead in the rapidly evolving world of artificial intelligence.
