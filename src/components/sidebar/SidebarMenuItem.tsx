@@ -3,11 +3,11 @@ import { LucideIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import {
-  Tooltip,
-  TooltipContent,
   TooltipProvider,
   TooltipTrigger,
+  TooltipContent,
 } from "@/components/ui/tooltip";
+import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 
 interface SidebarMenuItemProps {
   href: string;
@@ -74,14 +74,14 @@ export const SidebarMenuItem = ({
   if (collapsed) {
     return (
       <TooltipProvider>
-        <Tooltip>
+        <TooltipPrimitive.Root>
           <TooltipTrigger asChild>
             {menuItem}
           </TooltipTrigger>
           <TooltipContent side="right">
             {label}
           </TooltipContent>
-        </Tooltip>
+        </TooltipPrimitive.Root>
       </TooltipProvider>
     );
   }
