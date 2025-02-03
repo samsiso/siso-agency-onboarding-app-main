@@ -4,9 +4,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { Sidebar } from '@/components/Sidebar';
 import { GraduationCap } from 'lucide-react';
 import { GradientText } from '@/components/ui/gradient-text';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
-import { ExternalLink } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
 import { EducationNav } from '@/components/education/EducationNav';
 import { VideoLibrary } from '@/components/education/VideoLibrary';
@@ -74,32 +71,6 @@ export default function SisoEducation() {
               </p>
             </div>
           </div>
-
-          {/* List Learner Callout Box */}
-          <Alert className="border border-[#0FA0CE]/20 bg-gradient-to-r from-[#0FA0CE]/5 to-transparent backdrop-blur-sm rounded-xl shadow-lg">
-            <AlertDescription className="flex items-center justify-between gap-4 p-2">
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold text-[#0FA0CE] mb-1">Scale Your Learning Programs</h3>
-                <p className="text-siso-text/90">
-                  List Learner is a powerful B2B education infrastructure platform - perfect for agencies, businesses, and individuals looking to scale their learning programs.
-                </p>
-              </div>
-              <Button
-                asChild
-                variant="outline"
-                className="shrink-0 border-[#0FA0CE] text-[#0FA0CE] hover:bg-[#0FA0CE]/10 hover:text-[#0FA0CE] transition-all shadow-sm"
-              >
-                <a 
-                  href="https://demo.listlearner.com/?ref=sourcesiso" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="flex items-center gap-2"
-                >
-                  Try it Free <ExternalLink size={16} />
-                </a>
-              </Button>
-            </AlertDescription>
-          </Alert>
 
           {/* Navigation */}
           <EducationNav
