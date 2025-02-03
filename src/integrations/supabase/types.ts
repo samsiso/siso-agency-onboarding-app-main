@@ -1239,11 +1239,14 @@ export type Database = {
           channel_url: string | null
           created_at: string
           description: string | null
+          description_links: Json | null
           id: string
           input_channel_url: string | null
           is_verified: boolean | null
           joined_date: string | null
           location: string | null
+          niche: string | null
+          relevance: string | null
           subscriber_count: number | null
           total_videos: number | null
           total_views: number | null
@@ -1258,11 +1261,14 @@ export type Database = {
           channel_url?: string | null
           created_at?: string
           description?: string | null
+          description_links?: Json | null
           id?: string
           input_channel_url?: string | null
           is_verified?: boolean | null
           joined_date?: string | null
           location?: string | null
+          niche?: string | null
+          relevance?: string | null
           subscriber_count?: number | null
           total_videos?: number | null
           total_views?: number | null
@@ -1277,11 +1283,14 @@ export type Database = {
           channel_url?: string | null
           created_at?: string
           description?: string | null
+          description_links?: Json | null
           id?: string
           input_channel_url?: string | null
           is_verified?: boolean | null
           joined_date?: string | null
           location?: string | null
+          niche?: string | null
+          relevance?: string | null
           subscriber_count?: number | null
           total_videos?: number | null
           total_views?: number | null
