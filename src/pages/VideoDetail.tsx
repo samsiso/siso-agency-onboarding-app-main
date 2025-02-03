@@ -13,16 +13,18 @@ import { extractVideoIdFromSlug } from '@/utils/slugUtils';
 import { format, parseISO } from 'date-fns';
 import { Helmet } from 'react-helmet';
 import { motion } from 'framer-motion';
+import { useToast } from '@/hooks/use-toast';
 
 export default function VideoDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') || 'analysis';
+  const { toast } = useToast();
   
   const videoId = slug ? extractVideoIdFromSlug(slug) : '';
 
-  const { data: video, isLoading } = useQuery({
+  const { data: video, isLoading, error } = useQuery({
     queryKey: ['video', videoId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -32,10 +34,12 @@ export default function VideoDetail() {
           channel:youtube_channels(*)
         `)
         .eq('id', videoId)
-        .single();
+        .maybeSingle();
       
       if (error) throw error;
-      if (!data) throw new Error('Video not found');
+      if (!data) {
+        throw new Error('Video not found');
+      }
       return data;
     },
   });
@@ -48,10 +52,34 @@ export default function VideoDetail() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-siso-bg to-siso-bg/95 p-4 md:p-8 flex flex-col items-center justify-center gap-4">
+        <div className="text-xl text-siso-text">Video not found</div>
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate('/education')}
+          className="flex items-center gap-2"
+        >
+          <ChevronLeft className="w-5 h-5" />
+          Back to Videos
+        </Button>
+      </div>
+    );
+  }
+
   if (!video) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-siso-bg to-siso-bg/95 p-4 md:p-8 flex items-center justify-center">
-        <div className="text-siso-text">Video not found</div>
+      <div className="min-h-screen bg-gradient-to-b from-siso-bg to-siso-bg/95 p-4 md:p-8 flex flex-col items-center justify-center gap-4">
+        <div className="text-xl text-siso-text">Video not found</div>
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate('/education')}
+          className="flex items-center gap-2"
+        >
+          <ChevronLeft className="w-5 h-5" />
+          Back to Videos
+        </Button>
       </div>
     );
   }
