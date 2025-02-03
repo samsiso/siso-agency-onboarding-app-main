@@ -21,28 +21,24 @@ export default function SisoEducation() {
       
       if (error) throw error;
       
+      // [Analysis] Mapping database fields to match UI component expectations
       return data.map(member => ({
         id: member.id,
         name: member.name,
-        description: member.description,
-        member_type: member.member_type,
+        description: member.channel_description,
+        member_type: member.member_type || 'Creator', // Provide default if null
         youtube_url: member.youtube_url,
-        youtube_videos: Array.isArray(member.youtube_videos) 
-          ? member.youtube_videos.map((video: any) => ({
-              title: video.title || '',
-              url: video.url || ''
-            }))
-          : [],
+        youtube_videos: member.youtube_videos || [],
         website_url: member.website_url,
-        specialization: member.specialization,
-        content_themes: member.content_themes,
-        profile_image_url: member.profile_image_url,
-        member_count: null,
-        join_url: null,
-        platform: null,
+        specialization: member.specialization || [],
+        content_themes: member.content_themes || [],
+        profile_image_url: member.channel_avatar_url || member.profile_image_url,
+        member_count: member.number_of_subscribers || 0,
+        join_url: member.url,
+        platform: member.niche,
         points: 0,
         rank: null,
-        contribution_count: 0,
+        contribution_count: member.channel_total_videos || 0,
         referral_count: 0
       }));
     },
