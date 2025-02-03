@@ -2,6 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { cn } from '@/lib/utils';
+import { Brain, Info, Video, User } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface ToolVideoCardProps {
   video: {
@@ -14,7 +16,6 @@ interface ToolVideoCardProps {
     };
     metrics?: {
       views?: number;
-      likes?: number;
       sentiment_score?: number;
       difficulty?: string;
       impact_score?: number;
@@ -50,6 +51,44 @@ export const ToolVideoCard = ({ video, className, featured = false }: ToolVideoC
       )}
     >
       <div className="space-y-3">
+        {/* Feature Icons */}
+        <div className="flex items-center justify-end gap-2 mb-2">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="p-1.5 rounded-full bg-siso-bg-alt hover:bg-siso-orange/10 transition-colors">
+                  <Brain className="w-4 h-4 text-siso-text/70" />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>AI Analysis</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="p-1.5 rounded-full bg-siso-bg-alt hover:bg-siso-orange/10 transition-colors">
+                  <Info className="w-4 h-4 text-siso-text/70" />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Key Takeaways</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="p-1.5 rounded-full bg-siso-bg-alt hover:bg-siso-orange/10 transition-colors">
+                  <Video className="w-4 h-4 text-siso-text/70" />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Watch Video</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+
         <AspectRatio ratio={16 / 9} className="overflow-hidden rounded-lg bg-siso-bg">
           {video.thumbnail_url ? (
             <img
@@ -74,7 +113,7 @@ export const ToolVideoCard = ({ video, className, featured = false }: ToolVideoC
           
           {video.educator && (
             <div className="flex items-center gap-2">
-              {video.educator.avatar_url && (
+              {video.educator.avatar_url ? (
                 <img
                   src={video.educator.avatar_url}
                   alt={video.educator.name}
@@ -83,6 +122,13 @@ export const ToolVideoCard = ({ video, className, featured = false }: ToolVideoC
                     featured ? "h-8 w-8" : "h-6 w-6"
                   )}
                 />
+              ) : (
+                <div className={cn(
+                  "rounded-full bg-siso-bg flex items-center justify-center",
+                  featured ? "h-8 w-8" : "h-6 w-6"
+                )}>
+                  <User className="w-4 h-4 text-siso-text/70" />
+                </div>
               )}
               <p className={cn(
                 "text-siso-text/70",
@@ -97,9 +143,6 @@ export const ToolVideoCard = ({ video, className, featured = false }: ToolVideoC
             <div className="flex items-center gap-4 text-xs text-siso-text/60">
               {video.metrics.views !== undefined && (
                 <span>{video.metrics.views.toLocaleString()} views</span>
-              )}
-              {video.metrics.likes !== undefined && (
-                <span>{video.metrics.likes.toLocaleString()} likes</span>
               )}
               {video.metrics.difficulty && (
                 <span className="capitalize">{video.metrics.difficulty}</span>
