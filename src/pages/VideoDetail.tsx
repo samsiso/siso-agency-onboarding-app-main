@@ -61,13 +61,10 @@ export default function VideoDetail() {
   const videoDescription = video.channel?.description || '';
   const thumbnailUrl = video.thumbnailUrl || '';
   
-  // Add validation for date parsing
   let publishDate = null;
   try {
     if (video.date && typeof video.date === 'string') {
-      // First try parsing as ISO string
       publishDate = parseISO(video.date);
-      // Check if the date is valid
       if (isNaN(publishDate.getTime())) {
         publishDate = null;
       }
@@ -92,12 +89,34 @@ export default function VideoDetail() {
       </Helmet>
 
       <div className="min-h-screen bg-black">
+        {/* Navigation */}
+        <div className="max-w-[1800px] mx-auto px-4 py-4">
+          <div className="flex items-center gap-4 text-gray-400">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="hover:bg-white/10"
+              onClick={() => navigate('/education')}
+            >
+              <ChevronLeft className="w-5 h-5 mr-2" />
+              Back to Videos
+            </Button>
+            <div className="flex items-center gap-2">
+              <span>Education</span>
+              <ChevronLeft className="w-4 h-4" />
+              <span>Videos</span>
+              <ChevronLeft className="w-4 h-4" />
+              <span className="text-white truncate max-w-[300px]">{video.title}</span>
+            </div>
+          </div>
+        </div>
+
         {/* Main Content */}
         <div className="max-w-[1800px] mx-auto grid grid-cols-1 xl:grid-cols-3 gap-6 p-4">
           {/* Left Column - Video Player and Info */}
-          <div className="xl:col-span-2 space-y-4">
+          <div className="xl:col-span-2 space-y-6">
             {/* Video Player */}
-            <div className="rounded-lg overflow-hidden bg-black/20 ring-1 ring-siso-text/10">
+            <div className="rounded-xl overflow-hidden bg-black ring-1 ring-white/10">
               <AspectRatio ratio={16 / 9}>
                 <iframe
                   src={`https://www.youtube.com/embed/${video.id}`}
@@ -110,8 +129,8 @@ export default function VideoDetail() {
             </div>
 
             {/* Video Title and Actions */}
-            <div className="space-y-4">
-              <h1 className="text-2xl font-bold text-white">{video.title}</h1>
+            <div className="space-y-6">
+              <h1 className="text-2xl md:text-3xl font-bold text-white leading-tight">{video.title}</h1>
               
               <div className="flex flex-wrap items-center justify-between gap-4">
                 {/* Channel Info */}
@@ -120,26 +139,26 @@ export default function VideoDetail() {
                     <img 
                       src={channelAvatar} 
                       alt={channelName}
-                      className="w-10 h-10 rounded-full"
+                      className="w-12 h-12 rounded-full ring-2 ring-white/10"
                     />
                   )}
                   <div>
-                    <h3 className="font-semibold text-white">{channelName}</h3>
+                    <h3 className="font-semibold text-white text-lg">{channelName}</h3>
                     <p className="text-sm text-gray-400">Creator</p>
                   </div>
                 </div>
 
                 {/* Action Buttons */}
                 <div className="flex items-center gap-2">
-                  <Button variant="secondary" size="sm" className="gap-2">
+                  <Button variant="secondary" size="sm" className="gap-2 bg-white/5 hover:bg-white/10">
                     <Share2 className="w-4 h-4" />
                     Share
                   </Button>
-                  <Button variant="secondary" size="sm" className="gap-2">
+                  <Button variant="secondary" size="sm" className="gap-2 bg-white/5 hover:bg-white/10">
                     <Download className="w-4 h-4" />
                     Download
                   </Button>
-                  <Button variant="secondary" size="sm" className="gap-2">
+                  <Button variant="secondary" size="sm" className="gap-2 bg-white/5 hover:bg-white/10">
                     <ThumbsUp className="w-4 h-4" />
                     Like
                   </Button>
@@ -147,7 +166,7 @@ export default function VideoDetail() {
               </div>
 
               {/* Video Stats */}
-              <div className="flex items-center gap-6 text-sm text-gray-400 border-t border-b border-gray-800 py-3">
+              <div className="flex items-center gap-6 text-sm text-gray-400 border-t border-b border-gray-800 py-4">
                 <div className="flex items-center gap-2">
                   <Eye className="h-4 w-4" />
                   <span>{viewCount.toLocaleString()} views</span>
@@ -166,17 +185,26 @@ export default function VideoDetail() {
             </div>
 
             {/* Interaction Panel */}
-            <Tabs defaultValue={activeTab} className="space-y-4">
-              <TabsList className="w-full grid grid-cols-3 lg:w-[400px] bg-gray-800">
-                <TabsTrigger value="analysis" className="gap-2 data-[state=active]:bg-siso-red">
+            <Tabs defaultValue={activeTab} className="space-y-6">
+              <TabsList className="w-full grid grid-cols-3 lg:w-[400px] bg-white/5">
+                <TabsTrigger 
+                  value="analysis" 
+                  className="gap-2 data-[state=active]:bg-siso-red data-[state=active]:text-white"
+                >
                   <Brain className="h-4 w-4" />
                   AI Analysis
                 </TabsTrigger>
-                <TabsTrigger value="chat" className="gap-2 data-[state=active]:bg-siso-red">
+                <TabsTrigger 
+                  value="chat" 
+                  className="gap-2 data-[state=active]:bg-siso-red data-[state=active]:text-white"
+                >
                   <MessageCircle className="h-4 w-4" />
                   Chat
                 </TabsTrigger>
-                <TabsTrigger value="takeaways" className="gap-2 data-[state=active]:bg-siso-red">
+                <TabsTrigger 
+                  value="takeaways" 
+                  className="gap-2 data-[state=active]:bg-siso-red data-[state=active]:text-white"
+                >
                   <ListChecks className="h-4 w-4" />
                   Key Takeaways
                 </TabsTrigger>
@@ -197,8 +225,11 @@ export default function VideoDetail() {
           </div>
 
           {/* Right Column - Related Videos */}
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-white">Related Videos</h2>
+          <div className="space-y-6">
+            <h2 className="text-xl font-semibold text-white flex items-center gap-2">
+              <Users className="w-5 h-5" />
+              Related Videos
+            </h2>
             <RelatedVideos 
               currentVideoId={video.id} 
               topics={[]}
