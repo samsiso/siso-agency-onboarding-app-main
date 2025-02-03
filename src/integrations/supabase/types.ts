@@ -1283,6 +1283,7 @@ export type Database = {
           "aboutChannelInfo/isAgeRestricted": boolean | null
           "aboutChannelInfo/isChannelVerified": boolean | null
           "aboutChannelInfo/numberOfSubscribers": number | null
+          channel_ref_id: string | null
           channelAvatarUrl: string | null
           channelBannerUrl: string | null
           channelDescription: string | null
@@ -1296,6 +1297,7 @@ export type Database = {
           channelUsername: string | null
           created_at: string
           date: string | null
+          difficulty_level: string | null
           duration: string | null
           fromChannelListPage: boolean | null
           fromYTUrl: boolean | null
@@ -1304,6 +1306,7 @@ export type Database = {
           inputChannelUrl: string | null
           isAgeRestricted: boolean | null
           isChannelVerified: boolean | null
+          like_count: number | null
           numberOfSubscribers: number | null
           order: number | null
           "progressKey/label": string | null
@@ -1311,6 +1314,7 @@ export type Database = {
           standardizedUrl: string | null
           thumbnailUrl: string | null
           title: string | null
+          topics: string[] | null
           type: string | null
           updated_at: string
           url: string | null
@@ -1333,6 +1337,7 @@ export type Database = {
           "aboutChannelInfo/isAgeRestricted"?: boolean | null
           "aboutChannelInfo/isChannelVerified"?: boolean | null
           "aboutChannelInfo/numberOfSubscribers"?: number | null
+          channel_ref_id?: string | null
           channelAvatarUrl?: string | null
           channelBannerUrl?: string | null
           channelDescription?: string | null
@@ -1346,6 +1351,7 @@ export type Database = {
           channelUsername?: string | null
           created_at?: string
           date?: string | null
+          difficulty_level?: string | null
           duration?: string | null
           fromChannelListPage?: boolean | null
           fromYTUrl?: boolean | null
@@ -1354,6 +1360,7 @@ export type Database = {
           inputChannelUrl?: string | null
           isAgeRestricted?: boolean | null
           isChannelVerified?: boolean | null
+          like_count?: number | null
           numberOfSubscribers?: number | null
           order?: number | null
           "progressKey/label"?: string | null
@@ -1361,6 +1368,7 @@ export type Database = {
           standardizedUrl?: string | null
           thumbnailUrl?: string | null
           title?: string | null
+          topics?: string[] | null
           type?: string | null
           updated_at?: string
           url?: string | null
@@ -1383,6 +1391,7 @@ export type Database = {
           "aboutChannelInfo/isAgeRestricted"?: boolean | null
           "aboutChannelInfo/isChannelVerified"?: boolean | null
           "aboutChannelInfo/numberOfSubscribers"?: number | null
+          channel_ref_id?: string | null
           channelAvatarUrl?: string | null
           channelBannerUrl?: string | null
           channelDescription?: string | null
@@ -1396,6 +1405,7 @@ export type Database = {
           channelUsername?: string | null
           created_at?: string
           date?: string | null
+          difficulty_level?: string | null
           duration?: string | null
           fromChannelListPage?: boolean | null
           fromYTUrl?: boolean | null
@@ -1404,6 +1414,7 @@ export type Database = {
           inputChannelUrl?: string | null
           isAgeRestricted?: boolean | null
           isChannelVerified?: boolean | null
+          like_count?: number | null
           numberOfSubscribers?: number | null
           order?: number | null
           "progressKey/label"?: string | null
@@ -1411,13 +1422,22 @@ export type Database = {
           standardizedUrl?: string | null
           thumbnailUrl?: string | null
           title?: string | null
+          topics?: string[] | null
           type?: string | null
           updated_at?: string
           url?: string | null
           video_id?: string | null
           viewCount?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "youtube_videos_channel_ref_id_fkey"
+            columns: ["channel_ref_id"]
+            isOneToOne: false
+            referencedRelation: "youtube_channels"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
