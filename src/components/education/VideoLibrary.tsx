@@ -22,11 +22,12 @@ export const VideoLibrary = ({ isLoading: externalLoading, selectedEducator }: V
   const { data: videos, isLoading: videosLoading } = useQuery({
     queryKey: ['video-library', currentPage, selectedEducator],
     queryFn: async () => {
+      // [Analysis] Specify the exact foreign key to use in the relationship
       let query = supabase
         .from('youtube_videos')
         .select(`
           *,
-          channel:youtube_channels(*)
+          channel:youtube_channels!youtube_videos_channel_id_fkey(*)
         `)
         .order('order', { ascending: true });
 
@@ -36,7 +37,11 @@ export const VideoLibrary = ({ isLoading: externalLoading, selectedEducator }: V
 
       const { data: videos, error } = await query;
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching videos:', error);
+        throw error;
+      }
+      
       if (!videos) return [];
 
       // Transform the data to match the expected format
