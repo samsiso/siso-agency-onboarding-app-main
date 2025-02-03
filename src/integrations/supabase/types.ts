@@ -1234,8 +1234,16 @@ export type Database = {
         Row: {
           avatar_url: string | null
           banner_url: string | null
+          channel_avatar_url: string | null
+          channel_banner_url: string | null
+          channel_description: string | null
+          channel_description_links: Json | null
           channel_id: string
+          channel_joined_date: string | null
+          channel_location: string | null
           channel_name: string
+          channel_total_videos: number | null
+          channel_total_views: number | null
           channel_url: string | null
           created_at: string
           description: string | null
@@ -1246,18 +1254,29 @@ export type Database = {
           joined_date: string | null
           location: string | null
           niche: string | null
+          number_of_subscribers: number | null
           relevance: string | null
+          relevant: string | null
           subscriber_count: number | null
           total_videos: number | null
           total_views: number | null
           updated_at: string
+          url: string | null
           username: string | null
         }
         Insert: {
           avatar_url?: string | null
           banner_url?: string | null
+          channel_avatar_url?: string | null
+          channel_banner_url?: string | null
+          channel_description?: string | null
+          channel_description_links?: Json | null
           channel_id: string
+          channel_joined_date?: string | null
+          channel_location?: string | null
           channel_name: string
+          channel_total_videos?: number | null
+          channel_total_views?: number | null
           channel_url?: string | null
           created_at?: string
           description?: string | null
@@ -1268,18 +1287,29 @@ export type Database = {
           joined_date?: string | null
           location?: string | null
           niche?: string | null
+          number_of_subscribers?: number | null
           relevance?: string | null
+          relevant?: string | null
           subscriber_count?: number | null
           total_videos?: number | null
           total_views?: number | null
           updated_at?: string
+          url?: string | null
           username?: string | null
         }
         Update: {
           avatar_url?: string | null
           banner_url?: string | null
+          channel_avatar_url?: string | null
+          channel_banner_url?: string | null
+          channel_description?: string | null
+          channel_description_links?: Json | null
           channel_id?: string
+          channel_joined_date?: string | null
+          channel_location?: string | null
           channel_name?: string
+          channel_total_videos?: number | null
+          channel_total_views?: number | null
           channel_url?: string | null
           created_at?: string
           description?: string | null
@@ -1290,11 +1320,14 @@ export type Database = {
           joined_date?: string | null
           location?: string | null
           niche?: string | null
+          number_of_subscribers?: number | null
           relevance?: string | null
+          relevant?: string | null
           subscriber_count?: number | null
           total_videos?: number | null
           total_views?: number | null
           updated_at?: string
+          url?: string | null
           username?: string | null
         }
         Relationships: []
