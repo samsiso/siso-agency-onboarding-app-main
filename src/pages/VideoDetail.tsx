@@ -27,10 +27,7 @@ export default function VideoDetail() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('youtube_videos')
-        .select(`
-          *,
-          channel:youtube_channels!youtube_videos_channel_ref_id_fkey(*)
-        `)
+        .select('*')
         .eq('video_id', videoId)
         .maybeSingle();
       
@@ -56,12 +53,12 @@ export default function VideoDetail() {
     );
   }
 
-  const channelName = video.channel?.name || video["aboutChannelInfo/channelName"];
-  const channelAvatar = video.channel?.profile_image_url || video["aboutChannelInfo/channelAvatarUrl"];
+  const channelName = video["aboutChannelInfo/channelName"] || 'Unknown Creator';
+  const channelAvatar = video["aboutChannelInfo/channelAvatarUrl"];
   const videoDescription = video["aboutChannelInfo/channelDescription"] || '';
-  const thumbnailUrl = video.thumbnailUrl || '';
+  const thumbnailUrl = video.thumbnailurl || '';
   const publishDate = video.date ? new Date(video.date) : null;
-  const viewCount = video.viewCount || 0;
+  const viewCount = video.viewcount || 0;
   const likeCount = video.like_count || 0;
 
   return (

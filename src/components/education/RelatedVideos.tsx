@@ -12,17 +12,12 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
   const { data: relatedVideos, isLoading } = useQuery({
     queryKey: ['related-videos', currentVideoId, topics],
     queryFn: async () => {
-      // First, get the channel data
-      const { data: channels } = await supabase
-        .from('youtube_channels')
-        .select('*');
-
-      // Then get the videos with a proper join
+      // Get videos with proper join
       const { data: videos, error } = await supabase
         .from('youtube_videos')
         .select(`
           *,
-          channel:youtube_channels!youtube_videos_channel_ref_id_fkey(*)
+          channel:youtube_channels!youtube_videos_channel_id_fkey(*)
         `)
         .neq('video_id', currentVideoId)
         .limit(10);
@@ -36,13 +31,13 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
         title: video.title || '',
         url: `https://youtube.com/watch?v=${video.video_id}`,
         duration: video.duration || '0:00',
-        thumbnail_url: video.thumbnailUrl || '',
+        thumbnail_url: video.thumbnailurl || '',
         educator: {
-          name: video.channel?.name || video["aboutChannelInfo/channelName"] || 'Unknown Creator',
-          avatar_url: video.channel?.profile_image_url || video["aboutChannelInfo/channelAvatarUrl"] || ''
+          name: video["aboutChannelInfo/channelName"] || 'Unknown Creator',
+          avatar_url: video["aboutChannelInfo/channelAvatarUrl"] || ''
         },
         metrics: {
-          views: video.viewCount || 0,
+          views: video.viewcount || 0,
           likes: video.like_count || 0,
           sentiment_score: 0.8,
           difficulty: video.difficulty_level as "Beginner" | "Intermediate" | "Advanced" || "Intermediate",
