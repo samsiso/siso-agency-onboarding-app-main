@@ -60,7 +60,23 @@ export default function VideoDetail() {
   const channelAvatar = video.channel?.profile_image_url;
   const videoDescription = video.channel?.description || '';
   const thumbnailUrl = video.thumbnailUrl || '';
-  const publishDate = video.date ? parseISO(video.date) : null;
+  
+  // Add validation for date parsing
+  let publishDate = null;
+  try {
+    if (video.date && typeof video.date === 'string') {
+      // First try parsing as ISO string
+      publishDate = parseISO(video.date);
+      // Check if the date is valid
+      if (isNaN(publishDate.getTime())) {
+        publishDate = null;
+      }
+    }
+  } catch (e) {
+    console.error('Error parsing date:', e);
+    publishDate = null;
+  }
+  
   const viewCount = video.viewCount || 0;
   const likeCount = 0; // We don't have this in the simplified schema
 
