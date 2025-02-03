@@ -18,11 +18,13 @@ export const Hero = () => {
   }, []);
 
   const handleResourceClick = (path: string) => {
+    console.log('Resource clicked:', path);
     setOpen(true);
     navigate(path);
   };
 
   const handleGetStarted = () => {
+    console.log('Get Started clicked');
     navigate('/auth');
   };
 
@@ -52,9 +54,13 @@ export const Hero = () => {
   return (
     <div className="flex-1 relative">
       <Sidebar />
-      <div className="absolute inset-0 bg-gradient-to-br from-siso-bg via-siso-bg/95 to-siso-bg/90" />
+      {/* Background layer - pointer-events-none to allow clicks through */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-br from-siso-bg via-siso-bg/95 to-siso-bg/90" />
+      </div>
       
-      <div className="relative max-w-6xl mx-auto px-2 sm:px-4 py-3 sm:py-4 md:py-6">
+      {/* Content layer - explicit z-index and pointer-events-auto */}
+      <div className="relative z-20 max-w-6xl mx-auto px-2 sm:px-4 py-3 sm:py-4 md:py-6">
         <div className="text-center">
           <div className="space-y-2 sm:space-y-3">
             <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-siso-text-bold leading-tight max-w-[85vw] mx-auto">
@@ -75,20 +81,20 @@ export const Hero = () => {
               </div>
             </div>
             
-            <div className="mt-2 sm:mt-3 md:mt-4">
+            <div className="relative mt-2 sm:mt-3 md:mt-4">
               <RainbowButton
                 onClick={handleGetStarted}
-                className="text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-3 font-semibold"
+                className="relative z-30 text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-3 font-semibold"
               >
                 Start Onboarding
               </RainbowButton>
             </div>
           </div>
 
-          <div className="mt-3 sm:mt-4 md:mt-6">
+          <div className="relative z-20 mt-3 sm:mt-4 md:mt-6">
             <div className="relative p-2 sm:p-3 rounded-xl bg-black/30 backdrop-blur-sm border border-siso-text/10 
               hover:border-siso-text/20 transition-all duration-300">
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-siso-orange/5 to-siso-red/5" />
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-siso-orange/5 to-siso-red/5 pointer-events-none" />
               
               <h2 className="text-base sm:text-lg md:text-xl font-bold text-siso-text-bold mb-2 sm:mb-3 bg-gradient-to-r from-siso-orange to-siso-red 
                 text-transparent bg-clip-text">
@@ -99,7 +105,7 @@ export const Hero = () => {
                 {resourceGuideItems.map((item, i) => (
                   <div
                     key={i}
-                    className="group p-1.5 sm:p-2 rounded-lg bg-siso-bg/50 hover:bg-siso-bg/70 
+                    className="group relative z-30 p-1.5 sm:p-2 rounded-lg bg-siso-bg/50 hover:bg-siso-bg/70 
                       border border-siso-text/10 hover:border-siso-text/20 transition-all duration-300
                       cursor-pointer"
                     onClick={() => handleResourceClick(item.path)}
