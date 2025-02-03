@@ -29,9 +29,9 @@ export default function VideoDetail() {
         .from('youtube_videos')
         .select(`
           *,
-          channel:youtube_channels(*)
+          channel:youtube_channels!youtube_videos_channel_id_fkey(*)
         `)
-        .eq('id', videoId)
+        .eq('video_id', videoId)
         .single();
       
       if (error) throw error;
@@ -55,34 +55,42 @@ export default function VideoDetail() {
     );
   }
 
+  const channelName = video.channel?.name || video["aboutChannelInfo/channelName"];
+  const channelAvatar = video.channel?.profile_image_url || video["aboutChannelInfo/channelAvatarUrl"];
+  const videoDescription = video["aboutChannelInfo/channelDescription"] || '';
+  const thumbnailUrl = video.thumbnailUrl || '';
+  const publishDate = video.date ? new Date(video.date) : null;
+  const viewCount = video.viewCount || 0;
+  const likeCount = video.like_count || 0;
+
   return (
     <>
       <Helmet>
-        <title>{`${video.title} | ${video.channel?.name} | SISO Education`}</title>
-        <meta name="description" content={video.description} />
+        <title>{`${video.title} | ${channelName} | SISO Education`}</title>
+        <meta name="description" content={videoDescription} />
         <meta property="og:title" content={video.title} />
-        <meta property="og:description" content={video.description} />
-        <meta property="og:image" content={video.thumbnail_url} />
+        <meta property="og:description" content={videoDescription} />
+        <meta property="og:image" content={thumbnailUrl} />
         <meta property="og:type" content="video.other" />
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "VideoObject",
             "name": video.title,
-            "description": video.description,
-            "thumbnailUrl": video.thumbnail_url,
-            "uploadDate": video.published_at,
+            "description": videoDescription,
+            "thumbnailUrl": thumbnailUrl,
+            "uploadDate": publishDate?.toISOString(),
             "duration": video.duration,
             "interactionStatistic": [
               {
                 "@type": "InteractionCounter",
                 "interactionType": "http://schema.org/WatchAction",
-                "userInteractionCount": video.view_count
+                "userInteractionCount": viewCount
               },
               {
                 "@type": "InteractionCounter",
                 "interactionType": "http://schema.org/LikeAction",
-                "userInteractionCount": video.like_count
+                "userInteractionCount": likeCount
               }
             ]
           })}
@@ -110,18 +118,16 @@ export default function VideoDetail() {
               <h1 className="text-lg md:text-xl font-semibold text-siso-text-bold line-clamp-1">
                 {video.title}
               </h1>
-              {video.channel && (
-                <div className="hidden md:flex items-center gap-2">
-                  {video.channel.profile_image_url && (
-                    <img 
-                      src={video.channel.profile_image_url} 
-                      alt={video.channel.name}
-                      className="w-6 h-6 rounded-full"
-                    />
-                  )}
-                  <span className="text-sm text-siso-text/70">{video.channel.name}</span>
-                </div>
-              )}
+              <div className="hidden md:flex items-center gap-2">
+                {channelAvatar && (
+                  <img 
+                    src={channelAvatar} 
+                    alt={channelName}
+                    className="w-6 h-6 rounded-full"
+                  />
+                )}
+                <span className="text-sm text-siso-text/70">{channelName}</span>
+              </div>
             </div>
 
             <Button
@@ -151,16 +157,16 @@ export default function VideoDetail() {
           <div className="flex items-center gap-6 text-sm text-siso-text/70">
             <div className="flex items-center gap-2">
               <Eye className="h-4 w-4" />
-              <span>{video.view_count.toLocaleString()} views</span>
+              <span>{viewCount.toLocaleString()} views</span>
             </div>
             <div className="flex items-center gap-2">
               <ThumbsUp className="h-4 w-4" />
-              <span>{video.like_count.toLocaleString()} likes</span>
+              <span>{likeCount.toLocaleString()} likes</span>
             </div>
-            {video.published_at && (
+            {publishDate && (
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
-                <span>{format(new Date(video.published_at), 'MMM d, yyyy')}</span>
+                <span>{format(publishDate, 'MMM d, yyyy')}</span>
               </div>
             )}
           </div>
@@ -183,21 +189,21 @@ export default function VideoDetail() {
             </TabsList>
 
             <TabsContent value="analysis">
-              <VideoAnalysis videoId={video.id} />
+              <VideoAnalysis videoId={video.video_id} />
             </TabsContent>
 
             <TabsContent value="chat">
-              <VideoChat videoId={video.id} />
+              <VideoChat videoId={video.video_id} />
             </TabsContent>
 
             <TabsContent value="takeaways">
-              <VideoTakeaways videoId={video.id} />
+              <VideoTakeaways videoId={video.video_id} />
             </TabsContent>
           </Tabs>
 
           {/* Related Videos */}
           <RelatedVideos 
-            currentVideoId={video.id} 
+            currentVideoId={video.video_id} 
             topics={video.topics || []} 
           />
         </div>
