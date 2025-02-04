@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
-import { Home, Sparkles, Users, Gift } from "lucide-react"
+import { Home, Sparkles, Users } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Icons } from "./icons"
 
 const navItems = [
   {
@@ -21,7 +22,7 @@ const navItems = [
   },
   {
     name: "Get Started",
-    icon: Gift,
+    icon: Icons.logo,
     sectionId: "cta",
   },
 ]
