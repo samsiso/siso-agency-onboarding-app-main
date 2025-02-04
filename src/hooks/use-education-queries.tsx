@@ -21,7 +21,8 @@ export const useEducatorsList = (page: number, searchQuery: string) => {
           channel_avatar_url,
           number_of_subscribers,
           channel_total_videos,
-          slug
+          slug,
+          featured_videos
         `)
         .order('number_of_subscribers', { ascending: false })
         .range((page - 1) * 20, page * 20 - 1);
@@ -68,7 +69,8 @@ export const useEducatorDetails = (slug: string) => {
           channel_joined_date,
           social_links,
           youtube_url,
-          website_url
+          website_url,
+          featured_videos
         `)
         .eq('slug', slug)
         .single();
@@ -82,7 +84,7 @@ export const useEducatorDetails = (slug: string) => {
         throw new Error('Educator not found');
       }
 
-      console.log('Found educator:', educator); // Debug log
+      console.log('Found educator with featured videos:', educator); // Debug log
       
       return educator;
     },
