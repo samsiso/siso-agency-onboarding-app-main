@@ -20,6 +20,22 @@ interface VideoLibraryProps {
 
 const ITEMS_PER_PAGE = 12;
 
+// [Analysis] Define the type for the Supabase query response
+type VideoQueryResponse = {
+  id: string;
+  title: string | null;
+  url: string | null;
+  thumbnailUrl: string | null;
+  duration: string | null;
+  viewCount: number | null;
+  date: string | null;
+  channel_id: string | null;
+  education_creators: {
+    name: string | null;
+    channel_avatar_url: string | null;
+  } | null;
+}
+
 export const VideoLibrary = ({ 
   isLoading: externalLoading, 
   selectedEducator,
@@ -31,7 +47,6 @@ export const VideoLibrary = ({
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
   const { ref: loadMoreRef, inView } = useInView();
 
-  // [Analysis] Using infinite query for better UX and performance
   const {
     data,
     fetchNextPage,
@@ -87,7 +102,7 @@ export const VideoLibrary = ({
         throw error;
       }
 
-      return videos?.map(video => ({
+      return (videos as VideoQueryResponse[])?.map(video => ({
         id: video.id,
         title: video.title || '',
         url: `https://youtube.com/watch?v=${video.id}`,
@@ -109,7 +124,7 @@ export const VideoLibrary = ({
           key_takeaways: ['Coming soon...'],
           implementation_steps: ['Coming soon...']
         }
-      } as Video)) || [];
+      } satisfies Video)) || [];
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {
