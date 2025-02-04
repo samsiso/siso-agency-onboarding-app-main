@@ -55,7 +55,7 @@ export const LandingPage = () => {
   }, [user, navigate]);
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-black via-gray-900 to-[#0A0A0A] overflow-x-hidden">
+    <div className="min-h-screen w-full bg-gradient-to-b from-black via-siso-bg to-black overflow-x-hidden">
       <Suspense fallback={<LoadingFallback />}>
         <ScrollNav />
       </Suspense>
