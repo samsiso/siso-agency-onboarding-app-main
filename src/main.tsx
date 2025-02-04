@@ -32,11 +32,11 @@ window.ALLOWED_ORIGINS = ALLOWED_ORIGINS;
 
 // Create root and render app with correct provider order
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <QueryClientProvider client={queryClient}>
-    <React.StrictMode>
-      <BrowserRouter>
+  <React.StrictMode>
+    <BrowserRouter>
+      <QueryClientProvider client={queryClient}>
         <App />
-      </BrowserRouter>
-    </React.StrictMode>
-  </QueryClientProvider>
+      </QueryClientProvider>
+    </BrowserRouter>
+  </React.StrictMode>
 )
