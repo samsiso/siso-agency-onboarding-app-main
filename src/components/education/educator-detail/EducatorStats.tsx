@@ -1,4 +1,5 @@
-import { Users, PlaySquare, Eye } from 'lucide-react';
+import { Users, PlaySquare, Eye, TrendingUp } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface EducatorStatsProps {
   subscriberCount?: number | null;
@@ -18,55 +19,75 @@ const formatNumber = (num: number | null | undefined): string => {
   return num.toString();
 };
 
+const statVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: i * 0.1,
+      duration: 0.5,
+      ease: "easeOut"
+    }
+  })
+};
+
 export const EducatorStats = ({ 
   subscriberCount, 
   videoCount, 
   totalViews 
 }: EducatorStatsProps) => {
-  // Add debug logs to track incoming data
-  console.log('EducatorStats received:', {
-    subscriberCount,
-    videoCount,
-    totalViews
-  });
+  const stats = [
+    {
+      icon: Users,
+      label: "Subscribers",
+      value: formatNumber(subscriberCount),
+      color: "text-siso-orange",
+      bgColor: "bg-siso-orange/10"
+    },
+    {
+      icon: PlaySquare,
+      label: "Videos",
+      value: formatNumber(videoCount),
+      color: "text-siso-red",
+      bgColor: "bg-siso-red/10"
+    },
+    {
+      icon: Eye,
+      label: "Total Views",
+      value: formatNumber(totalViews),
+      color: "text-blue-500",
+      bgColor: "bg-blue-500/10"
+    }
+  ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
-      <div className="flex items-center gap-3">
-        <div className="p-3 bg-siso-orange/10 rounded-lg">
-          <Users className="w-6 h-6 text-siso-orange" />
-        </div>
-        <div>
-          <div className="text-2xl font-bold text-siso-text">
-            {formatNumber(subscriberCount)}
-          </div>
-          <div className="text-siso-text/60 text-sm">Subscribers</div>
-        </div>
-      </div>
-
-      <div className="flex items-center gap-3">
-        <div className="p-3 bg-siso-orange/10 rounded-lg">
-          <PlaySquare className="w-6 h-6 text-siso-orange" />
-        </div>
-        <div>
-          <div className="text-2xl font-bold text-siso-text">
-            {formatNumber(videoCount)}
-          </div>
-          <div className="text-siso-text/60 text-sm">Videos</div>
-        </div>
-      </div>
-
-      <div className="flex items-center gap-3">
-        <div className="p-3 bg-siso-orange/10 rounded-lg">
-          <Eye className="w-6 h-6 text-siso-orange" />
-        </div>
-        <div>
-          <div className="text-2xl font-bold text-siso-text">
-            {formatNumber(totalViews)}
-          </div>
-          <div className="text-siso-text/60 text-sm">Total Views</div>
-        </div>
-      </div>
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-gradient-to-br from-siso-bg-alt to-siso-bg-alt/50 backdrop-blur-sm rounded-xl p-6 border border-siso-border">
+      {stats.map((stat, index) => {
+        const Icon = stat.icon;
+        return (
+          <motion.div
+            key={stat.label}
+            custom={index}
+            initial="hidden"
+            animate="visible"
+            variants={statVariants}
+            className="flex items-center gap-4 p-4 rounded-lg bg-black/20 border border-siso-border/50 hover:border-siso-border transition-colors"
+          >
+            <div className={`p-3 rounded-lg ${stat.bgColor}`}>
+              <Icon className={`w-6 h-6 ${stat.color}`} />
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-siso-text">
+                {stat.value}
+              </div>
+              <div className="text-siso-text/60 text-sm">
+                {stat.label}
+              </div>
+            </div>
+          </motion.div>
+        );
+      })}
     </div>
   );
 };
