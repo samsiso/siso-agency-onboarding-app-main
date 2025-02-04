@@ -7,7 +7,7 @@ interface EducatorStatsProps {
 }
 
 const formatNumber = (num: number | null | undefined): string => {
-  if (!num) return '0';
+  if (num === null || num === undefined) return '0';
   
   if (num >= 1000000) {
     return `${(num / 1000000).toFixed(1)}M`;
@@ -19,10 +19,17 @@ const formatNumber = (num: number | null | undefined): string => {
 };
 
 export const EducatorStats = ({ 
-  subscriberCount = 0, 
-  videoCount = 0, 
-  totalViews = 0 
+  subscriberCount, 
+  videoCount, 
+  totalViews 
 }: EducatorStatsProps) => {
+  // Add debug logs to track incoming data
+  console.log('EducatorStats received:', {
+    subscriberCount,
+    videoCount,
+    totalViews
+  });
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
       <div className="flex items-center gap-3">

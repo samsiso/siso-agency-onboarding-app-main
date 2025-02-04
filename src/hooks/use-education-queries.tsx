@@ -92,7 +92,7 @@ export const useEducatorDetails = (slug: string) => {
         throw new Error('Educator not found');
       }
 
-      console.log('Educator data:', data); // Debug log to verify data
+      console.log('Raw educator data:', data); // Debug log
       
       return data;
     },

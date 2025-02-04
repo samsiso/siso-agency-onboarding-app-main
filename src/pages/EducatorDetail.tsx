@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet';
-import { toast } from '@/components/ui/use-toast';
 import { EducatorHeader } from '@/components/education/educator-detail/EducatorHeader';
 import { EducatorStats } from '@/components/education/educator-detail/EducatorStats';
 import { EducatorVideoSection } from '@/components/education/educator-detail/EducatorVideoSection';
@@ -15,6 +14,9 @@ export default function EducatorDetail() {
   const navigate = useNavigate();
 
   const { data: educator, isLoading, error } = useEducatorDetails(slug || '');
+
+  // Add debug log to track educator data
+  console.log('EducatorDetail received data:', educator);
 
   if (isLoading) {
     return (
