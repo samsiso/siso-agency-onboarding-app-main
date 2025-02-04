@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { GradientText } from '@/components/ui/gradient-text';
 import { Button } from '@/components/ui/button';
-import { Youtube, Globe, Twitter, Linkedin, Share2, MapPin, Calendar } from 'lucide-react';
+import { Youtube, Globe, Twitter, Linkedin, Share2, MapPin, Calendar, ImageOff } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface EducatorHeaderProps {
@@ -30,6 +30,9 @@ export const EducatorHeader = ({
 }: EducatorHeaderProps) => {
   const formattedDate = joinedDate ? format(new Date(joinedDate), 'MMMM yyyy') : null;
 
+  // [Analysis] Add debug logs to track image URLs
+  console.log('EducatorHeader image URLs:', { profileImage, bannerImage });
+
   return (
     <div className="relative w-full">
       {/* Banner Image with Gradient Overlay */}
@@ -39,9 +42,15 @@ export const EducatorHeader = ({
             src={bannerImage}
             alt={`${name}'s channel banner`}
             className="w-full h-full object-cover"
+            onError={(e) => {
+              console.error('Banner image failed to load:', bannerImage);
+              e.currentTarget.style.display = 'none';
+            }}
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-r from-siso-orange/20 to-siso-red/20" />
+          <div className="w-full h-full bg-gradient-to-r from-siso-orange/20 to-siso-red/20 flex items-center justify-center">
+            <ImageOff className="w-12 h-12 text-siso-text/30" />
+          </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
       </div>
@@ -56,11 +65,22 @@ export const EducatorHeader = ({
             transition={{ delay: 0.2 }}
             className="relative z-10"
           >
-            <img
-              src={profileImage}
-              alt={name}
-              className="w-32 h-32 rounded-full object-cover border-4 border-siso-bg shadow-xl"
-            />
+            {profileImage ? (
+              <img
+                src={profileImage}
+                alt={name}
+                className="w-32 h-32 rounded-full object-cover border-4 border-siso-bg shadow-xl bg-siso-bg"
+                onError={(e) => {
+                  console.error('Profile image failed to load:', profileImage);
+                  e.currentTarget.style.display = 'none';
+                  e.currentTarget.parentElement?.classList.add('fallback-avatar');
+                }}
+              />
+            ) : (
+              <div className="w-32 h-32 rounded-full border-4 border-siso-bg shadow-xl bg-siso-bg flex items-center justify-center">
+                <ImageOff className="w-12 h-12 text-siso-text/30" />
+              </div>
+            )}
           </motion.div>
 
           {/* Content */}
