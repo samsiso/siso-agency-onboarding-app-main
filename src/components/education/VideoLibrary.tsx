@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { usePagination } from '@/hooks/use-pagination';
 import { VideoGrid } from './video-library/VideoGrid';
 import { VideoPagination } from './video-library/VideoPagination';
+import { toast } from 'sonner';
 
 interface VideoLibraryProps {
   isLoading?: boolean;
@@ -27,9 +28,13 @@ export const VideoLibrary = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
 
+  // [Analysis] Using join to get educator details with videos
+  // [Plan] Add caching layer when video count exceeds 1000
   const { data: videos, isLoading: videosLoading } = useQuery({
     queryKey: ['video-library', currentPage, selectedEducator, searchQuery, sortBy, filterBySeries],
     queryFn: async () => {
+      console.log('Fetching videos for educator:', selectedEducator);
+      
       let query = supabase
         .from('youtube_videos')
         .select(`
@@ -39,13 +44,18 @@ export const VideoLibrary = ({
           duration,
           thumbnailUrl,
           viewCount,
-          channel_id,
           date,
           educator:education_creators(
             name,
             channel_avatar_url
           )
-        `);
+        `)
+        .eq('educator_id', selectedEducator);
+
+      // Apply search filter if query exists
+      if (searchQuery) {
+        query = query.ilike('title', `%${searchQuery}%`);
+      }
 
       // Apply sorting
       switch (sortBy) {
@@ -59,14 +69,6 @@ export const VideoLibrary = ({
           query = query.order('date', { ascending: false });
       }
 
-      if (selectedEducator) {
-        query = query.eq('educator_id', selectedEducator);
-      }
-
-      if (searchQuery) {
-        query = query.ilike('title', `%${searchQuery}%`);
-      }
-
       // Filter by series if needed
       if (filterBySeries) {
         query = query.not('series_id', 'is', null);
@@ -76,6 +78,7 @@ export const VideoLibrary = ({
       
       if (error) {
         console.error('Error fetching videos:', error);
+        toast.error('Failed to load videos');
         throw error;
       }
       
@@ -127,14 +130,16 @@ export const VideoLibrary = ({
         isLoading={isLoading}
       />
 
-      <VideoPagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-        pages={pages}
-        showLeftEllipsis={showLeftEllipsis}
-        showRightEllipsis={showRightEllipsis}
-      />
+      {totalPages > 1 && (
+        <VideoPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          pages={pages}
+          showLeftEllipsis={showLeftEllipsis}
+          showRightEllipsis={showRightEllipsis}
+        />
+      )}
     </div>
   );
 };
