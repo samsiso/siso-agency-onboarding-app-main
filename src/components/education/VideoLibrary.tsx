@@ -51,8 +51,8 @@ export const VideoLibrary = ({
           )
         `);
 
-      // Only apply educator filter if selectedEducator is provided
-      if (selectedEducator) {
+      // Only apply educator filter if selectedEducator is provided and not null/undefined
+      if (selectedEducator && selectedEducator !== 'null' && selectedEducator !== 'undefined') {
         query = query.eq('educator_id', selectedEducator);
       }
 

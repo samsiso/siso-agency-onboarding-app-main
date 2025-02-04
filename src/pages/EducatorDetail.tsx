@@ -14,6 +14,7 @@ export default function EducatorDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
 
+  // [Analysis] Using slug to fetch educator details first
   const { data: educator, isLoading, error } = useEducatorDetails(slug || '');
 
   // Add debug log to track educator data
@@ -111,6 +112,7 @@ export default function EducatorDetail() {
               />
 
               <div className="mt-8">
+                {/* [Analysis] Pass the educator.id instead of slug */}
                 <EducatorVideoSection educatorId={educator.id} />
               </div>
             </div>
