@@ -10,7 +10,7 @@ interface VideoGridProps {
   isLoading: boolean;
 }
 
-export const VideoGrid = ({ videos, featuredVideos, isLoading }: VideoGridProps) => {
+export const VideoGrid = ({ videos = [], featuredVideos = [], isLoading }: VideoGridProps) => {
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -50,10 +50,12 @@ export const VideoGrid = ({ videos, featuredVideos, isLoading }: VideoGridProps)
         </AspectRatio>
         
         {/* Duration Badge */}
-        <div className="absolute bottom-2 right-2 bg-black/80 px-2 py-1 rounded text-xs text-white flex items-center gap-1">
-          <Clock className="w-3 h-3" />
-          {video.duration}
-        </div>
+        {video.duration && (
+          <div className="absolute bottom-2 right-2 bg-black/80 px-2 py-1 rounded text-xs text-white flex items-center gap-1">
+            <Clock className="w-3 h-3" />
+            {video.duration}
+          </div>
+        )}
       </div>
 
       <div className="p-4 space-y-2">
@@ -85,7 +87,7 @@ export const VideoGrid = ({ videos, featuredVideos, isLoading }: VideoGridProps)
           <div className="flex items-center gap-4 text-xs text-siso-text/60">
             <div className="flex items-center gap-1">
               <Eye className="w-3 h-3" />
-              {video.metrics.views.toLocaleString()} views
+              {video.metrics.views?.toLocaleString()} views
             </div>
             {video.metrics.difficulty && (
               <span className="capitalize">{video.metrics.difficulty}</span>
@@ -104,7 +106,7 @@ export const VideoGrid = ({ videos, featuredVideos, isLoading }: VideoGridProps)
       className="space-y-8"
     >
       {/* Featured Videos Section */}
-      {featuredVideos.length > 0 && (
+      {featuredVideos?.length > 0 && (
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold text-siso-text-bold">Featured Videos</h2>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
