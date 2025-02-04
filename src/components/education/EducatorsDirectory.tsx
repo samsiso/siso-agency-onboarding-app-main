@@ -1,10 +1,11 @@
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CommunityMember } from '../community/types';
-import { CommunityMemberCard } from '../community/CommunityMemberCard';
 import { CommunityMemberDetails } from '../community/CommunityMemberDetails';
-import { useState } from 'react';
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink } from "@/components/ui/pagination";
-import { Button } from "@/components/ui/button";
+import { DirectoryFilters } from './directory/DirectoryFilters';
+import { DirectoryHeader } from './directory/DirectoryHeader';
+import { DirectoryList } from './directory/DirectoryList';
+import { DirectoryPagination } from './directory/DirectoryPagination';
 import { usePagination } from '@/hooks/use-pagination';
 
 interface EducatorsDirectoryProps {
@@ -14,11 +15,18 @@ interface EducatorsDirectoryProps {
   searchQuery: string;
 }
 
-const ITEMS_PER_PAGE = 20; // Updated to show 20 items per page
+const ITEMS_PER_PAGE = 20;
 
-export const EducatorsDirectory = ({ members, isLoading, viewMode, searchQuery }: EducatorsDirectoryProps) => {
+export const EducatorsDirectory = ({ 
+  members, 
+  isLoading, 
+  viewMode: initialViewMode, 
+  searchQuery: initialSearchQuery 
+}: EducatorsDirectoryProps) => {
   const [selectedMember, setSelectedMember] = useState<CommunityMember | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [viewMode, setViewMode] = useState(initialViewMode);
+  const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
 
   // Filter members based on search query
   const filteredMembers = members?.filter(member => 
@@ -40,6 +48,18 @@ export const EducatorsDirectory = ({ members, isLoading, viewMode, searchQuery }
     paginationItemsToDisplay: 7,
   });
 
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {[...Array(20)].map((_, i) => (
+          <div key={i} className="animate-pulse">
+            <div className="h-48 bg-siso-bg-alt rounded-lg"></div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -47,112 +67,34 @@ export const EducatorsDirectory = ({ members, isLoading, viewMode, searchQuery }
       exit={{ opacity: 0, y: -20 }}
       className="space-y-8"
     >
+      <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+        <DirectoryFilters
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+        />
+        <DirectoryHeader
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+        />
+      </div>
+
       <AnimatePresence mode="wait">
-        <motion.div
-          key={`educators-${viewMode}`}
-          variants={{
-            hidden: { opacity: 0 },
-            show: {
-              opacity: 1,
-              transition: {
-                staggerChildren: 0.1
-              }
-            }
-          }}
-          initial="hidden"
-          animate="show"
-          className={
-            viewMode === 'grid' 
-              ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
-              : "flex flex-col gap-4"
-          }
-        >
-          {isLoading ? (
-            [...Array(20)].map((_, i) => (
-              <div key={i} className="animate-pulse">
-                <div className={`${viewMode === 'grid' ? 'h-48' : 'h-24'} bg-siso-bg-alt rounded-lg`}></div>
-              </div>
-            ))
-          ) : currentMembers?.map((member) => (
-            <motion.div
-              key={member.id}
-              variants={{
-                hidden: { opacity: 0, y: 20 },
-                show: { opacity: 1, y: 0 }
-              }}
-              className={viewMode === 'list' ? 'w-full' : ''}
-            >
-              <CommunityMemberCard
-                member={member}
-                onClick={setSelectedMember}
-                viewMode={viewMode}
-              />
-            </motion.div>
-          ))}
-        </motion.div>
+        <DirectoryList
+          members={currentMembers}
+          viewMode={viewMode}
+          onMemberSelect={setSelectedMember}
+        />
       </AnimatePresence>
 
       {totalPages > 1 && (
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-              >
-                ←
-              </Button>
-            </PaginationItem>
-
-            {showLeftEllipsis && (
-              <>
-                <PaginationItem>
-                  <PaginationLink onClick={() => setCurrentPage(1)}>1</PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationEllipsis />
-                </PaginationItem>
-              </>
-            )}
-
-            {pages.map((page) => (
-              <PaginationItem key={page}>
-                <PaginationLink
-                  onClick={() => setCurrentPage(page)}
-                  isActive={currentPage === page}
-                >
-                  {page}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-
-            {showRightEllipsis && (
-              <>
-                <PaginationItem>
-                  <PaginationEllipsis />
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationLink onClick={() => setCurrentPage(totalPages)}>
-                    {totalPages}
-                  </PaginationLink>
-                </PaginationItem>
-              </>
-            )}
-
-            <PaginationItem>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-              >
-                →
-              </Button>
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+        <DirectoryPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          pages={pages}
+          showLeftEllipsis={showLeftEllipsis}
+          showRightEllipsis={showRightEllipsis}
+        />
       )}
 
       <CommunityMemberDetails
