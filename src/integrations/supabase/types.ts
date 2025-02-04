@@ -1414,6 +1414,7 @@ export type Database = {
           created_at: string
           date: string | null
           duration: string | null
+          educator_id: string | null
           id: string
           order: number | null
           thumbnailUrl: string | null
@@ -1428,6 +1429,7 @@ export type Database = {
           created_at?: string
           date?: string | null
           duration?: string | null
+          educator_id?: string | null
           id: string
           order?: number | null
           thumbnailUrl?: string | null
@@ -1442,6 +1444,7 @@ export type Database = {
           created_at?: string
           date?: string | null
           duration?: string | null
+          educator_id?: string | null
           id?: string
           order?: number | null
           thumbnailUrl?: string | null
@@ -1450,7 +1453,15 @@ export type Database = {
           url?: string | null
           viewCount?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "youtube_videos_educator_id_fkey"
+            columns: ["educator_id"]
+            isOneToOne: false
+            referencedRelation: "education_creators"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
