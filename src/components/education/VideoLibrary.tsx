@@ -35,15 +35,12 @@ export const VideoLibrary = ({
           duration,
           thumbnailUrl,
           viewCount,
-          channel:youtube_channels!youtube_videos_channel_id_fkey (
-            name,
-            profile_image_url
-          )
+          channel_id
         `)
         .order('order', { ascending: true });
 
       if (selectedEducator) {
-        query = query.eq('channel.name', selectedEducator);
+        query = query.eq('channel_id', selectedEducator);
       }
 
       if (searchQuery) {
@@ -64,8 +61,8 @@ export const VideoLibrary = ({
         duration: video.duration || '0:00',
         thumbnail_url: video.thumbnailUrl || '',
         educator: {
-          name: video.channel?.name || 'Unknown Creator',
-          avatar_url: video.channel?.profile_image_url || ''
+          name: video.channel_id || 'Unknown Creator',
+          avatar_url: '' // Since we don't have avatar URLs anymore, we'll use a default empty string
         },
         metrics: {
           views: video.viewCount || 0,
