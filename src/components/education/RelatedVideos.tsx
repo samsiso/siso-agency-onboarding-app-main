@@ -18,7 +18,7 @@ interface VideoWithCreator {
   viewCount: number | null;
   channel_id: string | null;
   creator: {
-    name: string;
+    name: string | null;
     channel_avatar_url: string | null;
   } | null;
 }
@@ -38,7 +38,7 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
           thumbnailUrl,
           viewCount,
           channel_id,
-          creator:education_creators(
+          creator:education_creators!youtube_videos_channel_id_fkey(
             name,
             channel_avatar_url
           )
