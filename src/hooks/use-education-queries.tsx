@@ -40,9 +40,9 @@ export const useEducatorsList = (page: number, searchQuery: string) => {
       
       return data || [];
     },
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
-    placeholderData: (previousData) => previousData, // Replace keepPreviousData with placeholderData
-    gcTime: 10 * 60 * 1000, // Set garbage collection time (previously cacheTime)
+    staleTime: 5 * 60 * 1000,
+    placeholderData: (previousData) => previousData,
+    gcTime: 10 * 60 * 1000,
   });
 };
 
@@ -58,27 +58,45 @@ export const useEducatorDetails = (slug: string) => {
           id,
           name,
           description,
-          specialization,
-          profile_image_url,
+          channel_description,
           channel_avatar_url,
+          channel_banner_url,
+          profile_image_url,
           number_of_subscribers,
           channel_total_videos,
           channel_total_views,
+          channel_location,
+          channel_joined_date,
           social_links,
           youtube_url,
-          website_url
+          website_url,
+          youtube_videos (
+            id,
+            title,
+            url,
+            thumbnailUrl,
+            date,
+            duration,
+            viewCount
+          )
         `)
         .eq('slug', slug)
-        .single();
+        .maybeSingle();
       
       if (error) {
         console.error('Error fetching educator details:', error);
         throw error;
       }
       
+      if (!data) {
+        throw new Error('Educator not found');
+      }
+
+      console.log('Educator data:', data); // Debug log to verify data
+      
       return data;
     },
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });
 };
@@ -114,8 +132,8 @@ export const useEducatorVideos = (educatorId: string | null, page = 1) => {
       return data || [];
     },
     enabled: !!educatorId,
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
-    placeholderData: (previousData) => previousData, // Replace keepPreviousData with placeholderData
+    staleTime: 5 * 60 * 1000,
+    placeholderData: (previousData) => previousData,
     gcTime: 10 * 60 * 1000,
   });
 };

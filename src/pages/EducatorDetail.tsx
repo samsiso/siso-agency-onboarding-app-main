@@ -1,6 +1,4 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { Sidebar } from '@/components/Sidebar';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
@@ -10,56 +8,13 @@ import { toast } from '@/components/ui/use-toast';
 import { EducatorHeader } from '@/components/education/educator-detail/EducatorHeader';
 import { EducatorStats } from '@/components/education/educator-detail/EducatorStats';
 import { EducatorVideoSection } from '@/components/education/educator-detail/EducatorVideoSection';
+import { useEducatorDetails } from '@/hooks/use-education-queries';
 
 export default function EducatorDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
 
-  const { data: educator, isLoading, error } = useQuery({
-    queryKey: ['educator', slug],
-    queryFn: async () => {
-      if (!slug) throw new Error('Invalid slug');
-
-      const { data, error } = await supabase
-        .from('education_creators')
-        .select(`
-          *,
-          youtube_videos (
-            id,
-            title,
-            url,
-            thumbnailUrl,
-            date,
-            duration,
-            viewCount
-          )
-        `)
-        .eq('slug', slug)
-        .maybeSingle();
-      
-      if (error) {
-        console.error('Supabase query error:', error);
-        throw error;
-      }
-      
-      if (!data) {
-        throw new Error('Educator not found');
-      }
-
-      return data;
-    },
-    meta: {
-      onSettled: (data, error) => {
-        if (error) {
-          console.error('Query error:', error);
-          toast({
-            description: "The requested educator could not be found or accessed.",
-            variant: "destructive"
-          });
-        }
-      }
-    }
-  });
+  const { data: educator, isLoading, error } = useEducatorDetails(slug || '');
 
   if (isLoading) {
     return (
