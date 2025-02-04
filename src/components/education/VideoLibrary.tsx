@@ -35,12 +35,23 @@ export const VideoLibrary = ({
     queryFn: async () => {
       console.log('Fetching videos for educator:', selectedEducator);
       
+      if (!selectedEducator) {
+        console.log('No educator ID provided');
+        return [];
+      }
+
       // First get the educator details to get both ID and channel_id
-      const { data: educator } = await supabase
+      const { data: educator, error: educatorError } = await supabase
         .from('education_creators')
         .select('id, channel_id')
         .eq('id', selectedEducator)
         .maybeSingle();
+
+      if (educatorError) {
+        console.error('Error fetching educator:', educatorError);
+        toast.error('Failed to fetch educator details');
+        throw educatorError;
+      }
 
       console.log('Found educator:', educator);
 
@@ -66,7 +77,7 @@ export const VideoLibrary = ({
           )
         `);
 
-      // Query videos using both educator_id and channel_id
+      // Build the OR condition for both educator_id and channel_id
       if (educator.id && educator.channel_id) {
         query = query.or(`educator_id.eq.${educator.id},channel_id.eq.${educator.channel_id}`);
       } else if (educator.id) {
