@@ -30,10 +30,8 @@ type VideoQueryResponse = {
   viewCount: number | null;
   date: string | null;
   channel_id: string | null;
-  education_creators: {
-    name: string | null;
-    channel_avatar_url: string | null;
-  } | null;
+  creator_name: string | null;
+  creator_avatar: string | null;
 }
 
 export const VideoLibrary = ({ 
@@ -57,7 +55,8 @@ export const VideoLibrary = ({
   } = useInfiniteQuery({
     queryKey: ['videos', selectedEducator, searchQuery, sortBy, filterBySeries],
     queryFn: async ({ pageParam = 0 }) => {
-      let query = supabase
+      // [Analysis] Using a subquery to get creator info since we don't have a direct foreign key yet
+      const { data: videos, error } = await supabase
         .from('youtube_videos')
         .select(`
           id,
@@ -68,33 +67,10 @@ export const VideoLibrary = ({
           viewCount,
           date,
           channel_id,
-          education_creators (
-            name,
-            channel_avatar_url
-          )
+          creator_name:education_creators!channel_id(name),
+          creator_avatar:education_creators!channel_id(channel_avatar_url)
         `)
         .range(pageParam * ITEMS_PER_PAGE, (pageParam + 1) * ITEMS_PER_PAGE - 1);
-
-      if (selectedEducator) {
-        query = query.eq('channel_id', selectedEducator);
-      }
-
-      if (searchQuery) {
-        query = query.ilike('title', `%${searchQuery}%`);
-      }
-
-      switch (sortBy) {
-        case 'popular':
-          query = query.order('viewCount', { ascending: false });
-          break;
-        case 'oldest':
-          query = query.order('date', { ascending: true });
-          break;
-        default: // recent
-          query = query.order('date', { ascending: false });
-      }
-
-      const { data: videos, error } = await query;
 
       if (error) {
         console.error('Error fetching videos:', error);
@@ -109,8 +85,8 @@ export const VideoLibrary = ({
         duration: video.duration || '0:00',
         thumbnail_url: video.thumbnailUrl || '',
         educator: {
-          name: video.education_creators?.name || 'Unknown Creator',
-          avatar_url: video.education_creators?.channel_avatar_url || ''
+          name: video.creator_name || video.channel_id || 'Unknown Creator',
+          avatar_url: video.creator_avatar || ''
         },
         metrics: {
           views: video.viewCount || 0,
