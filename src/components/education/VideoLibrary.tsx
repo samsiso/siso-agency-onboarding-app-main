@@ -1,11 +1,10 @@
-import { motion } from 'framer-motion';
-import { ToolVideoGrid } from '../tools/ToolVideoGrid';
 import { useState } from 'react';
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink } from "@/components/ui/pagination";
-import { Button } from "@/components/ui/button";
-import { usePagination } from '@/hooks/use-pagination';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { usePagination } from '@/hooks/use-pagination';
+import { VideoGrid } from './video-library/VideoGrid';
+import { VideoFilters } from './video-library/VideoFilters';
+import { VideoPagination } from './video-library/VideoPagination';
 
 interface VideoLibraryProps {
   isLoading?: boolean;
@@ -16,11 +15,16 @@ interface VideoLibraryProps {
 
 const ITEMS_PER_PAGE = 12;
 
-export const VideoLibrary = ({ isLoading: externalLoading, selectedEducator }: VideoLibraryProps) => {
+export const VideoLibrary = ({ 
+  isLoading: externalLoading, 
+  selectedEducator,
+  searchQuery: initialSearchQuery = '',
+}: VideoLibraryProps) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
 
   const { data: videos, isLoading: videosLoading } = useQuery({
-    queryKey: ['video-library', currentPage, selectedEducator],
+    queryKey: ['video-library', currentPage, selectedEducator, searchQuery],
     queryFn: async () => {
       let query = supabase
         .from('youtube_videos')
@@ -42,6 +46,10 @@ export const VideoLibrary = ({ isLoading: externalLoading, selectedEducator }: V
         query = query.eq('channel.name', selectedEducator);
       }
 
+      if (searchQuery) {
+        query = query.ilike('title', `%${searchQuery}%`);
+      }
+
       const { data: videos, error } = await query;
       
       if (error) {
@@ -49,10 +57,7 @@ export const VideoLibrary = ({ isLoading: externalLoading, selectedEducator }: V
         throw error;
       }
       
-      if (!videos) return [];
-
-      // Transform the data to match the expected format
-      return videos.map(video => ({
+      return videos?.map(video => ({
         id: video.id,
         title: video.title || '',
         url: `https://youtube.com/watch?v=${video.id}`,
@@ -74,15 +79,12 @@ export const VideoLibrary = ({ isLoading: externalLoading, selectedEducator }: V
           key_takeaways: ['Coming soon...'],
           implementation_steps: ['Coming soon...']
         }
-      }));
+      })) || [];
     },
   });
 
   const isLoading = externalLoading || videosLoading;
-
-  // Get featured videos (first 3 videos)
   const featuredVideos = videos?.slice(0, 3) || [];
-
   const totalVideos = videos?.length || 0;
   const totalPages = Math.ceil(totalVideos / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -96,80 +98,26 @@ export const VideoLibrary = ({ isLoading: externalLoading, selectedEducator }: V
   });
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      className="space-y-8"
-    >
-      <ToolVideoGrid
+    <div className="space-y-8">
+      <VideoFilters
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+      />
+      
+      <VideoGrid
         videos={currentVideos}
         featuredVideos={featuredVideos}
         isLoading={isLoading}
       />
 
-      {totalPages > 1 && (
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-              >
-                ←
-              </Button>
-            </PaginationItem>
-
-            {showLeftEllipsis && (
-              <>
-                <PaginationItem>
-                  <PaginationLink onClick={() => setCurrentPage(1)}>1</PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationEllipsis />
-                </PaginationItem>
-              </>
-            )}
-
-            {pages.map((page) => (
-              <PaginationItem key={page}>
-                <PaginationLink
-                  onClick={() => setCurrentPage(page)}
-                  isActive={currentPage === page}
-                >
-                  {page}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-
-            {showRightEllipsis && (
-              <>
-                <PaginationItem>
-                  <PaginationEllipsis />
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationLink onClick={() => setCurrentPage(totalPages)}>
-                    {totalPages}
-                  </PaginationLink>
-                </PaginationItem>
-              </>
-            )}
-
-            <PaginationItem>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-              >
-                →
-              </Button>
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      )}
-    </motion.div>
+      <VideoPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+        pages={pages}
+        showLeftEllipsis={showLeftEllipsis}
+        showRightEllipsis={showRightEllipsis}
+      />
+    </div>
   );
 };
