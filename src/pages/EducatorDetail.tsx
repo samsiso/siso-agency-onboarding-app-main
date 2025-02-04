@@ -92,13 +92,14 @@ export default function EducatorDetail() {
       return transformedData;
     },
     retry: 1, // Only retry once
-    onError: (error) => {
-      console.error('Query error:', error);
-      toast.error('Failed to load educator profile');
+    meta: {
+      errorMessage: 'Failed to load educator profile'
     }
   });
 
+  // Handle error state with toast notification
   if (error) {
+    toast.error('Failed to load educator profile');
     return (
       <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
         <Sidebar />
