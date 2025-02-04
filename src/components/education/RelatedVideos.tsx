@@ -8,38 +8,10 @@ interface RelatedVideosProps {
   topics: string[];
 }
 
-// [Analysis] Define proper types for our database response
-interface VideoWithCreator {
-  id: string;
-  title: string | null;
-  url: string | null;
-  duration: string | null;
-  thumbnailUrl: string | null;
-  viewCount: number | null;
-  channel_id: string | null;
-  creator: {
-    name: string | null;
-    channel_avatar_url: string | null;
-  } | null;
-}
-
 export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
   const { data: relatedVideos, isLoading } = useQuery({
     queryKey: ['related-videos', currentVideoId, topics],
     queryFn: async () => {
-      // First get the channel_id for the current video
-      const { data: currentVideo } = await supabase
-        .from('youtube_videos')
-        .select('channel_id')
-        .eq('id', currentVideoId)
-        .single();
-
-      if (!currentVideo?.channel_id) {
-        console.error('Could not find channel_id for current video');
-        return [];
-      }
-
-      // [Analysis] Get related videos from the same channel
       const { data: videos, error } = await supabase
         .from('youtube_videos')
         .select(`
@@ -49,13 +21,8 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
           duration,
           thumbnailUrl,
           viewCount,
-          channel_id,
-          creator:education_creators(
-            name,
-            channel_avatar_url
-          )
+          channel_id
         `)
-        .eq('channel_id', currentVideo.channel_id)
         .neq('id', currentVideoId)
         .limit(10);
       
@@ -68,15 +35,15 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
 
       console.log('Raw video data:', videos); // Debug log
 
-      return videos.map((video: VideoWithCreator) => ({
+      return videos.map(video => ({
         id: video.id,
         title: video.title || '',
         url: `https://youtube.com/watch?v=${video.id}`,
         duration: video.duration || '0:00',
         thumbnail_url: video.thumbnailUrl || '',
         educator: {
-          name: video.creator?.name || 'Unknown Creator',
-          avatar_url: video.creator?.channel_avatar_url || ''
+          name: video.channel_id || 'Unknown Creator',
+          avatar_url: '' // Default empty string for avatar
         },
         metrics: {
           views: video.viewCount || 0,
