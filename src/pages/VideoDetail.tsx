@@ -25,7 +25,8 @@ export default function VideoDetail() {
   const videoId = slug ? extractVideoIdFromSlug(slug) : '';
   console.log('Extracted Video ID:', videoId); // Debug log
 
-  const { data: video, isLoading, error } = useQuery({
+  // Query to fetch both video details and educator info
+  const { data: videoData, isLoading, error } = useQuery({
     queryKey: ['video', videoId],
     queryFn: async () => {
       console.log('Fetching video with ID:', videoId); // Debug log
@@ -34,24 +35,29 @@ export default function VideoDetail() {
         throw new Error('Invalid video ID');
       }
 
-      const { data, error } = await supabase
+      // First get the video details
+      const { data: videoDetails, error: videoError } = await supabase
         .from('youtube_videos')
         .select('*')
         .eq('id', videoId)
         .maybeSingle();
       
-      console.log('Query response:', { data, error }); // Debug log
-      
-      if (error) {
-        console.error('Supabase error:', error);
-        throw error;
-      }
-      
-      if (!data) {
-        throw new Error('Video not found');
-      }
+      if (videoError) throw videoError;
+      if (!videoDetails) throw new Error('Video not found');
 
-      return data;
+      // Then get the educator details using the channel_id (which contains the name)
+      const { data: educatorDetails, error: educatorError } = await supabase
+        .from('education_creators')
+        .select('name, slug, channel_avatar_url, description')
+        .eq('name', videoDetails.channel_id)
+        .maybeSingle();
+
+      console.log('Query responses:', { videoDetails, educatorDetails }); // Debug log
+      
+      return {
+        ...videoDetails,
+        educator: educatorDetails
+      };
     },
     meta: {
       onSettled: (data, error) => {
@@ -75,7 +81,7 @@ export default function VideoDetail() {
     );
   }
 
-  if (error || !video) {
+  if (error || !videoData) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-siso-bg to-siso-bg/95 p-4 md:p-8 flex flex-col items-center justify-center gap-4">
         <div className="text-xl text-siso-text">Video not found</div>
@@ -91,16 +97,16 @@ export default function VideoDetail() {
     );
   }
 
-  // Use channel_id directly as the channel name
-  const channelName = video.channel_id || 'Unknown Creator';
-  const channelAvatar = ''; // We don't have avatar URLs anymore
-  const videoDescription = ''; // We don't have channel descriptions anymore
-  const thumbnailUrl = video.thumbnailUrl || '';
+  const channelName = videoData.channel_id || 'Unknown Creator';
+  const channelAvatar = videoData.educator?.channel_avatar_url || '';
+  const videoDescription = videoData.educator?.description || '';
+  const thumbnailUrl = videoData.thumbnailUrl || '';
+  const educatorSlug = videoData.educator?.slug;
   
   let publishDate = null;
   try {
-    if (video.date && typeof video.date === 'string') {
-      publishDate = parseISO(video.date);
+    if (videoData.date && typeof videoData.date === 'string') {
+      publishDate = parseISO(videoData.date);
       if (isNaN(publishDate.getTime())) {
         publishDate = null;
       }
@@ -110,14 +116,14 @@ export default function VideoDetail() {
     publishDate = null;
   }
   
-  const viewCount = video.viewCount || 0;
+  const viewCount = videoData.viewCount || 0;
 
   return (
     <>
       <Helmet>
-        <title>{`${video.title} | ${channelName} | SISO Education`}</title>
+        <title>{`${videoData.title} | ${channelName} | SISO Education`}</title>
         <meta name="description" content={videoDescription} />
-        <meta property="og:title" content={video.title} />
+        <meta property="og:title" content={videoData.title} />
         <meta property="og:description" content={videoDescription} />
         <meta property="og:image" content={thumbnailUrl} />
         <meta property="og:type" content="video.other" />
@@ -141,7 +147,7 @@ export default function VideoDetail() {
               <ChevronLeft className="w-4 h-4" />
               <span>Videos</span>
               <ChevronLeft className="w-4 h-4" />
-              <span className="text-white truncate max-w-[300px]">{video.title}</span>
+              <span className="text-white truncate max-w-[300px]">{videoData.title}</span>
             </div>
           </div>
         </div>
@@ -154,8 +160,8 @@ export default function VideoDetail() {
             <div className="rounded-xl overflow-hidden bg-black ring-1 ring-white/10">
               <AspectRatio ratio={16 / 9}>
                 <iframe
-                  src={`https://www.youtube.com/embed/${video.id}`}
-                  title={video.title}
+                  src={`https://www.youtube.com/embed/${videoData.id}`}
+                  title={videoData.title}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                   className="w-full h-full"
@@ -165,16 +171,33 @@ export default function VideoDetail() {
 
             {/* Video Title and Actions */}
             <div className="space-y-6">
-              <h1 className="text-2xl md:text-3xl font-bold text-white leading-tight">{video.title}</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-white leading-tight">{videoData.title}</h1>
               
               <div className="flex flex-wrap items-center justify-between gap-4">
                 {/* Channel Info */}
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
-                    <Users className="w-6 h-6 text-white/60" />
+                    {channelAvatar ? (
+                      <img 
+                        src={channelAvatar} 
+                        alt={channelName} 
+                        className="w-full h-full rounded-full object-cover"
+                      />
+                    ) : (
+                      <Users className="w-6 h-6 text-white/60" />
+                    )}
                   </div>
                   <div>
-                    <h3 className="font-semibold text-white text-lg">{channelName}</h3>
+                    {educatorSlug ? (
+                      <button
+                        onClick={() => navigate(`/education/educators/${educatorSlug}`)}
+                        className="font-semibold text-white text-lg hover:text-siso-red transition-colors"
+                      >
+                        {channelName}
+                      </button>
+                    ) : (
+                      <h3 className="font-semibold text-white text-lg">{channelName}</h3>
+                    )}
                     <p className="text-sm text-gray-400">Creator</p>
                   </div>
                 </div>
@@ -234,15 +257,15 @@ export default function VideoDetail() {
               </TabsList>
 
               <TabsContent value="analysis">
-                <VideoAnalysis videoId={video.id} />
+                <VideoAnalysis videoId={videoData.id} />
               </TabsContent>
 
               <TabsContent value="chat">
-                <VideoChat videoId={video.id} />
+                <VideoChat videoId={videoData.id} />
               </TabsContent>
 
               <TabsContent value="takeaways">
-                <VideoTakeaways videoId={video.id} />
+                <VideoTakeaways videoId={videoData.id} />
               </TabsContent>
             </Tabs>
           </div>
@@ -254,7 +277,7 @@ export default function VideoDetail() {
               Related Videos
             </h2>
             <RelatedVideos 
-              currentVideoId={video.id} 
+              currentVideoId={videoData.id} 
               topics={[]}
             />
           </div>
