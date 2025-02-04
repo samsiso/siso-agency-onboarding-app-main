@@ -15,6 +15,8 @@ export const EducatorVideoSection = ({ educatorId }: EducatorVideoSectionProps) 
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('recent');
 
+  console.log('EducatorVideoSection received educatorId:', educatorId); // Debug log
+
   return (
     <div className="space-y-6">
       <Tabs defaultValue="all" className="w-full">

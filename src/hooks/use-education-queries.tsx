@@ -5,7 +5,6 @@ import { supabase } from '@/integrations/supabase/client';
 // [Plan] Add error boundary wrapper for better error handling at 1000+ users
 
 export const useEducatorsList = (page: number, searchQuery: string) => {
-  // [Analysis] Only select fields we need, reducing payload size
   return useQuery({
     queryKey: ['educators', page, searchQuery],
     queryFn: async () => {
@@ -52,8 +51,6 @@ export const useEducatorDetails = (slug: string) => {
     queryFn: async () => {
       console.log('Fetching educator details for slug:', slug);
       
-      // [Analysis] Split the query into two parts to reduce initial payload
-      // First fetch educator details without videos
       const { data: educator, error: educatorError } = await supabase
         .from('education_creators')
         .select(`
@@ -74,7 +71,7 @@ export const useEducatorDetails = (slug: string) => {
           website_url
         `)
         .eq('slug', slug)
-        .maybeSingle();
+        .single();
       
       if (educatorError) {
         console.error('Error fetching educator details:', educatorError);
@@ -85,35 +82,12 @@ export const useEducatorDetails = (slug: string) => {
         throw new Error('Educator not found');
       }
 
-      // [Analysis] Only fetch first 12 most recent videos initially
-      const { data: videos, error: videosError } = await supabase
-        .from('youtube_videos')
-        .select(`
-          id,
-          title,
-          url,
-          thumbnailUrl,
-          date,
-          duration,
-          viewCount
-        `)
-        .eq('channel_id', educator.name)
-        .order('date', { ascending: false })
-        .limit(12);
+      console.log('Found educator:', educator); // Debug log
       
-      if (videosError) {
-        console.error('Error fetching educator videos:', videosError);
-        throw videosError;
-      }
-
-      console.log('Raw educator data:', { educator, videos }); // Debug log
-      
-      return {
-        ...educator,
-        youtube_videos: videos || []
-      };
+      return educator;
     },
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    enabled: !!slug,
+    staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });
 };

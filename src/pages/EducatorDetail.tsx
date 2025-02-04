@@ -9,6 +9,7 @@ import { EducatorStats } from '@/components/education/educator-detail/EducatorSt
 import { EducatorVideoSection } from '@/components/education/educator-detail/EducatorVideoSection';
 import { EducatorLoadingScreen } from '@/components/education/educator-detail/EducatorLoadingScreen';
 import { useEducatorDetails } from '@/hooks/use-education-queries';
+import { toast } from 'sonner';
 
 export default function EducatorDetail() {
   const { slug } = useParams();
@@ -40,6 +41,7 @@ export default function EducatorDetail() {
   }
 
   if (error || !educator) {
+    toast.error('Failed to load educator details');
     return (
       <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
         <Sidebar />
