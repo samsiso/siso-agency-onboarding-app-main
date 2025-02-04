@@ -36,10 +36,7 @@ export default function VideoDetail() {
 
       const { data, error } = await supabase
         .from('youtube_videos')
-        .select(`
-          *,
-          channel:youtube_channels!youtube_videos_channel_id_fkey(*)
-        `)
+        .select('*')
         .eq('id', videoId)
         .maybeSingle();
       
@@ -94,14 +91,15 @@ export default function VideoDetail() {
     );
   }
 
-  const channelName = video?.channel?.name || 'Unknown Creator';
-  const channelAvatar = video?.channel?.profile_image_url;
-  const videoDescription = video?.channel?.description || '';
-  const thumbnailUrl = video?.thumbnailUrl || '';
+  // Use channel_id directly as the channel name
+  const channelName = video.channel_id || 'Unknown Creator';
+  const channelAvatar = ''; // We don't have avatar URLs anymore
+  const videoDescription = ''; // We don't have channel descriptions anymore
+  const thumbnailUrl = video.thumbnailUrl || '';
   
   let publishDate = null;
   try {
-    if (video?.date && typeof video.date === 'string') {
+    if (video.date && typeof video.date === 'string') {
       publishDate = parseISO(video.date);
       if (isNaN(publishDate.getTime())) {
         publishDate = null;
@@ -112,7 +110,7 @@ export default function VideoDetail() {
     publishDate = null;
   }
   
-  const viewCount = video?.viewCount || 0;
+  const viewCount = video.viewCount || 0;
 
   return (
     <>
@@ -172,13 +170,9 @@ export default function VideoDetail() {
               <div className="flex flex-wrap items-center justify-between gap-4">
                 {/* Channel Info */}
                 <div className="flex items-center gap-3">
-                  {channelAvatar && (
-                    <img 
-                      src={channelAvatar} 
-                      alt={channelName}
-                      className="w-12 h-12 rounded-full ring-2 ring-white/10"
-                    />
-                  )}
+                  <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
+                    <Users className="w-6 h-6 text-white/60" />
+                  </div>
                   <div>
                     <h3 className="font-semibold text-white text-lg">{channelName}</h3>
                     <p className="text-sm text-gray-400">Creator</p>
