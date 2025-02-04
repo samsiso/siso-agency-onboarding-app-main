@@ -28,63 +28,42 @@ export const VideoLibrary = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
 
-  // [Analysis] Using join to get educator details with videos
-  // [Plan] Add caching layer when video count exceeds 1000
-  const { data: videos, isLoading: videosLoading } = useQuery({
-    queryKey: ['video-library', currentPage, selectedEducator, searchQuery, sortBy, filterBySeries],
+  // First fetch educator details to get channel_id
+  const { data: educator, isLoading: educatorLoading } = useQuery({
+    queryKey: ['educator-details', selectedEducator],
     queryFn: async () => {
-      console.log('Fetching videos for educator:', selectedEducator);
-      
-      if (!selectedEducator) {
-        console.log('No educator ID provided');
-        return [];
-      }
+      if (!selectedEducator) return null;
 
-      // First get the educator details to get both ID and channel_id
-      const { data: educator, error: educatorError } = await supabase
+      const { data, error } = await supabase
         .from('education_creators')
-        .select('id, channel_id')
+        .select('id, channel_id, name, channel_avatar_url')
         .eq('id', selectedEducator)
         .maybeSingle();
 
-      if (educatorError) {
-        console.error('Error fetching educator:', educatorError);
+      if (error) {
+        console.error('Error fetching educator:', error);
         toast.error('Failed to fetch educator details');
-        throw educatorError;
+        throw error;
       }
 
-      console.log('Found educator:', educator);
+      return data;
+    },
+    enabled: !!selectedEducator,
+  });
 
-      if (!educator) {
-        console.log('No educator found with ID:', selectedEducator);
-        toast.error('Educator not found');
+  // Then fetch videos using channel_id
+  const { data: videos, isLoading: videosLoading } = useQuery({
+    queryKey: ['videos', educator?.channel_id, currentPage, searchQuery, sortBy, filterBySeries],
+    queryFn: async () => {
+      if (!educator?.channel_id) {
+        console.log('No channel ID available');
         return [];
       }
 
       let query = supabase
         .from('youtube_videos')
-        .select(`
-          id,
-          title,
-          url,
-          duration,
-          thumbnailUrl,
-          viewCount,
-          date,
-          educator:education_creators(
-            name,
-            channel_avatar_url
-          )
-        `);
-
-      // Build the OR condition for both educator_id and channel_id
-      if (educator.id && educator.channel_id) {
-        query = query.or(`educator_id.eq.${educator.id},channel_id.eq.${educator.channel_id}`);
-      } else if (educator.id) {
-        query = query.eq('educator_id', educator.id);
-      } else if (educator.channel_id) {
-        query = query.eq('channel_id', educator.channel_id);
-      }
+        .select('*')
+        .eq('channel_id', educator.channel_id);
 
       // Apply search filter if query exists
       if (searchQuery) {
@@ -103,30 +82,25 @@ export const VideoLibrary = ({
           query = query.order('date', { ascending: false });
       }
 
-      // Filter by series if needed
-      if (filterBySeries) {
-        query = query.not('series_id', 'is', null);
-      }
+      const { data: videoData, error } = await query;
 
-      const { data: videos, error } = await query;
-      
       if (error) {
         console.error('Error fetching videos:', error);
         toast.error('Failed to load videos');
         throw error;
       }
 
-      console.log('Found videos:', videos?.length || 0);
-      
-      return videos?.map(video => ({
+      console.log('Found videos:', videoData?.length || 0);
+
+      return videoData?.map(video => ({
         id: video.id,
         title: video.title || '',
         url: `https://youtube.com/watch?v=${video.id}`,
         duration: video.duration || '0:00',
         thumbnail_url: video.thumbnailUrl || '',
         educator: {
-          name: video.educator?.name || 'Unknown Creator',
-          avatar_url: video.educator?.channel_avatar_url || ''
+          name: educator.name || 'Unknown Creator',
+          avatar_url: educator.channel_avatar_url || ''
         },
         metrics: {
           views: video.viewCount || 0,
@@ -142,10 +116,10 @@ export const VideoLibrary = ({
         }
       })) || [];
     },
-    enabled: !!selectedEducator,
+    enabled: !!educator?.channel_id,
   });
 
-  const isLoading = externalLoading || videosLoading;
+  const isLoading = externalLoading || educatorLoading || videosLoading;
   const featuredVideos = videos?.slice(0, 3) || [];
   const totalVideos = videos?.length || 0;
   const totalPages = Math.ceil(totalVideos / ITEMS_PER_PAGE);
