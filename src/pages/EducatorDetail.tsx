@@ -28,7 +28,7 @@ export default function EducatorDetail() {
         <div className="flex-1">
           <Button
             variant="ghost"
-            onClick={() => navigate('/education')}
+            onClick={() => navigate('/education/educators')}
             className="m-4 md:m-8"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -49,7 +49,7 @@ export default function EducatorDetail() {
           <div className="text-xl text-siso-text">Educator not found</div>
           <Button 
             variant="ghost" 
-            onClick={() => navigate('/education')}
+            onClick={() => navigate('/education/educators')}
             className="flex items-center gap-2"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -139,7 +139,11 @@ export default function EducatorDetail() {
               />
 
               <div className="mt-8">
-                <EducatorVideoSection educatorId={educator.id} />
+                <EducatorVideoSection 
+                  educatorId={educator.id}
+                  featuredVideos={educator.featured_videos}
+                  educatorName={educator.name}
+                />
               </div>
             </div>
           </motion.div>
