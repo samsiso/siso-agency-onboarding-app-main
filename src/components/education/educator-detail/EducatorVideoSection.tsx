@@ -17,6 +17,11 @@ export const EducatorVideoSection = ({ educatorId }: EducatorVideoSectionProps) 
 
   console.log('EducatorVideoSection received educatorId:', educatorId); // Debug log
 
+  if (!educatorId) {
+    console.log('No educator ID provided to EducatorVideoSection');
+    return null;
+  }
+
   return (
     <div className="space-y-6">
       <Tabs defaultValue="all" className="w-full">
