@@ -74,14 +74,14 @@ export default function EducatorDetail() {
       const transformedData: Educator = {
         ...data,
         youtube_videos: Array.isArray(data.youtube_videos) 
-          ? data.youtube_videos.map(video => ({
-              id: video.id || '',
-              title: video.title,
-              url: video.url,
-              thumbnailUrl: video.thumbnailUrl,
-              date: video.date,
-              duration: video.duration,
-              viewCount: video.viewCount
+          ? data.youtube_videos.map((video: any) => ({
+              id: video?.id || '',
+              title: video?.title || null,
+              url: video?.url || null,
+              thumbnailUrl: video?.thumbnailUrl || null,
+              date: video?.date || null,
+              duration: video?.duration || null,
+              viewCount: typeof video?.viewCount === 'number' ? video.viewCount : null
             }))
           : []
       };
