@@ -81,6 +81,7 @@ export const EducatorVideoSection = ({ educatorId }: EducatorVideoSectionProps) 
               selectedEducator={educatorId}
               viewMode={viewMode}
               searchQuery={searchQuery}
+              sortBy={sortBy}
               isLoading={false}
             />
           </TabsContent>
@@ -89,8 +90,8 @@ export const EducatorVideoSection = ({ educatorId }: EducatorVideoSectionProps) 
               selectedEducator={educatorId}
               viewMode={viewMode}
               searchQuery={searchQuery}
+              sortBy="popular"
               isLoading={false}
-              sortBy="views"
             />
           </TabsContent>
           <TabsContent value="recent">
@@ -98,8 +99,8 @@ export const EducatorVideoSection = ({ educatorId }: EducatorVideoSectionProps) 
               selectedEducator={educatorId}
               viewMode={viewMode}
               searchQuery={searchQuery}
+              sortBy="recent"
               isLoading={false}
-              sortBy="date"
             />
           </TabsContent>
           <TabsContent value="series">
@@ -107,8 +108,9 @@ export const EducatorVideoSection = ({ educatorId }: EducatorVideoSectionProps) 
               selectedEducator={educatorId}
               viewMode={viewMode}
               searchQuery={searchQuery}
-              isLoading={false}
+              sortBy={sortBy}
               filterBySeries={true}
+              isLoading={false}
             />
           </TabsContent>
         </motion.div>

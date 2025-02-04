@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { usePagination } from '@/hooks/use-pagination';
 import { VideoGrid } from './video-library/VideoGrid';
-import { VideoFilters } from './video-library/VideoFilters';
 import { VideoPagination } from './video-library/VideoPagination';
 
 interface VideoLibraryProps {
@@ -40,7 +39,12 @@ export const VideoLibrary = ({
           duration,
           thumbnailUrl,
           viewCount,
-          channel_id
+          channel_id,
+          date,
+          educator:education_creators(
+            name,
+            channel_avatar_url
+          )
         `);
 
       // Apply sorting
@@ -49,14 +53,14 @@ export const VideoLibrary = ({
           query = query.order('viewCount', { ascending: false });
           break;
         case 'oldest':
-          query = query.order('created_at', { ascending: true });
+          query = query.order('date', { ascending: true });
           break;
         default: // recent
-          query = query.order('created_at', { ascending: false });
+          query = query.order('date', { ascending: false });
       }
 
       if (selectedEducator) {
-        query = query.eq('channel_id', selectedEducator);
+        query = query.eq('educator_id', selectedEducator);
       }
 
       if (searchQuery) {
@@ -82,8 +86,8 @@ export const VideoLibrary = ({
         duration: video.duration || '0:00',
         thumbnail_url: video.thumbnailUrl || '',
         educator: {
-          name: video.channel_id || 'Unknown Creator',
-          avatar_url: '' 
+          name: video.educator?.name || 'Unknown Creator',
+          avatar_url: video.educator?.channel_avatar_url || ''
         },
         metrics: {
           views: video.viewCount || 0,
@@ -117,11 +121,6 @@ export const VideoLibrary = ({
 
   return (
     <div className="space-y-8">
-      <VideoFilters
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-      />
-      
       <VideoGrid
         videos={currentVideos}
         featuredVideos={featuredVideos}
