@@ -25,6 +25,15 @@ import { ChatBubble, ChatBubbleAvatar, ChatBubbleMessage } from '@/components/ui
 import { ChatInput } from '@/components/ui/chat-input';
 import { Send, Paperclip, Mic } from 'lucide-react';
 
+const popularCategories = [
+  "AI Tools",
+  "Marketing",
+  "Automation",
+  "Content Creation",
+  "Business Growth",
+  "Agency Management"
+];
+
 export default function SisoEducation() {
   const [activeSection, setActiveSection] = useState<'videos' | 'educators'>('videos');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
