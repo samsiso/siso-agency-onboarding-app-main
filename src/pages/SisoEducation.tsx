@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Sidebar } from '@/components/Sidebar';
-import { GraduationCap, Search, Grid, List, TrendingUp, Star, Clock, Filter, SlidersHorizontal } from 'lucide-react';
+import { GraduationCap, Search, Grid, List, TrendingUp, Star, Clock, Filter, SlidersHorizontal, Bot } from 'lucide-react';
 import { GradientText } from '@/components/ui/gradient-text';
 import { AnimatePresence, motion } from 'framer-motion';
 import { EducationNav } from '@/components/education/EducationNav';
@@ -14,8 +14,16 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
-
-const popularCategories = ['AI & ML', 'Web Development', 'Data Science', 'Business', 'Design'];
+import {
+  ExpandableChat,
+  ExpandableChatHeader,
+  ExpandableChatBody,
+  ExpandableChatFooter,
+} from '@/components/ui/expandable-chat';
+import { ChatMessageList } from '@/components/ui/chat-message-list';
+import { ChatBubble, ChatBubbleAvatar, ChatBubbleMessage } from '@/components/ui/chat-bubble';
+import { ChatInput } from '@/components/ui/chat-input';
+import { Send, Paperclip, Mic } from 'lucide-react';
 
 export default function SisoEducation() {
   const [activeSection, setActiveSection] = useState<'videos' | 'educators'>('videos');
@@ -70,7 +78,6 @@ export default function SisoEducation() {
       <Sidebar />
       <div className="flex-1 p-4 md:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
-          {/* Enhanced Hero Section */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -88,7 +95,6 @@ export default function SisoEducation() {
                 </GradientText>
               </div>
               
-              {/* Stats Section */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <motion.div 
                   initial={{ scale: 0.9, opacity: 0 }}
@@ -119,7 +125,6 @@ export default function SisoEducation() {
                 </motion.div>
               </div>
 
-              {/* Search and Filters */}
               <div className="space-y-4">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-siso-text/50" />
@@ -146,7 +151,6 @@ export default function SisoEducation() {
             </div>
           </motion.div>
 
-          {/* Enhanced Navigation */}
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <Tabs defaultValue={activeSection} className="w-full md:w-auto">
               <TabsList className="bg-white/5 border border-white/10">
@@ -226,7 +230,6 @@ export default function SisoEducation() {
             </div>
           </div>
 
-          {/* Content Sections */}
           <AnimatePresence mode="wait">
             {activeSection === 'videos' ? (
               <VideoLibrary
@@ -246,6 +249,57 @@ export default function SisoEducation() {
               />
             )}
           </AnimatePresence>
+
+          {/* Add the ExpandableChat component */}
+          <ExpandableChat
+            size="lg"
+            position="bottom-right"
+            icon={<Bot className="h-6 w-6" />}
+          >
+            <ExpandableChatHeader className="flex-col text-center justify-center">
+              <h1 className="text-xl font-semibold">Education Assistant</h1>
+              <p className="text-sm text-muted-foreground">
+                Ask me anything about our educational resources
+              </p>
+            </ExpandableChatHeader>
+
+            <ExpandableChatBody>
+              <ChatMessageList>
+                <ChatBubble variant="received">
+                  <ChatBubbleAvatar
+                    src="/path-to-ai-avatar.png"
+                    fallback="AI"
+                  />
+                  <ChatBubbleMessage>
+                    Hello! I'm your Education Assistant. How can I help you find learning resources today?
+                  </ChatBubbleMessage>
+                </ChatBubble>
+              </ChatMessageList>
+            </ExpandableChatBody>
+
+            <ExpandableChatFooter>
+              <form className="relative rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring p-1">
+                <ChatInput
+                  placeholder="Type your message..."
+                  className="min-h-12 resize-none rounded-lg bg-background border-0 p-3 shadow-none focus-visible:ring-0"
+                />
+                <div className="flex items-center p-3 pt-0 justify-between">
+                  <div className="flex">
+                    <Button variant="ghost" size="icon" type="button">
+                      <Paperclip className="size-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" type="button">
+                      <Mic className="size-4" />
+                    </Button>
+                  </div>
+                  <Button type="submit" size="sm" className="ml-auto gap-1.5">
+                    Send Message
+                    <Send className="size-3.5" />
+                  </Button>
+                </div>
+              </form>
+            </ExpandableChatFooter>
+          </ExpandableChat>
         </div>
       </div>
     </div>
