@@ -107,12 +107,12 @@ export default function EducatorDetail() {
       </Helmet>
 
       <Sidebar />
-      <div className="flex-1 p-4 md:p-8">
-        <div className="max-w-7xl mx-auto space-y-8">
+      <div className="flex-1">
+        <div className="max-w-7xl mx-auto">
           <Button
             variant="ghost"
             onClick={() => navigate('/education')}
-            className="mb-4"
+            className="m-4 md:m-8"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Education Hub
@@ -121,12 +121,14 @@ export default function EducatorDetail() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-siso-red/10 to-siso-orange/10 p-8 border border-siso-border shadow-lg backdrop-blur-sm"
           >
             <EducatorHeader
               name={educator.name}
               description={educator.description || educator.channel_description}
               profileImage={educator.profile_image_url || educator.channel_avatar_url}
+              bannerImage={educator.channel_banner_url}
+              location={educator.channel_location}
+              joinedDate={educator.channel_joined_date}
               socialLinks={{
                 youtube: educator.youtube_url,
                 website: educator.website_url,
@@ -135,14 +137,18 @@ export default function EducatorDetail() {
               }}
             />
 
-            <EducatorStats
-              subscriberCount={educator.number_of_subscribers}
-              videoCount={educator.video_count}
-              totalViews={educator.channel_total_views}
-            />
-          </motion.div>
+            <div className="px-4 md:px-8 -mt-8 relative z-10">
+              <EducatorStats
+                subscriberCount={educator.number_of_subscribers}
+                videoCount={educator.channel_total_videos}
+                totalViews={educator.channel_total_views}
+              />
 
-          <EducatorVideoSection educatorId={educator.id} />
+              <div className="mt-8">
+                <EducatorVideoSection educatorId={educator.id} />
+              </div>
+            </div>
+          </motion.div>
         </div>
       </div>
     </div>

@@ -1,8 +1,20 @@
+import { Users, PlaySquare, Eye } from 'lucide-react';
+
 interface EducatorStatsProps {
   subscriberCount?: number;
   videoCount?: number;
   totalViews?: number;
 }
+
+const formatNumber = (num: number): string => {
+  if (num >= 1000000) {
+    return `${(num / 1000000).toFixed(1)}M`;
+  }
+  if (num >= 1000) {
+    return `${(num / 1000).toFixed(1)}K`;
+  }
+  return num.toString();
+};
 
 export const EducatorStats = ({ 
   subscriberCount = 0, 
@@ -10,24 +22,41 @@ export const EducatorStats = ({
   totalViews = 0 
 }: EducatorStatsProps) => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-      <div className="bg-white/5 rounded-lg p-4">
-        <div className="text-2xl font-bold text-siso-orange">
-          {subscriberCount.toLocaleString()}
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
+      <div className="flex items-center gap-3">
+        <div className="p-3 bg-siso-orange/10 rounded-lg">
+          <Users className="w-6 h-6 text-siso-orange" />
         </div>
-        <div className="text-siso-text/80">Subscribers</div>
+        <div>
+          <div className="text-2xl font-bold text-siso-text">
+            {formatNumber(subscriberCount)}
+          </div>
+          <div className="text-siso-text/60 text-sm">Subscribers</div>
+        </div>
       </div>
-      <div className="bg-white/5 rounded-lg p-4">
-        <div className="text-2xl font-bold text-siso-orange">
-          {videoCount.toLocaleString()}
+
+      <div className="flex items-center gap-3">
+        <div className="p-3 bg-siso-orange/10 rounded-lg">
+          <PlaySquare className="w-6 h-6 text-siso-orange" />
         </div>
-        <div className="text-siso-text/80">Videos</div>
+        <div>
+          <div className="text-2xl font-bold text-siso-text">
+            {formatNumber(videoCount)}
+          </div>
+          <div className="text-siso-text/60 text-sm">Videos</div>
+        </div>
       </div>
-      <div className="bg-white/5 rounded-lg p-4">
-        <div className="text-2xl font-bold text-siso-orange">
-          {totalViews.toLocaleString()}
+
+      <div className="flex items-center gap-3">
+        <div className="p-3 bg-siso-orange/10 rounded-lg">
+          <Eye className="w-6 h-6 text-siso-orange" />
         </div>
-        <div className="text-siso-text/80">Total Views</div>
+        <div>
+          <div className="text-2xl font-bold text-siso-text">
+            {formatNumber(totalViews)}
+          </div>
+          <div className="text-siso-text/60 text-sm">Total Views</div>
+        </div>
       </div>
     </div>
   );
