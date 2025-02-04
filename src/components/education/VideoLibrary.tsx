@@ -7,6 +7,7 @@ import { VideoPagination } from './video-library/VideoPagination';
 import { toast } from 'sonner';
 import { useInView } from 'react-intersection-observer';
 import { useEffect } from 'react';
+import { Video } from './types';
 
 interface VideoLibraryProps {
   isLoading?: boolean;
@@ -110,6 +111,7 @@ export const VideoLibrary = ({
         }
       })) || [];
     },
+    initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {
       return lastPage.length === ITEMS_PER_PAGE ? allPages.length : undefined;
     },
@@ -131,7 +133,7 @@ export const VideoLibrary = ({
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const isLoading = externalLoading || videosLoading;
-  const allVideos = data?.pages.flat() || [];
+  const allVideos = (data?.pages.flat() || []) as Video[];
   const featuredVideos = allVideos.slice(0, 3);
 
   if (error) {
