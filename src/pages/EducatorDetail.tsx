@@ -31,10 +31,11 @@ type Educator = Database['public']['Tables']['education_creators']['Row'] & {
 }
 
 export default function EducatorDetail() {
+  console.log('EducatorDetail component mounting...'); // Debug log
   const { slug } = useParams();
   const navigate = useNavigate();
 
-  console.log('EducatorDetail mounted, slug:', slug); // Debug log
+  console.log('Current slug:', slug); // Debug log
 
   const { data: educator, isLoading, error } = useQuery({
     queryKey: ['educator', slug],
@@ -261,3 +262,4 @@ export default function EducatorDetail() {
     </div>
   );
 }
+};
