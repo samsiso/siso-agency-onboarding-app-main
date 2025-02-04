@@ -12,6 +12,7 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
   const { data: relatedVideos, isLoading } = useQuery({
     queryKey: ['related-videos', currentVideoId, topics],
     queryFn: async () => {
+      // [Analysis] Join with education_creators to get channel details
       const { data: videos, error } = await supabase
         .from('youtube_videos')
         .select(`
@@ -21,7 +22,11 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
           duration,
           thumbnailUrl,
           viewCount,
-          channel_id
+          channel_id,
+          education_creators!inner (
+            name,
+            channel_avatar_url
+          )
         `)
         .neq('id', currentVideoId)
         .limit(10);
@@ -42,8 +47,8 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
         duration: video.duration || '0:00',
         thumbnail_url: video.thumbnailUrl || '',
         educator: {
-          name: video.channel_id || 'Unknown Creator',
-          avatar_url: '' // Default empty string for avatar
+          name: video.education_creators?.name || 'Unknown Creator',
+          avatar_url: video.education_creators?.channel_avatar_url || ''
         },
         metrics: {
           views: video.viewCount || 0,
