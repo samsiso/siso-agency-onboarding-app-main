@@ -48,7 +48,7 @@ export default function EducatorDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
 
-  console.log('Attempting to fetch educator with slug:', slug); // Debug log
+  console.log('EducatorDetail mounted, slug:', slug); // Debug log
 
   const { data: educator, isLoading, error } = useQuery({
     queryKey: ['educator', slug],
@@ -57,9 +57,20 @@ export default function EducatorDetail() {
       
       const { data, error } = await supabase
         .from('education_creators')
-        .select('*')
+        .select(`
+          *,
+          youtube_videos (
+            id,
+            title,
+            url,
+            thumbnailUrl,
+            date,
+            duration,
+            viewCount
+          )
+        `)
         .eq('slug', slug)
-        .maybeSingle(); // Using maybeSingle instead of single to handle not found case
+        .maybeSingle();
       
       if (error) {
         console.error('Supabase query error:', error); // Debug log
@@ -72,33 +83,16 @@ export default function EducatorDetail() {
       }
       
       console.log('Found educator data:', data); // Debug log
-      
-      // Transform the data to match our EducatorData interface
-      const transformedData: EducatorData = {
-        ...data,
-        youtube_videos: Array.isArray(data.youtube_videos) 
-          ? data.youtube_videos.map((video: any) => ({
-              title: video.title || '',
-              url: video.url || '',
-              thumbnailUrl: video.thumbnailUrl,
-              date: video.date,
-              duration: video.duration,
-              viewCount: video.viewCount
-            }))
-          : [],
-        social_links: typeof data.social_links === 'object' ? data.social_links as SocialLinks : null
-      };
-      
-      return transformedData;
+      return data;
     },
-    retry: 1, // Only retry once
-    meta: {
-      errorMessage: 'Failed to load educator profile'
-    }
+    retry: 1,
   });
+
+  console.log('Component state:', { educator, isLoading, error }); // Debug log
 
   // Handle error state with toast notification
   if (error) {
+    console.error('Error in component:', error); // Debug log
     toast.error('Failed to load educator profile');
     return (
       <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
@@ -118,6 +112,7 @@ export default function EducatorDetail() {
   }
 
   if (isLoading) {
+    console.log('Showing loading state'); // Debug log
     return (
       <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
         <Sidebar />
@@ -132,6 +127,7 @@ export default function EducatorDetail() {
   }
 
   if (!educator) {
+    console.log('No educator data available'); // Debug log
     return (
       <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
         <Sidebar />
@@ -146,6 +142,8 @@ export default function EducatorDetail() {
       </div>
     );
   }
+
+  console.log('Rendering educator profile:', educator); // Debug log
 
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
