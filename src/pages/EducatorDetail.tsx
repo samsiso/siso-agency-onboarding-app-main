@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/use-toast';
 import { EducatorHeader } from '@/components/education/educator-detail/EducatorHeader';
 import { EducatorStats } from '@/components/education/educator-detail/EducatorStats';
 import { EducatorVideoSection } from '@/components/education/educator-detail/EducatorVideoSection';
@@ -53,7 +53,6 @@ export default function EducatorDetail() {
         if (error) {
           console.error('Query error:', error);
           toast({
-            title: "Error loading educator profile",
             description: "The requested educator could not be found or accessed.",
             variant: "destructive"
           });
