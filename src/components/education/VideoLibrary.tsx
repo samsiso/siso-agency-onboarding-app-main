@@ -35,6 +35,21 @@ export const VideoLibrary = ({
     queryFn: async () => {
       console.log('Fetching videos for educator:', selectedEducator);
       
+      // First get the educator details to get both ID and channel_id
+      const { data: educator } = await supabase
+        .from('education_creators')
+        .select('id, channel_id')
+        .eq('id', selectedEducator)
+        .maybeSingle();
+
+      console.log('Found educator:', educator);
+
+      if (!educator) {
+        console.log('No educator found with ID:', selectedEducator);
+        toast.error('Educator not found');
+        return [];
+      }
+
       let query = supabase
         .from('youtube_videos')
         .select(`
@@ -51,9 +66,13 @@ export const VideoLibrary = ({
           )
         `);
 
-      // Only apply educator filter if selectedEducator is provided and not null/undefined
-      if (selectedEducator && selectedEducator !== 'null' && selectedEducator !== 'undefined') {
-        query = query.eq('educator_id', selectedEducator);
+      // Query videos using both educator_id and channel_id
+      if (educator.id && educator.channel_id) {
+        query = query.or(`educator_id.eq.${educator.id},channel_id.eq.${educator.channel_id}`);
+      } else if (educator.id) {
+        query = query.eq('educator_id', educator.id);
+      } else if (educator.channel_id) {
+        query = query.eq('channel_id', educator.channel_id);
       }
 
       // Apply search filter if query exists
@@ -85,6 +104,8 @@ export const VideoLibrary = ({
         toast.error('Failed to load videos');
         throw error;
       }
+
+      console.log('Found videos:', videos?.length || 0);
       
       return videos?.map(video => ({
         id: video.id,
@@ -110,6 +131,7 @@ export const VideoLibrary = ({
         }
       })) || [];
     },
+    enabled: !!selectedEducator,
   });
 
   const isLoading = externalLoading || videosLoading;
