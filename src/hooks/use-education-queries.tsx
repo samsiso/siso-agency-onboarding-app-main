@@ -41,7 +41,8 @@ export const useEducatorsList = (page: number, searchQuery: string) => {
       return data || [];
     },
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
-    keepPreviousData: true, // Keep old data while fetching new data
+    placeholderData: (previousData) => previousData, // Replace keepPreviousData with placeholderData
+    gcTime: 10 * 60 * 1000, // Set garbage collection time (previously cacheTime)
   });
 };
 
@@ -78,6 +79,7 @@ export const useEducatorDetails = (slug: string) => {
       return data;
     },
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    gcTime: 10 * 60 * 1000,
   });
 };
 
@@ -113,6 +115,7 @@ export const useEducatorVideos = (educatorId: string | null, page = 1) => {
     },
     enabled: !!educatorId,
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
-    keepPreviousData: true,
+    placeholderData: (previousData) => previousData, // Replace keepPreviousData with placeholderData
+    gcTime: 10 * 60 * 1000,
   });
 };
