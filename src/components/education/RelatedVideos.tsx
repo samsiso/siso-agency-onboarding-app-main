@@ -27,7 +27,7 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
   const { data: relatedVideos, isLoading } = useQuery({
     queryKey: ['related-videos', currentVideoId, topics],
     queryFn: async () => {
-      // [Analysis] Use LEFT JOIN to handle cases where creator might not exist
+      // [Analysis] Use channel_id to join with education_creators
       const { data: videos, error } = await supabase
         .from('youtube_videos')
         .select(`
@@ -38,11 +38,12 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
           thumbnailUrl,
           viewCount,
           channel_id,
-          creator:education_creators!youtube_videos_channel_id_fkey(
+          creator:education_creators(
             name,
             channel_avatar_url
           )
         `)
+        .eq('education_creators.channel_id', 'youtube_videos.channel_id')
         .neq('id', currentVideoId)
         .limit(10);
       
