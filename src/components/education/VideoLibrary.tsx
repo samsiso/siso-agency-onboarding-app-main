@@ -46,6 +46,7 @@ export const VideoLibrary = ({
         throw error;
       }
 
+      console.log('Fetched educator:', data); // Debug log
       return data;
     },
     enabled: !!selectedEducator,
@@ -55,15 +56,14 @@ export const VideoLibrary = ({
   const { data: videos, isLoading: videosLoading } = useQuery({
     queryKey: ['videos', educator?.channel_id, currentPage, searchQuery, sortBy, filterBySeries],
     queryFn: async () => {
-      if (!educator?.channel_id) {
-        console.log('No channel ID available');
-        return [];
-      }
-
       let query = supabase
         .from('youtube_videos')
-        .select('*')
-        .eq('channel_id', educator.channel_id);
+        .select('*');
+
+      // Only filter by channel_id if we have an educator
+      if (educator?.channel_id) {
+        query = query.eq('channel_id', educator.channel_id);
+      }
 
       // Apply search filter if query exists
       if (searchQuery) {
@@ -90,7 +90,7 @@ export const VideoLibrary = ({
         throw error;
       }
 
-      console.log('Found videos:', videoData?.length || 0);
+      console.log('Found videos:', videoData?.length || 0); // Debug log
 
       return videoData?.map(video => ({
         id: video.id,
@@ -99,8 +99,8 @@ export const VideoLibrary = ({
         duration: video.duration || '0:00',
         thumbnail_url: video.thumbnailUrl || '',
         educator: {
-          name: educator.name || 'Unknown Creator',
-          avatar_url: educator.channel_avatar_url || ''
+          name: educator?.name || 'Unknown Creator',
+          avatar_url: educator?.channel_avatar_url || ''
         },
         metrics: {
           views: video.viewCount || 0,
@@ -116,7 +116,7 @@ export const VideoLibrary = ({
         }
       })) || [];
     },
-    enabled: !!educator?.channel_id,
+    enabled: true, // Changed to always fetch videos, even without an educator
   });
 
   const isLoading = externalLoading || educatorLoading || videosLoading;
