@@ -1369,6 +1369,7 @@ export type Database = {
           title: string | null
           updated_at: string
           url: string | null
+          usecase_category: string | null
           viewCount: number | null
         }
         Insert: {
@@ -1382,6 +1383,7 @@ export type Database = {
           title?: string | null
           updated_at?: string
           url?: string | null
+          usecase_category?: string | null
           viewCount?: number | null
         }
         Update: {
@@ -1395,6 +1397,7 @@ export type Database = {
           title?: string | null
           updated_at?: string
           url?: string | null
+          usecase_category?: string | null
           viewCount?: number | null
         }
         Relationships: []
