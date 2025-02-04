@@ -1,118 +1,91 @@
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { Tabs } from '@/components/ui/tabs';
-import { CommunityMemberCard } from '@/components/community/CommunityMemberCard';
-import { CommunityMemberDetails } from '@/components/community/CommunityMemberDetails';
-import { CommunityMember } from '@/components/community/types';
 import { Sidebar } from '@/components/Sidebar';
-import { NetworkingHeader } from '@/components/networking/NetworkingHeader';
-import { NetworkingCategories } from '@/components/networking/NetworkingCategories';
+import { Bot } from 'lucide-react';
+import {
+  ExpandableChat,
+  ExpandableChatHeader,
+  ExpandableChatBody,
+  ExpandableChatFooter,
+} from '@/components/ui/expandable-chat';
+import { ChatMessageList } from '@/components/ui/chat-message-list';
+import { ChatBubble, ChatBubbleAvatar, ChatBubbleMessage } from '@/components/ui/chat-bubble';
+import { ChatInput } from '@/components/ui/chat-input';
+import { Send, Paperclip, Mic } from 'lucide-react';
 
 export default function Networking() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [selectedMember, setSelectedMember] = useState<CommunityMember | null>(null);
-
-  const { data: members, isLoading } = useQuery({
-    queryKey: ['networking-members', selectedCategory],
-    queryFn: async () => {
-      console.log('Fetching networking resources...');
-      let query = supabase
-        .from('networking_resources')
-        .select('*');
-      
-      if (selectedCategory !== 'all') {
-        query = query.eq('category', selectedCategory);
-      }
-
-      const { data, error } = await query;
-      
-      if (error) {
-        console.error('Error fetching networking resources:', error);
-        throw error;
-      }
-      
-      const transformedData = data.map(resource => ({
-        id: resource.id,
-        name: resource.name,
-        description: resource.description,
-        member_type: resource.category,
-        platform: resource.platform,
-        join_url: resource.join_url,
-        member_count: resource.member_count,
-        profile_image_url: resource.profile_image_url,
-        youtube_url: null,
-        youtube_videos: null,
-        website_url: null,
-        specialization: null,
-        content_themes: null,
-      })) as CommunityMember[];
-      
-      console.log('Fetched networking resources:', transformedData);
-      return transformedData;
-    },
-  });
-
-  const filteredMembers = members?.filter(member => 
-    !searchQuery || 
-    member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    member.description?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const categories = {
-    all: members?.length || 0,
-    business: members?.filter(m => m.member_type === 'Business').length || 0,
-    technology: members?.filter(m => m.member_type === 'Technology').length || 0,
-    'personal development': members?.filter(m => m.member_type === 'Personal Development').length || 0,
-    finance: members?.filter(m => m.member_type === 'Finance').length || 0,
-    ai: members?.filter(m => m.member_type === 'AI').length || 0,
-  };
-
   return (
-    <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
+    <div className="flex min-h-screen">
       <Sidebar />
-      <div className="flex-1 p-8">
-        <div className="max-w-7xl mx-auto">
-          <NetworkingHeader 
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-          />
-
-          <Tabs defaultValue="all" className="w-full" onValueChange={setSelectedCategory}>
-            <NetworkingCategories 
-              categories={categories}
-              selectedCategory={selectedCategory}
-            />
-          </Tabs>
-
-          {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
-              {[...Array(8)].map((_, i) => (
-                <div 
-                  key={i}
-                  className="h-48 rounded-lg bg-siso-text/5 animate-pulse"
-                />
-              ))}
+      <div className="flex-1">
+        <div className="container mx-auto px-4 py-8">
+          <h1 className="text-4xl font-bold mb-8">Networking</h1>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="bg-card p-6 rounded-lg shadow-lg">
+              <h2 className="text-2xl font-semibold mb-4">Connect with Experts</h2>
+              <p className="text-muted-foreground">Find and connect with industry experts and mentors.</p>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
-              {filteredMembers?.map((member) => (
-                <CommunityMemberCard
-                  key={member.id}
-                  member={member}
-                  onClick={setSelectedMember}
-                />
-              ))}
+            <div className="bg-card p-6 rounded-lg shadow-lg">
+              <h2 className="text-2xl font-semibold mb-4">Join Communities</h2>
+              <p className="text-muted-foreground">Participate in professional communities and discussions.</p>
             </div>
-          )}
-
-          <CommunityMemberDetails
-            member={selectedMember}
-            onClose={() => setSelectedMember(null)}
-          />
+            <div className="bg-card p-6 rounded-lg shadow-lg">
+              <h2 className="text-2xl font-semibold mb-4">Events</h2>
+              <p className="text-muted-foreground">Discover networking events and meetups.</p>
+            </div>
+          </div>
         </div>
       </div>
+      <ExpandableChat
+        size="lg"
+        position="bottom-right"
+        icon={<Bot className="h-6 w-6" />}
+      >
+        <ExpandableChatHeader className="flex-col text-center justify-center">
+          <h1 className="text-xl font-semibold">Networking Assistant ✨</h1>
+          <p className="text-sm text-muted-foreground">
+            Ask me about networking opportunities and connections
+          </p>
+        </ExpandableChatHeader>
+
+        <ExpandableChatBody>
+          <ChatMessageList>
+            <ChatBubble variant="received">
+              <ChatBubbleAvatar
+                className="h-8 w-8"
+                src="/lovable-uploads/c482563a-42db-4f47-83f2-c2e7771400b7.png"
+                fallback="AI"
+              />
+              <ChatBubbleMessage>
+                Hi! I'm here to help you connect with other professionals and find networking opportunities. What are you looking for?
+              </ChatBubbleMessage>
+            </ChatBubble>
+          </ChatMessageList>
+        </ExpandableChatBody>
+
+        <ExpandableChatFooter>
+          <form
+            onSubmit={(e) => e.preventDefault()}
+            className="relative rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring p-1"
+          >
+            <ChatInput
+              placeholder="Type your message..."
+              className="min-h-12 resize-none rounded-lg bg-background border-0 p-3 shadow-none focus-visible:ring-0"
+            />
+            <div className="flex items-center p-3 pt-0 justify-between">
+              <div className="flex">
+                <button className="p-2 hover:bg-accent rounded-md">
+                  <Paperclip className="size-4" />
+                </button>
+                <button className="p-2 hover:bg-accent rounded-md">
+                  <Mic className="size-4" />
+                </button>
+              </div>
+              <button className="bg-primary text-primary-foreground px-4 py-2 rounded-md flex items-center gap-2">
+                Send <Send className="size-4" />
+              </button>
+            </div>
+          </form>
+        </ExpandableChatFooter>
+      </ExpandableChat>
     </div>
   );
 }
