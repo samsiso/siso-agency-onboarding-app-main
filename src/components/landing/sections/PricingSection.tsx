@@ -8,32 +8,32 @@ export const PricingSection = () => {
   return (
     <section id="pricing" className="py-16">
       <PricingCard
-        title="Enterprise AI Suite"
-        description="Complete AI transformation toolkit for established agencies"
-        price={999}
-        originalPrice={1999}
+        title="Build Your Agency's Future - Completely Free"
+        description="Access our full suite of AI-powered tools, integrations, and resources without any cost. No credit card required."
+        price={0}
         features={[
           {
-            title: "AI Integration Features",
+            title: "Core Platform Features",
             items: [
-              "Custom AI Model Development",
-              "Advanced Automation Workflows",
-              "Real-time AI Analytics",
-              "Multi-platform Integration",
+              "Full access to AI automation suite",
+              "Unlimited integrations with top platforms",
+              "Real-time support and community access",
+              "Regular feature updates and improvements",
             ],
           },
           {
-            title: "Business Benefits",
+            title: "Enterprise Benefits",
             items: [
               "24/7 Priority Support",
-              "Dedicated Success Manager",
               "Custom Development Support",
               "Strategic AI Consulting",
+              "Trusted by 1000+ agencies worldwide",
             ],
           },
         ]}
-        buttonText="Start Onboarding"
+        buttonText="Start Building Today"
         onButtonClick={handleGetStarted}
+        trustMessage="Trusted by agencies worldwide with $10M+ processed through our platform"
       />
     </section>
   );

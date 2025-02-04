@@ -20,6 +20,7 @@ interface PricingCardProps {
   features: PricingFeature[];
   buttonText?: string;
   onButtonClick?: () => void;
+  trustMessage?: string;
 }
 
 export function PricingCard({
@@ -30,6 +31,7 @@ export function PricingCard({
   features,
   buttonText = "Get Started",
   onButtonClick,
+  trustMessage,
 }: PricingCardProps) {
   const containerRef = useRef(null);
   const isInView = useInView(containerRef, { once: true, amount: 0.2 });
@@ -103,7 +105,7 @@ export function PricingCard({
               </CardHeader>
               <motion.div className="mt-6 space-y-4" variants={itemVariants}>
                 <div className="flex items-baseline">
-                  <span className="text-5xl font-extrabold">${price}</span>
+                  <span className="text-5xl font-extrabold">Free</span>
                   {originalPrice && (
                     <span className="ml-2 text-xl text-muted-foreground line-through">
                       ${originalPrice}
@@ -111,14 +113,19 @@ export function PricingCard({
                   )}
                 </div>
                 <span className="block text-sm text-muted-foreground">
-                  one-time payment
+                  no credit card required
                 </span>
               </motion.div>
             </div>
-            <motion.div className="mt-8" variants={itemVariants}>
+            <motion.div className="mt-8 space-y-4" variants={itemVariants}>
               <Button className="w-full" size="lg" onClick={onButtonClick}>
                 {buttonText}
               </Button>
+              {trustMessage && (
+                <p className="text-sm text-center text-muted-foreground">
+                  {trustMessage}
+                </p>
+              )}
             </motion.div>
           </motion.div>
           <Separator className="lg:my-6 lg:hidden" />
