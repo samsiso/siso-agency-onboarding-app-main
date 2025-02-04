@@ -38,13 +38,13 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
           thumbnailUrl,
           viewCount,
           channel_id,
-          creator:education_creators!inner(
+          creator:education_creators(
             name,
             channel_avatar_url
           )
         `)
-        .eq('channel_id', 'education_creators.channel_id')
         .neq('id', currentVideoId)
+        .eq('channel_id', supabase.from('education_creators').select('channel_id'))
         .limit(10);
       
       if (error) {
