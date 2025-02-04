@@ -65,6 +65,11 @@ export default function EducatorDetail() {
     ? JSON.parse(educator.social_links)
     : (educator.social_links || {});
 
+  // [Analysis] Parse featured_videos from JSON if it exists
+  const featuredVideos = typeof educator.featured_videos === 'string'
+    ? JSON.parse(educator.featured_videos)
+    : (Array.isArray(educator.featured_videos) ? educator.featured_videos : []);
+
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
       <Helmet>
@@ -141,7 +146,7 @@ export default function EducatorDetail() {
               <div className="mt-8">
                 <EducatorVideoSection 
                   educatorId={educator.id}
-                  featuredVideos={educator.featured_videos}
+                  featuredVideos={featuredVideos}
                   educatorName={educator.name}
                 />
               </div>
