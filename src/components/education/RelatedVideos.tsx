@@ -27,7 +27,19 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
   const { data: relatedVideos, isLoading } = useQuery({
     queryKey: ['related-videos', currentVideoId, topics],
     queryFn: async () => {
-      // [Analysis] Join based on matching channel_id values
+      // First get the channel_id for the current video
+      const { data: currentVideo } = await supabase
+        .from('youtube_videos')
+        .select('channel_id')
+        .eq('id', currentVideoId)
+        .single();
+
+      if (!currentVideo?.channel_id) {
+        console.error('Could not find channel_id for current video');
+        return [];
+      }
+
+      // [Analysis] Get related videos from the same channel
       const { data: videos, error } = await supabase
         .from('youtube_videos')
         .select(`
@@ -43,8 +55,8 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
             channel_avatar_url
           )
         `)
+        .eq('channel_id', currentVideo.channel_id)
         .neq('id', currentVideoId)
-        .eq('channel_id', supabase.from('education_creators').select('channel_id'))
         .limit(10);
       
       if (error) {
