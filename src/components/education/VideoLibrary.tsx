@@ -53,7 +53,7 @@ export const VideoLibrary = ({
           viewCount,
           date,
           channel_id,
-          education_creators!inner (
+          education_creators (
             name,
             channel_avatar_url
           )
@@ -109,7 +109,7 @@ export const VideoLibrary = ({
           key_takeaways: ['Coming soon...'],
           implementation_steps: ['Coming soon...']
         }
-      })) || [];
+      } as Video)) || [];
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {
