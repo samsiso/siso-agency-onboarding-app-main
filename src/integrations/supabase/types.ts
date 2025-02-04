@@ -259,6 +259,7 @@ export type Database = {
       }
       education_creators: {
         Row: {
+          categories: string[] | null
           channel_avatar_url: string | null
           channel_banner_url: string | null
           channel_description: string | null
@@ -274,7 +275,9 @@ export type Database = {
           created_at: string
           description: string | null
           expertise_level: string | null
+          featured_videos: Json | null
           id: string
+          implementation_guides: Json | null
           member_type: string | null
           name: string
           niche: string | null
@@ -284,6 +287,8 @@ export type Database = {
           slug: string
           social_links: Json | null
           specialization: string[] | null
+          success_cases: Json | null
+          tool_stack: Json | null
           tools_covered: string[] | null
           updated_at: string
           url: string | null
@@ -293,6 +298,7 @@ export type Database = {
           youtube_videos: Json | null
         }
         Insert: {
+          categories?: string[] | null
           channel_avatar_url?: string | null
           channel_banner_url?: string | null
           channel_description?: string | null
@@ -308,7 +314,9 @@ export type Database = {
           created_at?: string
           description?: string | null
           expertise_level?: string | null
+          featured_videos?: Json | null
           id?: string
+          implementation_guides?: Json | null
           member_type?: string | null
           name: string
           niche?: string | null
@@ -318,6 +326,8 @@ export type Database = {
           slug: string
           social_links?: Json | null
           specialization?: string[] | null
+          success_cases?: Json | null
+          tool_stack?: Json | null
           tools_covered?: string[] | null
           updated_at?: string
           url?: string | null
@@ -327,6 +337,7 @@ export type Database = {
           youtube_videos?: Json | null
         }
         Update: {
+          categories?: string[] | null
           channel_avatar_url?: string | null
           channel_banner_url?: string | null
           channel_description?: string | null
@@ -342,7 +353,9 @@ export type Database = {
           created_at?: string
           description?: string | null
           expertise_level?: string | null
+          featured_videos?: Json | null
           id?: string
+          implementation_guides?: Json | null
           member_type?: string | null
           name?: string
           niche?: string | null
@@ -352,6 +365,8 @@ export type Database = {
           slug?: string
           social_links?: Json | null
           specialization?: string[] | null
+          success_cases?: Json | null
+          tool_stack?: Json | null
           tools_covered?: string[] | null
           updated_at?: string
           url?: string | null
@@ -361,6 +376,38 @@ export type Database = {
           youtube_videos?: Json | null
         }
         Relationships: []
+      }
+      educator_chat_threads: {
+        Row: {
+          created_at: string
+          educator_id: string | null
+          id: string
+          title: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          educator_id?: string | null
+          id?: string
+          title: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          educator_id?: string | null
+          id?: string
+          title?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "educator_chat_threads_educator_id_fkey"
+            columns: ["educator_id"]
+            isOneToOne: false
+            referencedRelation: "education_creators"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       gpt_resources: {
         Row: {
@@ -1139,6 +1186,35 @@ export type Database = {
           weekly_bonus?: number | null
         }
         Relationships: []
+      }
+      video_bookmarks: {
+        Row: {
+          created_at: string
+          id: string
+          user_id: string | null
+          video_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          user_id?: string | null
+          video_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          user_id?: string | null
+          video_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_bookmarks_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "youtube_videos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       video_discussions: {
         Row: {
