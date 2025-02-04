@@ -103,7 +103,7 @@ export default function EducatorDetail() {
         <meta name="description" content={educator.description || ''} />
         <meta property="og:title" content={educator.name} />
         <meta property="og:description" content={educator.description || ''} />
-        <meta property="og:image" content={educator.profile_image_url || educator.channel_avatar_url || ''} />
+        <meta property="og:image" content={educator.channel_avatar_url || ''} />
       </Helmet>
 
       <Sidebar />
@@ -124,8 +124,8 @@ export default function EducatorDetail() {
           >
             <EducatorHeader
               name={educator.name}
-              description={educator.description || educator.channel_description}
-              profileImage={educator.profile_image_url || educator.channel_avatar_url}
+              description={educator.channel_description || educator.description}
+              profileImage={educator.channel_avatar_url || educator.profile_image_url}
               bannerImage={educator.channel_banner_url}
               location={educator.channel_location}
               joinedDate={educator.channel_joined_date}
