@@ -11,6 +11,8 @@ interface VideoLibraryProps {
   selectedEducator?: string;
   viewMode?: 'grid' | 'list';
   searchQuery?: string;
+  sortBy?: string;
+  filterBySeries?: boolean;
 }
 
 const ITEMS_PER_PAGE = 12;
@@ -18,13 +20,16 @@ const ITEMS_PER_PAGE = 12;
 export const VideoLibrary = ({ 
   isLoading: externalLoading, 
   selectedEducator,
+  viewMode = 'grid',
   searchQuery: initialSearchQuery = '',
+  sortBy = 'recent',
+  filterBySeries = false
 }: VideoLibraryProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
 
   const { data: videos, isLoading: videosLoading } = useQuery({
-    queryKey: ['video-library', currentPage, selectedEducator, searchQuery],
+    queryKey: ['video-library', currentPage, selectedEducator, searchQuery, sortBy, filterBySeries],
     queryFn: async () => {
       let query = supabase
         .from('youtube_videos')
@@ -36,8 +41,19 @@ export const VideoLibrary = ({
           thumbnailUrl,
           viewCount,
           channel_id
-        `)
-        .order('order', { ascending: true });
+        `);
+
+      // Apply sorting
+      switch (sortBy) {
+        case 'popular':
+          query = query.order('viewCount', { ascending: false });
+          break;
+        case 'oldest':
+          query = query.order('created_at', { ascending: true });
+          break;
+        default: // recent
+          query = query.order('created_at', { ascending: false });
+      }
 
       if (selectedEducator) {
         query = query.eq('channel_id', selectedEducator);
@@ -45,6 +61,11 @@ export const VideoLibrary = ({
 
       if (searchQuery) {
         query = query.ilike('title', `%${searchQuery}%`);
+      }
+
+      // Filter by series if needed
+      if (filterBySeries) {
+        query = query.not('series_id', 'is', null);
       }
 
       const { data: videos, error } = await query;
@@ -62,7 +83,7 @@ export const VideoLibrary = ({
         thumbnail_url: video.thumbnailUrl || '',
         educator: {
           name: video.channel_id || 'Unknown Creator',
-          avatar_url: '' // Since we don't have avatar URLs anymore, we'll use a default empty string
+          avatar_url: '' 
         },
         metrics: {
           views: video.viewCount || 0,
