@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { Home, Sparkles, Users } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { Icons } from "./icons"
+import { SisoIcon } from "./icons/SisoIcon"
 
 const navItems = [
   {
@@ -22,7 +22,7 @@ const navItems = [
   },
   {
     name: "Get Started",
-    icon: Icons.logo,
+    icon: SisoIcon,
     sectionId: "cta",
   },
 ]
