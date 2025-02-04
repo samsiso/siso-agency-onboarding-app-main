@@ -8,11 +8,26 @@ interface RelatedVideosProps {
   topics: string[];
 }
 
+// [Analysis] Define proper types for our database response
+interface VideoWithCreator {
+  id: string;
+  title: string | null;
+  url: string | null;
+  duration: string | null;
+  thumbnailUrl: string | null;
+  viewCount: number | null;
+  channel_id: string | null;
+  education_creators: {
+    name: string;
+    channel_avatar_url: string | null;
+  } | null;
+}
+
 export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
   const { data: relatedVideos, isLoading } = useQuery({
     queryKey: ['related-videos', currentVideoId, topics],
     queryFn: async () => {
-      // [Analysis] Join with education_creators to get channel details
+      // [Analysis] Use LEFT JOIN instead of INNER JOIN to handle cases where creator might not exist
       const { data: videos, error } = await supabase
         .from('youtube_videos')
         .select(`
@@ -23,7 +38,7 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
           thumbnailUrl,
           viewCount,
           channel_id,
-          education_creators!inner (
+          education_creators (
             name,
             channel_avatar_url
           )
@@ -40,7 +55,7 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
 
       console.log('Raw video data:', videos); // Debug log
 
-      return videos.map(video => ({
+      return videos.map((video: VideoWithCreator) => ({
         id: video.id,
         title: video.title || '',
         url: `https://youtube.com/watch?v=${video.id}`,
