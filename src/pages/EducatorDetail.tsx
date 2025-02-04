@@ -8,40 +8,24 @@ import { motion } from 'framer-motion';
 import { GradientText } from '@/components/ui/gradient-text';
 import { VideoLibrary } from '@/components/education/VideoLibrary';
 import { toast } from 'sonner';
+import { Database } from '@/integrations/supabase/types';
 
-interface SocialLinks {
+type SocialLinks = {
   twitter?: string;
   linkedin?: string;
   [key: string]: string | undefined;
 }
 
-interface YoutubeVideo {
-  title: string;
-  url: string;
-  thumbnailUrl?: string;
-  date?: string;
-  duration?: string;
-  viewCount?: number;
-}
-
-interface EducatorData {
-  id: string;
-  name: string;
-  description: string | null;
-  member_type: string | null;
-  youtube_url: string | null;
-  youtube_videos: YoutubeVideo[];
-  website_url: string | null;
-  specialization: string[] | null;
-  content_themes: string[] | null;
-  profile_image_url: string | null;
-  channel_avatar_url: string | null;
-  channel_description: string | null;
-  number_of_subscribers: number | null;
-  video_count: number | null;
-  channel_total_views: number | null;
-  social_links: SocialLinks | null;
-  slug: string;
+type Educator = Database['public']['Tables']['education_creators']['Row'] & {
+  youtube_videos: Array<{
+    id: string;
+    title: string | null;
+    url: string | null;
+    thumbnailUrl: string | null;
+    date: string | null;
+    duration: string | null;
+    viewCount: number | null;
+  }>;
 }
 
 export default function EducatorDetail() {
@@ -83,7 +67,7 @@ export default function EducatorDetail() {
       }
       
       console.log('Found educator data:', data); // Debug log
-      return data;
+      return data as Educator;
     },
     retry: 1,
   });
@@ -144,6 +128,11 @@ export default function EducatorDetail() {
   }
 
   console.log('Rendering educator profile:', educator); // Debug log
+
+  // Parse social links from JSON if they exist
+  const socialLinks: SocialLinks = typeof educator.social_links === 'string' 
+    ? JSON.parse(educator.social_links)
+    : (educator.social_links as SocialLinks) || {};
 
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
@@ -223,16 +212,16 @@ export default function EducatorDetail() {
                       </a>
                     </Button>
                   )}
-                  {educator.social_links?.twitter && (
+                  {socialLinks.twitter && (
                     <Button variant="outline" size="icon" asChild>
-                      <a href={educator.social_links.twitter} target="_blank" rel="noopener noreferrer">
+                      <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer">
                         <Twitter className="w-4 h-4" />
                       </a>
                     </Button>
                   )}
-                  {educator.social_links?.linkedin && (
+                  {socialLinks.linkedin && (
                     <Button variant="outline" size="icon" asChild>
-                      <a href={educator.social_links.linkedin} target="_blank" rel="noopener noreferrer">
+                      <a href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer">
                         <Linkedin className="w-4 h-4" />
                       </a>
                     </Button>
