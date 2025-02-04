@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
-import { Home, Sparkles, Users, Gift } from "lucide-react"
+import { Home, Sparkles, Users } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const navItems = [
@@ -21,7 +21,13 @@ const navItems = [
   },
   {
     name: "Get Started",
-    icon: Gift,
+    icon: () => (
+      <img 
+        src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png" 
+        alt="SISO Logo"
+        className="w-5 h-5"
+      />
+    ),
     sectionId: "cta",
   },
 ]
