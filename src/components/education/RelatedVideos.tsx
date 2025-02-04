@@ -38,7 +38,7 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
           thumbnailUrl,
           viewCount,
           channel_id,
-          creator:education_creators (
+          creator:education_creators(
             name,
             channel_avatar_url
           )
