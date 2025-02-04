@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { Sidebar } from '@/components/Sidebar';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet';
 import { EducatorHeader } from '@/components/education/educator-detail/EducatorHeader';
@@ -78,14 +78,39 @@ export default function EducatorDetail() {
       <Sidebar />
       <div className="flex-1">
         <div className="max-w-7xl mx-auto">
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/education')}
-            className="m-4 md:m-8"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Education Hub
-          </Button>
+          {/* Navigation Section */}
+          <div className="p-4 md:p-8 space-y-4">
+            {/* Back Button */}
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/education/educators')}
+              className="group flex items-center gap-2 text-siso-text/70 hover:text-siso-text-bold transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+              Back to Educators
+            </Button>
+            
+            {/* Breadcrumbs */}
+            <nav className="flex items-center gap-2 text-sm text-siso-text/60">
+              <Button 
+                variant="link" 
+                className="p-0 text-siso-text/60 hover:text-siso-text-bold"
+                onClick={() => navigate('/education')}
+              >
+                Education Hub
+              </Button>
+              <ChevronRight className="w-4 h-4" />
+              <Button 
+                variant="link" 
+                className="p-0 text-siso-text/60 hover:text-siso-text-bold"
+                onClick={() => navigate('/education/educators')}
+              >
+                Educators
+              </Button>
+              <ChevronRight className="w-4 h-4" />
+              <span className="text-siso-text-bold">{educator.name}</span>
+            </nav>
+          </div>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -114,7 +139,6 @@ export default function EducatorDetail() {
               />
 
               <div className="mt-8">
-                {/* [Analysis] Pass the educator.id instead of slug */}
                 <EducatorVideoSection educatorId={educator.id} />
               </div>
             </div>
