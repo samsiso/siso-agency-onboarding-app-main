@@ -1486,11 +1486,9 @@ export type Database = {
       youtube_videos: {
         Row: {
           channel_id: string | null
-          channelId: string | null
           created_at: string
           date: string | null
           duration: string | null
-          educator_id: string | null
           id: string
           order: number | null
           thumbnailUrl: string | null
@@ -1501,11 +1499,9 @@ export type Database = {
         }
         Insert: {
           channel_id?: string | null
-          channelId?: string | null
           created_at?: string
           date?: string | null
           duration?: string | null
-          educator_id?: string | null
           id: string
           order?: number | null
           thumbnailUrl?: string | null
@@ -1516,11 +1512,9 @@ export type Database = {
         }
         Update: {
           channel_id?: string | null
-          channelId?: string | null
           created_at?: string
           date?: string | null
           duration?: string | null
-          educator_id?: string | null
           id?: string
           order?: number | null
           thumbnailUrl?: string | null
@@ -1529,15 +1523,7 @@ export type Database = {
           url?: string | null
           viewCount?: number | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "youtube_videos_educator_id_fkey"
-            columns: ["educator_id"]
-            isOneToOne: false
-            referencedRelation: "education_creators"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
     }
     Views: {
