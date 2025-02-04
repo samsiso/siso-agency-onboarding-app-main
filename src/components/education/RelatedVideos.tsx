@@ -17,7 +17,7 @@ interface VideoWithCreator {
   thumbnailUrl: string | null;
   viewCount: number | null;
   channel_id: string | null;
-  education_creators: {
+  creator?: {
     name: string;
     channel_avatar_url: string | null;
   } | null;
@@ -27,7 +27,7 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
   const { data: relatedVideos, isLoading } = useQuery({
     queryKey: ['related-videos', currentVideoId, topics],
     queryFn: async () => {
-      // [Analysis] Use LEFT JOIN instead of INNER JOIN to handle cases where creator might not exist
+      // [Analysis] Use LEFT JOIN to handle cases where creator might not exist
       const { data: videos, error } = await supabase
         .from('youtube_videos')
         .select(`
@@ -38,7 +38,7 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
           thumbnailUrl,
           viewCount,
           channel_id,
-          education_creators (
+          creator:education_creators!youtube_videos_channel_id_fkey (
             name,
             channel_avatar_url
           )
@@ -62,8 +62,8 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
         duration: video.duration || '0:00',
         thumbnail_url: video.thumbnailUrl || '',
         educator: {
-          name: video.education_creators?.name || 'Unknown Creator',
-          avatar_url: video.education_creators?.channel_avatar_url || ''
+          name: video.creator?.name || 'Unknown Creator',
+          avatar_url: video.creator?.channel_avatar_url || ''
         },
         metrics: {
           views: video.viewCount || 0,
