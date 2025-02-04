@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { usePagination } from '@/hooks/use-pagination';
 import { VideoGrid } from './video-library/VideoGrid';
 import { VideoPagination } from './video-library/VideoPagination';
 import { toast } from 'sonner';
+import { useInView } from 'react-intersection-observer';
+import { useEffect } from 'react';
 
 interface VideoLibraryProps {
   isLoading?: boolean;
@@ -25,52 +27,46 @@ export const VideoLibrary = ({
   sortBy = 'recent',
   filterBySeries = false
 }: VideoLibraryProps) => {
-  const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
+  const { ref: loadMoreRef, inView } = useInView();
 
-  // First fetch educator details to get channel_id
-  const { data: educator, isLoading: educatorLoading } = useQuery({
-    queryKey: ['educator-details', selectedEducator],
-    queryFn: async () => {
-      if (!selectedEducator) return null;
-
-      const { data, error } = await supabase
-        .from('education_creators')
-        .select('id, channel_id, name, channel_avatar_url')
-        .eq('id', selectedEducator)
-        .maybeSingle();
-
-      if (error) {
-        console.error('Error fetching educator:', error);
-        toast.error('Failed to fetch educator details');
-        throw error;
-      }
-
-      console.log('Fetched educator:', data); // Debug log
-      return data;
-    },
-    enabled: !!selectedEducator,
-  });
-
-  // Then fetch videos using channel_id
-  const { data: videos, isLoading: videosLoading } = useQuery({
-    queryKey: ['videos', educator?.channel_id, currentPage, searchQuery, sortBy, filterBySeries],
-    queryFn: async () => {
+  // [Analysis] Using infinite query for better UX and performance
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading: videosLoading,
+    error
+  } = useInfiniteQuery({
+    queryKey: ['videos', selectedEducator, searchQuery, sortBy, filterBySeries],
+    queryFn: async ({ pageParam = 0 }) => {
       let query = supabase
         .from('youtube_videos')
-        .select('*');
+        .select(`
+          id,
+          title,
+          url,
+          thumbnailUrl,
+          duration,
+          viewCount,
+          date,
+          channel_id,
+          education_creators!inner (
+            name,
+            channel_avatar_url
+          )
+        `)
+        .range(pageParam * ITEMS_PER_PAGE, (pageParam + 1) * ITEMS_PER_PAGE - 1);
 
-      // Only filter by channel_id if we have an educator
-      if (educator?.channel_id) {
-        query = query.eq('channel_id', educator.channel_id);
+      if (selectedEducator) {
+        query = query.eq('channel_id', selectedEducator);
       }
 
-      // Apply search filter if query exists
       if (searchQuery) {
         query = query.ilike('title', `%${searchQuery}%`);
       }
 
-      // Apply sorting
       switch (sortBy) {
         case 'popular':
           query = query.order('viewCount', { ascending: false });
@@ -82,7 +78,7 @@ export const VideoLibrary = ({
           query = query.order('date', { ascending: false });
       }
 
-      const { data: videoData, error } = await query;
+      const { data: videos, error } = await query;
 
       if (error) {
         console.error('Error fetching videos:', error);
@@ -90,17 +86,15 @@ export const VideoLibrary = ({
         throw error;
       }
 
-      console.log('Found videos:', videoData?.length || 0); // Debug log
-
-      return videoData?.map(video => ({
+      return videos?.map(video => ({
         id: video.id,
         title: video.title || '',
         url: `https://youtube.com/watch?v=${video.id}`,
         duration: video.duration || '0:00',
         thumbnail_url: video.thumbnailUrl || '',
         educator: {
-          name: educator?.name || 'Unknown Creator',
-          avatar_url: educator?.channel_avatar_url || ''
+          name: video.education_creators?.name || 'Unknown Creator',
+          avatar_url: video.education_creators?.channel_avatar_url || ''
         },
         metrics: {
           views: video.viewCount || 0,
@@ -116,40 +110,57 @@ export const VideoLibrary = ({
         }
       })) || [];
     },
-    enabled: true, // Changed to always fetch videos, even without an educator
+    getNextPageParam: (lastPage, allPages) => {
+      return lastPage.length === ITEMS_PER_PAGE ? allPages.length : undefined;
+    },
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    meta: {
+      onSettled: (data, error) => {
+        if (error) {
+          console.error('Query error:', error);
+          toast.error('Failed to load videos');
+        }
+      }
+    }
   });
 
-  const isLoading = externalLoading || educatorLoading || videosLoading;
-  const featuredVideos = videos?.slice(0, 3) || [];
-  const totalVideos = videos?.length || 0;
-  const totalPages = Math.ceil(totalVideos / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
-  const currentVideos = videos?.slice(startIndex, endIndex) || [];
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const { pages, showLeftEllipsis, showRightEllipsis } = usePagination({
-    currentPage,
-    totalPages,
-    paginationItemsToDisplay: 7,
-  });
+  const isLoading = externalLoading || videosLoading;
+  const allVideos = data?.pages.flat() || [];
+  const featuredVideos = allVideos.slice(0, 3);
+
+  if (error) {
+    return (
+      <div className="p-8 text-center text-siso-text">
+        <p>Failed to load videos. Please try again later.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
       <VideoGrid
-        videos={currentVideos}
+        videos={allVideos}
         featuredVideos={featuredVideos}
         isLoading={isLoading}
       />
 
-      {totalPages > 1 && (
-        <VideoPagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-          pages={pages}
-          showLeftEllipsis={showLeftEllipsis}
-          showRightEllipsis={showRightEllipsis}
-        />
+      {hasNextPage && (
+        <div
+          ref={loadMoreRef}
+          className="w-full h-20 flex items-center justify-center"
+        >
+          {isFetchingNextPage ? (
+            <div className="w-6 h-6 border-2 border-siso-red border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <span className="text-siso-text/60">Scroll to load more</span>
+          )}
+        </div>
       )}
     </div>
   );
