@@ -42,11 +42,11 @@ export const GettingStartedSection = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="max-w-3xl mx-auto space-y-12">
           {steps.map((step, index) => (
             <div 
               key={step.title}
-              className="relative glow-card group"
+              className="relative glow-card group flex items-start gap-8"
             >
               {/* Step Number */}
               <div className="absolute -top-4 -left-4 w-8 h-8 rounded-full bg-gradient-to-r from-siso-red to-siso-orange 
@@ -54,16 +54,25 @@ export const GettingStartedSection = () => {
                 {index + 1}
               </div>
               
-              <div className="flex flex-col items-center text-center gap-4">
-                <div className="p-3 rounded-lg bg-gradient-to-br from-siso-red/10 to-siso-orange/10 
+              {/* Icon */}
+              <div className="flex-shrink-0">
+                <div className="p-4 rounded-lg bg-gradient-to-br from-siso-red/10 to-siso-orange/10 
                   group-hover:from-siso-red/20 group-hover:to-siso-orange/20">
                   <step.icon className="w-8 h-8 text-siso-orange" />
                 </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-siso-text-bold mb-2">{step.title}</h3>
-                  <p className="text-siso-text-muted">{step.description}</p>
-                </div>
               </div>
+
+              {/* Content */}
+              <div>
+                <h3 className="text-xl font-semibold text-siso-text-bold mb-2">{step.title}</h3>
+                <p className="text-siso-text-muted">{step.description}</p>
+              </div>
+
+              {/* Connector Line (except for last item) */}
+              {index < steps.length - 1 && (
+                <div className="absolute bottom-0 left-12 w-px h-12 bg-gradient-to-b from-siso-red/20 to-siso-orange/20 
+                  transform translate-y-full" />
+              )}
             </div>
           ))}
         </div>
