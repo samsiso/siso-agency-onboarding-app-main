@@ -12,7 +12,7 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
   const { data: relatedVideos, isLoading } = useQuery({
     queryKey: ['related-videos', currentVideoId, topics],
     queryFn: async () => {
-      // [Analysis] Using the correct foreign key relationship and adding error handling
+      // [Analysis] Using education_creators relationship for better data completeness
       const { data: videos, error } = await supabase
         .from('youtube_videos')
         .select(`
@@ -22,9 +22,11 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
           duration,
           thumbnailUrl,
           viewCount,
-          channel:youtube_channels!youtube_videos_channel_id_fkey (
+          creator:education_creators!fk_youtube_videos_education_creator (
             name,
-            profile_image_url
+            channel_avatar_url,
+            number_of_subscribers,
+            slug
           )
         `)
         .neq('id', currentVideoId)
@@ -37,6 +39,8 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
       
       if (!videos) return [];
 
+      console.log('Raw video data:', videos); // Debug log
+
       // Transform the data to match the expected ToolVideoCard props
       return videos.map(video => ({
         id: video.id,
@@ -45,8 +49,8 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
         duration: video.duration || '0:00',
         thumbnail_url: video.thumbnailUrl || '',
         educator: {
-          name: video.channel?.name || 'Unknown Creator',
-          avatar_url: video.channel?.profile_image_url || ''
+          name: video.creator?.name || 'Unknown Creator',
+          avatar_url: video.creator?.channel_avatar_url || ''
         },
         metrics: {
           views: video.viewCount || 0,
