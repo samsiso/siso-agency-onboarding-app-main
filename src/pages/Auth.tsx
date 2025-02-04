@@ -39,8 +39,10 @@ export default function Auth() {
 
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-siso-bg to-black p-4 overflow-hidden">
+      {/* Waves Background */}
       <Waves 
         lineColor="rgba(255, 87, 34, 0.2)"
+        backgroundColor="transparent"
         waveSpeedX={0.02}
         waveSpeedY={0.01}
         waveAmpX={40}
@@ -50,6 +52,7 @@ export default function Auth() {
         maxCursorMove={120}
         xGap={12}
         yGap={36}
+        className="-z-10"
       />
       
       <div className="w-full max-w-md bg-black/20 backdrop-blur-lg rounded-lg shadow-xl p-8 space-y-6 border border-siso-border relative z-10">
