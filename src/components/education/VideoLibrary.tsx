@@ -20,20 +20,6 @@ interface VideoLibraryProps {
 
 const ITEMS_PER_PAGE = 12;
 
-// [Analysis] Define the type for the Supabase query response
-type VideoQueryResponse = {
-  id: string;
-  title: string | null;
-  url: string | null;
-  thumbnailUrl: string | null;
-  duration: string | null;
-  viewCount: number | null;
-  date: string | null;
-  channel_id: string | null;
-  creator_name: string | null;
-  creator_avatar: string | null;
-}
-
 export const VideoLibrary = ({ 
   isLoading: externalLoading, 
   selectedEducator,
@@ -55,21 +41,10 @@ export const VideoLibrary = ({
   } = useInfiniteQuery({
     queryKey: ['videos', selectedEducator, searchQuery, sortBy, filterBySeries],
     queryFn: async ({ pageParam = 0 }) => {
-      // [Analysis] Using a subquery to get creator info since we don't have a direct foreign key yet
+      // First get the videos
       const { data: videos, error } = await supabase
         .from('youtube_videos')
-        .select(`
-          id,
-          title,
-          url,
-          thumbnailUrl,
-          duration,
-          viewCount,
-          date,
-          channel_id,
-          creator_name:education_creators!channel_id(name),
-          creator_avatar:education_creators!channel_id(channel_avatar_url)
-        `)
+        .select('*')
         .range(pageParam * ITEMS_PER_PAGE, (pageParam + 1) * ITEMS_PER_PAGE - 1);
 
       if (error) {
@@ -78,15 +53,29 @@ export const VideoLibrary = ({
         throw error;
       }
 
-      return (videos as VideoQueryResponse[])?.map(video => ({
+      // Then get the creator info for these videos
+      const channelIds = videos?.map(video => video.channel_id).filter(Boolean) || [];
+      const { data: creators } = await supabase
+        .from('education_creators')
+        .select('channel_id, name, channel_avatar_url')
+        .in('channel_id', channelIds);
+
+      // Create a map of channel_id to creator info
+      const creatorMap = (creators || []).reduce((acc, creator) => {
+        acc[creator.channel_id] = creator;
+        return acc;
+      }, {} as Record<string, any>);
+
+      // Transform the video data
+      return (videos || []).map(video => ({
         id: video.id,
         title: video.title || '',
         url: `https://youtube.com/watch?v=${video.id}`,
         duration: video.duration || '0:00',
         thumbnail_url: video.thumbnailUrl || '',
         educator: {
-          name: video.creator_name || video.channel_id || 'Unknown Creator',
-          avatar_url: video.creator_avatar || ''
+          name: creatorMap[video.channel_id]?.name || video.channel_id || 'Unknown Creator',
+          avatar_url: creatorMap[video.channel_id]?.channel_avatar_url || ''
         },
         metrics: {
           views: video.viewCount || 0,
@@ -100,13 +89,13 @@ export const VideoLibrary = ({
           key_takeaways: ['Coming soon...'],
           implementation_steps: ['Coming soon...']
         }
-      } satisfies Video)) || [];
+      } satisfies Video));
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {
       return lastPage.length === ITEMS_PER_PAGE ? allPages.length : undefined;
     },
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    staleTime: 5 * 60 * 1000,
     meta: {
       onSettled: (data, error) => {
         if (error) {
