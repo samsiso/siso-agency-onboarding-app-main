@@ -6,6 +6,7 @@ import { DirectoryFilters } from './directory/DirectoryFilters';
 import { DirectoryHeader } from './directory/DirectoryHeader';
 import { DirectoryList } from './directory/DirectoryList';
 import { DirectoryPagination } from './directory/DirectoryPagination';
+import { FeaturedEducators } from './FeaturedEducators';
 import { usePagination } from '@/hooks/use-pagination';
 
 interface EducatorsDirectoryProps {
@@ -37,10 +38,13 @@ export const EducatorsDirectory = ({
     : true
   );
 
-  const totalPages = Math.ceil((filteredMembers?.length || 0) / ITEMS_PER_PAGE);
+  // [Analysis] Separate non-featured educators for main list
+  const nonFeaturedMembers = filteredMembers?.filter(member => !member.is_featured) || [];
+
+  const totalPages = Math.ceil((nonFeaturedMembers?.length || 0) / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
-  const currentMembers = filteredMembers?.slice(startIndex, endIndex) || [];
+  const currentMembers = nonFeaturedMembers?.slice(startIndex, endIndex) || [];
 
   const { pages, showLeftEllipsis, showRightEllipsis } = usePagination({
     currentPage,
@@ -67,6 +71,13 @@ export const EducatorsDirectory = ({
       exit={{ opacity: 0, y: -20 }}
       className="space-y-8"
     >
+      {members && (
+        <FeaturedEducators 
+          educators={members}
+          onEducatorSelect={setSelectedMember}
+        />
+      )}
+
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
         <DirectoryFilters
           searchQuery={searchQuery}

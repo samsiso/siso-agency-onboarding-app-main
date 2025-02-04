@@ -278,6 +278,7 @@ export type Database = {
           featured_videos: Json | null
           id: string
           implementation_guides: Json | null
+          is_featured: boolean | null
           member_type: string | null
           name: string
           niche: string | null
@@ -317,6 +318,7 @@ export type Database = {
           featured_videos?: Json | null
           id?: string
           implementation_guides?: Json | null
+          is_featured?: boolean | null
           member_type?: string | null
           name: string
           niche?: string | null
@@ -356,6 +358,7 @@ export type Database = {
           featured_videos?: Json | null
           id?: string
           implementation_guides?: Json | null
+          is_featured?: boolean | null
           member_type?: string | null
           name?: string
           niche?: string | null
