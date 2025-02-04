@@ -16,16 +16,18 @@ type SocialLinks = {
   [key: string]: string | undefined;
 }
 
+type YoutubeVideo = {
+  id: string;
+  title: string | null;
+  url: string | null;
+  thumbnailUrl: string | null;
+  date: string | null;
+  duration: string | null;
+  viewCount: number | null;
+}
+
 type Educator = Database['public']['Tables']['education_creators']['Row'] & {
-  youtube_videos: Array<{
-    id: string;
-    title: string | null;
-    url: string | null;
-    thumbnailUrl: string | null;
-    date: string | null;
-    duration: string | null;
-    viewCount: number | null;
-  }>;
+  youtube_videos?: YoutubeVideo[];
 }
 
 export default function EducatorDetail() {
@@ -67,14 +69,28 @@ export default function EducatorDetail() {
       }
       
       console.log('Found educator data:', data); // Debug log
-      return data as Educator;
+
+      // Transform the data to match our expected type
+      const transformedData: Educator = {
+        ...data,
+        youtube_videos: Array.isArray(data.youtube_videos) 
+          ? data.youtube_videos.map(video => ({
+              id: video.id || '',
+              title: video.title,
+              url: video.url,
+              thumbnailUrl: video.thumbnailUrl,
+              date: video.date,
+              duration: video.duration,
+              viewCount: video.viewCount
+            }))
+          : []
+      };
+      
+      return transformedData;
     },
     retry: 1,
   });
 
-  console.log('Component state:', { educator, isLoading, error }); // Debug log
-
-  // Handle error state with toast notification
   if (error) {
     console.error('Error in component:', error); // Debug log
     toast.error('Failed to load educator profile');
