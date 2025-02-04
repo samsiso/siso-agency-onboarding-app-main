@@ -50,9 +50,11 @@ export const useEducatorDetails = (slug: string) => {
   return useQuery({
     queryKey: ['educator', slug],
     queryFn: async () => {
-      console.log('Fetching educator details for slug:', slug); // Debug log
+      console.log('Fetching educator details for slug:', slug);
       
-      const { data, error } = await supabase
+      // [Analysis] Split the query into two parts to reduce initial payload
+      // First fetch educator details without videos
+      const { data: educator, error: educatorError } = await supabase
         .from('education_creators')
         .select(`
           id,
@@ -69,34 +71,49 @@ export const useEducatorDetails = (slug: string) => {
           channel_joined_date,
           social_links,
           youtube_url,
-          website_url,
-          youtube_videos (
-            id,
-            title,
-            url,
-            thumbnailUrl,
-            date,
-            duration,
-            viewCount
-          )
+          website_url
         `)
         .eq('slug', slug)
         .maybeSingle();
       
-      if (error) {
-        console.error('Error fetching educator details:', error);
-        throw error;
+      if (educatorError) {
+        console.error('Error fetching educator details:', educatorError);
+        throw educatorError;
       }
       
-      if (!data) {
+      if (!educator) {
         throw new Error('Educator not found');
       }
 
-      console.log('Raw educator data:', data); // Debug log
+      // [Analysis] Only fetch first 12 most recent videos initially
+      const { data: videos, error: videosError } = await supabase
+        .from('youtube_videos')
+        .select(`
+          id,
+          title,
+          url,
+          thumbnailUrl,
+          date,
+          duration,
+          viewCount
+        `)
+        .eq('channel_id', educator.name)
+        .order('date', { ascending: false })
+        .limit(12);
       
-      return data;
+      if (videosError) {
+        console.error('Error fetching educator videos:', videosError);
+        throw videosError;
+      }
+
+      console.log('Raw educator data:', { educator, videos }); // Debug log
+      
+      return {
+        ...educator,
+        youtube_videos: videos || []
+      };
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
     gcTime: 10 * 60 * 1000,
   });
 };

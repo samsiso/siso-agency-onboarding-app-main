@@ -7,6 +7,7 @@ import { Helmet } from 'react-helmet';
 import { EducatorHeader } from '@/components/education/educator-detail/EducatorHeader';
 import { EducatorStats } from '@/components/education/educator-detail/EducatorStats';
 import { EducatorVideoSection } from '@/components/education/educator-detail/EducatorVideoSection';
+import { EducatorLoadingScreen } from '@/components/education/educator-detail/EducatorLoadingScreen';
 import { useEducatorDetails } from '@/hooks/use-education-queries';
 
 export default function EducatorDetail() {
@@ -22,8 +23,16 @@ export default function EducatorDetail() {
     return (
       <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
         <Sidebar />
-        <div className="flex-1 p-4 md:p-8 flex items-center justify-center">
-          <div className="w-16 h-16 border-4 border-siso-red border-t-transparent rounded-full animate-spin" />
+        <div className="flex-1">
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/education')}
+            className="m-4 md:m-8"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Education Hub
+          </Button>
+          <EducatorLoadingScreen />
         </div>
       </div>
     );
