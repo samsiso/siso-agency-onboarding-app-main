@@ -49,8 +49,12 @@ export const VideoLibrary = ({
             name,
             channel_avatar_url
           )
-        `)
-        .eq('educator_id', selectedEducator);
+        `);
+
+      // Only apply educator filter if selectedEducator is provided
+      if (selectedEducator) {
+        query = query.eq('educator_id', selectedEducator);
+      }
 
       // Apply search filter if query exists
       if (searchQuery) {
