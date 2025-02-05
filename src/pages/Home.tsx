@@ -21,6 +21,30 @@ interface Message {
   };
 }
 
+// [Analysis] Separate feature items for better maintainability
+const featureItems = [
+  {
+    icon: Bot,
+    title: "AI-Powered Research",
+    description: "Get instant insights and answers powered by advanced AI technology"
+  },
+  {
+    icon: Bot,
+    title: "Resource Hub Access",
+    description: "Access comprehensive resources and documentation"
+  },
+  {
+    icon: Bot,
+    title: "Social Integration",
+    description: "Connect and collaborate with the SISO community"
+  },
+  {
+    icon: Bot,
+    title: "Automated Tools",
+    description: "Streamline your workflow with automated solutions"
+  }
+];
+
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -30,15 +54,12 @@ export default function Home() {
   const handleSubmit = async (message: string) => {
     if (!message.trim() || isLoading) return;
 
-    // Set expanded state if this is the first message
     if (!isExpanded) {
       setIsExpanded(true);
     }
 
-    // Add user message
     setMessages(prev => [...prev, { role: 'user', content: message }]);
     
-    // Add initial AI message with loading state
     setMessages(prev => [...prev, { 
       role: 'assistant', 
       content: '',
@@ -51,7 +72,6 @@ export default function Home() {
     setIsLoading(true);
 
     try {
-      // Update with searching step
       setMessages(prev => {
         const lastMessage = { ...prev[prev.length - 1] };
         lastMessage.steps = {
@@ -67,7 +87,6 @@ export default function Home() {
 
       if (error) throw error;
 
-      // Update with final response
       setMessages(prev => {
         const newMessages = [...prev.slice(0, -1)];
         newMessages.push({ 
@@ -89,7 +108,6 @@ export default function Home() {
         description: "Failed to get response. Please try again.",
         variant: "destructive"
       });
-      // Remove the loading message on error
       setMessages(prev => prev.slice(0, -1));
     } finally {
       setIsLoading(false);
@@ -98,7 +116,6 @@ export default function Home() {
 
   return (
     <div className="relative flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95 overflow-hidden">
-      {/* Waves Background */}
       <div className="absolute inset-0 z-0">
         <Waves 
           lineColor="rgba(255, 87, 34, 0.2)"
@@ -114,13 +131,11 @@ export default function Home() {
         />
       </div>
 
-      {/* Main Content */}
       <Sidebar />
       <div className="relative z-10 flex-1 p-4 md:p-8">
         <div className="max-w-4xl mx-auto flex flex-col h-[calc(100vh-4rem)]">
           <AnimatePresence mode="wait">
             {!isExpanded ? (
-              // Initial State - Logo and Input Only
               <motion.div
                 key="initial"
                 initial={{ opacity: 0, y: 20 }}
@@ -128,7 +143,6 @@ export default function Home() {
                 exit={{ opacity: 0, y: -20 }}
                 className="flex flex-col items-center justify-center h-full"
               >
-                {/* Logo Section */}
                 <motion.div
                   className="mb-8"
                   initial={{ scale: 0.5, opacity: 0 }}
@@ -142,19 +156,19 @@ export default function Home() {
                   />
                 </motion.div>
 
-                {/* Title */}
                 <motion.h1
-                  className="text-2xl md:text-3xl lg:text-4xl font-bold text-siso-text-bold mb-8 text-center"
+                  className="text-2xl md:text-3xl lg:text-4xl font-bold mb-8 text-center"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
                 >
-                  How can I assist you today?
+                  <span className="bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
+                    How can I assist you today?
+                  </span>
                 </motion.h1>
 
-                {/* Initial Input */}
                 <motion.div
-                  className="w-full max-w-2xl"
+                  className="w-full max-w-2xl mb-16"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
@@ -165,9 +179,33 @@ export default function Home() {
                     placeholder="Type your message here..."
                   />
                 </motion.div>
+
+                {/* Features Grid */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 }}
+                  className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-4xl"
+                >
+                  {featureItems.map((feature, index) => (
+                    <motion.div
+                      key={feature.title}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.6 + index * 0.1 }}
+                      className="group relative overflow-hidden rounded-lg bg-black/20 border border-siso-text/10 p-6 hover:bg-black/30 transition-all duration-300"
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-br from-siso-red/5 to-siso-orange/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <div className="relative z-10">
+                        <feature.icon className="w-8 h-8 text-siso-orange mb-4" />
+                        <h3 className="text-lg font-semibold text-siso-text-bold mb-2">{feature.title}</h3>
+                        <p className="text-sm text-siso-text/80">{feature.description}</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </motion.div>
               </motion.div>
             ) : (
-              // Expanded Chat Interface
               <motion.div
                 key="expanded"
                 initial={{ opacity: 0 }}
