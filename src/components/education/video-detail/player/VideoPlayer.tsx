@@ -13,3 +13,6 @@ export const VideoPlayer = memo(({ videoId, title }: VideoPlayerProps) => {
 });
 
 VideoPlayer.displayName = 'VideoPlayer';
+
+// [Analysis] Default export needed for lazy loading
+export default { VideoPlayer };

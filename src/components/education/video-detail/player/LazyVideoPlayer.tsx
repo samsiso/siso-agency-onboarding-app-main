@@ -2,6 +2,7 @@ import { Suspense, lazy } from 'react';
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Loader2 } from 'lucide-react';
 import { ErrorBoundary } from 'react-error-boundary';
+import type { VideoPlayerProps } from './VideoPlayer';
 
 // [Analysis] Using dynamic import for VideoPlayer to reduce initial bundle size
 const VideoPlayer = lazy(() => import('./VideoPlayer').then(module => ({
