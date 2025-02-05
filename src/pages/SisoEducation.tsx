@@ -1,8 +1,10 @@
+
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Sidebar } from '@/components/Sidebar';
 import { Bot } from 'lucide-react';
+import { motion } from 'framer-motion';
 import {
   ExpandableChat,
   ExpandableChatHeader,
@@ -71,6 +73,22 @@ export default function SisoEducation() {
       <Sidebar />
       <div className="flex-1 p-4 md:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
+          {/* Logo Section */}
+          <div className="flex justify-center mb-8">
+            <motion.div
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="flex items-center justify-center"
+            >
+              <img 
+                src="/lovable-uploads/f18bd386-e74e-4601-9d78-ade0cb831744.png" 
+                alt="SISO Logo" 
+                className="w-16 h-16 object-contain rounded-full"
+              />
+            </motion.div>
+          </div>
+
           <EducationHeader 
             stats={stats}
             searchQuery={searchQuery}
