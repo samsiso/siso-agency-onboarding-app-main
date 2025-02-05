@@ -1,7 +1,8 @@
 import { memo } from 'react';
 import { VideoPlayerFrame } from './VideoPlayerFrame';
 
-interface VideoPlayerProps {
+// [Analysis] Define and export props interface for better type safety
+export interface VideoPlayerProps {
   videoId: string;
   title: string;
 }

@@ -2,5 +2,3 @@
 export * from './LazyVideoPlayer';
 export * from './VideoPlayer';
 export * from './VideoPlayerFrame';
-export * from './VideoLoadingState';
-export * from './VideoErrorState';
