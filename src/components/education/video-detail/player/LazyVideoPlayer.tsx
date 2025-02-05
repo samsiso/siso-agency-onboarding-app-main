@@ -5,14 +5,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import type { VideoPlayerProps } from './VideoPlayer';
 
 // [Analysis] Using dynamic import for VideoPlayer to reduce initial bundle size
-const VideoPlayer = lazy(() => import('./VideoPlayer').then(module => ({
-  default: module.VideoPlayer
-})));
-
-interface LazyVideoPlayerProps {
-  videoId: string;
-  title: string;
-}
+const VideoPlayer = lazy(() => import('./VideoPlayer'));
 
 // [Analysis] Separate loading component for better UX during video load
 const VideoLoadingFallback = () => (
@@ -34,7 +27,7 @@ const VideoErrorFallback = ({ error, resetErrorBoundary }: { error: Error, reset
   </div>
 );
 
-export const LazyVideoPlayer = ({ videoId, title }: LazyVideoPlayerProps) => {
+export const LazyVideoPlayer = ({ videoId, title }: VideoPlayerProps) => {
   return (
     <div className="rounded-xl overflow-hidden bg-black ring-1 ring-white/10">
       <AspectRatio ratio={16 / 9}>
