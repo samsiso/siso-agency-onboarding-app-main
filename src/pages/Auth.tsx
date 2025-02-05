@@ -19,8 +19,9 @@ export default function Auth() {
     }
   }, [user, navigate]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Form submitted, navigating to social onboarding...');
     toast({
       title: "Welcome aboard!",
       description: "Proceeding to the next step...",
@@ -28,12 +29,23 @@ export default function Auth() {
     navigate('/onboarding/social');
   };
 
-  const handleDemoGoogleSignIn = () => {
-    toast({
-      title: "Demo Mode",
-      description: "Proceeding with demo account...",
-    });
-    navigate('/onboarding/social');
+  const handleDemoGoogleSignIn = async () => {
+    try {
+      console.log('Starting demo Google sign in...');
+      await handleGoogleSignIn();
+      toast({
+        title: "Demo Mode",
+        description: "Proceeding with demo account...",
+      });
+      navigate('/onboarding/social');
+    } catch (error) {
+      console.error('Demo sign in error:', error);
+      toast({
+        variant: "destructive",
+        title: "Error signing in",
+        description: "There was a problem with the demo sign in",
+      });
+    }
   };
 
   return (
