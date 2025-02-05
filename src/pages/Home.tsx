@@ -28,7 +28,7 @@ export default function Home() {
       content: '',
       loading: true,
       steps: {
-        thinking: '🤔 Analyzing your question and gathering relevant information...',
+        thinking: '🤔 Analyzing your question and identifying key topics...',
       }
     }]);
     
@@ -39,7 +39,8 @@ export default function Home() {
         const lastMessage = { ...prev[prev.length - 1] };
         lastMessage.steps = {
           ...lastMessage.steps,
-          searching: '🔍 Searching through SISO Resource Hub...'
+          searching: '🔍 Searching through SISO Resource Hub...',
+          processing: '⚡ Processing relevant information...'
         };
         return [...prev.slice(0, -1), lastMessage];
       });
@@ -59,6 +60,7 @@ export default function Home() {
           steps: {
             thinking: '🤔 I analyzed your question and identified key topics.',
             searching: '🔍 I searched through our resource database.',
+            processing: '⚡ I processed the most relevant information.',
             response: '💡 Here\'s what I found:'
           }
         });

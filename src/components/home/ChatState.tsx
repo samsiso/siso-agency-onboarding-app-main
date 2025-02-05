@@ -19,6 +19,28 @@ export const ChatState = ({ messages, handleSubmit, isLoading }: ChatStateProps)
     }
   };
 
+  const LoadingIndicator = () => (
+    <div className="flex items-center space-x-2">
+      <div className="flex space-x-1">
+        <motion.div
+          className="w-2 h-2 rounded-full bg-gradient-to-r from-siso-red to-siso-orange"
+          animate={{ scale: [1, 1.2, 1] }}
+          transition={{ duration: 1, repeat: Infinity }}
+        />
+        <motion.div
+          className="w-2 h-2 rounded-full bg-gradient-to-r from-siso-red to-siso-orange"
+          animate={{ scale: [1, 1.2, 1] }}
+          transition={{ duration: 1, delay: 0.2, repeat: Infinity }}
+        />
+        <motion.div
+          className="w-2 h-2 rounded-full bg-gradient-to-r from-siso-red to-siso-orange"
+          animate={{ scale: [1, 1.2, 1] }}
+          transition={{ duration: 1, delay: 0.4, repeat: Infinity }}
+        />
+      </div>
+    </div>
+  );
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -57,6 +79,7 @@ export const ChatState = ({ messages, handleSubmit, isLoading }: ChatStateProps)
                         className="text-sm text-gray-300"
                       >
                         {value}
+                        {key === Object.keys(message.steps || {}).slice(-1)[0] && <LoadingIndicator />}
                       </motion.div>
                     ))}
                   </div>

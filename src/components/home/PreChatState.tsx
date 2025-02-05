@@ -69,7 +69,7 @@ export const PreChatState = ({ handleSubmit, isLoading }: PreChatStateProps) => 
           placeholders={searchPlaceholders}
           onChange={handleInputChange}
           onSubmit={handleInputSubmit}
-          className="bg-black/30 border-white/10 focus:border-siso-orange/50"
+          className="bg-black/30 border-white/10 focus:border-siso-orange/50 text-white placeholder-gray-400"
         />
       </motion.div>
     </motion.div>
