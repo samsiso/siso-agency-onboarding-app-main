@@ -156,7 +156,7 @@ export default function Home() {
             </ChatMessageList>
 
             <ChatInput 
-              onSubmit={handleSubmit}
+              onSubmit={handleSubmit} 
               isLoading={isLoading}
             />
           </div>
