@@ -70,9 +70,11 @@ export default defineConfig(({ mode }) => ({
         chunkSizeWarningLimit: 1000,
         // Optimize asset file names
         assetFileNames: (assetInfo) => {
-          let extType = assetInfo.name.split('.').at(1);
+          if (!assetInfo.name) return 'assets/[name]-[hash][extname]';
+          
+          const extType = assetInfo.name.split('.').pop() || '';
           if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
-            extType = 'img';
+            return `assets/img/[name]-[hash][extname]`;
           }
           return `assets/${extType}/[name]-[hash][extname]`;
         },
