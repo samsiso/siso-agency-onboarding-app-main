@@ -22,6 +22,7 @@ import VideoDetail from '@/pages/VideoDetail';
 import Terms from '@/pages/Terms';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import ThankYou from '@/pages/ThankYou';
+import SocialOnboarding from '@/pages/onboarding/social';
 
 function App() {
   return (
@@ -52,6 +53,7 @@ function App() {
       <Route path="/terms" element={<Terms />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/thank-you" element={<ThankYou />} />
+      <Route path="/onboarding/social" element={<SocialOnboarding />} />
     </Routes>
   );
 }
