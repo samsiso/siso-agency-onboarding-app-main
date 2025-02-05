@@ -22,9 +22,9 @@ export const PreChatState = ({ handleSubmit, isLoading }: PreChatStateProps) => 
   const handleInputSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const input = formData.get('message') as string;
-    if (input?.trim()) {
-      handleSubmit(input.trim());
+    const message = e.currentTarget.querySelector('input')?.value;
+    if (message?.trim()) {
+      handleSubmit(message.trim());
     }
   };
 
