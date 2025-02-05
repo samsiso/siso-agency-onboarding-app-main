@@ -38,11 +38,12 @@ function App() {
       <Route path="/networking" element={<Networking />} />
       <Route path="/community" element={<Community />} />
       <Route path="/learn" element={<LearnNetwork />} />
-      <Route path="/economy/earn" element={<HowToEarn />} /> {/* Updated this route */}
-      <Route path="/earn" element={<HowToEarn />} /> {/* Keep this as a fallback */}
+      <Route path="/economy/earn" element={<HowToEarn />} />
+      <Route path="/earn" element={<HowToEarn />} />
       <Route path="/economy" element={<Economy />} />
       <Route path="/exchange" element={<CryptoExchange />} />
       <Route path="/crypto" element={<Crypto />} />
+      <Route path="/economy/leaderboards" element={<Leaderboards />} /> {/* Added this route */}
       <Route path="/leaderboards" element={<Leaderboards />} />
       <Route path="/education" element={<SisoEducation />} />
       <Route path="/education/educators/:slug" element={<EducatorDetail />} />
