@@ -6,27 +6,57 @@ import { useAuthSession } from '@/hooks/useAuthSession';
 import { useGoogleAuth } from '@/hooks/useGoogleAuth';
 import { useToast } from '@/hooks/use-toast';
 import { Waves } from '@/components/ui/waves-background';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function Auth() {
-  const { user } = useAuthSession();
+  const { user, handleSignIn } = useAuthSession();
   const { handleGoogleSignIn, loading } = useGoogleAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    if (user) {
+    // Only redirect to profile if user exists and we're not in the middle of onboarding
+    const currentPath = window.location.pathname;
+    if (user && !currentPath.includes('onboarding')) {
       navigate('/profile');
     }
   }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted, navigating to social onboarding...');
-    toast({
-      title: "Welcome aboard!",
-      description: "Proceeding to the next step...",
-    });
-    navigate('/onboarding/social');
+    console.log('Form submitted, starting auth process...');
+    
+    try {
+      // Get form data
+      const formData = new FormData(e.target as HTMLFormElement);
+      const email = formData.get('email') as string;
+      const password = formData.get('password') as string;
+
+      // Sign in with email/password
+      const { data: { session }, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+
+      if (session) {
+        console.log('Authentication successful, proceeding to onboarding...');
+        await handleSignIn(session);
+        toast({
+          title: "Account created!",
+          description: "Let's set up your profile...",
+        });
+        navigate('/onboarding/social');
+      }
+    } catch (error: any) {
+      console.error('Auth error:', error);
+      toast({
+        variant: "destructive",
+        title: "Error signing up",
+        description: error.message || "Please try again",
+      });
+    }
   };
 
   const handleDemoGoogleSignIn = async () => {
@@ -38,12 +68,12 @@ export default function Auth() {
         description: "Proceeding with demo account...",
       });
       navigate('/onboarding/social');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Demo sign in error:', error);
       toast({
         variant: "destructive",
         title: "Error signing in",
-        description: "There was a problem with the demo sign in",
+        description: error.message || "Please try again",
       });
     }
   };
@@ -90,15 +120,19 @@ export default function Auth() {
             <div className="space-y-2">
               <Input
                 type="email"
+                name="email"
                 placeholder="Work Email"
                 className="w-full bg-white/5 border-siso-border text-siso-text placeholder:text-siso-text-muted focus:border-siso-red"
+                required
               />
             </div>
             <div className="space-y-2">
               <Input
                 type="password"
+                name="password"
                 placeholder="Create Password"
                 className="w-full bg-white/5 border-siso-border text-siso-text placeholder:text-siso-text-muted focus:border-siso-red"
+                required
               />
             </div>
             <Button 
