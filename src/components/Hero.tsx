@@ -3,16 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { RainbowButton } from './ui/rainbow-button';
 import { useSidebar } from './ui/sidebar';
 import { Sidebar } from './Sidebar';
+import { PlaceholdersAndVanishInput } from './ui/placeholders-and-vanish-input';
 
-// [Analysis] Optimizing Hero component for faster initial render
-// [Plan] Monitor performance metrics and adjust loading strategy if needed
 const Hero = () => {
   const navigate = useNavigate();
   const { setOpen } = useSidebar();
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    // [Analysis] Using requestIdleCallback for non-critical initialization
     const idleCallback = window.requestIdleCallback || ((cb) => setTimeout(cb, 1));
     idleCallback(() => {
       console.log('Hero component mounted');
@@ -38,6 +36,23 @@ const Hero = () => {
       console.error('Navigation error:', error);
     }
   };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('Search input changed:', e.target.value);
+  };
+
+  const handleInputSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log('Search submitted');
+  };
+
+  const searchPlaceholders = [
+    "How can AI help my business grow?",
+    "What tools do you recommend for automation?",
+    "How to implement AI in my workflow?",
+    "Best practices for agency scaling",
+    "Latest AI trends for agencies",
+  ];
 
   console.log('Hero rendering, isLoaded:', isLoaded);
 
@@ -65,12 +80,10 @@ const Hero = () => {
   return (
     <div className="flex-1 relative">
       <Sidebar />
-      {/* Background layer with optimized rendering */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-br from-siso-bg via-siso-bg/95 to-siso-bg/90" />
       </div>
       
-      {/* Content layer with explicit z-index and pointer-events-auto */}
       <div className="relative z-30 max-w-6xl mx-auto px-2 sm:px-4 py-3 sm:py-4 md:py-6">
         <div className="text-center">
           <div className="space-y-2 sm:space-y-3">
@@ -84,6 +97,16 @@ const Hero = () => {
                 </span>
               </span>
             </h1>
+
+            {/* Add the animated input component here */}
+            <div className="mt-6 mb-8 px-4 sm:px-6 max-w-3xl mx-auto">
+              <PlaceholdersAndVanishInput
+                placeholders={searchPlaceholders}
+                onChange={handleInputChange}
+                onSubmit={handleInputSubmit}
+              />
+            </div>
+
             <div className="relative h-[120px] sm:h-[140px] md:h-[160px] flex w-full justify-center overflow-hidden text-center">
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-sm sm:text-base md:text-lg text-siso-text max-w-[80vw] mx-auto leading-relaxed px-2">
