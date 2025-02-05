@@ -93,6 +93,18 @@ export default defineConfig(({ mode }) => ({
           'state-auth': ['@/hooks/useAuthSession'],
           'state-preferences': ['@/hooks/use-mobile'],
           'state-app': ['@/hooks/usePoints'],
+          
+          // Index route specific bundles
+          'index-hero': ['@/components/Hero'],
+          'index-auth': ['@/components/AuthButton'],
+          'index-chat': ['@/components/ui/expandable-chat'],
+          'index-footer': ['@/components/Footer'],
+          
+          // Index animations
+          'index-animations': [
+            '@/components/ui/waves-background',
+            '@/components/effects/FloatingOrbs'
+          ],
         },
         
         chunkSizeWarningLimit: 400,
