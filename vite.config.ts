@@ -64,7 +64,6 @@ export default defineConfig(({ mode }) => ({
           
           // Animation bundles
           'animation-transitions': ['framer-motion'],
-          'animation-hover': ['@/components/effects/FloatingOrbs'],
           'animation-loading': ['@/components/ui/message-loading'],
           
           // Utility bundles
