@@ -14,6 +14,7 @@ import { ChatBubble, ChatBubbleAvatar, ChatBubbleMessage } from '@/components/ui
 import { ChatInput } from '@/components/ui/chat-input';
 import { Send, Paperclip, Mic } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Waves } from '@/components/ui/waves-background';
 
 export default function Home() {
   return (
@@ -41,6 +42,20 @@ export default function Home() {
           <div className="max-w-4xl mx-auto">
             <PlaceholdersAndVanishInputDemo />
           </div>
+
+          {/* Waves Background */}
+          <Waves 
+            lineColor="rgba(255, 87, 34, 0.2)"
+            waveSpeedX={0.02}
+            waveSpeedY={0.01}
+            waveAmpX={40}
+            waveAmpY={20}
+            friction={0.9}
+            tension={0.01}
+            maxCursorMove={120}
+            xGap={12}
+            yGap={36}
+          />
 
           {/* Expandable Chat */}
           <ExpandableChat
