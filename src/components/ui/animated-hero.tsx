@@ -2,9 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { PhoneCall, MoveRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 function Hero() {
   const [titleNumber, setTitleNumber] = useState(0);
+  const navigate = useNavigate();
+  
   const titles = useMemo(
     () => ["Innovate, Scale, Succeed", "Collaborate with 1M+ Agencies", "Future-Proof Your Agency"],
     []
@@ -20,6 +23,20 @@ function Hero() {
     }, 2000);
     return () => clearTimeout(timeoutId);
   }, [titleNumber, titles]);
+
+  const handleGetStarted = () => {
+    console.log('Get Started clicked - navigating to /auth');
+    try {
+      navigate('/auth');
+    } catch (error) {
+      console.error('Navigation error:', error);
+    }
+  };
+
+  const handleScheduleDemo = () => {
+    console.log('Schedule Demo clicked');
+    // Demo scheduling logic here
+  };
 
   return (
     <div className="w-full">
@@ -60,10 +77,19 @@ function Hero() {
             </p>
           </div>
           <div className="flex flex-row gap-3">
-            <Button size="lg" className="gap-4" variant="outline">
+            <Button 
+              size="lg" 
+              className="gap-4" 
+              variant="outline"
+              onClick={handleScheduleDemo}
+            >
               Schedule a Demo <PhoneCall className="w-4 h-4" />
             </Button>
-            <Button size="lg" className="gap-4 bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90">
+            <Button 
+              size="lg" 
+              className="gap-4 bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90"
+              onClick={handleGetStarted}
+            >
               Get Started <MoveRight className="w-4 h-4" />
             </Button>
           </div>
