@@ -48,7 +48,6 @@ export default defineConfig(({ mode }) => ({
           
           // Landing page chunks - split by section
           'landing-hero': ['@/components/ui/animated-hero'],
-          'landing-waves': ['@/components/ui/waves-background'],
           'landing-features': ['@/components/blocks/feature-section-with-hover-effects'],
           'landing-testimonials': ['@/components/landing/TestimonialSection'],
           'landing-pricing': ['@/components/ui/pricing-card'],
@@ -95,19 +94,14 @@ export default defineConfig(({ mode }) => ({
           'state-app': ['@/hooks/usePoints'],
           
           // Index route specific bundles
-          'index-hero': ['@/components/Hero'],
-          'index-auth': ['@/components/AuthButton'],
-          'index-chat': ['@/components/ui/expandable-chat'],
-          'index-footer': ['@/components/Footer'],
-          
-          // Index animations
-          'index-animations': [
-            '@/components/ui/waves-background',
+          'index-components': [
+            '@/components/Hero',
+            '@/components/AuthButton',
+            '@/components/ui/expandable-chat',
+            '@/components/Footer',
             '@/components/effects/FloatingOrbs'
           ],
         },
-        
-        chunkSizeWarningLimit: 400,
         
         assetFileNames: (assetInfo) => {
           if (!assetInfo.name) return 'assets/[name]-[hash][extname]';
