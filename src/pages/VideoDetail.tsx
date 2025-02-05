@@ -21,6 +21,7 @@ export default function VideoDetail() {
   const { toast } = useToast();
   
   const videoId = slug ? extractVideoIdFromSlug(slug) : '';
+  console.log('Extracted video ID:', videoId); // Debug log
 
   const { data: videoData, isLoading, error } = useQuery({
     queryKey: ['video', videoId],
@@ -29,33 +30,49 @@ export default function VideoDetail() {
         throw new Error('Invalid video ID');
       }
 
+      console.log('Fetching video with ID:', videoId); // Debug log
+
       const { data: videoDetails, error: videoError } = await supabase
         .from('youtube_videos')
         .select('*')
         .eq('id', videoId)
         .maybeSingle();
       
-      if (videoError) throw videoError;
-      if (!videoDetails) throw new Error('Video not found');
+      if (videoError) {
+        console.error('Error fetching video:', videoError);
+        throw videoError;
+      }
+      
+      if (!videoDetails) {
+        console.error('No video found with ID:', videoId);
+        throw new Error('Video not found');
+      }
+
+      console.log('Found video details:', videoDetails); // Debug log
 
       const { data: educatorDetails, error: educatorError } = await supabase
         .from('education_creators')
         .select('name, slug, channel_avatar_url, description')
-        .eq('name', videoDetails.channel_id)
+        .eq('channel_id', videoDetails.channel_id)
         .maybeSingle();
       
+      if (educatorError) {
+        console.error('Error fetching educator:', educatorError);
+      }
+
       return {
         ...videoDetails,
         educator: educatorDetails
       };
     },
+    enabled: !!videoId,
     meta: {
       onSettled: (data, error) => {
         if (error) {
           console.error('Query error:', error);
           toast({
             title: "Error loading video",
-            description: "The requested video could not be found or accessed.",
+            description: error.message || "The requested video could not be found or accessed.",
             variant: "destructive"
           });
         }
@@ -87,18 +104,18 @@ export default function VideoDetail() {
     );
   }
 
-  const channelName = videoData.channel_id || 'Unknown Creator';
-  const channelAvatar = videoData.educator?.channel_avatar_url || '';
-  const videoDescription = videoData.educator?.description || '';
-  const thumbnailUrl = videoData.thumbnailUrl || '';
-  const educatorSlug = videoData.educator?.slug;
+  const channelName = videoData?.channel_id || 'Unknown Creator';
+  const channelAvatar = videoData?.educator?.channel_avatar_url || '';
+  const videoDescription = videoData?.educator?.description || '';
+  const thumbnailUrl = videoData?.thumbnailUrl || '';
+  const educatorSlug = videoData?.educator?.slug;
 
   return (
     <>
       <Helmet>
-        <title>{`${videoData.title} | ${channelName} | SISO Education`}</title>
+        <title>{`${videoData?.title || 'Video'} | ${channelName} | SISO Education`}</title>
         <meta name="description" content={videoDescription} />
-        <meta property="og:title" content={videoData.title} />
+        <meta property="og:title" content={videoData?.title || ''} />
         <meta property="og:description" content={videoDescription} />
         <meta property="og:image" content={thumbnailUrl} />
         <meta property="og:type" content="video.other" />
@@ -121,20 +138,26 @@ export default function VideoDetail() {
               <ChevronLeft className="w-4 h-4" />
               <span>Videos</span>
               <ChevronLeft className="w-4 h-4" />
-              <span className="text-white truncate max-w-[300px]">{videoData.title}</span>
+              <span className="text-white truncate max-w-[300px]">{videoData?.title || 'Loading...'}</span>
             </div>
           </div>
         </div>
 
         <div className="max-w-[1800px] mx-auto grid grid-cols-1 xl:grid-cols-3 gap-6 p-4">
           <div className="xl:col-span-2 space-y-6">
-            <LazyVideoPlayer videoId={videoData.id} title={videoData.title} />
+            {videoData?.id ? (
+              <LazyVideoPlayer videoId={videoData.id} title={videoData.title || ''} />
+            ) : (
+              <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center">
+                <p className="text-gray-400">Loading video...</p>
+              </div>
+            )}
 
             <div className="space-y-6">
               <VideoMetadata 
-                title={videoData.title}
-                viewCount={videoData.viewCount || 0}
-                publishDate={videoData.date}
+                title={videoData?.title || ''}
+                viewCount={videoData?.viewCount || 0}
+                publishDate={videoData?.date || ''}
               />
               
               <div className="flex flex-wrap items-center justify-between gap-4">
@@ -147,7 +170,7 @@ export default function VideoDetail() {
               </div>
             </div>
 
-            <VideoInteractionPanel videoId={videoData.id} activeTab={activeTab} />
+            <VideoInteractionPanel videoId={videoId} activeTab={activeTab} />
           </div>
 
           <div className="space-y-6">
@@ -156,7 +179,7 @@ export default function VideoDetail() {
               Related Videos
             </h2>
             <RelatedVideos 
-              currentVideoId={videoData.id} 
+              currentVideoId={videoId} 
               topics={[]}
             />
           </div>

@@ -28,12 +28,20 @@ export const VideoGrid = ({ videos = [], featuredVideos = [], isLoading }: Video
   }
 
   const handleVideoClick = (video: Video) => {
+    // [Analysis] Improved slug generation with validation
+    if (!video.id || !video.title) {
+      console.error('Invalid video data:', video);
+      return;
+    }
+
     const slug = video.title
       .toLowerCase()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .substring(0, 60);
+      .replace(/[^\w\s-]/g, '') // Remove special characters
+      .replace(/\s+/g, '-') // Replace spaces with hyphens
+      .replace(/-+/g, '-') // Remove consecutive hyphens
+      .substring(0, 60); // Limit length
     
+    console.log('Generated slug:', slug, 'for video:', video.id); // Debug log
     navigate(`/education/videos/${slug}-${video.id}`);
   };
 
