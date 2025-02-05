@@ -5,6 +5,7 @@ export interface Message {
   steps?: {
     thinking?: string;
     searching?: string;
+    processing?: string;
     response?: string;
   };
 }
