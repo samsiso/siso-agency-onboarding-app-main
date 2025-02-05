@@ -1,3 +1,4 @@
+
 import { RainbowButton } from '@/components/ui/rainbow-button';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -39,9 +40,9 @@ export const CallToActionSection = () => {
                   className="flex items-center justify-center"
                 >
                   <img 
-                    src="/lovable-uploads/c482563a-42db-4f47-83f2-c2e7771400b7.png" 
+                    src="/lovable-uploads/f18bd386-e74e-4601-9d78-ade0cb831744.png" 
                     alt="SISO Logo" 
-                    className="w-12 h-12 object-contain"
+                    className="w-12 h-12 object-contain rounded-full"
                   />
                 </motion.div>
                 <h3 className="text-3xl md:text-4xl font-bold text-white 
