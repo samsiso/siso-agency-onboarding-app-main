@@ -1,3 +1,4 @@
+/* Critical CSS - Inlined for fastest paint */
 #root {
   margin: 0;
   padding: 0;
@@ -7,6 +8,7 @@
   width: 100%;
 }
 
+/* Performance optimized animations with will-change */
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -18,13 +20,13 @@
   filter: drop-shadow(0 0 2em rgba(255, 87, 34, 0.5));
 }
 
-/* Improved selection color */
+/* Optimized selection color */
 ::selection {
   background-color: rgba(255, 87, 34, 0.2);
   color: #FFFFFF;
 }
 
-/* Optimized scrollbar styling */
+/* Hardware accelerated scrollbar styling */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -43,35 +45,37 @@
   background: #3A3A3A;
 }
 
-/* Animation keyframes */
+/* Performance optimized animations with transform-gpu */
 @keyframes float {
   0% {
-    transform: translate(0, 0) scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
   }
   50% {
-    transform: translate(20px, -20px) scale(1.05);
+    transform: translate3d(20px, -20px, 0) scale(1.05);
   }
   100% {
-    transform: translate(0, 0) scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 
 @keyframes float-delayed {
   0% {
-    transform: translate(0, 0) scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
   }
   50% {
-    transform: translate(-20px, 20px) scale(1.05);
+    transform: translate3d(-20px, 20px, 0) scale(1.05);
   }
   100% {
-    transform: translate(0, 0) scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 
 .animate-float {
   animation: float 20s ease-in-out infinite;
+  will-change: transform;
 }
 
 .animate-float-delayed {
   animation: float-delayed 25s ease-in-out infinite;
+  will-change: transform;
 }
