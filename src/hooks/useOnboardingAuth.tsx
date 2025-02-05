@@ -11,21 +11,25 @@ export const useOnboardingAuth = () => {
     const checkAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        if (!session?.user) {
-          navigate('/auth');
-          return;
+        
+        // Allow both authenticated users and guests
+        if (session?.user) {
+          setUserId(session.user.id);
+        } else {
+          // For guest users, set userId to null but don't redirect
+          setUserId(null);
         }
-        setUserId(session.user.id);
       } catch (error) {
         console.error('Auth check error:', error);
-        navigate('/auth');
+        // Don't redirect on error, just set userId to null
+        setUserId(null);
       } finally {
         setIsLoading(false);
       }
     };
 
     checkAuth();
-  }, [navigate]);
+  }, []);
 
   return { userId, isLoading };
 };

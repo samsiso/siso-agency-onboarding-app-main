@@ -36,7 +36,7 @@ export default function SocialOnboarding() {
           </span>
         </div>
 
-        {userId && <SocialLinksForm userId={userId} />}
+        <SocialLinksForm userId={userId} />
       </div>
     </div>
   );

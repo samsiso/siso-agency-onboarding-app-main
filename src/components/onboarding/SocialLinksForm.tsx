@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { GradientText } from '@/components/ui/gradient-text';
 
 interface SocialLinksFormProps {
-  userId: string;
+  userId: string | null;
 }
 
 export const SocialLinksForm = ({ userId }: SocialLinksFormProps) => {
@@ -27,21 +27,24 @@ export const SocialLinksForm = ({ userId }: SocialLinksFormProps) => {
     try {
       setIsSubmitting(true);
       
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          linkedin_url: linkedinUrl,
-          website_url: websiteUrl,
-          twitter_url: twitterUrl,
-          has_completed_social_info: true,
-          social_info_completed_at: new Date().toISOString()
-        })
-        .eq('id', userId);
+      if (userId) {
+        // For authenticated users, save to database
+        const { error } = await supabase
+          .from('profiles')
+          .update({
+            linkedin_url: linkedinUrl,
+            website_url: websiteUrl,
+            twitter_url: twitterUrl,
+            has_completed_social_info: true,
+            social_info_completed_at: new Date().toISOString()
+          })
+          .eq('id', userId);
 
-      if (error) throw error;
+        if (error) throw error;
+      }
 
       toast({
-        title: "Social links saved!",
+        title: userId ? "Social links saved!" : "Guest profile created",
         description: "Moving to the next step...",
       });
 
@@ -65,7 +68,10 @@ export const SocialLinksForm = ({ userId }: SocialLinksFormProps) => {
           Connect Your Social Profiles
         </GradientText>
         <p className="text-siso-text">
-          Help us personalize your experience by connecting your professional profiles
+          {userId 
+            ? "Help us personalize your experience by connecting your professional profiles"
+            : "Add your social profiles to enhance your guest experience"
+          }
         </p>
       </div>
 
