@@ -18,9 +18,26 @@ import { Waves } from '@/components/ui/waves-background';
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
+    <div className="relative flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95 overflow-hidden">
+      {/* Waves Background - Positioned at a lower z-index */}
+      <div className="absolute inset-0 z-0">
+        <Waves 
+          lineColor="rgba(255, 87, 34, 0.2)"
+          waveSpeedX={0.02}
+          waveSpeedY={0.01}
+          waveAmpX={40}
+          waveAmpY={20}
+          friction={0.9}
+          tension={0.01}
+          maxCursorMove={120}
+          xGap={12}
+          yGap={36}
+        />
+      </div>
+
+      {/* Main Content - Higher z-index */}
       <Sidebar />
-      <div className="flex-1 p-4 md:p-8">
+      <div className="relative z-10 flex-1 p-4 md:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Logo Section */}
           <div className="flex justify-center mb-8">
@@ -42,20 +59,6 @@ export default function Home() {
           <div className="max-w-4xl mx-auto">
             <PlaceholdersAndVanishInputDemo />
           </div>
-
-          {/* Waves Background */}
-          <Waves 
-            lineColor="rgba(255, 87, 34, 0.2)"
-            waveSpeedX={0.02}
-            waveSpeedY={0.01}
-            waveAmpX={40}
-            waveAmpY={20}
-            friction={0.9}
-            tension={0.01}
-            maxCursorMove={120}
-            xGap={12}
-            yGap={36}
-          />
 
           {/* Expandable Chat */}
           <ExpandableChat
