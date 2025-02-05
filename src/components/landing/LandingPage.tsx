@@ -1,23 +1,12 @@
-import { useEffect, lazy, Suspense, memo } from 'react';
+import { lazy, Suspense, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { LoadingFallback } from './sections/LoadingFallback';
 
+// [Analysis] Lazy load components for optimal performance
 const HeroSection = lazy(() => 
   import('./sections/HeroSection').then(m => ({ 
     default: memo(m.HeroSection) 
-  }))
-);
-
-const FeaturesSection = lazy(() => 
-  import('./sections/FeaturesSection').then(m => ({ 
-    default: memo(m.FeaturesSection) 
-  }))
-);
-
-const PricingSection = lazy(() => 
-  import('./sections/PricingSection').then(m => ({ 
-    default: memo(m.PricingSection) 
   }))
 );
 
@@ -27,9 +16,21 @@ const WhyChooseSection = lazy(() =>
   }))
 );
 
+const FeaturesSection = lazy(() => 
+  import('./sections/FeaturesSection').then(m => ({ 
+    default: memo(m.FeaturesSection) 
+  }))
+);
+
 const GettingStartedSection = lazy(() => 
   import('./sections/GettingStartedSection').then(m => ({ 
     default: memo(m.GettingStartedSection) 
+  }))
+);
+
+const PricingSection = lazy(() => 
+  import('./sections/PricingSection').then(m => ({ 
+    default: memo(m.PricingSection) 
   }))
 );
 
@@ -67,12 +68,11 @@ const LandingPage = () => {
   const { user } = useAuthSession();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    console.log('LandingPage mounted');
-    if (user) {
-      navigate('/app');
-    }
-  }, [user, navigate]);
+  // [Analysis] Redirect authenticated users to app
+  if (user) {
+    navigate('/app');
+    return null;
+  }
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-black via-siso-bg to-black overflow-x-hidden">
@@ -102,40 +102,50 @@ const LandingPage = () => {
         />
       </div>
 
-      {/* Main Content with progressive loading */}
-      <div className="relative z-10 px-4 md:px-0 space-y-12 md:space-y-0">
+      {/* Main Content with progressive loading in new order */}
+      <div className="relative z-10 px-4 md:px-0">
+        {/* 1. Hero Section */}
         <Suspense fallback={<LoadingFallback />}>
           <HeroSection />
         </Suspense>
 
-        <Suspense fallback={<LoadingFallback />}>
-          <FeaturesSection />
-        </Suspense>
-
-        <Suspense fallback={<LoadingFallback />}>
-          <PricingSection />
-        </Suspense>
-
+        {/* 2. Agency Growth Section */}
         <Suspense fallback={<LoadingFallback />}>
           <WhyChooseSection />
         </Suspense>
 
+        {/* 3. Resource Hub Features */}
+        <Suspense fallback={<LoadingFallback />}>
+          <FeaturesSection />
+        </Suspense>
+
+        {/* 4. Getting Started Steps */}
         <Suspense fallback={<LoadingFallback />}>
           <GettingStartedSection />
         </Suspense>
 
+        {/* 5. Pricing Section */}
         <Suspense fallback={<LoadingFallback />}>
-          <TestimonialsSection />
+          <PricingSection />
         </Suspense>
 
-        <Suspense fallback={<LoadingFallback />}>
-          <LogoCarouselSection />
-        </Suspense>
+        {/* 6. Social Proof */}
+        <div className="space-y-12 md:space-y-24">
+          <Suspense fallback={<LoadingFallback />}>
+            <TestimonialsSection />
+          </Suspense>
 
+          <Suspense fallback={<LoadingFallback />}>
+            <LogoCarouselSection />
+          </Suspense>
+        </div>
+
+        {/* 7. Final CTA */}
         <Suspense fallback={<LoadingFallback />}>
           <CallToActionSection />
         </Suspense>
 
+        {/* Footer */}
         <Suspense fallback={<LoadingFallback />}>
           <StackedCircularFooter />
         </Suspense>
