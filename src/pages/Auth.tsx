@@ -83,12 +83,19 @@ export default function Auth() {
     }
   };
 
+  const handleSkip = () => {
+    console.log('Skipping auth, proceeding to social onboarding...');
+    toast({
+      title: "Guest Mode",
+      description: "Proceeding without an account. Some features may be limited.",
+    });
+    navigate('/onboarding/social');
+  };
+
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden">
-      {/* Background with gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-black to-siso-bg z-0" />
       
-      {/* Waves Background - Positioned above gradient but below content */}
       <Waves 
         lineColor="rgba(255, 87, 34, 0.1)"
         backgroundColor="rgba(255, 87, 34, 0.01)"
@@ -104,10 +111,8 @@ export default function Auth() {
         className="z-10"
       />
       
-      {/* Content Container - Highest z-index */}
       <div className="relative z-20 w-full max-w-md p-8">
         <div className="backdrop-blur-xl bg-black/40 rounded-lg shadow-xl p-8 border border-siso-border/60 space-y-6">
-          {/* Progress Indicator */}
           <div className="absolute -top-10 left-0 w-full flex justify-center text-siso-text/70">
             <span className="px-4 py-1 rounded-full bg-siso-bg-alt border border-siso-border text-sm">
               Step 1 of 3
@@ -128,7 +133,6 @@ export default function Auth() {
                 name="email"
                 placeholder="Work Email"
                 className="w-full bg-white/5 border-siso-border text-siso-text placeholder:text-siso-text-muted focus:border-siso-red"
-                required
               />
             </div>
             <div className="space-y-2">
@@ -137,16 +141,25 @@ export default function Auth() {
                 name="password"
                 placeholder="Create Password"
                 className="w-full bg-white/5 border-siso-border text-siso-text placeholder:text-siso-text-muted focus:border-siso-red"
-                required
                 maxLength={72}
               />
             </div>
-            <Button 
-              type="submit"
-              className="w-full bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-white"
-            >
-              Continue to Next Step
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                type="submit"
+                className="flex-1 bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-white"
+              >
+                Create Account
+              </Button>
+              <Button 
+                type="button"
+                onClick={handleSkip}
+                variant="outline"
+                className="flex-1 border-siso-border text-siso-text hover:bg-white/5"
+              >
+                Skip for now
+              </Button>
+            </div>
           </form>
 
           <div className="relative">
