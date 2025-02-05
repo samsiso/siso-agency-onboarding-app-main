@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Bot, User, Code, Copy, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -9,9 +10,14 @@ interface ChatMessageProps {
   content: string;
   assistantType?: string;
   isLoading?: boolean;
+  steps?: {
+    thinking?: string;
+    searching?: string;
+    response?: string;
+  };
 }
 
-export const ChatMessage = ({ role, content, assistantType, isLoading }: ChatMessageProps) => {
+export const ChatMessage = ({ role, content, assistantType, isLoading, steps }: ChatMessageProps) => {
   const [copied, setCopied] = React.useState(false);
   
   // Function to detect and format code blocks
@@ -67,6 +73,43 @@ export const ChatMessage = ({ role, content, assistantType, isLoading }: ChatMes
     });
   };
 
+  const renderSteps = () => {
+    if (!steps) return null;
+    
+    return (
+      <div className="space-y-2 mb-4 text-sm text-siso-text/80">
+        {steps.thinking && (
+          <motion.div
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {steps.thinking}
+          </motion.div>
+        )}
+        {steps.searching && (
+          <motion.div
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.3 }}
+          >
+            {steps.searching}
+          </motion.div>
+        )}
+        {steps.response && (
+          <motion.div
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.6 }}
+            className="text-siso-orange font-medium"
+          >
+            {steps.response}
+          </motion.div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -104,7 +147,10 @@ export const ChatMessage = ({ role, content, assistantType, isLoading }: ChatMes
               <span className="w-2 h-2 bg-siso-orange/50 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
             </div>
           ) : (
-            formatContent(content)
+            <>
+              {renderSteps()}
+              {content && formatContent(content)}
+            </>
           )}
         </div>
       </div>

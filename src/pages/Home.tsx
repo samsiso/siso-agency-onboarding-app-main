@@ -22,6 +22,12 @@ import { Waves } from '@/components/ui/waves-background';
 interface Message {
   role: 'assistant' | 'user';
   content: string;
+  loading?: boolean;
+  steps?: {
+    thinking?: string;
+    searching?: string;
+    response?: string;
+  };
 }
 
 export default function Home() {
@@ -37,20 +43,51 @@ export default function Home() {
 
     // Add user message
     setMessages(prev => [...prev, { role: 'user', content: message }]);
+    
+    // Add initial AI message with loading state
+    setMessages(prev => [...prev, { 
+      role: 'assistant', 
+      content: '',
+      loading: true,
+      steps: {
+        thinking: '🤔 Analyzing your question and gathering relevant information...',
+      }
+    }]);
+    
     setIsLoading(true);
 
     try {
+      // Update with searching step
+      setMessages(prev => {
+        const lastMessage = { ...prev[prev.length - 1] };
+        lastMessage.steps = {
+          ...lastMessage.steps,
+          searching: '🔍 Searching through SISO Resource Hub...'
+        };
+        return [...prev.slice(0, -1), lastMessage];
+      });
+
       const { data, error } = await supabase.functions.invoke('chat-with-assistant', {
         body: { message }
       });
 
       if (error) throw error;
 
-      // Add AI response
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: data.response 
-      }]);
+      // Update with final response
+      setMessages(prev => {
+        const newMessages = [...prev.slice(0, -1)];
+        newMessages.push({ 
+          role: 'assistant', 
+          content: data.response,
+          loading: false,
+          steps: {
+            thinking: '🤔 I analyzed your question and identified key topics.',
+            searching: '🔍 I searched through our resource database.',
+            response: '💡 Here\'s what I found:'
+          }
+        });
+        return newMessages;
+      });
     } catch (error) {
       console.error('Error:', error);
       toast({
@@ -58,6 +95,8 @@ export default function Home() {
         description: "Failed to get response. Please try again.",
         variant: "destructive"
       });
+      // Remove the loading message on error
+      setMessages(prev => prev.slice(0, -1));
     } finally {
       setIsLoading(false);
     }
@@ -110,7 +149,8 @@ export default function Home() {
                   role={message.role}
                   content={message.content}
                   assistantType="SISO AI"
-                  isLoading={index === messages.length - 1 && isLoading}
+                  isLoading={message.loading}
+                  steps={message.steps}
                 />
               ))}
             </ChatMessageList>
