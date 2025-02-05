@@ -41,9 +41,10 @@ function App() {
       <Route path="/economy/earn" element={<HowToEarn />} />
       <Route path="/earn" element={<HowToEarn />} />
       <Route path="/economy" element={<Economy />} />
+      <Route path="/economy/crypto-exchange" element={<CryptoExchange />} />
       <Route path="/exchange" element={<CryptoExchange />} />
       <Route path="/crypto" element={<Crypto />} />
-      <Route path="/economy/leaderboards" element={<Leaderboards />} /> {/* Added this route */}
+      <Route path="/economy/leaderboards" element={<Leaderboards />} />
       <Route path="/leaderboards" element={<Leaderboards />} />
       <Route path="/education" element={<SisoEducation />} />
       <Route path="/education/educators/:slug" element={<EducatorDetail />} />
