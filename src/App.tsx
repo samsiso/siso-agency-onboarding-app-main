@@ -38,7 +38,8 @@ function App() {
       <Route path="/networking" element={<Networking />} />
       <Route path="/community" element={<Community />} />
       <Route path="/learn" element={<LearnNetwork />} />
-      <Route path="/earn" element={<HowToEarn />} />
+      <Route path="/economy/earn" element={<HowToEarn />} /> {/* Updated this route */}
+      <Route path="/earn" element={<HowToEarn />} /> {/* Keep this as a fallback */}
       <Route path="/economy" element={<Economy />} />
       <Route path="/exchange" element={<CryptoExchange />} />
       <Route path="/crypto" element={<Crypto />} />
