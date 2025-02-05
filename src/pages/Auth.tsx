@@ -41,21 +41,21 @@ export default function Auth() {
     <div className="relative min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-siso-bg to-black p-4 overflow-hidden">
       {/* Waves Background */}
       <Waves 
-        lineColor="rgba(255, 87, 34, 0.4)"
-        backgroundColor="rgba(255, 87, 34, 0.03)"
-        waveSpeedX={0.02}
-        waveSpeedY={0.01}
-        waveAmpX={50}
-        waveAmpY={25}
-        friction={0.9}
-        tension={0.01}
-        maxCursorMove={120}
-        xGap={12}
-        yGap={36}
+        lineColor="rgba(255, 87, 34, 0.8)"
+        backgroundColor="rgba(255, 87, 34, 0.05)"
+        waveSpeedX={0.025}
+        waveSpeedY={0.015}
+        waveAmpX={80}
+        waveAmpY={40}
+        friction={0.85}
+        tension={0.02}
+        maxCursorMove={150}
+        xGap={8}
+        yGap={24}
         className="-z-10"
       />
       
-      <div className="w-full max-w-md bg-black/30 backdrop-blur-lg rounded-lg shadow-xl p-8 space-y-6 border border-siso-border/50 relative z-10">
+      <div className="w-full max-w-md bg-black/40 backdrop-blur-xl rounded-lg shadow-xl p-8 space-y-6 border border-siso-border/60 relative z-10">
         {/* Progress Indicator */}
         <div className="absolute -top-10 left-0 w-full flex justify-center text-siso-text/70">
           <span className="px-4 py-1 rounded-full bg-siso-bg-alt border border-siso-border text-sm">
