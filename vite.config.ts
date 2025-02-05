@@ -3,8 +3,8 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 
-// [Analysis] Further optimizing chunk strategy for better initial load performance
-// [Plan] Monitor chunk sizes and adjust splits if any chunk exceeds 50kb
+// [Analysis] Implementing granular code splitting for optimal chunk sizes
+// [Plan] Monitor performance impact and adjust splits if needed
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
@@ -31,74 +31,72 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks: {
-          // Core vendor bundle - essential for all routes
-          'react-vendor': ['react', 'react-dom'],
-          'router-vendor': ['react-router-dom'],
+          // Core vendor bundles - split by functionality
+          'react-core': ['react', 'react-dom'],
+          'react-router': ['react-router-dom'],
           
           // UI Components bundles - split by feature
           'ui-core': ['@radix-ui/react-slot'],
-          'ui-navigation': [
-            '@radix-ui/react-navigation-menu',
-            '@radix-ui/react-tabs'
-          ],
-          'ui-overlay': [
-            '@radix-ui/react-dialog',
-            '@radix-ui/react-popover',
-            '@radix-ui/react-tooltip'
-          ],
-          'ui-forms': [
-            '@radix-ui/react-label',
-            '@radix-ui/react-select',
-            '@radix-ui/react-switch',
-            '@radix-ui/react-checkbox'
-          ],
-          'ui-data': [
-            '@radix-ui/react-avatar',
-            '@radix-ui/react-progress'
-          ],
+          'ui-navigation': ['@radix-ui/react-navigation-menu'],
+          'ui-overlay': ['@radix-ui/react-dialog', '@radix-ui/react-popover'],
+          'ui-tooltip': ['@radix-ui/react-tooltip'],
+          'ui-forms': ['@radix-ui/react-label', '@radix-ui/react-select'],
+          'ui-data': ['@radix-ui/react-avatar', '@radix-ui/react-progress'],
+          'ui-tabs': ['@radix-ui/react-tabs'],
+          'ui-switch': ['@radix-ui/react-switch'],
+          'ui-checkbox': ['@radix-ui/react-checkbox'],
           
-          // Landing page specific chunks
-          'landing-hero': [
-            '@/components/ui/animated-hero',
-            '@/components/ui/waves-background'
-          ],
-          'landing-features': [
-            '@/components/blocks/feature-section-with-hover-effects',
-            '@/components/blocks/shadcnblocks-com-feature108'
-          ],
-          'landing-testimonials': [
-            '@/components/landing/TestimonialSection',
-            '@/components/landing/TestimonialCard'
-          ],
-          'landing-pricing': [
-            '@/components/ui/pricing-card'
-          ],
+          // Landing page chunks - split by section
+          'landing-hero': ['@/components/ui/animated-hero'],
+          'landing-waves': ['@/components/ui/waves-background'],
+          'landing-features': ['@/components/blocks/feature-section-with-hover-effects'],
+          'landing-testimonials': ['@/components/landing/TestimonialSection'],
+          'landing-pricing': ['@/components/ui/pricing-card'],
           
-          // Utilities bundle - split by function
+          // Chat components - split by functionality
+          'chat-messages': ['@/components/chat/ChatMessage'],
+          'chat-input': ['@/components/chat/ChatInput'],
+          'chat-thread': ['@/components/ui/chat-message-list'],
+          
+          // Modal variants
+          'modal-dialog': ['@/components/ui/dialog'],
+          'modal-drawer': ['@/components/ui/drawer'],
+          'modal-sheet': ['@/components/ui/sheet'],
+          
+          // Animation bundles
+          'animation-transitions': ['framer-motion'],
+          'animation-hover': ['@/components/effects/FloatingOrbs'],
+          'animation-loading': ['@/components/ui/message-loading'],
+          
+          // Utility bundles
           'utils-styling': ['clsx', 'tailwind-merge'],
           'utils-icons': ['lucide-react'],
-          'utils-animation': ['framer-motion'],
+          'utils-date': ['date-fns'],
           
           // Form handling bundle
-          'form-vendor': ['react-hook-form', 'zod'],
+          'form-core': ['react-hook-form'],
+          'form-validation': ['zod'],
           
           // Data management bundles
           'data-query': ['@tanstack/react-query'],
           'data-charts': ['recharts'],
           
-          // Auth bundles - split by provider
+          // Auth bundles
           'auth-supabase': ['@supabase/auth-helpers-react'],
           'auth-ui': ['@supabase/auth-ui-react'],
           
-          // Blockchain bundles - split by chain
+          // Blockchain bundles
           'blockchain-solana': ['@solana/web3.js'],
-          'blockchain-moralis': ['moralis']
+          'blockchain-moralis': ['moralis'],
+          
+          // State management
+          'state-auth': ['@/hooks/useAuthSession'],
+          'state-preferences': ['@/hooks/use-mobile'],
+          'state-app': ['@/hooks/usePoints'],
         },
         
-        // Optimize chunk size
-        chunkSizeWarningLimit: 500, // Reduced from 1000 to catch smaller chunks
+        chunkSizeWarningLimit: 400,
         
-        // Optimize asset file names
         assetFileNames: (assetInfo) => {
           if (!assetInfo.name) return 'assets/[name]-[hash][extname]';
           
@@ -109,18 +107,13 @@ export default defineConfig(({ mode }) => ({
           return `assets/${extType}/[name]-[hash][extname]`;
         },
         
-        // Optimize chunk file names
         chunkFileNames: 'assets/js/[name]-[hash].js',
-        
-        // Optimize entry file name
         entryFileNames: 'assets/js/[name]-[hash].js',
       },
     },
-    // Enable source maps for production debugging
     sourcemap: mode === 'development',
   },
   
-  // Optimize dev server performance
   optimizeDeps: {
     include: [
       'react', 
@@ -136,7 +129,6 @@ export default defineConfig(({ mode }) => ({
     exclude: ['moralis']
   },
   
-  // Add preload directives
   experimental: {
     renderBuiltUrl(filename: string, { hostType }: { hostType: 'js' | 'css' | 'html' }) {
       if (hostType === 'html') {
