@@ -7,7 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { extractVideoIdFromSlug } from '@/utils/slugUtils';
 import { Helmet } from 'react-helmet';
 import { useToast } from '@/hooks/use-toast';
-import { LazyVideoPlayer } from '@/components/education/video-detail/LazyVideoPlayer';
+import { LazyVideoPlayer } from '@/components/education/video-detail/player';
 import { VideoMetadata } from '@/components/education/video-detail/VideoMetadata';
 import { VideoCreatorInfo } from '@/components/education/video-detail/VideoCreatorInfo';
 import { VideoActions } from '@/components/education/video-detail/VideoActions';
