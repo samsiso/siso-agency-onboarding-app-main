@@ -2,7 +2,7 @@
 import { PlaceholdersAndVanishInputDemo } from "@/components/demo/PlaceholdersAndVanishInputDemo";
 import { Sidebar } from "@/components/Sidebar";
 import { Bot } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { ChatMessage } from '@/components/chat/ChatMessage';
 import { supabase } from '@/integrations/supabase/client';
@@ -22,15 +22,18 @@ interface Message {
 }
 
 export default function Home() {
-  const [messages, setMessages] = useState<Message[]>([{
-    role: 'assistant',
-    content: "Hi! I'm your SISO AI assistant. I can help you find information about tools, automations, educational resources, and more from the SISO Resource Hub. What would you like to learn about?"
-  }]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = async (message: string) => {
     if (!message.trim() || isLoading) return;
+
+    // Set expanded state if this is the first message
+    if (!isExpanded) {
+      setIsExpanded(true);
+    }
 
     // Add user message
     setMessages(prev => [...prev, { role: 'user', content: message }]);
@@ -95,7 +98,7 @@ export default function Home() {
 
   return (
     <div className="relative flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95 overflow-hidden">
-      {/* Waves Background - Positioned at a lower z-index */}
+      {/* Waves Background */}
       <div className="absolute inset-0 z-0">
         <Waves 
           lineColor="rgba(255, 87, 34, 0.2)"
@@ -111,46 +114,88 @@ export default function Home() {
         />
       </div>
 
-      {/* Main Content - Higher z-index */}
+      {/* Main Content */}
       <Sidebar />
       <div className="relative z-10 flex-1 p-4 md:p-8">
         <div className="max-w-4xl mx-auto flex flex-col h-[calc(100vh-4rem)]">
-          {/* Logo Section */}
-          <div className="flex justify-center mb-8">
-            <motion.div
-              initial={{ scale: 0.5, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.5 }}
-              className="flex items-center justify-center"
-            >
-              <img 
-                src="/lovable-uploads/dee36671-c662-422f-a9a0-deb2eeb03973.png" 
-                alt="SISO Lion Logo" 
-                className="w-16 h-16 object-contain rounded-full"
-              />
-            </motion.div>
-          </div>
-          
-          {/* Chat Section */}
-          <div className="flex-1 overflow-hidden flex flex-col bg-black/20 rounded-lg border border-siso-text/10">
-            <div className="flex-1 overflow-y-auto">
-              {messages.map((message, index) => (
-                <ChatMessage
-                  key={index}
-                  role={message.role}
-                  content={message.content}
-                  assistantType="SISO AI"
-                  isLoading={message.loading}
-                  steps={message.steps}
-                />
-              ))}
-            </div>
+          <AnimatePresence mode="wait">
+            {!isExpanded ? (
+              // Initial State - Logo and Input Only
+              <motion.div
+                key="initial"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="flex flex-col items-center justify-center h-full"
+              >
+                {/* Logo Section */}
+                <motion.div
+                  className="mb-8"
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <img 
+                    src="/lovable-uploads/dee36671-c662-422f-a9a0-deb2eeb03973.png" 
+                    alt="SISO Lion Logo" 
+                    className="w-24 h-24 object-contain rounded-full"
+                  />
+                </motion.div>
 
-            <ChatInput 
-              onSubmit={handleSubmit} 
-              isLoading={isLoading}
-            />
-          </div>
+                {/* Title */}
+                <motion.h1
+                  className="text-2xl md:text-3xl lg:text-4xl font-bold text-siso-text-bold mb-8 text-center"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  How can I assist you today?
+                </motion.h1>
+
+                {/* Initial Input */}
+                <motion.div
+                  className="w-full max-w-2xl"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                >
+                  <ChatInput 
+                    onSubmit={handleSubmit}
+                    isLoading={isLoading}
+                    placeholder="Type your message here..."
+                  />
+                </motion.div>
+              </motion.div>
+            ) : (
+              // Expanded Chat Interface
+              <motion.div
+                key="expanded"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex-1 overflow-hidden flex flex-col bg-black/20 rounded-lg border border-siso-text/10"
+              >
+                <div className="flex-1 overflow-y-auto">
+                  {messages.map((message, index) => (
+                    <ChatMessage
+                      key={index}
+                      role={message.role}
+                      content={message.content}
+                      assistantType="SISO AI"
+                      isLoading={message.loading}
+                      steps={message.steps}
+                    />
+                  ))}
+                </div>
+
+                <ChatInput 
+                  onSubmit={handleSubmit}
+                  isLoading={isLoading}
+                  placeholder="Type your message here..."
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </div>

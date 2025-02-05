@@ -7,9 +7,10 @@ import { motion } from 'framer-motion';
 interface ChatInputProps {
   onSubmit: (message: string) => void;
   isLoading: boolean;
+  placeholder?: string;
 }
 
-export const ChatInput = ({ onSubmit, isLoading }: ChatInputProps) => {
+export const ChatInput = ({ onSubmit, isLoading, placeholder = "Type your message..." }: ChatInputProps) => {
   const [input, setInput] = useState('');
   const [isRecording, setIsRecording] = useState(false);
 
@@ -41,7 +42,7 @@ export const ChatInput = ({ onSubmit, isLoading }: ChatInputProps) => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type your message..."
+            placeholder={placeholder}
             className="min-h-[52px] w-full resize-none rounded-lg bg-black/20 border border-siso-text/10 px-4 py-3 text-siso-text placeholder:text-siso-text/50 focus:outline-none focus:ring-2 focus:ring-siso-red/50 transition-all pr-12"
             disabled={isLoading}
             rows={1}
