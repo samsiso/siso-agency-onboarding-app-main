@@ -87,7 +87,7 @@ export default function ThankYou() {
       
       {/* Waves with higher z-index than background */}
       <Waves 
-        lineColor="rgba(255, 87, 34, 0.3)"
+        lineColor="rgba(255, 87, 34, 0.1)"
         waveSpeedX={0.02}
         waveSpeedY={0.01}
         waveAmpX={40}
