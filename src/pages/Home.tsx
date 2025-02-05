@@ -3,6 +3,10 @@ import { PlaceholdersAndVanishInputDemo } from "@/components/demo/PlaceholdersAn
 import { Sidebar } from "@/components/Sidebar";
 import { Bot } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { ChatMessage } from '@/components/chat/ChatMessage';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from "@/hooks/use-toast";
 import {
   ExpandableChat,
   ExpandableChatHeader,
@@ -10,13 +14,55 @@ import {
   ExpandableChatFooter,
 } from '@/components/ui/expandable-chat';
 import { ChatMessageList } from '@/components/ui/chat-message-list';
-import { ChatBubble, ChatBubbleAvatar, ChatBubbleMessage } from '@/components/ui/chat-bubble';
 import { ChatInput } from '@/components/ui/chat-input';
-import { Send, Paperclip, Mic } from 'lucide-react';
+import { Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Waves } from '@/components/ui/waves-background';
 
+interface Message {
+  role: 'assistant' | 'user';
+  content: string;
+}
+
 export default function Home() {
+  const [messages, setMessages] = useState<Message[]>([{
+    role: 'assistant',
+    content: "Hi! I'm your SISO AI assistant. I can help you find information about tools, automations, educational resources, and more from the SISO Resource Hub. What would you like to learn about?"
+  }]);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handleSubmit = async (message: string) => {
+    if (!message.trim() || isLoading) return;
+
+    // Add user message
+    setMessages(prev => [...prev, { role: 'user', content: message }]);
+    setIsLoading(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('chat-with-assistant', {
+        body: { message }
+      });
+
+      if (error) throw error;
+
+      // Add AI response
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: data.response 
+      }]);
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to get response. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="relative flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95 overflow-hidden">
       {/* Waves Background - Positioned at a lower z-index */}
@@ -38,7 +84,7 @@ export default function Home() {
       {/* Main Content - Higher z-index */}
       <Sidebar />
       <div className="relative z-10 flex-1 p-4 md:p-8">
-        <div className="max-w-7xl mx-auto space-y-8">
+        <div className="max-w-4xl mx-auto flex flex-col h-[calc(100vh-4rem)]">
           {/* Logo Section */}
           <div className="flex justify-center mb-8">
             <motion.div
@@ -55,61 +101,25 @@ export default function Home() {
             </motion.div>
           </div>
           
-          {/* Main Chat Section */}
-          <div className="max-w-4xl mx-auto">
-            <PlaceholdersAndVanishInputDemo />
-          </div>
-
-          {/* Expandable Chat */}
-          <ExpandableChat
-            size="lg"
-            position="bottom-right"
-            icon={<Bot className="h-6 w-6" />}
-          >
-            <ExpandableChatHeader className="flex-col text-center justify-center">
-              <h1 className="text-xl font-semibold">SISO Assistant</h1>
-              <p className="text-sm text-muted-foreground">
-                Ask me anything about our platform
-              </p>
-            </ExpandableChatHeader>
-
-            <ExpandableChatBody>
-              <ChatMessageList>
-                <ChatBubble variant="received">
-                  <ChatBubbleAvatar
-                    src="/lovable-uploads/c482563a-42db-4f47-83f2-c2e7771400b7.png"
-                    fallback="AI"
-                  />
-                  <ChatBubbleMessage>
-                    Hello! I'm your SISO assistant. How can I help you today?
-                  </ChatBubbleMessage>
-                </ChatBubble>
-              </ChatMessageList>
-            </ExpandableChatBody>
-
-            <ExpandableChatFooter>
-              <form className="relative rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring p-1">
-                <ChatInput
-                  placeholder="Type your message..."
-                  className="min-h-12 resize-none rounded-lg bg-background border-0 p-3 shadow-none focus-visible:ring-0"
+          {/* Chat Section */}
+          <div className="flex-1 overflow-hidden flex flex-col bg-black/20 rounded-lg border border-siso-text/10">
+            <ChatMessageList>
+              {messages.map((message, index) => (
+                <ChatMessage
+                  key={index}
+                  role={message.role}
+                  content={message.content}
+                  assistantType="SISO AI"
+                  isLoading={index === messages.length - 1 && isLoading}
                 />
-                <div className="flex items-center p-3 pt-0 justify-between">
-                  <div className="flex">
-                    <Button variant="ghost" size="icon" type="button">
-                      <Paperclip className="size-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" type="button">
-                      <Mic className="size-4" />
-                    </Button>
-                  </div>
-                  <Button type="submit" size="sm" className="ml-auto gap-1.5">
-                    Send Message
-                    <Send className="size-3.5" />
-                  </Button>
-                </div>
-              </form>
-            </ExpandableChatFooter>
-          </ExpandableChat>
+              ))}
+            </ChatMessageList>
+
+            <ChatInput 
+              onSubmit={handleSubmit}
+              isLoading={isLoading}
+            />
+          </div>
         </div>
       </div>
     </div>
