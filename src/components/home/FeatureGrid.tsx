@@ -1,25 +1,25 @@
-
-import { Bot } from 'lucide-react';
+import { Bot, Rocket, Users, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Feature } from './types';
 
-const featureItems = [
+const featureItems: Feature[] = [
   {
     icon: Bot,
     title: "AI-Powered Research",
     description: "Get instant insights and answers powered by advanced AI technology"
   },
   {
-    icon: Bot,
+    icon: Rocket,
     title: "Resource Hub Access",
     description: "Access comprehensive resources and documentation"
   },
   {
-    icon: Bot,
+    icon: Users,
     title: "Social Integration",
     description: "Connect and collaborate with the SISO community"
   },
   {
-    icon: Bot,
+    icon: Zap,
     title: "Automated Tools",
     description: "Streamline your workflow with automated solutions"
   }

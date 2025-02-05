@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
@@ -7,17 +6,7 @@ import { Sidebar } from "@/components/Sidebar";
 import { Waves } from '@/components/ui/waves-background';
 import { PreChatState } from '@/components/home/PreChatState';
 import { ChatState } from '@/components/home/ChatState';
-
-interface Message {
-  role: 'assistant' | 'user';
-  content: string;
-  loading?: boolean;
-  steps?: {
-    thinking?: string;
-    searching?: string;
-    response?: string;
-  };
-}
+import { Message } from '@/components/home/types';
 
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);

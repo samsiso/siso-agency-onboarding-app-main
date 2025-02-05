@@ -1,18 +1,7 @@
-
 import { motion } from 'framer-motion';
 import { ChatMessage } from '../chat/ChatMessage';
 import { ChatInput } from '../chat/ChatInput';
-
-interface Message {
-  role: 'assistant' | 'user';
-  content: string;
-  loading?: boolean;
-  steps?: {
-    thinking?: string;
-    searching?: string;
-    response?: string;
-  };
-}
+import { Message } from './types';
 
 interface ChatStateProps {
   messages: Message[];

@@ -1,8 +1,8 @@
-
 import { Bot } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ChatInput } from '../chat/ChatInput';
 import { FeatureGrid } from './FeatureGrid';
+import { GradientText } from '@/components/ui/gradient-text';
 
 interface PreChatStateProps {
   handleSubmit: (message: string) => Promise<void>;
@@ -37,9 +37,12 @@ export const PreChatState = ({ handleSubmit, isLoading }: PreChatStateProps) => 
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
-        <span className="bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
+        <GradientText
+          colors={["#FF5722", "#FFA726", "#FF5722"]}
+          animationSpeed={6}
+        >
           How can I assist you today?
-        </span>
+        </GradientText>
       </motion.h1>
 
       <motion.div
