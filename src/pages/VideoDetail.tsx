@@ -7,7 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { extractVideoIdFromSlug } from '@/utils/slugUtils';
 import { Helmet } from 'react-helmet';
 import { useToast } from '@/hooks/use-toast';
-import { VideoPlayer } from '@/components/education/video-detail/VideoPlayer';
+import { LazyVideoPlayer } from '@/components/education/video-detail/LazyVideoPlayer';
 import { VideoMetadata } from '@/components/education/video-detail/VideoMetadata';
 import { VideoCreatorInfo } from '@/components/education/video-detail/VideoCreatorInfo';
 import { VideoActions } from '@/components/education/video-detail/VideoActions';
@@ -128,7 +128,7 @@ export default function VideoDetail() {
 
         <div className="max-w-[1800px] mx-auto grid grid-cols-1 xl:grid-cols-3 gap-6 p-4">
           <div className="xl:col-span-2 space-y-6">
-            <VideoPlayer videoId={videoData.id} title={videoData.title} />
+            <LazyVideoPlayer videoId={videoData.id} title={videoData.title} />
 
             <div className="space-y-6">
               <VideoMetadata 

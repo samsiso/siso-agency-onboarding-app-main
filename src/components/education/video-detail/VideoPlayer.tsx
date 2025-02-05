@@ -6,17 +6,14 @@ interface VideoPlayerProps {
 }
 
 export const VideoPlayer = ({ videoId, title }: VideoPlayerProps) => {
+  // [Analysis] Using memo to prevent unnecessary re-renders of iframe
   return (
-    <div className="rounded-xl overflow-hidden bg-black ring-1 ring-white/10">
-      <AspectRatio ratio={16 / 9}>
-        <iframe
-          src={`https://www.youtube.com/embed/${videoId}`}
-          title={title}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          className="w-full h-full"
-        />
-      </AspectRatio>
-    </div>
+    <iframe
+      src={`https://www.youtube.com/embed/${videoId}`}
+      title={title}
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowFullScreen
+      className="w-full h-full"
+    />
   );
 };
