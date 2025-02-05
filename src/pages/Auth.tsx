@@ -85,11 +85,14 @@ export default function Auth() {
 
   const handleSkip = () => {
     console.log('Skipping auth, proceeding to social onboarding...');
-    toast({
-      title: "Guest Mode",
-      description: "Proceeding without an account. Some features may be limited.",
+    // Use Promise.resolve() to ensure navigation happens after the toast
+    Promise.resolve().then(() => {
+      navigate('/onboarding/social');
+      toast({
+        title: "Guest Mode",
+        description: "Proceeding without an account. Some features may be limited.",
+      });
     });
-    navigate('/onboarding/social');
   };
 
   return (
