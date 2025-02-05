@@ -4,7 +4,7 @@ import { RainbowButton } from './ui/rainbow-button';
 import { useSidebar } from './ui/sidebar';
 import { Sidebar } from './Sidebar';
 
-export const Hero = () => {
+const Hero = () => {
   const navigate = useNavigate();
   const { setOpen } = useSidebar();
   const [isLoaded, setIsLoaded] = useState(false);
@@ -133,3 +133,5 @@ export const Hero = () => {
     </div>
   );
 };
+
+export default Hero;

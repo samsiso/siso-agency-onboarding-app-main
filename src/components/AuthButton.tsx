@@ -7,7 +7,7 @@ import { SocialMediaModal } from './auth/SocialMediaModal';
 import { Button } from '@/components/ui/button';
 import { useGoogleAuth } from '@/hooks/useGoogleAuth';
 
-export const AuthButton = () => {
+const AuthButton = () => {
   const { user, setUser, loading, setLoading, handleSignIn } = useAuthSession();
   const { handleSignOut } = useGoogleAuth();
   const [showSocialModal, setShowSocialModal] = useState(false);
@@ -124,3 +124,5 @@ export const AuthButton = () => {
     </div>
   );
 };
+
+export default AuthButton;

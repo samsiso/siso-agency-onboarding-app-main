@@ -3,9 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { LoadingFallback } from './sections/LoadingFallback';
 
-// [Analysis] Implementing aggressive code splitting for landing page sections
-// [Plan] Monitor component load times and adjust splitting strategy if needed
-
 const HeroSection = lazy(() => 
   import('./sections/HeroSection').then(m => ({ 
     default: memo(m.HeroSection) 
@@ -66,7 +63,7 @@ const ScrollNav = lazy(() =>
   }))
 );
 
-export const LandingPage = () => {
+const LandingPage = () => {
   const { user } = useAuthSession();
   const navigate = useNavigate();
 
@@ -146,3 +143,5 @@ export const LandingPage = () => {
     </div>
   );
 };
+
+export default LandingPage;
