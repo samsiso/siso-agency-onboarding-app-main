@@ -1,5 +1,7 @@
+
 import { Routes, Route } from 'react-router-dom';
 import Index from '@/pages/Index';
+import Home from '@/pages/Home';
 import Auth from '@/pages/Auth';
 import Profile from '@/pages/Profile';
 import Tools from '@/pages/Tools';
@@ -28,6 +30,7 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Index />} />
+      <Route path="/home" element={<Home />} />
       <Route path="/auth" element={<Auth />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/tools" element={<Tools />} />
