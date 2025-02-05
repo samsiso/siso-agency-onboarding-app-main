@@ -96,7 +96,7 @@ export default function Home() {
 
       <Sidebar />
       <div className="relative z-10 flex-1 p-4 md:p-8">
-        <div className="max-w-4xl mx-auto flex flex-col h-[calc(100vh-4rem)]">
+        <div className="h-[calc(100vh-4rem)]">
           <AnimatePresence mode="wait">
             {!isExpanded ? (
               <PreChatState handleSubmit={handleSubmit} isLoading={isLoading} />

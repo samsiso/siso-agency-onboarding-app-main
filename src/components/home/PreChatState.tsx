@@ -21,7 +21,6 @@ export const PreChatState = ({ handleSubmit, isLoading }: PreChatStateProps) => 
 
   const handleInputSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
     const message = e.currentTarget.querySelector('input')?.value;
     if (message?.trim()) {
       handleSubmit(message.trim());
@@ -34,7 +33,7 @@ export const PreChatState = ({ handleSubmit, isLoading }: PreChatStateProps) => 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="flex flex-col items-center justify-center h-full"
+      className="flex flex-col items-center justify-center h-full max-w-3xl mx-auto px-4"
     >
       <motion.div
         className="mb-8"
@@ -45,7 +44,7 @@ export const PreChatState = ({ handleSubmit, isLoading }: PreChatStateProps) => 
         <img 
           src="/lovable-uploads/dee36671-c662-422f-a9a0-deb2eeb03973.png" 
           alt="SISO Lion Logo" 
-          className="w-24 h-24 object-contain rounded-full"
+          className="w-24 h-24 object-contain rounded-full bg-black/30 p-2 border border-white/10"
         />
       </motion.div>
 
@@ -61,7 +60,7 @@ export const PreChatState = ({ handleSubmit, isLoading }: PreChatStateProps) => 
       </motion.h1>
 
       <motion.div
-        className="w-full max-w-2xl mb-16"
+        className="w-full"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
@@ -70,6 +69,7 @@ export const PreChatState = ({ handleSubmit, isLoading }: PreChatStateProps) => 
           placeholders={searchPlaceholders}
           onChange={handleInputChange}
           onSubmit={handleInputSubmit}
+          className="bg-black/30 border-white/10 focus:border-siso-orange/50"
         />
       </motion.div>
     </motion.div>
