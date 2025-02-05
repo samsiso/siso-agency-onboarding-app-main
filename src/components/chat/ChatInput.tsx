@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Send, Mic, MicOff } from 'lucide-react';
 import { Button } from '../ui/button';
@@ -43,7 +42,7 @@ export const ChatInput = ({ onSubmit, isLoading, placeholder = "Type your messag
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
-            className="min-h-[52px] w-full resize-none rounded-lg bg-black/20 border border-siso-text/10 px-4 py-3 text-siso-text placeholder:text-siso-text/50 focus:outline-none focus:ring-2 focus:ring-siso-red/50 transition-all pr-12"
+            className="min-h-[52px] w-full resize-none rounded-lg bg-black/20 border border-siso-text/10 px-4 py-3 text-white placeholder:text-siso-text/50 focus:outline-none focus:ring-2 focus:ring-siso-red/50 transition-all pr-12"
             disabled={isLoading}
             rows={1}
           />
