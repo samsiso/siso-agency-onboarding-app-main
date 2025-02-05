@@ -1,5 +1,5 @@
 export interface Message {
-  role: 'assistant' | 'user';
+  role: 'user' | 'assistant';
   content: string;
   loading?: boolean;
   steps?: {
@@ -8,10 +8,4 @@ export interface Message {
     processing?: string;
     response?: string;
   };
-}
-
-export interface Feature {
-  icon: React.ComponentType<{ className?: string }>;
-  title: string;
-  description: string;
 }

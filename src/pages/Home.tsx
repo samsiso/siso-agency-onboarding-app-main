@@ -23,6 +23,7 @@ export default function Home() {
 
     setMessages(prev => [...prev, { role: 'user', content: message }]);
     
+    // Add initial loading message with first step
     setMessages(prev => [...prev, { 
       role: 'assistant', 
       content: '',
@@ -35,15 +36,29 @@ export default function Home() {
     setIsLoading(true);
 
     try {
-      setMessages(prev => {
-        const lastMessage = { ...prev[prev.length - 1] };
-        lastMessage.steps = {
-          ...lastMessage.steps,
-          searching: '🔍 Searching through SISO Resource Hub...',
-          processing: '⚡ Processing relevant information...'
-        };
-        return [...prev.slice(0, -1), lastMessage];
-      });
+      // Update with second step after a short delay
+      setTimeout(() => {
+        setMessages(prev => {
+          const lastMessage = { ...prev[prev.length - 1] };
+          lastMessage.steps = {
+            ...lastMessage.steps,
+            searching: '🔍 Searching through SISO Resource Hub...',
+          };
+          return [...prev.slice(0, -1), lastMessage];
+        });
+      }, 1000);
+
+      // Update with third step after another delay
+      setTimeout(() => {
+        setMessages(prev => {
+          const lastMessage = { ...prev[prev.length - 1] };
+          lastMessage.steps = {
+            ...lastMessage.steps,
+            processing: '⚡ Processing relevant information...',
+          };
+          return [...prev.slice(0, -1), lastMessage];
+        });
+      }, 2000);
 
       const { data, error } = await supabase.functions.invoke('chat-with-assistant', {
         body: { message }
@@ -51,6 +66,7 @@ export default function Home() {
 
       if (error) throw error;
 
+      // Final step and response
       setMessages(prev => {
         const newMessages = [...prev.slice(0, -1)];
         newMessages.push({ 
@@ -58,10 +74,10 @@ export default function Home() {
           content: data.response,
           loading: false,
           steps: {
-            thinking: '🤔 I analyzed your question and identified key topics.',
-            searching: '🔍 I searched through our resource database.',
-            processing: '⚡ I processed the most relevant information.',
-            response: '💡 Here\'s what I found:'
+            thinking: '🤔 Analyzed your question and identified key topics',
+            searching: '🔍 Searched through our resource database',
+            processing: '⚡ Processed the most relevant information',
+            response: '💡 Generated response based on findings'
           }
         });
         return newMessages;

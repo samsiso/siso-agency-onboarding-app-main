@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Message } from './types';
-import { Bot } from 'lucide-react';
+import { Bot, CheckCircle2, Loader } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ChatStateProps {
@@ -19,25 +19,39 @@ export const ChatState = ({ messages, handleSubmit, isLoading }: ChatStateProps)
     }
   };
 
-  const LoadingIndicator = () => (
-    <div className="flex items-center space-x-2">
-      <div className="flex space-x-1">
-        <motion.div
-          className="w-2 h-2 rounded-full bg-gradient-to-r from-siso-red to-siso-orange"
-          animate={{ scale: [1, 1.2, 1] }}
-          transition={{ duration: 1, repeat: Infinity }}
-        />
-        <motion.div
-          className="w-2 h-2 rounded-full bg-gradient-to-r from-siso-red to-siso-orange"
-          animate={{ scale: [1, 1.2, 1] }}
-          transition={{ duration: 1, delay: 0.2, repeat: Infinity }}
-        />
-        <motion.div
-          className="w-2 h-2 rounded-full bg-gradient-to-r from-siso-red to-siso-orange"
-          animate={{ scale: [1, 1.2, 1] }}
-          transition={{ duration: 1, delay: 0.4, repeat: Infinity }}
-        />
+  const LoadingStep = ({ step, isActive, isCompleted }: { step: string; isActive: boolean; isCompleted: boolean }) => (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className={cn(
+        "flex items-center space-x-2 text-sm",
+        isActive ? "text-siso-text" : "text-siso-text/50",
+        isCompleted ? "text-siso-orange" : ""
+      )}
+    >
+      <div className="flex items-center justify-center w-5 h-5">
+        {isCompleted ? (
+          <CheckCircle2 className="w-4 h-4 text-siso-orange" />
+        ) : isActive ? (
+          <Loader className="w-4 h-4 animate-spin" />
+        ) : (
+          <div className="w-2 h-2 bg-current rounded-full" />
+        )}
       </div>
+      <span>{step}</span>
+    </motion.div>
+  );
+
+  const LoadingIndicator = ({ steps }: { steps: Record<string, boolean> }) => (
+    <div className="flex flex-col space-y-3">
+      {Object.entries(steps).map(([step, completed], index) => (
+        <LoadingStep
+          key={step}
+          step={step}
+          isActive={!completed && index === Object.values(steps).filter(Boolean).length}
+          isCompleted={completed}
+        />
+      ))}
     </div>
   );
 
@@ -69,20 +83,20 @@ export const ChatState = ({ messages, handleSubmit, isLoading }: ChatStateProps)
               )}
               <div className="flex-1 space-y-2">
                 {message.loading ? (
-                  <div className="space-y-2">
-                    {Object.entries(message.steps || {}).map(([key, value], stepIndex) => (
-                      <motion.div
-                        key={key}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: stepIndex * 0.5 }}
-                        className="text-sm text-gray-300"
-                      >
-                        {value}
-                        {key === Object.keys(message.steps || {}).slice(-1)[0] && <LoadingIndicator />}
-                      </motion.div>
-                    ))}
-                  </div>
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="space-y-4"
+                  >
+                    <LoadingIndicator
+                      steps={{
+                        "🤔 Analyzing your question and identifying key topics...": message.steps?.thinking !== undefined,
+                        "🔍 Searching through SISO Resource Hub...": message.steps?.searching !== undefined,
+                        "⚡ Processing relevant information...": message.steps?.processing !== undefined,
+                        "💡 Generating response...": message.steps?.response !== undefined,
+                      }}
+                    />
+                  </motion.div>
                 ) : (
                   <div className="text-sm text-gray-200 leading-relaxed">
                     {message.content}
