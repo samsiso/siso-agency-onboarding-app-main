@@ -1,9 +1,7 @@
 import { useState } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { usePagination } from '@/hooks/use-pagination';
 import { VideoGrid } from './video-library/VideoGrid';
-import { VideoPagination } from './video-library/VideoPagination';
 import { toast } from 'sonner';
 import { useInView } from 'react-intersection-observer';
 import { useEffect } from 'react';
@@ -31,6 +29,8 @@ export const VideoLibrary = ({
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
   const { ref: loadMoreRef, inView } = useInView();
 
+  // [Analysis] Using a single JOIN query for better performance
+  // [Plan] Add Redis caching layer at 10k+ daily active users
   const {
     data,
     fetchNextPage,
@@ -41,11 +41,26 @@ export const VideoLibrary = ({
   } = useInfiniteQuery({
     queryKey: ['videos', selectedEducator, searchQuery, sortBy, filterBySeries],
     queryFn: async ({ pageParam = 0 }) => {
-      // First get the videos
+      console.log('Fetching videos with params:', { pageParam, selectedEducator, searchQuery, sortBy });
+      
       const { data: videos, error } = await supabase
         .from('youtube_videos')
-        .select('*')
-        .range(pageParam * ITEMS_PER_PAGE, (pageParam + 1) * ITEMS_PER_PAGE - 1);
+        .select(`
+          id,
+          title,
+          url,
+          thumbnailUrl,
+          duration,
+          viewCount,
+          date,
+          channel_id,
+          education_creators (
+            name,
+            channel_avatar_url
+          )
+        `)
+        .range(pageParam * ITEMS_PER_PAGE, (pageParam + 1) * ITEMS_PER_PAGE - 1)
+        .order('date', { ascending: false });
 
       if (error) {
         console.error('Error fetching videos:', error);
@@ -53,20 +68,9 @@ export const VideoLibrary = ({
         throw error;
       }
 
-      // Then get the creator info for these videos
-      const channelIds = videos?.map(video => video.channel_id).filter(Boolean) || [];
-      const { data: creators } = await supabase
-        .from('education_creators')
-        .select('channel_id, name, channel_avatar_url')
-        .in('channel_id', channelIds);
+      console.log('Fetched videos:', videos);
 
-      // Create a map of channel_id to creator info
-      const creatorMap = (creators || []).reduce((acc, creator) => {
-        acc[creator.channel_id] = creator;
-        return acc;
-      }, {} as Record<string, any>);
-
-      // Transform the video data
+      // Transform the data
       return (videos || []).map(video => ({
         id: video.id,
         title: video.title || '',
@@ -74,8 +78,8 @@ export const VideoLibrary = ({
         duration: video.duration || '0:00',
         thumbnail_url: video.thumbnailUrl || '',
         educator: {
-          name: creatorMap[video.channel_id]?.name || video.channel_id || 'Unknown Creator',
-          avatar_url: creatorMap[video.channel_id]?.channel_avatar_url || ''
+          name: video.education_creators?.name || 'Unknown Creator',
+          avatar_url: video.education_creators?.channel_avatar_url || ''
         },
         metrics: {
           views: video.viewCount || 0,
@@ -95,7 +99,8 @@ export const VideoLibrary = ({
     getNextPageParam: (lastPage, allPages) => {
       return lastPage.length === ITEMS_PER_PAGE ? allPages.length : undefined;
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    gcTime: 10 * 60 * 1000,   // Keep unused data for 10 minutes
     meta: {
       onSettled: (data, error) => {
         if (error) {
