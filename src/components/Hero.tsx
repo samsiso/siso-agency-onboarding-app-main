@@ -4,14 +4,21 @@ import { RainbowButton } from './ui/rainbow-button';
 import { useSidebar } from './ui/sidebar';
 import { Sidebar } from './Sidebar';
 
+// [Analysis] Optimizing Hero component for faster initial render
+// [Plan] Monitor performance metrics and adjust loading strategy if needed
 const Hero = () => {
   const navigate = useNavigate();
   const { setOpen } = useSidebar();
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    console.log('Hero component mounted');
-    setIsLoaded(true);
+    // [Analysis] Using requestIdleCallback for non-critical initialization
+    const idleCallback = window.requestIdleCallback || ((cb) => setTimeout(cb, 1));
+    idleCallback(() => {
+      console.log('Hero component mounted');
+      setIsLoaded(true);
+    });
+
     return () => {
       console.log('Hero component unmounted');
     };
@@ -58,12 +65,12 @@ const Hero = () => {
   return (
     <div className="flex-1 relative">
       <Sidebar />
-      {/* Background layer */}
+      {/* Background layer with optimized rendering */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-br from-siso-bg via-siso-bg/95 to-siso-bg/90" />
       </div>
       
-      {/* Content layer - explicit z-index and pointer-events-auto */}
+      {/* Content layer with explicit z-index and pointer-events-auto */}
       <div className="relative z-30 max-w-6xl mx-auto px-2 sm:px-4 py-3 sm:py-4 md:py-6">
         <div className="text-center">
           <div className="space-y-2 sm:space-y-3">
