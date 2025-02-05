@@ -43,8 +43,8 @@ export default function Auth() {
       
       {/* Waves Background - Positioned above gradient but below content */}
       <Waves 
-        lineColor="rgba(255, 87, 34, 0.8)"
-        backgroundColor="rgba(255, 87, 34, 0.05)"
+        lineColor="rgba(255, 87, 34, 0.2)"
+        backgroundColor="rgba(255, 87, 34, 0.02)"
         waveSpeedX={0.025}
         waveSpeedY={0.015}
         waveAmpX={80}
