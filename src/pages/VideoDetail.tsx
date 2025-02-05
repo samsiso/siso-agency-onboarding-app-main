@@ -27,6 +27,7 @@ export default function VideoDetail() {
     queryKey: ['video', videoId],
     queryFn: async () => {
       if (!videoId) {
+        console.error('Invalid video ID');
         throw new Error('Invalid video ID');
       }
 
@@ -34,7 +35,15 @@ export default function VideoDetail() {
 
       const { data: videoDetails, error: videoError } = await supabase
         .from('youtube_videos')
-        .select('*')
+        .select(`
+          *,
+          education_creators (
+            name,
+            slug,
+            channel_avatar_url,
+            description
+          )
+        `)
         .eq('id', videoId)
         .maybeSingle();
       
@@ -50,20 +59,7 @@ export default function VideoDetail() {
 
       console.log('Found video details:', videoDetails); // Debug log
 
-      const { data: educatorDetails, error: educatorError } = await supabase
-        .from('education_creators')
-        .select('name, slug, channel_avatar_url, description')
-        .eq('channel_id', videoDetails.channel_id)
-        .maybeSingle();
-      
-      if (educatorError) {
-        console.error('Error fetching educator:', educatorError);
-      }
-
-      return {
-        ...videoDetails,
-        educator: educatorDetails
-      };
+      return videoDetails;
     },
     enabled: !!videoId,
     meta: {
@@ -104,11 +100,11 @@ export default function VideoDetail() {
     );
   }
 
-  const channelName = videoData?.channel_id || 'Unknown Creator';
-  const channelAvatar = videoData?.educator?.channel_avatar_url || '';
-  const videoDescription = videoData?.educator?.description || '';
+  const channelName = videoData?.education_creators?.name || videoData?.channel_id || 'Unknown Creator';
+  const channelAvatar = videoData?.education_creators?.channel_avatar_url || '';
+  const videoDescription = videoData?.education_creators?.description || '';
   const thumbnailUrl = videoData?.thumbnailUrl || '';
-  const educatorSlug = videoData?.educator?.slug;
+  const educatorSlug = videoData?.education_creators?.slug;
 
   return (
     <>

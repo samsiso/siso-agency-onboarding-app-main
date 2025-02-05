@@ -5,14 +5,18 @@ export const extractVideoIdFromSlug = (slug: string): string => {
     return '';
   }
 
-  // [Analysis] YouTube IDs are 11 characters, match last segment after hyphen
-  const matches = slug.match(/-([A-Za-z0-9_-]{11})$/);
-  console.log('Extracting ID from slug:', slug, 'Matches:', matches); // Debug log
+  console.log('Extracting ID from slug:', slug); // Debug log
   
-  if (!matches || !matches[1]) {
+  // [Analysis] Match the last segment that looks like a YouTube ID (11 characters)
+  const matches = slug.match(/[A-Za-z0-9_-]{11}$/);
+  
+  if (!matches || !matches[0]) {
     console.error('Could not extract video ID from slug:', slug);
     return '';
   }
 
-  return matches[1];
+  const videoId = matches[0];
+  console.log('Extracted video ID:', videoId); // Debug log
+  
+  return videoId;
 };
