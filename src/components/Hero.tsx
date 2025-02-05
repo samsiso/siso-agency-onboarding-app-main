@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { RainbowButton } from './ui/rainbow-button';
 import { useSidebar } from './ui/sidebar';
 import { Sidebar } from './Sidebar';
 import { PlaceholdersAndVanishInput } from './ui/placeholders-and-vanish-input';
@@ -28,15 +27,6 @@ const Hero = () => {
     navigate(path);
   };
 
-  const handleGetStarted = () => {
-    console.log('Get Started clicked - attempting navigation to /auth');
-    try {
-      navigate('/auth');
-    } catch (error) {
-      console.error('Navigation error:', error);
-    }
-  };
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log('Search input changed:', e.target.value);
   };
@@ -44,6 +34,11 @@ const Hero = () => {
   const handleInputSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log('Search submitted');
+    const message = e.currentTarget.querySelector('input')?.value;
+    if (message?.trim()) {
+      console.log('Navigating to auth with query:', message);
+      navigate('/auth', { state: { initialQuery: message } });
+    }
   };
 
   const searchPlaceholders = [
@@ -113,15 +108,6 @@ const Hero = () => {
                   Tools, education & networking for agency growth.
                 </span>
               </div>
-            </div>
-            
-            <div className="relative mt-2 sm:mt-3 md:mt-4">
-              <RainbowButton
-                onClick={handleGetStarted}
-                className="relative z-30 text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-3 font-semibold pointer-events-auto"
-              >
-                Start Onboarding
-              </RainbowButton>
             </div>
           </div>
 
