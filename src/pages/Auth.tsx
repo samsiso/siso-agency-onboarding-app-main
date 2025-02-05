@@ -32,6 +32,11 @@ export default function Auth() {
       const email = formData.get('email') as string;
       const password = formData.get('password') as string;
 
+      // Validate password length
+      if (password.length > 72) {
+        throw new Error('Password must be less than 72 characters');
+      }
+
       // Sign in with email/password
       const { data: { session }, error } = await supabase.auth.signUp({
         email,
@@ -133,6 +138,7 @@ export default function Auth() {
                 placeholder="Create Password"
                 className="w-full bg-white/5 border-siso-border text-siso-text placeholder:text-siso-text-muted focus:border-siso-red"
                 required
+                maxLength={72}
               />
             </div>
             <Button 
