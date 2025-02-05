@@ -7,16 +7,7 @@ import { useState } from 'react';
 import { ChatMessage } from '@/components/chat/ChatMessage';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/hooks/use-toast";
-import {
-  ExpandableChat,
-  ExpandableChatHeader,
-  ExpandableChatBody,
-  ExpandableChatFooter,
-} from '@/components/ui/expandable-chat';
-import { ChatMessageList } from '@/components/ui/chat-message-list';
-import { ChatInput } from '@/components/ui/chat-input';
-import { Send } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { ChatInput } from '@/components/chat/ChatInput';
 import { Waves } from '@/components/ui/waves-background';
 
 interface Message {
@@ -142,7 +133,7 @@ export default function Home() {
           
           {/* Chat Section */}
           <div className="flex-1 overflow-hidden flex flex-col bg-black/20 rounded-lg border border-siso-text/10">
-            <ChatMessageList>
+            <div className="flex-1 overflow-y-auto">
               {messages.map((message, index) => (
                 <ChatMessage
                   key={index}
@@ -153,7 +144,7 @@ export default function Home() {
                   steps={message.steps}
                 />
               ))}
-            </ChatMessageList>
+            </div>
 
             <ChatInput 
               onSubmit={handleSubmit} 
