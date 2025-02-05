@@ -1,6 +1,5 @@
 import { RainbowButton } from '@/components/ui/rainbow-button';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const CallToActionSection = () => {
@@ -37,11 +36,12 @@ export const CallToActionSection = () => {
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                  className="flex items-center justify-center"
                 >
                   <img 
-                    src="/lovable-uploads/ec589ece-3c6c-45ea-b886-a84404f4788a.png" 
+                    src="/lovable-uploads/c482563a-42db-4f47-83f2-c2e7771400b7.png" 
                     alt="SISO Logo" 
-                    className="w-12 h-12"
+                    className="w-12 h-12 object-contain"
                   />
                 </motion.div>
                 <h3 className="text-3xl md:text-4xl font-bold text-white 
