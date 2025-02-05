@@ -13,7 +13,6 @@ export default function Auth() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Redirect if already authenticated
   useEffect(() => {
     if (user) {
       navigate('/profile');
@@ -38,8 +37,11 @@ export default function Auth() {
   };
 
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-siso-bg to-black p-4 overflow-hidden">
-      {/* Waves Background */}
+    <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden">
+      {/* Background with gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black to-siso-bg z-0" />
+      
+      {/* Waves Background - Positioned above gradient but below content */}
       <Waves 
         lineColor="rgba(255, 87, 34, 0.8)"
         backgroundColor="rgba(255, 87, 34, 0.05)"
@@ -52,89 +54,92 @@ export default function Auth() {
         maxCursorMove={150}
         xGap={8}
         yGap={24}
-        className="-z-10"
+        className="z-10"
       />
       
-      <div className="w-full max-w-md bg-black/40 backdrop-blur-xl rounded-lg shadow-xl p-8 space-y-6 border border-siso-border/60 relative z-10">
-        {/* Progress Indicator */}
-        <div className="absolute -top-10 left-0 w-full flex justify-center text-siso-text/70">
-          <span className="px-4 py-1 rounded-full bg-siso-bg-alt border border-siso-border text-sm">
-            Step 1 of 3
-          </span>
-        </div>
-
-        <div className="text-center space-y-2">
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent">
-            Welcome to SISO Agency
-          </h1>
-          <p className="text-siso-text">Let's get started with your account setup</p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Input
-              type="email"
-              placeholder="Work Email"
-              className="w-full bg-white/5 border-siso-border text-siso-text placeholder:text-siso-text-muted focus:border-siso-red"
-            />
+      {/* Content Container - Highest z-index */}
+      <div className="relative z-20 w-full max-w-md p-8">
+        <div className="backdrop-blur-xl bg-black/40 rounded-lg shadow-xl p-8 border border-siso-border/60 space-y-6">
+          {/* Progress Indicator */}
+          <div className="absolute -top-10 left-0 w-full flex justify-center text-siso-text/70">
+            <span className="px-4 py-1 rounded-full bg-siso-bg-alt border border-siso-border text-sm">
+              Step 1 of 3
+            </span>
           </div>
-          <div className="space-y-2">
-            <Input
-              type="password"
-              placeholder="Create Password"
-              className="w-full bg-white/5 border-siso-border text-siso-text placeholder:text-siso-text-muted focus:border-siso-red"
-            />
-          </div>
-          <Button 
-            type="submit"
-            className="w-full bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-white"
-          >
-            Continue to Next Step
-          </Button>
-        </form>
 
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-siso-border" />
+          <div className="text-center space-y-2">
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent">
+              Welcome to SISO Agency
+            </h1>
+            <p className="text-siso-text">Let's get started with your account setup</p>
           </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-black/20 px-2 text-siso-text-muted">Or continue with</span>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Input
+                type="email"
+                placeholder="Work Email"
+                className="w-full bg-white/5 border-siso-border text-siso-text placeholder:text-siso-text-muted focus:border-siso-red"
+              />
+            </div>
+            <div className="space-y-2">
+              <Input
+                type="password"
+                placeholder="Create Password"
+                className="w-full bg-white/5 border-siso-border text-siso-text placeholder:text-siso-text-muted focus:border-siso-red"
+              />
+            </div>
+            <Button 
+              type="submit"
+              className="w-full bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-white"
+            >
+              Continue to Next Step
+            </Button>
+          </form>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-siso-border" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-black/20 px-2 text-siso-text-muted">Or continue with</span>
+            </div>
           </div>
-        </div>
 
-        <div className="space-y-3">
-          <Button
-            onClick={handleDemoGoogleSignIn}
-            disabled={loading}
-            className="w-full bg-white text-black hover:bg-gray-100 flex items-center justify-center gap-2"
-          >
-            <GoogleIcon />
-            Continue with Google
-          </Button>
-          
-          <Button
-            onClick={() => {
-              toast({
-                title: "Demo Mode",
-                description: "Proceeding with demo account...",
-              });
-              navigate('/onboarding/social');
-            }}
-            className="w-full bg-[#24292F] text-white hover:bg-[#24292F]/90 flex items-center justify-center gap-2"
-          >
-            <GitHubIcon />
-            Continue with GitHub
-          </Button>
-        </div>
+          <div className="space-y-3">
+            <Button
+              onClick={handleDemoGoogleSignIn}
+              disabled={loading}
+              className="w-full bg-white text-black hover:bg-gray-100 flex items-center justify-center gap-2"
+            >
+              <GoogleIcon />
+              Continue with Google
+            </Button>
+            
+            <Button
+              onClick={() => {
+                toast({
+                  title: "Demo Mode",
+                  description: "Proceeding with demo account...",
+                });
+                navigate('/onboarding/social');
+              }}
+              className="w-full bg-[#24292F] text-white hover:bg-[#24292F]/90 flex items-center justify-center gap-2"
+            >
+              <GitHubIcon />
+              Continue with GitHub
+            </Button>
+          </div>
 
-        <div className="text-center text-sm text-siso-text/70">
-          Already have an account?{" "}
-          <button 
-            onClick={() => navigate('/login')} 
-            className="text-siso-red hover:text-siso-orange transition-colors"
-          >
-            Sign in
-          </button>
+          <div className="text-center text-sm text-siso-text/70">
+            Already have an account?{" "}
+            <button 
+              onClick={() => navigate('/login')} 
+              className="text-siso-red hover:text-siso-orange transition-colors"
+            >
+              Sign in
+            </button>
+          </div>
         </div>
       </div>
     </div>
