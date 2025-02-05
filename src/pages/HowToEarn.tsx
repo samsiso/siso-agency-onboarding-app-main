@@ -6,6 +6,8 @@ import { EarningCategory } from '@/components/earn/EarningCategory';
 import { EarningDetails } from '@/components/earn/EarningDetails';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 const earningSections = [
   {
@@ -307,6 +309,55 @@ const HowToEarn = () => {
   const [selectedCategory, setSelectedCategory] = useState(0);
   const navigate = useNavigate();
 
+  // Fetch point configurations
+  const { data: pointConfigs, isLoading } = useQuery({
+    queryKey: ['pointConfigurations'],
+    queryFn: async () => {
+      console.log('Fetching point configurations...');
+      const { data, error } = await supabase
+        .from('point_configurations')
+        .select('*')
+        .order('created_at', { ascending: true });
+      
+      if (error) {
+        console.error('Error fetching point configurations:', error);
+        throw error;
+      }
+      
+      console.log('Point configurations fetched:', data);
+      return data;
+    }
+  });
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <SidebarProvider>
+        <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
+          <Sidebar />
+          <div className="flex-1 p-4 md:p-8">
+            <div className="max-w-7xl mx-auto">
+              <div className="animate-pulse">
+                <div className="h-12 w-48 bg-siso-text/10 rounded mb-4 mx-auto"></div>
+                <div className="h-6 w-96 bg-siso-text/10 rounded mb-8 mx-auto"></div>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                  <div className="lg:col-span-4 space-y-4">
+                    {[1, 2, 3, 4].map((i) => (
+                      <div key={i} className="h-24 bg-siso-text/10 rounded"></div>
+                    ))}
+                  </div>
+                  <div className="lg:col-span-8">
+                    <div className="h-96 bg-siso-text/10 rounded"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </SidebarProvider>
+    );
+  }
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
@@ -326,7 +377,7 @@ const HowToEarn = () => {
                 Every action counts towards your progress!
               </p>
               <Button
-                onClick={() => navigate('/economy/leaderboards')}
+                onClick={() => navigate('/leaderboards')}
                 className="bg-gradient-to-r from-siso-red to-siso-orange hover:from-siso-red/90 hover:to-siso-orange/90 
                   text-white font-semibold px-6 py-2 rounded-lg transition-all duration-300"
               >
@@ -348,7 +399,14 @@ const HowToEarn = () => {
                     items={section.items}
                     isSelected={selectedCategory === index}
                     onClick={() => setSelectedCategory(index)}
-                    progress={{ completed: 1, total: section.items.length }}
+                    progress={{ 
+                      completed: pointConfigs?.filter(pc => 
+                        section.items.some(item => 
+                          pc.action === item.action.toLowerCase().replace(/ /g, '_')
+                        )
+                      )?.length || 0,
+                      total: section.items.length 
+                    }}
                   />
                 ))}
               </div>
