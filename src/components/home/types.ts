@@ -1,3 +1,5 @@
+import { LucideIcon } from 'lucide-react';
+
 export interface Message {
   role: 'user' | 'assistant';
   content: string;
@@ -8,4 +10,10 @@ export interface Message {
     processing?: string;
     response?: string;
   };
+}
+
+export interface Feature {
+  icon: LucideIcon;
+  title: string;
+  description: string;
 }
