@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthButton } from '../AuthButton';
+import AuthButton from '../AuthButton';
 import { supabase } from '@/integrations/supabase/client';
 import { ProfileSection } from './ProfileSection';
 
