@@ -1400,13 +1400,27 @@ export type Database = {
           usecase_category?: string | null
           viewCount?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "youtube_videos_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "education_creators"
+            referencedColumns: ["channel_id"]
+          },
+        ]
       }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      generate_unique_slug: {
+        Args: {
+          base_name: string
+        }
+        Returns: string
+      }
       handle_onboarding_completion: {
         Args: {
           user_id: string
