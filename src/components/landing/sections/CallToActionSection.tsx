@@ -38,7 +38,11 @@ export const CallToActionSection = () => {
                   animate={{ rotate: 360 }}
                   transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                 >
-                  <Sparkles className="w-8 h-8 text-siso-orange" />
+                  <img 
+                    src="/lovable-uploads/ec589ece-3c6c-45ea-b886-a84404f4788a.png" 
+                    alt="SISO Logo" 
+                    className="w-12 h-12"
+                  />
                 </motion.div>
                 <h3 className="text-3xl md:text-4xl font-bold text-white 
                   bg-clip-text text-transparent bg-gradient-to-r from-white to-white/80
