@@ -1,12 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Sidebar } from '../components/Sidebar';
-import { MessageSquare, Brain, Sparkles, Bot, Wrench, GraduationCap, Network } from 'lucide-react';
+import { MessageSquare, Brain, Sparkles, Bot, Wrench, GraduationCap, Network, ChevronDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChatMessage } from '@/components/chat/ChatMessage';
 import { ChatInput } from '@/components/chat/ChatInput';
 import { useToast } from '@/hooks/use-toast';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface Message {
   role: 'assistant' | 'user';
@@ -16,14 +21,13 @@ interface Message {
 type AssistantType = 'general' | 'tools' | 'education' | 'automations' | 'assistants' | 'ai' | 'networking' | 'news';
 
 const assistantTypes = [
-  { id: 'general', label: 'General Assistant', icon: Bot },
-  { id: 'tools', label: 'Tools Expert', icon: Wrench },
-  { id: 'education', label: 'Education Guide', icon: GraduationCap },
-  { id: 'automations', label: 'Automation Specialist', icon: Bot },
-  { id: 'assistants', label: 'AI Assistant Expert', icon: MessageSquare },
-  { id: 'networking', label: 'Networking Guide', icon: Network },
-  { id: 'ai', label: 'AI Specialist', icon: Brain },
-  { id: 'news', label: 'AI News Expert', icon: MessageSquare },
+  { id: 'general', label: 'General Assistant', icon: Bot, description: 'Your all-purpose AI assistant for any question' },
+  { id: 'tools', label: 'Tools Expert', icon: Wrench, description: 'Specialized in AI tools and their implementation' },
+  { id: 'education', label: 'Education Guide', icon: GraduationCap, description: 'Helps with learning resources and paths' },
+  { id: 'automations', label: 'Automation Specialist', icon: Bot, description: 'Expert in workflow automation' },
+  { id: 'assistants', label: 'AI Assistant Expert', icon: MessageSquare, description: 'Guides you in choosing AI assistants' },
+  { id: 'networking', label: 'Networking Guide', icon: Network, description: 'Helps with community connections' },
+  { id: 'ai', label: 'AI Specialist', icon: Brain, description: 'Deep expertise in AI implementation' },
 ] as const;
 
 const getAssistantPrompt = (type: AssistantType) => {
@@ -93,91 +97,91 @@ const SisoAI = () => {
     }
   };
 
+  const handleAssistantChange = (type: AssistantType) => {
+    setSelectedAssistant(type);
+    setMessages([{ 
+      role: 'assistant', 
+      content: `Hello! I'm your ${assistantTypes.find(a => a.id === type)?.label}. How can I help you today?` 
+    }]);
+  };
+
   return (
-    <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
-      <Sidebar />
-      <div className="flex-1 flex">
-        <div className="w-64 border-r border-siso-text/10 p-4 bg-black/20 overflow-hidden transition-all duration-300">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <h2 className="text-lg font-semibold text-siso-text mb-4">Choose Assistant</h2>
-            <ScrollArea className="h-[calc(100vh-8rem)]">
-              <div className="space-y-2">
-                {assistantTypes.map(({ id, label, icon: Icon }) => (
-                  <motion.button
-                    key={id}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className={`w-full flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
-                      selectedAssistant === id 
-                        ? 'bg-gradient-to-r from-siso-red/20 to-siso-orange/20 text-siso-text-bold'
-                        : 'text-siso-text hover:bg-siso-text/5'
-                    }`}
-                    onClick={() => {
-                      setSelectedAssistant(id as AssistantType);
-                      setMessages([{ 
-                        role: 'assistant', 
-                        content: `Hello! I'm your ${label}. How can I help you today?` 
-                      }]);
-                    }}
-                  >
-                    <Icon className="w-4 h-4" />
-                    <span className="text-sm">{label}</span>
-                  </motion.button>
-                ))}
-              </div>
-            </ScrollArea>
-          </motion.div>
+    <div className="min-h-screen bg-gradient-to-b from-siso-bg to-siso-bg/95">
+      <div className="flex flex-col h-screen">
+        {/* Header */}
+        <div className="border-b border-siso-text/10 bg-siso-bg/80 backdrop-blur-sm">
+          <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <MessageSquare className="h-6 w-6 text-siso-red" />
+              <h1 className="text-xl font-semibold text-siso-text-bold">SISO AI</h1>
+            </div>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-siso-text/5 hover:bg-siso-text/10 transition-colors">
+                  <div className="flex items-center gap-2">
+                    {React.createElement(assistantTypes.find(a => a.id === selectedAssistant)?.icon || Bot, {
+                      className: "h-4 w-4 text-siso-orange"
+                    })}
+                    <span className="text-sm font-medium text-siso-text">
+                      {assistantTypes.find(a => a.id === selectedAssistant)?.label}
+                    </span>
+                  </div>
+                  <ChevronDown className="h-4 w-4 text-siso-text/70" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-[300px] bg-siso-bg border border-siso-text/10">
+                <AnimatePresence>
+                  {assistantTypes.map((type) => (
+                    <DropdownMenuItem
+                      key={type.id}
+                      className="flex items-start gap-3 p-3 hover:bg-siso-text/5 cursor-pointer"
+                      onClick={() => handleAssistantChange(type.id as AssistantType)}
+                    >
+                      <div className="mt-1">
+                        {React.createElement(type.icon, {
+                          className: "h-4 w-4 text-siso-orange"
+                        })}
+                      </div>
+                      <div>
+                        <div className="font-medium text-siso-text">{type.label}</div>
+                        <div className="text-sm text-siso-text/70">{type.description}</div>
+                      </div>
+                    </DropdownMenuItem>
+                  ))}
+                </AnimatePresence>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <div className="w-[100px]" /> {/* Spacer for alignment */}
+          </div>
         </div>
 
-        <div className="flex-1 flex flex-col">
-          <div className="container mx-auto px-4 py-6 max-w-7xl flex-1 flex flex-col">
-            <div className="space-y-6 flex-1 flex flex-col">
+        {/* Chat Area */}
+        <div className="flex-1 container mx-auto max-w-5xl px-4">
+          <div className="h-full flex flex-col">
+            <ScrollArea className="flex-1 px-2">
               <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
-                className="flex items-center gap-4 border-b border-siso-text/10 pb-6"
+                className="space-y-4 py-4"
               >
-                <div className="h-12 w-12 rounded-full bg-gradient-to-br from-siso-red/20 to-siso-orange/20 flex items-center justify-center">
-                  <MessageSquare className="w-6 h-6 text-siso-red" />
-                </div>
-                <div>
-                  <h1 className="text-4xl font-bold text-siso-text-bold">
-                    {assistantTypes.find(a => a.id === selectedAssistant)?.label}
-                  </h1>
-                  <p className="text-siso-text/70">
-                    Ask me anything about {selectedAssistant === 'general' ? 'SISO' : selectedAssistant}
-                  </p>
-                </div>
+                {messages.map((message, index) => (
+                  <ChatMessage
+                    key={index}
+                    role={message.role}
+                    content={message.content}
+                    assistantType={assistantTypes.find(a => a.id === selectedAssistant)?.label}
+                    isLoading={isLoading && index === messages.length - 1 && message.role === 'assistant'}
+                  />
+                ))}
+                <div ref={messagesEndRef} />
               </motion.div>
-              
-              <div className="bg-black/20 rounded-xl border border-siso-text/10 flex-1 flex flex-col overflow-hidden">
-                <ScrollArea className="flex-1 px-2">
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.3 }}
-                    className="space-y-2 py-4"
-                  >
-                    {messages.map((message, index) => (
-                      <ChatMessage
-                        key={index}
-                        role={message.role}
-                        content={message.content}
-                        assistantType={assistantTypes.find(a => a.id === selectedAssistant)?.label}
-                        isLoading={isLoading && index === messages.length - 1 && message.role === 'assistant'}
-                      />
-                    ))}
-                    <div ref={messagesEndRef} />
-                  </motion.div>
-                </ScrollArea>
-                
-                <ChatInput onSubmit={handleSubmit} isLoading={isLoading} />
-              </div>
+            </ScrollArea>
+            
+            <div className="py-4">
+              <ChatInput onSubmit={handleSubmit} isLoading={isLoading} />
             </div>
           </div>
         </div>
