@@ -7,7 +7,9 @@ import { Card } from '@/components/ui/card';
 import { ButtonCta } from '@/components/ui/button-shiny';
 import { GradientText } from '@/components/ui/gradient-text';
 import { Confetti } from '@/components/ui/confetti';
+import confetti from 'canvas-confetti';
 import type { ConfettiRef } from '@/components/ui/confetti';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function ThankYou() {
   const navigate = useNavigate();
