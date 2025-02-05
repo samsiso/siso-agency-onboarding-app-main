@@ -31,7 +31,7 @@ export const PricingSection = () => {
             ],
           },
         ]}
-        buttonText="Start Building Today"
+        buttonText="Start Onboarding Today"
         onButtonClick={handleGetStarted}
         trustMessage="Trusted by agencies worldwide with $10M+ processed through our platform"
       />
