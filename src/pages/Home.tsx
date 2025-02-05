@@ -30,8 +30,8 @@ export default function Home() {
               className="flex items-center justify-center"
             >
               <img 
-                src="/lovable-uploads/f18bd386-e74e-4601-9d78-ade0cb831744.png" 
-                alt="SISO Logo" 
+                src="/lovable-uploads/dee36671-c662-422f-a9a0-deb2eeb03973.png" 
+                alt="SISO Lion Logo" 
                 className="w-16 h-16 object-contain rounded-full"
               />
             </motion.div>
@@ -97,4 +97,3 @@ export default function Home() {
     </div>
   );
 }
-
