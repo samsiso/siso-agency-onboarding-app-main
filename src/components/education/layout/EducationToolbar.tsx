@@ -1,7 +1,5 @@
-import { Grid, List, Filter, SlidersHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import { Grid2X2, List, Video, Users } from 'lucide-react';
 
 interface EducationToolbarProps {
   activeSection: 'videos' | 'educators';
@@ -14,85 +12,46 @@ export const EducationToolbar = ({
   activeSection,
   viewMode,
   onSectionChange,
-  onViewModeChange
+  onViewModeChange,
 }: EducationToolbarProps) => {
   return (
-    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-      <Tabs defaultValue={activeSection} className="w-full md:w-auto">
-        <TabsList className="bg-white/5 border border-white/10">
-          <TabsTrigger 
-            value="videos"
-            onClick={() => onSectionChange('videos')}
-            className="data-[state=active]:bg-siso-orange"
-          >
-            Videos
-          </TabsTrigger>
-          <TabsTrigger 
-            value="educators"
-            onClick={() => onSectionChange('educators')}
-            className="data-[state=active]:bg-siso-orange"
-          >
-            Educators
-          </TabsTrigger>
-        </TabsList>
-      </Tabs>
-
+    <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+      {/* Section Toggle */}
       <div className="flex items-center gap-2">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onViewModeChange('grid')}
-                className={viewMode === 'grid' ? 'text-siso-orange' : 'text-siso-text/50'}
-              >
-                <Grid className="w-4 h-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Grid View</p>
-            </TooltipContent>
-          </Tooltip>
+        <Button
+          variant={activeSection === 'videos' ? 'default' : 'ghost'}
+          onClick={() => onSectionChange('videos')}
+          className="gap-2"
+        >
+          <Video className="w-4 h-4" />
+          Videos
+        </Button>
+        <Button
+          variant={activeSection === 'educators' ? 'default' : 'ghost'}
+          onClick={() => onSectionChange('educators')}
+          className="gap-2"
+        >
+          <Users className="w-4 h-4" />
+          Educators
+        </Button>
+      </div>
 
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onViewModeChange('list')}
-                className={viewMode === 'list' ? 'text-siso-orange' : 'text-siso-text/50'}
-              >
-                <List className="w-4 h-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>List View</p>
-            </TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="outline" size="icon">
-                <Filter className="w-4 h-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Filter</p>
-            </TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="outline" size="icon">
-                <SlidersHorizontal className="w-4 h-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Sort</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+      {/* View Mode Toggle */}
+      <div className="flex items-center gap-2">
+        <Button
+          variant={viewMode === 'grid' ? 'default' : 'ghost'}
+          size="icon"
+          onClick={() => onViewModeChange('grid')}
+        >
+          <Grid2X2 className="w-4 h-4" />
+        </Button>
+        <Button
+          variant={viewMode === 'list' ? 'default' : 'ghost'}
+          size="icon"
+          onClick={() => onViewModeChange('list')}
+        >
+          <List className="w-4 h-4" />
+        </Button>
       </div>
     </div>
   );
