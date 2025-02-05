@@ -33,9 +33,13 @@ function Hero() {
     }
   };
 
-  const handleScheduleDemo = () => {
-    console.log('Schedule Demo clicked');
-    // Demo scheduling logic here
+  const handleTryAI = () => {
+    console.log('Try AI clicked - navigating to /home');
+    try {
+      navigate('/home');
+    } catch (error) {
+      console.error('Navigation error:', error);
+    }
   };
 
   return (
@@ -81,9 +85,9 @@ function Hero() {
               size="lg" 
               className="gap-4" 
               variant="outline"
-              onClick={handleScheduleDemo}
+              onClick={handleTryAI}
             >
-              Schedule a Demo <PhoneCall className="w-4 h-4" />
+              Try SISO AI Now <PhoneCall className="w-4 h-4" />
             </Button>
             <Button 
               size="lg" 
