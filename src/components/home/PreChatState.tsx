@@ -1,8 +1,5 @@
-import { Bot } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { ChatInput } from '../chat/ChatInput';
-import { FeatureGrid } from './FeatureGrid';
-import { GradientText } from '@/components/ui/gradient-text';
+import { PlaceholdersAndVanishInput } from '@/components/ui/placeholders-and-vanish-input';
 
 interface PreChatStateProps {
   handleSubmit: (message: string) => Promise<void>;
@@ -10,6 +7,27 @@ interface PreChatStateProps {
 }
 
 export const PreChatState = ({ handleSubmit, isLoading }: PreChatStateProps) => {
+  const searchPlaceholders = [
+    "How can AI help my business grow?",
+    "What tools do you recommend for automation?",
+    "How to implement AI in my workflow?",
+    "Best practices for agency scaling",
+    "Latest AI trends for agencies",
+  ];
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('Search input changed:', e.target.value);
+  };
+
+  const handleInputSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const input = formData.get('message') as string;
+    if (input?.trim()) {
+      handleSubmit(input.trim());
+    }
+  };
+
   return (
     <motion.div
       key="initial"
@@ -37,12 +55,9 @@ export const PreChatState = ({ handleSubmit, isLoading }: PreChatStateProps) => 
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
-        <GradientText
-          colors={["#FF5722", "#FFA726", "#FF5722"]}
-          animationSpeed={6}
-        >
-          How can I assist you today?
-        </GradientText>
+        <span className="bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent">
+          Welcome to SISO Resources
+        </span>
       </motion.h1>
 
       <motion.div
@@ -51,14 +66,12 @@ export const PreChatState = ({ handleSubmit, isLoading }: PreChatStateProps) => 
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
       >
-        <ChatInput 
-          onSubmit={handleSubmit}
-          isLoading={isLoading}
-          placeholder="Type your message here..."
+        <PlaceholdersAndVanishInput 
+          placeholders={searchPlaceholders}
+          onChange={handleInputChange}
+          onSubmit={handleInputSubmit}
         />
       </motion.div>
-
-      <FeatureGrid />
     </motion.div>
   );
 };
