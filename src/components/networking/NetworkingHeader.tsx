@@ -11,6 +11,7 @@ interface NetworkingHeaderProps {
 }
 
 export const NetworkingHeader = ({ searchQuery, setSearchQuery }: NetworkingHeaderProps) => {
+  // [Analysis] Using React Query for real-time stats with automatic background updates
   const { data: stats } = useQuery({
     queryKey: ['networking-stats'],
     queryFn: async () => {
