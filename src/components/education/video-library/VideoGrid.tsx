@@ -48,23 +48,27 @@ export const VideoGrid = ({ videos = [], featuredVideos = [], isLoading }: Video
   }
 
   const handleVideoClick = (video: Video) => {
+    console.log('[VideoGrid] Video clicked:', video);
+    
     if (!video.id || !video.title) {
-      console.error('Invalid video data:', video);
+      console.error('[VideoGrid] Invalid video data:', video);
       return;
     }
 
     const slug = video.title
       .toLowerCase()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .substring(0, 60);
+      .replace(/[^\w\s-]/g, '') // Remove special characters
+      .replace(/\s+/g, '-') // Replace spaces with hyphens
+      .replace(/-+/g, '-') // Remove consecutive hyphens
+      .substring(0, 60); // Limit length
     
-    console.log('[VideoGrid] Navigating to video:', { 
-      slug, 
-      videoId: video.id 
+    console.log('[VideoGrid] Navigating to:', {
+      slug,
+      videoId: video.id,
+      fullPath: `/education/videos/${slug}-${video.id}`
     });
     
+    // [Analysis] Ensure the path starts with /education/videos
     navigate(`/education/videos/${slug}-${video.id}`);
   };
 

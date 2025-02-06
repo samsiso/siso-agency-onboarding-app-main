@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Video } from '../types';
 import { useAuthSession } from '@/hooks/useAuthSession';
-import { useNavigate } from 'react-router-dom';
 import { VideoThumbnail } from './VideoThumbnail';
 import { VideoActions } from './VideoActions';
 import { VideoMetadata } from './VideoMetadata';
@@ -21,7 +20,6 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
   const [isInView, setIsInView] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const { user } = useAuthSession();
-  const navigate = useNavigate();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -60,27 +58,10 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
     checkBookmarkStatus();
   }, [user?.id, video.id]);
 
-  const handleVideoClick = async (e: React.MouseEvent) => {
+  const handleCardClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!video.id || !video.title) {
-      console.error('Invalid video data:', video);
-      return;
-    }
-
-    const slug = video.title
-      .toLowerCase()
-      .replace(/[^\w\s-]/g, '') // Remove special characters
-      .replace(/\s+/g, '-') // Replace spaces with hyphens
-      .replace(/-+/g, '-') // Remove consecutive hyphens
-      .substring(0, 60); // Limit length
-    
-    console.log('[OptimizedVideoCard] Navigation:', {
-      videoId: video.id,
-      slug,
-      fullPath: `/education/videos/${slug}-${video.id}`
-    });
-    
-    navigate(`/education/videos/${slug}-${video.id}`);
+    console.log('[OptimizedVideoCard] Card clicked, delegating to onClick handler');
+    onClick?.();
   };
 
   // Stagger animation delay based on index
@@ -92,7 +73,7 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
       initial={{ opacity: 0, y: 20 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.5, delay: staggerDelay }}
-      onClick={onClick}
+      onClick={handleCardClick}
       className={cn(
         "group cursor-pointer rounded-lg border border-siso-border bg-siso-bg-alt overflow-hidden",
         "transition-all duration-300 hover:border-siso-orange/30 hover:bg-siso-text/5",
@@ -104,7 +85,7 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
       role="article"
       aria-label={`Video: ${video.title}`}
     >
-      <div onClick={handleVideoClick}>
+      <div>
         <VideoThumbnail
           thumbnailUrl={video.thumbnail_url}
           duration={video.duration}
@@ -123,7 +104,9 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
       </div>
 
       <div className="p-4 space-y-2">
-        <h3 className="line-clamp-2 font-semibold text-siso-text-bold group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-siso-red group-hover:to-siso-orange">
+        <h3 className={cn(
+          "line-clamp-2 font-semibold text-siso-text-bold group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-siso-red group-hover:to-siso-orange"
+        )}>
           {video.title}
         </h3>
         
