@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -19,18 +20,27 @@ import { EducationToolbar } from '@/components/education/layout/EducationToolbar
 import { EducationContent } from '@/components/education/layout/EducationContent';
 
 export default function SisoEducation() {
+  console.log('[SisoEducation] Component mounted'); // Debug log
+
   const [activeSection, setActiveSection] = useState<'videos' | 'educators'>('videos');
   const [searchQuery, setSearchQuery] = useState('');
+
+  console.log('[SisoEducation] Current active section:', activeSection); // Debug log
 
   const { data: members, isLoading } = useQuery({
     queryKey: ['education-creators'],
     queryFn: async () => {
+      console.log('[SisoEducation] Fetching education creators'); // Debug log
       const { data, error } = await supabase
         .from('education_creators')
         .select('*');
       
-      if (error) throw error;
+      if (error) {
+        console.error('[SisoEducation] Error fetching creators:', error); // Debug error
+        throw error;
+      }
       
+      console.log('[SisoEducation] Fetched creators:', data); // Debug log
       return data.map(member => ({
         id: member.id,
         name: member.name,
@@ -59,19 +69,17 @@ export default function SisoEducation() {
     },
   });
 
-  const stats = {
-    totalEducators: members?.length || 0,
-    totalVideos: members?.reduce((acc, member) => acc + (member.contribution_count || 0), 0) || 0,
-    totalStudents: members?.reduce((acc, member) => acc + (member.member_count || 0), 0) || 0
-  };
-
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
       <Sidebar />
       <div className="flex-1 p-4 md:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           <EducationHeader 
-            stats={stats}
+            stats={{
+              totalEducators: members?.length || 0,
+              totalVideos: members?.reduce((acc, member) => acc + (member.contribution_count || 0), 0) || 0,
+              totalStudents: members?.reduce((acc, member) => acc + (member.member_count || 0), 0) || 0
+            }}
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
           />
