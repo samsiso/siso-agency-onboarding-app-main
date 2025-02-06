@@ -18,7 +18,7 @@ export const EducationHeader = ({
   onSearchChange 
 }: EducationHeaderProps) => {
   return (
-    <div className="space-y-12 px-6 py-8">
+    <div className="space-y-6 px-6 py-8">
       <HeaderTitle />
       <StatsDisplay stats={stats} />
       <SearchSection 
