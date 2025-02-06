@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from 'lucide-react';
 import { RelatedVideos } from '@/components/education/RelatedVideos';
