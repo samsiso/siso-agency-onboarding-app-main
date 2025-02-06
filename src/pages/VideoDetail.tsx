@@ -93,7 +93,8 @@ export default function VideoDetail() {
 
         if (creators && creators.length > 0) {
           const creator = creators[0];
-          const featuredVideos = creator.featured_videos as FeaturedVideo[];
+          // First cast to unknown, then to FeaturedVideo[] to safely handle the type conversion
+          const featuredVideos = (creator.featured_videos as unknown) as FeaturedVideo[];
           const featuredVideo = featuredVideos.find(v => v.id === videoId);
           
           if (featuredVideo) {
