@@ -20,7 +20,6 @@ import { EducationContent } from '@/components/education/layout/EducationContent
 
 export default function SisoEducation() {
   const [activeSection, setActiveSection] = useState<'videos' | 'educators'>('videos');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
 
   const { data: members, isLoading } = useQuery({
@@ -79,14 +78,11 @@ export default function SisoEducation() {
 
           <EducationToolbar
             activeSection={activeSection}
-            viewMode={viewMode}
             onSectionChange={setActiveSection}
-            onViewModeChange={setViewMode}
           />
 
           <EducationContent
             activeSection={activeSection}
-            viewMode={viewMode}
             searchQuery={searchQuery}
             members={members}
             isLoading={isLoading}
