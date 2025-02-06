@@ -56,9 +56,9 @@ export const EducationHeader = ({ stats, searchQuery, onSearchChange }: Educatio
   };
 
   return (
-    <div className="space-y-8 px-4">
+    <div className="space-y-12 px-6 py-8">
       {/* Stats Section */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {statCards.map((stat, index) => {
           const Icon = stat.icon;
           return (
@@ -107,7 +107,7 @@ export const EducationHeader = ({ stats, searchQuery, onSearchChange }: Educatio
 
       {/* Search Section */}
       <motion.div 
-        className="relative max-w-4xl mx-auto"
+        className="relative w-full max-w-6xl mx-auto px-4"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
@@ -120,7 +120,7 @@ export const EducationHeader = ({ stats, searchQuery, onSearchChange }: Educatio
           className="bg-siso-bg-alt/50 border-siso-border backdrop-blur-sm
             focus:ring-2 focus:ring-siso-orange/50 focus:border-siso-orange
             hover:bg-siso-bg-alt hover:border-siso-border-hover
-            transition-all duration-300 h-16 text-lg"
+            transition-all duration-300 h-20 text-xl py-6 px-8"
         />
       </motion.div>
     </div>
