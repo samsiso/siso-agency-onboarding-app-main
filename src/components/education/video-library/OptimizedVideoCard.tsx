@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { VideoThumbnail } from './VideoThumbnail';
 import { VideoActions } from './VideoActions';
 import { VideoMetadata } from './VideoMetadata';
+import { supabase } from '@/integrations/supabase/client';
 
 interface OptimizedVideoCardProps {
   video: Video;
