@@ -11,6 +11,12 @@ const LearnNetwork = () => {
       icon: GraduationCap
     },
     {
+      title: "AI Assistants",
+      description: "Access specialized AI assistants",
+      path: "/assistants",
+      icon: Bot
+    },
+    {
       title: "Tools",
       description: "Discover and use AI tools",
       path: "/tools",
@@ -21,12 +27,6 @@ const LearnNetwork = () => {
       description: "Connect with other members",
       path: "/networking",
       icon: Users
-    },
-    {
-      title: "GPT Assistants",
-      description: "Access specialized AI assistants",
-      path: "/assistants",
-      icon: Bot
     }
   ];
 

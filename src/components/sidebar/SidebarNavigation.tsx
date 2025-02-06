@@ -13,26 +13,14 @@ import {
   Wallet,
   BarChart,
   List,
-  Folder
+  Folder,
+  Bot
 } from 'lucide-react';
 
 interface SidebarNavigationProps {
   collapsed: boolean;
   onItemClick: (e: React.MouseEvent<HTMLAnchorElement>) => void;
   visible: boolean;
-}
-
-interface MenuSection {
-  type: 'main' | 'section';
-  title?: string;
-  href?: string;
-  icon?: any;
-  label?: string;
-  items?: {
-    href: string;
-    icon: any;
-    label: string;
-  }[];
 }
 
 export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNavigationProps) => {
@@ -48,7 +36,7 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
     }
   };
 
-  const menuSections: MenuSection[] = [
+  const menuSections = [
     {
       type: 'main',
       href: '/',
@@ -64,6 +52,11 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
           href: '/education',
           icon: GraduationCap,
           label: 'Education',
+        },
+        {
+          href: '/assistants',
+          icon: Bot,
+          label: 'AI Assistants',
         },
         {
           href: '/tools',
