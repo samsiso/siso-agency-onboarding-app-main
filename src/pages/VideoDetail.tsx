@@ -36,6 +36,23 @@ interface VideoDetails {
   };
 }
 
+// Type guard to validate FeaturedVideo structure
+const isFeaturedVideo = (video: any): video is FeaturedVideo => {
+  return (
+    typeof video === 'object' &&
+    typeof video.id === 'string' &&
+    typeof video.title === 'string' &&
+    typeof video.thumbnail_url === 'string' &&
+    typeof video.view_count === 'number' &&
+    typeof video.date === 'string'
+  );
+};
+
+// Type guard to validate FeaturedVideo array
+const isFeaturedVideoArray = (arr: any): arr is FeaturedVideo[] => {
+  return Array.isArray(arr) && arr.every(isFeaturedVideo);
+};
+
 export default function VideoDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -93,9 +110,15 @@ export default function VideoDetail() {
 
         if (creators && creators.length > 0) {
           const creator = creators[0];
-          // First cast to unknown, then to FeaturedVideo[] to safely handle the type conversion
-          const featuredVideos = (creator.featured_videos as unknown) as FeaturedVideo[];
-          const featuredVideo = featuredVideos.find(v => v.id === videoId);
+          const featuredVideosRaw = creator.featured_videos;
+          
+          // Validate the featured_videos array
+          if (!isFeaturedVideoArray(featuredVideosRaw)) {
+            console.error('Invalid featured videos data structure:', featuredVideosRaw);
+            throw new Error('Invalid featured videos data structure');
+          }
+
+          const featuredVideo = featuredVideosRaw.find(v => v.id === videoId);
           
           if (featuredVideo) {
             console.log('Found video in featured_videos:', featuredVideo);
