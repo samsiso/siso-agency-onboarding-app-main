@@ -1,3 +1,4 @@
+
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from 'lucide-react';
@@ -21,19 +22,18 @@ export default function VideoDetail() {
   const { toast } = useToast();
   
   const videoId = slug ? extractVideoIdFromSlug(slug) : '';
-  console.log('Extracted video ID:', videoId); // Debug log
+  console.log('[VideoDetail] Processing video ID:', videoId); // Debug log
 
   const { data: videoData, isLoading, error } = useQuery({
     queryKey: ['video', videoId],
     queryFn: async () => {
       if (!videoId) {
-        console.error('Invalid video ID');
+        console.error('[VideoDetail] Invalid video ID');
         throw new Error('Invalid video ID');
       }
 
-      console.log('Fetching video with ID:', videoId); // Debug log
+      console.log('[VideoDetail] Fetching video data for ID:', videoId); // Debug log
 
-      // First, try to find the video in youtube_videos table
       const { data: videoDetails, error: videoError } = await supabase
         .from('youtube_videos')
         .select(`
@@ -42,30 +42,31 @@ export default function VideoDetail() {
             name,
             slug,
             channel_avatar_url,
-            description
+            description,
+            channel_id
           )
         `)
         .eq('id', videoId)
         .maybeSingle();
 
       if (videoError) {
-        console.error('Error fetching video:', videoError);
+        console.error('[VideoDetail] Error fetching video:', videoError);
         throw videoError;
       }
 
       if (!videoDetails) {
-        console.error('No video found with ID:', videoId);
+        console.error('[VideoDetail] No video found with ID:', videoId);
         throw new Error('Video not found');
       }
 
-      console.log('Found video details:', videoDetails); // Debug log
+      console.log('[VideoDetail] Found video details:', videoDetails); // Debug log
       return videoDetails;
     },
     enabled: !!videoId,
     meta: {
       onSettled: (data, error) => {
         if (error) {
-          console.error('Query error:', error);
+          console.error('[VideoDetail] Query error:', error);
           toast({
             title: "Error loading video",
             description: error.message || "The requested video could not be found or accessed.",
@@ -100,7 +101,8 @@ export default function VideoDetail() {
     );
   }
 
-  const channelName = videoData?.education_creators?.name || 'Unknown Creator';
+  // Use null coalescing for safer data access
+  const channelName = videoData?.education_creators?.name || videoData?.channel_id || 'Unknown Creator';
   const channelAvatar = videoData?.education_creators?.channel_avatar_url || '';
   const videoDescription = videoData?.education_creators?.description || '';
   const thumbnailUrl = videoData?.thumbnailUrl || '';
