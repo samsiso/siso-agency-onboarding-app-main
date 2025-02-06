@@ -1,6 +1,6 @@
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Users } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { RelatedVideos } from '@/components/education/RelatedVideos';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -12,29 +12,6 @@ import { VideoMetadata } from '@/components/education/video-detail/VideoMetadata
 import { VideoCreatorInfo } from '@/components/education/video-detail/VideoCreatorInfo';
 import { VideoActions } from '@/components/education/video-detail/VideoActions';
 import { VideoInteractionPanel } from '@/components/education/video-detail/VideoInteractionPanel';
-
-interface FeaturedVideo {
-  id: string;
-  title: string;
-  thumbnail_url: string;
-  view_count: number;
-  date: string;
-}
-
-interface VideoDetails {
-  id: string;
-  title: string;
-  thumbnailUrl: string;
-  viewCount: number;
-  date: string | null;
-  channel_id?: string;
-  education_creators: {
-    name: string;
-    slug: string;
-    channel_avatar_url: string;
-    description: string;
-  };
-}
 
 export default function VideoDetail() {
   const { slug } = useParams();
@@ -65,8 +42,7 @@ export default function VideoDetail() {
             name,
             slug,
             channel_avatar_url,
-            description,
-            featured_videos
+            description
           )
         `)
         .eq('id', videoId)
@@ -77,50 +53,13 @@ export default function VideoDetail() {
         throw videoError;
       }
 
-      // If video not found in youtube_videos, check featured_videos in education_creators
       if (!videoDetails) {
-        console.log('Video not found in youtube_videos, checking featured_videos');
-        
-        const { data: creators, error: creatorsError } = await supabase
-          .from('education_creators')
-          .select('*')
-          .contains('featured_videos', [{ id: videoId }]);
-
-        if (creatorsError) {
-          console.error('Error checking featured videos:', creatorsError);
-          throw creatorsError;
-        }
-
-        if (creators && creators.length > 0) {
-          const creator = creators[0];
-          // First cast to unknown, then to FeaturedVideo[] to safely handle the type conversion
-          const featuredVideos = (creator.featured_videos as unknown) as FeaturedVideo[];
-          const featuredVideo = featuredVideos.find(v => v.id === videoId);
-          
-          if (featuredVideo) {
-            console.log('Found video in featured_videos:', featuredVideo);
-            return {
-              id: featuredVideo.id,
-              title: featuredVideo.title,
-              thumbnailUrl: featuredVideo.thumbnail_url,
-              viewCount: featuredVideo.view_count,
-              date: featuredVideo.date,
-              education_creators: {
-                name: creator.name,
-                slug: creator.slug,
-                channel_avatar_url: creator.channel_avatar_url,
-                description: creator.description
-              }
-            } satisfies VideoDetails;
-          }
-        }
-
         console.error('No video found with ID:', videoId);
         throw new Error('Video not found');
       }
 
       console.log('Found video details:', videoDetails); // Debug log
-      return videoDetails as VideoDetails;
+      return videoDetails;
     },
     enabled: !!videoId,
     meta: {
@@ -214,7 +153,7 @@ export default function VideoDetail() {
               <VideoMetadata 
                 title={videoData?.title || ''}
                 viewCount={videoData?.viewCount || 0}
-                publishDate={videoData?.date || ''}
+                publishDate={videoData?.date || null}
               />
               
               <div className="flex flex-wrap items-center justify-between gap-4">
@@ -231,10 +170,6 @@ export default function VideoDetail() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-xl font-semibold text-white flex items-center gap-2">
-              <Users className="w-5 h-5" />
-              Related Videos
-            </h2>
             <RelatedVideos 
               currentVideoId={videoId} 
               topics={[]}
