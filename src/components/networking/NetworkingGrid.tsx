@@ -4,6 +4,7 @@ import { Globe, Users, MessageSquare } from "lucide-react";
 import { NetworkingCategories } from "./NetworkingCategories";
 import { Tabs } from "@/components/ui/tabs";
 import { useState } from "react";
+import { motion } from "framer-motion";
 
 export const NetworkingGrid = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -21,7 +22,20 @@ export const NetworkingGrid = () => {
   });
 
   if (isLoading) {
-    return <div className="flex justify-center items-center h-64">Loading...</div>;
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[...Array(6)].map((_, i) => (
+          <div
+            key={i}
+            className="bg-siso-text/5 border border-siso-text/10 rounded-lg p-6 animate-pulse"
+          >
+            <div className="w-12 h-12 bg-siso-text/10 rounded-full mb-4" />
+            <div className="h-4 bg-siso-text/10 rounded w-3/4 mb-2" />
+            <div className="h-4 bg-siso-text/10 rounded w-1/2" />
+          </div>
+        ))}
+      </div>
+    );
   }
 
   if (!resources) {
@@ -46,13 +60,23 @@ export const NetworkingGrid = () => {
         <NetworkingCategories 
           categories={categories} 
           selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
         />
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <motion.div 
+          layout
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
           {filteredResources.map((resource) => (
-            <div
+            <motion.div
               key={resource.id}
-              className="bg-card p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow"
+              layout
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="group relative overflow-hidden rounded-lg bg-gradient-to-br from-siso-text/5 to-siso-text/10 
+                hover:from-siso-red/10 hover:to-siso-orange/10 border border-siso-text/10 hover:border-siso-orange/20
+                p-6 transition-all duration-300 backdrop-blur-sm"
             >
               <div className="flex items-center gap-4 mb-4">
                 {resource.profile_image_url ? (
@@ -67,32 +91,35 @@ export const NetworkingGrid = () => {
                   </div>
                 )}
                 <div>
-                  <h3 className="font-semibold text-lg">{resource.name}</h3>
-                  <p className="text-sm text-muted-foreground">{resource.platform}</p>
+                  <h3 className="font-semibold text-lg text-siso-text-bold">{resource.name}</h3>
+                  <p className="text-sm text-siso-text/60">{resource.platform}</p>
                 </div>
               </div>
               
-              <p className="text-muted-foreground mb-4">{resource.description}</p>
+              <p className="text-siso-text/80 mb-4">{resource.description}</p>
               
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2 text-sm text-siso-text/60">
                   <Users className="w-4 h-4" />
                   <span>{resource.member_count.toLocaleString()} members</span>
                 </div>
                 
-                <a
+                <motion.a
                   href={resource.join_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-gradient-to-r from-siso-red to-siso-orange 
+                    text-white hover:opacity-90 transition-all duration-300"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   <MessageSquare className="w-4 h-4" />
                   Join
-                </a>
+                </motion.a>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </Tabs>
     </div>
   );

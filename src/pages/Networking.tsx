@@ -11,15 +11,21 @@ import { ChatBubble, ChatBubbleAvatar, ChatBubbleMessage } from '@/components/ui
 import { ChatInput } from '@/components/ui/chat-input';
 import { Send, Paperclip, Mic } from 'lucide-react';
 import { NetworkingGrid } from '@/components/networking/NetworkingGrid';
+import { NetworkingHeader } from '@/components/networking/NetworkingHeader';
+import { useState } from 'react';
 
 export default function Networking() {
+  const [searchQuery, setSearchQuery] = useState('');
+
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-gradient-radial from-siso-bg via-siso-bg-alt to-black">
       <Sidebar />
       <div className="flex-1">
         <div className="container mx-auto px-4 py-8">
-          <h1 className="text-4xl font-bold mb-8">Networking</h1>
-          
+          <NetworkingHeader 
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+          />
           <NetworkingGrid />
         </div>
       </div>

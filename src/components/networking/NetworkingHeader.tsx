@@ -1,6 +1,6 @@
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Users, Search, Youtube, Sparkles } from "lucide-react";
-import { motion } from "framer-motion";
+import { Search, Users, Globe, Sparkles } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Input } from '@/components/ui/input';
 
 interface NetworkingHeaderProps {
   searchQuery: string;
@@ -32,7 +32,7 @@ export const NetworkingHeader = ({ searchQuery, setSearchQuery }: NetworkingHead
         </div>
         <div className="w-full md:w-auto relative">
           <div className="relative">
-            <input
+            <Input
               type="text"
               placeholder="Search communities..."
               value={searchQuery}
@@ -49,36 +49,36 @@ export const NetworkingHeader = ({ searchQuery, setSearchQuery }: NetworkingHead
           whileHover={{ scale: 1.02 }}
           className="relative group"
         >
-          <Alert className="bg-siso-text/5 border border-siso-text/10 transition-all duration-300 group-hover:border-siso-orange/50">
+          <div className="bg-siso-text/5 border border-siso-text/10 rounded-lg p-4 transition-all duration-300 group-hover:border-siso-orange/50">
             <Users className="h-4 w-4 text-siso-orange group-hover:text-siso-red transition-colors" />
-            <AlertDescription className="text-siso-text/80">
+            <p className="text-siso-text/80 mt-2">
               <span className="font-semibold text-siso-text">Community Members:</span> Discover and connect with featured creators, educators, and community leaders.
-            </AlertDescription>
-          </Alert>
+            </p>
+          </div>
         </motion.div>
         
         <motion.div
           whileHover={{ scale: 1.02 }}
           className="relative group"
         >
-          <Alert className="bg-siso-text/5 border border-siso-text/10 transition-all duration-300 group-hover:border-siso-orange/50">
+          <div className="bg-siso-text/5 border border-siso-text/10 rounded-lg p-4 transition-all duration-300 group-hover:border-siso-orange/50">
             <Search className="h-4 w-4 text-siso-orange group-hover:text-siso-red transition-colors" />
-            <AlertDescription className="text-siso-text/80">
+            <p className="text-siso-text/80 mt-2">
               <span className="font-semibold text-siso-text">Smart Search:</span> Find communities by name, category, or activity level with intelligent matching.
-            </AlertDescription>
-          </Alert>
+            </p>
+          </div>
         </motion.div>
         
         <motion.div
           whileHover={{ scale: 1.02 }}
           className="relative group"
         >
-          <Alert className="bg-siso-text/5 border border-siso-text/10 transition-all duration-300 group-hover:border-siso-orange/50">
-            <Youtube className="h-4 w-4 text-siso-orange group-hover:text-siso-red transition-colors" />
-            <AlertDescription className="text-siso-text/80">
+          <div className="bg-siso-text/5 border border-siso-text/10 rounded-lg p-4 transition-all duration-300 group-hover:border-siso-orange/50">
+            <Globe className="h-4 w-4 text-siso-orange group-hover:text-siso-red transition-colors" />
+            <p className="text-siso-text/80 mt-2">
               <span className="font-semibold text-siso-text">Rich Insights:</span> View detailed analytics, engagement metrics, and growth trends for each community.
-            </AlertDescription>
-          </Alert>
+            </p>
+          </div>
         </motion.div>
       </div>
     </motion.div>
