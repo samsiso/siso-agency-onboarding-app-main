@@ -10,6 +10,7 @@ import { ChatMessageList } from '@/components/ui/chat-message-list';
 import { ChatBubble, ChatBubbleAvatar, ChatBubbleMessage } from '@/components/ui/chat-bubble';
 import { ChatInput } from '@/components/ui/chat-input';
 import { Send, Paperclip, Mic } from 'lucide-react';
+import { NetworkingGrid } from '@/components/networking/NetworkingGrid';
 
 export default function Networking() {
   return (
@@ -18,20 +19,8 @@ export default function Networking() {
       <div className="flex-1">
         <div className="container mx-auto px-4 py-8">
           <h1 className="text-4xl font-bold mb-8">Networking</h1>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-card p-6 rounded-lg shadow-lg">
-              <h2 className="text-2xl font-semibold mb-4">Connect with Experts</h2>
-              <p className="text-muted-foreground">Find and connect with industry experts and mentors.</p>
-            </div>
-            <div className="bg-card p-6 rounded-lg shadow-lg">
-              <h2 className="text-2xl font-semibold mb-4">Join Communities</h2>
-              <p className="text-muted-foreground">Participate in professional communities and discussions.</p>
-            </div>
-            <div className="bg-card p-6 rounded-lg shadow-lg">
-              <h2 className="text-2xl font-semibold mb-4">Events</h2>
-              <p className="text-muted-foreground">Discover networking events and meetups.</p>
-            </div>
-          </div>
+          
+          <NetworkingGrid />
         </div>
       </div>
       <ExpandableChat
