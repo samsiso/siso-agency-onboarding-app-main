@@ -1,6 +1,6 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
-import { MessageSquare, BrandSlack, BrandLinkedin } from "lucide-react";
+import { MessageSquare, Slack, Linkedin } from "lucide-react";
 
 interface NetworkingCategoriesProps {
   categories: Record<string, number>;
@@ -13,9 +13,9 @@ const getCategoryIcon = (category: string) => {
     case 'discord':
       return <MessageSquare className="w-4 h-4" />;
     case 'slack':
-      return <BrandSlack className="w-4 h-4" />;
+      return <Slack className="w-4 h-4" />;
     case 'linkedin':
-      return <BrandLinkedin className="w-4 h-4" />;
+      return <Linkedin className="w-4 h-4" />;
     default:
       return null;
   }
