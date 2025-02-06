@@ -13,7 +13,7 @@ interface UseVideosProps {
   filterBySeries?: boolean;
 }
 
-// [Analysis] Optimize query performance by reducing initial load and implementing proper pagination
+// [Analysis] Optimize query performance and add better error handling
 export const useVideos = ({ 
   selectedEducator,
   searchQuery,
@@ -33,14 +33,21 @@ export const useVideos = ({
       console.log('[useVideos] Fetching page:', pageParam);
       
       try {
-        // [Analysis] Split the query into two parts for better performance
-        // 1. First get the video data
+        // [Analysis] Split query into two parts for better debugging
+        // 1. First get the video data with explicit logging
         let query = supabase
           .from('youtube_videos')
-          .select('id, title, thumbnailUrl, duration, viewCount, date, channel_id')
-          .range(pageParam * ITEMS_PER_PAGE, (pageParam + 1) * ITEMS_PER_PAGE - 1)
-          .order('date', { ascending: false });
+          .select('id, title, thumbnailUrl, duration, viewCount, date, channel_id');
 
+        // Log the SQL query being constructed
+        console.log('[useVideos] Building query with params:', {
+          offset: pageParam * ITEMS_PER_PAGE,
+          limit: ITEMS_PER_PAGE,
+          selectedEducator,
+          searchQuery
+        });
+
+        // Add filters
         if (selectedEducator) {
           query = query.eq('channel_id', selectedEducator);
         }
@@ -49,20 +56,33 @@ export const useVideos = ({
           query = query.ilike('title', `%${searchQuery}%`);
         }
 
-        const { data: videos, error: videosError } = await query;
+        // Add pagination
+        query = query
+          .range(pageParam * ITEMS_PER_PAGE, (pageParam + 1) * ITEMS_PER_PAGE - 1)
+          .order('date', { ascending: false });
+
+        const { data: videos, error: videosError, count } = await query;
 
         if (videosError) {
           console.error('[useVideos] Error fetching videos:', videosError);
-          throw videosError;
+          throw new Error(`Failed to fetch videos: ${videosError.message}`);
         }
 
-        if (!videos || videos.length === 0) {
-          console.log('[useVideos] No videos found for current query');
+        if (!videos) {
+          console.log('[useVideos] No videos returned from query');
           return [];
         }
 
+        console.log('[useVideos] Fetched videos:', {
+          count: videos.length,
+          firstVideoId: videos[0]?.id,
+          lastVideoId: videos[videos.length - 1]?.id
+        });
+
         // 2. Then get creator data for these videos
         const channelIds = [...new Set(videos.map(v => v.channel_id))];
+        console.log('[useVideos] Fetching creators for channels:', channelIds);
+
         const { data: creators, error: creatorsError } = await supabase
           .from('education_creators')
           .select('channel_id, name, channel_avatar_url')
@@ -70,6 +90,7 @@ export const useVideos = ({
 
         if (creatorsError) {
           console.error('[useVideos] Error fetching creators:', creatorsError);
+          // Don't throw here, we can still show videos without creator data
         }
 
         // Create a map for quick creator lookup
@@ -77,9 +98,14 @@ export const useVideos = ({
           (creators || []).map(c => [c.channel_id, c])
         );
 
-        // [Analysis] Transform the data with better fallbacks
+        // [Analysis] Transform the data with detailed logging
         const transformedVideos = videos.map(video => {
           const creator = creatorMap.get(video.channel_id);
+          console.log('[useVideos] Transforming video:', {
+            videoId: video.id,
+            hasCreator: !!creator,
+            creatorName: creator?.name || video.channel_id
+          });
           
           return {
             id: video.id,
@@ -106,11 +132,11 @@ export const useVideos = ({
           } satisfies Video;
         });
 
-        console.log('[useVideos] Transformed videos:', transformedVideos.length);
+        console.log('[useVideos] Transformed videos count:', transformedVideos.length);
         return transformedVideos;
       } catch (error) {
-        console.error('[useVideos] Error in query function:', error);
-        toast.error('Failed to load videos');
+        console.error('[useVideos] Critical error in query function:', error);
+        // Rethrow to trigger error boundary
         throw error;
       }
     },
@@ -126,5 +152,15 @@ export const useVideos = ({
     },
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
     gcTime: 10 * 60 * 1000,   // Keep unused data for 10 minutes
+    meta: {
+      onSettled: (data, error) => {
+        if (error) {
+          console.error('[useVideos] Query settled with error:', error);
+          toast.error('Failed to load videos. Please try refreshing the page.');
+        } else {
+          console.log('[useVideos] Query settled successfully');
+        }
+      }
+    }
   });
 };

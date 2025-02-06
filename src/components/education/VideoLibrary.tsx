@@ -24,7 +24,7 @@ export const VideoLibrary = ({
 }: VideoLibraryProps) => {
   const [searchQuery] = useState(initialSearchQuery);
 
-  console.log('[VideoLibrary] Initial render with props:', {
+  console.log('[VideoLibrary] Rendering with props:', {
     selectedEducator,
     viewMode,
     searchQuery,
@@ -46,24 +46,23 @@ export const VideoLibrary = ({
     filterBySeries
   });
 
-  const isLoading = externalLoading || videosLoading;
+  // Only consider loading if both external and videos are loading
+  const isLoading = videosLoading;
   const allVideos = (data?.pages.flat() || []) as Video[];
-  const featuredVideos = allVideos.slice(0, 3);
-
-  console.log('[VideoLibrary] Final render state:', { 
-    isLoading, 
+  
+  console.log('[VideoLibrary] Current state:', {
+    isLoading,
     videosCount: allVideos.length,
     hasNextPage,
-    isFetchingNextPage,
-    error,
-    featuredVideosCount: featuredVideos.length
+    error: error ? (error as Error).message : null
   });
 
   if (error) {
-    console.error('[VideoLibrary] Render error:', error);
+    console.error('[VideoLibrary] Error state:', error);
     return (
       <div className="p-8 text-center text-siso-text">
-        <p>Failed to load videos. Please try again later.</p>
+        <p>Failed to load videos. Please try refreshing the page.</p>
+        <p className="text-sm text-siso-text/70">Error: {(error as Error).message}</p>
       </div>
     );
   }
@@ -72,7 +71,7 @@ export const VideoLibrary = ({
     <div className="space-y-8">
       <VideoGrid
         videos={allVideos}
-        featuredVideos={featuredVideos}
+        featuredVideos={[]} // We'll add featured videos later
         isLoading={isLoading}
       />
 
