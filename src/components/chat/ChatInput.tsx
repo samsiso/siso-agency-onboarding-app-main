@@ -33,7 +33,7 @@ export const ChatInput = ({ onSubmit, isLoading, placeholder = "Type your messag
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       onSubmit={handleSubmit}
-      className="border-t border-siso-text/10 bg-black/20 p-4"
+      className="border-t border-siso-text/10 bg-black/20 backdrop-blur-sm p-4 rounded-b-lg"
     >
       <div className="flex gap-3">
         <div className="relative flex-1">
@@ -42,7 +42,7 @@ export const ChatInput = ({ onSubmit, isLoading, placeholder = "Type your messag
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
-            className="min-h-[52px] w-full resize-none rounded-lg bg-black/20 border border-siso-text/10 px-4 py-3 text-white placeholder:text-siso-text/50 focus:outline-none focus:ring-2 focus:ring-siso-red/50 transition-all pr-12"
+            className="min-h-[52px] w-full resize-none rounded-lg bg-black/20 border border-siso-text/10 px-4 py-3 text-white placeholder:text-siso-text/50 focus:outline-none focus:ring-2 focus:ring-siso-red/50 transition-all pr-12 shadow-lg"
             disabled={isLoading}
             rows={1}
           />
@@ -63,7 +63,7 @@ export const ChatInput = ({ onSubmit, isLoading, placeholder = "Type your messag
         <Button 
           type="submit"
           disabled={isLoading}
-          className="bg-gradient-to-r from-siso-red to-siso-orange text-white px-6 py-3 rounded-lg hover:opacity-90 transition-all min-h-[52px] w-[52px]"
+          className="bg-gradient-to-r from-siso-red to-siso-orange text-white px-6 py-3 rounded-lg hover:opacity-90 transition-all min-h-[52px] w-[52px] shadow-lg"
         >
           {isLoading ? (
             <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
