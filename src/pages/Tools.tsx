@@ -2,24 +2,15 @@ import { useQuery } from '@tanstack/react-query';
 import { useState, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Tool } from '@/components/tools/types';
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Bot } from 'lucide-react';
 import { ChatBot } from '@/components/ChatBot';
 import { Sidebar } from '@/components/Sidebar';
 import { toast } from 'react-hot-toast';
-import { ToolsHeader } from '@/components/tools/ToolsHeader';
+import { ToolsPageHeader } from '@/components/tools/ToolsPageHeader';
 import { ToolsCategories } from '@/components/tools/ToolsCategories';
+import { ToolsFilters } from '@/components/tools/ToolsFilters';
 import { ToolsGrid } from '@/components/tools/ToolsGrid';
-import { ToolCard } from '@/components/tools/ToolCard';
 import { motion } from 'framer-motion';
-import { Bot } from 'lucide-react';
 import {
   ExpandableChat,
   ExpandableChatHeader,
@@ -104,10 +95,17 @@ export default function Tools() {
     return sortTools(filtered);
   }, [tools, searchQuery, selectedCategory, sortBy]);
 
-  const featuredTools = useMemo(() => {
-    if (!tools) return [];
-    return tools.filter(tool => tool.rating && tool.rating >= 4.5).slice(0, 4);
-  }, [tools]);
+  const categoryStats = useMemo(() => {
+    if (!tools) return {};
+    return categories.reduce((acc, category) => {
+      acc[category.label] = tools.filter(tool => 
+        category.id === 'all' ? true : 
+        category.id === 'featured' ? (tool.rating && tool.rating >= 4.5) :
+        tool.category.toLowerCase() === category.id.toLowerCase()
+      ).length;
+      return acc;
+    }, {} as { [key: string]: number });
+  }, [tools, categories]);
 
   if (error) {
     return (
@@ -132,78 +130,33 @@ export default function Tools() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <ToolsHeader 
+          <ToolsPageHeader 
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             totalTools={tools?.length}
+            categoryStats={categoryStats}
           />
 
           <div className="flex items-center justify-between">
-            <ToolsCategories />
-            <Select
-              value={sortBy}
-              onValueChange={setSortBy}
-            >
-              <SelectTrigger className="w-[180px] bg-siso-text/5 border-siso-text/10">
-                <SelectValue placeholder="Sort by..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="rating">Highest Rated</SelectItem>
-                <SelectItem value="name">Alphabetical</SelectItem>
-                <SelectItem value="newest">Newest First</SelectItem>
-                <SelectItem value="popular">Most Popular</SelectItem>
-              </SelectContent>
-            </Select>
+            <ToolsCategories 
+              categories={categories.map(cat => ({
+                ...cat,
+                count: categoryStats[cat.label]
+              }))}
+              selectedCategory={selectedCategory}
+              onCategoryChange={setSelectedCategory}
+              isLoading={isLoading}
+            />
+            <ToolsFilters
+              sortBy={sortBy}
+              onSortChange={setSortBy}
+            />
           </div>
-
-          {featuredTools.length > 0 && selectedCategory === 'all' && !searchQuery && (
-            <div className="space-y-4">
-              <h2 className="text-2xl font-semibold text-siso-text-bold">Featured Tools</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {featuredTools.map((tool) => (
-                  <motion.div
-                    key={tool.id}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <ToolCard tool={tool} />
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <ScrollArea className="w-full">
-            <Tabs 
-              defaultValue="all" 
-              className="w-full" 
-              onValueChange={setSelectedCategory}
-            >
-              <TabsList className="h-auto flex-wrap bg-siso-text/5 p-2 mb-6 border border-siso-text/10 rounded-xl">
-                {categories.map((category) => (
-                  <TabsTrigger
-                    key={category.id}
-                    value={category.id}
-                    className="m-1 data-[state=active]:bg-gradient-to-r data-[state=active]:from-siso-red/20 data-[state=active]:to-siso-orange/20 data-[state=active]:text-siso-orange transition-all duration-300 hover:text-siso-orange/80"
-                  >
-                    {category.label}
-                    <span className="ml-2 text-sm text-siso-text/60">
-                      ({tools?.filter(t => 
-                        category.id === 'all' ? true : 
-                        category.id === 'featured' ? (t.rating && t.rating >= 4.5) :
-                        t.category.toLowerCase() === category.id.toLowerCase()
-                      ).length || 0})
-                    </span>
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </Tabs>
-          </ScrollArea>
 
           <ToolsGrid tools={filteredTools} isLoading={isLoading} />
         </motion.div>
       </div>
+
       <ExpandableChat
         size="lg"
         position="bottom-right"
