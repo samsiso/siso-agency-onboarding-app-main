@@ -27,7 +27,7 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
   const [isLoaded, setIsLoaded] = useState(false);
   const [isInView, setIsInView] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
-  const { session } = useAuthSession();
+  const { user } = useAuthSession();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -50,13 +50,13 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
 
   // Check if video is bookmarked
   useEffect(() => {
-    if (!session?.user?.id) return;
+    if (!user?.id) return;
     
     const checkBookmarkStatus = async () => {
       const { data } = await supabase
         .from('video_bookmarks')
         .select('id')
-        .eq('user_id', session.user.id)
+        .eq('user_id', user.id)
         .eq('video_id', video.id)
         .maybeSingle();
       
@@ -64,11 +64,11 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
     };
 
     checkBookmarkStatus();
-  }, [session?.user?.id, video.id]);
+  }, [user?.id, video.id]);
 
   const handleBookmark = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!session?.user?.id) {
+    if (!user?.id) {
       toast.error('Please sign in to bookmark videos');
       return;
     }
@@ -78,14 +78,14 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
         await supabase
           .from('video_bookmarks')
           .delete()
-          .eq('user_id', session.user.id)
+          .eq('user_id', user.id)
           .eq('video_id', video.id);
         setIsBookmarked(false);
         toast.success('Video removed from bookmarks');
       } else {
         await supabase
           .from('video_bookmarks')
-          .insert([{ user_id: session.user.id, video_id: video.id }]);
+          .insert([{ user_id: user.id, video_id: video.id }]);
         setIsBookmarked(true);
         toast.success('Video bookmarked');
       }
