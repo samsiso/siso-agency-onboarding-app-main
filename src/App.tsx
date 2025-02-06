@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import VideoDetailPage from './pages/education/videos/[slug]';
 import SisoEducation from './pages/SisoEducation';
 
-// [Analysis] Single Router instance with proper nesting
 function App() {
   return (
     <Router>
