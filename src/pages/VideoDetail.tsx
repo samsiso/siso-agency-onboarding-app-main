@@ -22,7 +22,7 @@ export default function VideoDetail() {
   const { toast } = useToast();
   
   const videoId = slug ? extractVideoIdFromSlug(slug) : '';
-  console.log('[VideoDetail] Processing video ID:', videoId); // Debug log
+  console.log('[VideoDetail] Processing video ID:', videoId);
 
   const { data: videoData, isLoading, error } = useQuery({
     queryKey: ['video', videoId],
@@ -32,12 +32,20 @@ export default function VideoDetail() {
         throw new Error('Invalid video ID');
       }
 
-      console.log('[VideoDetail] Fetching video data for ID:', videoId); // Debug log
+      console.log('[VideoDetail] Fetching video data for ID:', videoId);
 
+      // [Analysis] Match the exact column names from the database (camelCase)
       const { data: videoDetails, error: videoError } = await supabase
         .from('youtube_videos')
         .select(`
-          *,
+          id,
+          title,
+          url,
+          duration,
+          thumbnailUrl,
+          viewCount,
+          date,
+          channel_id,
           education_creators (
             name,
             slug,
@@ -59,7 +67,7 @@ export default function VideoDetail() {
         throw new Error('Video not found');
       }
 
-      console.log('[VideoDetail] Found video details:', videoDetails); // Debug log
+      console.log('[VideoDetail] Found video details:', videoDetails);
       return videoDetails;
     },
     enabled: !!videoId,
