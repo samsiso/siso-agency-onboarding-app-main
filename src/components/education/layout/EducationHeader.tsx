@@ -1,5 +1,6 @@
+import { Search, Command, Mic, History, GraduationCap, Video, Users } from 'lucide-react';
+import { Input } from "@/components/ui/input";
 import { motion } from 'framer-motion';
-import { Search, Users, Video, GraduationCap, Command, Mic, History } from 'lucide-react';
 import { PlaceholdersAndVanishInput } from '@/components/ui/placeholders-and-vanish-input';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
@@ -20,7 +21,6 @@ export const EducationHeader = ({ stats, searchQuery, onSearchChange }: Educatio
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
-  // [Analysis] Load recent searches from localStorage for persistence
   useEffect(() => {
     const saved = localStorage.getItem('recentSearches');
     if (saved) {
@@ -36,7 +36,6 @@ export const EducationHeader = ({ stats, searchQuery, onSearchChange }: Educatio
     localStorage.setItem('recentSearches', JSON.stringify(updated));
   };
 
-  // [Analysis] Keyboard shortcut for better UX
   useHotkeys('mod+k', (event) => {
     event.preventDefault();
     const searchInput = document.querySelector('input[type="text"]') as HTMLInputElement;
@@ -44,6 +43,15 @@ export const EducationHeader = ({ stats, searchQuery, onSearchChange }: Educatio
       searchInput.focus();
     }
   });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onSearchChange(e.target.value);
+  };
+
+  const handleInputSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    saveSearch(searchQuery);
+  };
 
   const statCards = [
     {
@@ -80,17 +88,37 @@ export const EducationHeader = ({ stats, searchQuery, onSearchChange }: Educatio
     "Explore AI case studies and success stories..."
   ];
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onSearchChange(e.target.value);
-  };
-
-  const handleInputSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    saveSearch(searchQuery);
-  };
-
   return (
     <div className="space-y-12 px-6 py-8">
+      {/* Logo and Title Section */}
+      <motion.div 
+        className="flex flex-col items-center text-center gap-4"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <motion.div
+          initial={{ scale: 0.5, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="flex items-center justify-center"
+        >
+          <img 
+            src="/lovable-uploads/f18bd386-e74e-4601-9d78-ade0cb831744.png" 
+            alt="SISO Logo" 
+            className="w-16 h-16 object-contain rounded-full"
+          />
+        </motion.div>
+        <div className="space-y-2">
+          <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
+            SISO Education Hub
+          </h1>
+          <p className="text-lg text-siso-text/80 max-w-2xl mx-auto">
+            Discover expert educators, tutorials, and resources to master AI implementation
+          </p>
+        </div>
+      </motion.div>
+
       {/* Stats Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {statCards.map((stat, index) => {
