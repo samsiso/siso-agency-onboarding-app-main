@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from 'lucide-react';
@@ -24,6 +23,7 @@ export default function VideoDetail() {
   const videoId = slug ? extractVideoIdFromSlug(slug) : '';
   console.log('[VideoDetail] Processing video ID:', videoId);
 
+  // [Analysis] Let's first check if this is one of Tech with Tim's videos about Python futures
   const { data: videoData, isLoading, error } = useQuery({
     queryKey: ['video', videoId],
     queryFn: async () => {
@@ -34,7 +34,7 @@ export default function VideoDetail() {
 
       console.log('[VideoDetail] Fetching video data for ID:', videoId);
 
-      // [Analysis] We need to fetch the video first to get its channel_id
+      // [Analysis] First get the video details
       const { data: videoDetails, error: videoError } = await supabase
         .from('youtube_videos')
         .select(`
@@ -60,7 +60,15 @@ export default function VideoDetail() {
         throw new Error('Video not found');
       }
 
-      // [Analysis] Now fetch the creator details using the channel_id
+      console.log('[DEBUG] Video details found:', {
+        id: videoDetails.id,
+        title: videoDetails.title,
+        url: videoDetails.url,
+        date: videoDetails.date,
+        channelId: videoDetails.channel_id
+      });
+
+      // [Analysis] Now fetch the creator details
       const { data: creatorDetails, error: creatorError } = await supabase
         .from('education_creators')
         .select(`
@@ -78,13 +86,15 @@ export default function VideoDetail() {
         // Don't throw here, we can still show the video without creator info
       }
 
-      // [Analysis] Combine video and creator data
+      // [Analysis] Let's log the creator details too
+      console.log('[DEBUG] Creator details:', creatorDetails);
+
       const combinedData = {
         ...videoDetails,
         education_creators: creatorDetails
       };
 
-      console.log('[VideoDetail] Found combined details:', combinedData);
+      console.log('[VideoDetail] Final combined details:', combinedData);
       return combinedData;
     },
     enabled: !!videoId,
