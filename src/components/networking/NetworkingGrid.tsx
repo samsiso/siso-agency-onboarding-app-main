@@ -25,16 +25,16 @@ export const NetworkingGrid = () => {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[...Array(6)].map((_, i) => (
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        {[...Array(10)].map((_, i) => (
           <motion.div
             key={i}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: i * 0.1 }}
-            className="bg-siso-text/5 border border-siso-text/10 rounded-lg p-6 animate-pulse"
+            className="bg-siso-text/5 border border-siso-text/10 rounded-lg p-4 animate-pulse"
           >
-            <div className="w-12 h-12 bg-siso-text/10 rounded-full mb-4" />
+            <div className="w-10 h-10 bg-siso-text/10 rounded-full mb-3" />
             <div className="h-4 bg-siso-text/10 rounded w-3/4 mb-2" />
             <div className="h-4 bg-siso-text/10 rounded w-1/2" />
           </motion.div>
@@ -57,20 +57,18 @@ export const NetworkingGrid = () => {
     );
   }
 
-  // Calculate categories and their counts
   const categories = resources.reduce((acc, resource) => {
     const category = resource.category;
     acc[category] = (acc[category] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 
-  // Filter resources based on selected category
   const filteredResources = selectedCategory === "all" 
     ? resources 
     : resources.filter(resource => resource.category === selectedCategory);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
         <NetworkingCategories 
           categories={categories} 
@@ -80,7 +78,7 @@ export const NetworkingGrid = () => {
         
         <motion.div 
           layout
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-6"
+          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 pt-4"
         >
           <AnimatePresence mode="popLayout">
             {filteredResources.map((resource) => (
@@ -93,53 +91,57 @@ export const NetworkingGrid = () => {
                 whileHover={{ scale: 1.02 }}
                 className="group relative overflow-hidden rounded-lg bg-gradient-to-br from-siso-text/5 to-siso-text/10 
                   hover:from-siso-red/10 hover:to-siso-orange/10 border border-siso-text/10 hover:border-siso-orange/20
-                  p-6 transition-all duration-300 backdrop-blur-sm"
+                  p-4 transition-all duration-300 backdrop-blur-sm"
               >
-                <div className="flex items-center gap-4 mb-4">
+                <div className="flex items-center gap-3 mb-3">
                   {resource.profile_image_url ? (
                     <motion.img
                       src={resource.profile_image_url}
                       alt={resource.name}
-                      className="w-12 h-12 rounded-full"
+                      className="w-10 h-10 rounded-full"
                       whileHover={{ scale: 1.1 }}
                     />
                   ) : (
                     <motion.div
                       whileHover={{ scale: 1.1 }}
-                      className="w-12 h-12 rounded-full bg-gradient-to-r from-siso-red/20 to-siso-orange/20 
+                      className="w-10 h-10 rounded-full bg-gradient-to-r from-siso-red/20 to-siso-orange/20 
                         flex items-center justify-center"
                     >
-                      <Globe className="w-6 h-6 text-siso-orange" />
+                      <Globe className="w-5 h-5 text-siso-orange" />
                     </motion.div>
                   )}
                   <div>
-                    <h3 className="font-semibold text-lg text-siso-text-bold">{resource.name}</h3>
-                    <p className="text-sm text-siso-text/60">{resource.platform}</p>
+                    <h3 className="font-semibold text-base text-siso-text-bold">{resource.name}</h3>
+                    <p className="text-xs text-siso-text/60">{resource.platform}</p>
                   </div>
                 </div>
                 
-                <p className="text-siso-text/80 mb-4">{resource.description}</p>
+                <div className="relative overflow-hidden">
+                  <p className="text-sm text-siso-text/80 line-clamp-2 group-hover:line-clamp-none transition-all duration-300">
+                    {resource.description}
+                  </p>
+                </div>
                 
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between mt-3 pt-2 border-t border-siso-text/10">
                   <motion.div 
                     initial={{ opacity: 0.6 }}
                     whileHover={{ opacity: 1 }}
-                    className="flex items-center gap-2 text-sm text-siso-text/60"
+                    className="flex items-center gap-1.5 text-xs text-siso-text/60"
                   >
-                    <Users className="w-4 h-4" />
-                    <span>{resource.member_count.toLocaleString()} members</span>
+                    <Users className="w-3.5 h-3.5" />
+                    <span>{resource.member_count.toLocaleString()}</span>
                   </motion.div>
                   
                   <motion.a
                     href={resource.join_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-gradient-to-r from-siso-red to-siso-orange 
-                      text-white hover:opacity-90 transition-all duration-300"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md bg-gradient-to-r 
+                      from-siso-red to-siso-orange text-white hover:opacity-90 transition-all duration-300"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <MessageSquare className="w-4 h-4" />
+                    <MessageSquare className="w-3.5 h-3.5" />
                     Join
                   </motion.a>
                 </div>
