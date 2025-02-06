@@ -40,7 +40,12 @@ export const useVideos = ({
         let query = supabase
           .from('youtube_videos')
           .select(`
-            *,
+            id,
+            title,
+            thumbnailUrl,
+            duration,
+            viewCount,
+            date,
             education_creators (
               name,
               channel_avatar_url
@@ -80,30 +85,38 @@ export const useVideos = ({
           return [];
         }
 
-        // Transform the data
-        const transformedVideos = videos.map(video => ({
-          id: video.id,
-          title: video.title || '',
-          url: `https://youtube.com/watch?v=${video.id}`,
-          duration: video.duration || '0:00',
-          thumbnail_url: video.thumbnailUrl || '',
-          educator: {
-            name: video.education_creators?.name || 'Unknown Creator',
-            avatar_url: video.education_creators?.channel_avatar_url || ''
-          },
-          metrics: {
-            views: video.viewCount || 0,
-            likes: 0,
-            sentiment_score: 0.8,
-            difficulty: "Intermediate" as const,
-            impact_score: 8.5
-          },
-          topics: [],
-          ai_analysis: {
-            key_takeaways: ['Coming soon...'],
-            implementation_steps: ['Coming soon...']
-          }
-        } satisfies Video));
+        // Transform the data - now with more precise logging
+        const transformedVideos = videos.map(video => {
+          console.log('[useVideos] Transforming video:', { 
+            id: video.id,
+            title: video.title,
+            date: video.date
+          });
+
+          return {
+            id: video.id, // This is the YouTube video ID
+            title: video.title || '',
+            url: `https://youtube.com/watch?v=${video.id}`,
+            duration: video.duration || '0:00',
+            thumbnail_url: video.thumbnailUrl || '',
+            educator: {
+              name: video.education_creators?.name || 'Unknown Creator',
+              avatar_url: video.education_creators?.channel_avatar_url || ''
+            },
+            metrics: {
+              views: video.viewCount || 0,
+              likes: 0,
+              sentiment_score: 0.8,
+              difficulty: "Intermediate" as const,
+              impact_score: 8.5
+            },
+            topics: [],
+            ai_analysis: {
+              key_takeaways: ['Coming soon...'],
+              implementation_steps: ['Coming soon...']
+            }
+          } satisfies Video;
+        });
 
         console.log('[useVideos] Transformed videos:', transformedVideos);
         return transformedVideos;

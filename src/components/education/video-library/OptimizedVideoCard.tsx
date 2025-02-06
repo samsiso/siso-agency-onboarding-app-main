@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthSession } from '@/hooks/useAuthSession';
+import { useNavigate } from 'react-router-dom';
 
 // [Analysis] Format large numbers to human readable format (e.g., 1.2M)
 const formatNumber = (num: number) => {
@@ -28,6 +29,7 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
   const [isInView, setIsInView] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const { user } = useAuthSession();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -109,6 +111,29 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
       navigator.clipboard.writeText(video.url);
       toast.success('Link copied to clipboard');
     }
+  };
+
+  const handleVideoClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!video.id || !video.title) {
+      console.error('Invalid video data:', video);
+      return;
+    }
+
+    const slug = video.title
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '') // Remove special characters
+      .replace(/\s+/g, '-') // Replace spaces with hyphens
+      .replace(/-+/g, '-') // Remove consecutive hyphens
+      .substring(0, 60); // Limit length
+    
+    console.log('[OptimizedVideoCard] Navigation:', {
+      videoId: video.id,
+      slug,
+      fullPath: `/education/videos/${slug}-${video.id}`
+    });
+    
+    navigate(`/education/videos/${slug}-${video.id}`);
   };
 
   // Stagger animation delay based on index
