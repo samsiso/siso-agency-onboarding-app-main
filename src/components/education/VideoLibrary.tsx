@@ -99,7 +99,14 @@ export const VideoLibrary = ({
           .range(pageParam * ITEMS_PER_PAGE, (pageParam + 1) * ITEMS_PER_PAGE - 1)
           .order('date', { ascending: false });
 
-        console.log('[VideoLibrary] Executing query:', query.toSQL()); // Debug log
+        console.log('[VideoLibrary] Query parameters:', { 
+          filters: {
+            selectedEducator,
+            searchQuery,
+            pageStart: pageParam * ITEMS_PER_PAGE,
+            pageEnd: (pageParam + 1) * ITEMS_PER_PAGE - 1
+          }
+        });
 
         const { data: videos, error: queryError } = await query;
 
