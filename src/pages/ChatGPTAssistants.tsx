@@ -5,11 +5,13 @@ import { MainLayout } from '@/components/assistants/layout/MainLayout';
 import { HeaderTitle } from '@/components/assistants/layout/header/HeaderTitle';
 import { HeaderAlerts } from '@/components/assistants/layout/header/HeaderAlerts';
 import { SearchSection } from '@/components/assistants/layout/header/SearchSection';
+import { StatsDisplay } from '@/components/assistants/layout/header/StatsDisplay';
 import { Categories } from '@/components/assistants/layout/content/Categories';
 import { AssistantGrid } from '@/components/assistants/layout/content/AssistantGrid';
 import { useAssistants } from '@/components/assistants/hooks/useAssistants';
 import { Assistant } from '@/components/assistants/types';
 import { motion } from 'framer-motion';
+import { FloatingOrbs } from '@/components/effects/FloatingOrbs';
 
 export default function ChatGPTAssistants() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -43,20 +45,38 @@ export default function ChatGPTAssistants() {
     (a.rating && a.rating >= 4.5) || (a.review_average && a.review_average >= 4.5)
   ).length || 0;
 
+  const totalConversations = assistants?.reduce((sum, assistant) => {
+    if (assistant.num_conversations_str) {
+      const num = parseInt(assistant.num_conversations_str);
+      return isNaN(num) ? sum : sum + num;
+    }
+    return sum;
+  }, 0) || 0;
+
   return (
     <MainLayout>
-      <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="space-y-6"
-      >
-        <div className="flex flex-col md:flex-row justify-between items-start gap-6">
-          <HeaderTitle />
-          <SearchSection 
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-          />
+      <div className="space-y-8 px-6 py-8">
+        <div className="relative">
+          {/* Background effects */}
+          <FloatingOrbs />
+          <div className="absolute inset-0 bg-gradient-radial from-siso-orange/20 via-transparent to-transparent opacity-30 -z-10">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-siso-red/10 via-transparent to-transparent animate-pulse" />
+          </div>
+
+          {/* Content */}
+          <div className="relative z-10 space-y-6">
+            <HeaderTitle />
+            <StatsDisplay 
+              totalAssistants={assistants?.length || 0}
+              featuredCount={featuredCount}
+              categoryCount={Object.keys(categoryCounts || {}).length}
+              conversationsCount={totalConversations}
+            />
+            <SearchSection 
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+            />
+          </div>
         </div>
 
         <HeaderAlerts />
@@ -69,18 +89,18 @@ export default function ChatGPTAssistants() {
           assistantsCount={assistants?.length || 0}
           featuredCount={featuredCount}
         />
-      </motion.div>
 
-      <AssistantGrid 
-        assistants={filteredAssistants}
-        onAssistantClick={setSelectedAssistant}
-        isLoading={isLoading}
-      />
+        <AssistantGrid 
+          assistants={filteredAssistants}
+          onAssistantClick={setSelectedAssistant}
+          isLoading={isLoading}
+        />
 
-      <AssistantDetails
-        assistant={selectedAssistant}
-        onClose={() => setSelectedAssistant(null)}
-      />
+        <AssistantDetails
+          assistant={selectedAssistant}
+          onClose={() => setSelectedAssistant(null)}
+        />
+      </div>
     </MainLayout>
   );
 }
