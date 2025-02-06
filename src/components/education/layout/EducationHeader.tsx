@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
-import { Input } from '@/components/ui/input';
 import { Search, Users, Video, GraduationCap } from 'lucide-react';
+import { PlaceholdersAndVanishInput } from '@/components/ui/placeholders-and-vanish-input';
 import { cn } from '@/lib/utils';
 
 interface EducationHeaderProps {
@@ -37,6 +37,23 @@ export const EducationHeader = ({ stats, searchQuery, onSearchChange }: Educatio
       iconColor: "text-green-500"
     }
   ];
+
+  const searchPlaceholders = [
+    "Search for AI implementation tutorials...",
+    "Find courses on automation...",
+    "Discover educators specializing in AI...",
+    "Learn about AI tools and platforms...",
+    "Explore AI case studies and success stories..."
+  ];
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onSearchChange(e.target.value);
+  };
+
+  const handleInputSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log('Search submitted:', searchQuery);
+  };
 
   return (
     <div className="space-y-6">
@@ -90,30 +107,21 @@ export const EducationHeader = ({ stats, searchQuery, onSearchChange }: Educatio
 
       {/* Search Section */}
       <motion.div 
-        className="relative"
+        className="relative max-w-3xl mx-auto"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
       >
-        <div className="relative group">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-siso-text/50 
-            group-hover:text-siso-orange transition-colors duration-300" />
-          <Input
-            type="text"
-            placeholder="Search educators and videos..."
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className={cn(
-              "pl-10 bg-siso-bg-alt/50 border-siso-border",
-              "backdrop-blur-sm",
-              "focus:ring-2 focus:ring-siso-orange/50 focus:border-siso-orange",
-              "hover:bg-siso-bg-alt hover:border-siso-border-hover",
-              "transition-all duration-300"
-            )}
-          />
-          <div className="absolute inset-0 -z-10 bg-gradient-to-r from-siso-red/10 to-siso-orange/10 
-            rounded-lg blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        </div>
+        <PlaceholdersAndVanishInput
+          placeholders={searchPlaceholders}
+          onChange={handleInputChange}
+          onSubmit={handleInputSubmit}
+          value={searchQuery}
+          className="bg-siso-bg-alt/50 border-siso-border backdrop-blur-sm
+            focus:ring-2 focus:ring-siso-orange/50 focus:border-siso-orange
+            hover:bg-siso-bg-alt hover:border-siso-border-hover
+            transition-all duration-300"
+        />
       </motion.div>
     </div>
   );
