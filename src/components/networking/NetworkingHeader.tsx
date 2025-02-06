@@ -15,16 +15,23 @@ export const NetworkingHeader = ({ searchQuery, setSearchQuery }: NetworkingHead
   const { data: stats } = useQuery({
     queryKey: ['networking-stats'],
     queryFn: async () => {
-      const { data: communities, error } = await supabase
-        .from('networking_resources')
-        .select('member_count');
+      const { data: categoryStats, error: categoryError } = await supabase
+        .from('category_stats')
+        .select('*');
       
-      if (error) throw error;
+      if (categoryError) throw categoryError;
       
-      const totalCommunities = communities.length;
-      const totalMembers = communities.reduce((sum, community) => sum + (community.member_count || 0), 0);
+      const totalCommunities = categoryStats.reduce((sum, stat) => sum + stat.community_count, 0);
+      const totalMembers = categoryStats.reduce((sum, stat) => sum + stat.total_members, 0);
+      const featuredCount = categoryStats.reduce((sum, stat) => sum + stat.featured_count, 0);
+      const totalActivity = categoryStats.reduce((sum, stat) => sum + stat.total_activity, 0);
       
-      return { totalCommunities, totalMembers };
+      return { 
+        totalCommunities, 
+        totalMembers,
+        featuredCount,
+        totalActivity
+      };
     }
   });
 

@@ -590,36 +590,48 @@ export type Database = {
           category: string
           created_at: string
           description: string | null
+          featured: boolean | null
           id: string
+          join_count_last_week: number | null
           join_url: string | null
+          last_activity_at: string | null
           member_count: number | null
           name: string
           platform: string | null
           profile_image_url: string | null
+          total_weekly_activity: number | null
           updated_at: string
         }
         Insert: {
           category: string
           created_at?: string
           description?: string | null
+          featured?: boolean | null
           id?: string
+          join_count_last_week?: number | null
           join_url?: string | null
+          last_activity_at?: string | null
           member_count?: number | null
           name: string
           platform?: string | null
           profile_image_url?: string | null
+          total_weekly_activity?: number | null
           updated_at?: string
         }
         Update: {
           category?: string
           created_at?: string
           description?: string | null
+          featured?: boolean | null
           id?: string
+          join_count_last_week?: number | null
           join_url?: string | null
+          last_activity_at?: string | null
           member_count?: number | null
           name?: string
           platform?: string | null
           profile_image_url?: string | null
+          total_weekly_activity?: number | null
           updated_at?: string
         }
         Relationships: []
@@ -1412,7 +1424,16 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      category_stats: {
+        Row: {
+          category: string | null
+          community_count: number | null
+          featured_count: number | null
+          total_activity: number | null
+          total_members: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       generate_unique_slug: {

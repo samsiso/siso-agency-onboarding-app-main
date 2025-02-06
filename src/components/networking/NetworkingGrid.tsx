@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Globe, Users, MessageSquare } from "lucide-react";
@@ -10,11 +11,12 @@ export const NetworkingGrid = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   const { data: resources, isLoading } = useQuery({
-    queryKey: ["networking-resources"],
+    queryKey: ['networking-resources'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("networking_resources")
-        .select("*");
+        .from('networking_resources')
+        .select('*')
+        .order('member_count', { ascending: false });
       
       if (error) throw error;
       return data;

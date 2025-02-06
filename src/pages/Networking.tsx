@@ -1,3 +1,4 @@
+
 import { Sidebar } from '@/components/Sidebar';
 import { Bot } from 'lucide-react';
 import {
@@ -13,6 +14,7 @@ import { Send, Paperclip, Mic } from 'lucide-react';
 import { NetworkingGrid } from '@/components/networking/NetworkingGrid';
 import { NetworkingHeader } from '@/components/networking/NetworkingHeader';
 import { useState } from 'react';
+import { FloatingOrbs } from '@/components/effects/FloatingOrbs';
 
 export default function Networking() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -29,6 +31,11 @@ export default function Networking() {
           <NetworkingGrid />
         </div>
       </div>
+      
+      {/* Background Effects */}
+      <FloatingOrbs />
+      
+      {/* Chat Assistant */}
       <ExpandableChat
         size="lg"
         position="bottom-right"
