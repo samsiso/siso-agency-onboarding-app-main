@@ -1,4 +1,4 @@
-import { VideoDetail } from '@/pages/VideoDetail';
+import VideoDetail from '@/pages/VideoDetail';
 import { useParams } from 'react-router-dom';
 
 export default function VideoDetailPage() {
