@@ -8,16 +8,20 @@ interface PlaceholdersAndVanishInputProps {
   placeholders: string[];
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  onFocus?: () => void; // Added as optional
+  onBlur?: () => void;  // Added as optional
   className?: string;
-  value?: string; // Added value prop
+  value?: string;
 }
 
 export function PlaceholdersAndVanishInput({
   placeholders,
   onChange,
   onSubmit,
+  onFocus,
+  onBlur,
   className,
-  value: externalValue, // Renamed to avoid conflict with internal state
+  value: externalValue,
 }: PlaceholdersAndVanishInputProps) {
   const [currentPlaceholder, setCurrentPlaceholder] = useState(0);
   const [value, setValue] = useState(externalValue || "");
@@ -215,6 +219,8 @@ export function PlaceholdersAndVanishInput({
       <input
         onChange={handleChange}
         onKeyDown={handleKeyDown}
+        onFocus={onFocus}
+        onBlur={onBlur}
         ref={inputRef}
         value={value}
         type="text"
