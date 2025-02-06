@@ -7,7 +7,7 @@ import { Video } from '../types';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuthSession';
+import { useAuthSession } from '@/hooks/useAuthSession';
 
 // [Analysis] Format large numbers to human readable format (e.g., 1.2M)
 const formatNumber = (num: number) => {
@@ -27,7 +27,7 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
   const [isLoaded, setIsLoaded] = useState(false);
   const [isInView, setIsInView] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
-  const { session } = useAuth();
+  const { session } = useAuthSession();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
