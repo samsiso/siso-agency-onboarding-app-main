@@ -13,6 +13,29 @@ import { VideoCreatorInfo } from '@/components/education/video-detail/VideoCreat
 import { VideoActions } from '@/components/education/video-detail/VideoActions';
 import { VideoInteractionPanel } from '@/components/education/video-detail/VideoInteractionPanel';
 
+interface FeaturedVideo {
+  id: string;
+  title: string;
+  thumbnail_url: string;
+  view_count: number;
+  date: string;
+}
+
+interface VideoDetails {
+  id: string;
+  title: string;
+  thumbnailUrl: string;
+  viewCount: number;
+  date: string | null;
+  channel_id?: string;
+  education_creators: {
+    name: string;
+    slug: string;
+    channel_avatar_url: string;
+    description: string;
+  };
+}
+
 export default function VideoDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -70,7 +93,8 @@ export default function VideoDetail() {
 
         if (creators && creators.length > 0) {
           const creator = creators[0];
-          const featuredVideo = creator.featured_videos.find((v: any) => v.id === videoId);
+          const featuredVideos = creator.featured_videos as FeaturedVideo[];
+          const featuredVideo = featuredVideos.find(v => v.id === videoId);
           
           if (featuredVideo) {
             console.log('Found video in featured_videos:', featuredVideo);
@@ -86,7 +110,7 @@ export default function VideoDetail() {
                 channel_avatar_url: creator.channel_avatar_url,
                 description: creator.description
               }
-            };
+            } satisfies VideoDetails;
           }
         }
 
@@ -95,7 +119,7 @@ export default function VideoDetail() {
       }
 
       console.log('Found video details:', videoDetails); // Debug log
-      return videoDetails;
+      return videoDetails as VideoDetails;
     },
     enabled: !!videoId,
     meta: {
@@ -136,7 +160,7 @@ export default function VideoDetail() {
     );
   }
 
-  const channelName = videoData?.education_creators?.name || videoData?.channel_id || 'Unknown Creator';
+  const channelName = videoData?.education_creators?.name || 'Unknown Creator';
   const channelAvatar = videoData?.education_creators?.channel_avatar_url || '';
   const videoDescription = videoData?.education_creators?.description || '';
   const thumbnailUrl = videoData?.thumbnailUrl || '';
