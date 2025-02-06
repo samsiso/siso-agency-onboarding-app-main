@@ -33,6 +33,7 @@ export default function VideoDetail() {
 
       console.log('Fetching video with ID:', videoId); // Debug log
 
+      // First, try to find the video in youtube_videos table
       const { data: videoDetails, error: videoError } = await supabase
         .from('youtube_videos')
         .select(`
@@ -41,24 +42,59 @@ export default function VideoDetail() {
             name,
             slug,
             channel_avatar_url,
-            description
+            description,
+            featured_videos
           )
         `)
         .eq('id', videoId)
         .maybeSingle();
-      
+
       if (videoError) {
         console.error('Error fetching video:', videoError);
         throw videoError;
       }
-      
+
+      // If video not found in youtube_videos, check featured_videos in education_creators
       if (!videoDetails) {
+        console.log('Video not found in youtube_videos, checking featured_videos');
+        
+        const { data: creators, error: creatorsError } = await supabase
+          .from('education_creators')
+          .select('*')
+          .contains('featured_videos', [{ id: videoId }]);
+
+        if (creatorsError) {
+          console.error('Error checking featured videos:', creatorsError);
+          throw creatorsError;
+        }
+
+        if (creators && creators.length > 0) {
+          const creator = creators[0];
+          const featuredVideo = creator.featured_videos.find((v: any) => v.id === videoId);
+          
+          if (featuredVideo) {
+            console.log('Found video in featured_videos:', featuredVideo);
+            return {
+              id: featuredVideo.id,
+              title: featuredVideo.title,
+              thumbnailUrl: featuredVideo.thumbnail_url,
+              viewCount: featuredVideo.view_count,
+              date: featuredVideo.date,
+              education_creators: {
+                name: creator.name,
+                slug: creator.slug,
+                channel_avatar_url: creator.channel_avatar_url,
+                description: creator.description
+              }
+            };
+          }
+        }
+
         console.error('No video found with ID:', videoId);
         throw new Error('Video not found');
       }
 
       console.log('Found video details:', videoDetails); // Debug log
-
       return videoDetails;
     },
     enabled: !!videoId,
