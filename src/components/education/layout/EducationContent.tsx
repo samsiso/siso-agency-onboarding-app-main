@@ -31,7 +31,6 @@ export const EducationContent = ({
           members={members}
           isLoading={isLoading}
           searchQuery={searchQuery}
-          viewMode="grid"
         />
       )}
     </AnimatePresence>

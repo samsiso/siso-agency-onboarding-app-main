@@ -12,7 +12,6 @@ import { usePagination } from '@/hooks/use-pagination';
 interface EducatorsDirectoryProps {
   members?: CommunityMember[];
   isLoading: boolean;
-  viewMode: 'grid' | 'list';
   searchQuery: string;
 }
 
@@ -21,12 +20,10 @@ const ITEMS_PER_PAGE = 20;
 export const EducatorsDirectory = ({ 
   members, 
   isLoading, 
-  viewMode: initialViewMode, 
   searchQuery: initialSearchQuery 
 }: EducatorsDirectoryProps) => {
   const [selectedMember, setSelectedMember] = useState<CommunityMember | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [viewMode, setViewMode] = useState(initialViewMode);
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
 
   // Filter members based on search query
@@ -83,16 +80,13 @@ export const EducatorsDirectory = ({
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
         />
-        <DirectoryHeader
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-        />
+        <DirectoryHeader />
       </div>
 
       <AnimatePresence mode="wait">
         <DirectoryList
           members={currentMembers}
-          viewMode={viewMode}
+          viewMode="grid"
           onMemberSelect={setSelectedMember}
         />
       </AnimatePresence>
