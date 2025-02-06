@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -55,30 +56,10 @@ export const VideoLibrary = ({
       });
       
       try {
-        // First, let's verify the table exists and has data
-        const { count, error: countError } = await supabase
-          .from('youtube_videos')
-          .select('*', { count: 'exact', head: true });
-
-        console.log('[VideoLibrary] Table check result:', { count, error: countError });
-
-        if (countError) {
-          console.error('[VideoLibrary] Error checking table:', countError);
-          throw countError;
-        }
-
-        // Build the query
         let query = supabase
           .from('youtube_videos')
           .select(`
-            id,
-            title,
-            url,
-            thumbnailUrl,
-            duration,
-            viewCount,
-            date,
-            channel_id,
+            *,
             education_creators (
               name,
               channel_avatar_url
