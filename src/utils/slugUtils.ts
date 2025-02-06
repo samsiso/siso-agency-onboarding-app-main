@@ -7,8 +7,8 @@ export const extractVideoIdFromSlug = (slug: string): string => {
 
   console.log('Extracting ID from slug:', slug); // Debug log
   
-  // [Analysis] Match the last segment that looks like a YouTube ID (11 characters)
-  const matches = slug.match(/[A-Za-z0-9_-]{11}$/);
+  // [Analysis] Match the last segment that looks like a YouTube ID (11-12 chars including possible hyphens)
+  const matches = slug.match(/[A-Za-z0-9_-]{11,12}$/);
   
   if (!matches || !matches[0]) {
     console.error('Could not extract video ID from slug:', slug);
