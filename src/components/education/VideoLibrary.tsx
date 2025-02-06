@@ -29,7 +29,7 @@ export const VideoLibrary = ({
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
   const { ref: loadMoreRef, inView } = useInView();
 
-  // [Analysis] Using a single JOIN query for better performance
+  // [Analysis] Simplified query structure for better performance
   // [Plan] Add Redis caching layer at 10k+ daily active users
   const {
     data,
@@ -41,9 +41,14 @@ export const VideoLibrary = ({
   } = useInfiniteQuery({
     queryKey: ['videos', selectedEducator, searchQuery, sortBy, filterBySeries],
     queryFn: async ({ pageParam = 0 }) => {
-      console.log('Fetching videos with params:', { pageParam, selectedEducator, searchQuery, sortBy });
+      console.log('Fetching videos with params:', { 
+        pageParam, 
+        selectedEducator, 
+        searchQuery, 
+        sortBy 
+      });
       
-      const { data: videos, error } = await supabase
+      let query = supabase
         .from('youtube_videos')
         .select(`
           id,
@@ -62,6 +67,17 @@ export const VideoLibrary = ({
         .range(pageParam * ITEMS_PER_PAGE, (pageParam + 1) * ITEMS_PER_PAGE - 1)
         .order('date', { ascending: false });
 
+      // Add filters if provided
+      if (selectedEducator) {
+        query = query.eq('channel_id', selectedEducator);
+      }
+
+      if (searchQuery) {
+        query = query.ilike('title', `%${searchQuery}%`);
+      }
+
+      const { data: videos, error } = await query;
+
       if (error) {
         console.error('Error fetching videos:', error);
         toast.error('Failed to load videos');
@@ -70,7 +86,7 @@ export const VideoLibrary = ({
 
       console.log('Fetched videos:', videos);
 
-      // Transform the data
+      // Transform the data to match the Video type
       return (videos || []).map(video => ({
         id: video.id,
         title: video.title || '',
@@ -113,6 +129,7 @@ export const VideoLibrary = ({
 
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
+      console.log('Loading more videos...');
       fetchNextPage();
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
