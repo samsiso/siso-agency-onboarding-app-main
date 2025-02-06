@@ -29,7 +29,7 @@ export const VideoLibrary = ({
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
   const { ref: loadMoreRef, inView } = useInView();
 
-  console.log('VideoLibrary render - Initial props:', {
+  console.log('[VideoLibrary] Initial render with props:', {
     selectedEducator,
     viewMode,
     searchQuery,
@@ -47,7 +47,7 @@ export const VideoLibrary = ({
   } = useInfiniteQuery({
     queryKey: ['videos', selectedEducator, searchQuery, sortBy, filterBySeries],
     queryFn: async ({ pageParam = 0 }) => {
-      console.log('Starting video fetch with params:', { 
+      console.log('[VideoLibrary] Starting video fetch with params:', { 
         pageParam, 
         selectedEducator, 
         searchQuery, 
@@ -60,10 +60,10 @@ export const VideoLibrary = ({
           .from('youtube_videos')
           .select('*', { count: 'exact', head: true });
 
-        console.log('Table check result:', { count, error: countError });
+        console.log('[VideoLibrary] Table check result:', { count, error: countError });
 
         if (countError) {
-          console.error('Error checking table:', countError);
+          console.error('[VideoLibrary] Error checking table:', countError);
           throw countError;
         }
 
@@ -99,11 +99,11 @@ export const VideoLibrary = ({
           .range(pageParam * ITEMS_PER_PAGE, (pageParam + 1) * ITEMS_PER_PAGE - 1)
           .order('date', { ascending: false });
 
-        console.log('Executing query:', query); // Debug log
+        console.log('[VideoLibrary] Executing query:', query.toSQL()); // Debug log
 
         const { data: videos, error: queryError } = await query;
 
-        console.log('Query result:', { 
+        console.log('[VideoLibrary] Query result:', { 
           success: !!videos,
           count: videos?.length,
           error: queryError,
@@ -111,18 +111,18 @@ export const VideoLibrary = ({
         });
 
         if (queryError) {
-          console.error('Error fetching videos:', queryError);
+          console.error('[VideoLibrary] Error fetching videos:', queryError);
           throw queryError;
         }
 
         if (!videos || videos.length === 0) {
-          console.log('No videos found for current query');
+          console.log('[VideoLibrary] No videos found for current query');
           return [];
         }
 
         // Transform the data
         const transformedVideos = videos.map(video => {
-          console.log('Transforming video:', video);
+          console.log('[VideoLibrary] Transforming video:', video);
           
           const transformed = {
             id: video.id,
@@ -148,14 +148,14 @@ export const VideoLibrary = ({
             }
           } satisfies Video;
 
-          console.log('Transformed video:', transformed);
+          console.log('[VideoLibrary] Transformed video:', transformed);
           return transformed;
         });
 
-        console.log('Final transformed page:', transformedVideos);
+        console.log('[VideoLibrary] Final transformed page:', transformedVideos);
         return transformedVideos;
       } catch (error) {
-        console.error('Error in query function:', error);
+        console.error('[VideoLibrary] Error in query function:', error);
         toast.error('Failed to load videos');
         throw error;
       }
@@ -163,7 +163,7 @@ export const VideoLibrary = ({
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {
       const hasMore = lastPage.length === ITEMS_PER_PAGE;
-      console.log('Pagination check:', { 
+      console.log('[VideoLibrary] Pagination check:', { 
         lastPageSize: lastPage.length, 
         hasMore, 
         currentPages: allPages.length,
@@ -177,7 +177,7 @@ export const VideoLibrary = ({
 
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
-      console.log('Infinite scroll triggered, loading more videos...');
+      console.log('[VideoLibrary] Infinite scroll triggered, loading more videos...');
       fetchNextPage();
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
@@ -186,7 +186,7 @@ export const VideoLibrary = ({
   const allVideos = (data?.pages.flat() || []) as Video[];
   const featuredVideos = allVideos.slice(0, 3);
 
-  console.log('VideoLibrary final render state:', { 
+  console.log('[VideoLibrary] Final render state:', { 
     isLoading, 
     videosCount: allVideos.length,
     hasNextPage,
@@ -196,7 +196,7 @@ export const VideoLibrary = ({
   });
 
   if (error) {
-    console.error('Render error:', error);
+    console.error('[VideoLibrary] Render error:', error);
     return (
       <div className="p-8 text-center text-siso-text">
         <p>Failed to load videos. Please try again later.</p>
