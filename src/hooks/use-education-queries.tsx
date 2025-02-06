@@ -2,11 +2,14 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Video } from '@/components/education/types';
 
+// [Analysis] Separate query hooks improve reusability and maintainability
+// [Plan] Add error boundary wrapper for better error handling at 1000+ users
+
 export const useEducatorsList = (page: number, searchQuery: string) => {
   return useQuery({
     queryKey: ['educators', page, searchQuery],
     queryFn: async () => {
-      console.log('Fetching educators for page:', page);
+      console.log('Fetching educators for page:', page); // Debug log
       
       let query = supabase
         .from('education_creators')
@@ -20,8 +23,7 @@ export const useEducatorsList = (page: number, searchQuery: string) => {
           number_of_subscribers,
           channel_total_videos,
           slug,
-          featured_videos,
-          is_featured
+          featured_videos
         `)
         .order('number_of_subscribers', { ascending: false })
         .range((page - 1) * 20, page * 20 - 1);
@@ -72,7 +74,7 @@ export const useEducatorDetails = (slug: string) => {
           featured_videos
         `)
         .eq('slug', slug)
-        .maybeSingle();
+        .single();
       
       if (educatorError) {
         console.error('Error fetching educator details:', educatorError);
@@ -83,7 +85,7 @@ export const useEducatorDetails = (slug: string) => {
         throw new Error('Educator not found');
       }
 
-      console.log('Found educator with featured videos:', educator);
+      console.log('Found educator with featured videos:', educator); // Debug log
       
       return educator;
     },
@@ -99,7 +101,7 @@ export const useEducatorVideos = (educatorId: string | null, page = 1) => {
     queryFn: async () => {
       if (!educatorId) return [];
       
-      console.log('Fetching videos for educator:', educatorId);
+      console.log('Fetching videos for educator:', educatorId); // Debug log
       
       const { data: educator } = await supabase
         .from('education_creators')
@@ -107,7 +109,7 @@ export const useEducatorVideos = (educatorId: string | null, page = 1) => {
         .eq('id', educatorId)
         .single();
 
-      console.log('Educator data:', educator);
+      console.log('Educator data:', educator); // Debug log
 
       const { data: videos, error } = await supabase
         .from('youtube_videos')
@@ -155,7 +157,7 @@ export const useEducatorVideos = (educatorId: string | null, page = 1) => {
         }
       }));
       
-      console.log('Transformed videos:', transformedVideos);
+      console.log('Transformed videos:', transformedVideos); // Debug log
       
       return transformedVideos;
     },

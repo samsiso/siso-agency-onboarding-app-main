@@ -111,24 +111,18 @@ export default function VideoDetail() {
 
         if (creators && creators.length > 0) {
           const creator = creators[0];
-          let featuredVideos;
+          // Parse and validate featured_videos array
+          const featuredVideosRaw = creator.featured_videos;
           
-          try {
-            // Parse featured_videos if it's a string
-            featuredVideos = typeof creator.featured_videos === 'string' 
-              ? JSON.parse(creator.featured_videos)
-              : creator.featured_videos;
-            
-            // Validate the structure
-            if (!Array.isArray(featuredVideos)) {
-              throw new Error('Featured videos is not an array');
-            }
-          } catch (e) {
-            console.error('Error parsing featured videos:', e);
+          // First cast to unknown, then validate structure
+          const parsedVideos = featuredVideosRaw as unknown;
+          
+          if (!isFeaturedVideoArray(parsedVideos)) {
+            console.error('Invalid featured videos data structure:', featuredVideosRaw);
             throw new Error('Invalid featured videos data structure');
           }
 
-          const featuredVideo = featuredVideos.find(v => v.id === videoId);
+          const featuredVideo = parsedVideos.find(v => v.id === videoId);
           
           if (featuredVideo) {
             console.log('Found video in featured_videos:', featuredVideo);
