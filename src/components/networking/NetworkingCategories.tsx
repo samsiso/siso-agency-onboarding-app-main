@@ -42,7 +42,9 @@ export const NetworkingCategories = ({
           >
             <TabsTrigger 
               value={category}
-              className="group data-[state=active]:bg-gradient-to-r data-[state=active]:from-siso-red/20 data-[state=active]:to-siso-orange/20 data-[state=active]:text-siso-orange transition-all duration-300 hover:bg-siso-text/10 focus:ring-2 focus:ring-siso-orange/50 focus:outline-none relative overflow-hidden"
+              className="group data-[state=active]:bg-gradient-to-r data-[state=active]:from-siso-red/20 data-[state=active]:to-siso-orange/20 
+                data-[state=active]:text-siso-orange transition-all duration-300 hover:bg-siso-text/10 
+                focus:ring-2 focus:ring-siso-orange/50 focus:outline-none relative overflow-hidden"
             >
               <span className="relative z-10 flex items-center gap-2">
                 {getCategoryIcon(category)}
