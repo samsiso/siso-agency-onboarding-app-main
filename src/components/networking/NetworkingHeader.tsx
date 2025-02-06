@@ -1,3 +1,4 @@
+
 import { Search, Users, Globe, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Input } from '@/components/ui/input';
