@@ -1,5 +1,5 @@
 
-import { Search, Users, Globe, Sparkles } from 'lucide-react';
+import { Search, Users, Globe } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Input } from '@/components/ui/input';
 import { useQuery } from '@tanstack/react-query';
@@ -39,80 +39,74 @@ export const NetworkingHeader = ({ searchQuery, setSearchQuery }: NetworkingHead
   });
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="space-y-4 mb-6"
-    >
-      <div className="relative">
+    <div className="space-y-6 px-6 py-8">
+      {/* Title Section */}
+      <motion.div 
+        className="text-center space-y-2"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
+          SISO Networking Hub
+        </h1>
+        <p className="text-siso-text/80 max-w-2xl mx-auto">
+          Connect with other professionals and join thriving communities
+        </p>
+      </motion.div>
+
+      {/* Stats Display */}
+      {stats && (
         <motion.div 
-          className="absolute inset-0 bg-gradient-radial from-siso-red/5 via-siso-orange/5 to-transparent rounded-3xl"
-          animate={{ 
-            scale: [1, 1.02, 1],
-            opacity: [0.5, 0.8, 0.5] 
-          }}
-          transition={{ 
-            duration: 8,
-            repeat: Infinity,
-            ease: "linear"
-          }}
-        />
-        
-        <div className="relative z-10 space-y-4 p-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
-              SISO Networking Hub
-            </h1>
-            
-            {stats && (
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex gap-4 text-sm"
-              >
-                <div className="flex items-center gap-2">
-                  <Globe className="w-4 h-4 text-siso-orange" />
-                  <span className="text-siso-text-bold">
-                    {stats.totalCommunities.toLocaleString()} Communities
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-siso-orange" />
-                  <span className="text-siso-text-bold">
-                    {stats.totalMembers.toLocaleString()} Members
-                  </span>
-                </div>
-              </motion.div>
-            )}
+          className="flex justify-center gap-8 py-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+        >
+          <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-siso-text/5 hover:bg-siso-text/10 transition-all duration-300">
+            <Globe className="w-4 h-4 text-siso-orange" />
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-lg font-semibold text-siso-text-bold">
+                {stats.totalCommunities.toLocaleString()}
+              </span>
+              <span className="text-sm text-siso-text/70">Communities</span>
+            </div>
           </div>
-          
-          <div className="w-full relative">
-            <motion.div
-              initial={false}
-              animate={{ 
-                scale: searchQuery ? 0.98 : 1,
-                boxShadow: searchQuery 
-                  ? "0 0 0 2px rgba(255, 87, 34, 0.3)" 
-                  : "0 0 0 0px rgba(255, 87, 34, 0)"
-              }}
-              transition={{ duration: 0.2 }}
-              className="relative"
-            >
-              <Input
-                type="text"
-                placeholder="Search communities... (⌘K)"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-12 px-4 py-3 bg-siso-text/5 border border-siso-text/10 rounded-lg 
-                  focus:outline-none focus:border-siso-orange/50 text-siso-text pl-10 
-                  transition-all duration-300 hover:bg-siso-text/10"
-              />
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-siso-text/60 w-4 h-4" />
-            </motion.div>
+          <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-siso-text/5 hover:bg-siso-text/10 transition-all duration-300">
+            <Users className="w-4 h-4 text-siso-orange" />
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-lg font-semibold text-siso-text-bold">
+                {stats.totalMembers.toLocaleString()}
+              </span>
+              <span className="text-sm text-siso-text/70">Members</span>
+            </div>
           </div>
+        </motion.div>
+      )}
+
+      {/* Search Section */}
+      <motion.div 
+        className="relative w-full max-w-3xl mx-auto"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+      >
+        <div className="relative group">
+          <Input
+            type="text"
+            placeholder="Search communities... (⌘K)"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full h-14 pl-12 pr-24 bg-gradient-to-r from-siso-text/5 to-siso-text/10 
+              border border-siso-text/10 rounded-xl text-lg
+              focus:ring-2 focus:ring-siso-orange/30 focus:border-siso-orange/50
+              hover:border-siso-text/20 hover:bg-siso-text/10
+              transition-all duration-300 backdrop-blur-sm"
+          />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-siso-text/50 
+            group-hover:text-siso-text/70 transition-colors" />
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 };
