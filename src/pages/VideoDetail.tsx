@@ -34,7 +34,7 @@ export default function VideoDetail() {
 
       console.log('[VideoDetail] Fetching video data for ID:', videoId);
 
-      // [Analysis] Match the exact column names from the database (camelCase)
+      // [Analysis] We need to fetch the video first to get its channel_id
       const { data: videoDetails, error: videoError } = await supabase
         .from('youtube_videos')
         .select(`
@@ -45,17 +45,10 @@ export default function VideoDetail() {
           thumbnailUrl,
           viewCount,
           date,
-          channel_id,
-          education_creators (
-            name,
-            slug,
-            channel_avatar_url,
-            description,
-            channel_id
-          )
+          channel_id
         `)
         .eq('id', videoId)
-        .maybeSingle();
+        .single();
 
       if (videoError) {
         console.error('[VideoDetail] Error fetching video:', videoError);
@@ -67,8 +60,32 @@ export default function VideoDetail() {
         throw new Error('Video not found');
       }
 
-      console.log('[VideoDetail] Found video details:', videoDetails);
-      return videoDetails;
+      // [Analysis] Now fetch the creator details using the channel_id
+      const { data: creatorDetails, error: creatorError } = await supabase
+        .from('education_creators')
+        .select(`
+          name,
+          slug,
+          channel_avatar_url,
+          description,
+          channel_id
+        `)
+        .eq('channel_id', videoDetails.channel_id)
+        .maybeSingle();
+
+      if (creatorError) {
+        console.error('[VideoDetail] Error fetching creator:', creatorError);
+        // Don't throw here, we can still show the video without creator info
+      }
+
+      // [Analysis] Combine video and creator data
+      const combinedData = {
+        ...videoDetails,
+        education_creators: creatorDetails
+      };
+
+      console.log('[VideoDetail] Found combined details:', combinedData);
+      return combinedData;
     },
     enabled: !!videoId,
     meta: {
