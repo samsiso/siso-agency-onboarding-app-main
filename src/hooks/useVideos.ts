@@ -13,6 +13,7 @@ interface UseVideosProps {
   filterBySeries?: boolean;
 }
 
+// [Analysis] Optimize query performance by reducing initial load and implementing proper pagination
 export const useVideos = ({ 
   selectedEducator,
   searchQuery,
@@ -29,28 +30,16 @@ export const useVideos = ({
   return useInfiniteQuery({
     queryKey: ['videos', selectedEducator, searchQuery, sortBy, filterBySeries],
     queryFn: async ({ pageParam = 0 }) => {
-      console.log('[useVideos] Starting video fetch with params:', { 
-        pageParam, 
-        selectedEducator, 
-        searchQuery, 
-        sortBy 
-      });
+      console.log('[useVideos] Fetching page:', pageParam);
       
       try {
+        // [Analysis] Split the query into two parts for better performance
+        // 1. First get the video data
         let query = supabase
           .from('youtube_videos')
-          .select(`
-            id,
-            title,
-            thumbnailUrl,
-            duration,
-            viewCount,
-            date,
-            education_creators (
-              name,
-              channel_avatar_url
-            )
-          `);
+          .select('id, title, thumbnailUrl, duration, viewCount, date, channel_id')
+          .range(pageParam * ITEMS_PER_PAGE, (pageParam + 1) * ITEMS_PER_PAGE - 1)
+          .order('date', { ascending: false });
 
         if (selectedEducator) {
           query = query.eq('channel_id', selectedEducator);
@@ -60,24 +49,11 @@ export const useVideos = ({
           query = query.ilike('title', `%${searchQuery}%`);
         }
 
-        query = query
-          .range(pageParam * ITEMS_PER_PAGE, (pageParam + 1) * ITEMS_PER_PAGE - 1)
-          .order('date', { ascending: false });
+        const { data: videos, error: videosError } = await query;
 
-        console.log('[useVideos] Query parameters:', { 
-          filters: {
-            selectedEducator,
-            searchQuery,
-            pageStart: pageParam * ITEMS_PER_PAGE,
-            pageEnd: (pageParam + 1) * ITEMS_PER_PAGE - 1
-          }
-        });
-
-        const { data: videos, error: queryError } = await query;
-
-        if (queryError) {
-          console.error('[useVideos] Error fetching videos:', queryError);
-          throw queryError;
+        if (videosError) {
+          console.error('[useVideos] Error fetching videos:', videosError);
+          throw videosError;
         }
 
         if (!videos || videos.length === 0) {
@@ -85,23 +61,35 @@ export const useVideos = ({
           return [];
         }
 
-        // Transform the data - now with more precise logging
-        const transformedVideos = videos.map(video => {
-          console.log('[useVideos] Transforming video:', { 
-            id: video.id,
-            title: video.title,
-            date: video.date
-          });
+        // 2. Then get creator data for these videos
+        const channelIds = [...new Set(videos.map(v => v.channel_id))];
+        const { data: creators, error: creatorsError } = await supabase
+          .from('education_creators')
+          .select('channel_id, name, channel_avatar_url')
+          .in('channel_id', channelIds);
 
+        if (creatorsError) {
+          console.error('[useVideos] Error fetching creators:', creatorsError);
+        }
+
+        // Create a map for quick creator lookup
+        const creatorMap = new Map(
+          (creators || []).map(c => [c.channel_id, c])
+        );
+
+        // [Analysis] Transform the data with better fallbacks
+        const transformedVideos = videos.map(video => {
+          const creator = creatorMap.get(video.channel_id);
+          
           return {
-            id: video.id, // This is the YouTube video ID
+            id: video.id,
             title: video.title || '',
             url: `https://youtube.com/watch?v=${video.id}`,
             duration: video.duration || '0:00',
             thumbnail_url: video.thumbnailUrl || '',
             educator: {
-              name: video.education_creators?.name || 'Unknown Creator',
-              avatar_url: video.education_creators?.channel_avatar_url || ''
+              name: creator?.name || video.channel_id || 'Unknown Creator',
+              avatar_url: creator?.channel_avatar_url || ''
             },
             metrics: {
               views: video.viewCount || 0,
@@ -118,7 +106,7 @@ export const useVideos = ({
           } satisfies Video;
         });
 
-        console.log('[useVideos] Transformed videos:', transformedVideos);
+        console.log('[useVideos] Transformed videos:', transformedVideos.length);
         return transformedVideos;
       } catch (error) {
         console.error('[useVideos] Error in query function:', error);
@@ -132,8 +120,7 @@ export const useVideos = ({
       console.log('[useVideos] Pagination check:', { 
         lastPageSize: lastPage.length, 
         hasMore, 
-        currentPages: allPages.length,
-        nextPage: hasMore ? allPages.length : undefined 
+        currentPages: allPages.length 
       });
       return hasMore ? allPages.length : undefined;
     },

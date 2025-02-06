@@ -1,3 +1,4 @@
+
 import { motion } from 'framer-motion';
 import { OptimizedVideoCard } from './OptimizedVideoCard';
 import { Video } from '../types';
@@ -12,23 +13,41 @@ interface VideoGridProps {
 export const VideoGrid = ({ videos = [], featuredVideos = [], isLoading }: VideoGridProps) => {
   const navigate = useNavigate();
 
-  // [Analysis] Using skeleton loading for better UX during data fetch
+  // [Analysis] Improved loading state with staggered animation
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {[...Array(8)].map((_, i) => (
-          <div key={i} className="animate-pulse">
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: i * 0.1 }}
+            className="animate-pulse"
+          >
             <div className="aspect-video bg-siso-bg-alt rounded-lg"></div>
             <div className="mt-2 h-4 bg-siso-bg-alt rounded w-3/4"></div>
             <div className="mt-2 h-4 bg-siso-bg-alt rounded w-1/2"></div>
-          </div>
+          </motion.div>
         ))}
       </div>
     );
   }
 
+  // [Analysis] Early return with message if no videos
+  if (!videos.length && !featuredVideos.length) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="text-center py-12"
+      >
+        <p className="text-xl text-siso-text/70">No videos found</p>
+      </motion.div>
+    );
+  }
+
   const handleVideoClick = (video: Video) => {
-    // [Analysis] Improved slug generation with validation
     if (!video.id || !video.title) {
       console.error('Invalid video data:', video);
       return;
@@ -36,12 +55,16 @@ export const VideoGrid = ({ videos = [], featuredVideos = [], isLoading }: Video
 
     const slug = video.title
       .toLowerCase()
-      .replace(/[^\w\s-]/g, '') // Remove special characters
-      .replace(/\s+/g, '-') // Replace spaces with hyphens
-      .replace(/-+/g, '-') // Remove consecutive hyphens
-      .substring(0, 60); // Limit length
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .substring(0, 60);
     
-    console.log('Generated slug:', slug, 'for video:', video.id); // Debug log
+    console.log('[VideoGrid] Navigating to video:', { 
+      slug, 
+      videoId: video.id 
+    });
+    
     navigate(`/education/videos/${slug}-${video.id}`);
   };
 
@@ -59,7 +82,7 @@ export const VideoGrid = ({ videos = [], featuredVideos = [], isLoading }: Video
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {featuredVideos.map((video, index) => (
               <OptimizedVideoCard
-                key={video.id}
+                key={`featured-${video.id}`}
                 video={video}
                 index={index}
                 onClick={() => handleVideoClick(video)}
