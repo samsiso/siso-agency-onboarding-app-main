@@ -9,6 +9,7 @@ interface PlaceholdersAndVanishInputProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   className?: string;
+  value?: string; // Added value prop
 }
 
 export function PlaceholdersAndVanishInput({
@@ -16,8 +17,17 @@ export function PlaceholdersAndVanishInput({
   onChange,
   onSubmit,
   className,
+  value: externalValue, // Renamed to avoid conflict with internal state
 }: PlaceholdersAndVanishInputProps) {
   const [currentPlaceholder, setCurrentPlaceholder] = useState(0);
+  const [value, setValue] = useState(externalValue || "");
+
+  // Update internal value when external value changes
+  useEffect(() => {
+    if (externalValue !== undefined) {
+      setValue(externalValue);
+    }
+  }, [externalValue]);
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const startAnimation = () => {
@@ -49,7 +59,6 @@ export function PlaceholdersAndVanishInput({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const newDataRef = useRef<any[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [value, setValue] = useState("");
   const [animating, setAnimating] = useState(false);
 
   const draw = useCallback(() => {
@@ -179,6 +188,13 @@ export function PlaceholdersAndVanishInput({
     onSubmit && onSubmit(e);
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!animating) {
+      setValue(e.target.value);
+      onChange && onChange(e);
+    }
+  };
+
   return (
     <form
       className={cn(
@@ -196,12 +212,7 @@ export function PlaceholdersAndVanishInput({
         ref={canvasRef}
       />
       <input
-        onChange={(e) => {
-          if (!animating) {
-            setValue(e.target.value);
-            onChange && onChange(e);
-          }
-        }}
+        onChange={handleChange}
         onKeyDown={handleKeyDown}
         ref={inputRef}
         value={value}
