@@ -5,7 +5,6 @@ import { CommunityMember } from '@/components/community/types';
 
 interface EducationContentProps {
   activeSection: 'videos' | 'educators';
-  viewMode: 'grid' | 'list';
   searchQuery: string;
   members?: CommunityMember[];
   isLoading: boolean;
@@ -13,7 +12,6 @@ interface EducationContentProps {
 
 export const EducationContent = ({
   activeSection,
-  viewMode,
   searchQuery,
   members,
   isLoading
@@ -25,7 +23,6 @@ export const EducationContent = ({
           key="video-library"
           isLoading={isLoading}
           selectedEducator={null}
-          viewMode={viewMode}
           searchQuery={searchQuery}
         />
       ) : (
@@ -33,7 +30,6 @@ export const EducationContent = ({
           key="educators-directory"
           members={members}
           isLoading={isLoading}
-          viewMode={viewMode}
           searchQuery={searchQuery}
         />
       )}
