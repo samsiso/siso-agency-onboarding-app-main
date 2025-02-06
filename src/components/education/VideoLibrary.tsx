@@ -29,8 +29,14 @@ export const VideoLibrary = ({
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
   const { ref: loadMoreRef, inView } = useInView();
 
-  // [Analysis] Simplified query to debug data fetching
-  // [Plan] Add proper error boundaries and loading states
+  console.log('VideoLibrary render - Initial props:', {
+    selectedEducator,
+    viewMode,
+    searchQuery,
+    sortBy,
+    filterBySeries
+  });
+
   const {
     data,
     fetchNextPage,
@@ -49,14 +55,19 @@ export const VideoLibrary = ({
       });
       
       try {
-        // First, let's check if we can get any videos at all
-        const { data: countCheck, error: countError } = await supabase
+        // First, let's verify the table exists and has data
+        const { count, error: countError } = await supabase
           .from('youtube_videos')
-          .select('id', { count: 'exact' });
+          .select('*', { count: 'exact', head: true });
 
-        console.log('Count check result:', { count: countCheck?.length, error: countError });
+        console.log('Table check result:', { count, error: countError });
 
-        // Now attempt the main query
+        if (countError) {
+          console.error('Error checking table:', countError);
+          throw countError;
+        }
+
+        // Build the query
         let query = supabase
           .from('youtube_videos')
           .select(`
@@ -72,10 +83,9 @@ export const VideoLibrary = ({
               name,
               channel_avatar_url
             )
-          `)
-          .range(pageParam * ITEMS_PER_PAGE, (pageParam + 1) * ITEMS_PER_PAGE - 1)
-          .order('date', { ascending: false });
+          `);
 
+        // Add filters
         if (selectedEducator) {
           query = query.eq('channel_id', selectedEducator);
         }
@@ -84,12 +94,20 @@ export const VideoLibrary = ({
           query = query.ilike('title', `%${searchQuery}%`);
         }
 
-        console.log('Executing query...'); // Debug log
+        // Add pagination
+        query = query
+          .range(pageParam * ITEMS_PER_PAGE, (pageParam + 1) * ITEMS_PER_PAGE - 1)
+          .order('date', { ascending: false });
+
+        console.log('Executing query:', query); // Debug log
+
         const { data: videos, error: queryError } = await query;
+
         console.log('Query result:', { 
-          videosCount: videos?.length, 
-          firstVideo: videos?.[0],
-          error: queryError 
+          success: !!videos,
+          count: videos?.length,
+          error: queryError,
+          firstVideo: videos?.[0]
         });
 
         if (queryError) {
@@ -102,10 +120,11 @@ export const VideoLibrary = ({
           return [];
         }
 
-        // Transform the data to match the Video type
-        const transformedVideos = (videos || []).map(video => {
-          console.log('Transforming video:', video); // Debug individual video transformation
-          return {
+        // Transform the data
+        const transformedVideos = videos.map(video => {
+          console.log('Transforming video:', video);
+          
+          const transformed = {
             id: video.id,
             title: video.title || '',
             url: `https://youtube.com/watch?v=${video.id}`,
@@ -128,9 +147,12 @@ export const VideoLibrary = ({
               implementation_steps: ['Coming soon...']
             }
           } satisfies Video;
+
+          console.log('Transformed video:', transformed);
+          return transformed;
         });
 
-        console.log('Transformed videos:', transformedVideos); // Debug final result
+        console.log('Final transformed page:', transformedVideos);
         return transformedVideos;
       } catch (error) {
         console.error('Error in query function:', error);
@@ -141,9 +163,10 @@ export const VideoLibrary = ({
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {
       const hasMore = lastPage.length === ITEMS_PER_PAGE;
-      console.log('Checking for next page:', { 
+      console.log('Pagination check:', { 
         lastPageSize: lastPage.length, 
         hasMore, 
+        currentPages: allPages.length,
         nextPage: hasMore ? allPages.length : undefined 
       });
       return hasMore ? allPages.length : undefined;
@@ -163,15 +186,17 @@ export const VideoLibrary = ({
   const allVideos = (data?.pages.flat() || []) as Video[];
   const featuredVideos = allVideos.slice(0, 3);
 
-  console.log('VideoLibrary render state:', { 
+  console.log('VideoLibrary final render state:', { 
     isLoading, 
     videosCount: allVideos.length,
     hasNextPage,
     isFetchingNextPage,
-    error 
+    error,
+    featuredVideosCount: featuredVideos.length
   });
 
   if (error) {
+    console.error('Render error:', error);
     return (
       <div className="p-8 text-center text-siso-text">
         <p>Failed to load videos. Please try again later.</p>
