@@ -12,6 +12,7 @@ interface VideoGridProps {
 export const VideoGrid = ({ videos = [], featuredVideos = [], isLoading }: VideoGridProps) => {
   const navigate = useNavigate();
 
+  // [Analysis] Using skeleton loading for better UX during data fetch
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -27,6 +28,7 @@ export const VideoGrid = ({ videos = [], featuredVideos = [], isLoading }: Video
   }
 
   const handleVideoClick = (video: Video) => {
+    // [Analysis] Improved slug generation with validation
     if (!video.id || !video.title) {
       console.error('Invalid video data:', video);
       return;

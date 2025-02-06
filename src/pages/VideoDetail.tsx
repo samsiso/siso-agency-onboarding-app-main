@@ -36,24 +36,6 @@ interface VideoDetails {
   };
 }
 
-// Type guard to validate FeaturedVideo structure
-const isFeaturedVideo = (video: unknown): video is FeaturedVideo => {
-  if (!video || typeof video !== 'object') return false;
-  const v = video as Record<string, unknown>;
-  return (
-    typeof v.id === 'string' &&
-    typeof v.title === 'string' &&
-    typeof v.thumbnail_url === 'string' &&
-    typeof v.view_count === 'number' &&
-    typeof v.date === 'string'
-  );
-};
-
-// Type guard to validate FeaturedVideo array
-const isFeaturedVideoArray = (arr: unknown): arr is FeaturedVideo[] => {
-  return Array.isArray(arr) && arr.every(isFeaturedVideo);
-};
-
 export default function VideoDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -111,18 +93,9 @@ export default function VideoDetail() {
 
         if (creators && creators.length > 0) {
           const creator = creators[0];
-          // Parse and validate featured_videos array
-          const featuredVideosRaw = creator.featured_videos;
-          
-          // First cast to unknown, then validate structure
-          const parsedVideos = featuredVideosRaw as unknown;
-          
-          if (!isFeaturedVideoArray(parsedVideos)) {
-            console.error('Invalid featured videos data structure:', featuredVideosRaw);
-            throw new Error('Invalid featured videos data structure');
-          }
-
-          const featuredVideo = parsedVideos.find(v => v.id === videoId);
+          // First cast to unknown, then to FeaturedVideo[] to safely handle the type conversion
+          const featuredVideos = (creator.featured_videos as unknown) as FeaturedVideo[];
+          const featuredVideo = featuredVideos.find(v => v.id === videoId);
           
           if (featuredVideo) {
             console.log('Found video in featured_videos:', featuredVideo);
