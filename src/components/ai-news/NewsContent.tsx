@@ -47,30 +47,34 @@ export const NewsContent = ({
     );
   });
 
-  // [Analysis] Separate featured and regular news items for different layouts
-  const featuredItems = filteredNewsItems.filter(item => item.impact?.toLowerCase() === 'high');
-  const regularItems = filteredNewsItems.filter(item => item.impact?.toLowerCase() !== 'high');
+  // [Analysis] Get the most recent high-impact article for the hero section
+  const featuredItem = filteredNewsItems.find(item => item.impact?.toLowerCase() === 'high');
+  
+  // [Analysis] Get all remaining articles for the grid, including other high-impact articles
+  const gridItems = featuredItem 
+    ? filteredNewsItems.filter(item => item.id !== featuredItem.id)
+    : filteredNewsItems;
 
   return (
     <Suspense fallback={<LoadingSpinner />}>
       <div className="space-y-8 animate-fade-in">
         {/* Featured News Hero */}
-        {featuredItems.length > 0 && (
+        {featuredItem && (
           <FeaturedNewsHero 
-            item={featuredItems[0]} 
+            item={featuredItem} 
             onGenerateSummary={onGenerateSummary}
           />
         )}
 
         {/* Regular News Grid */}
-        {regularItems.length > 0 && (
+        {gridItems.length > 0 && (
           <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="show"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-[minmax(200px,auto)] gap-4 sm:gap-6"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 auto-rows-[minmax(200px,auto)] gap-4 sm:gap-6"
           >
-            {regularItems.map((item) => (
+            {gridItems.map((item) => (
               <motion.div
                 key={item.id}
                 className="group h-full"
