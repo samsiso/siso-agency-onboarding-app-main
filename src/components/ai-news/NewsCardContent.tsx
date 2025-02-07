@@ -1,10 +1,12 @@
-import { Calendar, ExternalLink, MessageSquare } from 'lucide-react';
+
+import { Calendar, ExternalLink, MessageSquare, BookmarkPlus, Share2, Eye, Clock, ChevronRight, Shield, Cpu } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ShareButtons } from './ShareButtons';
 import { NewsCardComments } from './NewsCardComments';
+import { cn } from '@/lib/utils';
 
 interface NewsCardContentProps {
   title: string;
@@ -19,6 +21,12 @@ interface NewsCardContentProps {
   onGenerateSummary?: () => void;
   newsId?: string;
   comments?: any[];
+  readingTime?: number;
+  views?: number;
+  bookmarks?: number;
+  sourceCredibility?: string;
+  technicalComplexity?: string;
+  articleType?: string;
 }
 
 export const NewsCardContent = ({ 
@@ -33,7 +41,13 @@ export const NewsCardContent = ({
   loadingSummary,
   onGenerateSummary,
   newsId,
-  comments = []
+  comments = [],
+  readingTime = 5,
+  views = 0,
+  bookmarks = 0,
+  sourceCredibility = 'verified',
+  technicalComplexity = 'intermediate',
+  articleType = 'news'
 }: NewsCardContentProps) => {
   const getImpactColor = (impact: string) => {
     switch (impact.toLowerCase()) {
@@ -45,6 +59,19 @@ export const NewsCardContent = ({
         return 'bg-green-500/10 text-green-500 border-green-500/20';
       default:
         return 'bg-siso-red/10 text-siso-red border-siso-red/20';
+    }
+  };
+
+  const getTechComplexityColor = (complexity: string) => {
+    switch (complexity.toLowerCase()) {
+      case 'advanced':
+        return 'bg-purple-500/10 text-purple-500 border-purple-500/20';
+      case 'intermediate':
+        return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
+      case 'beginner':
+        return 'bg-green-500/10 text-green-500 border-green-500/20';
+      default:
+        return 'bg-gray-500/10 text-gray-500 border-gray-500/20';
     }
   };
 
@@ -62,7 +89,21 @@ export const NewsCardContent = ({
       transition={{ duration: 0.3 }}
       className={`flex flex-col h-full ${isCompact ? 'pl-0' : 'px-4'}`}
     >
-      <div className="space-y-2 sm:space-y-3">
+      <div className="space-y-2 sm:space-y-3 mb-4">
+        {/* Article Type & Credibility */}
+        <div className="flex items-center gap-2 flex-wrap mb-2">
+          <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20 capitalize">
+            {articleType}
+          </Badge>
+          {sourceCredibility === 'verified' && (
+            <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20">
+              <Shield className="h-3 w-3 mr-1" />
+              Verified Source
+            </Badge>
+          )}
+        </div>
+
+        {/* Title */}
         <button 
           onClick={handleClick}
           className="group block w-full text-left"
@@ -79,25 +120,53 @@ export const NewsCardContent = ({
           </h2>
         </button>
 
+        {/* Description */}
         {!isCompact && (
           <p className="text-sm sm:text-base text-siso-text/80 line-clamp-2 leading-relaxed max-w-[95%]">
             {description}
           </p>
         )}
+
+        {/* Technical Info */}
+        <div className="flex items-center gap-3 text-xs sm:text-sm text-siso-text/60">
+          <span className="flex items-center gap-1">
+            <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
+            {readingTime} min read
+          </span>
+          <span className="flex items-center gap-1">
+            <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
+            {views} views
+          </span>
+          <span className="flex items-center gap-1">
+            <BookmarkPlus className="h-3 w-3 sm:h-4 sm:w-4" />
+            {bookmarks}
+          </span>
+        </div>
       </div>
       
       <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm mt-auto">
+        {/* Source & Date */}
         <span className="text-siso-text/60">
           {source}
         </span>
         
         <span className="text-siso-text/40">•</span>
         
+        {/* Impact Badge */}
         <Badge 
           variant="outline" 
           className={`${getImpactColor(impact)} border text-xs font-medium px-2 py-0.5`}
         >
           {impact} Impact
+        </Badge>
+
+        {/* Technical Complexity */}
+        <Badge 
+          variant="outline" 
+          className={`${getTechComplexityColor(technicalComplexity)} border text-xs font-medium px-2 py-0.5`}
+        >
+          <Cpu className="h-3 w-3 mr-1" />
+          {technicalComplexity}
         </Badge>
 
         <span className="text-siso-text/40">•</span>
@@ -113,6 +182,7 @@ export const NewsCardContent = ({
 
         {!isCompact && (
           <div className="flex items-center gap-2 ml-auto">
+            {/* Read Button */}
             <Button 
               variant="ghost"
               size="sm"
@@ -120,9 +190,10 @@ export const NewsCardContent = ({
               onClick={handleClick}
             >
               <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-              Read
+              Read Article
             </Button>
 
+            {/* AI Summary Dialog */}
             <Dialog>
               <DialogTrigger asChild>
                 <Button
@@ -154,6 +225,7 @@ export const NewsCardContent = ({
               </DialogContent>
             </Dialog>
 
+            {/* Comments Dialog */}
             {newsId && comments && (
               <Dialog>
                 <DialogTrigger asChild>

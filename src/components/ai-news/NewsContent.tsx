@@ -73,13 +73,13 @@ export const NewsContent = ({
           />
         )}
 
-        {/* Regular News Grid */}
+        {/* Regular News Grid - Updated to 2 columns with larger cards */}
         {gridItems.length > 0 && (
           <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="show"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 auto-rows-[minmax(200px,auto)] gap-4 sm:gap-6"
+            className="grid grid-cols-1 md:grid-cols-2 auto-rows-[minmax(300px,auto)] gap-6 sm:gap-8"
           >
             {gridItems.map((item) => (
               <motion.div
@@ -94,7 +94,7 @@ export const NewsContent = ({
                   summaries={summaries}
                   loadingSummaries={loadingSummaries}
                   onGenerateSummary={onGenerateSummary}
-                  isCompact={true}
+                  isCompact={false}
                 />
               </motion.div>
             ))}

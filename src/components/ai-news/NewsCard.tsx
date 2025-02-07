@@ -1,3 +1,4 @@
+
 import { Card, CardContent } from '@/components/ui/card';
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
@@ -100,7 +101,7 @@ const NewsCard = ({
   };
 
   if (isLoading) {
-    return <Skeleton className="w-full h-[200px] rounded-lg" />;
+    return <Skeleton className="w-full h-[300px] rounded-lg" />;
   }
 
   return (
@@ -134,6 +135,12 @@ const NewsCard = ({
                 onGenerateSummary={() => onGenerateSummary(item.id)}
                 newsId={item.id}
                 comments={comments}
+                readingTime={item.reading_time}
+                views={item.views}
+                bookmarks={item.bookmarks}
+                sourceCredibility={item.source_credibility}
+                technicalComplexity={item.technical_complexity}
+                articleType={item.article_type}
               />
             </div>
           </div>
