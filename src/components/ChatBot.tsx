@@ -4,10 +4,16 @@ import { MessageSquare, Send, X } from 'lucide-react';
 import { Button } from './ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/hooks/use-toast";
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
+  steps?: {
+    thinking?: string;
+    searching?: string;
+    response?: string;
+  };
 }
 
 interface ChatBotProps {
@@ -52,6 +58,48 @@ export const ChatBot = ({ agentType }: ChatBotProps) => {
     
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
 
+    // Add initial loading message with first thinking step
+    setMessages(prev => [...prev, { 
+      role: 'assistant', 
+      content: '',
+      steps: {
+        thinking: "🤔 Analyzing your question..."
+      }
+    }]);
+
+    // Simulate sequential thinking steps
+    setTimeout(() => {
+      setMessages(prev => {
+        const lastMsg = prev[prev.length - 1];
+        if (lastMsg.role === 'assistant') {
+          return [...prev.slice(0, -1), {
+            ...lastMsg,
+            steps: {
+              ...lastMsg.steps,
+              searching: "🔍 Searching for relevant information..."
+            }
+          }];
+        }
+        return prev;
+      });
+    }, 1000);
+
+    setTimeout(() => {
+      setMessages(prev => {
+        const lastMsg = prev[prev.length - 1];
+        if (lastMsg.role === 'assistant') {
+          return [...prev.slice(0, -1), {
+            ...lastMsg,
+            steps: {
+              ...lastMsg.steps,
+              response: "✨ Preparing your response..."
+            }
+          }];
+        }
+        return prev;
+      });
+    }, 2000);
+
     try {
       const { data, error } = await supabase.functions.invoke('chat-with-assistant', {
         body: { 
@@ -62,7 +110,8 @@ export const ChatBot = ({ agentType }: ChatBotProps) => {
 
       if (error) throw error;
 
-      setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
+      // Replace loading message with actual response
+      setMessages(prev => [...prev.slice(0, -1), { role: 'assistant', content: data.response }]);
     } catch (error) {
       console.error('Error:', error);
       toast({
@@ -70,6 +119,8 @@ export const ChatBot = ({ agentType }: ChatBotProps) => {
         title: "Error",
         description: "Failed to get response. Please try again.",
       });
+      // Remove loading message on error
+      setMessages(prev => prev.slice(0, -1));
     } finally {
       setIsLoading(false);
     }
@@ -116,24 +167,53 @@ export const ChatBot = ({ agentType }: ChatBotProps) => {
                 👋 Hi! I'm your {getAgentTitle()}. How can I help you today?
               </div>
             )}
-            {messages.map((message, index) => (
-              <div
-                key={index}
-                className={`flex ${
-                  message.role === 'user' ? 'justify-end' : 'justify-start'
-                }`}
-              >
-                <div
-                  className={`max-w-[80%] p-3 rounded-lg ${
-                    message.role === 'user'
-                      ? 'bg-siso-orange/20 text-siso-text ml-4'
-                      : 'bg-siso-text/10 text-siso-text mr-4'
+            <AnimatePresence mode="wait">
+              {messages.map((message, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                  className={`flex ${
+                    message.role === 'user' ? 'justify-end' : 'justify-start'
                   }`}
                 >
-                  {message.content}
-                </div>
-              </div>
-            ))}
+                  <div
+                    className={`max-w-[80%] p-3 rounded-lg ${
+                      message.role === 'user'
+                        ? 'bg-siso-orange/20 text-siso-text ml-4'
+                        : 'bg-siso-text/10 text-siso-text mr-4'
+                    }`}
+                  >
+                    {message.steps ? (
+                      <AnimatePresence mode="wait">
+                        <motion.div 
+                          className="space-y-2"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                        >
+                          {Object.values(message.steps).map((step, stepIndex) => (
+                            <motion.div
+                              key={stepIndex}
+                              initial={{ opacity: 0, y: 5 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: stepIndex * 0.3 }}
+                              className="text-sm text-siso-text/80"
+                            >
+                              {step}
+                            </motion.div>
+                          ))}
+                        </motion.div>
+                      </AnimatePresence>
+                    ) : (
+                      message.content
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
 
           <form onSubmit={handleSubmit} className="p-4 border-t border-siso-text/10">
@@ -149,7 +229,7 @@ export const ChatBot = ({ agentType }: ChatBotProps) => {
               <Button 
                 type="submit"
                 disabled={isLoading}
-                className="bg-gradient-to-r from-siso-red to-siso-orange text-white"
+                className="bg-gradient-to-r from-siso-red to-siso-orange text-white hover:opacity-90 transition-opacity"
               >
                 {isLoading ? (
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />

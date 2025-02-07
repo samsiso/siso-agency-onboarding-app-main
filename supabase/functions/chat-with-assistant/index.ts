@@ -47,7 +47,14 @@ serve(async (req) => {
     console.log('Received response from OpenAI');
     
     return new Response(
-      JSON.stringify({ response: data.choices[0].message.content }),
+      JSON.stringify({ 
+        response: data.choices[0].message.content,
+        steps: {
+          thinking: "🤔 Analyzing your question...",
+          searching: "🔍 Searching for relevant information...",
+          response: "✨ Preparing your response..."
+        }
+      }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
