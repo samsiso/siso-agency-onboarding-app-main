@@ -1,3 +1,4 @@
+
 import { useState, useEffect, Suspense, lazy } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { SidebarProvider } from '@/components/ui/sidebar';
@@ -6,7 +7,6 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 
-// Lazy load components
 const NewsHeader = lazy(() => import('@/components/ai-news/NewsHeader'));
 const NewsCard = lazy(() => import('@/components/ai-news/NewsCard'));
 const NewsCategories = lazy(() => import('@/components/ai-news/NewsCategories'));
@@ -86,7 +86,7 @@ const AINews = () => {
     }
   };
 
-  // [Analysis] Filter news items based on search query, title, and description
+  // Filter news items based on search query
   const filteredNewsItems = newsItems.filter(item => {
     if (!searchQuery) return true;
     const searchLower = searchQuery.toLowerCase();

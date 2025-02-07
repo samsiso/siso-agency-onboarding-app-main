@@ -1,7 +1,7 @@
 
 import { Search, Command } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { PlaceholdersAndVanishInput } from '@/components/ui/placeholders-and-vanish-input';
+import { Input } from '@/components/ui/input';
 import { useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 
@@ -21,18 +21,6 @@ export const NewsSearchSection = ({ searchQuery, onSearchChange }: NewsSearchSec
     }
   });
 
-  const searchPlaceholders = [
-    "Search AI news and updates...",
-    "Find breakthrough announcements...",
-    "Discover AI innovations...",
-    "Explore industry news..."
-  ];
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log('Search submitted:', searchQuery);
-  };
-
   return (
     <motion.div 
       className="relative w-full max-w-3xl mx-auto mb-6"
@@ -41,11 +29,11 @@ export const NewsSearchSection = ({ searchQuery, onSearchChange }: NewsSearchSec
       transition={{ delay: 0.3 }}
     >
       <div className="relative group">
-        <PlaceholdersAndVanishInput
-          placeholders={searchPlaceholders}
+        <Input
+          type="text"
+          placeholder="Search AI news and updates... (⌘K)"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          onSubmit={handleSubmit}
           onFocus={() => setIsSearchFocused(true)}
           onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
           className="w-full h-14 pl-12 pr-24 bg-gradient-to-r from-siso-text/5 to-siso-text/10 
