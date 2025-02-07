@@ -70,7 +70,7 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
   // [Analysis] Calculate if video is new (within last 7 days)
   const isNew = video.created_at && new Date(video.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
   
-  // [Analysis] Calculate if video is trending (more than 1000 views in the last 7 days)
+  // [Analysis] Calculate if video is trending (more than 1000 views)
   const isTrending = video.metrics?.views > 1000;
 
   // Stagger animation delay based on index
@@ -118,9 +118,9 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
           {video.metrics?.difficulty && (
             <Badge className={cn(
               "text-white",
-              video.metrics.difficulty === 'beginner' && 'bg-blue-500/90',
-              video.metrics.difficulty === 'intermediate' && 'bg-yellow-500/90',
-              video.metrics.difficulty === 'advanced' && 'bg-red-500/90'
+              video.metrics.difficulty === 'Beginner' && 'bg-blue-500/90',
+              video.metrics.difficulty === 'Intermediate' && 'bg-yellow-500/90',
+              video.metrics.difficulty === 'Advanced' && 'bg-red-500/90'
             )}>
               {video.metrics.difficulty}
             </Badge>
