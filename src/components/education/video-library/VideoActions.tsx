@@ -1,6 +1,5 @@
-
 import { Button } from '@/components/ui/button';
-import { Bookmark, Share2 } from 'lucide-react';
+import { Bookmark, Share2, ThumbsUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -69,6 +68,18 @@ export const VideoActions = ({
 
   return (
     <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+      <Button
+        size="icon"
+        variant="secondary"
+        className="h-8 w-8 bg-black/50 hover:bg-black/70"
+        onClick={(e) => e.stopPropagation()}
+        aria-label="Upvote video"
+      >
+        <div className="flex flex-col items-center">
+          <ThumbsUp className="h-4 w-4" />
+          <span className="text-xs mt-0.5">0</span>
+        </div>
+      </Button>
       <Button
         size="icon"
         variant="secondary"
