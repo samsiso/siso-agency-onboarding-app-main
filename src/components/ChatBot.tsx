@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { MessageSquare, Send, X } from 'lucide-react';
 import { Button } from './ui/button';
@@ -52,7 +53,7 @@ export const ChatBot = ({ agentType }: ChatBotProps) => {
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
 
     try {
-      const { data, error } = await supabase.functions.invoke('chat-with-bot', {
+      const { data, error } = await supabase.functions.invoke('chat-with-assistant', {
         body: { 
           message: userMessage,
           systemPrompt: getAgentPrompt(agentType)
