@@ -1,3 +1,4 @@
+
 import { lazy, Suspense, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthSession } from '@/hooks/useAuthSession';
@@ -65,12 +66,18 @@ const ScrollNav = lazy(() =>
 );
 
 const LandingPage = () => {
-  const { user } = useAuthSession();
+  const { user, loading } = useAuthSession();
   const navigate = useNavigate();
 
-  // [Analysis] Redirect authenticated users to app
+  // [Analysis] Handle loading state
+  if (loading) {
+    return <LoadingFallback />;
+  }
+
+  // [Analysis] Redirect authenticated users to home
   if (user) {
-    navigate('/app');
+    console.log('User authenticated in LandingPage, redirecting to home');
+    navigate('/', { replace: true });
     return null;
   }
 
@@ -102,34 +109,28 @@ const LandingPage = () => {
         />
       </div>
 
-      {/* Main Content with progressive loading in new order */}
+      {/* Main Content with progressive loading */}
       <div className="relative z-10 px-4 md:px-0">
-        {/* 1. Hero Section */}
         <Suspense fallback={<LoadingFallback />}>
           <HeroSection />
         </Suspense>
 
-        {/* 2. Agency Growth Section */}
         <Suspense fallback={<LoadingFallback />}>
           <WhyChooseSection />
         </Suspense>
 
-        {/* 3. Resource Hub Features */}
         <Suspense fallback={<LoadingFallback />}>
           <FeaturesSection />
         </Suspense>
 
-        {/* 4. Getting Started Steps */}
         <Suspense fallback={<LoadingFallback />}>
           <GettingStartedSection />
         </Suspense>
 
-        {/* 5. Pricing Section */}
         <Suspense fallback={<LoadingFallback />}>
           <PricingSection />
         </Suspense>
 
-        {/* 6. Social Proof */}
         <div className="space-y-12 md:space-y-24">
           <Suspense fallback={<LoadingFallback />}>
             <TestimonialsSection />
@@ -140,12 +141,10 @@ const LandingPage = () => {
           </Suspense>
         </div>
 
-        {/* 7. Final CTA */}
         <Suspense fallback={<LoadingFallback />}>
           <CallToActionSection />
         </Suspense>
 
-        {/* Footer */}
         <Suspense fallback={<LoadingFallback />}>
           <StackedCircularFooter />
         </Suspense>

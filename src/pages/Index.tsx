@@ -3,17 +3,13 @@ import { lazy, Suspense } from 'react';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { useNavigate } from 'react-router-dom';
 import { Bot } from 'lucide-react';
+import { LoadingFallback } from '@/components/landing/sections/LoadingFallback';
 
 // [Analysis] Implementing granular code splitting for optimal initial load
 // [Plan] Monitor component load times and adjust splits if needed
 
 // Lazy load components with descriptive chunk names
-const Hero = lazy(() => import(/* webpackChunkName: "hero" */ '@/components/Hero'));
-const Footer = lazy(() => import(/* webpackChunkName: "footer" */ '@/components/Footer'));
 const LandingPage = lazy(() => import(/* webpackChunkName: "landing" */ '@/components/landing/LandingPage'));
-const SidebarProvider = lazy(() => import(/* webpackChunkName: "sidebar" */ '@/components/ui/sidebar').then(m => ({ default: m.SidebarProvider })));
-
-// Chat components with their own chunk
 const ChatComponents = {
   ExpandableChat: lazy(() => import(/* webpackChunkName: "chat-expandable" */ '@/components/ui/expandable-chat').then(m => ({ default: m.ExpandableChat }))),
   ExpandableChatHeader: lazy(() => import(/* webpackChunkName: "chat-header" */ '@/components/ui/expandable-chat').then(m => ({ default: m.ExpandableChatHeader }))),
@@ -26,21 +22,19 @@ const ChatComponents = {
   ChatInput: lazy(() => import(/* webpackChunkName: "chat-input" */ '@/components/ui/chat-input').then(m => ({ default: m.ChatInput }))),
 };
 
-const LoadingFallback = () => (
-  <div className="flex items-center justify-center min-h-[200px] animate-pulse">
-    <div className="bg-siso-bg/50 rounded-lg p-4 backdrop-blur-sm">
-      Loading...
-    </div>
-  </div>
-);
-
 export default function Index() {
-  const { user } = useAuthSession();
+  const { user, loading } = useAuthSession();
   const navigate = useNavigate();
+
+  // [Analysis] Early auth check and redirect
+  if (loading) {
+    return <LoadingFallback />;
+  }
 
   // [Analysis] Redirect authenticated users to home
   if (user) {
-    navigate('/');
+    console.log('User authenticated, redirecting to home');
+    navigate('/', { replace: true });
     return null;
   }
 
