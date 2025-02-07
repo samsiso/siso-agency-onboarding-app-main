@@ -37,6 +37,7 @@ export const NewsContent = ({
   loadingSummaries,
   onGenerateSummary
 }: NewsContentProps) => {
+  // [Analysis] Filter news items based on search query
   const filteredNewsItems = newsItems.filter(item => {
     if (!searchQuery) return true;
     const searchLower = searchQuery.toLowerCase();

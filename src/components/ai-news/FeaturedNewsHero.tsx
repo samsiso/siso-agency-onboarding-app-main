@@ -13,12 +13,15 @@ interface FeaturedNewsHeroProps {
 export const FeaturedNewsHero = ({ item, onGenerateSummary }: FeaturedNewsHeroProps) => {
   if (!item) return null;
 
+  // [Analysis] Enhanced visual hierarchy with gradient overlay and backdrop blur
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="relative w-full rounded-xl overflow-hidden mb-8"
     >
+      {/* Background gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-siso-red/20 via-siso-orange/10 to-transparent opacity-75" />
       <div className="absolute inset-0 bg-gradient-radial from-siso-red/10 via-siso-orange/5 to-transparent opacity-50" />
       
       <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-6 p-6 bg-siso-bg-alt/50 backdrop-blur-sm border border-siso-border rounded-xl">

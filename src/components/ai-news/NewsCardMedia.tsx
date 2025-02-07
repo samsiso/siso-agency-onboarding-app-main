@@ -19,6 +19,7 @@ export const NewsCardMedia = ({
   const [isLoading, setIsLoading] = useState(true);
   const [isIntersecting, setIsIntersecting] = useState(false);
 
+  // [Analysis] Implement intersection observer for lazy loading
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -53,7 +54,9 @@ export const NewsCardMedia = ({
         id={`news-image-${title.replace(/\s+/g, '-')}`}
         className={`relative ${isCompact ? 'aspect-[4/3]' : 'aspect-video'} overflow-hidden rounded-lg border border-siso-border group`}
       >
+        {/* Loading placeholder */}
         <div className={`absolute inset-0 bg-siso-bg-alt animate-pulse ${isLoading ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`} />
+        
         {isIntersecting && (
           <img
             src={imageUrl || '/placeholder.svg'}
@@ -69,6 +72,7 @@ export const NewsCardMedia = ({
             onError={() => setIsLoading(false)}
           />
         )}
+
         {isFeatured && (
           <div className="absolute top-2 left-2 z-10">
             <Badge 
@@ -79,6 +83,8 @@ export const NewsCardMedia = ({
             </Badge>
           </div>
         )}
+
+        {/* Hover overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       </div>
     </motion.div>
