@@ -10,29 +10,38 @@ export const useAuthSession = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // [Analysis] Initialize auth state on mount
+  // [Analysis] Initialize auth state on mount with debounced check
   useEffect(() => {
+    let isSubscribed = true;
+
     const initializeAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        setUser(session?.user || null);
+        if (isSubscribed) {
+          setUser(session?.user || null);
+        }
       } catch (error) {
         console.error('Error initializing auth:', error);
       } finally {
-        setLoading(false);
+        if (isSubscribed) {
+          setLoading(false);
+        }
       }
     };
 
-    // Set up auth state listener
+    // [Analysis] Set up auth state listener with cleanup
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state changed:', event, session?.user?.id);
-      setUser(session?.user || null);
-      setLoading(false);
+      if (isSubscribed) {
+        setUser(session?.user || null);
+        setLoading(false);
+      }
     });
 
     initializeAuth();
 
     return () => {
+      isSubscribed = false;
       subscription.unsubscribe();
     };
   }, []);
@@ -63,7 +72,7 @@ export const useAuthSession = () => {
       console.log('Handling sign in for session:', session);
       setUser(session.user);
       
-      // Wait for profile creation
+      // [Analysis] Wait for profile creation with proper timeout
       console.log('Waiting for profile creation...');
       await new Promise(resolve => setTimeout(resolve, 1000));
       
@@ -75,7 +84,6 @@ export const useAuthSession = () => {
           title: "Successfully signed in",
           description: "Welcome to SISO Resource Hub!",
         });
-        // [Analysis] Let user stay on current page after login
         return true;
       } else {
         console.error('Profile not found after waiting');

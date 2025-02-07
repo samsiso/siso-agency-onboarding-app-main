@@ -1,7 +1,6 @@
 
 import { lazy, Suspense } from 'react';
 import { useAuthSession } from '@/hooks/useAuthSession';
-import { useNavigate } from 'react-router-dom';
 import { Bot } from 'lucide-react';
 import { LoadingFallback } from '@/components/landing/sections/LoadingFallback';
 
@@ -24,7 +23,6 @@ const ChatComponents = {
 
 export default function Index() {
   const { user, loading } = useAuthSession();
-  const navigate = useNavigate();
 
   // [Analysis] Early auth check and redirect
   if (loading) {
@@ -93,7 +91,12 @@ export default function Index() {
     );
   }
 
-  // [Analysis] Redirect authenticated users to home
-  navigate('/', { replace: true });
-  return null;
+  // [Analysis] For authenticated users, show landing page content
+  return (
+    <div className="relative">
+      <Suspense fallback={<LoadingFallback />}>
+        <LandingPage />
+      </Suspense>
+    </div>
+  );
 }

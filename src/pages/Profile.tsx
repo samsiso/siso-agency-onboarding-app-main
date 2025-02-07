@@ -39,17 +39,19 @@ const Profile = () => {
   });
 
   useEffect(() => {
+    let isSubscribed = true;
+
     const getProfile = async () => {
       try {
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
           console.error('[Profile] Session error:', sessionError);
-          throw sessionError;
+          return;
         }
         
-        if (!session) {
-          console.log('[Profile] No session found');
+        if (!session && !loading) {
+          console.log('[Profile] No session found, redirecting to auth');
           toast({
             variant: "destructive",
             title: "Authentication Required",
@@ -59,37 +61,39 @@ const Profile = () => {
           return;
         }
 
-        console.log('[Profile] Session found:', session.user.id);
-        setUser(session.user);
+        if (session && isSubscribed) {
+          console.log('[Profile] Session found:', session.user.id);
+          setUser(session.user);
 
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
 
-        if (profileError) {
-          console.error('[Profile] Profile fetch error:', profileError);
-          throw profileError;
-        }
+          if (profileError) {
+            console.error('[Profile] Profile fetch error:', profileError);
+            return;
+          }
 
-        if (profileData) {
-          console.log('[Profile] Profile data found:', profileData);
-          setProfile(profileData);
-          setFormData({
-            fullName: profileData.full_name || '',
-            businessName: profileData.business_name || '',
-            businessType: profileData.business_type || '',
-            industry: profileData.industry || '',
-            interests: Array.isArray(profileData.interests) ? profileData.interests.join(', ') : '',
-            bio: profileData.bio || '',
-            linkedinUrl: profileData.linkedin_url || '',
-            websiteUrl: profileData.website_url || '',
-            youtubeUrl: profileData.youtube_url || '',
-            instagramUrl: profileData.instagram_url || '',
-            twitterUrl: profileData.twitter_url || '',
-            professionalRole: profileData.professional_role || '',
-          });
+          if (profileData && isSubscribed) {
+            console.log('[Profile] Profile data found:', profileData);
+            setProfile(profileData);
+            setFormData({
+              fullName: profileData.full_name || '',
+              businessName: profileData.business_name || '',
+              businessType: profileData.business_type || '',
+              industry: profileData.industry || '',
+              interests: Array.isArray(profileData.interests) ? profileData.interests.join(', ') : '',
+              bio: profileData.bio || '',
+              linkedinUrl: profileData.linkedin_url || '',
+              websiteUrl: profileData.website_url || '',
+              youtubeUrl: profileData.youtube_url || '',
+              instagramUrl: profileData.instagram_url || '',
+              twitterUrl: profileData.twitter_url || '',
+              professionalRole: profileData.professional_role || '',
+            });
+          }
         }
       } catch (error: any) {
         console.error('[Profile] Error in getProfile:', error);
@@ -99,11 +103,17 @@ const Profile = () => {
           description: "Failed to load profile data",
         });
       } finally {
-        setLoading(false);
+        if (isSubscribed) {
+          setLoading(false);
+        }
       }
     };
 
     getProfile();
+
+    return () => {
+      isSubscribed = false;
+    };
   }, [navigate]);
 
   const handleFormChange = (field: string, value: string) => {
