@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -97,15 +98,20 @@ const AuthButton = () => {
           onClick={handleSignOut}
           disabled={loading}
           variant="outline"
-          className="bg-white/10 text-white hover:bg-white/20 active:bg-white/30"
+          className="bg-white/10 text-white hover:bg-white/20 active:bg-white/30 backdrop-blur-sm 
+            border border-white/20 shadow-lg shadow-black/5 transition-all duration-300
+            hover:scale-105 hover:shadow-xl hover:border-white/30"
         >
           Sign Out
         </Button>
       ) : (
         <Button 
           onClick={handleAuthClick}
-          className="bg-white text-black hover:bg-gray-100 active:bg-gray-200"
           disabled={loading}
+          className="bg-white/90 text-black hover:bg-white active:bg-white/80 backdrop-blur-sm
+            border border-white/20 shadow-lg shadow-black/5 transition-all duration-300
+            hover:scale-105 hover:shadow-xl hover:border-white/30 font-medium
+            animate-fade-in"
         >
           Sign In
         </Button>
