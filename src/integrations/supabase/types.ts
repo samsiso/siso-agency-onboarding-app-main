@@ -577,52 +577,67 @@ export type Database = {
       }
       leaderboard: {
         Row: {
+          achievement_score: number | null
           achievements: Json | null
+          activity_score: number | null
           avatar_url: string | null
           contribution_count: number | null
           created_at: string
           id: string
           kda: number | null
+          last_active: string | null
           losses: number | null
           points: number | null
           rank: string | null
           referral_count: number | null
           season_rank: string | null
           siso_tokens: number | null
+          streak_count: number | null
+          total_contributions: number | null
           updated_at: string
           user_id: string
           wins: number | null
         }
         Insert: {
+          achievement_score?: number | null
           achievements?: Json | null
+          activity_score?: number | null
           avatar_url?: string | null
           contribution_count?: number | null
           created_at?: string
           id?: string
           kda?: number | null
+          last_active?: string | null
           losses?: number | null
           points?: number | null
           rank?: string | null
           referral_count?: number | null
           season_rank?: string | null
           siso_tokens?: number | null
+          streak_count?: number | null
+          total_contributions?: number | null
           updated_at?: string
           user_id: string
           wins?: number | null
         }
         Update: {
+          achievement_score?: number | null
           achievements?: Json | null
+          activity_score?: number | null
           avatar_url?: string | null
           contribution_count?: number | null
           created_at?: string
           id?: string
           kda?: number | null
+          last_active?: string | null
           losses?: number | null
           points?: number | null
           rank?: string | null
           referral_count?: number | null
           season_rank?: string | null
           siso_tokens?: number | null
+          streak_count?: number | null
+          total_contributions?: number | null
           updated_at?: string
           user_id?: string
           wins?: number | null
