@@ -2,6 +2,7 @@
 import { lazy, Suspense } from 'react';
 import { motion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
+import { FeaturedNewsHero } from './FeaturedNewsHero';
 
 const NewsCard = lazy(() => import('@/components/ai-news/NewsCard'));
 
@@ -45,49 +46,45 @@ export const NewsContent = ({
     );
   });
 
-  // Separate featured and regular news items
+  // [Analysis] Separate featured and regular news items for different layouts
   const featuredItems = filteredNewsItems.filter(item => item.impact?.toLowerCase() === 'high');
   const regularItems = filteredNewsItems.filter(item => item.impact?.toLowerCase() !== 'high');
 
   return (
     <Suspense fallback={<LoadingSpinner />}>
-      <div className="space-y-8">
+      <div className="space-y-8 animate-fade-in">
+        {/* Featured News Hero */}
         {featuredItems.length > 0 && (
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="show"
-            className="grid grid-cols-1 gap-6"
-          >
-            {featuredItems.map((item) => (
-              <NewsCard
-                key={item.id}
-                item={item}
-                summaries={summaries}
-                loadingSummaries={loadingSummaries}
-                onGenerateSummary={onGenerateSummary}
-                isFeatured={true}
-              />
-            ))}
-          </motion.div>
+          <FeaturedNewsHero 
+            item={featuredItems[0]} 
+            onGenerateSummary={onGenerateSummary}
+          />
         )}
 
+        {/* Regular News Grid */}
         {regularItems.length > 0 && (
           <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="show"
-            className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-[minmax(200px,auto)] gap-4 sm:gap-6"
           >
             {regularItems.map((item) => (
-              <NewsCard
+              <motion.div
                 key={item.id}
-                item={item}
-                summaries={summaries}
-                loadingSummaries={loadingSummaries}
-                onGenerateSummary={onGenerateSummary}
-                isCompact={true}
-              />
+                className="group h-full"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <NewsCard
+                  item={item}
+                  summaries={summaries}
+                  loadingSummaries={loadingSummaries}
+                  onGenerateSummary={onGenerateSummary}
+                  isCompact={true}
+                />
+              </motion.div>
             ))}
           </motion.div>
         )}
