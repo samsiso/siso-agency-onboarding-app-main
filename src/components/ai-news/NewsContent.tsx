@@ -45,26 +45,63 @@ export const NewsContent = ({
     );
   });
 
+  // Separate featured and regular news items
+  const featuredItems = filteredNewsItems.filter(item => item.impact?.toLowerCase() === 'high');
+  const regularItems = filteredNewsItems.filter(item => item.impact?.toLowerCase() !== 'high');
+
   return (
     <Suspense fallback={<LoadingSpinner />}>
-      {filteredNewsItems.length > 0 && (
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="show"
-          className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6"
-        >
-          {filteredNewsItems.map((item) => (
-            <NewsCard
-              key={item.id}
-              item={item}
-              summaries={summaries}
-              loadingSummaries={loadingSummaries}
-              onGenerateSummary={onGenerateSummary}
-            />
-          ))}
-        </motion.div>
-      )}
+      <div className="space-y-8">
+        {featuredItems.length > 0 && (
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+            className="grid grid-cols-1 gap-6"
+          >
+            {featuredItems.map((item) => (
+              <NewsCard
+                key={item.id}
+                item={item}
+                summaries={summaries}
+                loadingSummaries={loadingSummaries}
+                onGenerateSummary={onGenerateSummary}
+                isFeatured={true}
+              />
+            ))}
+          </motion.div>
+        )}
+
+        {regularItems.length > 0 && (
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+            className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6"
+          >
+            {regularItems.map((item) => (
+              <NewsCard
+                key={item.id}
+                item={item}
+                summaries={summaries}
+                loadingSummaries={loadingSummaries}
+                onGenerateSummary={onGenerateSummary}
+                isCompact={true}
+              />
+            ))}
+          </motion.div>
+        )}
+
+        {filteredNewsItems.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center py-12"
+          >
+            <p className="text-siso-text/60">No news items found matching your search criteria.</p>
+          </motion.div>
+        )}
+      </div>
     </Suspense>
   );
 };

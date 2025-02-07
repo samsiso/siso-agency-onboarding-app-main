@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -97,43 +98,8 @@ export default {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        gradient: "gradient var(--animation-duration, 8s) linear infinite",
+        gradient: "gradient 6s linear infinite",
         glow: "glow 3s ease-in-out infinite",
-        fadeIn: "fadeIn 0.5s ease-out forwards",
-        "float-slow": "float-slow 20s ease-in-out infinite",
-        "float-slower": "float-slower 25s ease-in-out infinite",
-        "slide-in-right": "slide-in-right 0.3s ease-out forwards",
-        shimmer: "shimmer 2s linear infinite",
-        ping: "ping 2s cubic-bezier(0, 0, 0.2, 1) infinite",
-        float: "float 3s ease-in-out infinite",
-        'wave-pulse': 'wave-pulse 4s ease-in-out infinite',
-        rainbow: "rainbow 3s infinite linear",
-      },
-      typography: {
-        DEFAULT: {
-          css: {
-            maxWidth: '65ch',
-            color: '#E0E0E0',
-            h1: {
-              color: '#FFFFFF',
-            },
-            h2: {
-              color: '#FFFFFF',
-            },
-            h3: {
-              color: '#FFFFFF',
-            },
-            strong: {
-              color: '#FFFFFF',
-            },
-            a: {
-              color: '#FF5722',
-              '&:hover': {
-                color: '#FFA726',
-              },
-            },
-          },
-        },
       },
     },
   },

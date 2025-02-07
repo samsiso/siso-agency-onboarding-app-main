@@ -44,12 +44,12 @@ const AINews = () => {
       <div className="flex h-screen bg-background">
         <Sidebar />
         <main className="flex-1 overflow-hidden">
-          <div className="h-full overflow-y-auto px-4 md:px-6 lg:px-8 py-6">
+          <div className="h-full overflow-y-auto">
             <motion.div
               variants={containerVariants}
               initial="hidden"
               animate="show"
-              className="space-y-6 max-w-[1600px] mx-auto"
+              className="space-y-6 max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 py-6"
             >
               <Suspense fallback={<LoadingSpinner />}>
                 <NewsHeader
