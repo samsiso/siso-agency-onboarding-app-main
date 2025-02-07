@@ -314,6 +314,7 @@ export type Database = {
           status: string | null
           tokens_received: number
           transaction_hash: string | null
+          transaction_type: string | null
           updated_at: string
           user_id: string
         }
@@ -324,6 +325,7 @@ export type Database = {
           status?: string | null
           tokens_received: number
           transaction_hash?: string | null
+          transaction_type?: string | null
           updated_at?: string
           user_id: string
         }
@@ -334,6 +336,7 @@ export type Database = {
           status?: string | null
           tokens_received?: number
           transaction_hash?: string | null
+          transaction_type?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -1054,6 +1057,7 @@ export type Database = {
           professional_role: string | null
           rank: string | null
           short_term_goals: string[] | null
+          siso_tokens: number | null
           social_info_completed_at: string | null
           solana_wallet_address: string | null
           target_market: string[] | null
@@ -1096,6 +1100,7 @@ export type Database = {
           professional_role?: string | null
           rank?: string | null
           short_term_goals?: string[] | null
+          siso_tokens?: number | null
           social_info_completed_at?: string | null
           solana_wallet_address?: string | null
           target_market?: string[] | null
@@ -1138,6 +1143,7 @@ export type Database = {
           professional_role?: string | null
           rank?: string | null
           short_term_goals?: string[] | null
+          siso_tokens?: number | null
           social_info_completed_at?: string | null
           solana_wallet_address?: string | null
           target_market?: string[] | null
@@ -1596,6 +1602,20 @@ export type Database = {
           featured_count: number | null
           total_activity: number | null
           total_members: number | null
+        }
+        Relationships: []
+      }
+      user_crypto_history: {
+        Row: {
+          created_at: string | null
+          current_balance: number | null
+          id: string | null
+          points_exchanged: number | null
+          status: string | null
+          tokens_received: number | null
+          transaction_type: string | null
+          updated_at: string | null
+          user_id: string | null
         }
         Relationships: []
       }
