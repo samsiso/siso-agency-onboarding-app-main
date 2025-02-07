@@ -1,3 +1,4 @@
+
 import { lazy, Suspense } from 'react';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { Bot } from 'lucide-react';
@@ -7,7 +8,6 @@ import { Bot } from 'lucide-react';
 
 // Lazy load components with descriptive chunk names
 const Hero = lazy(() => import(/* webpackChunkName: "hero" */ '@/components/Hero'));
-const AuthButton = lazy(() => import(/* webpackChunkName: "auth-button" */ '@/components/AuthButton'));
 const Footer = lazy(() => import(/* webpackChunkName: "footer" */ '@/components/Footer'));
 const LandingPage = lazy(() => import(/* webpackChunkName: "landing" */ '@/components/landing/LandingPage'));
 const SidebarProvider = lazy(() => import(/* webpackChunkName: "sidebar" */ '@/components/ui/sidebar').then(m => ({ default: m.SidebarProvider })));
@@ -106,9 +106,6 @@ export default function Index() {
           <div className="relative min-h-screen flex flex-col">
             <div className="flex-grow relative z-10">
               <Hero key="main-hero" />
-            </div>
-            <div className="relative z-20">
-              <AuthButton />
             </div>
             <div className="relative z-10">
               <Footer />
