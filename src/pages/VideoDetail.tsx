@@ -1,218 +1,53 @@
 
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
-import { ChevronLeft } from 'lucide-react';
-import { RelatedVideos } from '@/components/education/RelatedVideos';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { extractVideoIdFromSlug } from '@/utils/slugUtils';
 import { Helmet } from 'react-helmet';
-import { useToast } from '@/hooks/use-toast';
-import { LazyVideoPlayer } from '@/components/education/video-detail/player';
-import { VideoMetadata } from '@/components/education/video-detail/VideoMetadata';
-import { VideoCreatorInfo } from '@/components/education/video-detail/VideoCreatorInfo';
-import { VideoActions } from '@/components/education/video-detail/VideoActions';
-import { VideoInteractionPanel } from '@/components/education/video-detail/VideoInteractionPanel';
-import { Video } from '@/components/education/types';
+import { useVideoDetail } from '@/hooks/useVideoDetail';
+import { LoadingState } from '@/components/education/video-detail/LoadingState';
+import { ErrorState } from '@/components/education/video-detail/ErrorState';
+import { VideoBreadcrumbs } from '@/components/education/video-detail/VideoBreadcrumbs';
+import { VideoDetailLayout } from '@/components/education/video-detail/VideoDetailLayout';
 
 export default function VideoDetail() {
   const { slug } = useParams();
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') || 'analysis';
-  const { toast } = useToast();
   
   const videoId = slug ? extractVideoIdFromSlug(slug) : '';
   console.log('[VideoDetail] Processing video ID:', videoId);
 
-  // [Analysis] Fetch video data with proper field mapping and error handling
-  const { data: videoData, isLoading, error } = useQuery({
-    queryKey: ['video', videoId],
-    queryFn: async () => {
-      if (!videoId) {
-        console.error('[VideoDetail] Invalid video ID');
-        throw new Error('Invalid video ID');
-      }
-
-      console.log('[VideoDetail] Fetching video data for ID:', videoId);
-
-      // [Analysis] First get the video details with a join to creator info
-      const { data: videoDetails, error: videoError } = await supabase
-        .from('youtube_videos')
-        .select(`
-          id,
-          title,
-          url,
-          duration,
-          thumbnailUrl,
-          viewCount,
-          date,
-          channel_id,
-          education_creators:channel_id (
-            name,
-            channel_avatar_url,
-            description
-          )
-        `)
-        .eq('id', videoId)
-        .single();
-
-      if (videoError) {
-        console.error('[VideoDetail] Error fetching video:', videoError);
-        throw videoError;
-      }
-
-      if (!videoDetails) {
-        console.error('[VideoDetail] No video found with ID:', videoId);
-        throw new Error('Video not found');
-      }
-
-      // [Analysis] Transform database fields to match Video interface
-      const transformedVideo: Video = {
-        id: videoDetails.id,
-        title: videoDetails.title,
-        url: videoDetails.url,
-        duration: videoDetails.duration,
-        thumbnail_url: videoDetails.thumbnailUrl,
-        created_at: videoDetails.date,
-        educator: {
-          name: videoDetails.education_creators?.name || 'Unknown Creator',
-          avatar_url: videoDetails.education_creators?.channel_avatar_url || '',
-          title: 'Content Creator' // Default title for now
-        },
-        metrics: {
-          views: videoDetails.viewCount || 0,
-          likes: 0,
-          sentiment_score: 0,
-          difficulty: 'Intermediate',
-          impact_score: 0,
-          category: 'Education'
-        },
-        topics: [],
-        ai_analysis: {
-          key_takeaways: [],
-          implementation_steps: []
-        }
-      };
-
-      console.log('[VideoDetail] Transformed video data:', transformedVideo);
-      return transformedVideo;
-    },
-    meta: {
-      onSettled: (data, error) => {
-        if (error) {
-          console.error('[VideoDetail] Query error:', error);
-          toast({
-            title: "Error loading video",
-            description: error.message || "The requested video could not be found or accessed.",
-            variant: "destructive"
-          });
-        }
-      }
-    }
-  });
+  const { data: videoData, isLoading, error } = useVideoDetail(videoId);
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-siso-bg to-siso-bg/95 p-4 md:p-8 flex items-center justify-center">
-        <div className="w-16 h-16 border-4 border-siso-red border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
+    return <LoadingState />;
   }
 
   if (error || !videoData) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-siso-bg to-siso-bg/95 p-4 md:p-8 flex flex-col items-center justify-center gap-4">
-        <div className="text-xl text-siso-text">Video not found</div>
-        <Button 
-          variant="ghost" 
-          onClick={() => navigate('/education')}
-          className="flex items-center gap-2"
-        >
-          <ChevronLeft className="w-5 h-5" />
-          Back to Videos
-        </Button>
-      </div>
-    );
+    return <ErrorState />;
   }
 
-  // [Analysis] Safer data access with null coalescing
-  const channelName = videoData.educator.name;
-  const channelAvatar = videoData.educator.avatar_url;
   const videoDescription = '';  // We can get this from video_summaries table later
-  const thumbnailUrl = videoData.thumbnail_url;
-  const educatorSlug = ''; // We can get this from education_creators table later
 
   return (
     <>
       <Helmet>
-        <title>{`${videoData.title || 'Video'} | ${channelName} | SISO Education`}</title>
+        <title>{`${videoData.title || 'Video'} | ${videoData.educator.name} | SISO Education`}</title>
         <meta name="description" content={videoDescription} />
         <meta property="og:title" content={videoData.title || ''} />
         <meta property="og:description" content={videoDescription} />
-        <meta property="og:image" content={thumbnailUrl} />
+        <meta property="og:image" content={videoData.thumbnail_url} />
         <meta property="og:type" content="video.other" />
       </Helmet>
 
       <div className="min-h-screen bg-black">
         <div className="max-w-[1800px] mx-auto px-4 py-4">
-          <div className="flex items-center gap-4 text-gray-400">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="hover:bg-white/10"
-              onClick={() => navigate('/education')}
-            >
-              <ChevronLeft className="w-5 h-5 mr-2" />
-              Back to Videos
-            </Button>
-            <div className="flex items-center gap-2">
-              <span>Education</span>
-              <ChevronLeft className="w-4 h-4" />
-              <span>Videos</span>
-              <ChevronLeft className="w-4 h-4" />
-              <span className="text-white truncate max-w-[300px]">{videoData.title || 'Loading...'}</span>
-            </div>
-          </div>
+          <VideoBreadcrumbs title={videoData.title} />
         </div>
 
-        <div className="max-w-[1800px] mx-auto grid grid-cols-1 xl:grid-cols-3 gap-6 p-4">
-          <div className="xl:col-span-2 space-y-6">
-            {videoData.id ? (
-              <LazyVideoPlayer videoId={videoData.id} title={videoData.title || ''} />
-            ) : (
-              <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center">
-                <p className="text-gray-400">Loading video...</p>
-              </div>
-            )}
-
-            <div className="space-y-6">
-              <VideoMetadata 
-                title={videoData.title || ''}
-                viewCount={videoData.metrics.views || 0}
-                publishDate={videoData.created_at || null}
-              />
-              
-              <div className="flex flex-wrap items-center justify-between gap-4">
-                <VideoCreatorInfo
-                  channelName={channelName}
-                  channelAvatar={channelAvatar}
-                  educatorSlug={educatorSlug}
-                />
-                <VideoActions />
-              </div>
-            </div>
-
-            <VideoInteractionPanel videoId={videoId} activeTab={activeTab} />
-          </div>
-
-          <div className="space-y-6">
-            <RelatedVideos 
-              currentVideoId={videoId} 
-              topics={[]}
-            />
-          </div>
-        </div>
+        <VideoDetailLayout 
+          video={videoData}
+          activeTab={activeTab}
+        />
       </div>
     </>
   );
