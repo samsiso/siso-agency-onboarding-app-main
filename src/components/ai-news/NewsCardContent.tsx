@@ -1,4 +1,3 @@
-
 import { Calendar, ExternalLink, MessageSquare, BookmarkPlus, Share2, Eye, Clock, ChevronRight, Shield, Cpu } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
@@ -7,6 +6,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { ShareButtons } from './ShareButtons';
 import { NewsCardComments } from './NewsCardComments';
 import { cn } from '@/lib/utils';
+import { AIAnalysisDialog } from './AIAnalysisDialog';
+import { Sparkles } from 'lucide-react';
+import { useState } from 'react';
 
 interface NewsCardContentProps {
   title: string;
@@ -49,6 +51,8 @@ export const NewsCardContent = ({
   technicalComplexity = 'intermediate',
   articleType = 'news'
 }: NewsCardContentProps) => {
+  const [aiAnalysisOpen, setAiAnalysisOpen] = useState(false);
+
   const getImpactColor = (impact: string) => {
     switch (impact.toLowerCase()) {
       case 'high':
@@ -192,6 +196,25 @@ export const NewsCardContent = ({
               <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
               Read Article
             </Button>
+
+            {/* AI Analysis Button */}
+            <Dialog open={aiAnalysisOpen} onOpenChange={setAiAnalysisOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 px-2 text-xs sm:text-sm hover:bg-siso-red/10 hover:text-siso-red transition-colors"
+                >
+                  <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                  AI Analysis
+                </Button>
+              </DialogTrigger>
+            </Dialog>
+            <AIAnalysisDialog 
+              open={aiAnalysisOpen} 
+              onOpenChange={setAiAnalysisOpen}
+              newsId={newsId || ''}
+            />
 
             {/* AI Summary Dialog */}
             <Dialog>

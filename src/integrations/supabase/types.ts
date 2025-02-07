@@ -718,6 +718,53 @@ export type Database = {
         }
         Relationships: []
       }
+      news_ai_analysis: {
+        Row: {
+          business_implications: string
+          confidence_score: number
+          created_at: string
+          id: string
+          key_insights: string[]
+          market_impact: string
+          news_id: string
+          related_technologies: string[]
+          tech_predictions: string[]
+          updated_at: string
+        }
+        Insert: {
+          business_implications: string
+          confidence_score: number
+          created_at?: string
+          id?: string
+          key_insights?: string[]
+          market_impact: string
+          news_id: string
+          related_technologies?: string[]
+          tech_predictions?: string[]
+          updated_at?: string
+        }
+        Update: {
+          business_implications?: string
+          confidence_score?: number
+          created_at?: string
+          id?: string
+          key_insights?: string[]
+          market_impact?: string
+          news_id?: string
+          related_technologies?: string[]
+          tech_predictions?: string[]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "news_ai_analysis_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "ai_news"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       news_comments: {
         Row: {
           content: string
