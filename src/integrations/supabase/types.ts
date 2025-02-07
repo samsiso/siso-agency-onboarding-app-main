@@ -959,6 +959,27 @@ export type Database = {
         }
         Relationships: []
       }
+      points_history: {
+        Row: {
+          id: string
+          points: number
+          recorded_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          points: number
+          recorded_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          points?: number
+          recorded_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       points_log: {
         Row: {
           action: string

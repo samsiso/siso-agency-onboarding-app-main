@@ -1,5 +1,5 @@
 
-import { Trophy, Users, UserPlus, Clock, Award, Medal, TrendingUp, TrendingDown } from 'lucide-react';
+import { Trophy, Users, UserPlus, Clock, Award, Medal, TrendingUp, TrendingDown, CircleDollarSign } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from '@/lib/utils';
@@ -158,7 +158,7 @@ export const LeaderboardTable = ({ leaderboardData, onUserClick }: LeaderboardTa
               </TableCell>
               <TableCell className="text-center">
                 <div className="flex items-center justify-center gap-2">
-                  <Coins className="h-4 w-4 text-siso-orange" />
+                  <CircleDollarSign className="h-4 w-4 text-siso-orange" />
                   <span className="font-medium">{entry.siso_tokens || 0}</span>
                 </div>
               </TableCell>
@@ -175,3 +175,4 @@ export const LeaderboardTable = ({ leaderboardData, onUserClick }: LeaderboardTa
     </div>
   );
 };
+
