@@ -1,3 +1,4 @@
+
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from 'lucide-react';
@@ -12,6 +13,7 @@ import { VideoMetadata } from '@/components/education/video-detail/VideoMetadata
 import { VideoCreatorInfo } from '@/components/education/video-detail/VideoCreatorInfo';
 import { VideoActions } from '@/components/education/video-detail/VideoActions';
 import { VideoInteractionPanel } from '@/components/education/video-detail/VideoInteractionPanel';
+import { Video } from '@/components/education/types';
 
 export default function VideoDetail() {
   const { slug } = useParams();
@@ -23,7 +25,7 @@ export default function VideoDetail() {
   const videoId = slug ? extractVideoIdFromSlug(slug) : '';
   console.log('[VideoDetail] Processing video ID:', videoId);
 
-  // [Analysis] Let's first check if this is one of Tech with Tim's videos about Python futures
+  // [Analysis] Fetch video data with proper field mapping and error handling
   const { data: videoData, isLoading, error } = useQuery({
     queryKey: ['video', videoId],
     queryFn: async () => {
@@ -34,7 +36,7 @@ export default function VideoDetail() {
 
       console.log('[VideoDetail] Fetching video data for ID:', videoId);
 
-      // [Analysis] First get the video details
+      // [Analysis] First get the video details with a join to creator info
       const { data: videoDetails, error: videoError } = await supabase
         .from('youtube_videos')
         .select(`
@@ -45,7 +47,12 @@ export default function VideoDetail() {
           thumbnailUrl,
           viewCount,
           date,
-          channel_id
+          channel_id,
+          education_creators:channel_id (
+            name,
+            channel_avatar_url,
+            description
+          )
         `)
         .eq('id', videoId)
         .single();
@@ -60,44 +67,37 @@ export default function VideoDetail() {
         throw new Error('Video not found');
       }
 
-      console.log('[DEBUG] Video details found:', {
+      // [Analysis] Transform database fields to match Video interface
+      const transformedVideo: Video = {
         id: videoDetails.id,
         title: videoDetails.title,
         url: videoDetails.url,
-        date: videoDetails.date,
-        channelId: videoDetails.channel_id
-      });
-
-      // [Analysis] Now fetch the creator details
-      const { data: creatorDetails, error: creatorError } = await supabase
-        .from('education_creators')
-        .select(`
-          name,
-          slug,
-          channel_avatar_url,
-          description,
-          channel_id
-        `)
-        .eq('channel_id', videoDetails.channel_id)
-        .maybeSingle();
-
-      if (creatorError) {
-        console.error('[VideoDetail] Error fetching creator:', creatorError);
-        // Don't throw here, we can still show the video without creator info
-      }
-
-      // [Analysis] Let's log the creator details too
-      console.log('[DEBUG] Creator details:', creatorDetails);
-
-      const combinedData = {
-        ...videoDetails,
-        education_creators: creatorDetails
+        duration: videoDetails.duration,
+        thumbnail_url: videoDetails.thumbnailUrl,
+        created_at: videoDetails.date,
+        educator: {
+          name: videoDetails.education_creators?.name || 'Unknown Creator',
+          avatar_url: videoDetails.education_creators?.channel_avatar_url || '',
+          title: 'Content Creator' // Default title for now
+        },
+        metrics: {
+          views: videoDetails.viewCount || 0,
+          likes: 0,
+          sentiment_score: 0,
+          difficulty: 'Intermediate',
+          impact_score: 0,
+          category: 'Education'
+        },
+        topics: [],
+        ai_analysis: {
+          key_takeaways: [],
+          implementation_steps: []
+        }
       };
 
-      console.log('[VideoDetail] Final combined details:', combinedData);
-      return combinedData;
+      console.log('[VideoDetail] Transformed video data:', transformedVideo);
+      return transformedVideo;
     },
-    enabled: !!videoId,
     meta: {
       onSettled: (data, error) => {
         if (error) {
@@ -136,19 +136,19 @@ export default function VideoDetail() {
     );
   }
 
-  // Use null coalescing for safer data access
-  const channelName = videoData?.education_creators?.name || videoData?.channel_id || 'Unknown Creator';
-  const channelAvatar = videoData?.education_creators?.channel_avatar_url || '';
-  const videoDescription = videoData?.education_creators?.description || '';
-  const thumbnailUrl = videoData?.thumbnailUrl || '';
-  const educatorSlug = videoData?.education_creators?.slug;
+  // [Analysis] Safer data access with null coalescing
+  const channelName = videoData.educator.name;
+  const channelAvatar = videoData.educator.avatar_url;
+  const videoDescription = '';  // We can get this from video_summaries table later
+  const thumbnailUrl = videoData.thumbnail_url;
+  const educatorSlug = ''; // We can get this from education_creators table later
 
   return (
     <>
       <Helmet>
-        <title>{`${videoData?.title || 'Video'} | ${channelName} | SISO Education`}</title>
+        <title>{`${videoData.title || 'Video'} | ${channelName} | SISO Education`}</title>
         <meta name="description" content={videoDescription} />
-        <meta property="og:title" content={videoData?.title || ''} />
+        <meta property="og:title" content={videoData.title || ''} />
         <meta property="og:description" content={videoDescription} />
         <meta property="og:image" content={thumbnailUrl} />
         <meta property="og:type" content="video.other" />
@@ -171,14 +171,14 @@ export default function VideoDetail() {
               <ChevronLeft className="w-4 h-4" />
               <span>Videos</span>
               <ChevronLeft className="w-4 h-4" />
-              <span className="text-white truncate max-w-[300px]">{videoData?.title || 'Loading...'}</span>
+              <span className="text-white truncate max-w-[300px]">{videoData.title || 'Loading...'}</span>
             </div>
           </div>
         </div>
 
         <div className="max-w-[1800px] mx-auto grid grid-cols-1 xl:grid-cols-3 gap-6 p-4">
           <div className="xl:col-span-2 space-y-6">
-            {videoData?.id ? (
+            {videoData.id ? (
               <LazyVideoPlayer videoId={videoData.id} title={videoData.title || ''} />
             ) : (
               <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center">
@@ -188,9 +188,9 @@ export default function VideoDetail() {
 
             <div className="space-y-6">
               <VideoMetadata 
-                title={videoData?.title || ''}
-                viewCount={videoData?.viewCount || 0}
-                publishDate={videoData?.date || null}
+                title={videoData.title || ''}
+                viewCount={videoData.metrics.views || 0}
+                publishDate={videoData.created_at || null}
               />
               
               <div className="flex flex-wrap items-center justify-between gap-4">
