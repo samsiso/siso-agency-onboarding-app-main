@@ -7,18 +7,26 @@ export const useNewsItems = (selectedCategory: string | null) => {
   const [newsItems, setNewsItems] = useState<any[]>([]);
   const [summaries, setSummaries] = useState<Record<string, string>>({});
   const [loadingSummaries, setLoadingSummaries] = useState<Record<string, boolean>>({});
+  const [loading, setLoading] = useState(true);
+  const [hasMore, setHasMore] = useState(true);
   const { toast } = useToast();
+
+  // [Analysis] Added pagination config
+  const PAGE_SIZE = 12;
+  const [page, setPage] = useState(0);
 
   useEffect(() => {
     fetchNews();
-  }, [selectedCategory]);
+  }, [selectedCategory, page]);
 
   const fetchNews = async () => {
     try {
+      setLoading(true);
       let query = supabase
         .from('ai_news')
         .select('*')
-        .order('date', { ascending: false });
+        .order('date', { ascending: false })
+        .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
 
       if (selectedCategory) {
         query = query.eq('category', selectedCategory);
@@ -35,7 +43,11 @@ export const useNewsItems = (selectedCategory: string | null) => {
         return;
       }
 
-      setNewsItems(data || []);
+      // [Analysis] Check if we have more items to load
+      setHasMore(data.length === PAGE_SIZE);
+      
+      // [Analysis] Append new items to existing ones for infinite scroll
+      setNewsItems(prev => page === 0 ? data : [...prev, ...data]);
 
       const { data: summariesData, error: summariesError } = await supabase
         .from('ai_news_summaries')
@@ -55,6 +67,8 @@ export const useNewsItems = (selectedCategory: string | null) => {
         title: "Error",
         description: "Failed to fetch news items",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -114,10 +128,19 @@ export const useNewsItems = (selectedCategory: string | null) => {
     }
   };
 
+  const loadMore = () => {
+    if (!loading && hasMore) {
+      setPage(prev => prev + 1);
+    }
+  };
+
   return {
     newsItems,
     summaries,
     loadingSummaries,
-    generateSummary
+    generateSummary,
+    loading,
+    hasMore,
+    loadMore
   };
 };

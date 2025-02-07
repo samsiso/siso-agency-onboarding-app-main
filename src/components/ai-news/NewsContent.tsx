@@ -3,6 +3,7 @@ import { lazy, Suspense } from 'react';
 import { motion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import { FeaturedNewsHero } from './FeaturedNewsHero';
+import { Button } from '@/components/ui/button';
 
 const NewsCard = lazy(() => import('@/components/ai-news/NewsCard'));
 
@@ -28,6 +29,9 @@ interface NewsContentProps {
   summaries: Record<string, string>;
   loadingSummaries: Record<string, boolean>;
   onGenerateSummary: (id: string) => void;
+  loading?: boolean;
+  hasMore?: boolean;
+  onLoadMore?: () => void;
 }
 
 export const NewsContent = ({
@@ -35,7 +39,10 @@ export const NewsContent = ({
   searchQuery,
   summaries,
   loadingSummaries,
-  onGenerateSummary
+  onGenerateSummary,
+  loading = false,
+  hasMore = false,
+  onLoadMore
 }: NewsContentProps) => {
   // [Analysis] Filter news items based on search query
   const filteredNewsItems = newsItems.filter(item => {
@@ -94,7 +101,27 @@ export const NewsContent = ({
           </motion.div>
         )}
 
-        {filteredNewsItems.length === 0 && (
+        {/* Load More Button */}
+        {hasMore && !loading && gridItems.length > 0 && (
+          <div className="flex justify-center mt-8">
+            <Button
+              variant="outline"
+              onClick={onLoadMore}
+              className="bg-siso-bg border-siso-border hover:bg-siso-red/10 hover:text-siso-red"
+            >
+              Load More Articles
+            </Button>
+          </div>
+        )}
+
+        {/* Loading State */}
+        {loading && (
+          <div className="flex justify-center mt-8">
+            <Loader2 className="h-6 w-6 animate-spin text-siso-red" />
+          </div>
+        )}
+
+        {filteredNewsItems.length === 0 && !loading && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

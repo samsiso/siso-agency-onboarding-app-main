@@ -36,7 +36,10 @@ const AINews = () => {
     newsItems,
     summaries,
     loadingSummaries,
-    generateSummary
+    generateSummary,
+    loading,
+    hasMore,
+    loadMore
   } = useNewsItems(selectedCategory);
 
   return (
@@ -72,6 +75,9 @@ const AINews = () => {
                   summaries={summaries}
                   loadingSummaries={loadingSummaries}
                   onGenerateSummary={generateSummary}
+                  loading={loading}
+                  hasMore={hasMore}
+                  onLoadMore={loadMore}
                 />
               </Suspense>
             </motion.div>

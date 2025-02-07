@@ -18,6 +18,7 @@ export type Database = {
           id: string
           image_url: string | null
           impact: string
+          priority: number | null
           source: string
           title: string
           updated_at: string
@@ -30,6 +31,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           impact: string
+          priority?: number | null
           source: string
           title: string
           updated_at?: string
@@ -42,6 +44,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           impact?: string
+          priority?: number | null
           source?: string
           title?: string
           updated_at?: string
