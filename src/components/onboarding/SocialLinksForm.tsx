@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -88,7 +89,7 @@ export const SocialLinksForm = ({ userId }: SocialLinksFormProps) => {
         description: "Moving to the next step...",
       });
 
-      navigate('/onboarding/congratulations');
+      navigate('/thank-you');
     } catch (error: any) {
       console.error('Error saving social links:', error);
       toast({
@@ -196,7 +197,7 @@ export const SocialLinksForm = ({ userId }: SocialLinksFormProps) => {
         <div className="space-x-4">
           <Button
             variant="outline"
-            onClick={() => navigate('/onboarding/congratulations')}
+            onClick={() => navigate('/thank-you')}
             className="bg-white/10 text-white hover:bg-white/20"
           >
             Skip
