@@ -11,6 +11,8 @@ export type Database = {
     Tables: {
       ai_news: {
         Row: {
+          article_type: string | null
+          bookmarks: number | null
           category: string
           created_at: string
           date: string
@@ -19,11 +21,17 @@ export type Database = {
           image_url: string | null
           impact: string
           priority: number | null
+          reading_time: number | null
           source: string
+          source_credibility: string | null
+          technical_complexity: string | null
           title: string
           updated_at: string
+          views: number | null
         }
         Insert: {
+          article_type?: string | null
+          bookmarks?: number | null
           category: string
           created_at?: string
           date: string
@@ -32,11 +40,17 @@ export type Database = {
           image_url?: string | null
           impact: string
           priority?: number | null
+          reading_time?: number | null
           source: string
+          source_credibility?: string | null
+          technical_complexity?: string | null
           title: string
           updated_at?: string
+          views?: number | null
         }
         Update: {
+          article_type?: string | null
+          bookmarks?: number | null
           category?: string
           created_at?: string
           date?: string
@@ -45,11 +59,76 @@ export type Database = {
           image_url?: string | null
           impact?: string
           priority?: number | null
+          reading_time?: number | null
           source?: string
+          source_credibility?: string | null
+          technical_complexity?: string | null
           title?: string
           updated_at?: string
+          views?: number | null
         }
         Relationships: []
+      }
+      ai_news_bookmarks: {
+        Row: {
+          created_at: string | null
+          id: string
+          news_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          news_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          news_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_news_bookmarks_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "ai_news"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_news_reactions: {
+        Row: {
+          created_at: string | null
+          id: string
+          news_id: string | null
+          reaction_type: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          news_id?: string | null
+          reaction_type: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          news_id?: string | null
+          reaction_type?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_news_reactions_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "ai_news"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ai_news_summaries: {
         Row: {
