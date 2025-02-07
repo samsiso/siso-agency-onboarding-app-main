@@ -1436,6 +1436,10 @@ export type Database = {
       }
     }
     Functions: {
+      create_news_images_bucket: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       generate_unique_slug: {
         Args: {
           base_name: string
