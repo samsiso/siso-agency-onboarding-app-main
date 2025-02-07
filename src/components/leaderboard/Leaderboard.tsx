@@ -62,6 +62,27 @@ export const Leaderboard = () => {
     setSelectedUser(user);
   };
 
+  // Map LeaderboardEntry to CommunityMember type
+  const mapToCommunityMember = (entry: LeaderboardEntry | null) => {
+    if (!entry) return null;
+    
+    return {
+      id: entry.id,
+      name: entry.profile?.full_name || 'Anonymous User',
+      description: entry.profile?.bio || undefined,
+      member_type: 'Community',
+      youtube_url: entry.profile?.youtube_url,
+      website_url: entry.profile?.website_url,
+      profile_image_url: entry.profile?.avatar_url,
+      platform: undefined,
+      points: entry.points || 0,
+      rank: entry.rank,
+      contribution_count: entry.contribution_count,
+      referral_count: entry.referral_count,
+      slug: entry.id, // Using id as slug since it's required
+    };
+  };
+
   return (
     <div className="space-y-6 animate-fadeIn">
       <LeaderboardStats 
@@ -81,7 +102,7 @@ export const Leaderboard = () => {
       />
 
       <CommunityMemberDetails
-        member={selectedUser}
+        member={mapToCommunityMember(selectedUser)}
         onClose={() => setSelectedUser(null)}
       />
     </div>
