@@ -31,6 +31,7 @@ const AINews = () => {
   const [selectedMonth, setSelectedMonth] = useState<string>('03');
   const [selectedYear, setSelectedYear] = useState<string>('2024');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [newsItems, setNewsItems] = useState<any[]>([]);
   const [summaries, setSummaries] = useState<Record<string, string>>({});
   const [loadingSummaries, setLoadingSummaries] = useState<Record<string, boolean>>({});
@@ -84,6 +85,16 @@ const AINews = () => {
       });
     }
   };
+
+  // [Analysis] Filter news items based on search query, title, and description
+  const filteredNewsItems = newsItems.filter(item => {
+    if (!searchQuery) return true;
+    const searchLower = searchQuery.toLowerCase();
+    return (
+      item.title?.toLowerCase().includes(searchLower) ||
+      item.description?.toLowerCase().includes(searchLower)
+    );
+  });
 
   const generateSummary = async (id: string) => {
     if (summaries[id]) return;
@@ -159,6 +170,8 @@ const AINews = () => {
                   selectedYear={selectedYear}
                   onMonthChange={setSelectedMonth}
                   onYearChange={setSelectedYear}
+                  searchQuery={searchQuery}
+                  onSearchChange={setSearchQuery}
                 />
 
                 <NewsCategories
@@ -166,9 +179,9 @@ const AINews = () => {
                   onCategoryChange={setSelectedCategory}
                 />
 
-                {newsItems.length > 0 && (
+                {filteredNewsItems.length > 0 && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                    {newsItems.map((item) => (
+                    {filteredNewsItems.map((item) => (
                       <NewsCard
                         key={item.id}
                         item={item}

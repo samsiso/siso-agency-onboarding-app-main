@@ -1,17 +1,23 @@
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { NewsSearchSection } from './NewsSearchSection';
 
 interface NewsHeaderProps {
   selectedMonth: string;
   selectedYear: string;
   onMonthChange: (value: string) => void;
   onYearChange: (value: string) => void;
+  searchQuery: string;
+  onSearchChange: (value: string) => void;
 }
 
 const NewsHeader = ({ 
   selectedMonth, 
   selectedYear, 
   onMonthChange, 
-  onYearChange 
+  onYearChange,
+  searchQuery,
+  onSearchChange
 }: NewsHeaderProps) => {
   return (
     <div className="space-y-4 mb-8">
@@ -23,6 +29,11 @@ const NewsHeader = ({
           Stay updated with the latest breakthroughs and news in AI technology
         </p>
       </div>
+
+      <NewsSearchSection 
+        searchQuery={searchQuery}
+        onSearchChange={onSearchChange}
+      />
       
       <div className="flex flex-wrap gap-2 sm:gap-4">
         <Select value={selectedMonth} onValueChange={onMonthChange}>
