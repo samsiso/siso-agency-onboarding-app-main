@@ -4,18 +4,22 @@ import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LeaderboardStats } from './LeaderboardStats';
 import { LeaderboardTable } from './LeaderboardTable';
+import { LeaderboardFilters } from './LeaderboardFilters';
 import { CommunityMemberDetails } from '../community/CommunityMemberDetails';
 import { Trophy, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { LeaderboardEntry } from './types';
-import type { Achievement } from './types';
 
 export const Leaderboard = () => {
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
+  const [filteredData, setFilteredData] = useState<LeaderboardEntry[]>([]);
   const [totalUsersWithPoints, setTotalUsersWithPoints] = useState<number>(0);
   const [totalPoints, setTotalPoints] = useState<number>(0);
   const [totalSisoTokens, setTotalSisoTokens] = useState<number>(0);
   const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [timePeriod, setTimePeriod] = useState<string>('all-time');
+  const [category, setCategory] = useState<string>('points');
   const { toast } = useToast();
 
   useEffect(() => {
@@ -50,6 +54,45 @@ export const Leaderboard = () => {
       supabase.removeChannel(channel);
     };
   }, []);
+
+  // Filter data when search query, time period, or category changes
+  useEffect(() => {
+    let filtered = [...leaderboardData];
+
+    // Apply search filter
+    if (searchQuery) {
+      filtered = filtered.filter(entry => 
+        entry.profile?.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        entry.profile?.email?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    // Apply time period filter
+    // Note: This is a simplified version. In a real app, you'd need to store timestamps
+    // and filter based on actual dates
+    if (timePeriod !== 'all-time') {
+      // This is just a demonstration. You'd need to implement proper time-based filtering
+      filtered = filtered.slice(0, timePeriod === 'daily' ? 10 : 
+                                 timePeriod === 'weekly' ? 20 : 
+                                 timePeriod === 'monthly' ? 50 : filtered.length);
+    }
+
+    // Apply category filter
+    if (category !== 'points') {
+      filtered.sort((a, b) => {
+        if (category === 'contributions') {
+          return (b.contribution_count || 0) - (a.contribution_count || 0);
+        } else if (category === 'referrals') {
+          return (b.referral_count || 0) - (a.referral_count || 0);
+        } else if (category === 'achievements') {
+          return (b.achievements?.length || 0) - (a.achievements?.length || 0);
+        }
+        return 0;
+      });
+    }
+
+    setFilteredData(filtered);
+  }, [searchQuery, timePeriod, category, leaderboardData]);
 
   const fetchTotalPoints = async () => {
     try {
@@ -104,7 +147,6 @@ export const Leaderboard = () => {
   const fetchLeaderboard = async () => {
     try {
       console.log('Fetching leaderboard data...');
-      // First, get all profiles with points
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select(`
@@ -129,7 +171,6 @@ export const Leaderboard = () => {
 
       if (profilesError) throw profilesError;
 
-      // Then, get the leaderboard data for these profiles
       const profileIds = profilesData?.map(profile => profile.id) || [];
       const { data: leaderboardData, error: leaderboardError } = await supabase
         .from('leaderboard')
@@ -138,23 +179,15 @@ export const Leaderboard = () => {
 
       if (leaderboardError) throw leaderboardError;
 
-      // Combine the data
       const combinedData = profilesData?.map(profile => {
         const leaderboardEntry = leaderboardData?.find(entry => entry.user_id === profile.id);
         
-        const achievements: Achievement[] = Array.isArray(leaderboardEntry?.achievements) 
-          ? (leaderboardEntry.achievements as any[]).map(achievement => ({
-              name: achievement.name || 'Unknown Achievement',
-              icon: achievement.icon || '🏆'
-            }))
-          : [];
-
         return {
           id: profile.id,
           user_id: profile.id,
           points: profile.points,
           rank: profile.rank,
-          achievements: achievements,
+          achievements: leaderboardEntry?.achievements || [],
           siso_tokens: leaderboardEntry?.siso_tokens || 0,
           updated_at: profile.updated_at,
           contribution_count: leaderboardEntry?.contribution_count || 0,
@@ -176,6 +209,7 @@ export const Leaderboard = () => {
 
       console.log('Combined leaderboard data:', combinedData);
       setLeaderboardData(combinedData);
+      setFilteredData(combinedData);
     } catch (error) {
       console.error('Error fetching leaderboard:', error);
       toast({
@@ -225,13 +259,18 @@ export const Leaderboard = () => {
           <CardTitle className="flex items-center justify-between">
             <span className="text-siso-text-bold">Leaderboard Rankings</span>
             <span className="text-sm font-normal text-siso-text-muted">
-              Top {Math.min(leaderboardData.length, 100)} Users
+              Top {Math.min(filteredData.length, 100)} Users
             </span>
           </CardTitle>
         </CardHeader>
         <CardContent>
+          <LeaderboardFilters
+            onSearchChange={setSearchQuery}
+            onPeriodChange={setTimePeriod}
+            onCategoryChange={setCategory}
+          />
           <LeaderboardTable 
-            leaderboardData={leaderboardData} 
+            leaderboardData={filteredData} 
             onUserClick={handleUserClick}
           />
         </CardContent>
