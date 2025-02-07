@@ -1,3 +1,4 @@
+
 import { useNavigate, useLocation } from 'react-router-dom';
 import { SidebarMenuItem } from './SidebarMenuItem';
 import { cn } from '@/lib/utils';
@@ -115,9 +116,9 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
           >
             {section.type === 'main' ? (
               <SidebarMenuItem
-                href={section.href!}
+                href={section.href}
                 icon={section.icon}
-                label={section.label!}
+                label={section.label}
                 collapsed={collapsed}
                 onClick={handleClick}
                 isMain={true}

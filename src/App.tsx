@@ -1,3 +1,4 @@
+
 import { Routes, Route } from 'react-router-dom';
 import Index from '@/pages/Index';
 import Home from '@/pages/Home';
@@ -28,8 +29,8 @@ import SocialOnboarding from '@/pages/onboarding/social';
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Index />} />
-      <Route path="/home" element={<Home />} />
+      <Route path="/" element={<Home />} />
+      <Route path="/welcome" element={<Index />} />
       <Route path="/auth" element={<Auth />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/tools" element={<Tools />} />
