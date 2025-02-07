@@ -1,6 +1,5 @@
+
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import AuthButton from '../AuthButton';
 import { supabase } from '@/integrations/supabase/client';
 import { ProfileSection } from './ProfileSection';
 
@@ -49,7 +48,7 @@ export const SidebarFooter = ({ collapsed }: SidebarFooterProps) => {
 
   return (
     <div className="absolute bottom-0 w-full p-4 border-t border-siso-text/10 space-y-3 bg-gradient-to-t from-siso-bg to-transparent">
-      {user ? (
+      {user && (
         <ProfileSection
           userId={user.id}
           userEmail={user.email}
@@ -57,8 +56,6 @@ export const SidebarFooter = ({ collapsed }: SidebarFooterProps) => {
           avatarUrl={profile?.avatar_url}
           collapsed={collapsed}
         />
-      ) : (
-        <AuthButton />
       )}
     </div>
   );
