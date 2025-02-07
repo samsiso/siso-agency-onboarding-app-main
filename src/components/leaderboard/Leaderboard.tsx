@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
@@ -8,7 +9,7 @@ import { LeaderboardFilters } from './LeaderboardFilters';
 import { CommunityMemberDetails } from '../community/CommunityMemberDetails';
 import { Trophy, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import type { LeaderboardEntry } from './types';
+import type { LeaderboardEntry, Achievement } from './types';
 
 export const Leaderboard = () => {
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
@@ -16,7 +17,7 @@ export const Leaderboard = () => {
   const [totalUsersWithPoints, setTotalUsersWithPoints] = useState<number>(0);
   const [totalPoints, setTotalPoints] = useState<number>(0);
   const [totalSisoTokens, setTotalSisoTokens] = useState<number>(0);
-  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [selectedUser, setSelectedUser] = useState<LeaderboardEntry | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [timePeriod, setTimePeriod] = useState<string>('all-time');
   const [category, setCategory] = useState<string>('points');
@@ -179,15 +180,23 @@ export const Leaderboard = () => {
 
       if (leaderboardError) throw leaderboardError;
 
-      const combinedData = profilesData?.map(profile => {
+      const combinedData: LeaderboardEntry[] = profilesData?.map(profile => {
         const leaderboardEntry = leaderboardData?.find(entry => entry.user_id === profile.id);
         
+        // Ensure achievements is properly parsed as Achievement[]
+        const achievements = Array.isArray(leaderboardEntry?.achievements) 
+          ? leaderboardEntry.achievements.map((achievement: any) => ({
+              name: achievement.name || '',
+              icon: achievement.icon || ''
+            }))
+          : [];
+
         return {
           id: profile.id,
           user_id: profile.id,
           points: profile.points,
           rank: profile.rank,
-          achievements: leaderboardEntry?.achievements || [],
+          achievements: achievements,
           siso_tokens: leaderboardEntry?.siso_tokens || 0,
           updated_at: profile.updated_at,
           contribution_count: leaderboardEntry?.contribution_count || 0,
