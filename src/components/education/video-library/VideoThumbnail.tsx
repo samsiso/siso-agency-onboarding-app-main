@@ -1,5 +1,4 @@
 
-import { useState } from 'react';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Play, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -12,35 +11,29 @@ interface VideoThumbnailProps {
 }
 
 export const VideoThumbnail = ({ thumbnailUrl, duration, isInView, index }: VideoThumbnailProps) => {
-  const [isLoaded, setIsLoaded] = useState(false);
-
   return (
-    <div className="relative">
+    <div className="relative group/thumbnail">
       <AspectRatio ratio={16 / 9}>
         {thumbnailUrl && isInView ? (
-          <>
-            {/* Low quality placeholder */}
-            <div
-              className={cn(
-                "absolute inset-0 bg-cover bg-center blur-lg scale-110 transition-opacity duration-300",
-                isLoaded ? "opacity-0" : "opacity-100"
-              )}
-              style={{
-                backgroundImage: `url(${thumbnailUrl}?quality=1&width=50)`,
-              }}
-            />
-            {/* High quality image */}
+          <div className="relative w-full h-full overflow-hidden">
+            {/* Thumbnail image */}
             <img
               src={thumbnailUrl}
               alt=""
-              className={cn(
-                "h-full w-full object-cover transition-all duration-300 group-hover:scale-105",
-                isLoaded ? "opacity-100" : "opacity-0"
-              )}
-              onLoad={() => setIsLoaded(true)}
+              className="h-full w-full object-cover transition-transform duration-300 group-hover/thumbnail:scale-110"
               loading="lazy"
             />
-          </>
+            
+            {/* Gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover/thumbnail:opacity-100 transition-opacity duration-300" />
+            
+            {/* Play button overlay */}
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/thumbnail:opacity-100 transition-opacity duration-300">
+              <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center transform scale-90 group-hover/thumbnail:scale-100 transition-transform duration-300">
+                <Play className="w-6 h-6 text-siso-bg fill-current" />
+              </div>
+            </div>
+          </div>
         ) : (
           <div className="flex h-full items-center justify-center bg-siso-bg animate-pulse">
             <Play className="w-12 h-12 text-siso-text/20" />
@@ -48,9 +41,9 @@ export const VideoThumbnail = ({ thumbnailUrl, duration, isInView, index }: Vide
         )}
       </AspectRatio>
       
-      {/* Duration Badge */}
+      {/* Duration badge with improved styling */}
       {duration && (
-        <div className="absolute bottom-2 right-2 bg-black/80 px-2 py-1 rounded text-xs text-white flex items-center gap-1">
+        <div className="absolute bottom-2 right-2 bg-black/80 px-2 py-1 rounded text-xs text-white flex items-center gap-1 backdrop-blur-sm">
           <Clock className="w-3 h-3" />
           {duration}
         </div>
