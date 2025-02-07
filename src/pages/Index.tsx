@@ -31,69 +31,69 @@ export default function Index() {
     return <LoadingFallback />;
   }
 
-  // [Analysis] Redirect authenticated users to home
-  if (user) {
-    console.log('User authenticated, redirecting to home');
-    navigate('/', { replace: true });
-    return null;
+  // [Analysis] Show landing page for non-authenticated users
+  if (!user) {
+    const {
+      ExpandableChat,
+      ExpandableChatHeader,
+      ExpandableChatBody,
+      ExpandableChatFooter,
+      ChatMessageList,
+      ChatBubble,
+      ChatBubbleAvatar,
+      ChatBubbleMessage,
+      ChatInput,
+    } = ChatComponents;
+
+    return (
+      <div className="relative">
+        <Suspense fallback={<LoadingFallback />}>
+          <LandingPage />
+          <ExpandableChat
+            size="lg"
+            position="bottom-right"
+            icon={<Bot className="h-6 w-6" />}
+          >
+            <ExpandableChatHeader className="flex-col text-center justify-center">
+              <h1 className="text-xl font-semibold">Welcome to SISO ✨</h1>
+              <p className="text-sm text-muted-foreground">
+                How can I help you get started?
+              </p>
+            </ExpandableChatHeader>
+
+            <ExpandableChatBody>
+              <ChatMessageList>
+                <ChatBubble variant="received">
+                  <ChatBubbleAvatar
+                    className="h-8 w-8"
+                    src="/lovable-uploads/c482563a-42db-4f47-83f2-c2e7771400b7.png"
+                    fallback="AI"
+                  />
+                  <ChatBubbleMessage>
+                    Welcome to SISO! I'm here to help you explore our platform and find the resources you need. What would you like to know about?
+                  </ChatBubbleMessage>
+                </ChatBubble>
+              </ChatMessageList>
+            </ExpandableChatBody>
+
+            <ExpandableChatFooter>
+              <form
+                onSubmit={(e) => e.preventDefault()}
+                className="relative rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring p-1"
+              >
+                <ChatInput
+                  placeholder="Type your message..."
+                  className="min-h-12 resize-none rounded-lg bg-background border-0 p-3 shadow-none focus-visible:ring-0"
+                />
+              </form>
+            </ExpandableChatFooter>
+          </ExpandableChat>
+        </Suspense>
+      </div>
+    );
   }
 
-  const {
-    ExpandableChat,
-    ExpandableChatHeader,
-    ExpandableChatBody,
-    ExpandableChatFooter,
-    ChatMessageList,
-    ChatBubble,
-    ChatBubbleAvatar,
-    ChatBubbleMessage,
-    ChatInput,
-  } = ChatComponents;
-
-  return (
-    <div className="relative">
-      <Suspense fallback={<LoadingFallback />}>
-        <LandingPage />
-        <ExpandableChat
-          size="lg"
-          position="bottom-right"
-          icon={<Bot className="h-6 w-6" />}
-        >
-          <ExpandableChatHeader className="flex-col text-center justify-center">
-            <h1 className="text-xl font-semibold">Welcome to SISO ✨</h1>
-            <p className="text-sm text-muted-foreground">
-              How can I help you get started?
-            </p>
-          </ExpandableChatHeader>
-
-          <ExpandableChatBody>
-            <ChatMessageList>
-              <ChatBubble variant="received">
-                <ChatBubbleAvatar
-                  className="h-8 w-8"
-                  src="/lovable-uploads/c482563a-42db-4f47-83f2-c2e7771400b7.png"
-                  fallback="AI"
-                />
-                <ChatBubbleMessage>
-                  Welcome to SISO! I'm here to help you explore our platform and find the resources you need. What would you like to know about?
-                </ChatBubbleMessage>
-              </ChatBubble>
-            </ChatMessageList>
-          </ExpandableChatBody>
-
-          <ExpandableChatFooter>
-            <form
-              onSubmit={(e) => e.preventDefault()}
-              className="relative rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring p-1"
-            >
-              <ChatInput
-                placeholder="Type your message..."
-                className="min-h-12 resize-none rounded-lg bg-background border-0 p-3 shadow-none focus-visible:ring-0"
-              />
-            </form>
-          </ExpandableChatFooter>
-        </ExpandableChat>
-      </Suspense>
-    </div>
-  );
+  // [Analysis] Redirect authenticated users to home
+  navigate('/', { replace: true });
+  return null;
 }

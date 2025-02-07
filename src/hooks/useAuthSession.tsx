@@ -70,12 +70,13 @@ export const useAuthSession = () => {
       const profile = await checkProfile(session.user.id);
       
       if (profile) {
-        console.log('Profile verified, proceeding with redirect');
+        console.log('Profile verified, proceeding');
         toast({
           title: "Successfully signed in",
           description: "Welcome to SISO Resource Hub!",
         });
-        navigate('/profile');
+        // [Analysis] Let user stay on current page after login
+        return true;
       } else {
         console.error('Profile not found after waiting');
         throw new Error('Profile creation failed');
@@ -87,6 +88,7 @@ export const useAuthSession = () => {
         title: "Error signing in",
         description: "There was a problem signing you in. Please try again.",
       });
+      return false;
     }
   };
 

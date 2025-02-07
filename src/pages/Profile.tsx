@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -48,8 +49,13 @@ const Profile = () => {
         }
         
         if (!session) {
-          console.log('[Profile] No session found, redirecting to home');
-          navigate('/');
+          console.log('[Profile] No session found');
+          toast({
+            variant: "destructive",
+            title: "Authentication Required",
+            description: "Please sign in to view your profile.",
+          });
+          navigate('/auth');
           return;
         }
 
@@ -70,7 +76,6 @@ const Profile = () => {
         if (profileData) {
           console.log('[Profile] Profile data found:', profileData);
           setProfile(profileData);
-          // Update form data with profile data
           setFormData({
             fullName: profileData.full_name || '',
             businessName: profileData.business_name || '',
@@ -93,7 +98,6 @@ const Profile = () => {
           title: "Error",
           description: "Failed to load profile data",
         });
-        navigate('/');
       } finally {
         setLoading(false);
       }
