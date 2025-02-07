@@ -94,12 +94,27 @@ export default {
             boxShadow: "0 0 25px rgba(255, 167, 38, 0.5)",
           },
         },
+        "float-slow": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-20px)" },
+        },
+        "float-slower": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
+        "fade-in": {
+          "0%": { opacity: "0", transform: "translateY(10px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         gradient: "gradient 6s linear infinite",
         glow: "glow 3s ease-in-out infinite",
+        "float-slow": "float-slow 6s ease-in-out infinite",
+        "float-slower": "float-slower 8s ease-in-out infinite",
+        "fade-in": "fade-in 0.5s ease-out forwards",
       },
     },
   },

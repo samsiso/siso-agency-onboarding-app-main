@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSidebar } from './ui/sidebar';
@@ -86,7 +87,7 @@ const Hero = () => {
               <span className="text-siso-text-bold">Welcome to</span>
               <span className="relative block mt-1 sm:mt-2">
                 <span className="relative inline-block p-1.5 sm:p-2 rounded-lg bg-black/30 backdrop-blur-sm border border-siso-text/10 max-w-[80vw] mx-auto">
-                  <span className="relative bg-gradient-to-r from-siso-orange to-siso-red text-transparent bg-clip-text break-words hyphens-auto">
+                  <span className="relative bg-gradient-to-r from-siso-orange to-siso-red text-transparent bg-clip-text break-words hyphens-auto animate-gradient">
                     SISO Resources
                   </span>
                 </span>
@@ -104,7 +105,7 @@ const Hero = () => {
 
             <div className="relative h-[120px] sm:h-[140px] md:h-[160px] flex w-full justify-center overflow-hidden text-center">
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-sm sm:text-base md:text-lg text-siso-text max-w-[80vw] mx-auto leading-relaxed px-2">
+                <span className="text-sm sm:text-base md:text-lg text-siso-text max-w-[80vw] mx-auto leading-relaxed px-2 animate-fade-in">
                   Tools, education & networking for agency growth.
                 </span>
               </div>
@@ -113,11 +114,11 @@ const Hero = () => {
 
           <div className="relative z-30 mt-3 sm:mt-4 md:mt-6">
             <div className="relative p-2 sm:p-3 rounded-xl bg-black/30 backdrop-blur-sm border border-siso-text/10 
-              hover:border-siso-text/20 transition-all duration-300">
+              hover:border-siso-text/20 transition-all duration-300 animate-fade-in">
               <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-siso-orange/5 to-siso-red/5 pointer-events-none" />
               
               <h2 className="text-base sm:text-lg md:text-xl font-bold text-siso-text-bold mb-2 sm:mb-3 bg-gradient-to-r from-siso-orange to-siso-red 
-                text-transparent bg-clip-text">
+                text-transparent bg-clip-text animate-gradient">
                 Resource Hub
               </h2>
               
@@ -127,7 +128,8 @@ const Hero = () => {
                     key={i}
                     className="group relative z-30 p-1.5 sm:p-2 rounded-lg bg-siso-bg/50 hover:bg-siso-bg/70 
                       border border-siso-text/10 hover:border-siso-text/20 transition-all duration-300
-                      cursor-pointer pointer-events-auto"
+                      cursor-pointer pointer-events-auto animate-fade-in"
+                    style={{ animationDelay: `${i * 100}ms` }}
                     onClick={() => handleResourceClick(item.path)}
                   >
                     <div className="flex items-start gap-1.5">
