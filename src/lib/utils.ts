@@ -6,8 +6,10 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-// [Analysis] Add number formatting utility for consistent display of large numbers
-export function formatNumber(num: number): string {
+// [Analysis] Add null/undefined check to prevent toString() errors
+// [Plan] Consider adding input validation for negative numbers at scale
+export function formatNumber(num: number | null | undefined): string {
+  if (num === null || num === undefined) return '0';
   if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
   if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
   return num.toString();
