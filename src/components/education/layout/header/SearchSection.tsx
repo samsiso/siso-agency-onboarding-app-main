@@ -1,4 +1,3 @@
-
 import { Search, Command, Mic, Clock, ChevronRight, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PlaceholdersAndVanishInput } from '@/components/ui/placeholders-and-vanish-input';
@@ -7,7 +6,7 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
-import { Avatar } from '@/components/ui/avatar';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatNumber } from '@/lib/utils';
@@ -38,7 +37,6 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
   const [selectedSkillLevel, setSelectedSkillLevel] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  // [Analysis] Add search history tracking and educator preview fetching
   const { data: searchHistory, refetch: refetchHistory } = useQuery({
     queryKey: ['search-history'],
     queryFn: async () => {
@@ -75,7 +73,6 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
     enabled: isSearchFocused,
   });
 
-  // [Analysis] Add video preview fetching with search query
   const { data: recentVideos, isLoading: videosLoading } = useQuery({
     queryKey: ['recent-videos', searchQuery],
     queryFn: async () => {
@@ -163,7 +160,6 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
     >
-      {/* Categories */}
       <motion.div 
         className="flex flex-wrap gap-3 justify-center"
         initial={{ opacity: 0 }}
@@ -189,7 +185,6 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
         ))}
       </motion.div>
 
-      {/* Skill Levels */}
       <motion.div 
         className="flex justify-center gap-4"
         initial={{ opacity: 0 }}
@@ -217,7 +212,6 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
         ))}
       </motion.div>
 
-      {/* Search Input */}
       <div className="relative group">
         <PlaceholdersAndVanishInput
           placeholders={searchPlaceholders}
@@ -244,7 +238,6 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
           <Mic className="w-5 h-5 cursor-pointer hover:text-[#FF5722] transition-colors" />
         </div>
 
-        {/* Enhanced Search Dropdown */}
         <AnimatePresence>
           {isSearchFocused && (
             <motion.div
@@ -255,7 +248,6 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
             >
               <ScrollArea className="h-[600px]">
                 <div className="p-4 space-y-6">
-                  {/* Recent Searches */}
                   {searchHistory && searchHistory.length > 0 && (
                     <div className="space-y-3">
                       <h3 className="text-sm font-medium text-white/80">Recent Searches</h3>
@@ -281,7 +273,6 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
                     </div>
                   )}
 
-                  {/* Featured Educators */}
                   <div className="space-y-3">
                     <h3 className="text-sm font-medium text-white/80">Featured Educators</h3>
                     {educatorsLoading ? (
@@ -298,11 +289,15 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
                             className="flex items-start gap-3 p-3 rounded-lg hover:bg-white/5 cursor-pointer group"
                             whileHover={{ scale: 1.02 }}
                           >
-                            <Avatar
-                              src={educator.channel_avatar_url}
-                              fallback={educator.name[0]}
-                              className="w-12 h-12 border-2 border-siso-orange/20"
-                            />
+                            <div className="relative h-12 w-12">
+                              <AvatarImage
+                                src={educator.channel_avatar_url}
+                                className="w-12 h-12 rounded-full border-2 border-siso-orange/20"
+                              />
+                              <AvatarFallback className="w-12 h-12 rounded-full border-2 border-siso-orange/20">
+                                {educator.name[0]}
+                              </AvatarFallback>
+                            </div>
                             <div className="flex-1 min-w-0">
                               <h4 className="font-medium text-white truncate">{educator.name}</h4>
                               <p className="text-xs text-siso-text/60">
@@ -328,7 +323,6 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
                     )}
                   </div>
 
-                  {/* Recent Videos */}
                   <div className="space-y-3">
                     <h3 className="text-sm font-medium text-white/80">Popular Videos</h3>
                     {videosLoading ? (
@@ -358,11 +352,15 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
                             <div className="mt-2 space-y-1">
                               <h4 className="text-sm font-medium text-white line-clamp-2">{video.title}</h4>
                               <div className="flex items-center gap-2">
-                                <Avatar
-                                  src={video.education_creators.channel_avatar_url}
-                                  fallback={video.education_creators.name[0]}
-                                  className="w-5 h-5"
-                                />
+                                <div className="relative h-5 w-5">
+                                  <AvatarImage
+                                    src={video.education_creators.channel_avatar_url}
+                                    className="w-5 h-5 rounded-full"
+                                  />
+                                  <AvatarFallback className="w-5 h-5 rounded-full">
+                                    {video.education_creators.name[0]}
+                                  </AvatarFallback>
+                                </div>
                                 <span className="text-xs text-siso-text/60">
                                   {video.education_creators.name}
                                 </span>
@@ -377,7 +375,6 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
                     )}
                   </div>
 
-                  {/* Learning Paths */}
                   <div className="space-y-3">
                     <h3 className="text-sm font-medium text-white/80">Popular Learning Paths</h3>
                     <div className="grid grid-cols-2 gap-3">
@@ -409,4 +406,3 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
     </motion.div>
   );
 };
-
