@@ -5,11 +5,12 @@ export interface Video {
   url: string;
   duration: string;
   thumbnail_url: string;
-  created_at?: string; // Added this
+  created_at?: string;
   educator: {
     name: string;
     avatar_url: string;
-    title?: string; // Added this
+    title?: string;
+    slug?: string; // Added this optional property
   };
   metrics: {
     views: number;
@@ -17,7 +18,7 @@ export interface Video {
     sentiment_score: number;
     difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
     impact_score: number;
-    category?: string; // Added this
+    category?: string;
   };
   topics: string[];
   ai_analysis: {
@@ -25,3 +26,4 @@ export interface Video {
     implementation_steps: string[];
   };
 }
+
