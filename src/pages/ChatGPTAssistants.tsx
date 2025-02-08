@@ -14,6 +14,7 @@ import { AssistantGrid } from '@/components/assistants/layout/content/AssistantG
 import { useAssistants } from '@/components/assistants/hooks/useAssistants';
 import { Assistant } from '@/components/assistants/types';
 import { FloatingOrbs } from '@/components/effects/FloatingOrbs';
+import { Card } from '@/components/ui/card';
 import { 
   ExpandableChat, 
   ExpandableChatHeader, 
@@ -89,130 +90,111 @@ export default function ChatGPTAssistants() {
     }
   };
 
-  const searchPlaceholders = [
-    "Search for AI assistants...",
-    "Find coding helpers...",
-    "Discover automation tools...",
-    "Explore GPT assistants..."
-  ];
-
   return (
     <MainLayout>
-      <div className="max-w-7xl mx-auto space-y-8 px-4 md:px-8 py-8">
-        <div className="relative">
-          <FloatingOrbs />
-          <div className="absolute inset-0 bg-gradient-radial from-siso-orange/20 via-transparent to-transparent opacity-30 -z-10">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-siso-red/10 via-transparent to-transparent animate-pulse" />
-          </div>
-
-          <div className="relative z-10 space-y-6">
-            <HeaderTitle />
-            <StatsDisplay 
-              totalAssistants={assistants?.length || 0}
-              featuredCount={featuredCount}
-              categoryCount={Object.keys(categoryCounts || {}).length}
-              conversationsCount={totalConversations}
-            />
+      <div className="relative min-h-screen bg-gradient-to-b from-siso-bg to-siso-bg/95">
+        <div className="max-w-7xl mx-auto space-y-8 px-4 md:px-8 py-8">
+          <Card className="relative border-siso-border bg-black/20 backdrop-blur-sm overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-siso-red/5 via-siso-orange/5 to-transparent" />
+            <FloatingOrbs />
             
-            <div className="relative w-full max-w-2xl mx-auto">
-              <PlaceholdersAndVanishInput
-                placeholders={searchPlaceholders}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+            <motion.div 
+              className="relative z-10 space-y-8 p-8"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <HeaderTitle />
+              
+              <StatsDisplay 
+                totalAssistants={assistants?.length || 0}
+                featuredCount={featuredCount}
+                categoryCount={Object.keys(categoryCounts || {}).length}
+                conversationsCount={totalConversations}
+              />
+
+              <SearchSection 
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                isSearchFocused={isSearchFocused}
                 onFocus={() => setIsSearchFocused(true)}
                 onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
                 onSubmit={handleSubmit}
-                className="w-full h-14 pl-12 pr-24 bg-gradient-to-r from-siso-text/5 to-siso-text/10 
-                  border border-siso-text/10 rounded-xl text-lg
-                  focus:ring-2 focus:ring-siso-orange/30 focus:border-siso-orange/50
-                  hover:border-siso-text/20 hover:bg-siso-text/10
-                  transition-all duration-300 backdrop-blur-sm"
               />
-              
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-siso-text/50 
-                group-hover:text-siso-text/70 transition-colors" />
-              
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 text-siso-text/50">
-                <kbd className="hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border 
-                  border-siso-text/20 bg-siso-text/5 px-1.5 font-mono text-[10px] font-medium">
-                  <span className="text-xs"><Command className="h-3 w-3" /></span>K
-                </kbd>
-                <Mic className="w-5 h-5 cursor-pointer hover:text-siso-orange transition-colors" />
-              </div>
-            </div>
-          </div>
-        </div>
+            </motion.div>
+          </Card>
 
-        {!isSearchFocused && (
-          <>
-            <HeaderAlerts />
-            <Categories 
-              categories={categories}
-              selectedCategory={selectedCategory}
-              onCategoryChange={setSelectedCategory}
-              categoryCounts={categoryCounts || {}}
-              assistantsCount={assistants?.length || 0}
-              featuredCount={featuredCount}
-            />
-          </>
-        )}
+          {!isSearchFocused && (
+            <>
+              <HeaderAlerts />
+              <Categories 
+                categories={categories}
+                selectedCategory={selectedCategory}
+                onCategoryChange={setSelectedCategory}
+                categoryCounts={categoryCounts || {}}
+                assistantsCount={assistants?.length || 0}
+                featuredCount={featuredCount}
+              />
+            </>
+          )}
 
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={`${selectedCategory}-${searchQuery}`}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`${selectedCategory}-${searchQuery}`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <AssistantGrid 
+                assistants={filteredAssistants}
+                onAssistantClick={setSelectedAssistant}
+                isLoading={isLoading}
+              />
+            </motion.div>
+          </AnimatePresence>
+
+          <AssistantDetails
+            assistant={selectedAssistant}
+            onClose={() => setSelectedAssistant(null)}
+          />
+
+          <ExpandableChat
+            size="lg"
+            position="bottom-right"
+            icon={<Bot className="h-6 w-6" />}
           >
-            <AssistantGrid 
-              assistants={filteredAssistants}
-              onAssistantClick={setSelectedAssistant}
-              isLoading={isLoading}
-            />
-          </motion.div>
-        </AnimatePresence>
+            <ExpandableChatHeader className="flex-col text-center justify-center">
+              <h1 className="text-xl font-semibold">Assistant Helper</h1>
+              <p className="text-sm text-muted-foreground">
+                Ask me anything about our AI assistants
+              </p>
+            </ExpandableChatHeader>
 
-        <AssistantDetails
-          assistant={selectedAssistant}
-          onClose={() => setSelectedAssistant(null)}
-        />
+            <ExpandableChatBody>
+              <ChatMessageList>
+                <ChatBubble variant="received">
+                  <ChatBubbleAvatar
+                    src="/path-to-ai-avatar.png"
+                    fallback="AI"
+                  />
+                  <ChatBubbleMessage>
+                    Hello! I'm your Assistant Helper. How can I help you find the perfect AI assistant today?
+                  </ChatBubbleMessage>
+                </ChatBubble>
+              </ChatMessageList>
+            </ExpandableChatBody>
 
-        <ExpandableChat
-          size="lg"
-          position="bottom-right"
-          icon={<Bot className="h-6 w-6" />}
-        >
-          <ExpandableChatHeader className="flex-col text-center justify-center">
-            <h1 className="text-xl font-semibold">Assistant Helper</h1>
-            <p className="text-sm text-muted-foreground">
-              Ask me anything about our AI assistants
-            </p>
-          </ExpandableChatHeader>
-
-          <ExpandableChatBody>
-            <ChatMessageList>
-              <ChatBubble variant="received">
-                <ChatBubbleAvatar
-                  src="/path-to-ai-avatar.png"
-                  fallback="AI"
-                />
-                <ChatBubbleMessage>
-                  Hello! I'm your Assistant Helper. How can I help you find the perfect AI assistant today?
-                </ChatBubbleMessage>
-              </ChatBubble>
-            </ChatMessageList>
-          </ExpandableChatBody>
-
-          <ExpandableChatFooter>
-            <ChatInput
-              placeholder="Type your message..."
-              onSubmit={(value) => {
-                console.log('Message submitted:', value);
-              }}
-            />
-          </ExpandableChatFooter>
-        </ExpandableChat>
+            <ExpandableChatFooter>
+              <ChatInput
+                placeholder="Type your message..."
+                onSubmit={(value) => {
+                  console.log('Message submitted:', value);
+                }}
+              />
+            </ExpandableChatFooter>
+          </ExpandableChat>
+        </div>
       </div>
     </MainLayout>
   );
