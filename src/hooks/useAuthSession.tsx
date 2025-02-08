@@ -89,6 +89,9 @@ export const useAuthSession = () => {
       // [Analysis] Only handle navigation on explicit auth events
       if (event === 'SIGNED_IN') {
         isAuthEvent.current = true;
+      } else if (event === 'SIGNED_OUT') {
+        isAuthEvent.current = true;
+        navigate('/', { replace: true });
       }
 
       if (session?.user) {
@@ -102,10 +105,6 @@ export const useAuthSession = () => {
         }
       } else {
         setUser(null);
-        // [Analysis] Only redirect on explicit sign out
-        if (event === 'SIGNED_OUT') {
-          navigate('/', { replace: true });
-        }
       }
 
       // [Analysis] Reset auth event flag after handling

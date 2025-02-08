@@ -3,8 +3,6 @@ import { lazy, Suspense } from 'react';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { Bot } from 'lucide-react';
 import { LoadingFallback } from '@/components/landing/sections/LoadingFallback';
-import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
 
 // [Analysis] Implementing granular code splitting for optimal initial load
 // [Plan] Monitor component load times and adjust splits if needed
@@ -25,14 +23,6 @@ const ChatComponents = {
 
 export default function Index() {
   const { user, loading } = useAuthSession();
-  const navigate = useNavigate();
-
-  // [Analysis] Handle authenticated users immediately
-  useEffect(() => {
-    if (!loading && user) {
-      navigate('/home', { replace: true });
-    }
-  }, [loading, user, navigate]);
 
   // [Analysis] Early auth check and loading state
   if (loading) {
@@ -101,6 +91,12 @@ export default function Index() {
     );
   }
 
-  // [Analysis] While redirecting, show loading state
-  return <LoadingFallback />;
+  // [Analysis] Show landing page for authenticated users too
+  return (
+    <div className="relative">
+      <Suspense fallback={<LoadingFallback />}>
+        <LandingPage />
+      </Suspense>
+    </div>
+  );
 }
