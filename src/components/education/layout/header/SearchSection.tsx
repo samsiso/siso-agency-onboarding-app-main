@@ -36,7 +36,6 @@ interface SearchEducator {
 export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProps) => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [selectedSkillLevel, setSelectedSkillLevel] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const { data: searchHistory, refetch: refetchHistory } = useQuery({
     queryKey: ['search-history'],
@@ -122,8 +121,6 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
     { label: 'Advanced', color: '#FFA726' }
   ];
 
-  const categories = ['AI', 'Machine Learning', 'Web3', 'Cloud'];
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
@@ -162,35 +159,10 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
       transition={{ delay: 0.3 }}
     >
       <motion.div 
-        className="flex flex-wrap gap-3 justify-center"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.4 }}
-      >
-        {categories.map((category, i) => (
-          <motion.button
-            key={category}
-            onClick={() => setSelectedCategory(category === selectedCategory ? null : category)}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-              selectedCategory === category
-                ? 'bg-gradient-to-r from-siso-red to-siso-orange text-white'
-                : 'bg-gradient-to-r from-siso-red/10 to-siso-orange/10 text-siso-text hover:from-siso-red/20 hover:to-siso-orange/20'
-            }`}
-            whileHover={{ scale: 1.05 }}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4 + (i * 0.1) }}
-          >
-            {category}
-          </motion.button>
-        ))}
-      </motion.div>
-
-      <motion.div 
         className="flex justify-center gap-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
+        transition={{ delay: 0.4 }}
       >
         {skillLevels.map((level) => (
           <Button
@@ -380,10 +352,10 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
                     <h3 className="text-sm font-medium text-white/80">Popular Learning Paths</h3>
                     <div className="grid grid-cols-2 gap-3">
                       {[
-                        { path: "AI Fundamentals → ML Basics → Deep Learning", color: "#FF5722" },
-                        { path: "Web Dev → React → Full Stack", color: "#FF7043" },
-                        { path: "Python → Data Science → AI", color: "#FFA726" },
-                        { path: "Blockchain → Smart Contracts → DApps", color: "#FF9100" },
+                        { path: "Python → Data Science → AI", color: "#FF5722" },
+                        { path: "React → Full Stack → Cloud", color: "#FF7043" },
+                        { path: "UI/UX → Web Design → Dev", color: "#FFA726" },
+                        { path: "Data Analysis → Statistics → ML", color: "#FF9100" },
                       ].map((item, i) => (
                         <motion.div
                           key={i}
@@ -407,4 +379,3 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
     </motion.div>
   );
 };
-
