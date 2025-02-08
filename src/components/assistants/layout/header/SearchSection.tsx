@@ -2,36 +2,30 @@
 import { Search, Command } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { PlaceholdersAndVanishInput } from '@/components/ui/placeholders-and-vanish-input';
-import { useState } from 'react';
-import { useHotkeys } from 'react-hotkeys-hook';
 
 interface SearchSectionProps {
   searchQuery: string;
   onSearchChange: (value: string) => void;
+  isSearchFocused: boolean;
+  onFocus: () => void;
+  onBlur: () => void;
+  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 }
 
-export function SearchSection({ searchQuery, onSearchChange }: SearchSectionProps) {
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
-
-  useHotkeys('mod+k', (event) => {
-    event.preventDefault();
-    const searchInput = document.querySelector('input[type="text"]') as HTMLInputElement;
-    if (searchInput) {
-      searchInput.focus();
-    }
-  });
-
+export function SearchSection({ 
+  searchQuery, 
+  onSearchChange,
+  isSearchFocused,
+  onFocus,
+  onBlur,
+  onSubmit
+}: SearchSectionProps) {
   const searchPlaceholders = [
     "Search for AI assistants...",
     "Find GPT tools...",
     "Discover automation assistants...",
     "Explore coding helpers..."
   ];
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log('Search submitted:', searchQuery);
-  };
 
   return (
     <motion.div 
@@ -45,9 +39,9 @@ export function SearchSection({ searchQuery, onSearchChange }: SearchSectionProp
           placeholders={searchPlaceholders}
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          onSubmit={handleSubmit}
-          onFocus={() => setIsSearchFocused(true)}
-          onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
+          onSubmit={onSubmit}
+          onFocus={onFocus}
+          onBlur={onBlur}
           className="w-full h-14 pl-12 pr-24 bg-gradient-to-r from-siso-text/5 to-siso-text/10 
             border border-siso-text/10 rounded-xl text-lg
             focus:ring-2 focus:ring-siso-orange/30 focus:border-siso-orange/50
