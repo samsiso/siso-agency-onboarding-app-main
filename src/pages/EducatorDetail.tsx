@@ -147,6 +147,7 @@ export default function EducatorDetail() {
               <div className="mt-8">
                 <EducatorVideoSection 
                   educatorId={educator.id}
+                  channelId={educator.channel_id}
                   featuredVideos={featuredVideos}
                   educatorName={educator.name}
                 />

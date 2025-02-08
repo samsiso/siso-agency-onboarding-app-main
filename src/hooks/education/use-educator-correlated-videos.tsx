@@ -32,7 +32,8 @@ export const useEducatorCorrelatedVideos = (channelId: string | undefined) => {
           )
         `)
         .eq('channel_id', channelId)
-        .order('date', { ascending: false });
+        .order('date', { ascending: false })
+        .limit(12); // [Analysis] Limit to 12 videos for performance
 
       if (error) {
         console.error('[useEducatorCorrelatedVideos] Error:', error);
@@ -68,6 +69,8 @@ export const useEducatorCorrelatedVideos = (channelId: string | undefined) => {
         }
       }));
     },
-    enabled: !!channelId
+    enabled: !!channelId,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    gcTime: 10 * 60 * 1000 // Keep unused data for 10 minutes
   });
 };
