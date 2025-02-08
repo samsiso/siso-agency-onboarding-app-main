@@ -1,13 +1,14 @@
+
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CommunityMember } from '../community/types';
 import { CommunityMemberDetails } from '../community/CommunityMemberDetails';
 import { DirectoryFilters } from './directory/DirectoryFilters';
 import { DirectoryHeader } from './directory/DirectoryHeader';
-import { DirectoryList } from './directory/DirectoryList';
 import { DirectoryPagination } from './directory/DirectoryPagination';
 import { FeaturedEducators } from './FeaturedEducators';
 import { usePagination } from '@/hooks/use-pagination';
+import { EducatorCard } from './EducatorCard';
 
 interface EducatorsDirectoryProps {
   members?: CommunityMember[];
@@ -15,7 +16,7 @@ interface EducatorsDirectoryProps {
   searchQuery: string;
 }
 
-const ITEMS_PER_PAGE = 20;
+const ITEMS_PER_PAGE = 12;
 
 export const EducatorsDirectory = ({ 
   members, 
@@ -35,7 +36,8 @@ export const EducatorsDirectory = ({
     : true
   );
 
-  // [Analysis] Separate non-featured educators for main list
+  // [Analysis] Separate featured educators for special rendering
+  const featuredMembers = filteredMembers?.filter(member => member.is_featured) || [];
   const nonFeaturedMembers = filteredMembers?.filter(member => !member.is_featured) || [];
 
   const totalPages = Math.ceil((nonFeaturedMembers?.length || 0) / ITEMS_PER_PAGE);
@@ -51,10 +53,10 @@ export const EducatorsDirectory = ({
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {[...Array(20)].map((_, i) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {[...Array(12)].map((_, i) => (
           <div key={i} className="animate-pulse">
-            <div className="h-48 bg-siso-bg-alt rounded-lg"></div>
+            <div className="h-[480px] bg-siso-bg-alt rounded-lg"></div>
           </div>
         ))}
       </div>
@@ -68,11 +70,21 @@ export const EducatorsDirectory = ({
       exit={{ opacity: 0, y: -20 }}
       className="space-y-8"
     >
-      {members && (
-        <FeaturedEducators 
-          educators={members}
-          onEducatorSelect={setSelectedMember}
-        />
+      {featuredMembers.length > 0 && (
+        <section>
+          <FeaturedEducators 
+            educators={featuredMembers.map(member => ({
+              id: member.id,
+              name: member.name,
+              channel_avatar_url: member.profile_image_url,
+              channel_banner_url: member.youtube_banner_url,
+              number_of_subscribers: member.member_count,
+              specialization: member.specialization || [],
+              is_featured: member.is_featured
+            }))}
+            isLoading={isLoading}
+          />
+        </section>
       )}
 
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
@@ -84,11 +96,47 @@ export const EducatorsDirectory = ({
       </div>
 
       <AnimatePresence mode="wait">
-        <DirectoryList
-          members={currentMembers}
-          viewMode="grid"
-          onMemberSelect={setSelectedMember}
-        />
+        <motion.div
+          variants={{
+            hidden: { opacity: 0 },
+            show: {
+              opacity: 1,
+              transition: {
+                staggerChildren: 0.1
+              }
+            }
+          }}
+          initial="hidden"
+          animate="show"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        >
+          {currentMembers.map((member) => (
+            <motion.div
+              key={member.id}
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                show: { opacity: 1, y: 0 }
+              }}
+            >
+              <EducatorCard
+                educator={{
+                  name: member.name,
+                  description: member.description,
+                  profile_image_url: member.profile_image_url,
+                  channel_avatar_url: member.youtube_avatar_url,
+                  channel_banner_url: member.youtube_banner_url,
+                  number_of_subscribers: member.member_count,
+                  channel_total_videos: member.contribution_count,
+                  specialization: member.specialization,
+                  channel_location: member.location,
+                  slug: member.slug || '',
+                  is_featured: member.is_featured
+                }}
+                onClick={() => setSelectedMember(member)}
+              />
+            </motion.div>
+          ))}
+        </motion.div>
       </AnimatePresence>
 
       {totalPages > 1 && (
