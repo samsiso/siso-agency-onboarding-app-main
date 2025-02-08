@@ -1,7 +1,8 @@
+
 project_id = "fzuwsjxjymwcjsbpwfsl"
 
 [functions.chat-with-assistant]
 verify_jwt = false
 
-[functions.fetch-news]
+[functions.sync-educator-videos]
 verify_jwt = false
