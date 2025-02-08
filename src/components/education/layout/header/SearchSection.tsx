@@ -1,3 +1,4 @@
+
 import { Search, Command, Mic, Clock, ChevronRight, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PlaceholdersAndVanishInput } from '@/components/ui/placeholders-and-vanish-input';
@@ -289,15 +290,15 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
                             className="flex items-start gap-3 p-3 rounded-lg hover:bg-white/5 cursor-pointer group"
                             whileHover={{ scale: 1.02 }}
                           >
-                            <div className="relative h-12 w-12">
+                            <Avatar className="h-12 w-12 border-2 border-siso-orange/20">
                               <AvatarImage
                                 src={educator.channel_avatar_url}
-                                className="w-12 h-12 rounded-full border-2 border-siso-orange/20"
+                                alt={educator.name}
                               />
-                              <AvatarFallback className="w-12 h-12 rounded-full border-2 border-siso-orange/20">
+                              <AvatarFallback>
                                 {educator.name[0]}
                               </AvatarFallback>
-                            </div>
+                            </Avatar>
                             <div className="flex-1 min-w-0">
                               <h4 className="font-medium text-white truncate">{educator.name}</h4>
                               <p className="text-xs text-siso-text/60">
@@ -352,15 +353,15 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
                             <div className="mt-2 space-y-1">
                               <h4 className="text-sm font-medium text-white line-clamp-2">{video.title}</h4>
                               <div className="flex items-center gap-2">
-                                <div className="relative h-5 w-5">
+                                <Avatar className="h-5 w-5">
                                   <AvatarImage
                                     src={video.education_creators.channel_avatar_url}
-                                    className="w-5 h-5 rounded-full"
+                                    alt={video.education_creators.name}
                                   />
-                                  <AvatarFallback className="w-5 h-5 rounded-full">
+                                  <AvatarFallback>
                                     {video.education_creators.name[0]}
                                   </AvatarFallback>
-                                </div>
+                                </Avatar>
                                 <span className="text-xs text-siso-text/60">
                                   {video.education_creators.name}
                                 </span>
@@ -406,3 +407,4 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
     </motion.div>
   );
 };
+
