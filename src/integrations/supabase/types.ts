@@ -162,6 +162,95 @@ export type Database = {
           },
         ]
       }
+      assistant_analytics: {
+        Row: {
+          assistant_id: string
+          average_rating: number | null
+          created_at: string | null
+          id: string
+          interactions: number | null
+          searches: number | null
+          updated_at: string | null
+          views: number | null
+        }
+        Insert: {
+          assistant_id: string
+          average_rating?: number | null
+          created_at?: string | null
+          id?: string
+          interactions?: number | null
+          searches?: number | null
+          updated_at?: string | null
+          views?: number | null
+        }
+        Update: {
+          assistant_id?: string
+          average_rating?: number | null
+          created_at?: string | null
+          id?: string
+          interactions?: number | null
+          searches?: number | null
+          updated_at?: string | null
+          views?: number | null
+        }
+        Relationships: []
+      }
+      assistant_collection_items: {
+        Row: {
+          assistant_id: string
+          collection_id: string | null
+          created_at: string | null
+          id: string
+        }
+        Insert: {
+          assistant_id: string
+          collection_id?: string | null
+          created_at?: string | null
+          id?: string
+        }
+        Update: {
+          assistant_id?: string
+          collection_id?: string | null
+          created_at?: string | null
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assistant_collection_items_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "assistant_collections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assistant_collections: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_featured: boolean | null
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_featured?: boolean | null
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_featured?: boolean | null
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       automations: {
         Row: {
           category: string
@@ -1331,6 +1420,33 @@ export type Database = {
           website_url?: string | null
           youtube_url?: string | null
           youtube_videos?: Json | null
+        }
+        Relationships: []
+      }
+      user_assistant_interactions: {
+        Row: {
+          assistant_id: string
+          created_at: string | null
+          id: string
+          interaction_type: string
+          metadata: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          assistant_id: string
+          created_at?: string | null
+          id?: string
+          interaction_type: string
+          metadata?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          assistant_id?: string
+          created_at?: string | null
+          id?: string
+          interaction_type?: string
+          metadata?: Json | null
+          user_id?: string | null
         }
         Relationships: []
       }
