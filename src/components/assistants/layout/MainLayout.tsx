@@ -9,13 +9,12 @@ interface MainLayoutProps {
 
 export function MainLayout({ children }: MainLayoutProps) {
   return (
-    <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
+    <div className="flex min-h-screen w-full bg-black">
       <Sidebar />
-      <div className="flex-1 p-8 overflow-y-auto">
-        <div className="max-w-7xl mx-auto space-y-8">
-          {children}
-        </div>
-      </div>
+      <main className="flex-1 overflow-y-auto">
+        {children}
+      </main>
     </div>
   );
 }
+
