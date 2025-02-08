@@ -433,6 +433,7 @@ export type Database = {
       }
       education_creators: {
         Row: {
+          auto_feature_videos: boolean | null
           categories: string[] | null
           channel_avatar_url: string | null
           channel_banner_url: string | null
@@ -453,6 +454,7 @@ export type Database = {
           id: string
           implementation_guides: Json | null
           is_featured: boolean | null
+          last_sync_id: string | null
           last_synced_at: string | null
           member_count: number | null
           member_type: string | null
@@ -478,6 +480,7 @@ export type Database = {
           youtube_videos: Json | null
         }
         Insert: {
+          auto_feature_videos?: boolean | null
           categories?: string[] | null
           channel_avatar_url?: string | null
           channel_banner_url?: string | null
@@ -498,6 +501,7 @@ export type Database = {
           id?: string
           implementation_guides?: Json | null
           is_featured?: boolean | null
+          last_sync_id?: string | null
           last_synced_at?: string | null
           member_count?: number | null
           member_type?: string | null
@@ -523,6 +527,7 @@ export type Database = {
           youtube_videos?: Json | null
         }
         Update: {
+          auto_feature_videos?: boolean | null
           categories?: string[] | null
           channel_avatar_url?: string | null
           channel_banner_url?: string | null
@@ -543,6 +548,7 @@ export type Database = {
           id?: string
           implementation_guides?: Json | null
           is_featured?: boolean | null
+          last_sync_id?: string | null
           last_synced_at?: string | null
           member_count?: number | null
           member_type?: string | null
@@ -567,7 +573,15 @@ export type Database = {
           youtube_url?: string | null
           youtube_videos?: Json | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "education_creators_last_sync_id_fkey"
+            columns: ["last_sync_id"]
+            isOneToOne: false
+            referencedRelation: "video_sync_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       educator_chat_threads: {
         Row: {
@@ -1617,6 +1631,53 @@ export type Database = {
         }
         Relationships: []
       }
+      video_sync_jobs: {
+        Row: {
+          created_at: string | null
+          creator_id: string | null
+          error_message: string | null
+          id: string
+          last_page_token: string | null
+          status: string | null
+          sync_options: Json | null
+          synced_videos: number | null
+          total_videos: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          creator_id?: string | null
+          error_message?: string | null
+          id?: string
+          last_page_token?: string | null
+          status?: string | null
+          sync_options?: Json | null
+          synced_videos?: number | null
+          total_videos?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          creator_id?: string | null
+          error_message?: string | null
+          id?: string
+          last_page_token?: string | null
+          status?: string | null
+          sync_options?: Json | null
+          synced_videos?: number | null
+          total_videos?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_sync_jobs_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "education_creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       wallet_nonces: {
         Row: {
           created_at: string | null
@@ -1801,6 +1862,12 @@ export type Database = {
       handle_onboarding_completion: {
         Args: {
           user_id: string
+        }
+        Returns: undefined
+      }
+      update_creator_featured_videos: {
+        Args: {
+          creator_id: string
         }
         Returns: undefined
       }
