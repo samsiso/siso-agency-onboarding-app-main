@@ -1,4 +1,3 @@
-
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Video } from '@/components/education/types';
@@ -10,8 +9,7 @@ interface Educator {
   specialization: string[];
   profile_image_url: string;
   channel_avatar_url: string;
-  youtube_avatar_url: string;
-  youtube_banner_url: string;
+  channel_banner_url: string;
   number_of_subscribers: number;
   channel_total_videos: number;
   channel_location: string;
@@ -44,8 +42,7 @@ export const useEducatorsList = (searchQuery: string) => {
           specialization,
           profile_image_url,
           channel_avatar_url,
-          youtube_avatar_url,
-          youtube_banner_url,
+          channel_banner_url,
           number_of_subscribers,
           channel_total_videos,
           channel_location,
@@ -73,9 +70,27 @@ export const useEducatorsList = (searchQuery: string) => {
         console.error('Error fetching educators:', error);
         throw error;
       }
+
+      // Transform the data to match Educator type
+      const educators = (data || []).map(item => ({
+        id: item.id,
+        name: item.name,
+        description: item.description || '',
+        specialization: item.specialization || [],
+        profile_image_url: item.profile_image_url || '',
+        channel_avatar_url: item.channel_avatar_url || '',
+        channel_banner_url: item.channel_banner_url || '',
+        number_of_subscribers: item.number_of_subscribers || 0,
+        channel_total_videos: item.channel_total_videos || 0,
+        channel_location: item.channel_location || '',
+        slug: item.slug || '',
+        featured_videos: item.featured_videos || [],
+        is_featured: item.is_featured || false,
+        member_count: item.member_count || 0
+      }));
       
       return {
-        educators: data || [],
+        educators,
         nextCursor: data?.length === 12 ? data[data.length - 1].id : undefined
       };
     },

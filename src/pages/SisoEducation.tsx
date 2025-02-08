@@ -42,7 +42,7 @@ export default function SisoEducation() {
           <EducationHeader 
             stats={{
               totalEducators: members?.length || 0,
-              totalVideos: members?.reduce((acc, member) => acc + (member.contribution_count || 0), 0) || 0,
+              totalVideos: members?.reduce((acc, member) => acc + (member.channel_total_videos || 0), 0) || 0,
               totalStudents: members?.reduce((acc, member) => acc + (member.member_count || 0), 0) || 0
             }}
             searchQuery={searchQuery}
