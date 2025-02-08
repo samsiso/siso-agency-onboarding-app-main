@@ -128,7 +128,7 @@ export const EducatorsDirectory = ({
                   number_of_subscribers: member.member_count,
                   channel_total_videos: member.contribution_count,
                   specialization: member.specialization,
-                  channel_location: member.location,
+                  channel_location: member.channel_location,
                   slug: member.slug || '',
                   is_featured: member.is_featured
                 }}
