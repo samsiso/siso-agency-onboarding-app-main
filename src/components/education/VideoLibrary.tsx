@@ -26,6 +26,7 @@ export const VideoLibrary = ({
   filterBySeries = false
 }: VideoLibraryProps) => {
   const [localSearchQuery] = useState(searchQuery);
+  const isSearchActive = !!searchQuery;
 
   // [Analysis] Query for matching educators when searching
   const { data: matchingEducators, isLoading: educatorsLoading } = useQuery({
@@ -42,7 +43,7 @@ export const VideoLibrary = ({
       if (error) throw error;
       return data;
     },
-    enabled: !!searchQuery,
+    enabled: isSearchActive,
   });
 
   const {
@@ -62,15 +63,6 @@ export const VideoLibrary = ({
   const isLoading = videosLoading || educatorsLoading;
   const allVideos = (data?.pages.flat() || []) as Video[];
   
-  console.log('[VideoLibrary] Current state:', {
-    isLoading,
-    videosCount: allVideos.length,
-    hasNextPage,
-    error: error ? (error as Error).message : null,
-    searchQuery,
-    matchingEducators: matchingEducators?.length
-  });
-
   if (error) {
     console.error('[VideoLibrary] Error state:', error);
     return (
@@ -83,12 +75,24 @@ export const VideoLibrary = ({
 
   return (
     <div className="space-y-8">
+      {/* Show search results header when searching */}
+      {isSearchActive && (
+        <div className="text-siso-text">
+          <h2 className="text-xl font-semibold mb-2">
+            Search Results for "{searchQuery}"
+          </h2>
+          <p className="text-sm text-siso-text/70">
+            Found {allVideos.length} videos and {matchingEducators?.length || 0} educators
+          </p>
+        </div>
+      )}
+
       {/* Show matching educators if searching */}
-      {searchQuery && matchingEducators && matchingEducators.length > 0 && (
+      {isSearchActive && matchingEducators && matchingEducators.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="space-y-4"
+          className="space-y-4 pb-8 border-b border-siso-border"
         >
           <h2 className="text-2xl font-semibold text-siso-text-bold">
             Matching Educators
@@ -118,17 +122,26 @@ export const VideoLibrary = ({
         </motion.div>
       )}
 
-      <VideoGrid
-        videos={allVideos}
-        featuredVideos={[]} // We'll add featured videos later
-        isLoading={isLoading}
-      />
+      {/* Show videos section */}
+      <div className="space-y-4">
+        {isSearchActive && (
+          <h2 className="text-2xl font-semibold text-siso-text-bold">
+            Matching Videos
+          </h2>
+        )}
+        
+        <VideoGrid
+          videos={allVideos}
+          featuredVideos={[]}
+          isLoading={isLoading}
+        />
 
-      <LoadMore
-        hasNextPage={hasNextPage}
-        isFetchingNextPage={isFetchingNextPage}
-        fetchNextPage={fetchNextPage}
-      />
+        <LoadMore
+          hasNextPage={hasNextPage}
+          isFetchingNextPage={isFetchingNextPage}
+          fetchNextPage={fetchNextPage}
+        />
+      </div>
     </div>
   );
 };

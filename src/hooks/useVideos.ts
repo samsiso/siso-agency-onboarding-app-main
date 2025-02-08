@@ -13,7 +13,6 @@ interface UseVideosProps {
   filterBySeries?: boolean;
 }
 
-// [Analysis] Optimize query performance and add better error handling
 export const useVideos = ({ 
   selectedEducator,
   searchQuery,
@@ -61,7 +60,7 @@ export const useVideos = ({
           .range(pageParam * ITEMS_PER_PAGE, (pageParam + 1) * ITEMS_PER_PAGE - 1)
           .order('date', { ascending: false });
 
-        const { data: videos, error: videosError, count } = await query;
+        const { data: videos, error: videosError } = await query;
 
         if (videosError) {
           console.error('[useVideos] Error fetching videos:', videosError);
@@ -72,12 +71,6 @@ export const useVideos = ({
           console.log('[useVideos] No videos returned from query');
           return [];
         }
-
-        console.log('[useVideos] Fetched videos:', {
-          count: videos.length,
-          firstVideoId: videos[0]?.id,
-          lastVideoId: videos[videos.length - 1]?.id
-        });
 
         // 2. Then get creator data for these videos
         const channelIds = [...new Set(videos.map(v => v.channel_id))];
@@ -98,14 +91,9 @@ export const useVideos = ({
           (creators || []).map(c => [c.channel_id, c])
         );
 
-        // [Analysis] Transform the data with detailed logging
+        // Transform the data with detailed logging
         const transformedVideos = videos.map(video => {
           const creator = creatorMap.get(video.channel_id);
-          console.log('[useVideos] Transforming video:', {
-            videoId: video.id,
-            hasCreator: !!creator,
-            creatorName: creator?.name || video.channel_id
-          });
           
           return {
             id: video.id,
@@ -136,7 +124,6 @@ export const useVideos = ({
         return transformedVideos;
       } catch (error) {
         console.error('[useVideos] Critical error in query function:', error);
-        // Rethrow to trigger error boundary
         throw error;
       }
     },
@@ -152,15 +139,5 @@ export const useVideos = ({
     },
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
     gcTime: 10 * 60 * 1000,   // Keep unused data for 10 minutes
-    meta: {
-      onSettled: (data, error) => {
-        if (error) {
-          console.error('[useVideos] Query settled with error:', error);
-          toast.error('Failed to load videos. Please try refreshing the page.');
-        } else {
-          console.log('[useVideos] Query settled successfully');
-        }
-      }
-    }
   });
 };
