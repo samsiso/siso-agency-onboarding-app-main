@@ -31,11 +31,11 @@ export const SearchResultsDropdown = ({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 10 }}
-      className="absolute mt-2 w-full max-h-[80vh] bg-black/90 border border-[#FF5722]/20 rounded-xl backdrop-blur-sm shadow-xl overflow-hidden"
-      style={{ maxHeight: 'calc(100vh - 200px)' }}
+      className="fixed inset-0 top-20 z-50 bg-black/90 backdrop-blur-md"
+      style={{ height: 'calc(100vh - 5rem)' }}
     >
       <ScrollArea className="h-full">
-        <div className="p-4 space-y-6">
+        <div className="mx-auto max-w-7xl px-4 py-8 space-y-8">
           {searchHistory && (
             <SearchHistory
               history={searchHistory}
@@ -43,25 +43,25 @@ export const SearchResultsDropdown = ({
             />
           )}
 
-          <div className="space-y-3">
-            <h3 className="text-sm font-medium text-white/80">Featured Educators</h3>
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-white/90">Featured Educators</h3>
             <FeaturedEducators
               educators={featuredEducators}
               isLoading={educatorsLoading}
             />
           </div>
 
-          <div className="space-y-3">
-            <h3 className="text-sm font-medium text-white/80">Popular Videos</h3>
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-white/90">Popular Videos</h3>
             <PopularVideos
               videos={recentVideos}
               isLoading={videosLoading}
             />
           </div>
 
-          <div className="space-y-3">
-            <h3 className="text-sm font-medium text-white/80">Popular Learning Paths</h3>
-            <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-white/90">Popular Learning Paths</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {[
                 { path: "Python → Data Science → AI", color: "#FF5722" },
                 { path: "React → Full Stack → Cloud", color: "#FF7043" },
@@ -70,11 +70,11 @@ export const SearchResultsDropdown = ({
               ].map((item, i) => (
                 <motion.div
                   key={i}
-                  className="flex items-center gap-2 p-3 rounded-lg hover:bg-white/5 cursor-pointer group"
+                  className="flex items-center gap-3 p-4 rounded-lg bg-white/5 hover:bg-white/10 cursor-pointer group transition-colors"
                   whileHover={{ scale: 1.02 }}
                 >
-                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
-                  <span className="text-sm text-white/70 group-hover:text-white/90 transition-colors">
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
+                  <span className="text-base text-white/80 group-hover:text-white transition-colors">
                     {item.path}
                   </span>
                 </motion.div>
