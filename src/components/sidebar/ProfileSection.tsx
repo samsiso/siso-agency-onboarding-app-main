@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trophy, Star, ChevronDown, LogOut } from 'lucide-react';
@@ -12,22 +13,29 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { usePoints } from '@/hooks/usePoints';
+import { useBasicUserData } from '@/hooks/useBasicUserData';
 
 interface ProfileSectionProps {
-  userId: string;
-  userEmail: string;
-  fullName?: string | null;
-  avatarUrl?: string | null;
   collapsed: boolean;
 }
 
-export const ProfileSection = ({ userId, userEmail, fullName, avatarUrl, collapsed }: ProfileSectionProps) => {
+export const ProfileSection = ({ collapsed }: ProfileSectionProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { points, rank } = usePoints(userId);
+  const { userData, loading } = useBasicUserData();
+  const { points, rank } = usePoints(userData.id || '');
 
-  const displayName = fullName || userEmail?.split('@')[0] || 'User';
+  // [Analysis] Show loading state while user data is being fetched
+  if (loading) {
+    return (
+      <div className="w-full h-12 animate-pulse bg-siso-text/5 rounded-lg" />
+    );
+  }
+
+  if (!userData.id) return null;
+
+  const displayName = userData.fullName || userData.email?.split('@')[0] || 'User';
 
   const handleSignOut = async () => {
     try {
@@ -58,9 +66,9 @@ export const ProfileSection = ({ userId, userEmail, fullName, avatarUrl, collaps
         className="w-full p-2"
         onClick={() => navigate('/profile')}
       >
-        {avatarUrl ? (
+        {userData.avatarUrl ? (
           <img
-            src={supabase.storage.from('avatars').getPublicUrl(avatarUrl).data.publicUrl}
+            src={supabase.storage.from('avatars').getPublicUrl(userData.avatarUrl).data.publicUrl}
             alt="Profile"
             className="w-8 h-8 rounded-full"
           />
@@ -84,9 +92,9 @@ export const ProfileSection = ({ userId, userEmail, fullName, avatarUrl, collaps
           disabled={isLoading}
         >
           <div className="flex items-center gap-3 w-full">
-            {avatarUrl ? (
+            {userData.avatarUrl ? (
               <img
-                src={supabase.storage.from('avatars').getPublicUrl(avatarUrl).data.publicUrl}
+                src={supabase.storage.from('avatars').getPublicUrl(userData.avatarUrl).data.publicUrl}
                 alt="Profile"
                 className="w-10 h-10 rounded-full"
               />

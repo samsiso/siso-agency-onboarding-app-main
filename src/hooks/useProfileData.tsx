@@ -1,9 +1,9 @@
 
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
+// [Analysis] Separated profile data concerns from auth logic
 export interface ProfileFormData {
   fullName: string;
   businessName: string;
@@ -24,7 +24,6 @@ export const useProfileData = () => {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
-  const navigate = useNavigate();
   const { toast } = useToast();
 
   const [formData, setFormData] = useState<ProfileFormData>({
@@ -47,6 +46,7 @@ export const useProfileData = () => {
 
     const getProfile = async () => {
       try {
+        // [Analysis] Only fetch profile if we have a session
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
@@ -54,18 +54,7 @@ export const useProfileData = () => {
           return;
         }
         
-        if (!session && !loading) {
-          console.log('[Profile] No session found, redirecting to auth');
-          toast({
-            variant: "destructive",
-            title: "Authentication Required",
-            description: "Please sign in to view your profile.",
-          });
-          navigate('/auth');
-          return;
-        }
-
-        if (session && isSubscribed) {
+        if (session?.user && isSubscribed) {
           console.log('[Profile] Session found:', session.user.id);
           setUser(session.user);
 
@@ -118,7 +107,7 @@ export const useProfileData = () => {
     return () => {
       isSubscribed = false;
     };
-  }, [navigate]);
+  }, []);
 
   const handleFormChange = (field: string, value: string) => {
     setFormData(prev => ({
