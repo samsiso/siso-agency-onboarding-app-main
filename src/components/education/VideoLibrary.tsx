@@ -7,7 +7,6 @@ import { Video } from './types';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { SearchHistory } from './layout/header/components/SearchHistory';
 import { FeaturedEducators } from './layout/header/components/FeaturedEducators';
 import { PopularVideos } from './layout/header/components/PopularVideos';
 
@@ -30,22 +29,6 @@ export const VideoLibrary = ({
 }: VideoLibraryProps) => {
   const [localSearchQuery] = useState(searchQuery);
   const isSearchActive = !!searchQuery;
-
-  // [Analysis] Query for search history when searching
-  const { data: searchHistory, refetch: refetchHistory } = useQuery({
-    queryKey: ['search-history'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('user_search_history')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(5);
-
-      if (error) throw error;
-      return data;
-    },
-    enabled: isSearchActive,
-  });
 
   // [Analysis] Query for featured educators during search
   const { data: featuredEducators, isLoading: educatorsLoading } = useQuery({
@@ -137,15 +120,6 @@ export const VideoLibrary = ({
           </p>
         </div>
 
-        {searchHistory && (
-          <SearchHistory
-            history={searchHistory}
-            onHistoryCleared={async () => {
-              await refetchHistory();
-            }}
-          />
-        )}
-
         {featuredEducators && (
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-white/90">Featured Educators</h3>
@@ -209,3 +183,4 @@ export const VideoLibrary = ({
     </div>
   );
 };
+
