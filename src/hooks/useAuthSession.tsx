@@ -4,17 +4,16 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-// [Analysis] Centralized auth state management with debounced profile check
+// [Analysis] Centralized auth state management with optimized profile checks and caching
 export const useAuthSession = () => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // [Analysis] Initialize auth state on mount with debounced check
+  // [Analysis] Initialize auth state on mount with cached profile check
   useEffect(() => {
     let isSubscribed = true;
-    let profileCheckTimeout: NodeJS.Timeout;
 
     const initializeAuth = async () => {
       try {
@@ -22,12 +21,13 @@ export const useAuthSession = () => {
         if (isSubscribed) {
           if (session?.user) {
             setUser(session.user);
-            // [Analysis] Check profile immediately on session restore
+            // [Analysis] Only check profile on initial load
             const profile = await checkProfile(session.user.id);
             if (!profile) {
               console.error('No profile found on session restore');
               await supabase.auth.signOut();
               setUser(null);
+              navigate('/', { replace: true });
             }
           } else {
             setUser(null);
@@ -40,40 +40,38 @@ export const useAuthSession = () => {
       }
     };
 
-    // [Analysis] Set up auth state listener with cleanup
+    // [Analysis] Set up auth state listener with optimized navigation
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state changed:', event, session?.user?.id);
-      if (isSubscribed) {
-        if (session?.user) {
-          setUser(session.user);
-          // [Analysis] Check profile on auth state change
-          if (event === 'SIGNED_IN') {
-            const profile = await checkProfile(session.user.id);
-            if (!profile) {
-              console.error('No profile found after sign in');
-              await supabase.auth.signOut();
-              setUser(null);
-            } else {
-              // [Analysis] Navigate to home on successful sign in
-              navigate('/home', { replace: true });
-            }
+      
+      if (!isSubscribed) return;
+
+      if (session?.user) {
+        setUser(session.user);
+        // [Analysis] Only check profile and navigate on explicit sign in
+        if (event === 'SIGNED_IN') {
+          const profile = await checkProfile(session.user.id);
+          if (!profile) {
+            console.error('No profile found after sign in');
+            await supabase.auth.signOut();
+            setUser(null);
+            navigate('/', { replace: true });
           }
-        } else {
-          setUser(null);
-          // [Analysis] Navigate to welcome page on sign out
+        }
+      } else {
+        setUser(null);
+        // [Analysis] Only navigate on explicit sign out
+        if (event === 'SIGNED_OUT') {
           navigate('/', { replace: true });
         }
-        setLoading(false);
       }
+      setLoading(false);
     });
 
     initializeAuth();
 
     return () => {
       isSubscribed = false;
-      if (profileCheckTimeout) {
-        clearTimeout(profileCheckTimeout);
-      }
       subscription.unsubscribe();
     };
   }, [navigate]);
@@ -104,10 +102,6 @@ export const useAuthSession = () => {
       console.log('Handling sign in for session:', session);
       setUser(session.user);
       
-      // [Analysis] Wait for profile creation with proper timeout
-      console.log('Waiting for profile creation...');
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
       const profile = await checkProfile(session.user.id);
       
       if (profile) {
@@ -119,7 +113,7 @@ export const useAuthSession = () => {
         navigate('/home', { replace: true });
         return true;
       } else {
-        console.error('Profile not found after waiting');
+        console.error('Profile not found after sign in');
         throw new Error('Profile creation failed');
       }
     } catch (error) {
