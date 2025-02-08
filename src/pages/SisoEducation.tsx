@@ -17,6 +17,7 @@ import { EducationHeader } from '@/components/education/layout/EducationHeader';
 import { EducationToolbar } from '@/components/education/layout/EducationToolbar';
 import { EducationContent } from '@/components/education/layout/EducationContent';
 import { useEducatorsList } from '@/hooks/use-education-queries';
+import { useEducationStats } from '@/hooks/use-education-stats';
 
 export default function SisoEducation() {
   const [activeSection, setActiveSection] = useState<'videos' | 'educators'>('videos');
@@ -24,15 +25,20 @@ export default function SisoEducation() {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   const { 
-    data,
-    isLoading,
+    data: educatorData,
+    isLoading: isEducatorsLoading,
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage
   } = useEducatorsList(searchQuery);
 
+  const {
+    data: stats,
+    isLoading: isStatsLoading
+  } = useEducationStats();
+
   // [Analysis] Flatten pages data for infinite scroll
-  const members = data?.pages.flatMap(page => page.educators) || [];
+  const members = educatorData?.pages.flatMap(page => page.educators) || [];
 
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
@@ -41,9 +47,9 @@ export default function SisoEducation() {
         <div className="max-w-7xl mx-auto space-y-8">
           <EducationHeader 
             stats={{
-              totalEducators: members?.length || 0,
-              totalVideos: members?.reduce((acc, member) => acc + (member.channel_total_videos || 0), 0) || 0,
-              totalStudents: members?.reduce((acc, member) => acc + (member.member_count || 0), 0) || 0
+              totalEducators: stats?.totalEducators || 0,
+              totalVideos: stats?.totalVideos || 0,
+              totalStudents: stats?.totalStudents || 0
             }}
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
@@ -63,7 +69,7 @@ export default function SisoEducation() {
             activeSection={activeSection}
             searchQuery={searchQuery}
             members={members}
-            isLoading={isLoading}
+            isLoading={isEducatorsLoading}
             hasNextPage={hasNextPage}
             fetchNextPage={fetchNextPage}
             isFetchingNextPage={isFetchingNextPage}
