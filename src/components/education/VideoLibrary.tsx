@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { VideoGrid } from './video-library/VideoGrid';
 import { LoadMore } from './video-library/LoadMore';
@@ -65,7 +64,10 @@ export const VideoLibrary = ({
           duration,
           viewCount,
           channel_id,
-          education_creators!inner(name, channel_avatar_url)
+          education_creators!youtube_videos_channel_id_fkey (
+            name,
+            channel_avatar_url
+          )
         `)
         .limit(6);
 
@@ -183,4 +185,3 @@ export const VideoLibrary = ({
     </div>
   );
 };
-

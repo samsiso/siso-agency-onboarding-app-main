@@ -28,7 +28,7 @@ export const useVideoDetail = (videoId: string) => {
           viewCount,
           date,
           channel_id,
-          education_creators:channel_id (
+          education_creators!youtube_videos_channel_id_fkey (
             name,
             channel_avatar_url,
             description

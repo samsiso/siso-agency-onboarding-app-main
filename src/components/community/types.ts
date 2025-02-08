@@ -20,11 +20,12 @@ export interface CommunityMember {
   rank?: string | null;
   contribution_count?: number;
   referral_count?: number;
-  youtube_avatar_url?: string;  // Added
-  youtube_banner_url?: string;  // Added
+  youtube_avatar_url?: string;  
+  youtube_banner_url?: string;  
   number_of_subscribers?: number;
-  channel_total_videos?: number; // Added
-  channel_location?: string;     // Added
+  channel_total_videos?: number;
+  channel_location?: string;    
   is_featured?: boolean;
   slug: string;
+  sync_status?: 'pending' | 'in_progress' | 'completed' | 'failed';
 }
