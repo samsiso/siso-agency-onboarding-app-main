@@ -1,19 +1,25 @@
 
-import { Clock, X } from 'lucide-react';
+import { Clock, X, Search, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { motion } from 'framer-motion';
 
 interface SearchHistoryProps {
   history: Array<{
     id: string;
     query: string;
     created_at: string;
-    result_type: string;  // Accept any string from DB
+    result_type: string;
   }>;
   onHistoryCleared: () => Promise<void>;
+  onSearchSelect?: (query: string) => void;
 }
 
-export const SearchHistory = ({ history, onHistoryCleared }: SearchHistoryProps) => {
+export const SearchHistory = ({ 
+  history, 
+  onHistoryCleared,
+  onSearchSelect 
+}: SearchHistoryProps) => {
   const clearSearchHistory = async (id: string) => {
     try {
       await supabase
@@ -21,42 +27,101 @@ export const SearchHistory = ({ history, onHistoryCleared }: SearchHistoryProps)
         .delete()
         .eq('id', id);
       await onHistoryCleared();
-      toast.success('Search history item removed');
+      toast.success('Search removed from history');
     } catch (error) {
       console.error('Error clearing search history:', error);
       toast.error('Failed to clear search history');
     }
   };
 
-  // Filter valid result types and map the data
-  const validHistory = history.filter(item => 
-    ['video', 'path', 'educator'].includes(item.result_type)
-  );
+  // [Analysis] Group history items by date
+  const groupedHistory = history.reduce((groups: any, item) => {
+    const date = new Date(item.created_at).toLocaleDateString();
+    if (!groups[date]) {
+      groups[date] = [];
+    }
+    groups[date].push(item);
+    return groups;
+  }, {});
 
-  if (!validHistory || validHistory.length === 0) return null;
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.05
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, x: -20 },
+    show: { opacity: 1, x: 0 }
+  };
+
+  if (!history || history.length === 0) {
+    return (
+      <div className="p-6 text-center text-siso-text/60">
+        <Search className="w-8 h-8 mx-auto mb-3 opacity-50" />
+        <p>No recent searches</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-3">
-      <h3 className="text-sm font-medium text-white/80">Recent Searches</h3>
-      <div className="space-y-2">
-        {validHistory.map((item) => (
-          <div
-            key={item.id}
-            className="flex items-center justify-between group px-3 py-2 rounded-lg hover:bg-white/5"
-          >
-            <div className="flex items-center gap-3">
-              <Clock className="w-4 h-4 text-siso-text/60" />
-              <span className="text-sm text-siso-text/80">{item.query}</span>
-            </div>
-            <button
-              onClick={() => clearSearchHistory(item.id)}
-              className="opacity-0 group-hover:opacity-100 transition-opacity"
-            >
-              <X className="w-4 h-4 text-siso-text/60 hover:text-siso-red" />
-            </button>
+    <motion.div 
+      variants={containerVariants}
+      initial="hidden"
+      animate="show"
+      className="space-y-6"
+    >
+      {Object.entries(groupedHistory).map(([date, items]: [string, any]) => (
+        <div key={date} className="space-y-2">
+          <h3 className="text-sm font-medium text-siso-text/60 px-3">{date}</h3>
+          <div className="space-y-1">
+            {items.map((item: any) => (
+              <motion.div
+                key={item.id}
+                variants={itemVariants}
+                className="flex items-center justify-between group px-3 py-2 rounded-lg 
+                  hover:bg-white/5 cursor-pointer"
+                onClick={() => onSearchSelect?.(item.query)}
+              >
+                <div className="flex items-center gap-3 flex-1">
+                  <Clock className="w-4 h-4 text-siso-text/60" />
+                  <span className="text-sm text-siso-text/80 group-hover:text-white transition-colors">
+                    {item.query}
+                  </span>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-siso-text/40">
+                    {new Date(item.created_at).toLocaleTimeString([], { 
+                      hour: '2-digit', 
+                      minute: '2-digit' 
+                    })}
+                  </span>
+                  
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      clearSearchHistory(item.id);
+                    }}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity
+                      hover:text-siso-red focus:opacity-100 focus:outline-none"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                  
+                  <ChevronRight className="w-4 h-4 text-siso-text/40 
+                    group-hover:text-siso-orange group-hover:translate-x-1
+                    transition-all duration-300" />
+                </div>
+              </motion.div>
+            ))}
           </div>
-        ))}
-      </div>
-    </div>
+        </div>
+      ))}
+    </motion.div>
   );
 };
