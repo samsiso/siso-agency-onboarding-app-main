@@ -1,10 +1,8 @@
-import { motion, AnimatePresence } from 'framer-motion';
+
+import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { SearchInput } from './components/SearchInput';
-import { SearchResultsDropdown } from './components/SearchResultsDropdown';
 
 interface SearchSectionProps {
   searchQuery: string;
@@ -13,69 +11,6 @@ interface SearchSectionProps {
 
 export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProps) => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-
-  const { data: searchHistory, refetch: refetchHistory } = useQuery({
-    queryKey: ['search-history'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('user_search_history')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(5);
-
-      if (error) throw error;
-      return data;
-    },
-    enabled: isSearchFocused,
-  });
-
-  const { data: featuredEducators, isLoading: educatorsLoading } = useQuery({
-    queryKey: ['featured-educators', searchQuery],
-    queryFn: async () => {
-      const query = supabase
-        .from('education_creators')
-        .select('id, name, channel_avatar_url, number_of_subscribers, specialization')
-        .limit(4);
-
-      if (searchQuery) {
-        query.ilike('name', `%${searchQuery}%`);
-      } else {
-        query.eq('is_featured', true);
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
-      return data;
-    },
-    enabled: isSearchFocused,
-  });
-
-  const { data: recentVideos, isLoading: videosLoading } = useQuery({
-    queryKey: ['recent-videos', searchQuery],
-    queryFn: async () => {
-      const query = supabase
-        .from('youtube_videos')
-        .select(`
-          id,
-          title,
-          thumbnailUrl,
-          duration,
-          viewCount,
-          channel_id,
-          education_creators!inner(name, channel_avatar_url)
-        `)
-        .limit(6);
-
-      if (searchQuery) {
-        query.ilike('title', `%${searchQuery}%`);
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
-      return data;
-    },
-    enabled: isSearchFocused,
-  });
 
   useHotkeys('mod+k', (event) => {
     event.preventDefault();
@@ -101,8 +36,7 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
         query: searchQuery,
         result_type: 'path'
       });
-      await refetchHistory();
-      setIsSearchFocused(false); // Close dropdown on submit
+      setIsSearchFocused(false);
     } catch (error) {
       console.error('Error saving search:', error);
     }
@@ -124,22 +58,6 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
           onSubmit={handleSubmit}
           placeholders={searchPlaceholders}
         />
-
-        <AnimatePresence>
-          {isSearchFocused && (
-            <SearchResultsDropdown
-              isVisible={isSearchFocused}
-              searchHistory={searchHistory}
-              onHistoryCleared={async () => {
-                await refetchHistory();
-              }}
-              featuredEducators={featuredEducators}
-              educatorsLoading={educatorsLoading}
-              recentVideos={recentVideos}
-              videosLoading={videosLoading}
-            />
-          )}
-        </AnimatePresence>
       </div>
     </motion.div>
   );
