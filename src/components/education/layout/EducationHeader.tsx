@@ -4,7 +4,7 @@ import { StatsDisplay } from './header/StatsDisplay';
 import { SearchSection } from './header/SearchSection';
 import { Card } from '@/components/ui/card';
 import { motion } from 'framer-motion';
-import { Book, GraduationCap, Atom } from 'lucide-react';
+import { Book, Atom, GraduationCap } from 'lucide-react';
 
 interface EducationHeaderProps {
   stats: {
@@ -37,14 +37,14 @@ export const EducationHeader = ({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="relative p-8 md:p-10 space-y-10" // Increased padding and spacing
+          className="relative p-8 md:p-10 space-y-10"
         >
           {/* Header Section with Floating Icons */}
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <HeaderTitle />
             
             {/* Interactive Floating Icons */}
-            <div className="hidden md:flex items-center justify-center gap-10"> {/* Increased gap */}
+            <div className="hidden md:flex items-center justify-center gap-10">
               <motion.div
                 animate={{ 
                   y: [0, -10, 0],
@@ -57,7 +57,7 @@ export const EducationHeader = ({
                 }}
                 className="relative"
               >
-                <Book className="w-10 h-10 text-siso-red" /> {/* Larger icon */}
+                <Book className="w-10 h-10 text-siso-red" />
                 <motion.div
                   className="absolute inset-0 rounded-full bg-siso-red/20"
                   animate={{ scale: [1, 1.2, 1] }}
@@ -77,7 +77,7 @@ export const EducationHeader = ({
                 }}
                 className="relative"
               >
-                <Atom className="w-10 h-10 text-[#FF7043]" /> {/* Mid tone */}
+                <Atom className="w-10 h-10 text-[#FF7043]" />
                 <motion.div
                   className="absolute inset-0 rounded-full bg-[#FF7043]/20"
                   animate={{ scale: [1, 1.2, 1] }}

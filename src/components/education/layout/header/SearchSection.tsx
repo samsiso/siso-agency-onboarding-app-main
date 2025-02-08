@@ -13,7 +13,8 @@ interface SearchSectionProps {
 
 export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProps) => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
+  const [selectedSkillLevel, setSelectedSkillLevel] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   useHotkeys('mod+k', (event) => {
     event.preventDefault();
@@ -30,93 +31,116 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
     "Learn about AI tools and platforms..."
   ];
 
-  const filters = [
-    { label: 'Beginner', color: '#4776E6' },
-    { label: 'Intermediate', color: '#8E54E9' },
-    { label: 'Advanced', color: '#11998e' },
+  const skillLevels = [
+    { label: 'Beginner', color: '#FF5722' },
+    { label: 'Intermediate', color: '#FF7043' },
+    { label: 'Advanced', color: '#FFA726' }
   ];
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log('Search submitted:', searchQuery);
-  };
+  const categories = ['AI', 'Machine Learning', 'Web3', 'Cloud'];
 
   return (
     <motion.div 
-      className="relative w-full max-w-3xl mx-auto space-y-4"
+      className="w-full space-y-6"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
     >
-      {/* Quick Filters */}
+      {/* Categories */}
       <motion.div 
-        className="flex flex-wrap gap-2 justify-center md:justify-start"
+        className="flex flex-wrap gap-3 justify-center"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.4 }}
       >
-        {filters.map((filter) => (
+        {categories.map((category, i) => (
+          <motion.button
+            key={category}
+            onClick={() => setSelectedCategory(category === selectedCategory ? null : category)}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+              selectedCategory === category
+                ? 'bg-gradient-to-r from-siso-red to-siso-orange text-white'
+                : 'bg-gradient-to-r from-siso-red/10 to-siso-orange/10 text-siso-text hover:from-siso-red/20 hover:to-siso-orange/20'
+            }`}
+            whileHover={{ scale: 1.05 }}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4 + (i * 0.1) }}
+          >
+            {category}
+          </motion.button>
+        ))}
+      </motion.div>
+
+      {/* Skill Levels */}
+      <motion.div 
+        className="flex justify-center gap-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5 }}
+      >
+        {skillLevels.map((level, index) => (
           <Button
-            key={filter.label}
+            key={level.label}
             variant="outline"
             size="sm"
             className={`rounded-full border-2 transition-all duration-300 ${
-              selectedFilter === filter.label
+              selectedSkillLevel === level.label
                 ? 'bg-white/10'
                 : 'bg-transparent hover:bg-white/5'
             }`}
             style={{
-              borderColor: selectedFilter === filter.label ? filter.color : 'transparent',
-              color: selectedFilter === filter.label ? filter.color : 'inherit'
+              borderColor: selectedSkillLevel === level.label ? level.color : 'transparent',
+              color: selectedSkillLevel === level.label ? level.color : 'inherit'
             }}
-            onClick={() => setSelectedFilter(filter.label === selectedFilter ? null : filter.label)}
+            onClick={() => setSelectedSkillLevel(level.label === selectedSkillLevel ? null : level.label)}
           >
-            {filter.label}
+            {level.label}
           </Button>
         ))}
       </motion.div>
 
+      {/* Search Input */}
       <div className="relative group">
         <PlaceholdersAndVanishInput
           placeholders={searchPlaceholders}
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          onSubmit={handleSubmit}
           onFocus={() => setIsSearchFocused(true)}
           onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
           className="w-full h-14 pl-12 pr-24 bg-black/20 backdrop-blur-sm
-            border border-[#4776E6]/20 rounded-xl text-lg text-siso-text-bold placeholder-siso-text/60
-            focus:ring-2 focus:ring-[#4776E6]/30 focus:border-[#4776E6]/40
-            hover:bg-black/30 hover:border-[#4776E6]/30
+            border border-[#FF5722]/20 rounded-xl text-lg text-siso-text-bold placeholder-siso-text/60
+            focus:ring-2 focus:ring-[#FF5722]/30 focus:border-[#FF5722]/40
+            hover:bg-black/30 hover:border-[#FF5722]/30
             transition-all duration-300"
         />
         
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#4776E6]/70 
-          group-hover:text-[#4776E6] transition-colors" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#FF5722]/70 
+          group-hover:text-[#FF5722] transition-colors" />
         
         <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 text-siso-text/70">
           <kbd className="hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border 
-            border-[#4776E6]/20 bg-black/20 px-1.5 font-mono text-[10px] font-medium text-siso-text/80">
+            border-[#FF5722]/20 bg-black/20 px-1.5 font-mono text-[10px] font-medium text-siso-text/80">
             <span className="text-xs"><Command className="h-3 w-3" /></span>K
           </kbd>
-          <Mic className="w-5 h-5 cursor-pointer hover:text-[#4776E6] transition-colors" />
+          <Mic className="w-5 h-5 cursor-pointer hover:text-[#FF5722] transition-colors" />
         </div>
 
-        {/* Knowledge Map Preview */}
+        {/* Search Suggestions */}
         {isSearchFocused && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
-            className="absolute mt-2 w-full bg-black/90 border border-[#4776E6]/20 rounded-xl p-4 backdrop-blur-sm"
+            className="absolute mt-2 w-full bg-black/90 border border-[#FF5722]/20 rounded-xl p-4 backdrop-blur-sm"
           >
             <div className="text-sm font-medium text-white/80 mb-3">Popular Learning Paths</div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {[
-                { path: "AI Fundamentals → ML Basics → Deep Learning", color: "#4776E6" },
-                { path: "Web Dev → React → Full Stack", color: "#8E54E9" },
-                { path: "Python → Data Science → AI", color: "#11998e" },
-                { path: "Blockchain → Smart Contracts → DApps", color: "#DD2476" },
+                { path: "AI Fundamentals → ML Basics → Deep Learning", color: "#FF5722" },
+                { path: "Web Dev → React → Full Stack", color: "#FF7043" },
+                { path: "Python → Data Science → AI", color: "#FFA726" },
+                { path: "Blockchain → Smart Contracts → DApps", color: "#FF9100" },
               ].map((item, i) => (
                 <motion.div
                   key={i}
