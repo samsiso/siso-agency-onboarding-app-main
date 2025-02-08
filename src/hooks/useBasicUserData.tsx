@@ -19,6 +19,7 @@ export const useBasicUserData = () => {
 
   useEffect(() => {
     let isSubscribed = true;
+    let debounceTimeout: NodeJS.Timeout;
 
     const fetchBasicUserData = async () => {
       try {
@@ -49,10 +50,12 @@ export const useBasicUserData = () => {
       }
     };
 
-    fetchBasicUserData();
+    // Debounce the fetch to prevent rapid successive calls
+    debounceTimeout = setTimeout(fetchBasicUserData, 100);
 
     return () => {
       isSubscribed = false;
+      clearTimeout(debounceTimeout);
     };
   }, []);
 

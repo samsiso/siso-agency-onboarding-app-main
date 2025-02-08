@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
+// [Analysis] Centralized auth state management with debounced profile check
 export const useAuthSession = () => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
@@ -13,19 +14,18 @@ export const useAuthSession = () => {
   // [Analysis] Initialize auth state on mount with debounced check
   useEffect(() => {
     let isSubscribed = true;
+    let profileCheckTimeout: NodeJS.Timeout;
 
     const initializeAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (isSubscribed) {
           setUser(session?.user || null);
+          setLoading(false);
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
-      } finally {
-        if (isSubscribed) {
-          setLoading(false);
-        }
+        setLoading(false);
       }
     };
 
@@ -42,6 +42,9 @@ export const useAuthSession = () => {
 
     return () => {
       isSubscribed = false;
+      if (profileCheckTimeout) {
+        clearTimeout(profileCheckTimeout);
+      }
       subscription.unsubscribe();
     };
   }, []);

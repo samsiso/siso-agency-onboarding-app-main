@@ -9,6 +9,7 @@ import { ToolsPageHeader } from '@/components/tools/ToolsPageHeader';
 import { MainContent } from '@/components/tools/layout/MainContent';
 import { ChatAssistant } from '@/components/tools/layout/ChatAssistant';
 
+// [Analysis] Tools page with optimized auth handling and memoized filters
 export default function Tools() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
