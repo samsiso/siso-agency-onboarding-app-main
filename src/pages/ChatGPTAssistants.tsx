@@ -2,11 +2,7 @@
 import { useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { AssistantDetails } from '@/components/assistants/AssistantDetails';
-import { HeaderTitle } from '@/components/assistants/layout/header/HeaderTitle';
-import { HeaderAlerts } from '@/components/assistants/layout/header/HeaderAlerts';
-import { SearchSection } from '@/components/assistants/layout/header/SearchSection';
-import { StatsDisplay } from '@/components/assistants/layout/header/StatsDisplay';
-import { Categories } from '@/components/assistants/layout/content/Categories';
+import { AssistantsHeader } from '@/components/assistants/layout/header/AssistantsHeader';
 import { AssistantGrid } from '@/components/assistants/layout/content/AssistantGrid';
 import { AssistantsLayout } from '@/components/assistants/layout/AssistantsLayout';
 import { ChatAssistantHelper } from '@/components/assistants/ChatAssistantHelper';
@@ -58,37 +54,19 @@ export default function ChatGPTAssistants() {
 
   return (
     <AssistantsLayout>
-      <HeaderTitle />
-      
-      <StatsDisplay 
-        totalAssistants={assistantsCount}
-        featuredCount={featuredCount}
-        categoryCount={Object.keys(categoryCounts || {}).length}
-        conversationsCount={totalConversations}
-      />
-
-      <SearchSection 
+      <AssistantsHeader 
         searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
+        setSearchQuery={setSearchQuery}
         isSearchFocused={isSearchFocused}
-        onFocus={() => setIsSearchFocused(true)}
-        onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
-        onSubmit={handleSubmit}
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+        categoryCounts={categoryCounts || {}}
+        assistantsCount={assistantsCount}
+        featuredCount={featuredCount}
+        totalConversations={totalConversations}
+        onSearchSubmit={handleSubmit}
+        categories={categories}
       />
-
-      {!isSearchFocused && (
-        <>
-          <HeaderAlerts />
-          <Categories 
-            categories={categories}
-            selectedCategory={selectedCategory}
-            onCategoryChange={setSelectedCategory}
-            categoryCounts={categoryCounts || {}}
-            assistantsCount={assistantsCount}
-            featuredCount={featuredCount}
-          />
-        </>
-      )}
 
       <AnimatePresence mode="wait">
         <motion.div
