@@ -2,9 +2,10 @@
 import { motion } from 'framer-motion';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { cn } from '@/lib/utils';
-import { User, MapPin, Video, TrendingUp, Crown } from 'lucide-react';
+import { User, MapPin, Video, TrendingUp, Crown, ImageOff } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
+import { useState, useEffect } from 'react';
 
 interface EducatorCardProps {
   educator: {
@@ -33,38 +34,73 @@ const formatNumber = (num?: number) => {
 };
 
 export const EducatorCard = ({ educator, onClick, className }: EducatorCardProps) => {
+  const [bannerLoaded, setBannerLoaded] = useState(false);
+  const [bannerError, setBannerError] = useState(false);
+  const [avatarLoaded, setAvatarLoaded] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
+
+  // [Analysis] Pre-load images to prevent layout shift
+  useEffect(() => {
+    if (educator.channel_banner_url) {
+      const img = new Image();
+      img.src = educator.channel_banner_url;
+      img.onload = () => setBannerLoaded(true);
+      img.onerror = () => setBannerError(true);
+    }
+
+    if (educator.channel_avatar_url || educator.profile_image_url) {
+      const img = new Image();
+      img.src = educator.channel_avatar_url || educator.profile_image_url || '';
+      img.onload = () => setAvatarLoaded(true);
+      img.onerror = () => setAvatarError(true);
+    }
+  }, [educator.channel_banner_url, educator.channel_avatar_url, educator.profile_image_url]);
+
   return (
     <motion.div
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
       className={cn(
-        "group relative h-[480px] cursor-pointer rounded-xl border border-siso-border bg-gradient-to-br from-siso-bg-alt/50 to-siso-bg overflow-hidden transition-all duration-500",
+        "group relative h-[480px] cursor-pointer rounded-xl border border-siso-border",
+        "bg-gradient-to-br from-siso-bg-alt/50 to-siso-bg overflow-hidden transition-all duration-500",
+        "hover:shadow-lg hover:shadow-black/20 hover:border-siso-orange/30",
+        "backdrop-blur-sm",
         educator.is_featured && "ring-1 ring-siso-orange/30",
         className
       )}
     >
       {/* Banner Section */}
       <div className="relative h-40 w-full overflow-hidden">
-        {(educator.channel_banner_url) ? (
+        {educator.channel_banner_url ? (
           <motion.div 
             className="absolute inset-0"
-            whileHover={{ scale: 1.05 }}
+            initial={{ opacity: 0, scale: 1.1 }}
+            animate={{ 
+              opacity: bannerLoaded ? 1 : 0,
+              scale: bannerLoaded ? 1 : 1.1
+            }}
             transition={{ duration: 0.5 }}
           >
             <AspectRatio ratio={16/5} className="h-full">
-              <img
-                src={educator.channel_banner_url}
-                alt={`${educator.name}'s channel banner`}
-                className="h-full w-full object-cover"
-                loading="lazy"
-              />
+              {!bannerError ? (
+                <img
+                  src={educator.channel_banner_url}
+                  alt={`${educator.name}'s channel banner`}
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                />
+              ) : (
+                <div className="h-full w-full bg-gradient-to-r from-siso-red/10 to-siso-orange/10 flex items-center justify-center">
+                  <ImageOff className="w-8 h-8 text-siso-text/30" />
+                </div>
+              )}
             </AspectRatio>
-            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-transparent" />
           </motion.div>
         ) : (
           <div className="h-full w-full bg-gradient-to-r from-siso-red/10 to-siso-orange/10" />
         )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         
         {educator.is_featured && (
           <Badge 
@@ -85,14 +121,26 @@ export const EducatorCard = ({ educator, onClick, className }: EducatorCardProps
           transition={{ type: "spring", stiffness: 300 }}
         >
           {(educator.channel_avatar_url || educator.profile_image_url) ? (
-            <AspectRatio ratio={1} className="h-full">
-              <img
-                src={educator.channel_avatar_url || educator.profile_image_url}
-                alt={educator.name}
-                className="h-full w-full object-cover"
-                loading="lazy"
-              />
-            </AspectRatio>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: avatarLoaded ? 1 : 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {!avatarError ? (
+                <AspectRatio ratio={1} className="h-full">
+                  <img
+                    src={educator.channel_avatar_url || educator.profile_image_url}
+                    alt={educator.name}
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                </AspectRatio>
+              ) : (
+                <div className="h-full w-full bg-siso-bg-alt flex items-center justify-center">
+                  <User className="w-8 h-8 text-siso-text/70" />
+                </div>
+              )}
+            </motion.div>
           ) : (
             <div className="h-full w-full bg-siso-bg-alt flex items-center justify-center">
               <User className="w-8 h-8 text-siso-text/70" />
