@@ -1,31 +1,46 @@
 
-import { useState } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CommunityMember } from '../community/types';
 import { CommunityMemberDetails } from '../community/CommunityMemberDetails';
 import { DirectoryFilters } from './directory/DirectoryFilters';
 import { DirectoryHeader } from './directory/DirectoryHeader';
-import { DirectoryPagination } from './directory/DirectoryPagination';
 import { FeaturedEducators } from './FeaturedEducators';
-import { usePagination } from '@/hooks/use-pagination';
 import { EducatorCard } from './EducatorCard';
+import { useInView } from 'react-intersection-observer';
 
 interface EducatorsDirectoryProps {
   members?: CommunityMember[];
   isLoading: boolean;
   searchQuery: string;
+  hasNextPage?: boolean;
+  fetchNextPage: () => void;
+  isFetchingNextPage: boolean;
 }
-
-const ITEMS_PER_PAGE = 12;
 
 export const EducatorsDirectory = ({ 
   members, 
   isLoading, 
-  searchQuery: initialSearchQuery 
+  searchQuery: initialSearchQuery,
+  hasNextPage,
+  fetchNextPage,
+  isFetchingNextPage
 }: EducatorsDirectoryProps) => {
   const [selectedMember, setSelectedMember] = useState<CommunityMember | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
+
+  // [Analysis] Setup intersection observer for infinite scroll
+  const { ref: loadMoreRef, inView } = useInView({
+    threshold: 0.1,
+    rootMargin: '100px',
+  });
+
+  // Fetch more data when the load more element comes into view
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   // Filter members based on search query
   const filteredMembers = members?.filter(member => 
@@ -40,18 +55,7 @@ export const EducatorsDirectory = ({
   const featuredMembers = filteredMembers?.filter(member => member.is_featured) || [];
   const nonFeaturedMembers = filteredMembers?.filter(member => !member.is_featured) || [];
 
-  const totalPages = Math.ceil((nonFeaturedMembers?.length || 0) / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
-  const currentMembers = nonFeaturedMembers?.slice(startIndex, endIndex) || [];
-
-  const { pages, showLeftEllipsis, showRightEllipsis } = usePagination({
-    currentPage,
-    totalPages,
-    paginationItemsToDisplay: 7,
-  });
-
-  if (isLoading) {
+  if (isLoading && !members?.length) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {[...Array(12)].map((_, i) => (
@@ -110,7 +114,7 @@ export const EducatorsDirectory = ({
           animate="show"
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
         >
-          {currentMembers.map((member) => (
+          {nonFeaturedMembers.map((member) => (
             <motion.div
               key={member.id}
               variants={{
@@ -139,15 +143,21 @@ export const EducatorsDirectory = ({
         </motion.div>
       </AnimatePresence>
 
-      {totalPages > 1 && (
-        <DirectoryPagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-          pages={pages}
-          showLeftEllipsis={showLeftEllipsis}
-          showRightEllipsis={showRightEllipsis}
-        />
+      {/* Infinite scroll trigger element */}
+      {(hasNextPage || isFetchingNextPage) && (
+        <div ref={loadMoreRef} className="py-8">
+          <div className="flex justify-center">
+            {isFetchingNextPage ? (
+              <div className="animate-pulse space-y-4">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="h-[480px] w-full bg-siso-bg-alt rounded-lg" />
+                ))}
+              </div>
+            ) : (
+              <div className="h-20" /> // Spacer for scroll trigger
+            )}
+          </div>
+        </div>
       )}
 
       <CommunityMemberDetails

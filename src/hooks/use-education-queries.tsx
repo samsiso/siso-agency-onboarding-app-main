@@ -1,15 +1,14 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Video } from '@/components/education/types';
 
-// [Analysis] Separate query hooks improve reusability and maintainability
-// [Plan] Add error boundary wrapper for better error handling at 1000+ users
-
-export const useEducatorsList = (page: number, searchQuery: string) => {
-  return useQuery({
-    queryKey: ['educators', page, searchQuery],
-    queryFn: async () => {
-      console.log('Fetching educators for page:', page); // Debug log
+// [Analysis] Convert to infinite query for better UX and performance
+// [Plan] Add caching layer at 10k+ users
+export const useEducatorsList = (searchQuery: string) => {
+  return useInfiniteQuery({
+    queryKey: ['educators', searchQuery],
+    queryFn: async ({ pageParam = 0 }) => {
+      console.log('Fetching educators for cursor:', pageParam); // Debug log
       
       let query = supabase
         .from('education_creators')
@@ -20,17 +19,28 @@ export const useEducatorsList = (page: number, searchQuery: string) => {
           specialization,
           profile_image_url,
           channel_avatar_url,
+          youtube_avatar_url,
+          youtube_banner_url,
           number_of_subscribers,
           channel_total_videos,
+          channel_location,
           slug,
-          featured_videos
+          featured_videos,
+          is_featured,
+          member_count
         `)
-        .order('number_of_subscribers', { ascending: false })
-        .range((page - 1) * 20, page * 20 - 1);
+        .order('number_of_subscribers', { ascending: false });
 
       if (searchQuery) {
         query = query.or(`name.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
       }
+
+      // [Analysis] Use cursor-based pagination for better performance
+      if (pageParam) {
+        query = query.lt('id', pageParam);
+      }
+
+      query = query.limit(12);
 
       const { data, error } = await query;
       
@@ -39,10 +49,13 @@ export const useEducatorsList = (page: number, searchQuery: string) => {
         throw error;
       }
       
-      return data || [];
+      return {
+        educators: data || [],
+        nextCursor: data?.length === 12 ? data[data.length - 1].id : undefined
+      };
     },
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
     staleTime: 5 * 60 * 1000,
-    placeholderData: (previousData) => previousData,
     gcTime: 10 * 60 * 1000,
   });
 };

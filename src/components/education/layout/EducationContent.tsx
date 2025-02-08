@@ -9,13 +9,19 @@ interface EducationContentProps {
   searchQuery: string;
   members?: CommunityMember[];
   isLoading: boolean;
+  hasNextPage?: boolean;
+  fetchNextPage?: () => void;
+  isFetchingNextPage?: boolean;
 }
 
 export const EducationContent = ({
   activeSection,
   searchQuery,
   members,
-  isLoading
+  isLoading,
+  hasNextPage,
+  fetchNextPage,
+  isFetchingNextPage
 }: EducationContentProps) => {
   return (
     <AnimatePresence mode="wait">
@@ -32,9 +38,11 @@ export const EducationContent = ({
           members={members}
           isLoading={isLoading}
           searchQuery={searchQuery}
+          hasNextPage={hasNextPage}
+          fetchNextPage={fetchNextPage!}
+          isFetchingNextPage={isFetchingNextPage!}
         />
       )}
     </AnimatePresence>
   );
 };
-

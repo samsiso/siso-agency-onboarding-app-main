@@ -1,7 +1,5 @@
 
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { Sidebar } from '@/components/Sidebar';
 import { Bot } from 'lucide-react';
 import {
@@ -18,48 +16,23 @@ import { Button } from '@/components/ui/button';
 import { EducationHeader } from '@/components/education/layout/EducationHeader';
 import { EducationToolbar } from '@/components/education/layout/EducationToolbar';
 import { EducationContent } from '@/components/education/layout/EducationContent';
+import { useEducatorsList } from '@/hooks/use-education-queries';
 
 export default function SisoEducation() {
   const [activeSection, setActiveSection] = useState<'videos' | 'educators'>('videos');
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
-  const { data: members, isLoading } = useQuery({
-    queryKey: ['education-creators'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('education_creators')
-        .select('*');
-      
-      if (error) throw error;
-      
-      return data.map(member => ({
-        id: member.id,
-        name: member.name,
-        description: member.channel_description,
-        member_type: member.member_type || 'Creator',
-        youtube_url: member.youtube_url,
-        youtube_videos: Array.isArray(member.youtube_videos) 
-          ? member.youtube_videos.map((video: any) => ({
-              title: typeof video.title === 'string' ? video.title : '',
-              url: typeof video.url === 'string' ? video.url : ''
-            }))
-          : [],
-        website_url: member.website_url,
-        specialization: member.specialization || [],
-        content_themes: member.content_themes || [],
-        profile_image_url: member.channel_avatar_url || member.profile_image_url,
-        member_count: member.number_of_subscribers || 0,
-        join_url: member.url,
-        platform: member.niche,
-        points: 0,
-        rank: null,
-        contribution_count: member.channel_total_videos || 0,
-        referral_count: 0,
-        slug: member.slug
-      }));
-    },
-  });
+  const { 
+    data,
+    isLoading,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage
+  } = useEducatorsList(searchQuery);
+
+  // [Analysis] Flatten pages data for infinite scroll
+  const members = data?.pages.flatMap(page => page.educators) || [];
 
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
@@ -91,6 +64,9 @@ export default function SisoEducation() {
             searchQuery={searchQuery}
             members={members}
             isLoading={isLoading}
+            hasNextPage={hasNextPage}
+            fetchNextPage={fetchNextPage}
+            isFetchingNextPage={isFetchingNextPage}
           />
 
           <ExpandableChat
