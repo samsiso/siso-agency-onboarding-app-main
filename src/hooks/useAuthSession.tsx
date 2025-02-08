@@ -11,9 +11,18 @@ export const useAuthSession = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const profileChecked = useRef(false);
+  // [Analysis] Add ref to track if this is an actual auth event vs just a check
+  const isAuthEvent = useRef(false);
+  // [Analysis] Cache profile to prevent repeated checks
+  const profileCache = useRef<any>(null);
 
   // [Analysis] Memoized profile check to prevent unnecessary API calls
   const checkProfile = useCallback(async (userId: string) => {
+    // [Analysis] Return cached profile if available
+    if (profileCache.current) {
+      return profileCache.current;
+    }
+
     try {
       console.log('Checking profile for user:', userId);
       const { data: profile, error } = await supabase
@@ -26,6 +35,12 @@ export const useAuthSession = () => {
         console.error('Error checking profile:', error);
         return null;
       }
+      
+      // [Analysis] Cache successful profile checks
+      if (profile) {
+        profileCache.current = profile;
+      }
+      
       console.log('Profile found:', profile);
       return profile;
     } catch (error) {
@@ -66,13 +81,25 @@ export const useAuthSession = () => {
     };
 
     // [Analysis] Set up auth state listener with minimal redirects
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state changed:', event, session?.user?.id);
       
       if (!isSubscribed) return;
 
+      // [Analysis] Only handle navigation on explicit auth events
+      if (event === 'SIGNED_IN') {
+        isAuthEvent.current = true;
+      }
+
       if (session?.user) {
         setUser(session.user);
+        // [Analysis] Only navigate on explicit sign in
+        if (isAuthEvent.current) {
+          const profile = await checkProfile(session.user.id);
+          if (profile) {
+            navigate('/home', { replace: true });
+          }
+        }
       } else {
         setUser(null);
         // [Analysis] Only redirect on explicit sign out
@@ -80,6 +107,9 @@ export const useAuthSession = () => {
           navigate('/', { replace: true });
         }
       }
+
+      // [Analysis] Reset auth event flag after handling
+      isAuthEvent.current = false;
       setLoading(false);
     });
 
@@ -94,6 +124,7 @@ export const useAuthSession = () => {
   const handleSignIn = async (session: any) => {
     try {
       console.log('Handling sign in for session:', session);
+      isAuthEvent.current = true;
       setUser(session.user);
       
       const profile = await checkProfile(session.user.id);
@@ -104,8 +135,6 @@ export const useAuthSession = () => {
           title: "Successfully signed in",
           description: "Welcome to SISO Resource Hub!",
         });
-        // [Analysis] Only navigate on successful sign in
-        navigate('/home', { replace: true });
         return true;
       } else {
         console.error('Profile not found after sign in');
@@ -119,20 +148,22 @@ export const useAuthSession = () => {
         description: "There was a problem signing you in. Please try again.",
       });
       return false;
+    } finally {
+      isAuthEvent.current = false;
     }
   };
 
   const handleSignOut = async () => {
     console.log('Handling sign out');
     try {
+      isAuthEvent.current = true;
       await supabase.auth.signOut();
       setUser(null);
+      profileCache.current = null; // Clear profile cache
       toast({
         title: "Signed out",
         description: "Come back soon!",
       });
-      // [Analysis] Only navigate on explicit sign out
-      navigate('/', { replace: true });
     } catch (error) {
       console.error('Error signing out:', error);
       toast({
@@ -140,6 +171,8 @@ export const useAuthSession = () => {
         title: "Error signing out",
         description: "There was a problem signing you out. Please try again.",
       });
+    } finally {
+      isAuthEvent.current = false;
     }
   };
 
