@@ -1,5 +1,5 @@
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CommunityMember } from '../community/types';
 import { CommunityMemberDetails } from '../community/CommunityMemberDetails';

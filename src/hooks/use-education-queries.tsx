@@ -1,13 +1,38 @@
+
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Video } from '@/components/education/types';
 
+interface Educator {
+  id: string;
+  name: string;
+  description: string;
+  specialization: string[];
+  profile_image_url: string;
+  channel_avatar_url: string;
+  youtube_avatar_url: string;
+  youtube_banner_url: string;
+  number_of_subscribers: number;
+  channel_total_videos: number;
+  channel_location: string;
+  slug: string;
+  featured_videos: string[];
+  is_featured: boolean;
+  member_count: number;
+}
+
+interface EducatorPage {
+  educators: Educator[];
+  nextCursor: string | undefined;
+}
+
 // [Analysis] Convert to infinite query for better UX and performance
 // [Plan] Add caching layer at 10k+ users
 export const useEducatorsList = (searchQuery: string) => {
-  return useInfiniteQuery({
+  return useInfiniteQuery<EducatorPage, Error>({
     queryKey: ['educators', searchQuery],
-    queryFn: async ({ pageParam = 0 }) => {
+    initialPageParam: null as string | null,
+    queryFn: async ({ pageParam }) => {
       console.log('Fetching educators for cursor:', pageParam); // Debug log
       
       let query = supabase
