@@ -19,6 +19,11 @@ export const EducatorsGrid = ({ educators, isLoading }: EducatorsGridProps) => {
     threshold: 0.1
   });
 
+  const handleEducatorClick = (slug: string) => {
+    // [Analysis] Smoothly transition to educator detail page
+    navigate(`/education/educators/${slug}`);
+  };
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -78,7 +83,7 @@ export const EducatorsGrid = ({ educators, isLoading }: EducatorsGridProps) => {
         >
           <EducatorCard
             educator={educator}
-            onClick={() => navigate(`/education/educators/${educator.slug}`)}
+            onClick={() => handleEducatorClick(educator.slug || '')}
           />
         </motion.div>
       ))}
