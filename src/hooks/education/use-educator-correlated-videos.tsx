@@ -26,7 +26,9 @@ export const useEducatorCorrelatedVideos = (channelId: string | undefined) => {
         throw creatorError;
       }
 
-      // [Analysis] Improved query to properly match channel IDs without extra quotes
+      console.log('[useEducatorCorrelatedVideos] Found creator:', creator);
+
+      // [Analysis] Improved query using proper Supabase filter syntax for OR conditions
       const { data: videos, error } = await supabase
         .from('youtube_videos')
         .select(`
@@ -44,7 +46,11 @@ export const useEducatorCorrelatedVideos = (channelId: string | undefined) => {
             slug
           )
         `)
-        .or(`channel_id.eq.${channelId},channel_id.eq.${creator.name},channel_id.ilike.${creator.name}`)
+        .or([
+          { channel_id: channelId },
+          { channel_id: creator.name },
+          { channel_id: creator.channel_id }
+        ])
         .order('date', { ascending: false })
         .limit(12);
 
