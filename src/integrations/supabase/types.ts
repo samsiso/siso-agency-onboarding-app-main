@@ -1373,6 +1373,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_search_history: {
+        Row: {
+          created_at: string
+          id: string
+          query: string
+          result_id: string | null
+          result_type: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          query: string
+          result_id?: string | null
+          result_type?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          query?: string
+          result_id?: string | null
+          result_type?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       video_bookmarks: {
         Row: {
           created_at: string
@@ -1548,6 +1575,7 @@ export type Database = {
           duration: string | null
           id: string
           order: number | null
+          preview_gif_url: string | null
           thumbnailUrl: string | null
           title: string | null
           updated_at: string
@@ -1562,6 +1590,7 @@ export type Database = {
           duration?: string | null
           id: string
           order?: number | null
+          preview_gif_url?: string | null
           thumbnailUrl?: string | null
           title?: string | null
           updated_at?: string
@@ -1576,6 +1605,7 @@ export type Database = {
           duration?: string | null
           id?: string
           order?: number | null
+          preview_gif_url?: string | null
           thumbnailUrl?: string | null
           title?: string | null
           updated_at?: string
