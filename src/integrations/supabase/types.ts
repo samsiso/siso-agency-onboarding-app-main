@@ -1752,13 +1752,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "fk_channel_id"
-            columns: ["channel_id"]
-            isOneToOne: false
-            referencedRelation: "education_creators"
-            referencedColumns: ["channel_id"]
-          },
-          {
             foreignKeyName: "youtube_videos_channel_id_fkey"
             columns: ["channel_id"]
             isOneToOne: false

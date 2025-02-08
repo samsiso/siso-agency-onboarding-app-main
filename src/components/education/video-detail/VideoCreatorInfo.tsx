@@ -50,7 +50,7 @@ export const VideoCreatorInfo = ({
       <div className="flex-1">
         {hasCreatorProfile ? (
           <button
-            onClick={() => navigate(`/education/educators/${educatorSlug}`)}
+            onClick={() => educatorSlug && navigate(`/education/educators/${educatorSlug}`)}
             className="font-semibold text-white text-lg hover:text-siso-red transition-colors group"
           >
             {channelName}

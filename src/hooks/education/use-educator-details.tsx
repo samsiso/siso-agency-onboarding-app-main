@@ -6,8 +6,9 @@ export const useEducatorDetails = (slug: string) => {
   return useQuery({
     queryKey: ['educator', slug],
     queryFn: async () => {
-      console.log('Fetching educator details for slug:', slug);
+      console.log('[useEducatorDetails] Fetching educator details for slug:', slug);
       
+      // [Analysis] Match both old and new slug formats for backward compatibility
       const { data: educator, error: educatorError } = await supabase
         .from('education_creators')
         .select(`
@@ -26,13 +27,29 @@ export const useEducatorDetails = (slug: string) => {
           social_links,
           youtube_url,
           website_url,
-          featured_videos
+          featured_videos,
+          channel_id
         `)
         .eq('slug', slug)
         .single();
       
       if (educatorError) {
-        console.error('Error fetching educator details:', educatorError);
+        console.error('[useEducatorDetails] Error fetching educator details:', educatorError);
+        
+        // [Analysis] If not found with exact slug, try finding by the old format
+        if (slug.match(/-\d+$/)) {
+          const baseSlug = slug.replace(/-\d+$/, '');
+          const { data: oldFormatEducator, error: oldFormatError } = await supabase
+            .from('education_creators')
+            .select()
+            .ilike('slug', `${baseSlug}-%`)
+            .single();
+            
+          if (!oldFormatError && oldFormatEducator) {
+            return oldFormatEducator;
+          }
+        }
+        
         throw educatorError;
       }
       
@@ -40,7 +57,7 @@ export const useEducatorDetails = (slug: string) => {
         throw new Error('Educator not found');
       }
 
-      console.log('Found educator with featured videos:', educator); // Debug log
+      console.log('[useEducatorDetails] Found educator:', educator);
       
       return educator;
     },

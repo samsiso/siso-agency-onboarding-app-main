@@ -27,7 +27,8 @@ export const useEducatorCorrelatedVideos = (channelId: string | undefined) => {
           channel_id,
           education_creators!youtube_videos_channel_id_fkey (
             name,
-            channel_avatar_url
+            channel_avatar_url,
+            slug
           )
         `)
         .eq('channel_id', channelId)
@@ -49,7 +50,8 @@ export const useEducatorCorrelatedVideos = (channelId: string | undefined) => {
         educator: {
           name: video.education_creators?.name || 'Unknown Creator',
           avatar_url: video.education_creators?.channel_avatar_url || '',
-          title: 'Content Creator'
+          title: 'Content Creator',
+          slug: video.education_creators?.slug
         },
         metrics: {
           views: video.viewCount || 0,
