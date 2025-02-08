@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { EducatorCard } from './EducatorCard';
 import { CommunityMember } from '../community/types';
 import { useInView } from 'react-intersection-observer';
+import { AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 
 interface EducatorsGridProps {
   educators: CommunityMember[];
@@ -16,6 +17,19 @@ export const EducatorsGrid = ({ educators, isLoading }: EducatorsGridProps) => {
     triggerOnce: true,
     threshold: 0.1
   });
+
+  const getSyncStatusIcon = (status?: string) => {
+    switch (status) {
+      case 'completed':
+        return <CheckCircle2 className="w-4 h-4 text-green-500" />;
+      case 'failed':
+        return <AlertCircle className="w-4 h-4 text-red-500" />;
+      case 'in_progress':
+        return <Loader2 className="w-4 h-4 text-blue-500 animate-spin" />;
+      default:
+        return null;
+    }
+  };
 
   if (isLoading) {
     return (
@@ -73,7 +87,13 @@ export const EducatorsGrid = ({ educators, isLoading }: EducatorsGridProps) => {
             stiffness: 260,
             damping: 20
           }}
+          className="relative"
         >
+          {educator.sync_status && (
+            <div className="absolute top-2 right-2 z-10">
+              {getSyncStatusIcon(educator.sync_status)}
+            </div>
+          )}
           <EducatorCard educator={educator} />
         </motion.div>
       ))}

@@ -453,6 +453,7 @@ export type Database = {
           id: string
           implementation_guides: Json | null
           is_featured: boolean | null
+          last_synced_at: string | null
           member_count: number | null
           member_type: string | null
           name: string
@@ -464,6 +465,7 @@ export type Database = {
           social_links: Json | null
           specialization: string[] | null
           success_cases: Json | null
+          sync_status: string | null
           tool_stack: Json | null
           tools_covered: string[] | null
           updated_at: string
@@ -494,6 +496,7 @@ export type Database = {
           id?: string
           implementation_guides?: Json | null
           is_featured?: boolean | null
+          last_synced_at?: string | null
           member_count?: number | null
           member_type?: string | null
           name: string
@@ -505,6 +508,7 @@ export type Database = {
           social_links?: Json | null
           specialization?: string[] | null
           success_cases?: Json | null
+          sync_status?: string | null
           tool_stack?: Json | null
           tools_covered?: string[] | null
           updated_at?: string
@@ -535,6 +539,7 @@ export type Database = {
           id?: string
           implementation_guides?: Json | null
           is_featured?: boolean | null
+          last_synced_at?: string | null
           member_count?: number | null
           member_type?: string | null
           name?: string
@@ -546,6 +551,7 @@ export type Database = {
           social_links?: Json | null
           specialization?: string[] | null
           success_cases?: Json | null
+          sync_status?: string | null
           tool_stack?: Json | null
           tools_covered?: string[] | null
           updated_at?: string
@@ -1733,6 +1739,13 @@ export type Database = {
           viewCount?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_channel_id"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "education_creators"
+            referencedColumns: ["channel_id"]
+          },
           {
             foreignKeyName: "youtube_videos_channel_id_fkey"
             columns: ["channel_id"]
