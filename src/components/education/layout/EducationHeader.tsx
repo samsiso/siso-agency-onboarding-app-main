@@ -14,36 +14,37 @@ interface EducationHeaderProps {
   };
   searchQuery: string;
   onSearchChange: (value: string) => void;
+  isSearchFocused: boolean;
+  onSearchFocus: () => void;
+  onSearchBlur: () => void;
 }
 
 export const EducationHeader = ({ 
   stats, 
   searchQuery, 
-  onSearchChange 
+  onSearchChange,
+  isSearchFocused,
+  onSearchFocus,
+  onSearchBlur
 }: EducationHeaderProps) => {
   return (
     <div className="relative">
-      {/* Knowledge Flow Background */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,87,34,0.1),transparent_50%)]" />
       </div>
 
       <Card className="relative border-siso-border bg-black/20 backdrop-blur-sm overflow-hidden">
-        {/* Brand Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-siso-red/5 via-siso-orange/5 to-transparent" />
         
-        {/* Main Content */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           className="relative p-8 md:p-10 space-y-10"
         >
-          {/* Header Section with Floating Icons */}
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <HeaderTitle />
             
-            {/* Interactive Floating Icons */}
             <div className="hidden md:flex items-center justify-center gap-10">
               <motion.div
                 animate={{ 
@@ -112,6 +113,9 @@ export const EducationHeader = ({
           <SearchSection 
             searchQuery={searchQuery}
             onSearchChange={onSearchChange}
+            isSearchFocused={isSearchFocused}
+            onFocus={onSearchFocus}
+            onBlur={onSearchBlur}
           />
         </motion.div>
       </Card>

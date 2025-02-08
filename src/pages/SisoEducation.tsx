@@ -20,27 +20,19 @@ import { EducationToolbar } from '@/components/education/layout/EducationToolbar
 import { EducationContent } from '@/components/education/layout/EducationContent';
 
 export default function SisoEducation() {
-  console.log('[SisoEducation] Component mounted'); // Debug log
-
   const [activeSection, setActiveSection] = useState<'videos' | 'educators'>('videos');
   const [searchQuery, setSearchQuery] = useState('');
-
-  console.log('[SisoEducation] Current active section:', activeSection); // Debug log
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   const { data: members, isLoading } = useQuery({
     queryKey: ['education-creators'],
     queryFn: async () => {
-      console.log('[SisoEducation] Fetching education creators'); // Debug log
       const { data, error } = await supabase
         .from('education_creators')
         .select('*');
       
-      if (error) {
-        console.error('[SisoEducation] Error fetching creators:', error); // Debug error
-        throw error;
-      }
+      if (error) throw error;
       
-      console.log('[SisoEducation] Fetched creators:', data); // Debug log
       return data.map(member => ({
         id: member.id,
         name: member.name,
@@ -82,12 +74,17 @@ export default function SisoEducation() {
             }}
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
+            isSearchFocused={isSearchFocused}
+            onSearchFocus={() => setIsSearchFocused(true)}
+            onSearchBlur={() => setIsSearchFocused(false)}
           />
 
-          <EducationToolbar
-            activeSection={activeSection}
-            onSectionChange={setActiveSection}
-          />
+          {!isSearchFocused && (
+            <EducationToolbar
+              activeSection={activeSection}
+              onSectionChange={setActiveSection}
+            />
+          )}
 
           <EducationContent
             activeSection={activeSection}

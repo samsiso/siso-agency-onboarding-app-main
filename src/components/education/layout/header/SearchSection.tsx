@@ -1,6 +1,5 @@
 
 import { motion } from 'framer-motion';
-import { useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { SearchInput } from './components/SearchInput';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,11 +7,18 @@ import { supabase } from '@/integrations/supabase/client';
 interface SearchSectionProps {
   searchQuery: string;
   onSearchChange: (value: string) => void;
+  isSearchFocused: boolean;
+  onFocus: () => void;
+  onBlur: () => void;
 }
 
-export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProps) => {
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
-
+export const SearchSection = ({ 
+  searchQuery, 
+  onSearchChange,
+  isSearchFocused,
+  onFocus,
+  onBlur
+}: SearchSectionProps) => {
   useHotkeys('mod+k', (event) => {
     event.preventDefault();
     const searchInput = document.querySelector('input[type="text"]') as HTMLInputElement;
@@ -37,7 +43,7 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
         query: searchQuery,
         result_type: 'path'
       });
-      setIsSearchFocused(false);
+      onBlur();
     } catch (error) {
       console.error('Error saving search:', error);
     }
@@ -54,8 +60,8 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
         <SearchInput
           searchQuery={searchQuery}
           onSearchChange={onSearchChange}
-          onFocus={() => setIsSearchFocused(true)}
-          onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
+          onFocus={onFocus}
+          onBlur={() => setTimeout(onBlur, 200)}
           onSubmit={handleSubmit}
           placeholders={searchPlaceholders}
         />
