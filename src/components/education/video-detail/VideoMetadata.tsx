@@ -1,6 +1,7 @@
 
 import { Eye, Calendar } from 'lucide-react';
 import { format, parseISO, isValid } from 'date-fns';
+import { motion } from 'framer-motion';
 
 interface VideoMetadataProps {
   title: string;
@@ -21,23 +22,28 @@ export const VideoMetadata = ({ title, viewCount, publishDate }: VideoMetadataPr
   };
 
   return (
-    <div className="space-y-6">
+    <motion.div 
+      className="space-y-4"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
       <h1 className="text-2xl md:text-3xl font-bold text-white leading-tight">
         {title}
       </h1>
       
-      <div className="flex items-center gap-6 text-sm text-gray-400 border-t border-b border-gray-800 py-4">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-6 text-sm text-gray-400">
+        <div className="flex items-center gap-2 bg-white/5 rounded-full px-4 py-2">
           <Eye className="h-4 w-4" />
           <span>{viewCount.toLocaleString()} views</span>
         </div>
         {publishDate && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 bg-white/5 rounded-full px-4 py-2">
             <Calendar className="h-4 w-4" />
             <span>{formatDate(publishDate)}</span>
           </div>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 };

@@ -1,6 +1,8 @@
 
 import { Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
 
 interface VideoCreatorInfoProps {
   channelName: string;
@@ -14,20 +16,22 @@ export const VideoCreatorInfo = ({
   educatorSlug 
 }: VideoCreatorInfoProps) => {
   const navigate = useNavigate();
-
-  // [Analysis] Render differently based on whether we have a full creator profile or just basic info
   const hasCreatorProfile = !!educatorSlug;
 
   return (
-    <div className="flex items-center gap-3">
-      <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center overflow-hidden">
+    <motion.div 
+      className="flex items-center gap-4"
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      <div className="relative w-12 h-12 rounded-full bg-white/10 overflow-hidden group">
         {channelAvatar ? (
           <img 
             src={channelAvatar} 
             alt={channelName} 
-            className="w-full h-full rounded-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
             onError={(e) => {
-              console.log('[VideoCreatorInfo] Avatar failed to load:', channelAvatar);
               e.currentTarget.style.display = 'none';
               e.currentTarget.parentElement?.classList.add('flex', 'items-center', 'justify-center');
               const parent = e.currentTarget.parentElement;
@@ -42,21 +46,31 @@ export const VideoCreatorInfo = ({
           <Users className="w-6 h-6 text-white/60" />
         )}
       </div>
-      <div>
+
+      <div className="flex-1">
         {hasCreatorProfile ? (
           <button
             onClick={() => navigate(`/education/educators/${educatorSlug}`)}
-            className="font-semibold text-white text-lg hover:text-siso-red transition-colors"
+            className="font-semibold text-white text-lg hover:text-siso-red transition-colors group"
           >
             {channelName}
+            <span className="block text-sm text-gray-400 group-hover:text-siso-red/80">View Channel</span>
           </button>
         ) : (
-          <h3 className="font-semibold text-white text-lg">{channelName}</h3>
+          <div>
+            <h3 className="font-semibold text-white text-lg">{channelName}</h3>
+            <p className="text-sm text-gray-400">YouTube Channel</p>
+          </div>
         )}
-        <p className="text-sm text-gray-400">
-          {hasCreatorProfile ? 'Creator' : 'YouTube Channel'}
-        </p>
       </div>
-    </div>
+
+      <Button 
+        variant="secondary"
+        size="sm"
+        className="bg-white/5 hover:bg-white/10 transition-all duration-300"
+      >
+        Follow
+      </Button>
+    </motion.div>
   );
 };
