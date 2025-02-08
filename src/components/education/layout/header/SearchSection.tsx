@@ -1,4 +1,3 @@
-
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -103,6 +102,7 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
         result_type: 'path'
       });
       await refetchHistory();
+      setIsSearchFocused(false); // Close dropdown on submit
     } catch (error) {
       console.error('Error saving search:', error);
     }
