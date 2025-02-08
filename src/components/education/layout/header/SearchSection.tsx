@@ -39,6 +39,13 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
 
   const categories = ['AI', 'Machine Learning', 'Web3', 'Cloud'];
 
+  // [Analysis] Added handleSubmit to satisfy the required onSubmit prop
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // We can add search submission logic here if needed
+    console.log('Search submitted:', searchQuery);
+  };
+
   return (
     <motion.div 
       className="w-full space-y-6"
@@ -108,6 +115,7 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
           onChange={(e) => onSearchChange(e.target.value)}
           onFocus={() => setIsSearchFocused(true)}
           onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
+          onSubmit={handleSubmit}
           className="w-full h-14 pl-12 pr-24 bg-black/20 backdrop-blur-sm
             border border-[#FF5722]/20 rounded-xl text-lg text-siso-text-bold placeholder-siso-text/60
             focus:ring-2 focus:ring-[#FF5722]/30 focus:border-[#FF5722]/40
@@ -162,3 +170,4 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
     </motion.div>
   );
 };
+
