@@ -1,36 +1,20 @@
 
-import { Search, Command, Mic, Clock, ChevronRight, X } from 'lucide-react';
+import { Search, Command, Mic } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PlaceholdersAndVanishInput } from '@/components/ui/placeholders-and-vanish-input';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Skeleton } from '@/components/ui/skeleton';
-import { formatNumber } from '@/lib/utils';
-import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { SkillLevelFilters } from './components/SkillLevelFilters';
+import { SearchHistory } from './components/SearchHistory';
+import { FeaturedEducators } from './components/FeaturedEducators';
+import { PopularVideos } from './components/PopularVideos';
 
 interface SearchSectionProps {
   searchQuery: string;
   onSearchChange: (value: string) => void;
-}
-
-interface SearchHistory {
-  id: string;
-  query: string;
-  created_at: string;
-  result_type: 'video' | 'educator' | 'path';
-}
-
-interface SearchEducator {
-  id: string;
-  name: string;
-  channel_avatar_url: string;
-  number_of_subscribers: number;
-  specialization: string[];
 }
 
 export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProps) => {
@@ -47,7 +31,7 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
         .limit(5);
 
       if (error) throw error;
-      return data as SearchHistory[];
+      return data;
     },
     enabled: isSearchFocused,
   });
@@ -68,7 +52,7 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
 
       const { data, error } = await query;
       if (error) throw error;
-      return data as SearchEducator[];
+      return data;
     },
     enabled: isSearchFocused,
   });
@@ -115,12 +99,6 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
     "Learn about AI tools and platforms..."
   ];
 
-  const skillLevels = [
-    { label: 'Beginner', color: '#FF5722' },
-    { label: 'Intermediate', color: '#FF7043' },
-    { label: 'Advanced', color: '#FFA726' }
-  ];
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
@@ -133,21 +111,6 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
       await refetchHistory();
     } catch (error) {
       console.error('Error saving search:', error);
-      toast.error('Failed to save search history');
-    }
-  };
-
-  const clearSearchHistory = async (id: string) => {
-    try {
-      await supabase
-        .from('user_search_history')
-        .delete()
-        .eq('id', id);
-      await refetchHistory();
-      toast.success('Search history item removed');
-    } catch (error) {
-      console.error('Error clearing search history:', error);
-      toast.error('Failed to clear search history');
     }
   };
 
@@ -158,32 +121,10 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
     >
-      <motion.div 
-        className="flex justify-center gap-4"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.4 }}
-      >
-        {skillLevels.map((level) => (
-          <Button
-            key={level.label}
-            variant="outline"
-            size="sm"
-            className={`rounded-full border-2 transition-all duration-300 ${
-              selectedSkillLevel === level.label
-                ? 'bg-white/10'
-                : 'bg-transparent hover:bg-white/5'
-            }`}
-            style={{
-              borderColor: selectedSkillLevel === level.label ? level.color : 'transparent',
-              color: selectedSkillLevel === level.label ? level.color : 'inherit'
-            }}
-            onClick={() => setSelectedSkillLevel(level.label === selectedSkillLevel ? null : level.label)}
-          >
-            {level.label}
-          </Button>
-        ))}
-      </motion.div>
+      <SkillLevelFilters
+        selectedSkillLevel={selectedSkillLevel}
+        onSkillLevelChange={setSelectedSkillLevel}
+      />
 
       <div className="relative group">
         <PlaceholdersAndVanishInput
@@ -221,131 +162,27 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
             >
               <ScrollArea className="h-[600px]">
                 <div className="p-4 space-y-6">
-                  {searchHistory && searchHistory.length > 0 && (
-                    <div className="space-y-3">
-                      <h3 className="text-sm font-medium text-white/80">Recent Searches</h3>
-                      <div className="space-y-2">
-                        {searchHistory.map((item) => (
-                          <div
-                            key={item.id}
-                            className="flex items-center justify-between group px-3 py-2 rounded-lg hover:bg-white/5"
-                          >
-                            <div className="flex items-center gap-3">
-                              <Clock className="w-4 h-4 text-siso-text/60" />
-                              <span className="text-sm text-siso-text/80">{item.query}</span>
-                            </div>
-                            <button
-                              onClick={() => clearSearchHistory(item.id)}
-                              className="opacity-0 group-hover:opacity-100 transition-opacity"
-                            >
-                              <X className="w-4 h-4 text-siso-text/60 hover:text-siso-red" />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+                  {searchHistory && (
+                    <SearchHistory
+                      history={searchHistory}
+                      onHistoryCleared={refetchHistory}
+                    />
                   )}
 
                   <div className="space-y-3">
                     <h3 className="text-sm font-medium text-white/80">Featured Educators</h3>
-                    {educatorsLoading ? (
-                      <div className="grid grid-cols-2 gap-3">
-                        {[...Array(4)].map((_, i) => (
-                          <Skeleton key={i} className="h-24 rounded-lg bg-white/5" />
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-2 gap-3">
-                        {featuredEducators?.map((educator) => (
-                          <motion.div
-                            key={educator.id}
-                            className="flex items-start gap-3 p-3 rounded-lg hover:bg-white/5 cursor-pointer group"
-                            whileHover={{ scale: 1.02 }}
-                          >
-                            <Avatar className="h-12 w-12 border-2 border-siso-orange/20">
-                              <AvatarImage
-                                src={educator.channel_avatar_url}
-                                alt={educator.name}
-                              />
-                              <AvatarFallback>
-                                {educator.name[0]}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1 min-w-0">
-                              <h4 className="font-medium text-white truncate">{educator.name}</h4>
-                              <p className="text-xs text-siso-text/60">
-                                {formatNumber(educator.number_of_subscribers)} subscribers
-                              </p>
-                              {educator.specialization && (
-                                <div className="flex flex-wrap gap-1 mt-1">
-                                  {educator.specialization.slice(0, 2).map((spec) => (
-                                    <span
-                                      key={spec}
-                                      className="px-1.5 py-0.5 text-[10px] rounded-full bg-siso-orange/10 text-siso-orange"
-                                    >
-                                      {spec}
-                                    </span>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                            <ChevronRight className="w-4 h-4 text-siso-text/40 group-hover:text-siso-orange transition-colors" />
-                          </motion.div>
-                        ))}
-                      </div>
-                    )}
+                    <FeaturedEducators
+                      educators={featuredEducators}
+                      isLoading={educatorsLoading}
+                    />
                   </div>
 
                   <div className="space-y-3">
                     <h3 className="text-sm font-medium text-white/80">Popular Videos</h3>
-                    {videosLoading ? (
-                      <div className="grid grid-cols-2 gap-3">
-                        {[...Array(4)].map((_, i) => (
-                          <Skeleton key={i} className="h-32 rounded-lg bg-white/5" />
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-2 gap-3">
-                        {recentVideos?.map((video: any) => (
-                          <motion.div
-                            key={video.id}
-                            className="group cursor-pointer"
-                            whileHover={{ scale: 1.02 }}
-                          >
-                            <div className="relative rounded-lg overflow-hidden">
-                              <img
-                                src={video.thumbnailUrl}
-                                alt={video.title}
-                                className="w-full h-24 object-cover"
-                              />
-                              <div className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded bg-black/80 text-xs text-white">
-                                {video.duration}
-                              </div>
-                            </div>
-                            <div className="mt-2 space-y-1">
-                              <h4 className="text-sm font-medium text-white line-clamp-2">{video.title}</h4>
-                              <div className="flex items-center gap-2">
-                                <Avatar className="h-5 w-5">
-                                  <AvatarImage
-                                    src={video.education_creators.channel_avatar_url}
-                                    alt={video.education_creators.name}
-                                  />
-                                  <AvatarFallback>
-                                    {video.education_creators.name[0]}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <span className="text-xs text-siso-text/60">
-                                  {video.education_creators.name}
-                                </span>
-                              </div>
-                              <p className="text-xs text-siso-text/60">
-                                {formatNumber(video.viewCount)} views
-                              </p>
-                            </div>
-                          </motion.div>
-                        ))}
-                      </div>
-                    )}
+                    <PopularVideos
+                      videos={recentVideos}
+                      isLoading={videosLoading}
+                    />
                   </div>
 
                   <div className="space-y-3">
