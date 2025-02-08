@@ -68,10 +68,30 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
   };
 
   // [Analysis] Calculate if video is new (within last 7 days)
-  const isNew = video.created_at && new Date(video.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const isNew = video.created_at && (() => {
+    try {
+      // [Analysis] Handle both ISO strings and YYYY-MM-DD format
+      const date = new Date(video.created_at);
+      return !isNaN(date.getTime()) && date > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    } catch {
+      return false;
+    }
+  })();
   
   // [Analysis] Calculate if video is trending (more than 1000 views)
   const isTrending = video.metrics?.views > 1000;
+
+  // [Analysis] Format the date for display, handling both ISO and YYYY-MM-DD formats
+  const formatDate = (dateString: string | undefined) => {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return '';
+      return date.toLocaleDateString();
+    } catch {
+      return '';
+    }
+  };
 
   // Stagger animation delay based on index
   const staggerDelay = Math.min(index * 0.1, 0.8);
@@ -161,8 +181,8 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
               </div>
             )}
             {video.created_at && (
-              <time dateTime={new Date(video.created_at).toISOString()}>
-                {new Date(video.created_at).toLocaleDateString()}
+              <time dateTime={video.created_at}>
+                {formatDate(video.created_at)}
               </time>
             )}
           </div>
