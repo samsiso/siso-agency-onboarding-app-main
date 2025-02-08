@@ -26,7 +26,7 @@ export const useEducatorCorrelatedVideos = (channelId: string | undefined) => {
         throw creatorError;
       }
 
-      // [Analysis] Using proper parameter format for the OR condition
+      // [Analysis] Improved query to properly match channel IDs without extra quotes
       const { data: videos, error } = await supabase
         .from('youtube_videos')
         .select(`
@@ -44,7 +44,7 @@ export const useEducatorCorrelatedVideos = (channelId: string | undefined) => {
             slug
           )
         `)
-        .or(`channel_id.eq."${channelId}",channel_id.eq."${creator.name}",channel_id.ilike."%${creator.name}%"`)
+        .or(`channel_id.eq.${channelId},channel_id.eq.${creator.name},channel_id.ilike.${creator.name}`)
         .order('date', { ascending: false })
         .limit(12);
 
