@@ -6,17 +6,20 @@ import { VideoPagination } from '../video-library/VideoPagination';
 import { Skeleton } from '@/components/ui/skeleton';
 import { usePagination } from '@/hooks/use-pagination';
 import { VideoOff } from 'lucide-react';
+import { EducatorCorrelatedVideos } from './EducatorCorrelatedVideos';
 
 interface EducatorVideoSectionProps {
   educatorId: string;
   featuredVideos?: any[];
   educatorName?: string;
+  channelId?: string;
 }
 
 export const EducatorVideoSection: React.FC<EducatorVideoSectionProps> = ({
   educatorId,
   featuredVideos = [],
-  educatorName = ''
+  educatorName = '',
+  channelId
 }) => {
   const [currentPage, setCurrentPage] = React.useState(1);
   const { data: videos, isLoading } = useEducatorVideos(educatorId, currentPage);
@@ -28,8 +31,6 @@ export const EducatorVideoSection: React.FC<EducatorVideoSectionProps> = ({
     totalPages,
     paginationItemsToDisplay: 5
   });
-
-  console.log('Videos in EducatorVideoSection:', videos); // Debug log
 
   if (isLoading) {
     return (
@@ -73,6 +74,13 @@ export const EducatorVideoSection: React.FC<EducatorVideoSectionProps> = ({
           showLeftEllipsis={showLeftEllipsis}
           showRightEllipsis={showRightEllipsis}
         />
+      )}
+      
+      {/* Show correlated videos if we have a channel ID */}
+      {channelId && (
+        <div className="mt-12">
+          <EducatorCorrelatedVideos channelId={channelId} />
+        </div>
       )}
     </div>
   );
