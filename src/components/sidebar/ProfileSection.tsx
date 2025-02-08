@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trophy, Star, ChevronDown, LogOut } from 'lucide-react';
@@ -26,7 +25,6 @@ export const ProfileSection = ({ collapsed }: ProfileSectionProps) => {
   const { userData, loading } = useBasicUserData();
   const { points, rank } = usePoints(userData.id || '');
 
-  // [Analysis] Show loading state while user data is being fetched
   if (loading) {
     return (
       <div className="w-full h-12 animate-pulse bg-siso-text/5 rounded-lg" />
@@ -64,7 +62,6 @@ export const ProfileSection = ({ collapsed }: ProfileSectionProps) => {
         variant="ghost"
         size="icon"
         className="w-full p-2"
-        onClick={() => navigate('/profile')}
       >
         {userData.avatarUrl ? (
           <img
