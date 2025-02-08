@@ -364,6 +364,7 @@ export type Database = {
           id: string
           implementation_guides: Json | null
           is_featured: boolean | null
+          member_count: number | null
           member_type: string | null
           name: string
           niche: string | null
@@ -404,6 +405,7 @@ export type Database = {
           id?: string
           implementation_guides?: Json | null
           is_featured?: boolean | null
+          member_count?: number | null
           member_type?: string | null
           name: string
           niche?: string | null
@@ -444,6 +446,7 @@ export type Database = {
           id?: string
           implementation_guides?: Json | null
           is_featured?: boolean | null
+          member_count?: number | null
           member_type?: string | null
           name?: string
           niche?: string | null
