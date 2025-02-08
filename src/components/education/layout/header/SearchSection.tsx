@@ -110,7 +110,7 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
 
   return (
     <motion.div 
-      className="w-full"
+      className="w-full relative z-[101]"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}

@@ -34,11 +34,17 @@ export const SearchResultsDropdown = ({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.2 }}
-          className="fixed left-0 right-0 mt-2 z-50"
-          style={{ top: 'calc(var(--header-height, 4rem) + 1rem)' }}
+          className="fixed inset-x-0 mt-2 z-[100]"
+          style={{ top: 'calc(var(--header-height, 4rem))' }}
         >
           <div className="mx-4 border border-[#FF5722]/20 bg-black/90 backdrop-blur-md shadow-2xl rounded-xl">
-            <ScrollArea className="h-[calc(90vh-var(--header-height,4rem)-2rem)]">
+            <ScrollArea className="h-[calc(90vh-var(--header-height,4rem)-2rem)] relative">
+              <div className="sticky top-0 z-50 bg-black/95 backdrop-blur-md px-6 py-4 border-b border-[#FF5722]/20">
+                <div className="text-sm font-medium text-white/60 mb-1">
+                  Recent Searches & Suggestions
+                </div>
+              </div>
+
               <div className="p-6 space-y-8">
                 {searchHistory && (
                   <SearchHistory
