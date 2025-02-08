@@ -16,20 +16,17 @@ export const StatsDisplay = ({ stats }: StatsDisplayProps) => {
     {
       icon: GraduationCap,
       label: "Educators",
-      value: stats.totalEducators,
-      color: "text-white"
+      value: stats.totalEducators
     },
     {
       icon: Video,
       label: "Videos",
-      value: stats.totalVideos,
-      color: "text-white"
+      value: stats.totalVideos
     },
     {
       icon: Users,
       label: "Students",
-      value: stats.totalStudents,
-      color: "text-white"
+      value: stats.totalStudents
     }
   ];
 
@@ -45,21 +42,22 @@ export const StatsDisplay = ({ stats }: StatsDisplayProps) => {
         return (
           <motion.div
             key={stat.label}
-            className="flex items-center justify-center gap-3 px-6 py-4 rounded-xl bg-white/10 backdrop-blur-sm 
-                     hover:bg-white/15 transition-all duration-300 group"
+            className="flex items-center justify-center gap-3 p-4 rounded-xl 
+                     bg-black/20 border border-siso-border backdrop-blur-sm
+                     hover:bg-black/30 hover:border-siso-border-hover transition-all duration-300 group"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
           >
-            <Icon className="w-5 h-5 text-white group-hover:scale-110 transition-transform duration-300" />
+            <Icon className="w-5 h-5 text-siso-orange group-hover:scale-110 transition-transform duration-300" />
             <div className="flex items-baseline gap-2">
               <CountUp
                 end={stat.value}
                 duration={2}
                 separator=","
-                className="text-2xl font-bold text-white"
+                className="text-2xl font-bold text-siso-text-bold"
               />
-              <span className="text-sm text-white/80 font-medium">{stat.label}</span>
+              <span className="text-sm text-siso-text/80 font-medium">{stat.label}</span>
             </div>
           </motion.div>
         );
