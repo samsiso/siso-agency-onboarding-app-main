@@ -12,12 +12,21 @@ interface EducatorCorrelatedVideosProps {
 export const EducatorCorrelatedVideos = ({ channelId }: EducatorCorrelatedVideosProps) => {
   const { data: videos, isLoading, error } = useEducatorCorrelatedVideos(channelId);
 
+  // [Analysis] Add debug logging for visibility
+  console.log('[EducatorCorrelatedVideos] Videos loaded:', {
+    channelId,
+    videosCount: videos?.length,
+    isLoading,
+    error
+  });
+
   if (error) {
+    console.error('[EducatorCorrelatedVideos] Error:', error);
     return (
       <div className="p-8 text-center text-siso-text/70 bg-siso-bg-alt/50 rounded-lg">
         <VideoOff className="w-12 h-12 mx-auto mb-4 text-siso-text/50" />
         <p className="text-lg font-semibold">Failed to load videos</p>
-        <p className="text-sm">Please try again later</p>
+        <p className="text-sm">There was an error loading the videos. Please try again later.</p>
       </div>
     );
   }

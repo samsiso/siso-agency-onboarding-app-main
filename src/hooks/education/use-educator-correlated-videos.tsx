@@ -14,6 +14,7 @@ export const useEducatorCorrelatedVideos = (channelId: string | undefined) => {
 
       console.log('[useEducatorCorrelatedVideos] Fetching videos for channel:', channelId);
 
+      // [Analysis] Try both exact match and fuzzy match on channel name
       const { data: videos, error } = await supabase
         .from('youtube_videos')
         .select(`
@@ -31,14 +32,16 @@ export const useEducatorCorrelatedVideos = (channelId: string | undefined) => {
             slug
           )
         `)
-        .eq('channel_id', channelId)
+        .or(`channel_id.eq.${channelId},channel_id.ilike.%${channelId}%`)
         .order('date', { ascending: false })
-        .limit(12); // [Analysis] Limit to 12 videos for performance
+        .limit(12);
 
       if (error) {
         console.error('[useEducatorCorrelatedVideos] Error:', error);
         throw error;
       }
+
+      console.log('[useEducatorCorrelatedVideos] Found videos:', videos?.length);
 
       // [Analysis] Transform the data to match our Video interface
       return videos.map((video): Video => ({
