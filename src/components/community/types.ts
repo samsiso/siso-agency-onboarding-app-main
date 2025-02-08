@@ -1,3 +1,4 @@
+
 export interface CommunityMember {
   id: string;
   name: string;
@@ -19,10 +20,11 @@ export interface CommunityMember {
   rank?: string | null;
   contribution_count?: number;
   referral_count?: number;
-  channel_avatar_url?: string;
+  youtube_avatar_url?: string;  // Added
+  youtube_banner_url?: string;  // Added
   number_of_subscribers?: number;
-  channel_total_videos?: number;
-  channel_location?: string;
+  channel_total_videos?: number; // Added
+  channel_location?: string;     // Added
   is_featured?: boolean;
   slug: string;
 }
