@@ -8,8 +8,8 @@ export const useEducatorDetails = (slug: string) => {
     queryFn: async () => {
       console.log('[useEducatorDetails] Fetching educator details for slug:', slug);
       
-      // [Analysis] Match both old and new slug formats for backward compatibility
-      const { data: educator, error: educatorError } = await supabase
+      // [Analysis] Try exact match first
+      const { data: educator, error: exactMatchError } = await supabase
         .from('education_creators')
         .select(`
           id,
@@ -28,38 +28,40 @@ export const useEducatorDetails = (slug: string) => {
           youtube_url,
           website_url,
           featured_videos,
-          channel_id
+          channel_id,
+          slug
         `)
         .eq('slug', slug)
-        .single();
-      
-      if (educatorError) {
-        console.error('[useEducatorDetails] Error fetching educator details:', educatorError);
-        
-        // [Analysis] If not found with exact slug, try finding by the old format
-        if (slug.match(/-\d+$/)) {
-          const baseSlug = slug.replace(/-\d+$/, '');
-          const { data: oldFormatEducator, error: oldFormatError } = await supabase
-            .from('education_creators')
-            .select()
-            .ilike('slug', `${baseSlug}-%`)
-            .single();
-            
-          if (!oldFormatError && oldFormatEducator) {
-            return oldFormatEducator;
-          }
-        }
-        
-        throw educatorError;
+        .maybeSingle();
+
+      // If exact match found, return it
+      if (educator) {
+        console.log('[useEducatorDetails] Found educator with exact match:', educator);
+        return educator;
       }
+
+      // [Analysis] If not found, try finding by name part of the slug
+      const baseName = slug.split('-')[0]; // Get first part of the slug
+      console.log('[useEducatorDetails] Trying to find by base name:', baseName);
       
-      if (!educator) {
+      const { data: fuzzyMatchEducator, error: fuzzyMatchError } = await supabase
+        .from('education_creators')
+        .select()
+        .ilike('slug', `${baseName}%`)
+        .maybeSingle();
+
+      if (fuzzyMatchError) {
+        console.error('[useEducatorDetails] Error in fuzzy match:', fuzzyMatchError);
+        throw fuzzyMatchError;
+      }
+
+      if (!fuzzyMatchEducator) {
+        console.error('[useEducatorDetails] No educator found for slug:', slug);
         throw new Error('Educator not found');
       }
 
-      console.log('[useEducatorDetails] Found educator:', educator);
-      
-      return educator;
+      console.log('[useEducatorDetails] Found educator with fuzzy match:', fuzzyMatchEducator);
+      return fuzzyMatchEducator;
     },
     enabled: !!slug,
     staleTime: 5 * 60 * 1000,
