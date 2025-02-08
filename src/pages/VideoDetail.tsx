@@ -1,6 +1,5 @@
 
-import { useParams, useSearchParams } from 'react-router-dom';
-import { extractVideoIdFromSlug } from '@/utils/slugUtils';
+import { useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { useVideoDetail } from '@/hooks/useVideoDetail';
 import { LoadingState } from '@/components/education/video-detail/LoadingState';
@@ -9,14 +8,10 @@ import { VideoBreadcrumbs } from '@/components/education/video-detail/VideoBread
 import { VideoDetailLayout } from '@/components/education/video-detail/VideoDetailLayout';
 
 export default function VideoDetail() {
-  const { slug } = useParams();
-  const [searchParams] = useSearchParams();
-  const activeTab = searchParams.get('tab') || 'analysis';
-  
-  const videoId = slug ? extractVideoIdFromSlug(slug) : '';
-  console.log('[VideoDetail] Processing video ID:', videoId);
+  const { id } = useParams();
+  console.log('[VideoDetail] Processing video ID:', id);
 
-  const { data: videoData, isLoading, error } = useVideoDetail(videoId);
+  const { data: videoData, isLoading, error } = useVideoDetail(id || '');
 
   if (isLoading) {
     return <LoadingState />;
@@ -46,7 +41,7 @@ export default function VideoDetail() {
 
         <VideoDetailLayout 
           video={videoData}
-          activeTab={activeTab}
+          activeTab="analysis"
         />
       </div>
     </>

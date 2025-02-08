@@ -52,7 +52,7 @@ function App() {
       <Route path="/leaderboards" element={<Leaderboards />} />
       <Route path="/education" element={<SisoEducation />} />
       <Route path="/education/educators/:slug" element={<EducatorDetail />} />
-      <Route path="/education/videos/:id" element={<VideoDetail />} />
+      <Route path="/education/video/:id" element={<VideoDetail />} />
       <Route path="/terms" element={<Terms />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/thank-you" element={<ThankYou />} />

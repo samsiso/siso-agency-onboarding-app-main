@@ -50,26 +50,18 @@ export const VideoGrid = ({ videos = [], featuredVideos = [], isLoading }: Video
   const handleVideoClick = (video: Video) => {
     console.log('[VideoGrid] Video clicked:', video);
     
-    if (!video.id || !video.title) {
+    if (!video.id) {
       console.error('[VideoGrid] Invalid video data:', video);
       return;
     }
-
-    const slug = video.title
-      .toLowerCase()
-      .replace(/[^\w\s-]/g, '') // Remove special characters
-      .replace(/\s+/g, '-') // Replace spaces with hyphens
-      .replace(/-+/g, '-') // Remove consecutive hyphens
-      .substring(0, 60); // Limit length
     
     console.log('[VideoGrid] Navigating to:', {
-      slug,
       videoId: video.id,
-      fullPath: `/education/videos/${slug}-${video.id}`
+      fullPath: `/education/video/${video.id}`
     });
     
-    // [Analysis] Ensure the path starts with /education/videos
-    navigate(`/education/videos/${slug}-${video.id}`);
+    // [Analysis] Simplified navigation - just use the video ID
+    navigate(`/education/video/${video.id}`);
   };
 
   return (
