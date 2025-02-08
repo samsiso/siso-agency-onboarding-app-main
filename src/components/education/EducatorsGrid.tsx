@@ -1,7 +1,6 @@
 
 import { motion } from 'framer-motion';
 import { EducatorCard } from './EducatorCard';
-import { useNavigate } from 'react-router-dom';
 import { CommunityMember } from '../community/types';
 import { useInView } from 'react-intersection-observer';
 
@@ -13,16 +12,10 @@ interface EducatorsGridProps {
 // [Analysis] Using staggered animations for better visual flow
 // [Plan] Add virtualization at 100+ educators
 export const EducatorsGrid = ({ educators, isLoading }: EducatorsGridProps) => {
-  const navigate = useNavigate();
   const { ref, inView } = useInView({
     triggerOnce: true,
     threshold: 0.1
   });
-
-  const handleEducatorClick = (slug: string) => {
-    // [Analysis] Smoothly transition to educator detail page
-    navigate(`/education/educators/${slug}`);
-  };
 
   if (isLoading) {
     return (
@@ -81,10 +74,7 @@ export const EducatorsGrid = ({ educators, isLoading }: EducatorsGridProps) => {
             damping: 20
           }}
         >
-          <EducatorCard
-            educator={educator}
-            onClick={() => handleEducatorClick(educator.slug || '')}
-          />
+          <EducatorCard educator={educator} />
         </motion.div>
       ))}
     </motion.div>

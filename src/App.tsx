@@ -50,7 +50,7 @@ function App() {
       <Route path="/crypto" element={<Crypto />} />
       <Route path="/economy/leaderboards" element={<Leaderboards />} />
       <Route path="/leaderboards" element={<Leaderboards />} />
-      <Route path="/education" element={<SisoEducation />} />
+      <Route path="/education/*" element={<SisoEducation />} />
       <Route path="/education/educators/:slug" element={<EducatorDetail />} />
       <Route path="/education/video/:id" element={<VideoDetail />} />
       <Route path="/terms" element={<Terms />} />
