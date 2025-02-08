@@ -4,14 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-// [Analysis] Centralized auth state management with optimized profile checks and caching
+// [Analysis] Optimized auth state management with profile caching
 export const useAuthSession = () => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // [Analysis] Initialize auth state on mount with cached profile check
+  // [Analysis] Initialize auth state on mount with optimized profile check
   useEffect(() => {
     let isSubscribed = true;
 
@@ -21,13 +21,12 @@ export const useAuthSession = () => {
         if (isSubscribed) {
           if (session?.user) {
             setUser(session.user);
-            // [Analysis] Only check profile on initial load
+            // [Analysis] Only check profile on initial auth to ensure it exists
             const profile = await checkProfile(session.user.id);
             if (!profile) {
-              console.error('No profile found on session restore');
+              console.error('No profile found during initialization');
               await supabase.auth.signOut();
               setUser(null);
-              navigate('/', { replace: true });
             }
           } else {
             setUser(null);
@@ -40,7 +39,7 @@ export const useAuthSession = () => {
       }
     };
 
-    // [Analysis] Set up auth state listener with optimized navigation
+    // [Analysis] Set up auth state listener with minimal redirects
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state changed:', event, session?.user?.id);
       
@@ -48,19 +47,9 @@ export const useAuthSession = () => {
 
       if (session?.user) {
         setUser(session.user);
-        // [Analysis] Only check profile and navigate on explicit sign in
-        if (event === 'SIGNED_IN') {
-          const profile = await checkProfile(session.user.id);
-          if (!profile) {
-            console.error('No profile found after sign in');
-            await supabase.auth.signOut();
-            setUser(null);
-            navigate('/', { replace: true });
-          }
-        }
       } else {
         setUser(null);
-        // [Analysis] Only navigate on explicit sign out
+        // [Analysis] Only redirect on explicit sign out
         if (event === 'SIGNED_OUT') {
           navigate('/', { replace: true });
         }
@@ -105,7 +94,7 @@ export const useAuthSession = () => {
       const profile = await checkProfile(session.user.id);
       
       if (profile) {
-        console.log('Profile verified, proceeding');
+        console.log('Profile verified, proceeding to home');
         toast({
           title: "Successfully signed in",
           description: "Welcome to SISO Resource Hub!",
