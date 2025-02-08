@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { ToolVideoCard } from './ToolVideoCard';
 import { Input } from "@/components/ui/input";
@@ -41,8 +42,8 @@ export function ToolVideoGrid({ videos = [], featuredVideos = [], isLoading = fa
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {[...Array(8)].map((_, i) => (
+      <div className="space-y-6">
+        {[...Array(4)].map((_, i) => (
           <div key={i} className="animate-pulse">
             <div className="h-48 bg-siso-bg-alt rounded-lg"></div>
           </div>
@@ -90,25 +91,31 @@ export function ToolVideoGrid({ videos = [], featuredVideos = [], isLoading = fa
         ))}
       </div>
 
+      {/* [Analysis] Featured videos are now displayed in a single column layout */}
       {featuredVideos.length > 0 && (
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold text-siso-text-bold">Featured Videos</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {featuredVideos.slice(0, 6).map((video, index) => (
+          <div className="space-y-4">
+            {featuredVideos.map((video, index) => (
               <ToolVideoCard 
                 key={index} 
                 video={video} 
                 featured 
-                className="h-full"
+                className="w-full"
               />
             ))}
           </div>
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {/* [Analysis] Main video list now uses a single column layout */}
+      <div className="space-y-4">
         {filteredVideos.map((video, index) => (
-          <ToolVideoCard key={index} video={video} />
+          <ToolVideoCard 
+            key={index} 
+            video={video} 
+            className="w-full"
+          />
         ))}
       </div>
     </div>
