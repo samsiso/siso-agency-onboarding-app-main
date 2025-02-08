@@ -4,27 +4,25 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-// [Analysis] Optimized auth state management with profile caching and preventing redirect loops
+// [Analysis] Complete rewrite of auth session management to fix infinite redirects
+// [Plan] Monitor auth state changes and session restoration separately
 export const useAuthSession = () => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const profileChecked = useRef(false);
-  // [Analysis] Add ref to track if this is an actual auth event vs just a check
+  // [Analysis] Track initialization vs auth events separately
+  const isInitialized = useRef(false);
   const isAuthEvent = useRef(false);
-  // [Analysis] Cache profile to prevent repeated checks
   const profileCache = useRef<any>(null);
 
   // [Analysis] Memoized profile check to prevent unnecessary API calls
   const checkProfile = useCallback(async (userId: string) => {
-    // [Analysis] Return cached profile if available
     if (profileCache.current) {
       return profileCache.current;
     }
 
     try {
-      console.log('Checking profile for user:', userId);
       const { data: profile, error } = await supabase
         .from('profiles')
         .select('*')
@@ -36,12 +34,10 @@ export const useAuthSession = () => {
         return null;
       }
       
-      // [Analysis] Cache successful profile checks
       if (profile) {
         profileCache.current = profile;
       }
       
-      console.log('Profile found:', profile);
       return profile;
     } catch (error) {
       console.error('Error in checkProfile:', error);
@@ -49,91 +45,90 @@ export const useAuthSession = () => {
     }
   }, []);
 
-  // [Analysis] Initialize auth state on mount with optimized profile check
+  // [Analysis] Initialize session state without triggering navigation
   useEffect(() => {
-    let isSubscribed = true;
-
-    const initializeAuth = async () => {
+    const initializeSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        if (!isSubscribed) return;
-
+        
         if (session?.user) {
-          setUser(session.user);
-          // [Analysis] Only check profile once on initial load
-          if (!profileChecked.current) {
-            profileChecked.current = true;
-            const profile = await checkProfile(session.user.id);
-            if (!profile) {
-              console.error('No profile found during initialization');
-              await supabase.auth.signOut();
-              setUser(null);
-            }
-          }
-        } else {
-          setUser(null);
-        }
-        setLoading(false);
-      } catch (error) {
-        console.error('Error initializing auth:', error);
-        setLoading(false);
-      }
-    };
-
-    // [Analysis] Set up auth state listener with minimal redirects
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state changed:', event, session?.user?.id);
-      
-      if (!isSubscribed) return;
-
-      // [Analysis] Only handle navigation on explicit auth events
-      if (event === 'SIGNED_IN') {
-        isAuthEvent.current = true;
-      } else if (event === 'SIGNED_OUT') {
-        isAuthEvent.current = true;
-        navigate('/', { replace: true });
-      }
-
-      if (session?.user) {
-        setUser(session.user);
-        // [Analysis] Only navigate on explicit sign in
-        if (isAuthEvent.current) {
           const profile = await checkProfile(session.user.id);
           if (profile) {
-            navigate('/home', { replace: true });
+            setUser(session.user);
+          } else {
+            await supabase.auth.signOut();
+            setUser(null);
           }
         }
-      } else {
-        setUser(null);
+        
+        isInitialized.current = true;
+        setLoading(false);
+      } catch (error) {
+        console.error('Error initializing session:', error);
+        setLoading(false);
       }
+    };
 
-      // [Analysis] Reset auth event flag after handling
+    initializeSession();
+  }, [checkProfile]);
+
+  // [Analysis] Handle auth state changes separately from initialization
+  useEffect(() => {
+    if (!isInitialized.current) return;
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event, session?.user?.id);
+
+      if (event === 'SIGNED_IN') {
+        isAuthEvent.current = true;
+        if (session?.user) {
+          const profile = await checkProfile(session.user.id);
+          if (profile) {
+            setUser(session.user);
+            navigate('/home', { replace: true });
+            toast({
+              title: "Successfully signed in",
+              description: "Welcome to SISO Resource Hub!",
+            });
+          } else {
+            await supabase.auth.signOut();
+            setUser(null);
+          }
+        }
+      } else if (event === 'SIGNED_OUT') {
+        isAuthEvent.current = true;
+        setUser(null);
+        profileCache.current = null;
+        navigate('/', { replace: true });
+        toast({
+          title: "Signed out",
+          description: "Come back soon!",
+        });
+      } else if (event === 'TOKEN_REFRESHED') {
+        // Just update the user without navigation
+        if (session?.user) {
+          setUser(session.user);
+        }
+      }
+      
       isAuthEvent.current = false;
-      setLoading(false);
     });
 
-    initializeAuth();
-
     return () => {
-      isSubscribed = false;
       subscription.unsubscribe();
     };
-  }, [navigate, checkProfile]);
+  }, [navigate, checkProfile, toast]);
 
   const handleSignIn = async (session: any) => {
     try {
       console.log('Handling sign in for session:', session);
       isAuthEvent.current = true;
-      setUser(session.user);
       
       const profile = await checkProfile(session.user.id);
       
       if (profile) {
+        setUser(session.user);
         console.log('Profile verified, proceeding to home');
-        toast({
-          title: "Successfully signed in",
-          description: "Welcome to SISO Resource Hub!",
-        });
         return true;
       } else {
         console.error('Profile not found after sign in');
@@ -158,7 +153,7 @@ export const useAuthSession = () => {
       isAuthEvent.current = true;
       await supabase.auth.signOut();
       setUser(null);
-      profileCache.current = null; // Clear profile cache
+      profileCache.current = null;
       toast({
         title: "Signed out",
         description: "Come back soon!",

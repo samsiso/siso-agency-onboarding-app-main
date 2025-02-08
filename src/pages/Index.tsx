@@ -1,4 +1,3 @@
-
 import { lazy, Suspense } from 'react';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { Bot } from 'lucide-react';
@@ -29,24 +28,24 @@ export default function Index() {
     return <LoadingFallback />;
   }
 
-  // [Analysis] Show landing page for non-authenticated users
-  if (!user) {
-    const {
-      ExpandableChat,
-      ExpandableChatHeader,
-      ExpandableChatBody,
-      ExpandableChatFooter,
-      ChatMessageList,
-      ChatBubble,
-      ChatBubbleAvatar,
-      ChatBubbleMessage,
-      ChatInput,
-    } = ChatComponents;
+  // [Analysis] Show landing page for all users
+  const {
+    ExpandableChat,
+    ExpandableChatHeader,
+    ExpandableChatBody,
+    ExpandableChatFooter,
+    ChatMessageList,
+    ChatBubble,
+    ChatBubbleAvatar,
+    ChatBubbleMessage,
+    ChatInput,
+  } = ChatComponents;
 
-    return (
-      <div className="relative">
-        <Suspense fallback={<LoadingFallback />}>
-          <LandingPage />
+  return (
+    <div className="relative">
+      <Suspense fallback={<LoadingFallback />}>
+        <LandingPage />
+        {!user && (
           <ExpandableChat
             size="lg"
             position="bottom-right"
@@ -86,16 +85,7 @@ export default function Index() {
               </form>
             </ExpandableChatFooter>
           </ExpandableChat>
-        </Suspense>
-      </div>
-    );
-  }
-
-  // [Analysis] Show landing page for authenticated users too
-  return (
-    <div className="relative">
-      <Suspense fallback={<LoadingFallback />}>
-        <LandingPage />
+        )}
       </Suspense>
     </div>
   );
