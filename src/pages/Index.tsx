@@ -3,6 +3,8 @@ import { lazy, Suspense } from 'react';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { Bot } from 'lucide-react';
 import { LoadingFallback } from '@/components/landing/sections/LoadingFallback';
+import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 // [Analysis] Implementing granular code splitting for optimal initial load
 // [Plan] Monitor component load times and adjust splits if needed
@@ -10,7 +12,7 @@ import { LoadingFallback } from '@/components/landing/sections/LoadingFallback';
 // Lazy load components with descriptive chunk names
 const LandingPage = lazy(() => import(/* webpackChunkName: "landing" */ '@/components/landing/LandingPage'));
 const ChatComponents = {
-  ExpandableChat: lazy(() => import(/* webpackChunkName: "chat-expandable" */ '@/components/ui/expandable-chat').then(m => ({ default: m.ExpandableChat }))),
+  ExpandableChat: lazy(() => import(/* webpackChunkName: "chat-expandable" */ '@/components/ui/expandable-chat').then(m => ({ default: m.ExpandableChatHeader }))),
   ExpandableChatHeader: lazy(() => import(/* webpackChunkName: "chat-header" */ '@/components/ui/expandable-chat').then(m => ({ default: m.ExpandableChatHeader }))),
   ExpandableChatBody: lazy(() => import(/* webpackChunkName: "chat-body" */ '@/components/ui/expandable-chat').then(m => ({ default: m.ExpandableChatBody }))),
   ExpandableChatFooter: lazy(() => import(/* webpackChunkName: "chat-footer" */ '@/components/ui/expandable-chat').then(m => ({ default: m.ExpandableChatFooter }))),
@@ -23,8 +25,16 @@ const ChatComponents = {
 
 export default function Index() {
   const { user, loading } = useAuthSession();
+  const navigate = useNavigate();
 
-  // [Analysis] Early auth check and redirect
+  // [Analysis] Handle authenticated users immediately
+  useEffect(() => {
+    if (!loading && user) {
+      navigate('/home', { replace: true });
+    }
+  }, [loading, user, navigate]);
+
+  // [Analysis] Early auth check and loading state
   if (loading) {
     return <LoadingFallback />;
   }
@@ -91,12 +101,6 @@ export default function Index() {
     );
   }
 
-  // [Analysis] For authenticated users, show landing page content
-  return (
-    <div className="relative">
-      <Suspense fallback={<LoadingFallback />}>
-        <LandingPage />
-      </Suspense>
-    </div>
-  );
+  // [Analysis] While redirecting, show loading state
+  return <LoadingFallback />;
 }

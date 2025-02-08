@@ -1,7 +1,5 @@
 
 import { lazy, Suspense, memo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuthSession } from '@/hooks/useAuthSession';
 import { LoadingFallback } from './sections/LoadingFallback';
 
 // [Analysis] Lazy load components for optimal performance
@@ -66,21 +64,6 @@ const ScrollNav = lazy(() =>
 );
 
 const LandingPage = () => {
-  const { user, loading } = useAuthSession();
-  const navigate = useNavigate();
-
-  // [Analysis] Handle loading state
-  if (loading) {
-    return <LoadingFallback />;
-  }
-
-  // [Analysis] Redirect authenticated users to home
-  if (user) {
-    console.log('User authenticated in LandingPage, redirecting to home');
-    navigate('/', { replace: true });
-    return null;
-  }
-
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-black via-siso-bg to-black overflow-x-hidden">
       {/* Preload critical resources */}

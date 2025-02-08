@@ -53,10 +53,15 @@ export const useAuthSession = () => {
               console.error('No profile found after sign in');
               await supabase.auth.signOut();
               setUser(null);
+            } else {
+              // [Analysis] Navigate to home on successful sign in
+              navigate('/home', { replace: true });
             }
           }
         } else {
           setUser(null);
+          // [Analysis] Navigate to welcome page on sign out
+          navigate('/', { replace: true });
         }
         setLoading(false);
       }
@@ -71,7 +76,7 @@ export const useAuthSession = () => {
       }
       subscription.unsubscribe();
     };
-  }, []);
+  }, [navigate]);
 
   const checkProfile = async (userId: string) => {
     try {
@@ -111,7 +116,7 @@ export const useAuthSession = () => {
           title: "Successfully signed in",
           description: "Welcome to SISO Resource Hub!",
         });
-        navigate('/');
+        navigate('/home', { replace: true });
         return true;
       } else {
         console.error('Profile not found after waiting');
@@ -137,7 +142,7 @@ export const useAuthSession = () => {
         title: "Signed out",
         description: "Come back soon!",
       });
-      navigate('/');
+      navigate('/', { replace: true });
     } catch (error) {
       console.error('Error signing out:', error);
       toast({
