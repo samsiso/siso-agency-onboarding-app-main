@@ -23,9 +23,12 @@ interface PopularVideosProps {
 }
 
 export const PopularVideos = ({ videos, isLoading }: PopularVideosProps) => {
+  // [Analysis] Early return if no videos
+  if (!videos?.length) return null;
+
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {[...Array(4)].map((_, i) => (
           <Skeleton 
             key={i} 
@@ -56,9 +59,9 @@ export const PopularVideos = ({ videos, isLoading }: PopularVideosProps) => {
       variants={containerVariants}
       initial="hidden"
       animate="show"
-      className="grid grid-cols-2 gap-4"
+      className="grid grid-cols-1 md:grid-cols-2 gap-4"
     >
-      {videos?.map((video) => (
+      {videos.map((video) => (
         <motion.div
           key={video.id}
           variants={itemVariants}
@@ -66,7 +69,7 @@ export const PopularVideos = ({ videos, isLoading }: PopularVideosProps) => {
           whileHover={{ scale: 1.02 }}
         >
           <div className="relative aspect-video rounded-xl overflow-hidden 
-            bg-gradient-to-br from-white/5 to-transparent">
+            bg-gradient-to-br from-white/5 to-transparent backdrop-blur-sm">
             <img
               src={video.thumbnailUrl}
               alt={video.title}
@@ -74,54 +77,60 @@ export const PopularVideos = ({ videos, isLoading }: PopularVideosProps) => {
                 group-hover:scale-105"
             />
             
-            {/* Overlay & Play Button */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent 
-              opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <motion.div
-                  initial={false}
-                  animate={{ scale: [0.9, 1], opacity: [0, 1] }}
-                  className="w-12 h-12 rounded-full bg-siso-orange/90 flex items-center justify-center
-                    transform group-hover:scale-110 transition-transform duration-300"
-                >
-                  <Play className="w-6 h-6 text-white fill-current ml-1" />
-                </motion.div>
-              </div>
+            {/* Enhanced Overlay & Play Button */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent 
+              opacity-0 group-hover:opacity-100 transition-all duration-300">
+              <motion.div 
+                className="absolute inset-0 flex items-center justify-center"
+                initial={false}
+                animate={{ scale: [0.9, 1], opacity: [0, 1] }}
+              >
+                <div className="w-16 h-16 rounded-full bg-gradient-to-r from-siso-red to-siso-orange 
+                  flex items-center justify-center transform group-hover:scale-110 
+                  transition-transform duration-300 shadow-lg shadow-siso-orange/20">
+                  <Play className="w-8 h-8 text-white fill-current ml-1" />
+                </div>
+              </motion.div>
             </div>
 
-            {/* Duration Badge */}
-            <div className="absolute bottom-2 right-2 px-2 py-1 rounded-md bg-black/80 
-              text-xs text-white flex items-center gap-1.5 backdrop-blur-sm">
-              <Clock className="w-3 h-3" />
+            {/* Enhanced Duration Badge */}
+            <div className="absolute bottom-3 right-3 px-3 py-1.5 rounded-lg 
+              bg-black/80 backdrop-blur-sm border border-white/10
+              text-sm text-white flex items-center gap-2">
+              <Clock className="w-4 h-4" />
               {video.duration}
             </div>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-3">
             <h4 className="text-base font-medium text-white line-clamp-2 
               group-hover:text-transparent group-hover:bg-clip-text 
-              group-hover:bg-gradient-to-r group-hover:from-siso-red group-hover:to-siso-orange">
+              group-hover:bg-gradient-to-r group-hover:from-siso-red group-hover:to-siso-orange
+              transition-all duration-300">
               {video.title}
             </h4>
 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Avatar className="h-6 w-6">
+                <Avatar className="h-8 w-8 ring-2 ring-white/10 group-hover:ring-siso-orange/20 
+                  transition-colors duration-300">
                   <AvatarImage
                     src={video.education_creators.channel_avatar_url}
                     alt={video.education_creators.name}
                   />
-                  <AvatarFallback>
+                  <AvatarFallback className="bg-gradient-to-br from-siso-red/10 to-siso-orange/10">
                     {video.education_creators.name[0]}
                   </AvatarFallback>
                 </Avatar>
-                <span className="text-sm text-siso-text/70">
-                  {video.education_creators.name}
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5 text-sm text-siso-text/60">
-                <Eye className="w-4 h-4" />
-                {formatNumber(video.viewCount)}
+                <div className="flex flex-col">
+                  <span className="text-sm text-siso-text/90 group-hover:text-white transition-colors">
+                    {video.education_creators.name}
+                  </span>
+                  <div className="flex items-center gap-1.5 text-sm text-siso-text/60">
+                    <Eye className="w-4 h-4" />
+                    {formatNumber(video.viewCount)} views
+                  </div>
+                </div>
               </div>
             </div>
           </div>
