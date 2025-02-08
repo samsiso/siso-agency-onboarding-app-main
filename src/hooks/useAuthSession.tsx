@@ -20,7 +20,18 @@ export const useAuthSession = () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (isSubscribed) {
-          setUser(session?.user || null);
+          if (session?.user) {
+            setUser(session.user);
+            // [Analysis] Check profile immediately on session restore
+            const profile = await checkProfile(session.user.id);
+            if (!profile) {
+              console.error('No profile found on session restore');
+              await supabase.auth.signOut();
+              setUser(null);
+            }
+          } else {
+            setUser(null);
+          }
           setLoading(false);
         }
       } catch (error) {
@@ -33,7 +44,20 @@ export const useAuthSession = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state changed:', event, session?.user?.id);
       if (isSubscribed) {
-        setUser(session?.user || null);
+        if (session?.user) {
+          setUser(session.user);
+          // [Analysis] Check profile on auth state change
+          if (event === 'SIGNED_IN') {
+            const profile = await checkProfile(session.user.id);
+            if (!profile) {
+              console.error('No profile found after sign in');
+              await supabase.auth.signOut();
+              setUser(null);
+            }
+          }
+        } else {
+          setUser(null);
+        }
         setLoading(false);
       }
     });
@@ -87,6 +111,7 @@ export const useAuthSession = () => {
           title: "Successfully signed in",
           description: "Welcome to SISO Resource Hub!",
         });
+        navigate('/');
         return true;
       } else {
         console.error('Profile not found after waiting');
@@ -103,14 +128,24 @@ export const useAuthSession = () => {
     }
   };
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
     console.log('Handling sign out');
-    setUser(null);
-    toast({
-      title: "Signed out",
-      description: "Come back soon!",
-    });
-    navigate('/');
+    try {
+      await supabase.auth.signOut();
+      setUser(null);
+      toast({
+        title: "Signed out",
+        description: "Come back soon!",
+      });
+      navigate('/');
+    } catch (error) {
+      console.error('Error signing out:', error);
+      toast({
+        variant: "destructive",
+        title: "Error signing out",
+        description: "There was a problem signing you out. Please try again.",
+      });
+    }
   };
 
   return {
