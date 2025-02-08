@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { SearchInput } from './components/SearchInput';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SearchSectionProps {
   searchQuery: string;
