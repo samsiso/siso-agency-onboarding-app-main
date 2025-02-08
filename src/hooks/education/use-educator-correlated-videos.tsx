@@ -14,7 +14,19 @@ export const useEducatorCorrelatedVideos = (channelId: string | undefined) => {
 
       console.log('[useEducatorCorrelatedVideos] Fetching videos for channel:', channelId);
 
-      // [Analysis] Try both exact match and fuzzy match on channel name
+      // First get the creator details to get both channel_id and name
+      const { data: creator, error: creatorError } = await supabase
+        .from('education_creators')
+        .select('name, channel_id')
+        .eq('channel_id', channelId)
+        .single();
+
+      if (creatorError) {
+        console.error('[useEducatorCorrelatedVideos] Error fetching creator:', creatorError);
+        throw creatorError;
+      }
+
+      // [Analysis] Try matching on both channel ID and creator name
       const { data: videos, error } = await supabase
         .from('youtube_videos')
         .select(`
@@ -32,7 +44,7 @@ export const useEducatorCorrelatedVideos = (channelId: string | undefined) => {
             slug
           )
         `)
-        .or(`channel_id.eq.${channelId},channel_id.ilike.%${channelId}%`)
+        .or(`channel_id.eq.${channelId},channel_id.eq.${creator.name},channel_id.ilike.%${creator.name}%`)
         .order('date', { ascending: false })
         .limit(12);
 
@@ -52,7 +64,7 @@ export const useEducatorCorrelatedVideos = (channelId: string | undefined) => {
         thumbnail_url: video.thumbnailUrl || '',
         created_at: video.date,
         educator: {
-          name: video.education_creators?.name || 'Unknown Creator',
+          name: video.education_creators?.name || creator.name || 'Unknown Creator',
           avatar_url: video.education_creators?.channel_avatar_url || '',
           title: 'Content Creator',
           slug: video.education_creators?.slug
