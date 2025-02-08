@@ -12,7 +12,7 @@ import { useEffect } from 'react';
 // Lazy load components with descriptive chunk names
 const LandingPage = lazy(() => import(/* webpackChunkName: "landing" */ '@/components/landing/LandingPage'));
 const ChatComponents = {
-  ExpandableChat: lazy(() => import(/* webpackChunkName: "chat-expandable" */ '@/components/ui/expandable-chat').then(m => ({ default: m.ExpandableChatHeader }))),
+  ExpandableChat: lazy(() => import(/* webpackChunkName: "chat-expandable" */ '@/components/ui/expandable-chat').then(m => ({ default: m.ExpandableChat }))),
   ExpandableChatHeader: lazy(() => import(/* webpackChunkName: "chat-header" */ '@/components/ui/expandable-chat').then(m => ({ default: m.ExpandableChatHeader }))),
   ExpandableChatBody: lazy(() => import(/* webpackChunkName: "chat-body" */ '@/components/ui/expandable-chat').then(m => ({ default: m.ExpandableChatBody }))),
   ExpandableChatFooter: lazy(() => import(/* webpackChunkName: "chat-footer" */ '@/components/ui/expandable-chat').then(m => ({ default: m.ExpandableChatFooter }))),
