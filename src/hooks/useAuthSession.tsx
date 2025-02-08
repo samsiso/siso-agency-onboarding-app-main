@@ -1,15 +1,38 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-// [Analysis] Optimized auth state management with profile caching
+// [Analysis] Optimized auth state management with profile caching and preventing redirect loops
 export const useAuthSession = () => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const profileChecked = useRef(false);
+
+  // [Analysis] Memoized profile check to prevent unnecessary API calls
+  const checkProfile = useCallback(async (userId: string) => {
+    try {
+      console.log('Checking profile for user:', userId);
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+        
+      if (error) {
+        console.error('Error checking profile:', error);
+        return null;
+      }
+      console.log('Profile found:', profile);
+      return profile;
+    } catch (error) {
+      console.error('Error in checkProfile:', error);
+      return null;
+    }
+  }, []);
 
   // [Analysis] Initialize auth state on mount with optimized profile check
   useEffect(() => {
@@ -18,21 +41,24 @@ export const useAuthSession = () => {
     const initializeAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        if (isSubscribed) {
-          if (session?.user) {
-            setUser(session.user);
-            // [Analysis] Only check profile on initial auth to ensure it exists
+        if (!isSubscribed) return;
+
+        if (session?.user) {
+          setUser(session.user);
+          // [Analysis] Only check profile once on initial load
+          if (!profileChecked.current) {
+            profileChecked.current = true;
             const profile = await checkProfile(session.user.id);
             if (!profile) {
               console.error('No profile found during initialization');
               await supabase.auth.signOut();
               setUser(null);
             }
-          } else {
-            setUser(null);
           }
-          setLoading(false);
+        } else {
+          setUser(null);
         }
+        setLoading(false);
       } catch (error) {
         console.error('Error initializing auth:', error);
         setLoading(false);
@@ -40,7 +66,7 @@ export const useAuthSession = () => {
     };
 
     // [Analysis] Set up auth state listener with minimal redirects
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log('Auth state changed:', event, session?.user?.id);
       
       if (!isSubscribed) return;
@@ -63,28 +89,7 @@ export const useAuthSession = () => {
       isSubscribed = false;
       subscription.unsubscribe();
     };
-  }, [navigate]);
-
-  const checkProfile = async (userId: string) => {
-    try {
-      console.log('Checking profile for user:', userId);
-      const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
-        
-      if (error) {
-        console.error('Error checking profile:', error);
-        return null;
-      }
-      console.log('Profile found:', profile);
-      return profile;
-    } catch (error) {
-      console.error('Error in checkProfile:', error);
-      return null;
-    }
-  };
+  }, [navigate, checkProfile]);
 
   const handleSignIn = async (session: any) => {
     try {
@@ -99,6 +104,7 @@ export const useAuthSession = () => {
           title: "Successfully signed in",
           description: "Welcome to SISO Resource Hub!",
         });
+        // [Analysis] Only navigate on successful sign in
         navigate('/home', { replace: true });
         return true;
       } else {
@@ -125,6 +131,7 @@ export const useAuthSession = () => {
         title: "Signed out",
         description: "Come back soon!",
       });
+      // [Analysis] Only navigate on explicit sign out
       navigate('/', { replace: true });
     } catch (error) {
       console.error('Error signing out:', error);
