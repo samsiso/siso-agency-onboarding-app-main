@@ -8,7 +8,7 @@ interface SearchHistoryProps {
     id: string;
     query: string;
     created_at: string;
-    result_type: 'video' | 'educator' | 'path';
+    result_type: string;  // Accept any string from DB
   }>;
   onHistoryCleared: () => Promise<void>;
 }
@@ -28,13 +28,18 @@ export const SearchHistory = ({ history, onHistoryCleared }: SearchHistoryProps)
     }
   };
 
-  if (!history || history.length === 0) return null;
+  // Filter valid result types and map the data
+  const validHistory = history.filter(item => 
+    ['video', 'path', 'educator'].includes(item.result_type)
+  );
+
+  if (!validHistory || validHistory.length === 0) return null;
 
   return (
     <div className="space-y-3">
       <h3 className="text-sm font-medium text-white/80">Recent Searches</h3>
       <div className="space-y-2">
-        {history.map((item) => (
+        {validHistory.map((item) => (
           <div
             key={item.id}
             className="flex items-center justify-between group px-3 py-2 rounded-lg hover:bg-white/5"

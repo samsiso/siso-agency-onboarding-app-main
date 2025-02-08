@@ -108,7 +108,10 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
         query: searchQuery,
         result_type: 'path'
       });
-      await refetchHistory();
+      // Wrap the refetch in an async function that returns void
+      await (async () => {
+        await refetchHistory();
+      })();
     } catch (error) {
       console.error('Error saving search:', error);
     }
@@ -165,7 +168,9 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
                   {searchHistory && (
                     <SearchHistory
                       history={searchHistory}
-                      onHistoryCleared={refetchHistory}
+                      onHistoryCleared={async () => {
+                        await refetchHistory();
+                      }}
                     />
                   )}
 
