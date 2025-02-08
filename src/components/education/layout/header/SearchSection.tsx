@@ -1,3 +1,4 @@
+
 import { Search, Command, Mic } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { PlaceholdersAndVanishInput } from '@/components/ui/placeholders-and-vanish-input';
@@ -30,7 +31,6 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log('Search submitted:', searchQuery);
-    // Add any additional search submission logic here
   };
 
   return (
@@ -48,22 +48,22 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
           onSubmit={handleSubmit}
           onFocus={() => setIsSearchFocused(true)}
           onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
-          className="w-full h-14 pl-12 pr-24 bg-gradient-to-r from-siso-text/5 to-siso-text/10 
-            border border-siso-text/10 rounded-xl text-lg
-            focus:ring-2 focus:ring-siso-orange/30 focus:border-siso-orange/50
-            hover:border-siso-text/20 hover:bg-siso-text/10
-            transition-all duration-300 backdrop-blur-sm"
+          className="w-full h-14 pl-12 pr-24 bg-white/10 backdrop-blur-sm
+            border border-white/20 rounded-xl text-lg text-white placeholder-white/60
+            focus:ring-2 focus:ring-white/30 focus:border-white/40
+            hover:bg-white/15 hover:border-white/30
+            transition-all duration-300"
         />
         
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-siso-text/50 
-          group-hover:text-siso-text/70 transition-colors" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/70 
+          group-hover:text-white transition-colors" />
         
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 text-siso-text/50">
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 text-white/70">
           <kbd className="hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border 
-            border-siso-text/20 bg-siso-text/5 px-1.5 font-mono text-[10px] font-medium">
+            border-white/20 bg-white/10 px-1.5 font-mono text-[10px] font-medium text-white/80">
             <span className="text-xs"><Command className="h-3 w-3" /></span>K
           </kbd>
-          <Mic className="w-5 h-5 cursor-pointer hover:text-siso-text/90 transition-colors" />
+          <Mic className="w-5 h-5 cursor-pointer hover:text-white transition-colors" />
         </div>
       </div>
     </motion.div>

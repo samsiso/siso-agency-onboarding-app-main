@@ -1,3 +1,4 @@
+
 import { GraduationCap, Video, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
 import CountUp from 'react-countup';
@@ -16,25 +17,25 @@ export const StatsDisplay = ({ stats }: StatsDisplayProps) => {
       icon: GraduationCap,
       label: "Educators",
       value: stats.totalEducators,
-      color: "text-siso-orange"
+      color: "text-white"
     },
     {
       icon: Video,
       label: "Videos",
       value: stats.totalVideos,
-      color: "text-blue-500"
+      color: "text-white"
     },
     {
       icon: Users,
       label: "Students",
       value: stats.totalStudents,
-      color: "text-green-500"
+      color: "text-white"
     }
   ];
 
   return (
     <motion.div 
-      className="flex justify-center gap-8 py-4"
+      className="grid grid-cols-1 md:grid-cols-3 gap-4"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 0.2 }}
@@ -44,20 +45,21 @@ export const StatsDisplay = ({ stats }: StatsDisplayProps) => {
         return (
           <motion.div
             key={stat.label}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-siso-text/5 hover:bg-siso-text/10 transition-all duration-300"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
+            className="flex items-center justify-center gap-3 px-6 py-4 rounded-xl bg-white/10 backdrop-blur-sm 
+                     hover:bg-white/15 transition-all duration-300 group"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
           >
-            <Icon className={`w-4 h-4 ${stat.color}`} />
-            <div className="flex items-baseline gap-1.5">
+            <Icon className="w-5 h-5 text-white group-hover:scale-110 transition-transform duration-300" />
+            <div className="flex items-baseline gap-2">
               <CountUp
                 end={stat.value}
                 duration={2}
                 separator=","
-                className="text-lg font-semibold text-siso-text-bold"
+                className="text-2xl font-bold text-white"
               />
-              <span className="text-sm text-siso-text/70">{stat.label}</span>
+              <span className="text-sm text-white/80 font-medium">{stat.label}</span>
             </div>
           </motion.div>
         );
