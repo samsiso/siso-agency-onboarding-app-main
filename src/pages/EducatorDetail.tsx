@@ -8,7 +8,7 @@ import { EducatorHeader } from '@/components/education/educator-detail/EducatorH
 import { EducatorStats } from '@/components/education/educator-detail/EducatorStats';
 import { EducatorVideoSection } from '@/components/education/educator-detail/EducatorVideoSection';
 import { EducatorLoadingScreen } from '@/components/education/educator-detail/EducatorLoadingScreen';
-import { useEducatorDetails } from '@/hooks/use-education-queries';
+import { useEducatorDetails } from '@/hooks/education';
 import { toast } from 'sonner';
 
 export default function EducatorDetail() {

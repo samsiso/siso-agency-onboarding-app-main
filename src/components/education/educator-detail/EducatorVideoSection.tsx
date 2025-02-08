@@ -1,5 +1,5 @@
 import React from 'react';
-import { useEducatorVideos } from '@/hooks/use-education-queries';
+import { useEducatorVideos } from '@/hooks/education';
 import { VideoGrid } from '../video-library/VideoGrid';
 import { VideoPagination } from '../video-library/VideoPagination';
 import { Skeleton } from '@/components/ui/skeleton';

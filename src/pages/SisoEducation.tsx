@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button';
 import { EducationHeader } from '@/components/education/layout/EducationHeader';
 import { EducationToolbar } from '@/components/education/layout/EducationToolbar';
 import { EducationContent } from '@/components/education/layout/EducationContent';
-import { useEducatorsList } from '@/hooks/use-education-queries';
+import { useEducatorsList } from '@/hooks/education';
 import { useEducationStats } from '@/hooks/use-education-stats';
 
 export default function SisoEducation() {

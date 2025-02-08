@@ -68,7 +68,9 @@ export const useEducatorsList = (searchQuery: string) => {
         channel_total_videos: item.channel_total_videos || 0,
         channel_location: item.channel_location || '',
         slug: item.slug || '',
-        featured_videos: Array.isArray(item.featured_videos) ? item.featured_videos : [],
+        featured_videos: Array.isArray(item.featured_videos) 
+          ? (item.featured_videos as any[]).map(v => String(v))  // Convert to string[]
+          : [],
         is_featured: item.is_featured || false,
         member_count: item.member_count || 0
       }));
