@@ -31,7 +31,6 @@ export default function ChatGPTAssistants() {
   const [selectedAssistant, setSelectedAssistant] = useState<Assistant | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const { data: assistants, isLoading } = useAssistants();
 
@@ -183,8 +182,6 @@ export default function ChatGPTAssistants() {
           size="lg"
           position="bottom-right"
           icon={<Bot className="h-6 w-6" />}
-          isOpen={isChatOpen}
-          onOpenChange={setIsChatOpen}
         >
           <ExpandableChatHeader className="flex-col text-center justify-center">
             <h1 className="text-xl font-semibold">Assistant Helper</h1>
