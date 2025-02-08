@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { SkillLevelFilters } from './components/SkillLevelFilters';
 import { SearchInput } from './components/SearchInput';
 import { SearchResultsDropdown } from './components/SearchResultsDropdown';
 
@@ -15,7 +14,6 @@ interface SearchSectionProps {
 
 export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProps) => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const [selectedSkillLevel, setSelectedSkillLevel] = useState<string | null>(null);
 
   const { data: searchHistory, refetch: refetchHistory } = useQuery({
     queryKey: ['search-history'],
@@ -104,9 +102,7 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
         query: searchQuery,
         result_type: 'path'
       });
-      await (async () => {
-        await refetchHistory();
-      })();
+      await refetchHistory();
     } catch (error) {
       console.error('Error saving search:', error);
     }
@@ -114,16 +110,11 @@ export const SearchSection = ({ searchQuery, onSearchChange }: SearchSectionProp
 
   return (
     <motion.div 
-      className="w-full space-y-6"
+      className="w-full"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
     >
-      <SkillLevelFilters
-        selectedSkillLevel={selectedSkillLevel}
-        onSkillLevelChange={setSelectedSkillLevel}
-      />
-
       <div className="relative">
         <SearchInput
           searchQuery={searchQuery}

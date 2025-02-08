@@ -31,9 +31,10 @@ export const SearchResultsDropdown = ({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 10 }}
-      className="absolute mt-2 w-full bg-black/90 border border-[#FF5722]/20 rounded-xl backdrop-blur-sm"
+      className="absolute mt-2 w-full max-h-[80vh] bg-black/90 border border-[#FF5722]/20 rounded-xl backdrop-blur-sm shadow-xl overflow-hidden"
+      style={{ maxHeight: 'calc(100vh - 200px)' }}
     >
-      <ScrollArea className="h-[600px]">
+      <ScrollArea className="h-full">
         <div className="p-4 space-y-6">
           {searchHistory && (
             <SearchHistory
