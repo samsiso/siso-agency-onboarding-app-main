@@ -96,6 +96,13 @@ export type Database = {
             referencedRelation: "ai_news"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "ai_news_bookmarks_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "mv_trending_articles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       ai_news_reactions: {
@@ -128,6 +135,13 @@ export type Database = {
             referencedRelation: "ai_news"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "ai_news_reactions_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "mv_trending_articles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       ai_news_summaries: {
@@ -158,6 +172,13 @@ export type Database = {
             columns: ["news_id"]
             isOneToOne: true
             referencedRelation: "ai_news"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_summaries_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: true
+            referencedRelation: "mv_trending_articles"
             referencedColumns: ["id"]
           },
         ]
@@ -923,6 +944,13 @@ export type Database = {
             referencedRelation: "ai_news"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "news_ai_analysis_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "mv_trending_articles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       news_comments: {
@@ -956,6 +984,13 @@ export type Database = {
             columns: ["news_id"]
             isOneToOne: false
             referencedRelation: "ai_news"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "news_comments_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "mv_trending_articles"
             referencedColumns: ["id"]
           },
         ]
@@ -2080,6 +2115,24 @@ export type Database = {
         }
         Relationships: []
       }
+      mv_trending_articles: {
+        Row: {
+          article_type: string | null
+          category: string | null
+          date: string | null
+          description: string | null
+          id: string | null
+          image_url: string | null
+          impact: string | null
+          reading_time: number | null
+          source: string | null
+          source_credibility: string | null
+          technical_complexity: string | null
+          title: string | null
+          views: number | null
+        }
+        Relationships: []
+      }
       user_crypto_history: {
         Row: {
           created_at: string | null
@@ -2110,6 +2163,10 @@ export type Database = {
         Args: {
           user_id: string
         }
+        Returns: undefined
+      }
+      refresh_trending_articles: {
+        Args: Record<PropertyKey, never>
         Returns: undefined
       }
       update_creator_featured_videos: {

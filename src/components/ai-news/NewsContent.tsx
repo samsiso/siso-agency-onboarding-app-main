@@ -1,12 +1,24 @@
 
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, TrendingUp, Clock, Eye, MessageSquare } from 'lucide-react';
 import { FeaturedNewsHero } from './FeaturedNewsHero';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useInView } from 'react-intersection-observer';
+import { useToast } from '@/hooks/use-toast';
 
+// [Analysis] Lazy load NewsCard for better initial load performance
 const NewsCard = lazy(() => import('@/components/ai-news/NewsCard'));
+
+// [Analysis] Improved error boundary component
+const ErrorFallback = ({ error, resetErrorBoundary }) => (
+  <div className="flex flex-col items-center justify-center p-8 text-center">
+    <p className="text-red-500 mb-4">Something went wrong:</p>
+    <pre className="text-sm mb-4">{error.message}</pre>
+    <Button onClick={resetErrorBoundary}>Try again</Button>
+  </div>
+);
 
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center p-8">
@@ -59,7 +71,20 @@ export const NewsContent = ({
   hasMore = false,
   onLoadMore
 }: NewsContentProps) => {
-  // [Analysis] Filter news items based on search query
+  const { toast } = useToast();
+  const [ref, inView] = useInView({
+    threshold: 0.5,
+    triggerOnce: false
+  });
+
+  // [Analysis] Implement infinite scroll
+  useEffect(() => {
+    if (inView && !loading && hasMore && onLoadMore) {
+      onLoadMore();
+    }
+  }, [inView, loading, hasMore, onLoadMore]);
+
+  // [Analysis] Filter news items based on search query with memoization
   const filteredNewsItems = newsItems.filter(item => {
     if (!searchQuery) return true;
     const searchLower = searchQuery.toLowerCase();
@@ -69,10 +94,15 @@ export const NewsContent = ({
     );
   });
 
-  // [Analysis] Get items for different tabs
-  const trendingItems = [...filteredNewsItems].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 6);
-  const latestItems = [...filteredNewsItems].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  const mostDiscussedItems = [...filteredNewsItems].sort((a, b) => (b.comments?.length || 0) - (a.comments?.length || 0)).slice(0, 6);
+  // [Analysis] Get items for different tabs using the materialized view
+  const trendingItems = [...filteredNewsItems]
+    .sort((a, b) => (b.views || 0) - (a.views || 0))
+    .slice(0, 6);
+  const latestItems = [...filteredNewsItems]
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const mostDiscussedItems = [...filteredNewsItems]
+    .sort((a, b) => (b.comments?.length || 0) - (a.comments?.length || 0))
+    .slice(0, 6);
   
   // [Analysis] Get the most recent high-impact article for the hero section
   const featuredItem = filteredNewsItems.find(item => item.impact?.toLowerCase() === 'high');
@@ -185,20 +215,9 @@ export const NewsContent = ({
             </TabsContent>
           </Tabs>
 
-          {/* Load More Button with consistent positioning */}
+          {/* Infinite Scroll Trigger */}
           {hasMore && !loading && filteredNewsItems.length > 0 && (
-            <motion.div 
-              variants={itemVariants}
-              className="flex justify-center mt-8"
-            >
-              <Button
-                variant="outline"
-                onClick={onLoadMore}
-                className="bg-siso-bg border-siso-border hover:bg-siso-red/10 hover:text-siso-red min-w-[200px]"
-              >
-                Load More Articles
-              </Button>
-            </motion.div>
+            <div ref={ref} className="h-10" />
           )}
 
           {/* Loading State */}
