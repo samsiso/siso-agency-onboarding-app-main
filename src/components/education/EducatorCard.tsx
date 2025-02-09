@@ -1,12 +1,15 @@
 
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { User, MapPin, Video, Eye, TrendingUp, Crown, ImageOff, Clock, RefreshCw } from 'lucide-react';
-import { AspectRatio } from '@/components/ui/aspect-ratio';
+import { RefreshCw, TrendingUp } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { format } from 'date-fns';
+import { EducatorCardBanner } from './educator-card/EducatorCardBanner';
+import { EducatorCardProfile } from './educator-card/EducatorCardProfile';
+import { EducatorCardStats } from './educator-card/EducatorCardStats';
+import { EducatorCardDescription } from './educator-card/EducatorCardDescription';
+import { EducatorCardSpecializations } from './educator-card/EducatorCardSpecializations';
 
 interface EducatorCardProps {
   educator: {
@@ -106,48 +109,14 @@ export const EducatorCard = ({ educator, className }: EducatorCardProps) => {
           className
         )}
       >
-        {/* Banner Section */}
-        <div className="relative h-40 w-full overflow-hidden">
-          {educator.channel_banner_url ? (
-            <motion.div 
-              className="absolute inset-0"
-              initial={{ opacity: 0, scale: 1.1 }}
-              animate={{ 
-                opacity: bannerLoaded ? 1 : 0,
-                scale: bannerLoaded ? 1 : 1.1
-              }}
-              transition={{ duration: 0.5 }}
-            >
-              <AspectRatio ratio={16/5} className="h-full">
-                {!bannerError ? (
-                  <img
-                    src={educator.channel_banner_url}
-                    alt={`${educator.name}'s channel banner`}
-                    className="h-full w-full object-cover"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="h-full w-full bg-gradient-to-r from-siso-red/10 to-siso-orange/10 flex items-center justify-center">
-                    <ImageOff className="w-8 h-8 text-siso-text/30" />
-                  </div>
-                )}
-              </AspectRatio>
-            </motion.div>
-          ) : (
-            <div className="h-full w-full bg-gradient-to-r from-siso-red/10 to-siso-orange/10" />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-          
-          {educator.is_featured && (
-            <Badge 
-              variant="secondary" 
-              className="absolute top-4 right-4 bg-black/40 backdrop-blur-sm border-siso-orange/30"
-            >
-              <Crown className="w-3 h-3 mr-1 text-siso-orange" />
-              Featured Creator
-            </Badge>
-          )}
-        </div>
+        <EducatorCardBanner
+          bannerUrl={educator.channel_banner_url}
+          isFeatured={educator.is_featured}
+          onBannerLoad={() => setBannerLoaded(true)}
+          onBannerError={() => setBannerError(true)}
+          bannerLoaded={bannerLoaded}
+          bannerError={bannerError}
+        />
 
         {/* Sync Status Badge */}
         {educator.sync_status && (
@@ -172,41 +141,14 @@ export const EducatorCard = ({ educator, className }: EducatorCardProps) => {
           </div>
         )}
 
-        {/* Profile Section - Floating on Banner */}
-        <div className="relative px-6 -mt-10">
-          <motion.div 
-            className="relative h-20 w-20 rounded-2xl overflow-hidden ring-4 ring-siso-bg"
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 300 }}
-          >
-            {(educator.channel_avatar_url || educator.profile_image_url) ? (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: avatarLoaded ? 1 : 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                {!avatarError ? (
-                  <AspectRatio ratio={1} className="h-full">
-                    <img
-                      src={educator.channel_avatar_url || educator.profile_image_url}
-                      alt={educator.name}
-                      className="h-full w-full object-cover"
-                      loading="lazy"
-                    />
-                  </AspectRatio>
-                ) : (
-                  <div className="h-full w-full bg-siso-bg-alt flex items-center justify-center">
-                    <User className="w-8 h-8 text-siso-text/70" />
-                  </div>
-                )}
-              </motion.div>
-            ) : (
-              <div className="h-full w-full bg-siso-bg-alt flex items-center justify-center">
-                <User className="w-8 h-8 text-siso-text/70" />
-              </div>
-            )}
-          </motion.div>
-        </div>
+        <EducatorCardProfile
+          name={educator.name}
+          avatarUrl={educator.channel_avatar_url || educator.profile_image_url}
+          onAvatarLoad={() => setAvatarLoaded(true)}
+          onAvatarError={() => setAvatarError(true)}
+          avatarLoaded={avatarLoaded}
+          avatarError={avatarError}
+        />
 
         {/* Content Section */}
         <div className="px-6 mt-4 space-y-4">
@@ -215,69 +157,19 @@ export const EducatorCard = ({ educator, className }: EducatorCardProps) => {
               {educator.name}
             </h3>
             
-            <div className="flex items-center gap-4 mt-2 text-sm text-siso-text/70">
-              {educator.number_of_subscribers && (
-                <div className="flex items-center gap-1.5">
-                  <User className="w-4 h-4" />
-                  <span>{formatNumber(educator.number_of_subscribers)} subscribers</span>
-                </div>
-              )}
-              
-              {educator.last_synced_at && (
-                <div className="flex items-center gap-1.5">
-                  <Clock className="w-4 h-4" />
-                  <span>Last synced {format(new Date(educator.last_synced_at), 'MMM d, yyyy')}</span>
-                </div>
-              )}
-            </div>
+            <EducatorCardStats
+              subscriberCount={educator.number_of_subscribers}
+              videoCount={educator.channel_total_videos}
+              totalViews={educator.channel_total_views}
+              location={educator.channel_location}
+              lastSyncedAt={educator.last_synced_at}
+              formatNumber={formatNumber}
+            />
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
-            {educator.channel_location && (
-              <div className="flex items-center gap-1.5 text-sm text-siso-text/70">
-                <MapPin className="w-4 h-4 flex-shrink-0" />
-                <span className="truncate">{educator.channel_location}</span>
-              </div>
-            )}
-            {educator.channel_total_videos && (
-              <div className="flex items-center gap-1.5 text-sm text-siso-text/70">
-                <Video className="w-4 h-4 flex-shrink-0" />
-                <span>{educator.channel_total_videos} videos</span>
-              </div>
-            )}
-          </div>
+          <EducatorCardDescription description={educator.description} />
 
-          {/* Description - Fixed Height with Ellipsis */}
-          {educator.description && (
-            <p className="text-sm text-siso-text/70 line-clamp-3 h-[4.5rem] group-hover:text-siso-text/90 transition-colors">
-              {educator.description}
-            </p>
-          )}
-
-          {/* Specializations - Scrollable Container */}
-          {educator.specialization && educator.specialization.length > 0 && (
-            <div className="space-y-1 overflow-hidden">
-              <div className="flex flex-wrap gap-2">
-                {educator.specialization.map((spec, index) => (
-                  <motion.span
-                    key={index}
-                    className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-siso-red/10 to-siso-orange/10 text-siso-text/90 border border-siso-border/50 group-hover:border-siso-orange/30 transition-colors whitespace-nowrap"
-                    whileHover={{ scale: 1.05 }}
-                  >
-                    {spec}
-                  </motion.span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Additional Stats */}
-          {educator.channel_total_views && (
-            <div className="flex items-center gap-1.5 text-sm text-siso-text/70 mt-2">
-              <Eye className="w-4 h-4" />
-              <span>{formatNumber(educator.channel_total_views)} total views</span>
-            </div>
-          )}
+          <EducatorCardSpecializations specializations={educator.specialization} />
 
           {educator.video_upload_frequency && (
             <div className="flex items-center gap-1.5 text-sm text-siso-text/70">
@@ -290,4 +182,3 @@ export const EducatorCard = ({ educator, className }: EducatorCardProps) => {
     </Link>
   );
 };
-
