@@ -1,5 +1,5 @@
 
-import { Search, Command, Mic, Clock, History, ArrowRight } from 'lucide-react';
+import { Search, Command, Mic, Clock, History, ArrowRight, Star, TrendingUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PlaceholdersAndVanishInput } from '@/components/ui/placeholders-and-vanish-input';
 import { 
