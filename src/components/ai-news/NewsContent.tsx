@@ -1,9 +1,10 @@
 
 import { lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2 } from 'lucide-react';
+import { Loader2, TrendingUp, Clock, Eye, MessageSquare } from 'lucide-react';
 import { FeaturedNewsHero } from './FeaturedNewsHero';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const NewsCard = lazy(() => import('@/components/ai-news/NewsCard'));
 
@@ -68,19 +69,19 @@ export const NewsContent = ({
     );
   });
 
+  // [Analysis] Get items for different tabs
+  const trendingItems = [...filteredNewsItems].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 6);
+  const latestItems = [...filteredNewsItems].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const mostDiscussedItems = [...filteredNewsItems].sort((a, b) => (b.comments?.length || 0) - (a.comments?.length || 0)).slice(0, 6);
+  
   // [Analysis] Get the most recent high-impact article for the hero section
   const featuredItem = filteredNewsItems.find(item => item.impact?.toLowerCase() === 'high');
-  
-  // [Analysis] Get all remaining articles for the grid
-  const gridItems = featuredItem 
-    ? filteredNewsItems.filter(item => item.id !== featuredItem.id)
-    : filteredNewsItems;
 
   return (
     <Suspense fallback={<LoadingSpinner />}>
       <AnimatePresence mode="wait">
         <motion.div
-          key={searchQuery} // Force re-render on search change
+          key={searchQuery}
           initial="hidden"
           animate="show"
           exit="hidden"
@@ -89,10 +90,7 @@ export const NewsContent = ({
         >
           {/* Featured News Hero with improved transitions */}
           {featuredItem && (
-            <motion.div
-              variants={itemVariants}
-              className="w-full"
-            >
+            <motion.div variants={itemVariants} className="w-full">
               <FeaturedNewsHero 
                 item={featuredItem} 
                 onGenerateSummary={onGenerateSummary}
@@ -100,32 +98,95 @@ export const NewsContent = ({
             </motion.div>
           )}
 
-          {/* Regular News Grid - Updated with consistent sizing */}
-          {gridItems.length > 0 && (
-            <motion.div
-              variants={containerVariants}
-              className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 auto-rows-[minmax(300px,auto)]"
-            >
-              {gridItems.map((item) => (
-                <motion.div
-                  key={item.id}
-                  variants={itemVariants}
-                  className="group h-full min-h-[300px] flex"
-                >
-                  <NewsCard
-                    item={item}
-                    summaries={summaries}
-                    loadingSummaries={loadingSummaries}
-                    onGenerateSummary={onGenerateSummary}
-                    isCompact={false}
-                  />
-                </motion.div>
-              ))}
-            </motion.div>
-          )}
+          {/* Tabs for content organization */}
+          <Tabs defaultValue="latest" className="w-full">
+            <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
+              <TabsTrigger value="latest" className="flex items-center gap-2">
+                <Clock className="h-4 w-4" />
+                Latest
+              </TabsTrigger>
+              <TabsTrigger value="trending" className="flex items-center gap-2">
+                <TrendingUp className="h-4 w-4" />
+                Trending
+              </TabsTrigger>
+              <TabsTrigger value="discussed" className="flex items-center gap-2">
+                <MessageSquare className="h-4 w-4" />
+                Most Discussed
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="latest" className="mt-6">
+              <motion.div
+                variants={containerVariants}
+                className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 auto-rows-[minmax(300px,auto)]"
+              >
+                {latestItems.map((item) => (
+                  <motion.div
+                    key={item.id}
+                    variants={itemVariants}
+                    className="group h-full min-h-[300px] flex"
+                  >
+                    <NewsCard
+                      item={item}
+                      summaries={summaries}
+                      loadingSummaries={loadingSummaries}
+                      onGenerateSummary={onGenerateSummary}
+                      isCompact={false}
+                    />
+                  </motion.div>
+                ))}
+              </motion.div>
+            </TabsContent>
+
+            <TabsContent value="trending" className="mt-6">
+              <motion.div
+                variants={containerVariants}
+                className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 auto-rows-[minmax(300px,auto)]"
+              >
+                {trendingItems.map((item) => (
+                  <motion.div
+                    key={item.id}
+                    variants={itemVariants}
+                    className="group h-full min-h-[300px] flex"
+                  >
+                    <NewsCard
+                      item={item}
+                      summaries={summaries}
+                      loadingSummaries={loadingSummaries}
+                      onGenerateSummary={onGenerateSummary}
+                      isCompact={false}
+                    />
+                  </motion.div>
+                ))}
+              </motion.div>
+            </TabsContent>
+
+            <TabsContent value="discussed" className="mt-6">
+              <motion.div
+                variants={containerVariants}
+                className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 auto-rows-[minmax(300px,auto)]"
+              >
+                {mostDiscussedItems.map((item) => (
+                  <motion.div
+                    key={item.id}
+                    variants={itemVariants}
+                    className="group h-full min-h-[300px] flex"
+                  >
+                    <NewsCard
+                      item={item}
+                      summaries={summaries}
+                      loadingSummaries={loadingSummaries}
+                      onGenerateSummary={onGenerateSummary}
+                      isCompact={false}
+                    />
+                  </motion.div>
+                ))}
+              </motion.div>
+            </TabsContent>
+          </Tabs>
 
           {/* Load More Button with consistent positioning */}
-          {hasMore && !loading && gridItems.length > 0 && (
+          {hasMore && !loading && filteredNewsItems.length > 0 && (
             <motion.div 
               variants={itemVariants}
               className="flex justify-center mt-8"
