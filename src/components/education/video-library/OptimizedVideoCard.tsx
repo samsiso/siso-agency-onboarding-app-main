@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -26,7 +25,6 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
   const [isBookmarked, setIsBookmarked] = useState(false);
   const { user } = useAuthSession();
 
-  // [Analysis] Using intersection observer for performance optimization
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -46,7 +44,6 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
     return () => observer.disconnect();
   }, [index]);
 
-  // Check if video is bookmarked
   useEffect(() => {
     if (!user?.id) return;
     
@@ -70,7 +67,6 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
     onClick?.();
   };
 
-  // Format relative time
   const formatUploadDate = (dateString: string | undefined) => {
     if (!dateString) return '';
     try {
@@ -81,7 +77,6 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
     }
   };
 
-  // [Analysis] Calculate engagement score (simple version)
   const calculateEngagementScore = () => {
     const views = video.metrics?.views || 0;
     const comments = video.metrics?.comments || 0;
@@ -92,7 +87,6 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
   const engagementScore = calculateEngagementScore();
   const uploadDate = formatUploadDate(video.created_at);
 
-  // Stagger animation delay based on index
   const staggerDelay = Math.min(index * 0.1, 0.8);
 
   return (
@@ -122,7 +116,6 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
             index={index}
           />
           
-          {/* Quick Stats Overlay */}
           <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent">
             <div className="flex items-center justify-between text-white text-xs">
               <div className="flex items-center gap-2">
@@ -175,16 +168,15 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
             {video.title}
           </h3>
 
-          {/* Video metadata with improved layout */}
           <div className="space-y-2">
             <VideoMetadata
               educator={video.educator}
               metrics={video.metrics}
+              created_at={video.created_at}
             />
           </div>
         </div>
 
-        {/* Progress bar for watched videos */}
         <div className="absolute bottom-0 left-0 w-full h-1 bg-siso-bg">
           <div className="h-full bg-gradient-to-r from-siso-red to-siso-orange" style={{ width: '0%' }} />
         </div>
@@ -192,4 +184,3 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
     </TooltipProvider>
   );
 };
-
