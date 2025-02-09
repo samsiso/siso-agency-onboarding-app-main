@@ -59,8 +59,9 @@ export const useVideoDetail = (videoId: string) => {
       }
 
       // Get the latest subscriber count from history
-      const latestSubscriberCount = videoDetails.education_creators?.subscriber_count_history?.length > 0
-        ? videoDetails.education_creators.subscriber_count_history[videoDetails.education_creators.subscriber_count_history.length - 1].count
+      const subscriberCountHistory = videoDetails.education_creators?.subscriber_count_history as { count: number }[] || [];
+      const latestSubscriberCount = subscriberCountHistory.length > 0
+        ? subscriberCountHistory[subscriberCountHistory.length - 1].count
         : 0;
 
       // Transform database fields to match Video interface
@@ -118,4 +119,3 @@ export const useVideoDetail = (videoId: string) => {
     }
   });
 };
-

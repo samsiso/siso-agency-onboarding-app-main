@@ -33,13 +33,29 @@ export function VideoAnalysis({ videoId }: VideoAnalysisProps) {
         .maybeSingle();
       
       if (error) throw error;
-      return data as VideoAnalysisType;
+      
+      // [Analysis] Cast JSON fields to their proper types
+      return {
+        ...data,
+        chapters: data?.chapters as VideoAnalysisType['chapters'],
+        code_quality_metrics: data?.code_quality_metrics as VideoAnalysisType['code_quality_metrics'],
+        code_segments: data?.code_segments as VideoAnalysisType['code_segments'],
+        community_insights: data?.community_insights as VideoAnalysisType['community_insights'],
+        content_timeline: data?.content_timeline as VideoAnalysisType['content_timeline'],
+        external_resources: data?.external_resources as VideoAnalysisType['external_resources'],
+        key_concepts: data?.key_concepts as VideoAnalysisType['key_concepts'],
+        learning_outcomes: data?.learning_outcomes as VideoAnalysisType['learning_outcomes'],
+        learning_path: data?.learning_path as VideoAnalysisType['learning_path'],
+        practice_exercises: data?.practice_exercises as VideoAnalysisType['practice_exercises'],
+        sentiment_analysis: data?.sentiment_analysis as VideoAnalysisType['sentiment_analysis'],
+        supplementary_materials: data?.supplementary_materials as VideoAnalysisType['supplementary_materials'],
+        visual_aids: data?.visual_aids as VideoAnalysisType['visual_aids']
+      } as VideoAnalysisType;
     },
   });
 
   const handleTimeClick = (timestamp: string) => {
     setSelectedTimestamp(timestamp);
-    // This will be implemented to jump to specific timestamps in the video
     console.log('Jumping to timestamp:', timestamp);
   };
 

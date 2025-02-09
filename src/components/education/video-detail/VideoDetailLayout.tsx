@@ -19,7 +19,6 @@ interface VideoDetailLayoutProps {
 export const VideoDetailLayout = ({ video, activeTab }: VideoDetailLayoutProps) => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-black to-gray-900">
-      {/* Full-width video section with gradient overlay */}
       <div className="relative w-full bg-black/60">
         <div className="max-w-[1800px] mx-auto">
           <LazyVideoPlayer videoId={video.id} title={video.title} />
@@ -33,7 +32,6 @@ export const VideoDetailLayout = ({ video, activeTab }: VideoDetailLayoutProps) 
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          {/* Content Card with Glass Effect */}
           <div className="space-y-6 rounded-xl bg-white/5 backdrop-blur-sm p-6 border border-white/10">
             <div className="space-y-4">
               <VideoMetadata 
@@ -44,7 +42,6 @@ export const VideoDetailLayout = ({ video, activeTab }: VideoDetailLayoutProps) 
                 commentCount={video.metrics.comments}
               />
               
-              {/* Video Quality Badges */}
               <div className="flex flex-wrap gap-2">
                 {video.has_captions && (
                   <Badge variant="secondary" className="flex items-center gap-1">
@@ -73,21 +70,17 @@ export const VideoDetailLayout = ({ video, activeTab }: VideoDetailLayoutProps) 
             
             <div className="flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-4">
               <VideoCreatorInfo
-                channelName={video.educator.name}
-                channelAvatar={video.educator.avatar_url}
+                name={video.educator.name}
+                avatar={video.educator.avatar_url}
                 subscriberCount={video.educator.subscriber_count}
                 videoCount={video.educator.video_count}
                 uploadFrequency={video.educator.upload_frequency}
-                educatorSlug={video.educator.slug}
+                slug={video.educator.slug}
               />
-              <VideoActions 
-                videoId={video.id}
-                hasCaption={video.has_captions}
-              />
+              <VideoActions videoId={video.id} />
             </div>
           </div>
 
-          {/* Description Card */}
           {video.full_description && (
             <div className="rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 overflow-hidden">
               <VideoDescription 
@@ -97,17 +90,14 @@ export const VideoDetailLayout = ({ video, activeTab }: VideoDetailLayoutProps) 
             </div>
           )}
 
-          {/* Tabs Panel with Glass Effect */}
           <div className="rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 overflow-hidden">
             <VideoInteractionPanel 
               videoId={video.id} 
               activeTab={activeTab}
-              metrics={video.metrics}
             />
           </div>
         </motion.div>
 
-        {/* Related Videos with Glass Effect */}
         <motion.div 
           className="space-y-6"
           initial={{ opacity: 0, x: 20 }}
@@ -116,9 +106,8 @@ export const VideoDetailLayout = ({ video, activeTab }: VideoDetailLayoutProps) 
         >
           <div className="rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 p-4">
             <RelatedVideos 
-              currentVideoId={video.id} 
+              videoId={video.id} 
               topics={video.topics}
-              category={video.metrics.category}
             />
           </div>
         </motion.div>
@@ -126,4 +115,3 @@ export const VideoDetailLayout = ({ video, activeTab }: VideoDetailLayoutProps) 
     </div>
   );
 };
-
