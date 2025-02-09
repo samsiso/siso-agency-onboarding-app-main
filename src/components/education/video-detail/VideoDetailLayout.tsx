@@ -72,9 +72,9 @@ export const VideoDetailLayout = ({ video, activeTab }: VideoDetailLayoutProps) 
               <VideoCreatorInfo
                 channelName={video.educator.name}
                 channelAvatar={video.educator.avatar_url}
-                title={video.educator.title || 'Content Creator'}
+                educatorSlug={video.educator.slug}
               />
-              <VideoActions videoId={video.id} />
+              <VideoActions video={video} />
             </div>
           </div>
 
@@ -89,7 +89,7 @@ export const VideoDetailLayout = ({ video, activeTab }: VideoDetailLayoutProps) 
 
           <div className="rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 overflow-hidden">
             <VideoInteractionPanel 
-              videoId={video.id} 
+              video={video}
               activeTab={activeTab}
             />
           </div>
