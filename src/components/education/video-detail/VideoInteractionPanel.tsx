@@ -1,10 +1,8 @@
-
 import { Brain, MessageCircle, ListChecks, TrendingUp } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { VideoAnalysis } from '../VideoAnalysis';
 import { VideoChat } from '../VideoChat';
 import { VideoTakeaways } from '../VideoTakeaways';
-import { BusinessTab } from '../video-analysis/tabs/BusinessTab';
 
 interface VideoInteractionPanelProps {
   videoId: string;

@@ -1,5 +1,5 @@
 
-import { VideoAnalysis } from '../types/analysis';
+import { VideoAnalysis } from '@/components/education/types/analysis';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Clock, BarChart3, Brain } from 'lucide-react';

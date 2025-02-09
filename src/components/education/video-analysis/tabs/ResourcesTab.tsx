@@ -1,5 +1,5 @@
 
-import { VideoAnalysis } from '../types/analysis';
+import { VideoAnalysis } from '@/components/education/types/analysis';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link2, ExternalLink } from 'lucide-react';
