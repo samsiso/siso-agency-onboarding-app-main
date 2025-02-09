@@ -84,8 +84,8 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
   // [Analysis] Calculate engagement score (simple version)
   const calculateEngagementScore = () => {
     const views = video.metrics?.views || 0;
-    const comments = video.metrics?.comment_count || 0;
-    const likes = video.metrics?.likes_count || 0;
+    const comments = video.metrics?.comments || 0;
+    const likes = video.metrics?.likes || 0;
     return ((comments + likes) / (views || 1)) * 100;
   };
 
@@ -132,11 +132,11 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
                 </div>
                 <div className="flex items-center gap-1">
                   <MessageSquare className="w-3 h-3" />
-                  <span>{formatNumber(video.metrics?.comment_count || 0)}</span>
+                  <span>{formatNumber(video.metrics?.comments || 0)}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <ThumbsUp className="w-3 h-3" />
-                  <span>{formatNumber(video.metrics?.likes_count || 0)}</span>
+                  <span>{formatNumber(video.metrics?.likes || 0)}</span>
                 </div>
               </div>
               <Tooltip>
@@ -149,8 +149,8 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
                 <TooltipContent>
                   <div className="text-xs">
                     <p>Engagement Score: {engagementScore.toFixed(1)}%</p>
-                    <p>Comments: {video.metrics?.comment_count || 0}</p>
-                    <p>Likes: {video.metrics?.likes_count || 0}</p>
+                    <p>Comments: {video.metrics?.comments || 0}</p>
+                    <p>Likes: {video.metrics?.likes || 0}</p>
                   </div>
                 </TooltipContent>
               </Tooltip>
@@ -192,3 +192,4 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
     </TooltipProvider>
   );
 };
+
