@@ -19,9 +19,11 @@ import { BusinessTab } from './video-analysis/tabs/BusinessTab';
 
 interface VideoAnalysisProps {
   videoId: string;
+  businessView?: boolean;
 }
 
-export function VideoAnalysis({ videoId }: VideoAnalysisProps) {
+// [Analysis] Added businessView prop to conditionally render different views while maintaining single source of truth for video analysis data
+export function VideoAnalysis({ videoId, businessView = false }: VideoAnalysisProps) {
   const [selectedTimestamp, setSelectedTimestamp] = useState<string | null>(null);
 
   // [Analysis] Added type guards to safely transform Supabase data
@@ -125,6 +127,15 @@ export function VideoAnalysis({ videoId }: VideoAnalysisProps) {
     );
   }
 
+  // [Analysis] If businessView is true, we directly render the BusinessTab component
+  if (businessView) {
+    return (
+      <div className="p-6">
+        <BusinessTab analysis={analysis} />
+      </div>
+    );
+  }
+
   return (
     <div className="p-6">
       <Tabs defaultValue="overview" className="w-full">
@@ -183,4 +194,3 @@ export function VideoAnalysis({ videoId }: VideoAnalysisProps) {
     </div>
   );
 }
-

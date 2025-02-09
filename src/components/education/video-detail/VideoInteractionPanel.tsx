@@ -10,6 +10,7 @@ interface VideoInteractionPanelProps {
   activeTab: string;
 }
 
+// [Analysis] Using separate view flag for business analysis to maintain code reuse while differentiating views
 export const VideoInteractionPanel = ({ videoId, activeTab }: VideoInteractionPanelProps) => {
   return (
     <Tabs defaultValue={activeTab} className="space-y-6">
@@ -49,7 +50,7 @@ export const VideoInteractionPanel = ({ videoId, activeTab }: VideoInteractionPa
       </TabsContent>
 
       <TabsContent value="business">
-        <VideoAnalysis videoId={videoId} />
+        <VideoAnalysis videoId={videoId} businessView />
       </TabsContent>
 
       <TabsContent value="chat">
@@ -62,3 +63,4 @@ export const VideoInteractionPanel = ({ videoId, activeTab }: VideoInteractionPa
     </Tabs>
   );
 };
+
