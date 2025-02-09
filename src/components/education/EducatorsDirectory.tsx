@@ -1,5 +1,5 @@
 
-import { useEffect, useRef, useCallback, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CommunityMember } from '../community/types';
 import { CommunityMemberDetails } from '../community/CommunityMemberDetails';
@@ -35,7 +35,6 @@ export const EducatorsDirectory = ({
     rootMargin: '100px',
   });
 
-  // Fetch more data when the load more element comes into view
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
@@ -84,7 +83,15 @@ export const EducatorsDirectory = ({
               channel_banner_url: member.youtube_banner_url,
               number_of_subscribers: member.member_count,
               specialization: member.specialization || [],
-              is_featured: member.is_featured
+              is_featured: member.is_featured,
+              last_synced_at: member.last_synced_at,
+              sync_status: member.sync_status,
+              description: member.description,
+              slug: member.slug || '',
+              video_upload_frequency: member.video_upload_frequency,
+              channel_location: member.channel_location,
+              channel_total_videos: member.channel_total_videos,
+              channel_total_views: member.channel_total_views
             }))}
             isLoading={isLoading}
           />
@@ -131,10 +138,14 @@ export const EducatorsDirectory = ({
                   channel_banner_url: member.youtube_banner_url,
                   number_of_subscribers: member.member_count,
                   channel_total_videos: member.contribution_count,
+                  channel_total_views: member.channel_total_views,
                   specialization: member.specialization,
                   channel_location: member.channel_location,
                   slug: member.slug || '',
-                  is_featured: member.is_featured
+                  is_featured: member.is_featured,
+                  last_synced_at: member.last_synced_at,
+                  sync_status: member.sync_status,
+                  video_upload_frequency: member.video_upload_frequency
                 }}
                 onClick={() => setSelectedMember(member)}
               />
@@ -167,3 +178,4 @@ export const EducatorsDirectory = ({
     </motion.div>
   );
 };
+
