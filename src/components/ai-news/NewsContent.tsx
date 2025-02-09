@@ -1,5 +1,5 @@
 
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import { FeaturedNewsHero } from './FeaturedNewsHero';
@@ -67,35 +67,47 @@ export const NewsContent = ({
     triggerOnce: false
   });
 
-  // [Analysis] Implement infinite scroll
-  useEffect(() => {
-    if (inView && !loading && hasMore && onLoadMore) {
+  // [Analysis] Memoize callback to prevent recreating function on each render
+  const handleLoadMore = useCallback(() => {
+    if (!loading && hasMore && onLoadMore) {
       onLoadMore();
     }
-  }, [inView, loading, hasMore, onLoadMore]);
+  }, [loading, hasMore, onLoadMore]);
 
-  // [Analysis] Filter news items based on search query
-  const filteredNewsItems = newsItems.filter(item => {
-    if (!searchQuery) return true;
+  // [Analysis] Memoize filtered news items to prevent unnecessary recalculation
+  const filteredNewsItems = useMemo(() => {
+    if (!searchQuery) return newsItems;
     const searchLower = searchQuery.toLowerCase();
-    return (
+    return newsItems.filter(item => 
       item.title?.toLowerCase().includes(searchLower) ||
       item.description?.toLowerCase().includes(searchLower)
     );
-  });
+  }, [newsItems, searchQuery]);
 
-  // [Analysis] Get items for different tabs using the materialized view
-  const trendingItems = [...filteredNewsItems]
-    .sort((a, b) => (b.views || 0) - (a.views || 0))
-    .slice(0, 6);
-  const latestItems = [...filteredNewsItems]
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  const mostDiscussedItems = [...filteredNewsItems]
-    .sort((a, b) => (b.comments?.length || 0) - (a.comments?.length || 0))
-    .slice(0, 6);
-  
-  // [Analysis] Get the most recent high-impact article for the hero section
-  const featuredItem = filteredNewsItems.find(item => item.impact?.toLowerCase() === 'high');
+  // [Analysis] Memoize sorted items for different tabs
+  const { trendingItems, latestItems, mostDiscussedItems, featuredItem } = useMemo(() => {
+    const trending = [...filteredNewsItems]
+      .sort((a, b) => (b.views || 0) - (a.views || 0))
+      .slice(0, 6);
+    
+    const latest = [...filteredNewsItems]
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    
+    const mostDiscussed = [...filteredNewsItems]
+      .sort((a, b) => (b.comments?.length || 0) - (a.comments?.length || 0))
+      .slice(0, 6);
+
+    const featured = filteredNewsItems.find(item => item.impact?.toLowerCase() === 'high');
+
+    return { trendingItems: trending, latestItems: latest, mostDiscussedItems: mostDiscussed, featuredItem: featured };
+  }, [filteredNewsItems]);
+
+  // [Analysis] Implement infinite scroll
+  useEffect(() => {
+    if (inView) {
+      handleLoadMore();
+    }
+  }, [inView, handleLoadMore]);
 
   return (
     <Suspense fallback={<LoadingSpinner />}>
@@ -141,3 +153,4 @@ export const NewsContent = ({
     </Suspense>
   );
 };
+

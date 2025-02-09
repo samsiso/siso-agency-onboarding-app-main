@@ -2,6 +2,7 @@
 import { TrendingUp, Clock, MessageSquare } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { NewsTabContent } from './NewsTabContent';
+import { memo, useCallback } from 'react';
 
 interface NewsTabsProps {
   latestItems: any[];
@@ -12,7 +13,8 @@ interface NewsTabsProps {
   onGenerateSummary: (id: string) => void;
 }
 
-export const NewsTabs = ({
+// [Analysis] Memoized component to prevent unnecessary re-renders
+export const NewsTabs = memo(({
   latestItems,
   trendingItems,
   mostDiscussedItems,
@@ -20,6 +22,11 @@ export const NewsTabs = ({
   loadingSummaries,
   onGenerateSummary
 }: NewsTabsProps) => {
+  // [Analysis] Memoize callback to prevent recreating function on each render
+  const handleGenerateSummary = useCallback((id: string) => {
+    onGenerateSummary(id);
+  }, [onGenerateSummary]);
+
   return (
     <Tabs defaultValue="latest" className="w-full">
       <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
@@ -42,7 +49,7 @@ export const NewsTabs = ({
           items={latestItems}
           summaries={summaries}
           loadingSummaries={loadingSummaries}
-          onGenerateSummary={onGenerateSummary}
+          onGenerateSummary={handleGenerateSummary}
         />
       </TabsContent>
 
@@ -51,7 +58,7 @@ export const NewsTabs = ({
           items={trendingItems}
           summaries={summaries}
           loadingSummaries={loadingSummaries}
-          onGenerateSummary={onGenerateSummary}
+          onGenerateSummary={handleGenerateSummary}
         />
       </TabsContent>
 
@@ -60,9 +67,12 @@ export const NewsTabs = ({
           items={mostDiscussedItems}
           summaries={summaries}
           loadingSummaries={loadingSummaries}
-          onGenerateSummary={onGenerateSummary}
+          onGenerateSummary={handleGenerateSummary}
         />
       </TabsContent>
     </Tabs>
   );
-};
+});
+
+NewsTabs.displayName = 'NewsTabs';
+

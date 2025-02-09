@@ -1,6 +1,6 @@
 
 import { motion } from 'framer-motion';
-import { lazy } from 'react';
+import { lazy, memo } from 'react';
 
 const NewsCard = lazy(() => import('@/components/ai-news/NewsCard'));
 
@@ -35,7 +35,8 @@ const itemVariants = {
   }
 };
 
-export const NewsTabContent = ({
+// [Analysis] Memoized component to prevent unnecessary re-renders
+export const NewsTabContent = memo(({
   items,
   summaries,
   loadingSummaries,
@@ -65,4 +66,7 @@ export const NewsTabContent = ({
       ))}
     </motion.div>
   );
-};
+});
+
+NewsTabContent.displayName = 'NewsTabContent';
+
