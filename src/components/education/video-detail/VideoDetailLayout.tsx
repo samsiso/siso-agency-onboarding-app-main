@@ -70,14 +70,14 @@ export const VideoDetailLayout = ({ video, activeTab }: VideoDetailLayoutProps) 
             
             <div className="flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-4">
               <VideoCreatorInfo
-                name={video.educator.name}
-                avatar={video.educator.avatar_url}
+                channelName={video.educator.name}
+                channelAvatar={video.educator.avatar_url}
                 subscriberCount={video.educator.subscriber_count}
                 videoCount={video.educator.video_count}
                 uploadFrequency={video.educator.upload_frequency}
-                slug={video.educator.slug}
+                educatorSlug={video.educator.slug}
               />
-              <VideoActions videoId={video.id} />
+              <VideoActions currentVideoId={video.id} />
             </div>
           </div>
 
@@ -106,7 +106,7 @@ export const VideoDetailLayout = ({ video, activeTab }: VideoDetailLayoutProps) 
         >
           <div className="rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 p-4">
             <RelatedVideos 
-              videoId={video.id} 
+              currentVideoId={video.id} 
               topics={video.topics}
             />
           </div>
