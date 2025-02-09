@@ -95,7 +95,7 @@ serve(async (req) => {
             .upsert({
               id: video.id,
               title: video.snippet.title,
-              thumbnailUrl: video.snippet.thumbnails.high?.url || video.snippet.thumbnails.default?.url,
+              thumbnail_url: video.snippet.thumbnails.high?.url || video.snippet.thumbnails.default?.url,
               duration: video.contentDetails.duration,
               viewCount: parseInt(video.statistics.viewCount),
               date: video.snippet.publishedAt,
