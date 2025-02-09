@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { EducationHeader } from '@/components/education/layout/EducationHeader';
 import { EducationToolbar } from '@/components/education/layout/EducationToolbar';
 import { EducationContent } from '@/components/education/layout/EducationContent';
+import { LearningProgress } from '@/components/education/learning/LearningProgress';
 import { useEducatorsList } from '@/hooks/education';
 import { useEducationStats } from '@/hooks/use-education-stats';
 
@@ -37,7 +38,6 @@ export default function SisoEducation() {
     isLoading: isStatsLoading
   } = useEducationStats();
 
-  // [Analysis] Flatten pages data for infinite scroll
   const members = educatorData?.pages.flatMap(page => page.educators) || [];
 
   return (
@@ -57,6 +57,9 @@ export default function SisoEducation() {
             onSearchFocus={() => setIsSearchFocused(true)}
             onSearchBlur={() => setIsSearchFocused(false)}
           />
+
+          {/* Learning Progress Section */}
+          {!isSearchFocused && <LearningProgress />}
 
           {!isSearchFocused && (
             <EducationToolbar
