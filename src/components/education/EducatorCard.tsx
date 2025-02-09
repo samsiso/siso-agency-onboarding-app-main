@@ -290,3 +290,4 @@ export const EducatorCard = ({ educator, className }: EducatorCardProps) => {
     </Link>
   );
 };
+
