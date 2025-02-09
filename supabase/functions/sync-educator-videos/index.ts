@@ -26,25 +26,164 @@ interface YouTubeVideo {
   }
 }
 
+interface Educator {
+  id: string
+  channel_id: string
+  name: string
+  last_synced_at?: string
+}
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
 const BATCH_SIZE = 5
-const MAX_RETRIES = 3
 const QUOTA_PER_REQUEST = 100
 
+// [Analysis] Separate YouTube API calls for better error handling and reusability
+async function fetchChannelPlaylistId(channelId: string): Promise<string> {
+  const playlistResponse = await fetch(
+    `https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${channelId}&key=${YOUTUBE_API_KEY}`
+  )
+  const playlistData = await playlistResponse.json()
+  const uploadsPlaylistId = playlistData.items[0]?.contentDetails?.relatedPlaylists?.uploads
+
+  if (!uploadsPlaylistId) {
+    throw new Error(`Could not find uploads playlist for channel: ${channelId}`)
+  }
+
+  return uploadsPlaylistId
+}
+
+async function fetchPlaylistVideos(playlistId: string, lastSyncedAt?: string): Promise<string[]> {
+  const publishedAfter = lastSyncedAt ? `&publishedAfter=${lastSyncedAt}` : ''
+  const videosResponse = await fetch(
+    `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&maxResults=50${publishedAfter}&key=${YOUTUBE_API_KEY}`
+  )
+  const videosData = await videosResponse.json()
+  
+  if (!videosData.items?.length) {
+    return []
+  }
+
+  return videosData.items.map((item: any) => item.snippet.resourceId.videoId)
+}
+
+async function fetchVideoDetails(videoIds: string[]): Promise<YouTubeVideo[]> {
+  const videoDetailsResponse = await fetch(
+    `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${videoIds.join(',')}&key=${YOUTUBE_API_KEY}`
+  )
+  const videoDetails = await videoDetailsResponse.json()
+  return videoDetails.items || []
+}
+
+// [Analysis] Database operations isolated for better error handling
+async function createSyncHistory(supabase: any, educator: Educator) {
+  const { data: historyRecord, error } = await supabase
+    .from('video_sync_history')
+    .insert({
+      creator_id: educator.id,
+      status: 'running'
+    })
+    .select()
+    .single()
+
+  if (error) throw error
+  return historyRecord
+}
+
+async function updateEducatorStatus(supabase: any, educatorId: string, status: string, data = {}) {
+  await supabase
+    .from('education_creators')
+    .update({ 
+      sync_status: status,
+      ...data
+    })
+    .eq('id', educatorId)
+}
+
+async function upsertVideo(supabase: any, video: YouTubeVideo, channelId: string) {
+  const { error } = await supabase
+    .from('youtube_videos')
+    .upsert({
+      id: video.id,
+      title: video.snippet.title,
+      thumbnailUrl: video.snippet.thumbnails.high?.url || video.snippet.thumbnails.default?.url,
+      duration: video.contentDetails.duration,
+      viewCount: parseInt(video.statistics.viewCount),
+      date: video.snippet.publishedAt,
+      channel_id: channelId,
+      url: `https://youtube.com/watch?v=${video.id}`
+    })
+
+  if (error) throw error
+}
+
+// [Analysis] Main sync logic separated for clarity
+async function syncEducatorVideos(supabase: any, educator: Educator) {
+  let syncHistory;
+  try {
+    syncHistory = await createSyncHistory(supabase, educator)
+    await updateEducatorStatus(supabase, educator.id, 'in_progress', { 
+      sync_started_at: new Date().toISOString() 
+    })
+
+    const playlistId = await fetchChannelPlaylistId(educator.channel_id)
+    const videoIds = await fetchPlaylistVideos(playlistId, educator.last_synced_at)
+    const videos = await fetchVideoDetails(videoIds)
+    
+    console.log(`[sync-educator-videos] Fetched ${videos.length} videos for ${educator.name}`)
+    
+    for (const video of videos) {
+      await upsertVideo(supabase, video, educator.channel_id)
+    }
+
+    await Promise.all([
+      supabase
+        .from('video_sync_history')
+        .update({ 
+          status: 'completed',
+          completed_at: new Date().toISOString(),
+          videos_synced: videos.length,
+          api_quota_used: QUOTA_PER_REQUEST
+        })
+        .eq('id', syncHistory.id),
+      
+      updateEducatorStatus(supabase, educator.id, 'completed', {
+        sync_completed_at: new Date().toISOString(),
+        last_synced_at: new Date().toISOString()
+      })
+    ])
+
+  } catch (error) {
+    console.error(`[sync-educator-videos] Error syncing educator ${educator.name}:`, error)
+    await Promise.all([
+      supabase
+        .from('video_sync_history')
+        .update({ 
+          status: 'failed',
+          completed_at: new Date().toISOString(),
+          error_message: error.message
+        })
+        .eq('id', syncHistory?.id),
+      
+      updateEducatorStatus(supabase, educator.id, 'failed', {
+        last_sync_error: error.message
+      })
+    ])
+    throw error
+  }
+}
+
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders })
   }
 
   try {
     const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!)
     
-    // Get educators that need syncing (pending or not synced in last 24 hours)
     const { data: educators, error: educatorsError } = await supabase
       .from('education_creators')
       .select('id, channel_id, name, last_synced_at')
@@ -53,117 +192,21 @@ serve(async (req) => {
       .limit(BATCH_SIZE)
 
     if (educatorsError) {
-      console.error('[sync-educator-videos] Error fetching educators:', educatorsError);
-      throw educatorsError;
+      console.error('[sync-educator-videos] Error fetching educators:', educatorsError)
+      throw educatorsError
     }
 
-    console.log(`[sync-educator-videos] Processing ${educators?.length || 0} educators`);
+    console.log(`[sync-educator-videos] Processing ${educators?.length || 0} educators`)
 
     for (const educator of educators || []) {
-      let syncHistory;
-      try {
-        // Create sync history record
-        const { data: historyRecord, error: historyError } = await supabase
-          .from('video_sync_history')
-          .insert({
-            creator_id: educator.id,
-            status: 'running'
-          })
-          .select()
-          .single()
-
-        if (historyError) throw historyError;
-        syncHistory = historyRecord;
-
-        // Update educator sync status
-        await supabase
-          .from('education_creators')
-          .update({ 
-            sync_status: 'in_progress',
-            sync_started_at: new Date().toISOString()
-          })
-          .eq('id', educator.id)
-
-        // Fetch videos from YouTube API
-        const videos = await fetchYouTubeVideos(educator.channel_id, educator.last_synced_at)
-        console.log(`[sync-educator-videos] Fetched ${videos.length} videos for ${educator.name}`);
-        
-        // Begin transaction to update videos
-        for (const video of videos) {
-          const { error: upsertError } = await supabase
-            .from('youtube_videos')
-            .upsert({
-              id: video.id,
-              title: video.snippet.title,
-              thumbnail_url: video.snippet.thumbnails.high?.url || video.snippet.thumbnails.default?.url,
-              duration: video.contentDetails.duration,
-              viewCount: parseInt(video.statistics.viewCount),
-              date: video.snippet.publishedAt,
-              channel_id: educator.channel_id,
-              url: `https://youtube.com/watch?v=${video.id}`
-            })
-
-          if (upsertError) {
-            console.error(`[sync-educator-videos] Error upserting video ${video.id}:`, upsertError);
-            throw upsertError;
-          }
-        }
-
-        // Update sync history and educator status
-        await Promise.all([
-          supabase
-            .from('video_sync_history')
-            .update({ 
-              status: 'completed',
-              completed_at: new Date().toISOString(),
-              videos_synced: videos.length,
-              api_quota_used: QUOTA_PER_REQUEST
-            })
-            .eq('id', syncHistory.id),
-          
-          supabase
-            .from('education_creators')
-            .update({ 
-              sync_status: 'completed',
-              sync_completed_at: new Date().toISOString(),
-              last_synced_at: new Date().toISOString()
-            })
-            .eq('id', educator.id)
-        ])
-
-      } catch (error) {
-        console.error(`[sync-educator-videos] Error syncing educator ${educator.name}:`, error)
-        
-        // Update sync history and educator with error status
-        await Promise.all([
-          supabase
-            .from('video_sync_history')
-            .update({ 
-              status: 'failed',
-              completed_at: new Date().toISOString(),
-              error_message: error.message
-            })
-            .eq('id', syncHistory?.id),
-          
-          supabase
-            .from('education_creators')
-            .update({ 
-              sync_status: 'failed',
-              last_sync_error: error.message
-            })
-            .eq('id', educator.id)
-        ])
-      }
+      await syncEducatorVideos(supabase, educator)
     }
 
     return new Response(JSON.stringify({ 
       success: true,
       message: `Processed ${educators?.length || 0} educators`
     }), {
-      headers: { 
-        ...corsHeaders,
-        "Content-Type": "application/json"
-      },
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200
     })
 
@@ -173,45 +216,9 @@ serve(async (req) => {
       success: false,
       error: error.message 
     }), {
-      headers: {
-        ...corsHeaders,
-        "Content-Type": "application/json"
-      },
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500
     })
   }
 })
 
-async function fetchYouTubeVideos(channelId: string, lastSyncedAt?: string): Promise<YouTubeVideo[]> {
-  // First get playlist ID for channel uploads
-  const playlistResponse = await fetch(
-    `https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${channelId}&key=${YOUTUBE_API_KEY}`
-  )
-  const playlistData = await playlistResponse.json()
-  const uploadsPlaylistId = playlistData.items[0]?.contentDetails?.relatedPlaylists?.uploads
-
-  if (!uploadsPlaylistId) {
-    console.error('[sync-educator-videos] Could not find uploads playlist for channel:', channelId);
-    throw new Error('Could not find uploads playlist for channel')
-  }
-
-  // Then get videos from playlist, only fetch videos after last sync if available
-  const publishedAfter = lastSyncedAt ? `&publishedAfter=${lastSyncedAt}` : ''
-  const videosResponse = await fetch(
-    `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${uploadsPlaylistId}&maxResults=50${publishedAfter}&key=${YOUTUBE_API_KEY}`
-  )
-  const videosData = await videosResponse.json()
-
-  if (!videosData.items?.length) {
-    return [];
-  }
-
-  // Get full video details
-  const videoIds = videosData.items.map((item: any) => item.snippet.resourceId.videoId).join(',')
-  const videoDetailsResponse = await fetch(
-    `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${videoIds}&key=${YOUTUBE_API_KEY}`
-  )
-  const videoDetails = await videoDetailsResponse.json()
-
-  return videoDetails.items || []
-}
