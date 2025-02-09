@@ -15,13 +15,21 @@ interface VideoProgress {
 }
 
 export const LearningProgress = () => {
-  // [Analysis] Fetch user's recent video progress
+  // [Analysis] Fetch user's recent video progress with video titles
   const { data: progressData } = useQuery({
     queryKey: ['learning-progress'],
     queryFn: async () => {
       const { data: progress, error } = await supabase
         .from('video_progress')
-        .select('*')
+        .select(`
+          id,
+          video_id,
+          progress,
+          last_watched_at,
+          youtube_videos!inner (
+            title
+          )
+        `)
         .order('last_watched_at', { ascending: false })
         .limit(5);
       
@@ -29,7 +37,17 @@ export const LearningProgress = () => {
         console.error('Error fetching video progress:', error);
         throw error;
       }
-      return progress as VideoProgress[];
+
+      // Transform the data to match VideoProgress interface
+      const transformedProgress: VideoProgress[] = progress.map(item => ({
+        id: item.id,
+        video_id: item.video_id,
+        progress: item.progress,
+        title: item.youtube_videos.title,
+        last_watched_at: item.last_watched_at,
+      }));
+      
+      return transformedProgress;
     },
   });
 
