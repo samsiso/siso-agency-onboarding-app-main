@@ -6,6 +6,9 @@ import { VideoCreatorInfo } from './VideoCreatorInfo';
 import { VideoActions } from './VideoActions';
 import { VideoInteractionPanel } from './VideoInteractionPanel';
 import { RelatedVideos } from '@/components/education/RelatedVideos';
+import { VideoDescription } from './VideoDescription';
+import { Badge } from '@/components/ui/badge';
+import { Languages, FileVideo } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface VideoDetailLayoutProps {
@@ -16,7 +19,7 @@ interface VideoDetailLayoutProps {
 export const VideoDetailLayout = ({ video, activeTab }: VideoDetailLayoutProps) => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-black to-gray-900">
-      {/* [Analysis] Full-width video section with gradient overlay for better contrast */}
+      {/* Full-width video section with gradient overlay */}
       <div className="relative w-full bg-black/60">
         <div className="max-w-[1800px] mx-auto">
           <LazyVideoPlayer videoId={video.id} title={video.title} />
@@ -32,25 +35,75 @@ export const VideoDetailLayout = ({ video, activeTab }: VideoDetailLayoutProps) 
         >
           {/* Content Card with Glass Effect */}
           <div className="space-y-6 rounded-xl bg-white/5 backdrop-blur-sm p-6 border border-white/10">
-            <VideoMetadata 
-              title={video.title}
-              viewCount={video.metrics.views}
-              publishDate={video.created_at || null}
-            />
+            <div className="space-y-4">
+              <VideoMetadata 
+                title={video.title}
+                viewCount={video.metrics.views}
+                publishDate={video.created_at || null}
+                likesCount={video.metrics.likes}
+                commentCount={video.metrics.comments}
+              />
+              
+              {/* Video Quality Badges */}
+              <div className="flex flex-wrap gap-2">
+                {video.has_captions && (
+                  <Badge variant="secondary" className="flex items-center gap-1">
+                    <Languages className="w-3 h-3" />
+                    Captions
+                  </Badge>
+                )}
+                {video.hd_thumbnail_url && (
+                  <Badge variant="secondary" className="flex items-center gap-1">
+                    <FileVideo className="w-3 h-3" />
+                    HD
+                  </Badge>
+                )}
+                {video.language && (
+                  <Badge variant="outline">
+                    {video.language}
+                  </Badge>
+                )}
+                {video.metrics.category && (
+                  <Badge variant="outline" className="bg-siso-red/10">
+                    {video.metrics.category}
+                  </Badge>
+                )}
+              </div>
+            </div>
             
             <div className="flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-4">
               <VideoCreatorInfo
                 channelName={video.educator.name}
                 channelAvatar={video.educator.avatar_url}
-                educatorSlug=""
+                subscriberCount={video.educator.subscriber_count}
+                videoCount={video.educator.video_count}
+                uploadFrequency={video.educator.upload_frequency}
+                educatorSlug={video.educator.slug}
               />
-              <VideoActions />
+              <VideoActions 
+                videoId={video.id}
+                hasCaption={video.has_captions}
+              />
             </div>
           </div>
 
+          {/* Description Card */}
+          {video.full_description && (
+            <div className="rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 overflow-hidden">
+              <VideoDescription 
+                description={video.full_description}
+                tags={video.tags}
+              />
+            </div>
+          )}
+
           {/* Tabs Panel with Glass Effect */}
           <div className="rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 overflow-hidden">
-            <VideoInteractionPanel videoId={video.id} activeTab={activeTab} />
+            <VideoInteractionPanel 
+              videoId={video.id} 
+              activeTab={activeTab}
+              metrics={video.metrics}
+            />
           </div>
         </motion.div>
 
@@ -65,6 +118,7 @@ export const VideoDetailLayout = ({ video, activeTab }: VideoDetailLayoutProps) 
             <RelatedVideos 
               currentVideoId={video.id} 
               topics={video.topics}
+              category={video.metrics.category}
             />
           </div>
         </motion.div>
@@ -72,3 +126,4 @@ export const VideoDetailLayout = ({ video, activeTab }: VideoDetailLayoutProps) 
     </div>
   );
 };
+

@@ -25,17 +25,28 @@ export const useVideoDetail = (videoId: string) => {
           url,
           duration,
           thumbnailUrl,
+          hd_thumbnail_url,
           viewCount,
+          likes_count,
+          comment_count,
           date,
+          category_id,
+          tags,
+          full_description,
+          language,
+          has_captions,
           channel_id,
           education_creators!youtube_videos_channel_id_fkey (
             name,
             channel_avatar_url,
-            description
+            description,
+            subscriber_count_history,
+            video_upload_frequency,
+            video_count
           )
         `)
         .eq('id', videoId)
-        .single();
+        .maybeSingle();
 
       if (videoError) {
         console.error('[useVideoDetail] Error fetching video:', videoError);
@@ -47,22 +58,37 @@ export const useVideoDetail = (videoId: string) => {
         throw new Error('Video not found');
       }
 
-      // [Analysis] Transform database fields to match Video interface
+      // Get the latest subscriber count from history
+      const latestSubscriberCount = videoDetails.education_creators?.subscriber_count_history?.length > 0
+        ? videoDetails.education_creators.subscriber_count_history[videoDetails.education_creators.subscriber_count_history.length - 1].count
+        : 0;
+
+      // Transform database fields to match Video interface
       const transformedVideo: Video = {
         id: videoDetails.id,
         title: videoDetails.title,
         url: videoDetails.url,
         duration: videoDetails.duration,
         thumbnail_url: videoDetails.thumbnailUrl,
+        hd_thumbnail_url: videoDetails.hd_thumbnail_url,
         created_at: videoDetails.date,
+        language: videoDetails.language,
+        has_captions: videoDetails.has_captions,
+        category_id: videoDetails.category_id,
+        full_description: videoDetails.full_description,
+        tags: videoDetails.tags,
         educator: {
           name: videoDetails.education_creators?.name || 'Unknown Creator',
           avatar_url: videoDetails.education_creators?.channel_avatar_url || '',
-          title: 'Content Creator'
+          title: 'Content Creator',
+          subscriber_count: latestSubscriberCount,
+          video_count: videoDetails.education_creators?.video_count,
+          upload_frequency: videoDetails.education_creators?.video_upload_frequency
         },
         metrics: {
           views: videoDetails.viewCount || 0,
-          likes: 0,
+          likes: videoDetails.likes_count || 0,
+          comments: videoDetails.comment_count,
           sentiment_score: 0,
           difficulty: 'Intermediate',
           impact_score: 0,
@@ -92,3 +118,4 @@ export const useVideoDetail = (videoId: string) => {
     }
   });
 };
+

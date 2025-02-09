@@ -466,6 +466,7 @@ export type Database = {
           slug: string
           social_links: Json | null
           specialization: string[] | null
+          subscriber_count_history: Json[] | null
           success_cases: Json | null
           sync_completed_at: string | null
           sync_started_at: string | null
@@ -475,6 +476,7 @@ export type Database = {
           updated_at: string
           url: string | null
           video_count: number | null
+          video_upload_frequency: string | null
           website_url: string | null
           youtube_url: string | null
           youtube_videos: Json | null
@@ -513,6 +515,7 @@ export type Database = {
           slug: string
           social_links?: Json | null
           specialization?: string[] | null
+          subscriber_count_history?: Json[] | null
           success_cases?: Json | null
           sync_completed_at?: string | null
           sync_started_at?: string | null
@@ -522,6 +525,7 @@ export type Database = {
           updated_at?: string
           url?: string | null
           video_count?: number | null
+          video_upload_frequency?: string | null
           website_url?: string | null
           youtube_url?: string | null
           youtube_videos?: Json | null
@@ -560,6 +564,7 @@ export type Database = {
           slug?: string
           social_links?: Json | null
           specialization?: string[] | null
+          subscriber_count_history?: Json[] | null
           success_cases?: Json | null
           sync_completed_at?: string | null
           sync_started_at?: string | null
@@ -569,6 +574,7 @@ export type Database = {
           updated_at?: string
           url?: string | null
           video_count?: number | null
+          video_upload_frequency?: string | null
           website_url?: string | null
           youtube_url?: string | null
           youtube_videos?: Json | null
@@ -1604,6 +1610,41 @@ export type Database = {
         }
         Relationships: []
       }
+      video_engagement_history: {
+        Row: {
+          comment_count: number | null
+          id: string
+          likes_count: number | null
+          recorded_at: string | null
+          video_id: string | null
+          view_count: number | null
+        }
+        Insert: {
+          comment_count?: number | null
+          id?: string
+          likes_count?: number | null
+          recorded_at?: string | null
+          video_id?: string | null
+          view_count?: number | null
+        }
+        Update: {
+          comment_count?: number | null
+          id?: string
+          likes_count?: number | null
+          recorded_at?: string | null
+          video_id?: string | null
+          view_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_engagement_history_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "youtube_videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       video_summaries: {
         Row: {
           created_at: string
@@ -1761,15 +1802,23 @@ export type Database = {
       }
       youtube_videos: {
         Row: {
+          category_id: string | null
           channel_id: string | null
+          comment_count: number | null
           created_at: string
           date: string | null
           duration: string | null
+          full_description: string | null
+          has_captions: boolean | null
+          hd_thumbnail_url: string | null
           id: string
+          language: string | null
+          likes_count: number | null
           order: number | null
           preview_gif_url: string | null
           sync_id: string | null
           sync_timestamp: string | null
+          tags: string[] | null
           thumbnailUrl: string | null
           title: string | null
           updated_at: string
@@ -1778,15 +1827,23 @@ export type Database = {
           viewCount: number | null
         }
         Insert: {
+          category_id?: string | null
           channel_id?: string | null
+          comment_count?: number | null
           created_at?: string
           date?: string | null
           duration?: string | null
+          full_description?: string | null
+          has_captions?: boolean | null
+          hd_thumbnail_url?: string | null
           id: string
+          language?: string | null
+          likes_count?: number | null
           order?: number | null
           preview_gif_url?: string | null
           sync_id?: string | null
           sync_timestamp?: string | null
+          tags?: string[] | null
           thumbnailUrl?: string | null
           title?: string | null
           updated_at?: string
@@ -1795,15 +1852,23 @@ export type Database = {
           viewCount?: number | null
         }
         Update: {
+          category_id?: string | null
           channel_id?: string | null
+          comment_count?: number | null
           created_at?: string
           date?: string | null
           duration?: string | null
+          full_description?: string | null
+          has_captions?: boolean | null
+          hd_thumbnail_url?: string | null
           id?: string
+          language?: string | null
+          likes_count?: number | null
           order?: number | null
           preview_gif_url?: string | null
           sync_id?: string | null
           sync_timestamp?: string | null
+          tags?: string[] | null
           thumbnailUrl?: string | null
           title?: string | null
           updated_at?: string
