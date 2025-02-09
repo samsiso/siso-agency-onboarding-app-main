@@ -36,7 +36,7 @@ export const useVideos = ({
         // 1. First get the video data with explicit logging
         let query = supabase
           .from('youtube_videos')
-          .select('id, title, thumbnail_url, duration, viewCount, date, channel_id');
+          .select('id, title, thumbnailUrl, duration, viewCount, date, channel_id');
 
         // Log the SQL query being constructed
         console.log('[useVideos] Building query with params:', {
@@ -100,7 +100,7 @@ export const useVideos = ({
             title: video.title || '',
             url: `https://youtube.com/watch?v=${video.id}`,
             duration: video.duration || '0:00',
-            thumbnail_url: video.thumbnail_url || '',
+            thumbnail_url: video.thumbnailUrl || '',
             educator: {
               name: creator?.name || video.channel_id || 'Unknown Creator',
               avatar_url: creator?.channel_avatar_url || ''

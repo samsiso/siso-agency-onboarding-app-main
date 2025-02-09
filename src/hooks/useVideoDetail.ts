@@ -24,7 +24,7 @@ export const useVideoDetail = (videoId: string) => {
           title,
           url,
           duration,
-          thumbnail_url,
+          thumbnailUrl,
           viewCount,
           date,
           channel_id,
@@ -53,7 +53,7 @@ export const useVideoDetail = (videoId: string) => {
         title: videoDetails.title,
         url: videoDetails.url,
         duration: videoDetails.duration,
-        thumbnail_url: videoDetails.thumbnail_url,
+        thumbnail_url: videoDetails.thumbnailUrl,
         created_at: videoDetails.date,
         educator: {
           name: videoDetails.education_creators?.name || 'Unknown Creator',
