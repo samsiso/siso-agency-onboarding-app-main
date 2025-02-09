@@ -36,18 +36,18 @@ export function VideoAnalysis({ videoId }: VideoAnalysisProps) {
       if (error) throw error;
       if (!data) return null;
 
-      // Type assertion and validation for JSON fields
+      // [Analysis] Using type assertions to safely convert JSON data
       const transformedData: VideoAnalysisType = {
         id: data.id,
         video_id: data.video_id,
         chapters: data.chapters as VideoAnalysisType['chapters'],
-        complexity_score: data.complexity_score || 0,
-        prerequisites: data.prerequisites as string[],
-        technologies_mentioned: data.technologies_mentioned as string[],
+        complexity_score: Number(data.complexity_score) || 0,
+        prerequisites: Array.isArray(data.prerequisites) ? data.prerequisites : [],
+        technologies_mentioned: Array.isArray(data.technologies_mentioned) ? data.technologies_mentioned : [],
         code_segments: data.code_segments as VideoAnalysisType['code_segments'],
-        key_concepts: data.key_concepts as string[],
-        learning_outcomes: data.learning_outcomes as string[],
-        estimated_completion_time: data.estimated_completion_time || 0,
+        key_concepts: Array.isArray(data.key_concepts) ? data.key_concepts : [],
+        learning_outcomes: Array.isArray(data.learning_outcomes) ? data.learning_outcomes : [],
+        estimated_completion_time: Number(data.estimated_completion_time) || 0,
         difficulty_level: (data.difficulty_level || 'Intermediate') as VideoAnalysisType['difficulty_level'],
         external_resources: data.external_resources as VideoAnalysisType['external_resources'],
         sentiment_analysis: data.sentiment_analysis as VideoAnalysisType['sentiment_analysis'],
