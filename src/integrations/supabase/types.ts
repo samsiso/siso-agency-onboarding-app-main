@@ -1167,6 +1167,78 @@ export type Database = {
         }
         Relationships: []
       }
+      products: {
+        Row: {
+          care_instructions: string[] | null
+          collection: string | null
+          colors: string[] | null
+          created_at: string
+          description: string | null
+          dimensions: string | null
+          features: string[] | null
+          id: string
+          images: string[] | null
+          materials: string[] | null
+          name: string
+          nft_benefits: string[] | null
+          price_crypto: number
+          price_usd: number
+          related_products: string[] | null
+          sizes: string[] | null
+          slug: string
+          specifications: Json | null
+          stock: number
+          tags: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          care_instructions?: string[] | null
+          collection?: string | null
+          colors?: string[] | null
+          created_at?: string
+          description?: string | null
+          dimensions?: string | null
+          features?: string[] | null
+          id?: string
+          images?: string[] | null
+          materials?: string[] | null
+          name: string
+          nft_benefits?: string[] | null
+          price_crypto: number
+          price_usd: number
+          related_products?: string[] | null
+          sizes?: string[] | null
+          slug: string
+          specifications?: Json | null
+          stock?: number
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          care_instructions?: string[] | null
+          collection?: string | null
+          colors?: string[] | null
+          created_at?: string
+          description?: string | null
+          dimensions?: string | null
+          features?: string[] | null
+          id?: string
+          images?: string[] | null
+          materials?: string[] | null
+          name?: string
+          nft_benefits?: string[] | null
+          price_crypto?: number
+          price_usd?: number
+          related_products?: string[] | null
+          sizes?: string[] | null
+          slug?: string
+          specifications?: Json | null
+          stock?: number
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           ai_budget_range: string | null
