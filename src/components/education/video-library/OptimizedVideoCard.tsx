@@ -9,8 +9,7 @@ import { VideoActions } from './VideoActions';
 import { VideoMetadata } from './VideoMetadata';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Eye, MessageSquare, Calendar, Heart } from 'lucide-react';
-import { formatNumber } from '@/lib/formatters';
+import { Clock, Calendar } from 'lucide-react';
 
 interface OptimizedVideoCardProps {
   video: Video;
@@ -80,10 +79,10 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
       transition={{ duration: 0.5, delay: Math.min(index * 0.1, 0.8) }}
       onClick={handleCardClick}
       className={cn(
-        "group cursor-pointer rounded-lg border border-siso-border bg-siso-bg-alt overflow-hidden",
+        "group cursor-pointer rounded-lg border border-siso-border bg-siso-bg-alt/80 overflow-hidden",
         "transition-all duration-300 hover:border-siso-orange/30 hover:bg-siso-text/5 hover:scale-[1.02]",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-siso-orange",
-        "relative",
+        "shadow-sm hover:shadow-md",
         className
       )}
       tabIndex={0}
@@ -96,6 +95,7 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
           duration={video.duration}
           isInView={isInView}
           index={index}
+          viewCount={video.metrics.views}
         />
         
         {/* Badge for new videos */}
@@ -117,30 +117,22 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
         />
       </div>
 
-      <div className="p-4 space-y-3">
+      <div className="p-3 space-y-2">
+        {/* Title with gradient effect */}
         <h3 className={cn(
-          "line-clamp-2 font-semibold text-siso-text-bold text-lg leading-tight",
+          "line-clamp-2 font-semibold text-siso-text-bold text-base leading-tight",
           "group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-siso-red group-hover:to-siso-orange"
         )}>
           {video.title}
         </h3>
 
-        {/* Quick Stats Section */}
-        <div className="grid grid-cols-2 gap-2 text-xs text-siso-text/70">
-          <div className="flex items-center gap-1.5">
-            <Eye className="w-3.5 h-3.5" />
-            <span>{formatNumber(video.metrics.views)} views</span>
-          </div>
-          {video.metrics.likes > 0 && (
-            <div className="flex items-center gap-1.5">
-              <Heart className="w-3.5 h-3.5" />
-              <span>{formatNumber(video.metrics.likes)}</span>
-            </div>
-          )}
+        {/* Metadata with bullet point separation */}
+        <div className="flex items-center gap-2 text-xs text-siso-text/70">
           <div className="flex items-center gap-1.5">
             <Clock className="w-3.5 h-3.5" />
             <span>{video.duration}</span>
           </div>
+          <span className="text-siso-text/40">•</span>
           {video.date && (
             <div className="flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5" />
@@ -157,7 +149,7 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
       </div>
 
       {/* Progress bar for watched videos (if implemented) */}
-      <div className="absolute bottom-0 left-0 w-full h-1 bg-siso-bg">
+      <div className="absolute bottom-0 left-0 w-full h-0.5 bg-siso-bg">
         <div className="h-full bg-gradient-to-r from-siso-red to-siso-orange" style={{ width: '0%' }} />
       </div>
     </motion.div>

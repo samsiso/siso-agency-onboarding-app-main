@@ -1,17 +1,19 @@
 
 import { AspectRatio } from '@/components/ui/aspect-ratio';
-import { Play, Clock, AlertCircle, Loader2 } from 'lucide-react';
+import { Play, Clock, AlertCircle, Loader2, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
+import { formatNumber } from '@/lib/formatters';
 
 interface VideoThumbnailProps {
   thumbnailUrl?: string;
   duration?: string;
   isInView: boolean;
   index: number;
+  viewCount?: number;
 }
 
-export const VideoThumbnail = ({ thumbnailUrl, duration, isInView, index }: VideoThumbnailProps) => {
+export const VideoThumbnail = ({ thumbnailUrl, duration, isInView, index, viewCount }: VideoThumbnailProps) => {
   const [imageError, setImageError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -48,26 +50,37 @@ export const VideoThumbnail = ({ thumbnailUrl, duration, isInView, index }: Vide
   }, [thumbnailUrl, isInView]);
 
   return (
-    <div className="relative group/thumbnail">
+    <div className="relative group/thumbnail overflow-hidden rounded-lg">
       <AspectRatio ratio={16 / 9}>
         {thumbnailUrl && isInView && !imageError && !isLoading ? (
           <div className="relative w-full h-full overflow-hidden">
             <img
               src={thumbnailUrl}
               alt=""
-              className="h-full w-full object-cover transition-transform duration-300 group-hover/thumbnail:scale-110"
+              className="h-full w-full object-cover transition-transform duration-300 group-hover/thumbnail:scale-105"
               loading="lazy"
             />
             
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent 
-              opacity-0 group-hover/thumbnail:opacity-100 transition-opacity duration-300" />
+            {/* Gradient overlay - always visible but stronger on hover */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent 
+              opacity-80 group-hover/thumbnail:opacity-100 transition-opacity duration-300" />
             
+            {/* View count overlay */}
+            {viewCount !== undefined && (
+              <div className="absolute top-2 right-2 bg-black/80 px-2 py-1 rounded-md 
+                text-xs font-medium text-white flex items-center gap-1.5 backdrop-blur-sm">
+                <Eye className="w-3 h-3" />
+                {formatNumber(viewCount)}
+              </div>
+            )}
+            
+            {/* Play button overlay */}
             <div className="absolute inset-0 flex items-center justify-center opacity-0 
               group-hover/thumbnail:opacity-100 transition-opacity duration-300">
-              <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center 
+              <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center 
                 transform scale-90 group-hover/thumbnail:scale-100 transition-transform duration-300 
                 shadow-lg shadow-black/30">
-                <Play className="w-7 h-7 text-siso-bg fill-current ml-1" />
+                <Play className="w-6 h-6 text-black fill-current ml-1" />
               </div>
             </div>
           </div>
@@ -94,9 +107,9 @@ export const VideoThumbnail = ({ thumbnailUrl, duration, isInView, index }: Vide
       </AspectRatio>
       
       {duration && !isLoading && !imageError && (
-        <div className="absolute bottom-2 right-2 bg-black/80 px-2.5 py-1.5 rounded-md 
+        <div className="absolute bottom-2 right-2 bg-black/90 px-2 py-1 rounded-md 
           text-xs font-medium text-white flex items-center gap-1.5 backdrop-blur-sm 
-          shadow-lg shadow-black/20 border border-white/10">
+          shadow-lg shadow-black/20">
           <Clock className="w-3 h-3" />
           {duration}
         </div>
