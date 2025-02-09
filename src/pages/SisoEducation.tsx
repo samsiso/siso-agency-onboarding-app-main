@@ -1,6 +1,5 @@
 
-import { useState, useEffect } from 'react';
-import { useSearchParams, useLocation } from 'react-router-dom';
+import { useState } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { Bot } from 'lucide-react';
 import {
@@ -20,22 +19,10 @@ import { EducationContent } from '@/components/education/layout/EducationContent
 import { useEducatorsList } from '@/hooks/education';
 import { useEducationStats } from '@/hooks/use-education-stats';
 
-// [Analysis] Using URL query params to persist section state across navigation
 export default function SisoEducation() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const location = useLocation();
+  const [activeSection, setActiveSection] = useState<'videos' | 'educators'>('videos');
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-
-  // [Analysis] Get initial section from URL or default to 'videos'
-  const activeSection = (searchParams.get('section') || 'videos') as 'videos' | 'educators';
-
-  // [Analysis] Update URL when section changes
-  const handleSectionChange = (section: 'videos' | 'educators') => {
-    const newParams = new URLSearchParams(searchParams);
-    newParams.set('section', section);
-    setSearchParams(newParams);
-  };
 
   const { 
     data: educatorData,
@@ -52,10 +39,6 @@ export default function SisoEducation() {
 
   // [Analysis] Flatten pages data for infinite scroll
   const members = educatorData?.pages.flatMap(page => page.educators) || [];
-
-  // [Analysis] Log navigation state changes for debugging
-  console.log('[SisoEducation] Current section:', activeSection);
-  console.log('[SisoEducation] Current path:', location.pathname);
 
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
@@ -78,7 +61,7 @@ export default function SisoEducation() {
           {!isSearchFocused && (
             <EducationToolbar
               activeSection={activeSection}
-              onSectionChange={handleSectionChange}
+              onSectionChange={setActiveSection}
             />
           )}
 
