@@ -2,11 +2,12 @@
 import { motion } from 'framer-motion';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { cn } from '@/lib/utils';
-import { User, MapPin, Video, TrendingUp, Crown, ImageOff } from 'lucide-react';
+import { User, MapPin, Video, TrendingUp, Crown, ImageOff, Clock, RefreshCw } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { format } from 'date-fns';
 
 interface EducatorCardProps {
   educator: {
@@ -21,6 +22,8 @@ interface EducatorCardProps {
     channel_location?: string;
     slug: string;
     is_featured?: boolean;
+    sync_status?: string;
+    last_synced_at?: string;
   };
   onClick?: () => void;
   className?: string;
@@ -32,6 +35,32 @@ const formatNumber = (num?: number) => {
   if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
   if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
   return num.toString();
+};
+
+const getSyncStatusColor = (status?: string) => {
+  switch (status) {
+    case 'completed':
+      return 'bg-green-500';
+    case 'failed':
+      return 'bg-red-500';
+    case 'in_progress':
+      return 'bg-blue-500';
+    default:
+      return 'bg-gray-500';
+  }
+};
+
+const getSyncStatusText = (status?: string) => {
+  switch (status) {
+    case 'completed':
+      return 'Synced';
+    case 'failed':
+      return 'Sync Failed';
+    case 'in_progress':
+      return 'Syncing...';
+    default:
+      return 'Pending Sync';
+  }
 };
 
 export const EducatorCard = ({ educator, className }: EducatorCardProps) => {
@@ -118,6 +147,29 @@ export const EducatorCard = ({ educator, className }: EducatorCardProps) => {
           )}
         </div>
 
+        {/* Sync Status Badge */}
+        {educator.sync_status && (
+          <div className="absolute top-2 left-2 z-10">
+            <Badge
+              variant="secondary"
+              className={cn(
+                "flex items-center gap-1.5 text-white",
+                getSyncStatusColor(educator.sync_status)
+              )}
+            >
+              {educator.sync_status === 'in_progress' ? (
+                <RefreshCw className="w-3 h-3 animate-spin" />
+              ) : (
+                <div className={cn(
+                  "w-2 h-2 rounded-full",
+                  getSyncStatusColor(educator.sync_status)
+                )} />
+              )}
+              {getSyncStatusText(educator.sync_status)}
+            </Badge>
+          </div>
+        )}
+
         {/* Profile Section - Floating on Banner */}
         <div className="relative px-6 -mt-10">
           <motion.div 
@@ -166,6 +218,13 @@ export const EducatorCard = ({ educator, className }: EducatorCardProps) => {
                 <div className="flex items-center gap-1.5">
                   <User className="w-4 h-4" />
                   <span>{formatNumber(educator.number_of_subscribers)} subscribers</span>
+                </div>
+              )}
+              
+              {educator.last_synced_at && (
+                <div className="flex items-center gap-1.5">
+                  <Clock className="w-4 h-4" />
+                  <span>Last synced {format(new Date(educator.last_synced_at), 'MMM d, yyyy')}</span>
                 </div>
               )}
             </div>

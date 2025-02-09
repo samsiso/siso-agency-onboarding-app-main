@@ -26,7 +26,17 @@ interface YouTubeVideo {
   }
 }
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
 serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
   try {
     const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!)
     
@@ -37,18 +47,29 @@ serve(async (req) => {
       .or('sync_status.eq.pending,last_synced_at.lt.' + new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
       .limit(5) // Process in batches to respect YouTube API quotas
 
-    if (educatorsError) throw educatorsError
+    if (educatorsError) {
+      console.error('[sync-educator-videos] Error fetching educators:', educatorsError);
+      throw educatorsError;
+    }
+
+    console.log(`[sync-educator-videos] Processing ${educators?.length || 0} educators`);
 
     for (const educator of educators || []) {
       try {
         // Update sync status to in_progress
-        await supabase
+        const { error: updateError } = await supabase
           .from('education_creators')
           .update({ sync_status: 'in_progress' })
           .eq('id', educator.id)
 
+        if (updateError) {
+          console.error(`[sync-educator-videos] Error updating status for ${educator.name}:`, updateError);
+          continue;
+        }
+
         // Fetch videos from YouTube API
         const videos = await fetchYouTubeVideos(educator.channel_id)
+        console.log(`[sync-educator-videos] Fetched ${videos.length} videos for ${educator.name}`);
         
         // Begin transaction to update videos
         for (const video of videos) {
@@ -65,7 +86,10 @@ serve(async (req) => {
               url: `https://youtube.com/watch?v=${video.id}`
             })
 
-          if (upsertError) throw upsertError
+          if (upsertError) {
+            console.error(`[sync-educator-videos] Error upserting video ${video.id}:`, upsertError);
+            throw upsertError;
+          }
         }
 
         // Update educator sync status
@@ -73,19 +97,17 @@ serve(async (req) => {
           .from('education_creators')
           .update({ 
             sync_status: 'completed',
-            last_synced_at: new Date().toISOString(),
           })
           .eq('id', educator.id)
 
       } catch (error) {
-        console.error(`Error syncing educator ${educator.name}:`, error)
+        console.error(`[sync-educator-videos] Error syncing educator ${educator.name}:`, error)
         
         // Update educator with error status
         await supabase
           .from('education_creators')
           .update({ 
             sync_status: 'failed',
-            last_synced_at: new Date().toISOString()
           })
           .eq('id', educator.id)
       }
@@ -95,17 +117,23 @@ serve(async (req) => {
       success: true,
       message: `Processed ${educators?.length || 0} educators`
     }), {
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        ...corsHeaders,
+        "Content-Type": "application/json"
+      },
       status: 200
     })
 
   } catch (error) {
-    console.error('Error in sync function:', error)
+    console.error('[sync-educator-videos] Error in sync function:', error)
     return new Response(JSON.stringify({ 
       success: false,
       error: error.message 
     }), {
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "application/json"
+      },
       status: 500
     })
   }
@@ -120,6 +148,7 @@ async function fetchYouTubeVideos(channelId: string): Promise<YouTubeVideo[]> {
   const uploadsPlaylistId = playlistData.items[0]?.contentDetails?.relatedPlaylists?.uploads
 
   if (!uploadsPlaylistId) {
+    console.error('[sync-educator-videos] Could not find uploads playlist for channel:', channelId);
     throw new Error('Could not find uploads playlist for channel')
   }
 
