@@ -449,8 +449,11 @@ export type Database = {
           content_themes: string[] | null
           created_at: string
           description: string | null
+          engagement_rate: number | null
+          expertise_areas: string[] | null
           expertise_level: string | null
           featured_videos: Json | null
+          following_count: number | null
           id: string
           implementation_guides: Json | null
           is_featured: boolean | null
@@ -461,8 +464,11 @@ export type Database = {
           name: string
           niche: string | null
           number_of_subscribers: number | null
+          primary_category: string | null
+          profile_color: string | null
           profile_image_url: string | null
           relevant: string | null
+          secondary_categories: string[] | null
           slug: string
           social_links: Json | null
           specialization: string[] | null
@@ -498,8 +504,11 @@ export type Database = {
           content_themes?: string[] | null
           created_at?: string
           description?: string | null
+          engagement_rate?: number | null
+          expertise_areas?: string[] | null
           expertise_level?: string | null
           featured_videos?: Json | null
+          following_count?: number | null
           id?: string
           implementation_guides?: Json | null
           is_featured?: boolean | null
@@ -510,8 +519,11 @@ export type Database = {
           name: string
           niche?: string | null
           number_of_subscribers?: number | null
+          primary_category?: string | null
+          profile_color?: string | null
           profile_image_url?: string | null
           relevant?: string | null
+          secondary_categories?: string[] | null
           slug: string
           social_links?: Json | null
           specialization?: string[] | null
@@ -547,8 +559,11 @@ export type Database = {
           content_themes?: string[] | null
           created_at?: string
           description?: string | null
+          engagement_rate?: number | null
+          expertise_areas?: string[] | null
           expertise_level?: string | null
           featured_videos?: Json | null
+          following_count?: number | null
           id?: string
           implementation_guides?: Json | null
           is_featured?: boolean | null
@@ -559,8 +574,11 @@ export type Database = {
           name?: string
           niche?: string | null
           number_of_subscribers?: number | null
+          primary_category?: string | null
+          profile_color?: string | null
           profile_image_url?: string | null
           relevant?: string | null
+          secondary_categories?: string[] | null
           slug?: string
           social_links?: Json | null
           specialization?: string[] | null
