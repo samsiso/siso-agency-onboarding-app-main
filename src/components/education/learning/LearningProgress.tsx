@@ -6,17 +6,55 @@ import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
 
+interface VideoProgress {
+  id: string;
+  video_id: string;
+  progress: number;
+  title: string;
+  last_watched_at: string;
+}
+
 export const LearningProgress = () => {
+  // [Analysis] Fetch user's recent video progress
   const { data: progressData } = useQuery({
     queryKey: ['learning-progress'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('video_summaries')
+      const { data: progress, error } = await supabase
+        .from('video_progress')
         .select('*')
+        .order('last_watched_at', { ascending: false })
         .limit(5);
       
-      if (error) throw error;
-      return data;
+      if (error) {
+        console.error('Error fetching video progress:', error);
+        throw error;
+      }
+      return progress as VideoProgress[];
+    },
+  });
+
+  // [Analysis] Fetch user's learning stats
+  const { data: learningStats } = useQuery({
+    queryKey: ['learning-stats'],
+    queryFn: async () => {
+      const { data: stats, error } = await supabase
+        .from('video_progress')
+        .select('*')
+        .eq('completed', true);
+
+      if (error) {
+        console.error('Error fetching learning stats:', error);
+        throw error;
+      }
+
+      // Calculate total hours based on completed videos (assuming average video length)
+      const totalHours = Math.round((stats?.length || 0) * 0.5); // Assuming 30 min average per video
+      
+      return {
+        completedVideos: stats?.length || 0,
+        hoursLearned: totalHours,
+        skillsGained: Math.floor((stats?.length || 0) / 2) // Estimate 1 skill per 2 completed videos
+      };
     },
   });
 
@@ -59,7 +97,7 @@ export const LearningProgress = () => {
             <h3 className="text-lg font-semibold">Recently Watched</h3>
           </div>
           <div className="space-y-4">
-            {progressData?.map((item: any) => (
+            {progressData?.map((item) => (
               <motion.div
                 key={item.id}
                 className="flex items-center gap-4 p-4 rounded-lg bg-siso-bg-alt/50 hover:bg-siso-bg-alt cursor-pointer"
@@ -68,10 +106,10 @@ export const LearningProgress = () => {
               >
                 <div className="flex-1">
                   <h4 className="font-medium text-siso-text-bold mb-2">{item.title}</h4>
-                  <Progress value={item.progress || 0} className="h-2" />
+                  <Progress value={item.progress} className="h-2" />
                 </div>
                 <span className="text-sm text-siso-text/70">
-                  {item.progress || 0}% Complete
+                  {item.progress}% Complete
                 </span>
               </motion.div>
             ))}
@@ -84,9 +122,9 @@ export const LearningProgress = () => {
         <Card className="p-6 bg-gradient-to-br from-siso-red/10 to-transparent">
           <div className="flex items-center gap-3 mb-2">
             <TrendingUp className="w-5 h-5 text-siso-red" />
-            <h3 className="font-semibold">Current Streak</h3>
+            <h3 className="font-semibold">Videos Completed</h3>
           </div>
-          <p className="text-2xl font-bold">7 Days</p>
+          <p className="text-2xl font-bold">{learningStats?.completedVideos || 0}</p>
         </Card>
 
         <Card className="p-6 bg-gradient-to-br from-siso-orange/10 to-transparent">
@@ -94,7 +132,7 @@ export const LearningProgress = () => {
             <Award className="w-5 h-5 text-siso-orange" />
             <h3 className="font-semibold">Skills Gained</h3>
           </div>
-          <p className="text-2xl font-bold">12</p>
+          <p className="text-2xl font-bold">{learningStats?.skillsGained || 0}</p>
         </Card>
 
         <Card className="p-6 bg-gradient-to-br from-purple-500/10 to-transparent">
@@ -102,7 +140,7 @@ export const LearningProgress = () => {
             <BookOpenCheck className="w-5 h-5 text-purple-500" />
             <h3 className="font-semibold">Hours Learned</h3>
           </div>
-          <p className="text-2xl font-bold">24</p>
+          <p className="text-2xl font-bold">{learningStats?.hoursLearned || 0}</p>
         </Card>
       </motion.div>
     </motion.div>
