@@ -24,8 +24,11 @@ export interface CommunityMember {
   youtube_banner_url?: string;  
   number_of_subscribers?: number;
   channel_total_videos?: number;
+  channel_total_views?: number;  // Added
   channel_location?: string;    
   is_featured?: boolean;
+  last_synced_at?: string;      // Added
+  sync_status?: 'pending' | 'in_progress' | 'completed' | 'failed';  // Added
+  video_upload_frequency?: string;  // Added
   slug: string;
-  sync_status?: 'pending' | 'in_progress' | 'completed' | 'failed';
 }
