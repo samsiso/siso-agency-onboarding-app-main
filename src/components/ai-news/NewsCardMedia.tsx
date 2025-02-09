@@ -52,10 +52,19 @@ export const NewsCardMedia = ({
     >
       <div 
         id={`news-image-${title.replace(/\s+/g, '-')}`}
-        className={`relative ${isCompact ? 'aspect-[4/3]' : 'aspect-video'} overflow-hidden rounded-lg border border-siso-border group`}
+        className={`
+          relative overflow-hidden rounded-lg border border-siso-border group
+          ${isCompact ? 'aspect-[4/3]' : 'aspect-video'}
+        `}
       >
         {/* Loading placeholder */}
-        <div className={`absolute inset-0 bg-siso-bg-alt animate-pulse ${isLoading ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`} />
+        <div 
+          className={`
+            absolute inset-0 bg-siso-bg-alt animate-pulse 
+            ${isLoading ? 'opacity-100' : 'opacity-0'} 
+            transition-opacity duration-300
+          `} 
+        />
         
         {isIntersecting && (
           <img

@@ -105,48 +105,41 @@ const NewsCard = ({
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="h-full"
-    >
-      <Card className="group h-full hover:bg-card/60 transition-all duration-200 border-siso-border hover:border-siso-border-hover hover:shadow-lg">
-        <CardContent className={`h-full p-4 sm:p-6 flex flex-col ${isFeatured ? 'gap-6' : 'gap-4'}`}>
-          <div className={`flex ${isCompact ? 'flex-row' : 'flex-col'} gap-4 sm:gap-6 h-full`}>
-            <NewsCardMedia 
-              imageUrl={item.image_url} 
-              title={item.title} 
-              isFeatured={isFeatured}
+    <Card className="group w-full h-full hover:bg-card/60 transition-all duration-300 border-siso-border hover:border-siso-border-hover hover:shadow-lg">
+      <CardContent className={`h-full p-4 sm:p-6 flex flex-col ${isFeatured ? 'gap-6' : 'gap-4'}`}>
+        <div className={`flex ${isCompact ? 'flex-row' : 'flex-col'} gap-4 sm:gap-6 h-full`}>
+          <NewsCardMedia 
+            imageUrl={item.image_url} 
+            title={item.title} 
+            isFeatured={isFeatured}
+            isCompact={isCompact}
+          />
+          
+          <div className="flex-1 min-w-0 flex flex-col">
+            <NewsCardContent
+              title={item.title}
+              description={item.description}
+              date={item.date}
+              source={item.source}
+              impact={item.impact}
+              onReadArticle={handleReadArticle}
               isCompact={isCompact}
+              summary={summaries[item.id]}
+              loadingSummary={loadingSummaries[item.id]}
+              onGenerateSummary={() => onGenerateSummary(item.id)}
+              newsId={item.id}
+              comments={comments}
+              readingTime={item.reading_time}
+              views={item.views}
+              bookmarks={item.bookmarks}
+              sourceCredibility={item.source_credibility}
+              technicalComplexity={item.technical_complexity}
+              articleType={item.article_type}
             />
-            
-            <div className="flex-1 min-w-0 flex flex-col">
-              <NewsCardContent
-                title={item.title}
-                description={item.description}
-                date={item.date}
-                source={item.source}
-                impact={item.impact}
-                onReadArticle={handleReadArticle}
-                isCompact={isCompact}
-                summary={summaries[item.id]}
-                loadingSummary={loadingSummaries[item.id]}
-                onGenerateSummary={() => onGenerateSummary(item.id)}
-                newsId={item.id}
-                comments={comments}
-                readingTime={item.reading_time}
-                views={item.views}
-                bookmarks={item.bookmarks}
-                sourceCredibility={item.source_credibility}
-                technicalComplexity={item.technical_complexity}
-                articleType={item.article_type}
-              />
-            </div>
           </div>
-        </CardContent>
-      </Card>
-    </motion.div>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
