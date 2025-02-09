@@ -1,7 +1,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { TrendingUp, Award, Clock, BookOpenCheck } from 'lucide-react';
+import { TrendingUp, Award, Clock, BookOpenCheck, Target, Flame, Trophy } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
@@ -12,6 +12,13 @@ interface VideoProgress {
   progress: number;
   title: string;
   last_watched_at: string;
+}
+
+interface LearningMilestone {
+  title: string;
+  progress: number;
+  target: number;
+  icon: JSX.Element;
 }
 
 export const LearningProgress = () => {
@@ -51,7 +58,7 @@ export const LearningProgress = () => {
     },
   });
 
-  // [Analysis] Fetch user's learning stats
+  // [Analysis] Fetch user's learning stats with enhanced metrics
   const { data: learningStats } = useQuery({
     queryKey: ['learning-stats'],
     queryFn: async () => {
@@ -65,16 +72,39 @@ export const LearningProgress = () => {
         throw error;
       }
 
-      // Calculate total hours based on completed videos (assuming average video length)
-      const totalHours = Math.round((stats?.length || 0) * 0.5); // Assuming 30 min average per video
+      const totalHours = Math.round((stats?.length || 0) * 0.5);
       
       return {
         completedVideos: stats?.length || 0,
         hoursLearned: totalHours,
-        skillsGained: Math.floor((stats?.length || 0) / 2) // Estimate 1 skill per 2 completed videos
+        skillsGained: Math.floor((stats?.length || 0) / 2),
+        weeklyStreak: 3, // [Plan] Add streak tracking in future iteration
+        totalProgress: 45, // [Plan] Calculate based on curriculum completion
       };
     },
   });
+
+  // Learning milestones
+  const milestones: LearningMilestone[] = [
+    {
+      title: 'Complete 10 Videos',
+      progress: learningStats?.completedVideos || 0,
+      target: 10,
+      icon: <Trophy className="w-4 h-4 text-yellow-500" />
+    },
+    {
+      title: 'Learn for 5 Hours',
+      progress: learningStats?.hoursLearned || 0,
+      target: 5,
+      icon: <Clock className="w-4 h-4 text-blue-500" />
+    },
+    {
+      title: 'Gain 5 Skills',
+      progress: learningStats?.skillsGained || 0,
+      target: 5,
+      icon: <Target className="w-4 h-4 text-green-500" />
+    }
+  ];
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -106,6 +136,55 @@ export const LearningProgress = () => {
       animate="show"
       className="space-y-6"
     >
+      {/* Overall Progress Section */}
+      <motion.div variants={itemVariants} className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-siso-text-bold">Learning Journey</h2>
+          <div className="flex items-center gap-2">
+            <Flame className="w-5 h-5 text-siso-orange" />
+            <span className="text-sm font-medium">
+              {learningStats?.weeklyStreak || 0} Day Streak
+            </span>
+          </div>
+        </div>
+        
+        <Card className="p-6 bg-gradient-to-br from-siso-bg-alt to-siso-bg border-siso-border">
+          <div className="space-y-4">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm font-medium">Overall Progress</span>
+              <span className="text-sm font-medium">{learningStats?.totalProgress || 0}%</span>
+            </div>
+            <Progress 
+              value={learningStats?.totalProgress || 0} 
+              className="h-2"
+              indicatorClassName="bg-gradient-to-r from-siso-orange to-siso-red"
+            />
+            
+            {/* Milestones */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+              {milestones.map((milestone, index) => (
+                <div 
+                  key={index}
+                  className="bg-siso-bg-alt/50 p-4 rounded-lg space-y-2"
+                >
+                  <div className="flex items-center gap-2">
+                    {milestone.icon}
+                    <span className="text-sm font-medium">{milestone.title}</span>
+                  </div>
+                  <Progress 
+                    value={(milestone.progress / milestone.target) * 100} 
+                    className="h-1.5"
+                  />
+                  <div className="text-xs text-siso-text/70">
+                    {milestone.progress} / {milestone.target}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Card>
+      </motion.div>
+
       {/* Continue Learning Section */}
       <motion.div variants={itemVariants} className="space-y-4">
         <h2 className="text-2xl font-bold text-siso-text-bold">Continue Learning</h2>
