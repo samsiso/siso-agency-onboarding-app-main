@@ -2,6 +2,7 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { SidebarMenuItem } from './SidebarMenuItem';
 import { cn } from '@/lib/utils';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Home,
   GraduationCap,
@@ -103,56 +104,97 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
 
   if (!visible) return null;
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2
+      }
+    }
+  };
+
+  const sectionVariants = {
+    hidden: { opacity: 0, y: 20 },
+    show: { 
+      opacity: 1, 
+      y: 0,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 30
+      }
+    }
+  };
+
   return (
-    <nav className={cn("px-2 py-4", collapsed && "px-1")}>
+    <motion.nav
+      initial="hidden"
+      animate="show"
+      variants={containerVariants}
+      className={cn("px-2 py-4", collapsed && "px-1")}
+    >
       <div className="space-y-2">
-        {menuSections.map((section, index) => (
-          <div 
-            key={index} 
-            className={cn(
-              "space-y-1",
-              section.type === 'section' && "border-b border-siso-border pb-2"
-            )}
-          >
-            {section.type === 'main' ? (
-              <SidebarMenuItem
-                href={section.href}
-                icon={section.icon}
-                label={section.label}
-                collapsed={collapsed}
-                onClick={handleClick}
-                isMain={true}
-                isActive={location.pathname === section.href}
-              />
-            ) : (
-              <div className="space-y-1">
-                {section.title && !collapsed && (
-                  <div className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-siso-text-bold">
-                    <section.icon className="w-4 h-4 text-siso-text-muted" />
-                    {section.title}
-                  </div>
-                )}
-                <div className={cn(
-                  "space-y-1",
-                  !collapsed && "pl-3 border-l-2 border-siso-border ml-4"
-                )}>
-                  {section.items?.map((item, subIndex) => (
-                    <SidebarMenuItem
-                      key={subIndex}
-                      href={item.href}
-                      icon={item.icon}
-                      label={item.label}
-                      collapsed={collapsed}
-                      onClick={handleClick}
-                      isActive={location.pathname === item.href}
-                    />
-                  ))}
+        <AnimatePresence mode="wait">
+          {menuSections.map((section, index) => (
+            <motion.div 
+              key={index}
+              variants={sectionVariants}
+              className={cn(
+                "space-y-1",
+                section.type === 'section' && "border-b border-siso-border pb-2"
+              )}
+            >
+              {section.type === 'main' ? (
+                <SidebarMenuItem
+                  href={section.href}
+                  icon={section.icon}
+                  label={section.label}
+                  collapsed={collapsed}
+                  onClick={handleClick}
+                  isMain={true}
+                  isActive={location.pathname === section.href}
+                />
+              ) : (
+                <div className="space-y-1">
+                  {section.title && !collapsed && (
+                    <motion.div 
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                      className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-siso-text-bold"
+                    >
+                      <section.icon className="w-4 h-4 text-siso-text-muted" />
+                      {section.title}
+                    </motion.div>
+                  )}
+                  <motion.div 
+                    className={cn(
+                      "space-y-1",
+                      !collapsed && "pl-3 border-l-2 border-siso-border ml-4"
+                    )}
+                    variants={containerVariants}
+                  >
+                    {section.items?.map((item, subIndex) => (
+                      <SidebarMenuItem
+                        key={subIndex}
+                        href={item.href}
+                        icon={item.icon}
+                        label={item.label}
+                        collapsed={collapsed}
+                        onClick={handleClick}
+                        isActive={location.pathname === item.href}
+                      />
+                    ))}
+                  </motion.div>
                 </div>
-              </div>
-            )}
-          </div>
-        ))}
+              )}
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
-    </nav>
+    </motion.nav>
   );
 };
