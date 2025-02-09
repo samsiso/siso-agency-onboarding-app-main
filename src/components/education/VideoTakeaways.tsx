@@ -1,20 +1,10 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { CheckCircle } from 'lucide-react';
 
-// [Analysis] Explicitly define the interface for props and export it for reuse
-export interface VideoTakeawaysProps {
+interface VideoTakeawaysProps {
   videoId: string;
-}
-
-// [Analysis] Define type for video summary data
-interface VideoSummary {
-  id: string;
-  video_id: string;
-  key_points: string[];
-  created_at?: string;
 }
 
 export function VideoTakeaways({ videoId }: VideoTakeawaysProps) {
@@ -28,7 +18,7 @@ export function VideoTakeaways({ videoId }: VideoTakeawaysProps) {
         .maybeSingle();
       
       if (error) throw error;
-      return data as VideoSummary | null;
+      return data;
     },
   });
 
