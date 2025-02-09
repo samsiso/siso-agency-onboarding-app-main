@@ -63,4 +63,3 @@ export const VideoInteractionPanel = ({ videoId, activeTab }: VideoInteractionPa
     </Tabs>
   );
 };
-
