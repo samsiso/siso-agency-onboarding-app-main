@@ -1551,6 +1551,71 @@ export type Database = {
         }
         Relationships: []
       }
+      video_analysis: {
+        Row: {
+          chapters: Json | null
+          code_segments: Json | null
+          complexity_score: number | null
+          created_at: string | null
+          difficulty_level: string | null
+          estimated_completion_time: number | null
+          external_resources: Json | null
+          id: string
+          key_concepts: string[] | null
+          learning_outcomes: string[] | null
+          prerequisites: string[] | null
+          sentiment_analysis: Json | null
+          technologies_mentioned: string[] | null
+          updated_at: string | null
+          video_id: string
+          visual_aids: Json | null
+        }
+        Insert: {
+          chapters?: Json | null
+          code_segments?: Json | null
+          complexity_score?: number | null
+          created_at?: string | null
+          difficulty_level?: string | null
+          estimated_completion_time?: number | null
+          external_resources?: Json | null
+          id?: string
+          key_concepts?: string[] | null
+          learning_outcomes?: string[] | null
+          prerequisites?: string[] | null
+          sentiment_analysis?: Json | null
+          technologies_mentioned?: string[] | null
+          updated_at?: string | null
+          video_id: string
+          visual_aids?: Json | null
+        }
+        Update: {
+          chapters?: Json | null
+          code_segments?: Json | null
+          complexity_score?: number | null
+          created_at?: string | null
+          difficulty_level?: string | null
+          estimated_completion_time?: number | null
+          external_resources?: Json | null
+          id?: string
+          key_concepts?: string[] | null
+          learning_outcomes?: string[] | null
+          prerequisites?: string[] | null
+          sentiment_analysis?: Json | null
+          technologies_mentioned?: string[] | null
+          updated_at?: string | null
+          video_id?: string
+          visual_aids?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_analysis_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: true
+            referencedRelation: "youtube_videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       video_bookmarks: {
         Row: {
           created_at: string
