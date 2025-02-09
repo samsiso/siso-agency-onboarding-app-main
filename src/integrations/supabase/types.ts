@@ -1554,8 +1554,11 @@ export type Database = {
       video_analysis: {
         Row: {
           chapters: Json | null
+          code_quality_metrics: Json | null
           code_segments: Json | null
+          community_insights: Json | null
           complexity_score: number | null
+          content_timeline: Json | null
           created_at: string | null
           difficulty_level: string | null
           estimated_completion_time: number | null
@@ -1563,8 +1566,11 @@ export type Database = {
           id: string
           key_concepts: string[] | null
           learning_outcomes: string[] | null
+          learning_path: Json | null
+          practice_exercises: Json | null
           prerequisites: string[] | null
           sentiment_analysis: Json | null
+          supplementary_materials: Json | null
           technologies_mentioned: string[] | null
           updated_at: string | null
           video_id: string
@@ -1572,8 +1578,11 @@ export type Database = {
         }
         Insert: {
           chapters?: Json | null
+          code_quality_metrics?: Json | null
           code_segments?: Json | null
+          community_insights?: Json | null
           complexity_score?: number | null
+          content_timeline?: Json | null
           created_at?: string | null
           difficulty_level?: string | null
           estimated_completion_time?: number | null
@@ -1581,8 +1590,11 @@ export type Database = {
           id?: string
           key_concepts?: string[] | null
           learning_outcomes?: string[] | null
+          learning_path?: Json | null
+          practice_exercises?: Json | null
           prerequisites?: string[] | null
           sentiment_analysis?: Json | null
+          supplementary_materials?: Json | null
           technologies_mentioned?: string[] | null
           updated_at?: string | null
           video_id: string
@@ -1590,8 +1602,11 @@ export type Database = {
         }
         Update: {
           chapters?: Json | null
+          code_quality_metrics?: Json | null
           code_segments?: Json | null
+          community_insights?: Json | null
           complexity_score?: number | null
+          content_timeline?: Json | null
           created_at?: string | null
           difficulty_level?: string | null
           estimated_completion_time?: number | null
@@ -1599,8 +1614,11 @@ export type Database = {
           id?: string
           key_concepts?: string[] | null
           learning_outcomes?: string[] | null
+          learning_path?: Json | null
+          practice_exercises?: Json | null
           prerequisites?: string[] | null
           sentiment_analysis?: Json | null
+          supplementary_materials?: Json | null
           technologies_mentioned?: string[] | null
           updated_at?: string | null
           video_id?: string
