@@ -1,3 +1,4 @@
+
 export interface VideoChapter {
   timestamp: string;
   title: string;

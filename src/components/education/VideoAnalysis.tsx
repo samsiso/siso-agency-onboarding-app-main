@@ -40,73 +40,27 @@ export function VideoAnalysis({ videoId }: VideoAnalysisProps) {
       const transformedData: VideoAnalysisType = {
         id: data.id,
         video_id: data.video_id,
-        chapters: (data.chapters || []) as VideoAnalysisType['chapters'],
+        chapters: data.chapters as VideoAnalysisType['chapters'],
         complexity_score: data.complexity_score || 0,
-        prerequisites: (data.prerequisites || []) as string[],
-        technologies_mentioned: (data.technologies_mentioned || []) as string[],
-        code_segments: (data.code_segments || []) as VideoAnalysisType['code_segments'],
-        key_concepts: (data.key_concepts || []) as string[],
-        learning_outcomes: (data.learning_outcomes || []) as string[],
+        prerequisites: data.prerequisites as string[],
+        technologies_mentioned: data.technologies_mentioned as string[],
+        code_segments: data.code_segments as VideoAnalysisType['code_segments'],
+        key_concepts: data.key_concepts as string[],
+        learning_outcomes: data.learning_outcomes as string[],
         estimated_completion_time: data.estimated_completion_time || 0,
-        difficulty_level: data.difficulty_level as 'Beginner' | 'Intermediate' | 'Advanced' || 'Intermediate',
-        external_resources: (data.external_resources || []) as VideoAnalysisType['external_resources'],
-        sentiment_analysis: data.sentiment_analysis as VideoAnalysisType['sentiment_analysis'] || {
-          overall_score: 0,
-          key_sentiments: [],
-          engagement_prediction: 0
-        },
-        visual_aids: (data.visual_aids || []) as VideoAnalysisType['visual_aids'],
-        content_timeline: (data.content_timeline || []) as VideoAnalysisType['content_timeline'],
-        code_quality_metrics: data.code_quality_metrics as VideoAnalysisType['code_quality_metrics'] || {
-          overall_score: 0,
-          maintainability: 0,
-          reusability: 0,
-          best_practices: [],
-          improvement_suggestions: []
-        },
-        learning_path: data.learning_path as VideoAnalysisType['learning_path'] || {
-          prerequisites: [],
-          next_steps: [],
-          skill_tree: []
-        },
-        practice_exercises: (data.practice_exercises || []) as VideoAnalysisType['practice_exercises'],
-        community_insights: (data.community_insights || []) as VideoAnalysisType['community_insights'],
-        supplementary_materials: (data.supplementary_materials || []) as VideoAnalysisType['supplementary_materials'],
-        business_metrics: data.business_metrics as VideoAnalysisType['business_metrics'] || {
-          implementation_costs: {
-            small_team: null,
-            medium_team: null,
-            enterprise: null
-          },
-          roi_metrics: {
-            time_savings: null,
-            cost_savings: null,
-            productivity_gain: null
-          },
-          resource_requirements: {
-            team_size: null,
-            skill_levels: [],
-            tools_needed: []
-          },
-          industry_insights: {
-            market_trends: [],
-            competitor_analysis: [],
-            best_practices: []
-          }
-        },
-        client_resources: data.client_resources as VideoAnalysisType['client_resources'] || {
-          presentation_templates: [],
-          implementation_guides: [],
-          cost_calculators: [],
-          timeline_templates: [],
-          success_metrics: []
-        },
-        team_collaboration: data.team_collaboration as VideoAnalysisType['team_collaboration'] || {
-          annotations: [],
-          assigned_tasks: [],
-          skill_requirements: [],
-          knowledge_gaps: []
-        }
+        difficulty_level: (data.difficulty_level || 'Intermediate') as VideoAnalysisType['difficulty_level'],
+        external_resources: data.external_resources as VideoAnalysisType['external_resources'],
+        sentiment_analysis: data.sentiment_analysis as VideoAnalysisType['sentiment_analysis'],
+        visual_aids: data.visual_aids as VideoAnalysisType['visual_aids'],
+        content_timeline: data.content_timeline as VideoAnalysisType['content_timeline'],
+        code_quality_metrics: data.code_quality_metrics as VideoAnalysisType['code_quality_metrics'],
+        learning_path: data.learning_path as VideoAnalysisType['learning_path'],
+        practice_exercises: data.practice_exercises as VideoAnalysisType['practice_exercises'],
+        community_insights: data.community_insights as VideoAnalysisType['community_insights'],
+        supplementary_materials: data.supplementary_materials as VideoAnalysisType['supplementary_materials'],
+        business_metrics: data.business_metrics as VideoAnalysisType['business_metrics'],
+        client_resources: data.client_resources as VideoAnalysisType['client_resources'],
+        team_collaboration: data.team_collaboration as VideoAnalysisType['team_collaboration']
       };
 
       return transformedData;

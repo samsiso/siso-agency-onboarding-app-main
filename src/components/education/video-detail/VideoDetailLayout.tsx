@@ -70,8 +70,8 @@ export const VideoDetailLayout = ({ video, activeTab }: VideoDetailLayoutProps) 
             
             <div className="flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-4">
               <VideoCreatorInfo
-                name={video.educator.name}
-                avatarUrl={video.educator.avatar_url}
+                channelName={video.educator.name}
+                channelAvatar={video.educator.avatar_url}
                 title={video.educator.title || 'Content Creator'}
               />
               <VideoActions videoId={video.id} />
