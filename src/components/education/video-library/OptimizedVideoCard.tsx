@@ -69,26 +69,8 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
   };
 
   // [Analysis] Calculate if video is new (within last 7 days)
-  const isNew = video.created_at && (() => {
-    try {
-      const date = new Date(video.created_at);
-      return !isNaN(date.getTime()) && date > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    } catch {
-      return false;
-    }
-  })();
-  
-  // [Analysis] Format the date for display, handling both ISO and YYYY-MM-DD formats
-  const formatDate = (dateString: string | undefined) => {
-    if (!dateString) return '';
-    try {
-      const date = new Date(dateString);
-      if (isNaN(date.getTime())) return '';
-      return date.toLocaleDateString();
-    } catch {
-      return '';
-    }
-  };
+  const isNew = video.date && video.date.toLowerCase().includes('day') && 
+    parseInt(video.date.split(' ')[0]) <= 7;
 
   return (
     <motion.div
@@ -159,10 +141,12 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
             <Clock className="w-3.5 h-3.5" />
             <span>{video.duration}</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <Calendar className="w-3.5 h-3.5" />
-            <span>{formatDate(video.created_at)}</span>
-          </div>
+          {video.date && (
+            <div className="flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5" />
+              <span>{video.date}</span>
+            </div>
+          )}
         </div>
 
         {/* Educator Info */}

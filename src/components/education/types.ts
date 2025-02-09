@@ -6,6 +6,7 @@ export interface Video {
   duration: string;
   thumbnail_url: string;
   created_at?: string;
+  date?: string; // [Analysis] Added date field from youtube_videos table
   educator: {
     name: string;
     avatar_url: string;

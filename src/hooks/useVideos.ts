@@ -101,6 +101,7 @@ export const useVideos = ({
             url: `https://youtube.com/watch?v=${video.id}`,
             duration: video.duration || '0:00',
             thumbnail_url: video.thumbnailUrl || '',
+            date: video.date, // [Analysis] Added date field from youtube_videos
             educator: {
               name: creator?.name || video.channel_id || 'Unknown Creator',
               avatar_url: creator?.channel_avatar_url || ''
