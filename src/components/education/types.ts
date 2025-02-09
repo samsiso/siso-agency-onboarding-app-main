@@ -10,7 +10,7 @@ export interface Video {
     name: string;
     avatar_url: string;
     title?: string;
-    slug?: string; // Added this optional property
+    slug?: string;
   };
   metrics: {
     views: number;
@@ -26,4 +26,3 @@ export interface Video {
     implementation_steps: string[];
   };
 }
-

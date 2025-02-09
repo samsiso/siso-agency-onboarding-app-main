@@ -9,7 +9,8 @@ import { VideoActions } from './VideoActions';
 import { VideoMetadata } from './VideoMetadata';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Sparkles, Bookmark } from 'lucide-react';
+import { Clock, Eye, MessageSquare, Calendar, Heart } from 'lucide-react';
+import { formatNumber } from '@/lib/formatters';
 
 interface OptimizedVideoCardProps {
   video: Video;
@@ -70,7 +71,6 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
   // [Analysis] Calculate if video is new (within last 7 days)
   const isNew = video.created_at && (() => {
     try {
-      // [Analysis] Handle both ISO strings and YYYY-MM-DD format
       const date = new Date(video.created_at);
       return !isNaN(date.getTime()) && date > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     } catch {
@@ -78,9 +78,6 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
     }
   })();
   
-  // [Analysis] Calculate if video is trending (more than 1000 views)
-  const isTrending = video.metrics?.views > 1000;
-
   // [Analysis] Format the date for display, handling both ISO and YYYY-MM-DD formats
   const formatDate = (dateString: string | undefined) => {
     if (!dateString) return '';
@@ -93,15 +90,12 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
     }
   };
 
-  // Stagger animation delay based on index
-  const staggerDelay = Math.min(index * 0.1, 0.8);
-
   return (
     <motion.div
       id={`video-card-${index}`}
       initial={{ opacity: 0, y: 20 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5, delay: staggerDelay }}
+      transition={{ duration: 0.5, delay: Math.min(index * 0.1, 0.8) }}
       onClick={handleCardClick}
       className={cn(
         "group cursor-pointer rounded-lg border border-siso-border bg-siso-bg-alt overflow-hidden",
@@ -122,30 +116,14 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
           index={index}
         />
         
-        {/* Status badges */}
-        <div className="absolute top-2 left-2 flex gap-2">
-          {isNew && (
+        {/* Badge for new videos */}
+        {isNew && (
+          <div className="absolute top-2 left-2">
             <Badge className="bg-green-500/90 text-white">
               NEW
             </Badge>
-          )}
-          {isTrending && (
-            <Badge className="bg-orange-500/90 text-white flex items-center gap-1">
-              <Sparkles className="w-3 h-3" />
-              Trending
-            </Badge>
-          )}
-          {video.metrics?.difficulty && (
-            <Badge className={cn(
-              "text-white",
-              video.metrics.difficulty === 'Beginner' && 'bg-blue-500/90',
-              video.metrics.difficulty === 'Intermediate' && 'bg-yellow-500/90',
-              video.metrics.difficulty === 'Advanced' && 'bg-red-500/90'
-            )}>
-              {video.metrics.difficulty}
-            </Badge>
-          )}
-        </div>
+          </div>
+        )}
 
         <VideoActions
           videoId={video.id}
@@ -165,28 +143,33 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
           {video.title}
         </h3>
 
-        {/* Video metadata with improved layout */}
-        <div className="space-y-2">
-          <VideoMetadata
-            educator={video.educator}
-            metrics={video.metrics}
-          />
-          
-          {/* Additional metadata */}
-          <div className="flex items-center gap-4 text-xs text-siso-text/60">
-            {video.duration && (
-              <div className="flex items-center gap-1">
-                <Clock className="w-3 h-3" />
-                {video.duration}
-              </div>
-            )}
-            {video.created_at && (
-              <time dateTime={video.created_at}>
-                {formatDate(video.created_at)}
-              </time>
-            )}
+        {/* Quick Stats Section */}
+        <div className="grid grid-cols-2 gap-2 text-xs text-siso-text/70">
+          <div className="flex items-center gap-1.5">
+            <Eye className="w-3.5 h-3.5" />
+            <span>{formatNumber(video.metrics.views)} views</span>
+          </div>
+          {video.metrics.likes > 0 && (
+            <div className="flex items-center gap-1.5">
+              <Heart className="w-3.5 h-3.5" />
+              <span>{formatNumber(video.metrics.likes)}</span>
+            </div>
+          )}
+          <div className="flex items-center gap-1.5">
+            <Clock className="w-3.5 h-3.5" />
+            <span>{video.duration}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Calendar className="w-3.5 h-3.5" />
+            <span>{formatDate(video.created_at)}</span>
           </div>
         </div>
+
+        {/* Educator Info */}
+        <VideoMetadata
+          educator={video.educator}
+          metrics={video.metrics}
+        />
       </div>
 
       {/* Progress bar for watched videos (if implemented) */}
