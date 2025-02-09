@@ -1,4 +1,3 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { VideoAnalysis as VideoAnalysisType } from './types/analysis';
@@ -15,6 +14,7 @@ import { ResourcesTab } from './video-analysis/tabs/ResourcesTab';
 import { PracticeTab } from './video-analysis/tabs/PracticeTab';
 import { CommunityTab } from './video-analysis/tabs/CommunityTab';
 import { VisualTab } from './video-analysis/tabs/VisualTab';
+import { BusinessTab } from './video-analysis/tabs/BusinessTab';
 
 interface VideoAnalysisProps {
   videoId: string;
@@ -35,7 +35,7 @@ export function VideoAnalysis({ videoId }: VideoAnalysisProps) {
       if (error) throw error;
       if (!data) return null;
       
-      // [Analysis] Type assertion for JSON fields
+      // Type assertion for JSON fields
       const transformedData: VideoAnalysisType = {
         ...data,
         chapters: data.chapters as VideoAnalysisType['chapters'],
@@ -48,7 +48,10 @@ export function VideoAnalysis({ videoId }: VideoAnalysisProps) {
         practice_exercises: data.practice_exercises as VideoAnalysisType['practice_exercises'],
         sentiment_analysis: data.sentiment_analysis as VideoAnalysisType['sentiment_analysis'],
         supplementary_materials: data.supplementary_materials as VideoAnalysisType['supplementary_materials'],
-        visual_aids: data.visual_aids as VideoAnalysisType['visual_aids']
+        visual_aids: data.visual_aids as VideoAnalysisType['visual_aids'],
+        business_metrics: data.business_metrics as VideoAnalysisType['business_metrics'],
+        client_resources: data.client_resources as VideoAnalysisType['client_resources'],
+        team_collaboration: data.team_collaboration as VideoAnalysisType['team_collaboration']
       };
 
       return transformedData;
@@ -88,11 +91,12 @@ export function VideoAnalysis({ videoId }: VideoAnalysisProps) {
   return (
     <div className="p-6">
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8">
+        <TabsList className="grid w-full grid-cols-4 lg:grid-cols-9">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="timeline">Timeline</TabsTrigger>
           <TabsTrigger value="technical">Technical</TabsTrigger>
           <TabsTrigger value="learning">Learning</TabsTrigger>
+          <TabsTrigger value="business">Business</TabsTrigger>
           <TabsTrigger value="resources">Resources</TabsTrigger>
           <TabsTrigger value="practice">Practice</TabsTrigger>
           <TabsTrigger value="community">Community</TabsTrigger>
@@ -117,6 +121,10 @@ export function VideoAnalysis({ videoId }: VideoAnalysisProps) {
 
         <TabsContent value="learning" className="mt-6">
           <LearningTab analysis={analysis} />
+        </TabsContent>
+
+        <TabsContent value="business" className="mt-6">
+          <BusinessTab analysis={analysis} />
         </TabsContent>
 
         <TabsContent value="resources" className="mt-6">

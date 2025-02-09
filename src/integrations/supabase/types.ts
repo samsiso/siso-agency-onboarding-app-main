@@ -1553,7 +1553,9 @@ export type Database = {
       }
       video_analysis: {
         Row: {
+          business_metrics: Json | null
           chapters: Json | null
+          client_resources: Json | null
           code_quality_metrics: Json | null
           code_segments: Json | null
           community_insights: Json | null
@@ -1571,13 +1573,16 @@ export type Database = {
           prerequisites: string[] | null
           sentiment_analysis: Json | null
           supplementary_materials: Json | null
+          team_collaboration: Json | null
           technologies_mentioned: string[] | null
           updated_at: string | null
           video_id: string
           visual_aids: Json | null
         }
         Insert: {
+          business_metrics?: Json | null
           chapters?: Json | null
+          client_resources?: Json | null
           code_quality_metrics?: Json | null
           code_segments?: Json | null
           community_insights?: Json | null
@@ -1595,13 +1600,16 @@ export type Database = {
           prerequisites?: string[] | null
           sentiment_analysis?: Json | null
           supplementary_materials?: Json | null
+          team_collaboration?: Json | null
           technologies_mentioned?: string[] | null
           updated_at?: string | null
           video_id: string
           visual_aids?: Json | null
         }
         Update: {
+          business_metrics?: Json | null
           chapters?: Json | null
+          client_resources?: Json | null
           code_quality_metrics?: Json | null
           code_segments?: Json | null
           community_insights?: Json | null
@@ -1619,6 +1627,7 @@ export type Database = {
           prerequisites?: string[] | null
           sentiment_analysis?: Json | null
           supplementary_materials?: Json | null
+          team_collaboration?: Json | null
           technologies_mentioned?: string[] | null
           updated_at?: string | null
           video_id?: string

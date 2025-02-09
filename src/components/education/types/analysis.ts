@@ -1,4 +1,3 @@
-
 export interface VideoChapter {
   timestamp: string;
   title: string;
@@ -84,6 +83,79 @@ export interface SentimentAnalysis {
   engagement_prediction: number;
 }
 
+export interface BusinessMetrics {
+  implementation_costs: {
+    small_team: number | null;
+    medium_team: number | null;
+    enterprise: number | null;
+  };
+  roi_metrics: {
+    time_savings: number | null;
+    cost_savings: number | null;
+    productivity_gain: number | null;
+  };
+  resource_requirements: {
+    team_size: number | null;
+    skill_levels: string[];
+    tools_needed: string[];
+  };
+  industry_insights: {
+    market_trends: string[];
+    competitor_analysis: string[];
+    best_practices: string[];
+  };
+}
+
+export interface ClientResources {
+  presentation_templates: Array<{
+    title: string;
+    url: string;
+    type: string;
+  }>;
+  implementation_guides: Array<{
+    title: string;
+    content: string;
+    difficulty: string;
+  }>;
+  cost_calculators: Array<{
+    name: string;
+    parameters: Record<string, unknown>;
+  }>;
+  timeline_templates: Array<{
+    name: string;
+    duration: string;
+    milestones: string[];
+  }>;
+  success_metrics: Array<{
+    metric: string;
+    target: number;
+    unit: string;
+  }>;
+}
+
+export interface TeamCollaboration {
+  annotations: Array<{
+    timestamp: string;
+    note: string;
+    author: string;
+  }>;
+  assigned_tasks: Array<{
+    task: string;
+    assignee: string;
+    status: string;
+  }>;
+  skill_requirements: Array<{
+    skill: string;
+    level: string;
+    priority: string;
+  }>;
+  knowledge_gaps: Array<{
+    topic: string;
+    impact: string;
+    resolution: string;
+  }>;
+}
+
 export interface VideoAnalysis {
   id: string;
   video_id: string;
@@ -105,4 +177,7 @@ export interface VideoAnalysis {
   practice_exercises: PracticeExercise[];
   community_insights: CommunityInsight[];
   supplementary_materials: SupplementaryMaterial[];
+  business_metrics: BusinessMetrics;
+  client_resources: ClientResources;
+  team_collaboration: TeamCollaboration;
 }
