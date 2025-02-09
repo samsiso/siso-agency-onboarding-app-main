@@ -1,9 +1,8 @@
 
 import { motion } from 'framer-motion';
-import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { cn } from '@/lib/utils';
-import { User, MapPin, Video, TrendingUp, Crown, ImageOff, Clock, RefreshCw } from 'lucide-react';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { User, MapPin, Video, Eye, TrendingUp, Crown, ImageOff, Clock, RefreshCw } from 'lucide-react';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Badge } from '@/components/ui/badge';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
@@ -18,12 +17,15 @@ interface EducatorCardProps {
     channel_banner_url?: string;
     number_of_subscribers?: number;
     channel_total_videos?: number;
+    channel_total_views?: number;
     specialization?: string[];
     channel_location?: string;
+    channel_joined_date?: string;
     slug: string;
     is_featured?: boolean;
     sync_status?: string;
     last_synced_at?: string;
+    video_upload_frequency?: string;
   };
   onClick?: () => void;
   className?: string;
@@ -254,7 +256,7 @@ export const EducatorCard = ({ educator, className }: EducatorCardProps) => {
 
           {/* Specializations - Scrollable Container */}
           {educator.specialization && educator.specialization.length > 0 && (
-            <ScrollArea className="h-24 w-full">
+            <div className="space-y-1 overflow-hidden">
               <div className="flex flex-wrap gap-2">
                 {educator.specialization.map((spec, index) => (
                   <motion.span
@@ -266,7 +268,22 @@ export const EducatorCard = ({ educator, className }: EducatorCardProps) => {
                   </motion.span>
                 ))}
               </div>
-            </ScrollArea>
+            </div>
+          )}
+
+          {/* Additional Stats */}
+          {educator.channel_total_views && (
+            <div className="flex items-center gap-1.5 text-sm text-siso-text/70 mt-2">
+              <Eye className="w-4 h-4" />
+              <span>{formatNumber(educator.channel_total_views)} total views</span>
+            </div>
+          )}
+
+          {educator.video_upload_frequency && (
+            <div className="flex items-center gap-1.5 text-sm text-siso-text/70">
+              <TrendingUp className="w-4 h-4" />
+              <span>Posts {educator.video_upload_frequency}</span>
+            </div>
           )}
         </div>
       </motion.div>
