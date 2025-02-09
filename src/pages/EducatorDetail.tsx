@@ -1,5 +1,5 @@
 
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Sidebar } from '@/components/Sidebar';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ChevronRight } from 'lucide-react';
@@ -15,12 +15,22 @@ import { toast } from 'sonner';
 export default function EducatorDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  
+  // [Analysis] Get current section from URL params to preserve it during navigation
+  const currentSection = searchParams.get('section') || 'educators';
 
   // [Analysis] Using slug to fetch educator details first
   const { data: educator, isLoading, error } = useEducatorDetails(slug || '');
 
+  // [Analysis] Preserve section parameter when navigating back
+  const handleNavigateBack = () => {
+    navigate(`/education?section=${currentSection}`);
+  };
+
   // Add debug log to track educator data
   console.log('EducatorDetail received data:', educator);
+  console.log('[EducatorDetail] Preserving section:', currentSection);
 
   if (isLoading) {
     return (
@@ -29,7 +39,7 @@ export default function EducatorDetail() {
         <div className="flex-1">
           <Button
             variant="ghost"
-            onClick={() => navigate('/education/educators')}
+            onClick={handleNavigateBack}
             className="m-4 md:m-8"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -50,7 +60,7 @@ export default function EducatorDetail() {
           <div className="text-xl text-siso-text">Educator not found</div>
           <Button 
             variant="ghost" 
-            onClick={() => navigate('/education/educators')}
+            onClick={handleNavigateBack}
             className="flex items-center gap-2"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -89,7 +99,7 @@ export default function EducatorDetail() {
             {/* Back Button */}
             <Button
               variant="ghost"
-              onClick={() => navigate('/education/educators')}
+              onClick={handleNavigateBack}
               className="group flex items-center gap-2 text-siso-text/70 hover:text-siso-text-bold transition-colors"
             >
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
@@ -109,7 +119,7 @@ export default function EducatorDetail() {
               <Button 
                 variant="link" 
                 className="p-0 text-siso-text/60 hover:text-siso-text-bold"
-                onClick={() => navigate('/education/educators')}
+                onClick={handleNavigateBack}
               >
                 Educators
               </Button>
