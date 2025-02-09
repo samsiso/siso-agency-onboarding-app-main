@@ -1,9 +1,8 @@
 
-import { User, Info, Calendar } from 'lucide-react';
+import { User, Info } from 'lucide-react';
 import { formatNumber } from '@/lib/utils';
 import { Video } from '../types';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { formatDistanceToNow } from 'date-fns';
 
 interface VideoMetadataProps {
   educator: Video['educator'];
@@ -12,11 +11,6 @@ interface VideoMetadataProps {
 }
 
 export const VideoMetadata = ({ educator, metrics, created_at }: VideoMetadataProps) => {
-  // [Analysis] Format date relative to now for better UX
-  const formattedDate = created_at 
-    ? formatDistanceToNow(new Date(created_at), { addSuffix: true })
-    : '';
-
   return (
     <TooltipProvider>
       <div className="space-y-2">
@@ -57,19 +51,10 @@ export const VideoMetadata = ({ educator, metrics, created_at }: VideoMetadataPr
                     <div className="flex items-center gap-1">
                       <Info className="w-3 h-3" />
                       <span>{metrics.difficulty}</span>
-                      {created_at && (
-                        <>
-                          <Calendar className="w-3 h-3 ml-1" />
-                          <span>{formattedDate}</span>
-                        </>
-                      )}
                     </div>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <div className="space-y-1">
-                      <p>Difficulty level: {metrics.difficulty}</p>
-                      {created_at && <p>Created: {formattedDate}</p>}
-                    </div>
+                    <p>Difficulty level: {metrics.difficulty}</p>
                   </TooltipContent>
                 </Tooltip>
               )}
