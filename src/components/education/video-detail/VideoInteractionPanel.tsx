@@ -1,15 +1,17 @@
+
 import { Brain, MessageCircle, ListChecks } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { VideoAnalysis } from '../VideoAnalysis';
 import { VideoChat } from '../VideoChat';
 import { VideoTakeaways } from '../VideoTakeaways';
 
+// [Analysis] Define explicit interface for component props to fix TypeScript error
 interface VideoInteractionPanelProps {
   videoId: string;
   activeTab: string;
 }
 
-export const VideoInteractionPanel = ({ videoId, activeTab }: VideoInteractionPanelProps) => {
+export const VideoInteractionPanel: React.FC<VideoInteractionPanelProps> = ({ videoId, activeTab }: VideoInteractionPanelProps) => {
   return (
     <Tabs defaultValue={activeTab} className="space-y-6">
       <TabsList className="w-full grid grid-cols-3 lg:w-[400px] bg-white/5">
