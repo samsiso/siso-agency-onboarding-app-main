@@ -7,7 +7,7 @@ interface VideoMetadataProps {
   metrics: Video['metrics'];
 }
 
-export const VideoMetadata = ({ educator }: VideoMetadataProps) => {
+export const VideoMetadata = ({ educator, metrics }: VideoMetadataProps) => {
   return (
     <div className="flex items-center gap-2">
       {educator.avatar_url ? (
