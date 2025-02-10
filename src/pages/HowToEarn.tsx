@@ -10,6 +10,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { SmartEarningSearch } from '@/components/earn/SmartEarningSearch';
 import { EarningChatAssistant } from '@/components/earn/EarningChatAssistant';
+import { motion } from 'framer-motion';
 
 const earningSections = [
   {
@@ -333,7 +334,6 @@ const HowToEarn = () => {
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    // You can add additional search logic here if needed
   };
 
   if (isLoading) {
@@ -343,7 +343,11 @@ const HowToEarn = () => {
           <Sidebar />
           <div className="flex-1 p-4 md:p-8">
             <div className="max-w-7xl mx-auto">
-              <div className="animate-pulse">
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="animate-pulse"
+              >
                 <div className="h-12 w-48 bg-siso-text/10 rounded mb-4 mx-auto"></div>
                 <div className="h-6 w-96 bg-siso-text/10 rounded mb-8 mx-auto"></div>
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -356,7 +360,7 @@ const HowToEarn = () => {
                     <div className="h-96 bg-siso-text/10 rounded"></div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             </div>
           </div>
         </div>
@@ -370,31 +374,55 @@ const HowToEarn = () => {
         <Sidebar />
         <div className="flex-1 p-4 md:p-8">
           <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-8">
-              <div className="flex items-center justify-center gap-3 mb-4">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center mb-8"
+            >
+              <motion.div 
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 200, damping: 15 }}
+                className="flex items-center justify-center gap-3 mb-4"
+              >
                 <Trophy className="w-12 h-12 text-siso-orange animate-bounce" />
                 <h1 className="text-4xl font-bold bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent">
                   How to Earn SISO Points
                 </h1>
-              </div>
-              <p className="text-lg text-siso-text/80 max-w-2xl mx-auto mb-6">
+              </motion.div>
+              <motion.p 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="text-lg text-siso-text/80 max-w-2xl mx-auto mb-6"
+              >
                 Maximize your points by completing daily activities and contributing to the community. 
                 Every action counts towards your progress!
-              </p>
-              <Button
-                onClick={() => navigate('/leaderboards')}
-                className="bg-gradient-to-r from-siso-red to-siso-orange hover:from-siso-red/90 hover:to-siso-orange/90 
-                  text-white font-semibold px-6 py-2 rounded-lg transition-all duration-300"
+              </motion.p>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
               >
-                View Leaderboard
-              </Button>
-            </div>
+                <Button
+                  onClick={() => navigate('/leaderboards')}
+                  className="bg-gradient-to-r from-siso-red to-siso-orange hover:from-siso-red/90 hover:to-siso-orange/90 
+                    text-white font-semibold px-6 py-2 rounded-lg transition-all duration-300 transform hover:scale-105"
+                >
+                  View Leaderboard
+                </Button>
+              </motion.div>
+            </motion.div>
 
             <SmartEarningSearch onSearch={handleSearch} />
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-              <div className="lg:col-span-4 space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto pr-4 
-                scrollbar-thin scrollbar-thumb-siso-border scrollbar-track-transparent">
+              <motion.div 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="lg:col-span-4 space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto pr-4 
+                  scrollbar-thin scrollbar-thumb-siso-border scrollbar-track-transparent"
+              >
                 {earningSections.map((section, index) => (
                   <EarningCategory
                     key={index}
@@ -414,15 +442,19 @@ const HowToEarn = () => {
                     }}
                   />
                 ))}
-              </div>
+              </motion.div>
 
-              <div className="lg:col-span-8">
+              <motion.div 
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="lg:col-span-8"
+              >
                 <EarningDetails
                   title={earningSections[selectedCategory].title}
                   description={earningSections[selectedCategory].description}
                   items={earningSections[selectedCategory].items}
                 />
-              </div>
+              </motion.div>
             </div>
           </div>
         </div>
