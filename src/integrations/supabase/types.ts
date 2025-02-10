@@ -1803,6 +1803,77 @@ export type Database = {
           },
         ]
       }
+      video_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+          parent_id: string | null
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          parent_id?: string | null
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          parent_id?: string | null
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_categories_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "video_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      video_category_relations: {
+        Row: {
+          category_id: string
+          video_id: string
+        }
+        Insert: {
+          category_id: string
+          video_id: string
+        }
+        Update: {
+          category_id?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_category_relations_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "video_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "video_category_relations_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "youtube_videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       video_discussions: {
         Row: {
           content: string
@@ -2066,12 +2137,16 @@ export type Database = {
       }
       youtube_videos: {
         Row: {
+          category: string | null
           category_id: string | null
           channel_id: string | null
           comment_count: number | null
           created_at: string
           date: string | null
+          difficulty_level: string | null
           duration: string | null
+          estimated_duration: number | null
+          featured: boolean | null
           full_description: string | null
           has_captions: boolean | null
           hd_thumbnail_url: string | null
@@ -2089,14 +2164,19 @@ export type Database = {
           url: string | null
           usecase_category: string | null
           viewCount: number | null
+          views: number | null
         }
         Insert: {
+          category?: string | null
           category_id?: string | null
           channel_id?: string | null
           comment_count?: number | null
           created_at?: string
           date?: string | null
+          difficulty_level?: string | null
           duration?: string | null
+          estimated_duration?: number | null
+          featured?: boolean | null
           full_description?: string | null
           has_captions?: boolean | null
           hd_thumbnail_url?: string | null
@@ -2114,14 +2194,19 @@ export type Database = {
           url?: string | null
           usecase_category?: string | null
           viewCount?: number | null
+          views?: number | null
         }
         Update: {
+          category?: string | null
           category_id?: string | null
           channel_id?: string | null
           comment_count?: number | null
           created_at?: string
           date?: string | null
+          difficulty_level?: string | null
           duration?: string | null
+          estimated_duration?: number | null
+          featured?: boolean | null
           full_description?: string | null
           has_captions?: boolean | null
           hd_thumbnail_url?: string | null
@@ -2139,6 +2224,7 @@ export type Database = {
           url?: string | null
           usecase_category?: string | null
           viewCount?: number | null
+          views?: number | null
         }
         Relationships: [
           {

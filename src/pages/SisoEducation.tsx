@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { Bot, Send, Paperclip, Mic, Brain, Book, GraduationCap, Search } from 'lucide-react';
@@ -15,6 +16,8 @@ import { EducationHeader } from '@/components/education/layout/EducationHeader';
 import { EducationToolbar } from '@/components/education/layout/EducationToolbar';
 import { EducationContent } from '@/components/education/layout/EducationContent';
 import { LearningProgress } from '@/components/education/learning/LearningProgress';
+import { FeaturedVideosSection } from '@/components/education/FeaturedVideosSection';
+import { VideoCategories } from '@/components/education/VideoCategories';
 import { useEducatorsList } from '@/hooks/education';
 import { useEducationStats } from '@/hooks/use-education-stats';
 import { useEducationChat } from '@/hooks/useEducationChat';
@@ -24,6 +27,7 @@ export default function SisoEducation() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isChatExpanded, setIsChatExpanded] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('all');
 
   const { messages, isLoading, sendMessage } = useEducationChat();
 
@@ -67,7 +71,18 @@ export default function SisoEducation() {
             onSearchBlur={() => setIsSearchFocused(false)}
           />
 
-          {!isSearchFocused && <LearningProgress />}
+          {!isSearchFocused && (
+            <>
+              <FeaturedVideosSection />
+              
+              <VideoCategories
+                selectedCategory={selectedCategory}
+                onCategorySelect={setSelectedCategory}
+              />
+              
+              <LearningProgress />
+            </>
+          )}
 
           {!isSearchFocused && (
             <EducationToolbar
