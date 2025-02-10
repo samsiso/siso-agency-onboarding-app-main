@@ -3,6 +3,7 @@ import { Shield } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { ProfileCard } from './ProfileCard';
 import { ProfileSection } from './ProfileSection';
+import { motion } from "framer-motion";
 
 interface BasicInfoProps {
   email: string | null;
@@ -25,7 +26,7 @@ export const BasicInfo = ({
   onFormChange,
 }: BasicInfoProps) => {
   return (
-    <ProfileCard icon={Shield} title="Basic Information">
+    <ProfileCard icon={Shield} title="Basic Information" isEditing={isEditing}>
       <div className="space-y-4">
         <ProfileSection label="Email">
           <p className="text-siso-text">{email}</p>
@@ -33,26 +34,54 @@ export const BasicInfo = ({
         
         <ProfileSection label="Full Name">
           {isEditing ? (
-            <Input
-              value={formData.fullName}
-              onChange={(e) => onFormChange('fullName', e.target.value)}
-              className="bg-siso-bg-alt border-siso-border"
-            />
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Input
+                value={formData.fullName}
+                onChange={(e) => onFormChange('fullName', e.target.value)}
+                className="bg-siso-bg-alt border-siso-border focus:border-siso-orange/50 focus:ring-siso-orange/20"
+              />
+            </motion.div>
           ) : (
-            <p className="text-siso-text">{fullName || 'Not set'}</p>
+            <motion.p 
+              className="text-siso-text"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              {fullName || 'Not set'}
+            </motion.p>
           )}
         </ProfileSection>
 
         <ProfileSection label="Professional Role">
           {isEditing ? (
-            <Input
-              value={formData.professionalRole}
-              onChange={(e) => onFormChange('professionalRole', e.target.value)}
-              className="bg-siso-bg-alt border-siso-border"
-              placeholder="e.g., Software Engineer, Product Manager"
-            />
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Input
+                value={formData.professionalRole}
+                onChange={(e) => onFormChange('professionalRole', e.target.value)}
+                className="bg-siso-bg-alt border-siso-border focus:border-siso-orange/50 focus:ring-siso-orange/20"
+                placeholder="e.g., Software Engineer, Product Manager"
+              />
+            </motion.div>
           ) : (
-            <p className="text-siso-text">{professionalRole || 'Not set'}</p>
+            <motion.p 
+              className="text-siso-text"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              {professionalRole || 'Not set'}
+            </motion.p>
           )}
         </ProfileSection>
       </div>
