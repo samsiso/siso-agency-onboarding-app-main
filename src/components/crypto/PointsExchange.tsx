@@ -386,7 +386,8 @@ export const PointsExchange = ({ userPoints }: { userPoints: number }) => {
         )}
       </AnimatePresence>
 
-      <style jsx global>{`
+      <style>
+        {`
         .success-particle {
           position: absolute;
           pointer-events: none;
@@ -431,7 +432,8 @@ export const PointsExchange = ({ userPoints }: { userPoints: number }) => {
             transform: translateX(200%);
           }
         }
-      `}</style>
+        `}
+      </style>
     </div>
   );
 };
