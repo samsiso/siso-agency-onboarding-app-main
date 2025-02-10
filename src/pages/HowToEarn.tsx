@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { SmartEarningSearch } from '@/components/earn/SmartEarningSearch';
+import { EarningChatAssistant } from '@/components/earn/EarningChatAssistant';
 
 const earningSections = [
   {
@@ -307,9 +309,9 @@ const earningSections = [
 
 const HowToEarn = () => {
   const [selectedCategory, setSelectedCategory] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
 
-  // Fetch point configurations
   const { data: pointConfigs, isLoading } = useQuery({
     queryKey: ['pointConfigurations'],
     queryFn: async () => {
@@ -329,7 +331,11 @@ const HowToEarn = () => {
     }
   });
 
-  // Loading state
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    // You can add additional search logic here if needed
+  };
+
   if (isLoading) {
     return (
       <SidebarProvider>
@@ -364,8 +370,7 @@ const HowToEarn = () => {
         <Sidebar />
         <div className="flex-1 p-4 md:p-8">
           <div className="max-w-7xl mx-auto">
-            {/* Header */}
-            <div className="text-center mb-12">
+            <div className="text-center mb-8">
               <div className="flex items-center justify-center gap-3 mb-4">
                 <Trophy className="w-12 h-12 text-siso-orange animate-bounce" />
                 <h1 className="text-4xl font-bold bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent">
@@ -385,9 +390,9 @@ const HowToEarn = () => {
               </Button>
             </div>
 
-            {/* Main Content */}
+            <SmartEarningSearch onSearch={handleSearch} />
+
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-              {/* Left Panel - Categories */}
               <div className="lg:col-span-4 space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto pr-4 
                 scrollbar-thin scrollbar-thumb-siso-border scrollbar-track-transparent">
                 {earningSections.map((section, index) => (
@@ -411,7 +416,6 @@ const HowToEarn = () => {
                 ))}
               </div>
 
-              {/* Right Panel - Details */}
               <div className="lg:col-span-8">
                 <EarningDetails
                   title={earningSections[selectedCategory].title}
@@ -422,6 +426,8 @@ const HowToEarn = () => {
             </div>
           </div>
         </div>
+
+        <EarningChatAssistant />
       </div>
     </SidebarProvider>
   );

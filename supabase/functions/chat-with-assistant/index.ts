@@ -13,7 +13,6 @@ serve(async (req) => {
   }
 
   try {
-    console.log('Received chat request');
     const { message, systemPrompt } = await req.json();
     
     const apiKey = Deno.env.get('OPENAI_API_KEY');
@@ -21,7 +20,8 @@ serve(async (req) => {
       throw new Error('OpenAI API key is missing');
     }
 
-    console.log('Making request to OpenAI with system prompt:', systemPrompt);
+    console.log('Processing request with system prompt:', systemPrompt);
+    
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -33,7 +33,7 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: systemPrompt || "You are a helpful assistant for the SISO platform. You help users find and understand various tools, automations, and resources available on the platform. Keep your responses concise and friendly."
+            content: systemPrompt || "You are a helpful assistant for the SISO platform that helps users understand how to earn points and maximize their earnings."
           },
           {
             role: "user",
@@ -47,14 +47,7 @@ serve(async (req) => {
     console.log('Received response from OpenAI');
     
     return new Response(
-      JSON.stringify({ 
-        response: data.choices[0].message.content,
-        steps: {
-          thinking: "🤔 Analyzing your question...",
-          searching: "🔍 Searching for relevant information...",
-          response: "✨ Preparing your response..."
-        }
-      }),
+      JSON.stringify({ response: data.choices[0].message.content }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
