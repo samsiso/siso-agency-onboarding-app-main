@@ -1216,6 +1216,7 @@ export type Database = {
           materials: string[] | null
           name: string
           nft_benefits: string[] | null
+          opensea_url: string | null
           price_crypto: number
           price_usd: number
           related_products: string[] | null
@@ -1223,6 +1224,7 @@ export type Database = {
           slug: string
           specifications: Json | null
           stock: number
+          stripe_product_id: string | null
           tags: string[] | null
           updated_at: string
         }
@@ -1239,6 +1241,7 @@ export type Database = {
           materials?: string[] | null
           name: string
           nft_benefits?: string[] | null
+          opensea_url?: string | null
           price_crypto: number
           price_usd: number
           related_products?: string[] | null
@@ -1246,6 +1249,7 @@ export type Database = {
           slug: string
           specifications?: Json | null
           stock?: number
+          stripe_product_id?: string | null
           tags?: string[] | null
           updated_at?: string
         }
@@ -1262,6 +1266,7 @@ export type Database = {
           materials?: string[] | null
           name?: string
           nft_benefits?: string[] | null
+          opensea_url?: string | null
           price_crypto?: number
           price_usd?: number
           related_products?: string[] | null
@@ -1269,6 +1274,7 @@ export type Database = {
           slug?: string
           specifications?: Json | null
           stock?: number
+          stripe_product_id?: string | null
           tags?: string[] | null
           updated_at?: string
         }
