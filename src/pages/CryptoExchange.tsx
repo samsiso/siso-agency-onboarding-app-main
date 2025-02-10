@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { ArrowRightLeft, Loader2, Wifi, Database, History, Filter } from 'lucide-react';
 import { PointsExchange } from "@/components/crypto/PointsExchange";
@@ -13,7 +12,6 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { motion, AnimatePresence } from 'framer-motion';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-// [Analysis] Added NetworkStatus component for real-time connection feedback
 const NetworkStatus = () => {
   const [isOnline, setIsOnline] = useState(true);
   
@@ -46,7 +44,6 @@ const NetworkStatus = () => {
   );
 };
 
-// [Analysis] Added TransactionHistory component for better transaction tracking
 const TransactionHistory = () => {
   return (
     <ScrollArea className="h-[500px] pr-4">
@@ -61,7 +58,6 @@ const TransactionHistory = () => {
           </Button>
         </div>
         <div className="space-y-2">
-          {/* Placeholder for transaction history items */}
           <div className="bg-black/20 p-3 rounded-lg">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-siso-text">Points Exchange</span>
@@ -69,7 +65,6 @@ const TransactionHistory = () => {
             </div>
             <p className="text-xs text-siso-text/80 mt-1">Converted 1000 points to SISO tokens</p>
           </div>
-          {/* Add more transaction items here */}
         </div>
       </div>
     </ScrollArea>
@@ -118,6 +113,28 @@ const CryptoExchange = () => {
     fetchUserPoints();
   }, []);
 
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut"
+      }
+    }
+  };
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-screen">
@@ -135,17 +152,31 @@ const CryptoExchange = () => {
       <div className="flex-1 bg-gradient-to-b from-siso-bg via-black to-siso-bg relative overflow-hidden">
         <FloatingOrbs />
         
-        <div className="container mx-auto p-6 space-y-8 relative z-10">
-          {/* Enhanced Header Section */}
+        <motion.div 
+          className="container mx-auto p-6 space-y-8 relative z-10"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
           <motion.div 
-            className="flex flex-col space-y-4 bg-black/20 p-6 rounded-lg backdrop-blur-sm border border-siso-text/5"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
+            className="flex flex-col space-y-4 bg-black/20 p-6 rounded-lg backdrop-blur-sm border border-siso-text/5 hover:border-siso-text/10 transition-all duration-300"
+            variants={cardVariants}
           >
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div className="flex items-center gap-3">
-                <ArrowRightLeft className="w-8 h-8 text-gradient bg-gradient-to-r from-siso-red to-siso-orange" />
+                <motion.div
+                  animate={{
+                    rotate: [0, 360],
+                    scale: [1, 1.1, 1]
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    repeatType: "reverse"
+                  }}
+                >
+                  <ArrowRightLeft className="w-8 h-8 text-gradient bg-gradient-to-r from-siso-red to-siso-orange" />
+                </motion.div>
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent">
                   Crypto Exchange
                 </h1>
@@ -159,7 +190,7 @@ const CryptoExchange = () => {
               <div className="flex items-center gap-4">
                 <Sheet>
                   <SheetTrigger asChild>
-                    <Button variant="outline" size="sm" className="gap-2">
+                    <Button variant="outline" size="sm" className="gap-2 hover:border-siso-text/20 hover:bg-black/40 transition-all duration-300">
                       <History className="h-4 w-4" />
                       Transaction History
                     </Button>
@@ -178,57 +209,51 @@ const CryptoExchange = () => {
           </motion.div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="flex flex-col space-y-4">
-              <motion.div 
-                className="flex items-center justify-between"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: 0.1 }}
-              >
+            <motion.div 
+              className="flex flex-col space-y-4"
+              variants={cardVariants}
+            >
+              <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold text-siso-text-bold">
                   Swap Your Points
                 </h2>
                 <div className="text-sm text-siso-text/60">
                   Balance: {userPoints.toLocaleString()} Points
                 </div>
-              </motion.div>
+              </div>
               <motion.div 
-                className="bg-black/40 backdrop-blur-lg rounded-xl border border-siso-text/10 p-6 hover:border-siso-text/20 transition-all duration-300 shadow-lg"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3, delay: 0.2 }}
+                className="bg-black/40 backdrop-blur-lg rounded-xl border border-siso-text/10 p-6 hover:border-siso-text/20 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-siso-red/5"
+                whileHover={{ scale: 1.01 }}
+                transition={{ duration: 0.2 }}
               >
                 <PointsExchange userPoints={userPoints} />
               </motion.div>
               
               <WelcomeNFTStatus />
-            </div>
+            </motion.div>
 
-            <div className="flex flex-col space-y-4">
-              <motion.div 
-                className="flex items-center justify-between"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: 0.3 }}
-              >
+            <motion.div 
+              className="flex flex-col space-y-4"
+              variants={cardVariants}
+            >
+              <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold text-siso-text-bold">
                   Your NFT Gallery
                 </h2>
                 <div className="text-sm text-siso-text/60">
                   Connected to Solana
                 </div>
-              </motion.div>
+              </div>
               <motion.div 
-                className="bg-black/40 backdrop-blur-lg rounded-xl border border-siso-text/10 p-6 hover:border-siso-text/20 transition-all duration-300 shadow-lg"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3, delay: 0.4 }}
+                className="bg-black/40 backdrop-blur-lg rounded-xl border border-siso-text/10 p-6 hover:border-siso-text/20 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-siso-orange/5"
+                whileHover={{ scale: 1.01 }}
+                transition={{ duration: 0.2 }}
               >
                 <NFTGallery />
               </motion.div>
-            </div>
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
