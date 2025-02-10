@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useRef, useState } from "react";
@@ -35,6 +36,7 @@ interface ExpandableChatProps extends React.HTMLAttributes<HTMLDivElement> {
   position?: ChatPosition;
   size?: ChatSize;
   icon?: React.ReactNode;
+  onExpandedChange?: (expanded: boolean) => void;
 }
 
 const ExpandableChat: React.FC<ExpandableChatProps> = ({
@@ -42,13 +44,18 @@ const ExpandableChat: React.FC<ExpandableChatProps> = ({
   position = "bottom-right",
   size = "md",
   icon,
+  onExpandedChange,
   children,
   ...props
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const chatRef = useRef<HTMLDivElement>(null);
 
-  const toggleChat = () => setIsOpen(!isOpen);
+  const toggleChat = () => {
+    const newIsOpen = !isOpen;
+    setIsOpen(newIsOpen);
+    onExpandedChange?.(newIsOpen);
+  };
 
   return (
     <div
@@ -151,3 +158,4 @@ export {
   ExpandableChatBody,
   ExpandableChatFooter,
 };
+
