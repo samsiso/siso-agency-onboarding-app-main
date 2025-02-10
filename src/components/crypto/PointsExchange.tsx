@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -164,14 +165,16 @@ export const PointsExchange = ({ userPoints }: { userPoints: number }) => {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto space-y-6 exchange-container relative">
+    <div className="w-full max-w-md mx-auto space-y-6 exchange-container relative backdrop-blur-lg bg-siso-bg-alt/30 p-6 rounded-2xl border border-siso-text/10 shadow-xl">
       <motion.div 
         className="flex items-center justify-between"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <h2 className="text-xl font-semibold text-siso-text-bold">Swap</h2>
+        <h2 className="text-2xl font-bold bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent">
+          Swap Points
+        </h2>
         <div className="flex items-center gap-2">
           <motion.button 
             whileHover={{ scale: 1.05 }}
@@ -201,9 +204,9 @@ export const PointsExchange = ({ userPoints }: { userPoints: number }) => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="bg-siso-bg-alt rounded-lg p-4 border border-siso-text/10"
+            className="bg-black/20 rounded-lg p-4 border border-siso-text/10 backdrop-blur"
           >
-            <h3 className="text-lg font-semibold mb-4">Transaction History</h3>
+            <h3 className="text-lg font-semibold mb-4 text-siso-text-bold">Transaction History</h3>
             <ScrollArea className="h-[300px]">
               <div className="space-y-4">
                 {transactions.map((tx) => (
@@ -211,14 +214,14 @@ export const PointsExchange = ({ userPoints }: { userPoints: number }) => {
                     key={tx.id}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="p-3 bg-black/20 rounded-lg border border-siso-text/5 hover:border-siso-text/20 transition-all duration-200"
+                    className="p-3 bg-black/30 rounded-lg border border-siso-text/5 hover:border-siso-text/20 transition-all duration-200"
                   >
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-siso-text/80">
                         {tx.points_exchanged.toLocaleString()} Points → {tx.tokens_received.toLocaleString()} Tokens
                       </span>
                       <span className={cn(
-                        "text-xs px-2 py-1 rounded-full",
+                        "text-xs px-2 py-1 rounded-full font-medium",
                         tx.status === 'completed' && "bg-green-500/20 text-green-400",
                         tx.status === 'failed' && "bg-red-500/20 text-red-400",
                         tx.status === 'pending' && "bg-yellow-500/20 text-yellow-400"
@@ -244,7 +247,7 @@ export const PointsExchange = ({ userPoints }: { userPoints: number }) => {
             <div className="space-y-2">
               <div className="text-sm text-siso-text/60 uppercase tracking-wider">From</div>
               <motion.div 
-                className="bg-siso-bg-alt rounded-lg p-4 border border-siso-text/10 hover:border-siso-text/20 transition-all duration-300 relative group"
+                className="bg-black/20 rounded-lg p-4 border border-siso-text/10 hover:border-siso-text/20 transition-all duration-300 relative group backdrop-blur"
                 whileHover={{ scale: 1.01 }}
                 transition={{ duration: 0.2 }}
               >
@@ -280,7 +283,7 @@ export const PointsExchange = ({ userPoints }: { userPoints: number }) => {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => handleQuickSelect(percentage)}
-                        className="px-2 py-1 text-xs rounded-md bg-siso-text/10 hover:bg-siso-text/20 text-siso-text-bold transition-colors relative group"
+                        className="px-2 py-1 text-xs rounded-md bg-white/5 hover:bg-white/10 text-siso-text-bold transition-colors relative group"
                       >
                         {percentage}%
                         <div className="absolute inset-0 bg-gradient-to-r from-siso-red/10 to-siso-orange/10 rounded-md opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -299,7 +302,7 @@ export const PointsExchange = ({ userPoints }: { userPoints: number }) => {
               transition={{ duration: 1, repeat: loading ? Infinity : 0, ease: "linear" }}
             >
               <motion.div 
-                className="w-10 h-10 rounded-full bg-siso-bg-alt border border-siso-text/10 flex items-center justify-center relative group"
+                className="w-10 h-10 rounded-full bg-black/20 border border-siso-text/10 flex items-center justify-center relative group backdrop-blur"
                 whileHover={{ scale: 1.1, rotate: 180 }}
                 transition={{ duration: 0.3 }}
               >
@@ -311,7 +314,7 @@ export const PointsExchange = ({ userPoints }: { userPoints: number }) => {
             <div className="space-y-2">
               <div className="text-sm text-siso-text/60 uppercase tracking-wider">To</div>
               <motion.div 
-                className="bg-siso-bg-alt rounded-lg p-4 border border-siso-text/10 hover:border-siso-text/20 transition-all duration-300 relative group"
+                className="bg-black/20 rounded-lg p-4 border border-siso-text/10 hover:border-siso-text/20 transition-all duration-300 relative group backdrop-blur"
                 whileHover={{ scale: 1.01 }}
                 transition={{ duration: 0.2 }}
               >
@@ -347,10 +350,10 @@ export const PointsExchange = ({ userPoints }: { userPoints: number }) => {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-sm text-siso-text/60 text-center p-2 rounded-lg bg-siso-text/5 relative overflow-hidden group"
+              className="text-sm text-center p-2 rounded-lg bg-black/10 backdrop-blur relative overflow-hidden group"
             >
               <div className="relative z-10">1 SISO Token = 1,000 SISO Points</div>
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
             </motion.div>
 
             <motion.div
