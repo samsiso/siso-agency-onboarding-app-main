@@ -46,6 +46,7 @@ const Profile = () => {
           points={profile?.points || 0}
           rank={profile?.rank || 'Bronze'}
           avatarUrl={profile?.avatar_url}
+          bannerUrl={profile?.banner_url}
           onLogout={async () => {
             try {
               const { error } = await supabase.auth.signOut();

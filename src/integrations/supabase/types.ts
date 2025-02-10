@@ -1288,6 +1288,7 @@ export type Database = {
           annual_revenue_range: string | null
           automation_priorities: string[] | null
           avatar_url: string | null
+          banner_url: string | null
           bio: string | null
           business_challenges: string[] | null
           business_name: string | null
@@ -1331,6 +1332,7 @@ export type Database = {
           annual_revenue_range?: string | null
           automation_priorities?: string[] | null
           avatar_url?: string | null
+          banner_url?: string | null
           bio?: string | null
           business_challenges?: string[] | null
           business_name?: string | null
@@ -1374,6 +1376,7 @@ export type Database = {
           annual_revenue_range?: string | null
           automation_priorities?: string[] | null
           avatar_url?: string | null
+          banner_url?: string | null
           bio?: string | null
           business_challenges?: string[] | null
           business_name?: string | null
