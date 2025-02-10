@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,14 +25,12 @@ export const PointsExchange = ({ userPoints }: { userPoints: number }) => {
   const [showHistory, setShowHistory] = useState(false);
   const { toast } = useToast();
 
-  // Fetch user's SISO token balance and transaction history
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) return;
 
-        // Fetch SISO tokens balance
         const { data: profile } = await supabase
           .from('profiles')
           .select('siso_tokens')
@@ -44,7 +41,6 @@ export const PointsExchange = ({ userPoints }: { userPoints: number }) => {
           setSisoTokens(profile.siso_tokens || 0);
         }
 
-        // Fetch transaction history
         const { data: txHistory } = await supabase
           .from('user_crypto_history')
           .select('*')
@@ -61,7 +57,6 @@ export const PointsExchange = ({ userPoints }: { userPoints: number }) => {
 
     fetchUserData();
 
-    // Set up realtime subscription for transactions
     const channel = supabase
       .channel('crypto-updates')
       .on(
@@ -73,7 +68,7 @@ export const PointsExchange = ({ userPoints }: { userPoints: number }) => {
         },
         (payload) => {
           console.log('Transaction update:', payload);
-          fetchUserData(); // Refresh data when transactions change
+          fetchUserData();
         }
       )
       .subscribe();
@@ -130,6 +125,14 @@ export const PointsExchange = ({ userPoints }: { userPoints: number }) => {
       if (error) throw error;
 
       if (data.status === 'completed') {
+        const container = document.querySelector('.exchange-container');
+        if (container) {
+          const particle = document.createElement('div');
+          particle.className = 'success-particle';
+          container.appendChild(particle);
+          setTimeout(() => particle.remove(), 1000);
+        }
+
         toast({
           title: "Exchange successful",
           description: `Converted ${points} points to ${points / 1000} SISO tokens.`,
@@ -161,8 +164,7 @@ export const PointsExchange = ({ userPoints }: { userPoints: number }) => {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto space-y-6">
-      {/* Header */}
+    <div className="w-full max-w-md mx-auto space-y-6 exchange-container relative">
       <motion.div 
         className="flex items-center justify-between"
         initial={{ opacity: 0, y: -20 }}
@@ -175,18 +177,20 @@ export const PointsExchange = ({ userPoints }: { userPoints: number }) => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowHistory(!showHistory)}
-            className="p-2 hover:bg-siso-text/5 rounded-lg transition-colors" 
+            className="p-2 hover:bg-siso-text/5 rounded-lg transition-colors relative group" 
             title="Transaction History"
           >
-            <History className="w-5 h-5 text-siso-text/60" />
+            <History className="w-5 h-5 text-siso-text/60 relative z-10" />
+            <div className="absolute inset-0 bg-gradient-to-r from-siso-red/10 to-siso-orange/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity" />
           </motion.button>
           <motion.button 
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="p-2 hover:bg-siso-text/5 rounded-lg transition-colors" 
+            className="p-2 hover:bg-siso-text/5 rounded-lg transition-colors relative group" 
             title="Exchange Settings"
           >
-            <Settings className="w-5 h-5 text-siso-text/60" />
+            <Settings className="w-5 h-5 text-siso-text/60 relative z-10" />
+            <div className="absolute inset-0 bg-gradient-to-r from-siso-red/10 to-siso-orange/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity" />
           </motion.button>
         </div>
       </motion.div>
@@ -237,49 +241,56 @@ export const PointsExchange = ({ userPoints }: { userPoints: number }) => {
             exit={{ opacity: 0 }}
             className="space-y-6"
           >
-            {/* From Section */}
             <div className="space-y-2">
               <div className="text-sm text-siso-text/60 uppercase tracking-wider">From</div>
               <motion.div 
-                className="bg-siso-bg-alt rounded-lg p-4 border border-siso-text/10 hover:border-siso-text/20 transition-colors"
+                className="bg-siso-bg-alt rounded-lg p-4 border border-siso-text/10 hover:border-siso-text/20 transition-all duration-300 relative group"
                 whileHover={{ scale: 1.01 }}
                 transition={{ duration: 0.2 }}
               >
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-siso-red to-siso-orange flex items-center justify-center">
-                      <span className="text-white font-semibold text-sm">SP</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-siso-red/5 to-siso-orange/5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <motion.div 
+                        className="w-8 h-8 rounded-full bg-gradient-to-br from-siso-red to-siso-orange flex items-center justify-center relative"
+                        whileHover={{ scale: 1.1 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <span className="text-white font-semibold text-sm">SP</span>
+                        <div className="absolute inset-0 rounded-full bg-gradient-to-br from-siso-red to-siso-orange blur-lg opacity-50" />
+                      </motion.div>
+                      <span className="font-semibold text-siso-text-bold">SISO Points</span>
                     </div>
-                    <span className="font-semibold text-siso-text-bold">SISO Points</span>
+                    <div className="text-sm text-siso-text/60">
+                      Balance: {userPoints.toLocaleString()}
+                    </div>
                   </div>
-                  <div className="text-sm text-siso-text/60">
-                    Balance: {userPoints.toLocaleString()}
+                  <Input
+                    type="number"
+                    value={pointsToExchange}
+                    onChange={(e) => setPointsToExchange(e.target.value)}
+                    placeholder="0.0"
+                    className="bg-transparent border-none text-2xl font-bold text-siso-text-bold placeholder:text-siso-text/30 focus-visible:ring-0 relative z-10"
+                  />
+                  <div className="flex gap-2 mt-2">
+                    {[25, 50, 75, 100].map((percentage) => (
+                      <motion.button
+                        key={percentage}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => handleQuickSelect(percentage)}
+                        className="px-2 py-1 text-xs rounded-md bg-siso-text/10 hover:bg-siso-text/20 text-siso-text-bold transition-colors relative group"
+                      >
+                        {percentage}%
+                        <div className="absolute inset-0 bg-gradient-to-r from-siso-red/10 to-siso-orange/10 rounded-md opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </motion.button>
+                    ))}
                   </div>
-                </div>
-                <Input
-                  type="number"
-                  value={pointsToExchange}
-                  onChange={(e) => setPointsToExchange(e.target.value)}
-                  placeholder="0.0"
-                  className="bg-transparent border-none text-2xl font-bold text-siso-text-bold placeholder:text-siso-text/30 focus-visible:ring-0"
-                />
-                <div className="flex gap-2 mt-2">
-                  {[25, 50, 75, 100].map((percentage) => (
-                    <motion.button
-                      key={percentage}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => handleQuickSelect(percentage)}
-                      className="px-2 py-1 text-xs rounded-md bg-siso-text/10 hover:bg-siso-text/20 text-siso-text-bold transition-colors"
-                    >
-                      {percentage}%
-                    </motion.button>
-                  ))}
                 </div>
               </motion.div>
             </div>
 
-            {/* Swap Icon */}
             <motion.div 
               className="flex justify-center -my-2"
               animate={{ 
@@ -287,50 +298,61 @@ export const PointsExchange = ({ userPoints }: { userPoints: number }) => {
               }}
               transition={{ duration: 1, repeat: loading ? Infinity : 0, ease: "linear" }}
             >
-              <div className="w-10 h-10 rounded-full bg-siso-bg-alt border border-siso-text/10 flex items-center justify-center">
-                <ArrowDown className="w-5 h-5 text-siso-text/60" />
-              </div>
+              <motion.div 
+                className="w-10 h-10 rounded-full bg-siso-bg-alt border border-siso-text/10 flex items-center justify-center relative group"
+                whileHover={{ scale: 1.1, rotate: 180 }}
+                transition={{ duration: 0.3 }}
+              >
+                <ArrowDown className="w-5 h-5 text-siso-text/60 relative z-10" />
+                <div className="absolute inset-0 bg-gradient-to-r from-siso-red/10 to-siso-orange/10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+              </motion.div>
             </motion.div>
 
-            {/* To Section */}
             <div className="space-y-2">
               <div className="text-sm text-siso-text/60 uppercase tracking-wider">To</div>
               <motion.div 
-                className="bg-siso-bg-alt rounded-lg p-4 border border-siso-text/10 hover:border-siso-text/20 transition-colors"
+                className="bg-siso-bg-alt rounded-lg p-4 border border-siso-text/10 hover:border-siso-text/20 transition-all duration-300 relative group"
                 whileHover={{ scale: 1.01 }}
                 transition={{ duration: 0.2 }}
               >
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-siso-red to-siso-orange flex items-center justify-center">
-                      <span className="text-white font-semibold text-sm">ST</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-siso-red/5 to-siso-orange/5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <motion.div 
+                        className="w-8 h-8 rounded-full bg-gradient-to-br from-siso-red to-siso-orange flex items-center justify-center relative"
+                        whileHover={{ scale: 1.1 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <span className="text-white font-semibold text-sm">ST</span>
+                        <div className="absolute inset-0 rounded-full bg-gradient-to-br from-siso-red to-siso-orange blur-lg opacity-50" />
+                      </motion.div>
+                      <span className="font-semibold text-siso-text-bold">SISO Tokens</span>
                     </div>
-                    <span className="font-semibold text-siso-text-bold">SISO Tokens</span>
+                    <div className="text-sm text-siso-text/60">
+                      Balance: {sisoTokens.toLocaleString()}
+                    </div>
                   </div>
-                  <div className="text-sm text-siso-text/60">
-                    Balance: {sisoTokens.toLocaleString()}
-                  </div>
+                  <Input
+                    type="text"
+                    value={tokensToReceive ? tokensToReceive.toLocaleString() : ''}
+                    readOnly
+                    placeholder="0.0"
+                    className="bg-transparent border-none text-2xl font-bold text-siso-text-bold placeholder:text-siso-text/30 focus-visible:ring-0 relative z-10"
+                  />
                 </div>
-                <Input
-                  type="text"
-                  value={tokensToReceive ? tokensToReceive.toLocaleString() : ''}
-                  readOnly
-                  placeholder="0.0"
-                  className="bg-transparent border-none text-2xl font-bold text-siso-text-bold placeholder:text-siso-text/30 focus-visible:ring-0"
-                />
               </motion.div>
             </div>
 
-            {/* Exchange Rate Info */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-sm text-siso-text/60 text-center p-2 rounded-lg bg-siso-text/5"
+              className="text-sm text-siso-text/60 text-center p-2 rounded-lg bg-siso-text/5 relative overflow-hidden group"
             >
-              1 SISO Token = 1,000 SISO Points
+              <div className="relative z-10">1 SISO Token = 1,000 SISO Points</div>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
             </motion.div>
 
-            {/* Swap Button */}
             <motion.div
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
@@ -339,7 +361,7 @@ export const PointsExchange = ({ userPoints }: { userPoints: number }) => {
                 onClick={handleExchange}
                 disabled={loading || !pointsToExchange}
                 className={cn(
-                  "w-full h-12 bg-gradient-to-r from-siso-red to-siso-orange",
+                  "w-full h-12 bg-gradient-to-r from-siso-red to-siso-orange relative group overflow-hidden",
                   "hover:from-siso-red/90 hover:to-siso-orange/90",
                   "text-white font-semibold rounded-lg transition-all duration-200",
                   "disabled:opacity-50 disabled:cursor-not-allowed"
@@ -353,13 +375,63 @@ export const PointsExchange = ({ userPoints }: { userPoints: number }) => {
                     <Loader2 className="w-5 h-5" />
                   </motion.div>
                 ) : (
-                  'Swap Points for Tokens'
+                  <>
+                    <span className="relative z-10">Swap Points for Tokens</span>
+                    <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-500 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                  </>
                 )}
               </Button>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      <style jsx global>{`
+        .success-particle {
+          position: absolute;
+          pointer-events: none;
+          width: 10px;
+          height: 10px;
+          background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+          border-radius: 50%;
+          animation: particle-burst 1s ease-out forwards;
+        }
+
+        @keyframes particle-burst {
+          0% {
+            transform: scale(0) translate(0, 0);
+            opacity: 1;
+          }
+          100% {
+            transform: scale(20) translate(var(--tx), var(--ty));
+            opacity: 0;
+          }
+        }
+
+        .shimmer {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 50%;
+          height: 100%;
+          background: linear-gradient(
+            to right,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.1) 50%,
+            rgba(255, 255, 255, 0) 100%
+          );
+          animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+          0% {
+            transform: translateX(-100%);
+          }
+          100% {
+            transform: translateX(200%);
+          }
+        }
+      `}</style>
     </div>
   );
 };
