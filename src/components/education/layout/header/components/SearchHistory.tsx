@@ -142,3 +142,4 @@ export const SearchHistory = ({
     </motion.div>
   );
 };
+
