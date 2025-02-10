@@ -28,7 +28,7 @@ export const SearchInput = ({
   const [isExpanded, setIsExpanded] = useState(false);
 
   // [Analysis] Use React Query for better caching and loading states
-  const { data: searchHistory, refetch } = useQuery({
+  const { data: searchHistory, refetch: refetchHistory } = useQuery({
     queryKey: ['search-history'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -58,6 +58,11 @@ export const SearchInput = ({
 
   const clearSearch = () => {
     onSearchChange('');
+  };
+
+  // [Analysis] Create a wrapper function to handle the refetch promise
+  const handleHistoryRefetch = async () => {
+    await refetchHistory();
   };
 
   return (
@@ -114,7 +119,7 @@ export const SearchInput = ({
               
               <SearchHistory
                 history={searchHistory || []}
-                onHistoryCleared={refetch}
+                onHistoryCleared={handleHistoryRefetch}
                 onSearchSelect={(query) => {
                   onSearchChange(query);
                   setIsExpanded(false);
@@ -127,4 +132,3 @@ export const SearchInput = ({
     </div>
   );
 };
-
