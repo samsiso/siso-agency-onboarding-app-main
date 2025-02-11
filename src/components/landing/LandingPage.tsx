@@ -39,12 +39,6 @@ const TestimonialsSection = lazy(() =>
   }))
 );
 
-const LogoCarouselSection = lazy(() => 
-  import('./sections/LogoCarouselSection').then(m => ({ 
-    default: memo(m.LogoCarouselSection) 
-  }))
-);
-
 const CallToActionSection = lazy(() => 
   import('./sections/CallToActionSection').then(m => ({ 
     default: memo(m.CallToActionSection) 
@@ -117,10 +111,6 @@ const LandingPage = () => {
         <div className="space-y-12 md:space-y-24">
           <Suspense fallback={<LoadingFallback />}>
             <TestimonialsSection />
-          </Suspense>
-
-          <Suspense fallback={<LoadingFallback />}>
-            <LogoCarouselSection />
           </Suspense>
         </div>
 
