@@ -1,4 +1,4 @@
-import { BookOpen, Users, BarChart, Zap, Newspaper, Globe, Bot, Coins, Check, Clock, Award, ArrowRight, TrendingUp, Users2 } from "lucide-react";
+import { BookOpen, Users, BarChart, Zap, Newspaper, Globe, Bot, Coins, Check, Clock, Award, ArrowRight, TrendingUp, Users2, ImageOff } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -59,7 +59,7 @@ const Feature108 = ({
         description:
           "Use our AI assistant to discover perfect tools for your agency. We analyze our database of successful agencies to suggest solutions that work best in your field. Get data-driven recommendations based on real success stories.",
         buttonText: "Try AI Assistant",
-        imageSrc: "/lovable-uploads/1deec2b0-a8ce-4d71-bf22-22ea39020cd7.png",
+        imageSrc: "https://raw.githubusercontent.com/your-username/your-repo/main/lovable-uploads/1deec2b0-a8ce-4d71-bf22-22ea39020cd7.png",
         imageAlt: "AI Chat Demo",
       },
     },
@@ -123,7 +123,23 @@ const Feature108 = ({
 }: Feature108Props) => {
   const [activeTab, setActiveTab] = useState(tabs[0].value);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const activeContent = tabs.find(tab => tab.value === activeTab)?.content;
+
+  // Debug log for image loading
+  console.log('[Feature108] Attempting to load image:', activeContent?.imageSrc);
+
+  const handleImageLoad = () => {
+    console.log('[Feature108] Image loaded successfully');
+    setImageLoaded(true);
+    setImageError(false);
+  };
+
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    console.error('[Feature108] Image failed to load:', e);
+    setImageLoaded(false);
+    setImageError(true);
+  };
 
   const getCardStats = (type: string) => {
     switch (type) {
@@ -340,48 +356,29 @@ const Feature108 = ({
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ duration: 0.5, delay: 0.3 }}
                         >
-                          <div className="relative h-[400px] rounded-xl overflow-hidden bg-gradient-to-br from-black/40 to-black/20">
-                            <motion.img
-                              src={activeContent.imageSrc}
-                              alt={activeContent.imageAlt}
-                              className={`w-full h-full object-contain transition-opacity duration-300 ${
-                                imageLoaded ? 'opacity-100' : 'opacity-0'
-                              }`}
-                              onLoad={() => setImageLoaded(true)}
-                              onError={(e) => {
-                                console.error('Image failed to load:', e);
-                                setImageLoaded(false);
-                              }}
-                              whileHover={{ scale: 1.05 }}
-                              transition={{ duration: 0.7 }}
-                            />
-                            {!imageLoaded && (
+                          <div className="relative h-[400px] rounded-xl overflow-hidden">
+                            {!imageError ? (
+                              <img
+                                src={activeContent.imageSrc}
+                                alt={activeContent.imageAlt}
+                                className={`w-full h-full object-contain transition-all duration-300 ${
+                                  imageLoaded ? 'opacity-100' : 'opacity-0'
+                                }`}
+                                onLoad={handleImageLoad}
+                                onError={handleImageError}
+                              />
+                            ) : (
+                              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/20">
+                                <ImageOff className="w-12 h-12 text-siso-orange mb-2" />
+                                <p className="text-sm text-siso-text/70">Image could not be loaded</p>
+                              </div>
+                            )}
+
+                            {!imageLoaded && !imageError && (
                               <div className="absolute inset-0 flex items-center justify-center">
                                 <div className="w-8 h-8 border-2 border-siso-orange border-t-transparent rounded-full animate-spin" />
                               </div>
                             )}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-                            
-                            <div className="absolute bottom-0 left-0 right-0 p-6 space-y-4">
-                              <div className="flex items-center justify-between text-white/90">
-                                <div className="flex items-center gap-2">
-                                  <Clock className="w-4 h-4 text-siso-orange" />
-                                  <span className="text-sm">Updated daily</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <Award className="w-4 h-4 text-siso-orange" />
-                                  <span className="text-sm">Top rated</span>
-                                </div>
-                              </div>
-                              
-                              <div className="flex items-center gap-2 text-white/80 text-sm">
-                                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                                <span>Active now</span>
-                                <span className="text-white/60">•</span>
-                                <Users2 className="w-4 h-4 text-siso-orange" />
-                                <span>234 online</span>
-                              </div>
-                            </div>
                           </div>
                         </motion.div>
                       </div>
