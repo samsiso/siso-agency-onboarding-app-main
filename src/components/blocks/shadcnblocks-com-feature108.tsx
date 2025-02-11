@@ -59,7 +59,7 @@ const Feature108 = ({
         description:
           "Use our AI assistant to discover perfect tools for your agency. We analyze our database of successful agencies to suggest solutions that work best in your field. Get data-driven recommendations based on real success stories.",
         buttonText: "Try AI Assistant",
-        imageSrc: "/lovable-uploads/1deec2b0-a8ce-4d71-bf22-22ea39020cd7.png",
+        imageSrc: "./lovable-uploads/1deec2b0-a8ce-4d71-bf22-22ea39020cd7.png",
         imageAlt: "AI Chat Demo",
       },
     },
@@ -73,7 +73,7 @@ const Feature108 = ({
         description:
           "Access our daily-updated YouTube content from curated creators. Our AI analyzes videos to extract key takeaways, saving you hours of watching time. Get the most valuable insights 10x faster.",
         buttonText: "Explore Content",
-        imageSrc: "/lovable-uploads/c482563a-42db-4f47-83f2-c2e7771400b7.png",
+        imageSrc: "./lovable-uploads/c482563a-42db-4f47-83f2-c2e7771400b7.png",
         imageAlt: "Education Interface Demo",
       },
     },
@@ -87,7 +87,7 @@ const Feature108 = ({
         description:
           "Connect with a million-strong community of agency owners. Find and join the perfect networking groups for your niche, engage in meaningful conversations, and grow your agency through valuable connections.",
         buttonText: "Join Network",
-        imageSrc: "/lovable-uploads/dee36671-c662-422f-a9a0-deb2eeb03973.png",
+        imageSrc: "./lovable-uploads/dee36671-c662-422f-a9a0-deb2eeb03973.png",
         imageAlt: "Network Interface Demo",
       },
     },
@@ -101,7 +101,7 @@ const Feature108 = ({
         description:
           "Earn points for every platform interaction, convertible to our native cryptocurrency. Use tokens for premium features, rank upgrades, or trade them. Participate in the platform's economic future.",
         buttonText: "View Economy",
-        imageSrc: "/lovable-uploads/b269df74-3740-4134-8618-2c941cda5a5a.png",
+        imageSrc: "./lovable-uploads/b269df74-3740-4134-8618-2c941cda5a5a.png",
         imageAlt: "Economy System Demo",
       },
     },
@@ -115,7 +115,7 @@ const Feature108 = ({
         description:
           "Stay informed with daily AI news curated for agency owners. Earn points by engaging with articles and sharing insights. Get personalized news feeds based on your agency's focus.",
         buttonText: "Read News",
-        imageSrc: "/lovable-uploads/19ca8c73-3736-4506-bfb2-de867b272e12.png",
+        imageSrc: "./lovable-uploads/19ca8c73-3736-4506-bfb2-de867b272e12.png",
         imageAlt: "News Interface Demo",
       },
     },
@@ -126,67 +126,34 @@ const Feature108 = ({
   const [imageError, setImageError] = useState(false);
   const activeContent = tabs.find(tab => tab.value === activeTab)?.content;
 
-  // Debug log for image loading
-  console.log('[Feature108] Attempting to load image:', activeContent?.imageSrc);
-
+  // Enhanced debug logging
+  console.log('[Feature108] Current active tab:', activeTab);
+  console.log('[Feature108] Active content:', activeContent);
+  
   const handleImageLoad = () => {
-    console.log('[Feature108] Image loaded successfully');
+    console.log('[Feature108] Image loaded successfully:', activeContent?.imageSrc);
     setImageLoaded(true);
     setImageError(false);
   };
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    console.error('[Feature108] Image failed to load:', e);
+    const img = e.target as HTMLImageElement;
+    console.error('[Feature108] Image failed to load:', {
+      src: img.src,
+      naturalWidth: img.naturalWidth,
+      naturalHeight: img.naturalHeight,
+      error: e
+    });
     setImageLoaded(false);
     setImageError(true);
   };
 
-  const getCardStats = (type: string) => {
-    switch (type) {
-      case "ai-tools":
-        return {
-          mainStat: "98%",
-          mainLabel: "Match Accuracy",
-          secondaryStat: "5,234",
-          secondaryLabel: "Tools Analyzed",
-          benefits: ["Personalized Recommendations", "Real-time Analysis", "Agency-specific Insights"]
-        };
-      case "education":
-        return {
-          mainStat: "2.4M+",
-          mainLabel: "Hours Saved",
-          secondaryStat: "1,200+",
-          secondaryLabel: "Video Tutorials",
-          benefits: ["AI-powered Learning", "Daily Updates", "Expert Tutorials"]
-        };
-      case "community":
-        return {
-          mainStat: "50K+",
-          mainLabel: "Active Members",
-          secondaryStat: "3.2K",
-          secondaryLabel: "Daily Discussions",
-          benefits: ["Global Network", "Expert Connections", "Live Collaborations"]
-        };
-      case "economy":
-        return {
-          mainStat: "$2.1M",
-          mainLabel: "Rewards Given",
-          secondaryStat: "89K",
-          secondaryLabel: "Token Holders",
-          benefits: ["Daily Rewards", "Token Growth", "Community Benefits"]
-        };
-      case "news":
-        return {
-          mainStat: "24/7",
-          mainLabel: "Live Updates",
-          secondaryStat: "500+",
-          secondaryLabel: "Daily Insights",
-          benefits: ["Breaking News", "Industry Analysis", "Expert Commentary"]
-        };
-      default:
-        return null;
-    }
-  };
+  // Reset image states when tab changes
+  React.useEffect(() => {
+    setImageLoaded(false);
+    setImageError(false);
+    console.log('[Feature108] Tab changed, resetting image states');
+  }, [activeTab]);
 
   return (
     <section className="relative py-24">
@@ -356,27 +323,29 @@ const Feature108 = ({
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ duration: 0.5, delay: 0.3 }}
                         >
-                          <div className="relative h-[400px] rounded-xl overflow-hidden">
+                          <div className="relative h-[400px] rounded-xl overflow-hidden bg-black/20">
                             {!imageError ? (
-                              <img
-                                src={activeContent.imageSrc}
-                                alt={activeContent.imageAlt}
-                                className={`w-full h-full object-contain transition-all duration-300 ${
-                                  imageLoaded ? 'opacity-100' : 'opacity-0'
-                                }`}
-                                onLoad={handleImageLoad}
-                                onError={handleImageError}
-                              />
+                              <>
+                                {!imageLoaded && (
+                                  <div className="absolute inset-0 flex items-center justify-center">
+                                    <div className="w-8 h-8 border-2 border-siso-orange border-t-transparent rounded-full animate-spin" />
+                                  </div>
+                                )}
+                                <img
+                                  src={activeContent?.imageSrc}
+                                  alt={activeContent?.imageAlt}
+                                  className={`w-full h-full object-contain transition-opacity duration-300 ${
+                                    imageLoaded ? 'opacity-100' : 'opacity-0'
+                                  }`}
+                                  onLoad={handleImageLoad}
+                                  onError={handleImageError}
+                                />
+                              </>
                             ) : (
-                              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/20">
+                              <div className="absolute inset-0 flex flex-col items-center justify-center">
                                 <ImageOff className="w-12 h-12 text-siso-orange mb-2" />
-                                <p className="text-sm text-siso-text/70">Image could not be loaded</p>
-                              </div>
-                            )}
-
-                            {!imageLoaded && !imageError && (
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="w-8 h-8 border-2 border-siso-orange border-t-transparent rounded-full animate-spin" />
+                                <p className="text-sm text-siso-text/70">Unable to load image</p>
+                                <p className="text-xs text-siso-text/50 mt-1">{activeContent?.imageSrc}</p>
                               </div>
                             )}
                           </div>
