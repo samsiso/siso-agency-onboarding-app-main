@@ -1,4 +1,3 @@
-
 /// <reference types="react" />
 import React, { useState, useEffect } from "react";
 import { BookOpen, Users, BarChart, Zap, Newspaper, Globe, Bot, Coins, Check, Clock, Award, ArrowRight, TrendingUp, Users2, ImageOff } from "lucide-react";
@@ -371,7 +370,7 @@ const Feature108: React.FC<Feature108Props> = ({
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ duration: 0.5, delay: 0.3 }}
                         >
-                          <div className="relative h-[400px] rounded-xl overflow-hidden bg-black/20">
+                          <div className="relative h-[400px] rounded-xl overflow-hidden bg-gradient-to-br from-black/40 to-black/20 backdrop-blur-sm border border-siso-orange/20 shadow-lg shadow-siso-orange/5">
                             {!imageError ? (
                               <>
                                 {!imageLoaded && (
@@ -379,14 +378,21 @@ const Feature108: React.FC<Feature108Props> = ({
                                     <div className="w-8 h-8 border-2 border-siso-orange border-t-transparent rounded-full animate-spin" />
                                   </div>
                                 )}
+                                <div className="absolute inset-0 bg-gradient-radial from-siso-orange/10 via-transparent to-transparent opacity-30" />
                                 <img
                                   src={activeContent?.imageSrc}
                                   alt={activeContent?.imageAlt}
-                                  className={`w-full h-full object-contain transition-opacity duration-300 ${
+                                  className={`w-full h-full object-contain transition-all duration-300 hover:scale-105 ${
                                     imageLoaded ? 'opacity-100' : 'opacity-0'
                                   }`}
                                   onLoad={handleImageLoad}
                                   onError={handleImageError}
+                                  style={{
+                                    maxHeight: '100%',
+                                    width: 'auto',
+                                    margin: '0 auto',
+                                    padding: '1rem'
+                                  }}
                                 />
                               </>
                             ) : (
