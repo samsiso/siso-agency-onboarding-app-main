@@ -76,9 +76,21 @@ export const AIAnalysisDialog = ({ open, onOpenChange, newsId }: AIAnalysisDialo
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] relative overflow-hidden">
+        {/* Background pattern */}
+        <div 
+          className="absolute inset-0 -z-10"
+          style={{
+            backgroundImage: "url('/lovable-uploads/d08f5142-c0ad-4700-bd7a-c035da96ec0b.png')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            opacity: 0.15
+          }}
+        />
+        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm -z-10" />
+
         <DialogHeader>
-          <DialogTitle>AI Analysis</DialogTitle>
+          <DialogTitle className="text-siso-text-bold">AI Analysis</DialogTitle>
         </DialogHeader>
         
         <div className="mt-4">
@@ -137,30 +149,30 @@ export const AIAnalysisDialog = ({ open, onOpenChange, newsId }: AIAnalysisDialo
                 className="space-y-6"
               >
                 <div className="space-y-4">
-                  <h3 className="font-semibold">Key Insights</h3>
+                  <h3 className="font-semibold text-siso-text-bold">Key Insights</h3>
                   <ul className="list-disc pl-5 space-y-2">
                     {analysis.key_insights.map((insight: string, index: number) => (
-                      <li key={index}>{insight}</li>
+                      <li key={index} className="text-siso-text">{insight}</li>
                     ))}
                   </ul>
                 </div>
 
                 <div>
-                  <h3 className="font-semibold">Market Impact</h3>
-                  <p className="mt-2">{analysis.market_impact}</p>
+                  <h3 className="font-semibold text-siso-text-bold">Market Impact</h3>
+                  <p className="mt-2 text-siso-text">{analysis.market_impact}</p>
                 </div>
 
                 <div>
-                  <h3 className="font-semibold">Tech Predictions</h3>
+                  <h3 className="font-semibold text-siso-text-bold">Tech Predictions</h3>
                   <ul className="mt-2 list-disc pl-5 space-y-2">
                     {analysis.tech_predictions.map((prediction: string, index: number) => (
-                      <li key={index}>{prediction}</li>
+                      <li key={index} className="text-siso-text">{prediction}</li>
                     ))}
                   </ul>
                 </div>
 
                 <div>
-                  <h3 className="font-semibold">Related Technologies</h3>
+                  <h3 className="font-semibold text-siso-text-bold">Related Technologies</h3>
                   <div className="mt-2 flex flex-wrap gap-2">
                     {analysis.related_technologies.map((tech: string, index: number) => (
                       <span
@@ -174,11 +186,11 @@ export const AIAnalysisDialog = ({ open, onOpenChange, newsId }: AIAnalysisDialo
                 </div>
 
                 <div>
-                  <h3 className="font-semibold">Business Implications</h3>
-                  <p className="mt-2">{analysis.business_implications}</p>
+                  <h3 className="font-semibold text-siso-text-bold">Business Implications</h3>
+                  <p className="mt-2 text-siso-text">{analysis.business_implications}</p>
                 </div>
 
-                <div className="flex items-center justify-between text-sm text-gray-500">
+                <div className="flex items-center justify-between text-sm text-siso-text/70">
                   <span>Confidence Score</span>
                   <span>{(analysis.confidence_score * 100).toFixed(1)}%</span>
                 </div>
