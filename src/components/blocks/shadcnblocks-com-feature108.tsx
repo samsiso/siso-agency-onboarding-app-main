@@ -1,4 +1,4 @@
-import { BookOpen, Users, BarChart, Zap, Newspaper, Globe } from "lucide-react";
+import { BookOpen, Users, BarChart, Zap, Bot, Globe } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -29,76 +29,62 @@ interface Feature108Props {
 const Feature108 = ({
   badge = "SISO Agency",
   heading = "Resource Hub Features",
-  description = "Discover powerful tools and insights designed to help your business grow.",
+  description = "Unlock powerful tools and insights designed specifically for agency growth.",
   tabs = [
     {
-      value: "ai-tools",
-      icon: <Zap className="h-auto w-4 shrink-0" />,
-      label: "AI-Powered Analysis",
+      value: "ai-agent",
+      icon: <Bot className="h-auto w-4 shrink-0" />,
+      label: "Custom AI Agent",
       content: {
-        badge: "Smart Solutions",
-        title: "Transform Your Agency with AI",
+        badge: "AI-Powered Growth",
+        title: "AI Agent Trained for Your Agency",
         description:
-          "Get tailored insights by cross-referencing industry videos and your agency needs. Our AI-powered tools help you make data-driven decisions and stay ahead of the competition.",
-        buttonText: "Explore Tools",
+          "Experience our custom AI agent that learns your agency's unique needs, analyzes our extensive resource bank, and delivers personalized recommendations for tools, strategies, and growth opportunities.",
+        buttonText: "Explore AI Agent",
         imageSrc: "https://images.unsplash.com/photo-1677442136019-21780ecad995",
-        imageAlt: "AI Analysis Dashboard",
-      },
-    },
-    {
-      value: "education",
-      icon: <BookOpen className="h-auto w-4 shrink-0" />,
-      label: "Education Hub",
-      content: {
-        badge: "Learn & Grow",
-        title: "Access Premium Educational Content",
-        description:
-          "Dive into our curated collection of YouTube videos, expert analysis, and top video recommendations tailored to your business needs. Stay ahead with continuous learning.",
-        buttonText: "Start Learning",
-        imageSrc: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3",
-        imageAlt: "Education Resources",
+        imageAlt: "AI Agent Interface",
       },
     },
     {
       value: "community",
       icon: <Users className="h-auto w-4 shrink-0" />,
-      label: "Community & Network",
+      label: "Community Insights",
       content: {
-        badge: "Connect & Collaborate",
-        title: "Join a Thriving Community",
+        badge: "1000+ Agency Owners",
+        title: "Learn from Successful Agencies",
         description:
-          "Engage with industry experts, get personalized GP assistance, and become part of a vibrant community of agency owners and professionals sharing insights and opportunities.",
+          "Get direct insights into what's working for over 1,000 successful agency owners. Discover tried-and-tested solutions, tools, and strategies you can implement in your business today.",
         buttonText: "Join Network",
         imageSrc: "https://images.unsplash.com/photo-1522071820081-009f0129c71c",
-        imageAlt: "Community Network",
+        imageAlt: "Agency Community",
       },
     },
     {
-      value: "economy",
-      icon: <BarChart className="h-auto w-4 shrink-0" />,
-      label: "Economy Insights",
+      value: "tech-updates",
+      icon: <Zap className="h-auto w-4 shrink-0" />,
+      label: "Real-time Updates",
       content: {
-        badge: "Market Intelligence",
-        title: "Navigate Economic Trends",
+        badge: "Daily Updates",
+        title: "Stay Ahead with Latest Tech",
         description:
-          "Access powerful tools and visualizations to understand economic trends and make informed decisions. Stay ahead of market changes with our comprehensive analysis.",
-        buttonText: "View Insights",
+          "Access cutting-edge tools and technologies as soon as they're available. Our platform is updated multiple times daily, ensuring you're always at the forefront of agency innovation.",
+        buttonText: "View Updates",
         imageSrc: "https://images.unsplash.com/photo-1642543492481-44e81e3914a7",
-        imageAlt: "Economic Analysis",
+        imageAlt: "Technology Updates",
       },
     },
     {
-      value: "news",
-      icon: <Newspaper className="h-auto w-4 shrink-0" />,
-      label: "AI News",
+      value: "resource-hub",
+      icon: <Globe className="h-auto w-4 shrink-0" />,
+      label: "Resource Hub",
       content: {
-        badge: "Stay Updated",
-        title: "Latest AI Industry News",
+        badge: "All-in-One Platform",
+        title: "Centralized Agency Resources",
         description:
-          "Keep up with the rapidly evolving AI landscape through our curated news feed. Get insights on the latest developments, trends, and innovations in the AI industry.",
-        buttonText: "Read News",
-        imageSrc: "https://images.unsplash.com/photo-1655720828018-edd2daec9349",
-        imageAlt: "AI News Feed",
+          "Access a comprehensive suite of agency tools, educational content, and implementation guides - all in one place. Transform how you manage and grow your agency with our integrated platform.",
+        buttonText: "Access Resources",
+        imageSrc: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3",
+        imageAlt: "Resource Hub",
       },
     },
   ],
