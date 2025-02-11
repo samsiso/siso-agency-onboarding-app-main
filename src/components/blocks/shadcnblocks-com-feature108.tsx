@@ -1,4 +1,3 @@
-
 /// <reference types="react" />
 import React, { useState, useEffect } from "react";
 import { BookOpen, Users, BarChart, Zap, Newspaper, Globe, Bot, Coins, Check, Clock, Award, ArrowRight, TrendingUp, Users2, ImageOff } from "lucide-react";
@@ -380,21 +379,20 @@ const Feature108: React.FC<Feature108Props> = ({
                                   </div>
                                 )}
                                 <div className="absolute inset-0 bg-gradient-radial from-siso-orange/10 via-transparent to-transparent opacity-30" />
-                                <img
-                                  src={activeContent?.imageSrc}
-                                  alt={activeContent?.imageAlt}
-                                  className={`w-full h-full object-contain transition-all duration-300 hover:scale-105 ${
-                                    imageLoaded ? 'opacity-100' : 'opacity-0'
-                                  }`}
-                                  onLoad={handleImageLoad}
-                                  onError={handleImageError}
-                                  style={{
-                                    maxHeight: '100%',
-                                    width: 'auto',
-                                    margin: '0 auto',
-                                    padding: '1rem'
-                                  }}
-                                />
+                                <div className="relative w-full h-full flex items-center justify-center p-4">
+                                  <img
+                                    src={activeContent?.imageSrc}
+                                    alt={activeContent?.imageAlt}
+                                    className={`max-w-full max-h-full w-auto h-auto object-contain rounded-lg transition-all duration-300 hover:scale-105 ${
+                                      imageLoaded ? 'opacity-100' : 'opacity-0'
+                                    }`}
+                                    onLoad={handleImageLoad}
+                                    onError={handleImageError}
+                                    style={{ 
+                                      maxHeight: '380px', // Slightly less than container to maintain padding
+                                    }}
+                                  />
+                                </div>
                               </>
                             ) : (
                               <div className="absolute inset-0 flex flex-col items-center justify-center">
