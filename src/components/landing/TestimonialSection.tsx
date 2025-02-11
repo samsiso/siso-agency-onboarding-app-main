@@ -1,7 +1,7 @@
 
 import { TestimonialCard } from './TestimonialCard';
 
-// [Analysis] Sample testimonial data - in a real app, this would come from an API or CMS
+// [Analysis] Sample testimonial data - alternating video and audio reviews for visual balance
 const testimonials = [
   {
     name: "Sarah K.",
@@ -22,20 +22,11 @@ const testimonials = [
     audioReview: true
   },
   {
-    name: "David W.",
-    role: "Marketing Strategist",
-    company: "Innovate Digital",
+    name: "Lisa M.",
+    role: "Content Strategy Lead",
+    company: "Content Kings",
     image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
-    quote: "The automation capabilities have transformed our workflow. We're seeing incredible results with minimal effort.",
-    linkedinUrl: "https://linkedin.com",
-    audioReview: true
-  },
-  {
-    name: "Emma T.",
-    role: "Operations Manager",
-    company: "Tech Solutions Ltd",
-    image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
-    quote: "Integration was seamless and the support team is incredibly responsive. A must-have for modern agencies.",
+    quote: "Finally, a platform that understands what modern agencies need. The automation tools are exceptional.",
     linkedinUrl: "https://linkedin.com",
     videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1"
   },
@@ -49,20 +40,20 @@ const testimonials = [
     audioReview: true
   },
   {
-    name: "Lisa M.",
-    role: "Content Strategy Lead",
-    company: "Content Kings",
+    name: "Emma T.",
+    role: "Operations Manager",
+    company: "Tech Solutions Ltd",
     image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
-    quote: "Finally, a platform that understands what modern agencies need. The automation tools are exceptional.",
+    quote: "Integration was seamless and the support team is incredibly responsive. A must-have for modern agencies.",
     linkedinUrl: "https://linkedin.com",
     videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1"
   },
   {
-    name: "Alex P.",
-    role: "Growth Specialist",
-    company: "Scale Up Agency",
+    name: "David W.",
+    role: "Marketing Strategist",
+    company: "Innovate Digital",
     image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
-    quote: "The platform paid for itself within the first month. The AI capabilities are genuinely impressive.",
+    quote: "The automation capabilities have transformed our workflow. We're seeing incredible results with minimal effort.",
     linkedinUrl: "https://linkedin.com",
     audioReview: true
   },
@@ -74,6 +65,15 @@ const testimonials = [
     quote: "Lovable has become an essential part of our tech stack. The continuous improvements keep getting better.",
     linkedinUrl: "https://linkedin.com",
     videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1"
+  },
+  {
+    name: "Alex P.",
+    role: "Growth Specialist",
+    company: "Scale Up Agency",
+    image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
+    quote: "The platform paid for itself within the first month. The AI capabilities are genuinely impressive.",
+    linkedinUrl: "https://linkedin.com",
+    audioReview: true
   }
 ];
 
