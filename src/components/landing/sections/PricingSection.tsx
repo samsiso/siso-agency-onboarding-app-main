@@ -2,7 +2,7 @@
 import { PricingCard } from '@/components/ui/pricing-card';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Check, Users, Star, ShieldCheck } from 'lucide-react';
+import { Check } from 'lucide-react';
 
 export const PricingSection = () => {
   const navigate = useNavigate();
@@ -40,18 +40,9 @@ export const PricingSection = () => {
               {
                 title: "Premium Features (£1,000+ Annual Value)",
                 items: [
-                  <div key="1" className="flex items-center gap-2">
-                    <Users className="w-4 h-4 text-siso-orange" />
-                    <span>Enterprise-grade AI automation suite (£500 value) - Used by 500+ agencies</span>
-                  </div>,
-                  <div key="2" className="flex items-center gap-2">
-                    <Star className="w-4 h-4 text-yellow-500" />
-                    <span>24/7 Priority support & consulting (£250 value) - 4.9/5 customer rating</span>
-                  </div>,
-                  <div key="3" className="flex items-center gap-2">
-                    <ShieldCheck className="w-4 h-4 text-blue-500" />
-                    <span>Unlimited platform integrations (£250 value) - Enterprise-grade security</span>
-                  </div>,
+                  "⚡ Enterprise-grade AI automation suite (£500 value) - Used by 500+ agencies",
+                  "⭐ 24/7 Priority support & consulting (£250 value) - 4.9/5 customer rating",
+                  "🛡️ Unlimited platform integrations (£250 value) - Enterprise-grade security",
                   "Regular feature updates and improvements",
                 ],
               },
