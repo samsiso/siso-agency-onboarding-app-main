@@ -1,4 +1,5 @@
 
+/// <reference types="react" />
 import React, { useState, useEffect } from "react";
 import { BookOpen, Users, BarChart, Zap, Newspaper, Globe, Bot, Coins, Check, Clock, Award, ArrowRight, TrendingUp, Users2, ImageOff } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -92,7 +93,7 @@ const getCardStats = (type: string) => {
   }
 };
 
-const Feature108 = ({
+const Feature108: React.FC<Feature108Props> = ({
   badge = "SISO Agency",
   heading = "Resource Hub Features",
   description = "Access our comprehensive suite of tools and insights designed to accelerate your agency's growth.",
@@ -168,7 +169,7 @@ const Feature108 = ({
       },
     },
   ],
-}: Feature108Props) => {
+}) => {
   const [activeTab, setActiveTab] = useState(tabs[0].value);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -196,7 +197,6 @@ const Feature108 = ({
     setImageError(true);
   };
 
-  // Reset image states when tab changes
   useEffect(() => {
     setImageLoaded(false);
     setImageError(false);
