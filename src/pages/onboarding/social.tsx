@@ -1,3 +1,4 @@
+
 import { useOnboardingAuth } from '@/hooks/useOnboardingAuth';
 import { SocialLinksForm } from '@/components/onboarding/SocialLinksForm';
 import { Waves } from '@/components/ui/waves-background';
