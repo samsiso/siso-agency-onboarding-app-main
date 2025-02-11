@@ -18,7 +18,8 @@ import {
   BookOpen,
   Bot,
   Layout,
-  Folder
+  Folder,
+  Newspaper
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -69,45 +70,6 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
     },
     {
       type: 'section',
-      title: 'Platform',
-      icon: Layout,
-      items: [
-        {
-          href: '#why-choose',
-          icon: Target,
-          label: 'Why SISO',
-        },
-        {
-          href: '#features',
-          icon: Layers,
-          label: 'Features',
-        },
-        {
-          href: '#getting-started',
-          icon: PlayCircle,
-          label: 'Getting Started',
-        }
-      ]
-    },
-    {
-      type: 'section',
-      title: 'Solutions',
-      icon: Folder,
-      items: [
-        {
-          href: '#pricing',
-          icon: CreditCard,
-          label: 'Pricing Plans',
-        },
-        {
-          href: '#testimonials',
-          icon: Users,
-          label: 'Success Stories',
-        }
-      ]
-    },
-    {
-      type: 'section',
       title: 'Resources',
       icon: BookOpen,
       items: [
@@ -125,6 +87,11 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
           href: '/tools',
           icon: Wrench,
           label: 'Tools',
+        },
+        {
+          href: '/ai-news',
+          icon: Newspaper,
+          label: 'AI News',
         }
       ]
     },
