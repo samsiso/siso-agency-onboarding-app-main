@@ -1,5 +1,5 @@
 
-import { Twitter, Linkedin, Mail, MapPin } from "lucide-react";
+import { Mail, MapPin, Twitter, Linkedin } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 
 const Footer = () => {
@@ -10,14 +10,13 @@ const Footer = () => {
       <div className="relative container mx-auto px-4 py-12">
         {/* Main Footer Content */}
         <div className="flex flex-col items-center text-center space-y-8">
-          {/* Logo & Company */}
-          <div className="flex items-center gap-3">
+          {/* Logo Only - Larger Size */}
+          <div className="flex items-center">
             <img 
               src="/lovable-uploads/8fa1a06e-e80e-4869-8ef8-683326c20870.png"
-              alt="SISO AI Logo"
-              className="w-10 h-10"
+              alt="Logo"
+              className="w-16 h-16"
             />
-            <span className="text-white text-xl font-semibold">SISO AI</span>
           </div>
 
           {/* Description */}
@@ -25,17 +24,8 @@ const Footer = () => {
             Elevate your productivity with our enterprise-grade AI automation suite.
           </p>
 
-          {/* Quick Links */}
+          {/* Legal Links Only */}
           <div className="flex flex-wrap justify-center gap-6 text-sm">
-            <a href="#features" className="text-gray-400 hover:text-white transition-colors">
-              Features
-            </a>
-            <a href="#pricing" className="text-gray-400 hover:text-white transition-colors">
-              Pricing
-            </a>
-            <a href="#contact" className="text-gray-400 hover:text-white transition-colors">
-              Contact
-            </a>
             <a href="/terms" className="text-gray-400 hover:text-white transition-colors">
               Terms
             </a>
@@ -48,7 +38,7 @@ const Footer = () => {
           <div className="flex flex-col items-center space-y-4">
             <div className="flex items-center gap-2 text-gray-400">
               <Mail className="w-4 h-4" />
-              <span>support@siso.ai</span>
+              <span>siso@sisoinnovatorshub.io</span>
             </div>
             <div className="flex items-center gap-2 text-gray-400">
               <MapPin className="w-4 h-4" />
@@ -77,7 +67,7 @@ const Footer = () => {
 
           {/* Copyright */}
           <div className="text-gray-400 text-sm">
-            ©SISO {new Date().getFullYear()}. All rights reserved.
+            ©{new Date().getFullYear()}. All rights reserved.
           </div>
         </div>
       </div>
