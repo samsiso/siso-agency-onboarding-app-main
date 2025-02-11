@@ -1,3 +1,4 @@
+
 /// <reference types="react" />
 import React, { useState, useEffect } from "react";
 import { BookOpen, Users, BarChart, Zap, Newspaper, Globe, Bot, Coins, Check, Clock, Award, ArrowRight, TrendingUp, Users2, ImageOff } from "lucide-react";
@@ -121,7 +122,7 @@ const Feature108: React.FC<Feature108Props> = ({
         description:
           "Access our daily-updated YouTube content from curated creators. Our AI analyzes videos to extract key takeaways, saving you hours of watching time. Get the most valuable insights 10x faster.",
         buttonText: "Explore Content",
-        imageSrc: "/lovable-uploads/c482563a-42db-4f47-83f2-c2e7771400b7.png",
+        imageSrc: "/lovable-uploads/2abbfd96-461a-4ccc-87d0-1ec32698671f.png",
         imageAlt: "Education Interface Demo",
       },
     },
