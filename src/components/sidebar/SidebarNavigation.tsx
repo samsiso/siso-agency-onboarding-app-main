@@ -7,17 +7,20 @@ import {
   Home,
   GraduationCap,
   Network,
-  Coins,
-  Newspaper,
+  Target,
+  Layers,
+  PlayCircle,
+  CreditCard,
   Users,
   Wrench,
   Trophy,
-  Wallet,
   BarChart,
-  List,
-  Folder,
-  Bot
+  BookOpen,
+  Bot,
+  Layout,
+  Folder
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface SidebarNavigationProps {
   collapsed: boolean;
@@ -28,15 +31,34 @@ interface SidebarNavigationProps {
 export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNavigationProps) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [activeSection, setActiveSection] = useState<string | null>(null);
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     const href = e.currentTarget.getAttribute('href');
     if (href) {
       onItemClick(e);
-      navigate(href);
     }
   };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(`#${entry.target.id}`);
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    document.querySelectorAll('section[id]').forEach((section) => {
+      observer.observe(section);
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   const menuSections = [
     {
@@ -47,8 +69,47 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
     },
     {
       type: 'section',
-      title: 'Learn & Network',
+      title: 'Platform',
+      icon: Layout,
+      items: [
+        {
+          href: '#why-choose',
+          icon: Target,
+          label: 'Why SISO',
+        },
+        {
+          href: '#features',
+          icon: Layers,
+          label: 'Features',
+        },
+        {
+          href: '#getting-started',
+          icon: PlayCircle,
+          label: 'Getting Started',
+        }
+      ]
+    },
+    {
+      type: 'section',
+      title: 'Solutions',
       icon: Folder,
+      items: [
+        {
+          href: '#pricing',
+          icon: CreditCard,
+          label: 'Pricing Plans',
+        },
+        {
+          href: '#testimonials',
+          icon: Users,
+          label: 'Success Stories',
+        }
+      ]
+    },
+    {
+      type: 'section',
+      title: 'Resources',
+      icon: BookOpen,
       items: [
         {
           href: '/education',
@@ -64,42 +125,31 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
           href: '/tools',
           icon: Wrench,
           label: 'Tools',
-        },
-        {
-          href: '/networking',
-          icon: Users,
-          label: 'Networking',
-        },
+        }
       ]
     },
     {
       type: 'section',
-      title: 'Economy',
-      icon: List,
+      title: 'Community',
+      icon: Users,
       items: [
+        {
+          href: '/networking',
+          icon: Network,
+          label: 'Networking',
+        },
         {
           href: '/economy/earn',
           icon: Trophy,
           label: 'How to Earn',
         },
         {
-          href: '/economy/crypto-exchange',
-          icon: Wallet,
-          label: 'Crypto Exchange',
-        },
-        {
           href: '/economy/leaderboards',
           icon: BarChart,
           label: 'Leaderboards',
-        },
+        }
       ]
-    },
-    {
-      type: 'main',
-      href: '/ai-news',
-      icon: Newspaper,
-      label: 'SISO News',
-    },
+    }
   ];
 
   if (!visible) return null;
@@ -126,6 +176,13 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
         damping: 30
       }
     }
+  };
+
+  const isItemActive = (href: string) => {
+    if (href.startsWith('#')) {
+      return href === activeSection;
+    }
+    return location.pathname === href;
   };
 
   return (
@@ -185,7 +242,7 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
                         label={item.label}
                         collapsed={collapsed}
                         onClick={handleClick}
-                        isActive={location.pathname === item.href}
+                        isActive={isItemActive(item.href)}
                       />
                     ))}
                   </motion.div>

@@ -88,35 +88,49 @@ const LandingPage = () => {
 
       {/* Main Content with progressive loading */}
       <div className="relative z-10 px-4 md:px-0">
-        <Suspense fallback={<LoadingFallback />}>
-          <HeroSection />
-        </Suspense>
+        <section id="hero">
+          <Suspense fallback={<LoadingFallback />}>
+            <HeroSection />
+          </Suspense>
+        </section>
 
-        <Suspense fallback={<LoadingFallback />}>
-          <WhyChooseSection />
-        </Suspense>
+        <section id="why-choose">
+          <Suspense fallback={<LoadingFallback />}>
+            <WhyChooseSection />
+          </Suspense>
+        </section>
 
-        <Suspense fallback={<LoadingFallback />}>
-          <FeaturesSection />
-        </Suspense>
+        <section id="features">
+          <Suspense fallback={<LoadingFallback />}>
+            <FeaturesSection />
+          </Suspense>
+        </section>
 
-        <Suspense fallback={<LoadingFallback />}>
-          <GettingStartedSection />
-        </Suspense>
+        <section id="getting-started">
+          <Suspense fallback={<LoadingFallback />}>
+            <GettingStartedSection />
+          </Suspense>
+        </section>
 
-        <Suspense fallback={<LoadingFallback />}>
-          <PricingSection />
-        </Suspense>
+        <section id="pricing">
+          <Suspense fallback={<LoadingFallback />}>
+            <PricingSection />
+          </Suspense>
+        </section>
 
         <div className="space-y-12 md:space-y-24">
-          <Suspense fallback={<LoadingFallback />}>
-            <TestimonialsSection />
-          </Suspense>
+          <section id="testimonials">
+            <Suspense fallback={<LoadingFallback />}>
+              <TestimonialsSection />
+            </Suspense>
+          </section>
         </div>
 
-        <Suspense fallback={<LoadingFallback />}>
-          <CallToActionSection />
-        </Suspense>
+        <section id="cta">
+          <Suspense fallback={<LoadingFallback />}>
+            <CallToActionSection />
+          </Suspense>
+        </section>
 
         <Suspense fallback={<LoadingFallback />}>
           <StackedCircularFooter />
