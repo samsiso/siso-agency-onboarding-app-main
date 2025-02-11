@@ -150,7 +150,7 @@ const Feature108: React.FC<Feature108Props> = ({
         description:
           "Earn points for every platform interaction, convertible to our native cryptocurrency. Use tokens for premium features, rank upgrades, or trade them. Participate in the platform's economic future.",
         buttonText: "View Economy",
-        imageSrc: "/lovable-uploads/b269df74-3740-4134-8618-2c941cda5a5a.png",
+        imageSrc: "/lovable-uploads/4ac2a247-8806-47db-9d59-0a0c7bf75136.png",
         imageAlt: "Economy System Demo",
       },
     },
