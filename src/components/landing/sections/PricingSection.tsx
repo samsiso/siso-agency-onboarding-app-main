@@ -3,29 +3,6 @@ import { PricingCard } from '@/components/ui/pricing-card';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Check } from 'lucide-react';
-import { TestimonialCard } from '../TestimonialCard';
-
-// [Analysis] Selected testimonials focused on pricing value and ROI
-const pricingTestimonials = [
-  {
-    name: "Sarah K.",
-    role: "Digital Marketing Director",
-    company: "Growth Co",
-    image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
-    quote: "The £1,000+ value is real - we've seen 300% efficiency increase since joining.",
-    linkedinUrl: "https://linkedin.com",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1"
-  },
-  {
-    name: "Michael R.",
-    role: "Agency Owner",
-    company: "Digital Spark",
-    image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
-    quote: "The ROI has been incredible for our agency.",
-    linkedinUrl: "https://linkedin.com",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1"
-  }
-];
 
 export const PricingSection = () => {
   const navigate = useNavigate();
@@ -77,30 +54,6 @@ export const PricingSection = () => {
             onButtonClick={handleGetStarted}
             trustMessage="Join 500+ agencies already using our platform. Start transforming your workflow today."
           />
-        </motion.div>
-
-        {/* Video Testimonials Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="mt-16"
-        >
-          <h3 className="text-center text-2xl font-semibold text-siso-text-bold mb-8">
-            Hear from Our Users
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-            {pricingTestimonials.map((testimonial, index) => (
-              <motion.div
-                key={testimonial.name}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 * (index + 1) }}
-              >
-                <TestimonialCard {...testimonial} />
-              </motion.div>
-            ))}
-          </div>
         </motion.div>
 
         {/* Trust Banner */}
