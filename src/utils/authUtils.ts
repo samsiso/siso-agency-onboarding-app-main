@@ -26,7 +26,7 @@ export const signOut = async () => {
   return await supabase.auth.signOut();
 };
 
-// Enhanced auth callback handler with better error handling
+// Enhanced auth callback handler with onboarding flow
 export const handleAuthCallback = async () => {
   console.log('Handling auth callback...');
   try {
@@ -43,9 +43,22 @@ export const handleAuthCallback = async () => {
       }
       
       if (session) {
-        console.log('Valid session found, redirecting to profile');
-        // Use window.location.replace to ensure a clean redirect
-        window.location.replace('/profile');
+        console.log('Valid session found, checking onboarding status');
+        
+        // Check onboarding status
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('onboarding_completed, onboarding_step')
+          .eq('id', session.user.id)
+          .single();
+
+        if (!profile?.onboarding_completed) {
+          console.log('Redirecting to social onboarding...');
+          window.location.replace('/onboarding/social');
+        } else {
+          console.log('Onboarding completed, redirecting to profile');
+          window.location.replace('/profile');
+        }
       } else {
         console.log('No session found after callback');
         window.location.replace('/?error=no_session');
