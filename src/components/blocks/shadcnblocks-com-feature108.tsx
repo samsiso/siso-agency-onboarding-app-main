@@ -108,7 +108,7 @@ const Feature108: React.FC<Feature108Props> = ({
         description:
           "Use our AI assistant to discover perfect tools for your agency. We analyze our database of successful agencies to suggest solutions that work best in your field. Get data-driven recommendations based on real success stories.",
         buttonText: "Try AI Assistant",
-        imageSrc: "./lovable-uploads/1deec2b0-a8ce-4d71-bf22-22ea39020cd7.png",
+        imageSrc: "/lovable-uploads/19ca8c73-3736-4506-bfb2-de867b272e12.png",
         imageAlt: "AI Chat Demo",
       },
     },
@@ -122,7 +122,7 @@ const Feature108: React.FC<Feature108Props> = ({
         description:
           "Access our daily-updated YouTube content from curated creators. Our AI analyzes videos to extract key takeaways, saving you hours of watching time. Get the most valuable insights 10x faster.",
         buttonText: "Explore Content",
-        imageSrc: "./lovable-uploads/c482563a-42db-4f47-83f2-c2e7771400b7.png",
+        imageSrc: "/lovable-uploads/c482563a-42db-4f47-83f2-c2e7771400b7.png",
         imageAlt: "Education Interface Demo",
       },
     },
@@ -136,7 +136,7 @@ const Feature108: React.FC<Feature108Props> = ({
         description:
           "Connect with a million-strong community of agency owners. Find and join the perfect networking groups for your niche, engage in meaningful conversations, and grow your agency through valuable connections.",
         buttonText: "Join Network",
-        imageSrc: "./lovable-uploads/dee36671-c662-422f-a9a0-deb2eeb03973.png",
+        imageSrc: "/lovable-uploads/dee36671-c662-422f-a9a0-deb2eeb03973.png",
         imageAlt: "Network Interface Demo",
       },
     },
@@ -150,7 +150,7 @@ const Feature108: React.FC<Feature108Props> = ({
         description:
           "Earn points for every platform interaction, convertible to our native cryptocurrency. Use tokens for premium features, rank upgrades, or trade them. Participate in the platform's economic future.",
         buttonText: "View Economy",
-        imageSrc: "./lovable-uploads/b269df74-3740-4134-8618-2c941cda5a5a.png",
+        imageSrc: "/lovable-uploads/b269df74-3740-4134-8618-2c941cda5a5a.png",
         imageAlt: "Economy System Demo",
       },
     },
@@ -164,7 +164,7 @@ const Feature108: React.FC<Feature108Props> = ({
         description:
           "Stay informed with daily AI news curated for agency owners. Earn points by engaging with articles and sharing insights. Get personalized news feeds based on your agency's focus.",
         buttonText: "Read News",
-        imageSrc: "./lovable-uploads/19ca8c73-3736-4506-bfb2-de867b272e12.png",
+        imageSrc: "/lovable-uploads/19ca8c73-3736-4506-bfb2-de867b272e12.png",
         imageAlt: "News Interface Demo",
       },
     },
