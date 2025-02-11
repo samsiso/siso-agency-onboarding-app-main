@@ -1,7 +1,8 @@
+
+import React, { useState, useEffect } from "react";
 import { BookOpen, Users, BarChart, Zap, Newspaper, Globe, Bot, Coins, Check, Clock, Award, ArrowRight, TrendingUp, Users2, ImageOff } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface TabContent {
@@ -41,6 +42,53 @@ const getCardStyles = (type: string) => {
       return "bg-gradient-to-br from-blue-900/30 to-purple-900/30 border-blue-500/20 hover:border-blue-500/40";
     default:
       return "bg-black/90";
+  }
+};
+
+const getCardStats = (type: string) => {
+  switch (type) {
+    case "ai-tools":
+      return {
+        mainStat: "24/7",
+        mainLabel: "AI Availability",
+        secondaryStat: "95%",
+        secondaryLabel: "Accuracy Rate",
+        benefits: ["Custom Recommendations", "Real-time Analysis", "Data-driven Insights"]
+      };
+    case "education":
+      return {
+        mainStat: "1000+",
+        mainLabel: "Video Resources",
+        secondaryStat: "10x",
+        secondaryLabel: "Learning Speed",
+        benefits: ["AI-Powered Summaries", "Interactive Learning", "Progress Tracking"]
+      };
+    case "community":
+      return {
+        mainStat: "1M+",
+        mainLabel: "Members",
+        secondaryStat: "50k+",
+        secondaryLabel: "Active Daily",
+        benefits: ["Global Network", "Niche Groups", "Expert Connections"]
+      };
+    case "economy":
+      return {
+        mainStat: "$10M+",
+        mainLabel: "Total Value",
+        secondaryStat: "100k+",
+        secondaryLabel: "Token Holders",
+        benefits: ["Tokenized Rewards", "Premium Features", "Economic Benefits"]
+      };
+    case "news":
+      return {
+        mainStat: "24/7",
+        mainLabel: "Updates",
+        secondaryStat: "1hr",
+        secondaryLabel: "Avg. Response",
+        benefits: ["Real-time Updates", "Curated Content", "Industry Analysis"]
+      };
+    default:
+      return null;
   }
 };
 
@@ -149,7 +197,7 @@ const Feature108 = ({
   };
 
   // Reset image states when tab changes
-  React.useEffect(() => {
+  useEffect(() => {
     setImageLoaded(false);
     setImageError(false);
     console.log('[Feature108] Tab changed, resetting image states');
