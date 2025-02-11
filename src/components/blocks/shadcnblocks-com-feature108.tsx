@@ -108,7 +108,7 @@ const Feature108: React.FC<Feature108Props> = ({
         description:
           "Use our AI assistant to discover perfect tools for your agency. We analyze our database of successful agencies to suggest solutions that work best in your field. Get data-driven recommendations based on real success stories.",
         buttonText: "Try AI Assistant",
-        imageSrc: "/lovable-uploads/19ca8c73-3736-4506-bfb2-de867b272e12.png",
+        imageSrc: "/lovable-uploads/9c6a19b7-a212-4e1b-a835-28401a7fb75a.png",
         imageAlt: "AI Chat Demo",
       },
     },
