@@ -15,6 +15,26 @@ export const useGoogleAuth = () => {
       setLoading(true);
       console.log('Initiating Google sign in...');
       
+      // First get the current session
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      
+      // If already signed in, check profile and redirect
+      if (currentSession) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('onboarding_completed, onboarding_step')
+          .eq('id', currentSession.user.id)
+          .single();
+
+        if (!profile?.onboarding_completed) {
+          navigate('/onboarding/social');
+        } else {
+          navigate('/profile');
+        }
+        return;
+      }
+
+      // If not signed in, initiate Google OAuth
       const { error, data } = await initiateGoogleSignIn();
       
       if (error) {
@@ -22,23 +42,7 @@ export const useGoogleAuth = () => {
         throw error;
       }
 
-      // If we have data.session, it means the user was already signed in
-      if (data?.session) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('onboarding_completed, onboarding_step')
-          .eq('id', data.session.user.id)
-          .single();
-
-        // Redirect based on onboarding status
-        if (!profile?.onboarding_completed) {
-          navigate('/onboarding/social');
-        } else {
-          navigate('/profile');
-        }
-      }
-
-      // If no session, the auth flow will continue in the browser
+      // The OAuth flow will continue in the browser and handle the redirect
       return data;
 
     } catch (error: any) {
