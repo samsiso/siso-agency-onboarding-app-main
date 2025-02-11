@@ -1,5 +1,5 @@
 
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { ResourceHubProps } from "./types";
 import { TabHeader } from "./TabHeader";
