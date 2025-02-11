@@ -27,7 +27,6 @@ interface Feature108Props {
   tabs?: Tab[];
 }
 
-// [Analysis] Each theme type gets its own gradient and styling
 const getCardStyles = (type: string) => {
   switch (type) {
     case "ai-tools":
@@ -123,9 +122,9 @@ const Feature108 = ({
   ],
 }: Feature108Props) => {
   const [activeTab, setActiveTab] = useState(tabs[0].value);
+  const [imageLoaded, setImageLoaded] = useState(false);
   const activeContent = tabs.find(tab => tab.value === activeTab)?.content;
 
-  // [Analysis] Helper function to get stats based on card type
   const getCardStats = (type: string) => {
     switch (type) {
       case "ai-tools":
@@ -179,7 +178,6 @@ const Feature108 = ({
 
       <div className="relative">
         <div className="container mx-auto px-4 md:px-6">
-          {/* Header Section */}
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -220,7 +218,6 @@ const Feature108 = ({
             </motion.p>
           </div>
 
-          {/* Tabs Section */}
           <div className="mt-12">
             <div className="container max-w-7xl mx-auto px-6 lg:px-8">
               <div className="flex flex-wrap items-center justify-center gap-4 sm:flex-row md:gap-8 mb-8">
@@ -245,7 +242,6 @@ const Feature108 = ({
                 ))}
               </div>
 
-              {/* Enhanced Card Content */}
               <AnimatePresence mode="wait">
                 {activeContent && (
                   <motion.div
@@ -262,14 +258,12 @@ const Feature108 = ({
                       layout
                     >
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        {/* Content Side */}
                         <motion.div 
                           className="flex flex-col gap-6"
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ duration: 0.5, delay: 0.2 }}
                         >
-                          {/* Header */}
                           <div className="space-y-4">
                             <Badge 
                               variant="outline" 
@@ -282,7 +276,6 @@ const Feature108 = ({
                             </h3>
                           </div>
 
-                          {/* Stats Grid */}
                           {getCardStats(activeTab) && (
                             <div className="grid grid-cols-2 gap-4 p-4 rounded-lg bg-gradient-to-br from-siso-red/5 to-siso-orange/5 border border-siso-orange/10">
                               <div className="space-y-1">
@@ -304,12 +297,10 @@ const Feature108 = ({
                             </div>
                           )}
 
-                          {/* Description */}
                           <p className="text-siso-text/80 leading-relaxed">
                             {activeContent.description}
                           </p>
 
-                          {/* Benefits List */}
                           <div className="space-y-2">
                             {getCardStats(activeTab)?.benefits.map((benefit, index) => (
                               <motion.div 
@@ -327,7 +318,6 @@ const Feature108 = ({
                             ))}
                           </div>
 
-                          {/* Action Buttons */}
                           <div className="flex items-center gap-4">
                             <Button 
                               className="bg-gradient-to-r from-siso-red to-siso-orange hover:from-siso-red/90 hover:to-siso-orange/90 
@@ -344,24 +334,34 @@ const Feature108 = ({
                           </div>
                         </motion.div>
 
-                        {/* Image Side with Stats Overlay */}
                         <motion.div 
                           className="relative"
                           initial={{ opacity: 0, x: 20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ duration: 0.5, delay: 0.3 }}
                         >
-                          <div className="relative h-[400px] rounded-xl overflow-hidden">
+                          <div className="relative h-[400px] rounded-xl overflow-hidden bg-gradient-to-br from-black/40 to-black/20">
                             <motion.img
                               src={activeContent.imageSrc}
                               alt={activeContent.imageAlt}
-                              className="w-full h-full object-cover"
+                              className={`w-full h-full object-contain transition-opacity duration-300 ${
+                                imageLoaded ? 'opacity-100' : 'opacity-0'
+                              }`}
+                              onLoad={() => setImageLoaded(true)}
+                              onError={(e) => {
+                                console.error('Image failed to load:', e);
+                                setImageLoaded(false);
+                              }}
                               whileHover={{ scale: 1.05 }}
                               transition={{ duration: 0.7 }}
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                            {!imageLoaded && (
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="w-8 h-8 border-2 border-siso-orange border-t-transparent rounded-full animate-spin" />
+                              </div>
+                            )}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
                             
-                            {/* Quick Stats Overlay */}
                             <div className="absolute bottom-0 left-0 right-0 p-6 space-y-4">
                               <div className="flex items-center justify-between text-white/90">
                                 <div className="flex items-center gap-2">
@@ -374,7 +374,6 @@ const Feature108 = ({
                                 </div>
                               </div>
                               
-                              {/* Activity Indicator */}
                               <div className="flex items-center gap-2 text-white/80 text-sm">
                                 <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                                 <span>Active now</span>
