@@ -1,15 +1,25 @@
 
-import { lazy, Suspense, memo } from 'react';
+import { lazy, Suspense, memo, useEffect } from 'react';
 import { LoadingFallback } from './sections/LoadingFallback';
-import Footer from '@/components/Footer';  // Import our updated Footer
+import Footer from '@/components/Footer';
+import { useViewportLoading } from '@/hooks/useViewportLoading';
+import { usePerformanceMetrics } from '@/hooks/usePerformanceMetrics';
 
-// [Analysis] Lazy load components for optimal performance
-const HeroSection = lazy(() => 
-  import('./sections/HeroSection').then(m => ({ 
+// [Analysis] Optimized lazy loading with prefetch hints
+const HeroSection = lazy(() => {
+  // Add preload hint for critical hero image
+  const link = document.createElement('link');
+  link.rel = 'preload';
+  link.as = 'image';
+  link.href = '/lovable-uploads/c482563a-42db-4f47-83f2-c2e7771400b7.png';
+  document.head.appendChild(link);
+  
+  return import('./sections/HeroSection').then(m => ({ 
     default: memo(m.HeroSection) 
-  }))
-);
+  }));
+});
 
+// [Analysis] Other sections can be loaded when needed
 const WhyChooseSection = lazy(() => 
   import('./sections/WhyChooseSection').then(m => ({ 
     default: memo(m.WhyChooseSection) 
@@ -53,19 +63,29 @@ const ScrollNav = lazy(() =>
 );
 
 const LandingPage = () => {
+  // Initialize performance monitoring
+  usePerformanceMetrics();
+
+  // Setup viewport loading for each section
+  const hero = useViewportLoading({ threshold: 0.1 });
+  const whyChoose = useViewportLoading({ threshold: 0.1 });
+  const features = useViewportLoading({ threshold: 0.1 });
+  const gettingStarted = useViewportLoading({ threshold: 0.1 });
+  const pricing = useViewportLoading({ threshold: 0.1 });
+  const testimonials = useViewportLoading({ threshold: 0.1 });
+  const cta = useViewportLoading({ threshold: 0.1 });
+
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-black via-siso-bg to-black overflow-x-hidden">
-      {/* Preload critical resources */}
-      <link rel="preload" as="image" href="/lovable-uploads/c482563a-42db-4f47-83f2-c2e7771400b7.png" />
-      
-      {/* DNS prefetch for external resources */}
+      {/* DNS prefetch and preconnect optimizations */}
       <link rel="dns-prefetch" href="https://fzuwsjxjymwcjsbpwfsl.supabase.co" />
+      <link rel="preconnect" href="https://fzuwsjxjymwcjsbpwfsl.supabase.co" crossOrigin="anonymous" />
       
       <Suspense fallback={<LoadingFallback />}>
         <ScrollNav />
       </Suspense>
       
-      {/* Background elements with hardware acceleration */}
+      {/* Optimized background elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 -left-1/4 w-[250px] md:w-[600px] h-[250px] md:h-[600px] 
           bg-siso-red/15 rounded-full filter blur-[80px] md:blur-[120px] 
@@ -81,49 +101,49 @@ const LandingPage = () => {
         />
       </div>
 
-      {/* Main Content with progressive loading */}
+      {/* Progressive section loading */}
       <div className="relative z-10 px-4 md:px-0">
-        <section id="hero">
+        <section id="hero" ref={hero.elementRef}>
           <Suspense fallback={<LoadingFallback />}>
-            <HeroSection />
+            {(hero.isVisible || hero.isLoaded) && <HeroSection />}
           </Suspense>
         </section>
 
-        <section id="why-choose">
+        <section id="why-choose" ref={whyChoose.elementRef}>
           <Suspense fallback={<LoadingFallback />}>
-            <WhyChooseSection />
+            {(whyChoose.isVisible || whyChoose.isLoaded) && <WhyChooseSection />}
           </Suspense>
         </section>
 
-        <section id="features">
+        <section id="features" ref={features.elementRef}>
           <Suspense fallback={<LoadingFallback />}>
-            <FeaturesSection />
+            {(features.isVisible || features.isLoaded) && <FeaturesSection />}
           </Suspense>
         </section>
 
-        <section id="getting-started">
+        <section id="getting-started" ref={gettingStarted.elementRef}>
           <Suspense fallback={<LoadingFallback />}>
-            <GettingStartedSection />
+            {(gettingStarted.isVisible || gettingStarted.isLoaded) && <GettingStartedSection />}
           </Suspense>
         </section>
 
-        <section id="pricing">
+        <section id="pricing" ref={pricing.elementRef}>
           <Suspense fallback={<LoadingFallback />}>
-            <PricingSection />
+            {(pricing.isVisible || pricing.isLoaded) && <PricingSection />}
           </Suspense>
         </section>
 
         <div className="space-y-12 md:space-y-24">
-          <section id="testimonials">
+          <section id="testimonials" ref={testimonials.elementRef}>
             <Suspense fallback={<LoadingFallback />}>
-              <TestimonialsSection />
+              {(testimonials.isVisible || testimonials.isLoaded) && <TestimonialsSection />}
             </Suspense>
           </section>
         </div>
 
-        <section id="cta">
+        <section id="cta" ref={cta.elementRef}>
           <Suspense fallback={<LoadingFallback />}>
-            <CallToActionSection />
+            {(cta.isVisible || cta.isLoaded) && <CallToActionSection />}
           </Suspense>
         </section>
 
@@ -133,4 +153,4 @@ const LandingPage = () => {
   );
 };
 
-export default LandingPage;
+export default memo(LandingPage);

@@ -1118,6 +1118,39 @@ export type Database = {
         }
         Relationships: []
       }
+      performance_metrics: {
+        Row: {
+          cls: number | null
+          created_at: string
+          fid: number | null
+          id: string
+          lcp: number | null
+          page_url: string
+          ttfb: number | null
+          user_id: string | null
+        }
+        Insert: {
+          cls?: number | null
+          created_at?: string
+          fid?: number | null
+          id?: string
+          lcp?: number | null
+          page_url: string
+          ttfb?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          cls?: number | null
+          created_at?: string
+          fid?: number | null
+          id?: string
+          lcp?: number | null
+          page_url?: string
+          ttfb?: number | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       point_configurations: {
         Row: {
           action: string
