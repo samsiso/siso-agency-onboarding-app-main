@@ -1,4 +1,3 @@
-
 import { BookOpen, Users, BarChart, Zap, Bot, Globe } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -30,48 +29,48 @@ interface Feature108Props {
 const Feature108 = ({
   badge = "SISO Agency",
   heading = "Resource Hub Features",
-  description = "Access cutting-edge tools and community insights to accelerate your agency's growth.",
+  description = "Unlock powerful tools and insights designed specifically for agency growth.",
   tabs = [
     {
       value: "ai-agent",
       icon: <Bot className="h-auto w-4 shrink-0" />,
-      label: "AI Assistant",
+      label: "Custom AI Agent",
       content: {
-        badge: "Personalized AI",
+        badge: "AI-Powered Growth",
         title: "AI Agent Trained for Your Agency",
         description:
-          "Our intelligent AI agent learns your agency's unique needs and goals, then analyzes our extensive resource bank to provide tailored recommendations for growth strategies, tools, and opportunities specific to your business.",
-        buttonText: "Meet Your AI Assistant",
+          "Experience our custom AI agent that learns your agency's unique needs, analyzes our extensive resource bank, and delivers personalized recommendations for tools, strategies, and growth opportunities.",
+        buttonText: "Explore AI Agent",
         imageSrc: "https://images.unsplash.com/photo-1677442136019-21780ecad995",
-        imageAlt: "AI Assistant Interface",
+        imageAlt: "AI Agent Interface",
       },
     },
     {
       value: "community",
       icon: <Users className="h-auto w-4 shrink-0" />,
-      label: "Agency Network",
+      label: "Community Insights",
       content: {
         badge: "1000+ Agency Owners",
-        title: "Learn What's Working Now",
+        title: "Learn from Successful Agencies",
         description:
-          "Tap into the collective wisdom of over 1,000 successful agency owners. See exactly which tools, strategies, and solutions are driving results for agencies like yours, and implement proven approaches in your business.",
-        buttonText: "Join the Network",
+          "Get direct insights into what's working for over 1,000 successful agency owners. Discover tried-and-tested solutions, tools, and strategies you can implement in your business today.",
+        buttonText: "Join Network",
         imageSrc: "https://images.unsplash.com/photo-1522071820081-009f0129c71c",
-        imageAlt: "Agency Community Network",
+        imageAlt: "Agency Community",
       },
     },
     {
       value: "tech-updates",
       icon: <Zap className="h-auto w-4 shrink-0" />,
-      label: "Latest Tech",
+      label: "Real-time Updates",
       content: {
-        badge: "Real-time Updates",
-        title: "Stay Ahead of Innovation",
+        badge: "Daily Updates",
+        title: "Stay Ahead with Latest Tech",
         description:
-          "Get instant access to the newest agency tools and technologies. Our platform updates multiple times daily, ensuring you're always first to know about and implement game-changing solutions for your agency.",
-        buttonText: "See Latest Updates",
+          "Access cutting-edge tools and technologies as soon as they're available. Our platform is updated multiple times daily, ensuring you're always at the forefront of agency innovation.",
+        buttonText: "View Updates",
         imageSrc: "https://images.unsplash.com/photo-1642543492481-44e81e3914a7",
-        imageAlt: "Technology Innovation Dashboard",
+        imageAlt: "Technology Updates",
       },
     },
     {
@@ -79,13 +78,13 @@ const Feature108 = ({
       icon: <Globe className="h-auto w-4 shrink-0" />,
       label: "Resource Hub",
       content: {
-        badge: "Comprehensive Suite",
-        title: "All-in-One Agency Platform",
+        badge: "All-in-One Platform",
+        title: "Centralized Agency Resources",
         description:
-          "Transform your agency workflow with our integrated platform. Access a complete suite of tools, step-by-step implementation guides, and educational resources - all designed to help you scale your agency efficiently.",
-        buttonText: "Explore Resources",
+          "Access a comprehensive suite of agency tools, educational content, and implementation guides - all in one place. Transform how you manage and grow your agency with our integrated platform.",
+        buttonText: "Access Resources",
         imageSrc: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3",
-        imageAlt: "Resource Hub Dashboard",
+        imageAlt: "Resource Hub",
       },
     },
   ],
