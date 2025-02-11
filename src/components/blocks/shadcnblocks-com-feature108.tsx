@@ -59,7 +59,7 @@ const Feature108 = ({
         description:
           "Use our AI assistant to discover perfect tools for your agency. We analyze our database of successful agencies to suggest solutions that work best in your field. Get data-driven recommendations based on real success stories.",
         buttonText: "Try AI Assistant",
-        imageSrc: "https://raw.githubusercontent.com/your-username/your-repo/main/lovable-uploads/1deec2b0-a8ce-4d71-bf22-22ea39020cd7.png",
+        imageSrc: "/lovable-uploads/1deec2b0-a8ce-4d71-bf22-22ea39020cd7.png",
         imageAlt: "AI Chat Demo",
       },
     },
@@ -73,7 +73,7 @@ const Feature108 = ({
         description:
           "Access our daily-updated YouTube content from curated creators. Our AI analyzes videos to extract key takeaways, saving you hours of watching time. Get the most valuable insights 10x faster.",
         buttonText: "Explore Content",
-        imageSrc: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3",
+        imageSrc: "/lovable-uploads/c482563a-42db-4f47-83f2-c2e7771400b7.png",
         imageAlt: "Education Interface Demo",
       },
     },
@@ -87,7 +87,7 @@ const Feature108 = ({
         description:
           "Connect with a million-strong community of agency owners. Find and join the perfect networking groups for your niche, engage in meaningful conversations, and grow your agency through valuable connections.",
         buttonText: "Join Network",
-        imageSrc: "https://images.unsplash.com/photo-1522071820081-009f0129c71c",
+        imageSrc: "/lovable-uploads/dee36671-c662-422f-a9a0-deb2eeb03973.png",
         imageAlt: "Network Interface Demo",
       },
     },
@@ -101,7 +101,7 @@ const Feature108 = ({
         description:
           "Earn points for every platform interaction, convertible to our native cryptocurrency. Use tokens for premium features, rank upgrades, or trade them. Participate in the platform's economic future.",
         buttonText: "View Economy",
-        imageSrc: "https://images.unsplash.com/photo-1642543492481-44e81e3914a7",
+        imageSrc: "/lovable-uploads/b269df74-3740-4134-8618-2c941cda5a5a.png",
         imageAlt: "Economy System Demo",
       },
     },
@@ -115,7 +115,7 @@ const Feature108 = ({
         description:
           "Stay informed with daily AI news curated for agency owners. Earn points by engaging with articles and sharing insights. Get personalized news feeds based on your agency's focus.",
         buttonText: "Read News",
-        imageSrc: "https://images.unsplash.com/photo-1655720828018-edd2daec9349",
+        imageSrc: "/lovable-uploads/19ca8c73-3736-4506-bfb2-de867b272e12.png",
         imageAlt: "News Interface Demo",
       },
     },
