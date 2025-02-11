@@ -25,38 +25,136 @@ import Terms from '@/pages/Terms';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import ThankYou from '@/pages/ThankYou';
 import SocialOnboarding from '@/pages/onboarding/social';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 
 function App() {
   return (
     <Routes>
+      {/* Public routes */}
       <Route path="/" element={<Home />} />
       <Route path="/welcome" element={<Index />} />
       <Route path="/auth" element={<Auth />} />
-      <Route path="/profile" element={<Profile />} />
-      <Route path="/tools" element={<Tools />} />
-      <Route path="/tools/:id" element={<ToolPage />} />
-      <Route path="/ai-news" element={<AINews />} />
-      <Route path="/siso-ai" element={<SisoAI />} />
-      <Route path="/assistants" element={<ChatGPTAssistants />} />
-      <Route path="/automations" element={<Automations />} />
-      <Route path="/networking" element={<Networking />} />
-      <Route path="/community" element={<Community />} />
-      <Route path="/learn" element={<LearnNetwork />} />
-      <Route path="/economy/earn" element={<HowToEarn />} />
-      <Route path="/earn" element={<HowToEarn />} />
-      <Route path="/economy" element={<Economy />} />
-      <Route path="/economy/crypto-exchange" element={<CryptoExchange />} />
-      <Route path="/exchange" element={<CryptoExchange />} />
-      <Route path="/crypto" element={<Crypto />} />
-      <Route path="/economy/leaderboards" element={<Leaderboards />} />
-      <Route path="/leaderboards" element={<Leaderboards />} />
-      <Route path="/education/*" element={<SisoEducation />} />
-      <Route path="/education/educators/:slug" element={<EducatorDetail />} />
-      <Route path="/education/video/:id" element={<VideoDetail />} />
       <Route path="/terms" element={<Terms />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
-      <Route path="/thank-you" element={<ThankYou />} />
-      <Route path="/onboarding/social" element={<SocialOnboarding />} />
+
+      {/* Protected routes that require authentication */}
+      <Route path="/profile" element={
+        <ProtectedRoute>
+          <Profile />
+        </ProtectedRoute>
+      } />
+      <Route path="/tools" element={
+        <ProtectedRoute>
+          <Tools />
+        </ProtectedRoute>
+      } />
+      <Route path="/tools/:id" element={
+        <ProtectedRoute>
+          <ToolPage />
+        </ProtectedRoute>
+      } />
+      <Route path="/ai-news" element={
+        <ProtectedRoute>
+          <AINews />
+        </ProtectedRoute>
+      } />
+      <Route path="/siso-ai" element={
+        <ProtectedRoute>
+          <SisoAI />
+        </ProtectedRoute>
+      } />
+      <Route path="/assistants" element={
+        <ProtectedRoute>
+          <ChatGPTAssistants />
+        </ProtectedRoute>
+      } />
+      <Route path="/automations" element={
+        <ProtectedRoute>
+          <Automations />
+        </ProtectedRoute>
+      } />
+      <Route path="/networking" element={
+        <ProtectedRoute>
+          <Networking />
+        </ProtectedRoute>
+      } />
+      <Route path="/community" element={
+        <ProtectedRoute>
+          <Community />
+        </ProtectedRoute>
+      } />
+      <Route path="/learn" element={
+        <ProtectedRoute>
+          <LearnNetwork />
+        </ProtectedRoute>
+      } />
+      <Route path="/economy/earn" element={
+        <ProtectedRoute>
+          <HowToEarn />
+        </ProtectedRoute>
+      } />
+      <Route path="/earn" element={
+        <ProtectedRoute>
+          <HowToEarn />
+        </ProtectedRoute>
+      } />
+      <Route path="/economy" element={
+        <ProtectedRoute>
+          <Economy />
+        </ProtectedRoute>
+      } />
+      <Route path="/economy/crypto-exchange" element={
+        <ProtectedRoute>
+          <CryptoExchange />
+        </ProtectedRoute>
+      } />
+      <Route path="/exchange" element={
+        <ProtectedRoute>
+          <CryptoExchange />
+        </ProtectedRoute>
+      } />
+      <Route path="/crypto" element={
+        <ProtectedRoute>
+          <Crypto />
+        </ProtectedRoute>
+      } />
+      <Route path="/economy/leaderboards" element={
+        <ProtectedRoute>
+          <Leaderboards />
+        </ProtectedRoute>
+      } />
+      <Route path="/leaderboards" element={
+        <ProtectedRoute>
+          <Leaderboards />
+        </ProtectedRoute>
+      } />
+      <Route path="/education/*" element={
+        <ProtectedRoute>
+          <SisoEducation />
+        </ProtectedRoute>
+      } />
+      <Route path="/education/educators/:slug" element={
+        <ProtectedRoute>
+          <EducatorDetail />
+        </ProtectedRoute>
+      } />
+      <Route path="/education/video/:id" element={
+        <ProtectedRoute>
+          <VideoDetail />
+        </ProtectedRoute>
+      } />
+
+      {/* Onboarding routes (protected but allow partial auth) */}
+      <Route path="/onboarding/social" element={
+        <ProtectedRoute>
+          <SocialOnboarding />
+        </ProtectedRoute>
+      } />
+      <Route path="/thank-you" element={
+        <ProtectedRoute>
+          <ThankYou />
+        </ProtectedRoute>
+      } />
     </Routes>
   );
 }
