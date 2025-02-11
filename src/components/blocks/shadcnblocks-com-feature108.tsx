@@ -164,7 +164,7 @@ const Feature108: React.FC<Feature108Props> = ({
         description:
           "Stay informed with daily AI news curated for agency owners. Earn points by engaging with articles and sharing insights. Get personalized news feeds based on your agency's focus.",
         buttonText: "Read News",
-        imageSrc: "/lovable-uploads/19ca8c73-3736-4506-bfb2-de867b272e12.png",
+        imageSrc: "/lovable-uploads/3b17a23d-630e-4e55-94bf-9d6fef9e6fc4.png",
         imageAlt: "News Interface Demo",
       },
     },
