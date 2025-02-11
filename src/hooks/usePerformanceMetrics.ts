@@ -2,6 +2,15 @@
 import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
+// [Analysis] Define web vitals metric types for better type safety
+interface WebVitalMetric {
+  id: string;
+  name: string;
+  value: number;
+  rating: 'good' | 'needs-improvement' | 'poor';
+  delta: number;
+}
+
 export const usePerformanceMetrics = () => {
   useEffect(() => {
     // Only run in production and for authenticated users
@@ -15,12 +24,18 @@ export const usePerformanceMetrics = () => {
             // Type guard to handle different performance entry types
             let metricValue: number | undefined;
             
-            if (entry.entryType === 'largest-contentful-paint') {
-              metricValue = (entry as PerformanceElementTiming).startTime;
-            } else if (entry.entryType === 'first-input') {
-              metricValue = (entry as PerformanceEventTiming).processingStart - entry.startTime;
-            } else if (entry.entryType === 'layout-shift') {
-              metricValue = (entry as LayoutShift).value;
+            switch (entry.entryType) {
+              case 'largest-contentful-paint':
+                metricValue = entry.startTime;
+                break;
+              case 'first-input':
+                const firstInputEntry = entry as PerformanceEventTiming;
+                metricValue = firstInputEntry.processingStart - firstInputEntry.startTime;
+                break;
+              case 'layout-shift':
+                // For CLS, we need to access the value differently since it's part of the entry object
+                metricValue = (entry as any).value;
+                break;
             }
 
             if (metricValue !== undefined) {
