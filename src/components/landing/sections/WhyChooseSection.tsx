@@ -1,27 +1,28 @@
+
 import { GradientHeading } from '@/components/ui/gradient-heading';
-import { RocketIcon, BrainCircuitIcon, LayersIcon, SparklesIcon } from 'lucide-react';
+import { Bot, Users, Zap, Globe } from 'lucide-react';
 
 export const WhyChooseSection = () => {
   const features = [
     {
-      icon: RocketIcon,
-      title: "Accelerated Growth",
-      description: "Import proven strategies, use AI-powered tools, and leverage expert guidance to scale your agency. Our platform ensures successful implementation."
+      icon: Bot,
+      title: "Custom AI Agency Agent",
+      description: "Experience our AI agent that learns your agency's unique needs, analyzes our resource bank, and delivers personalized recommendations for tools and growth strategies."
     },
     {
-      icon: BrainCircuitIcon,
-      title: "AI-Powered Solutions",
-      description: "Get unstuck with AI assistants, automated workflows, and tools that understand your business needs. Connect with experts for real-time guidance."
+      icon: Users,
+      title: "Community Insights",
+      description: "Learn from over 1,000 successful agency owners. See exactly which solutions are driving results for agencies like yours and implement proven strategies in your business."
     },
     {
-      icon: LayersIcon,
-      title: "Streamlined Operations",
-      description: "Quick access to documentation, authentication, testing, and integrations. Keep track of your agency's progress with built-in management tools."
+      icon: Zap,
+      title: "Real-time Updates",
+      description: "Stay ahead with a platform that updates multiple times daily. Get instant access to new technologies and implementation guides as soon as they become available."
     },
     {
-      icon: SparklesIcon,
-      title: "Enhanced Efficiency",
-      description: "Generate proposals, action plans, and reports automatically. Use our AI tools for hands-free task management and quick access to resources."
+      icon: Globe,
+      title: "Integrated Resource Hub",
+      description: "Access a comprehensive suite of agency tools, step-by-step implementation guides, and educational resources - all designed to help you scale efficiently."
     }
   ];
 
@@ -33,7 +34,7 @@ export const WhyChooseSection = () => {
             Supercharge Your Agency Growth
           </GradientHeading>
           <p className="text-lg text-siso-text-muted max-w-2xl mx-auto">
-            Transform your business with AI-powered agency tools and resources
+            Transform your business with AI-powered tools and proven strategies from successful agency owners
           </p>
         </div>
 
