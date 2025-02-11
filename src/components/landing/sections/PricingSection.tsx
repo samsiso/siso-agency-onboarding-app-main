@@ -2,7 +2,7 @@
 import { PricingCard } from '@/components/ui/pricing-card';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Check } from 'lucide-react';
+import { Rocket, Shield, Star, Check, ArrowUp, Award, DollarSign } from 'lucide-react';
 
 export const PricingSection = () => {
   const navigate = useNavigate();
@@ -25,57 +25,99 @@ export const PricingSection = () => {
           transition={{ duration: 0.5 }}
           className="relative max-w-4xl mx-auto"
         >
+          {/* Early Access Banner */}
+          <motion.div 
+            className="text-center mb-8 space-y-2"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            <div className="flex items-center justify-center gap-2 text-2xl font-bold text-white">
+              <Rocket className="w-6 h-6 text-siso-orange" />
+              <h2>Exclusive Early Access - First 1,000 Agencies</h2>
+            </div>
+            <p className="text-siso-text/80 text-lg">
+              After that, just £249/year. Lock in your free access now!
+            </p>
+          </motion.div>
+
           {/* Main Pricing Card */}
           <PricingCard
             title="Complete Platform Access"
-            description="Get instant access to our complete platform with all premium features. No credit card required."
+            description="Get instant access to our complete platform with all premium features."
             price={249}
             features={[
               {
-                title: "Premium Features",
+                title: "Core Features",
                 items: [
-                  "⚡ Enterprise-grade AI automation suite - Used by 500+ agencies",
-                  "⭐ 24/7 Priority support & consulting - 4.9/5 customer rating",
-                  "🛡️ Unlimited platform integrations - Enterprise-grade security",
-                  "Regular feature updates and improvements",
+                  <div className="flex items-center gap-2">
+                    <Rocket className="w-4 h-4 text-siso-orange" />
+                    <span>Enterprise-grade AI automation suite - Used by 500+ agencies</span>
+                  </div>,
+                  <div className="flex items-center gap-2">
+                    <Shield className="w-4 h-4 text-siso-orange" />
+                    <span>Unlimited platform integrations with enterprise security</span>
+                  </div>,
+                  <div className="flex items-center gap-2">
+                    <ArrowUp className="w-4 h-4 text-siso-orange" />
+                    <span>Regular feature updates & improvements</span>
+                  </div>,
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="w-4 h-4 text-siso-orange" />
+                    <span>No credit card required to start</span>
+                  </div>,
                 ],
               },
               {
-                title: "Additional Benefits",
+                title: "Enterprise Features",
                 items: [
+                  <div className="flex items-center gap-2">
+                    <Star className="w-4 h-4 text-siso-orange" />
+                    <span>24/7 Priority support & consulting - 4.9/5 rating</span>
+                  </div>,
+                  <div className="flex items-center gap-2">
+                    <Award className="w-4 h-4 text-siso-orange" />
+                    <span>Expert strategy sessions included</span>
+                  </div>,
                   "Standard Plan: £249/year",
                   "Enterprise Plan: £999/year",
-                  "Access to all future updates",
-                  "Trusted by 1000+ agencies worldwide",
                 ],
               },
             ]}
-            buttonText="Get Started Now"
+            buttonText="Claim Your Free Access"
             onButtonClick={handleGetStarted}
-            trustMessage="Join 500+ agencies already using our platform. Start transforming your workflow today."
+            trustMessage={
+              <div className="flex items-center justify-center gap-2">
+                <Award className="w-5 h-5 text-siso-orange" />
+                <span>764/1,000 Free Spots Taken – Claim yours now!</span>
+              </div>
+            }
           />
         </motion.div>
 
         {/* Trust Banner */}
         <motion.div 
-          className="mt-12 text-center space-y-6"
+          className="mt-8 text-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <div className="flex items-center justify-center gap-2 text-sm">
-            <Check className="w-4 h-4 text-green-500" />
-            <span className="text-siso-text/70">30-day money-back guarantee</span>
-            <span className="mx-2 text-siso-text/30">•</span>
-            <Check className="w-4 h-4 text-green-500" />
-            <span className="text-siso-text/70">No credit card required</span>
-            <span className="mx-2 text-siso-text/30">•</span>
-            <Check className="w-4 h-4 text-green-500" />
-            <span className="text-siso-text/70">Cancel anytime</span>
+          <div className="flex items-center justify-center gap-4 text-sm flex-wrap">
+            <div className="flex items-center gap-2">
+              <Check className="w-4 h-4 text-green-500" />
+              <span className="text-siso-text/70">30-day money-back guarantee</span>
+            </div>
+            <span className="text-siso-text/30">•</span>
+            <div className="flex items-center gap-2">
+              <Check className="w-4 h-4 text-green-500" />
+              <span className="text-siso-text/70">No credit card required</span>
+            </div>
+            <span className="text-siso-text/30">•</span>
+            <div className="flex items-center gap-2">
+              <Check className="w-4 h-4 text-green-500" />
+              <span className="text-siso-text/70">Cancel anytime</span>
+            </div>
           </div>
-          <p className="text-sm text-siso-text/60">
-            Trusted by agencies worldwide with £10M+ processed through our platform
-          </p>
         </motion.div>
       </div>
     </section>
