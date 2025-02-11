@@ -3,6 +3,7 @@ import { BookOpen, Users, BarChart, Zap, Newspaper, Globe, Bot, Coins } from "lu
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface TabContent {
   badge: string;
@@ -26,6 +27,24 @@ interface Feature108Props {
   description?: string;
   tabs?: Tab[];
 }
+
+// [Analysis] Each theme type gets its own gradient and styling
+const getCardStyles = (type: string) => {
+  switch (type) {
+    case "ai-tools":
+      return "bg-gradient-to-br from-purple-900/30 to-blue-900/30 border-purple-500/20 hover:border-purple-500/40";
+    case "education":
+      return "bg-gradient-to-br from-green-900/30 to-blue-900/30 border-green-500/20 hover:border-green-500/40";
+    case "community":
+      return "bg-gradient-to-br from-orange-900/30 to-red-900/30 border-orange-500/20 hover:border-orange-500/40";
+    case "economy":
+      return "bg-gradient-to-br from-emerald-900/30 to-yellow-900/30 border-emerald-500/20 hover:border-emerald-500/40";
+    case "news":
+      return "bg-gradient-to-br from-blue-900/30 to-purple-900/30 border-blue-500/20 hover:border-blue-500/40";
+    default:
+      return "bg-black/90";
+  }
+};
 
 const Feature108 = ({
   badge = "SISO Agency",
@@ -114,77 +133,134 @@ const Feature108 = ({
       <div className="relative">
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
-            <Badge className="bg-siso-bg-alt text-siso-text px-4 py-2 rounded-full">
-              {badge}
-            </Badge>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Badge className="bg-siso-bg-alt text-siso-text px-4 py-2 rounded-full">
+                {badge}
+              </Badge>
+            </motion.div>
             
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-siso-text-bold">
+            <motion.h2 
+              className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-siso-text-bold"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
               {heading}
-            </h2>
+            </motion.h2>
 
-            <div className="flex items-center gap-2 text-siso-text/80 text-lg">
+            <motion.div 
+              className="flex items-center gap-2 text-siso-text/80 text-lg"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
               <Globe className="w-5 h-5" />
               <p>Powered by thousands of innovators worldwide</p>
-            </div>
+            </motion.div>
 
-            <p className="mx-auto max-w-[700px] text-siso-text/80 md:text-xl">
+            <motion.p 
+              className="mx-auto max-w-[700px] text-siso-text/80 md:text-xl"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
               {description}
-            </p>
+            </motion.p>
           </div>
 
           <div className="mt-12">
             <div className="container max-w-7xl mx-auto px-6 lg:px-8">
               {/* Tab Triggers */}
               <div className="flex flex-wrap items-center justify-center gap-4 sm:flex-row md:gap-8 mb-8">
-                {tabs.map((tab) => (
-                  <button
+                {tabs.map((tab, index) => (
+                  <motion.button
                     key={tab.value}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
                     onClick={() => setActiveTab(tab.value)}
                     className={`flex items-center gap-2 rounded-xl px-6 py-4 text-sm font-semibold 
-                      transition-all duration-300
+                      transition-all duration-300 hover:scale-105
                       ${activeTab === tab.value 
                         ? 'text-siso-text-bold bg-gradient-to-r from-siso-red/20 to-siso-orange/20 shadow-lg shadow-siso-red/10' 
                         : 'text-siso-text hover:text-siso-text-bold hover:bg-gradient-to-r hover:from-siso-red/20 hover:to-siso-orange/20'
                       }`}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                   >
                     {tab.icon} {tab.label}
-                  </button>
+                  </motion.button>
                 ))}
               </div>
 
               {/* Content Display */}
-              {activeContent && (
-                <div className="mt-8 px-4">
-                  <div className="rounded-lg border border-siso-border bg-black/90 backdrop-blur-sm p-8">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                      <div className="flex flex-col gap-4">
-                        <Badge variant="outline" className="w-fit bg-black/50 backdrop-blur-sm border-siso-orange/20">
-                          {activeContent.badge}
-                        </Badge>
-                        <h3 className="text-2xl font-bold bg-gradient-to-r from-siso-orange to-siso-red text-transparent bg-clip-text">
-                          {activeContent.title}
-                        </h3>
-                        <p className="text-siso-text/80">
-                          {activeContent.description}
-                        </p>
-                        <Button 
-                          className="w-fit bg-gradient-to-r from-siso-red to-siso-orange hover:from-siso-red/90 hover:to-siso-orange/90 
-                            text-white shadow-lg shadow-siso-red/20 transition-all duration-300 hover:shadow-xl hover:shadow-siso-orange/30"
+              <AnimatePresence mode="wait">
+                {activeContent && (
+                  <motion.div
+                    key={activeTab}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="mt-8 px-4"
+                  >
+                    <motion.div 
+                      className={`rounded-lg border backdrop-blur-sm p-8 shadow-2xl transition-all duration-500
+                        ${getCardStyles(activeTab)}`}
+                      whileHover={{ scale: 1.02 }}
+                      layout
+                    >
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                        <motion.div 
+                          className="flex flex-col gap-4"
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.5, delay: 0.2 }}
                         >
-                          {activeContent.buttonText}
-                        </Button>
+                          <Badge 
+                            variant="outline" 
+                            className="w-fit bg-black/50 backdrop-blur-sm border-siso-orange/20 hover:border-siso-orange/40 transition-colors"
+                          >
+                            {activeContent.badge}
+                          </Badge>
+                          <h3 className="text-2xl font-bold bg-gradient-to-r from-siso-orange to-siso-red text-transparent bg-clip-text">
+                            {activeContent.title}
+                          </h3>
+                          <p className="text-siso-text/80 leading-relaxed">
+                            {activeContent.description}
+                          </p>
+                          <Button 
+                            className="w-fit bg-gradient-to-r from-siso-red to-siso-orange hover:from-siso-red/90 hover:to-siso-orange/90 
+                              text-white shadow-lg shadow-siso-red/20 transition-all duration-300 hover:shadow-xl hover:shadow-siso-orange/30
+                              hover:scale-105"
+                          >
+                            {activeContent.buttonText}
+                          </Button>
+                        </motion.div>
+                        <motion.div 
+                          className="w-full h-[300px] rounded-lg overflow-hidden shadow-xl shadow-black/20
+                            ring-1 ring-white/10 hover:ring-white/20 transition-all duration-300"
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.5, delay: 0.3 }}
+                        >
+                          <motion.img
+                            src={activeContent.imageSrc}
+                            alt={activeContent.imageAlt}
+                            className="w-full h-full object-cover"
+                            whileHover={{ scale: 1.1 }}
+                            transition={{ duration: 0.7 }}
+                          />
+                        </motion.div>
                       </div>
-                      <div className="w-full h-[300px] rounded-lg overflow-hidden shadow-xl shadow-black/20">
-                        <img
-                          src={activeContent.imageSrc}
-                          alt={activeContent.imageAlt}
-                          className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </div>
