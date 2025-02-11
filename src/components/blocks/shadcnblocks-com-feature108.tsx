@@ -1,4 +1,3 @@
-
 import { BookOpen, Users, BarChart, Zap, Newspaper, Globe, Bot, Coins, Check, Clock, Award, ArrowRight, TrendingUp, Users2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -61,7 +60,7 @@ const Feature108 = ({
         description:
           "Use our AI assistant to discover perfect tools for your agency. We analyze our database of successful agencies to suggest solutions that work best in your field. Get data-driven recommendations based on real success stories.",
         buttonText: "Try AI Assistant",
-        imageSrc: "https://images.unsplash.com/photo-1677442136019-21780ecad995",
+        imageSrc: "/lovable-uploads/1deec2b0-a8ce-4d71-bf22-22ea39020cd7.png",
         imageAlt: "AI Chat Demo",
       },
     },
