@@ -1,5 +1,5 @@
 
-import { BookOpen, Users, BarChart, Zap, Newspaper, Globe, Bot, Coins } from "lucide-react";
+import { BookOpen, Users, BarChart, Zap, Newspaper, Globe, Bot, Coins, Check, Clock, Award, ArrowRight, TrendingUp, Users2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -126,25 +126,74 @@ const Feature108 = ({
   const [activeTab, setActiveTab] = useState(tabs[0].value);
   const activeContent = tabs.find(tab => tab.value === activeTab)?.content;
 
+  // [Analysis] Helper function to get stats based on card type
+  const getCardStats = (type: string) => {
+    switch (type) {
+      case "ai-tools":
+        return {
+          mainStat: "98%",
+          mainLabel: "Match Accuracy",
+          secondaryStat: "5,234",
+          secondaryLabel: "Tools Analyzed",
+          benefits: ["Personalized Recommendations", "Real-time Analysis", "Agency-specific Insights"]
+        };
+      case "education":
+        return {
+          mainStat: "2.4M+",
+          mainLabel: "Hours Saved",
+          secondaryStat: "1,200+",
+          secondaryLabel: "Video Tutorials",
+          benefits: ["AI-powered Learning", "Daily Updates", "Expert Tutorials"]
+        };
+      case "community":
+        return {
+          mainStat: "50K+",
+          mainLabel: "Active Members",
+          secondaryStat: "3.2K",
+          secondaryLabel: "Daily Discussions",
+          benefits: ["Global Network", "Expert Connections", "Live Collaborations"]
+        };
+      case "economy":
+        return {
+          mainStat: "$2.1M",
+          mainLabel: "Rewards Given",
+          secondaryStat: "89K",
+          secondaryLabel: "Token Holders",
+          benefits: ["Daily Rewards", "Token Growth", "Community Benefits"]
+        };
+      case "news":
+        return {
+          mainStat: "24/7",
+          mainLabel: "Live Updates",
+          secondaryStat: "500+",
+          secondaryLabel: "Daily Insights",
+          benefits: ["Breaking News", "Industry Analysis", "Expert Commentary"]
+        };
+      default:
+        return null;
+    }
+  };
+
   return (
     <section className="relative py-24">
       <div className="absolute inset-0 bg-gradient-radial from-siso-orange/10 via-transparent to-transparent opacity-30" />
 
       <div className="relative">
         <div className="container mx-auto px-4 md:px-6">
+          {/* Header Section */}
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <Badge className="bg-siso-bg-alt text-siso-text px-4 py-2 rounded-full">
+              <Badge className="bg-gradient-to-r from-siso-red/20 to-siso-orange/20 text-siso-text px-4 py-2 rounded-full border border-siso-orange/20">
                 {badge}
               </Badge>
             </motion.div>
             
             <motion.h2 
-              className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-siso-text-bold"
+              className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl bg-gradient-to-r from-siso-orange to-siso-red text-transparent bg-clip-text"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
@@ -158,7 +207,7 @@ const Feature108 = ({
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              <Globe className="w-5 h-5" />
+              <Globe className="w-5 h-5 text-siso-orange" />
               <p>Powered by thousands of innovators worldwide</p>
             </motion.div>
 
@@ -172,9 +221,9 @@ const Feature108 = ({
             </motion.p>
           </div>
 
+          {/* Tabs Section */}
           <div className="mt-12">
             <div className="container max-w-7xl mx-auto px-6 lg:px-8">
-              {/* Tab Triggers */}
               <div className="flex flex-wrap items-center justify-center gap-4 sm:flex-row md:gap-8 mb-8">
                 {tabs.map((tab, index) => (
                   <motion.button
@@ -184,10 +233,10 @@ const Feature108 = ({
                     transition={{ duration: 0.5, delay: index * 0.1 }}
                     onClick={() => setActiveTab(tab.value)}
                     className={`flex items-center gap-2 rounded-xl px-6 py-4 text-sm font-semibold 
-                      transition-all duration-300 hover:scale-105
+                      transition-all duration-300 hover:scale-105 border
                       ${activeTab === tab.value 
-                        ? 'text-siso-text-bold bg-gradient-to-r from-siso-red/20 to-siso-orange/20 shadow-lg shadow-siso-red/10' 
-                        : 'text-siso-text hover:text-siso-text-bold hover:bg-gradient-to-r hover:from-siso-red/20 hover:to-siso-orange/20'
+                        ? 'text-siso-text-bold border-siso-orange bg-gradient-to-r from-siso-red/20 to-siso-orange/20 shadow-lg shadow-siso-red/10' 
+                        : 'text-siso-text border-transparent hover:text-siso-text-bold hover:bg-gradient-to-r hover:from-siso-red/10 hover:to-siso-orange/10'
                       }`}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -197,7 +246,7 @@ const Feature108 = ({
                 ))}
               </div>
 
-              {/* Content Display */}
+              {/* Enhanced Card Content */}
               <AnimatePresence mode="wait">
                 {activeContent && (
                   <motion.div
@@ -209,52 +258,133 @@ const Feature108 = ({
                     className="mt-8 px-4"
                   >
                     <motion.div 
-                      className={`rounded-lg border backdrop-blur-sm p-8 shadow-2xl transition-all duration-500
-                        ${getCardStyles(activeTab)}`}
+                      className="rounded-xl border border-siso-orange/20 bg-gradient-to-br from-black/40 to-black/20 backdrop-blur-sm p-8 shadow-2xl transition-all duration-500 hover:border-siso-orange/40"
                       whileHover={{ scale: 1.02 }}
                       layout
                     >
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        {/* Content Side */}
                         <motion.div 
-                          className="flex flex-col gap-4"
+                          className="flex flex-col gap-6"
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ duration: 0.5, delay: 0.2 }}
                         >
-                          <Badge 
-                            variant="outline" 
-                            className="w-fit bg-black/50 backdrop-blur-sm border-siso-orange/20 hover:border-siso-orange/40 transition-colors"
-                          >
-                            {activeContent.badge}
-                          </Badge>
-                          <h3 className="text-2xl font-bold bg-gradient-to-r from-siso-orange to-siso-red text-transparent bg-clip-text">
-                            {activeContent.title}
-                          </h3>
+                          {/* Header */}
+                          <div className="space-y-4">
+                            <Badge 
+                              variant="outline" 
+                              className="w-fit bg-gradient-to-r from-siso-red/10 to-siso-orange/10 border-siso-orange/20"
+                            >
+                              {activeContent.badge}
+                            </Badge>
+                            <h3 className="text-2xl font-bold bg-gradient-to-r from-siso-orange to-siso-red text-transparent bg-clip-text">
+                              {activeContent.title}
+                            </h3>
+                          </div>
+
+                          {/* Stats Grid */}
+                          {getCardStats(activeTab) && (
+                            <div className="grid grid-cols-2 gap-4 p-4 rounded-lg bg-gradient-to-br from-siso-red/5 to-siso-orange/5 border border-siso-orange/10">
+                              <div className="space-y-1">
+                                <p className="text-2xl font-bold text-siso-orange">
+                                  {getCardStats(activeTab)?.mainStat}
+                                </p>
+                                <p className="text-sm text-siso-text/70">
+                                  {getCardStats(activeTab)?.mainLabel}
+                                </p>
+                              </div>
+                              <div className="space-y-1">
+                                <p className="text-2xl font-bold text-siso-orange">
+                                  {getCardStats(activeTab)?.secondaryStat}
+                                </p>
+                                <p className="text-sm text-siso-text/70">
+                                  {getCardStats(activeTab)?.secondaryLabel}
+                                </p>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Description */}
                           <p className="text-siso-text/80 leading-relaxed">
                             {activeContent.description}
                           </p>
-                          <Button 
-                            className="w-fit bg-gradient-to-r from-siso-red to-siso-orange hover:from-siso-red/90 hover:to-siso-orange/90 
-                              text-white shadow-lg shadow-siso-red/20 transition-all duration-300 hover:shadow-xl hover:shadow-siso-orange/30
-                              hover:scale-105"
-                          >
-                            {activeContent.buttonText}
-                          </Button>
+
+                          {/* Benefits List */}
+                          <div className="space-y-2">
+                            {getCardStats(activeTab)?.benefits.map((benefit, index) => (
+                              <motion.div 
+                                key={benefit}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: index * 0.1 }}
+                                className="flex items-center gap-2"
+                              >
+                                <div className="w-5 h-5 rounded-full bg-gradient-to-r from-siso-red/20 to-siso-orange/20 flex items-center justify-center">
+                                  <Check className="w-3 h-3 text-siso-orange" />
+                                </div>
+                                <span className="text-siso-text/80">{benefit}</span>
+                              </motion.div>
+                            ))}
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="flex items-center gap-4">
+                            <Button 
+                              className="bg-gradient-to-r from-siso-red to-siso-orange hover:from-siso-red/90 hover:to-siso-orange/90 
+                                text-white shadow-lg shadow-siso-red/20 transition-all duration-300 hover:shadow-xl hover:shadow-siso-orange/30"
+                            >
+                              {activeContent.buttonText}
+                            </Button>
+                            <Button 
+                              variant="outline"
+                              className="border-siso-orange/20 hover:bg-siso-orange/10"
+                            >
+                              Learn More
+                            </Button>
+                          </div>
                         </motion.div>
+
+                        {/* Image Side with Stats Overlay */}
                         <motion.div 
-                          className="w-full h-[300px] rounded-lg overflow-hidden shadow-xl shadow-black/20
-                            ring-1 ring-white/10 hover:ring-white/20 transition-all duration-300"
+                          className="relative"
                           initial={{ opacity: 0, x: 20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ duration: 0.5, delay: 0.3 }}
                         >
-                          <motion.img
-                            src={activeContent.imageSrc}
-                            alt={activeContent.imageAlt}
-                            className="w-full h-full object-cover"
-                            whileHover={{ scale: 1.1 }}
-                            transition={{ duration: 0.7 }}
-                          />
+                          <div className="relative h-[400px] rounded-xl overflow-hidden">
+                            <motion.img
+                              src={activeContent.imageSrc}
+                              alt={activeContent.imageAlt}
+                              className="w-full h-full object-cover"
+                              whileHover={{ scale: 1.05 }}
+                              transition={{ duration: 0.7 }}
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                            
+                            {/* Quick Stats Overlay */}
+                            <div className="absolute bottom-0 left-0 right-0 p-6 space-y-4">
+                              <div className="flex items-center justify-between text-white/90">
+                                <div className="flex items-center gap-2">
+                                  <Clock className="w-4 h-4 text-siso-orange" />
+                                  <span className="text-sm">Updated daily</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Award className="w-4 h-4 text-siso-orange" />
+                                  <span className="text-sm">Top rated</span>
+                                </div>
+                              </div>
+                              
+                              {/* Activity Indicator */}
+                              <div className="flex items-center gap-2 text-white/80 text-sm">
+                                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                                <span>Active now</span>
+                                <span className="text-white/60">•</span>
+                                <Users2 className="w-4 h-4 text-siso-orange" />
+                                <span>234 online</span>
+                              </div>
+                            </div>
+                          </div>
                         </motion.div>
                       </div>
                     </motion.div>
