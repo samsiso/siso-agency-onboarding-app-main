@@ -12,18 +12,31 @@ export const usePerformanceMetrics = () => {
         // Get Web Vitals metrics
         const observer = new PerformanceObserver((list) => {
           list.getEntries().forEach(async (entry) => {
-            const metric = {
-              page_url: window.location.pathname,
-              [entry.name.toLowerCase()]: entry.value,
-            };
+            // Type guard to handle different performance entry types
+            let metricValue: number | undefined;
+            
+            if (entry.entryType === 'largest-contentful-paint') {
+              metricValue = (entry as PerformanceElementTiming).startTime;
+            } else if (entry.entryType === 'first-input') {
+              metricValue = (entry as PerformanceEventTiming).processingStart - entry.startTime;
+            } else if (entry.entryType === 'layout-shift') {
+              metricValue = (entry as LayoutShift).value;
+            }
 
-            // Store metrics in Supabase
-            const { error } = await supabase
-              .from('performance_metrics')
-              .insert([metric]);
+            if (metricValue !== undefined) {
+              const metric = {
+                page_url: window.location.pathname,
+                [entry.entryType]: metricValue,
+              };
 
-            if (error) {
-              console.error('Error recording metrics:', error);
+              // Store metrics in Supabase
+              const { error } = await supabase
+                .from('performance_metrics')
+                .insert([metric]);
+
+              if (error) {
+                console.error('Error recording metrics:', error);
+              }
             }
           });
         });
