@@ -1300,6 +1300,7 @@ export type Database = {
           email: string | null
           full_name: string | null
           geographic_markets: string[] | null
+          google_auth_completed: boolean | null
           growth_targets: Json | null
           has_completed_social_info: boolean | null
           id: string
@@ -1309,6 +1310,8 @@ export type Database = {
           linkedin_url: string | null
           long_term_goals: string[] | null
           moralis_provider_id: string | null
+          onboarding_completed: boolean | null
+          onboarding_step: string | null
           points: number | null
           professional_role: string | null
           rank: string | null
@@ -1344,6 +1347,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           geographic_markets?: string[] | null
+          google_auth_completed?: boolean | null
           growth_targets?: Json | null
           has_completed_social_info?: boolean | null
           id: string
@@ -1353,6 +1357,8 @@ export type Database = {
           linkedin_url?: string | null
           long_term_goals?: string[] | null
           moralis_provider_id?: string | null
+          onboarding_completed?: boolean | null
+          onboarding_step?: string | null
           points?: number | null
           professional_role?: string | null
           rank?: string | null
@@ -1388,6 +1394,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           geographic_markets?: string[] | null
+          google_auth_completed?: boolean | null
           growth_targets?: Json | null
           has_completed_social_info?: boolean | null
           id?: string
@@ -1397,6 +1404,8 @@ export type Database = {
           linkedin_url?: string | null
           long_term_goals?: string[] | null
           moralis_provider_id?: string | null
+          onboarding_completed?: boolean | null
+          onboarding_step?: string | null
           points?: number | null
           professional_role?: string | null
           rank?: string | null
