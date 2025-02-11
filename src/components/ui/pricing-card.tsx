@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator";
 
 interface PricingFeature {
   title: string;
-  items: string[];
+  items: (string | React.ReactElement)[];  // Updated to allow both strings and React elements
 }
 
 interface PricingCardProps {
@@ -20,7 +20,7 @@ interface PricingCardProps {
   features: PricingFeature[];
   buttonText?: string;
   onButtonClick?: () => void;
-  trustMessage?: string;
+  trustMessage?: React.ReactElement | string;  // Updated to allow React elements
 }
 
 export function PricingCard({

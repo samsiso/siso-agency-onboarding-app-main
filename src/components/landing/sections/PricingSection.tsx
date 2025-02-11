@@ -50,19 +50,19 @@ export const PricingSection = () => {
               {
                 title: "Core Features",
                 items: [
-                  <div className="flex items-center gap-2">
+                  <div key="automation" className="flex items-center gap-2">
                     <Rocket className="w-4 h-4 text-siso-orange" />
                     <span>Enterprise-grade AI automation suite - Used by 500+ agencies</span>
                   </div>,
-                  <div className="flex items-center gap-2">
+                  <div key="integrations" className="flex items-center gap-2">
                     <Shield className="w-4 h-4 text-siso-orange" />
                     <span>Unlimited platform integrations with enterprise security</span>
                   </div>,
-                  <div className="flex items-center gap-2">
+                  <div key="updates" className="flex items-center gap-2">
                     <ArrowUp className="w-4 h-4 text-siso-orange" />
                     <span>Regular feature updates & improvements</span>
                   </div>,
-                  <div className="flex items-center gap-2">
+                  <div key="card" className="flex items-center gap-2">
                     <DollarSign className="w-4 h-4 text-siso-orange" />
                     <span>No credit card required to start</span>
                   </div>,
@@ -71,11 +71,11 @@ export const PricingSection = () => {
               {
                 title: "Enterprise Features",
                 items: [
-                  <div className="flex items-center gap-2">
+                  <div key="support" className="flex items-center gap-2">
                     <Star className="w-4 h-4 text-siso-orange" />
                     <span>24/7 Priority support & consulting - 4.9/5 rating</span>
                   </div>,
-                  <div className="flex items-center gap-2">
+                  <div key="sessions" className="flex items-center gap-2">
                     <Award className="w-4 h-4 text-siso-orange" />
                     <span>Expert strategy sessions included</span>
                   </div>,
