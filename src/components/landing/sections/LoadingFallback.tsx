@@ -1,6 +1,8 @@
-import { Skeleton } from "@/components/ui/skeleton";
 
-export const LoadingFallback = () => {
+import { Skeleton } from "@/components/ui/skeleton";
+import { memo } from "react";
+
+export const LoadingFallback = memo(() => {
   return (
     <div className="w-full py-12 space-y-8">
       <div className="container mx-auto px-4">
@@ -14,4 +16,6 @@ export const LoadingFallback = () => {
       </div>
     </div>
   );
-};
+});
+
+LoadingFallback.displayName = 'LoadingFallback';
