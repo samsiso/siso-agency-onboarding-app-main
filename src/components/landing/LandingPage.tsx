@@ -1,6 +1,7 @@
 
 import { lazy, Suspense, memo } from 'react';
 import { LoadingFallback } from './sections/LoadingFallback';
+import Footer from '@/components/Footer';  // Import our updated Footer
 
 // [Analysis] Lazy load components for optimal performance
 const HeroSection = lazy(() => 
@@ -42,12 +43,6 @@ const TestimonialsSection = lazy(() =>
 const CallToActionSection = lazy(() => 
   import('./sections/CallToActionSection').then(m => ({ 
     default: memo(m.CallToActionSection) 
-  }))
-);
-
-const StackedCircularFooter = lazy(() => 
-  import('@/components/ui/stacked-circular-footer').then(m => ({ 
-    default: memo(m.StackedCircularFooter) 
   }))
 );
 
@@ -132,9 +127,7 @@ const LandingPage = () => {
           </Suspense>
         </section>
 
-        <Suspense fallback={<LoadingFallback />}>
-          <StackedCircularFooter />
-        </Suspense>
+        <Footer />
       </div>
     </div>
   );
