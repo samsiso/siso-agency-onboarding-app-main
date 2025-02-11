@@ -87,11 +87,6 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
           href: '/tools',
           icon: Wrench,
           label: 'Tools',
-        },
-        {
-          href: '/ai-news',
-          icon: Newspaper,
-          label: 'AI News',
         }
       ]
     },
@@ -116,6 +111,12 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
           label: 'Leaderboards',
         }
       ]
+    },
+    {
+      type: 'main',
+      href: '/ai-news',
+      icon: Newspaper,
+      label: 'AI News',
     }
   ];
 
