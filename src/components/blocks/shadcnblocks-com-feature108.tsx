@@ -1,4 +1,5 @@
-import { BookOpen, Users, BarChart, Zap, Newspaper, Globe } from "lucide-react";
+
+import { BookOpen, Users, BarChart, Zap, Newspaper, Globe, Bot, Coins } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -29,20 +30,20 @@ interface Feature108Props {
 const Feature108 = ({
   badge = "SISO Agency",
   heading = "Resource Hub Features",
-  description = "Discover powerful tools and insights designed to help your business grow.",
+  description = "Access our comprehensive suite of tools and insights designed to accelerate your agency's growth.",
   tabs = [
     {
       value: "ai-tools",
-      icon: <Zap className="h-auto w-4 shrink-0" />,
-      label: "AI-Powered Analysis",
+      icon: <Bot className="h-auto w-4 shrink-0" />,
+      label: "AI Analysis",
       content: {
-        badge: "Smart Solutions",
-        title: "Transform Your Agency with AI",
+        badge: "Smart Assistant",
+        title: "Custom AI Resource Finder",
         description:
-          "Get tailored insights by cross-referencing industry videos and your agency needs. Our AI-powered tools help you make data-driven decisions and stay ahead of the competition.",
-        buttonText: "Explore Tools",
+          "Use our AI assistant to discover perfect tools for your agency. We analyze our database of successful agencies to suggest solutions that work best in your field. Get data-driven recommendations based on real success stories.",
+        buttonText: "Try AI Assistant",
         imageSrc: "https://images.unsplash.com/photo-1677442136019-21780ecad995",
-        imageAlt: "AI Analysis Dashboard",
+        imageAlt: "AI Chat Demo",
       },
     },
     {
@@ -50,41 +51,41 @@ const Feature108 = ({
       icon: <BookOpen className="h-auto w-4 shrink-0" />,
       label: "Education Hub",
       content: {
-        badge: "Learn & Grow",
-        title: "Access Premium Educational Content",
+        badge: "Daily Updates",
+        title: "AI-Powered Video Analysis",
         description:
-          "Dive into our curated collection of YouTube videos, expert analysis, and top video recommendations tailored to your business needs. Stay ahead with continuous learning.",
-        buttonText: "Start Learning",
+          "Access our daily-updated YouTube content from curated creators. Our AI analyzes videos to extract key takeaways, saving you hours of watching time. Get the most valuable insights 10x faster.",
+        buttonText: "Explore Content",
         imageSrc: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3",
-        imageAlt: "Education Resources",
+        imageAlt: "Education Interface Demo",
       },
     },
     {
       value: "community",
       icon: <Users className="h-auto w-4 shrink-0" />,
-      label: "Community & Network",
+      label: "Network",
       content: {
-        badge: "Connect & Collaborate",
-        title: "Join a Thriving Community",
+        badge: "1M+ Agency Owners",
+        title: "Global Agency Network",
         description:
-          "Engage with industry experts, get personalized GP assistance, and become part of a vibrant community of agency owners and professionals sharing insights and opportunities.",
+          "Connect with a million-strong community of agency owners. Find and join the perfect networking groups for your niche, engage in meaningful conversations, and grow your agency through valuable connections.",
         buttonText: "Join Network",
         imageSrc: "https://images.unsplash.com/photo-1522071820081-009f0129c71c",
-        imageAlt: "Community Network",
+        imageAlt: "Network Interface Demo",
       },
     },
     {
       value: "economy",
-      icon: <BarChart className="h-auto w-4 shrink-0" />,
-      label: "Economy Insights",
+      icon: <Coins className="h-auto w-4 shrink-0" />,
+      label: "Economy",
       content: {
-        badge: "Market Intelligence",
-        title: "Navigate Economic Trends",
+        badge: "Earn & Grow",
+        title: "Tokenized Rewards System",
         description:
-          "Access powerful tools and visualizations to understand economic trends and make informed decisions. Stay ahead of market changes with our comprehensive analysis.",
-        buttonText: "View Insights",
+          "Earn points for every platform interaction, convertible to our native cryptocurrency. Use tokens for premium features, rank upgrades, or trade them. Participate in the platform's economic future.",
+        buttonText: "View Economy",
         imageSrc: "https://images.unsplash.com/photo-1642543492481-44e81e3914a7",
-        imageAlt: "Economic Analysis",
+        imageAlt: "Economy System Demo",
       },
     },
     {
@@ -92,13 +93,13 @@ const Feature108 = ({
       icon: <Newspaper className="h-auto w-4 shrink-0" />,
       label: "AI News",
       content: {
-        badge: "Stay Updated",
-        title: "Latest AI Industry News",
+        badge: "Daily AI Updates",
+        title: "Curated AI Industry News",
         description:
-          "Keep up with the rapidly evolving AI landscape through our curated news feed. Get insights on the latest developments, trends, and innovations in the AI industry.",
+          "Stay informed with daily AI news curated for agency owners. Earn points by engaging with articles and sharing insights. Get personalized news feeds based on your agency's focus.",
         buttonText: "Read News",
         imageSrc: "https://images.unsplash.com/photo-1655720828018-edd2daec9349",
-        imageAlt: "AI News Feed",
+        imageAlt: "News Interface Demo",
       },
     },
   ],
@@ -121,7 +122,6 @@ const Feature108 = ({
               {heading}
             </h2>
 
-            {/* Added subtitle with Globe icon */}
             <div className="flex items-center gap-2 text-siso-text/80 text-lg">
               <Globe className="w-5 h-5" />
               <p>Powered by thousands of innovators worldwide</p>
