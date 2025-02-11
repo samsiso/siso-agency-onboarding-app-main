@@ -136,7 +136,7 @@ const Feature108: React.FC<Feature108Props> = ({
         description:
           "Connect with a million-strong community of agency owners. Find and join the perfect networking groups for your niche, engage in meaningful conversations, and grow your agency through valuable connections.",
         buttonText: "Join Network",
-        imageSrc: "/lovable-uploads/dee36671-c662-422f-a9a0-deb2eeb03973.png",
+        imageSrc: "/lovable-uploads/2a89d9b1-9fbb-4a86-a53a-36d9f63d1f7a.png",
         imageAlt: "Network Interface Demo",
       },
     },
