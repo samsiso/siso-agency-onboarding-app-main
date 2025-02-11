@@ -1,4 +1,6 @@
+
 import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 
 interface GoogleSignInButtonProps {
   onClick: () => void;
@@ -10,10 +12,19 @@ export const GoogleSignInButton = ({ onClick, disabled }: GoogleSignInButtonProp
     <Button
       onClick={onClick}
       disabled={disabled}
-      className="relative z-50 bg-white text-black hover:bg-gray-100 active:bg-gray-200 cursor-pointer transition-all duration-200 hover:scale-105 shadow-lg flex items-center gap-2"
+      className="relative z-50 bg-white text-black hover:bg-gray-100 active:bg-gray-200 cursor-pointer transition-all duration-200 hover:scale-105 shadow-lg flex items-center gap-2 min-w-[240px] justify-center"
     >
-      <GoogleIcon />
-      Sign in with Google
+      {disabled ? (
+        <>
+          <Loader2 className="h-4 w-4 animate-spin" />
+          Signing in...
+        </>
+      ) : (
+        <>
+          <GoogleIcon />
+          Sign in with Google
+        </>
+      )}
     </Button>
   );
 };

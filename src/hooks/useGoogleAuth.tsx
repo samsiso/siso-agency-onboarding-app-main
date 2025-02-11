@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -14,11 +15,31 @@ export const useGoogleAuth = () => {
       setLoading(true);
       console.log('Initiating Google sign in...');
       
-      const { error } = await initiateGoogleSignIn();
+      const { error, data } = await initiateGoogleSignIn();
+      
       if (error) {
         console.error('Google sign in error:', error);
         throw error;
       }
+
+      // If we have data.session, it means the user was already signed in
+      if (data?.session) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('onboarding_completed, onboarding_step')
+          .eq('id', data.session.user.id)
+          .single();
+
+        // Redirect based on onboarding status
+        if (!profile?.onboarding_completed) {
+          navigate('/onboarding/social');
+        } else {
+          navigate('/profile');
+        }
+      }
+
+      // If no session, the auth flow will continue in the browser
+      return data;
 
     } catch (error: any) {
       console.error('Sign in error:', error);
@@ -27,6 +48,7 @@ export const useGoogleAuth = () => {
         title: "Error signing in",
         description: error.message || "There was a problem signing in with Google",
       });
+      throw error;
     } finally {
       setLoading(false);
     }
