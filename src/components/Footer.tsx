@@ -46,9 +46,16 @@ const Footer = () => {
       <div className="relative container mx-auto px-4 py-16">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-          {/* Company & About */}
+          {/* Company & Logo */}
           <div className="space-y-6">
-            <h3 className="text-xl font-bold text-white">Transform Your Workflow</h3>
+            <div className="flex items-center gap-4">
+              <img 
+                src="/lovable-uploads/8fa1a06e-e80e-4869-8ef8-683326c20870.png"
+                alt="SISO AI Logo"
+                className="w-12 h-12"
+              />
+              <h3 className="text-xl font-bold text-white">SISO AI</h3>
+            </div>
             <p className="text-gray-400 text-sm leading-relaxed">
               Enterprise-grade AI automation suite trusted by 500+ agencies worldwide. Start your journey to enhanced productivity today.
             </p>
