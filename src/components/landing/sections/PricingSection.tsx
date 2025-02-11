@@ -2,7 +2,7 @@
 import { PricingCard } from '@/components/ui/pricing-card';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Star, ShieldCheck, Users, TrendingUp, Target, Zap, Headphones, Check } from 'lucide-react';
+import { Check, Users, Star, ShieldCheck } from 'lucide-react';
 
 export const PricingSection = () => {
   const navigate = useNavigate();
@@ -18,117 +18,17 @@ export const PricingSection = () => {
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
-        {/* Pricing Header */}
-        <motion.div 
-          className="max-w-3xl mx-auto text-center mb-16"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <motion.div 
-            className="inline-block px-4 py-1 rounded-full bg-gradient-to-r from-siso-red/10 to-siso-orange/10 
-              border border-siso-orange/20 text-sm text-siso-orange mb-4"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            Limited Time Beta Access
-          </motion.div>
-          <h2 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-siso-orange to-siso-red text-transparent bg-clip-text">
-            Enterprise Features,<br />Beta Price
-          </h2>
-          <p className="text-xl text-siso-text/70">
-            Join 500+ successful agencies already growing their business with our AI-powered platform
-          </p>
-        </motion.div>
-
-        {/* Value Metrics Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
-          {[
-            { 
-              icon: Target, 
-              label: "Active Users", 
-              value: "500+",
-              subtext: "and growing fast",
-              color: "from-green-500/20 to-green-600/20 border-green-500/20"
-            },
-            { 
-              icon: Star, 
-              label: "Customer Rating", 
-              value: "4.9/5",
-              subtext: "from 200+ reviews",
-              color: "from-yellow-500/20 to-yellow-600/20 border-yellow-500/20"
-            },
-            { 
-              icon: ShieldCheck, 
-              label: "Security", 
-              value: "Enterprise",
-              subtext: "grade protection",
-              color: "from-blue-500/20 to-blue-600/20 border-blue-500/20"
-            },
-            { 
-              icon: TrendingUp, 
-              label: "Success Rate", 
-              value: "98%",
-              subtext: "client satisfaction",
-              color: "from-purple-500/20 to-purple-600/20 border-purple-500/20"
-            }
-          ].map((item, index) => (
-            <motion.div
-              key={item.label}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${item.color} 
-                border border-opacity-20 p-6 hover:scale-105 transition-all duration-300`}
-            >
-              <div className="absolute -top-4 -right-4 w-20 h-20 bg-white/5 rounded-full filter blur-xl 
-                group-hover:scale-150 transition-transform duration-500" />
-              <item.icon className="w-8 h-8 text-siso-orange mb-4" />
-              <div className="space-y-1">
-                <div className="text-2xl font-bold text-siso-text">{item.value}</div>
-                <div className="text-sm font-medium text-siso-text/70">{item.label}</div>
-                <div className="text-xs text-siso-text/50">{item.subtext}</div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
         {/* Main Pricing Card Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
+          transition={{ duration: 0.5 }}
           className="relative max-w-4xl mx-auto"
         >
           {/* Spots Counter */}
           <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-siso-red to-siso-orange 
             text-white px-6 py-2 rounded-full text-sm font-semibold z-10 whitespace-nowrap shadow-lg">
             🎉 Limited Time Beta Offer - Only 563 spots remaining
-          </div>
-
-          {/* Value Highlight Cards */}
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
-            {[
-              { icon: Zap, title: "AI Automation", value: "£500", desc: "Enterprise-grade suite" },
-              { icon: Headphones, title: "24/7 Support", value: "£250", desc: "Priority consulting" },
-              { icon: Users, title: "Integrations", value: "£250", desc: "Unlimited access" }
-            ].map((item, index) => (
-              <motion.div
-                key={item.title}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4, delay: 0.5 + (index * 0.1) }}
-                className="text-center p-4 rounded-xl bg-gradient-to-br from-siso-red/5 to-siso-orange/5 
-                  border border-siso-orange/20"
-              >
-                <item.icon className="w-8 h-8 text-siso-orange mx-auto mb-2" />
-                <div className="text-lg font-semibold text-siso-text">{item.title}</div>
-                <div className="text-2xl font-bold bg-gradient-to-r from-siso-orange to-siso-red 
-                  text-transparent bg-clip-text">{item.value}</div>
-                <div className="text-sm text-siso-text/70">{item.desc}</div>
-              </motion.div>
-            ))}
           </div>
 
           {/* Main Pricing Card */}
@@ -140,9 +40,18 @@ export const PricingSection = () => {
               {
                 title: "Premium Features (£1,000+ Annual Value)",
                 items: [
-                  "Enterprise-grade AI automation suite (£500 value)",
-                  "Unlimited platform integrations (£250 value)",
-                  "24/7 Priority support & consulting (£250 value)",
+                  <div key="1" className="flex items-center gap-2">
+                    <Users className="w-4 h-4 text-siso-orange" />
+                    <span>Enterprise-grade AI automation suite (£500 value) - Used by 500+ agencies</span>
+                  </div>,
+                  <div key="2" className="flex items-center gap-2">
+                    <Star className="w-4 h-4 text-yellow-500" />
+                    <span>24/7 Priority support & consulting (£250 value) - 4.9/5 customer rating</span>
+                  </div>,
+                  <div key="3" className="flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-blue-500" />
+                    <span>Unlimited platform integrations (£250 value) - Enterprise-grade security</span>
+                  </div>,
                   "Regular feature updates and improvements",
                 ],
               },
@@ -167,7 +76,7 @@ export const PricingSection = () => {
           className="mt-12 text-center space-y-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.6 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
         >
           <div className="flex items-center justify-center gap-2 text-sm">
             <Check className="w-4 h-4 text-green-500" />
