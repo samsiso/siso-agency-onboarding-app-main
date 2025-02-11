@@ -1,3 +1,4 @@
+
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -95,7 +96,6 @@ export default defineConfig(({ mode }) => ({
           // Index route specific bundles
           'index-components': [
             '@/components/Hero',
-            '@/components/AuthButton',
             '@/components/ui/expandable-chat',
             '@/components/Footer',
             '@/components/effects/FloatingOrbs'
