@@ -39,18 +39,23 @@ export const menuSections: MenuSection[] = [
         href: '/tools',
         icon: Wrench,
         label: 'Tools',
+      },
+      {
+        href: '/networking',
+        icon: Network,
+        label: 'Networking',
       }
     ]
   },
   {
     type: 'section',
-    title: 'Community',
+    title: 'Economy',
     icon: Users,
     items: [
       {
-        href: '/networking',
+        href: '/economy/crypto-exchange',
         icon: Network,
-        label: 'Networking',
+        label: 'Crypto Exchange',
       },
       {
         href: '/economy/earn',
