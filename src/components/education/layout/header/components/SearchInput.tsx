@@ -4,6 +4,7 @@ import { PlaceholdersAndVanishInput } from '@/components/ui/placeholders-and-van
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { SearchHistory } from './SearchHistory';
+import { SearchResults } from './SearchResults';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useState } from 'react';
@@ -27,7 +28,60 @@ export const SearchInput = ({
 }: SearchInputProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // [Analysis] Use React Query for better caching and loading states
+  // [Analysis] Fetch search results from both videos and educators
+  const { data: searchResults, isLoading } = useQuery({
+    queryKey: ['search-results', searchQuery],
+    queryFn: async () => {
+      if (!searchQuery.trim()) return [];
+
+      const [videosResponse, educatorsResponse] = await Promise.all([
+        supabase
+          .from('youtube_videos')
+          .select(`
+            id,
+            title,
+            thumbnailUrl,
+            description
+          `)
+          .ilike('title', `%${searchQuery}%`)
+          .limit(5),
+
+        supabase
+          .from('education_creators')
+          .select(`
+            id,
+            name,
+            channel_avatar_url,
+            description,
+            slug
+          `)
+          .ilike('name', `%${searchQuery}%`)
+          .limit(5)
+      ]);
+
+      const videos = (videosResponse.data || []).map(video => ({
+        id: video.id,
+        type: 'video' as const,
+        title: video.title,
+        thumbnailUrl: video.thumbnailUrl,
+        description: video.description
+      }));
+
+      const educators = (educatorsResponse.data || []).map(educator => ({
+        id: educator.id,
+        type: 'educator' as const,
+        title: educator.name,
+        channel_avatar_url: educator.channel_avatar_url,
+        description: educator.description,
+        slug: educator.slug
+      }));
+
+      return [...videos, ...educators];
+    },
+    enabled: !!searchQuery.trim()
+  });
+
+  // [Analysis] Fetch search history for the user
   const { data: searchHistory, refetch: refetchHistory } = useQuery({
     queryKey: ['search-history'],
     queryFn: async () => {
@@ -49,7 +103,6 @@ export const SearchInput = ({
   };
 
   const handleBlur = () => {
-    // [Analysis] Small delay to allow clicking search history items
     setTimeout(() => {
       setIsExpanded(false);
       onBlur();
@@ -60,9 +113,18 @@ export const SearchInput = ({
     onSearchChange('');
   };
 
-  // [Analysis] Create a wrapper function to handle the refetch promise
-  const handleHistoryRefetch = async () => {
-    await refetchHistory();
+  const handleSearchResultClick = async (result: any) => {
+    try {
+      await supabase.from('user_search_history').insert({
+        query: result.title,
+        result_type: result.type,
+        result_id: result.id
+      });
+      await refetchHistory();
+    } catch (error) {
+      console.error('Error saving search history:', error);
+    }
+    setIsExpanded(false);
   };
 
   return (
@@ -112,19 +174,29 @@ export const SearchInput = ({
             className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-[101]"
           >
             <Card className="p-4 border-siso-border bg-black/90 backdrop-blur-sm">
-              <div className="flex items-center gap-2 mb-4 text-siso-text/70">
-                <History className="w-4 h-4" />
-                <span className="text-sm font-medium">Recent Searches</span>
-              </div>
-              
-              <SearchHistory
-                history={searchHistory || []}
-                onHistoryCleared={handleHistoryRefetch}
-                onSearchSelect={(query) => {
-                  onSearchChange(query);
-                  setIsExpanded(false);
-                }}
-              />
+              {searchQuery ? (
+                <SearchResults
+                  results={searchResults || []}
+                  isLoading={isLoading}
+                  onResultClick={handleSearchResultClick}
+                />
+              ) : (
+                <>
+                  <div className="flex items-center gap-2 mb-4 text-siso-text/70">
+                    <History className="w-4 h-4" />
+                    <span className="text-sm font-medium">Recent Searches</span>
+                  </div>
+                  
+                  <SearchHistory
+                    history={searchHistory || []}
+                    onHistoryCleared={refetchHistory}
+                    onSearchSelect={(query) => {
+                      onSearchChange(query);
+                      setIsExpanded(false);
+                    }}
+                  />
+                </>
+              )}
             </Card>
           </motion.div>
         )}
