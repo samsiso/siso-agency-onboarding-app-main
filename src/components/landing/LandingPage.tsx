@@ -31,7 +31,7 @@ const HeroSection = lazy(() => {
 const createLazySection = (importPath: string) => {
   return lazy(() => 
     import(importPath).then(m => ({ 
-      default: memo(m.default || m[importPath.split('/').pop()?.split('.')[0] || '']) 
+      default: memo(m[importPath.split('/').pop()?.split('.')[0] || '']) 
     }))
   );
 };
@@ -42,7 +42,9 @@ const GettingStartedSection = createLazySection('./sections/GettingStartedSectio
 const PricingSection = createLazySection('./sections/PricingSection');
 const TestimonialsSection = createLazySection('./sections/TestimonialsSection');
 const CallToActionSection = createLazySection('./sections/CallToActionSection');
-const ScrollNav = createLazySection('@/components/ui/scroll-nav');
+const ScrollNav = lazy(() => import('@/components/ui/scroll-nav.tsx').then(m => ({ 
+  default: memo(m.ScrollNav) 
+})));
 
 const LandingPage = () => {
   // Initialize performance monitoring
