@@ -42,8 +42,6 @@ const GettingStartedSection = createLazySection('./sections/GettingStartedSectio
 const PricingSection = createLazySection('./sections/PricingSection');
 const TestimonialsSection = createLazySection('./sections/TestimonialsSection');
 const CallToActionSection = createLazySection('./sections/CallToActionSection');
-
-// [Analysis] Using consistent lazy loading pattern for ScrollNav
 const ScrollNav = createLazySection('@/components/ui/scroll-nav');
 
 const LandingPage = () => {
@@ -118,10 +116,7 @@ const LandingPage = () => {
       <link rel="dns-prefetch" href="https://fzuwsjxjymwcjsbpwfsl.supabase.co" />
       <link rel="preconnect" href="https://fzuwsjxjymwcjsbpwfsl.supabase.co" crossOrigin="anonymous" />
       
-      <ErrorBoundary 
-        fallback={<LoadingFallback error={new Error()} />}
-        onError={(error) => console.error('ScrollNav Error:', error)}
-      >
+      <ErrorBoundary fallback={<LoadingFallback error={new Error()} />}>
         <Suspense fallback={<LoadingFallback />}>
           <ScrollNav />
         </Suspense>

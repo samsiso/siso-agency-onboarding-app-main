@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { Home, Sparkles, Users } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { SisoIcon } from "@/components/ui/icons/SisoIcon"
+import { SisoIcon } from "./icons/SisoIcon"
 
 const navItems = [
   {
@@ -28,8 +28,7 @@ const navItems = [
   },
 ]
 
-// [Analysis] Changed to a const component with default export for proper lazy loading
-const ScrollNav = () => {
+export function ScrollNav() {
   const [activeSection, setActiveSection] = useState("hero")
 
   useEffect(() => {
@@ -91,6 +90,7 @@ const ScrollNav = () => {
                   }}
                 >
                   <div className="absolute -right-1 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary rounded-full">
+                    {/* Centered glow effects */}
                     <div className="absolute w-6 h-6 bg-primary/20 rounded-full blur-md -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" />
                     <div className="absolute w-4 h-4 bg-primary/20 rounded-full blur-sm -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" />
                   </div>
@@ -103,8 +103,3 @@ const ScrollNav = () => {
     </div>
   )
 }
-
-// [Analysis] Explicitly set displayName for better debugging
-ScrollNav.displayName = 'ScrollNav';
-
-export default ScrollNav;
