@@ -21,7 +21,7 @@ const LoadingSpinner = () => (
 );
 
 const PageLoadingState = () => (
-  <div className="flex h-screen bg-background">
+  <div className="flex min-h-screen w-full bg-background">
     <Sidebar />
     <main className="flex-1 overflow-hidden">
       <div className="flex items-center justify-center h-full">
@@ -44,7 +44,6 @@ const containerVariants = {
 
 // [Analysis] Renamed component but kept route compatibility
 const AINews = () => {
-  // [Analysis] Added status filter for draft/published posts
   const [selectedMonth, setSelectedMonth] = useState<string>('03');
   const [selectedYear, setSelectedYear] = useState<string>('2024');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -63,7 +62,6 @@ const AINews = () => {
     error
   } = useNewsItems(selectedCategory, postStatus);
 
-  // Show error toast if data fetching fails
   if (error) {
     toast({
       variant: "destructive",
@@ -74,50 +72,52 @@ const AINews = () => {
 
   return (
     <SidebarProvider>
-      <NewsErrorBoundary>
-        <div className="flex h-screen bg-background">
-          <Sidebar />
-          <main className="flex-1 overflow-hidden">
-            <div className="h-full overflow-y-auto">
-              <motion.div
-                variants={containerVariants}
-                initial="hidden"
-                animate="show"
-                className="space-y-6 max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 py-6"
-              >
-                <Suspense fallback={<LoadingSpinner />}>
-                  <NewsHeader
-                    selectedMonth={selectedMonth}
-                    selectedYear={selectedYear}
-                    onMonthChange={setSelectedMonth}
-                    onYearChange={setSelectedYear}
-                    searchQuery={searchQuery}
-                    onSearchChange={setSearchQuery}
-                    postStatus={postStatus}
-                    onPostStatusChange={setPostStatus}
-                  />
+      <div className="flex min-h-screen w-full">
+        <NewsErrorBoundary>
+          <div className="flex flex-1 h-screen bg-background">
+            <Sidebar />
+            <main className="flex-1 relative overflow-hidden">
+              <div className="absolute inset-0 overflow-y-auto">
+                <motion.div
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="show"
+                  className="space-y-6 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 min-h-full"
+                >
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <NewsHeader
+                      selectedMonth={selectedMonth}
+                      selectedYear={selectedYear}
+                      onMonthChange={setSelectedMonth}
+                      onYearChange={setSelectedYear}
+                      searchQuery={searchQuery}
+                      onSearchChange={setSearchQuery}
+                      postStatus={postStatus}
+                      onPostStatusChange={setPostStatus}
+                    />
 
-                  <NewsCategories
-                    selectedCategory={selectedCategory}
-                    onCategoryChange={setSelectedCategory}
-                  />
+                    <NewsCategories
+                      selectedCategory={selectedCategory}
+                      onCategoryChange={setSelectedCategory}
+                    />
 
-                  <NewsContent
-                    newsItems={posts}
-                    searchQuery={searchQuery}
-                    summaries={summaries}
-                    loadingSummaries={loadingSummaries}
-                    onGenerateSummary={generateSummary}
-                    loading={loading}
-                    hasMore={hasMore}
-                    onLoadMore={loadMore}
-                  />
-                </Suspense>
-              </motion.div>
-            </div>
-          </main>
-        </div>
-      </NewsErrorBoundary>
+                    <NewsContent
+                      newsItems={posts}
+                      searchQuery={searchQuery}
+                      summaries={summaries}
+                      loadingSummaries={loadingSummaries}
+                      onGenerateSummary={generateSummary}
+                      loading={loading}
+                      hasMore={hasMore}
+                      onLoadMore={loadMore}
+                    />
+                  </Suspense>
+                </motion.div>
+              </div>
+            </main>
+          </div>
+        </NewsErrorBoundary>
+      </div>
     </SidebarProvider>
   );
 };
