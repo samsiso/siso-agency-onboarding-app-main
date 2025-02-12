@@ -5,8 +5,12 @@ import { Sidebar } from '@/components/Sidebar';
 import { Trophy, Users, Award } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { motion } from 'framer-motion';
+import { useLeaderboardData } from '@/components/leaderboard/hooks/useLeaderboardData';
+import { formatNumber } from '@/lib/formatters';
 
 const Leaderboards = () => {
+  const { totalUsersWithPoints, totalPoints, totalSisoTokens } = useLeaderboardData();
+
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
       <Sidebar />
@@ -72,7 +76,7 @@ const Leaderboards = () => {
                     <Users className="w-8 h-8 text-siso-orange" />
                     <div>
                       <p className="text-sm text-siso-text/70">Active Players</p>
-                      <p className="text-lg font-semibold text-siso-text-bold">2.5k+</p>
+                      <p className="text-lg font-semibold text-siso-text-bold">{formatNumber(totalUsersWithPoints)}</p>
                     </div>
                   </motion.div>
 
@@ -84,8 +88,8 @@ const Leaderboards = () => {
                   >
                     <Award className="w-8 h-8 text-siso-red" />
                     <div>
-                      <p className="text-sm text-siso-text/70">Total Achievements</p>
-                      <p className="text-lg font-semibold text-siso-text-bold">150k+</p>
+                      <p className="text-sm text-siso-text/70">Total Points</p>
+                      <p className="text-lg font-semibold text-siso-text-bold">{formatNumber(totalPoints)}</p>
                     </div>
                   </motion.div>
                 </div>
