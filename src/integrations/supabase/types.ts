@@ -16,6 +16,7 @@ export type Database = {
           bookmarks: number | null
           category: string
           content: string | null
+          content_blocks: Json | null
           cover_image: string | null
           created_at: string
           date: string
@@ -26,16 +27,24 @@ export type Database = {
           impact: string
           linkedin_url: string | null
           meta_description: string | null
+          meta_keywords: string[] | null
+          meta_title: string | null
           priority: number | null
+          reading_progress: number | null
           reading_time: number | null
+          related_articles: string[] | null
+          seo_description: string | null
+          share_count: number | null
           slug: string | null
           source: string
           source_credibility: string | null
           status: string | null
+          table_of_contents: Json | null
           tags: string[] | null
           technical_complexity: string | null
           title: string
           updated_at: string
+          upvotes: number | null
           views: number | null
         }
         Insert: {
@@ -44,6 +53,7 @@ export type Database = {
           bookmarks?: number | null
           category: string
           content?: string | null
+          content_blocks?: Json | null
           cover_image?: string | null
           created_at?: string
           date: string
@@ -54,16 +64,24 @@ export type Database = {
           impact: string
           linkedin_url?: string | null
           meta_description?: string | null
+          meta_keywords?: string[] | null
+          meta_title?: string | null
           priority?: number | null
+          reading_progress?: number | null
           reading_time?: number | null
+          related_articles?: string[] | null
+          seo_description?: string | null
+          share_count?: number | null
           slug?: string | null
           source: string
           source_credibility?: string | null
           status?: string | null
+          table_of_contents?: Json | null
           tags?: string[] | null
           technical_complexity?: string | null
           title: string
           updated_at?: string
+          upvotes?: number | null
           views?: number | null
         }
         Update: {
@@ -72,6 +90,7 @@ export type Database = {
           bookmarks?: number | null
           category?: string
           content?: string | null
+          content_blocks?: Json | null
           cover_image?: string | null
           created_at?: string
           date?: string
@@ -82,16 +101,24 @@ export type Database = {
           impact?: string
           linkedin_url?: string | null
           meta_description?: string | null
+          meta_keywords?: string[] | null
+          meta_title?: string | null
           priority?: number | null
+          reading_progress?: number | null
           reading_time?: number | null
+          related_articles?: string[] | null
+          seo_description?: string | null
+          share_count?: number | null
           slug?: string | null
           source?: string
           source_credibility?: string | null
           status?: string | null
+          table_of_contents?: Json | null
           tags?: string[] | null
           technical_complexity?: string | null
           title?: string
           updated_at?: string
+          upvotes?: number | null
           views?: number | null
         }
         Relationships: [
