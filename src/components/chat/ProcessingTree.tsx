@@ -16,15 +16,19 @@ export const ProcessingTree = ({ currentStage, agentStatuses }: ProcessingTreePr
   const currentIndex = stages.indexOf(currentStage);
 
   return (
-    <div className="relative py-8">
+    <div className="relative py-12">
       <KnowledgeStream />
       <motion.div 
-        className="space-y-12"
+        className="space-y-24" // Increased spacing between main nodes
         variants={containerVariants}
         initial="hidden"
         animate="show"
       >
-        <motion.div variants={itemVariants}>
+        <motion.div 
+          variants={itemVariants}
+          whileHover={{ scale: 1.02 }}
+          transition={{ duration: 0.2 }}
+        >
           <ProcessingNode
             icon={Brain}
             label="Understanding request"
@@ -34,7 +38,11 @@ export const ProcessingTree = ({ currentStage, agentStatuses }: ProcessingTreePr
           />
         </motion.div>
 
-        <motion.div variants={itemVariants}>
+        <motion.div 
+          variants={itemVariants}
+          whileHover={{ scale: 1.02 }}
+          transition={{ duration: 0.2 }}
+        >
           <ProcessingNode
             icon={Building2}
             label="Applying company context"
@@ -48,7 +56,7 @@ export const ProcessingTree = ({ currentStage, agentStatuses }: ProcessingTreePr
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
-            className="pl-12 space-y-4"
+            className="pl-16 space-y-8" // Increased indent and spacing for agent nodes
           >
             {Object.entries(agentStatuses).map(([category, status], index) => {
               const Icon = agentIcons[category as AgentCategory];
@@ -57,7 +65,8 @@ export const ProcessingTree = ({ currentStage, agentStatuses }: ProcessingTreePr
                   key={category}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
+                  transition={{ delay: index * 0.15 }} // Slower stagger
+                  whileHover={{ scale: 1.02, x: 4 }}
                 >
                   <ProcessingNode
                     icon={Icon}
@@ -73,7 +82,11 @@ export const ProcessingTree = ({ currentStage, agentStatuses }: ProcessingTreePr
           </motion.div>
         )}
 
-        <motion.div variants={itemVariants}>
+        <motion.div 
+          variants={itemVariants}
+          whileHover={{ scale: 1.02 }}
+          transition={{ duration: 0.2 }}
+        >
           <ProcessingNode
             icon={Sparkles}
             label="Synthesizing information"

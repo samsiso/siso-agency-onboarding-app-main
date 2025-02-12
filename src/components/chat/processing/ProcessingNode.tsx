@@ -28,8 +28,8 @@ export const ProcessingNode = ({ icon: Icon, label, isActive, isComplete, size =
 
   return (
     <div className={cn(
-      "relative flex items-start",
-      size === 'sm' ? 'gap-3' : 'gap-4'
+      "relative flex items-start group",
+      size === 'sm' ? 'gap-4' : 'gap-6'
     )}>
       <motion.div
         initial={false}
@@ -39,27 +39,37 @@ export const ProcessingNode = ({ icon: Icon, label, isActive, isComplete, size =
         }}
         className={cn(
           "relative flex items-center justify-center rounded-full bg-siso-text/10 z-10 transition-shadow duration-500",
-          size === 'sm' ? 'w-8 h-8' : 'w-12 h-12',
-          isActive && "shadow-lg shadow-siso-orange/20",
-          isComplete && "shadow-md shadow-siso-orange/10"
+          size === 'sm' ? 'w-10 h-10' : 'w-14 h-14',
+          isActive && "shadow-lg shadow-siso-orange/30",
+          isComplete && "shadow-md shadow-siso-orange/20",
+          "hover:scale-110 transition-transform duration-300"
         )}
       >
+        {/* Outer glow */}
         {isActive && (
-          <motion.div
-            className="absolute inset-0 rounded-full bg-siso-red/20"
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1.2, opacity: 0 }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-          />
+          <>
+            <motion.div
+              className="absolute inset-0 rounded-full bg-siso-red/20"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1.4, opacity: 0 }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
+            <motion.div
+              className="absolute inset-0 rounded-full bg-siso-red/10"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1.8, opacity: 0 }}
+              transition={{ duration: 2.5, repeat: Infinity, delay: 0.2 }}
+            />
+          </>
         )}
         
         <Icon className={cn(
           "text-white relative z-10",
-          size === 'sm' ? 'w-4 h-4' : 'w-6 h-6'
+          size === 'sm' ? 'w-5 h-5' : 'w-7 h-7'
         )} />
       </motion.div>
       
-      <div className="flex-1 space-y-1">
+      <div className="flex-1 space-y-2">
         <span className={cn(
           "font-medium relative block",
           size === 'sm' ? 'text-sm' : 'text-base',
@@ -91,11 +101,12 @@ export const ProcessingNode = ({ icon: Icon, label, isActive, isComplete, size =
         )}
       </div>
 
+      {/* Enhanced background effect */}
       {isActive && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="absolute -inset-2 bg-siso-text/5 backdrop-blur-sm rounded-lg -z-10"
+          className="absolute -inset-4 bg-gradient-radial from-siso-text/10 to-transparent backdrop-blur-sm rounded-xl -z-10"
         />
       )}
     </div>
