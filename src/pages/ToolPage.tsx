@@ -1,3 +1,4 @@
+
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft } from 'lucide-react';
@@ -23,7 +24,7 @@ export default function ToolPage() {
       
       console.log('Fetching tool with ID:', id);
       const { data, error } = await supabase
-        .from('tools')
+        .from('core_tools')  // Changed from 'tools' to 'core_tools'
         .select('*')
         .eq('id', id)
         .maybeSingle();
