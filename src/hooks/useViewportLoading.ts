@@ -1,6 +1,5 @@
 
 import { useEffect, useRef, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 
 export const useViewportLoading = (options = { threshold: 0.1 }) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -20,7 +19,7 @@ export const useViewportLoading = (options = { threshold: 0.1 }) => {
       },
       {
         threshold: options.threshold,
-        rootMargin: '100px', // Start loading 100px before element comes into view
+        rootMargin: '300px 0px', // Increased from 100px to 300px for earlier loading
       }
     );
 

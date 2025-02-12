@@ -75,6 +75,28 @@ const LandingPage = () => {
   const testimonials = useViewportLoading({ threshold: 0.1 });
   const cta = useViewportLoading({ threshold: 0.1 });
 
+  // Preload next sections
+  useEffect(() => {
+    const preloadNextSections = () => {
+      const links = [
+        { rel: 'preload', href: '/why-choose', as: 'fetch' },
+        { rel: 'preload', href: '/features', as: 'fetch' },
+        { rel: 'preload', href: '/getting-started', as: 'fetch' }
+      ];
+
+      links.forEach(({ rel, href, as }) => {
+        const link = document.createElement('link');
+        link.rel = rel;
+        link.href = href;
+        link.as = as;
+        document.head.appendChild(link);
+      });
+    };
+
+    // Start preloading after initial render
+    requestIdleCallback(() => preloadNextSections());
+  }, []);
+
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-black via-siso-bg to-black overflow-x-hidden">
       {/* DNS prefetch and preconnect optimizations */}
