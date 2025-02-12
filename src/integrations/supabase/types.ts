@@ -2863,6 +2863,7 @@ export type Database = {
         | "beta_testing"
         | "report_bug"
         | "promotional_share"
+        | "article_upvote"
       user_rank: "bronze" | "silver" | "gold" | "diamond"
     }
     CompositeTypes: {
