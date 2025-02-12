@@ -31,6 +31,7 @@ export const SidebarMenuItem = ({
   isMain,
   isActive
 }: SidebarMenuItemProps) => {
+  // [Analysis] Improved spring animations for smoother transitions
   const menuItemVariants = {
     initial: { 
       opacity: 0, 
@@ -41,31 +42,37 @@ export const SidebarMenuItem = ({
       x: 0,
       transition: {
         type: "spring",
-        stiffness: 400,
-        damping: 30
+        stiffness: 300,
+        damping: 25,
+        mass: 1.2
       }
     },
     exit: { 
       opacity: 0, 
       x: -20,
       transition: {
-        duration: 0.2
+        duration: 0.2,
+        ease: "easeOut"
       }
     }
   };
 
+  // [Analysis] Enhanced highlight animation with better spring physics
   const highlightVariants = {
     initial: {
       opacity: 0,
-      scale: 0.95
+      scale: 0.95,
+      y: "-50%"
     },
     animate: {
       opacity: 1,
       scale: 1,
+      y: "-50%",
       transition: {
         type: "spring",
-        stiffness: 500,
-        damping: 30
+        stiffness: 300,
+        damping: 25,
+        mass: 1.2
       }
     }
   };
@@ -78,14 +85,15 @@ export const SidebarMenuItem = ({
       variants={menuItemVariants}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
+      className="relative"
     >
       <Link
         to={href}
         onClick={onClick}
         className={cn(
-          'relative flex items-center gap-3 rounded-lg px-3 py-2 text-siso-text transition-all duration-300',
-          isActive && 'bg-siso-text/5 text-siso-text-bold',
-          !isActive && 'hover:text-siso-text-bold hover:bg-siso-text/5',
+          'relative flex items-center gap-4 rounded-lg px-4 py-2.5 text-siso-text transition-all duration-300',
+          isActive && 'bg-gradient-to-r from-siso-red/10 to-siso-orange/10 text-siso-text-bold shadow-sm',
+          !isActive && 'hover:bg-gradient-to-r hover:from-siso-red/5 hover:to-siso-orange/5 hover:text-siso-text-bold',
           isMain ? 'text-lg font-semibold' : 'text-sm',
           collapsed ? 'justify-center' : '',
           className
@@ -93,7 +101,12 @@ export const SidebarMenuItem = ({
       >
         <motion.div
           whileHover={{ scale: 1.1 }}
-          transition={{ type: "spring", stiffness: 400, damping: 17 }}
+          transition={{ 
+            type: "spring", 
+            stiffness: 400, 
+            damping: 17 
+          }}
+          className="relative"
         >
           <Icon 
             className={cn(
@@ -102,32 +115,57 @@ export const SidebarMenuItem = ({
               "transition-colors duration-300"
             )} 
           />
+          {isActive && (
+            <motion.div 
+              className="absolute inset-0 blur-lg bg-siso-orange/30 -z-10"
+              animate={{
+                scale: [1, 1.2, 1],
+                opacity: [0.3, 0.6, 0.3]
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            />
+          )}
         </motion.div>
+
         <AnimatePresence mode="wait">
           {!collapsed && (
             <motion.span
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -10 }}
-              transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              className="truncate"
+              transition={{ 
+                type: "spring", 
+                stiffness: 300, 
+                damping: 25,
+                mass: 1.2
+              }}
+              className="truncate font-medium"
             >
               {label}
             </motion.span>
           )}
         </AnimatePresence>
+
         {isActive && (
           <motion.div
             layoutId="sidebar-highlight"
-            className="absolute inset-0 rounded-lg bg-gradient-to-r from-siso-red/5 to-siso-orange/5 -z-10"
+            className="absolute left-0 top-0 h-full w-full rounded-lg bg-gradient-to-r from-siso-red/5 to-siso-orange/5 -z-10"
             initial="initial"
             animate="animate"
             variants={highlightVariants}
           >
             <motion.div 
-              className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-siso-red to-siso-orange rounded-r-full"
+              className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-12 bg-gradient-to-b from-siso-red to-siso-orange rounded-r-full"
               animate={{
-                scale: [1, 1.2, 1],
+                boxShadow: [
+                  "0 0 10px rgba(255, 87, 34, 0.3)",
+                  "0 0 20px rgba(255, 167, 38, 0.5)",
+                  "0 0 10px rgba(255, 87, 34, 0.3)"
+                ],
                 opacity: [0.7, 1, 0.7]
               }}
               transition={{
@@ -136,7 +174,7 @@ export const SidebarMenuItem = ({
                 ease: "easeInOut"
               }}
             >
-              <div className="absolute w-6 h-6 bg-siso-orange/20 rounded-full blur-md -left-2" />
+              <div className="absolute w-8 h-8 bg-siso-orange/20 rounded-full blur-xl -left-3 top-1/2 -translate-y-1/2" />
             </motion.div>
           </motion.div>
         )}
@@ -156,6 +194,7 @@ export const SidebarMenuItem = ({
               initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2 }}
+              className="font-medium"
             >
               {label}
             </motion.p>
