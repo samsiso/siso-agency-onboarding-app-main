@@ -1,9 +1,11 @@
+
 import { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Hero } from '@/components/ui/animated-hero';
 import { Waves } from '@/components/ui/waves-background';
 
 export const HeroSection = memo(() => {
+  console.log('[HeroSection] Rendering hero section'); // Debug log
   const navigate = useNavigate();
 
   return (
