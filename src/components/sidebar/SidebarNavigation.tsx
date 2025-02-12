@@ -1,46 +1,15 @@
 
-import { useNavigate, useLocation } from 'react-router-dom';
-import { SidebarMenuItem } from './SidebarMenuItem';
-import { cn } from '@/lib/utils';
+import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Home,
-  GraduationCap,
-  Network,
-  Target,
-  Layers,
-  PlayCircle,
-  CreditCard,
-  Users,
-  Wrench,
-  Trophy,
-  BarChart,
-  BookOpen,
-  Bot,
-  Layout,
-  Folder,
-  Newspaper
-} from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
+import { SidebarSection } from './SidebarSection';
+import { NavigationProps } from './types';
+import { menuSections } from './navigationData';
 
-interface SidebarNavigationProps {
-  collapsed: boolean;
-  onItemClick: (e: React.MouseEvent<HTMLAnchorElement>) => void;
-  visible: boolean;
-}
-
-export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNavigationProps) => {
-  const navigate = useNavigate();
+export const SidebarNavigation = ({ collapsed, onItemClick, visible }: NavigationProps) => {
   const location = useLocation();
   const [activeSection, setActiveSection] = useState<string | null>(null);
-
-  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    const href = e.currentTarget.getAttribute('href');
-    if (href) {
-      onItemClick(e);
-    }
-  };
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -61,65 +30,6 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
     return () => observer.disconnect();
   }, []);
 
-  const menuSections = [
-    {
-      type: 'main',
-      href: '/',
-      icon: Home,
-      label: 'Home',
-    },
-    {
-      type: 'section',
-      title: 'Resources',
-      icon: BookOpen,
-      items: [
-        {
-          href: '/education',
-          icon: GraduationCap,
-          label: 'Education',
-        },
-        {
-          href: '/assistants',
-          icon: Bot,
-          label: 'AI Assistants',
-        },
-        {
-          href: '/tools',
-          icon: Wrench,
-          label: 'Tools',
-        }
-      ]
-    },
-    {
-      type: 'section',
-      title: 'Community',
-      icon: Users,
-      items: [
-        {
-          href: '/networking',
-          icon: Network,
-          label: 'Networking',
-        },
-        {
-          href: '/economy/earn',
-          icon: Trophy,
-          label: 'How to Earn',
-        },
-        {
-          href: '/economy/leaderboards',
-          icon: BarChart,
-          label: 'Leaderboards',
-        }
-      ]
-    },
-    {
-      type: 'main',
-      href: '/ai-news',
-      icon: Newspaper,
-      label: 'AI News',
-    }
-  ];
-
   if (!visible) return null;
 
   const containerVariants = {
@@ -129,19 +39,6 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
       transition: {
         staggerChildren: 0.1,
         delayChildren: 0.2
-      }
-    }
-  };
-
-  const sectionVariants = {
-    hidden: { opacity: 0, y: 20 },
-    show: { 
-      opacity: 1, 
-      y: 0,
-      transition: {
-        type: "spring",
-        stiffness: 300,
-        damping: 30
       }
     }
   };
@@ -165,57 +62,17 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: SidebarNa
           {menuSections.map((section, index) => (
             <motion.div 
               key={index}
-              variants={sectionVariants}
               className={cn(
                 "space-y-1",
                 section.type === 'section' && "border-b border-siso-border pb-2"
               )}
             >
-              {section.type === 'main' ? (
-                <SidebarMenuItem
-                  href={section.href}
-                  icon={section.icon}
-                  label={section.label}
-                  collapsed={collapsed}
-                  onClick={handleClick}
-                  isMain={true}
-                  isActive={location.pathname === section.href}
-                />
-              ) : (
-                <div className="space-y-1">
-                  {section.title && !collapsed && (
-                    <motion.div 
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -20 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                      className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-siso-text-bold"
-                    >
-                      <section.icon className="w-4 h-4 text-siso-text-muted" />
-                      {section.title}
-                    </motion.div>
-                  )}
-                  <motion.div 
-                    className={cn(
-                      "space-y-1",
-                      !collapsed && "pl-3 border-l-2 border-siso-border ml-4"
-                    )}
-                    variants={containerVariants}
-                  >
-                    {section.items?.map((item, subIndex) => (
-                      <SidebarMenuItem
-                        key={subIndex}
-                        href={item.href}
-                        icon={item.icon}
-                        label={item.label}
-                        collapsed={collapsed}
-                        onClick={handleClick}
-                        isActive={isItemActive(item.href)}
-                      />
-                    ))}
-                  </motion.div>
-                </div>
-              )}
+              <SidebarSection
+                section={section}
+                collapsed={collapsed}
+                onItemClick={onItemClick}
+                isItemActive={isItemActive}
+              />
             </motion.div>
           ))}
         </AnimatePresence>
