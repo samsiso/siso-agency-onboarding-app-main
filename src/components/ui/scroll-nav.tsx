@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { Home, Sparkles, Users } from "lucide-react"
@@ -89,8 +90,9 @@ export function ScrollNav() {
                   }}
                 >
                   <div className="absolute -right-1 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary rounded-full">
-                    <div className="absolute w-6 h-6 bg-primary/20 rounded-full blur-md -right-2 -top-2" />
-                    <div className="absolute w-4 h-4 bg-primary/20 rounded-full blur-sm -right-1 top-2" />
+                    {/* Centered glow effects */}
+                    <div className="absolute w-6 h-6 bg-primary/20 rounded-full blur-md -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" />
+                    <div className="absolute w-4 h-4 bg-primary/20 rounded-full blur-sm -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" />
                   </div>
                 </motion.div>
               )}
