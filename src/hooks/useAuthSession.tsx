@@ -85,11 +85,14 @@ export const useAuthSession = () => {
           const profile = await checkProfile(session.user.id);
           if (profile) {
             setUser(session.user);
-            navigate('/home', { replace: true });
-            toast({
-              title: "Successfully signed in",
-              description: "Welcome to SISO Resource Hub!",
-            });
+            // [Fix] Only navigate on explicit sign in, not session restore
+            if (!user) {
+              navigate('/home', { replace: true });
+              toast({
+                title: "Successfully signed in",
+                description: "Welcome to SISO Resource Hub!",
+              });
+            }
           } else {
             await supabase.auth.signOut();
             setUser(null);
@@ -117,7 +120,7 @@ export const useAuthSession = () => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate, checkProfile, toast]);
+  }, [navigate, checkProfile, toast, user]); // [Fix] Added user dependency to prevent unnecessary navigations
 
   const handleSignIn = async (session: any) => {
     try {
