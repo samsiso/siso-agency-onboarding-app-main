@@ -27,22 +27,26 @@ export const ProfileSection = ({ collapsed, onOpenChange }: ProfileSectionProps)
   const { userData, loading } = useBasicUserData();
   const { points, rank } = usePoints(userData.id || '');
 
-  if (loading) {
-    return (
-      <div className="w-full h-12 animate-pulse bg-siso-text/5 rounded-lg" />
-    );
-  }
-
-  if (!userData.id) return null;
-
-  const displayName = userData.fullName || userData.email?.split('@')[0] || 'User';
+  // [Analysis] Handle navigation with proper state updates
+  const handleItemClick = (path: string) => {
+    // Save current location for back navigation
+    const currentPath = window.location.pathname;
+    
+    navigate(path, {
+      state: { from: currentPath }
+    });
+    
+    // Close dropdown after navigation
+    onOpenChange(false);
+  };
 
   const handleSignOut = async () => {
     try {
       setIsLoading(true);
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      navigate('/');
+      
+      navigate('/', { replace: true });
       toast({
         title: "Signed out successfully",
         description: "Come back soon!",
@@ -55,12 +59,19 @@ export const ProfileSection = ({ collapsed, onOpenChange }: ProfileSectionProps)
       });
     } finally {
       setIsLoading(false);
+      onOpenChange(false);
     }
   };
 
-  const handleItemClick = (path: string) => {
-    navigate(path);
-  };
+  if (loading) {
+    return (
+      <div className="w-full h-12 animate-pulse bg-siso-text/5 rounded-lg" />
+    );
+  }
+
+  if (!userData.id) return null;
+
+  const displayName = userData.fullName || userData.email?.split('@')[0] || 'User';
 
   // [Analysis] For collapsed state, use direct navigation instead of dropdown
   if (collapsed) {
@@ -71,6 +82,7 @@ export const ProfileSection = ({ collapsed, onOpenChange }: ProfileSectionProps)
           size="icon"
           className="w-full aspect-square p-0 hover:bg-siso-text/5 transition-colors duration-200"
           onClick={(e) => {
+            e.preventDefault();
             e.stopPropagation();
             handleItemClick('/profile');
           }}
@@ -94,14 +106,19 @@ export const ProfileSection = ({ collapsed, onOpenChange }: ProfileSectionProps)
   }
 
   return (
-    <div className="px-2">
-      <DropdownMenu onOpenChange={onOpenChange}>
+    <div className="px-2 relative">
+      <DropdownMenu 
+        onOpenChange={onOpenChange}
+      >
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
             className="w-full px-2 py-4 hover:bg-siso-text/5 transition-colors duration-200"
             disabled={isLoading}
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
           >
             <div className="flex items-center gap-3 w-full">
               {userData.avatarUrl ? (
@@ -134,31 +151,47 @@ export const ProfileSection = ({ collapsed, onOpenChange }: ProfileSectionProps)
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="start"
-          className="w-56 bg-siso-bg-alt border-siso-border z-50"
-          onClick={(e) => e.stopPropagation()}
+          side="right"
+          className="w-56 bg-siso-bg-alt border-siso-border z-[100]"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
         >
           <DropdownMenuItem
             className="text-siso-text hover:text-siso-text-bold hover:bg-siso-text/5 cursor-pointer"
-            onClick={() => handleItemClick('/profile')}
+            onSelect={(e) => {
+              e.preventDefault();
+              handleItemClick('/profile');
+            }}
           >
             View Profile
           </DropdownMenuItem>
           <DropdownMenuItem
             className="text-siso-text hover:text-siso-text-bold hover:bg-siso-text/5 cursor-pointer"
-            onClick={() => handleItemClick('/leaderboards')}
+            onSelect={(e) => {
+              e.preventDefault();
+              handleItemClick('/leaderboards');
+            }}
           >
             Leaderboard
           </DropdownMenuItem>
           <DropdownMenuItem
             className="text-siso-text hover:text-siso-text-bold hover:bg-siso-text/5 cursor-pointer"
-            onClick={() => handleItemClick('/how-to-earn')}
+            onSelect={(e) => {
+              e.preventDefault();
+              handleItemClick('/how-to-earn');
+            }}
           >
             How to Earn Points
           </DropdownMenuItem>
           <DropdownMenuSeparator className="bg-siso-border" />
           <DropdownMenuItem
             className="text-red-500 hover:text-red-400 hover:bg-red-500/5 cursor-pointer"
-            onClick={handleSignOut}
+            onSelect={(e) => {
+              e.preventDefault();
+              handleSignOut();
+            }}
             disabled={isLoading}
           >
             <LogOut className="w-4 h-4 mr-2" />
