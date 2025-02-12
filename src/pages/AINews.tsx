@@ -9,9 +9,11 @@ import { NewsContent } from '@/components/ai-news/NewsContent';
 import { NewsErrorBoundary } from '@/components/ai-news/NewsErrorBoundary';
 import { useToast } from '@/hooks/use-toast';
 
+// [Analysis] Lazy load components for better initial load performance
 const NewsHeader = lazy(() => import('@/components/ai-news/NewsHeader'));
 const NewsCategories = lazy(() => import('@/components/ai-news/NewsCategories'));
 
+// [Analysis] Reusable loading components
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center p-8">
     <Loader2 className="h-6 w-6 animate-spin text-siso-red" />
@@ -29,6 +31,7 @@ const PageLoadingState = () => (
   </div>
 );
 
+// [Analysis] Animation variants for smooth transitions
 const containerVariants = {
   hidden: { opacity: 0 },
   show: {
@@ -39,15 +42,18 @@ const containerVariants = {
   }
 };
 
+// [Analysis] Renamed component but kept route compatibility
 const AINews = () => {
+  // [Analysis] Added status filter for draft/published posts
   const [selectedMonth, setSelectedMonth] = useState<string>('03');
   const [selectedYear, setSelectedYear] = useState<string>('2024');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [postStatus, setPostStatus] = useState<'all' | 'draft' | 'published'>('published');
   const { toast } = useToast();
   
   const {
-    newsItems,
+    newsItems: posts,
     summaries,
     loadingSummaries,
     generateSummary,
@@ -55,14 +61,14 @@ const AINews = () => {
     hasMore,
     loadMore,
     error
-  } = useNewsItems(selectedCategory);
+  } = useNewsItems(selectedCategory, postStatus);
 
   // Show error toast if data fetching fails
   if (error) {
     toast({
       variant: "destructive",
-      title: "Error loading news",
-      description: "Failed to load news items. Please try again.",
+      title: "Error loading posts",
+      description: "Failed to load blog posts. Please try again.",
     });
   }
 
@@ -87,6 +93,8 @@ const AINews = () => {
                     onYearChange={setSelectedYear}
                     searchQuery={searchQuery}
                     onSearchChange={setSearchQuery}
+                    postStatus={postStatus}
+                    onPostStatusChange={setPostStatus}
                   />
 
                   <NewsCategories
@@ -95,7 +103,7 @@ const AINews = () => {
                   />
 
                   <NewsContent
-                    newsItems={newsItems}
+                    newsItems={posts}
                     searchQuery={searchQuery}
                     summaries={summaries}
                     loadingSummaries={loadingSummaries}

@@ -3,7 +3,10 @@ import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
-export const useNewsItems = (selectedCategory: string | null) => {
+// [Analysis] Added status type for draft/published filtering
+type PostStatus = 'all' | 'draft' | 'published';
+
+export const useNewsItems = (selectedCategory: string | null, status: PostStatus = 'published') => {
   const [newsItems, setNewsItems] = useState<any[]>([]);
   const [summaries, setSummaries] = useState<Record<string, string>>({});
   const [loadingSummaries, setLoadingSummaries] = useState<Record<string, boolean>>({});
@@ -18,20 +21,25 @@ export const useNewsItems = (selectedCategory: string | null) => {
 
   useEffect(() => {
     fetchNews();
-  }, [selectedCategory, page]);
+  }, [selectedCategory, page, status]);
 
   const fetchNews = async () => {
     try {
       setLoading(true);
       setError(null);
       
-      console.log('Fetching news items...', { selectedCategory, page });
+      console.log('Fetching blog posts...', { selectedCategory, page, status });
       
       let query = supabase
         .from('ai_news')
-        .select('*')
+        .select('*, profiles:author_id(full_name, avatar_url)')
         .order('date', { ascending: false })
         .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
+
+      // [Analysis] Added status filtering
+      if (status !== 'all') {
+        query = query.eq('status', status);
+      }
 
       if (selectedCategory) {
         query = query.eq('category', selectedCategory);
@@ -40,11 +48,11 @@ export const useNewsItems = (selectedCategory: string | null) => {
       const { data, error: fetchError } = await query;
 
       if (fetchError) {
-        console.error('Error fetching news:', fetchError);
+        console.error('Error fetching posts:', fetchError);
         throw fetchError;
       }
 
-      console.log('Fetched news items:', data?.length);
+      console.log('Fetched blog posts:', data?.length);
 
       // [Analysis] Check if we have more items to load
       setHasMore(data && data.length === PAGE_SIZE);
@@ -74,7 +82,7 @@ export const useNewsItems = (selectedCategory: string | null) => {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to fetch news items. Please try again.",
+        description: "Failed to fetch blog posts. Please try again.",
       });
     } finally {
       setLoading(false);
@@ -109,8 +117,8 @@ export const useNewsItems = (selectedCategory: string | null) => {
 
       const { data, error } = await supabase.functions.invoke('chat-with-bot', {
         body: { 
-          message: `Please provide a brief 2-3 sentence summary of this news: ${newsItem.title}. ${newsItem.description}`,
-          systemPrompt: "You are a concise news summarizer. Provide brief, factual summaries."
+          message: `Please provide a brief 2-3 sentence summary of this blog post: ${newsItem.title}. ${newsItem.description || newsItem.content}`,
+          systemPrompt: "You are a concise blog summarizer. Provide brief, factual summaries."
         },
       });
 
