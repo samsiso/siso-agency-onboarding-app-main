@@ -1257,6 +1257,36 @@ export type Database = {
         }
         Relationships: []
       }
+      points_audit_log: {
+        Row: {
+          change_amount: number
+          created_at: string
+          id: string
+          points_after: number
+          points_before: number
+          source: string
+          user_id: string
+        }
+        Insert: {
+          change_amount: number
+          created_at?: string
+          id?: string
+          points_after: number
+          points_before: number
+          source: string
+          user_id: string
+        }
+        Update: {
+          change_amount?: number
+          created_at?: string
+          id?: string
+          points_after?: number
+          points_before?: number
+          source?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       points_history: {
         Row: {
           id: string
