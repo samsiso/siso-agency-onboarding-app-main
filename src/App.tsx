@@ -31,8 +31,8 @@ function App() {
   return (
     <Routes>
       {/* Public routes */}
-      <Route path="/" element={<Home />} />
-      <Route path="/welcome" element={<Index />} />
+      <Route path="/" element={<Index />} />
+      <Route path="/home" element={<Home />} />
       <Route path="/auth" element={<Auth />} />
       <Route path="/terms" element={<Terms />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
