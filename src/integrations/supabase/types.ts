@@ -266,6 +266,49 @@ export type Database = {
           },
         ]
       }
+      article_upvotes: {
+        Row: {
+          article_id: string | null
+          created_at: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          article_id?: string | null
+          created_at?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          article_id?: string | null
+          created_at?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "article_upvotes_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "ai_news"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "article_upvotes_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "featured_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "article_upvotes_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "mv_trending_articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       assistant_analytics: {
         Row: {
           assistant_id: string
