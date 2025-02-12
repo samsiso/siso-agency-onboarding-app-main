@@ -14,6 +14,26 @@ interface NewsHeaderProps {
   onPostStatusChange: (value: 'all' | 'draft' | 'published') => void;
 }
 
+// [Analysis] Database column mapping to UI components:
+// - title -> Main heading in NewsCard and hero section
+// - description -> Preview text in NewsCard
+// - content -> Full article content in detail view
+// - category -> Filter chips and category badge
+// - source -> Source attribution in NewsCard footer
+// - impact -> Colored badge indicating importance
+// - date -> Display date and filtering
+// - technical_complexity -> Difficulty badge
+// - article_type -> Content type filtering
+// - source_credibility -> Verification badge
+// - tags -> Search keywords and related content
+// - reading_time -> Estimated read time display
+// - status -> Draft/Published filtering
+// - image_url -> Card and hero thumbnails
+// - author_id -> Links to profiles table for author info
+// - views -> Analytics and trending calculation
+// - bookmarks -> User engagement metric
+// - meta_description -> SEO and social sharing
+
 const NewsHeader = ({ 
   selectedMonth, 
   selectedYear, 
@@ -37,11 +57,10 @@ const NewsHeader = ({
             animate={{ opacity: 1 }}
             className="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-siso-red via-siso-orange to-siso-red bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient"
           >
-            Latest AI News
+            SISO Updates
           </motion.h1>
           <p className="text-siso-text/80 text-sm sm:text-base max-w-2xl">
-            Stay updated with the latest breakthroughs and developments in artificial intelligence. 
-            Our curated news feed brings you the most important AI updates from around the world.
+            Your trusted source for AI technology news and insights. Stay informed about the latest developments and breakthroughs.
           </p>
         </div>
 
