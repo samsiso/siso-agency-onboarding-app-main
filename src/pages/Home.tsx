@@ -6,9 +6,10 @@ import { useToast } from "@/hooks/use-toast";
 import { Sidebar } from "@/components/Sidebar";
 import { Waves } from '@/components/ui/waves-background';
 import { PreChatState } from '@/components/home/PreChatState';
-import { ChatState } from '@/components/home/ChatState';
+import { EnhancedChatState } from '@/components/home/EnhancedChatState';
 import { ChatMessage, ProcessingStage, AgentCategory } from '@/types/chat';
 
+// [Analysis] Separated concerns for better maintainability
 export default function Home() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -165,7 +166,7 @@ export default function Home() {
             {!isExpanded ? (
               <PreChatState handleSubmit={handleSubmit} isLoading={isLoading} />
             ) : (
-              <ChatState 
+              <EnhancedChatState 
                 messages={messages} 
                 handleSubmit={handleSubmit} 
                 isLoading={isLoading} 
