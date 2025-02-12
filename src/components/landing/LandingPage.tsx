@@ -43,10 +43,8 @@ const PricingSection = createLazySection('./sections/PricingSection');
 const TestimonialsSection = createLazySection('./sections/TestimonialsSection');
 const CallToActionSection = createLazySection('./sections/CallToActionSection');
 
-// [Analysis] Fixed ScrollNav import to use absolute path and handle default export
-const ScrollNav = lazy(() => import('@/components/ui/scroll-nav').then(module => ({
-  default: memo(module.default)
-})));
+// [Analysis] Using consistent lazy loading pattern for ScrollNav
+const ScrollNav = createLazySection('@/components/ui/scroll-nav');
 
 const LandingPage = () => {
   // Initialize performance monitoring
