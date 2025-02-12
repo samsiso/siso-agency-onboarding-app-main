@@ -14,7 +14,7 @@ interface Video {
   education_creators: {
     name: string;
     channel_avatar_url: string;
-  };
+  } | null;
 }
 
 interface PopularVideosProps {
@@ -114,17 +114,19 @@ export const PopularVideos = ({ videos, isLoading }: PopularVideosProps) => {
               <div className="flex items-center gap-2">
                 <Avatar className="h-8 w-8 ring-2 ring-white/10 group-hover:ring-siso-orange/20 
                   transition-colors duration-300">
-                  <AvatarImage
-                    src={video.education_creators.channel_avatar_url}
-                    alt={video.education_creators.name}
-                  />
+                  {video.education_creators ? (
+                    <AvatarImage
+                      src={video.education_creators.channel_avatar_url}
+                      alt={video.education_creators.name}
+                    />
+                  ) : null}
                   <AvatarFallback className="bg-gradient-to-br from-siso-red/10 to-siso-orange/10">
-                    {video.education_creators.name[0]}
+                    {video.education_creators?.name?.[0] || '?'}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
                   <span className="text-sm text-siso-text/90 group-hover:text-white transition-colors">
-                    {video.education_creators.name}
+                    {video.education_creators?.name || 'Unknown Creator'}
                   </span>
                   <div className="flex items-center gap-1.5 text-sm text-siso-text/60">
                     <Eye className="w-4 h-4" />
