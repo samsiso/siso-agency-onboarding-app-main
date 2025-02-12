@@ -32,11 +32,23 @@ export const useVideos = ({
       console.log('[useVideos] Fetching page:', pageParam);
       
       try {
-        // [Analysis] Split query into two parts for better debugging
-        // 1. First get the video data with explicit logging
+        // [Analysis] Use a single query with JOIN to get both video and creator data
         let query = supabase
           .from('youtube_videos')
-          .select('id, title, thumbnailUrl, duration, viewCount, published_timestamp, date, channel_id');
+          .select(`
+            id,
+            title,
+            thumbnailUrl,
+            duration,
+            viewCount,
+            published_timestamp,
+            date,
+            channel_id,
+            education_creators!youtube_videos_channel_id_fkey (
+              name,
+              channel_avatar_url
+            )
+          `);
 
         // Log the SQL query being constructed
         console.log('[useVideos] Building query with params:', {
@@ -73,28 +85,10 @@ export const useVideos = ({
           return [];
         }
 
-        // 2. Then get creator data for these videos
-        const channelIds = [...new Set(videos.map(v => v.channel_id))];
-        console.log('[useVideos] Fetching creators for channels:', channelIds);
-
-        const { data: creators, error: creatorsError } = await supabase
-          .from('education_creators')
-          .select('channel_id, name, channel_avatar_url')
-          .in('channel_id', channelIds);
-
-        if (creatorsError) {
-          console.error('[useVideos] Error fetching creators:', creatorsError);
-          // Don't throw here, we can still show videos without creator data
-        }
-
-        // Create a map for quick creator lookup
-        const creatorMap = new Map(
-          (creators || []).map(c => [c.channel_id, c])
-        );
-
         // Transform the data with detailed logging
         const transformedVideos = videos.map(video => {
-          const creator = creatorMap.get(video.channel_id);
+          // [Analysis] Get creator info from the joined data
+          const creator = video.education_creators;
           
           return {
             id: video.id,
@@ -102,9 +96,9 @@ export const useVideos = ({
             url: `https://youtube.com/watch?v=${video.id}`,
             duration: video.duration || '0:00',
             thumbnail_url: video.thumbnailUrl || '',
-            date: video.published_timestamp || video.date, // [Analysis] Use new timestamp field with fallback
+            date: video.published_timestamp || video.date,
             educator: {
-              name: creator?.name || video.channel_id || 'Unknown Creator',
+              name: creator?.name || 'Unnamed Creator', // Use actual creator name from join
               avatar_url: creator?.channel_avatar_url || ''
             },
             metrics: {
