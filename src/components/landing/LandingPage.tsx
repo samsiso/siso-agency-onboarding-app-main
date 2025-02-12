@@ -1,70 +1,53 @@
 
-import { lazy, Suspense, memo, useEffect } from 'react';
+import { lazy, Suspense, memo, useEffect, useState, useCallback } from 'react';
 import { LoadingFallback } from './sections/LoadingFallback';
 import Footer from '@/components/Footer';
 import { useViewportLoading } from '@/hooks/useViewportLoading';
 import { usePerformanceMetrics } from '@/hooks/usePerformanceMetrics';
+import { ErrorBoundary } from 'react-error-boundary';
 
-// [Analysis] Optimized lazy loading with prefetch hints
+// [Analysis] Optimized lazy loading with prefetch hints and error handling
 const HeroSection = lazy(() => {
-  // Add preload hint for critical hero image
-  const link = document.createElement('link');
-  link.rel = 'preload';
-  link.as = 'image';
-  link.href = '/lovable-uploads/c482563a-42db-4f47-83f2-c2e7771400b7.png';
-  document.head.appendChild(link);
+  // Preload critical assets
+  const preloadAssets = [
+    { as: 'image', href: '/lovable-uploads/c482563a-42db-4f47-83f2-c2e7771400b7.png' },
+    // Add other critical assets here
+  ];
+
+  preloadAssets.forEach(({ as, href }) => {
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = as;
+    link.href = href;
+    document.head.appendChild(link);
+  });
   
   return import('./sections/HeroSection').then(m => ({ 
     default: memo(m.HeroSection) 
   }));
 });
 
-// [Analysis] Other sections can be loaded when needed
-const WhyChooseSection = lazy(() => 
-  import('./sections/WhyChooseSection').then(m => ({ 
-    default: memo(m.WhyChooseSection) 
-  }))
-);
+// [Analysis] Other sections with error handling and retry logic
+const createLazySection = (importPath: string) => {
+  return lazy(() => 
+    import(importPath).then(m => ({ 
+      default: memo(m.default || m[importPath.split('/').pop()?.split('.')[0] || '']) 
+    }))
+  );
+};
 
-const FeaturesSection = lazy(() => 
-  import('./sections/FeaturesSection').then(m => ({ 
-    default: memo(m.FeaturesSection) 
-  }))
-);
-
-const GettingStartedSection = lazy(() => 
-  import('./sections/GettingStartedSection').then(m => ({ 
-    default: memo(m.GettingStartedSection) 
-  }))
-);
-
-const PricingSection = lazy(() => 
-  import('./sections/PricingSection').then(m => ({ 
-    default: memo(m.PricingSection) 
-  }))
-);
-
-const TestimonialsSection = lazy(() => 
-  import('./sections/TestimonialsSection').then(m => ({ 
-    default: memo(m.TestimonialsSection) 
-  }))
-);
-
-const CallToActionSection = lazy(() => 
-  import('./sections/CallToActionSection').then(m => ({ 
-    default: memo(m.CallToActionSection) 
-  }))
-);
-
-const ScrollNav = lazy(() => 
-  import('@/components/ui/scroll-nav').then(m => ({ 
-    default: memo(m.ScrollNav) 
-  }))
-);
+const WhyChooseSection = createLazySection('./sections/WhyChooseSection');
+const FeaturesSection = createLazySection('./sections/FeaturesSection');
+const GettingStartedSection = createLazySection('./sections/GettingStartedSection');
+const PricingSection = createLazySection('./sections/PricingSection');
+const TestimonialsSection = createLazySection('./sections/TestimonialsSection');
+const CallToActionSection = createLazySection('./sections/CallToActionSection');
+const ScrollNav = createLazySection('@/components/ui/scroll-nav');
 
 const LandingPage = () => {
   // Initialize performance monitoring
   usePerformanceMetrics();
+  const [retryCount, setRetryCount] = useState<Record<string, number>>({});
 
   // Setup viewport loading for each section
   const hero = useViewportLoading({ threshold: 0.1 });
@@ -75,27 +58,57 @@ const LandingPage = () => {
   const testimonials = useViewportLoading({ threshold: 0.1 });
   const cta = useViewportLoading({ threshold: 0.1 });
 
-  // Preload next sections
+  // Enhanced error handling with retry mechanism
+  const handleError = useCallback((error: Error, sectionId: string) => {
+    console.error(`Error loading section ${sectionId}:`, error);
+    setRetryCount(prev => ({ ...prev, [sectionId]: (prev[sectionId] || 0) + 1 }));
+  }, []);
+
+  const handleRetry = useCallback((sectionId: string) => {
+    setRetryCount(prev => ({ ...prev, [sectionId]: 0 }));
+  }, []);
+
+  // Preload next sections with enhanced error handling
   useEffect(() => {
     const preloadNextSections = () => {
-      const links = [
-        { rel: 'preload', href: '/why-choose', as: 'fetch' },
-        { rel: 'preload', href: '/features', as: 'fetch' },
-        { rel: 'preload', href: '/getting-started', as: 'fetch' }
+      const sections = [
+        { path: '/why-choose', priority: 'high' },
+        { path: '/features', priority: 'high' },
+        { path: '/getting-started', priority: 'medium' },
+        { path: '/pricing', priority: 'low' },
       ];
 
-      links.forEach(({ rel, href, as }) => {
+      sections.forEach(({ path, priority }) => {
         const link = document.createElement('link');
-        link.rel = rel;
-        link.href = href;
-        link.as = as;
+        link.rel = 'prefetch';
+        link.href = path;
+        link.setAttribute('fetchpriority', priority);
         document.head.appendChild(link);
       });
     };
 
-    // Start preloading after initial render
     requestIdleCallback(() => preloadNextSections());
   }, []);
+
+  const renderSection = (
+    id: string,
+    Component: React.LazyExoticComponent<any>,
+    ref: React.RefObject<HTMLDivElement>,
+    isVisible: boolean,
+    isLoaded: boolean
+  ) => (
+    <ErrorBoundary
+      fallback={<LoadingFallback error={new Error()} onRetry={() => handleRetry(id)} />}
+      onError={(error) => handleError(error, id)}
+      key={`${id}-${retryCount[id] || 0}`}
+    >
+      <section id={id} ref={ref} className="transition-opacity duration-500">
+        <Suspense fallback={<LoadingFallback />}>
+          {(isVisible || isLoaded) && <Component />}
+        </Suspense>
+      </section>
+    </ErrorBoundary>
+  );
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-black via-siso-bg to-black overflow-x-hidden">
@@ -103,11 +116,13 @@ const LandingPage = () => {
       <link rel="dns-prefetch" href="https://fzuwsjxjymwcjsbpwfsl.supabase.co" />
       <link rel="preconnect" href="https://fzuwsjxjymwcjsbpwfsl.supabase.co" crossOrigin="anonymous" />
       
-      <Suspense fallback={<LoadingFallback />}>
-        <ScrollNav />
-      </Suspense>
+      <ErrorBoundary fallback={<LoadingFallback error={new Error()} />}>
+        <Suspense fallback={<LoadingFallback />}>
+          <ScrollNav />
+        </Suspense>
+      </ErrorBoundary>
       
-      {/* Optimized background elements */}
+      {/* Optimized background elements with reduced repaints */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 -left-1/4 w-[250px] md:w-[600px] h-[250px] md:h-[600px] 
           bg-siso-red/15 rounded-full filter blur-[80px] md:blur-[120px] 
@@ -123,51 +138,15 @@ const LandingPage = () => {
         />
       </div>
 
-      {/* Progressive section loading */}
-      <div className="relative z-10 px-4 md:px-0">
-        <section id="hero" ref={hero.elementRef}>
-          <Suspense fallback={<LoadingFallback />}>
-            {(hero.isVisible || hero.isLoaded) && <HeroSection />}
-          </Suspense>
-        </section>
-
-        <section id="why-choose" ref={whyChoose.elementRef}>
-          <Suspense fallback={<LoadingFallback />}>
-            {(whyChoose.isVisible || whyChoose.isLoaded) && <WhyChooseSection />}
-          </Suspense>
-        </section>
-
-        <section id="features" ref={features.elementRef}>
-          <Suspense fallback={<LoadingFallback />}>
-            {(features.isVisible || features.isLoaded) && <FeaturesSection />}
-          </Suspense>
-        </section>
-
-        <section id="getting-started" ref={gettingStarted.elementRef}>
-          <Suspense fallback={<LoadingFallback />}>
-            {(gettingStarted.isVisible || gettingStarted.isLoaded) && <GettingStartedSection />}
-          </Suspense>
-        </section>
-
-        <section id="pricing" ref={pricing.elementRef}>
-          <Suspense fallback={<LoadingFallback />}>
-            {(pricing.isVisible || pricing.isLoaded) && <PricingSection />}
-          </Suspense>
-        </section>
-
-        <div className="space-y-12 md:space-y-24">
-          <section id="testimonials" ref={testimonials.elementRef}>
-            <Suspense fallback={<LoadingFallback />}>
-              {(testimonials.isVisible || testimonials.isLoaded) && <TestimonialsSection />}
-            </Suspense>
-          </section>
-        </div>
-
-        <section id="cta" ref={cta.elementRef}>
-          <Suspense fallback={<LoadingFallback />}>
-            {(cta.isVisible || cta.isLoaded) && <CallToActionSection />}
-          </Suspense>
-        </section>
+      {/* Progressive section loading with error boundaries */}
+      <div className="relative z-10 px-4 md:px-0 space-y-12 md:space-y-24">
+        {renderSection('hero', HeroSection, hero.elementRef, hero.isVisible, hero.isLoaded)}
+        {renderSection('why-choose', WhyChooseSection, whyChoose.elementRef, whyChoose.isVisible, whyChoose.isLoaded)}
+        {renderSection('features', FeaturesSection, features.elementRef, features.isVisible, features.isLoaded)}
+        {renderSection('getting-started', GettingStartedSection, gettingStarted.elementRef, gettingStarted.isVisible, gettingStarted.isLoaded)}
+        {renderSection('pricing', PricingSection, pricing.elementRef, pricing.isVisible, pricing.isLoaded)}
+        {renderSection('testimonials', TestimonialsSection, testimonials.elementRef, testimonials.isVisible, testimonials.isLoaded)}
+        {renderSection('cta', CallToActionSection, cta.elementRef, cta.isVisible, cta.isLoaded)}
 
         <Footer />
       </div>
