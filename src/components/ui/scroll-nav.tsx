@@ -28,7 +28,7 @@ const navItems = [
   },
 ]
 
-export function ScrollNav() {
+function ScrollNav() {
   const [activeSection, setActiveSection] = useState("hero")
 
   useEffect(() => {
