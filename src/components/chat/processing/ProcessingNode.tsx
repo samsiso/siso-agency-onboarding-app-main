@@ -29,7 +29,7 @@ export const ProcessingNode = ({ icon: Icon, label, isActive, isComplete, size =
   return (
     <div className={cn(
       "relative flex flex-col items-center text-center group",
-      size === 'sm' ? 'gap-4' : 'gap-6'
+      size === 'sm' ? 'gap-3' : 'gap-4'
     )}>
       <motion.div
         initial={false}
@@ -39,7 +39,7 @@ export const ProcessingNode = ({ icon: Icon, label, isActive, isComplete, size =
         }}
         className={cn(
           "relative flex items-center justify-center rounded-full bg-siso-text/10 z-10 transition-shadow duration-500",
-          size === 'sm' ? 'w-16 h-16' : 'w-24 h-24',
+          size === 'sm' ? 'w-16 h-16' : 'w-20 h-20',
           isActive && "shadow-lg shadow-siso-orange/30",
           isComplete && "shadow-md shadow-siso-orange/20",
           "hover:scale-110 transition-transform duration-300"
@@ -65,13 +65,13 @@ export const ProcessingNode = ({ icon: Icon, label, isActive, isComplete, size =
         
         <Icon className={cn(
           "text-white relative z-10",
-          size === 'sm' ? 'w-8 h-8' : 'w-12 h-12'
+          size === 'sm' ? 'w-8 h-8' : 'w-10 h-10'
         )} />
       </motion.div>
       
-      <div className="flex-1 space-y-2 max-w-[200px]">
+      <div className="flex-1 space-y-1">
         <span className={cn(
-          "font-medium relative block",
+          "font-medium relative block whitespace-nowrap",
           size === 'sm' ? 'text-sm' : 'text-base',
           isActive ? 'text-white' : 'text-siso-text/70',
           isComplete && 'text-siso-orange'
@@ -106,7 +106,7 @@ export const ProcessingNode = ({ icon: Icon, label, isActive, isComplete, size =
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="absolute -inset-8 bg-gradient-radial from-siso-text/10 to-transparent backdrop-blur-sm rounded-xl -z-10"
+          className="absolute -inset-4 bg-gradient-radial from-siso-text/10 to-transparent backdrop-blur-sm rounded-xl -z-10"
         />
       )}
     </div>
