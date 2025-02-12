@@ -60,9 +60,13 @@ export const VideoGrid = ({ videos = [], featuredVideos = [], isLoading }: Video
       fullPath: `/education/video/${video.id}`
     });
     
-    // [Analysis] Simplified navigation - just use the video ID
     navigate(`/education/video/${video.id}`);
   };
+
+  // Sort videos by published date
+  const sortedVideos = [...videos].sort((a, b) => {
+    return new Date(b.date || '').getTime() - new Date(a.date || '').getTime();
+  });
 
   return (
     <motion.div
@@ -90,7 +94,7 @@ export const VideoGrid = ({ videos = [], featuredVideos = [], isLoading }: Video
 
       {/* All Videos Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {videos.map((video, index) => (
+        {sortedVideos.map((video, index) => (
           <OptimizedVideoCard
             key={video.id}
             video={video}

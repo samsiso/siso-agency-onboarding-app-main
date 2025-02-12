@@ -9,9 +9,9 @@ import { VideoCategories } from '@/components/education/VideoCategories';
 import { useEducationStats } from '@/hooks/use-education-stats';
 import { EducationChat } from '@/components/education/chat/EducationChat';
 import { LearningContent } from '@/components/education/learning/LearningContent';
+import { Card } from '@/components/ui/card';
 
 export default function SisoEducation() {
-  // [Analysis] State management centralized at the top level
   const [activeSection, setActiveSection] = useState<'videos' | 'educators'>('videos');
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -23,7 +23,6 @@ export default function SisoEducation() {
     isLoading: isStatsLoading
   } = useEducationStats();
 
-  // [Analysis] Early return for loading state could be added here if needed
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
       <Sidebar />
@@ -51,7 +50,9 @@ export default function SisoEducation() {
                 onCategorySelect={setSelectedCategory}
               />
               
-              <LearningProgress />
+              <Card className="p-6 bg-gradient-to-br from-siso-bg-alt to-siso-bg border-siso-border">
+                <LearningProgress />
+              </Card>
             </>
           )}
 

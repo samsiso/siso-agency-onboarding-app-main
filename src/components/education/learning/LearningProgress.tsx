@@ -1,63 +1,12 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { TrendingUp, Award, Clock, BookOpenCheck, Target, Flame, Trophy } from 'lucide-react';
+import { TrendingUp, Award, Clock, BookOpenCheck, Target, Trophy } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
 
-interface VideoProgress {
-  id: string;
-  video_id: string;
-  progress: number;
-  title: string;
-  last_watched_at: string;
-}
-
-interface LearningMilestone {
-  title: string;
-  progress: number;
-  target: number;
-  icon: JSX.Element;
-}
-
 export const LearningProgress = () => {
-  // [Analysis] Fetch user's recent video progress with video titles
-  const { data: progressData } = useQuery({
-    queryKey: ['learning-progress'],
-    queryFn: async () => {
-      const { data: progress, error } = await supabase
-        .from('video_progress')
-        .select(`
-          id,
-          video_id,
-          progress,
-          last_watched_at,
-          youtube_videos!inner (
-            title
-          )
-        `)
-        .order('last_watched_at', { ascending: false })
-        .limit(5);
-      
-      if (error) {
-        console.error('Error fetching video progress:', error);
-        throw error;
-      }
-
-      // Transform the data to match VideoProgress interface
-      const transformedProgress: VideoProgress[] = progress.map(item => ({
-        id: item.id,
-        video_id: item.video_id,
-        progress: item.progress,
-        title: item.youtube_videos.title,
-        last_watched_at: item.last_watched_at,
-      }));
-      
-      return transformedProgress;
-    },
-  });
-
   // [Analysis] Fetch user's learning stats with enhanced metrics
   const { data: learningStats } = useQuery({
     queryKey: ['learning-stats'],
@@ -85,7 +34,7 @@ export const LearningProgress = () => {
   });
 
   // Learning milestones
-  const milestones: LearningMilestone[] = [
+  const milestones = [
     {
       title: 'Complete 10 Videos',
       progress: learningStats?.completedVideos || 0,
@@ -141,104 +90,71 @@ export const LearningProgress = () => {
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold text-siso-text-bold">Learning Journey</h2>
           <div className="flex items-center gap-2">
-            <Flame className="w-5 h-5 text-siso-orange" />
+            <Trophy className="w-5 h-5 text-siso-orange" />
             <span className="text-sm font-medium">
               {learningStats?.weeklyStreak || 0} Day Streak
             </span>
           </div>
         </div>
         
-        <Card className="p-6 bg-gradient-to-br from-siso-bg-alt to-siso-bg border-siso-border">
-          <div className="space-y-4">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium">Overall Progress</span>
-              <span className="text-sm font-medium">{learningStats?.totalProgress || 0}%</span>
+        <div className="space-y-4">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm font-medium">Overall Progress</span>
+            <span className="text-sm font-medium">{learningStats?.totalProgress || 0}%</span>
+          </div>
+          <Progress 
+            value={learningStats?.totalProgress || 0} 
+            className="h-2"
+            indicatorClassName="bg-gradient-to-r from-siso-orange to-siso-red"
+          />
+          
+          {/* Quick Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+            <div className="flex flex-col gap-2 p-4 rounded-lg bg-siso-bg-alt/50">
+              <div className="flex items-center gap-2">
+                <BookOpenCheck className="w-4 h-4 text-siso-orange" />
+                <span className="font-medium">Videos Completed</span>
+              </div>
+              <div className="text-2xl font-bold">{learningStats?.completedVideos || 0}</div>
             </div>
-            <Progress 
-              value={learningStats?.totalProgress || 0} 
-              className="h-2"
-              indicatorClassName="bg-gradient-to-r from-siso-orange to-siso-red"
-            />
-            
-            {/* Milestones */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-              {milestones.map((milestone, index) => (
-                <div 
-                  key={index}
-                  className="bg-siso-bg-alt/50 p-4 rounded-lg space-y-2"
-                >
-                  <div className="flex items-center gap-2">
-                    {milestone.icon}
-                    <span className="text-sm font-medium">{milestone.title}</span>
-                  </div>
-                  <Progress 
-                    value={(milestone.progress / milestone.target) * 100} 
-                    className="h-1.5"
-                  />
-                  <div className="text-xs text-siso-text/70">
-                    {milestone.progress} / {milestone.target}
-                  </div>
-                </div>
-              ))}
+            <div className="flex flex-col gap-2 p-4 rounded-lg bg-siso-bg-alt/50">
+              <div className="flex items-center gap-2">
+                <Award className="w-4 h-4 text-siso-orange" />
+                <span className="font-medium">Skills Gained</span>
+              </div>
+              <div className="text-2xl font-bold">{learningStats?.skillsGained || 0}</div>
+            </div>
+            <div className="flex flex-col gap-2 p-4 rounded-lg bg-siso-bg-alt/50">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-siso-orange" />
+                <span className="font-medium">Hours Learned</span>
+              </div>
+              <div className="text-2xl font-bold">{learningStats?.hoursLearned || 0}</div>
             </div>
           </div>
-        </Card>
-      </motion.div>
-
-      {/* Continue Learning Section */}
-      <motion.div variants={itemVariants} className="space-y-4">
-        <h2 className="text-2xl font-bold text-siso-text-bold">Continue Learning</h2>
-        <Card className="p-6 bg-gradient-to-br from-siso-bg-alt to-siso-bg border-siso-border">
-          <div className="flex items-center gap-4 mb-4">
-            <Clock className="w-5 h-5 text-siso-orange" />
-            <h3 className="text-lg font-semibold">Recently Watched</h3>
-          </div>
-          <div className="space-y-4">
-            {progressData?.map((item) => (
-              <motion.div
-                key={item.id}
-                className="flex items-center gap-4 p-4 rounded-lg bg-siso-bg-alt/50 hover:bg-siso-bg-alt cursor-pointer"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+          
+          {/* Progress Milestones */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+            {milestones.map((milestone, index) => (
+              <div 
+                key={index}
+                className="bg-siso-bg-alt/50 p-4 rounded-lg space-y-2"
               >
-                <div className="flex-1">
-                  <h4 className="font-medium text-siso-text-bold mb-2">{item.title}</h4>
-                  <Progress value={item.progress} className="h-2" />
+                <div className="flex items-center gap-2">
+                  {milestone.icon}
+                  <span className="text-sm font-medium">{milestone.title}</span>
                 </div>
-                <span className="text-sm text-siso-text/70">
-                  {item.progress}% Complete
-                </span>
-              </motion.div>
+                <Progress 
+                  value={(milestone.progress / milestone.target) * 100} 
+                  className="h-1.5"
+                />
+                <div className="text-xs text-siso-text/70">
+                  {milestone.progress} / {milestone.target}
+                </div>
+              </div>
             ))}
           </div>
-        </Card>
-      </motion.div>
-
-      {/* Learning Stats */}
-      <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="p-6 bg-gradient-to-br from-siso-red/10 to-transparent">
-          <div className="flex items-center gap-3 mb-2">
-            <TrendingUp className="w-5 h-5 text-siso-red" />
-            <h3 className="font-semibold">Videos Completed</h3>
-          </div>
-          <p className="text-2xl font-bold">{learningStats?.completedVideos || 0}</p>
-        </Card>
-
-        <Card className="p-6 bg-gradient-to-br from-siso-orange/10 to-transparent">
-          <div className="flex items-center gap-3 mb-2">
-            <Award className="w-5 h-5 text-siso-orange" />
-            <h3 className="font-semibold">Skills Gained</h3>
-          </div>
-          <p className="text-2xl font-bold">{learningStats?.skillsGained || 0}</p>
-        </Card>
-
-        <Card className="p-6 bg-gradient-to-br from-purple-500/10 to-transparent">
-          <div className="flex items-center gap-3 mb-2">
-            <BookOpenCheck className="w-5 h-5 text-purple-500" />
-            <h3 className="font-semibold">Hours Learned</h3>
-          </div>
-          <p className="text-2xl font-bold">{learningStats?.hoursLearned || 0}</p>
-        </Card>
+        </div>
       </motion.div>
     </motion.div>
   );

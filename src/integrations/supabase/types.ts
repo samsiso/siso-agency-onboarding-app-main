@@ -2060,6 +2060,7 @@ export type Database = {
       video_progress: {
         Row: {
           completed: boolean | null
+          completed_at: string | null
           created_at: string | null
           id: string
           last_watched_at: string | null
@@ -2070,6 +2071,7 @@ export type Database = {
         }
         Insert: {
           completed?: boolean | null
+          completed_at?: string | null
           created_at?: string | null
           id?: string
           last_watched_at?: string | null
@@ -2080,6 +2082,7 @@ export type Database = {
         }
         Update: {
           completed?: boolean | null
+          completed_at?: string | null
           created_at?: string | null
           id?: string
           last_watched_at?: string | null
@@ -2273,6 +2276,7 @@ export type Database = {
           likes_count: number | null
           order: number | null
           preview_gif_url: string | null
+          published_at: string | null
           sync_id: string | null
           sync_timestamp: string | null
           tags: string[] | null
@@ -2303,6 +2307,7 @@ export type Database = {
           likes_count?: number | null
           order?: number | null
           preview_gif_url?: string | null
+          published_at?: string | null
           sync_id?: string | null
           sync_timestamp?: string | null
           tags?: string[] | null
@@ -2333,6 +2338,7 @@ export type Database = {
           likes_count?: number | null
           order?: number | null
           preview_gif_url?: string | null
+          published_at?: string | null
           sync_id?: string | null
           sync_timestamp?: string | null
           tags?: string[] | null
