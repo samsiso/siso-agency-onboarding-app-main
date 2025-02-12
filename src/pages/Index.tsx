@@ -1,3 +1,4 @@
+
 import { lazy, Suspense, useState } from 'react';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { Bot } from 'lucide-react';
@@ -23,8 +24,7 @@ export default function Index() {
   const { user, loading } = useAuthSession();
   const [messages, setMessages] = useState<ChatMessage[]>([{
     role: 'assistant',
-    content: "Welcome to SISO! I'm here to help you explore our platform and find the resources you need. What would you like to know about?",
-    timestamp: new Date()
+    content: "Welcome to SISO! I'm here to help you explore our platform and find the resources you need. What would you like to know about?"
   }]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -34,8 +34,7 @@ export default function Index() {
     // Add user message
     setMessages(prev => [...prev, {
       role: 'user',
-      content: message,
-      timestamp: new Date()
+      content: message
     }]);
 
     setIsLoading(true);
@@ -45,8 +44,7 @@ export default function Index() {
       setTimeout(() => {
         setMessages(prev => [...prev, {
           role: 'assistant',
-          content: "Here's a test response with formatting:\n\n# Main Points\n\n- First important point\n- Second key point\n\n## Details\n\n1. More detailed explanation\n2. Additional context\n\n> Important note: This is a blockquote\n\nYou can **emphasize** text or make it *italic*.",
-          timestamp: new Date()
+          content: "Here's a test response with formatting:\n\n# Main Points\n\n- First important point\n- Second key point\n\n## Details\n\n1. More detailed explanation\n2. Additional context\n\n> Important note: This is a blockquote\n\nYou can **emphasize** text or make it *italic*."
         }]);
         setIsLoading(false);
       }, 1000);
