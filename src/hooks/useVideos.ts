@@ -36,7 +36,7 @@ export const useVideos = ({
         // 1. First get the video data with explicit logging
         let query = supabase
           .from('youtube_videos')
-          .select('id, title, thumbnailUrl, duration, viewCount, date, channel_id');
+          .select('id, title, thumbnailUrl, duration, viewCount, published_timestamp, date, channel_id');
 
         // Log the SQL query being constructed
         console.log('[useVideos] Building query with params:', {
@@ -55,10 +55,11 @@ export const useVideos = ({
           query = query.ilike('title', `%${searchQuery}%`);
         }
 
-        // Add pagination
+        // [Analysis] Order by published_timestamp first, fall back to date field if timestamp is null
         query = query
           .range(pageParam * ITEMS_PER_PAGE, (pageParam + 1) * ITEMS_PER_PAGE - 1)
-          .order('date', { ascending: false });
+          .order('published_timestamp', { ascending: false, nullsFirst: false })
+          .order('date', { ascending: false, nullsFirst: false });
 
         const { data: videos, error: videosError } = await query;
 
@@ -101,7 +102,7 @@ export const useVideos = ({
             url: `https://youtube.com/watch?v=${video.id}`,
             duration: video.duration || '0:00',
             thumbnail_url: video.thumbnailUrl || '',
-            date: video.date, // [Analysis] Added date field from youtube_videos
+            date: video.published_timestamp || video.date, // [Analysis] Use new timestamp field with fallback
             educator: {
               name: creator?.name || video.channel_id || 'Unknown Creator',
               avatar_url: creator?.channel_avatar_url || ''

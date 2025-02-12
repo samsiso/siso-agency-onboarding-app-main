@@ -2277,6 +2277,7 @@ export type Database = {
           order: number | null
           preview_gif_url: string | null
           published_at: string | null
+          published_timestamp: string | null
           sync_id: string | null
           sync_timestamp: string | null
           tags: string[] | null
@@ -2308,6 +2309,7 @@ export type Database = {
           order?: number | null
           preview_gif_url?: string | null
           published_at?: string | null
+          published_timestamp?: string | null
           sync_id?: string | null
           sync_timestamp?: string | null
           tags?: string[] | null
@@ -2339,6 +2341,7 @@ export type Database = {
           order?: number | null
           preview_gif_url?: string | null
           published_at?: string | null
+          published_timestamp?: string | null
           sync_id?: string | null
           sync_timestamp?: string | null
           tags?: string[] | null
