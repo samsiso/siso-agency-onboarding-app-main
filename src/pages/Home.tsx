@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
@@ -6,10 +7,10 @@ import { Sidebar } from "@/components/Sidebar";
 import { Waves } from '@/components/ui/waves-background';
 import { PreChatState } from '@/components/home/PreChatState';
 import { ChatState } from '@/components/home/ChatState';
-import { Message } from '@/components/home/types';
+import { ChatMessage, ProcessingStage, AgentCategory } from '@/types/chat';
 
 export default function Home() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const { toast } = useToast();
@@ -21,64 +22,74 @@ export default function Home() {
       setIsExpanded(true);
     }
 
+    // Add user message
     setMessages(prev => [...prev, { role: 'user', content: message }]);
     
-    // Add initial loading message with first step
+    // Initialize assistant message with first stage
     setMessages(prev => [...prev, { 
       role: 'assistant', 
       content: '',
       loading: true,
-      steps: {
-        thinking: '🤔 Analyzing your question and identifying key topics...',
+      processingStage: {
+        current: 'initial',
+        progress: 0
+      },
+      agentResponses: {
+        'ai-tools': { category: 'ai-tools', content: '', status: 'pending', relevance: 0 },
+        'videos': { category: 'videos', content: '', status: 'pending', relevance: 0 },
+        'networking': { category: 'networking', content: '', status: 'pending', relevance: 0 },
+        'assistants': { category: 'assistants', content: '', status: 'pending', relevance: 0 },
+        'educators': { category: 'educators', content: '', status: 'pending', relevance: 0 },
+        'news': { category: 'news', content: '', status: 'pending', relevance: 0 }
       }
     }]);
     
     setIsLoading(true);
 
     try {
-      // Update with second step after a short delay
-      setTimeout(() => {
-        setMessages(prev => {
-          const lastMessage = { ...prev[prev.length - 1] };
-          lastMessage.steps = {
-            ...lastMessage.steps,
-            searching: '🔍 Searching through SISO Resource Hub...',
-          };
-          return [...prev.slice(0, -1), lastMessage];
-        });
-      }, 1000);
+      // Simulate the multi-stage processing
+      const stages: ProcessingStage[] = ['initial', 'context', 'agents', 'synthesis'];
+      const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-      // Update with third step after another delay
-      setTimeout(() => {
-        setMessages(prev => {
-          const lastMessage = { ...prev[prev.length - 1] };
-          lastMessage.steps = {
-            ...lastMessage.steps,
-            processing: '⚡ Processing relevant information...',
-          };
-          return [...prev.slice(0, -1), lastMessage];
-        });
-      }, 2000);
+      // Initial understanding stage
+      await delay(1000);
+      updateProcessingStage('initial');
 
+      // Company context stage
+      await delay(1000);
+      updateProcessingStage('context');
+
+      // Agent processing stage
+      await delay(1000);
+      updateProcessingStage('agents');
+
+      // Simulate individual agent processing
+      const agentCategories: AgentCategory[] = ['ai-tools', 'videos', 'networking', 'assistants', 'educators', 'news'];
+      for (const category of agentCategories) {
+        await delay(800);
+        updateAgentStatus(category, 'processing');
+        await delay(1200);
+        updateAgentStatus(category, 'complete');
+      }
+
+      // Final synthesis stage
+      await delay(1000);
+      updateProcessingStage('synthesis');
+
+      // Get the final response from the edge function
       const { data, error } = await supabase.functions.invoke('chat-with-assistant', {
         body: { message }
       });
 
       if (error) throw error;
 
-      // Final step and response
+      // Update with final response
       setMessages(prev => {
         const newMessages = [...prev.slice(0, -1)];
         newMessages.push({ 
           role: 'assistant', 
           content: data.response,
-          loading: false,
-          steps: {
-            thinking: '🤔 Analyzed your question and identified key topics',
-            searching: '🔍 Searched through our resource database',
-            processing: '⚡ Processed the most relevant information',
-            response: '💡 Generated response based on findings'
-          }
+          loading: false
         });
         return newMessages;
       });
@@ -93,6 +104,41 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const updateProcessingStage = (stage: ProcessingStage) => {
+    setMessages(prev => {
+      const lastMessage = prev[prev.length - 1];
+      if (lastMessage.role === 'assistant') {
+        return [...prev.slice(0, -1), {
+          ...lastMessage,
+          processingStage: {
+            ...lastMessage.processingStage!,
+            current: stage
+          }
+        }];
+      }
+      return prev;
+    });
+  };
+
+  const updateAgentStatus = (category: AgentCategory, status: 'pending' | 'processing' | 'complete') => {
+    setMessages(prev => {
+      const lastMessage = prev[prev.length - 1];
+      if (lastMessage.role === 'assistant' && lastMessage.agentResponses) {
+        return [...prev.slice(0, -1), {
+          ...lastMessage,
+          agentResponses: {
+            ...lastMessage.agentResponses,
+            [category]: {
+              ...lastMessage.agentResponses[category],
+              status
+            }
+          }
+        }];
+      }
+      return prev;
+    });
   };
 
   return (

@@ -1,10 +1,12 @@
+
 import { motion, AnimatePresence } from 'framer-motion';
-import { Message } from './types';
+import { ChatMessage } from '@/types/chat';
 import { Bot, CheckCircle2, Loader } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ProcessingTree } from '@/components/chat/ProcessingTree';
 
 interface ChatStateProps {
-  messages: Message[];
+  messages: ChatMessage[];
   handleSubmit: (message: string) => Promise<void>;
   isLoading: boolean;
 }
@@ -19,48 +21,12 @@ export const ChatState = ({ messages, handleSubmit, isLoading }: ChatStateProps)
     }
   };
 
-  const LoadingStep = ({ step, isActive, isCompleted }: { step: string; isActive: boolean; isCompleted: boolean }) => (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className={cn(
-        "flex items-center space-x-2 text-sm",
-        isActive ? "text-siso-text" : "text-siso-text/50",
-        isCompleted ? "text-siso-orange" : ""
-      )}
-    >
-      <div className="flex items-center justify-center w-5 h-5">
-        {isCompleted ? (
-          <CheckCircle2 className="w-4 h-4 text-siso-orange" />
-        ) : isActive ? (
-          <Loader className="w-4 h-4 animate-spin" />
-        ) : (
-          <div className="w-2 h-2 bg-current rounded-full" />
-        )}
-      </div>
-      <span>{step}</span>
-    </motion.div>
-  );
-
-  const LoadingIndicator = ({ steps }: { steps: Record<string, boolean> }) => (
-    <div className="flex flex-col space-y-3">
-      {Object.entries(steps).map(([step, completed], index) => (
-        <LoadingStep
-          key={step}
-          step={step}
-          isActive={!completed && index === Object.values(steps).filter(Boolean).length}
-          isCompleted={completed}
-        />
-      ))}
-    </div>
-  );
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="flex flex-col w-full max-w-3xl mx-auto h-full"
+      className="flex flex-col w-full max-w-4xl mx-auto h-full"
     >
       <div className="flex-1 overflow-y-auto space-y-6 p-4 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
         <AnimatePresence mode="popLayout">
@@ -81,21 +47,19 @@ export const ChatState = ({ messages, handleSubmit, isLoading }: ChatStateProps)
                   <Bot className="h-5 w-5 text-white" />
                 </div>
               )}
-              <div className="flex-1 space-y-2">
+              <div className="flex-1 space-y-4">
                 {message.loading ? (
                   <motion.div 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="space-y-4"
+                    className="space-y-6"
                   >
-                    <LoadingIndicator
-                      steps={{
-                        "🤔 Analyzing your question and identifying key topics...": message.steps?.thinking !== undefined,
-                        "🔍 Searching through SISO Resource Hub...": message.steps?.searching !== undefined,
-                        "⚡ Processing relevant information...": message.steps?.processing !== undefined,
-                        "💡 Generating response...": message.steps?.response !== undefined,
-                      }}
-                    />
+                    {message.processingStage && (
+                      <ProcessingTree
+                        currentStage={message.processingStage.current}
+                        agentStatuses={message.agentResponses || {}}
+                      />
+                    )}
                   </motion.div>
                 ) : (
                   <div className="text-sm text-gray-200 leading-relaxed">
