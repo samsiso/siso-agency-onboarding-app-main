@@ -48,12 +48,15 @@ export const ChatMessage = ({ role, content, assistantType, isLoading, steps, ri
   const [copied, setCopied] = React.useState(false);
   const { toast } = useToast();
   
+  // [Analysis] Enhanced content formatting with Markdown-like support
   const formatContent = (text: string) => {
-    const parts = text.split(/(```[\s\S]*?```)/);
+    // Handle code blocks first
+    const segments = text.split(/(```[\s\S]*?```)/);
     
-    return parts.map((part, index) => {
-      if (part.startsWith('```')) {
-        const [, ...codeLines] = part.split('\n');
+    return segments.map((segment, index) => {
+      // Handle code blocks
+      if (segment.startsWith('```')) {
+        const [, ...codeLines] = segment.split('\n');
         codeLines.pop();
         const code = codeLines.join('\n');
         
@@ -80,19 +83,87 @@ export const ChatMessage = ({ role, content, assistantType, isLoading, steps, ri
           </div>
         );
       }
+
+      // Process regular text content
+      const lines = segment.split('\n');
       
       return (
-        <p key={index} className="whitespace-pre-wrap leading-relaxed">
-          {part.split('\n').map((line, i) => (
-            <React.Fragment key={i}>
-              {line.replace(
-                /(https?:\/\/[^\s]+)/g,
-                (url) => `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-siso-orange hover:text-siso-red underline transition-colors">${url}</a>`
-              )}
-              {i !== part.split('\n').length - 1 && <br />}
-            </React.Fragment>
-          ))}
-        </p>
+        <div key={index} className="space-y-4">
+          {lines.map((line, lineIndex) => {
+            // Handle bullet points
+            if (line.trim().startsWith('- ')) {
+              return (
+                <div key={lineIndex} className="flex items-start gap-2 pl-4">
+                  <span className="mt-2 h-1.5 w-1.5 rounded-full bg-siso-orange/70" />
+                  <p className="flex-1 text-siso-text/90">{line.slice(2)}</p>
+                </div>
+              );
+            }
+
+            // Handle numbered lists
+            if (/^\d+\.\s/.test(line.trim())) {
+              const [number, ...rest] = line.trim().split(/\.\s/);
+              return (
+                <div key={lineIndex} className="flex items-start gap-2 pl-4">
+                  <span className="text-siso-orange/70 font-mono">{number}.</span>
+                  <p className="flex-1 text-siso-text/90">{rest.join('. ')}</p>
+                </div>
+              );
+            }
+
+            // Handle headers
+            if (line.startsWith('# ')) {
+              return (
+                <h2 key={lineIndex} className="text-xl font-semibold text-siso-text mt-6 mb-4">
+                  {line.slice(2)}
+                </h2>
+              );
+            }
+
+            if (line.startsWith('## ')) {
+              return (
+                <h3 key={lineIndex} className="text-lg font-semibold text-siso-text mt-4 mb-2">
+                  {line.slice(3)}
+                </h3>
+              );
+            }
+
+            // Handle quotes
+            if (line.startsWith('> ')) {
+              return (
+                <blockquote key={lineIndex} className="border-l-2 border-siso-orange/50 pl-4 italic text-siso-text/80">
+                  {line.slice(2)}
+                </blockquote>
+              );
+            }
+
+            // Handle links
+            const processedLine = line.replace(
+              /(https?:\/\/[^\s]+)/g,
+              (url) => `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-siso-orange hover:text-siso-red underline transition-colors">${url}</a>`
+            );
+
+            // Handle bold text
+            const processedBold = processedLine.replace(
+              /\*\*(.*?)\*\*/g,
+              '<strong class="font-semibold text-siso-text-bold">$1</strong>'
+            );
+
+            // Handle italic text
+            const processedItalic = processedBold.replace(
+              /\*(.*?)\*/g,
+              '<em class="italic text-siso-text/90">$1</em>'
+            );
+
+            return line.trim() ? (
+              <p
+                key={lineIndex}
+                className="text-siso-text/90 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: processedItalic }}
+              />
+            ) : <div key={lineIndex} className="h-4" />;
+          })}
+        </div>
       );
     });
   };
