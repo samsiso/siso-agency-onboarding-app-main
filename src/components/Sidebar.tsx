@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SidebarLogo } from './sidebar/SidebarLogo';
@@ -13,6 +12,7 @@ export const Sidebar = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showNavigation, setShowNavigation] = useState(true);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
 
@@ -69,6 +69,19 @@ export const Sidebar = () => {
     }
   };
 
+  // [Analysis] Keep sidebar expanded when profile is open
+  const handleMouseEnter = () => {
+    if (!isMobile && !isProfileOpen) {
+      setIsExpanded(true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (!isMobile && !isProfileOpen) {
+      setIsExpanded(false);
+    }
+  };
+
   return (
     <>
       {/* Mobile Menu Button with smooth icon transition */}
@@ -118,8 +131,8 @@ export const Sidebar = () => {
           border-r border-siso-text/10 shadow-lg
           ${isMobile ? 'left-0 z-40' : ''}
         `}
-        onMouseEnter={() => !isMobile && setIsExpanded(true)}
-        onMouseLeave={() => !isMobile && setIsExpanded(false)}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
       >
         <SidebarLogo 
           collapsed={!isExpanded} 
@@ -133,7 +146,13 @@ export const Sidebar = () => {
             visible={showNavigation}
           />
         </AnimatePresence>
-        <SidebarFooter collapsed={!isExpanded} />
+        <SidebarFooter 
+          collapsed={!isExpanded} 
+          onProfileOpen={(isOpen) => {
+            setIsProfileOpen(isOpen);
+            if (isOpen) setIsExpanded(true);
+          }}
+        />
       </motion.div>
 
       {/* Main Content Wrapper with smooth margin transition */}

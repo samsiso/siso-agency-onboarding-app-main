@@ -17,10 +17,10 @@ import { useBasicUserData } from '@/hooks/useBasicUserData';
 
 interface ProfileSectionProps {
   collapsed: boolean;
+  onOpenChange: (isOpen: boolean) => void;
 }
 
-export const ProfileSection = ({ collapsed }: ProfileSectionProps) => {
-  // [Analysis] Fixed state management to prevent animation conflicts
+export const ProfileSection = ({ collapsed, onOpenChange }: ProfileSectionProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -58,6 +58,10 @@ export const ProfileSection = ({ collapsed }: ProfileSectionProps) => {
     }
   };
 
+  const handleItemClick = (path: string) => {
+    navigate(path);
+  };
+
   // [Analysis] For collapsed state, use direct navigation instead of dropdown
   if (collapsed) {
     return (
@@ -66,7 +70,10 @@ export const ProfileSection = ({ collapsed }: ProfileSectionProps) => {
           variant="ghost"
           size="icon"
           className="w-full aspect-square p-0 hover:bg-siso-text/5 transition-colors duration-200"
-          onClick={() => navigate('/profile')}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleItemClick('/profile');
+          }}
         >
           {userData.avatarUrl ? (
             <img
@@ -86,15 +93,15 @@ export const ProfileSection = ({ collapsed }: ProfileSectionProps) => {
     );
   }
 
-  // [Analysis] Full dropdown for expanded state
   return (
     <div className="px-2">
-      <DropdownMenu>
+      <DropdownMenu onOpenChange={onOpenChange}>
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
             className="w-full px-2 py-4 hover:bg-siso-text/5 transition-colors duration-200"
             disabled={isLoading}
+            onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center gap-3 w-full">
               {userData.avatarUrl ? (
@@ -127,23 +134,24 @@ export const ProfileSection = ({ collapsed }: ProfileSectionProps) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="start"
-          className="w-56 bg-siso-bg-alt border-siso-border"
+          className="w-56 bg-siso-bg-alt border-siso-border z-50"
+          onClick={(e) => e.stopPropagation()}
         >
           <DropdownMenuItem
             className="text-siso-text hover:text-siso-text-bold hover:bg-siso-text/5 cursor-pointer"
-            onClick={() => navigate('/profile')}
+            onClick={() => handleItemClick('/profile')}
           >
             View Profile
           </DropdownMenuItem>
           <DropdownMenuItem
             className="text-siso-text hover:text-siso-text-bold hover:bg-siso-text/5 cursor-pointer"
-            onClick={() => navigate('/leaderboards')}
+            onClick={() => handleItemClick('/leaderboards')}
           >
             Leaderboard
           </DropdownMenuItem>
           <DropdownMenuItem
             className="text-siso-text hover:text-siso-text-bold hover:bg-siso-text/5 cursor-pointer"
-            onClick={() => navigate('/how-to-earn')}
+            onClick={() => handleItemClick('/how-to-earn')}
           >
             How to Earn Points
           </DropdownMenuItem>
