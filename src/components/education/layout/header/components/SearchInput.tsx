@@ -9,6 +9,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 interface SearchInputProps {
   searchQuery: string;
@@ -123,29 +124,35 @@ export const SearchInput = ({
     onSearchChange('');
   };
 
+  // [Analysis] Simplified navigation logic - direct path approach
   const handleSearchResultClick = async (result: any) => {
     try {
-      // Save to search history
-      await supabase.from('user_search_history').insert({
+      // Save to search history first
+      const { error: historyError } = await supabase.from('user_search_history').insert({
         query: result.title,
         result_type: result.type,
         result_id: result.id
       });
 
-      // [Analysis] Use full paths since React Router needs them for proper navigation
-      if (result.type === 'video') {
-        console.log('Navigating to video:', `/education/video/${result.id}`); // Debug log
-        navigate(`/education/video/${result.id}`);
-      } else if (result.type === 'educator' && result.slug) {
-        console.log('Navigating to educator:', `/education/educators/${result.slug}`); // Debug log
-        navigate(`/education/educators/${result.slug}`);
+      if (historyError) {
+        console.error('Error saving search history:', historyError);
       }
+
+      // [Analysis] Direct navigation using full paths
+      const path = result.type === 'video' 
+        ? `/education/video/${result.id}`
+        : `/education/educators/${result.slug}`;
+
+      console.log('Navigating to:', path);
+      navigate(path, { replace: true }); // Using replace to prevent back button issues
 
       // Close search panel and blur
       setIsExpanded(false);
       onBlur();
+
     } catch (error) {
-      console.error('Error handling search result:', error);
+      console.error('Navigation error:', error);
+      toast.error('Failed to navigate. Please try again.');
     }
   };
 
@@ -235,3 +242,4 @@ export const SearchInput = ({
     </div>
   );
 };
+
