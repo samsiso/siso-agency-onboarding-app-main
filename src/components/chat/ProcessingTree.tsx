@@ -1,6 +1,6 @@
 
 import { motion } from 'framer-motion';
-import { Bot, Brain, Building2, Network, News, PlayCircle, Sparkles } from 'lucide-react';
+import { Bot, Brain, Building2, Network, Newspaper, PlayCircle, Sparkles } from 'lucide-react';
 import { AgentCategory, ProcessingStage } from '@/types/chat';
 import { cn } from '@/lib/utils';
 
@@ -15,7 +15,7 @@ const agentIcons: Record<AgentCategory, typeof Bot> = {
   'networking': Network,
   'assistants': Bot,
   'educators': Brain,
-  'news': News,
+  'news': Newspaper,
 };
 
 export const ProcessingTree = ({ currentStage, agentStatuses }: ProcessingTreeProps) => {

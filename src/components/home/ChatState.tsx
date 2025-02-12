@@ -1,7 +1,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChatMessage } from '@/types/chat';
-import { Bot, CheckCircle2, Loader } from 'lucide-react';
+import { Bot } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ProcessingTree } from '@/components/chat/ProcessingTree';
 
@@ -54,10 +54,15 @@ export const ChatState = ({ messages, handleSubmit, isLoading }: ChatStateProps)
                     animate={{ opacity: 1 }}
                     className="space-y-6"
                   >
-                    {message.processingStage && (
+                    {message.processingStage && message.agentResponses && (
                       <ProcessingTree
                         currentStage={message.processingStage.current}
-                        agentStatuses={message.agentResponses || {}}
+                        agentStatuses={Object.fromEntries(
+                          Object.entries(message.agentResponses).map(([key, value]) => [
+                            key,
+                            value.status
+                          ])
+                        )}
                       />
                     )}
                   </motion.div>
