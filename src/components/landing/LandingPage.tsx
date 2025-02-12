@@ -52,7 +52,7 @@ const GettingStartedSection = createLazySection('./sections/GettingStartedSectio
 const PricingSection = createLazySection('./sections/PricingSection');
 const TestimonialsSection = createLazySection('./sections/TestimonialsSection');
 const CallToActionSection = createLazySection('./sections/CallToActionSection');
-const ScrollNav = createLazySection('../ui/scroll-nav');
+const ScrollNav = lazy(() => import('../ui/scroll-nav'));
 
 const LandingPage = () => {
   const isMobile = useIsMobile();
