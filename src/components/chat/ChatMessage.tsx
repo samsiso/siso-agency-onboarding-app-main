@@ -1,8 +1,11 @@
+
 import React from 'react';
-import { Bot, User, Code, Copy, Check } from 'lucide-react';
+import { Bot, User, Code, Copy, Check, Notebook, MessageSquare, ExternalLink, PlayCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Button } from '../ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
+import { useToast } from '@/hooks/use-toast';
 
 interface ChatMessageProps {
   role: 'assistant' | 'user';
@@ -14,10 +17,36 @@ interface ChatMessageProps {
     searching?: string;
     response?: string;
   };
+  richContent?: {
+    tools?: {
+      id: string;
+      name: string;
+      description: string;
+      type: 'ai' | 'automation' | 'integration';
+      url: string;
+      rating?: number;
+      imageUrl?: string;
+    }[];
+    videos?: {
+      id: string;
+      title: string;
+      thumbnailUrl: string;
+      duration: string;
+      channelName: string;
+      views: number;
+    }[];
+    resources?: {
+      type: 'documentation' | 'tutorial' | 'github' | 'article';
+      title: string;
+      url: string;
+      icon: string;
+    }[];
+  };
 }
 
-export const ChatMessage = ({ role, content, assistantType, isLoading, steps }: ChatMessageProps) => {
+export const ChatMessage = ({ role, content, assistantType, isLoading, steps, richContent }: ChatMessageProps) => {
   const [copied, setCopied] = React.useState(false);
+  const { toast } = useToast();
   
   const formatContent = (text: string) => {
     const parts = text.split(/(```[\s\S]*?```)/);
@@ -68,37 +97,206 @@ export const ChatMessage = ({ role, content, assistantType, isLoading, steps }: 
     });
   };
 
-  const renderSteps = () => {
-    if (!steps) return null;
-    
+  const handleCopyToClipboard = () => {
+    navigator.clipboard.writeText(content);
+    toast({
+      title: "Copied to clipboard",
+      description: "The response has been copied to your clipboard",
+    });
+  };
+
+  const handleSendToNotion = () => {
+    // [Plan] Implement Notion integration
+    toast({
+      title: "Coming soon",
+      description: "Notion integration will be available soon!",
+    });
+  };
+
+  const handleSendToChatGPT = () => {
+    window.open(`https://chat.openai.com/share/new?text=${encodeURIComponent(content)}`, '_blank');
+  };
+
+  const renderIntegrationActions = () => {
+    if (role !== 'assistant') return null;
+
     return (
-      <div className="space-y-2 mb-4 text-sm text-siso-text/80">
-        {steps.thinking && (
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-center gap-2 mb-4"
+      >
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                onClick={handleCopyToClipboard}
+              >
+                <Copy className="w-4 h-4" />
+                Copy
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Copy to clipboard</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                onClick={handleSendToNotion}
+              >
+                <Notebook className="w-4 h-4" />
+                Send to Notion
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Save to Notion</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                onClick={handleSendToChatGPT}
+              >
+                <MessageSquare className="w-4 h-4" />
+                Continue in ChatGPT
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Continue this conversation in ChatGPT</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </motion.div>
+    );
+  };
+
+  const renderRichContent = () => {
+    if (!richContent) return null;
+
+    return (
+      <div className="space-y-6 mt-4">
+        {/* Tools Section */}
+        {richContent.tools && richContent.tools.length > 0 && (
           <motion.div
-            initial={{ opacity: 0, y: 5 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
+            className="space-y-4"
           >
-            {steps.thinking}
+            <h3 className="text-lg font-semibold text-siso-text">Related Tools</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {richContent.tools.map((tool) => (
+                <motion.div
+                  key={tool.id}
+                  whileHover={{ scale: 1.02 }}
+                  className="p-4 rounded-lg bg-black/20 border border-siso-text/10"
+                >
+                  <div className="flex items-start gap-3">
+                    {tool.imageUrl ? (
+                      <img src={tool.imageUrl} alt={tool.name} className="w-12 h-12 rounded-lg" />
+                    ) : (
+                      <div className="w-12 h-12 rounded-lg bg-siso-text/10 flex items-center justify-center">
+                        <Code className="w-6 h-6 text-siso-orange" />
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <h4 className="font-medium text-siso-text">{tool.name}</h4>
+                      <p className="text-sm text-siso-text/70">{tool.description}</p>
+                      <div className="mt-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-siso-orange hover:text-siso-red"
+                          onClick={() => window.open(tool.url, '_blank')}
+                        >
+                          <ExternalLink className="w-4 h-4 mr-1" />
+                          Learn More
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           </motion.div>
         )}
-        {steps.searching && (
+
+        {/* Videos Section */}
+        {richContent.videos && richContent.videos.length > 0 && (
           <motion.div
-            initial={{ opacity: 0, y: 5 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.3 }}
+            className="space-y-4"
           >
-            {steps.searching}
+            <h3 className="text-lg font-semibold text-siso-text">Related Videos</h3>
+            <div className="flex overflow-x-auto pb-4 gap-4 scrollbar-thin scrollbar-thumb-siso-text/10 scrollbar-track-transparent">
+              {richContent.videos.map((video) => (
+                <motion.div
+                  key={video.id}
+                  whileHover={{ scale: 1.02 }}
+                  className="flex-shrink-0 w-72"
+                >
+                  <div className="relative rounded-lg overflow-hidden">
+                    <img
+                      src={video.thumbnailUrl}
+                      alt={video.title}
+                      className="w-full aspect-video object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className="absolute bottom-2 left-2 right-2">
+                      <p className="text-white text-sm font-medium line-clamp-2">{video.title}</p>
+                      <p className="text-white/70 text-xs mt-1">{video.channelName}</p>
+                    </div>
+                    <div className="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                      {video.duration}
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute inset-0 w-full h-full hover:bg-black/40 transition-colors group"
+                    >
+                      <PlayCircle className="w-12 h-12 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </Button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           </motion.div>
         )}
-        {steps.response && (
+
+        {/* Resources Section */}
+        {richContent.resources && richContent.resources.length > 0 && (
           <motion.div
-            initial={{ opacity: 0, y: 5 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.6 }}
-            className="text-siso-orange font-medium"
+            className="space-y-4"
           >
-            {steps.response}
+            <h3 className="text-lg font-semibold text-siso-text">Related Resources</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {richContent.resources.map((resource, index) => (
+                <motion.a
+                  key={index}
+                  href={resource.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{ scale: 1.02 }}
+                  className="flex items-center gap-3 p-3 rounded-lg bg-black/20 border border-siso-text/10 hover:bg-black/30 transition-colors"
+                >
+                  <div className="w-8 h-8 rounded-full bg-siso-text/10 flex items-center justify-center">
+                    <ExternalLink className="w-4 h-4 text-siso-orange" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-siso-text">{resource.title}</p>
+                    <p className="text-xs text-siso-text/70 capitalize">{resource.type}</p>
+                  </div>
+                </motion.a>
+              ))}
+            </div>
           </motion.div>
         )}
       </div>
@@ -135,6 +333,7 @@ export const ChatMessage = ({ role, content, assistantType, isLoading, steps }: 
           )}
         </div>
         <div className="text-siso-text prose prose-invert max-w-none">
+          {role === 'assistant' && renderIntegrationActions()}
           {isLoading ? (
             <div className="flex gap-2">
               <span className="w-2 h-2 bg-siso-orange/50 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
@@ -143,8 +342,25 @@ export const ChatMessage = ({ role, content, assistantType, isLoading, steps }: 
             </div>
           ) : (
             <>
-              {renderSteps()}
+              {steps && (
+                <div className="space-y-2 mb-4 text-sm text-siso-text/80">
+                  {Object.entries(steps).map(([key, value]) => (
+                    <motion.div
+                      key={key}
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className={cn(
+                        key === 'response' && "text-siso-orange font-medium"
+                      )}
+                    >
+                      {value}
+                    </motion.div>
+                  ))}
+                </div>
+              )}
               {content && formatContent(content)}
+              {renderRichContent()}
             </>
           )}
         </div>
