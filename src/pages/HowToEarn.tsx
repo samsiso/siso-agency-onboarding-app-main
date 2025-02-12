@@ -44,7 +44,12 @@ const HowToEarn = () => {
       
       const { data, error } = await query;
       if (error) throw error;
-      return data as Skill[];
+      return (data as any[]).map(skill => ({
+        ...skill,
+        requirements: typeof skill.requirements === 'string' 
+          ? JSON.parse(skill.requirements)
+          : skill.requirements
+      })) as Skill[];
     },
     enabled: !!skillPaths
   });
