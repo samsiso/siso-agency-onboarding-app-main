@@ -1,5 +1,5 @@
 
-import { Search, Command, Mic, X, Clock, History, ArrowLeft } from 'lucide-react';
+import { Search, Command, Mic, X, Clock, History } from 'lucide-react';
 import { PlaceholdersAndVanishInput } from '@/components/ui/placeholders-and-vanish-input';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card } from '@/components/ui/card';
@@ -34,49 +34,57 @@ export const SearchInput = ({
     queryFn: async () => {
       if (!searchQuery.trim()) return [];
 
-      const [videosResponse, educatorsResponse] = await Promise.all([
-        supabase
-          .from('youtube_videos')
-          .select(`
-            id,
-            title,
-            thumbnailUrl,
-            description
-          `)
-          .ilike('title', `%${searchQuery}%`)
-          .limit(5),
+      try {
+        const [videosResponse, educatorsResponse] = await Promise.all([
+          supabase
+            .from('youtube_videos')
+            .select(`
+              id,
+              title,
+              thumbnailUrl,
+              full_description
+            `)
+            .ilike('title', `%${searchQuery}%`)
+            .limit(5),
 
-        supabase
-          .from('education_creators')
-          .select(`
-            id,
-            name,
-            channel_avatar_url,
-            description,
-            slug
-          `)
-          .ilike('name', `%${searchQuery}%`)
-          .limit(5)
-      ]);
+          supabase
+            .from('education_creators')
+            .select(`
+              id,
+              name,
+              channel_avatar_url,
+              description,
+              slug
+            `)
+            .ilike('name', `%${searchQuery}%`)
+            .limit(5)
+        ]);
 
-      const videos = (videosResponse.data || []).map(video => ({
-        id: video.id,
-        type: 'video' as const,
-        title: video.title,
-        thumbnailUrl: video.thumbnailUrl,
-        description: video.description
-      }));
+        if (videosResponse.error) throw videosResponse.error;
+        if (educatorsResponse.error) throw educatorsResponse.error;
 
-      const educators = (educatorsResponse.data || []).map(educator => ({
-        id: educator.id,
-        type: 'educator' as const,
-        title: educator.name,
-        channel_avatar_url: educator.channel_avatar_url,
-        description: educator.description,
-        slug: educator.slug
-      }));
+        const videos = (videosResponse.data || []).map(video => ({
+          id: video.id,
+          type: 'video' as const,
+          title: video.title,
+          thumbnailUrl: video.thumbnailUrl,
+          description: video.full_description
+        }));
 
-      return [...videos, ...educators];
+        const educators = (educatorsResponse.data || []).map(educator => ({
+          id: educator.id,
+          type: 'educator' as const,
+          title: educator.name,
+          channel_avatar_url: educator.channel_avatar_url,
+          description: educator.description,
+          slug: educator.slug
+        }));
+
+        return [...videos, ...educators];
+      } catch (error) {
+        console.error('Search error:', error);
+        return [];
+      }
     },
     enabled: !!searchQuery.trim()
   });
@@ -120,6 +128,8 @@ export const SearchInput = ({
         result_type: result.type,
         result_id: result.id
       });
+      
+      // Properly handle the refetch
       await refetchHistory();
     } catch (error) {
       console.error('Error saving search history:', error);
