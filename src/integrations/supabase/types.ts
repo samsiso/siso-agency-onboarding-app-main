@@ -12,18 +12,27 @@ export type Database = {
       ai_news: {
         Row: {
           article_type: string | null
+          author_id: string | null
           bookmarks: number | null
           category: string
+          content: string | null
+          cover_image: string | null
           created_at: string
           date: string
           description: string
+          featured: boolean | null
           id: string
           image_url: string | null
           impact: string
+          linkedin_url: string | null
+          meta_description: string | null
           priority: number | null
           reading_time: number | null
+          slug: string | null
           source: string
           source_credibility: string | null
+          status: string | null
+          tags: string[] | null
           technical_complexity: string | null
           title: string
           updated_at: string
@@ -31,18 +40,27 @@ export type Database = {
         }
         Insert: {
           article_type?: string | null
+          author_id?: string | null
           bookmarks?: number | null
           category: string
+          content?: string | null
+          cover_image?: string | null
           created_at?: string
           date: string
           description: string
+          featured?: boolean | null
           id?: string
           image_url?: string | null
           impact: string
+          linkedin_url?: string | null
+          meta_description?: string | null
           priority?: number | null
           reading_time?: number | null
+          slug?: string | null
           source: string
           source_credibility?: string | null
+          status?: string | null
+          tags?: string[] | null
           technical_complexity?: string | null
           title: string
           updated_at?: string
@@ -50,24 +68,41 @@ export type Database = {
         }
         Update: {
           article_type?: string | null
+          author_id?: string | null
           bookmarks?: number | null
           category?: string
+          content?: string | null
+          cover_image?: string | null
           created_at?: string
           date?: string
           description?: string
+          featured?: boolean | null
           id?: string
           image_url?: string | null
           impact?: string
+          linkedin_url?: string | null
+          meta_description?: string | null
           priority?: number | null
           reading_time?: number | null
+          slug?: string | null
           source?: string
           source_credibility?: string | null
+          status?: string | null
+          tags?: string[] | null
           technical_complexity?: string | null
           title?: string
           updated_at?: string
           views?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "ai_news_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ai_news_bookmarks: {
         Row: {
@@ -94,6 +129,13 @@ export type Database = {
             columns: ["news_id"]
             isOneToOne: false
             referencedRelation: "ai_news"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_bookmarks_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "featured_posts"
             referencedColumns: ["id"]
           },
           {
@@ -139,6 +181,13 @@ export type Database = {
             foreignKeyName: "ai_news_reactions_news_id_fkey"
             columns: ["news_id"]
             isOneToOne: false
+            referencedRelation: "featured_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_reactions_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
             referencedRelation: "mv_trending_articles"
             referencedColumns: ["id"]
           },
@@ -172,6 +221,13 @@ export type Database = {
             columns: ["news_id"]
             isOneToOne: true
             referencedRelation: "ai_news"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_summaries_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: true
+            referencedRelation: "featured_posts"
             referencedColumns: ["id"]
           },
           {
@@ -948,6 +1004,13 @@ export type Database = {
             foreignKeyName: "news_ai_analysis_news_id_fkey"
             columns: ["news_id"]
             isOneToOne: false
+            referencedRelation: "featured_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "news_ai_analysis_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
             referencedRelation: "mv_trending_articles"
             referencedColumns: ["id"]
           },
@@ -984,6 +1047,13 @@ export type Database = {
             columns: ["news_id"]
             isOneToOne: false
             referencedRelation: "ai_news"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "news_comments_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "featured_posts"
             referencedColumns: ["id"]
           },
           {
@@ -2295,6 +2365,101 @@ export type Database = {
           total_members: number | null
         }
         Relationships: []
+      }
+      featured_posts: {
+        Row: {
+          article_type: string | null
+          author_id: string | null
+          bookmarks: number | null
+          category: string | null
+          content: string | null
+          cover_image: string | null
+          created_at: string | null
+          date: string | null
+          description: string | null
+          featured: boolean | null
+          id: string | null
+          image_url: string | null
+          impact: string | null
+          linkedin_url: string | null
+          meta_description: string | null
+          priority: number | null
+          reading_time: number | null
+          slug: string | null
+          source: string | null
+          source_credibility: string | null
+          status: string | null
+          tags: string[] | null
+          technical_complexity: string | null
+          title: string | null
+          updated_at: string | null
+          views: number | null
+        }
+        Insert: {
+          article_type?: string | null
+          author_id?: string | null
+          bookmarks?: number | null
+          category?: string | null
+          content?: string | null
+          cover_image?: string | null
+          created_at?: string | null
+          date?: string | null
+          description?: string | null
+          featured?: boolean | null
+          id?: string | null
+          image_url?: string | null
+          impact?: string | null
+          linkedin_url?: string | null
+          meta_description?: string | null
+          priority?: number | null
+          reading_time?: number | null
+          slug?: string | null
+          source?: string | null
+          source_credibility?: string | null
+          status?: string | null
+          tags?: string[] | null
+          technical_complexity?: string | null
+          title?: string | null
+          updated_at?: string | null
+          views?: number | null
+        }
+        Update: {
+          article_type?: string | null
+          author_id?: string | null
+          bookmarks?: number | null
+          category?: string | null
+          content?: string | null
+          cover_image?: string | null
+          created_at?: string | null
+          date?: string | null
+          description?: string | null
+          featured?: boolean | null
+          id?: string | null
+          image_url?: string | null
+          impact?: string | null
+          linkedin_url?: string | null
+          meta_description?: string | null
+          priority?: number | null
+          reading_time?: number | null
+          slug?: string | null
+          source?: string | null
+          source_credibility?: string | null
+          status?: string | null
+          tags?: string[] | null
+          technical_complexity?: string | null
+          title?: string | null
+          updated_at?: string | null
+          views?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_news_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       mv_trending_articles: {
         Row: {
