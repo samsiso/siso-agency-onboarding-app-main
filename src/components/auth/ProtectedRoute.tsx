@@ -9,7 +9,7 @@ interface ProtectedRouteProps {
   allowUnauth?: boolean;
 }
 
-export const ProtectedRoute = ({ children, allowUnauth = false }: ProtectedRouteProps) => {
+export const ProtectedRoute = ({ children, allowUnauth = true }: ProtectedRouteProps) => {
   const { user, loading } = useAuthSession();
   const navigate = useNavigate();
 
