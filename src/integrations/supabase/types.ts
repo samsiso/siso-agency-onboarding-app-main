@@ -1348,6 +1348,7 @@ export type Database = {
           points: number | null
           professional_role: string | null
           rank: string | null
+          role: string | null
           short_term_goals: string[] | null
           siso_tokens: number | null
           social_info_completed_at: string | null
@@ -1395,6 +1396,7 @@ export type Database = {
           points?: number | null
           professional_role?: string | null
           rank?: string | null
+          role?: string | null
           short_term_goals?: string[] | null
           siso_tokens?: number | null
           social_info_completed_at?: string | null
@@ -1442,6 +1444,7 @@ export type Database = {
           points?: number | null
           professional_role?: string | null
           rank?: string | null
+          role?: string | null
           short_term_goals?: string[] | null
           siso_tokens?: number | null
           social_info_completed_at?: string | null
