@@ -1,3 +1,4 @@
+
 import { lazy, Suspense, memo, useEffect, useState, useCallback } from 'react';
 import { LoadingFallback } from './sections/LoadingFallback';
 import Footer from '@/components/Footer';
@@ -52,7 +53,7 @@ const GettingStartedSection = createLazySection('./sections/GettingStartedSectio
 const PricingSection = createLazySection('./sections/PricingSection');
 const TestimonialsSection = createLazySection('./sections/TestimonialsSection');
 const CallToActionSection = createLazySection('./sections/CallToActionSection');
-const ScrollNav = lazy(() => import('../ui/scroll-nav'));
+const ScrollNav = createLazySection('@/components/ui/scroll-nav');
 
 const LandingPage = () => {
   const isMobile = useIsMobile();
