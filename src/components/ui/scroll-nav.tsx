@@ -103,3 +103,5 @@ export function ScrollNav() {
     </div>
   )
 }
+
+export default ScrollNav
