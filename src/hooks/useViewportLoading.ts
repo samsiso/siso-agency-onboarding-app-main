@@ -1,21 +1,10 @@
 
 import { useEffect, useRef, useState } from 'react';
-import { useIsMobile } from './use-mobile';
 
-interface ViewportLoadingOptions {
-  threshold?: number;
-  rootMargin?: string;
-}
-
-export const useViewportLoading = (options: ViewportLoadingOptions = {}) => {
+export const useViewportLoading = (options = { threshold: 0.1 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const elementRef = useRef<HTMLDivElement>(null);
-  const isMobile = useIsMobile();
-
-  // Mobile-optimized thresholds and margins
-  const defaultThreshold = isMobile ? 0.05 : 0.1;
-  const defaultRootMargin = isMobile ? '150px 0px' : '300px 0px';
 
   useEffect(() => {
     const element = elementRef.current;
@@ -25,22 +14,18 @@ export const useViewportLoading = (options: ViewportLoadingOptions = {}) => {
       ([entry]) => {
         setIsVisible(entry.isIntersecting);
         if (entry.isIntersecting && !isLoaded) {
-          // Delay loading slightly on mobile to prevent jank
-          const delay = isMobile ? 100 : 0;
-          setTimeout(() => {
-            setIsLoaded(true);
-          }, delay);
+          setIsLoaded(true);
         }
       },
       {
-        threshold: options.threshold ?? defaultThreshold,
-        rootMargin: options.rootMargin ?? defaultRootMargin,
+        threshold: options.threshold,
+        rootMargin: '300px 0px', // Increased from 100px to 300px for earlier loading
       }
     );
 
     observer.observe(element);
     return () => observer.disconnect();
-  }, [options.threshold, options.rootMargin, isLoaded, isMobile]);
+  }, [options.threshold, isLoaded]);
 
   return { elementRef, isVisible, isLoaded };
 };
