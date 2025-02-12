@@ -1,5 +1,5 @@
 
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Index from '@/pages/Index';
 import Home from '@/pages/Home';
 import Auth from '@/pages/Auth';
@@ -32,6 +32,7 @@ function App() {
     <Routes>
       {/* Public routes */}
       <Route path="/" element={<Index />} />
+      <Route path="/welcome" element={<Index />} /> {/* Keep this for existing users */}
       <Route path="/home" element={<Home />} />
       <Route path="/auth" element={<Auth />} />
       <Route path="/terms" element={<Terms />} />
