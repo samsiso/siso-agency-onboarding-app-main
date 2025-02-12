@@ -93,7 +93,7 @@ const BlogPost = () => {
         return;
       }
 
-      await awardPoints('upvote_article');
+      await awardPoints('article_upvote'); // Changed from 'upvote_article' to 'article_upvote'
       toast({
         title: "Success",
         description: "Article upvoted successfully!",
