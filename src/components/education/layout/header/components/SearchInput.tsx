@@ -128,13 +128,19 @@ export const SearchInput = ({
         result_type: result.type,
         result_id: result.id
       });
-      
-      // Properly handle the refetch
-      await refetchHistory();
+      setIsExpanded(false);
     } catch (error) {
       console.error('Error saving search history:', error);
     }
-    setIsExpanded(false);
+  };
+
+  // [Analysis] Wrap refetchHistory in a function that returns Promise<void>
+  const handleHistoryCleared = async () => {
+    try {
+      await refetchHistory();
+    } catch (error) {
+      console.error('Error refetching history:', error);
+    }
   };
 
   return (
@@ -199,7 +205,7 @@ export const SearchInput = ({
                   
                   <SearchHistory
                     history={searchHistory || []}
-                    onHistoryCleared={refetchHistory}
+                    onHistoryCleared={handleHistoryCleared}
                     onSearchSelect={(query) => {
                       onSearchChange(query);
                       setIsExpanded(false);
