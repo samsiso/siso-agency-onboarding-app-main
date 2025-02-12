@@ -8,6 +8,7 @@ import { SearchResults } from './SearchResults';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface SearchInputProps {
   searchQuery: string;
@@ -27,6 +28,7 @@ export const SearchInput = ({
   placeholders 
 }: SearchInputProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const navigate = useNavigate();
 
   // [Analysis] Fetch search results from both videos and educators
   const { data: searchResults, isLoading } = useQuery({
@@ -123,14 +125,25 @@ export const SearchInput = ({
 
   const handleSearchResultClick = async (result: any) => {
     try {
+      // Save to search history
       await supabase.from('user_search_history').insert({
         query: result.title,
         result_type: result.type,
         result_id: result.id
       });
+
+      // Navigate based on result type
+      if (result.type === 'video') {
+        navigate(`/education/video/${result.id}`);
+      } else if (result.type === 'educator' && result.slug) {
+        navigate(`/education/educators/${result.slug}`);
+      }
+
+      // Close search panel
       setIsExpanded(false);
+      onBlur();
     } catch (error) {
-      console.error('Error saving search history:', error);
+      console.error('Error handling search result:', error);
     }
   };
 
