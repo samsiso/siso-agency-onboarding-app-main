@@ -1,4 +1,3 @@
-
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Index from '@/pages/Index';
 import Home from '@/pages/Home';
@@ -7,6 +6,7 @@ import Profile from '@/pages/Profile';
 import Tools from '@/pages/Tools';
 import ToolPage from '@/pages/ToolPage';
 import AINews from '@/pages/AINews';
+import BlogPost from '@/pages/BlogPost';
 import SisoAI from '@/pages/SisoAI';
 import ChatGPTAssistants from '@/pages/ChatGPTAssistants';
 import Automations from '@/pages/Automations';
@@ -32,7 +32,7 @@ function App() {
     <Routes>
       {/* Public routes */}
       <Route path="/" element={<Index />} />
-      <Route path="/welcome" element={<Index />} /> {/* Keep this for existing users */}
+      <Route path="/welcome" element={<Index />} />
       <Route path="/home" element={<Home />} />
       <Route path="/auth" element={<Auth />} />
       <Route path="/terms" element={<Terms />} />
@@ -59,9 +59,9 @@ function App() {
           <AINews />
         </ProtectedRoute>
       } />
-      <Route path="/siso-ai" element={
+      <Route path="/ai-news/:id" element={
         <ProtectedRoute>
-          <SisoAI />
+          <BlogPost />
         </ProtectedRoute>
       } />
       <Route path="/assistants" element={

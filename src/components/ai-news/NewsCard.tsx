@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from '@/components/ui/card';
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
@@ -8,6 +7,7 @@ import { NewsCardContent } from './NewsCardContent';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { usePoints } from '@/hooks/usePoints';
+import { useNavigate } from 'react-router-dom';
 
 interface NewsComment {
   id: string;
@@ -40,6 +40,7 @@ const NewsCard = ({
   const [hasReadArticle, setHasReadArticle] = useState(false);
   const { toast } = useToast();
   const { awardPoints } = usePoints(undefined);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const channel = supabase
@@ -94,6 +95,8 @@ const NewsCard = ({
           title: "Points awarded!",
           description: "You earned 2 points for reading this article!",
         });
+        // Navigate to the blog post page
+        navigate(`/ai-news/${item.id}`);
       }
     } catch (error) {
       console.error('Error handling article read:', error);
