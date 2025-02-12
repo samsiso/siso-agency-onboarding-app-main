@@ -39,13 +39,13 @@ export const ProcessingNode = ({ icon: Icon, label, isActive, isComplete, size =
         }}
         className={cn(
           "relative flex items-center justify-center rounded-full bg-siso-text/10 z-10 transition-shadow duration-500",
-          size === 'sm' ? 'w-16 h-16' : 'w-20 h-20',
+          size === 'sm' ? 'w-20 h-20' : 'w-28 h-28',
           isActive && "shadow-lg shadow-siso-orange/30",
           isComplete && "shadow-md shadow-siso-orange/20",
           "hover:scale-110 transition-transform duration-300"
         )}
       >
-        {/* Outer glow */}
+        {/* Outer glow effect */}
         {isActive && (
           <>
             <motion.div
@@ -60,13 +60,62 @@ export const ProcessingNode = ({ icon: Icon, label, isActive, isComplete, size =
               animate={{ scale: 2, opacity: 0 }}
               transition={{ duration: 2.5, repeat: Infinity, delay: 0.2 }}
             />
+            
+            {/* Aurora effect */}
+            <motion.div 
+              className="absolute inset-0 rounded-full overflow-hidden"
+              style={{ clipPath: 'circle(50% at 50% 50%)' }}
+            >
+              <motion.div
+                className="absolute inset-0 bg-gradient-radial from-siso-orange/30 via-siso-red/20 to-transparent"
+                animate={{
+                  rotate: [0, 360],
+                  scale: [1, 1.2, 1],
+                }}
+                transition={{
+                  duration: 10,
+                  repeat: Infinity,
+                  ease: "linear"
+                }}
+              />
+            </motion.div>
           </>
         )}
         
         <Icon className={cn(
           "text-white relative z-10",
-          size === 'sm' ? 'w-8 h-8' : 'w-10 h-10'
+          size === 'sm' ? 'w-10 h-10' : 'w-12 h-12'
         )} />
+
+        {/* Progress ring */}
+        {isActive && (
+          <svg
+            className="absolute inset-0 w-full h-full -rotate-90"
+            viewBox="0 0 100 100"
+          >
+            <circle
+              className="text-siso-text/5"
+              strokeWidth="4"
+              stroke="currentColor"
+              fill="none"
+              r="48"
+              cx="50"
+              cy="50"
+            />
+            <motion.circle
+              className="text-siso-orange"
+              strokeWidth="4"
+              stroke="currentColor"
+              fill="none"
+              r="48"
+              cx="50"
+              cy="50"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
+          </svg>
+        )}
       </motion.div>
       
       <div className="flex-1 space-y-1">
