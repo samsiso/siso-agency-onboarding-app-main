@@ -42,7 +42,11 @@ const GettingStartedSection = createLazySection('./sections/GettingStartedSectio
 const PricingSection = createLazySection('./sections/PricingSection');
 const TestimonialsSection = createLazySection('./sections/TestimonialsSection');
 const CallToActionSection = createLazySection('./sections/CallToActionSection');
-const ScrollNav = createLazySection('@/components/ui/scroll-nav');
+
+// [Analysis] Fixed ScrollNav import to use absolute path and handle default export
+const ScrollNav = lazy(() => import('@/components/ui/scroll-nav').then(module => ({
+  default: memo(module.default)
+})));
 
 const LandingPage = () => {
   // Initialize performance monitoring
@@ -116,7 +120,10 @@ const LandingPage = () => {
       <link rel="dns-prefetch" href="https://fzuwsjxjymwcjsbpwfsl.supabase.co" />
       <link rel="preconnect" href="https://fzuwsjxjymwcjsbpwfsl.supabase.co" crossOrigin="anonymous" />
       
-      <ErrorBoundary fallback={<LoadingFallback error={new Error()} />}>
+      <ErrorBoundary 
+        fallback={<LoadingFallback error={new Error()} />}
+        onError={(error) => console.error('ScrollNav Error:', error)}
+      >
         <Suspense fallback={<LoadingFallback />}>
           <ScrollNav />
         </Suspense>
