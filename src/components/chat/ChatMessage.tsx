@@ -124,19 +124,19 @@ export const ChatMessage = ({ role, content, assistantType, isLoading, steps, ri
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex items-center gap-2 mb-4"
+        className="flex items-center gap-2 mb-4 p-2 rounded-lg bg-black/20"
       >
-        <TooltipProvider>
+        <TooltipProvider delayDuration={0}>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
                 variant="outline"
                 size="sm"
-                className="gap-2"
+                className="gap-2 bg-siso-bg-alt hover:bg-siso-bg"
                 onClick={handleCopyToClipboard}
               >
-                <Copy className="w-4 h-4" />
-                Copy
+                <Copy className="w-4 h-4 text-siso-orange" />
+                <span className="text-siso-text">Copy</span>
               </Button>
             </TooltipTrigger>
             <TooltipContent>Copy to clipboard</TooltipContent>
@@ -147,11 +147,11 @@ export const ChatMessage = ({ role, content, assistantType, isLoading, steps, ri
               <Button
                 variant="outline"
                 size="sm"
-                className="gap-2"
+                className="gap-2 bg-siso-bg-alt hover:bg-siso-bg"
                 onClick={handleSendToNotion}
               >
-                <Notebook className="w-4 h-4" />
-                Send to Notion
+                <Notebook className="w-4 h-4 text-siso-orange" />
+                <span className="text-siso-text">Send to Notion</span>
               </Button>
             </TooltipTrigger>
             <TooltipContent>Save to Notion</TooltipContent>
@@ -162,11 +162,11 @@ export const ChatMessage = ({ role, content, assistantType, isLoading, steps, ri
               <Button
                 variant="outline"
                 size="sm"
-                className="gap-2"
+                className="gap-2 bg-siso-bg-alt hover:bg-siso-bg"
                 onClick={handleSendToChatGPT}
               >
-                <MessageSquare className="w-4 h-4" />
-                Continue in ChatGPT
+                <MessageSquare className="w-4 h-4 text-siso-orange" />
+                <span className="text-siso-text">Continue in ChatGPT</span>
               </Button>
             </TooltipTrigger>
             <TooltipContent>Continue this conversation in ChatGPT</TooltipContent>
