@@ -57,12 +57,14 @@ export const ChatState = ({ messages, handleSubmit, isLoading }: ChatStateProps)
                     {message.processingStage && message.agentResponses && (
                       <ProcessingTree
                         currentStage={message.processingStage.current}
-                        agentStatuses={Object.fromEntries(
-                          Object.entries(message.agentResponses).map(([key, value]) => [
-                            key,
-                            value.status
-                          ])
-                        )}
+                        agentStatuses={{
+                          'ai-tools': message.agentResponses['ai-tools'].status,
+                          'videos': message.agentResponses['videos'].status,
+                          'networking': message.agentResponses['networking'].status,
+                          'assistants': message.agentResponses['assistants'].status,
+                          'educators': message.agentResponses['educators'].status,
+                          'news': message.agentResponses['news'].status,
+                        }}
                       />
                     )}
                   </motion.div>
