@@ -1,12 +1,13 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChatMessage } from '@/types/chat';
+import { ChatMessage } from '@/components/chat/ChatMessage';
 import { Bot } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ProcessingTree } from '@/components/chat/ProcessingTree';
+import { ChatMessage as ChatMessageType } from '@/types/chat';
 
 interface ChatStateProps {
-  messages: ChatMessage[];
+  messages: ChatMessageType[];
   handleSubmit: (message: string) => Promise<void>;
   isLoading: boolean;
 }
@@ -29,52 +30,15 @@ export const ChatState = ({ messages, handleSubmit, isLoading }: ChatStateProps)
       className="flex flex-col w-full max-w-4xl mx-auto h-full"
     >
       <div className="flex-1 overflow-y-auto space-y-6 p-4 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
-        <AnimatePresence mode="popLayout">
+        <AnimatePresence mode="sync">
           {messages.map((message, index) => (
-            <motion.div
+            <ChatMessage
               key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-              className={cn(
-                "flex w-full items-start gap-4 rounded-lg p-4",
-                message.role === 'assistant' ? 'bg-black/30' : 'bg-gradient-to-r from-siso-orange/10 to-siso-red/10'
-              )}
-            >
-              {message.role === 'assistant' && (
-                <div className="flex-shrink-0 rounded-full bg-gradient-to-r from-siso-orange to-siso-red p-2">
-                  <Bot className="h-5 w-5 text-white" />
-                </div>
-              )}
-              <div className="flex-1 space-y-4">
-                {message.loading ? (
-                  <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="space-y-6"
-                  >
-                    {message.processingStage && message.agentResponses && (
-                      <ProcessingTree
-                        currentStage={message.processingStage.current}
-                        agentStatuses={{
-                          'ai-tools': message.agentResponses['ai-tools'].status,
-                          'videos': message.agentResponses['videos'].status,
-                          'networking': message.agentResponses['networking'].status,
-                          'assistants': message.agentResponses['assistants'].status,
-                          'educators': message.agentResponses['educators'].status,
-                          'news': message.agentResponses['news'].status,
-                        }}
-                      />
-                    )}
-                  </motion.div>
-                ) : (
-                  <div className="text-sm text-gray-200 leading-relaxed">
-                    {message.content}
-                  </div>
-                )}
-              </div>
-            </motion.div>
+              role={message.role}
+              content={message.content}
+              assistantType={message.role === 'assistant' ? 'AI Assistant' : undefined}
+              isLoading={message.loading}
+            />
           ))}
         </AnimatePresence>
       </div>

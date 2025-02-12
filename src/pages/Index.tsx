@@ -1,10 +1,9 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { Bot } from 'lucide-react';
 import { LoadingFallback } from '@/components/landing/sections/LoadingFallback';
-
-// [Analysis] Implementing granular code splitting for optimal initial load
-// [Plan] Monitor component load times and adjust splits if needed
+import { ChatState } from '@/components/home/ChatState';
+import { ChatMessage } from '@/types/chat';
 
 // Lazy load components with descriptive chunk names
 const LandingPage = lazy(() => import(/* webpackChunkName: "landing" */ '@/components/landing/LandingPage'));
@@ -22,70 +21,53 @@ const ChatComponents = {
 
 export default function Index() {
   const { user, loading } = useAuthSession();
+  const [messages, setMessages] = useState<ChatMessage[]>([{
+    role: 'assistant',
+    content: "Welcome to SISO! I'm here to help you explore our platform and find the resources you need. What would you like to know about?",
+    timestamp: new Date()
+  }]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // [Analysis] Early auth check and loading state
+  const handleSubmit = async (message: string) => {
+    if (!message.trim() || isLoading) return;
+
+    // Add user message
+    setMessages(prev => [...prev, {
+      role: 'user',
+      content: message,
+      timestamp: new Date()
+    }]);
+
+    setIsLoading(true);
+
+    try {
+      // Simulate AI response for now
+      setTimeout(() => {
+        setMessages(prev => [...prev, {
+          role: 'assistant',
+          content: "Here's a test response with formatting:\n\n# Main Points\n\n- First important point\n- Second key point\n\n## Details\n\n1. More detailed explanation\n2. Additional context\n\n> Important note: This is a blockquote\n\nYou can **emphasize** text or make it *italic*.",
+          timestamp: new Date()
+        }]);
+        setIsLoading(false);
+      }, 1000);
+    } catch (error) {
+      console.error('Error:', error);
+      setIsLoading(false);
+    }
+  };
+
   if (loading) {
     return <LoadingFallback />;
   }
 
-  // [Analysis] Show landing page for all users
-  const {
-    ExpandableChat,
-    ExpandableChatHeader,
-    ExpandableChatBody,
-    ExpandableChatFooter,
-    ChatMessageList,
-    ChatBubble,
-    ChatBubbleAvatar,
-    ChatBubbleMessage,
-    ChatInput,
-  } = ChatComponents;
-
   return (
     <div className="relative">
       <Suspense fallback={<LoadingFallback />}>
-        <LandingPage />
-        {!user && (
-          <ExpandableChat
-            size="lg"
-            position="bottom-right"
-            icon={<Bot className="h-6 w-6" />}
-          >
-            <ExpandableChatHeader className="flex-col text-center justify-center">
-              <h1 className="text-xl font-semibold">Welcome to SISO ✨</h1>
-              <p className="text-sm text-muted-foreground">
-                How can I help you get started?
-              </p>
-            </ExpandableChatHeader>
-
-            <ExpandableChatBody>
-              <ChatMessageList>
-                <ChatBubble variant="received">
-                  <ChatBubbleAvatar
-                    className="h-8 w-8"
-                    src="/lovable-uploads/c482563a-42db-4f47-83f2-c2e7771400b7.png"
-                    fallback="AI"
-                  />
-                  <ChatBubbleMessage>
-                    Welcome to SISO! I'm here to help you explore our platform and find the resources you need. What would you like to know about?
-                  </ChatBubbleMessage>
-                </ChatBubble>
-              </ChatMessageList>
-            </ExpandableChatBody>
-
-            <ExpandableChatFooter>
-              <form
-                onSubmit={(e) => e.preventDefault()}
-                className="relative rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring p-1"
-              >
-                <ChatInput
-                  placeholder="Type your message..."
-                  className="min-h-12 resize-none rounded-lg bg-background border-0 p-3 shadow-none focus-visible:ring-0"
-                />
-              </form>
-            </ExpandableChatFooter>
-          </ExpandableChat>
-        )}
+        <ChatState
+          messages={messages}
+          handleSubmit={handleSubmit}
+          isLoading={isLoading}
+        />
       </Suspense>
     </div>
   );
