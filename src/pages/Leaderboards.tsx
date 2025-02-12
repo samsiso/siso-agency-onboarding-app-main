@@ -2,14 +2,29 @@
 import { GradientHeading } from '@/components/ui/gradient-heading';
 import { Leaderboard } from '@/components/leaderboard/Leaderboard';
 import { Sidebar } from '@/components/Sidebar';
-import { Trophy, Users, Award } from 'lucide-react';
+import { Trophy, Users, Award, TrendingUp, TrendingDown } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { motion } from 'framer-motion';
 import { useLeaderboardData } from '@/components/leaderboard/hooks/useLeaderboardData';
 import { formatNumber } from '@/lib/formatters';
 
 const Leaderboards = () => {
-  const { totalUsersWithPoints, totalPoints, totalSisoTokens } = useLeaderboardData();
+  const { totalUsersWithPoints, totalPoints, totalSisoTokens, trends } = useLeaderboardData();
+
+  const TrendIndicator = ({ value }: { value: number }) => {
+    if (value === 0) return null;
+    
+    return (
+      <span className={`text-xs flex items-center gap-1 ${value > 0 ? 'text-green-500' : 'text-red-500'}`}>
+        {value > 0 ? (
+          <TrendingUp className="w-3 h-3" />
+        ) : (
+          <TrendingDown className="w-3 h-3" />
+        )}
+        {Math.abs(value)}%
+      </span>
+    );
+  };
 
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
@@ -76,7 +91,12 @@ const Leaderboards = () => {
                     <Users className="w-8 h-8 text-siso-orange" />
                     <div>
                       <p className="text-sm text-siso-text/70">Active Players</p>
-                      <p className="text-lg font-semibold text-siso-text-bold">{formatNumber(totalUsersWithPoints)}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-lg font-semibold text-siso-text-bold">
+                          {formatNumber(totalUsersWithPoints)}
+                        </p>
+                        <TrendIndicator value={trends.users} />
+                      </div>
                     </div>
                   </motion.div>
 
@@ -89,7 +109,12 @@ const Leaderboards = () => {
                     <Award className="w-8 h-8 text-siso-red" />
                     <div>
                       <p className="text-sm text-siso-text/70">Total Points</p>
-                      <p className="text-lg font-semibold text-siso-text-bold">{formatNumber(totalPoints)}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-lg font-semibold text-siso-text-bold">
+                          {formatNumber(totalPoints)}
+                        </p>
+                        <TrendIndicator value={trends.points} />
+                      </div>
                     </div>
                   </motion.div>
                 </div>

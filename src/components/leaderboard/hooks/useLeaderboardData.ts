@@ -4,13 +4,75 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import type { LeaderboardEntry, Achievement } from '../types';
 
+export interface TrendStats {
+  points: number;
+  users: number;
+  tokens: number;
+}
+
 export const useLeaderboardData = () => {
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
   const [filteredData, setFilteredData] = useState<LeaderboardEntry[]>([]);
   const [totalUsersWithPoints, setTotalUsersWithPoints] = useState<number>(0);
   const [totalPoints, setTotalPoints] = useState<number>(0);
   const [totalSisoTokens, setTotalSisoTokens] = useState<number>(0);
+  const [trends, setTrends] = useState<TrendStats>({ points: 0, users: 0, tokens: 0 });
   const { toast } = useToast();
+
+  const calculateTrends = async () => {
+    try {
+      // Get data from 24 hours ago
+      const oneDayAgo = new Date();
+      oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+
+      // Get historical points data
+      const { data: historicalPoints } = await supabase
+        .from('profiles')
+        .select('points')
+        .lt('updated_at', oneDayAgo.toISOString())
+        .not('points', 'is', null);
+
+      const oldTotalPoints = historicalPoints?.reduce((sum, profile) => sum + (profile.points || 0), 0) || 0;
+      
+      // Get historical users count
+      const { count: oldUserCount } = await supabase
+        .from('profiles')
+        .select('*', { count: 'exact', head: true })
+        .gt('points', 0)
+        .lt('updated_at', oneDayAgo.toISOString());
+
+      // Get historical SISO tokens
+      const { data: historicalTokens } = await supabase
+        .from('leaderboard')
+        .select('siso_tokens')
+        .lt('updated_at', oneDayAgo.toISOString())
+        .not('siso_tokens', 'is', null);
+
+      const oldTotalTokens = historicalTokens?.reduce((sum, entry) => sum + (entry.siso_tokens || 0), 0) || 0;
+
+      // Calculate percentage changes
+      const pointsTrend = oldTotalPoints > 0 
+        ? ((totalPoints - oldTotalPoints) / oldTotalPoints) * 100 
+        : 0;
+      
+      const usersTrend = oldUserCount && oldUserCount > 0
+        ? ((totalUsersWithPoints - oldUserCount) / oldUserCount) * 100
+        : 0;
+
+      const tokensTrend = oldTotalTokens > 0
+        ? ((totalSisoTokens - oldTotalTokens) / oldTotalTokens) * 100
+        : 0;
+
+      setTrends({
+        points: Math.round(pointsTrend),
+        users: Math.round(usersTrend),
+        tokens: Math.round(tokensTrend)
+      });
+
+    } catch (error) {
+      console.error('Error calculating trends:', error);
+    }
+  };
 
   const fetchTotalPoints = async () => {
     try {
@@ -54,7 +116,6 @@ export const useLeaderboardData = () => {
       if (error) throw error;
       
       if (count !== null) {
-        console.log('Total users with points:', count);
         setTotalUsersWithPoints(count);
       }
     } catch (error) {
@@ -150,6 +211,7 @@ export const useLeaderboardData = () => {
     fetchTotalUsersWithPoints();
     fetchTotalPoints();
     fetchTotalSisoTokens();
+    calculateTrends();
 
     // Set up real-time subscription
     const channel = supabase
@@ -167,6 +229,7 @@ export const useLeaderboardData = () => {
           fetchTotalUsersWithPoints();
           fetchTotalPoints();
           fetchTotalSisoTokens();
+          calculateTrends();
         }
       )
       .subscribe((status) => {
@@ -185,5 +248,6 @@ export const useLeaderboardData = () => {
     totalUsersWithPoints,
     totalPoints,
     totalSisoTokens,
+    trends
   };
 };
