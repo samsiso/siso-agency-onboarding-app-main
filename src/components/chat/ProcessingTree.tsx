@@ -2,7 +2,6 @@
 import { motion } from 'framer-motion';
 import { Brain, Building2, Sparkles } from 'lucide-react';
 import { AgentCategory, ProcessingStage } from '@/types/chat';
-import { KnowledgeStream } from './processing/KnowledgeStream';
 import { ProcessingNode } from './processing/ProcessingNode';
 import { agentIcons, agentThoughts, containerVariants, itemVariants } from './processing/constants';
 
@@ -16,10 +15,9 @@ export const ProcessingTree = ({ currentStage, agentStatuses }: ProcessingTreePr
   const currentIndex = stages.indexOf(currentStage);
 
   return (
-    <div className="relative py-12">
-      <KnowledgeStream />
+    <div className="relative py-12 px-4">
       <motion.div 
-        className="space-y-24" // Increased spacing between main nodes
+        className="space-y-32 flex flex-col items-center" // Increased spacing and centered
         variants={containerVariants}
         initial="hidden"
         animate="show"
@@ -28,6 +26,7 @@ export const ProcessingTree = ({ currentStage, agentStatuses }: ProcessingTreePr
           variants={itemVariants}
           whileHover={{ scale: 1.02 }}
           transition={{ duration: 0.2 }}
+          className="w-full max-w-[300px]"
         >
           <ProcessingNode
             icon={Brain}
@@ -42,6 +41,7 @@ export const ProcessingTree = ({ currentStage, agentStatuses }: ProcessingTreePr
           variants={itemVariants}
           whileHover={{ scale: 1.02 }}
           transition={{ duration: 0.2 }}
+          className="w-full max-w-[300px]"
         >
           <ProcessingNode
             icon={Building2}
@@ -56,17 +56,17 @@ export const ProcessingTree = ({ currentStage, agentStatuses }: ProcessingTreePr
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
-            className="pl-16 space-y-8" // Increased indent and spacing for agent nodes
+            className="space-y-12 w-full max-w-[300px]" // Centered agents with increased spacing
           >
             {Object.entries(agentStatuses).map(([category, status], index) => {
               const Icon = agentIcons[category as AgentCategory];
               return (
                 <motion.div
                   key={category}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.15 }} // Slower stagger
-                  whileHover={{ scale: 1.02, x: 4 }}
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.15 }}
+                  whileHover={{ scale: 1.02 }}
                 >
                   <ProcessingNode
                     icon={Icon}
@@ -86,6 +86,7 @@ export const ProcessingTree = ({ currentStage, agentStatuses }: ProcessingTreePr
           variants={itemVariants}
           whileHover={{ scale: 1.02 }}
           transition={{ duration: 0.2 }}
+          className="w-full max-w-[300px]"
         >
           <ProcessingNode
             icon={Sparkles}

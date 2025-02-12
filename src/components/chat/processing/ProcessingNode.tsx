@@ -28,7 +28,7 @@ export const ProcessingNode = ({ icon: Icon, label, isActive, isComplete, size =
 
   return (
     <div className={cn(
-      "relative flex items-start group",
+      "relative flex flex-col items-center text-center group",
       size === 'sm' ? 'gap-4' : 'gap-6'
     )}>
       <motion.div
@@ -39,7 +39,7 @@ export const ProcessingNode = ({ icon: Icon, label, isActive, isComplete, size =
         }}
         className={cn(
           "relative flex items-center justify-center rounded-full bg-siso-text/10 z-10 transition-shadow duration-500",
-          size === 'sm' ? 'w-10 h-10' : 'w-14 h-14',
+          size === 'sm' ? 'w-16 h-16' : 'w-24 h-24',
           isActive && "shadow-lg shadow-siso-orange/30",
           isComplete && "shadow-md shadow-siso-orange/20",
           "hover:scale-110 transition-transform duration-300"
@@ -51,13 +51,13 @@ export const ProcessingNode = ({ icon: Icon, label, isActive, isComplete, size =
             <motion.div
               className="absolute inset-0 rounded-full bg-siso-red/20"
               initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1.4, opacity: 0 }}
+              animate={{ scale: 1.6, opacity: 0 }}
               transition={{ duration: 2, repeat: Infinity }}
             />
             <motion.div
               className="absolute inset-0 rounded-full bg-siso-red/10"
               initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1.8, opacity: 0 }}
+              animate={{ scale: 2, opacity: 0 }}
               transition={{ duration: 2.5, repeat: Infinity, delay: 0.2 }}
             />
           </>
@@ -65,11 +65,11 @@ export const ProcessingNode = ({ icon: Icon, label, isActive, isComplete, size =
         
         <Icon className={cn(
           "text-white relative z-10",
-          size === 'sm' ? 'w-5 h-5' : 'w-7 h-7'
+          size === 'sm' ? 'w-8 h-8' : 'w-12 h-12'
         )} />
       </motion.div>
       
-      <div className="flex-1 space-y-2">
+      <div className="flex-1 space-y-2 max-w-[200px]">
         <span className={cn(
           "font-medium relative block",
           size === 'sm' ? 'text-sm' : 'text-base',
@@ -79,9 +79,9 @@ export const ProcessingNode = ({ icon: Icon, label, isActive, isComplete, size =
           {label}
           {isActive && (
             <motion.div
-              className="absolute left-0 bottom-0 h-0.5 bg-gradient-to-r from-siso-orange to-siso-red"
-              initial={{ width: "0%" }}
-              animate={{ width: "100%" }}
+              className="absolute left-0 right-0 bottom-0 h-0.5 bg-gradient-to-r from-siso-orange to-siso-red"
+              initial={{ width: "0%", x: "-50%" }}
+              animate={{ width: "100%", x: "0%" }}
               transition={{ duration: 2, repeat: Infinity }}
             />
           )}
@@ -93,7 +93,7 @@ export const ProcessingNode = ({ icon: Icon, label, isActive, isComplete, size =
             initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <span className="inline-flex items-center gap-2">
+            <span className="inline-flex items-center justify-center gap-2">
               {thoughts[thoughtIndex]}
               <ThinkingDots />
             </span>
@@ -106,7 +106,7 @@ export const ProcessingNode = ({ icon: Icon, label, isActive, isComplete, size =
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="absolute -inset-4 bg-gradient-radial from-siso-text/10 to-transparent backdrop-blur-sm rounded-xl -z-10"
+          className="absolute -inset-8 bg-gradient-radial from-siso-text/10 to-transparent backdrop-blur-sm rounded-xl -z-10"
         />
       )}
     </div>
