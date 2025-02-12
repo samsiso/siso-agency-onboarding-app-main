@@ -1596,6 +1596,86 @@ export type Database = {
         }
         Relationships: []
       }
+      skill_paths: {
+        Row: {
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          level: number
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          level?: number
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          level?: number
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      skills: {
+        Row: {
+          cooldown_minutes: number | null
+          created_at: string
+          description: string | null
+          id: string
+          level: number
+          name: string
+          path_id: string | null
+          points: number
+          prerequisites: string[] | null
+          requirements: Json | null
+          updated_at: string
+        }
+        Insert: {
+          cooldown_minutes?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          level?: number
+          name: string
+          path_id?: string | null
+          points?: number
+          prerequisites?: string[] | null
+          requirements?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          cooldown_minutes?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          level?: number
+          name?: string
+          path_id?: string | null
+          points?: number
+          prerequisites?: string[] | null
+          requirements?: Json | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "skills_path_id_fkey"
+            columns: ["path_id"]
+            isOneToOne: false
+            referencedRelation: "skill_paths"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tools: {
         Row: {
           assistant_type: string | null
@@ -1799,6 +1879,50 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      user_skill_progress: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          last_completed_at: string | null
+          progress: number | null
+          skill_id: string | null
+          times_completed: number | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          last_completed_at?: string | null
+          progress?: number | null
+          skill_id?: string | null
+          times_completed?: number | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          last_completed_at?: string | null
+          progress?: number | null
+          skill_id?: string | null
+          times_completed?: number | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_skill_progress_skill_id_fkey"
+            columns: ["skill_id"]
+            isOneToOne: false
+            referencedRelation: "skills"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       video_analysis: {
         Row: {
