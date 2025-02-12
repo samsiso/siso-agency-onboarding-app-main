@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trophy, Star, ChevronDown, LogOut } from 'lucide-react';
@@ -19,6 +20,7 @@ interface ProfileSectionProps {
 }
 
 export const ProfileSection = ({ collapsed }: ProfileSectionProps) => {
+  // [Analysis] Fixed state management to prevent animation conflicts
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -61,7 +63,8 @@ export const ProfileSection = ({ collapsed }: ProfileSectionProps) => {
       <Button
         variant="ghost"
         size="icon"
-        className="w-full p-2"
+        className="w-full p-2 hover:bg-siso-text/5 transition-colors duration-200"
+        onClick={() => navigate('/profile')}
       >
         {userData.avatarUrl ? (
           <img
@@ -85,7 +88,7 @@ export const ProfileSection = ({ collapsed }: ProfileSectionProps) => {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="w-full px-2 py-4 hover:bg-siso-text/5"
+          className="w-full px-2 py-4 hover:bg-siso-text/5 transition-colors duration-200"
           disabled={isLoading}
         >
           <div className="flex items-center gap-3 w-full">
@@ -122,26 +125,26 @@ export const ProfileSection = ({ collapsed }: ProfileSectionProps) => {
         className="w-56 bg-siso-bg-alt border-siso-border"
       >
         <DropdownMenuItem
-          className="text-siso-text hover:text-siso-text-bold hover:bg-siso-text/5"
+          className="text-siso-text hover:text-siso-text-bold hover:bg-siso-text/5 cursor-pointer"
           onClick={() => navigate('/profile')}
         >
           View Profile
         </DropdownMenuItem>
         <DropdownMenuItem
-          className="text-siso-text hover:text-siso-text-bold hover:bg-siso-text/5"
+          className="text-siso-text hover:text-siso-text-bold hover:bg-siso-text/5 cursor-pointer"
           onClick={() => navigate('/leaderboards')}
         >
           Leaderboard
         </DropdownMenuItem>
         <DropdownMenuItem
-          className="text-siso-text hover:text-siso-text-bold hover:bg-siso-text/5"
+          className="text-siso-text hover:text-siso-text-bold hover:bg-siso-text/5 cursor-pointer"
           onClick={() => navigate('/how-to-earn')}
         >
           How to Earn Points
         </DropdownMenuItem>
         <DropdownMenuSeparator className="bg-siso-border" />
         <DropdownMenuItem
-          className="text-red-500 hover:text-red-400 hover:bg-red-500/5"
+          className="text-red-500 hover:text-red-400 hover:bg-red-500/5 cursor-pointer"
           onClick={handleSignOut}
           disabled={isLoading}
         >
