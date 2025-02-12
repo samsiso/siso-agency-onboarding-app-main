@@ -8,6 +8,7 @@ export const useNewsItems = (selectedCategory: string | null) => {
   const [summaries, setSummaries] = useState<Record<string, string>>({});
   const [loadingSummaries, setLoadingSummaries] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const { toast } = useToast();
 
@@ -22,6 +23,10 @@ export const useNewsItems = (selectedCategory: string | null) => {
   const fetchNews = async () => {
     try {
       setLoading(true);
+      setError(null);
+      
+      console.log('Fetching news items...', { selectedCategory, page });
+      
       let query = supabase
         .from('ai_news')
         .select('*')
@@ -32,28 +37,31 @@ export const useNewsItems = (selectedCategory: string | null) => {
         query = query.eq('category', selectedCategory);
       }
 
-      const { data, error } = await query;
+      const { data, error: fetchError } = await query;
 
-      if (error) {
-        toast({
-          variant: "destructive",
-          title: "Error fetching news",
-          description: error.message,
-        });
-        return;
+      if (fetchError) {
+        console.error('Error fetching news:', fetchError);
+        throw fetchError;
       }
 
+      console.log('Fetched news items:', data?.length);
+
       // [Analysis] Check if we have more items to load
-      setHasMore(data.length === PAGE_SIZE);
+      setHasMore(data && data.length === PAGE_SIZE);
       
       // [Analysis] Append new items to existing ones for infinite scroll
-      setNewsItems(prev => page === 0 ? data : [...prev, ...data]);
+      setNewsItems(prev => page === 0 ? data || [] : [...prev, ...(data || [])]);
 
       const { data: summariesData, error: summariesError } = await supabase
         .from('ai_news_summaries')
         .select('news_id, summary');
 
-      if (!summariesError && summariesData) {
+      if (summariesError) {
+        console.error('Error fetching summaries:', summariesError);
+        throw summariesError;
+      }
+
+      if (summariesData) {
         const summariesMap = summariesData.reduce((acc: Record<string, string>, curr) => {
           acc[curr.news_id] = curr.summary;
           return acc;
@@ -61,11 +69,12 @@ export const useNewsItems = (selectedCategory: string | null) => {
         setSummaries(summariesMap);
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error in fetchNews:', error);
+      setError(error as Error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to fetch news items",
+        description: "Failed to fetch news items. Please try again.",
       });
     } finally {
       setLoading(false);
@@ -117,7 +126,7 @@ export const useNewsItems = (selectedCategory: string | null) => {
 
       setSummaries(prev => ({ ...prev, [id]: summary }));
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error generating summary:', error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -141,6 +150,7 @@ export const useNewsItems = (selectedCategory: string | null) => {
     generateSummary,
     loading,
     hasMore,
-    loadMore
+    loadMore,
+    error
   };
 };
