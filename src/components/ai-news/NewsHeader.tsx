@@ -10,6 +10,8 @@ interface NewsHeaderProps {
   onYearChange: (value: string) => void;
   searchQuery: string;
   onSearchChange: (value: string) => void;
+  postStatus: 'all' | 'draft' | 'published';
+  onPostStatusChange: (value: 'all' | 'draft' | 'published') => void;
 }
 
 const NewsHeader = ({ 
@@ -18,7 +20,9 @@ const NewsHeader = ({
   onMonthChange, 
   onYearChange,
   searchQuery,
-  onSearchChange
+  onSearchChange,
+  postStatus,
+  onPostStatusChange
 }: NewsHeaderProps) => {
   return (
     <div className="sticky top-0 z-50 bg-gradient-to-b from-background via-background to-background/80 backdrop-blur-sm pb-4">
@@ -65,6 +69,19 @@ const NewsHeader = ({
               <SelectContent>
                 <SelectItem value="2024">2024</SelectItem>
                 <SelectItem value="2023">2023</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <Select value={postStatus} onValueChange={onPostStatusChange}>
+              <SelectTrigger className="w-[120px] h-9 sm:h-10 bg-siso-bg-alt border-siso-border">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Posts</SelectItem>
+                <SelectItem value="published">Published</SelectItem>
+                <SelectItem value="draft">Drafts</SelectItem>
               </SelectContent>
             </Select>
           </div>
