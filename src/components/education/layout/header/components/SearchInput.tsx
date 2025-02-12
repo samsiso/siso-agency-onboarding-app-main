@@ -132,14 +132,16 @@ export const SearchInput = ({
         result_id: result.id
       });
 
-      // Navigate based on result type
+      // [Analysis] Fix navigation paths by removing the /education prefix since we're already in that route
       if (result.type === 'video') {
-        navigate(`/education/video/${result.id}`);
+        console.log('Navigating to video:', result.id); // Debug log
+        navigate(`/video/${result.id}`);
       } else if (result.type === 'educator' && result.slug) {
-        navigate(`/education/educators/${result.slug}`);
+        console.log('Navigating to educator:', result.slug); // Debug log
+        navigate(`/educators/${result.slug}`);
       }
 
-      // Close search panel
+      // Close search panel and blur
       setIsExpanded(false);
       onBlur();
     } catch (error) {
