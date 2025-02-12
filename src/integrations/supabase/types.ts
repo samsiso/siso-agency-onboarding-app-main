@@ -2520,6 +2520,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      handle_single_page_app: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       refresh_trending_articles: {
         Args: Record<PropertyKey, never>
         Returns: undefined
