@@ -132,13 +132,13 @@ export const SearchInput = ({
         result_id: result.id
       });
 
-      // [Analysis] Fix navigation paths by removing the /education prefix since we're already in that route
+      // [Analysis] Use full paths since React Router needs them for proper navigation
       if (result.type === 'video') {
-        console.log('Navigating to video:', result.id); // Debug log
-        navigate(`/video/${result.id}`);
+        console.log('Navigating to video:', `/education/video/${result.id}`); // Debug log
+        navigate(`/education/video/${result.id}`);
       } else if (result.type === 'educator' && result.slug) {
-        console.log('Navigating to educator:', result.slug); // Debug log
-        navigate(`/educators/${result.slug}`);
+        console.log('Navigating to educator:', `/education/educators/${result.slug}`); // Debug log
+        navigate(`/education/educators/${result.slug}`);
       }
 
       // Close search panel and blur
