@@ -16,7 +16,7 @@ import { MenuSection } from './types';
 export const menuSections: MenuSection[] = [
   {
     type: 'main',
-    href: '/',
+    href: '/home',
     icon: Home,
     label: 'Home',
   },
