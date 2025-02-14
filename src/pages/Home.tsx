@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,12 +22,12 @@ export default function Home() {
       setIsExpanded(true);
     }
 
-    // Add user message
-    setMessages(prev => [...prev, { role: 'user', content: message }]);
+    // Add user message to the beginning
+    setMessages(prev => [{ role: 'user', content: message }, ...prev]);
     
-    // Initialize assistant message with first stage
-    setMessages(prev => [...prev, { 
-      role: 'assistant', 
+    // Initialize assistant message with first stage at the beginning
+    setMessages(prev => [{
+      role: 'assistant',
       content: '',
       loading: true,
       processingStage: {
@@ -43,7 +42,7 @@ export default function Home() {
         'educators': { category: 'educators', content: '', status: 'pending', relevance: 0 },
         'news': { category: 'news', content: '', status: 'pending', relevance: 0 }
       }
-    }]);
+    }, ...prev]);
     
     setIsLoading(true);
 
@@ -84,14 +83,14 @@ export default function Home() {
 
       if (error) throw error;
 
-      // Update with final response
+      // Update with final response at the beginning
       setMessages(prev => {
-        const newMessages = [...prev.slice(0, -1)];
-        newMessages.push({ 
+        const newMessages = [...prev];
+        newMessages[0] = { 
           role: 'assistant', 
           content: data.response,
           loading: false
-        });
+        };
         return newMessages;
       });
     } catch (error) {
@@ -101,7 +100,7 @@ export default function Home() {
         description: "Failed to get response. Please try again.",
         variant: "destructive"
       });
-      setMessages(prev => prev.slice(0, -1));
+      setMessages(prev => prev.slice(1)); // Remove the loading message
     } finally {
       setIsLoading(false);
     }
@@ -109,15 +108,15 @@ export default function Home() {
 
   const updateProcessingStage = (stage: ProcessingStage) => {
     setMessages(prev => {
-      const lastMessage = prev[prev.length - 1];
+      const lastMessage = prev[0];
       if (lastMessage.role === 'assistant') {
-        return [...prev.slice(0, -1), {
+        return [{
           ...lastMessage,
           processingStage: {
             ...lastMessage.processingStage!,
             current: stage
           }
-        }];
+        }, ...prev.slice(1)];
       }
       return prev;
     });
@@ -125,9 +124,9 @@ export default function Home() {
 
   const updateAgentStatus = (category: AgentCategory, status: 'pending' | 'processing' | 'complete') => {
     setMessages(prev => {
-      const lastMessage = prev[prev.length - 1];
+      const lastMessage = prev[0];
       if (lastMessage.role === 'assistant' && lastMessage.agentResponses) {
-        return [...prev.slice(0, -1), {
+        return [{
           ...lastMessage,
           agentResponses: {
             ...lastMessage.agentResponses,
@@ -136,7 +135,7 @@ export default function Home() {
               status
             }
           }
-        }];
+        }, ...prev.slice(1)];
       }
       return prev;
     });
