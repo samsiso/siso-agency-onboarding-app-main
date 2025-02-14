@@ -8,6 +8,7 @@ import { Waves } from '@/components/ui/waves-background';
 import { PreChatState } from '@/components/home/PreChatState';
 import { EnhancedChatState } from '@/components/home/EnhancedChatState';
 import { ChatMessage, ProcessingStage, AgentCategory } from '@/types/chat';
+import { useChatHistory } from '@/hooks/useChatHistory';
 
 // [Analysis] Separated concerns for better maintainability
 export default function Home() {
@@ -15,6 +16,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const { toast } = useToast();
+  const { saveConversation } = useChatHistory();
 
   const handleSubmit = async (message: string) => {
     if (!message.trim() || isLoading) return;
@@ -85,15 +87,17 @@ export default function Home() {
       if (error) throw error;
 
       // Update with final response
-      setMessages(prev => {
-        const newMessages = [...prev.slice(0, -1)];
-        newMessages.push({ 
-          role: 'assistant', 
-          content: data.response,
-          loading: false
-        });
-        return newMessages;
-      });
+      const updatedMessages = [...messages.slice(0, -1), { 
+        role: 'assistant', 
+        content: data.response,
+        loading: false
+      }];
+
+      setMessages(updatedMessages);
+      
+      // Save conversation to history
+      await saveConversation(updatedMessages);
+
     } catch (error) {
       console.error('Error:', error);
       toast({
