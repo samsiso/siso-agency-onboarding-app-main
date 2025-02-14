@@ -1,7 +1,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChatMessage } from '@/types/chat';
-import { Bot, Command, History, Send, User } from 'lucide-react';
+import { Bot, Command, History, Send } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ProcessingTree } from '@/components/chat/ProcessingTree';
 import { useState } from 'react';
