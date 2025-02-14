@@ -15,11 +15,12 @@ interface EnhancedChatStateProps {
 
 // [Analysis] Enhanced animations for a more engaging chat experience
 const messageVariants = {
-  initial: { opacity: 0, y: -20 },
+  initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: 20 }
+  exit: { opacity: 0, y: -20 }
 };
 
+// [Analysis] Suggestions provide quick access to common queries
 const suggestions = [
   "How can I automate my marketing workflows?",
   "What are the best AI tools for agencies?",
@@ -47,46 +48,60 @@ export const EnhancedChatState = ({ messages, handleSubmit, isLoading }: Enhance
       className="flex flex-col w-full max-w-4xl mx-auto h-full"
     >
       {/* Chat Messages Area */}
-      <div 
-        className="flex-1 overflow-y-auto flex flex-col-reverse pb-4 scrollbar-thin scrollbar-thumb-siso-text/10 scrollbar-track-transparent"
-      >
-        <AnimatePresence initial={false}>
-          {[...messages].reverse().map((message, index) => (
+      <div className="flex-1 overflow-y-auto space-y-6 p-4 scrollbar-thin scrollbar-thumb-siso-text/10 scrollbar-track-transparent">
+        <AnimatePresence mode="popLayout">
+          {messages.map((message, index) => (
             <motion.div
-              key={messages.length - 1 - index}
+              key={index}
               variants={messageVariants}
               initial="initial"
               animate="animate"
               exit="exit"
               className={cn(
-                "flex w-full items-start gap-4 rounded-lg p-6 mb-4",
+                "flex w-full items-start gap-4 rounded-lg p-6",
                 message.role === 'assistant' 
                   ? 'bg-black/30 backdrop-blur-sm border border-white/5' 
                   : 'bg-gradient-to-r from-siso-orange/10 to-siso-red/10'
               )}
             >
-              <div className={cn(
-                "flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center shadow-lg",
-                message.role === 'assistant' 
-                  ? 'bg-gradient-to-br from-siso-red to-siso-orange animate-glow' 
-                  : 'bg-gradient-to-br from-siso-text/20 to-siso-text/30'
-              )}>
-                {message.role === 'assistant' ? <Bot className="w-5 h-5 text-white" /> : <User className="w-5 h-5 text-white" />}
-              </div>
-              <div className="flex-1">
-                <div className="text-sm text-siso-text/80">
-                  {message.role === 'assistant' ? 'AI Assistant' : 'You'}
+              {message.role === 'assistant' && (
+                <div className="flex-shrink-0 rounded-full bg-gradient-to-r from-siso-orange to-siso-red p-2">
+                  <Bot className="h-5 w-5 text-white" />
                 </div>
-                <div className="mt-2 text-siso-text">
-                  {message.content}
-                </div>
+              )}
+              <div className="flex-1 space-y-4">
+                {message.loading ? (
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="space-y-6"
+                  >
+                    {message.processingStage && message.agentResponses && (
+                      <ProcessingTree
+                        currentStage={message.processingStage.current}
+                        agentStatuses={{
+                          'ai-tools': message.agentResponses['ai-tools'].status,
+                          'videos': message.agentResponses['videos'].status,
+                          'networking': message.agentResponses['networking'].status,
+                          'assistants': message.agentResponses['assistants'].status,
+                          'educators': message.agentResponses['educators'].status,
+                          'news': message.agentResponses['news'].status,
+                        }}
+                      />
+                    )}
+                  </motion.div>
+                ) : (
+                  <div className="text-sm text-siso-text leading-relaxed">
+                    {message.content}
+                  </div>
+                )}
               </div>
             </motion.div>
           ))}
         </AnimatePresence>
       </div>
 
-      {/* Input Section */}
+      {/* Enhanced Input Section */}
       <div className="p-4 border-t border-white/10 bg-black/30 backdrop-blur-sm">
         <form 
           onSubmit={handleFormSubmit}
