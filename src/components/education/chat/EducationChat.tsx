@@ -1,4 +1,5 @@
 
+import { useEffect, useRef } from 'react';
 import { useEducationChat } from '@/hooks/useEducationChat';
 import { Bot, Send, Paperclip, Mic } from 'lucide-react';
 import {
@@ -20,6 +21,15 @@ interface EducationChatProps {
 
 export const EducationChat = ({ isChatExpanded, onExpandedChange }: EducationChatProps) => {
   const { messages, isLoading, sendMessage } = useEducationChat();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const quickActions = [
     { icon: Bot, label: "Learning Path", query: "What's the recommended learning path for beginners?" },
@@ -88,6 +98,7 @@ export const EducationChat = ({ isChatExpanded, onExpandedChange }: EducationCha
               </ChatBubbleMessage>
             </ChatBubble>
           )}
+          <div ref={messagesEndRef} />
         </ChatMessageList>
       </ExpandableChatBody>
 

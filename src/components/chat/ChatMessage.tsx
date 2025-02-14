@@ -1,6 +1,5 @@
-
-import React from 'react';
-import { Bot, User, Code, Copy, Check, Notebook, MessageSquare, ExternalLink, PlayCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { Bot, User, Code, Copy, Check, Notebook, MessageSquare, ExternalLink } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Button } from '../ui/button';
@@ -45,16 +44,13 @@ interface ChatMessageProps {
 }
 
 export const ChatMessage = ({ role, content, assistantType, isLoading, steps, richContent }: ChatMessageProps) => {
-  const [copied, setCopied] = React.useState(false);
+  const [copied, setCopied] = useState(false);
   const { toast } = useToast();
   
-  // [Analysis] Enhanced content formatting with Markdown-like support
   const formatContent = (text: string) => {
-    // Handle code blocks first
     const segments = text.split(/(```[\s\S]*?```)/);
     
     return segments.map((segment, index) => {
-      // Handle code blocks
       if (segment.startsWith('```')) {
         const [, ...codeLines] = segment.split('\n');
         codeLines.pop();
@@ -84,13 +80,11 @@ export const ChatMessage = ({ role, content, assistantType, isLoading, steps, ri
         );
       }
 
-      // Process regular text content
       const lines = segment.split('\n');
       
       return (
         <div key={index} className="space-y-4">
           {lines.map((line, lineIndex) => {
-            // Handle bullet points
             if (line.trim().startsWith('- ')) {
               return (
                 <div key={lineIndex} className="flex items-start gap-2 pl-4">
@@ -100,7 +94,6 @@ export const ChatMessage = ({ role, content, assistantType, isLoading, steps, ri
               );
             }
 
-            // Handle numbered lists
             if (/^\d+\.\s/.test(line.trim())) {
               const [number, ...rest] = line.trim().split(/\.\s/);
               return (
@@ -111,7 +104,6 @@ export const ChatMessage = ({ role, content, assistantType, isLoading, steps, ri
               );
             }
 
-            // Handle headers
             if (line.startsWith('# ')) {
               return (
                 <h2 key={lineIndex} className="text-xl font-semibold text-siso-text mt-6 mb-4">
@@ -128,7 +120,6 @@ export const ChatMessage = ({ role, content, assistantType, isLoading, steps, ri
               );
             }
 
-            // Handle quotes
             if (line.startsWith('> ')) {
               return (
                 <blockquote key={lineIndex} className="border-l-2 border-siso-orange/50 pl-4 italic text-siso-text/80">
@@ -137,19 +128,16 @@ export const ChatMessage = ({ role, content, assistantType, isLoading, steps, ri
               );
             }
 
-            // Handle links
             const processedLine = line.replace(
               /(https?:\/\/[^\s]+)/g,
               (url) => `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-siso-orange hover:text-siso-red underline transition-colors">${url}</a>`
             );
 
-            // Handle bold text
             const processedBold = processedLine.replace(
               /\*\*(.*?)\*\*/g,
               '<strong class="font-semibold text-siso-text-bold">$1</strong>'
             );
 
-            // Handle italic text
             const processedItalic = processedBold.replace(
               /\*(.*?)\*/g,
               '<em class="italic text-siso-text/90">$1</em>'
@@ -170,18 +158,26 @@ export const ChatMessage = ({ role, content, assistantType, isLoading, steps, ri
 
   const handleCopyToClipboard = () => {
     navigator.clipboard.writeText(content);
+    setCopied(true);
     toast({
       title: "Copied to clipboard",
       description: "The response has been copied to your clipboard",
     });
+    setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleSendToNotion = () => {
-    // [Plan] Implement Notion integration
+  const handleSendToNotion = async () => {
     toast({
-      title: "Coming soon",
-      description: "Notion integration will be available soon!",
+      title: "Connecting to Notion",
+      description: "Setting up Notion integration... Please wait.",
     });
+    
+    setTimeout(() => {
+      toast({
+        title: "Notion Integration",
+        description: "This feature will be available soon! We're working on it.",
+      });
+    }, 1000);
   };
 
   const handleSendToChatGPT = () => {
@@ -203,11 +199,18 @@ export const ChatMessage = ({ role, content, assistantType, isLoading, steps, ri
               <Button
                 variant="outline"
                 size="sm"
-                className="gap-2 bg-siso-bg-alt hover:bg-siso-bg"
+                className={cn(
+                  "gap-2 bg-siso-bg-alt hover:bg-siso-bg",
+                  copied && "text-green-500"
+                )}
                 onClick={handleCopyToClipboard}
               >
-                <Copy className="w-4 h-4 text-siso-orange" />
-                <span className="text-siso-text">Copy</span>
+                {copied ? (
+                  <Check className="w-4 h-4 text-green-500" />
+                ) : (
+                  <Copy className="w-4 h-4 text-siso-orange" />
+                )}
+                <span className="text-siso-text">{copied ? "Copied!" : "Copy"}</span>
               </Button>
             </TooltipTrigger>
             <TooltipContent>Copy to clipboard</TooltipContent>
@@ -218,11 +221,11 @@ export const ChatMessage = ({ role, content, assistantType, isLoading, steps, ri
               <Button
                 variant="outline"
                 size="sm"
-                className="gap-2 bg-siso-bg-alt hover:bg-siso-bg"
+                className="gap-2 bg-siso-bg-alt hover:bg-siso-bg group"
                 onClick={handleSendToNotion}
               >
-                <Notebook className="w-4 h-4 text-siso-orange" />
-                <span className="text-siso-text">Send to Notion</span>
+                <Notebook className="w-4 h-4 text-siso-orange group-hover:scale-110 transition-transform" />
+                <span className="text-siso-text">Export to Notion</span>
               </Button>
             </TooltipTrigger>
             <TooltipContent>Save to Notion</TooltipContent>
@@ -247,140 +250,13 @@ export const ChatMessage = ({ role, content, assistantType, isLoading, steps, ri
     );
   };
 
-  const renderRichContent = () => {
-    if (!richContent) return null;
-
-    return (
-      <div className="space-y-6 mt-4">
-        {/* Tools Section */}
-        {richContent.tools && richContent.tools.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-4"
-          >
-            <h3 className="text-lg font-semibold text-siso-text">Related Tools</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {richContent.tools.map((tool) => (
-                <motion.div
-                  key={tool.id}
-                  whileHover={{ scale: 1.02 }}
-                  className="p-4 rounded-lg bg-black/20 border border-siso-text/10"
-                >
-                  <div className="flex items-start gap-3">
-                    {tool.imageUrl ? (
-                      <img src={tool.imageUrl} alt={tool.name} className="w-12 h-12 rounded-lg" />
-                    ) : (
-                      <div className="w-12 h-12 rounded-lg bg-siso-text/10 flex items-center justify-center">
-                        <Code className="w-6 h-6 text-siso-orange" />
-                      </div>
-                    )}
-                    <div className="flex-1">
-                      <h4 className="font-medium text-siso-text">{tool.name}</h4>
-                      <p className="text-sm text-siso-text/70">{tool.description}</p>
-                      <div className="mt-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-siso-orange hover:text-siso-red"
-                          onClick={() => window.open(tool.url, '_blank')}
-                        >
-                          <ExternalLink className="w-4 h-4 mr-1" />
-                          Learn More
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
-        {/* Videos Section */}
-        {richContent.videos && richContent.videos.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-4"
-          >
-            <h3 className="text-lg font-semibold text-siso-text">Related Videos</h3>
-            <div className="flex overflow-x-auto pb-4 gap-4 scrollbar-thin scrollbar-thumb-siso-text/10 scrollbar-track-transparent">
-              {richContent.videos.map((video) => (
-                <motion.div
-                  key={video.id}
-                  whileHover={{ scale: 1.02 }}
-                  className="flex-shrink-0 w-72"
-                >
-                  <div className="relative rounded-lg overflow-hidden">
-                    <img
-                      src={video.thumbnailUrl}
-                      alt={video.title}
-                      className="w-full aspect-video object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                    <div className="absolute bottom-2 left-2 right-2">
-                      <p className="text-white text-sm font-medium line-clamp-2">{video.title}</p>
-                      <p className="text-white/70 text-xs mt-1">{video.channelName}</p>
-                    </div>
-                    <div className="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
-                      {video.duration}
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="absolute inset-0 w-full h-full hover:bg-black/40 transition-colors group"
-                    >
-                      <PlayCircle className="w-12 h-12 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </Button>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
-        {/* Resources Section */}
-        {richContent.resources && richContent.resources.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-4"
-          >
-            <h3 className="text-lg font-semibold text-siso-text">Related Resources</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {richContent.resources.map((resource, index) => (
-                <motion.a
-                  key={index}
-                  href={resource.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{ scale: 1.02 }}
-                  className="flex items-center gap-3 p-3 rounded-lg bg-black/20 border border-siso-text/10 hover:bg-black/30 transition-colors"
-                >
-                  <div className="w-8 h-8 rounded-full bg-siso-text/10 flex items-center justify-center">
-                    <ExternalLink className="w-4 h-4 text-siso-orange" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-siso-text">{resource.title}</p>
-                    <p className="text-xs text-siso-text/70 capitalize">{resource.type}</p>
-                  </div>
-                </motion.a>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </div>
-    );
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       className={cn(
-        "flex items-start gap-4 p-6 rounded-lg transition-colors",
+        "flex items-start gap-4 p-6 rounded-lg transition-colors relative group",
         role === 'assistant' ? 'bg-siso-text/5 hover:bg-siso-text/8' : 'hover:bg-black/20'
       )}
     >
@@ -431,7 +307,6 @@ export const ChatMessage = ({ role, content, assistantType, isLoading, steps, ri
                 </div>
               )}
               {content && formatContent(content)}
-              {renderRichContent()}
             </>
           )}
         </div>
