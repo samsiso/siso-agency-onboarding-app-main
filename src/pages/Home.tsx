@@ -8,7 +8,6 @@ import { Waves } from '@/components/ui/waves-background';
 import { PreChatState } from '@/components/home/PreChatState';
 import { EnhancedChatState } from '@/components/home/EnhancedChatState';
 import { ChatMessage, ProcessingStage, AgentCategory } from '@/types/chat';
-import { useChatHistory } from '@/hooks/useChatHistory';
 
 // [Analysis] Separated concerns for better maintainability
 export default function Home() {
@@ -16,7 +15,6 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const { toast } = useToast();
-  const { saveConversation } = useChatHistory();
 
   const handleSubmit = async (message: string) => {
     if (!message.trim() || isLoading) return;
@@ -26,11 +24,10 @@ export default function Home() {
     }
 
     // Add user message
-    const userMessage: ChatMessage = { role: 'user', content: message };
-    setMessages(prev => [...prev, userMessage]);
+    setMessages(prev => [...prev, { role: 'user', content: message }]);
     
     // Initialize assistant message with first stage
-    const assistantMessage: ChatMessage = { 
+    setMessages(prev => [...prev, { 
       role: 'assistant', 
       content: '',
       loading: true,
@@ -46,8 +43,7 @@ export default function Home() {
         'educators': { category: 'educators', content: '', status: 'pending', relevance: 0 },
         'news': { category: 'news', content: '', status: 'pending', relevance: 0 }
       }
-    };
-    setMessages(prev => [...prev, assistantMessage]);
+    }]);
     
     setIsLoading(true);
 
@@ -89,18 +85,15 @@ export default function Home() {
       if (error) throw error;
 
       // Update with final response
-      const finalMessage: ChatMessage = { 
-        role: 'assistant', 
-        content: data.response,
-        loading: false
-      };
-
-      const updatedMessages = [...messages.slice(0, -1), finalMessage];
-      setMessages(updatedMessages);
-      
-      // Save conversation to history
-      await saveConversation(updatedMessages);
-
+      setMessages(prev => {
+        const newMessages = [...prev.slice(0, -1)];
+        newMessages.push({ 
+          role: 'assistant', 
+          content: data.response,
+          loading: false
+        });
+        return newMessages;
+      });
     } catch (error) {
       console.error('Error:', error);
       toast({
@@ -117,7 +110,7 @@ export default function Home() {
   const updateProcessingStage = (stage: ProcessingStage) => {
     setMessages(prev => {
       const lastMessage = prev[prev.length - 1];
-      if (lastMessage?.role === 'assistant') {
+      if (lastMessage.role === 'assistant') {
         return [...prev.slice(0, -1), {
           ...lastMessage,
           processingStage: {
@@ -133,7 +126,7 @@ export default function Home() {
   const updateAgentStatus = (category: AgentCategory, status: 'pending' | 'processing' | 'complete') => {
     setMessages(prev => {
       const lastMessage = prev[prev.length - 1];
-      if (lastMessage?.role === 'assistant' && lastMessage.agentResponses) {
+      if (lastMessage.role === 'assistant' && lastMessage.agentResponses) {
         return [...prev.slice(0, -1), {
           ...lastMessage,
           agentResponses: {
