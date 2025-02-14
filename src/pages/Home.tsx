@@ -26,10 +26,11 @@ export default function Home() {
     }
 
     // Add user message
-    setMessages(prev => [...prev, { role: 'user', content: message }]);
+    const userMessage: ChatMessage = { role: 'user', content: message };
+    setMessages(prev => [...prev, userMessage]);
     
     // Initialize assistant message with first stage
-    setMessages(prev => [...prev, { 
+    const assistantMessage: ChatMessage = { 
       role: 'assistant', 
       content: '',
       loading: true,
@@ -45,7 +46,8 @@ export default function Home() {
         'educators': { category: 'educators', content: '', status: 'pending', relevance: 0 },
         'news': { category: 'news', content: '', status: 'pending', relevance: 0 }
       }
-    }]);
+    };
+    setMessages(prev => [...prev, assistantMessage]);
     
     setIsLoading(true);
 
@@ -87,12 +89,13 @@ export default function Home() {
       if (error) throw error;
 
       // Update with final response
-      const updatedMessages = [...messages.slice(0, -1), { 
+      const finalMessage: ChatMessage = { 
         role: 'assistant', 
         content: data.response,
         loading: false
-      }];
+      };
 
+      const updatedMessages = [...messages.slice(0, -1), finalMessage];
       setMessages(updatedMessages);
       
       // Save conversation to history
@@ -114,7 +117,7 @@ export default function Home() {
   const updateProcessingStage = (stage: ProcessingStage) => {
     setMessages(prev => {
       const lastMessage = prev[prev.length - 1];
-      if (lastMessage.role === 'assistant') {
+      if (lastMessage?.role === 'assistant') {
         return [...prev.slice(0, -1), {
           ...lastMessage,
           processingStage: {
@@ -130,7 +133,7 @@ export default function Home() {
   const updateAgentStatus = (category: AgentCategory, status: 'pending' | 'processing' | 'complete') => {
     setMessages(prev => {
       const lastMessage = prev[prev.length - 1];
-      if (lastMessage.role === 'assistant' && lastMessage.agentResponses) {
+      if (lastMessage?.role === 'assistant' && lastMessage.agentResponses) {
         return [...prev.slice(0, -1), {
           ...lastMessage,
           agentResponses: {

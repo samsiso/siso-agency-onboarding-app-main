@@ -26,3 +26,4 @@ export interface ChatMessage {
     response?: string;
   };
 }
+
