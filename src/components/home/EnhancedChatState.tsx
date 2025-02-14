@@ -1,11 +1,12 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChatMessage } from '@/types/chat';
-import { Bot, Command, History, Send } from 'lucide-react';
+import { Bot, Command, History, Send, Copy, Notebook } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ProcessingTree } from '@/components/chat/ProcessingTree';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { useToast } from "@/hooks/use-toast";
 
 interface EnhancedChatStateProps {
   messages: ChatMessage[];
@@ -31,6 +32,7 @@ const suggestions = [
 export const EnhancedChatState = ({ messages, handleSubmit, isLoading }: EnhancedChatStateProps) => {
   const [input, setInput] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const { toast } = useToast();
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -38,6 +40,24 @@ export const EnhancedChatState = ({ messages, handleSubmit, isLoading }: Enhance
       handleSubmit(input.trim());
       setInput('');
     }
+  };
+
+  // [Analysis] Added clipboard functionality with user feedback
+  const handleCopyToClipboard = (content: string) => {
+    navigator.clipboard.writeText(content);
+    toast({
+      title: "Copied to clipboard",
+      description: "Message content has been copied to your clipboard",
+    });
+  };
+
+  // [Analysis] Added Notion export functionality
+  const handleNotionExport = (content: string) => {
+    // [Plan] Implement actual Notion integration in the future
+    toast({
+      title: "Coming soon",
+      description: "Notion export functionality will be available soon!",
+    });
   };
 
   return (
@@ -91,8 +111,30 @@ export const EnhancedChatState = ({ messages, handleSubmit, isLoading }: Enhance
                     )}
                   </motion.div>
                 ) : (
-                  <div className="text-sm text-siso-text leading-relaxed">
-                    {message.content}
+                  <div className="relative">
+                    {message.role === 'assistant' && (
+                      <div className="absolute top-0 right-0 flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-siso-text hover:bg-white/5"
+                          onClick={() => handleCopyToClipboard(message.content)}
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-siso-text hover:bg-white/5"
+                          onClick={() => handleNotionExport(message.content)}
+                        >
+                          <Notebook className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
+                    <div className="text-sm text-siso-text leading-relaxed pt-8">
+                      {message.content}
+                    </div>
                   </div>
                 )}
               </div>
