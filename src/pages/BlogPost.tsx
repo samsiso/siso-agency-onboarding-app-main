@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,17 +7,7 @@ import { EnhancedBlogLayout } from '@/components/ai-news/EnhancedBlogLayout';
 import { useToast } from '@/hooks/use-toast';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { usePoints } from '@/hooks/usePoints';
-import { NewsCardComments } from '@/components/ai-news/NewsCardComments';
 import type { EnhancedNewsItem, ContentCategory, TechnicalComplexity, ArticleImpact } from '@/types/blog';
-
-interface Comment {
-  id: string;
-  content: string;
-  created_at: string;
-  user_email: string;
-  updated_at: string;
-  news_id: string;
-}
 
 const BlogPost = () => {
   const { id } = useParams();
@@ -208,15 +197,6 @@ const BlogPost = () => {
             onShare={handleShare}
             onBookmark={handleBookmark}
           />
-          <div className="max-w-4xl mx-auto px-4 py-8">
-            <div className="bg-white/5 rounded-lg p-6 backdrop-blur-sm border border-white/10">
-              <h3 className="text-xl font-semibold text-white mb-6">Discussion</h3>
-              <NewsCardComments 
-                newsId={post.id}
-                comments={post.comments || []}
-              />
-            </div>
-          </div>
         </div>
       </div>
     </SidebarProvider>

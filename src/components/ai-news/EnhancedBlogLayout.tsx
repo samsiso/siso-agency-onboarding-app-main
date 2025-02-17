@@ -1,3 +1,4 @@
+
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -8,7 +9,8 @@ import {
   Share2, 
   BookmarkPlus,
   Eye,
-  Clock
+  Clock,
+  MessageCircle
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { EventCard } from './blog-layout/EventCard';
@@ -16,9 +18,17 @@ import { complexityColors } from './blog-layout/constants';
 import { cn } from '@/lib/utils';
 import { ArticleTableOfContents } from './blog-layout/ArticleTableOfContents';
 import { useState, useEffect } from 'react';
+import { NewsCardComments } from './NewsCardComments';
 
 interface EnhancedBlogLayoutProps {
-  article: EnhancedNewsItem;
+  article: EnhancedNewsItem & { comments?: Array<{
+    id: string;
+    content: string;
+    created_at: string;
+    user_email: string;
+    updated_at: string;
+    news_id: string;
+  }> };
   onShare?: () => void;
   onBookmark?: () => void;
 }
@@ -49,12 +59,6 @@ export const EnhancedBlogLayout = ({
       },
       { threshold: 0.5 }
     );
-
-    // Observe key takeaways section
-    const keyTakeawaysElement = document.getElementById('key-takeaways');
-    if (keyTakeawaysElement) {
-      observer.observe(keyTakeawaysElement);
-    }
 
     // Observe all content sections
     sortedSections.forEach((section) => {
@@ -121,6 +125,11 @@ export const EnhancedBlogLayout = ({
                   <Eye className="h-4 w-4" />
                   {article.views} views
                 </span>
+                <span>•</span>
+                <span className="flex items-center gap-1">
+                  <MessageCircle className="h-4 w-4" />
+                  {article.comments?.length || 0} comments
+                </span>
               </div>
             </div>
 
@@ -142,13 +151,24 @@ export const EnhancedBlogLayout = ({
                 <EventCard key={section.id} section={section} index={index} />
               ))}
             </motion.div>
+
+            {/* Comments Section */}
+            <div className="mt-12 bg-white/5 rounded-lg p-6 backdrop-blur-sm border border-white/10">
+              <h3 className="text-xl font-semibold text-white mb-6">Discussion</h3>
+              <NewsCardComments 
+                newsId={article.id}
+                comments={article.comments || []}
+              />
+            </div>
           </div>
 
           <div className="lg:col-span-4">
-            <ArticleTableOfContents 
-              article={article}
-              activeSection={activeSection}
-            />
+            <div className="sticky top-8">
+              <ArticleTableOfContents 
+                article={article}
+                activeSection={activeSection}
+              />
+            </div>
           </div>
         </div>
       </div>
