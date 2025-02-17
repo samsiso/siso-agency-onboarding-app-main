@@ -54,7 +54,7 @@ const BlogPost = () => {
         sections: articleData.article_sections || [],
         tags: articleData.article_tags || [],
         key_takeaways: Array.isArray(articleData.key_takeaways) 
-          ? articleData.key_takeaways 
+          ? articleData.key_takeaways.map(item => String(item))
           : [],
         related_articles: Array.isArray(articleData.related_articles) 
           ? articleData.related_articles.map((article: any) => ({
