@@ -1,3 +1,4 @@
+
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { format, addDays, subDays } from 'date-fns';
@@ -11,7 +12,6 @@ import { Sidebar } from '@/components/Sidebar';
 import { DailyNewsCard } from '@/components/ai-news/daily/DailyNewsCard';
 import { Skeleton } from '@/components/ui/skeleton';
 
-// [Analysis] Interface for news items to ensure type safety
 interface DailyNewsItem {
   id: string;
   title: string;
@@ -31,6 +31,7 @@ interface DailyNewsItem {
     created_at: string;
     user_email: string;
     updated_at: string;
+    news_id: string;
   }>;
   news_ai_analysis?: Array<{
     key_insights: string[];
@@ -75,19 +76,13 @@ const DailyNews = () => {
         ...item,
         sources: item.sources || [],
         key_takeaways: item.key_takeaways || [],
-        comments: item.comments || []
+        comments: (item.comments || []).map((comment: any) => ({
+          ...comment,
+          news_id: item.id // Ensure news_id is included in each comment
+        }))
       })) as DailyNewsItem[];
     },
   });
-
-  const handleDateChange = (direction: 'prev' | 'next') => {
-    if (!date) return;
-    const currentDate = new Date(date);
-    const newDate = direction === 'prev' 
-      ? subDays(currentDate, 1)
-      : addDays(currentDate, 1);
-    navigate(`/ai-news/daily/${format(newDate, 'yyyy-MM-dd')}`);
-  };
 
   return (
     <SidebarProvider>
