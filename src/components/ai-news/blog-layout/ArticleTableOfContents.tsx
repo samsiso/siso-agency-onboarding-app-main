@@ -10,9 +10,17 @@ interface ArticleTableOfContentsProps {
   activeSection?: string;
 }
 
+// [Analysis] Define distinct types for section and content items
+type TableItem = {
+  id: string;
+  title: string;
+  type: 'section' | 'content';
+  importance?: string;
+};
+
 export const ArticleTableOfContents = ({ article, activeSection }: ArticleTableOfContentsProps) => {
   // [Analysis] Generate table of contents items from article sections and key takeaways
-  const tableItems = [
+  const tableItems: TableItem[] = [
     { id: 'key-takeaways', title: 'Key Takeaways', type: 'section' },
     ...article.sections.map((section) => ({
       id: section.id,
