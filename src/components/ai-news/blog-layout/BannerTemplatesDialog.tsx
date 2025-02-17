@@ -70,9 +70,9 @@ export function BannerTemplatesDialog() {
       // Transform the response data to match our BannerTemplate interface
       const transformedTemplates: BannerTemplate[] = (data as BannerTemplateResponse[]).map(template => ({
         ...template,
-        text_overlay: typeof template.text_overlay === 'string' 
+        text_overlay: (typeof template.text_overlay === 'string' 
           ? JSON.parse(template.text_overlay)
-          : template.text_overlay as TextOverlay
+          : template.text_overlay) as TextOverlay
       }));
 
       setTemplates(transformedTemplates);
@@ -106,9 +106,9 @@ export function BannerTemplatesDialog() {
           name: newTemplate.name,
           description: newTemplate.description,
           template_type: newTemplate.template_type,
-          text_overlay: newTemplate.text_overlay,
+          text_overlay: JSON.stringify(newTemplate.text_overlay),
           is_default: false
-        })
+        } as any)
         .select()
         .single();
 
@@ -116,9 +116,9 @@ export function BannerTemplatesDialog() {
 
       const transformedTemplate: BannerTemplate = {
         ...data,
-        text_overlay: typeof data.text_overlay === 'string'
+        text_overlay: (typeof data.text_overlay === 'string'
           ? JSON.parse(data.text_overlay)
-          : data.text_overlay as TextOverlay
+          : data.text_overlay) as TextOverlay
       };
 
       toast({
