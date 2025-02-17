@@ -489,6 +489,27 @@ export type Database = {
         }
         Relationships: []
       }
+      content: {
+        Row: {
+          created_at: string
+          id: string
+          title: string
+          views: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          title: string
+          views?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          title?: string
+          views?: number | null
+        }
+        Relationships: []
+      }
       core_tools: {
         Row: {
           category: string
@@ -1562,12 +1583,15 @@ export type Database = {
           industry: string | null
           instagram_url: string | null
           interests: string[] | null
+          last_seen: string | null
           linkedin_url: string | null
           long_term_goals: string[] | null
+          metadata: Json | null
           moralis_provider_id: string | null
           onboarding_completed: boolean | null
           onboarding_step: string | null
           points: number | null
+          preferences: Json | null
           professional_role: string | null
           rank: string | null
           role: string | null
@@ -1610,12 +1634,15 @@ export type Database = {
           industry?: string | null
           instagram_url?: string | null
           interests?: string[] | null
+          last_seen?: string | null
           linkedin_url?: string | null
           long_term_goals?: string[] | null
+          metadata?: Json | null
           moralis_provider_id?: string | null
           onboarding_completed?: boolean | null
           onboarding_step?: string | null
           points?: number | null
+          preferences?: Json | null
           professional_role?: string | null
           rank?: string | null
           role?: string | null
@@ -1658,12 +1685,15 @@ export type Database = {
           industry?: string | null
           instagram_url?: string | null
           interests?: string[] | null
+          last_seen?: string | null
           linkedin_url?: string | null
           long_term_goals?: string[] | null
+          metadata?: Json | null
           moralis_provider_id?: string | null
           onboarding_completed?: boolean | null
           onboarding_step?: string | null
           points?: number | null
+          preferences?: Json | null
           professional_role?: string | null
           rank?: string | null
           role?: string | null
@@ -2075,6 +2105,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      users_private: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       video_analysis: {
         Row: {
@@ -2797,6 +2848,10 @@ export type Database = {
         Returns: undefined
       }
       handle_single_page_app: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      refresh_materialized_views: {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
