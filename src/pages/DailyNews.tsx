@@ -1,8 +1,8 @@
 
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { format, addDays, subDays } from 'date-fns';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { format, addDays, subDays, parseISO } from 'date-fns';
+import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useQuery } from '@tanstack/react-query';
@@ -11,130 +11,113 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { Sidebar } from '@/components/Sidebar';
 import { DailyNewsCard } from '@/components/ai-news/daily/DailyNewsCard';
 import { Skeleton } from '@/components/ui/skeleton';
-
-interface DailyNewsItem {
-  id: string;
-  title: string;
-  description: string;
-  image_url?: string;
-  date: string;
-  category: string;
-  impact: string;
-  technical_complexity: string;
-  source: string;
-  key_takeaways: string[];
-  reading_time: number;
-  sources: { title: string; url: string }[];
-  comments: Array<{
-    id: string;
-    content: string;
-    created_at: string;
-    user_email: string;
-    updated_at: string;
-    news_id: string;
-  }>;
-  news_ai_analysis?: Array<{
-    key_insights: string[];
-    tech_predictions: string[];
-    market_impact: string;
-    business_implications: string;
-    related_technologies: string[];
-    confidence_score: number;
-  }>;
-}
+import { useNewsItems } from '@/hooks/useNewsItems';
+import { NewsContent } from '@/components/ai-news/NewsContent';
 
 const DailyNews = () => {
   const { date } = useParams();
   const navigate = useNavigate();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
+  // [Analysis] Parse and validate the date
+  const currentDate = date ? parseISO(date) : new Date();
+  const formattedDate = format(currentDate, 'yyyy-MM-dd');
+
+  const {
+    newsItems,
+    summaries,
+    loadingSummaries,
+    generateSummary,
+    loading,
+    error
+  } = useNewsItems(null, 'published', formattedDate);
+
+  // [Analysis] Check for available dates in a range
+  const { data: dateAvailability } = useQuery({
+    queryKey: ['news-dates', formattedDate],
+    queryFn: async () => {
+      const startDate = format(subDays(currentDate, 7), 'yyyy-MM-dd');
+      const endDate = format(addDays(currentDate, 7), 'yyyy-MM-dd');
+      
+      const { data } = await supabase
+        .from('ai_news')
+        .select('date, count(*)')
+        .gte('date', startDate)
+        .lte('date', endDate)
+        .eq('status', 'published')
+        .group('date');
+      
+      return data || [];
+    }
+  });
+
   const handleDateChange = (direction: 'prev' | 'next') => {
-    if (!date) return;
-    const currentDate = new Date(date);
     const newDate = direction === 'prev' 
       ? subDays(currentDate, 1)
       : addDays(currentDate, 1);
     navigate(`/ai-news/daily/${format(newDate, 'yyyy-MM-dd')}`);
   };
 
-  const { data: newsItems, isLoading } = useQuery({
-    queryKey: ['daily-news', date],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('ai_news')
-        .select(`
-          *,
-          profiles:author_id(full_name, avatar_url),
-          news_ai_analysis(
-            key_insights,
-            tech_predictions,
-            market_impact,
-            business_implications,
-            related_technologies,
-            confidence_score
-          ),
-          comments:news_comments(*)
-        `)
-        .eq('date', date)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      
-      // Transform the data to match our interface
-      return (data as any[]).map(item => ({
-        ...item,
-        sources: item.sources || [],
-        key_takeaways: item.key_takeaways || [],
-        comments: (item.comments || []).map((comment: any) => ({
-          ...comment,
-          news_id: item.id // Ensure news_id is included in each comment
-        }))
-      })) as DailyNewsItem[];
-    },
-  });
-
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-gradient-to-b from-gray-900 to-black">
+      <div className="flex min-h-screen w-full bg-background">
         <Sidebar />
         <div className="flex-1 p-8">
-          {/* Header Section */}
-          <div className="mb-8 space-y-4">
-            <div className="flex items-center justify-between">
+          {/* Date Navigation */}
+          <div className="flex flex-col space-y-6 mb-8">
+            <div className="flex items-center justify-between bg-siso-bg-alt p-4 rounded-lg">
               <Button
-                variant="ghost"
-                onClick={() => navigate('/ai-news')}
-                className="text-white"
+                variant="outline"
+                onClick={() => handleDateChange('prev')}
               >
                 <ChevronLeft className="h-4 w-4 mr-2" />
-                Back to News
+                Previous Day
               </Button>
-              <div className="flex items-center gap-4">
-                <Button
-                  variant="outline"
-                  onClick={() => handleDateChange('prev')}
-                  className="text-white"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                  Previous Day
-                </Button>
-                <h2 className="text-xl font-semibold text-white">
-                  {date && format(new Date(date), 'MMMM d, yyyy')}
-                </h2>
-                <Button
-                  variant="outline"
-                  onClick={() => handleDateChange('next')}
-                  className="text-white"
-                >
-                  Next Day
-                  <ChevronRight className="h-4 w-4 ml-2" />
-                </Button>
+              <div className="flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-siso-red" />
+                <span className="text-xl font-semibold">
+                  {format(currentDate, 'MMMM d, yyyy')}
+                </span>
+                {newsItems.length > 0 && (
+                  <Badge variant="secondary" className="ml-2">
+                    {newsItems.length} articles
+                  </Badge>
+                )}
               </div>
+              <Button
+                variant="outline"
+                onClick={() => handleDateChange('next')}
+                disabled={format(currentDate, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd')}
+              >
+                Next Day
+                <ChevronRight className="h-4 w-4 ml-2" />
+              </Button>
+            </div>
+
+            {/* Date Availability Indicators */}
+            <div className="flex items-center justify-center gap-2">
+              {dateAvailability?.map((dateInfo: any) => {
+                const isCurrentDate = dateInfo.date === formattedDate;
+                return (
+                  <Button
+                    key={dateInfo.date}
+                    variant={isCurrentDate ? "default" : "ghost"}
+                    size="sm"
+                    className={`px-2 ${isCurrentDate ? 'bg-siso-red' : ''}`}
+                    onClick={() => navigate(`/ai-news/daily/${dateInfo.date}`)}
+                  >
+                    {format(parseISO(dateInfo.date), 'MMM d')}
+                    <Badge variant="secondary" className="ml-2">
+                      {dateInfo.count}
+                    </Badge>
+                  </Button>
+                );
+              })}
             </div>
           </div>
 
           {/* Main Content */}
-          {isLoading ? (
+          {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="space-y-4">
@@ -145,14 +128,24 @@ const DailyNews = () => {
               ))}
             </div>
           ) : newsItems?.length ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {newsItems.map((item) => (
-                <DailyNewsCard key={item.id} article={item} />
-              ))}
-            </div>
+            <NewsContent
+              newsItems={newsItems}
+              summaries={summaries}
+              loadingSummaries={loadingSummaries}
+              onGenerateSummary={generateSummary}
+              searchQuery=""
+              loading={loading}
+            />
           ) : (
             <div className="text-center py-12">
               <p className="text-lg text-gray-400">No news items found for this date.</p>
+              <Button 
+                variant="default" 
+                className="mt-4"
+                onClick={() => navigate('/ai-news')}
+              >
+                Return to Latest News
+              </Button>
             </div>
           )}
         </div>

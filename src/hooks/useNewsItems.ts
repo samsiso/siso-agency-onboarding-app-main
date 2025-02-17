@@ -2,11 +2,16 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { format, parseISO } from 'date-fns';
 
 // [Analysis] Added status type for draft/published filtering
 type PostStatus = 'all' | 'draft' | 'published';
 
-export const useNewsItems = (selectedCategory: string | null, status: PostStatus = 'published') => {
+export const useNewsItems = (
+  selectedCategory: string | null, 
+  status: PostStatus = 'published',
+  selectedDate?: string
+) => {
   const [newsItems, setNewsItems] = useState<any[]>([]);
   const [summaries, setSummaries] = useState<Record<string, string>>({});
   const [loadingSummaries, setLoadingSummaries] = useState<Record<string, boolean>>({});
@@ -21,20 +26,20 @@ export const useNewsItems = (selectedCategory: string | null, status: PostStatus
 
   useEffect(() => {
     fetchNews();
-  }, [selectedCategory, page, status]);
+  }, [selectedCategory, page, status, selectedDate]);
 
   const fetchNews = async () => {
     try {
       setLoading(true);
       setError(null);
       
-      console.log('Fetching blog posts...', { selectedCategory, page, status });
+      console.log('Fetching blog posts...', { selectedCategory, page, status, selectedDate });
       
       let query = supabase
         .from('ai_news')
         .select('*, profiles:author_id(full_name, avatar_url)')
         .order('date', { ascending: false })
-        .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
+        .order('created_at', { ascending: false });
 
       // [Analysis] Added status filtering
       if (status !== 'all') {
@@ -43,6 +48,16 @@ export const useNewsItems = (selectedCategory: string | null, status: PostStatus
 
       if (selectedCategory) {
         query = query.eq('category', selectedCategory);
+      }
+
+      // [Analysis] Added date filtering
+      if (selectedDate) {
+        query = query.eq('date', selectedDate);
+      }
+
+      // [Analysis] Add pagination only if not filtering by date
+      if (!selectedDate) {
+        query = query.range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
       }
 
       const { data, error: fetchError } = await query;
