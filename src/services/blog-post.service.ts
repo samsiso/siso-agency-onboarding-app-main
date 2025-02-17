@@ -36,15 +36,6 @@ export const fetchBlogPost = async (id: string) => {
         created_at,
         user_email,
         updated_at
-      ),
-      news_ai_analysis (
-        id,
-        key_insights,
-        market_impact,
-        tech_predictions,
-        related_technologies,
-        confidence_score,
-        business_implications
       )
     `)
     .eq('id', id)
@@ -118,15 +109,7 @@ export const fetchBlogPost = async (id: string) => {
     views: articleData.views || 0,
     image_url: articleData.image_url,
     source: articleData.source,
-    sources: Array.isArray(articleData.sources) ? articleData.sources.map(String) : [],
-    ai_analysis: articleData.news_ai_analysis ? {
-      key_insights: articleData.news_ai_analysis.key_insights || [],
-      market_impact: articleData.news_ai_analysis.market_impact || '',
-      tech_predictions: articleData.news_ai_analysis.tech_predictions || [],
-      related_technologies: articleData.news_ai_analysis.related_technologies || [],
-      confidence_score: articleData.news_ai_analysis.confidence_score || 0,
-      business_implications: articleData.news_ai_analysis.business_implications || ''
-    } : null
+    sources: Array.isArray(articleData.sources) ? articleData.sources.map(String) : []
   };
 
   const comments = (articleData.news_comments || []).map(comment => ({
@@ -139,4 +122,3 @@ export const fetchBlogPost = async (id: string) => {
     comments
   };
 };
-
