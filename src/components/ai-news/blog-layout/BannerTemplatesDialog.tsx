@@ -1,50 +1,13 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, Image as ImageIcon, Calendar } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { format } from 'date-fns';
-
-interface TextOverlay {
-  title: string;
-  subtitle: string;
-}
-
-interface TemplateMetadata {
-  dateFormat?: string;
-  dynamicDate?: boolean;
-}
-
-interface BannerTemplate {
-  id: string;
-  name: string;
-  description: string | null;
-  image_url: string | null;
-  is_default: boolean;
-  template_type: string;
-  text_overlay: TextOverlay;
-  metadata?: TemplateMetadata;
-  created_at?: string;
-  updated_at?: string;
-}
-
-interface BannerTemplateResponse {
-  id: string;
-  name: string;
-  description: string | null;
-  image_url: string | null;
-  is_default: boolean;
-  template_type: string;
-  text_overlay: unknown;
-  metadata: unknown;
-  created_at: string;
-  updated_at: string;
-}
+import { TemplateForm } from './TemplateForm';
+import { TemplateList } from './TemplateList';
+import type { BannerTemplate, BannerTemplateResponse } from './types';
 
 export function BannerTemplatesDialog() {
   const [isOpen, setIsOpen] = useState(false);
@@ -88,8 +51,8 @@ export function BannerTemplatesDialog() {
 
         return {
           ...template,
-          text_overlay: parsedTextOverlay as TextOverlay,
-          metadata: parsedMetadata as TemplateMetadata,
+          text_overlay: parsedTextOverlay as BannerTemplate['text_overlay'],
+          metadata: parsedMetadata,
           is_default: template.is_default || false
         };
       });
@@ -119,16 +82,18 @@ export function BannerTemplatesDialog() {
 
     try {
       setLoading(true);
+      const insertData = {
+        name: newTemplate.name,
+        description: newTemplate.description,
+        template_type: newTemplate.template_type,
+        text_overlay: newTemplate.text_overlay,
+        metadata: newTemplate.metadata,
+        is_default: false
+      };
+
       const { data, error } = await supabase
         .from('banner_templates')
-        .insert({
-          name: newTemplate.name,
-          description: newTemplate.description,
-          template_type: newTemplate.template_type,
-          text_overlay: newTemplate.text_overlay,
-          metadata: newTemplate.metadata,
-          is_default: false
-        })
+        .insert([insertData])
         .select()
         .single();
 
@@ -138,10 +103,10 @@ export function BannerTemplatesDialog() {
         ...data,
         text_overlay: typeof data.text_overlay === 'string'
           ? JSON.parse(data.text_overlay)
-          : data.text_overlay as TextOverlay,
+          : data.text_overlay as BannerTemplate['text_overlay'],
         metadata: typeof data.metadata === 'string'
           ? JSON.parse(data.metadata)
-          : data.metadata as TemplateMetadata,
+          : data.metadata,
         is_default: data.is_default || false
       };
 
@@ -178,15 +143,6 @@ export function BannerTemplatesDialog() {
     }
   };
 
-  const renderPreviewDate = (template: BannerTemplate) => {
-    if (template.metadata?.dynamicDate) {
-      const today = new Date();
-      const dateFormat = template.metadata.dateFormat || 'MMMM d, yyyy';
-      return format(today, dateFormat);
-    }
-    return template.text_overlay.subtitle;
-  };
-
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -208,127 +164,16 @@ export function BannerTemplatesDialog() {
         </DialogHeader>
         
         <div className="space-y-6">
-          <div className="space-y-4 p-4 border rounded-lg">
-            <h3 className="font-semibold">Create New Template</h3>
-            <div className="space-y-2">
-              <Label htmlFor="name">Template Name</Label>
-              <Input
-                id="name"
-                value={newTemplate.name}
-                onChange={(e) => setNewTemplate({ ...newTemplate, name: e.target.value })}
-                placeholder="Daily Brief Template"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                value={newTemplate.description}
-                onChange={(e) => setNewTemplate({ ...newTemplate, description: e.target.value })}
-                placeholder="Template description..."
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="title">Banner Title</Label>
-              <Input
-                id="title"
-                value={newTemplate.text_overlay.title}
-                onChange={(e) => setNewTemplate({
-                  ...newTemplate,
-                  text_overlay: { ...newTemplate.text_overlay, title: e.target.value }
-                })}
-                placeholder="SisoAI Daily Brief"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="subtitle">Banner Subtitle</Label>
-              <div className="flex items-center gap-2">
-                <Input
-                  id="subtitle"
-                  value={newTemplate.text_overlay.subtitle}
-                  onChange={(e) => setNewTemplate({
-                    ...newTemplate,
-                    text_overlay: { ...newTemplate.text_overlay, subtitle: e.target.value }
-                  })}
-                  placeholder="March 28, 2024"
-                  disabled={newTemplate.metadata?.dynamicDate}
-                />
-                <Button
-                  variant="outline"
-                  size="icon"
-                  type="button"
-                  onClick={() => setNewTemplate({
-                    ...newTemplate,
-                    metadata: {
-                      ...newTemplate.metadata,
-                      dynamicDate: !newTemplate.metadata?.dynamicDate
-                    }
-                  })}
-                  className={newTemplate.metadata?.dynamicDate ? "bg-blue-500/10 text-blue-500" : ""}
-                >
-                  <Calendar className="h-4 w-4" />
-                </Button>
-              </div>
-              {newTemplate.metadata?.dynamicDate && (
-                <p className="text-sm text-muted-foreground">
-                  Dynamic date will be automatically inserted
-                </p>
-              )}
-            </div>
-            <Button
-              onClick={handleCreateTemplate}
-              disabled={loading || !newTemplate.name}
-              className="w-full"
-            >
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create Template"}
-            </Button>
-          </div>
+          <TemplateForm
+            template={newTemplate}
+            onTemplateChange={setNewTemplate}
+            onSubmit={handleCreateTemplate}
+            loading={loading}
+          />
 
           <div className="space-y-4">
             <h3 className="font-semibold">Existing Templates</h3>
-            {loading ? (
-              <div className="flex items-center justify-center p-4">
-                <Loader2 className="h-6 w-6 animate-spin" />
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {templates.map((template) => (
-                  <div
-                    key={template.id}
-                    className="flex items-start justify-between p-4 border rounded-lg"
-                  >
-                    <div className="space-y-1">
-                      <p className="font-medium">{template.name}</p>
-                      <p className="text-sm text-gray-500">{template.description}</p>
-                      <p className="text-sm text-gray-500">Title: {template.text_overlay.title}</p>
-                      {template.metadata?.dynamicDate ? (
-                        <p className="text-sm text-blue-500">
-                          <Calendar className="h-3 w-3 inline-block mr-1" />
-                          Dynamic date: {renderPreviewDate(template)}
-                        </p>
-                      ) : (
-                        <p className="text-sm text-gray-500">
-                          Subtitle: {template.text_overlay.subtitle}
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {template.image_url ? (
-                        <img
-                          src={template.image_url}
-                          alt={template.name}
-                          className="w-16 h-16 rounded object-cover"
-                        />
-                      ) : (
-                        <div className="w-16 h-16 rounded bg-gray-100 flex items-center justify-center">
-                          <ImageIcon className="h-6 w-6 text-gray-400" />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            <TemplateList templates={templates} loading={loading} />
           </div>
         </div>
       </DialogContent>
