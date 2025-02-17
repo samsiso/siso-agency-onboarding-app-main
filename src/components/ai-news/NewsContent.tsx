@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import { FeaturedNewsHero } from './FeaturedNewsHero';
 import { useInView } from 'react-intersection-observer';
-import { NewsTabs } from './NewsTabs';
+import NewsTabs from './NewsTabs';
 import { NewsLoadingState } from './NewsLoadingState';
 import { NewsEmptyState } from './NewsEmptyState';
 
