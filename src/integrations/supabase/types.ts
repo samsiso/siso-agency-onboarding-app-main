@@ -1402,7 +1402,7 @@ export type Database = {
           id: string
           key_insights: string[]
           market_impact: string
-          news_id: string
+          news_id: string | null
           related_technologies: string[]
           section_id: string | null
           tech_predictions: string[]
@@ -1415,7 +1415,7 @@ export type Database = {
           id?: string
           key_insights?: string[]
           market_impact: string
-          news_id: string
+          news_id?: string | null
           related_technologies?: string[]
           section_id?: string | null
           tech_predictions?: string[]
@@ -1428,7 +1428,7 @@ export type Database = {
           id?: string
           key_insights?: string[]
           market_impact?: string
-          news_id?: string
+          news_id?: string | null
           related_technologies?: string[]
           section_id?: string | null
           tech_predictions?: string[]

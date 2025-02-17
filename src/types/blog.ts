@@ -1,4 +1,3 @@
-
 export type ArticleImpact = 'high' | 'medium' | 'low';
 
 export type TechnicalComplexity = 'basic' | 'intermediate' | 'advanced' | 'mixed';
@@ -23,7 +22,7 @@ export interface ArticleSection {
   created_at: string;
   updated_at: string;
   last_updated?: string;
-  // New fields matching our database schema
+  article_id: string;
   overview?: string;
   key_details?: string[];
   bullet_points?: string[];
