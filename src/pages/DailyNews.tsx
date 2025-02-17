@@ -48,6 +48,15 @@ const DailyNews = () => {
   const navigate = useNavigate();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
+  const handleDateChange = (direction: 'prev' | 'next') => {
+    if (!date) return;
+    const currentDate = new Date(date);
+    const newDate = direction === 'prev' 
+      ? subDays(currentDate, 1)
+      : addDays(currentDate, 1);
+    navigate(`/ai-news/daily/${format(newDate, 'yyyy-MM-dd')}`);
+  };
+
   const { data: newsItems, isLoading } = useQuery({
     queryKey: ['daily-news', date],
     queryFn: async () => {
