@@ -1404,6 +1404,7 @@ export type Database = {
           market_impact: string
           news_id: string
           related_technologies: string[]
+          section_id: string | null
           tech_predictions: string[]
           updated_at: string
         }
@@ -1416,6 +1417,7 @@ export type Database = {
           market_impact: string
           news_id: string
           related_technologies?: string[]
+          section_id?: string | null
           tech_predictions?: string[]
           updated_at?: string
         }
@@ -1428,6 +1430,7 @@ export type Database = {
           market_impact?: string
           news_id?: string
           related_technologies?: string[]
+          section_id?: string | null
           tech_predictions?: string[]
           updated_at?: string
         }
@@ -1465,6 +1468,13 @@ export type Database = {
             columns: ["news_id"]
             isOneToOne: false
             referencedRelation: "upcoming_scheduled_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "news_ai_analysis_section_id_fkey"
+            columns: ["section_id"]
+            isOneToOne: false
+            referencedRelation: "article_sections"
             referencedColumns: ["id"]
           },
         ]
