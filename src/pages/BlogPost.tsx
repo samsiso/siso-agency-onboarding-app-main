@@ -1,3 +1,4 @@
+
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -7,7 +8,7 @@ import { EnhancedBlogLayout } from '@/components/ai-news/EnhancedBlogLayout';
 import { useToast } from '@/hooks/use-toast';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { usePoints } from '@/hooks/usePoints';
-import type { EnhancedNewsItem, ContentCategory, TechnicalComplexity, ArticleImpact } from '@/types/blog';
+import type { EnhancedNewsItem, ContentCategory, TechnicalComplexity, ArticleImpact, ArticleSection } from '@/types/blog';
 
 const BlogPost = () => {
   const { id } = useParams();
@@ -59,7 +60,6 @@ const BlogPost = () => {
 
       if (error) throw error;
 
-      // Using 'read_article' as the point action type since there isn't a specific bookmark action
       await awardPoints('read_article');
       
       toast({
@@ -78,7 +78,6 @@ const BlogPost = () => {
   const { data: post, isLoading } = useQuery({
     queryKey: ['blog-post', id],
     queryFn: async () => {
-      // Fetch the main article data with comments
       const { data: articleData, error: articleError } = await supabase
         .from('ai_news')
         .select(`
@@ -95,7 +94,8 @@ const BlogPost = () => {
             source_references,
             created_at,
             updated_at,
-            last_updated
+            last_updated,
+            article_id
           ),
           article_tags (
             id,
@@ -116,19 +116,20 @@ const BlogPost = () => {
       if (articleError) throw articleError;
 
       // Transform the data to match our EnhancedNewsItem type
-      const enhancedArticle = {
+      const enhancedArticle: EnhancedNewsItem = {
         ...articleData,
         category: articleData.category as ContentCategory,
         technical_complexity: (articleData.technical_complexity || 'intermediate') as TechnicalComplexity,
         impact: (articleData.impact || 'medium') as ArticleImpact,
-        sections: articleData.article_sections?.map(section => ({
+        sections: (articleData.article_sections || []).map((section: any) => ({
           ...section,
+          article_id: section.article_id || articleData.id, // Ensure article_id is always set
           importance_level: section.importance_level || 'medium',
           subsection_type: section.subsection_type || 'overview',
           source_references: typeof section.source_references === 'object' ? section.source_references || {} : {},
           section_order: section.section_order || section.order_index,
           last_updated: section.last_updated || section.updated_at
-        })) || [],
+        })) as ArticleSection[],
         tags: articleData.article_tags || [],
         key_takeaways: Array.isArray(articleData.key_takeaways) 
           ? articleData.key_takeaways.map(item => String(item))
@@ -153,7 +154,7 @@ const BlogPost = () => {
         source_credibility: articleData.source_credibility || 'verified',
         estimated_reading_time: articleData.estimated_reading_time || 5,
         views: articleData.views || 0
-      } as EnhancedNewsItem;
+      };
 
       const comments = (articleData.news_comments || []).map(comment => ({
         ...comment,
