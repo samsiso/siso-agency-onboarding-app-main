@@ -9,7 +9,6 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Sidebar } from '@/components/Sidebar';
-import { DailyNewsCard } from '@/components/ai-news/daily/DailyNewsCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNewsItems } from '@/hooks/useNewsItems';
 import { NewsContent } from '@/components/ai-news/NewsContent';
@@ -32,22 +31,34 @@ const DailyNews = () => {
     error
   } = useNewsItems(null, 'published', formattedDate);
 
-  // [Analysis] Check for available dates in a range
+  // [Analysis] Check for available dates in a range using a compatible query
   const { data: dateAvailability } = useQuery({
     queryKey: ['news-dates', formattedDate],
     queryFn: async () => {
       const startDate = format(subDays(currentDate, 7), 'yyyy-MM-dd');
       const endDate = format(addDays(currentDate, 7), 'yyyy-MM-dd');
       
-      const { data } = await supabase
+      const { data: counts } = await supabase
         .from('ai_news')
-        .select('date, count(*)')
+        .select('date')
         .gte('date', startDate)
         .lte('date', endDate)
-        .eq('status', 'published')
-        .group('date');
-      
-      return data || [];
+        .eq('status', 'published');
+
+      if (!counts) return [];
+
+      // Process the results to get counts by date
+      const countsByDate = counts.reduce((acc: { [key: string]: number }, item) => {
+        const date = item.date;
+        acc[date] = (acc[date] || 0) + 1;
+        return acc;
+      }, {});
+
+      // Convert to array format
+      return Object.entries(countsByDate).map(([date, count]) => ({
+        date,
+        count
+      }));
     }
   });
 
@@ -96,7 +107,7 @@ const DailyNews = () => {
 
             {/* Date Availability Indicators */}
             <div className="flex items-center justify-center gap-2">
-              {dateAvailability?.map((dateInfo: any) => {
+              {dateAvailability?.map((dateInfo) => {
                 const isCurrentDate = dateInfo.date === formattedDate;
                 return (
                   <Button
