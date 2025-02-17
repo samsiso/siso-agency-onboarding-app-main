@@ -115,21 +115,44 @@ const BlogPost = () => {
 
       if (articleError) throw articleError;
 
-      // Transform the data to match our EnhancedNewsItem type
+      // [Analysis] Transform sections to ensure article_id is present
+      const transformedSections: ArticleSection[] = (articleData.article_sections || []).map((section: any) => ({
+        id: section.id,
+        title: section.title,
+        content: section.content,
+        order_index: section.order_index,
+        section_order: section.section_order || section.order_index,
+        technical_complexity: section.technical_complexity || 'intermediate',
+        importance_level: section.importance_level || 'medium',
+        subsection_type: section.subsection_type || 'overview',
+        source_references: typeof section.source_references === 'object' ? section.source_references : {},
+        created_at: section.created_at,
+        updated_at: section.updated_at,
+        last_updated: section.last_updated || section.updated_at,
+        article_id: section.article_id || articleData.id, // Ensure article_id is always set
+        overview: section.overview,
+        key_details: section.key_details || [],
+        bullet_points: section.bullet_points || [],
+        implications: section.implications || [],
+        related_topics: section.related_topics || [],
+        key_figures: section.key_figures || {},
+        reading_time_minutes: section.reading_time_minutes || 5,
+        category: section.category,
+        is_featured: section.is_featured || false,
+        metadata: section.metadata || {}
+      }));
+
+      // [Analysis] Transform to EnhancedNewsItem with strongly typed sections
       const enhancedArticle: EnhancedNewsItem = {
-        ...articleData,
+        id: articleData.id,
+        title: articleData.title,
+        description: articleData.description,
+        content: articleData.content,
+        date: articleData.date,
         category: articleData.category as ContentCategory,
         technical_complexity: (articleData.technical_complexity || 'intermediate') as TechnicalComplexity,
         impact: (articleData.impact || 'medium') as ArticleImpact,
-        sections: (articleData.article_sections || []).map((section: any) => ({
-          ...section,
-          article_id: section.article_id || articleData.id, // Ensure article_id is always set
-          importance_level: section.importance_level || 'medium',
-          subsection_type: section.subsection_type || 'overview',
-          source_references: typeof section.source_references === 'object' ? section.source_references || {} : {},
-          section_order: section.section_order || section.order_index,
-          last_updated: section.last_updated || section.updated_at
-        })) as ArticleSection[],
+        sections: transformedSections,
         tags: articleData.article_tags || [],
         key_takeaways: Array.isArray(articleData.key_takeaways) 
           ? articleData.key_takeaways.map(item => String(item))
@@ -149,11 +172,13 @@ const BlogPost = () => {
             }))
           : [],
         technical_details: typeof articleData.technical_details === 'object' 
-          ? articleData.technical_details || {}
+          ? articleData.technical_details
           : {},
         source_credibility: articleData.source_credibility || 'verified',
         estimated_reading_time: articleData.estimated_reading_time || 5,
-        views: articleData.views || 0
+        views: articleData.views || 0,
+        image_url: articleData.image_url,
+        source: articleData.source
       };
 
       const comments = (articleData.news_comments || []).map(comment => ({
