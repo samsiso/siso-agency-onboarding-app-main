@@ -99,11 +99,29 @@ export function BannerTemplatesDialog() {
 
       if (error) throw error;
 
+      // Create a default text overlay object in case parsing fails
+      const defaultTextOverlay = { title: '', subtitle: '' };
+      
+      // Safely parse the text_overlay with proper type assertion
+      let parsedTextOverlay;
+      try {
+        parsedTextOverlay = typeof data.text_overlay === 'string'
+          ? JSON.parse(data.text_overlay)
+          : data.text_overlay;
+      } catch (e) {
+        console.error('Error parsing text_overlay:', e);
+        parsedTextOverlay = defaultTextOverlay;
+      }
+
+      // Ensure the parsed text_overlay has the required properties
+      const validTextOverlay = {
+        title: parsedTextOverlay?.title || defaultTextOverlay.title,
+        subtitle: parsedTextOverlay?.subtitle || defaultTextOverlay.subtitle
+      };
+
       const transformedTemplate: BannerTemplate = {
         ...data,
-        text_overlay: typeof data.text_overlay === 'string'
-          ? JSON.parse(data.text_overlay)
-          : data.text_overlay as BannerTemplate['text_overlay'],
+        text_overlay: validTextOverlay,
         metadata: typeof data.metadata === 'string'
           ? JSON.parse(data.metadata)
           : data.metadata,
