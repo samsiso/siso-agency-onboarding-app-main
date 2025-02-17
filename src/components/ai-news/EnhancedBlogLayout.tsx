@@ -35,6 +35,18 @@ import {
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
+// [Analysis] Define interfaces at the top of the file for better organization
+interface EventCardProps {
+  section: ArticleSection;
+  index: number;
+}
+
+interface EnhancedBlogLayoutProps {
+  article: EnhancedNewsItem;
+  onShare?: () => void;
+  onBookmark?: () => void;
+}
+
 // [Analysis] Map section types to appropriate icons with semantic meaning
 const sectionIcons = {
   'research': Microscope,
@@ -81,11 +93,6 @@ const cardVariants = {
     }
   }
 };
-
-interface EventCardProps {
-  section: ArticleSection;
-  index: number;
-}
 
 const EventCard = ({ section, index }: EventCardProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -380,12 +387,6 @@ const EventCard = ({ section, index }: EventCardProps) => {
     </motion.div>
   );
 };
-
-interface EnhancedBlogLayoutProps {
-  article: EnhancedNewsItem;
-  onShare?: () => void;
-  onBookmark?: () => void;
-}
 
 export const EnhancedBlogLayout = ({
   article,
