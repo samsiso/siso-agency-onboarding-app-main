@@ -1,3 +1,4 @@
+
 import { Card, CardContent } from '@/components/ui/card';
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
@@ -8,6 +9,15 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { usePoints } from '@/hooks/usePoints';
 import { useNavigate } from 'react-router-dom';
+
+// [Analysis] Define category-based default images
+const categoryImages = {
+  'breakthrough_technologies': '/images/ai-robotics.jpg',
+  'language_models': '/images/nlp.jpg',
+  'robotics_automation': '/images/robotics.jpg',
+  'industry_applications': '/images/industry.jpg',
+  'international_developments': '/images/global.jpg'
+};
 
 interface NewsComment {
   id: string;
@@ -41,6 +51,11 @@ const NewsCard = ({
   const { toast } = useToast();
   const { awardPoints } = usePoints(undefined);
   const navigate = useNavigate();
+
+  // [Analysis] Get default image based on category
+  const getDefaultImage = (category: string) => {
+    return categoryImages[category as keyof typeof categoryImages] || categoryImages.breakthrough_technologies;
+  };
 
   useEffect(() => {
     const channel = supabase
@@ -95,7 +110,6 @@ const NewsCard = ({
           title: "Points awarded!",
           description: "You earned 2 points for reading this article!",
         });
-        // Navigate to the blog post page
         navigate(`/ai-news/${item.id}`);
       }
     } catch (error) {
@@ -108,41 +122,48 @@ const NewsCard = ({
   }
 
   return (
-    <Card className="group w-full h-full hover:bg-card/60 transition-all duration-300 border-siso-border hover:border-siso-border-hover hover:shadow-lg">
-      <CardContent className={`h-full p-4 sm:p-6 flex flex-col ${isFeatured ? 'gap-6' : 'gap-4'}`}>
-        <div className={`flex ${isCompact ? 'flex-row' : 'flex-col'} gap-4 sm:gap-6 h-full`}>
-          <NewsCardMedia 
-            imageUrl={item.image_url} 
-            title={item.title} 
-            isFeatured={isFeatured}
-            isCompact={isCompact}
-          />
-          
-          <div className="flex-1 min-w-0 flex flex-col">
-            <NewsCardContent
-              title={item.title}
-              description={item.description}
-              date={item.date}
-              source={item.source}
-              impact={item.impact}
-              onReadArticle={handleReadArticle}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="h-full"
+    >
+      <Card className="group h-full overflow-hidden hover:bg-card/60 transition-all duration-300 border-siso-border hover:border-siso-border-hover hover:shadow-lg backdrop-blur-sm">
+        <CardContent className={`h-full p-0 flex flex-col ${isFeatured ? 'gap-6' : 'gap-4'}`}>
+          <div className={`flex ${isCompact ? 'flex-row' : 'flex-col'} h-full`}>
+            <NewsCardMedia 
+              imageUrl={item.image_url || getDefaultImage(item.category)}
+              title={item.title} 
+              isFeatured={isFeatured}
               isCompact={isCompact}
-              summary={summaries[item.id]}
-              loadingSummary={loadingSummaries[item.id]}
-              onGenerateSummary={() => onGenerateSummary(item.id)}
-              newsId={item.id}
-              comments={comments}
-              readingTime={item.reading_time}
-              views={item.views}
-              bookmarks={item.bookmarks}
-              sourceCredibility={item.source_credibility}
-              technicalComplexity={item.technical_complexity}
-              articleType={item.article_type}
             />
+            
+            <div className="flex-1 min-w-0 flex flex-col p-4">
+              <NewsCardContent
+                title={item.title}
+                description={item.description}
+                date={item.date}
+                source={item.source}
+                impact={item.impact}
+                onReadArticle={handleReadArticle}
+                isCompact={isCompact}
+                summary={summaries[item.id]}
+                loadingSummary={loadingSummaries[item.id]}
+                onGenerateSummary={() => onGenerateSummary(item.id)}
+                newsId={item.id}
+                comments={comments}
+                readingTime={item.reading_time}
+                views={item.views}
+                bookmarks={item.bookmarks}
+                sourceCredibility={item.source_credibility}
+                technicalComplexity={item.technical_complexity}
+                articleType={item.article_type}
+              />
+            </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 };
 
