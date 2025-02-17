@@ -1,3 +1,4 @@
+
 export type ArticleImpact = 'high' | 'medium' | 'low';
 
 export type TechnicalComplexity = 'basic' | 'intermediate' | 'advanced' | 'mixed';
@@ -69,4 +70,5 @@ export interface EnhancedNewsItem {
   image_url?: string;
   views: number;
   source: string;
+  sources: any[]; // Added this field
 }
