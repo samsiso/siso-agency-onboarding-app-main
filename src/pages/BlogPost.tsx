@@ -4,189 +4,124 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Sidebar } from '@/components/Sidebar';
-import { EnhancedBlogLayout } from '@/components/ai-news/EnhancedBlogLayout';
-import { useToast } from '@/hooks/use-toast';
-import { useAuthSession } from '@/hooks/useAuthSession';
-import { usePoints } from '@/hooks/usePoints';
-import type { EnhancedNewsItem, ContentCategory, TechnicalComplexity, ArticleImpact } from '@/types/blog';
+import { Button } from '@/components/ui/button';
+import { format } from 'date-fns';
+import { ChevronLeft, Calendar } from 'lucide-react';
 
+// [Analysis] Single article view with navigation to daily view
 const BlogPost = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const { user } = useAuthSession();
-  const { awardPoints } = usePoints(user?.id);
-
-  const { data: post, isLoading } = useQuery({
-    queryKey: ['blog-post', id],
+  
+  const { data: article, isLoading } = useQuery({
+    queryKey: ['article', id],
     queryFn: async () => {
-      // Fetch the main article data
-      const { data: articleData, error: articleError } = await supabase
+      const { data, error } = await supabase
         .from('ai_news')
-        .select(`
-          *,
-          article_sections (
-            id,
-            title,
-            content,
-            order_index,
-            section_order,
-            technical_complexity,
-            importance_level,
-            subsection_type,
-            source_references,
-            created_at,
-            updated_at,
-            last_updated
-          ),
-          article_tags (
-            id,
-            tag,
-            created_at
-          )
-        `)
+        .select('*')
         .eq('id', id)
         .single();
-
-      if (articleError) throw articleError;
-
-      // Transform the data to match our EnhancedNewsItem type
-      const enhancedArticle: EnhancedNewsItem = {
-        ...articleData,
-        // Explicitly cast the category to ContentCategory
-        category: articleData.category as ContentCategory,
-        // Explicitly cast technical_complexity to TechnicalComplexity
-        technical_complexity: (articleData.technical_complexity || 'intermediate') as TechnicalComplexity,
-        // Explicitly cast impact to ArticleImpact
-        impact: (articleData.impact || 'medium') as ArticleImpact,
-        // Ensure all required fields are present with defaults if needed
-        sections: articleData.article_sections?.map(section => ({
-          ...section,
-          // Add new fields with proper types
-          importance_level: section.importance_level || 'medium',
-          subsection_type: section.subsection_type || 'overview',
-          // Ensure source_references is always an object
-          source_references: typeof section.source_references === 'object' ? section.source_references || {} : {},
-          section_order: section.section_order || section.order_index,
-          last_updated: section.last_updated || section.updated_at
-        })) || [],
-        tags: articleData.article_tags || [],
-        // Ensure key_takeaways are always strings
-        key_takeaways: Array.isArray(articleData.key_takeaways) 
-          ? articleData.key_takeaways.map(item => String(item))
-          : [],
-        related_articles: Array.isArray(articleData.related_articles) 
-          ? articleData.related_articles.map((article: any) => ({
-              id: article.id || '',
-              title: article.title || '',
-              description: article.description || ''
-            }))
-          : [],
-        table_of_contents: Array.isArray(articleData.table_of_contents)
-          ? articleData.table_of_contents.map((item: any) => ({
-              id: item.id || '',
-              title: item.title || '',
-              level: typeof item.level === 'number' ? item.level : 1
-            }))
-          : [],
-        technical_details: typeof articleData.technical_details === 'object' 
-          ? articleData.technical_details || {}
-          : {},
-        source_credibility: articleData.source_credibility || 'verified',
-        estimated_reading_time: articleData.estimated_reading_time || 5,
-        views: articleData.views || 0
-      };
-
-      return enhancedArticle;
+      
+      if (error) throw error;
+      return data;
     },
   });
 
-  const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: post?.title,
-          text: post?.description,
-          url: window.location.href
-        });
-      } catch (error) {
-        // User canceled share
-        console.log('Share canceled');
-      }
-    } else {
-      // Fallback
-      toast({
-        title: "Share",
-        description: "Copy link: " + window.location.href,
-      });
+  const navigateToDailyView = () => {
+    if (article?.date) {
+      navigate(`/ai-news/daily/${article.date}`);
     }
   };
-
-  const handleBookmark = async () => {
-    if (!user) {
-      toast({
-        title: "Authentication required",
-        description: "Please sign in to bookmark articles",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      const { error } = await supabase
-        .from('ai_news_bookmarks')
-        .insert([
-          {
-            news_id: id,
-            user_id: user.id
-          }
-        ]);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Article bookmarked successfully!",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: "Failed to bookmark article",
-        variant: "destructive"
-      });
-    }
-  };
-
-  if (isLoading || !post) {
-    return (
-      <SidebarProvider>
-        <div className="flex min-h-screen w-full bg-background">
-          <Sidebar />
-          <div className="flex-1 p-8">
-            <div className="animate-pulse space-y-8">
-              <div className="h-8 w-48 bg-siso-border rounded" />
-              <div className="h-64 w-full bg-siso-border rounded" />
-              <div className="space-y-4">
-                <div className="h-4 w-full bg-siso-border rounded" />
-                <div className="h-4 w-2/3 bg-siso-border rounded" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </SidebarProvider>
-    );
-  }
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full">
+      <div className="flex min-h-screen w-full bg-gradient-to-b from-gray-900 to-black">
         <Sidebar />
-        <div className="flex-1">
-          <EnhancedBlogLayout
-            article={post}
-            onShare={handleShare}
-            onBookmark={handleBookmark}
-          />
+        <div className="flex-1 p-8">
+          {/* Navigation Header */}
+          <div className="flex items-center justify-between mb-8">
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/ai-news')}
+              className="text-white"
+            >
+              <ChevronLeft className="h-4 w-4 mr-2" />
+              Back to News
+            </Button>
+            
+            <Button
+              variant="outline"
+              onClick={navigateToDailyView}
+              className="text-white gap-2"
+            >
+              <Calendar className="h-4 w-4" />
+              View Daily News for {article?.date && format(new Date(article.date), 'MMMM d, yyyy')}
+            </Button>
+          </div>
+
+          {/* Article Content */}
+          {isLoading ? (
+            <div className="animate-pulse space-y-4">
+              <div className="h-8 bg-white/10 rounded w-3/4"></div>
+              <div className="h-4 bg-white/10 rounded w-1/2"></div>
+              <div className="h-64 bg-white/10 rounded"></div>
+            </div>
+          ) : article ? (
+            <div className="space-y-6 max-w-4xl mx-auto">
+              <h1 className="text-3xl font-bold text-white">{article.title}</h1>
+              <div className="flex items-center gap-4 text-gray-400">
+                <span>{format(new Date(article.date), 'MMMM d, yyyy')}</span>
+                <span>•</span>
+                <span>{article.category}</span>
+              </div>
+              {article.image_url && (
+                <img 
+                  src={article.image_url} 
+                  alt={article.title}
+                  className="w-full rounded-lg object-cover h-64"
+                />
+              )}
+              <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">
+                {article.description}
+              </p>
+              
+              {/* Enhanced Content Section */}
+              <div className="mt-8 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-white/5 p-4 rounded-lg">
+                    <h3 className="text-lg font-semibold text-white mb-2">Impact Level</h3>
+                    <p className="text-gray-300">{article.impact}</p>
+                  </div>
+                  <div className="bg-white/5 p-4 rounded-lg">
+                    <h3 className="text-lg font-semibold text-white mb-2">Technical Complexity</h3>
+                    <p className="text-gray-300">{article.technical_complexity}</p>
+                  </div>
+                  <div className="bg-white/5 p-4 rounded-lg">
+                    <h3 className="text-lg font-semibold text-white mb-2">Reading Time</h3>
+                    <p className="text-gray-300">{article.reading_time} minutes</p>
+                  </div>
+                </div>
+                
+                {article.key_takeaways && (
+                  <div className="bg-white/5 p-6 rounded-lg">
+                    <h3 className="text-xl font-semibold text-white mb-4">Key Takeaways</h3>
+                    <ul className="space-y-3">
+                      {article.key_takeaways.map((takeaway, index) => (
+                        <li key={index} className="flex items-start gap-3 text-gray-300">
+                          <span className="bg-white/10 px-2 py-1 rounded-full text-sm">
+                            {index + 1}
+                          </span>
+                          {takeaway}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="text-center text-gray-400">Article not found</div>
+          )}
         </div>
       </div>
     </SidebarProvider>
