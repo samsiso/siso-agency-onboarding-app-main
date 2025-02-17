@@ -333,9 +333,12 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          implications: string[] | null
           importance_level: string | null
+          key_details: string[] | null
           last_updated: string | null
           order_index: number
+          overview: string | null
           section_order: number
           source_references: Json | null
           subsection_type: string | null
@@ -350,9 +353,12 @@ export type Database = {
           content: string
           created_at?: string
           id?: string
+          implications?: string[] | null
           importance_level?: string | null
+          key_details?: string[] | null
           last_updated?: string | null
           order_index: number
+          overview?: string | null
           section_order?: number
           source_references?: Json | null
           subsection_type?: string | null
@@ -367,9 +373,12 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          implications?: string[] | null
           importance_level?: string | null
+          key_details?: string[] | null
           last_updated?: string | null
           order_index?: number
+          overview?: string | null
           section_order?: number
           source_references?: Json | null
           subsection_type?: string | null
