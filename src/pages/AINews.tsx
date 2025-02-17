@@ -3,26 +3,24 @@ import { useState, Suspense, lazy } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { motion } from 'framer-motion';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { useNewsItems } from '@/hooks/useNewsItems';
 import { NewsContent } from '@/components/ai-news/NewsContent';
 import { NewsErrorBoundary } from '@/components/ai-news/NewsErrorBoundary';
 import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { format, subDays, addDays } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 
-// [Analysis] Lazy load components for better initial load performance
 const NewsHeader = lazy(() => import('@/components/ai-news/NewsHeader'));
 const NewsCategories = lazy(() => import('@/components/ai-news/NewsCategories'));
-const NewsCard = lazy(() => import('@/components/ai-news/NewsCard'));
-const NewsTabs = lazy(() => import('@/components/ai-news/NewsTabs'));
 
-// [Analysis] Reusable loading components
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center p-8">
     <Loader2 className="h-6 w-6 animate-spin text-siso-red" />
   </div>
 );
 
-// [Analysis] Animation variants for smooth transitions
 const containerVariants = {
   hidden: { opacity: 0 },
   show: {
@@ -40,6 +38,7 @@ const AINews = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [postStatus, setPostStatus] = useState<'all' | 'draft' | 'published'>('published');
   const { toast } = useToast();
+  const navigate = useNavigate();
   
   const {
     newsItems: posts,
@@ -52,9 +51,19 @@ const AINews = () => {
     error
   } = useNewsItems(selectedCategory, postStatus);
 
-  // [Analysis] Extract featured articles for hero section
-  const featuredArticles = posts.filter(post => post.impact === 'high').slice(0, 3);
-  const regularArticles = posts.filter(post => post.impact !== 'high');
+  // [Analysis] Get today's date for filtering
+  const today = new Date();
+  const todayPosts = posts.filter(post => 
+    new Date(post.date).toDateString() === today.toDateString()
+  );
+
+  const handleDateChange = (direction: 'prev' | 'next') => {
+    const currentDate = new Date();
+    const newDate = direction === 'prev' 
+      ? subDays(currentDate, 1)
+      : addDays(currentDate, 1);
+    navigate(`/ai-news/daily/${format(newDate, 'yyyy-MM-dd')}`);
+  };
 
   if (error) {
     toast({
@@ -90,67 +99,67 @@ const AINews = () => {
                       onPostStatusChange={setPostStatus}
                     />
 
+                    {/* Date Navigation */}
+                    <div className="flex items-center justify-between mb-8 bg-siso-bg-alt p-4 rounded-lg">
+                      <Button
+                        variant="outline"
+                        onClick={() => handleDateChange('prev')}
+                      >
+                        <ChevronLeft className="h-4 w-4 mr-2" />
+                        Previous Day
+                      </Button>
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-5 w-5 text-siso-red" />
+                        <span className="text-lg font-semibold">
+                          {format(today, 'MMMM d, yyyy')}
+                        </span>
+                      </div>
+                      <Button
+                        variant="outline"
+                        onClick={() => handleDateChange('next')}
+                      >
+                        Next Day
+                        <ChevronRight className="h-4 w-4 ml-2" />
+                      </Button>
+                    </div>
+
+                    {/* Today's Featured Articles */}
+                    {todayPosts.length > 0 && (
+                      <div className="mb-8">
+                        <h2 className="text-2xl font-bold mb-4 text-siso-text">Today's AI Highlights</h2>
+                        <div className="bg-gradient-to-r from-siso-red/10 to-siso-orange/10 p-6 rounded-lg">
+                          <NewsContent
+                            newsItems={todayPosts}
+                            summaries={summaries}
+                            loadingSummaries={loadingSummaries}
+                            onGenerateSummary={generateSummary}
+                            searchQuery={searchQuery}
+                            loading={loading}
+                            hasMore={false}
+                          />
+                        </div>
+                      </div>
+                    )}
+
                     <NewsCategories
                       selectedCategory={selectedCategory}
                       onCategoryChange={setSelectedCategory}
                     />
 
-                    {/* Featured Articles Section */}
-                    {featuredArticles.length > 0 && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="grid grid-cols-1 lg:grid-cols-3 gap-6"
-                      >
-                        {featuredArticles.map((article, index) => (
-                          <motion.div
-                            key={article.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.1 }}
-                            className={index === 0 ? "lg:col-span-2" : ""}
-                          >
-                            <Suspense fallback={<LoadingSpinner />}>
-                              <NewsCard
-                                item={article}
-                                summaries={summaries}
-                                loadingSummaries={loadingSummaries}
-                                onGenerateSummary={generateSummary}
-                                isFeatured={true}
-                              />
-                            </Suspense>
-                          </motion.div>
-                        ))}
-                      </motion.div>
-                    )}
-
-                    {/* Regular Articles Tabs */}
-                    <Suspense fallback={<LoadingSpinner />}>
-                      <NewsTabs
-                        latestItems={regularArticles}
-                        trendingItems={regularArticles.sort((a, b) => (b.views || 0) - (a.views || 0))}
-                        mostDiscussedItems={regularArticles.sort((a, b) => (b.comments?.length || 0) - (a.comments?.length || 0))}
+                    {/* All News Articles */}
+                    <div className="mt-8">
+                      <h2 className="text-xl font-semibold mb-4 text-siso-text">Browse All AI News</h2>
+                      <NewsContent
+                        newsItems={posts}
                         summaries={summaries}
                         loadingSummaries={loadingSummaries}
                         onGenerateSummary={generateSummary}
+                        searchQuery={searchQuery}
+                        loading={loading}
+                        hasMore={hasMore}
+                        onLoadMore={loadMore}
                       />
-                    </Suspense>
-
-                    {/* Load More Section */}
-                    {hasMore && !loading && (
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="flex justify-center py-8"
-                      >
-                        <button
-                          onClick={loadMore}
-                          className="px-6 py-3 bg-siso-red/10 text-siso-red rounded-lg hover:bg-siso-red/20 transition-colors"
-                        >
-                          Load More Articles
-                        </button>
-                      </motion.div>
-                    )}
+                    </div>
 
                     {loading && <LoadingSpinner />}
                   </Suspense>
