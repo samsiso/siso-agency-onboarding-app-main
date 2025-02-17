@@ -23,7 +23,11 @@ export const fetchBlogPost = async (id: string) => {
         article_id,
         overview,
         key_details,
-        implications
+        implications,
+        ai_analysis,
+        detailed_metadata,
+        implementation_timeline,
+        market_analysis
       ),
       article_tags (
         id,
@@ -69,7 +73,31 @@ export const fetchBlogPost = async (id: string) => {
     reading_time_minutes: 5, // Default value since it's not in DB
     category: articleData.category || 'general', // Using parent article's category
     is_featured: false, // Default value since it's not in DB
-    metadata: {} // Default empty object since it's not in DB
+    metadata: {}, // Default empty object since it's not in DB
+    // New fields with default values if not present
+    ai_analysis: section.ai_analysis || {
+      market_impact: null,
+      technical_predictions: [],
+      related_technologies: [],
+      business_implications: null
+    },
+    detailed_metadata: section.detailed_metadata || {
+      research_papers: [],
+      industry_reports: [],
+      expert_quotes: [],
+      market_data: []
+    },
+    implementation_timeline: section.implementation_timeline || {
+      short_term: [],
+      medium_term: [],
+      long_term: []
+    },
+    market_analysis: section.market_analysis || {
+      market_size: null,
+      growth_projections: null,
+      competitive_landscape: [],
+      investment_metrics: {}
+    }
   }));
 
   // [Analysis] Transform to EnhancedNewsItem with strongly typed sections

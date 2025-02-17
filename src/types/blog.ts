@@ -10,6 +10,33 @@ export type ContentCategory =
   | 'industry_applications'
   | 'international_developments';
 
+export interface AIAnalysis {
+  market_impact: string | null;
+  technical_predictions: string[];
+  related_technologies: string[];
+  business_implications: string | null;
+}
+
+export interface DetailedMetadata {
+  research_papers: string[];
+  industry_reports: string[];
+  expert_quotes: string[];
+  market_data: string[];
+}
+
+export interface ImplementationTimeline {
+  short_term: string[];
+  medium_term: string[];
+  long_term: string[];
+}
+
+export interface MarketAnalysis {
+  market_size: string | null;
+  growth_projections: string | null;
+  competitive_landscape: string[];
+  investment_metrics: Record<string, any>;
+}
+
 export interface ArticleSection {
   id: string;
   title: string;
@@ -34,6 +61,11 @@ export interface ArticleSection {
   category?: string;
   is_featured?: boolean;
   metadata?: Record<string, any>;
+  // New fields
+  ai_analysis?: AIAnalysis;
+  detailed_metadata?: DetailedMetadata;
+  implementation_timeline?: ImplementationTimeline;
+  market_analysis?: MarketAnalysis;
 }
 
 export interface ArticleTag {
@@ -70,5 +102,5 @@ export interface EnhancedNewsItem {
   image_url?: string;
   views: number;
   source: string;
-  sources: any[]; // Added this field
+  sources: any[];
 }

@@ -407,14 +407,18 @@ export type Database = {
       }
       article_sections: {
         Row: {
+          ai_analysis: Json | null
           article_id: string | null
           content: string
           created_at: string
+          detailed_metadata: Json | null
           id: string
+          implementation_timeline: Json | null
           implications: string[] | null
           importance_level: string | null
           key_details: string[] | null
           last_updated: string | null
+          market_analysis: Json | null
           order_index: number
           overview: string | null
           section_order: number
@@ -427,14 +431,18 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          ai_analysis?: Json | null
           article_id?: string | null
           content: string
           created_at?: string
+          detailed_metadata?: Json | null
           id?: string
+          implementation_timeline?: Json | null
           implications?: string[] | null
           importance_level?: string | null
           key_details?: string[] | null
           last_updated?: string | null
+          market_analysis?: Json | null
           order_index: number
           overview?: string | null
           section_order?: number
@@ -447,14 +455,18 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          ai_analysis?: Json | null
           article_id?: string | null
           content?: string
           created_at?: string
+          detailed_metadata?: Json | null
           id?: string
+          implementation_timeline?: Json | null
           implications?: string[] | null
           importance_level?: string | null
           key_details?: string[] | null
           last_updated?: string | null
+          market_analysis?: Json | null
           order_index?: number
           overview?: string | null
           section_order?: number
