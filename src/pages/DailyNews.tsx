@@ -37,7 +37,7 @@ const DailyNews = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('ai_news')
-        .select('*')
+        .select('*, profiles:author_id(full_name, avatar_url)')
         .eq('date', date)
         .order('created_at', { ascending: false });
 
