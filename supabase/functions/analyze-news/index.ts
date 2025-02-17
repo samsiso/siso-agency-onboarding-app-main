@@ -1,7 +1,6 @@
 
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -9,62 +8,71 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { newsId } = await req.json();
+    const { content, title, key_details, implications, news_id, section_id } = await req.json();
 
-    // Initialize Supabase client
+    // [Analysis] Using GPT-4o-mini for cost-effective, fast analysis
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: `You are an AI technology analyst. Analyze the provided content and extract key insights, market impact, technological predictions, and business implications. Format your response as JSON with the following structure:
+            {
+              "key_insights": string[],
+              "market_impact": string,
+              "tech_predictions": string[],
+              "related_technologies": string[],
+              "business_implications": string,
+              "confidence_score": number
+            }`
+          },
+          {
+            role: 'user',
+            content: `Title: ${title}\n\nContent: ${content}\n\nKey Details: ${key_details?.join('\n')}\n\nImplications: ${implications?.join('\n')}`
+          }
+        ],
+      }),
+    });
+
+    const aiResponse = await response.json();
+    const analysis = JSON.parse(aiResponse.choices[0].message.content);
+
+    // Store analysis in Supabase
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Get the article content
-    const { data: article, error: articleError } = await supabaseClient
-      .from('ai_news')
-      .select('title, description, content, technical_complexity')
-      .eq('id', newsId)
-      .single();
-
-    if (articleError) throw articleError;
-
-    // Generate AI analysis using GPT-4
-    const analysis = {
-      key_insights: [
-        "Revolutionary approach to knowledge processing",
-        "Significant impact on workflow efficiency",
-        "Novel integration of multiple AI models"
-      ],
-      tech_predictions: [
-        "Widespread adoption within 2 years",
-        "Integration with existing enterprise systems",
-        "Enhanced cognitive capabilities"
-      ],
-      market_impact: "High potential for market disruption with estimated 40% efficiency gains in knowledge work",
-      business_implications: "Organizations can expect significant ROI through reduced manual processing and improved accuracy",
-      related_technologies: ["Machine Learning", "Natural Language Processing", "Knowledge Graphs"],
-      confidence_score: 0.89
-    };
-
-    // Store the analysis
-    const { data: savedAnalysis, error: saveError } = await supabaseClient
+    const { data, error } = await supabaseClient
       .from('news_ai_analysis')
-      .insert({
-        news_id: newsId,
-        ...analysis
-      })
-      .select()
-      .single();
+      .upsert({
+        news_id,
+        section_id,
+        ...analysis,
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'news_id,section_id'
+      });
 
-    if (saveError) throw saveError;
+    if (error) throw error;
 
-    return new Response(JSON.stringify(savedAnalysis), {
+    return new Response(JSON.stringify({ analysis: data }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
+    console.error('Error in analyze-news function:', error);
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
