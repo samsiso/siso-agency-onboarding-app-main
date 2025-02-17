@@ -2,10 +2,22 @@
 import { motion } from 'framer-motion';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Eye, Share2, BookmarkPlus, ChevronLeft } from 'lucide-react';
+import { 
+  Clock, 
+  Eye, 
+  Share2, 
+  BookmarkPlus, 
+  ChevronLeft,
+  Globe,
+  Robot,
+  Microscope,
+  Network,
+  Heart,
+  ExternalLink
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { EnhancedNewsItem, TechnicalComplexity } from '@/types/blog';
+import { EnhancedNewsItem, ArticleSection, TechnicalComplexity } from '@/types/blog';
 import { cn } from '@/lib/utils';
 
 interface EnhancedBlogLayoutProps {
@@ -14,11 +26,110 @@ interface EnhancedBlogLayoutProps {
   onBookmark?: () => void;
 }
 
+// [Analysis] Map section types to appropriate icons
+const sectionIcons = {
+  'research': Microscope,
+  'integration': Network,
+  'medical': Heart,
+  'robotics': Robot,
+  'international': Globe,
+  'default': ExternalLink
+};
+
+// [Analysis] Color mappings for different importance levels
+const importanceColors = {
+  high: 'bg-red-500/10 text-red-500 border-red-500/20',
+  medium: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
+  low: 'bg-green-500/10 text-green-500 border-green-500/20'
+};
+
+// [Analysis] Subsection type color mappings
+const subsectionColors = {
+  overview: 'from-blue-500/10 to-blue-600/10',
+  analysis: 'from-purple-500/10 to-purple-600/10',
+  key_details: 'from-orange-500/10 to-orange-600/10',
+  implications: 'from-red-500/10 to-red-600/10',
+  default: 'from-gray-500/10 to-gray-600/10'
+};
+
 const complexityColors: Record<TechnicalComplexity, string> = {
   basic: 'bg-green-500/10 text-green-500',
   intermediate: 'bg-yellow-500/10 text-yellow-500',
   advanced: 'bg-red-500/10 text-red-500',
   mixed: 'bg-purple-500/10 text-purple-500'
+};
+
+// [Analysis] Card animation variants
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 }
+};
+
+const EventCard = ({ section }: { section: ArticleSection }) => {
+  // Determine icon based on content
+  const sectionType = section.title.toLowerCase().includes('research') ? 'research'
+    : section.title.toLowerCase().includes('integration') ? 'integration'
+    : section.title.toLowerCase().includes('medical') ? 'medical'
+    : section.title.toLowerCase().includes('robot') ? 'robotics'
+    : section.title.toLowerCase().includes('international') ? 'international'
+    : 'default';
+
+  const Icon = sectionIcons[sectionType];
+
+  return (
+    <motion.div
+      variants={cardVariants}
+      initial="hidden"
+      animate="visible"
+      whileHover={{ scale: 1.02 }}
+      className={cn(
+        "rounded-xl overflow-hidden backdrop-blur-sm border border-white/10",
+        "bg-gradient-to-br",
+        subsectionColors[section.subsection_type as keyof typeof subsectionColors] || subsectionColors.default
+      )}
+    >
+      <div className="p-6 space-y-4">
+        {/* Header */}
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-3">
+            <div className={cn(
+              "p-2 rounded-lg",
+              importanceColors[section.importance_level as keyof typeof importanceColors]
+            )}>
+              <Icon className="h-5 w-5" />
+            </div>
+            <h3 className="text-xl font-semibold text-white">{section.title}</h3>
+          </div>
+          <Badge variant="outline" className={cn(
+            complexityColors[section.technical_complexity],
+            "border text-xs"
+          )}>
+            {section.technical_complexity}
+          </Badge>
+        </div>
+
+        {/* Content */}
+        <div className="prose prose-invert max-w-none">
+          <div dangerouslySetInnerHTML={{ __html: section.content }} />
+        </div>
+
+        {/* Footer */}
+        <div className="pt-4 flex items-center justify-between text-sm text-gray-400 border-t border-white/10">
+          <div className="flex items-center gap-2">
+            <Clock className="h-4 w-4" />
+            {new Date(section.last_updated).toLocaleDateString()}
+          </div>
+          <div className="flex items-center gap-3">
+            {section.source_references && Object.entries(section.source_references).map(([key, value]) => (
+              <Badge key={key} variant="outline" className="bg-white/5">
+                {key}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
 };
 
 export const EnhancedBlogLayout = ({
@@ -28,8 +139,15 @@ export const EnhancedBlogLayout = ({
 }: EnhancedBlogLayoutProps) => {
   const navigate = useNavigate();
 
+  // [Analysis] Sort sections by importance and order
+  const sortedSections = [...article.sections].sort((a, b) => {
+    if (a.importance_level === 'high' && b.importance_level !== 'high') return -1;
+    if (a.importance_level !== 'high' && b.importance_level === 'high') return 1;
+    return a.section_order - b.section_order;
+  });
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black">
       {/* Reading Progress Bar */}
       <motion.div
         className="fixed top-0 left-0 right-0 h-1 bg-siso-red/20 origin-left z-50"
@@ -55,8 +173,9 @@ export const EnhancedBlogLayout = ({
             {/* Header */}
             <div className="space-y-4">
               <div className="flex flex-wrap gap-2">
-                <Badge variant="outline" className={cn("border-none", 
-                  complexityColors[article.technical_complexity])}>
+                <Badge variant="outline" className={cn(
+                  complexityColors[article.technical_complexity]
+                )}>
                   {article.technical_complexity}
                 </Badge>
                 <Badge variant="outline" 
@@ -69,11 +188,11 @@ export const EnhancedBlogLayout = ({
                 </Badge>
               </div>
 
-              <h1 className="text-4xl font-bold text-siso-text-bold">
+              <h1 className="text-4xl font-bold text-white bg-clip-text">
                 {article.title}
               </h1>
 
-              <div className="flex items-center gap-4 text-sm text-siso-text/60">
+              <div className="flex items-center gap-4 text-sm text-gray-400">
                 <span>{new Date(article.date).toLocaleDateString()}</span>
                 <span>•</span>
                 <span className="flex items-center gap-1">
@@ -88,34 +207,33 @@ export const EnhancedBlogLayout = ({
               </div>
             </div>
 
-            {/* Featured Image */}
-            {article.image_url && (
-              <div className="aspect-video relative overflow-hidden rounded-xl border border-siso-border">
-                <img
-                  src={article.image_url}
-                  alt={article.title}
-                  className="object-cover w-full h-full"
-                />
-              </div>
-            )}
-
-            {/* Content */}
-            <div className="prose prose-invert max-w-none">
-              {article.sections.map((section) => (
-                <div key={section.id} className="mb-8">
-                  <h2 className="text-2xl font-bold mb-4">{section.title}</h2>
-                  <div dangerouslySetInnerHTML={{ __html: section.content }} />
-                </div>
+            {/* Event Cards Grid */}
+            <motion.div 
+              className="grid grid-cols-1 gap-6"
+              variants={{
+                hidden: { opacity: 0 },
+                visible: {
+                  opacity: 1,
+                  transition: {
+                    staggerChildren: 0.1
+                  }
+                }
+              }}
+              initial="hidden"
+              animate="visible"
+            >
+              {sortedSections.map((section) => (
+                <EventCard key={section.id} section={section} />
               ))}
-            </div>
+            </motion.div>
           </div>
 
           {/* Sidebar */}
           <div className="lg:col-span-4">
             <div className="sticky top-8 space-y-8">
               {/* Table of Contents */}
-              <div className="bg-card rounded-lg border border-siso-border p-6">
-                <h3 className="text-lg font-semibold mb-4">Table of Contents</h3>
+              <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-6">
+                <h3 className="text-lg font-semibold mb-4 text-white">Table of Contents</h3>
                 <ScrollArea className="h-[300px]">
                   <nav className="space-y-2">
                     {article.table_of_contents.map((item) => (
@@ -123,7 +241,7 @@ export const EnhancedBlogLayout = ({
                         key={item.id}
                         href={`#${item.id}`}
                         className={cn(
-                          "block text-sm text-siso-text/60 hover:text-siso-text transition-colors",
+                          "block text-sm text-gray-400 hover:text-white transition-colors",
                           item.level === 1 ? "font-medium" : "pl-4"
                         )}
                       >
@@ -135,11 +253,11 @@ export const EnhancedBlogLayout = ({
               </div>
 
               {/* Key Takeaways */}
-              <div className="bg-card rounded-lg border border-siso-border p-6">
-                <h3 className="text-lg font-semibold mb-4">Key Takeaways</h3>
+              <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-6">
+                <h3 className="text-lg font-semibold mb-4 text-white">Key Takeaways</h3>
                 <ul className="space-y-2">
                   {article.key_takeaways.map((takeaway, index) => (
-                    <li key={index} className="text-sm text-siso-text/80">
+                    <li key={index} className="text-sm text-gray-400">
                       • {takeaway}
                     </li>
                   ))}
@@ -151,7 +269,7 @@ export const EnhancedBlogLayout = ({
                 <Button
                   variant="outline"
                   onClick={onShare}
-                  className="flex-1 hover:bg-siso-red/10 hover:text-siso-red"
+                  className="flex-1 border-white/10 bg-white/5 backdrop-blur-sm text-white hover:bg-white/10"
                 >
                   <Share2 className="h-4 w-4 mr-2" />
                   Share
@@ -159,7 +277,7 @@ export const EnhancedBlogLayout = ({
                 <Button
                   variant="outline"
                   onClick={onBookmark}
-                  className="flex-1 hover:bg-siso-red/10 hover:text-siso-red"
+                  className="flex-1 border-white/10 bg-white/5 backdrop-blur-sm text-white hover:bg-white/10"
                 >
                   <BookmarkPlus className="h-4 w-4 mr-2" />
                   Save
