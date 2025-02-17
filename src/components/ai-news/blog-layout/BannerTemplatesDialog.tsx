@@ -86,8 +86,8 @@ export function BannerTemplatesDialog() {
         name: newTemplate.name,
         description: newTemplate.description,
         template_type: newTemplate.template_type,
-        text_overlay: newTemplate.text_overlay,
-        metadata: newTemplate.metadata,
+        text_overlay: JSON.stringify(newTemplate.text_overlay),
+        metadata: JSON.stringify(newTemplate.metadata),
         is_default: false
       };
 
