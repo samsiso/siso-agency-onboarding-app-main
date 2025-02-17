@@ -12,8 +12,8 @@ import { useToast } from '@/hooks/use-toast';
 // [Analysis] Lazy load components for better initial load performance
 const NewsHeader = lazy(() => import('@/components/ai-news/NewsHeader'));
 const NewsCategories = lazy(() => import('@/components/ai-news/NewsCategories'));
-const NewsTabs = lazy(() => import('@/components/ai-news/NewsTabs').then(module => ({ default: module.NewsTabs })));
 const NewsCard = lazy(() => import('@/components/ai-news/NewsCard'));
+const NewsTabs = lazy(() => import('@/components/ai-news/NewsTabs'));
 
 // [Analysis] Reusable loading components
 const LoadingSpinner = () => (
@@ -125,14 +125,16 @@ const AINews = () => {
                     )}
 
                     {/* Regular Articles Tabs */}
-                    <NewsTabs
-                      latestItems={regularArticles}
-                      trendingItems={regularArticles.sort((a, b) => (b.views || 0) - (a.views || 0))}
-                      mostDiscussedItems={regularArticles.sort((a, b) => (b.comments?.length || 0) - (a.comments?.length || 0))}
-                      summaries={summaries}
-                      loadingSummaries={loadingSummaries}
-                      onGenerateSummary={generateSummary}
-                    />
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <NewsTabs
+                        latestItems={regularArticles}
+                        trendingItems={regularArticles.sort((a, b) => (b.views || 0) - (a.views || 0))}
+                        mostDiscussedItems={regularArticles.sort((a, b) => (b.comments?.length || 0) - (a.comments?.length || 0))}
+                        summaries={summaries}
+                        loadingSummaries={loadingSummaries}
+                        onGenerateSummary={generateSummary}
+                      />
+                    </Suspense>
 
                     {/* Load More Section */}
                     {hasMore && !loading && (

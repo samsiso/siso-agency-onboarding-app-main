@@ -13,7 +13,7 @@ interface NewsTabsProps {
   onGenerateSummary: (id: string) => void;
 }
 
-export const NewsTabs = memo(({
+const NewsTabs = memo(({
   latestItems,
   trendingItems,
   mostDiscussedItems,
@@ -69,3 +69,5 @@ export const NewsTabs = memo(({
 });
 
 NewsTabs.displayName = 'NewsTabs';
+
+export default NewsTabs;

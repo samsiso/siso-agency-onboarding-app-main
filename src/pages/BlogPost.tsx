@@ -71,10 +71,11 @@ const BlogPost = () => {
             onConflict: 'article_id,user_id'
           });
 
-        // Increment view count using RPC call
-        const { error: viewError } = await supabase.rpc('increment_article_views', {
-          article_id: id
-        });
+        // Increment view count by updating directly
+        const { error: viewError } = await supabase
+          .from('ai_news')
+          .update({ views: (post?.views || 0) + 1 })
+          .eq('id', id);
 
         if (viewError) throw viewError;
 
@@ -87,7 +88,7 @@ const BlogPost = () => {
     };
 
     trackProgress();
-  }, [id, user?.id]);
+  }, [id, user?.id, post?.views]);
 
   // [Analysis] Handle upvote
   const handleUpvote = async () => {
