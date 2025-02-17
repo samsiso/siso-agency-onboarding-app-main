@@ -13,7 +13,14 @@ import {
   Target,
   BookOpen,
   ArrowRight,
-  Code
+  Code,
+  Link,
+  FileText,
+  Database,
+  BarChart4,
+  Lightbulb,
+  ScrollText,
+  MessagesSquare
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -21,6 +28,7 @@ import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 interface DailyNewsCardProps {
   article: {
@@ -35,12 +43,15 @@ interface DailyNewsCardProps {
     source: string;
     key_takeaways: string[];
     reading_time: number;
+    technical_details?: Record<string, any>;
+    source_credibility?: string;
   };
 }
 
 export const DailyNewsCard = ({ article }: DailyNewsCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showSources, setShowSources] = useState(false);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
 
   const getImpactColor = (impact: string) => {
     switch (impact.toLowerCase()) {
@@ -55,12 +66,27 @@ export const DailyNewsCard = ({ article }: DailyNewsCardProps) => {
     }
   };
 
-  // [Analysis] Mock data for demo purposes - would come from API in production
-  const metrics = {
+  // [Analysis] Mock research data for the deep research features
+  const researchData = {
     performance: 85,
     adoption: 62,
     impact: 73,
-    technologies: ['AI', 'Machine Learning', 'Neural Networks', 'Computer Vision']
+    technologies: ['AI', 'Machine Learning', 'Neural Networks'],
+    researchSignificance: 88,
+    implementationFeasibility: 76,
+    industryAdoption: 65,
+    innovationIndex: 82,
+    primarySources: [
+      { title: 'Original Research Paper', url: 'https://example.com/paper' },
+      { title: 'Technical Documentation', url: 'https://example.com/docs' },
+      { title: 'Implementation Guide', url: 'https://example.com/guide' }
+    ],
+    methodology: {
+      approach: 'Quantitative Analysis',
+      sampleSize: '10,000 data points',
+      timeframe: '12 months',
+      validationMethod: 'Cross-validation'
+    }
   };
 
   return (
@@ -70,9 +96,9 @@ export const DailyNewsCard = ({ article }: DailyNewsCardProps) => {
         className="p-4 space-y-4"
         animate={{ height: 'auto' }}
       >
-        {/* Enhanced Header with Metrics */}
+        {/* Research Context Header */}
         <div className="space-y-4">
-          {/* Top Badges Row */}
+          {/* Credibility & Impact Badges */}
           <div className="flex flex-wrap items-center gap-2">
             <TooltipProvider>
               <Tooltip>
@@ -86,7 +112,7 @@ export const DailyNewsCard = ({ article }: DailyNewsCardProps) => {
                   </Badge>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Impact level based on industry significance</p>
+                  <p>Research impact assessment</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -100,73 +126,173 @@ export const DailyNewsCard = ({ article }: DailyNewsCardProps) => {
                   </Badge>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Technical complexity level</p>
+                  <p>Technical implementation complexity</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
 
             <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20 flex items-center gap-1">
               <Clock className="h-3 w-3" />
-              {article.reading_time}m
+              {article.reading_time}m read
             </Badge>
           </div>
 
-          {/* Title */}
-          <h3 className="text-lg font-semibold text-white line-clamp-2">
-            {article.title}
-          </h3>
+          {/* Title & Quick Actions */}
+          <div className="space-y-2">
+            <h3 className="text-lg font-semibold text-white line-clamp-2">
+              {article.title}
+            </h3>
+            <p className="text-sm text-gray-300 line-clamp-2">
+              {article.description}
+            </p>
+          </div>
 
-          {/* Metrics Dashboard */}
-          <div className="grid grid-cols-3 gap-4 bg-black/20 rounded-lg p-3">
+          {/* Research Metrics Dashboard */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-black/20 rounded-lg p-3">
+            {/* Performance Metrics */}
             <div className="space-y-2">
               <div className="flex items-center justify-between text-xs text-gray-400">
-                <span>Performance</span>
-                <span>{metrics.performance}%</span>
+                <span>Research Impact</span>
+                <span>{researchData.researchSignificance}%</span>
               </div>
-              <Progress value={metrics.performance} className="h-1" 
-                indicatorClassName="bg-green-500" />
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs text-gray-400">
-                <span>Adoption</span>
-                <span>{metrics.adoption}%</span>
-              </div>
-              <Progress value={metrics.adoption} className="h-1" 
-                indicatorClassName="bg-blue-500" />
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs text-gray-400">
-                <span>Impact</span>
-                <span>{metrics.impact}%</span>
-              </div>
-              <Progress value={metrics.impact} className="h-1" 
+              <Progress value={researchData.researchSignificance} className="h-1" 
                 indicatorClassName="bg-orange-500" />
             </div>
-          </div>
-
-          {/* Technology Tags */}
-          <div className="space-y-2">
-            <div className="text-xs text-gray-400">Technologies</div>
-            <div className="flex flex-wrap gap-2">
-              {metrics.technologies.map((tech, index) => (
-                <Badge 
-                  key={index}
-                  variant="outline" 
-                  className="bg-white/5 text-gray-300 border-white/10 hover:bg-white/10"
-                >
-                  {tech}
-                </Badge>
-              ))}
+            {/* Implementation Feasibility */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs text-gray-400">
+                <span>Feasibility</span>
+                <span>{researchData.implementationFeasibility}%</span>
+              </div>
+              <Progress value={researchData.implementationFeasibility} className="h-1" 
+                indicatorClassName="bg-green-500" />
+            </div>
+            {/* Industry Adoption */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs text-gray-400">
+                <span>Industry Adoption</span>
+                <span>{researchData.industryAdoption}%</span>
+              </div>
+              <Progress value={researchData.industryAdoption} className="h-1" 
+                indicatorClassName="bg-blue-500" />
+            </div>
+            {/* Innovation Index */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs text-gray-400">
+                <span>Innovation</span>
+                <span>{researchData.innovationIndex}%</span>
+              </div>
+              <Progress value={researchData.innovationIndex} className="h-1" 
+                indicatorClassName="bg-purple-500" />
             </div>
           </div>
 
-          {/* Description */}
-          <p className="text-sm text-gray-300 line-clamp-2">
-            {article.description}
-          </p>
+          {/* Research Content Sections */}
+          <Accordion type="single" collapsible className="w-full space-y-2">
+            {/* Methodology Section */}
+            <AccordionItem value="methodology" className="border border-white/10 rounded-lg px-4">
+              <AccordionTrigger className="hover:no-underline">
+                <div className="flex items-center gap-2">
+                  <ScrollText className="h-4 w-4 text-blue-400" />
+                  <span>Research Methodology</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="text-sm text-gray-300 space-y-2">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <p className="text-gray-400">Approach</p>
+                    <p>{researchData.methodology.approach}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-gray-400">Sample Size</p>
+                    <p>{researchData.methodology.sampleSize}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-gray-400">Timeframe</p>
+                    <p>{researchData.methodology.timeframe}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-gray-400">Validation</p>
+                    <p>{researchData.methodology.validationMethod}</p>
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
 
-          {/* Quick Actions */}
-          <div className="flex items-center justify-between">
+            {/* Technologies Section */}
+            <AccordionItem value="technologies" className="border border-white/10 rounded-lg px-4">
+              <AccordionTrigger className="hover:no-underline">
+                <div className="flex items-center gap-2">
+                  <Database className="h-4 w-4 text-purple-400" />
+                  <span>Technologies & Implementation</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="flex flex-wrap gap-2">
+                  {researchData.technologies.map((tech, index) => (
+                    <Badge 
+                      key={index}
+                      variant="outline" 
+                      className="bg-white/5 text-gray-300 border-white/10"
+                    >
+                      {tech}
+                    </Badge>
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* Key Findings Section */}
+            <AccordionItem value="findings" className="border border-white/10 rounded-lg px-4">
+              <AccordionTrigger className="hover:no-underline">
+                <div className="flex items-center gap-2">
+                  <Lightbulb className="h-4 w-4 text-yellow-400" />
+                  <span>Key Findings</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <ul className="space-y-2">
+                  {article.key_takeaways.map((takeaway, index) => (
+                    <li key={index} className="flex items-start gap-2">
+                      <span className="text-xs bg-white/10 rounded-full px-2 py-0.5 mt-0.5">
+                        {index + 1}
+                      </span>
+                      <span className="text-gray-300 text-sm">{takeaway}</span>
+                    </li>
+                  ))}
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* Sources Section */}
+            <AccordionItem value="sources" className="border border-white/10 rounded-lg px-4">
+              <AccordionTrigger className="hover:no-underline">
+                <div className="flex items-center gap-2">
+                  <Link className="h-4 w-4 text-green-400" />
+                  <span>Primary Sources & References</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-2">
+                  {researchData.primarySources.map((source, index) => (
+                    <a
+                      key={index}
+                      href={source.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-sm text-gray-300 hover:text-white transition-colors"
+                    >
+                      <ExternalLink className="h-3 w-3" />
+                      {source.title}
+                    </a>
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+
+          {/* Action Buttons */}
+          <div className="flex items-center justify-between pt-2">
             <Button
               variant="ghost"
               size="sm"
@@ -186,58 +312,41 @@ export const DailyNewsCard = ({ article }: DailyNewsCardProps) => {
               )}
             </Button>
             <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-white hover:bg-white/10"
-              >
-                <Target className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-white hover:bg-white/10"
-              >
-                <Share2 className="h-4 w-4" />
-              </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-white hover:bg-white/10"
+                    >
+                      <MessagesSquare className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Discuss this research</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-white hover:bg-white/10"
+                    >
+                      <Share2 className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Share research</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           </div>
         </div>
-
-        {/* Expanded Content */}
-        {isExpanded && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="pt-4 border-t border-white/10"
-          >
-            <div className="space-y-4">
-              <div>
-                <h4 className="text-sm font-semibold text-white mb-2">Key Takeaways</h4>
-                <ul className="space-y-2">
-                  {article.key_takeaways.map((takeaway, index) => (
-                    <li key={index} className="text-sm text-gray-300 flex items-start gap-2 bg-white/5 p-2 rounded-lg">
-                      <span className="text-xs bg-white/10 rounded-full px-2 py-0.5 mt-0.5">
-                        {index + 1}
-                      </span>
-                      {takeaway}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full mt-4 text-white border-white/10 hover:bg-white/10"
-                onClick={() => window.open(article.source, '_blank')}
-              >
-                <ExternalLink className="h-4 w-4 mr-2" />
-                View Full Article
-              </Button>
-            </div>
-          </motion.div>
-        )}
       </motion.div>
     </Card>
   );
