@@ -1,3 +1,4 @@
+
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -98,7 +99,6 @@ const BlogPost = () => {
             overview,
             key_details,
             implications,
-            is_featured,
             metadata
           ),
           article_tags (
@@ -143,8 +143,8 @@ const BlogPost = () => {
         related_topics: [], // Default empty array since it's not in DB
         key_figures: {}, // Default empty object since it's not in DB
         reading_time_minutes: 5, // Default value since it's not in DB
-        category: articleData.category || 'general', // Using parent article's category as fallback
-        is_featured: section.is_featured || false,
+        category: articleData.category || 'general', // Using parent article's category
+        is_featured: false, // Default value since it's not in DB
         metadata: section.metadata || {}
       }));
 
