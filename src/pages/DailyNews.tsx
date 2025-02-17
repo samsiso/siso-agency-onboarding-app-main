@@ -47,14 +47,12 @@ const DailyNews = () => {
 
       if (!counts) return [];
 
-      // Process the results to get counts by date
       const countsByDate = counts.reduce((acc: { [key: string]: number }, item) => {
         const date = item.date;
         acc[date] = (acc[date] || 0) + 1;
         return acc;
       }, {});
 
-      // Convert to array format
       return Object.entries(countsByDate).map(([date, count]) => ({
         date,
         count
@@ -73,92 +71,101 @@ const DailyNews = () => {
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">
         <Sidebar />
-        <div className="flex-1 p-8">
-          {/* Date Navigation */}
-          <div className="flex flex-col space-y-6 mb-8">
-            <div className="flex items-center justify-between bg-siso-bg-alt p-4 rounded-lg">
-              <Button
-                variant="outline"
-                onClick={() => handleDateChange('prev')}
-              >
-                <ChevronLeft className="h-4 w-4 mr-2" />
-                Previous Day
-              </Button>
-              <div className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-siso-red" />
-                <span className="text-xl font-semibold">
-                  {format(currentDate, 'MMMM d, yyyy')}
-                </span>
-                {newsItems.length > 0 && (
-                  <Badge variant="secondary" className="ml-2">
-                    {newsItems.length} articles
-                  </Badge>
-                )}
-              </div>
-              <Button
-                variant="outline"
-                onClick={() => handleDateChange('next')}
-                disabled={format(currentDate, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd')}
-              >
-                Next Day
-                <ChevronRight className="h-4 w-4 ml-2" />
-              </Button>
-            </div>
-
-            {/* Date Availability Indicators */}
-            <div className="flex items-center justify-center gap-2">
-              {dateAvailability?.map((dateInfo) => {
-                const isCurrentDate = dateInfo.date === formattedDate;
-                return (
-                  <Button
-                    key={dateInfo.date}
-                    variant={isCurrentDate ? "default" : "ghost"}
-                    size="sm"
-                    className={`px-2 ${isCurrentDate ? 'bg-siso-red' : ''}`}
-                    onClick={() => navigate(`/ai-news/daily/${dateInfo.date}`)}
-                  >
-                    {format(parseISO(dateInfo.date), 'MMM d')}
+        <div className="flex-1 p-4 lg:p-8">
+          {/* Date Navigation - Now sticky */}
+          <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 pb-4">
+            <div className="flex flex-col space-y-4">
+              <div className="flex items-center justify-between bg-siso-bg-alt p-4 rounded-lg shadow-sm">
+                <Button
+                  variant="outline"
+                  onClick={() => handleDateChange('prev')}
+                  className="w-32"
+                >
+                  <ChevronLeft className="h-4 w-4 mr-2" />
+                  Previous Day
+                </Button>
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-siso-red" />
+                  <span className="text-xl font-semibold">
+                    {format(currentDate, 'MMMM d, yyyy')}
+                  </span>
+                  {newsItems.length > 0 && (
                     <Badge variant="secondary" className="ml-2">
-                      {dateInfo.count}
+                      {newsItems.length} articles
                     </Badge>
-                  </Button>
-                );
-              })}
+                  )}
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => handleDateChange('next')}
+                  className="w-32"
+                  disabled={format(currentDate, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd')}
+                >
+                  Next Day
+                  <ChevronRight className="h-4 w-4 ml-2" />
+                </Button>
+              </div>
+
+              {/* Date Availability Indicators */}
+              <div className="flex items-center justify-center gap-2 overflow-x-auto py-2 px-4 bg-siso-bg-alt rounded-lg">
+                {dateAvailability?.map((dateInfo) => {
+                  const isCurrentDate = dateInfo.date === formattedDate;
+                  return (
+                    <Button
+                      key={dateInfo.date}
+                      variant={isCurrentDate ? "default" : "ghost"}
+                      size="sm"
+                      className={`
+                        px-2 shrink-0 transition-all duration-200
+                        ${isCurrentDate ? 'bg-siso-red shadow-lg scale-105' : 'hover:bg-siso-bg'}
+                      `}
+                      onClick={() => navigate(`/ai-news/daily/${dateInfo.date}`)}
+                    >
+                      {format(parseISO(dateInfo.date), 'MMM d')}
+                      <Badge variant="secondary" className="ml-2">
+                        {dateInfo.count}
+                      </Badge>
+                    </Button>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
-          {/* Main Content */}
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="space-y-4">
-                  <Skeleton className="h-48 w-full" />
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
-                </div>
-              ))}
-            </div>
-          ) : newsItems?.length ? (
-            <NewsContent
-              newsItems={newsItems}
-              summaries={summaries}
-              loadingSummaries={loadingSummaries}
-              onGenerateSummary={generateSummary}
-              searchQuery=""
-              loading={loading}
-            />
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-lg text-gray-400">No news items found for this date.</p>
-              <Button 
-                variant="default" 
-                className="mt-4"
-                onClick={() => navigate('/ai-news')}
-              >
-                Return to Latest News
-              </Button>
-            </div>
-          )}
+          {/* Main Content with Improved Layout */}
+          <div className="mt-6">
+            {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-fade-in">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="space-y-4 bg-siso-bg-alt p-4 rounded-lg">
+                    <Skeleton className="h-48 w-full rounded-lg" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                  </div>
+                ))}
+              </div>
+            ) : newsItems?.length ? (
+              <NewsContent
+                newsItems={newsItems}
+                summaries={summaries}
+                loadingSummaries={loadingSummaries}
+                onGenerateSummary={generateSummary}
+                searchQuery=""
+                loading={loading}
+              />
+            ) : (
+              <div className="text-center py-12 bg-siso-bg-alt rounded-lg animate-fade-in">
+                <p className="text-lg text-gray-400">No news items found for this date.</p>
+                <Button 
+                  variant="default" 
+                  className="mt-4"
+                  onClick={() => navigate('/ai-news')}
+                >
+                  Return to Latest News
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </SidebarProvider>

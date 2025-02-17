@@ -8,7 +8,6 @@ import NewsTabs from './NewsTabs';
 import { NewsLoadingState } from './NewsLoadingState';
 import { NewsEmptyState } from './NewsEmptyState';
 
-// [Analysis] Lazy load NewsCard for better initial load performance
 const NewsCard = lazy(() => import('@/components/ai-news/NewsCard'));
 
 const LoadingSpinner = () => (
@@ -24,18 +23,6 @@ const containerVariants = {
     opacity: 1,
     transition: {
       staggerChildren: 0.05,
-      duration: 0.3
-    }
-  }
-};
-
-// [Analysis] Individual item animations for consistent transitions
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  show: { 
-    opacity: 1, 
-    y: 0,
-    transition: {
       duration: 0.3
     }
   }
@@ -67,14 +54,12 @@ export const NewsContent = ({
     triggerOnce: false
   });
 
-  // [Analysis] Memoize callback to prevent recreating function on each render
   const handleLoadMore = useCallback(() => {
     if (!loading && hasMore && onLoadMore) {
       onLoadMore();
     }
   }, [loading, hasMore, onLoadMore]);
 
-  // [Analysis] Memoize filtered news items to prevent unnecessary recalculation
   const filteredNewsItems = useMemo(() => {
     if (!searchQuery) return newsItems;
     const searchLower = searchQuery.toLowerCase();
@@ -84,7 +69,6 @@ export const NewsContent = ({
     );
   }, [newsItems, searchQuery]);
 
-  // [Analysis] Memoize sorted items for different tabs
   const { trendingItems, latestItems, mostDiscussedItems, featuredItem } = useMemo(() => {
     const trending = [...filteredNewsItems]
       .sort((a, b) => (b.views || 0) - (a.views || 0))
@@ -102,7 +86,6 @@ export const NewsContent = ({
     return { trendingItems: trending, latestItems: latest, mostDiscussedItems: mostDiscussed, featuredItem: featured };
   }, [filteredNewsItems]);
 
-  // [Analysis] Implement infinite scroll
   useEffect(() => {
     if (inView) {
       handleLoadMore();
@@ -121,7 +104,10 @@ export const NewsContent = ({
           className="space-y-8"
         >
           {featuredItem && (
-            <motion.div variants={itemVariants} className="w-full">
+            <motion.div 
+              variants={containerVariants} 
+              className="w-full rounded-xl overflow-hidden shadow-lg"
+            >
               <FeaturedNewsHero 
                 item={featuredItem} 
                 onGenerateSummary={onGenerateSummary}
@@ -153,4 +139,3 @@ export const NewsContent = ({
     </Suspense>
   );
 };
-
