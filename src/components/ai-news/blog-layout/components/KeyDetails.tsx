@@ -19,7 +19,7 @@ export const KeyDetails = ({ details, onCopy }: KeyDetailsProps) => {
       transition={{ delay: 0.2 }}
     >
       <div className="flex items-center gap-3">
-        <TrendingUp className="h-5 w-5 text-emerald-400" />
+        <TrendingUp className="h-4 w-4 text-emerald-400" />
         <span className="text-base font-semibold text-emerald-400">Key Details</span>
       </div>
       <ul className="space-y-3">
