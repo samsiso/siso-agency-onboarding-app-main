@@ -15,18 +15,20 @@ interface TextOverlay {
   subtitle: string;
 }
 
+interface TemplateMetadata {
+  dateFormat?: string;
+  dynamicDate?: boolean;
+}
+
 interface BannerTemplate {
   id: string;
   name: string;
-  description: string;
-  image_url: string;
+  description: string | null;
+  image_url: string | null;
   is_default: boolean;
   template_type: string;
   text_overlay: TextOverlay;
-  metadata?: {
-    dateFormat?: string;
-    dynamicDate?: boolean;
-  };
+  metadata?: TemplateMetadata;
   created_at?: string;
   updated_at?: string;
 }
@@ -34,8 +36,8 @@ interface BannerTemplate {
 interface BannerTemplateResponse {
   id: string;
   name: string;
-  description: string;
-  image_url: string;
+  description: string | null;
+  image_url: string | null;
   is_default: boolean;
   template_type: string;
   text_overlay: unknown;
@@ -75,13 +77,22 @@ export function BannerTemplatesDialog() {
 
       if (error) throw error;
 
-      const transformedTemplates: BannerTemplate[] = (data as BannerTemplateResponse[]).map(template => ({
-        ...template,
-        text_overlay: (typeof template.text_overlay === 'string' 
+      const transformedTemplates: BannerTemplate[] = (data as BannerTemplateResponse[]).map(template => {
+        const parsedTextOverlay = typeof template.text_overlay === 'string' 
           ? JSON.parse(template.text_overlay)
-          : template.text_overlay) as TextOverlay,
-        metadata: template.metadata as BannerTemplate['metadata']
-      }));
+          : template.text_overlay;
+
+        const parsedMetadata = typeof template.metadata === 'string'
+          ? JSON.parse(template.metadata)
+          : template.metadata || { dateFormat: 'MMMM d, yyyy', dynamicDate: false };
+
+        return {
+          ...template,
+          text_overlay: parsedTextOverlay as TextOverlay,
+          metadata: parsedMetadata as TemplateMetadata,
+          is_default: template.is_default || false
+        };
+      });
 
       setTemplates(transformedTemplates);
     } catch (error) {
@@ -114,10 +125,10 @@ export function BannerTemplatesDialog() {
           name: newTemplate.name,
           description: newTemplate.description,
           template_type: newTemplate.template_type,
-          text_overlay: JSON.stringify(newTemplate.text_overlay),
+          text_overlay: newTemplate.text_overlay,
           metadata: newTemplate.metadata,
           is_default: false
-        } as any)
+        })
         .select()
         .single();
 
@@ -125,9 +136,13 @@ export function BannerTemplatesDialog() {
 
       const transformedTemplate: BannerTemplate = {
         ...data,
-        text_overlay: (typeof data.text_overlay === 'string'
+        text_overlay: typeof data.text_overlay === 'string'
           ? JSON.parse(data.text_overlay)
-          : data.text_overlay) as TextOverlay
+          : data.text_overlay as TextOverlay,
+        metadata: typeof data.metadata === 'string'
+          ? JSON.parse(data.metadata)
+          : data.metadata as TemplateMetadata,
+        is_default: data.is_default || false
       };
 
       toast({
