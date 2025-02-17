@@ -12,7 +12,8 @@ import { useToast } from '@/hooks/use-toast';
 // [Analysis] Lazy load components for better initial load performance
 const NewsHeader = lazy(() => import('@/components/ai-news/NewsHeader'));
 const NewsCategories = lazy(() => import('@/components/ai-news/NewsCategories'));
-const NewsTabs = lazy(() => import('@/components/ai-news/NewsTabs'));
+const NewsTabs = lazy(() => import('@/components/ai-news/NewsTabs').then(module => ({ default: module.NewsTabs })));
+const NewsCard = lazy(() => import('@/components/ai-news/NewsCard'));
 
 // [Analysis] Reusable loading components
 const LoadingSpinner = () => (
@@ -109,13 +110,15 @@ const AINews = () => {
                             transition={{ delay: index * 0.1 }}
                             className={index === 0 ? "lg:col-span-2" : ""}
                           >
-                            <NewsCard
-                              item={article}
-                              summaries={summaries}
-                              loadingSummaries={loadingSummaries}
-                              onGenerateSummary={generateSummary}
-                              isFeatured={true}
-                            />
+                            <Suspense fallback={<LoadingSpinner />}>
+                              <NewsCard
+                                item={article}
+                                summaries={summaries}
+                                loadingSummaries={loadingSummaries}
+                                onGenerateSummary={generateSummary}
+                                isFeatured={true}
+                              />
+                            </Suspense>
                           </motion.div>
                         ))}
                       </motion.div>

@@ -71,9 +71,12 @@ const BlogPost = () => {
             onConflict: 'article_id,user_id'
           });
 
-        // Increment view count
-        await supabase
-          .rpc('increment_article_views', { article_id: id });
+        // Increment view count using RPC call
+        const { error: viewError } = await supabase.rpc('increment_article_views', {
+          article_id: id
+        });
+
+        if (viewError) throw viewError;
 
         // Award points for reading
         await awardPoints('read_article');
