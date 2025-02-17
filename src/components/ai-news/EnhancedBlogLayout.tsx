@@ -381,6 +381,12 @@ const EventCard = ({ section, index }: EventCardProps) => {
   );
 };
 
+interface EnhancedBlogLayoutProps {
+  article: EnhancedNewsItem;
+  onShare?: () => void;
+  onBookmark?: () => void;
+}
+
 export const EnhancedBlogLayout = ({
   article,
   onShare,
