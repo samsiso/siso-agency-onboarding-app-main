@@ -1,6 +1,5 @@
 
 import { motion } from 'framer-motion';
-import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
@@ -51,27 +50,19 @@ export const EventCard = ({ section, index }: EventCardProps) => {
     }
   };
 
-  // [Analysis] Fetch AI analysis for this section with proper error handling and type safety
+  // [Analysis] Fetch AI analysis for this section
   const { data: analysis, isLoading: isAnalysisLoading } = useQuery({
     queryKey: ['section-analysis', section.id],
     queryFn: async () => {
-      // Validate section ID
-      if (!section.id) {
-        throw new Error('Invalid section ID');
-      }
-
       try {
         // First check if we have existing analysis
         const { data: existingAnalysis, error: fetchError } = await supabase
           .from('news_ai_analysis')
           .select('*')
-          .eq('section_id', section.id)
-          .single();
+          .eq('id', section.id)
+          .maybeSingle();
 
-        if (fetchError) {
-          console.error('Error fetching analysis:', fetchError);
-          throw fetchError;
-        }
+        if (fetchError) throw fetchError;
 
         if (existingAnalysis) {
           return existingAnalysis;
@@ -88,19 +79,15 @@ export const EventCard = ({ section, index }: EventCardProps) => {
           },
         });
 
-        if (invokeError) {
-          console.error('Error invoking analyze-news:', invokeError);
-          throw invokeError;
-        }
-
+        if (invokeError) throw invokeError;
         return analysisData?.analysis;
       } catch (error) {
         console.error('Error in analysis flow:', error);
         throw error;
       }
     },
-    retry: 1, // Only retry once to avoid excessive API calls
-    enabled: !!section.id // Only run query if section.id exists
+    retry: 1,
+    enabled: !!section.id
   });
 
   return (

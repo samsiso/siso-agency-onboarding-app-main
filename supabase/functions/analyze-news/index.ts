@@ -1,6 +1,7 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,7 +15,13 @@ serve(async (req) => {
   }
 
   try {
-    const { content, title, key_details, implications, news_id, section_id } = await req.json();
+    const { content, title, key_details, implications, section_id } = await req.json();
+
+    // Initialize Supabase client
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
 
     // [Analysis] Using GPT-4o-mini for cost-effective, fast analysis
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -50,23 +57,20 @@ serve(async (req) => {
     const analysis = JSON.parse(aiResponse.choices[0].message.content);
 
     // Store analysis in Supabase
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
-
     const { data, error } = await supabaseClient
       .from('news_ai_analysis')
       .upsert({
-        news_id,
         section_id,
         ...analysis,
         updated_at: new Date().toISOString()
       }, {
-        onConflict: 'news_id,section_id'
+        onConflict: 'section_id'
       });
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error storing analysis:', error);
+      throw error;
+    }
 
     return new Response(JSON.stringify({ analysis: data }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
