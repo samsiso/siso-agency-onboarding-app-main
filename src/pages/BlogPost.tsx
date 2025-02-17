@@ -8,7 +8,7 @@ import { EnhancedBlogLayout } from '@/components/ai-news/EnhancedBlogLayout';
 import { useToast } from '@/hooks/use-toast';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { usePoints } from '@/hooks/usePoints';
-import type { EnhancedNewsItem } from '@/types/blog';
+import type { EnhancedNewsItem, ContentCategory } from '@/types/blog';
 
 const BlogPost = () => {
   const { id } = useParams();
@@ -48,8 +48,18 @@ const BlogPost = () => {
       // Transform the data to match our EnhancedNewsItem type
       const enhancedArticle: EnhancedNewsItem = {
         ...articleData,
+        // Explicitly cast the category to ContentCategory
+        category: articleData.category as ContentCategory,
+        // Ensure all required fields are present with defaults if needed
         sections: articleData.article_sections || [],
         tags: articleData.article_tags || [],
+        key_takeaways: articleData.key_takeaways || [],
+        related_articles: articleData.related_articles || [],
+        table_of_contents: articleData.table_of_contents || [],
+        technical_details: articleData.technical_details || {},
+        source_credibility: articleData.source_credibility || 'verified',
+        estimated_reading_time: articleData.estimated_reading_time || 5,
+        views: articleData.views || 0
       };
 
       return enhancedArticle;
