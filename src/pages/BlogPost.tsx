@@ -8,7 +8,7 @@ import { EnhancedBlogLayout } from '@/components/ai-news/EnhancedBlogLayout';
 import { useToast } from '@/hooks/use-toast';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { usePoints } from '@/hooks/usePoints';
-import type { EnhancedNewsItem, ContentCategory, TechnicalComplexity } from '@/types/blog';
+import type { EnhancedNewsItem, ContentCategory, TechnicalComplexity, ArticleImpact } from '@/types/blog';
 
 const BlogPost = () => {
   const { id } = useParams();
@@ -52,6 +52,8 @@ const BlogPost = () => {
         category: articleData.category as ContentCategory,
         // Explicitly cast technical_complexity to TechnicalComplexity
         technical_complexity: (articleData.technical_complexity || 'intermediate') as TechnicalComplexity,
+        // Explicitly cast impact to ArticleImpact
+        impact: (articleData.impact || 'medium') as ArticleImpact,
         // Ensure all required fields are present with defaults if needed
         sections: articleData.article_sections || [],
         tags: articleData.article_tags || [],
