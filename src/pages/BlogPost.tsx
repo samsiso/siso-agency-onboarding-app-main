@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -98,8 +97,7 @@ const BlogPost = () => {
             article_id,
             overview,
             key_details,
-            implications,
-            metadata
+            implications
           ),
           article_tags (
             id,
@@ -145,7 +143,7 @@ const BlogPost = () => {
         reading_time_minutes: 5, // Default value since it's not in DB
         category: articleData.category || 'general', // Using parent article's category
         is_featured: false, // Default value since it's not in DB
-        metadata: section.metadata || {}
+        metadata: {} // Default empty object since it's not in DB
       }));
 
       // [Analysis] Transform to EnhancedNewsItem with strongly typed sections
