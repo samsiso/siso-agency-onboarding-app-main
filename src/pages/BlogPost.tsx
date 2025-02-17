@@ -70,7 +70,8 @@ const BlogPost = () => {
 
       if (error) throw error;
 
-      await awardPoints('bookmark_article');
+      // Using 'read_article' as the point action type since there isn't a specific bookmark action
+      await awardPoints('read_article');
       
       toast({
         title: "Success",
