@@ -21,11 +21,11 @@ type TableItem = {
 export const ArticleTableOfContents = ({ article, activeSection }: ArticleTableOfContentsProps) => {
   // [Analysis] Generate table of contents items from article sections and key takeaways
   const tableItems: TableItem[] = [
-    { id: 'key-takeaways', title: 'Key Takeaways', type: 'section' },
+    { id: 'key-takeaways', title: 'Key Takeaways', type: 'section' } as const,
     ...article.sections.map((section) => ({
       id: section.id,
       title: section.title,
-      type: 'content',
+      type: 'content' as const,
       importance: section.importance_level
     }))
   ];
