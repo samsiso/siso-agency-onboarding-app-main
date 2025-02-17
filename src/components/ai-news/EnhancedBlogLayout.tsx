@@ -255,7 +255,7 @@ const EventCard = ({ section, index }: EventCardProps) => {
                 </motion.div>
               )}
 
-              {/* Main Content */}
+              {/* Main Content with Better Typography */}
               <div className="prose prose-invert prose-lg max-w-none">
                 <div 
                   dangerouslySetInnerHTML={{ __html: section.content }}
