@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -98,7 +97,6 @@ const BlogPost = () => {
             article_id,
             overview,
             key_details,
-            bullet_points,
             implications,
             related_topics,
             key_figures,
@@ -125,7 +123,7 @@ const BlogPost = () => {
 
       if (articleError) throw articleError;
 
-      // [Analysis] Transform sections to ensure article_id is present
+      // [Analysis] Transform sections ensuring correct field mapping
       const transformedSections: ArticleSection[] = (articleData.article_sections || []).map((section: any) => ({
         id: section.id,
         title: section.title,
@@ -137,16 +135,14 @@ const BlogPost = () => {
         subsection_type: section.subsection_type || 'overview',
         source_references: typeof section.source_references === 'object' 
           ? section.source_references 
-          : Array.isArray(section.source_references)
-            ? section.source_references.reduce((acc, ref) => ({ ...acc, [ref.name]: ref.url }), {})
-            : {},
+          : {},
         created_at: section.created_at,
         updated_at: section.updated_at,
         last_updated: section.last_updated || section.updated_at,
         article_id: section.article_id || articleData.id,
         overview: section.overview,
         key_details: section.key_details || [],
-        bullet_points: section.bullet_points || [],
+        bullet_points: [], // Default empty array since it's not in DB
         implications: section.implications || [],
         related_topics: section.related_topics || [],
         key_figures: section.key_figures || {},
@@ -169,7 +165,7 @@ const BlogPost = () => {
         sections: transformedSections,
         tags: articleData.article_tags || [],
         key_takeaways: Array.isArray(articleData.key_takeaways) 
-          ? articleData.key_takeaways.map(item => String(item))
+          ? articleData.key_takeaways
           : [],
         related_articles: Array.isArray(articleData.related_articles) 
           ? articleData.related_articles.map((article: any) => ({
@@ -193,7 +189,7 @@ const BlogPost = () => {
         views: articleData.views || 0,
         image_url: articleData.image_url,
         source: articleData.source,
-        sources: articleData.sources || []
+        sources: Array.isArray(articleData.sources) ? articleData.sources : []
       };
 
       const comments = (articleData.news_comments || []).map(comment => ({
