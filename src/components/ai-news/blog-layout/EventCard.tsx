@@ -20,9 +20,9 @@ interface EventCardProps {
 
 export const EventCard = ({ section, index }: EventCardProps) => {
   const [hasReacted, setHasReacted] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
   const { toast } = useToast();
 
-  // [Analysis] Determine section type for icon selection
   const sectionType = section.title.toLowerCase().includes('research') ? 'research'
     : section.title.toLowerCase().includes('integration') ? 'integration'
     : section.title.toLowerCase().includes('medical') ? 'medical'
@@ -50,12 +50,14 @@ export const EventCard = ({ section, index }: EventCardProps) => {
     }
   };
 
-  // [Analysis] Fetch AI analysis for this section
+  const handleToggle = () => {
+    setIsExpanded(prev => !prev);
+  };
+
   const { data: analysis, isLoading: isAnalysisLoading } = useQuery({
     queryKey: ['section-analysis', section.id],
     queryFn: async () => {
       try {
-        // First check if we have existing analysis
         const { data: existingAnalysis, error: fetchError } = await supabase
           .from('news_ai_analysis')
           .select('*')
@@ -68,7 +70,6 @@ export const EventCard = ({ section, index }: EventCardProps) => {
           return existingAnalysis;
         }
 
-        // If no existing analysis, generate new one
         const { data: analysisData, error: invokeError } = await supabase.functions.invoke('analyze-news', {
           body: {
             content: section.content,
@@ -124,24 +125,30 @@ export const EventCard = ({ section, index }: EventCardProps) => {
           title={section.title}
           icon={Icon}
           importanceLevel={section.importance_level}
+          isExpanded={isExpanded}
+          onToggle={handleToggle}
         />
 
-        <KeyDetails 
-          details={section.key_details || []}
-          onCopy={handleCopyContent}
-        />
+        {isExpanded && (
+          <>
+            <KeyDetails 
+              details={section.key_details || []}
+              onCopy={handleCopyContent}
+            />
 
-        <div className="prose prose-invert prose-lg max-w-none">
-          <div 
-            dangerouslySetInnerHTML={{ __html: section.content }}
-            className="text-gray-200 leading-relaxed"
-          />
-        </div>
+            <div className="prose prose-invert prose-lg max-w-none">
+              <div 
+                dangerouslySetInnerHTML={{ __html: section.content }}
+                className="text-gray-200 leading-relaxed"
+              />
+            </div>
 
-        <AIAnalysis 
-          analysis={analysis}
-          isLoading={isAnalysisLoading}
-        />
+            <AIAnalysis 
+              analysis={analysis}
+              isLoading={isAnalysisLoading}
+            />
+          </>
+        )}
 
         <CardFooter 
           lastUpdated={section.last_updated || section.updated_at}

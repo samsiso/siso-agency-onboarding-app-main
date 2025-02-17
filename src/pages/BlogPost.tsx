@@ -95,7 +95,17 @@ const BlogPost = () => {
             created_at,
             updated_at,
             last_updated,
-            article_id
+            article_id,
+            overview,
+            key_details,
+            bullet_points,
+            implications,
+            related_topics,
+            key_figures,
+            reading_time_minutes,
+            category,
+            is_featured,
+            metadata
           ),
           article_tags (
             id,
@@ -125,11 +135,15 @@ const BlogPost = () => {
         technical_complexity: section.technical_complexity || 'intermediate',
         importance_level: section.importance_level || 'medium',
         subsection_type: section.subsection_type || 'overview',
-        source_references: typeof section.source_references === 'object' ? section.source_references : {},
+        source_references: typeof section.source_references === 'object' 
+          ? section.source_references 
+          : Array.isArray(section.source_references)
+            ? section.source_references.reduce((acc, ref) => ({ ...acc, [ref.name]: ref.url }), {})
+            : {},
         created_at: section.created_at,
         updated_at: section.updated_at,
         last_updated: section.last_updated || section.updated_at,
-        article_id: section.article_id || articleData.id, // Ensure article_id is always set
+        article_id: section.article_id || articleData.id,
         overview: section.overview,
         key_details: section.key_details || [],
         bullet_points: section.bullet_points || [],
@@ -178,7 +192,8 @@ const BlogPost = () => {
         estimated_reading_time: articleData.estimated_reading_time || 5,
         views: articleData.views || 0,
         image_url: articleData.image_url,
-        source: articleData.source
+        source: articleData.source,
+        sources: articleData.sources || []
       };
 
       const comments = (articleData.news_comments || []).map(comment => ({
