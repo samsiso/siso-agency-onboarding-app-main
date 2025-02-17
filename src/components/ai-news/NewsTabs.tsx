@@ -2,10 +2,11 @@
 import { TrendingUp, Clock, MessageSquare, Calendar } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { NewsTabContent } from './NewsTabContent';
-import { memo, useState } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { format, subWeeks, startOfWeek, endOfWeek } from 'date-fns';
 import NewsCard from './NewsCard';
+import { TableOfContents } from './TableOfContents';
 
 interface NewsTabsProps {
   latestItems: any[];
@@ -25,6 +26,7 @@ const NewsTabs = memo(({
   onGenerateSummary
 }: NewsTabsProps) => {
   const [currentWeekOffset, setCurrentWeekOffset] = useState(0);
+  const [activeId, setActiveId] = useState<string>();
   
   const weekStart = startOfWeek(subWeeks(new Date(), currentWeekOffset));
   const weekEnd = endOfWeek(weekStart);
@@ -44,6 +46,27 @@ const NewsTabs = memo(({
   const handleGenerateSummary = (id: string) => {
     onGenerateSummary(id);
   };
+
+  // [Analysis] Track which section is currently visible
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveId(entry.target.id);
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    filteredDailyBriefs.forEach((item) => {
+      const element = document.getElementById(item.id);
+      if (element) observer.observe(element);
+    });
+
+    return () => observer.disconnect();
+  }, [filteredDailyBriefs]);
 
   return (
     <Tabs defaultValue="latest" className="w-full">
@@ -87,17 +110,28 @@ const NewsTabs = memo(({
             </Button>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredDailyBriefs.map((item) => (
-            <NewsCard
-              key={item.id}
-              item={item}
-              summaries={summaries}
-              loadingSummaries={loadingSummaries}
-              onGenerateSummary={handleGenerateSummary}
-              isCompact={true}
+        <div className="flex gap-8">
+          <div className="flex-1">
+            <div className="grid grid-cols-1 gap-4">
+              {filteredDailyBriefs.map((item) => (
+                <div key={item.id} id={item.id}>
+                  <NewsCard
+                    item={item}
+                    summaries={summaries}
+                    loadingSummaries={loadingSummaries}
+                    onGenerateSummary={handleGenerateSummary}
+                    isCompact={true}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="w-80 hidden xl:block">
+            <TableOfContents
+              items={filteredDailyBriefs}
+              activeId={activeId}
             />
-          ))}
+          </div>
         </div>
       </TabsContent>
 
