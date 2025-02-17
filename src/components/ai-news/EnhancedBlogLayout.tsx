@@ -13,7 +13,10 @@ import {
   Microscope,
   Network,
   Heart,
-  ExternalLink
+  ExternalLink,
+  Info,
+  MessageSquare,
+  TrendingUp
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -108,16 +111,72 @@ const EventCard = ({ section }: { section: ArticleSection }) => {
           </Badge>
         </div>
 
-        {/* Content */}
+        {/* Overview Section */}
+        {section.overview && (
+          <div className="prose prose-invert max-w-none">
+            <div className="flex items-center gap-2 text-gray-400 mb-2">
+              <Info className="h-4 w-4" />
+              <span className="text-sm font-medium">Overview</span>
+            </div>
+            <p className="text-gray-300">{section.overview}</p>
+          </div>
+        )}
+
+        {/* Key Details Section */}
+        {section.key_details && section.key_details.length > 0 && (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-gray-400">
+              <TrendingUp className="h-4 w-4" />
+              <span className="text-sm font-medium">Key Details</span>
+            </div>
+            <ul className="space-y-2">
+              {(section.key_details as string[]).map((detail, index) => (
+                <li key={index} className="flex items-start gap-2 text-gray-300">
+                  <span className="text-siso-red">•</span>
+                  <span>{detail}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Main Content */}
         <div className="prose prose-invert max-w-none">
           <div dangerouslySetInnerHTML={{ __html: section.content }} />
         </div>
+
+        {/* Implications Section */}
+        {section.implications && section.implications.length > 0 && (
+          <div className="space-y-3 border-t border-white/10 pt-4">
+            <div className="flex items-center gap-2 text-gray-400">
+              <MessageSquare className="h-4 w-4" />
+              <span className="text-sm font-medium">Implications</span>
+            </div>
+            <ul className="space-y-2">
+              {(section.implications as string[]).map((implication, index) => (
+                <li key={index} className="flex items-start gap-2 text-gray-300">
+                  <span className="text-siso-orange">→</span>
+                  <span>{implication}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {/* Footer */}
         <div className="pt-4 flex items-center justify-between text-sm text-gray-400 border-t border-white/10">
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4" />
             {new Date(section.last_updated).toLocaleDateString()}
+            {section.reading_time_minutes && (
+              <>
+                <span className="mx-2">•</span>
+                <span className="flex items-center gap-1">
+                  <Clock className="h-4 w-4" />
+                  {section.reading_time_minutes} min read
+                </span>
+              </>
+            )}
           </div>
           <div className="flex items-center gap-3">
             {section.source_references && Object.entries(section.source_references).map(([key, value]) => (
@@ -290,3 +349,4 @@ export const EnhancedBlogLayout = ({
     </div>
   );
 };
+
