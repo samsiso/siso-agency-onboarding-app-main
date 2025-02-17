@@ -1,4 +1,3 @@
-
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { Toaster } from '@/components/ui/toaster';
@@ -29,6 +28,7 @@ import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import ThankYou from '@/pages/ThankYou';
 import SocialOnboarding from '@/pages/onboarding/social';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import DailyNews from '@/pages/DailyNews';
 
 function App() {
   const { user, loading } = useAuthSession();
@@ -160,6 +160,13 @@ function App() {
         <Route path="/thank-you" element={
           <ProtectedRoute>
             <ThankYou />
+          </ProtectedRoute>
+        } />
+
+        {/* Daily News Route */}
+        <Route path="/ai-news/daily/:date" element={
+          <ProtectedRoute>
+            <DailyNews />
           </ProtectedRoute>
         } />
 
