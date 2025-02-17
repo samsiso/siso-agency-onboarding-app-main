@@ -1,4 +1,3 @@
-
 import { motion } from 'framer-motion';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
@@ -84,103 +83,129 @@ const EventCard = ({ section }: { section: ArticleSection }) => {
       variants={cardVariants}
       initial="hidden"
       animate="visible"
-      whileHover={{ scale: 1.02 }}
+      whileHover={{ scale: 1.01 }}
       className={cn(
         "rounded-xl overflow-hidden backdrop-blur-sm border border-white/10",
         "bg-gradient-to-br",
         subsectionColors[section.subsection_type as keyof typeof subsectionColors] || subsectionColors.default
       )}
     >
-      <div className="p-6 space-y-4">
-        {/* Header */}
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
+      <div className="p-8 space-y-6">
+        {/* Header with increased spacing */}
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-center gap-4">
             <div className={cn(
-              "p-2 rounded-lg",
+              "p-3 rounded-lg",
               importanceColors[section.importance_level as keyof typeof importanceColors]
             )}>
-              <Icon className="h-5 w-5" />
+              <Icon className="h-6 w-6" />
             </div>
-            <h3 className="text-xl font-semibold text-white">{section.title}</h3>
+            <h3 className="text-2xl font-bold text-white tracking-tight">{section.title}</h3>
           </div>
           <Badge variant="outline" className={cn(
             complexityColors[section.technical_complexity],
-            "border text-xs"
+            "border text-sm px-3 py-1"
           )}>
             {section.technical_complexity}
           </Badge>
         </div>
 
-        {/* Overview Section */}
+        {/* Overview Section with larger text */}
         {section.overview && (
           <div className="prose prose-invert max-w-none">
-            <div className="flex items-center gap-2 text-gray-400 mb-2">
-              <Info className="h-4 w-4" />
-              <span className="text-sm font-medium">Overview</span>
+            <div className="flex items-center gap-3 mb-3">
+              <Info className="h-5 w-5 text-blue-400" />
+              <span className="text-base font-semibold text-blue-400">Overview</span>
             </div>
-            <p className="text-gray-300">{section.overview}</p>
+            <p className="text-lg leading-relaxed text-gray-200">{section.overview}</p>
           </div>
         )}
 
-        {/* Key Details Section */}
+        {/* Key Details Section with improved visibility */}
         {section.key_details && section.key_details.length > 0 && (
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 text-gray-400">
-              <TrendingUp className="h-4 w-4" />
-              <span className="text-sm font-medium">Key Details</span>
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <TrendingUp className="h-5 w-5 text-emerald-400" />
+              <span className="text-base font-semibold text-emerald-400">Key Details</span>
             </div>
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               {(section.key_details as string[]).map((detail, index) => (
-                <li key={index} className="flex items-start gap-2 text-gray-300">
-                  <span className="text-siso-red">•</span>
-                  <span>{detail}</span>
+                <li key={index} className="flex items-start gap-3 text-lg text-gray-200">
+                  <span className="text-emerald-400 mt-1.5">•</span>
+                  <span className="leading-relaxed">{detail}</span>
                 </li>
               ))}
             </ul>
           </div>
         )}
 
-        {/* Main Content */}
-        <div className="prose prose-invert max-w-none">
-          <div dangerouslySetInnerHTML={{ __html: section.content }} />
+        {/* Main Content with increased font size */}
+        <div className="prose prose-invert prose-lg max-w-none">
+          <div 
+            dangerouslySetInnerHTML={{ __html: section.content }}
+            className="text-gray-200 leading-relaxed"
+          />
         </div>
 
-        {/* Implications Section */}
+        {/* Implications Section with enhanced styling */}
         {section.implications && section.implications.length > 0 && (
-          <div className="space-y-3 border-t border-white/10 pt-4">
-            <div className="flex items-center gap-2 text-gray-400">
-              <MessageSquare className="h-4 w-4" />
-              <span className="text-sm font-medium">Implications</span>
+          <div className="space-y-4 border-t border-white/10 pt-6">
+            <div className="flex items-center gap-3">
+              <MessageSquare className="h-5 w-5 text-orange-400" />
+              <span className="text-base font-semibold text-orange-400">Implications & Impact</span>
             </div>
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               {(section.implications as string[]).map((implication, index) => (
-                <li key={index} className="flex items-start gap-2 text-gray-300">
-                  <span className="text-siso-orange">→</span>
-                  <span>{implication}</span>
+                <li key={index} className="flex items-start gap-3 text-lg text-gray-200">
+                  <span className="text-orange-400 mt-1.5">→</span>
+                  <span className="leading-relaxed">{implication}</span>
                 </li>
               ))}
             </ul>
           </div>
         )}
 
-        {/* Footer */}
-        <div className="pt-4 flex items-center justify-between text-sm text-gray-400 border-t border-white/10">
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4" />
-            {new Date(section.last_updated).toLocaleDateString()}
+        {/* Related Topics if available */}
+        {section.related_topics && section.related_topics.length > 0 && (
+          <div className="flex flex-wrap gap-2 border-t border-white/10 pt-6">
+            {section.related_topics.map((topic, index) => (
+              <Badge 
+                key={index}
+                variant="outline" 
+                className="bg-purple-500/10 text-purple-400 border-purple-500/20 px-3 py-1"
+              >
+                {topic}
+              </Badge>
+            ))}
+          </div>
+        )}
+
+        {/* Enhanced Footer with more metadata */}
+        <div className="pt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-sm text-gray-400 border-t border-white/10">
+          <div className="flex flex-wrap items-center gap-4">
+            <span className="flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              {new Date(section.last_updated).toLocaleDateString(undefined, {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })}
+            </span>
             {section.reading_time_minutes && (
-              <>
-                <span className="mx-2">•</span>
-                <span className="flex items-center gap-1">
-                  <Clock className="h-4 w-4" />
-                  {section.reading_time_minutes} min read
-                </span>
-              </>
+              <span className="flex items-center gap-2">
+                <Clock className="h-4 w-4" />
+                {section.reading_time_minutes} min read
+              </span>
+            )}
+            {section.category && (
+              <Badge variant="outline" className="bg-blue-500/10 text-blue-400">
+                {section.category}
+              </Badge>
             )}
           </div>
           <div className="flex items-center gap-3">
             {section.source_references && Object.entries(section.source_references).map(([key, value]) => (
-              <Badge key={key} variant="outline" className="bg-white/5">
+              <Badge key={key} variant="outline" className="bg-white/5 hover:bg-white/10 cursor-pointer transition-colors">
                 {key}
               </Badge>
             ))}
@@ -349,4 +374,3 @@ export const EnhancedBlogLayout = ({
     </div>
   );
 };
-
