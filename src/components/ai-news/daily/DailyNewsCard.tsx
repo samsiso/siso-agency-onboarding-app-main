@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -48,7 +49,13 @@ interface DailyNewsCardProps {
     technical_details?: Record<string, any>;
     source_credibility?: string;
     sources: { title: string; url: string }[];
-    comments?: any[];
+    comments?: Array<{
+      id: string;
+      content: string;
+      created_at: string;
+      user_email: string;
+      updated_at: string;
+    }>;
   };
 }
 
