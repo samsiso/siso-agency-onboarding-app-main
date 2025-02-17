@@ -1,13 +1,14 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, Image as ImageIcon } from 'lucide-react';
+import { Loader2, Plus, Image as ImageIcon, Calendar } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { format } from 'date-fns';
 
 interface TextOverlay {
   title: string;
@@ -22,9 +23,12 @@ interface BannerTemplate {
   is_default: boolean;
   template_type: string;
   text_overlay: TextOverlay;
+  metadata?: {
+    dateFormat?: string;
+    dynamicDate?: boolean;
+  };
   created_at?: string;
   updated_at?: string;
-  metadata?: unknown;
 }
 
 interface BannerTemplateResponse {
@@ -35,9 +39,9 @@ interface BannerTemplateResponse {
   is_default: boolean;
   template_type: string;
   text_overlay: unknown;
+  metadata: unknown;
   created_at: string;
   updated_at: string;
-  metadata: unknown;
 }
 
 export function BannerTemplatesDialog() {
@@ -53,6 +57,10 @@ export function BannerTemplatesDialog() {
     text_overlay: {
       title: '',
       subtitle: ''
+    },
+    metadata: {
+      dateFormat: 'MMMM d, yyyy',
+      dynamicDate: false
     }
   });
   const { toast } = useToast();
@@ -67,12 +75,12 @@ export function BannerTemplatesDialog() {
 
       if (error) throw error;
 
-      // Transform the response data to match our BannerTemplate interface
       const transformedTemplates: BannerTemplate[] = (data as BannerTemplateResponse[]).map(template => ({
         ...template,
         text_overlay: (typeof template.text_overlay === 'string' 
           ? JSON.parse(template.text_overlay)
-          : template.text_overlay) as TextOverlay
+          : template.text_overlay) as TextOverlay,
+        metadata: template.metadata as BannerTemplate['metadata']
       }));
 
       setTemplates(transformedTemplates);
@@ -107,6 +115,7 @@ export function BannerTemplatesDialog() {
           description: newTemplate.description,
           template_type: newTemplate.template_type,
           text_overlay: JSON.stringify(newTemplate.text_overlay),
+          metadata: newTemplate.metadata,
           is_default: false
         } as any)
         .select()
@@ -136,6 +145,10 @@ export function BannerTemplatesDialog() {
         text_overlay: {
           title: '',
           subtitle: ''
+        },
+        metadata: {
+          dateFormat: 'MMMM d, yyyy',
+          dynamicDate: false
         }
       });
     } catch (error) {
@@ -148,6 +161,15 @@ export function BannerTemplatesDialog() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const renderPreviewDate = (template: BannerTemplate) => {
+    if (template.metadata?.dynamicDate) {
+      const today = new Date();
+      const dateFormat = template.metadata.dateFormat || 'MMMM d, yyyy';
+      return format(today, dateFormat);
+    }
+    return template.text_overlay.subtitle;
   };
 
   return (
@@ -171,7 +193,6 @@ export function BannerTemplatesDialog() {
         </DialogHeader>
         
         <div className="space-y-6">
-          {/* Create New Template Form */}
           <div className="space-y-4 p-4 border rounded-lg">
             <h3 className="font-semibold">Create New Template</h3>
             <div className="space-y-2">
@@ -204,6 +225,41 @@ export function BannerTemplatesDialog() {
                 placeholder="SisoAI Daily Brief"
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="subtitle">Banner Subtitle</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="subtitle"
+                  value={newTemplate.text_overlay.subtitle}
+                  onChange={(e) => setNewTemplate({
+                    ...newTemplate,
+                    text_overlay: { ...newTemplate.text_overlay, subtitle: e.target.value }
+                  })}
+                  placeholder="March 28, 2024"
+                  disabled={newTemplate.metadata?.dynamicDate}
+                />
+                <Button
+                  variant="outline"
+                  size="icon"
+                  type="button"
+                  onClick={() => setNewTemplate({
+                    ...newTemplate,
+                    metadata: {
+                      ...newTemplate.metadata,
+                      dynamicDate: !newTemplate.metadata?.dynamicDate
+                    }
+                  })}
+                  className={newTemplate.metadata?.dynamicDate ? "bg-blue-500/10 text-blue-500" : ""}
+                >
+                  <Calendar className="h-4 w-4" />
+                </Button>
+              </div>
+              {newTemplate.metadata?.dynamicDate && (
+                <p className="text-sm text-muted-foreground">
+                  Dynamic date will be automatically inserted
+                </p>
+              )}
+            </div>
             <Button
               onClick={handleCreateTemplate}
               disabled={loading || !newTemplate.name}
@@ -213,7 +269,6 @@ export function BannerTemplatesDialog() {
             </Button>
           </div>
 
-          {/* Existing Templates List */}
           <div className="space-y-4">
             <h3 className="font-semibold">Existing Templates</h3>
             {loading ? (
@@ -231,6 +286,16 @@ export function BannerTemplatesDialog() {
                       <p className="font-medium">{template.name}</p>
                       <p className="text-sm text-gray-500">{template.description}</p>
                       <p className="text-sm text-gray-500">Title: {template.text_overlay.title}</p>
+                      {template.metadata?.dynamicDate ? (
+                        <p className="text-sm text-blue-500">
+                          <Calendar className="h-3 w-3 inline-block mr-1" />
+                          Dynamic date: {renderPreviewDate(template)}
+                        </p>
+                      ) : (
+                        <p className="text-sm text-gray-500">
+                          Subtitle: {template.text_overlay.subtitle}
+                        </p>
+                      )}
                     </div>
                     <div className="flex items-center gap-2">
                       {template.image_url ? (
