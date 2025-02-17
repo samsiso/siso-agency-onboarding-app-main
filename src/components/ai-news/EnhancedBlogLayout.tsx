@@ -1,4 +1,3 @@
-
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -15,6 +14,8 @@ import { motion } from 'framer-motion';
 import { EventCard } from './blog-layout/EventCard';
 import { complexityColors } from './blog-layout/constants';
 import { cn } from '@/lib/utils';
+import { ArticleTableOfContents } from './blog-layout/ArticleTableOfContents';
+import { useState, useEffect } from 'react';
 
 interface EnhancedBlogLayoutProps {
   article: EnhancedNewsItem;
@@ -28,12 +29,43 @@ export const EnhancedBlogLayout = ({
   onBookmark
 }: EnhancedBlogLayoutProps) => {
   const navigate = useNavigate();
+  const [activeSection, setActiveSection] = useState<string>();
 
   const sortedSections = [...article.sections].sort((a, b) => {
     if (a.importance_level === 'high' && b.importance_level !== 'high') return -1;
     if (a.importance_level !== 'high' && b.importance_level === 'high') return 1;
     return a.section_order - b.section_order;
   });
+
+  // [Analysis] Track which section is currently visible
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    // Observe key takeaways section
+    const keyTakeawaysElement = document.getElementById('key-takeaways');
+    if (keyTakeawaysElement) {
+      observer.observe(keyTakeawaysElement);
+    }
+
+    // Observe all content sections
+    sortedSections.forEach((section) => {
+      const element = document.getElementById(section.id);
+      if (element) {
+        observer.observe(element);
+      }
+    });
+
+    return () => observer.disconnect();
+  }, [sortedSections]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black">
@@ -113,57 +145,10 @@ export const EnhancedBlogLayout = ({
           </div>
 
           <div className="lg:col-span-4">
-            <div className="sticky top-8 space-y-8">
-              <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-6">
-                <h3 className="text-lg font-semibold mb-4 text-white">Table of Contents</h3>
-                <ScrollArea className="h-[300px]">
-                  <nav className="space-y-2">
-                    {article.table_of_contents.map((item) => (
-                      <a
-                        key={item.id}
-                        href={`#${item.id}`}
-                        className={cn(
-                          "block text-sm text-gray-400 hover:text-white transition-colors",
-                          item.level === 1 ? "font-medium" : "pl-4"
-                        )}
-                      >
-                        {item.title}
-                      </a>
-                    ))}
-                  </nav>
-                </ScrollArea>
-              </div>
-
-              <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-6">
-                <h3 className="text-lg font-semibold mb-4 text-white">Key Takeaways</h3>
-                <ul className="space-y-2">
-                  {article.key_takeaways.map((takeaway, index) => (
-                    <li key={index} className="text-sm text-gray-400">
-                      • {takeaway}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="flex gap-4">
-                <Button
-                  variant="outline"
-                  onClick={onShare}
-                  className="flex-1 border-white/10 bg-white/5 backdrop-blur-sm text-white hover:bg-white/10"
-                >
-                  <Share2 className="h-4 w-4 mr-2" />
-                  Share
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={onBookmark}
-                  className="flex-1 border-white/10 bg-white/5 backdrop-blur-sm text-white hover:bg-white/10"
-                >
-                  <BookmarkPlus className="h-4 w-4 mr-2" />
-                  Save
-                </Button>
-              </div>
-            </div>
+            <ArticleTableOfContents 
+              article={article}
+              activeSection={activeSection}
+            />
           </div>
         </div>
       </div>
