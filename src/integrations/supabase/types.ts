@@ -197,6 +197,13 @@ export type Database = {
             referencedRelation: "upcoming_posts"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "ai_news_bookmarks_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_scheduled_posts"
+            referencedColumns: ["id"]
+          },
         ]
       }
       ai_news_reactions: {
@@ -250,6 +257,13 @@ export type Database = {
             referencedRelation: "upcoming_posts"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "ai_news_reactions_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_scheduled_posts"
+            referencedColumns: ["id"]
+          },
         ]
       }
       ai_news_summaries: {
@@ -301,6 +315,13 @@ export type Database = {
             columns: ["news_id"]
             isOneToOne: true
             referencedRelation: "upcoming_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_summaries_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: true
+            referencedRelation: "upcoming_scheduled_posts"
             referencedColumns: ["id"]
           },
         ]
@@ -360,6 +381,13 @@ export type Database = {
             columns: ["article_id"]
             isOneToOne: false
             referencedRelation: "upcoming_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "article_reading_progress_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_scheduled_posts"
             referencedColumns: ["id"]
           },
         ]
@@ -454,6 +482,13 @@ export type Database = {
             referencedRelation: "upcoming_posts"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "article_sections_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_scheduled_posts"
+            referencedColumns: ["id"]
+          },
         ]
       }
       article_tags: {
@@ -504,6 +539,13 @@ export type Database = {
             referencedRelation: "upcoming_posts"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "article_tags_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_scheduled_posts"
+            referencedColumns: ["id"]
+          },
         ]
       }
       article_upvotes: {
@@ -552,6 +594,13 @@ export type Database = {
             columns: ["article_id"]
             isOneToOne: false
             referencedRelation: "upcoming_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "article_upvotes_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_scheduled_posts"
             referencedColumns: ["id"]
           },
         ]
@@ -1398,6 +1447,13 @@ export type Database = {
             referencedRelation: "upcoming_posts"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "news_ai_analysis_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_scheduled_posts"
+            referencedColumns: ["id"]
+          },
         ]
       }
       news_comments: {
@@ -1452,6 +1508,13 @@ export type Database = {
             columns: ["news_id"]
             isOneToOne: false
             referencedRelation: "upcoming_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "news_comments_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_scheduled_posts"
             referencedColumns: ["id"]
           },
         ]
@@ -3083,6 +3146,33 @@ export type Database = {
         Update: {
           banner_template_id?: string | null
           description?: string | null
+          id?: string | null
+          scheduled_for?: string | null
+          status?: string | null
+          title?: string | null
+        }
+        Relationships: []
+      }
+      upcoming_scheduled_posts: {
+        Row: {
+          banner_template_id: string | null
+          created_at: string | null
+          id: string | null
+          scheduled_for: string | null
+          status: string | null
+          title: string | null
+        }
+        Insert: {
+          banner_template_id?: string | null
+          created_at?: string | null
+          id?: string | null
+          scheduled_for?: string | null
+          status?: string | null
+          title?: string | null
+        }
+        Update: {
+          banner_template_id?: string | null
+          created_at?: string | null
           id?: string | null
           scheduled_for?: string | null
           status?: string | null
