@@ -55,6 +55,7 @@ interface DailyNewsCardProps {
       created_at: string;
       user_email: string;
       updated_at: string;
+      news_id: string;
     }>;
   };
 }
