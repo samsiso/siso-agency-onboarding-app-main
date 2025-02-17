@@ -43,9 +43,11 @@ export type Database = {
           slug: string | null
           source: string
           source_credibility: string | null
+          sources: Json | null
           status: string | null
           table_of_contents: Json | null
           tags: string[] | null
+          technical_analysis_id: string | null
           technical_complexity: string | null
           technical_details: Json | null
           title: string
@@ -86,9 +88,11 @@ export type Database = {
           slug?: string | null
           source: string
           source_credibility?: string | null
+          sources?: Json | null
           status?: string | null
           table_of_contents?: Json | null
           tags?: string[] | null
+          technical_analysis_id?: string | null
           technical_complexity?: string | null
           technical_details?: Json | null
           title: string
@@ -129,9 +133,11 @@ export type Database = {
           slug?: string | null
           source?: string
           source_credibility?: string | null
+          sources?: Json | null
           status?: string | null
           table_of_contents?: Json | null
           tags?: string[] | null
+          technical_analysis_id?: string | null
           technical_complexity?: string | null
           technical_details?: Json | null
           title?: string
@@ -145,6 +151,13 @@ export type Database = {
             columns: ["author_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_technical_analysis_id_fkey"
+            columns: ["technical_analysis_id"]
+            isOneToOne: false
+            referencedRelation: "news_ai_analysis"
             referencedColumns: ["id"]
           },
         ]

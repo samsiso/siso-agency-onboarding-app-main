@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -19,7 +20,8 @@ import {
   BarChart4,
   Lightbulb,
   ScrollText,
-  MessagesSquare
+  MessagesSquare,
+  Brain
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

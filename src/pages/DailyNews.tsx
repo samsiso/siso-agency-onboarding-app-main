@@ -1,3 +1,4 @@
+
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { format, addDays, subDays } from 'date-fns';
@@ -25,7 +26,14 @@ interface DailyNewsItem {
   key_takeaways: string[];
   reading_time: number;
   sources: { title: string; url: string }[];
-  technical_analysis_id?: string;
+  news_ai_analysis?: Array<{
+    key_insights: string[];
+    tech_predictions: string[];
+    market_impact: string;
+    business_implications: string;
+    related_technologies: string[];
+    confidence_score: number;
+  }>;
 }
 
 const DailyNews = () => {
@@ -54,7 +62,13 @@ const DailyNews = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data as DailyNewsItem[];
+      
+      // Transform the data to match our interface
+      return (data as any[]).map(item => ({
+        ...item,
+        sources: item.sources || [],
+        key_takeaways: item.key_takeaways || []
+      })) as DailyNewsItem[];
     },
   });
 
