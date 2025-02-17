@@ -73,10 +73,22 @@ function NewsCard({
           isCompact={isCompact}
         />
         <NewsCardContent
-          item={item}
-          summaries={summaries}
-          loadingSummaries={loadingSummaries}
+          title={item.title}
+          description={item.description}
+          date={item.date}
+          source={item.source || 'Unknown'}
+          impact={item.impact}
+          summary={summaries[item.id]}
+          loadingSummary={loadingSummaries[item.id]}
           onGenerateSummary={handleGenerateSummary}
+          newsId={item.id}
+          comments={item.comments}
+          readingTime={item.reading_time}
+          views={item.views}
+          bookmarks={item.bookmarks}
+          sourceCredibility={item.source_credibility}
+          technicalComplexity={item.technical_complexity}
+          articleType={item.article_type}
           isCompact={isCompact}
         />
       </div>
