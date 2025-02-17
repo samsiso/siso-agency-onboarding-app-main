@@ -23,6 +23,17 @@ export interface ArticleSection {
   created_at: string;
   updated_at: string;
   last_updated?: string;
+  // New fields matching our database schema
+  overview?: string;
+  key_details?: string[];
+  bullet_points?: string[];
+  implications?: string[];
+  related_topics?: string[];
+  key_figures?: Record<string, any>;
+  reading_time_minutes?: number;
+  category?: string;
+  is_featured?: boolean;
+  metadata?: Record<string, any>;
 }
 
 export interface ArticleTag {
