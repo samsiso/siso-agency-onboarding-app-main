@@ -8,7 +8,20 @@ import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { ChevronLeft, Calendar } from 'lucide-react';
 
-// [Analysis] Single article view with navigation to daily view
+// [Analysis] Define proper types for our article data
+interface Article {
+  id: string;
+  title: string;
+  description: string;
+  image_url?: string;
+  date: string;
+  category: string;
+  impact: string;
+  technical_complexity: string;
+  reading_time: number;
+  key_takeaways: string[];
+}
+
 const BlogPost = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -23,7 +36,7 @@ const BlogPost = () => {
         .single();
       
       if (error) throw error;
-      return data;
+      return data as Article; // Cast the response to our Article type
     },
   });
 
@@ -102,7 +115,7 @@ const BlogPost = () => {
                   </div>
                 </div>
                 
-                {article.key_takeaways && (
+                {Array.isArray(article.key_takeaways) && article.key_takeaways.length > 0 && (
                   <div className="bg-white/5 p-6 rounded-lg">
                     <h3 className="text-xl font-semibold text-white mb-4">Key Takeaways</h3>
                     <ul className="space-y-3">
