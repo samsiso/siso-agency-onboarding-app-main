@@ -15,7 +15,7 @@ serve(async (req) => {
   }
 
   try {
-    const { content, title, key_details, implications, section_id } = await req.json();
+    const { content, title, key_details, implications, section_id, news_id } = await req.json();
 
     // Initialize Supabase client
     const supabaseClient = createClient(
@@ -42,8 +42,8 @@ serve(async (req) => {
             content: `Title: ${title}\n\nContent: ${content}\n\nKey Details: ${key_details?.join('\n')}\n\nImplications: ${implications?.join('\n')}`
           }
         ],
-        temperature: 0.3, // Lower temperature for more consistent, structured output
-        response_format: { type: "json_object" } // Enforce JSON response format
+        temperature: 0.3,
+        response_format: { type: "json_object" }
       }),
     });
 
@@ -53,10 +53,8 @@ serve(async (req) => {
 
     const aiResponse = await response.json();
     
-    // Ensure we're getting valid JSON content
     let analysis;
     try {
-      // Handle both cases: direct JSON or JSON string within content
       analysis = typeof aiResponse.choices[0].message.content === 'string' 
         ? JSON.parse(aiResponse.choices[0].message.content)
         : aiResponse.choices[0].message.content;
@@ -66,7 +64,6 @@ serve(async (req) => {
       throw new Error('Invalid AI response format');
     }
 
-    // Validate the analysis object structure
     const requiredFields = ['key_insights', 'market_impact', 'tech_predictions', 'related_technologies', 'business_implications', 'confidence_score'];
     const missingFields = requiredFields.filter(field => !(field in analysis));
     
@@ -74,12 +71,13 @@ serve(async (req) => {
       throw new Error(`Missing required fields in analysis: ${missingFields.join(', ')}`);
     }
 
-    // Store analysis in Supabase
+    // Store analysis in Supabase with both section_id and news_id
     const { data, error } = await supabaseClient
       .from('news_ai_analysis')
       .upsert({
-        id: section_id, // Use section_id as the primary key
+        id: section_id,
         section_id,
+        news_id,
         key_insights: analysis.key_insights,
         market_impact: analysis.market_impact,
         tech_predictions: analysis.tech_predictions,

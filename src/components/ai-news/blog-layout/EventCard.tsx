@@ -75,7 +75,8 @@ export const EventCard = ({ section, index }: EventCardProps) => {
             title: section.title,
             key_details: section.key_details || [],
             implications: section.implications || [],
-            section_id: section.id
+            section_id: section.id,
+            news_id: section.article_id // Add the news_id from the section's article_id
           },
         });
 
