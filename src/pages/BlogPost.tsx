@@ -8,6 +8,7 @@ import { EnhancedBlogLayout } from '@/components/ai-news/EnhancedBlogLayout';
 import { useToast } from '@/hooks/use-toast';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { usePoints } from '@/hooks/usePoints';
+import { NewsCardComments } from '@/components/ai-news/NewsCardComments';
 import type { EnhancedNewsItem, ContentCategory, TechnicalComplexity, ArticleImpact } from '@/types/blog';
 
 const BlogPost = () => {
@@ -20,7 +21,7 @@ const BlogPost = () => {
   const { data: post, isLoading } = useQuery({
     queryKey: ['blog-post', id],
     queryFn: async () => {
-      // Fetch the main article data
+      // Fetch the main article data with comments
       const { data: articleData, error: articleError } = await supabase
         .from('ai_news')
         .select(`
@@ -43,6 +44,13 @@ const BlogPost = () => {
             id,
             tag,
             created_at
+          ),
+          news_comments (
+            id,
+            content,
+            created_at,
+            user_email,
+            updated_at
           )
         `)
         .eq('id', id)
@@ -53,25 +61,18 @@ const BlogPost = () => {
       // Transform the data to match our EnhancedNewsItem type
       const enhancedArticle: EnhancedNewsItem = {
         ...articleData,
-        // Explicitly cast the category to ContentCategory
         category: articleData.category as ContentCategory,
-        // Explicitly cast technical_complexity to TechnicalComplexity
         technical_complexity: (articleData.technical_complexity || 'intermediate') as TechnicalComplexity,
-        // Explicitly cast impact to ArticleImpact
         impact: (articleData.impact || 'medium') as ArticleImpact,
-        // Ensure all required fields are present with defaults if needed
         sections: articleData.article_sections?.map(section => ({
           ...section,
-          // Add new fields with proper types
           importance_level: section.importance_level || 'medium',
           subsection_type: section.subsection_type || 'overview',
-          // Ensure source_references is always an object
           source_references: typeof section.source_references === 'object' ? section.source_references || {} : {},
           section_order: section.section_order || section.order_index,
           last_updated: section.last_updated || section.updated_at
         })) || [],
         tags: articleData.article_tags || [],
-        // Ensure key_takeaways are always strings
         key_takeaways: Array.isArray(articleData.key_takeaways) 
           ? articleData.key_takeaways.map(item => String(item))
           : [],
@@ -94,68 +95,16 @@ const BlogPost = () => {
           : {},
         source_credibility: articleData.source_credibility || 'verified',
         estimated_reading_time: articleData.estimated_reading_time || 5,
-        views: articleData.views || 0
+        views: articleData.views || 0,
+        comments: (articleData.news_comments || []).map(comment => ({
+          ...comment,
+          news_id: id // Add news_id to each comment
+        }))
       };
 
       return enhancedArticle;
     },
   });
-
-  const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: post?.title,
-          text: post?.description,
-          url: window.location.href
-        });
-      } catch (error) {
-        // User canceled share
-        console.log('Share canceled');
-      }
-    } else {
-      // Fallback
-      toast({
-        title: "Share",
-        description: "Copy link: " + window.location.href,
-      });
-    }
-  };
-
-  const handleBookmark = async () => {
-    if (!user) {
-      toast({
-        title: "Authentication required",
-        description: "Please sign in to bookmark articles",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      const { error } = await supabase
-        .from('ai_news_bookmarks')
-        .insert([
-          {
-            news_id: id,
-            user_id: user.id
-          }
-        ]);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Article bookmarked successfully!",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: "Failed to bookmark article",
-        variant: "destructive"
-      });
-    }
-  };
 
   if (isLoading || !post) {
     return (
@@ -187,6 +136,15 @@ const BlogPost = () => {
             onShare={handleShare}
             onBookmark={handleBookmark}
           />
+          <div className="max-w-4xl mx-auto px-4 py-8">
+            <div className="bg-white/5 rounded-lg p-6 backdrop-blur-sm border border-white/10">
+              <h3 className="text-xl font-semibold text-white mb-6">Discussion</h3>
+              <NewsCardComments 
+                newsId={post.id}
+                comments={post.comments || []}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </SidebarProvider>
