@@ -13,6 +13,7 @@ export type Database = {
         Row: {
           article_type: string | null
           author_id: string | null
+          banner_template_id: string | null
           bookmarks: number | null
           category: string
           content: string | null
@@ -32,9 +33,11 @@ export type Database = {
           meta_keywords: string[] | null
           meta_title: string | null
           priority: number | null
+          publish_date: string | null
           reading_progress: number | null
           reading_time: number | null
           related_articles: string[] | null
+          scheduled_for: string | null
           seo_description: string | null
           share_count: number | null
           slug: string | null
@@ -53,6 +56,7 @@ export type Database = {
         Insert: {
           article_type?: string | null
           author_id?: string | null
+          banner_template_id?: string | null
           bookmarks?: number | null
           category: string
           content?: string | null
@@ -72,9 +76,11 @@ export type Database = {
           meta_keywords?: string[] | null
           meta_title?: string | null
           priority?: number | null
+          publish_date?: string | null
           reading_progress?: number | null
           reading_time?: number | null
           related_articles?: string[] | null
+          scheduled_for?: string | null
           seo_description?: string | null
           share_count?: number | null
           slug?: string | null
@@ -93,6 +99,7 @@ export type Database = {
         Update: {
           article_type?: string | null
           author_id?: string | null
+          banner_template_id?: string | null
           bookmarks?: number | null
           category?: string
           content?: string | null
@@ -112,9 +119,11 @@ export type Database = {
           meta_keywords?: string[] | null
           meta_title?: string | null
           priority?: number | null
+          publish_date?: string | null
           reading_progress?: number | null
           reading_time?: number | null
           related_articles?: string[] | null
+          scheduled_for?: string | null
           seo_description?: string | null
           share_count?: number | null
           slug?: string | null
@@ -181,6 +190,13 @@ export type Database = {
             referencedRelation: "mv_trending_articles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "ai_news_bookmarks_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_posts"
+            referencedColumns: ["id"]
+          },
         ]
       }
       ai_news_reactions: {
@@ -227,6 +243,13 @@ export type Database = {
             referencedRelation: "mv_trending_articles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "ai_news_reactions_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_posts"
+            referencedColumns: ["id"]
+          },
         ]
       }
       ai_news_summaries: {
@@ -271,6 +294,13 @@ export type Database = {
             columns: ["news_id"]
             isOneToOne: true
             referencedRelation: "mv_trending_articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_summaries_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: true
+            referencedRelation: "upcoming_posts"
             referencedColumns: ["id"]
           },
         ]
@@ -323,6 +353,13 @@ export type Database = {
             columns: ["article_id"]
             isOneToOne: false
             referencedRelation: "mv_trending_articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "article_reading_progress_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_posts"
             referencedColumns: ["id"]
           },
         ]
@@ -410,6 +447,13 @@ export type Database = {
             referencedRelation: "mv_trending_articles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "article_sections_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_posts"
+            referencedColumns: ["id"]
+          },
         ]
       }
       article_tags: {
@@ -453,6 +497,13 @@ export type Database = {
             referencedRelation: "mv_trending_articles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "article_tags_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_posts"
+            referencedColumns: ["id"]
+          },
         ]
       }
       article_upvotes: {
@@ -494,6 +545,13 @@ export type Database = {
             columns: ["article_id"]
             isOneToOne: false
             referencedRelation: "mv_trending_articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "article_upvotes_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_posts"
             referencedColumns: ["id"]
           },
         ]
@@ -622,6 +680,45 @@ export type Database = {
           platform?: string | null
           profile_image_url?: string | null
           setup_guide?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      banner_templates: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          is_default: boolean | null
+          metadata: Json | null
+          name: string
+          template_type: string | null
+          text_overlay: Json | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_default?: boolean | null
+          metadata?: Json | null
+          name: string
+          template_type?: string | null
+          text_overlay?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_default?: boolean | null
+          metadata?: Json | null
+          name?: string
+          template_type?: string | null
+          text_overlay?: Json | null
           updated_at?: string
         }
         Relationships: []
@@ -1294,6 +1391,13 @@ export type Database = {
             referencedRelation: "mv_trending_articles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "news_ai_analysis_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_posts"
+            referencedColumns: ["id"]
+          },
         ]
       }
       news_comments: {
@@ -1341,6 +1445,13 @@ export type Database = {
             columns: ["news_id"]
             isOneToOne: false
             referencedRelation: "mv_trending_articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "news_comments_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_posts"
             referencedColumns: ["id"]
           },
         ]
@@ -2952,6 +3063,33 @@ export type Database = {
         }
         Relationships: []
       }
+      upcoming_posts: {
+        Row: {
+          banner_template_id: string | null
+          description: string | null
+          id: string | null
+          scheduled_for: string | null
+          status: string | null
+          title: string | null
+        }
+        Insert: {
+          banner_template_id?: string | null
+          description?: string | null
+          id?: string | null
+          scheduled_for?: string | null
+          status?: string | null
+          title?: string | null
+        }
+        Update: {
+          banner_template_id?: string | null
+          description?: string | null
+          id?: string | null
+          scheduled_for?: string | null
+          status?: string | null
+          title?: string | null
+        }
+        Relationships: []
+      }
       user_crypto_history: {
         Row: {
           created_at: string | null
@@ -2985,6 +3123,10 @@ export type Database = {
         Returns: undefined
       }
       handle_single_page_app: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      publish_scheduled_posts: {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
