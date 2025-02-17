@@ -21,10 +21,12 @@ export type Database = {
           created_at: string
           date: string
           description: string
+          estimated_reading_time: number | null
           featured: boolean | null
           id: string
           image_url: string | null
           impact: string
+          key_takeaways: Json | null
           linkedin_url: string | null
           meta_description: string | null
           meta_keywords: string[] | null
@@ -42,6 +44,7 @@ export type Database = {
           table_of_contents: Json | null
           tags: string[] | null
           technical_complexity: string | null
+          technical_details: Json | null
           title: string
           updated_at: string
           upvotes: number | null
@@ -58,10 +61,12 @@ export type Database = {
           created_at?: string
           date: string
           description: string
+          estimated_reading_time?: number | null
           featured?: boolean | null
           id?: string
           image_url?: string | null
           impact: string
+          key_takeaways?: Json | null
           linkedin_url?: string | null
           meta_description?: string | null
           meta_keywords?: string[] | null
@@ -79,6 +84,7 @@ export type Database = {
           table_of_contents?: Json | null
           tags?: string[] | null
           technical_complexity?: string | null
+          technical_details?: Json | null
           title: string
           updated_at?: string
           upvotes?: number | null
@@ -95,10 +101,12 @@ export type Database = {
           created_at?: string
           date?: string
           description?: string
+          estimated_reading_time?: number | null
           featured?: boolean | null
           id?: string
           image_url?: string | null
           impact?: string
+          key_takeaways?: Json | null
           linkedin_url?: string | null
           meta_description?: string | null
           meta_keywords?: string[] | null
@@ -116,6 +124,7 @@ export type Database = {
           table_of_contents?: Json | null
           tags?: string[] | null
           technical_complexity?: string | null
+          technical_details?: Json | null
           title?: string
           updated_at?: string
           upvotes?: number | null
@@ -311,6 +320,110 @@ export type Database = {
           },
           {
             foreignKeyName: "article_reading_progress_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "mv_trending_articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      article_sections: {
+        Row: {
+          article_id: string | null
+          content: string
+          created_at: string
+          id: string
+          order_index: number
+          technical_complexity:
+            | Database["public"]["Enums"]["technical_complexity"]
+            | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          article_id?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          order_index: number
+          technical_complexity?:
+            | Database["public"]["Enums"]["technical_complexity"]
+            | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          article_id?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          order_index?: number
+          technical_complexity?:
+            | Database["public"]["Enums"]["technical_complexity"]
+            | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "article_sections_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "ai_news"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "article_sections_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "featured_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "article_sections_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "mv_trending_articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      article_tags: {
+        Row: {
+          article_id: string | null
+          created_at: string
+          id: string
+          tag: string
+        }
+        Insert: {
+          article_id?: string | null
+          created_at?: string
+          id?: string
+          tag: string
+        }
+        Update: {
+          article_id?: string | null
+          created_at?: string
+          id?: string
+          tag?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "article_tags_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "ai_news"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "article_tags_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "featured_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "article_tags_article_id_fkey"
             columns: ["article_id"]
             isOneToOne: false
             referencedRelation: "mv_trending_articles"
@@ -2867,6 +2980,13 @@ export type Database = {
       }
     }
     Enums: {
+      article_impact: "high" | "medium" | "low"
+      content_category:
+        | "breakthrough_technologies"
+        | "language_models"
+        | "robotics_automation"
+        | "industry_applications"
+        | "international_developments"
       doc_section_type:
         | "overview"
         | "features"
@@ -2919,6 +3039,7 @@ export type Database = {
         | "report_bug"
         | "promotional_share"
         | "article_upvote"
+      technical_complexity: "basic" | "intermediate" | "advanced" | "mixed"
       user_rank: "bronze" | "silver" | "gold" | "diamond"
     }
     CompositeTypes: {
