@@ -15,9 +15,14 @@ export interface ArticleSection {
   title: string;
   content: string;
   order_index: number;
+  section_order: number;
   technical_complexity: TechnicalComplexity;
+  importance_level: string;
+  subsection_type: string;
+  source_references: Record<string, any>;
   created_at: string;
   updated_at: string;
+  last_updated?: string;
 }
 
 export interface ArticleTag {

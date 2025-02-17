@@ -30,9 +30,14 @@ const BlogPost = () => {
             title,
             content,
             order_index,
+            section_order,
             technical_complexity,
+            importance_level,
+            subsection_type,
+            source_references,
             created_at,
-            updated_at
+            updated_at,
+            last_updated
           ),
           article_tags (
             id,
@@ -55,10 +60,18 @@ const BlogPost = () => {
         // Explicitly cast impact to ArticleImpact
         impact: (articleData.impact || 'medium') as ArticleImpact,
         // Ensure all required fields are present with defaults if needed
-        sections: articleData.article_sections || [],
+        sections: articleData.article_sections?.map(section => ({
+          ...section,
+          // Add new fields with proper types
+          importance_level: section.importance_level || 'medium',
+          subsection_type: section.subsection_type || 'overview',
+          source_references: section.source_references || {},
+          section_order: section.section_order || section.order_index,
+          last_updated: section.last_updated || section.updated_at
+        })) || [],
         tags: articleData.article_tags || [],
         key_takeaways: Array.isArray(articleData.key_takeaways) 
-          ? articleData.key_takeaways.map(item => String(item))
+          ? articleData.key_takeaways
           : [],
         related_articles: Array.isArray(articleData.related_articles) 
           ? articleData.related_articles.map((article: any) => ({
