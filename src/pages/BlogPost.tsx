@@ -11,12 +11,79 @@ import { usePoints } from '@/hooks/usePoints';
 import { NewsCardComments } from '@/components/ai-news/NewsCardComments';
 import type { EnhancedNewsItem, ContentCategory, TechnicalComplexity, ArticleImpact } from '@/types/blog';
 
+interface Comment {
+  id: string;
+  content: string;
+  created_at: string;
+  user_email: string;
+  updated_at: string;
+  news_id: string;
+}
+
 const BlogPost = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuthSession();
   const { awardPoints } = usePoints(user?.id);
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: post?.title,
+          text: post?.description,
+          url: window.location.href
+        });
+      } catch (error) {
+        // User canceled share
+        console.log('Share canceled');
+      }
+    } else {
+      // Fallback
+      toast({
+        title: "Share",
+        description: "Copy link: " + window.location.href,
+      });
+    }
+  };
+
+  const handleBookmark = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to bookmark articles",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('ai_news_bookmarks')
+        .insert([
+          {
+            news_id: id,
+            user_id: user.id
+          }
+        ]);
+
+      if (error) throw error;
+
+      await awardPoints('bookmark_article');
+      
+      toast({
+        title: "Success",
+        description: "Article bookmarked successfully!",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to bookmark article",
+        variant: "destructive"
+      });
+    }
+  };
 
   const { data: post, isLoading } = useQuery({
     queryKey: ['blog-post', id],
@@ -59,7 +126,7 @@ const BlogPost = () => {
       if (articleError) throw articleError;
 
       // Transform the data to match our EnhancedNewsItem type
-      const enhancedArticle: EnhancedNewsItem = {
+      const enhancedArticle = {
         ...articleData,
         category: articleData.category as ContentCategory,
         technical_complexity: (articleData.technical_complexity || 'intermediate') as TechnicalComplexity,
@@ -95,14 +162,18 @@ const BlogPost = () => {
           : {},
         source_credibility: articleData.source_credibility || 'verified',
         estimated_reading_time: articleData.estimated_reading_time || 5,
-        views: articleData.views || 0,
-        comments: (articleData.news_comments || []).map(comment => ({
-          ...comment,
-          news_id: id // Add news_id to each comment
-        }))
-      };
+        views: articleData.views || 0
+      } as EnhancedNewsItem;
 
-      return enhancedArticle;
+      const comments = (articleData.news_comments || []).map(comment => ({
+        ...comment,
+        news_id: id
+      }));
+
+      return {
+        ...enhancedArticle,
+        comments
+      };
     },
   });
 
