@@ -9,7 +9,6 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -17,13 +16,11 @@ serve(async (req) => {
   try {
     const { content, title, key_details, implications, section_id, news_id } = await req.json();
 
-    // Initialize Supabase client
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // [Analysis] Using GPT-4o-mini for cost-effective, fast analysis
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -35,7 +32,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are an AI technology analyst. Analyze the provided content and extract key insights, market impact, technological predictions, and business implications. Return ONLY a JSON object with no markdown formatting or additional text. The JSON should have this exact structure: {"key_insights": string[], "market_impact": string, "tech_predictions": string[], "related_technologies": string[], "business_implications": string, "confidence_score": number}'
+            content: 'You are an AI technology analyst. Analyze the provided content and extract key insights, market impact, technological predictions, and business implications. Return ONLY a JSON object with no markdown formatting or additional text. The confidence_score MUST be a number between 0 and 1. The JSON should have this exact structure: {"key_insights": string[], "market_impact": string, "tech_predictions": string[], "related_technologies": string[], "business_implications": string, "confidence_score": number}'
           },
           {
             role: 'user',
@@ -64,6 +61,7 @@ serve(async (req) => {
       throw new Error('Invalid AI response format');
     }
 
+    // Validate the analysis object structure
     const requiredFields = ['key_insights', 'market_impact', 'tech_predictions', 'related_technologies', 'business_implications', 'confidence_score'];
     const missingFields = requiredFields.filter(field => !(field in analysis));
     
@@ -71,7 +69,13 @@ serve(async (req) => {
       throw new Error(`Missing required fields in analysis: ${missingFields.join(', ')}`);
     }
 
-    // Store analysis in Supabase with both section_id and news_id
+    // Ensure confidence_score is within valid range
+    if (typeof analysis.confidence_score !== 'number' || analysis.confidence_score < 0 || analysis.confidence_score > 1) {
+      console.warn('Invalid confidence score, adjusting to valid range:', analysis.confidence_score);
+      analysis.confidence_score = Math.max(0, Math.min(1, Number(analysis.confidence_score) || 0.5));
+    }
+
+    // Store analysis in Supabase
     const { data, error } = await supabaseClient
       .from('news_ai_analysis')
       .upsert({
