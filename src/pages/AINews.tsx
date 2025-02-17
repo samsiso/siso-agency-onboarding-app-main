@@ -12,22 +12,12 @@ import { useToast } from '@/hooks/use-toast';
 // [Analysis] Lazy load components for better initial load performance
 const NewsHeader = lazy(() => import('@/components/ai-news/NewsHeader'));
 const NewsCategories = lazy(() => import('@/components/ai-news/NewsCategories'));
+const NewsTabs = lazy(() => import('@/components/ai-news/NewsTabs'));
 
 // [Analysis] Reusable loading components
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center p-8">
     <Loader2 className="h-6 w-6 animate-spin text-siso-red" />
-  </div>
-);
-
-const PageLoadingState = () => (
-  <div className="flex min-h-screen w-full bg-background">
-    <Sidebar />
-    <main className="flex-1 overflow-hidden">
-      <div className="flex items-center justify-center h-full">
-        <Loader2 className="h-8 w-8 animate-spin text-siso-red" />
-      </div>
-    </main>
   </div>
 );
 
@@ -42,7 +32,6 @@ const containerVariants = {
   }
 };
 
-// [Analysis] Renamed component but kept route compatibility
 const AINews = () => {
   const [selectedMonth, setSelectedMonth] = useState<string>('03');
   const [selectedYear, setSelectedYear] = useState<string>('2024');
@@ -61,6 +50,10 @@ const AINews = () => {
     loadMore,
     error
   } = useNewsItems(selectedCategory, postStatus);
+
+  // [Analysis] Extract featured articles for hero section
+  const featuredArticles = posts.filter(post => post.impact === 'high').slice(0, 3);
+  const regularArticles = posts.filter(post => post.impact !== 'high');
 
   if (error) {
     toast({
@@ -101,16 +94,60 @@ const AINews = () => {
                       onCategoryChange={setSelectedCategory}
                     />
 
-                    <NewsContent
-                      newsItems={posts}
-                      searchQuery={searchQuery}
+                    {/* Featured Articles Section */}
+                    {featuredArticles.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+                      >
+                        {featuredArticles.map((article, index) => (
+                          <motion.div
+                            key={article.id}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                            className={index === 0 ? "lg:col-span-2" : ""}
+                          >
+                            <NewsCard
+                              item={article}
+                              summaries={summaries}
+                              loadingSummaries={loadingSummaries}
+                              onGenerateSummary={generateSummary}
+                              isFeatured={true}
+                            />
+                          </motion.div>
+                        ))}
+                      </motion.div>
+                    )}
+
+                    {/* Regular Articles Tabs */}
+                    <NewsTabs
+                      latestItems={regularArticles}
+                      trendingItems={regularArticles.sort((a, b) => (b.views || 0) - (a.views || 0))}
+                      mostDiscussedItems={regularArticles.sort((a, b) => (b.comments?.length || 0) - (a.comments?.length || 0))}
                       summaries={summaries}
                       loadingSummaries={loadingSummaries}
                       onGenerateSummary={generateSummary}
-                      loading={loading}
-                      hasMore={hasMore}
-                      onLoadMore={loadMore}
                     />
+
+                    {/* Load More Section */}
+                    {hasMore && !loading && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="flex justify-center py-8"
+                      >
+                        <button
+                          onClick={loadMore}
+                          className="px-6 py-3 bg-siso-red/10 text-siso-red rounded-lg hover:bg-siso-red/20 transition-colors"
+                        >
+                          Load More Articles
+                        </button>
+                      </motion.div>
+                    )}
+
+                    {loading && <LoadingSpinner />}
                   </Suspense>
                 </motion.div>
               </div>

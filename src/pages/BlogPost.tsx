@@ -1,17 +1,17 @@
-
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Sidebar } from '@/components/Sidebar';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ThumbsUp, Share2 } from 'lucide-react';
+import { ArrowLeft, ThumbsUp, Share2, Clock, Eye, BookmarkPlus } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { useAuthSession } from '@/hooks/useAuthSession';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { usePoints } from '@/hooks/usePoints';
+import { motion } from 'framer-motion';
 
 const BlogPost = () => {
   const { id } = useParams();
@@ -20,7 +20,7 @@ const BlogPost = () => {
   const { user } = useAuthSession();
   const { awardPoints } = usePoints(user?.id);
 
-  // [Analysis] Fetch blog post with relations
+  // [Analysis] Fetch blog post with relations and additional metadata
   const { data: post, isLoading } = useQuery({
     queryKey: ['blog-post', id],
     queryFn: async () => {
@@ -28,7 +28,8 @@ const BlogPost = () => {
         .from('ai_news')
         .select(`
           *,
-          ai_news_summaries (summary)
+          ai_news_summaries (summary),
+          profiles (full_name, avatar_url)
         `)
         .eq('id', id)
         .single();
@@ -38,23 +39,46 @@ const BlogPost = () => {
     },
   });
 
-  // [Analysis] Track reading progress
+  // [Analysis] Track reading progress for better UX
+  const [readingProgress, setReadingProgress] = useState(0);
+
+  useEffect(() => {
+    const updateReadingProgress = () => {
+      const element = document.documentElement;
+      const totalHeight = element.scrollHeight - element.clientHeight;
+      const progress = (element.scrollTop / totalHeight) * 100;
+      setReadingProgress(progress);
+    };
+
+    window.addEventListener('scroll', updateReadingProgress);
+    return () => window.removeEventListener('scroll', updateReadingProgress);
+  }, []);
+
+  // [Analysis] Track article view and award points
   useEffect(() => {
     if (!user?.id || !id) return;
 
     const trackProgress = async () => {
-      const { error } = await supabase
-        .from('article_reading_progress')
-        .upsert({
-          article_id: id,
-          user_id: user.id,
-          progress: 0,
-          last_read_at: new Date().toISOString()
-        }, {
-          onConflict: 'article_id,user_id'
-        });
+      try {
+        await supabase
+          .from('article_reading_progress')
+          .upsert({
+            article_id: id,
+            user_id: user.id,
+            progress: 0,
+            last_read_at: new Date().toISOString()
+          }, {
+            onConflict: 'article_id,user_id'
+          });
 
-      if (error) {
+        // Increment view count
+        await supabase
+          .rpc('increment_article_views', { article_id: id });
+
+        // Award points for reading
+        await awardPoints('read_article');
+        
+      } catch (error) {
         console.error('Error tracking progress:', error);
       }
     };
@@ -132,6 +156,13 @@ const BlogPost = () => {
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
         <Sidebar />
+        
+        {/* Reading Progress Bar */}
+        <motion.div 
+          className="fixed top-0 left-0 right-0 h-1 bg-siso-red/20 z-50"
+          style={{ scaleX: readingProgress / 100 }}
+        />
+
         <div className="flex-1 p-4 md:p-8">
           <div className="max-w-4xl mx-auto">
             <Button
@@ -144,7 +175,7 @@ const BlogPost = () => {
             </Button>
 
             <article className="space-y-8">
-              {/* Header */}
+              {/* Enhanced Header */}
               <div className="space-y-4">
                 <div className="flex flex-wrap gap-2">
                   <Badge variant="outline" className="bg-siso-red/10 text-siso-red border-none">
@@ -153,23 +184,34 @@ const BlogPost = () => {
                   <Badge variant="outline" className="bg-siso-orange/10 text-siso-orange border-none">
                     {post.impact} Impact
                   </Badge>
+                  <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-none">
+                    {post.technical_complexity || 'Intermediate'} Level
+                  </Badge>
                 </div>
 
                 <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-siso-text-bold">
                   {post.title}
                 </h1>
 
-                {/* Meta info */}
+                {/* Enhanced Meta Info */}
                 <div className="flex items-center gap-4 text-sm text-siso-text/60">
                   <span>{new Date(post.date).toLocaleDateString()}</span>
                   <span>•</span>
                   <span>{post.source}</span>
                   <span>•</span>
-                  <span>{post.reading_time} min read</span>
+                  <span className="flex items-center gap-1">
+                    <Clock className="h-4 w-4" />
+                    {post.reading_time || 5} min read
+                  </span>
+                  <span>•</span>
+                  <span className="flex items-center gap-1">
+                    <Eye className="h-4 w-4" />
+                    {post.views || 0} views
+                  </span>
                 </div>
               </div>
 
-              {/* Featured image */}
+              {/* Featured Image */}
               {post.image_url && (
                 <div className="aspect-video relative overflow-hidden rounded-xl border border-siso-border">
                   <img
@@ -190,7 +232,7 @@ const BlogPost = () => {
                 )}
               </div>
 
-              {/* Actions */}
+              {/* Enhanced Actions */}
               <div className="flex items-center gap-4 pt-8 border-t border-siso-border">
                 <Button
                   variant="outline"
@@ -200,6 +242,7 @@ const BlogPost = () => {
                   <ThumbsUp className="h-4 w-4 mr-2" />
                   Upvote ({post.upvotes || 0})
                 </Button>
+                
                 <Button
                   variant="outline"
                   onClick={() => {
@@ -213,6 +256,14 @@ const BlogPost = () => {
                 >
                   <Share2 className="h-4 w-4 mr-2" />
                   Share
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  className="hover:bg-siso-red/10 hover:text-siso-red ml-auto"
+                >
+                  <BookmarkPlus className="h-4 w-4 mr-2" />
+                  Save for Later
                 </Button>
               </div>
             </article>

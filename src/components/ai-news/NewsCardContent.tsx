@@ -1,10 +1,12 @@
 
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
-import { Shield } from 'lucide-react';
+import { Shield, Clock, Eye, BookmarkPlus, MessageSquare } from 'lucide-react';
 import { ArticleMetadata } from './ArticleMetadata';
 import { ArticleActions } from './ArticleActions';
+import { useNavigate } from 'react-router-dom';
 
+// [Analysis] Added comprehensive type definitions for better maintainability
 interface NewsCardContentProps {
   title: string;
   description: string;
@@ -46,22 +48,29 @@ export const NewsCardContent = ({
   technicalComplexity = 'intermediate',
   articleType = 'news'
 }: NewsCardContentProps) => {
+  const navigate = useNavigate();
+
+  // [Analysis] Improved navigation to use React Router instead of window.open
   const handleClick = () => {
     if (onReadArticle) {
       onReadArticle();
     }
-    window.open(source, '_blank', 'noopener,noreferrer');
+    if (newsId) {
+      navigate(`/ai-news/${newsId}`);
+    } else {
+      window.open(source, '_blank', 'noopener,noreferrer');
+    }
   };
 
   return (
     <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       className={`flex flex-col h-full ${isCompact ? 'pl-0' : 'px-4'}`}
     >
       <div className="space-y-2 sm:space-y-3 mb-4">
-        {/* Article Type & Credibility */}
+        {/* Enhanced metadata badges */}
         <div className="flex items-center gap-2 flex-wrap mb-2">
           <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20 capitalize">
             {articleType}
@@ -72,12 +81,18 @@ export const NewsCardContent = ({
               Verified Source
             </Badge>
           )}
+          <Badge variant="outline" className="bg-purple-500/10 text-purple-500 border-purple-500/20">
+            <Clock className="h-3 w-3 mr-1" />
+            {readingTime} min read
+          </Badge>
         </div>
 
-        {/* Title */}
-        <button 
+        {/* Interactive title */}
+        <motion.button 
           onClick={handleClick}
           className="group block w-full text-left"
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.99 }}
         >
           <h2 className={`
             font-bold text-siso-text-bold group-hover:text-siso-red transition-colors
@@ -89,11 +104,11 @@ export const NewsCardContent = ({
           `}>
             {title}
           </h2>
-        </button>
+        </motion.button>
 
-        {/* Description */}
+        {/* Enhanced description with better visibility */}
         {!isCompact && (
-          <p className="text-sm sm:text-base text-siso-text/80 line-clamp-2 leading-relaxed max-w-[95%]">
+          <p className="text-sm sm:text-base text-siso-text/80 line-clamp-2 leading-relaxed max-w-[95%] bg-siso-bg-alt/50 p-2 rounded-md">
             {description}
           </p>
         )}
