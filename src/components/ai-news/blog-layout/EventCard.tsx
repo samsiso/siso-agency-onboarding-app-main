@@ -90,6 +90,17 @@ export const EventCard = ({ section, index }: EventCardProps) => {
         subsectionColors[section.subsection_type as keyof typeof subsectionColors] || subsectionColors.default
       )}
     >
+      {sectionType === 'research' && (
+        <div className="relative w-full h-[200px] overflow-hidden">
+          <img 
+            src="/lovable-uploads/05fd06bb-d4a1-4caf-81e9-3572f608b3a6.png"
+            alt="Deep Research Banner"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-900/90" />
+        </div>
+      )}
+
       <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-white/0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-[shimmer_2s_infinite]" />
 
       <div className="p-8 space-y-6 relative z-10">
