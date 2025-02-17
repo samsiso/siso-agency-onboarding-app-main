@@ -1,3 +1,4 @@
+
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -98,7 +99,6 @@ const BlogPost = () => {
             overview,
             key_details,
             implications,
-            related_topics,
             key_figures,
             reading_time_minutes,
             category,
@@ -144,7 +144,7 @@ const BlogPost = () => {
         key_details: section.key_details || [],
         bullet_points: [], // Default empty array since it's not in DB
         implications: section.implications || [],
-        related_topics: section.related_topics || [],
+        related_topics: [], // Default empty array since it's not in DB
         key_figures: section.key_figures || {},
         reading_time_minutes: section.reading_time_minutes || 5,
         category: section.category,
@@ -165,7 +165,7 @@ const BlogPost = () => {
         sections: transformedSections,
         tags: articleData.article_tags || [],
         key_takeaways: Array.isArray(articleData.key_takeaways) 
-          ? articleData.key_takeaways
+          ? articleData.key_takeaways.map(item => String(item))
           : [],
         related_articles: Array.isArray(articleData.related_articles) 
           ? articleData.related_articles.map((article: any) => ({
@@ -189,7 +189,7 @@ const BlogPost = () => {
         views: articleData.views || 0,
         image_url: articleData.image_url,
         source: articleData.source,
-        sources: Array.isArray(articleData.sources) ? articleData.sources : []
+        sources: Array.isArray(articleData.sources) ? articleData.sources.map(String) : []
       };
 
       const comments = (articleData.news_comments || []).map(comment => ({
