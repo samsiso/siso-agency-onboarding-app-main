@@ -35,36 +35,60 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are an AI technology analyst. Analyze the provided content and extract key insights, market impact, technological predictions, and business implications. Format your response as JSON with the following structure:
-            {
-              "key_insights": string[],
-              "market_impact": string,
-              "tech_predictions": string[],
-              "related_technologies": string[],
-              "business_implications": string,
-              "confidence_score": number
-            }`
+            content: 'You are an AI technology analyst. Analyze the provided content and extract key insights, market impact, technological predictions, and business implications. Return ONLY a JSON object with no markdown formatting or additional text. The JSON should have this exact structure: {"key_insights": string[], "market_impact": string, "tech_predictions": string[], "related_technologies": string[], "business_implications": string, "confidence_score": number}'
           },
           {
             role: 'user',
             content: `Title: ${title}\n\nContent: ${content}\n\nKey Details: ${key_details?.join('\n')}\n\nImplications: ${implications?.join('\n')}`
           }
         ],
+        temperature: 0.3, // Lower temperature for more consistent, structured output
+        response_format: { type: "json_object" } // Enforce JSON response format
       }),
     });
 
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${response.status} ${response.statusText}`);
+    }
+
     const aiResponse = await response.json();
-    const analysis = JSON.parse(aiResponse.choices[0].message.content);
+    
+    // Ensure we're getting valid JSON content
+    let analysis;
+    try {
+      // Handle both cases: direct JSON or JSON string within content
+      analysis = typeof aiResponse.choices[0].message.content === 'string' 
+        ? JSON.parse(aiResponse.choices[0].message.content)
+        : aiResponse.choices[0].message.content;
+    } catch (error) {
+      console.error('Error parsing AI response:', error);
+      console.error('Raw response:', aiResponse.choices[0].message.content);
+      throw new Error('Invalid AI response format');
+    }
+
+    // Validate the analysis object structure
+    const requiredFields = ['key_insights', 'market_impact', 'tech_predictions', 'related_technologies', 'business_implications', 'confidence_score'];
+    const missingFields = requiredFields.filter(field => !(field in analysis));
+    
+    if (missingFields.length > 0) {
+      throw new Error(`Missing required fields in analysis: ${missingFields.join(', ')}`);
+    }
 
     // Store analysis in Supabase
     const { data, error } = await supabaseClient
       .from('news_ai_analysis')
       .upsert({
+        id: section_id, // Use section_id as the primary key
         section_id,
-        ...analysis,
+        key_insights: analysis.key_insights,
+        market_impact: analysis.market_impact,
+        tech_predictions: analysis.tech_predictions,
+        related_technologies: analysis.related_technologies,
+        business_implications: analysis.business_implications,
+        confidence_score: analysis.confidence_score,
         updated_at: new Date().toISOString()
       }, {
-        onConflict: 'section_id'
+        onConflict: 'id'
       });
 
     if (error) {
