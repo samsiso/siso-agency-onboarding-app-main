@@ -53,10 +53,26 @@ const BlogPost = () => {
         // Ensure all required fields are present with defaults if needed
         sections: articleData.article_sections || [],
         tags: articleData.article_tags || [],
-        key_takeaways: articleData.key_takeaways || [],
-        related_articles: articleData.related_articles || [],
-        table_of_contents: articleData.table_of_contents || [],
-        technical_details: articleData.technical_details || {},
+        key_takeaways: Array.isArray(articleData.key_takeaways) 
+          ? articleData.key_takeaways 
+          : [],
+        related_articles: Array.isArray(articleData.related_articles) 
+          ? articleData.related_articles.map((article: any) => ({
+              id: article.id || '',
+              title: article.title || '',
+              description: article.description || ''
+            }))
+          : [],
+        table_of_contents: Array.isArray(articleData.table_of_contents)
+          ? articleData.table_of_contents.map((item: any) => ({
+              id: item.id || '',
+              title: item.title || '',
+              level: typeof item.level === 'number' ? item.level : 1
+            }))
+          : [],
+        technical_details: typeof articleData.technical_details === 'object' 
+          ? articleData.technical_details || {}
+          : {},
         source_credibility: articleData.source_credibility || 'verified',
         estimated_reading_time: articleData.estimated_reading_time || 5,
         views: articleData.views || 0
