@@ -333,7 +333,12 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          importance_level: string | null
+          last_updated: string | null
           order_index: number
+          section_order: number
+          source_references: Json | null
+          subsection_type: string | null
           technical_complexity:
             | Database["public"]["Enums"]["technical_complexity"]
             | null
@@ -345,7 +350,12 @@ export type Database = {
           content: string
           created_at?: string
           id?: string
+          importance_level?: string | null
+          last_updated?: string | null
           order_index: number
+          section_order?: number
+          source_references?: Json | null
+          subsection_type?: string | null
           technical_complexity?:
             | Database["public"]["Enums"]["technical_complexity"]
             | null
@@ -357,7 +367,12 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          importance_level?: string | null
+          last_updated?: string | null
           order_index?: number
+          section_order?: number
+          source_references?: Json | null
+          subsection_type?: string | null
           technical_complexity?:
             | Database["public"]["Enums"]["technical_complexity"]
             | null
