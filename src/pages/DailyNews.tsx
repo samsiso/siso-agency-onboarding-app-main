@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { format, addDays, subDays } from 'date-fns';
@@ -25,6 +24,8 @@ interface DailyNewsItem {
   source: string;
   key_takeaways: string[];
   reading_time: number;
+  sources: { title: string; url: string }[];
+  technical_analysis_id?: string;
 }
 
 const DailyNews = () => {
@@ -37,7 +38,18 @@ const DailyNews = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('ai_news')
-        .select('*, profiles:author_id(full_name, avatar_url)')
+        .select(`
+          *,
+          profiles:author_id(full_name, avatar_url),
+          news_ai_analysis(
+            key_insights,
+            tech_predictions,
+            market_impact,
+            business_implications,
+            related_technologies,
+            confidence_score
+          )
+        `)
         .eq('date', date)
         .order('created_at', { ascending: false });
 

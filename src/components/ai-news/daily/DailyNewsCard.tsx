@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -29,6 +28,7 @@ import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { AIAnalysisDialog } from '../AIAnalysisDialog';
 
 interface DailyNewsCardProps {
   article: {
@@ -45,6 +45,7 @@ interface DailyNewsCardProps {
     reading_time: number;
     technical_details?: Record<string, any>;
     source_credibility?: string;
+    sources: { title: string; url: string }[];
   };
 }
 
@@ -52,6 +53,7 @@ export const DailyNewsCard = ({ article }: DailyNewsCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showSources, setShowSources] = useState(false);
   const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [showAIAnalysis, setShowAIAnalysis] = useState(false);
 
   const getImpactColor = (impact: string) => {
     switch (impact.toLowerCase()) {
@@ -269,12 +271,12 @@ export const DailyNewsCard = ({ article }: DailyNewsCardProps) => {
               <AccordionTrigger className="hover:no-underline">
                 <div className="flex items-center gap-2">
                   <Link className="h-4 w-4 text-green-400" />
-                  <span>Primary Sources & References</span>
+                  <span>Sources & References</span>
                 </div>
               </AccordionTrigger>
               <AccordionContent>
                 <div className="space-y-2">
-                  {researchData.primarySources.map((source, index) => (
+                  {article.sources?.map((source, index) => (
                     <a
                       key={index}
                       href={source.url}
@@ -319,6 +321,23 @@ export const DailyNewsCard = ({ article }: DailyNewsCardProps) => {
                       variant="ghost"
                       size="sm"
                       className="text-white hover:bg-white/10"
+                      onClick={() => setShowAIAnalysis(true)}
+                    >
+                      <Brain className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>AI Analysis</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-white hover:bg-white/10"
                     >
                       <MessagesSquare className="h-4 w-4" />
                     </Button>
@@ -348,6 +367,11 @@ export const DailyNewsCard = ({ article }: DailyNewsCardProps) => {
           </div>
         </div>
       </motion.div>
+      <AIAnalysisDialog 
+        open={showAIAnalysis} 
+        onOpenChange={setShowAIAnalysis}
+        newsId={article.id}
+      />
     </Card>
   );
 };
