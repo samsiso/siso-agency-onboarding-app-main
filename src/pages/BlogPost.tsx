@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -99,7 +98,6 @@ const BlogPost = () => {
             overview,
             key_details,
             implications,
-            key_figures,
             reading_time_minutes,
             category,
             is_featured,
@@ -145,7 +143,7 @@ const BlogPost = () => {
         bullet_points: [], // Default empty array since it's not in DB
         implications: section.implications || [],
         related_topics: [], // Default empty array since it's not in DB
-        key_figures: section.key_figures || {},
+        key_figures: {}, // Default empty object since it's not in DB
         reading_time_minutes: section.reading_time_minutes || 5,
         category: section.category,
         is_featured: section.is_featured || false,
