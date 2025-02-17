@@ -20,10 +20,10 @@ interface EventCardProps {
 }
 
 export const EventCard = ({ section, index }: EventCardProps) => {
-  const [isExpanded, setIsExpanded] = useState(true);
-  const { toast } = useToast();
   const [hasReacted, setHasReacted] = useState(false);
+  const { toast } = useToast();
 
+  // [Analysis] Determine section type for icon selection
   const sectionType = section.title.toLowerCase().includes('research') ? 'research'
     : section.title.toLowerCase().includes('integration') ? 'integration'
     : section.title.toLowerCase().includes('medical') ? 'medical'
@@ -51,36 +51,56 @@ export const EventCard = ({ section, index }: EventCardProps) => {
     }
   };
 
-  // [Analysis] Fetch AI analysis for this section
+  // [Analysis] Fetch AI analysis for this section with proper error handling and type safety
   const { data: analysis, isLoading: isAnalysisLoading } = useQuery({
     queryKey: ['section-analysis', section.id],
     queryFn: async () => {
-      // First check if we have existing analysis
-      const { data: existingAnalysis } = await supabase
-        .from('news_ai_analysis')
-        .select('*')
-        .eq('section_id', section.id)
-        .single();
-
-      if (existingAnalysis) {
-        return existingAnalysis;
+      // Validate section ID
+      if (!section.id) {
+        throw new Error('Invalid section ID');
       }
 
-      // If no existing analysis, generate new one
-      const response = await supabase.functions.invoke('analyze-news', {
-        body: {
-          content: section.content,
-          title: section.title,
-          key_details: section.key_details,
-          implications: section.implications,
-          news_id: section.id,
-          section_id: section.id
-        },
-      });
+      try {
+        // First check if we have existing analysis
+        const { data: existingAnalysis, error: fetchError } = await supabase
+          .from('news_ai_analysis')
+          .select('*')
+          .eq('section_id', section.id)
+          .single();
 
-      if (response.error) throw response.error;
-      return response.data.analysis;
+        if (fetchError) {
+          console.error('Error fetching analysis:', fetchError);
+          throw fetchError;
+        }
+
+        if (existingAnalysis) {
+          return existingAnalysis;
+        }
+
+        // If no existing analysis, generate new one
+        const { data: analysisData, error: invokeError } = await supabase.functions.invoke('analyze-news', {
+          body: {
+            content: section.content,
+            title: section.title,
+            key_details: section.key_details || [],
+            implications: section.implications || [],
+            section_id: section.id
+          },
+        });
+
+        if (invokeError) {
+          console.error('Error invoking analyze-news:', invokeError);
+          throw invokeError;
+        }
+
+        return analysisData?.analysis;
+      } catch (error) {
+        console.error('Error in analysis flow:', error);
+        throw error;
+      }
     },
+    retry: 1, // Only retry once to avoid excessive API calls
+    enabled: !!section.id // Only run query if section.id exists
   });
 
   return (
