@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -31,6 +30,7 @@ import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { AIAnalysisDialog } from '../AIAnalysisDialog';
+import { NewsCardComments } from '../NewsCardComments';
 
 interface DailyNewsCardProps {
   article: {
@@ -48,6 +48,7 @@ interface DailyNewsCardProps {
     technical_details?: Record<string, any>;
     source_credibility?: string;
     sources: { title: string; url: string }[];
+    comments?: any[];
   };
 }
 
@@ -336,13 +337,12 @@ export const DailyNewsCard = ({ article }: DailyNewsCardProps) => {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-white hover:bg-white/10"
-                    >
-                      <MessagesSquare className="h-4 w-4" />
-                    </Button>
+                    <div className="relative">
+                      <NewsCardComments 
+                        newsId={article.id}
+                        comments={article.comments || []}
+                      />
+                    </div>
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>Discuss this research</p>
