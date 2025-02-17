@@ -65,13 +65,15 @@ const BlogPost = () => {
           // Add new fields with proper types
           importance_level: section.importance_level || 'medium',
           subsection_type: section.subsection_type || 'overview',
-          source_references: section.source_references || {},
+          // Ensure source_references is always an object
+          source_references: typeof section.source_references === 'object' ? section.source_references || {} : {},
           section_order: section.section_order || section.order_index,
           last_updated: section.last_updated || section.updated_at
         })) || [],
         tags: articleData.article_tags || [],
+        // Ensure key_takeaways are always strings
         key_takeaways: Array.isArray(articleData.key_takeaways) 
-          ? articleData.key_takeaways
+          ? articleData.key_takeaways.map(item => String(item))
           : [],
         related_articles: Array.isArray(articleData.related_articles) 
           ? articleData.related_articles.map((article: any) => ({
