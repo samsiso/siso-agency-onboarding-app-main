@@ -42,6 +42,15 @@ export interface ArticleTag {
   created_at: string;
 }
 
+export interface AIAnalysis {
+  key_insights: string[];
+  market_impact: string;
+  tech_predictions: string[];
+  related_technologies: string[];
+  confidence_score: number;
+  business_implications: string;
+}
+
 export interface EnhancedNewsItem {
   id: string;
   title: string;
@@ -70,5 +79,7 @@ export interface EnhancedNewsItem {
   image_url?: string;
   views: number;
   source: string;
-  sources: any[]; // Added this field
+  sources: any[];
+  ai_analysis: AIAnalysis | null;
 }
+

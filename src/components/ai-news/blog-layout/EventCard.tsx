@@ -1,4 +1,3 @@
-
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -7,7 +6,6 @@ import { ArticleSection } from '@/types/blog';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { sectionIcons, subsectionColors } from './constants';
-import { cardVariants } from './animations';
 import { CardHeader } from './components/CardHeader';
 import { KeyDetails } from './components/KeyDetails';
 import { AIAnalysis } from './components/AIAnalysis';
@@ -17,6 +15,18 @@ interface EventCardProps {
   section: ArticleSection;
   index: number;
 }
+
+// [Analysis] Added stagger effect for smoother content transitions
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5
+    }
+  }
+};
 
 export const EventCard = ({ section, index }: EventCardProps) => {
   const [hasReacted, setHasReacted] = useState(false);
