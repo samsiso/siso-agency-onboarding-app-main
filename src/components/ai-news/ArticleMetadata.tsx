@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 interface ArticleMetadataProps {
   date: string;
   source: string;
-  impact: string;
+  impact?: string;
   views?: number;
   bookmarks?: number;
   readingTime?: number;
@@ -19,7 +19,7 @@ interface ArticleMetadataProps {
 export const ArticleMetadata = ({
   date,
   source,
-  impact,
+  impact = 'medium', // Provide default value
   views = 0,
   bookmarks = 0,
   readingTime = 5,
@@ -28,8 +28,8 @@ export const ArticleMetadata = ({
   articleType = 'news',
   isCompact = false,
 }: ArticleMetadataProps) => {
-  const getImpactColor = (impact: string) => {
-    switch (impact.toLowerCase()) {
+  const getImpactColor = (impactLevel: string = 'medium') => {
+    switch (impactLevel.toLowerCase()) {
       case 'high':
         return 'bg-red-500/10 text-red-500 border-red-500/20';
       case 'medium':
@@ -41,7 +41,7 @@ export const ArticleMetadata = ({
     }
   };
 
-  const getTechComplexityColor = (complexity: string) => {
+  const getTechComplexityColor = (complexity: string = 'intermediate') => {
     switch (complexity.toLowerCase()) {
       case 'advanced':
         return 'bg-purple-500/10 text-purple-500 border-purple-500/20';

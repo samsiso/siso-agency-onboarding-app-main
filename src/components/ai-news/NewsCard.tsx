@@ -5,6 +5,7 @@ import { NewsCardContent } from './NewsCardContent';
 import { NewsCardMedia } from './NewsCardMedia';
 import { NewsCardComments } from './NewsCardComments';
 import { format } from 'date-fns';
+import { ArticleMetadata } from './ArticleMetadata';
 
 interface NewsCardProps {
   item: any;
@@ -41,9 +42,17 @@ function NewsCard({
           <p className="text-sm text-muted-foreground mb-4">
             {item.description}
           </p>
-          <NewsCardComments 
-            item={item}
-            className="mt-auto"
+          <ArticleMetadata
+            date={item.date}
+            source={item.source || 'Unknown'}
+            impact={item.impact}
+            views={item.views}
+            bookmarks={item.bookmarks}
+            readingTime={item.reading_time}
+            sourceCredibility={item.source_credibility}
+            technicalComplexity={item.technical_complexity}
+            articleType={item.article_type}
+            isCompact={true}
           />
         </div>
       </Card>
