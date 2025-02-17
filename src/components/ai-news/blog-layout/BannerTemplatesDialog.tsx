@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,11 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Plus, Image as ImageIcon } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
+interface TextOverlay {
+  title: string;
+  subtitle: string;
+}
+
 interface BannerTemplate {
   id: string;
   name: string;
@@ -15,19 +21,34 @@ interface BannerTemplate {
   image_url: string;
   is_default: boolean;
   template_type: string;
-  text_overlay: {
-    title: string;
-    subtitle: string;
-  };
+  text_overlay: TextOverlay;
+  created_at?: string;
+  updated_at?: string;
+  metadata?: unknown;
+}
+
+interface BannerTemplateResponse {
+  id: string;
+  name: string;
+  description: string;
+  image_url: string;
+  is_default: boolean;
+  template_type: string;
+  text_overlay: unknown;
+  created_at: string;
+  updated_at: string;
+  metadata: unknown;
 }
 
 export function BannerTemplatesDialog() {
   const [isOpen, setIsOpen] = useState(false);
   const [templates, setTemplates] = useState<BannerTemplate[]>([]);
   const [loading, setLoading] = useState(false);
-  const [newTemplate, setNewTemplate] = useState<Partial<BannerTemplate>>({
+  const [newTemplate, setNewTemplate] = useState<Omit<BannerTemplate, 'id'>>({
     name: '',
     description: '',
+    image_url: '',
+    is_default: false,
     template_type: 'daily_brief',
     text_overlay: {
       title: '',
@@ -45,7 +66,16 @@ export function BannerTemplatesDialog() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setTemplates(data || []);
+
+      // Transform the response data to match our BannerTemplate interface
+      const transformedTemplates: BannerTemplate[] = (data as BannerTemplateResponse[]).map(template => ({
+        ...template,
+        text_overlay: typeof template.text_overlay === 'string' 
+          ? JSON.parse(template.text_overlay)
+          : template.text_overlay as TextOverlay
+      }));
+
+      setTemplates(transformedTemplates);
     } catch (error) {
       console.error('Error fetching templates:', error);
       toast({
@@ -59,25 +89,49 @@ export function BannerTemplatesDialog() {
   };
 
   const handleCreateTemplate = async () => {
+    if (!newTemplate.name) {
+      toast({
+        title: "Error",
+        description: "Template name is required",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       setLoading(true);
       const { data, error } = await supabase
         .from('banner_templates')
-        .insert([newTemplate])
+        .insert({
+          name: newTemplate.name,
+          description: newTemplate.description,
+          template_type: newTemplate.template_type,
+          text_overlay: newTemplate.text_overlay,
+          is_default: false
+        })
         .select()
         .single();
 
       if (error) throw error;
+
+      const transformedTemplate: BannerTemplate = {
+        ...data,
+        text_overlay: typeof data.text_overlay === 'string'
+          ? JSON.parse(data.text_overlay)
+          : data.text_overlay as TextOverlay
+      };
 
       toast({
         title: "Success",
         description: "Banner template created successfully",
       });
 
-      setTemplates([data, ...templates]);
+      setTemplates([transformedTemplate, ...templates]);
       setNewTemplate({
         name: '',
         description: '',
+        image_url: '',
+        is_default: false,
         template_type: 'daily_brief',
         text_overlay: {
           title: '',
@@ -142,7 +196,7 @@ export function BannerTemplatesDialog() {
               <Label htmlFor="title">Banner Title</Label>
               <Input
                 id="title"
-                value={newTemplate.text_overlay?.title}
+                value={newTemplate.text_overlay.title}
                 onChange={(e) => setNewTemplate({
                   ...newTemplate,
                   text_overlay: { ...newTemplate.text_overlay, title: e.target.value }
