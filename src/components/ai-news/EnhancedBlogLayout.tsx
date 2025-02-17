@@ -9,7 +9,7 @@ import {
   BookmarkPlus, 
   ChevronLeft,
   Globe,
-  Robot,
+  Bot,
   Microscope,
   Network,
   Heart,
@@ -31,7 +31,7 @@ const sectionIcons = {
   'research': Microscope,
   'integration': Network,
   'medical': Heart,
-  'robotics': Robot,
+  'robotics': Bot,
   'international': Globe,
   'default': ExternalLink
 };
