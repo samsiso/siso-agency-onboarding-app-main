@@ -3,7 +3,6 @@ import { memo } from 'react';
 import { Card } from "@/components/ui/card";
 import { NewsCardContent } from './NewsCardContent';
 import { NewsCardMedia } from './NewsCardMedia';
-import { NewsCardComments } from './NewsCardComments';
 import { format } from 'date-fns';
 import { ArticleMetadata } from './ArticleMetadata';
 
@@ -26,6 +25,11 @@ function NewsCard({
 }: NewsCardProps) {
   const formattedDate = format(new Date(item.date), 'MMMM d, yyyy');
   const isDailyBrief = item.template_type === 'daily_brief';
+
+  // [Analysis] Handler to ensure correct function signature
+  const handleGenerateSummary = () => {
+    onGenerateSummary(item.id);
+  };
 
   if (isDailyBrief) {
     return (
@@ -72,7 +76,7 @@ function NewsCard({
           item={item}
           summaries={summaries}
           loadingSummaries={loadingSummaries}
-          onGenerateSummary={onGenerateSummary}
+          onGenerateSummary={handleGenerateSummary}
           isCompact={isCompact}
         />
       </div>

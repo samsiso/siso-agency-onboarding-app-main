@@ -5,6 +5,7 @@ import { NewsTabContent } from './NewsTabContent';
 import { memo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { format, subWeeks, startOfWeek, endOfWeek } from 'date-fns';
+import NewsCard from './NewsCard';
 
 interface NewsTabsProps {
   latestItems: any[];
@@ -38,6 +39,11 @@ const NewsTabs = memo(({
   const dailyBriefs = latestItems.filter(item => item.template_type === 'daily_brief');
   const filteredDailyBriefs = filterItemsByDateRange(dailyBriefs);
   const otherNews = latestItems.filter(item => item.template_type !== 'daily_brief');
+
+  // [Analysis] Handler to ensure correct function signature propagation
+  const handleGenerateSummary = (id: string) => {
+    onGenerateSummary(id);
+  };
 
   return (
     <Tabs defaultValue="latest" className="w-full">
@@ -88,7 +94,7 @@ const NewsTabs = memo(({
               item={item}
               summaries={summaries}
               loadingSummaries={loadingSummaries}
-              onGenerateSummary={onGenerateSummary}
+              onGenerateSummary={handleGenerateSummary}
               isCompact={true}
             />
           ))}
@@ -100,7 +106,7 @@ const NewsTabs = memo(({
           items={otherNews}
           summaries={summaries}
           loadingSummaries={loadingSummaries}
-          onGenerateSummary={onGenerateSummary}
+          onGenerateSummary={handleGenerateSummary}
         />
       </TabsContent>
 
@@ -109,7 +115,7 @@ const NewsTabs = memo(({
           items={trendingItems}
           summaries={summaries}
           loadingSummaries={loadingSummaries}
-          onGenerateSummary={onGenerateSummary}
+          onGenerateSummary={handleGenerateSummary}
         />
       </TabsContent>
 
@@ -118,7 +124,7 @@ const NewsTabs = memo(({
           items={mostDiscussedItems}
           summaries={summaries}
           loadingSummaries={loadingSummaries}
-          onGenerateSummary={onGenerateSummary}
+          onGenerateSummary={handleGenerateSummary}
         />
       </TabsContent>
     </Tabs>
