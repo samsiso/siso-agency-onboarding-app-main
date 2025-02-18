@@ -9,8 +9,7 @@ import {
   Bot,
   Wrench,
   Users,
-  Newspaper,
-  Coins
+  Newspaper
 } from 'lucide-react';
 import { MenuSection } from './types';
 
@@ -55,7 +54,7 @@ export const menuSections: MenuSection[] = [
     items: [
       {
         href: '/economy/crypto-exchange',
-        icon: Coins,
+        icon: Network,
         label: 'Crypto Exchange',
       },
       {
@@ -77,4 +76,3 @@ export const menuSections: MenuSection[] = [
     label: 'AI News',
   }
 ];
-

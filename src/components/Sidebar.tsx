@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { SidebarLogo } from './sidebar/SidebarLogo';
 import { SidebarNavigation } from './sidebar/SidebarNavigation';
 import { SidebarFooter } from './sidebar/SidebarFooter';
@@ -15,42 +14,39 @@ export const Sidebar = () => {
   const [showNavigation, setShowNavigation] = useState(true);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
   const isMobile = useIsMobile();
 
-  // [Analysis] Simplified navigation handler to work with all route types
   const handleItemClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     const href = e.currentTarget.getAttribute('href');
     
     if (!href) return;
 
-    // [Analysis] Handle both anchor links and route navigation
-    if (href.startsWith('#')) {
-      const element = document.querySelector(href);
-      if (element) {
-        element.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
-      }
-    } else {
-      // [Analysis] Use absolute path for navigation to ensure consistent routing
+    if (href.startsWith('/')) {
       navigate(href);
+      if (isMobile) {
+        setIsMobileMenuOpen(false);
+      }
+      return;
     }
 
-    // Close mobile menu after navigation
-    if (isMobile) {
-      setIsMobileMenuOpen(false);
+    const element = document.querySelector(href);
+    if (element) {
+      element.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+      if (isMobile) {
+        setIsMobileMenuOpen(false);
+      }
     }
   };
 
-  // [Analysis] Reset mobile menu state on route change
   useEffect(() => {
     if (isMobile) {
       setIsMobileMenuOpen(false);
     }
-  }, [location.pathname, isMobile]);
+  }, [location.pathname]);
 
   const sidebarVariants = {
     expanded: {
@@ -73,6 +69,7 @@ export const Sidebar = () => {
     }
   };
 
+  // [Analysis] Keep sidebar expanded when profile is open
   const handleMouseEnter = () => {
     if (!isMobile && !isProfileOpen) {
       setIsExpanded(true);
@@ -87,6 +84,7 @@ export const Sidebar = () => {
 
   return (
     <>
+      {/* Mobile Menu Button with smooth icon transition */}
       {isMobile && (
         <motion.div
           initial={false}
@@ -118,6 +116,7 @@ export const Sidebar = () => {
         </motion.div>
       )}
 
+      {/* Sidebar with improved animations */}
       <motion.div 
         initial={false}
         animate={
@@ -156,6 +155,7 @@ export const Sidebar = () => {
         />
       </motion.div>
 
+      {/* Main Content Wrapper with smooth margin transition */}
       <motion.div 
         className="min-h-screen"
         animate={{
@@ -167,18 +167,20 @@ export const Sidebar = () => {
           damping: 25
         }}
       >
-        {isMobile && isMobileMenuOpen && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30"
-            onClick={() => setIsMobileMenuOpen(false)}
-          />
-        )}
+        {/* Mobile Overlay with improved backdrop blur */}
+        <AnimatePresence>
+          {isMobile && isMobileMenuOpen && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30"
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+          )}
+        </AnimatePresence>
       </motion.div>
     </>
   );
 };
-
