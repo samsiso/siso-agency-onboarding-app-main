@@ -57,6 +57,19 @@ const AINews = () => {
     new Date(post.date).toDateString() === today.toDateString()
   );
 
+  // [Analysis] Separate daily briefs from regular posts
+  const dailyBriefs = todayPosts.filter(post => post.template_type === 'daily_brief');
+  const featuredDailyBrief = dailyBriefs[0]; // Most recent daily brief
+
+  // [Analysis] Group remaining posts by category
+  const categorizedPosts = todayPosts.reduce((acc, post) => {
+    if (!acc[post.category]) {
+      acc[post.category] = [];
+    }
+    acc[post.category].push(post);
+    return acc;
+  }, {} as Record<string, typeof posts>);
+
   const handleDateChange = (direction: 'prev' | 'next') => {
     const currentDate = new Date();
     const newDate = direction === 'prev' 
@@ -123,13 +136,13 @@ const AINews = () => {
                       </Button>
                     </div>
 
-                    {/* Today's Featured Articles */}
-                    {todayPosts.length > 0 && (
+                    {/* Featured Daily Brief */}
+                    {featuredDailyBrief && (
                       <div className="mb-8">
-                        <h2 className="text-2xl font-bold mb-4 text-siso-text">Today's AI Highlights</h2>
+                        <h2 className="text-2xl font-bold mb-4 text-siso-text">Today's AI Briefing</h2>
                         <div className="bg-gradient-to-r from-siso-red/10 to-siso-orange/10 p-6 rounded-lg">
                           <NewsContent
-                            newsItems={todayPosts}
+                            newsItems={[featuredDailyBrief]}
                             summaries={summaries}
                             loadingSummaries={loadingSummaries}
                             onGenerateSummary={generateSummary}
@@ -140,6 +153,26 @@ const AINews = () => {
                         </div>
                       </div>
                     )}
+
+                    {/* Categorized News Sections */}
+                    {Object.entries(categorizedPosts).map(([category, items]) => (
+                      <div key={category} className="mb-8">
+                        <h2 className="text-xl font-semibold mb-4 text-siso-text capitalize">
+                          {category.replace('_', ' ')}
+                        </h2>
+                        <div className="bg-siso-bg-alt/50 p-6 rounded-lg">
+                          <NewsContent
+                            newsItems={items}
+                            summaries={summaries}
+                            loadingSummaries={loadingSummaries}
+                            onGenerateSummary={generateSummary}
+                            searchQuery={searchQuery}
+                            loading={loading}
+                            hasMore={false}
+                          />
+                        </div>
+                      </div>
+                    ))}
 
                     <NewsCategories
                       selectedCategory={selectedCategory}

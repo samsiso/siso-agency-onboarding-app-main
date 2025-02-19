@@ -72,8 +72,14 @@ export const useNewsItems = (
       // [Analysis] Check if we have more items to load
       setHasMore(data && data.length === PAGE_SIZE);
       
+      // [Analysis] Transform data to include template_type if not present
+      const transformedData = data?.map(item => ({
+        ...item,
+        template_type: item.template_type || 'article'
+      })) || [];
+      
       // [Analysis] Append new items to existing ones for infinite scroll
-      setNewsItems(prev => page === 0 ? data || [] : [...prev, ...(data || [])]);
+      setNewsItems(prev => page === 0 ? transformedData : [...prev, ...transformedData]);
 
       const { data: summariesData, error: summariesError } = await supabase
         .from('ai_news_summaries')
