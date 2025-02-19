@@ -46,38 +46,29 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: Navigatio
     }
   };
 
-  // [Analysis] Enhanced route matching logic for all navigation types
-  const isItemActive = (href: string) => {
+  // [Analysis] Improved route matching with exact and nested route handling
+  const isItemActive = (href: string, isMainRoute: boolean = false) => {
     // Handle hash-based navigation
     if (href.startsWith('#')) {
       return href === activeSection;
     }
 
-    // Get current path segments
-    const currentPathSegments = location.pathname
-      .split('/')
-      .filter(Boolean);
+    // Remove trailing slashes for consistency
+    const currentPath = location.pathname.replace(/\/$/, '');
+    const targetPath = href.replace(/\/$/, '');
 
-    // Get href path segments
-    const hrefSegments = href
-      .split('/')
-      .filter(Boolean);
-
-    // For main routes (like /ai-news), do an exact match
-    if (hrefSegments.length === 1) {
-      return currentPathSegments[0] === hrefSegments[0];
+    // For main routes like /ai-news, match both exact and child routes
+    if (isMainRoute) {
+      return currentPath === targetPath || currentPath.startsWith(targetPath + '/');
     }
 
-    // For nested routes (like /economy/earn)
-    // Check if current path starts with the href segments
-    return hrefSegments.every((segment, index) => 
-      currentPathSegments[index] === segment
-    );
+    // For section items (like /tools), use exact matching
+    return currentPath === targetPath;
   };
 
   // [Analysis] Debug route matching
   console.log('Current pathname:', location.pathname);
-  console.log('Current segments:', location.pathname.split('/').filter(Boolean));
+  console.log('Target route matching:', location.pathname.replace(/\/$/, ''));
 
   return (
     <motion.nav
@@ -100,7 +91,7 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: Navigatio
                 section={section}
                 collapsed={collapsed}
                 onItemClick={onItemClick}
-                isItemActive={isItemActive}
+                isItemActive={(href) => isItemActive(href, section.type === 'main')}
               />
             </motion.div>
           ))}
