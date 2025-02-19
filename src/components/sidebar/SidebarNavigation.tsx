@@ -11,24 +11,27 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: Navigatio
   const location = useLocation();
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
+  // [Analysis] Only use IntersectionObserver for hash-based navigation
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(`#${entry.target.id}`);
-          }
-        });
-      },
-      { threshold: 0.5 }
-    );
+    if (location.hash) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setActiveSection(`#${entry.target.id}`);
+            }
+          });
+        },
+        { threshold: 0.5 }
+      );
 
-    document.querySelectorAll('section[id]').forEach((section) => {
-      observer.observe(section);
-    });
+      document.querySelectorAll('section[id]').forEach((section) => {
+        observer.observe(section);
+      });
 
-    return () => observer.disconnect();
-  }, []);
+      return () => observer.disconnect();
+    }
+  }, [location.hash]);
 
   if (!visible) return null;
 
@@ -43,11 +46,21 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: Navigatio
     }
   };
 
+  // [Analysis] Improved route matching logic
   const isItemActive = (href: string) => {
+    // Handle hash-based navigation
     if (href.startsWith('#')) {
       return href === activeSection;
     }
-    return location.pathname === href;
+
+    // Normalize paths by removing leading and trailing slashes
+    const normalizedHref = href.replace(/^\/+|\/+$/g, '');
+    const normalizedPathname = location.pathname.replace(/^\/+|\/+$/g, '');
+
+    // Check if the current path starts with the href (for nested routes)
+    // or if they match exactly
+    return normalizedPathname === normalizedHref ||
+           normalizedPathname.startsWith(normalizedHref + '/');
   };
 
   return (
