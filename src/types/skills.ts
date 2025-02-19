@@ -7,6 +7,11 @@ export interface SkillPath {
   level: number;
 }
 
+export interface SkillRequirements {
+  description: string;
+  external_url?: string;
+}
+
 export interface Skill {
   id: string;
   path_id: string;
@@ -16,9 +21,7 @@ export interface Skill {
   level: number;
   prerequisites: string[];
   cooldown_minutes: number | null;
-  requirements: {
-    description: string;
-  };
+  requirements: SkillRequirements;
 }
 
 export interface UserSkillProgress {

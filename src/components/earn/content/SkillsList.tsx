@@ -41,8 +41,9 @@ export const SkillsList = ({
     }
 
     // [Analysis] Check if this is an external resource
-    if (skill.requirements?.external_url) {
-      onExternalLinkClick?.(skill.requirements.external_url);
+    const externalUrl = skill.requirements?.external_url;
+    if (externalUrl) {
+      onExternalLinkClick?.(externalUrl);
       return;
     }
 
@@ -123,7 +124,7 @@ export const SkillsList = ({
               <div className="space-y-4">
                 {pathSkills.map(skill => {
                   const status = getSkillStatus(skill);
-                  const isExternalResource = !!skill.requirements?.external_url;
+                  const hasExternalUrl = !!skill.requirements?.external_url;
                   
                   return (
                     <div
@@ -156,8 +157,8 @@ export const SkillsList = ({
                           onClick={() => handleSkillAction(skill)}
                           className="flex items-center gap-2"
                         >
-                          {isExternalResource && <ExternalLink className="h-4 w-4" />}
-                          {isExternalResource ? 'Open Resource' : 
+                          {hasExternalUrl && <ExternalLink className="h-4 w-4" />}
+                          {hasExternalUrl ? 'Open Resource' : 
                             status === 'completed' ? 'Complete Again' : 'Complete'}
                         </Button>
                       </div>
