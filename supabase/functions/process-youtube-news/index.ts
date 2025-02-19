@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
@@ -8,26 +7,34 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // [Analysis] CORS handling for preflight requests
+  // [Analysis] Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { videoId, transcript } = await req.json();
+    const { videoId } = await req.json();
 
-    if (!videoId || !transcript) {
-      throw new Error('VideoId and transcript are required');
+    if (!videoId) {
+      throw new Error('VideoId is required');
     }
 
-    // [Analysis] Process transcript in chunks to avoid token limits
+    // [Analysis] First fetch video captions
+    const transcript = await fetchVideoTranscript(videoId);
+    
+    if (!transcript) {
+      throw new Error('No transcript available for this video');
+    }
+
+    // [Analysis] Process transcript into news segments
     const segments = await identifyNewsSegments(transcript);
     
-    // [Analysis] Store results in Supabase for each identified segment
+    // [Analysis] Store results in Supabase
     const processedSegments = await processSegments(videoId, segments);
 
     return new Response(JSON.stringify({ 
       success: true, 
+      transcript,
       segments: processedSegments 
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -44,6 +51,59 @@ serve(async (req) => {
     });
   }
 });
+
+async function fetchVideoTranscript(videoId: string): Promise<string | null> {
+  try {
+    // [Analysis] First get video details including caption tracks
+    const videoDetailsResponse = await fetch(
+      `https://www.googleapis.com/youtube/v3/videos?` +
+      `part=snippet,contentDetails&id=${videoId}&` +
+      `key=${Deno.env.get('YOUTUBE_API_KEY')}`
+    );
+
+    const videoDetails = await videoDetailsResponse.json();
+    
+    // [Analysis] Get caption tracks for the video
+    const captionsResponse = await fetch(
+      `https://www.googleapis.com/youtube/v3/captions?` +
+      `part=snippet&videoId=${videoId}&` +
+      `key=${Deno.env.get('YOUTUBE_API_KEY')}`
+    );
+
+    const captionsData = await captionsResponse.json();
+    console.log('Captions data:', captionsData);
+
+    if (!captionsData.items || captionsData.items.length === 0) {
+      throw new Error('No captions found for this video');
+    }
+
+    // [Analysis] Get English captions preferably
+    const captionTrack = captionsData.items.find(
+      (track: any) => track.snippet.language === 'en'
+    ) || captionsData.items[0];
+
+    // [Analysis] Fetch the actual transcript
+    const transcriptResponse = await fetch(
+      `https://www.googleapis.com/youtube/v3/captions/${captionTrack.id}?` +
+      `key=${Deno.env.get('YOUTUBE_API_KEY')}`, {
+      headers: {
+        'Accept': 'text/plain'
+      }
+    });
+
+    if (!transcriptResponse.ok) {
+      console.error('Transcript fetch error:', await transcriptResponse.text());
+      throw new Error('Failed to fetch transcript');
+    }
+
+    const transcript = await transcriptResponse.text();
+    return transcript;
+
+  } catch (error) {
+    console.error('Error fetching transcript:', error);
+    return null;
+  }
+}
 
 async function identifyNewsSegments(transcript: string) {
   // [Analysis] Use gpt-4o-mini for faster processing and cost efficiency
