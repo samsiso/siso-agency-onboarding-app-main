@@ -10,7 +10,7 @@ interface FeaturedNewsHeroProps {
   onGenerateSummary: (id: string) => void;
 }
 
-export const FeaturedNewsHero = ({ item, onGenerateSummary }: FeaturedNewsHeroProps) => {
+const FeaturedNewsHero = ({ item, onGenerateSummary }: FeaturedNewsHeroProps) => {
   if (!item) return null;
 
   // [Analysis] Enhanced visual hierarchy with gradient overlay and backdrop blur
@@ -159,3 +159,5 @@ export const FeaturedNewsHero = ({ item, onGenerateSummary }: FeaturedNewsHeroPr
     </motion.div>
   );
 };
+
+export default FeaturedNewsHero;
