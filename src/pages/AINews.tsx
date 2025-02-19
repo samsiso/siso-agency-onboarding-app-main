@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 
 const NewsHeader = lazy(() => import('@/components/ai-news/NewsHeader'));
 const NewsCategories = lazy(() => import('@/components/ai-news/NewsCategories'));
+const FeaturedNewsHero = lazy(() => import('@/components/ai-news/FeaturedNewsHero'));
 
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center p-8">
@@ -135,23 +136,11 @@ const AINews = () => {
                       </Button>
                     </div>
 
-                    {/* Featured Daily Brief */}
-                    {featuredDailyBrief && (
-                      <div className="mb-8">
-                        <h2 className="text-2xl font-bold mb-4 text-siso-text">Today's AI Briefing</h2>
-                        <div className="bg-gradient-to-r from-siso-red/10 to-siso-orange/10 p-6 rounded-lg">
-                          <NewsContent
-                            newsItems={[featuredDailyBrief]}
-                            summaries={summaries}
-                            loadingSummaries={loadingSummaries}
-                            onGenerateSummary={generateSummary}
-                            searchQuery={searchQuery}
-                            loading={loading}
-                            hasMore={false}
-                          />
-                        </div>
-                      </div>
-                    )}
+                    {/* Featured Impact Summary */}
+                    <FeaturedNewsHero 
+                      item={featuredDailyBrief}
+                      onGenerateSummary={generateSummary}
+                    />
 
                     {/* Categorized News Sections */}
                     {Object.entries(categorizedPosts).map(([category, items]) => (
@@ -177,21 +166,6 @@ const AINews = () => {
                       selectedCategory={selectedCategory}
                       onCategoryChange={setSelectedCategory}
                     />
-
-                    {/* All News Articles */}
-                    <div className="mt-8">
-                      <h2 className="text-xl font-semibold mb-4 text-siso-text">Browse All AI News</h2>
-                      <NewsContent
-                        newsItems={posts}
-                        summaries={summaries}
-                        loadingSummaries={loadingSummaries}
-                        onGenerateSummary={generateSummary}
-                        searchQuery={searchQuery}
-                        loading={loading}
-                        hasMore={hasMore}
-                        onLoadMore={loadMore}
-                      />
-                    </div>
 
                     {loading && <LoadingSpinner />}
                   </Suspense>
