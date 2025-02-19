@@ -1,10 +1,26 @@
-
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { format, parseISO } from 'date-fns';
 
-// [Analysis] Added status type for draft/published filtering
+// [Analysis] Added types for news items
+type NewsItem = {
+  id: string;
+  title: string;
+  description: string;
+  content: string;
+  date: string;
+  category: string;
+  article_type: string;
+  created_at: string;
+  author_id: string;
+  profiles?: {
+    full_name: string;
+    avatar_url: string;
+  };
+  // ... other properties
+};
+
 type PostStatus = 'all' | 'draft' | 'published';
 
 export const useNewsItems = (
@@ -12,7 +28,7 @@ export const useNewsItems = (
   status: PostStatus = 'published',
   selectedDate?: string
 ) => {
-  const [newsItems, setNewsItems] = useState<any[]>([]);
+  const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [summaries, setSummaries] = useState<Record<string, string>>({});
   const [loadingSummaries, setLoadingSummaries] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
@@ -20,7 +36,6 @@ export const useNewsItems = (
   const [hasMore, setHasMore] = useState(true);
   const { toast } = useToast();
 
-  // [Analysis] Added pagination config
   const PAGE_SIZE = 12;
   const [page, setPage] = useState(0);
 
@@ -41,7 +56,6 @@ export const useNewsItems = (
         .order('date', { ascending: false })
         .order('created_at', { ascending: false });
 
-      // [Analysis] Added status filtering
       if (status !== 'all') {
         query = query.eq('status', status);
       }
@@ -50,12 +64,10 @@ export const useNewsItems = (
         query = query.eq('category', selectedCategory);
       }
 
-      // [Analysis] Added date filtering
       if (selectedDate) {
         query = query.eq('date', selectedDate);
       }
 
-      // [Analysis] Add pagination only if not filtering by date
       if (!selectedDate) {
         query = query.range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
       }
@@ -69,16 +81,14 @@ export const useNewsItems = (
 
       console.log('Fetched blog posts:', data?.length);
 
-      // [Analysis] Check if we have more items to load
       setHasMore(data && data.length === PAGE_SIZE);
       
-      // [Analysis] Transform data to include template_type if not present
+      // [Analysis] Use article_type instead of template_type
       const transformedData = data?.map(item => ({
         ...item,
-        template_type: item.template_type || 'article'
+        article_type: item.article_type || 'article'
       })) || [];
       
-      // [Analysis] Append new items to existing ones for infinite scroll
       setNewsItems(prev => page === 0 ? transformedData : [...prev, ...transformedData]);
 
       const { data: summariesData, error: summariesError } = await supabase

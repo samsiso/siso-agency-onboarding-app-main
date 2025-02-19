@@ -1,4 +1,3 @@
-
 import { useState, Suspense, lazy } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { SidebarProvider } from '@/components/ui/sidebar';
@@ -57,18 +56,18 @@ const AINews = () => {
     new Date(post.date).toDateString() === today.toDateString()
   );
 
-  // [Analysis] Separate daily briefs from regular posts
-  const dailyBriefs = todayPosts.filter(post => post.template_type === 'daily_brief');
+  // [Analysis] Separate daily briefs from regular posts using article_type
+  const dailyBriefs = todayPosts.filter(post => post.article_type === 'daily_brief');
   const featuredDailyBrief = dailyBriefs[0]; // Most recent daily brief
 
-  // [Analysis] Group remaining posts by category
-  const categorizedPosts = todayPosts.reduce((acc, post) => {
+  // [Analysis] Group remaining posts by category with proper typing
+  const categorizedPosts = todayPosts.reduce<Record<string, typeof posts>>((acc, post) => {
     if (!acc[post.category]) {
       acc[post.category] = [];
     }
     acc[post.category].push(post);
     return acc;
-  }, {} as Record<string, typeof posts>);
+  }, {});
 
   const handleDateChange = (direction: 'prev' | 'next') => {
     const currentDate = new Date();
