@@ -12,6 +12,7 @@ import { Sidebar } from '@/components/Sidebar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNewsItems } from '@/hooks/useNewsItems';
 import { NewsContent } from '@/components/ai-news/NewsContent';
+import DailyStatsOverview from '@/components/ai-news/DailyStatsOverview';
 
 const DailyNews = () => {
   const { date } = useParams();
@@ -131,6 +132,13 @@ const DailyNews = () => {
               </div>
             </div>
           </div>
+
+          {/* Stats Overview Section */}
+          {!loading && newsItems.length > 0 && (
+            <div className="mt-6">
+              <DailyStatsOverview newsItems={newsItems} />
+            </div>
+          )}
 
           {/* Main Content with Improved Layout */}
           <div className="mt-6">
