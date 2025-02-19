@@ -1,5 +1,11 @@
 
+# project_id must be the first line
 project_id = "fzuwsjxjymwcjsbpwfsl"
-[db_config]
-port = 54322
-shadow_port = 54320
+
+[[functions]]
+name = "process-youtube-news"
+verify_jwt = false
+
+[[functions]]
+name = "sync-youtube-channels"
+verify_jwt = false

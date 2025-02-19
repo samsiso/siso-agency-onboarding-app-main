@@ -219,6 +219,45 @@ export type Database = {
           },
         ]
       }
+      ai_news_channels: {
+        Row: {
+          channel_id: string
+          channel_name: string
+          channel_url: string
+          content_quality_score: number | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          last_sync_at: string | null
+          sync_frequency_minutes: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          channel_id: string
+          channel_name: string
+          channel_url: string
+          content_quality_score?: number | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          sync_frequency_minutes?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          channel_id?: string
+          channel_name?: string
+          channel_url?: string
+          content_quality_score?: number | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          sync_frequency_minutes?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       ai_news_reactions: {
         Row: {
           created_at: string | null
@@ -420,6 +459,96 @@ export type Database = {
             columns: ["source_id"]
             isOneToOne: false
             referencedRelation: "ai_news_youtube_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_news_video_segments: {
+        Row: {
+          channel_id: string
+          confidence_score: number | null
+          created_at: string | null
+          description: string | null
+          end_time: number
+          id: string
+          news_article_id: string | null
+          processed_at: string | null
+          source_urls: string[] | null
+          start_time: number
+          technical_complexity: string | null
+          title: string | null
+          topic_tags: string[] | null
+          transcript_text: string
+          video_id: string
+        }
+        Insert: {
+          channel_id: string
+          confidence_score?: number | null
+          created_at?: string | null
+          description?: string | null
+          end_time: number
+          id?: string
+          news_article_id?: string | null
+          processed_at?: string | null
+          source_urls?: string[] | null
+          start_time: number
+          technical_complexity?: string | null
+          title?: string | null
+          topic_tags?: string[] | null
+          transcript_text: string
+          video_id: string
+        }
+        Update: {
+          channel_id?: string
+          confidence_score?: number | null
+          created_at?: string | null
+          description?: string | null
+          end_time?: number
+          id?: string
+          news_article_id?: string | null
+          processed_at?: string | null
+          source_urls?: string[] | null
+          start_time?: number
+          technical_complexity?: string | null
+          title?: string | null
+          topic_tags?: string[] | null
+          transcript_text?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_news_video_segments_news_article_id_fkey"
+            columns: ["news_article_id"]
+            isOneToOne: false
+            referencedRelation: "ai_news"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_video_segments_news_article_id_fkey"
+            columns: ["news_article_id"]
+            isOneToOne: false
+            referencedRelation: "featured_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_video_segments_news_article_id_fkey"
+            columns: ["news_article_id"]
+            isOneToOne: false
+            referencedRelation: "mv_trending_articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_video_segments_news_article_id_fkey"
+            columns: ["news_article_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_video_segments_news_article_id_fkey"
+            columns: ["news_article_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_scheduled_posts"
             referencedColumns: ["id"]
           },
         ]
