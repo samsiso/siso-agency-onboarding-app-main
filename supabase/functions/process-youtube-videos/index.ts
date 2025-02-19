@@ -1,17 +1,11 @@
 
 import { createClient } from '@supabase/supabase-js'
-import { Configuration, OpenAIApi } from 'openai';
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
-
-// Initialize OpenAI
-const configuration = new Configuration({
-  apiKey: Deno.env.get('OPENAI_API_KEY'),
-});
-const openai = new OpenAIApi(configuration);
 
 // Create Supabase client
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -19,38 +13,58 @@ const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function generateArticleContent(videoMetadata: any) {
-  const prompt = `
-    Create a detailed AI news article based on this YouTube video:
-    Title: ${videoMetadata.title}
-    Description: ${videoMetadata.description}
+  const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+  
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a knowledgeable AI news article writer who creates detailed and engaging content about AI technology.'
+          },
+          {
+            role: 'user',
+            content: `Create a detailed AI news article based on this YouTube video:
+              Title: ${videoMetadata.title}
+              Description: ${videoMetadata.description}
 
-    Generate a comprehensive article that includes:
-    1. An engaging title
-    2. A brief description
-    3. Key technical insights
-    4. Industry impact analysis
-    5. Future implications
+              Generate a comprehensive article that includes:
+              1. An engaging title
+              2. A brief description
+              3. Key technical insights
+              4. Industry impact analysis
+              5. Future implications
 
-    Format the response as a JSON object with the following structure:
-    {
-      "title": "Enhanced title",
-      "description": "Brief overview",
-      "content": "Main article content with proper formatting",
-      "technical_complexity": "basic|intermediate|advanced",
-      "impact": "low|medium|high",
-      "category": "industry_applications|breakthrough_technologies|language_models|robotics_automation|international_developments"
-    }
-  `;
+              Format the response as a JSON object with the following structure:
+              {
+                "title": "Enhanced title",
+                "description": "Brief overview",
+                "content": "Main article content with proper formatting",
+                "technical_complexity": "basic|intermediate|advanced",
+                "impact": "low|medium|high",
+                "category": "industry_applications|breakthrough_technologies|language_models|robotics_automation|international_developments"
+              }`
+          }
+        ]
+      }),
+    });
 
-  const completion = await openai.createChatCompletion({
-    model: "gpt-4",
-    messages: [{ role: "user", content: prompt }],
-  });
-
-  return JSON.parse(completion.data.choices[0].message?.content || '{}');
+    const data = await response.json();
+    return JSON.parse(data.choices[0].message.content);
+  } catch (error) {
+    console.error('Error generating article content:', error);
+    throw error;
+  }
 }
 
-Deno.serve(async (req) => {
+serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
