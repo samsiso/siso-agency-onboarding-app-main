@@ -33,7 +33,7 @@ async function fetchYouTubeTranscript(videoId: string) {
 }
 
 async function identifyNewsSegments(transcript: string) {
-  // Use OpenAI to identify distinct news stories in the transcript
+  // [Analysis] Updated to use the specified gpt-4o-mini-2024-07-18 model
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -41,7 +41,7 @@ async function identifyNewsSegments(transcript: string) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: "gpt-4",
+      model: "gpt-4o-mini-2024-07-18", // Updated model
       messages: [{
         role: "system",
         content: "You are an AI news analyzer. Identify distinct AI news stories from video transcripts. For each story, extract: title, description, start/end timestamps, technical complexity, and topic tags."
