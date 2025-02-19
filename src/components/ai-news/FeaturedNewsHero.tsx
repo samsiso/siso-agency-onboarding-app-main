@@ -1,4 +1,3 @@
-
 import { motion } from 'framer-motion';
 import { NewsCardMedia } from './NewsCardMedia';
 import { Badge } from '@/components/ui/badge';
@@ -11,10 +10,7 @@ interface FeaturedNewsHeroProps {
 }
 
 const FeaturedNewsHero = ({ item, onGenerateSummary }: FeaturedNewsHeroProps) => {
-  if (!item) return null;
-
-  // [Analysis] Enhanced visual hierarchy with gradient overlay and backdrop blur
-  return (
+  if (!item) return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
