@@ -46,22 +46,38 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: Navigatio
     }
   };
 
-  // [Analysis] Improved route matching logic
+  // [Analysis] Enhanced route matching logic for all navigation types
   const isItemActive = (href: string) => {
     // Handle hash-based navigation
     if (href.startsWith('#')) {
       return href === activeSection;
     }
 
-    // Normalize paths by removing leading and trailing slashes
-    const normalizedHref = href.replace(/^\/+|\/+$/g, '');
-    const normalizedPathname = location.pathname.replace(/^\/+|\/+$/g, '');
+    // Get current path segments
+    const currentPathSegments = location.pathname
+      .split('/')
+      .filter(Boolean);
 
-    // Check if the current path starts with the href (for nested routes)
-    // or if they match exactly
-    return normalizedPathname === normalizedHref ||
-           normalizedPathname.startsWith(normalizedHref + '/');
+    // Get href path segments
+    const hrefSegments = href
+      .split('/')
+      .filter(Boolean);
+
+    // For main routes (like /ai-news), do an exact match
+    if (hrefSegments.length === 1) {
+      return currentPathSegments[0] === hrefSegments[0];
+    }
+
+    // For nested routes (like /economy/earn)
+    // Check if current path starts with the href segments
+    return hrefSegments.every((segment, index) => 
+      currentPathSegments[index] === segment
+    );
   };
+
+  // [Analysis] Debug route matching
+  console.log('Current pathname:', location.pathname);
+  console.log('Current segments:', location.pathname.split('/').filter(Boolean));
 
   return (
     <motion.nav
