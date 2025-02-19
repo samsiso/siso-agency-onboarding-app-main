@@ -23,7 +23,7 @@ async function generateArticleContent(videoMetadata: any) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4',
         messages: [
           {
             role: 'system',
@@ -52,11 +52,16 @@ async function generateArticleContent(videoMetadata: any) {
                 "category": "industry_applications|breakthrough_technologies|language_models|robotics_automation|international_developments"
               }`
           }
-        ]
+        ],
+        temperature: 0.7,
+        max_tokens: 2000
       }),
     });
 
     const data = await response.json();
+    if (!data.choices?.[0]?.message?.content) {
+      throw new Error('Invalid response from OpenAI API');
+    }
     return JSON.parse(data.choices[0].message.content);
   } catch (error) {
     console.error('Error generating article content:', error);
@@ -79,7 +84,9 @@ serve(async (req) => {
 
     if (fetchError) throw fetchError;
 
-    for (const video of pendingVideos) {
+    console.log(`Found ${pendingVideos?.length || 0} pending videos to process`);
+
+    for (const video of pendingVideos || []) {
       console.log(`Processing video: ${video.video_id}`);
 
       try {
@@ -105,6 +112,8 @@ serve(async (req) => {
           .single();
 
         if (articleError) throw articleError;
+
+        console.log(`Successfully created article: ${article.id}`);
 
         // Update processing status
         await supabase
