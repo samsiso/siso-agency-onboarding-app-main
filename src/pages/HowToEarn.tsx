@@ -1,7 +1,5 @@
 
 import { useState } from 'react';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { Sidebar } from '@/components/Sidebar';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -11,6 +9,8 @@ import { EarnHeader } from '@/components/earn/header/EarnHeader';
 import { SkillTreeContent } from '@/components/earn/content/SkillTreeContent';
 import { SkillPath, Skill, UserSkillProgress } from '@/types/skills';
 import { useAuthSession } from '@/hooks/useAuthSession';
+import { MainLayout } from '@/components/assistants/layout/MainLayout';
+import { toast } from 'sonner';
 
 const HowToEarn = () => {
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
@@ -69,29 +69,42 @@ const HowToEarn = () => {
     enabled: !!user?.id
   });
 
+  const handleExternalLink = (url: string) => {
+    if (!url) {
+      toast.error("Invalid resource link");
+      return;
+    }
+
+    // [Analysis] Validate URL format before opening
+    try {
+      new URL(url);
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } catch (e) {
+      toast.error("Invalid URL format");
+    }
+  };
+
   const isLoading = isLoadingPaths || isLoadingSkills || isLoadingProgress;
 
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-gradient-to-b from-siso-bg to-siso-bg/95">
-        <Sidebar />
-        <div className="flex-1 p-4 md:p-8">
-          <div className="max-w-7xl mx-auto">
-            <EarnHeader navigate={navigate} />
-            <SmartEarningSearch onSearch={(query: string) => {}} />
-            <SkillTreeContent 
-              skillPaths={skillPaths || []}
-              skills={skills || []}
-              userProgress={userProgress || []}
-              selectedPath={selectedPath}
-              setSelectedPath={setSelectedPath}
-              isLoading={isLoading}
-            />
-          </div>
+    <MainLayout>
+      <div className="flex-1 p-4 md:p-8">
+        <div className="max-w-7xl mx-auto">
+          <EarnHeader navigate={navigate} />
+          <SmartEarningSearch onSearch={(query: string) => {}} />
+          <SkillTreeContent 
+            skillPaths={skillPaths || []}
+            skills={skills || []}
+            userProgress={userProgress || []}
+            selectedPath={selectedPath}
+            setSelectedPath={setSelectedPath}
+            isLoading={isLoading}
+            onExternalLinkClick={handleExternalLink}
+          />
         </div>
-        <EarningChatAssistant />
       </div>
-    </SidebarProvider>
+      <EarningChatAssistant />
+    </MainLayout>
   );
 };
 

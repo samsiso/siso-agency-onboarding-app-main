@@ -11,17 +11,20 @@ import { usePoints } from '@/hooks/usePoints';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { ExternalLink } from 'lucide-react';
 
 interface SkillsListProps {
   skills: Skill[];
   userProgress: UserSkillProgress[];
   skillPaths: SkillPath[];
+  onExternalLinkClick?: (url: string) => void;
 }
 
 export const SkillsList = ({
   skills,
   userProgress,
   skillPaths,
+  onExternalLinkClick
 }: SkillsListProps) => {
   const { user } = useAuthSession();
   const { toast } = useToast();
@@ -37,12 +40,17 @@ export const SkillsList = ({
       return;
     }
 
+    // [Analysis] Check if this is an external resource
+    if (skill.requirements?.external_url) {
+      onExternalLinkClick?.(skill.requirements.external_url);
+      return;
+    }
+
     try {
       const progress = userProgress.find(p => p.skill_id === skill.id);
       const now = new Date().toISOString();
 
       if (progress) {
-        // Check cooldown if applicable
         if (skill.cooldown_minutes && progress.last_completed_at) {
           const lastCompleted = new Date(progress.last_completed_at);
           const cooldownEnd = new Date(lastCompleted.getTime() + skill.cooldown_minutes * 60000);
@@ -56,7 +64,6 @@ export const SkillsList = ({
           }
         }
 
-        // Update existing progress
         const { error } = await supabase
           .from('user_skill_progress')
           .update({
@@ -68,7 +75,6 @@ export const SkillsList = ({
 
         if (error) throw error;
       } else {
-        // Create new progress entry
         const { error } = await supabase
           .from('user_skill_progress')
           .insert({
@@ -82,7 +88,6 @@ export const SkillsList = ({
         if (error) throw error;
       }
 
-      // Award points
       await awardPoints(skill.name.toLowerCase().replace(/ /g, '_') as any);
 
       toast({
@@ -118,6 +123,8 @@ export const SkillsList = ({
               <div className="space-y-4">
                 {pathSkills.map(skill => {
                   const status = getSkillStatus(skill);
+                  const isExternalResource = !!skill.requirements?.external_url;
+                  
                   return (
                     <div
                       key={skill.id}
@@ -147,8 +154,11 @@ export const SkillsList = ({
                           variant={status === 'completed' ? "secondary" : "default"}
                           size="sm"
                           onClick={() => handleSkillAction(skill)}
+                          className="flex items-center gap-2"
                         >
-                          {status === 'completed' ? 'Complete Again' : 'Complete'}
+                          {isExternalResource && <ExternalLink className="h-4 w-4" />}
+                          {isExternalResource ? 'Open Resource' : 
+                            status === 'completed' ? 'Complete Again' : 'Complete'}
                         </Button>
                       </div>
                     </div>
