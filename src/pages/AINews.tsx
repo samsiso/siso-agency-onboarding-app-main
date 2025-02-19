@@ -1,4 +1,3 @@
-
 import { useState, Suspense, lazy } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { SidebarProvider } from '@/components/ui/sidebar';
@@ -15,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 const NewsHeader = lazy(() => import('@/components/ai-news/NewsHeader'));
 const NewsCategories = lazy(() => import('@/components/ai-news/NewsCategories'));
 const FeaturedNewsHero = lazy(() => import('@/components/ai-news/FeaturedNewsHero'));
+const DailyStatsOverview = lazy(() => import('@/components/ai-news/DailyStatsOverview'));
 
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center p-8">
@@ -145,6 +145,11 @@ const AINews = () => {
                         <ChevronRight className="h-4 w-4 ml-2" />
                       </Button>
                     </div>
+
+                    {/* Daily Statistics Overview */}
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <DailyStatsOverview newsItems={todayPosts} />
+                    </Suspense>
 
                     {/* Featured Impact Summary */}
                     <Suspense fallback={<LoadingSpinner />}>
