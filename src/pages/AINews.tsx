@@ -1,3 +1,4 @@
+
 import { useState, Suspense, lazy } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { SidebarProvider } from '@/components/ui/sidebar';
@@ -86,6 +87,15 @@ const AINews = () => {
     });
   }
 
+  // [Analysis] Add null check for featuredDailyBrief
+  const featuredNewsProps = featuredDailyBrief ? {
+    item: featuredDailyBrief,
+    onGenerateSummary: generateSummary
+  } : {
+    item: null,
+    onGenerateSummary: generateSummary
+  };
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full">
@@ -137,10 +147,9 @@ const AINews = () => {
                     </div>
 
                     {/* Featured Impact Summary */}
-                    <FeaturedNewsHero 
-                      item={featuredDailyBrief}
-                      onGenerateSummary={generateSummary}
-                    />
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <FeaturedNewsHero {...featuredNewsProps} />
+                    </Suspense>
 
                     {/* Categorized News Sections */}
                     {Object.entries(categorizedPosts).map(([category, items]) => (

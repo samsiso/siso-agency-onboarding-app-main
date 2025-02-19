@@ -2,7 +2,6 @@
 import { lazy, Suspense, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
-import { FeaturedNewsHero } from './FeaturedNewsHero';
 import { useInView } from 'react-intersection-observer';
 import NewsTabs from './NewsTabs';
 import { NewsLoadingState } from './NewsLoadingState';
@@ -69,23 +68,6 @@ export const NewsContent = ({
     );
   }, [newsItems, searchQuery]);
 
-  const { trendingItems, latestItems, mostDiscussedItems, featuredItem } = useMemo(() => {
-    const trending = [...filteredNewsItems]
-      .sort((a, b) => (b.views || 0) - (a.views || 0))
-      .slice(0, 6);
-    
-    const latest = [...filteredNewsItems]
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    
-    const mostDiscussed = [...filteredNewsItems]
-      .sort((a, b) => (b.comments?.length || 0) - (a.comments?.length || 0))
-      .slice(0, 6);
-
-    const featured = filteredNewsItems.find(item => item.impact?.toLowerCase() === 'high');
-
-    return { trendingItems: trending, latestItems: latest, mostDiscussedItems: mostDiscussed, featuredItem: featured };
-  }, [filteredNewsItems]);
-
   useEffect(() => {
     if (inView) {
       handleLoadMore();
@@ -103,22 +85,10 @@ export const NewsContent = ({
           variants={containerVariants}
           className="space-y-8"
         >
-          {featuredItem && (
-            <motion.div 
-              variants={containerVariants} 
-              className="w-full rounded-xl overflow-hidden shadow-lg"
-            >
-              <FeaturedNewsHero 
-                item={featuredItem} 
-                onGenerateSummary={onGenerateSummary}
-              />
-            </motion.div>
-          )}
-
           <NewsTabs
-            latestItems={latestItems}
-            trendingItems={trendingItems}
-            mostDiscussedItems={mostDiscussedItems}
+            latestItems={filteredNewsItems}
+            trendingItems={filteredNewsItems.slice(0, 6)}
+            mostDiscussedItems={filteredNewsItems.slice(0, 6)}
             summaries={summaries}
             loadingSummaries={loadingSummaries}
             onGenerateSummary={onGenerateSummary}
