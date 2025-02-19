@@ -339,6 +339,127 @@ export type Database = {
           },
         ]
       }
+      ai_news_video_processing: {
+        Row: {
+          article_id: string | null
+          created_at: string | null
+          error_message: string | null
+          id: string
+          processed_at: string | null
+          processing_metadata: Json | null
+          retry_count: number | null
+          source_id: string | null
+          status: string | null
+          transcript: string | null
+          video_id: string
+        }
+        Insert: {
+          article_id?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          processed_at?: string | null
+          processing_metadata?: Json | null
+          retry_count?: number | null
+          source_id?: string | null
+          status?: string | null
+          transcript?: string | null
+          video_id: string
+        }
+        Update: {
+          article_id?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          processed_at?: string | null
+          processing_metadata?: Json | null
+          retry_count?: number | null
+          source_id?: string | null
+          status?: string | null
+          transcript?: string | null
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_news_video_processing_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "ai_news"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_video_processing_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "featured_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_video_processing_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "mv_trending_articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_video_processing_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_video_processing_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_scheduled_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_video_processing_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "ai_news_youtube_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_news_youtube_sources: {
+        Row: {
+          auto_process: boolean | null
+          channel_id: string
+          channel_name: string
+          channel_url: string | null
+          created_at: string | null
+          id: string
+          last_synced_at: string | null
+          processing_config: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          auto_process?: boolean | null
+          channel_id: string
+          channel_name: string
+          channel_url?: string | null
+          created_at?: string | null
+          id?: string
+          last_synced_at?: string | null
+          processing_config?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          auto_process?: boolean | null
+          channel_id?: string
+          channel_name?: string
+          channel_url?: string | null
+          created_at?: string | null
+          id?: string
+          last_synced_at?: string | null
+          processing_config?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       article_reading_progress: {
         Row: {
           article_id: string | null

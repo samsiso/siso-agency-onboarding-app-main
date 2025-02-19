@@ -1,8 +1,5 @@
 
 project_id = "fzuwsjxjymwcjsbpwfsl"
-
-[functions.chat-with-assistant]
-verify_jwt = false
-
-[functions.sync-educator-videos]
-verify_jwt = false
+[db_config]
+port = 54322
+shadow_port = 54320
