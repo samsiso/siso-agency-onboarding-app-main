@@ -1,7 +1,5 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -21,8 +19,6 @@ serve(async (req) => {
       throw new Error('VideoId is required');
     }
 
-    console.log('Processing video:', videoId);
-
     // [Analysis] First fetch video captions
     const transcript = await fetchVideoTranscript(videoId);
     
@@ -30,13 +26,9 @@ serve(async (req) => {
       throw new Error('No transcript available for this video');
     }
 
-    console.log('Transcript retrieved, processing segments...');
-
     // [Analysis] Process transcript into news segments
     const segments = await identifyNewsSegments(transcript);
     
-    console.log('Segments identified:', segments);
-
     // [Analysis] Store results in Supabase
     const processedSegments = await processSegments(videoId, segments);
 
@@ -70,7 +62,6 @@ async function fetchVideoTranscript(videoId: string): Promise<string | null> {
     );
 
     const videoDetails = await videoDetailsResponse.json();
-    console.log('Video details retrieved:', videoDetails.items?.[0]?.snippet?.title);
     
     // [Analysis] Get caption tracks for the video
     const captionsResponse = await fetch(
@@ -106,7 +97,6 @@ async function fetchVideoTranscript(videoId: string): Promise<string | null> {
     }
 
     const transcript = await transcriptResponse.text();
-    console.log('Transcript retrieved successfully');
     return transcript;
 
   } catch (error) {
@@ -116,54 +106,45 @@ async function fetchVideoTranscript(videoId: string): Promise<string | null> {
 }
 
 async function identifyNewsSegments(transcript: string) {
-  try {
-    // [Analysis] Use GPT-4 for accurate news story identification
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
-        'Content-Type': 'application/json',
+  // [Analysis] Use gpt-4o-mini for faster processing and cost efficiency
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: "gpt-4o-mini",
+      messages: [{
+        role: "system",
+        content: `You are an AI news analyzer specialized in identifying distinct AI news stories from video transcripts.
+For each story segment, you must extract:
+1. A clear, concise title
+2. A brief description (2-3 sentences)
+3. The key technical details discussed
+4. Technical complexity level (basic, intermediate, advanced)
+5. Relevant topic tags
+6. Impact assessment for businesses
+
+Format your response as a JSON array of story segments.`
       },
-      body: JSON.stringify({
-        model: "gpt-4",
-        messages: [{
-          role: "system",
-          content: `You are an AI news analyzer. Extract distinct AI news stories from video transcripts.
-For each story segment, provide:
-1. Title (clear, concise)
-2. Brief description (2-3 sentences)
-3. Key technical details
-4. Technical complexity (basic/intermediate/advanced)
-5. Topic tags
-6. Business impact assessment
+      {
+        role: "user",
+        content: transcript
+      }],
+      temperature: 0.5,
+      max_tokens: 1000,
+    }),
+  });
 
-Format response as a JSON array of story segments.`
-        },
-        {
-          role: "user",
-          content: transcript
-        }],
-        temperature: 0.5,
-        max_tokens: 1000,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to process with GPT-4');
-    }
-
-    const data = await response.json();
-    return data.choices[0].message.content;
-  } catch (error) {
-    console.error('Error in identifyNewsSegments:', error);
-    throw error;
-  }
+  const data = await response.json();
+  return data.choices[0].message.content;
 }
 
 async function processSegments(videoId: string, segments: string) {
-  const supabase = createClient(
+  const supabaseClient = createClient(
     Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
   );
 
   try {
@@ -172,7 +153,7 @@ async function processSegments(videoId: string, segments: string) {
     
     // [Analysis] Store each segment with metadata
     const insertPromises = parsedSegments.map(async (segment: any) => {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseClient
         .from('ai_news_video_segments')
         .insert({
           video_id: videoId,
