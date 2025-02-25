@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -146,7 +147,7 @@ export const useNewsItems = (
         return;
       }
 
-      const { data, error } = await supabase.functions.invoke('chat-with-bot', {
+      const { data, error } = await supabase.functions.invoke('chat-with-assistant', {
         body: { 
           message: `Please provide a brief 2-3 sentence summary of this blog post: ${newsItem.title}. ${newsItem.description || newsItem.content}`,
           systemPrompt: "You are a concise blog summarizer. Provide brief, factual summaries."
