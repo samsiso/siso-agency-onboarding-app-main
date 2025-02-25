@@ -1,11 +1,8 @@
 
-# project_id must be the first line
 project_id = "fzuwsjxjymwcjsbpwfsl"
 
-[[functions]]
-name = "process-youtube-news"
+[functions.chat-with-assistant]
 verify_jwt = false
 
-[[functions]]
-name = "sync-youtube-channels"
+[functions.sync-youtube-channels]
 verify_jwt = false
