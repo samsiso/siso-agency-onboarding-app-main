@@ -3,3 +3,6 @@ project_id = "fzuwsjxjymwcjsbpwfsl"
 
 [functions.chat-with-assistant]
 verify_jwt = false
+
+[functions.sync-youtube-channels]
+verify_jwt = false

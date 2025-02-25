@@ -2454,6 +2454,41 @@ export type Database = {
           },
         ]
       }
+      sync_history: {
+        Row: {
+          channel_id: string | null
+          created_at: string | null
+          error_message: string | null
+          id: number
+          sync_status: string | null
+          videos_processed: number | null
+        }
+        Insert: {
+          channel_id?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: number
+          sync_status?: string | null
+          videos_processed?: number | null
+        }
+        Update: {
+          channel_id?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: number
+          sync_status?: string | null
+          videos_processed?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_channel_id"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "ai_news_youtube_sources"
+            referencedColumns: ["channel_id"]
+          },
+        ]
+      }
       tools: {
         Row: {
           assistant_type: string | null
