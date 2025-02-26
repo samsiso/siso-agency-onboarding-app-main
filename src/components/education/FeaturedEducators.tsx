@@ -2,7 +2,7 @@
 import { motion } from 'framer-motion';
 import { ChevronRight, Crown } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { formatNumber } from '@/lib/utils';
+import { formatNumber } from '@/lib/formatters';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { AspectRatio } from '@/components/ui/aspect-ratio';

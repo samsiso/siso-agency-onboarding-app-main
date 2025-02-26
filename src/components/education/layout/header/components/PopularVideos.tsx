@@ -2,7 +2,7 @@
 import { motion } from 'framer-motion';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
-import { formatNumber } from '@/lib/utils';
+import { formatNumber } from '@/lib/formatters';
 import { Play, Clock, Eye } from 'lucide-react';
 
 interface Video {
