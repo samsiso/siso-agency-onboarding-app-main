@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -9,7 +8,9 @@ type PostStatus = 'all' | 'draft' | 'published';
 export const useNewsItems = (
   selectedCategory: string | null, 
   status: PostStatus = 'published',
-  selectedDate?: string | null
+  selectedDate?: string | null,
+  currentPage: number = 1,
+  pageSize: number = 12
 ) => {
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [summaries, setSummaries] = useState<Record<string, string>>({});
@@ -17,32 +18,48 @@ export const useNewsItems = (
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [hasMore, setHasMore] = useState(true);
+  const [totalCount, setTotalCount] = useState(0);
   const { toast } = useToast();
 
-  const PAGE_SIZE = 12;
-  const [page, setPage] = useState(0);
-
-  // [Analysis] Reset pagination when filters change
+  // [Analysis] Reset when filters change
   useEffect(() => {
-    setPage(0);
-    setNewsItems([]);
     fetchNews();
-  }, [selectedCategory, status, selectedDate]);
-
-  // [Analysis] Load more data when page changes
-  useEffect(() => {
-    if (page > 0) {
-      fetchNews();
-    }
-  }, [page]);
+  }, [selectedCategory, status, selectedDate, currentPage]);
 
   const fetchNews = async () => {
     try {
       setLoading(true);
       setError(null);
       
-      console.log('Fetching news...', { selectedCategory, page, status, selectedDate });
+      console.log('Fetching news...', { selectedCategory, currentPage, status, selectedDate });
       
+      // [Analysis] First fetch count for pagination
+      let countQuery = supabase
+        .from('ai_news')
+        .select('id', { count: 'exact' });
+        
+      if (status !== 'all') {
+        countQuery = countQuery.eq('status', status);
+      }
+
+      if (selectedCategory) {
+        countQuery = countQuery.eq('category', selectedCategory);
+      }
+
+      if (selectedDate) {
+        countQuery = countQuery.eq('date', selectedDate);
+      }
+
+      const { count, error: countError } = await countQuery;
+
+      if (countError) {
+        console.error('Error fetching count:', countError);
+        throw countError;
+      }
+
+      setTotalCount(count || 0);
+      
+      // [Analysis] Then fetch data with pagination
       let query = supabase
         .from('ai_news')
         .select('*, profiles:author_id(full_name, avatar_url)')
@@ -61,9 +78,11 @@ export const useNewsItems = (
         query = query.eq('date', selectedDate);
       }
 
-      if (!selectedDate) {
-        query = query.range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
-      }
+      // [Analysis] Calculate pagination range
+      const from = (currentPage - 1) * pageSize;
+      const to = from + pageSize - 1;
+      
+      query = query.range(from, to);
 
       const { data, error: fetchError } = await query;
 
@@ -74,7 +93,8 @@ export const useNewsItems = (
 
       console.log('Fetched news articles:', data?.length);
 
-      setHasMore(data && data.length === PAGE_SIZE);
+      // [Analysis] Check if there are more items to load
+      setHasMore(data && data.length === pageSize && from + data.length < (count || 0));
       
       // [Analysis] Determine template_type based on article properties
       const transformedData = data?.map(item => ({
@@ -83,7 +103,7 @@ export const useNewsItems = (
         article_type: item.article_type || 'article'
       })) || [];
       
-      setNewsItems(prev => page === 0 ? transformedData : [...prev, ...transformedData]);
+      setNewsItems(transformedData);
 
       // [Analysis] Fetch associated summaries
       const { data: summariesData, error: summariesError } = await supabase
@@ -177,7 +197,8 @@ export const useNewsItems = (
 
   const loadMore = useCallback(() => {
     if (!loading && hasMore) {
-      setPage(prev => prev + 1);
+      // This is for infinite scrolling if we want to keep it as an option
+      // Currently we use traditional pagination
     }
   }, [loading, hasMore]);
 
@@ -189,10 +210,9 @@ export const useNewsItems = (
     loading,
     hasMore,
     loadMore,
+    totalCount,
     error,
     refresh: () => {
-      setPage(0);
-      setNewsItems([]);
       fetchNews();
     }
   };

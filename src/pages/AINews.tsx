@@ -9,11 +9,14 @@ import { NewsErrorBoundary } from '@/components/ai-news/NewsErrorBoundary';
 import { NewsApiStatus } from '@/components/ai-news/NewsApiStatus'; 
 import { Helmet } from 'react-helmet';
 import { Sidebar } from '@/components/Sidebar';
+import NewsPagination from '@/components/ai-news/NewsPagination';
 
 const AINews = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12; // Same as PAGE_SIZE in useNewsItems
 
   const { 
     newsItems, 
@@ -21,11 +24,12 @@ const AINews = () => {
     loadingSummaries, 
     generateSummary, 
     loading, 
-    hasMore, 
+    hasMore,
+    totalCount,
     loadMore, 
     error,
     refresh
-  } = useNewsItems(selectedCategory, 'published', selectedDate);
+  } = useNewsItems(selectedCategory, 'published', selectedDate, currentPage, itemsPerPage);
 
   // [Analysis] Find featured article with priority on featured flag and then on views
   const featuredArticle = newsItems.find(item => item.featured) || 
@@ -34,12 +38,21 @@ const AINews = () => {
   // [Analysis] Add scroll restoration to preserve user's position
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [selectedCategory, selectedDate]);
+  }, [selectedCategory, selectedDate, currentPage]);
 
   // [Analysis] Handle search query change
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
+    setCurrentPage(1); // Reset to first page on new search
   };
+
+  // [Analysis] Handle page change
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  // [Analysis] Calculate total pages
+  const totalPages = totalCount ? Math.ceil(totalCount / itemsPerPage) : 0;
 
   return (
     <div className="flex min-h-screen bg-siso-bg">
@@ -70,7 +83,7 @@ const AINews = () => {
         </div>
         
         <NewsErrorBoundary>
-          {featuredArticle && !searchQuery && !selectedDate && !selectedCategory && (
+          {featuredArticle && !searchQuery && !selectedDate && !selectedCategory && currentPage === 1 && (
             <div className="mb-8">
               <FeaturedNewsHero 
                 article={featuredArticle}
@@ -82,7 +95,7 @@ const AINews = () => {
           )}
           
           <NewsContent
-            newsItems={searchQuery || selectedDate || selectedCategory ? 
+            newsItems={searchQuery || selectedDate || selectedCategory || currentPage > 1 ? 
               newsItems : 
               newsItems.filter(item => item.id !== featuredArticle?.id)}
             searchQuery={searchQuery}
@@ -93,6 +106,16 @@ const AINews = () => {
             hasMore={hasMore}
             onLoadMore={loadMore}
           />
+          
+          {totalPages > 1 && (
+            <div className="mt-8">
+              <NewsPagination 
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
         </NewsErrorBoundary>
       </main>
     </div>
