@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNewsItems } from '@/hooks/useNewsItems';
 import NewsFilters from '@/components/ai-news/NewsFilters';
@@ -26,12 +27,19 @@ const AINews = () => {
     refresh
   } = useNewsItems(selectedCategory, 'published', selectedDate);
 
-  const featuredArticle = newsItems.find(item => item.featured) || newsItems[0];
+  // [Analysis] Find featured article with priority on featured flag and then on views
+  const featuredArticle = newsItems.find(item => item.featured) || 
+    [...newsItems].sort((a, b) => (b.views || 0) - (a.views || 0))[0];
 
   // [Analysis] Add scroll restoration to preserve user's position
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [selectedCategory, selectedDate]);
+
+  // [Analysis] Handle search query change
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+  };
 
   return (
     <div className="flex min-h-screen bg-siso-bg">
@@ -51,18 +59,18 @@ const AINews = () => {
               selectedCategory={selectedCategory}
               onCategoryChange={setSelectedCategory}
               searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
+              onSearchChange={handleSearchChange}
               onDateChange={setSelectedDate}
               selectedDate={selectedDate}
             />
           </div>
           <div className="lg:col-span-1">
-            <NewsApiStatus />
+            <NewsApiStatus onRefresh={refresh} />
           </div>
         </div>
         
         <NewsErrorBoundary>
-          {featuredArticle && !searchQuery && !selectedDate && (
+          {featuredArticle && !searchQuery && !selectedDate && !selectedCategory && (
             <div className="mb-8">
               <FeaturedNewsHero 
                 article={featuredArticle}
@@ -74,7 +82,9 @@ const AINews = () => {
           )}
           
           <NewsContent
-            newsItems={searchQuery || selectedDate ? newsItems : newsItems.filter(item => item.id !== featuredArticle?.id)}
+            newsItems={searchQuery || selectedDate || selectedCategory ? 
+              newsItems : 
+              newsItems.filter(item => item.id !== featuredArticle?.id)}
             searchQuery={searchQuery}
             summaries={summaries}
             loadingSummaries={loadingSummaries}

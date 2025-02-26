@@ -9,8 +9,9 @@ import {
   PopoverTrigger 
 } from '@/components/ui/popover';
 import { Label } from '@/components/ui/label';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import NewsCategories from './NewsCategories';
+import { debounce } from '@/lib/utils';
 
 interface NewsFiltersProps {
   selectedCategory: string | null;
@@ -40,7 +41,23 @@ export const NewsFilters = ({
   selectedDate
 }: NewsFiltersProps) => {
   const [dateFilter, setDateFilter] = useState<string>(selectedDate || '');
+  const [inputValue, setInputValue] = useState(searchQuery);
   
+  // [Analysis] Use debounce to prevent too many search requests
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedSearch = useCallback(
+    debounce((value: string) => {
+      onSearchChange(value);
+    }, 350),
+    [onSearchChange]
+  );
+  
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setInputValue(value);
+    debouncedSearch(value);
+  };
+
   const handleDateSubmit = () => {
     if (onDateChange) {
       onDateChange(dateFilter || null);
@@ -68,8 +85,8 @@ export const NewsFilters = ({
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
             placeholder="Search AI news..."
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
+            value={inputValue}
+            onChange={handleSearchChange}
             className="pl-10 bg-background"
           />
         </div>

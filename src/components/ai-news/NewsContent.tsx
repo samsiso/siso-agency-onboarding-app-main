@@ -6,6 +6,7 @@ import { useInView } from 'react-intersection-observer';
 import NewsTabs from './NewsTabs';
 import { NewsLoadingState } from './NewsLoadingState';
 import { NewsEmptyState } from './NewsEmptyState';
+import { NewsItem } from '@/types/blog';
 
 const NewsCard = lazy(() => import('@/components/ai-news/NewsCard'));
 
@@ -28,7 +29,7 @@ const containerVariants = {
 };
 
 interface NewsContentProps {
-  newsItems: any[];
+  newsItems: NewsItem[];
   searchQuery: string;
   summaries: Record<string, string>;
   loadingSummaries: Record<string, boolean>;
@@ -64,9 +65,28 @@ export const NewsContent = ({
     const searchLower = searchQuery.toLowerCase();
     return newsItems.filter(item => 
       item.title?.toLowerCase().includes(searchLower) ||
-      item.description?.toLowerCase().includes(searchLower)
+      item.description?.toLowerCase().includes(searchLower) ||
+      item.content?.toLowerCase().includes(searchLower) ||
+      item.category?.toLowerCase().includes(searchLower) ||
+      (item.tags && item.tags.some(tag => 
+        typeof tag === 'string' && tag.toLowerCase().includes(searchLower)
+      ))
     );
   }, [newsItems, searchQuery]);
+
+  // [Analysis] Sort trending items by views
+  const trendingItems = useMemo(() => {
+    return [...filteredNewsItems]
+      .sort((a, b) => (b.views || 0) - (a.views || 0))
+      .slice(0, 6);
+  }, [filteredNewsItems]);
+
+  // [Analysis] Sort most discussed items by bookmarks/comments metrics
+  const mostDiscussedItems = useMemo(() => {
+    return [...filteredNewsItems]
+      .sort((a, b) => (b.bookmarks || 0) - (a.bookmarks || 0))
+      .slice(0, 6);
+  }, [filteredNewsItems]);
 
   useEffect(() => {
     if (inView) {
@@ -85,14 +105,20 @@ export const NewsContent = ({
           variants={containerVariants}
           className="space-y-8"
         >
-          <NewsTabs
-            latestItems={filteredNewsItems}
-            trendingItems={filteredNewsItems.slice(0, 6)}
-            mostDiscussedItems={filteredNewsItems.slice(0, 6)}
-            summaries={summaries}
-            loadingSummaries={loadingSummaries}
-            onGenerateSummary={onGenerateSummary}
-          />
+          {filteredNewsItems.length > 0 ? (
+            <NewsTabs
+              latestItems={filteredNewsItems}
+              trendingItems={trendingItems}
+              mostDiscussedItems={mostDiscussedItems}
+              summaries={summaries}
+              loadingSummaries={loadingSummaries}
+              onGenerateSummary={onGenerateSummary}
+            />
+          ) : loading ? (
+            <NewsLoadingState />
+          ) : (
+            <NewsEmptyState />
+          )}
 
           {/* Infinite Scroll Trigger */}
           {hasMore && !loading && filteredNewsItems.length > 0 && (
@@ -100,10 +126,7 @@ export const NewsContent = ({
           )}
 
           {/* Loading State */}
-          {loading && <NewsLoadingState />}
-
-          {/* No Results State */}
-          {filteredNewsItems.length === 0 && !loading && <NewsEmptyState />}
+          {loading && filteredNewsItems.length > 0 && <NewsLoadingState />}
         </motion.div>
       </AnimatePresence>
     </Suspense>

@@ -7,11 +7,12 @@ import { Button } from '@/components/ui/button';
 import { format, subWeeks, startOfWeek, endOfWeek } from 'date-fns';
 import NewsCard from './NewsCard';
 import { TableOfContents } from './TableOfContents';
+import { NewsItem } from '@/types/blog';
 
 interface NewsTabsProps {
-  latestItems: any[];
-  trendingItems: any[];
-  mostDiscussedItems: any[];
+  latestItems: NewsItem[];
+  trendingItems: NewsItem[];
+  mostDiscussedItems: NewsItem[];
   summaries: Record<string, string>;
   loadingSummaries: Record<string, boolean>;
   onGenerateSummary: (id: string) => void;
@@ -31,7 +32,7 @@ const NewsTabs = memo(({
   const weekStart = startOfWeek(subWeeks(new Date(), currentWeekOffset));
   const weekEnd = endOfWeek(weekStart);
   
-  const filterItemsByDateRange = (items: any[]) => {
+  const filterItemsByDateRange = (items: NewsItem[]) => {
     return items.filter(item => {
       const itemDate = new Date(item.date);
       return itemDate >= weekStart && itemDate <= weekEnd;
@@ -110,29 +111,50 @@ const NewsTabs = memo(({
             </Button>
           </div>
         </div>
-        <div className="flex gap-8">
-          <div className="flex-1">
-            <div className="grid grid-cols-1 gap-4">
-              {filteredDailyBriefs.map((item) => (
-                <div key={item.id} id={item.id}>
-                  <NewsCard
-                    item={item}
-                    summaries={summaries}
-                    loadingSummaries={loadingSummaries}
-                    onGenerateSummary={handleGenerateSummary}
-                    isCompact={true}
-                  />
-                </div>
-              ))}
+        
+        {filteredDailyBriefs.length > 0 ? (
+          <div className="flex gap-8">
+            <div className="flex-1">
+              <div className="grid grid-cols-1 gap-4">
+                {filteredDailyBriefs.map((item) => (
+                  <div key={item.id} id={item.id}>
+                    <NewsCard
+                      item={item}
+                      summaries={summaries}
+                      loadingSummaries={loadingSummaries}
+                      onGenerateSummary={handleGenerateSummary}
+                      isCompact={true}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="w-80 hidden xl:block">
+              <TableOfContents
+                items={filteredDailyBriefs}
+                activeId={activeId}
+              />
             </div>
           </div>
-          <div className="w-80 hidden xl:block">
-            <TableOfContents
-              items={filteredDailyBriefs}
-              activeId={activeId}
-            />
+        ) : (
+          <div className="flex flex-col items-center justify-center py-12 text-center space-y-4">
+            <div className="bg-muted rounded-full p-3">
+              <Calendar className="h-6 w-6 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-medium">No daily briefs found</h3>
+            <p className="text-muted-foreground max-w-md">
+              There are no daily brief articles published for this week.
+            </p>
+            {currentWeekOffset > 0 && (
+              <Button 
+                variant="outline" 
+                onClick={() => setCurrentWeekOffset(0)}
+              >
+                Back to Current Week
+              </Button>
+            )}
           </div>
-        </div>
+        )}
       </TabsContent>
 
       <TabsContent value="latest" className="mt-6">

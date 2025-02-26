@@ -1,35 +1,8 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { EnhancedNewsItem } from '@/types/blog';
-
-// [Analysis] Added types for news items
-type NewsItem = {
-  id: string;
-  title: string;
-  description: string;
-  content: string;
-  date: string;
-  category: string;
-  article_type: string;
-  created_at: string;
-  author_id: string;
-  image_url: string;
-  source: string;
-  source_credibility: string;
-  technical_complexity: string;
-  impact: string;
-  views: number;
-  bookmarks: number;
-  reading_time: number;
-  featured: boolean;
-  profiles?: {
-    full_name: string;
-    avatar_url: string;
-  };
-  template_type?: string;
-  // ... other properties
-};
+import { NewsItem } from '@/types/blog';
 
 type PostStatus = 'all' | 'draft' | 'published';
 
@@ -49,12 +22,14 @@ export const useNewsItems = (
   const PAGE_SIZE = 12;
   const [page, setPage] = useState(0);
 
+  // [Analysis] Reset pagination when filters change
   useEffect(() => {
     setPage(0);
     setNewsItems([]);
     fetchNews();
   }, [selectedCategory, status, selectedDate]);
 
+  // [Analysis] Load more data when page changes
   useEffect(() => {
     if (page > 0) {
       fetchNews();
@@ -110,6 +85,7 @@ export const useNewsItems = (
       
       setNewsItems(prev => page === 0 ? transformedData : [...prev, ...transformedData]);
 
+      // [Analysis] Fetch associated summaries
       const { data: summariesData, error: summariesError } = await supabase
         .from('ai_news_summaries')
         .select('news_id, summary');
@@ -124,7 +100,7 @@ export const useNewsItems = (
           acc[curr.news_id] = curr.summary;
           return acc;
         }, {});
-        setSummaries(summariesMap);
+        setSummaries(prev => ({...prev, ...summariesMap}));
       }
     } catch (error) {
       console.error('Error in fetchNews:', error);
@@ -140,6 +116,7 @@ export const useNewsItems = (
   };
 
   const generateSummary = async (id: string) => {
+    // [Analysis] Skip if summary already exists
     if (summaries[id]) return;
     
     setLoadingSummaries(prev => ({ ...prev, [id]: true }));
@@ -151,6 +128,7 @@ export const useNewsItems = (
     }
 
     try {
+      // [Analysis] Check if summary already exists in the database
       const { data: existingSummary, error: fetchError } = await supabase
         .from('ai_news_summaries')
         .select('summary')
@@ -165,6 +143,7 @@ export const useNewsItems = (
         return;
       }
 
+      // [Analysis] Generate a new summary using the edge function
       const { data, error } = await supabase.functions.invoke('chat-with-assistant', {
         body: { 
           message: `Please provide a brief 2-3 sentence summary of this news article: ${newsItem.title}. ${newsItem.description || newsItem.content}`,
@@ -176,6 +155,7 @@ export const useNewsItems = (
 
       const summary = data.response;
 
+      // [Analysis] Store the summary in the database for future use
       const { error: insertError } = await supabase
         .from('ai_news_summaries')
         .insert([{ news_id: id, summary }]);

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -7,7 +8,11 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-export const NewsApiStatus = () => {
+interface NewsApiStatusProps {
+  onRefresh?: () => void;
+}
+
+export const NewsApiStatus = ({ onRefresh }: NewsApiStatusProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [lastSync, setLastSync] = useState<string | null>(null);
   const [articleCount, setArticleCount] = useState(0);
@@ -76,6 +81,7 @@ export const NewsApiStatus = () => {
           description: data.message,
         });
         fetchApiStatus(); // Refresh stats
+        if (onRefresh) onRefresh(); // Refresh news list
       } else {
         throw new Error(data.message);
       }
