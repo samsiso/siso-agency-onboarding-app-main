@@ -1,12 +1,12 @@
 
 import { useState, useEffect } from 'react';
-import { NewsTabs } from '@/components/ai-news/NewsTabs';
-import { NewsHeader } from '@/components/ai-news/NewsHeader';
+import NewsTabs from '@/components/ai-news/NewsTabs';
+import NewsHeader from '@/components/ai-news/NewsHeader';
 import { MainLayout } from '@/components/assistants/layout/MainLayout';
 import { NewsTabContent } from '@/components/ai-news/NewsTabContent';
 import { useNewsItems } from '@/hooks/useNewsItems';
 import { NewsErrorBoundary } from '@/components/ai-news/NewsErrorBoundary';
-import { VideoProcessingTest } from '@/components/VideoProcessingTest'; // Add import for the new component
+import { VideoProcessingTest } from '@/components/VideoProcessingTest'; 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -50,10 +50,12 @@ export default function AINews() {
           
           <TabsContent value="news" className="space-y-4">
             <NewsHeader
+              selectedMonth=""
+              selectedYear=""
+              onMonthChange={() => {}}
+              onYearChange={() => {}}
               searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
+              onSearchChange={setSearchQuery}
             />
             
             <NewsTabs
@@ -65,15 +67,10 @@ export default function AINews() {
             
             <NewsErrorBoundary>
               <NewsTabContent
-                newsItems={newsItems}
+                items={newsItems}
                 summaries={summaries}
                 loadingSummaries={loadingSummaries}
                 onGenerateSummary={generateSummary}
-                searchQuery={searchQuery}
-                loading={loading}
-                hasMore={hasMore}
-                loadMore={loadMore}
-                error={error}
               />
             </NewsErrorBoundary>
           </TabsContent>

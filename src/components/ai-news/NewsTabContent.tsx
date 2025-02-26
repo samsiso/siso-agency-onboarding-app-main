@@ -4,7 +4,7 @@ import { lazy, memo } from 'react';
 
 const NewsCard = lazy(() => import('@/components/ai-news/NewsCard'));
 
-interface NewsTabContentProps {
+export interface NewsTabContentProps {
   items: any[];
   summaries: Record<string, string>;
   loadingSummaries: Record<string, boolean>;
@@ -69,4 +69,3 @@ export const NewsTabContent = memo(({
 });
 
 NewsTabContent.displayName = 'NewsTabContent';
-
