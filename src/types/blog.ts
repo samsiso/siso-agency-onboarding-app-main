@@ -132,4 +132,5 @@ export interface NewsItem {
   };
   template_type?: string;
   status?: string;
+  tags?: string[] | ArticleTag[]; // [Analysis] Added tags property to fix TypeScript error
 }
