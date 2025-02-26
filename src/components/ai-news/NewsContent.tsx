@@ -6,6 +6,7 @@ import { useInView } from 'react-intersection-observer';
 import NewsTabs from './NewsTabs';
 import { NewsLoadingState } from './NewsLoadingState';
 import { NewsEmptyState } from './NewsEmptyState';
+import { NewsTabContent } from './NewsTabContent';
 
 const NewsCard = lazy(() => import('@/components/ai-news/NewsCard'));
 
@@ -78,6 +79,18 @@ export const NewsContent = ({
     }
   }, [inView, handleLoadMore]);
 
+  // [Analysis] Filter news items based on active tab
+  const tabNewsItems = useMemo(() => {
+    // Here we could implement actual filtering based on the tab
+    // For now, we're using the same filteredNewsItems for all tabs except 'daily'
+    return filteredNewsItems;
+  }, [filteredNewsItems, activeTab]);
+
+  // [Analysis] Get daily briefs (could be filtered by date)
+  const dailyBriefs = useMemo(() => {
+    return filteredNewsItems.filter(item => item.article_type === 'daily_brief');
+  }, [filteredNewsItems]);
+
   return (
     <Suspense fallback={<LoadingSpinner />}>
       <AnimatePresence mode="wait">
@@ -96,6 +109,16 @@ export const NewsContent = ({
             selectedCategory={selectedCategory}
             setSelectedCategory={setSelectedCategory}
           />
+
+          {/* Display appropriate content based on activeTab */}
+          {activeTab !== 'daily' && (
+            <NewsTabContent 
+              items={tabNewsItems}
+              summaries={summaries}
+              loadingSummaries={loadingSummaries}
+              onGenerateSummary={onGenerateSummary}
+            />
+          )}
 
           {/* Infinite Scroll Trigger */}
           {hasMore && !loading && filteredNewsItems.length > 0 && (

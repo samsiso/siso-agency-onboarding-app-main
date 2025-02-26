@@ -1,14 +1,12 @@
 
 import { useState, useEffect } from 'react';
-import NewsTabs from '@/components/ai-news/NewsTabs';
 import NewsHeader from '@/components/ai-news/NewsHeader';
 import { MainLayout } from '@/components/assistants/layout/MainLayout';
-import { NewsTabContent } from '@/components/ai-news/NewsTabContent';
-import { useNewsItems } from '@/hooks/useNewsItems';
 import { NewsErrorBoundary } from '@/components/ai-news/NewsErrorBoundary';
 import { VideoProcessingTest } from '@/components/VideoProcessingTest'; 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { supabase } from '@/integrations/supabase/client';
+import { useNewsItems } from '@/hooks/useNewsItems';
+import { NewsContent } from '@/components/ai-news/NewsContent';
 
 export default function AINews() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -58,19 +56,16 @@ export default function AINews() {
               onSearchChange={setSearchQuery}
             />
             
-            <NewsTabs
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-              selectedCategory={selectedCategory}
-              setSelectedCategory={setSelectedCategory}
-            />
-            
             <NewsErrorBoundary>
-              <NewsTabContent
-                items={newsItems}
+              <NewsContent 
+                newsItems={newsItems}
+                searchQuery={searchQuery}
                 summaries={summaries}
                 loadingSummaries={loadingSummaries}
                 onGenerateSummary={generateSummary}
+                loading={loading}
+                hasMore={hasMore}
+                onLoadMore={loadMore}
               />
             </NewsErrorBoundary>
           </TabsContent>

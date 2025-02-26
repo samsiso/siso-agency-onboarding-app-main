@@ -1,14 +1,12 @@
 
 import { TrendingUp, Clock, MessageSquare, Calendar } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { NewsTabContent } from './NewsTabContent';
-import { memo, useState, useEffect } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { format, subWeeks, startOfWeek, endOfWeek } from 'date-fns';
-import NewsCard from './NewsCard';
 import { TableOfContents } from './TableOfContents';
 
-// [Analysis] Updated interface to match props being passed from AINews.tsx
+// [Analysis] Updated interface to match props being passed from NewsContent
 export interface NewsTabsProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
@@ -28,25 +26,6 @@ const NewsTabs = memo(({
   const weekStart = startOfWeek(subWeeks(new Date(), currentWeekOffset));
   const weekEnd = endOfWeek(weekStart);
   
-  const filterItemsByDateRange = (items: any[]) => {
-    return items.filter(item => {
-      const itemDate = new Date(item.date);
-      return itemDate >= weekStart && itemDate <= weekEnd;
-    });
-  };
-
-  // [Analysis] Using dummy data for now since we removed the direct props
-  const latestItems: any[] = [];
-  const trendingItems: any[] = [];
-  const mostDiscussedItems: any[] = [];
-  const summaries: Record<string, string> = {};
-  const loadingSummaries: Record<string, boolean> = {};
-  const onGenerateSummary = (id: string) => {};
-
-  const dailyBriefs = latestItems.filter(item => item.template_type === 'daily_brief');
-  const filteredDailyBriefs = filterItemsByDateRange(dailyBriefs);
-  const otherNews = latestItems.filter(item => item.template_type !== 'daily_brief');
-
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -59,13 +38,14 @@ const NewsTabs = memo(({
       { threshold: 0.5 }
     );
 
-    filteredDailyBriefs.forEach((item) => {
-      const element = document.getElementById(item.id);
-      if (element) observer.observe(element);
+    // This will be connected to actual daily brief elements when they're rendered
+    const elements = document.querySelectorAll('[data-daily-brief="true"]');
+    elements.forEach((element) => {
+      observer.observe(element);
     });
 
     return () => observer.disconnect();
-  }, [filteredDailyBriefs]);
+  }, []);
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -111,55 +91,22 @@ const NewsTabs = memo(({
         </div>
         <div className="flex gap-8">
           <div className="flex-1">
-            <div className="grid grid-cols-1 gap-4">
-              {filteredDailyBriefs.map((item) => (
-                <div key={item.id} id={item.id}>
-                  <NewsCard
-                    item={item}
-                    summaries={summaries}
-                    loadingSummaries={loadingSummaries}
-                    onGenerateSummary={onGenerateSummary}
-                    isCompact={true}
-                  />
-                </div>
-              ))}
-            </div>
+            {/* The actual daily brief content will be rendered by NewsContent */}
+            <p className="text-muted-foreground">Select a daily brief to view its contents.</p>
           </div>
           <div className="w-80 hidden xl:block">
             <TableOfContents
-              items={filteredDailyBriefs}
+              items={[]} // This will be populated when we have actual daily briefs
               activeId={activeId}
             />
           </div>
         </div>
       </TabsContent>
 
-      <TabsContent value="latest" className="mt-6">
-        <NewsTabContent 
-          items={otherNews}
-          summaries={summaries}
-          loadingSummaries={loadingSummaries}
-          onGenerateSummary={onGenerateSummary}
-        />
-      </TabsContent>
-
-      <TabsContent value="trending" className="mt-6">
-        <NewsTabContent 
-          items={trendingItems}
-          summaries={summaries}
-          loadingSummaries={loadingSummaries}
-          onGenerateSummary={onGenerateSummary}
-        />
-      </TabsContent>
-
-      <TabsContent value="discussed" className="mt-6">
-        <NewsTabContent 
-          items={mostDiscussedItems}
-          summaries={summaries}
-          loadingSummaries={loadingSummaries}
-          onGenerateSummary={onGenerateSummary}
-        />
-      </TabsContent>
+      {/* The content for the other tabs will be rendered by NewsContent */}
+      <TabsContent value="latest" className="mt-6" />
+      <TabsContent value="trending" className="mt-6" />
+      <TabsContent value="discussed" className="mt-6" />
     </Tabs>
   );
 });
