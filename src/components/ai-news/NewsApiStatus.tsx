@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { motion } from 'framer-motion';
-import { InfoCircle, RefreshCw } from 'lucide-react';
+import { Info, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -100,7 +99,7 @@ export const NewsApiStatus = () => {
     >
       <div className="flex justify-between items-center mb-3">
         <h3 className="text-lg font-medium flex items-center gap-2">
-          <InfoCircle className="h-5 w-5 text-blue-500" />
+          <Info className="h-5 w-5 text-blue-500" />
           API Status
         </h3>
         <Button 

@@ -3,14 +3,22 @@ import { NewsCardMedia } from './NewsCardMedia';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Share2, BookmarkPlus, Star, AlertCircle, AlertOctagon, ChartPie, Clock, Info } from 'lucide-react';
+import { NewsItem } from '@/types/blog';
 
 interface FeaturedNewsHeroProps {
-  item: any;
-  onGenerateSummary: (id: string) => void;
+  article: NewsItem;
+  onGenerateSummary: (id: string) => Promise<void>;
+  summary: string;
+  loadingSummary: boolean;
 }
 
-const FeaturedNewsHero = ({ item, onGenerateSummary }: FeaturedNewsHeroProps) => {
-  if (!item) return (
+const FeaturedNewsHero = ({ 
+  article,
+  onGenerateSummary,
+  summary,
+  loadingSummary 
+}: FeaturedNewsHeroProps) => {
+  if (!article) return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -151,6 +159,51 @@ const FeaturedNewsHero = ({ item, onGenerateSummary }: FeaturedNewsHeroProps) =>
             </div>
           </div>
         </div>
+      </div>
+    </motion.div>
+  );
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="relative w-full rounded-xl overflow-hidden"
+    >
+      <NewsCardMedia imageUrl={item.image_url} alt={item.title} className="h-64 md:h-96" />
+      
+      <div className="absolute inset-0 bg-gradient-to-br from-siso-red/20 via-siso-orange/10 to-transparent opacity-75" />
+      <div className="absolute inset-0 bg-gradient-radial from-siso-red/10 via-siso-orange/5 to-transparent opacity-50" />
+      
+      <div className="absolute bottom-0 left-0 p-6 w-full">
+        <div className="flex items-center justify-between mb-3">
+          <Badge variant="secondary">{item.category}</Badge>
+          <div className="flex items-center space-x-2 text-siso-text/70">
+            <Share2 className="h-4 w-4 cursor-pointer hover:text-siso-text" />
+            <BookmarkPlus className="h-4 w-4 cursor-pointer hover:text-siso-text" />
+          </div>
+        </div>
+        
+        <h2 className="text-2xl font-bold text-siso-text-bold mb-2">{item.title}</h2>
+        <p className="text-siso-text/80 line-clamp-2">{item.description}</p>
+        
+        <div className="flex items-center justify-between mt-4">
+          <div className="flex items-center space-x-3">
+            <img 
+              src={item.profiles?.avatar_url || 'https://avatar.vercel.sh/api/new'} 
+              alt={item.profiles?.full_name || 'Author'}
+              className="w-8 h-8 rounded-full object-cover"
+            />
+            <span className="text-sm text-siso-text/90">{item.profiles?.full_name || 'Unknown Author'}</span>
+          </div>
+          <Button variant="outline" size="sm" onClick={() => onGenerateSummary(item.id)}>
+            {loadingSummary ? 'Loading...' : (summary ? 'View Summary' : 'Generate Summary')}
+          </Button>
+        </div>
+        {summary && (
+          <div className="mt-4 p-3 rounded-md bg-siso-bg-alt border border-siso-border">
+            <p className="text-sm text-siso-text/90">{summary}</p>
+          </div>
+        )}
       </div>
     </motion.div>
   );

@@ -1,14 +1,13 @@
-
 import { useState, useEffect } from 'react';
 import { useNewsItems } from '@/hooks/useNewsItems';
 import NewsFilters from '@/components/ai-news/NewsFilters';
 import FeaturedNewsHero from '@/components/ai-news/FeaturedNewsHero';
 import { NewsContent } from '@/components/ai-news/NewsContent';
-import { NewsHeader } from '@/components/ai-news/NewsHeader';
+import NewsHeader from '@/components/ai-news/NewsHeader';
 import { NewsErrorBoundary } from '@/components/ai-news/NewsErrorBoundary';
 import { NewsApiStatus } from '@/components/ai-news/NewsApiStatus'; 
 import { Helmet } from 'react-helmet';
-import Sidebar from '@/components/Sidebar';
+import { Sidebar } from '@/components/Sidebar';
 
 const AINews = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -68,8 +67,8 @@ const AINews = () => {
               <FeaturedNewsHero 
                 article={featuredArticle}
                 onGenerateSummary={generateSummary}
-                summary={summaries[featuredArticle.id]}
-                loadingSummary={loadingSummaries[featuredArticle.id]}
+                summary={summaries[featuredArticle.id] || ""}
+                loadingSummary={loadingSummaries[featuredArticle.id] || false}
               />
             </div>
           )}
