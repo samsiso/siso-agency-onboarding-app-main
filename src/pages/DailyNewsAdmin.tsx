@@ -1,10 +1,10 @@
 
 import { useState } from 'react';
-import { MainLayout } from '@/components/assistants/layout/MainLayout';
-import GenerateDailyNews from '@/components/ai-news/admin/GenerateDailyNews';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { MainLayout } from '../components/assistants/layout/MainLayout';
+import GenerateDailyNews from '../components/ai-news/admin/GenerateDailyNews';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '../integrations/supabase/client';
 
 export default function DailyNewsAdmin() {
   const [activeTab, setActiveTab] = useState('generate');

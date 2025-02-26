@@ -1,16 +1,17 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Index from '@/pages';
-import Auth from '@/pages/Auth';
-import ThankYou from '@/pages/ThankYou';
-import AINews from '@/pages/AINews';
-import DailyNews from '@/pages/DailyNews';
-import BlogPost from '@/pages/BlogPost';
-import Tools from '@/pages/Tools';
-import ToolDetail from '@/pages/ToolDetail';
-import Education from '@/pages/Education';
-import VideoDetail from '@/pages/VideoDetail';
-import DailyNewsAdmin from '@/pages/DailyNewsAdmin';
+import Index from './pages';
+import Auth from './pages/Auth';
+import ThankYou from './pages/ThankYou';
+import AINews from './pages/AINews';
+import DailyNews from './pages/DailyNews';
+import BlogPost from './pages/BlogPost';
+import Tools from './pages/Tools';
+import ToolDetail from './pages/ToolDetail';
+import Education from './pages/Education';
+import VideoDetail from './pages/VideoDetail';
+import DailyNewsAdmin from './pages/DailyNewsAdmin';
 
 export default function App() {
   return (

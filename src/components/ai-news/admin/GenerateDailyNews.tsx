@@ -1,13 +1,13 @@
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '../../../components/ui/button';
+import { Calendar } from '../../../components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '../../../components/ui/popover';
 import { CalendarIcon, CheckCircle2, Loader2, RefreshCw } from 'lucide-react';
 import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { cn } from '../../../lib/utils';
+import { supabase } from '../../../integrations/supabase/client';
+import { useToast } from '../../../hooks/use-toast';
 
 type GenerationStep = {
   id: string;
