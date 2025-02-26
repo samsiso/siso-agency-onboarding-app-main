@@ -20,7 +20,6 @@ async function fetchWithRetry(url: string, options: RequestInit, retries = 3, ba
     if (response.ok) {
       return await response.json();
     }
-    throw new Error(`Failed with status: ${response.status}`);
   } catch (err) {
     if (retries === 0) {
       throw err;
@@ -109,64 +108,28 @@ async function processVideo(videoId: string) {
   console.log(`Starting processing for video: ${videoId}`);
   
   try {
-    // Check if we already have a processing record for this video
-    const { data: existingRecord, error: fetchError } = await supabase
+    // Get the video processing record
+    const { data: processingRecord, error: fetchError } = await supabase
       .from('ai_news_video_processing')
       .select('*')
       .eq('video_id', videoId)
-      .maybeSingle();
-    
-    if (fetchError) {
-      throw new Error(`Error checking existing records: ${fetchError.message}`);
+      .single();
+      
+    if (fetchError || !processingRecord) {
+      throw new Error(`Video processing record not found: ${fetchError?.message || 'No record'}`);
     }
-      
-    let processingRecordId;
     
-    if (existingRecord) {
-      // Validate status transition
-      if (existingRecord.status === 'processing') {
-        console.log(`Video ${videoId} is already being processed`);
-        return {
-          success: false,
-          videoId,
-          error: "Video is already being processed"
-        };
-      }
+    // Update status to processing
+    const { error: updateError } = await supabase
+      .from('ai_news_video_processing')
+      .update({
+        status: 'processing',
+        processed_at: new Date().toISOString()
+      })
+      .eq('id', processingRecord.id);
       
-      // Update the existing record to reprocess
-      processingRecordId = existingRecord.id;
-      
-      const { error: updateError } = await supabase
-        .from('ai_news_video_processing')
-        .update({
-          status: 'processing',
-          processed_at: new Date().toISOString(),
-          error_message: null,
-          retry_count: (existingRecord.retry_count || 0) + 1
-        })
-        .eq('id', processingRecordId);
-        
-      if (updateError) {
-        throw new Error(`Error updating processing record: ${updateError.message}`);
-      }
-    } else {
-      // Create a new processing record
-      const { data: newRecord, error: insertError } = await supabase
-        .from('ai_news_video_processing')
-        .insert({
-          video_id: videoId,
-          status: 'processing',
-          created_at: new Date().toISOString(),
-          processed_at: new Date().toISOString()
-        })
-        .select()
-        .single();
-        
-      if (insertError || !newRecord) {
-        throw new Error(`Error creating processing record: ${insertError?.message || 'No record returned'}`);
-      }
-      
-      processingRecordId = newRecord.id;
+    if (updateError) {
+      throw new Error(`Error updating status: ${updateError.message}`);
     }
     
     // Fetch video details
@@ -177,7 +140,7 @@ async function processVideo(videoId: string) {
     const transcript = await fetchYouTubeTranscript(videoId);
     console.log(`Transcript result: ${transcript?.substring(0, 100)}...`);
     
-    // Update processing record with details and transcript using a transaction
+    // Update processing record with details and transcript
     const { error: saveError } = await supabase
       .from('ai_news_video_processing')
       .update({
@@ -186,7 +149,7 @@ async function processVideo(videoId: string) {
         status: 'completed',
         processed_at: new Date().toISOString()
       })
-      .eq('id', processingRecordId);
+      .eq('id', processingRecord.id);
       
     if (saveError) {
       throw new Error(`Error saving video data: ${saveError.message}`);
@@ -202,25 +165,16 @@ async function processVideo(videoId: string) {
   } catch (error) {
     console.error(`Error processing video ${videoId}:`, error);
     
-    // Update error status in the record if we can
+    // Update error status in the record
     try {
-      // First find the record by video_id
-      const { data: record } = await supabase
+      await supabase
         .from('ai_news_video_processing')
-        .select('id')
-        .eq('video_id', videoId)
-        .maybeSingle();
-        
-      if (record) {
-        await supabase
-          .from('ai_news_video_processing')
-          .update({
-            status: 'failed',
-            error_message: error.message || 'Unknown error',
-            processed_at: new Date().toISOString()
-          })
-          .eq('id', record.id);
-      }
+        .update({
+          status: 'failed',
+          error_message: error.message || 'Unknown error',
+          processed_at: new Date().toISOString()
+        })
+        .eq('video_id', videoId);
     } catch (updateError) {
       console.error('Failed to update error status:', updateError);
     }

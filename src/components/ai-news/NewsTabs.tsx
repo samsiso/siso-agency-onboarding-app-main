@@ -1,24 +1,29 @@
 
 import { TrendingUp, Clock, MessageSquare, Calendar } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { memo, useEffect, useState } from 'react';
+import { NewsTabContent } from './NewsTabContent';
+import { memo, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { format, subWeeks, startOfWeek, endOfWeek } from 'date-fns';
+import NewsCard from './NewsCard';
 import { TableOfContents } from './TableOfContents';
 
-// [Analysis] Updated interface to match props being passed from NewsContent
-export interface NewsTabsProps {
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
-  selectedCategory: string | null;
-  setSelectedCategory: (category: string | null) => void;
+interface NewsTabsProps {
+  latestItems: any[];
+  trendingItems: any[];
+  mostDiscussedItems: any[];
+  summaries: Record<string, string>;
+  loadingSummaries: Record<string, boolean>;
+  onGenerateSummary: (id: string) => void;
 }
 
 const NewsTabs = memo(({
-  activeTab,
-  setActiveTab,
-  selectedCategory,
-  setSelectedCategory
+  latestItems,
+  trendingItems,
+  mostDiscussedItems,
+  summaries,
+  loadingSummaries,
+  onGenerateSummary
 }: NewsTabsProps) => {
   const [currentWeekOffset, setCurrentWeekOffset] = useState(0);
   const [activeId, setActiveId] = useState<string>();
@@ -26,6 +31,23 @@ const NewsTabs = memo(({
   const weekStart = startOfWeek(subWeeks(new Date(), currentWeekOffset));
   const weekEnd = endOfWeek(weekStart);
   
+  const filterItemsByDateRange = (items: any[]) => {
+    return items.filter(item => {
+      const itemDate = new Date(item.date);
+      return itemDate >= weekStart && itemDate <= weekEnd;
+    });
+  };
+
+  const dailyBriefs = latestItems.filter(item => item.template_type === 'daily_brief');
+  const filteredDailyBriefs = filterItemsByDateRange(dailyBriefs);
+  const otherNews = latestItems.filter(item => item.template_type !== 'daily_brief');
+
+  // [Analysis] Handler to ensure correct function signature propagation
+  const handleGenerateSummary = (id: string) => {
+    onGenerateSummary(id);
+  };
+
+  // [Analysis] Track which section is currently visible
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -38,17 +60,16 @@ const NewsTabs = memo(({
       { threshold: 0.5 }
     );
 
-    // This will be connected to actual daily brief elements when they're rendered
-    const elements = document.querySelectorAll('[data-daily-brief="true"]');
-    elements.forEach((element) => {
-      observer.observe(element);
+    filteredDailyBriefs.forEach((item) => {
+      const element = document.getElementById(item.id);
+      if (element) observer.observe(element);
     });
 
     return () => observer.disconnect();
-  }, []);
+  }, [filteredDailyBriefs]);
 
   return (
-    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+    <Tabs defaultValue="latest" className="w-full">
       <TabsList className="grid w-full lg:w-[600px] grid-cols-4">
         <TabsTrigger value="daily" className="flex items-center gap-2">
           <Calendar className="h-4 w-4" />
@@ -91,22 +112,55 @@ const NewsTabs = memo(({
         </div>
         <div className="flex gap-8">
           <div className="flex-1">
-            {/* The actual daily brief content will be rendered by NewsContent */}
-            <p className="text-muted-foreground">Select a daily brief to view its contents.</p>
+            <div className="grid grid-cols-1 gap-4">
+              {filteredDailyBriefs.map((item) => (
+                <div key={item.id} id={item.id}>
+                  <NewsCard
+                    item={item}
+                    summaries={summaries}
+                    loadingSummaries={loadingSummaries}
+                    onGenerateSummary={handleGenerateSummary}
+                    isCompact={true}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
           <div className="w-80 hidden xl:block">
             <TableOfContents
-              items={[]} // This will be populated when we have actual daily briefs
+              items={filteredDailyBriefs}
               activeId={activeId}
             />
           </div>
         </div>
       </TabsContent>
 
-      {/* The content for the other tabs will be rendered by NewsContent */}
-      <TabsContent value="latest" className="mt-6" />
-      <TabsContent value="trending" className="mt-6" />
-      <TabsContent value="discussed" className="mt-6" />
+      <TabsContent value="latest" className="mt-6">
+        <NewsTabContent 
+          items={otherNews}
+          summaries={summaries}
+          loadingSummaries={loadingSummaries}
+          onGenerateSummary={handleGenerateSummary}
+        />
+      </TabsContent>
+
+      <TabsContent value="trending" className="mt-6">
+        <NewsTabContent 
+          items={trendingItems}
+          summaries={summaries}
+          loadingSummaries={loadingSummaries}
+          onGenerateSummary={handleGenerateSummary}
+        />
+      </TabsContent>
+
+      <TabsContent value="discussed" className="mt-6">
+        <NewsTabContent 
+          items={mostDiscussedItems}
+          summaries={summaries}
+          loadingSummaries={loadingSummaries}
+          onGenerateSummary={handleGenerateSummary}
+        />
+      </TabsContent>
     </Tabs>
   );
 });

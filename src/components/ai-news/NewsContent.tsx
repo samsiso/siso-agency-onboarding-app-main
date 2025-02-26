@@ -1,12 +1,11 @@
 
-import { lazy, Suspense, useEffect, useMemo, useCallback, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import { useInView } from 'react-intersection-observer';
 import NewsTabs from './NewsTabs';
 import { NewsLoadingState } from './NewsLoadingState';
 import { NewsEmptyState } from './NewsEmptyState';
-import { NewsTabContent } from './NewsTabContent';
 
 const NewsCard = lazy(() => import('@/components/ai-news/NewsCard'));
 
@@ -54,10 +53,6 @@ export const NewsContent = ({
     triggerOnce: false
   });
 
-  // [Analysis] Added local state for tabs to align with NewsTabs interface
-  const [activeTab, setActiveTab] = useState<string>('latest');
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-
   const handleLoadMore = useCallback(() => {
     if (!loading && hasMore && onLoadMore) {
       onLoadMore();
@@ -79,22 +74,9 @@ export const NewsContent = ({
     }
   }, [inView, handleLoadMore]);
 
-  // [Analysis] Filter news items based on active tab
-  const tabNewsItems = useMemo(() => {
-    // Here we could implement actual filtering based on the tab
-    // For now, we're using the same filteredNewsItems for all tabs except 'daily'
-    return filteredNewsItems;
-  }, [filteredNewsItems, activeTab]);
-
-  // [Analysis] Get daily briefs (could be filtered by date)
-  const dailyBriefs = useMemo(() => {
-    return filteredNewsItems.filter(item => item.article_type === 'daily_brief');
-  }, [filteredNewsItems]);
-
   return (
     <Suspense fallback={<LoadingSpinner />}>
-      {/* Fixed AnimatePresence mode to "sync" instead of "wait" to support multiple children */}
-      <AnimatePresence mode="sync">
+      <AnimatePresence mode="wait">
         <motion.div
           key={searchQuery}
           initial="hidden"
@@ -103,23 +85,14 @@ export const NewsContent = ({
           variants={containerVariants}
           className="space-y-8"
         >
-          {/* [Analysis] Updated NewsTabs to match the new interface */}
           <NewsTabs
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            selectedCategory={selectedCategory}
-            setSelectedCategory={setSelectedCategory}
+            latestItems={filteredNewsItems}
+            trendingItems={filteredNewsItems.slice(0, 6)}
+            mostDiscussedItems={filteredNewsItems.slice(0, 6)}
+            summaries={summaries}
+            loadingSummaries={loadingSummaries}
+            onGenerateSummary={onGenerateSummary}
           />
-
-          {/* Display appropriate content based on activeTab */}
-          {activeTab !== 'daily' && (
-            <NewsTabContent 
-              items={tabNewsItems}
-              summaries={summaries}
-              loadingSummaries={loadingSummaries}
-              onGenerateSummary={onGenerateSummary}
-            />
-          )}
 
           {/* Infinite Scroll Trigger */}
           {hasMore && !loading && filteredNewsItems.length > 0 && (

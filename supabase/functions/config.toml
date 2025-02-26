@@ -1,6 +1,11 @@
 
 project_id = "fzuwsjxjymwcjsbpwfsl"
 
-[manual-process-videos]
+[functions.chat-with-assistant]
 verify_jwt = false
 
+[functions.sync-youtube-channels]
+verify_jwt = false
+
+[functions.process-youtube-videos]
+verify_jwt = false
