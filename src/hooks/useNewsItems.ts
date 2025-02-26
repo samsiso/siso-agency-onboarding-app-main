@@ -4,8 +4,8 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { format, parseISO } from 'date-fns';
 
-// [Analysis] Added types for news items
-type NewsItem = {
+// [Analysis] Added clear types for news items
+export type NewsItem = {
   id: string;
   title: string;
   description: string;
@@ -19,7 +19,16 @@ type NewsItem = {
     full_name: string;
     avatar_url: string;
   };
-  // ... other properties
+  status?: string;
+  views?: number;
+  source?: string;
+  source_credibility?: string;
+  technical_complexity?: string;
+  impact?: string;
+  image_url?: string;
+  reading_time?: number;
+  bookmarks?: number;
+  template_type?: string;
 };
 
 type PostStatus = 'all' | 'draft' | 'published';
@@ -39,6 +48,11 @@ export const useNewsItems = (
 
   const PAGE_SIZE = 12;
   const [page, setPage] = useState(0);
+
+  // [Analysis] Reset page when filter parameters change
+  useEffect(() => {
+    setPage(0);
+  }, [selectedCategory, status, selectedDate]);
 
   useEffect(() => {
     fetchNews();
@@ -65,10 +79,13 @@ export const useNewsItems = (
         query = query.eq('category', selectedCategory);
       }
 
+      // [Analysis] More precise date handling
       if (selectedDate) {
+        // Exact date match
         query = query.eq('date', selectedDate);
       }
 
+      // Only apply pagination when not filtering by date
       if (!selectedDate) {
         query = query.range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
       }
@@ -80,21 +97,52 @@ export const useNewsItems = (
         throw fetchError;
       }
 
-      console.log('Fetched blog posts:', data?.length);
+      console.log('Fetched blog posts:', data?.length, 'for date:', selectedDate || 'all dates');
 
-      setHasMore(data && data.length === PAGE_SIZE);
+      // Only set hasMore if we're not filtering by date
+      if (!selectedDate) {
+        setHasMore(data && data.length === PAGE_SIZE);
+      } else {
+        // When filtering by date, there's no more data beyond what we got
+        setHasMore(false);
+      }
       
-      // [Analysis] Use article_type instead of template_type
+      // [Analysis] Handle article_type and template_type transformation consistently
       const transformedData = data?.map(item => ({
         ...item,
-        article_type: item.article_type || 'article'
+        article_type: item.article_type || item.template_type || 'article'
       })) || [];
       
+      // Reset newsItems when page is 0 (new search/filter)
       setNewsItems(prev => page === 0 ? transformedData : [...prev, ...transformedData]);
 
+      // Fetch summaries for displayed news items
+      fetchSummaries(transformedData);
+    } catch (error) {
+      console.error('Error in fetchNews:', error);
+      setError(error as Error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch blog posts. Please try again.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // [Analysis] Separate function to fetch summaries for better code organization
+  const fetchSummaries = async (items: NewsItem[]) => {
+    try {
+      if (!items.length) return;
+      
+      // Get IDs of items that need summaries
+      const itemIds = items.map(item => item.id);
+      
       const { data: summariesData, error: summariesError } = await supabase
         .from('ai_news_summaries')
-        .select('news_id, summary');
+        .select('news_id, summary')
+        .in('news_id', itemIds);
 
       if (summariesError) {
         console.error('Error fetching summaries:', summariesError);
@@ -106,18 +154,10 @@ export const useNewsItems = (
           acc[curr.news_id] = curr.summary;
           return acc;
         }, {});
-        setSummaries(summariesMap);
+        setSummaries(prev => ({...prev, ...summariesMap}));
       }
     } catch (error) {
-      console.error('Error in fetchNews:', error);
-      setError(error as Error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to fetch blog posts. Please try again.",
-      });
-    } finally {
-      setLoading(false);
+      console.error('Error fetching summaries:', error);
     }
   };
 
@@ -191,6 +231,7 @@ export const useNewsItems = (
     loading,
     hasMore,
     loadMore,
-    error
+    error,
+    refetch: fetchNews // [Analysis] Added explicit refetch function for manual refreshes
   };
 };
