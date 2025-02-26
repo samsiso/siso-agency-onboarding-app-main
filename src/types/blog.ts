@@ -104,3 +104,32 @@ export interface EnhancedNewsItem {
   source: string;
   sources: any[];
 }
+
+// [Analysis] Added NewsItem type to represent the structure of news items
+// from the database which is different from EnhancedNewsItem
+export interface NewsItem {
+  id: string;
+  title: string;
+  description: string;
+  content: string;
+  date: string;
+  category: string;
+  article_type: string;
+  created_at: string;
+  author_id: string;
+  image_url: string;
+  source: string;
+  source_credibility: string;
+  technical_complexity: string;
+  impact: string;
+  views: number;
+  bookmarks: number;
+  reading_time: number;
+  featured: boolean;
+  profiles?: {
+    full_name: string;
+    avatar_url: string;
+  };
+  template_type?: string;
+  status?: string;
+}

@@ -1,3 +1,4 @@
+
 import { motion } from 'framer-motion';
 import { NewsCardMedia } from './NewsCardMedia';
 import { Badge } from '@/components/ui/badge';
@@ -18,6 +19,7 @@ const FeaturedNewsHero = ({
   summary,
   loadingSummary 
 }: FeaturedNewsHeroProps) => {
+  // [Analysis] Return placeholder content when article isn't available
   if (!article) return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -169,33 +171,33 @@ const FeaturedNewsHero = ({
       animate={{ opacity: 1, y: 0 }}
       className="relative w-full rounded-xl overflow-hidden"
     >
-      <NewsCardMedia imageUrl={item.image_url} alt={item.title} className="h-64 md:h-96" />
+      <NewsCardMedia imageUrl={article.image_url} title={article.title} className="h-64 md:h-96" />
       
       <div className="absolute inset-0 bg-gradient-to-br from-siso-red/20 via-siso-orange/10 to-transparent opacity-75" />
       <div className="absolute inset-0 bg-gradient-radial from-siso-red/10 via-siso-orange/5 to-transparent opacity-50" />
       
       <div className="absolute bottom-0 left-0 p-6 w-full">
         <div className="flex items-center justify-between mb-3">
-          <Badge variant="secondary">{item.category}</Badge>
+          <Badge variant="secondary">{article.category}</Badge>
           <div className="flex items-center space-x-2 text-siso-text/70">
             <Share2 className="h-4 w-4 cursor-pointer hover:text-siso-text" />
             <BookmarkPlus className="h-4 w-4 cursor-pointer hover:text-siso-text" />
           </div>
         </div>
         
-        <h2 className="text-2xl font-bold text-siso-text-bold mb-2">{item.title}</h2>
-        <p className="text-siso-text/80 line-clamp-2">{item.description}</p>
+        <h2 className="text-2xl font-bold text-siso-text-bold mb-2">{article.title}</h2>
+        <p className="text-siso-text/80 line-clamp-2">{article.description}</p>
         
         <div className="flex items-center justify-between mt-4">
           <div className="flex items-center space-x-3">
             <img 
-              src={item.profiles?.avatar_url || 'https://avatar.vercel.sh/api/new'} 
-              alt={item.profiles?.full_name || 'Author'}
+              src={article.profiles?.avatar_url || 'https://avatar.vercel.sh/api/new'} 
+              alt={article.profiles?.full_name || 'Author'}
               className="w-8 h-8 rounded-full object-cover"
             />
-            <span className="text-sm text-siso-text/90">{item.profiles?.full_name || 'Unknown Author'}</span>
+            <span className="text-sm text-siso-text/90">{article.profiles?.full_name || 'Unknown Author'}</span>
           </div>
-          <Button variant="outline" size="sm" onClick={() => onGenerateSummary(item.id)}>
+          <Button variant="outline" size="sm" onClick={() => onGenerateSummary(article.id)}>
             {loadingSummary ? 'Loading...' : (summary ? 'View Summary' : 'Generate Summary')}
           </Button>
         </div>

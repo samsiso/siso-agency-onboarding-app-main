@@ -9,13 +9,15 @@ interface NewsCardMediaProps {
   title: string;
   isFeatured?: boolean;
   isCompact?: boolean;
+  className?: string; // [Analysis] Added className prop to allow customization
 }
 
 export const NewsCardMedia = ({ 
   imageUrl, 
   title, 
   isFeatured = false,
-  isCompact = false 
+  isCompact = false,
+  className = '' // [Analysis] Default to empty string
 }: NewsCardMediaProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isIntersecting, setIsIntersecting] = useState(false);
@@ -47,7 +49,7 @@ export const NewsCardMedia = ({
 
   return (
     <div 
-      className={`${isCompact ? 'w-1/3 max-w-[200px]' : 'w-full'}`}
+      className={`${isCompact ? 'w-1/3 max-w-[200px]' : 'w-full'} ${className}`}
     >
       <AspectRatio ratio={isCompact ? 4/3 : 16/9}>
         <div 

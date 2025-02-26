@@ -1,12 +1,14 @@
+
 import { motion } from 'framer-motion';
 import { lazy, memo, useState } from 'react';
 import { Calendar, Grid3X3, LayoutList } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { NewsItem } from '@/types/blog';
 
 const NewsCard = lazy(() => import('@/components/ai-news/NewsCard'));
 
 interface NewsTabContentProps {
-  items: any[];
+  items: NewsItem[]; // [Analysis] Explicitly typed as NewsItem array to avoid unknown type
   summaries: Record<string, string>;
   loadingSummaries: Record<string, boolean>;
   onGenerateSummary: (id: string) => void;
@@ -58,7 +60,7 @@ export const NewsTabContent = memo(({
     }
     groups[date].push(item);
     return groups;
-  }, {} as Record<string, any[]>) : {};
+  }, {} as Record<string, NewsItem[]>) : {};
 
   // [Analysis] Determine the grid columns based on view mode
   const gridClass = viewMode === 'grid' 
