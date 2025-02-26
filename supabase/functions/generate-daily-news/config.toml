@@ -1,0 +1,5 @@
+
+project_id = "fzuwsjxjymwcjsbpwfsl"
+
+[functions.generate-daily-news]
+verify_jwt = false
