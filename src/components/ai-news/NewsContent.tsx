@@ -93,7 +93,8 @@ export const NewsContent = ({
 
   return (
     <Suspense fallback={<LoadingSpinner />}>
-      <AnimatePresence mode="wait">
+      {/* Fixed AnimatePresence mode to "sync" instead of "wait" to support multiple children */}
+      <AnimatePresence mode="sync">
         <motion.div
           key={searchQuery}
           initial="hidden"

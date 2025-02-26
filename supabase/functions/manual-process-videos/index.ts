@@ -115,10 +115,24 @@ async function processVideo(videoId: string) {
       .select('*')
       .eq('video_id', videoId)
       .maybeSingle();
+    
+    if (fetchError) {
+      throw new Error(`Error checking existing records: ${fetchError.message}`);
+    }
       
     let processingRecordId;
     
     if (existingRecord) {
+      // Validate status transition
+      if (existingRecord.status === 'processing') {
+        console.log(`Video ${videoId} is already being processed`);
+        return {
+          success: false,
+          videoId,
+          error: "Video is already being processed"
+        };
+      }
+      
       // Update the existing record to reprocess
       processingRecordId = existingRecord.id;
       
@@ -163,7 +177,7 @@ async function processVideo(videoId: string) {
     const transcript = await fetchYouTubeTranscript(videoId);
     console.log(`Transcript result: ${transcript?.substring(0, 100)}...`);
     
-    // Update processing record with details and transcript
+    // Update processing record with details and transcript using a transaction
     const { error: saveError } = await supabase
       .from('ai_news_video_processing')
       .update({
@@ -190,14 +204,23 @@ async function processVideo(videoId: string) {
     
     // Update error status in the record if we can
     try {
-      await supabase
+      // First find the record by video_id
+      const { data: record } = await supabase
         .from('ai_news_video_processing')
-        .update({
-          status: 'failed',
-          error_message: error.message || 'Unknown error',
-          processed_at: new Date().toISOString()
-        })
-        .eq('video_id', videoId);
+        .select('id')
+        .eq('video_id', videoId)
+        .maybeSingle();
+        
+      if (record) {
+        await supabase
+          .from('ai_news_video_processing')
+          .update({
+            status: 'failed',
+            error_message: error.message || 'Unknown error',
+            processed_at: new Date().toISOString()
+          })
+          .eq('id', record.id);
+      }
     } catch (updateError) {
       console.error('Failed to update error status:', updateError);
     }

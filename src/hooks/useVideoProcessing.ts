@@ -32,11 +32,6 @@ export const useVideoProcessing = () => {
       if (!data.success) {
         throw new Error(data.error || 'Processing failed');
       }
-
-      toast({
-        title: "Processing Completed",
-        description: `Successfully processed video: ${data.title || videoId}`,
-      });
       
       return data;
     } catch (err) {
@@ -94,7 +89,7 @@ export const useVideoProcessing = () => {
         .from('ai_news_video_processing')
         .select('*')
         .eq('video_id', videoId)
-        .single();
+        .maybeSingle();
 
       if (fetchError) {
         throw fetchError;
@@ -108,11 +103,70 @@ export const useVideoProcessing = () => {
     }
   };
 
+  // Retry a failed video processing
+  const retryProcessing = async (recordId: string) => {
+    try {
+      setProcessing(true);
+      setError(null);
+      
+      // Get the video record to extract the video_id
+      const { data: record, error: fetchError } = await supabase
+        .from('ai_news_video_processing')
+        .select('video_id')
+        .eq('id', recordId)
+        .single();
+      
+      if (fetchError || !record) {
+        throw new Error(fetchError?.message || 'Record not found');
+      }
+      
+      // Invoke processing with the video_id
+      return await processVideo(record.video_id);
+    } catch (err) {
+      console.error('Error retrying processing:', err);
+      setError(err as Error);
+      throw err;
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  // Delete a processing record
+  const deleteProcessingRecord = async (recordId: string) => {
+    try {
+      setError(null);
+      
+      const { error: deleteError } = await supabase
+        .from('ai_news_video_processing')
+        .delete()
+        .eq('id', recordId);
+      
+      if (deleteError) {
+        throw deleteError;
+      }
+      
+      return true;
+    } catch (err) {
+      console.error('Error deleting record:', err);
+      setError(err as Error);
+      
+      toast({
+        variant: "destructive",
+        title: "Delete Failed",
+        description: err instanceof Error ? err.message : 'Failed to delete processing record',
+      });
+      
+      return false;
+    }
+  };
+
   return {
     processing,
     error,
     processVideo,
     getPendingVideos,
-    getVideoStatus
+    getVideoStatus,
+    retryProcessing,
+    deleteProcessingRecord
   };
 };

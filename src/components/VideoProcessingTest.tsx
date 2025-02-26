@@ -1,44 +1,116 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useVideoProcessing } from '@/hooks/useVideoProcessing';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Loader2, CheckCircle, AlertTriangle, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/components/ui/use-toast';
 
 export function VideoProcessingTest() {
   const [videoId, setVideoId] = useState('Spr3tKzkqnk'); // Default to the video ID you want to test
   const [result, setResult] = useState<any>(null);
   const [showDetails, setShowDetails] = useState(false);
-  const { processVideo, processing, error } = useVideoProcessing();
+  const [statusPolling, setStatusPolling] = useState<NodeJS.Timeout | null>(null);
+  const { processVideo, processing, error, getVideoStatus } = useVideoProcessing();
 
   const handleProcess = async () => {
     try {
+      // Clear previous results and any previous polling
+      setResult(null);
+      if (statusPolling) clearInterval(statusPolling);
+      
+      // Validate videoId
+      if (!videoId || videoId.trim() === '') {
+        toast({
+          variant: "destructive",
+          title: "Invalid Video ID",
+          description: "Please enter a valid YouTube video ID",
+        });
+        return;
+      }
+      
+      // Start processing
+      toast({
+        title: "Processing Started",
+        description: `Request to process video ${videoId} has been submitted`,
+      });
+      
       const response = await processVideo(videoId);
       setResult(response);
       
-      // Fetch the detailed status after processing
-      setTimeout(fetchStatus, 1000);
+      // Set up polling to check the status
+      startStatusPolling();
     } catch (err) {
       console.error('Failed to process video:', err);
+      toast({
+        variant: "destructive",
+        title: "Processing Error",
+        description: err instanceof Error ? err.message : 'An unknown error occurred',
+      });
     }
+  };
+
+  const startStatusPolling = () => {
+    // Poll for status updates every 3 seconds
+    const interval = setInterval(fetchStatus, 3000);
+    setStatusPolling(interval);
+    
+    // Stop polling after 2 minutes (to avoid indefinite polling)
+    setTimeout(() => {
+      if (statusPolling) {
+        clearInterval(statusPolling);
+        setStatusPolling(null);
+      }
+    }, 2 * 60 * 1000);
   };
 
   const fetchStatus = async () => {
     try {
-      const { data, error } = await supabase
-        .from('ai_news_video_processing')
-        .select('*')
-        .eq('video_id', videoId)
-        .single();
+      if (!videoId) return;
+      
+      const status = await getVideoStatus(videoId);
+      
+      // Update result with the latest status
+      if (status) {
+        setResult(prev => ({ ...prev, details: status }));
         
-      if (error) throw error;
-      setResult(prev => ({ ...prev, details: data }));
+        // If processing is complete or failed, stop polling
+        if (status.status === 'completed' || status.status === 'failed') {
+          if (statusPolling) {
+            clearInterval(statusPolling);
+            setStatusPolling(null);
+            
+            // Show a toast notification for completion or failure
+            if (status.status === 'completed') {
+              toast({
+                title: "Processing Complete",
+                description: "The video has been successfully processed",
+              });
+            } else if (status.status === 'failed') {
+              toast({
+                variant: "destructive",
+                title: "Processing Failed",
+                description: status.error_message || "Failed to process video",
+              });
+            }
+          }
+        }
+      }
     } catch (err) {
       console.error('Failed to fetch status:', err);
     }
   };
+
+  // Clean up interval on component unmount
+  useEffect(() => {
+    return () => {
+      if (statusPolling) {
+        clearInterval(statusPolling);
+      }
+    };
+  }, [statusPolling]);
 
   return (
     <Card className="w-full max-w-3xl mx-auto">
@@ -77,6 +149,9 @@ export function VideoProcessingTest() {
               )}
             </Button>
           </div>
+          <p className="text-xs text-muted-foreground">
+            The ID is the part after "v=" in YouTube URLs, e.g., "Spr3tKzkqnk" from https://www.youtube.com/watch?v=Spr3tKzkqnk
+          </p>
         </div>
 
         {error && (
@@ -93,13 +168,19 @@ export function VideoProcessingTest() {
           <div className="p-4 bg-card border rounded-md">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                {result.success ? (
+                {result.details?.status === 'completed' ? (
                   <CheckCircle className="h-5 w-5 text-green-600" />
-                ) : (
+                ) : result.details?.status === 'failed' ? (
                   <AlertTriangle className="h-5 w-5 text-amber-600" />
+                ) : (
+                  <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
                 )}
                 <h3 className="font-bold">
-                  {result.success ? 'Processing Successful' : 'Processing Failed'}
+                  {result.details?.status === 'completed'
+                    ? 'Processing Successful'
+                    : result.details?.status === 'failed'
+                    ? 'Processing Failed'
+                    : 'Processing...'}
                 </h3>
               </div>
               
@@ -112,22 +193,43 @@ export function VideoProcessingTest() {
               </Button>
             </div>
             
-            {result.title && (
+            {result.details?.processing_metadata?.title && (
               <p className="mt-2 text-muted-foreground">
-                <span className="font-medium">Title:</span> {result.title}
+                <span className="font-medium">Title:</span> {result.details.processing_metadata.title}
               </p>
             )}
             
-            {result.transcriptLength && (
+            {result.details?.transcript && (
               <p className="text-muted-foreground">
-                <span className="font-medium">Transcript Length:</span> {result.transcriptLength} characters
+                <span className="font-medium">Transcript Length:</span> {result.details.transcript.length} characters
+              </p>
+            )}
+            
+            {result.details?.status && (
+              <div className="mt-2 flex items-center">
+                <span className="font-medium mr-2">Status:</span>
+                <span className={`px-2 py-0.5 rounded-full text-xs ${
+                  result.details.status === 'completed' 
+                    ? 'bg-green-100 text-green-800' 
+                    : result.details.status === 'failed'
+                    ? 'bg-red-100 text-red-800'
+                    : 'bg-blue-100 text-blue-800'
+                }`}>
+                  {result.details.status.charAt(0).toUpperCase() + result.details.status.slice(1)}
+                </span>
+              </div>
+            )}
+            
+            {result.details?.error_message && (
+              <p className="mt-2 text-red-600">
+                <span className="font-medium">Error:</span> {result.details.error_message}
               </p>
             )}
             
             {showDetails && result.details && (
               <div className="mt-4 bg-muted p-4 rounded-md overflow-auto max-h-96">
                 <h4 className="font-bold mb-2">Processing Details</h4>
-                <pre className="text-xs">{JSON.stringify(result.details, null, 2)}</pre>
+                <pre className="text-xs whitespace-pre-wrap">{JSON.stringify(result.details, null, 2)}</pre>
               </div>
             )}
           </div>
@@ -140,7 +242,12 @@ export function VideoProcessingTest() {
         </Button>
         
         {result && (
-          <Button variant="secondary" onClick={fetchStatus}>
+          <Button 
+            variant="secondary" 
+            onClick={fetchStatus}
+            disabled={processing}
+          >
+            <RefreshCw className="mr-2 h-4 w-4" />
             Refresh Status
           </Button>
         )}
