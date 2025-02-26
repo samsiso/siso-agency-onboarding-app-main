@@ -1,43 +1,181 @@
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { useAuthSession } from '@/hooks/useAuthSession';
+import { Toaster } from '@/components/ui/toaster';
+import Index from '@/pages/Index';
+import Home from '@/pages/Home';
+import Auth from '@/pages/Auth';
+import Profile from '@/pages/Profile';
+import Tools from '@/pages/Tools';
+import ToolPage from '@/pages/ToolPage';
+import AINews from '@/pages/AINews';
+import BlogPost from '@/pages/BlogPost';
+import SisoAI from '@/pages/SisoAI';
+import ChatGPTAssistants from '@/pages/ChatGPTAssistants';
+import Automations from '@/pages/Automations';
+import Networking from '@/pages/Networking';
+import Community from '@/pages/Community';
+import LearnNetwork from '@/pages/LearnNetwork';
+import HowToEarn from '@/pages/HowToEarn';
+import Economy from '@/pages/Economy';
+import CryptoExchange from '@/pages/CryptoExchange';
+import Crypto from '@/pages/Crypto';
+import Leaderboards from '@/pages/Leaderboards';
+import SisoEducation from '@/pages/SisoEducation';
+import EducatorDetail from '@/pages/EducatorDetail';
+import VideoDetail from '@/pages/VideoDetail';
+import Terms from '@/pages/Terms';
+import PrivacyPolicy from '@/pages/PrivacyPolicy';
+import ThankYou from '@/pages/ThankYou';
+import SocialOnboarding from '@/pages/onboarding/social';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import DailyNews from '@/pages/DailyNews';
 
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Index from './pages';
-import Auth from './pages/Auth';
-import ThankYou from './pages/ThankYou';
-import AINews from './pages/AINews';
-import DailyNews from './pages/DailyNews';
-import BlogPost from './pages/BlogPost';
-import Tools from './pages/Tools';
-import ToolDetail from './pages/ToolDetail';
-import Education from './pages/Education';
-import VideoDetail from './pages/VideoDetail';
-import DailyNewsAdmin from './pages/DailyNewsAdmin';
+function App() {
+  const { user, loading } = useAuthSession();
 
-export default function App() {
   return (
-    <Router>
+    <>
       <Routes>
+        {/* Public routes */}
         <Route path="/" element={<Index />} />
-        
-        {/* Auth Routes */}
+        <Route path="/welcome" element={<Index />} />
+        <Route path="/home" element={<Home />} />
         <Route path="/auth" element={<Auth />} />
-        <Route path="/thank-you" element={<ThankYou />} />
-        
-        {/* AI News Routes */}
-        <Route path="/ai-news" element={<AINews />} />
-        <Route path="/ai-news/daily/:date" element={<DailyNews />} />
-        <Route path="/ai-news/admin" element={<DailyNewsAdmin />} />
-        <Route path="/ai-news/:id" element={<BlogPost />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
 
-        {/* Tools Routes */}
-        <Route path="/tools" element={<Tools />} />
-        <Route path="/tools/:id" element={<ToolDetail />} />
+        {/* Protected routes that require authentication */}
+        <Route path="/profile" element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        } />
+        <Route path="/tools" element={
+          <ProtectedRoute>
+            <Tools />
+          </ProtectedRoute>
+        } />
+        <Route path="/tools/:id" element={
+          <ProtectedRoute>
+            <ToolPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/ai-news" element={
+          <ProtectedRoute>
+            <AINews />
+          </ProtectedRoute>
+        } />
+        <Route path="/ai-news/:id" element={
+          <ProtectedRoute>
+            <BlogPost />
+          </ProtectedRoute>
+        } />
+        <Route path="/assistants" element={
+          <ProtectedRoute>
+            <ChatGPTAssistants />
+          </ProtectedRoute>
+        } />
+        <Route path="/automations" element={
+          <ProtectedRoute>
+            <Automations />
+          </ProtectedRoute>
+        } />
+        <Route path="/networking" element={
+          <ProtectedRoute>
+            <Networking />
+          </ProtectedRoute>
+        } />
+        <Route path="/community" element={
+          <ProtectedRoute>
+            <Community />
+          </ProtectedRoute>
+        } />
+        <Route path="/learn" element={
+          <ProtectedRoute>
+            <LearnNetwork />
+          </ProtectedRoute>
+        } />
+        <Route path="/economy/earn" element={
+          <ProtectedRoute>
+            <HowToEarn />
+          </ProtectedRoute>
+        } />
+        <Route path="/earn" element={
+          <ProtectedRoute>
+            <HowToEarn />
+          </ProtectedRoute>
+        } />
+        <Route path="/economy" element={
+          <ProtectedRoute>
+            <Economy />
+          </ProtectedRoute>
+        } />
+        <Route path="/economy/crypto-exchange" element={
+          <ProtectedRoute>
+            <CryptoExchange />
+          </ProtectedRoute>
+        } />
+        <Route path="/exchange" element={
+          <ProtectedRoute>
+            <CryptoExchange />
+          </ProtectedRoute>
+        } />
+        <Route path="/crypto" element={
+          <ProtectedRoute>
+            <Crypto />
+          </ProtectedRoute>
+        } />
+        <Route path="/economy/leaderboards" element={
+          <ProtectedRoute>
+            <Leaderboards />
+          </ProtectedRoute>
+        } />
+        <Route path="/leaderboards" element={
+          <ProtectedRoute>
+            <Leaderboards />
+          </ProtectedRoute>
+        } />
+        <Route path="/education/*" element={
+          <ProtectedRoute>
+            <SisoEducation />
+          </ProtectedRoute>
+        } />
+        <Route path="/education/educators/:slug" element={
+          <ProtectedRoute>
+            <EducatorDetail />
+          </ProtectedRoute>
+        } />
+        <Route path="/education/video/:id" element={
+          <ProtectedRoute>
+            <VideoDetail />
+          </ProtectedRoute>
+        } />
 
-        {/* Education Routes */}
-        <Route path="/education" element={<Education />} />
-        <Route path="/education/videos/:id" element={<VideoDetail />} />
-        
+        {/* Onboarding routes (protected but allow partial auth) */}
+        <Route path="/onboarding/social" element={
+          <ProtectedRoute>
+            <SocialOnboarding />
+          </ProtectedRoute>
+        } />
+        <Route path="/thank-you" element={
+          <ProtectedRoute>
+            <ThankYou />
+          </ProtectedRoute>
+        } />
+
+        {/* Daily News Route */}
+        <Route path="/ai-news/daily/:date" element={
+          <ProtectedRoute>
+            <DailyNews />
+          </ProtectedRoute>
+        } />
+
+        {/* Catch-all route */}
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
-    </Router>
+      <Toaster />
+    </>
   );
 }
+
+export default App;
