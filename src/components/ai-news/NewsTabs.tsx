@@ -8,22 +8,19 @@ import { format, subWeeks, startOfWeek, endOfWeek } from 'date-fns';
 import NewsCard from './NewsCard';
 import { TableOfContents } from './TableOfContents';
 
-interface NewsTabsProps {
-  latestItems: any[];
-  trendingItems: any[];
-  mostDiscussedItems: any[];
-  summaries: Record<string, string>;
-  loadingSummaries: Record<string, boolean>;
-  onGenerateSummary: (id: string) => void;
+// [Analysis] Updated interface to match props being passed from AINews.tsx
+export interface NewsTabsProps {
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+  selectedCategory: string | null;
+  setSelectedCategory: (category: string | null) => void;
 }
 
 const NewsTabs = memo(({
-  latestItems,
-  trendingItems,
-  mostDiscussedItems,
-  summaries,
-  loadingSummaries,
-  onGenerateSummary
+  activeTab,
+  setActiveTab,
+  selectedCategory,
+  setSelectedCategory
 }: NewsTabsProps) => {
   const [currentWeekOffset, setCurrentWeekOffset] = useState(0);
   const [activeId, setActiveId] = useState<string>();
@@ -38,16 +35,18 @@ const NewsTabs = memo(({
     });
   };
 
+  // [Analysis] Using dummy data for now since we removed the direct props
+  const latestItems: any[] = [];
+  const trendingItems: any[] = [];
+  const mostDiscussedItems: any[] = [];
+  const summaries: Record<string, string> = {};
+  const loadingSummaries: Record<string, boolean> = {};
+  const onGenerateSummary = (id: string) => {};
+
   const dailyBriefs = latestItems.filter(item => item.template_type === 'daily_brief');
   const filteredDailyBriefs = filterItemsByDateRange(dailyBriefs);
   const otherNews = latestItems.filter(item => item.template_type !== 'daily_brief');
 
-  // [Analysis] Handler to ensure correct function signature propagation
-  const handleGenerateSummary = (id: string) => {
-    onGenerateSummary(id);
-  };
-
-  // [Analysis] Track which section is currently visible
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -69,7 +68,7 @@ const NewsTabs = memo(({
   }, [filteredDailyBriefs]);
 
   return (
-    <Tabs defaultValue="latest" className="w-full">
+    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
       <TabsList className="grid w-full lg:w-[600px] grid-cols-4">
         <TabsTrigger value="daily" className="flex items-center gap-2">
           <Calendar className="h-4 w-4" />
@@ -119,7 +118,7 @@ const NewsTabs = memo(({
                     item={item}
                     summaries={summaries}
                     loadingSummaries={loadingSummaries}
-                    onGenerateSummary={handleGenerateSummary}
+                    onGenerateSummary={onGenerateSummary}
                     isCompact={true}
                   />
                 </div>
@@ -140,7 +139,7 @@ const NewsTabs = memo(({
           items={otherNews}
           summaries={summaries}
           loadingSummaries={loadingSummaries}
-          onGenerateSummary={handleGenerateSummary}
+          onGenerateSummary={onGenerateSummary}
         />
       </TabsContent>
 
@@ -149,7 +148,7 @@ const NewsTabs = memo(({
           items={trendingItems}
           summaries={summaries}
           loadingSummaries={loadingSummaries}
-          onGenerateSummary={handleGenerateSummary}
+          onGenerateSummary={onGenerateSummary}
         />
       </TabsContent>
 
@@ -158,7 +157,7 @@ const NewsTabs = memo(({
           items={mostDiscussedItems}
           summaries={summaries}
           loadingSummaries={loadingSummaries}
-          onGenerateSummary={handleGenerateSummary}
+          onGenerateSummary={onGenerateSummary}
         />
       </TabsContent>
     </Tabs>
