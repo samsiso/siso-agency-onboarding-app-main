@@ -1,48 +1,22 @@
-import { useState, Suspense, lazy } from 'react';
-import { Sidebar } from '@/components/Sidebar';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { motion } from 'framer-motion';
-import { Loader2, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
+
+import { useState, useEffect } from 'react';
+import { NewsTabs } from '@/components/ai-news/NewsTabs';
+import { NewsHeader } from '@/components/ai-news/NewsHeader';
+import { MainLayout } from '@/components/assistants/layout/MainLayout';
+import { NewsTabContent } from '@/components/ai-news/NewsTabContent';
 import { useNewsItems } from '@/hooks/useNewsItems';
-import { NewsContent } from '@/components/ai-news/NewsContent';
 import { NewsErrorBoundary } from '@/components/ai-news/NewsErrorBoundary';
-import { useToast } from '@/hooks/use-toast';
-import { Button } from '@/components/ui/button';
-import { format, subDays, addDays } from 'date-fns';
-import { useNavigate } from 'react-router-dom';
+import { VideoProcessingTest } from '@/components/VideoProcessingTest'; // Add import for the new component
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { supabase } from '@/integrations/supabase/client';
 
-const NewsHeader = lazy(() => import('@/components/ai-news/NewsHeader'));
-const NewsCategories = lazy(() => import('@/components/ai-news/NewsCategories'));
-const FeaturedNewsHero = lazy(() => import('@/components/ai-news/FeaturedNewsHero'));
-const DailyStatsOverview = lazy(() => import('@/components/ai-news/DailyStatsOverview'));
-
-const LoadingSpinner = () => (
-  <div className="flex items-center justify-center p-8">
-    <Loader2 className="h-6 w-6 animate-spin text-siso-red" />
-  </div>
-);
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1
-    }
-  }
-};
-
-const AINews = () => {
-  const [selectedMonth, setSelectedMonth] = useState<string>('03');
-  const [selectedYear, setSelectedYear] = useState<string>('2024');
+export default function AINews() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [postStatus, setPostStatus] = useState<'all' | 'draft' | 'published'>('published');
-  const { toast } = useToast();
-  const navigate = useNavigate();
-  
+  const [activeTab, setActiveTab] = useState<string>('latest');
+
   const {
-    newsItems: posts,
+    newsItems,
     summaries,
     loadingSummaries,
     generateSummary,
@@ -50,147 +24,68 @@ const AINews = () => {
     hasMore,
     loadMore,
     error
-  } = useNewsItems(selectedCategory, postStatus);
+  } = useNewsItems(selectedCategory);
 
-  // [Analysis] Get today's date for filtering
-  const today = new Date();
-  const todayPosts = posts.filter(post => 
-    new Date(post.date).toDateString() === today.toDateString()
-  );
+  useEffect(() => {
+    const trackPageView = async () => {
+      try {
+        // Track page view for analytics
+        console.log('AI News page viewed');
+      } catch (error) {
+        console.error('Error tracking page view:', error);
+      }
+    };
 
-  // [Analysis] Separate daily briefs from regular posts using article_type
-  const dailyBriefs = todayPosts.filter(post => post.article_type === 'daily_brief');
-  const featuredDailyBrief = dailyBriefs[0]; // Most recent daily brief
-
-  // [Analysis] Group remaining posts by category with proper typing
-  const categorizedPosts = todayPosts.reduce<Record<string, typeof posts>>((acc, post) => {
-    if (!acc[post.category]) {
-      acc[post.category] = [];
-    }
-    acc[post.category].push(post);
-    return acc;
-  }, {});
-
-  const handleDateChange = (direction: 'prev' | 'next') => {
-    const currentDate = new Date();
-    const newDate = direction === 'prev' 
-      ? subDays(currentDate, 1)
-      : addDays(currentDate, 1);
-    navigate(`/ai-news/daily/${format(newDate, 'yyyy-MM-dd')}`);
-  };
-
-  if (error) {
-    toast({
-      variant: "destructive",
-      title: "Error loading posts",
-      description: "Failed to load blog posts. Please try again.",
-    });
-  }
-
-  // [Analysis] Add null check for featuredDailyBrief
-  const featuredNewsProps = featuredDailyBrief ? {
-    item: featuredDailyBrief,
-    onGenerateSummary: generateSummary
-  } : {
-    item: null,
-    onGenerateSummary: generateSummary
-  };
+    trackPageView();
+  }, []);
 
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-full">
-        <NewsErrorBoundary>
-          <div className="flex flex-1 h-screen bg-background">
-            <Sidebar />
-            <main className="flex-1 relative overflow-hidden">
-              <div className="absolute inset-0 overflow-y-auto">
-                <motion.div
-                  variants={containerVariants}
-                  initial="hidden"
-                  animate="show"
-                  className="space-y-6 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 min-h-full"
-                >
-                  <Suspense fallback={<LoadingSpinner />}>
-                    <NewsHeader
-                      selectedMonth={selectedMonth}
-                      selectedYear={selectedYear}
-                      onMonthChange={setSelectedMonth}
-                      onYearChange={setSelectedYear}
-                      searchQuery={searchQuery}
-                      onSearchChange={setSearchQuery}
-                      postStatus={postStatus}
-                      onPostStatusChange={setPostStatus}
-                    />
-
-                    {/* Date Navigation */}
-                    <div className="flex items-center justify-between mb-8 bg-siso-bg-alt p-4 rounded-lg">
-                      <Button
-                        variant="outline"
-                        onClick={() => handleDateChange('prev')}
-                      >
-                        <ChevronLeft className="h-4 w-4 mr-2" />
-                        Previous Day
-                      </Button>
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-5 w-5 text-siso-red" />
-                        <span className="text-lg font-semibold">
-                          {format(today, 'MMMM d, yyyy')}
-                        </span>
-                      </div>
-                      <Button
-                        variant="outline"
-                        onClick={() => handleDateChange('next')}
-                      >
-                        Next Day
-                        <ChevronRight className="h-4 w-4 ml-2" />
-                      </Button>
-                    </div>
-
-                    {/* Daily Statistics Overview */}
-                    <Suspense fallback={<LoadingSpinner />}>
-                      <DailyStatsOverview newsItems={todayPosts} />
-                    </Suspense>
-
-                    {/* Featured Impact Summary */}
-                    <Suspense fallback={<LoadingSpinner />}>
-                      <FeaturedNewsHero {...featuredNewsProps} />
-                    </Suspense>
-
-                    {/* Categorized News Sections */}
-                    {Object.entries(categorizedPosts).map(([category, items]) => (
-                      <div key={category} className="mb-8">
-                        <h2 className="text-xl font-semibold mb-4 text-siso-text capitalize">
-                          {category.replace('_', ' ')}
-                        </h2>
-                        <div className="bg-siso-bg-alt/50 p-6 rounded-lg">
-                          <NewsContent
-                            newsItems={items}
-                            summaries={summaries}
-                            loadingSummaries={loadingSummaries}
-                            onGenerateSummary={generateSummary}
-                            searchQuery={searchQuery}
-                            loading={loading}
-                            hasMore={false}
-                          />
-                        </div>
-                      </div>
-                    ))}
-
-                    <NewsCategories
-                      selectedCategory={selectedCategory}
-                      onCategoryChange={setSelectedCategory}
-                    />
-
-                    {loading && <LoadingSpinner />}
-                  </Suspense>
-                </motion.div>
-              </div>
-            </main>
-          </div>
-        </NewsErrorBoundary>
+    <MainLayout>
+      <div className="flex-1 space-y-4 p-4 md:p-8">
+        <Tabs defaultValue="news" className="w-full">
+          <TabsList className="mb-4">
+            <TabsTrigger value="news">AI News</TabsTrigger>
+            <TabsTrigger value="videos">Video Processing</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="news" className="space-y-4">
+            <NewsHeader
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+            />
+            
+            <NewsTabs
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              selectedCategory={selectedCategory}
+              setSelectedCategory={setSelectedCategory}
+            />
+            
+            <NewsErrorBoundary>
+              <NewsTabContent
+                newsItems={newsItems}
+                summaries={summaries}
+                loadingSummaries={loadingSummaries}
+                onGenerateSummary={generateSummary}
+                searchQuery={searchQuery}
+                loading={loading}
+                hasMore={hasMore}
+                loadMore={loadMore}
+                error={error}
+              />
+            </NewsErrorBoundary>
+          </TabsContent>
+          
+          <TabsContent value="videos">
+            <div className="p-4">
+              <h2 className="text-2xl font-bold mb-6">YouTube Video Processing</h2>
+              <VideoProcessingTest />
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
-    </SidebarProvider>
+    </MainLayout>
   );
-};
-
-export default AINews;
+}
