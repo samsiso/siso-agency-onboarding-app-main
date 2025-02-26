@@ -28,7 +28,6 @@ export type NewsItem = {
   image_url?: string;
   reading_time?: number;
   bookmarks?: number;
-  template_type?: string;
 };
 
 type PostStatus = 'all' | 'draft' | 'published';
@@ -107,10 +106,10 @@ export const useNewsItems = (
         setHasMore(false);
       }
       
-      // [Analysis] Handle article_type and template_type transformation consistently
+      // [Analysis] Handle article_type consistently
       const transformedData = data?.map(item => ({
         ...item,
-        article_type: item.article_type || item.template_type || 'article'
+        article_type: item.article_type || 'article'
       })) || [];
       
       // Reset newsItems when page is 0 (new search/filter)
