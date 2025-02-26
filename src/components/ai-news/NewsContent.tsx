@@ -1,5 +1,5 @@
 
-import { lazy, Suspense, useEffect, useMemo, useCallback } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import { useInView } from 'react-intersection-observer';
@@ -53,6 +53,10 @@ export const NewsContent = ({
     triggerOnce: false
   });
 
+  // [Analysis] Added local state for tabs to align with NewsTabs interface
+  const [activeTab, setActiveTab] = useState<string>('latest');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
   const handleLoadMore = useCallback(() => {
     if (!loading && hasMore && onLoadMore) {
       onLoadMore();
@@ -85,13 +89,12 @@ export const NewsContent = ({
           variants={containerVariants}
           className="space-y-8"
         >
+          {/* [Analysis] Updated NewsTabs to match the new interface */}
           <NewsTabs
-            latestItems={filteredNewsItems}
-            trendingItems={filteredNewsItems.slice(0, 6)}
-            mostDiscussedItems={filteredNewsItems.slice(0, 6)}
-            summaries={summaries}
-            loadingSummaries={loadingSummaries}
-            onGenerateSummary={onGenerateSummary}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
           />
 
           {/* Infinite Scroll Trigger */}
