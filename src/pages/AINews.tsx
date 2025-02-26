@@ -23,12 +23,17 @@ const AINews = () => {
     summaries, 
     loadingSummaries, 
     generateSummary, 
-    loading, 
+    loading,
+    syncingNews,
     hasMore,
     totalCount,
+    lastSync,
+    apiUsage,
+    articleCount,
     loadMore, 
     error,
-    refresh
+    refresh,
+    syncNews
   } = useNewsItems(selectedCategory, 'published', selectedDate, currentPage, itemsPerPage);
 
   // [Analysis] Find featured article with priority on featured flag and then on views
@@ -78,7 +83,14 @@ const AINews = () => {
             />
           </div>
           <div className="lg:col-span-1">
-            <NewsApiStatus onRefresh={refresh} />
+            <NewsApiStatus 
+              onRefresh={refresh}
+              syncNews={syncNews}
+              lastSync={lastSync}
+              articleCount={articleCount}
+              apiUsage={apiUsage}
+              syncingNews={syncingNews}
+            />
           </div>
         </div>
         

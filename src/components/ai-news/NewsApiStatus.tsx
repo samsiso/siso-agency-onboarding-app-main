@@ -1,99 +1,57 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { motion } from 'framer-motion';
-import { Info, RefreshCw } from 'lucide-react';
+import { Info, RefreshCw, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 
 interface NewsApiStatusProps {
   onRefresh?: () => void;
+  syncNews?: (keyword: string, limit: number) => Promise<void>;
+  lastSync: string | null;
+  articleCount: number;
+  apiUsage: number;
+  syncingNews: boolean;
 }
 
-export const NewsApiStatus = ({ onRefresh }: NewsApiStatusProps) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [lastSync, setLastSync] = useState<string | null>(null);
-  const [articleCount, setArticleCount] = useState(0);
-  const [apiUsage, setApiUsage] = useState(0);
-  const { toast } = useToast();
+export const NewsApiStatus = ({ 
+  onRefresh, 
+  syncNews, 
+  lastSync, 
+  articleCount, 
+  apiUsage,
+  syncingNews
+}: NewsApiStatusProps) => {
+  const [showSettings, setShowSettings] = useState(false);
+  const [keyword, setKeyword] = useState("artificial intelligence");
+  const [limit, setLimit] = useState("20");
+  const [advancedMode, setAdvancedMode] = useState(false);
 
-  // [Analysis] Fetch API status on component mount
-  useEffect(() => {
-    fetchApiStatus();
-  }, []);
-
-  const fetchApiStatus = async () => {
-    try {
-      // Get the count of articles from current month
-      const currentDate = new Date();
-      const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-      const firstDayStr = firstDay.toISOString().split('T')[0];
-      
-      const { count, error } = await supabase
-        .from('ai_news')
-        .select('*', { count: 'exact', head: true })
-        .gte('created_at', firstDayStr);
-      
-      if (error) throw error;
-      
-      // We're assuming each article creation used one API call
-      // API limit is 2000 calls per month
-      const usagePercentage = ((count || 0) / 2000) * 100;
-      
-      setApiUsage(usagePercentage);
-      setArticleCount(count || 0);
-      
-      // Get last sync time
-      const { data: latestArticle } = await supabase
-        .from('ai_news')
-        .select('created_at')
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single();
-      
-      if (latestArticle) {
-        const syncDate = new Date(latestArticle.created_at);
-        setLastSync(syncDate.toLocaleString());
-      }
-    } catch (error) {
-      console.error('Error fetching API status:', error);
-    }
-  };
-
-  // [Analysis] Function to trigger news fetch via Edge Function
-  const triggerNewsFetch = async () => {
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('fetch-ai-news', {
-        body: { 
-          keyword: "artificial intelligence", 
-          limit: 20 
-        },
-      });
-
-      if (error) throw error;
-
-      if (data.success) {
-        toast({
-          title: "News synced successfully",
-          description: data.message,
-        });
-        fetchApiStatus(); // Refresh stats
-        if (onRefresh) onRefresh(); // Refresh news list
-      } else {
-        throw new Error(data.message);
-      }
-    } catch (error) {
-      console.error('Error syncing news:', error);
-      toast({
-        variant: "destructive",
-        title: "Sync Error",
-        description: error.message || "Failed to sync AI news",
-      });
-    } finally {
-      setIsLoading(false);
+  const handleSync = async () => {
+    if (syncNews) {
+      await syncNews(keyword, parseInt(limit));
+    } else if (onRefresh) {
+      onRefresh();
     }
   };
 
@@ -108,16 +66,27 @@ export const NewsApiStatus = ({ onRefresh }: NewsApiStatusProps) => {
           <Info className="h-5 w-5 text-blue-500" />
           API Status
         </h3>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={triggerNewsFetch} 
-          disabled={isLoading}
-          className="h-8"
-        >
-          <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-          Sync Now
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setShowSettings(true)}
+            className="h-8"
+          >
+            <Settings className="h-4 w-4 mr-2" />
+            Configure
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleSync} 
+            disabled={syncingNews}
+            className="h-8"
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${syncingNews ? 'animate-spin' : ''}`} />
+            {syncingNews ? 'Syncing...' : 'Sync Now'}
+          </Button>
+        </div>
       </div>
       
       <div className="grid grid-cols-2 gap-4 mb-3">
@@ -143,6 +112,108 @@ export const NewsApiStatus = ({ onRefresh }: NewsApiStatusProps) => {
           Limit: 2000/month
         </Badge>
       </div>
+
+      <Dialog open={showSettings} onOpenChange={setShowSettings}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Configure News Sync</DialogTitle>
+            <DialogDescription>
+              Customize how the AI news is fetched from external sources.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="advanced-mode">Advanced Mode</Label>
+              <Switch 
+                id="advanced-mode" 
+                checked={advancedMode} 
+                onCheckedChange={setAdvancedMode} 
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="keyword" className="text-right">
+                Keyword
+              </Label>
+              <Input
+                id="keyword"
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                className="col-span-3"
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="limit" className="text-right">
+                Article Limit
+              </Label>
+              <Select
+                value={limit}
+                onValueChange={setLimit}
+              >
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="20" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="5">5 articles</SelectItem>
+                  <SelectItem value="10">10 articles</SelectItem>
+                  <SelectItem value="20">20 articles</SelectItem>
+                  <SelectItem value="50">50 articles</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {advancedMode && (
+              <>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="lang" className="text-right">
+                    Language
+                  </Label>
+                  <Select defaultValue="eng">
+                    <SelectTrigger className="col-span-3">
+                      <SelectValue placeholder="English" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="eng">English</SelectItem>
+                      <SelectItem value="deu">German</SelectItem>
+                      <SelectItem value="spa">Spanish</SelectItem>
+                      <SelectItem value="fra">French</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="sort" className="text-right">
+                    Sort By
+                  </Label>
+                  <Select defaultValue="date">
+                    <SelectTrigger className="col-span-3">
+                      <SelectValue placeholder="Date" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="date">Date</SelectItem>
+                      <SelectItem value="rel">Relevance</SelectItem>
+                      <SelectItem value="sourceImportance">Source Importance</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </>
+            )}
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setShowSettings(false)} variant="outline">Cancel</Button>
+            <Button 
+              onClick={() => {
+                handleSync();
+                setShowSettings(false);
+              }}
+              disabled={syncingNews}
+            >
+              {syncingNews ? 'Syncing...' : 'Sync Now'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 };

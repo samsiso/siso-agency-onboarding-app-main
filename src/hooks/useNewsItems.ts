@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -16,15 +17,63 @@ export const useNewsItems = (
   const [summaries, setSummaries] = useState<Record<string, string>>({});
   const [loadingSummaries, setLoadingSummaries] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
+  const [syncingNews, setSyncingNews] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
+  const [lastSync, setLastSync] = useState<string | null>(null);
+  const [apiUsage, setApiUsage] = useState(0);
+  const [articleCount, setArticleCount] = useState(0);
   const { toast } = useToast();
 
   // [Analysis] Reset when filters change
   useEffect(() => {
     fetchNews();
   }, [selectedCategory, status, selectedDate, currentPage]);
+
+  // [Analysis] Get API status info on mount
+  useEffect(() => {
+    fetchApiStatus();
+  }, []);
+
+  // [Analysis] Fetch API status metrics
+  const fetchApiStatus = async () => {
+    try {
+      // Get the count of articles from current month
+      const currentDate = new Date();
+      const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+      const firstDayStr = firstDay.toISOString().split('T')[0];
+      
+      const { count, error } = await supabase
+        .from('ai_news')
+        .select('*', { count: 'exact', head: true })
+        .gte('created_at', firstDayStr);
+      
+      if (error) throw error;
+      
+      // We're assuming each article creation used one API call
+      // API limit is 2000 calls per month
+      const usagePercentage = ((count || 0) / 2000) * 100;
+      
+      setApiUsage(usagePercentage);
+      setArticleCount(count || 0);
+      
+      // Get last sync time
+      const { data: latestArticle } = await supabase
+        .from('ai_news')
+        .select('created_at')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+      
+      if (latestArticle) {
+        const syncDate = new Date(latestArticle.created_at);
+        setLastSync(syncDate.toLocaleString());
+      }
+    } catch (error) {
+      console.error('Error fetching API status:', error);
+    }
+  };
 
   const fetchNews = async () => {
     try {
@@ -135,6 +184,41 @@ export const useNewsItems = (
     }
   };
 
+  const syncNews = async (keyword: string = "artificial intelligence", limit: number = 20) => {
+    setSyncingNews(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('fetch-ai-news', {
+        body: { 
+          keyword: keyword,
+          limit: limit
+        },
+      });
+
+      if (error) throw error;
+
+      if (data.success) {
+        toast({
+          title: "News synced successfully",
+          description: `${data.count} articles imported`,
+        });
+        // Refresh data and status
+        fetchNews();
+        fetchApiStatus();
+      } else {
+        throw new Error(data.message || "Failed to sync news");
+      }
+    } catch (error) {
+      console.error('Error syncing news:', error);
+      toast({
+        variant: "destructive",
+        title: "Sync Error",
+        description: error.message || "Failed to sync AI news",
+      });
+    } finally {
+      setSyncingNews(false);
+    }
+  };
+
   const generateSummary = async (id: string) => {
     // [Analysis] Skip if summary already exists
     if (summaries[id]) return;
@@ -208,12 +292,15 @@ export const useNewsItems = (
     loadingSummaries,
     generateSummary,
     loading,
+    syncingNews,
     hasMore,
     loadMore,
     totalCount,
+    lastSync,
+    apiUsage,
+    articleCount,
     error,
-    refresh: () => {
-      fetchNews();
-    }
+    refresh: fetchNews,
+    syncNews
   };
 };
