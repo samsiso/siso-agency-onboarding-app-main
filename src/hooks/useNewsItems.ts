@@ -1,8 +1,7 @@
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { format, parseISO } from 'date-fns';
+import { EnhancedNewsItem } from '@/types/blog';
 
 // [Analysis] Added types for news items
 type NewsItem = {
@@ -15,10 +14,20 @@ type NewsItem = {
   article_type: string;
   created_at: string;
   author_id: string;
+  image_url: string;
+  source: string;
+  source_credibility: string;
+  technical_complexity: string;
+  impact: string;
+  views: number;
+  bookmarks: number;
+  reading_time: number;
+  featured: boolean;
   profiles?: {
     full_name: string;
     avatar_url: string;
   };
+  template_type?: string;
   // ... other properties
 };
 
@@ -27,7 +36,7 @@ type PostStatus = 'all' | 'draft' | 'published';
 export const useNewsItems = (
   selectedCategory: string | null, 
   status: PostStatus = 'published',
-  selectedDate?: string
+  selectedDate?: string | null
 ) => {
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [summaries, setSummaries] = useState<Record<string, string>>({});
@@ -41,15 +50,23 @@ export const useNewsItems = (
   const [page, setPage] = useState(0);
 
   useEffect(() => {
+    setPage(0);
+    setNewsItems([]);
     fetchNews();
-  }, [selectedCategory, page, status, selectedDate]);
+  }, [selectedCategory, status, selectedDate]);
+
+  useEffect(() => {
+    if (page > 0) {
+      fetchNews();
+    }
+  }, [page]);
 
   const fetchNews = async () => {
     try {
       setLoading(true);
       setError(null);
       
-      console.log('Fetching blog posts...', { selectedCategory, page, status, selectedDate });
+      console.log('Fetching news...', { selectedCategory, page, status, selectedDate });
       
       let query = supabase
         .from('ai_news')
@@ -76,17 +93,18 @@ export const useNewsItems = (
       const { data, error: fetchError } = await query;
 
       if (fetchError) {
-        console.error('Error fetching posts:', fetchError);
+        console.error('Error fetching news:', fetchError);
         throw fetchError;
       }
 
-      console.log('Fetched blog posts:', data?.length);
+      console.log('Fetched news articles:', data?.length);
 
       setHasMore(data && data.length === PAGE_SIZE);
       
-      // [Analysis] Use article_type instead of template_type
+      // [Analysis] Determine template_type based on article properties
       const transformedData = data?.map(item => ({
         ...item,
+        template_type: item.banner_template_id ? 'daily_brief' : 'article',
         article_type: item.article_type || 'article'
       })) || [];
       
@@ -114,7 +132,7 @@ export const useNewsItems = (
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to fetch blog posts. Please try again.",
+        description: "Failed to fetch news articles. Please try again.",
       });
     } finally {
       setLoading(false);
@@ -149,8 +167,8 @@ export const useNewsItems = (
 
       const { data, error } = await supabase.functions.invoke('chat-with-assistant', {
         body: { 
-          message: `Please provide a brief 2-3 sentence summary of this blog post: ${newsItem.title}. ${newsItem.description || newsItem.content}`,
-          systemPrompt: "You are a concise blog summarizer. Provide brief, factual summaries."
+          message: `Please provide a brief 2-3 sentence summary of this news article: ${newsItem.title}. ${newsItem.description || newsItem.content}`,
+          systemPrompt: "You are a concise news summarizer. Provide brief, factual summaries focused on AI technology implications."
         },
       });
 
@@ -177,11 +195,11 @@ export const useNewsItems = (
     }
   };
 
-  const loadMore = () => {
+  const loadMore = useCallback(() => {
     if (!loading && hasMore) {
       setPage(prev => prev + 1);
     }
-  };
+  }, [loading, hasMore]);
 
   return {
     newsItems,
@@ -191,6 +209,11 @@ export const useNewsItems = (
     loading,
     hasMore,
     loadMore,
-    error
+    error,
+    refresh: () => {
+      setPage(0);
+      setNewsItems([]);
+      fetchNews();
+    }
   };
 };

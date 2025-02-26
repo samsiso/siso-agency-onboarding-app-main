@@ -9,3 +9,7 @@ verify_jwt = false
 
 [functions.process-youtube-videos]
 verify_jwt = false
+
+[functions.fetch-ai-news]
+verify_jwt = false
+
