@@ -1,17 +1,13 @@
 
-import { useMemo } from 'react';
-import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { 
-  Pagination, 
-  PaginationContent, 
-  PaginationItem, 
-  PaginationLink,
+import {
+  Pagination,
+  PaginationContent,
   PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
   PaginationNext,
-  PaginationPrevious
-} from '@/components/ui/pagination';
-import { usePagination } from '@/hooks/use-pagination';
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 interface NewsPaginationProps {
   currentPage: number;
@@ -19,90 +15,82 @@ interface NewsPaginationProps {
   onPageChange: (page: number) => void;
 }
 
-const NewsPagination = ({ currentPage, totalPages, onPageChange }: NewsPaginationProps) => {
-  // [Analysis] Use custom pagination hook to calculate which page numbers to show
-  const { pages, showLeftEllipsis, showRightEllipsis } = usePagination({
-    currentPage,
-    totalPages,
-    paginationItemsToDisplay: 5, // Show 5 page numbers in the middle
-  });
+const NewsPagination = ({ 
+  currentPage, 
+  totalPages, 
+  onPageChange 
+}: NewsPaginationProps) => {
+  // [Analysis] Prevent unnecessary rendering when there's only 1 page
+  if (totalPages <= 1) return null;
 
-  // [Analysis] Add motion effects for better UX
+  // [Analysis] Create array of page numbers to display
+  const getPageNumbers = () => {
+    const pages = [];
+    
+    // [Analysis] Always show first page
+    pages.push(1);
+    
+    // [Analysis] Add current page and surrounding pages
+    for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
+      if (pages.indexOf(i) === -1) {
+        pages.push(i);
+      }
+    }
+    
+    // [Analysis] Always show last page if there is more than one page
+    if (totalPages > 1) {
+      pages.push(totalPages);
+    }
+    
+    // [Analysis] Return sorted unique pages
+    return [...new Set(pages)].sort((a, b) => a - b);
+  };
+  
+  const pageNumbers = getPageNumbers();
+
   return (
-    <Pagination className="my-4">
+    <Pagination>
       <PaginationContent>
-        {/* Previous button */}
+        {/* Previous Button */}
         <PaginationItem>
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-9 w-9"
-            disabled={currentPage === 1}
-            onClick={() => onPageChange(currentPage - 1)}
-          >
-            <ChevronLeft className="h-4 w-4" />
-            <span className="sr-only">Go to previous page</span>
-          </Button>
+          <PaginationPrevious 
+            onClick={() => currentPage > 1 && onPageChange(currentPage - 1)}
+            className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+          />
         </PaginationItem>
 
-        {/* First page */}
-        {showLeftEllipsis && (
-          <>
-            <PaginationItem>
-              <PaginationLink
-                onClick={() => onPageChange(1)}
-                isActive={currentPage === 1}
-              >
-                1
-              </PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationEllipsis />
-            </PaginationItem>
-          </>
-        )}
+        {/* Page Numbers */}
+        {pageNumbers.map((page, i) => {
+          // [Analysis] Add ellipsis when there are gaps in the page numbers
+          const showEllipsisBefore = i > 0 && pageNumbers[i] - pageNumbers[i-1] > 1;
+          
+          return (
+            <div key={page} className="flex items-center">
+              {showEllipsisBefore && (
+                <PaginationItem>
+                  <PaginationEllipsis />
+                </PaginationItem>
+              )}
+              
+              <PaginationItem>
+                <PaginationLink
+                  isActive={page === currentPage}
+                  onClick={() => onPageChange(page)}
+                  className="cursor-pointer"
+                >
+                  {page}
+                </PaginationLink>
+              </PaginationItem>
+            </div>
+          );
+        })}
 
-        {/* Page numbers */}
-        {pages.map((page) => (
-          <PaginationItem key={page}>
-            <PaginationLink
-              onClick={() => onPageChange(page)}
-              isActive={page === currentPage}
-            >
-              {page}
-            </PaginationLink>
-          </PaginationItem>
-        ))}
-
-        {/* Last page */}
-        {showRightEllipsis && (
-          <>
-            <PaginationItem>
-              <PaginationEllipsis />
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink
-                onClick={() => onPageChange(totalPages)}
-                isActive={currentPage === totalPages}
-              >
-                {totalPages}
-              </PaginationLink>
-            </PaginationItem>
-          </>
-        )}
-
-        {/* Next button */}
+        {/* Next Button */}
         <PaginationItem>
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-9 w-9"
-            disabled={currentPage === totalPages || totalPages === 0}
-            onClick={() => onPageChange(currentPage + 1)}
-          >
-            <ChevronRight className="h-4 w-4" />
-            <span className="sr-only">Go to next page</span>
-          </Button>
+          <PaginationNext 
+            onClick={() => currentPage < totalPages && onPageChange(currentPage + 1)}
+            className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+          />
         </PaginationItem>
       </PaginationContent>
     </Pagination>

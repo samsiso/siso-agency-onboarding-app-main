@@ -10,12 +10,18 @@ import { NewsApiStatus } from '@/components/ai-news/NewsApiStatus';
 import { Helmet } from 'react-helmet';
 import { Sidebar } from '@/components/Sidebar';
 import NewsPagination from '@/components/ai-news/NewsPagination';
+import { Button } from '@/components/ui/button';
+import { CalendarDays, Clock } from 'lucide-react';
+import { format, subDays } from 'date-fns';
+import { toast } from '@/hooks/use-toast';
 
 const AINews = () => {
+  // [Analysis] State for filters, search, and pagination
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [showRecent, setShowRecent] = useState(false);
   const itemsPerPage = 12; // Same as PAGE_SIZE in useNewsItems
 
   const { 
@@ -34,7 +40,13 @@ const AINews = () => {
     error,
     refresh,
     syncNews
-  } = useNewsItems(selectedCategory, 'published', selectedDate, currentPage, itemsPerPage);
+  } = useNewsItems(
+    selectedCategory, 
+    'published', 
+    showRecent ? format(subDays(new Date(), 7), 'yyyy-MM-dd') : selectedDate, 
+    currentPage, 
+    itemsPerPage
+  );
 
   // [Analysis] Find featured article with priority on featured flag and then on views
   const featuredArticle = newsItems.find(item => item.featured) || 
@@ -43,17 +55,54 @@ const AINews = () => {
   // [Analysis] Add scroll restoration to preserve user's position
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [selectedCategory, selectedDate, currentPage]);
+  }, [selectedCategory, selectedDate, currentPage, showRecent]);
 
   // [Analysis] Handle search query change
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
     setCurrentPage(1); // Reset to first page on new search
+    
+    // [Analysis] Disable recent filter when searching
+    if (query && showRecent) {
+      setShowRecent(false);
+    }
   };
 
   // [Analysis] Handle page change
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+  };
+
+  // [Analysis] Handle recent toggle
+  const toggleRecent = () => {
+    if (showRecent) {
+      setShowRecent(false);
+    } else {
+      setShowRecent(true);
+      setSelectedDate(null); // Clear any date filter
+      setCurrentPage(1); // Reset to first page
+      toast({
+        title: "Showing recent articles",
+        description: "Displaying articles published in the last 7 days",
+      });
+    }
+  };
+
+  // [Analysis] Handle category change
+  const handleCategoryChange = (category: string | null) => {
+    setSelectedCategory(category);
+    setCurrentPage(1); // Reset to first page on category change
+  };
+
+  // [Analysis] Handle date change
+  const handleDateChange = (date: string | null) => {
+    setSelectedDate(date);
+    setCurrentPage(1); // Reset to first page on date change
+    
+    // [Analysis] Disable recent filter when selecting a specific date
+    if (date && showRecent) {
+      setShowRecent(false);
+    }
   };
 
   // [Analysis] Calculate total pages
@@ -73,12 +122,31 @@ const AINews = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
           <div className="lg:col-span-3">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4">
+              <Button 
+                variant={showRecent ? "default" : "outline"}
+                size="sm"
+                onClick={toggleRecent}
+                className="flex items-center gap-2"
+              >
+                <Clock className="h-4 w-4" />
+                Recently Published
+              </Button>
+              
+              {showRecent && (
+                <div className="text-sm text-muted-foreground flex items-center gap-2">
+                  <CalendarDays className="h-4 w-4" />
+                  <span>Last 7 days</span>
+                </div>
+              )}
+            </div>
+            
             <NewsFilters
               selectedCategory={selectedCategory}
-              onCategoryChange={setSelectedCategory}
+              onCategoryChange={handleCategoryChange}
               searchQuery={searchQuery}
               onSearchChange={handleSearchChange}
-              onDateChange={setSelectedDate}
+              onDateChange={handleDateChange}
               selectedDate={selectedDate}
             />
           </div>
@@ -95,7 +163,7 @@ const AINews = () => {
         </div>
         
         <NewsErrorBoundary>
-          {featuredArticle && !searchQuery && !selectedDate && !selectedCategory && currentPage === 1 && (
+          {featuredArticle && !searchQuery && !selectedDate && !selectedCategory && currentPage === 1 && !showRecent && (
             <div className="mb-8">
               <FeaturedNewsHero 
                 article={featuredArticle}
@@ -107,7 +175,7 @@ const AINews = () => {
           )}
           
           <NewsContent
-            newsItems={searchQuery || selectedDate || selectedCategory || currentPage > 1 ? 
+            newsItems={searchQuery || selectedDate || selectedCategory || currentPage > 1 || showRecent ? 
               newsItems : 
               newsItems.filter(item => item.id !== featuredArticle?.id)}
             searchQuery={searchQuery}
