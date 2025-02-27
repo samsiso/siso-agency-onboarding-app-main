@@ -1,171 +1,157 @@
 
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.47.0";
+import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
+import { corsHeaders } from "../_shared/cors.ts";
 
-// [Analysis] Using environment variables to maintain security
-const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
-const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
-const newsApiKey = Deno.env.get('NEWS_API_KEY') ?? '';
+const NEWS_API_KEY = Deno.env.get("NEWS_API_KEY") || "";
 
-// [Analysis] Initialize Supabase client with admin privileges to write to database
-const supabase = createClient(supabaseUrl, supabaseKey);
+interface FetchNewsOptions {
+  keyword?: string;
+  limit?: number;
+}
 
-// [Analysis] Define CORS headers for browser compatibility
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
-
-// [Analysis] Main server handler using Deno's serve API
 serve(async (req) => {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+  // [Analysis] Handle CORS for browser requests
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
   }
 
   try {
-    // Parse request body
-    const { keyword = "artificial intelligence", limit = 10 } = await req.json();
+    // [Analysis] Parse request body for parameters
+    const { keyword = "artificial intelligence", limit = 20 } = await req.json() as FetchNewsOptions;
+
+    // [Analysis] Validate API key
+    if (!NEWS_API_KEY) {
+      return new Response(
+        JSON.stringify({ success: false, message: "News API key not configured" }),
+        { 
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 500 
+        }
+      );
+    }
 
     console.log(`Fetching news for keyword: ${keyword}, limit: ${limit}`);
 
-    // [Analysis] Validate request parameters
-    if (!keyword) {
-      throw new Error("Keyword parameter is required");
-    }
+    // [Analysis] Use News API "everything" endpoint for comprehensive results
+    const url = new URL("https://newsapi.org/v2/everything");
+    url.searchParams.append("q", keyword);
+    url.searchParams.append("language", "en");
+    url.searchParams.append("sortBy", "publishedAt");
+    url.searchParams.append("pageSize", limit.toString());
 
-    // [Analysis] Calculate date range - last 30 days
-    const today = new Date();
-    const fromDate = new Date(today);
-    fromDate.setDate(today.getDate() - 30);
-
-    // Format dates for API query
-    const fromDateStr = fromDate.toISOString().split('T')[0];
-    const toDateStr = today.toISOString().split('T')[0];
-
-    // [Analysis] Build News API URL with parameters 
-    const url = new URL('https://newsapi.org/v2/everything');
-    url.searchParams.append('q', keyword);
-    url.searchParams.append('from', fromDateStr);
-    url.searchParams.append('to', toDateStr);
-    url.searchParams.append('language', 'en');
-    url.searchParams.append('sortBy', 'publishedAt');
-    url.searchParams.append('pageSize', limit.toString());
-
-    console.log(`Requesting: ${url.toString()}`);
-
-    // [Analysis] Fetch news from News API
     const response = await fetch(url.toString(), {
       headers: {
-        'X-Api-Key': newsApiKey,
-      },
+        "X-Api-Key": NEWS_API_KEY
+      }
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error("News API error:", errorData);
-      throw new Error(`News API error: ${response.status} - ${errorData.message || 'Unknown error'}`);
+      const errorText = await response.text();
+      console.error(`News API error: ${response.status} - ${errorText}`);
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          message: `News API request failed: ${response.status} ${response.statusText}` 
+        }),
+        { 
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: response.status 
+        }
+      );
     }
 
     const data = await response.json();
-    console.log(`Received ${data.articles?.length || 0} articles from News API`);
-
-    // [Analysis] Transform News API response to match our database schema
-    const articles = data.articles.map((article: any) => {
-      // Extract date without time
-      const publishDate = article.publishedAt 
-        ? article.publishedAt.split('T')[0]
-        : new Date().toISOString().split('T')[0];
-
-      // [Analysis] Calculate reading time based on content length
-      const wordCount = (article.content || article.description || '').split(' ').length;
-      const readingTime = Math.max(1, Math.ceil(wordCount / 200));
-
-      return {
-        title: article.title,
-        description: article.description || article.title,
-        content: article.content || article.description,
-        date: publishDate,
-        category: 'artificial_intelligence',
-        impact: 'medium',
-        source: article.source.name,
-        source_credibility: 'verified',
-        image_url: article.urlToImage,
-        technical_complexity: 'intermediate',
-        article_type: 'news',
-        reading_time: readingTime,
-        views: 0,
-        bookmarks: 0,
-        status: 'published',
-        url: article.url, // Store original URL for reference
-      };
-    });
-
-    // [Analysis] Start database transaction to save articles in batch
-    let successCount = 0;
-    let errorCount = 0;
-
-    for (const article of articles) {
-      try {
-        // Check if article already exists (by title to avoid duplicates)
-        const { data: existingArticle } = await supabase
-          .from('ai_news')
-          .select('id')
-          .eq('title', article.title)
-          .maybeSingle();
-
-        if (existingArticle) {
-          console.log(`Article already exists: ${article.title}`);
-          continue;
+    
+    if (!data.articles || !Array.isArray(data.articles)) {
+      return new Response(
+        JSON.stringify({ success: false, message: "Invalid response from News API" }),
+        { 
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 500 
         }
+      );
+    }
 
-        // Insert new article
-        const { error } = await supabase
-          .from('ai_news')
-          .insert([article]);
+    console.log(`Received ${data.articles.length} articles from News API`);
 
-        if (error) {
-          console.error("Error inserting article:", error);
-          errorCount++;
-        } else {
-          successCount++;
-        }
-      } catch (error) {
-        console.error("Error processing article:", error);
-        errorCount++;
+    // [Analysis] Transform News API format to our app's format
+    const { supabaseClient } = await import("../_shared/supabase-client.ts");
+
+    // [Analysis] Get our News API source record from database
+    const { data: newsSource, error: sourceError } = await supabaseClient
+      .from('news_sources')
+      .select('*')
+      .eq('source_type', 'news_api')
+      .single();
+
+    if (sourceError) {
+      console.error("Error fetching News API source record:", sourceError);
+    }
+
+    // [Analysis] Process and insert articles
+    const articles = data.articles.map(article => ({
+      title: article.title,
+      description: article.description || article.title,
+      content: article.content,
+      source: article.source.name,
+      category: 'AI Technology', // Default category
+      date: new Date(article.publishedAt).toISOString().split('T')[0],
+      image_url: article.urlToImage,
+      impact: 'Medium', // Default impact
+      status: 'published',
+      technical_complexity: 'intermediate',
+      source_credibility: 'verified',
+      article_type: 'news',
+      url: article.url,
+      created_at: new Date().toISOString()
+    }));
+
+    let importCount = 0;
+
+    // [Analysis] Insert articles in batches to avoid statement limits
+    for (let i = 0; i < articles.length; i += 10) {
+      const batch = articles.slice(i, i + 10);
+      const { data: insertedArticles, error: insertError } = await supabaseClient
+        .from('ai_news')
+        .upsert(batch, { 
+          onConflict: 'title',
+          ignoreDuplicates: true 
+        })
+        .select();
+
+      if (insertError) {
+        console.error(`Error inserting articles batch ${i / 10 + 1}:`, insertError);
+      } else {
+        importCount += insertedArticles?.length || 0;
       }
     }
 
-    // [Analysis] Update last_fetched timestamp in news_sources
-    await supabase
-      .from('news_sources')
-      .update({ last_fetched_at: new Date().toISOString() })
-      .eq('source_type', 'news_api');
+    // [Analysis] Update the last_fetched_at timestamp for the News API source
+    if (newsSource) {
+      await supabaseClient
+        .from('news_sources')
+        .update({ last_fetched_at: new Date().toISOString() })
+        .eq('id', newsSource.id);
+    }
 
     return new Response(
-      JSON.stringify({
-        success: true,
-        source: 'news_api',
-        count: successCount,
-        errored: errorCount,
-        message: `Imported ${successCount} articles from News API`,
+      JSON.stringify({ 
+        success: true, 
+        count: importCount,
+        message: `Imported ${importCount} articles from News API` 
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { 
+        headers: { ...corsHeaders, "Content-Type": "application/json" } 
+      }
     );
 
   } catch (error) {
-    console.error("Function error:", error.message);
-    
+    console.error("Error processing News API request:", error);
     return new Response(
-      JSON.stringify({
-        success: false,
-        source: 'news_api',
-        error: error.message,
-      }),
+      JSON.stringify({ success: false, message: error.message }),
       { 
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500 
       }
     );
   }
