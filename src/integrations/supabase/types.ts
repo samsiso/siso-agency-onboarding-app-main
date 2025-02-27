@@ -1807,6 +1807,48 @@ export type Database = {
           },
         ]
       }
+      news_fetch_history: {
+        Row: {
+          articles_added: number | null
+          articles_fetched: number | null
+          articles_updated: number | null
+          duplicates_skipped: number | null
+          error_message: string | null
+          execution_time_ms: number | null
+          fetch_time: string
+          id: string
+          metadata: Json | null
+          source_type: Database["public"]["Enums"]["news_source_type"]
+          status: string
+        }
+        Insert: {
+          articles_added?: number | null
+          articles_fetched?: number | null
+          articles_updated?: number | null
+          duplicates_skipped?: number | null
+          error_message?: string | null
+          execution_time_ms?: number | null
+          fetch_time?: string
+          id?: string
+          metadata?: Json | null
+          source_type: Database["public"]["Enums"]["news_source_type"]
+          status?: string
+        }
+        Update: {
+          articles_added?: number | null
+          articles_fetched?: number | null
+          articles_updated?: number | null
+          duplicates_skipped?: number | null
+          error_message?: string | null
+          execution_time_ms?: number | null
+          fetch_time?: string
+          id?: string
+          metadata?: Json | null
+          source_type?: Database["public"]["Enums"]["news_source_type"]
+          status?: string
+        }
+        Relationships: []
+      }
       news_sources: {
         Row: {
           api_key: string | null
@@ -3519,6 +3561,14 @@ export type Database = {
       }
     }
     Functions: {
+      archive_old_news_articles: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      cleanup_news_fetch_history: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       create_news_images_bucket: {
         Args: Record<PropertyKey, never>
         Returns: undefined
