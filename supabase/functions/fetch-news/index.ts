@@ -1,166 +1,172 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4"
-import { parse } from "https://deno.land/x/rss@1.0.0/mod.ts";
 
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.47.0";
+
+// [Analysis] Using environment variables to maintain security
+const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+const newsApiKey = Deno.env.get('NEWS_API_KEY') ?? '';
+
+// [Analysis] Initialize Supabase client with admin privileges to write to database
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+// [Analysis] Define CORS headers for browser compatibility
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+};
 
-interface NewsItem {
-  title: string;
-  description: string;
-  date: string;
-  source: string;
-  category: string;
-  impact: string;
-  image_url?: string;
-}
-
+// [Analysis] Main server handler using Deno's serve API
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // Initialize Supabase client
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
+    // Parse request body
+    const { keyword = "artificial intelligence", limit = 10 } = await req.json();
 
-    // Get active news sources
-    const { data: sources, error: sourcesError } = await supabaseClient
-      .from('news_sources')
-      .select('*')
-      .eq('is_active', true)
-      .lt('last_fetched_at', new Date(Date.now() - 60 * 60 * 1000).toISOString()) // Only fetch if last fetch was more than 1 hour ago
-      .order('last_fetched_at', { ascending: true })
-      .limit(5); // Process 5 sources at a time
+    console.log(`Fetching news for keyword: ${keyword}, limit: ${limit}`);
 
-    if (sourcesError) throw sourcesError;
+    // [Analysis] Validate request parameters
+    if (!keyword) {
+      throw new Error("Keyword parameter is required");
+    }
 
-    const newsItems: NewsItem[] = [];
+    // [Analysis] Calculate date range - last 30 days
+    const today = new Date();
+    const fromDate = new Date(today);
+    fromDate.setDate(today.getDate() - 30);
 
-    for (const source of sources || []) {
+    // Format dates for API query
+    const fromDateStr = fromDate.toISOString().split('T')[0];
+    const toDateStr = today.toISOString().split('T')[0];
+
+    // [Analysis] Build News API URL with parameters 
+    const url = new URL('https://newsapi.org/v2/everything');
+    url.searchParams.append('q', keyword);
+    url.searchParams.append('from', fromDateStr);
+    url.searchParams.append('to', toDateStr);
+    url.searchParams.append('language', 'en');
+    url.searchParams.append('sortBy', 'publishedAt');
+    url.searchParams.append('pageSize', limit.toString());
+
+    console.log(`Requesting: ${url.toString()}`);
+
+    // [Analysis] Fetch news from News API
+    const response = await fetch(url.toString(), {
+      headers: {
+        'X-Api-Key': newsApiKey,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("News API error:", errorData);
+      throw new Error(`News API error: ${response.status} - ${errorData.message || 'Unknown error'}`);
+    }
+
+    const data = await response.json();
+    console.log(`Received ${data.articles?.length || 0} articles from News API`);
+
+    // [Analysis] Transform News API response to match our database schema
+    const articles = data.articles.map((article: any) => {
+      // Extract date without time
+      const publishDate = article.publishedAt 
+        ? article.publishedAt.split('T')[0]
+        : new Date().toISOString().split('T')[0];
+
+      // [Analysis] Calculate reading time based on content length
+      const wordCount = (article.content || article.description || '').split(' ').length;
+      const readingTime = Math.max(1, Math.ceil(wordCount / 200));
+
+      return {
+        title: article.title,
+        description: article.description || article.title,
+        content: article.content || article.description,
+        date: publishDate,
+        category: 'artificial_intelligence',
+        impact: 'medium',
+        source: article.source.name,
+        source_credibility: 'verified',
+        image_url: article.urlToImage,
+        technical_complexity: 'intermediate',
+        article_type: 'news',
+        reading_time: readingTime,
+        views: 0,
+        bookmarks: 0,
+        status: 'published',
+        url: article.url, // Store original URL for reference
+      };
+    });
+
+    // [Analysis] Start database transaction to save articles in batch
+    let successCount = 0;
+    let errorCount = 0;
+
+    for (const article of articles) {
       try {
-        console.log(`Fetching news from ${source.name}`);
+        // Check if article already exists (by title to avoid duplicates)
+        const { data: existingArticle } = await supabase
+          .from('ai_news')
+          .select('id')
+          .eq('title', article.title)
+          .maybeSingle();
 
-        switch (source.source_type) {
-          case 'rss':
-            const response = await fetch(source.url);
-            const xml = await response.text();
-            const feed = await parse(xml);
-            
-            const rssItems = feed.entries?.map(entry => ({
-              title: entry.title?.value || '',
-              description: entry.description?.value || '',
-              date: entry.published || new Date().toISOString(),
-              source: source.name,
-              category: determineCategory(entry.title?.value || ''),
-              impact: determineImpact(entry.title?.value || ''),
-              image_url: extractImageUrl(entry.description?.value || '')
-            })) || [];
-
-            newsItems.push(...rssItems);
-            break;
-
-          case 'api':
-            // Handle API sources (implement specific API integrations here)
-            if (source.name.includes('newsapi')) {
-              const apiResponse = await fetch(`${source.url}?apiKey=${source.api_key}`);
-              const data = await apiResponse.json();
-              
-              const apiItems = data.articles?.map((article: any) => ({
-                title: article.title,
-                description: article.description,
-                date: article.publishedAt,
-                source: article.source.name,
-                category: determineCategory(article.title),
-                impact: determineImpact(article.title),
-                image_url: article.urlToImage
-              })) || [];
-
-              newsItems.push(...apiItems);
-            }
-            break;
+        if (existingArticle) {
+          console.log(`Article already exists: ${article.title}`);
+          continue;
         }
 
-        // Update last_fetched_at timestamp
-        await supabaseClient
-          .from('news_sources')
-          .update({ last_fetched_at: new Date().toISOString() })
-          .eq('id', source.id);
+        // Insert new article
+        const { error } = await supabase
+          .from('ai_news')
+          .insert([article]);
 
+        if (error) {
+          console.error("Error inserting article:", error);
+          errorCount++;
+        } else {
+          successCount++;
+        }
       } catch (error) {
-        console.error(`Error fetching from ${source.name}:`, error);
-        continue; // Continue with next source if one fails
+        console.error("Error processing article:", error);
+        errorCount++;
       }
     }
 
-    // Insert new items into ai_news table
-    if (newsItems.length > 0) {
-      const { error: insertError } = await supabaseClient
-        .from('ai_news')
-        .insert(newsItems);
-
-      if (insertError) throw insertError;
-    }
+    // [Analysis] Update last_fetched timestamp in news_sources
+    await supabase
+      .from('news_sources')
+      .update({ last_fetched_at: new Date().toISOString() })
+      .eq('source_type', 'news_api');
 
     return new Response(
-      JSON.stringify({ 
-        success: true, 
-        message: `Processed ${sources?.length || 0} sources, found ${newsItems.length} news items` 
+      JSON.stringify({
+        success: true,
+        source: 'news_api',
+        count: successCount,
+        errored: errorCount,
+        message: `Imported ${successCount} articles from News API`,
       }),
-      { 
-        headers: { 
-          ...corsHeaders,
-          'Content-Type': 'application/json'
-        } 
-      }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
-    console.error('Error in fetch-news:', error);
+    console.error("Function error:", error.message);
+    
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({
+        success: false,
+        source: 'news_api',
+        error: error.message,
+      }),
       { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
-    )
+    );
   }
-})
-
-// Helper functions
-function determineCategory(title: string): string {
-  const lowerTitle = title.toLowerCase();
-  if (lowerTitle.includes('chatgpt') || lowerTitle.includes('openai')) return 'AI Assistants';
-  if (lowerTitle.includes('machine learning') || lowerTitle.includes('neural')) return 'Machine Learning';
-  if (lowerTitle.includes('robotics') || lowerTitle.includes('robot')) return 'Robotics';
-  if (lowerTitle.includes('regulation') || lowerTitle.includes('policy')) return 'AI Policy';
-  return 'General AI';
-}
-
-function determineImpact(title: string): string {
-  const lowerTitle = title.toLowerCase();
-  if (
-    lowerTitle.includes('breakthrough') || 
-    lowerTitle.includes('revolutionary') ||
-    lowerTitle.includes('major')
-  ) return 'high';
-  
-  if (
-    lowerTitle.includes('improve') || 
-    lowerTitle.includes('update') ||
-    lowerTitle.includes('new feature')
-  ) return 'medium';
-  
-  return 'low';
-}
-
-function extractImageUrl(description: string): string | undefined {
-  const imgMatch = description.match(/<img[^>]+src="([^">]+)"/);
-  return imgMatch ? imgMatch[1] : undefined;
-}
+});

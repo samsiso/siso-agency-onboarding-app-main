@@ -36,6 +36,8 @@ const AINews = () => {
     lastSync,
     apiUsage,
     articleCount,
+    activeNewsSource,
+    switchNewsSource,
     loadMore, 
     error,
     refresh,
@@ -105,6 +107,15 @@ const AINews = () => {
     }
   };
 
+  // [Analysis] Handle news source change
+  const handleSourceChange = (source: 'event_registry' | 'news_api') => {
+    if (switchNewsSource) {
+      switchNewsSource(source);
+      // Optionally refresh the news or reset filters
+      refresh();
+    }
+  };
+
   // [Analysis] Calculate total pages
   const totalPages = totalCount ? Math.ceil(totalCount / itemsPerPage) : 0;
 
@@ -158,6 +169,8 @@ const AINews = () => {
               articleCount={articleCount}
               apiUsage={apiUsage}
               syncingNews={syncingNews}
+              activeNewsSource={activeNewsSource}
+              switchNewsSource={handleSourceChange}
             />
           </div>
         </div>

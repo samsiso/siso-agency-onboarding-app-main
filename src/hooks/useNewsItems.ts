@@ -24,6 +24,7 @@ export const useNewsItems = (
   const [lastSync, setLastSync] = useState<string | null>(null);
   const [apiUsage, setApiUsage] = useState(0);
   const [articleCount, setArticleCount] = useState(0);
+  const [activeNewsSource, setActiveNewsSource] = useState<'event_registry' | 'news_api'>('event_registry');
   const { toast } = useToast();
 
   // [Analysis] Reset when filters change
@@ -51,24 +52,37 @@ export const useNewsItems = (
       
       if (error) throw error;
       
-      // We're assuming each article creation used one API call
-      // API limit is 2000 calls per month
+      // [Analysis] Calculate API usage percentage - assuming 2000 calls/month limit
       const usagePercentage = ((count || 0) / 2000) * 100;
       
       setApiUsage(usagePercentage);
       setArticleCount(count || 0);
       
-      // Get last sync time
-      const { data: latestArticle } = await supabase
-        .from('ai_news')
-        .select('created_at')
-        .order('created_at', { ascending: false })
+      // Get last sync time from news_sources
+      const { data: sourceData } = await supabase
+        .from('news_sources')
+        .select('last_fetched_at, source_type')
+        .order('last_fetched_at', { ascending: false })
         .limit(1)
         .single();
       
-      if (latestArticle) {
-        const syncDate = new Date(latestArticle.created_at);
+      if (sourceData) {
+        const syncDate = new Date(sourceData.last_fetched_at);
         setLastSync(syncDate.toLocaleString());
+        setActiveNewsSource(sourceData.source_type as 'event_registry' | 'news_api');
+      } else {
+        // Fallback to checking latestArticle
+        const { data: latestArticle } = await supabase
+          .from('ai_news')
+          .select('created_at')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+        
+        if (latestArticle) {
+          const syncDate = new Date(latestArticle.created_at);
+          setLastSync(syncDate.toLocaleString());
+        }
       }
     } catch (error) {
       console.error('Error fetching API status:', error);
@@ -184,10 +198,14 @@ export const useNewsItems = (
     }
   };
 
-  const syncNews = async (keyword: string = "artificial intelligence", limit: number = 20) => {
+  // [Analysis] Function to sync news from a specific API source
+  const syncNews = async (keyword: string = "artificial intelligence", limit: number = 20, source: 'event_registry' | 'news_api' = activeNewsSource) => {
     setSyncingNews(true);
     try {
-      const { data, error } = await supabase.functions.invoke('fetch-ai-news', {
+      // [Analysis] Determine which edge function to call based on source
+      const functionName = source === 'event_registry' ? 'fetch-ai-news' : 'fetch-news';
+      
+      const { data, error } = await supabase.functions.invoke(functionName, {
         body: { 
           keyword: keyword,
           limit: limit
@@ -199,8 +217,12 @@ export const useNewsItems = (
       if (data.success) {
         toast({
           title: "News synced successfully",
-          description: `${data.count} articles imported`,
+          description: `${data.count} articles imported from ${source === 'event_registry' ? 'Event Registry' : 'News API'}`,
         });
+        
+        // [Analysis] Update active news source
+        setActiveNewsSource(source);
+        
         // Refresh data and status
         fetchNews();
         fetchApiStatus();
@@ -279,6 +301,18 @@ export const useNewsItems = (
     }
   };
 
+  // [Analysis] Switch between news sources
+  const switchNewsSource = (source: 'event_registry' | 'news_api') => {
+    if (source !== activeNewsSource) {
+      setActiveNewsSource(source);
+      // Optionally re-fetch with the new source
+      toast({
+        title: "News Source Changed",
+        description: `Switched to ${source === 'event_registry' ? 'Event Registry' : 'News API'} as the data source`,
+      });
+    }
+  };
+
   const loadMore = useCallback(() => {
     if (!loading && hasMore) {
       // This is for infinite scrolling if we want to keep it as an option
@@ -299,6 +333,8 @@ export const useNewsItems = (
     lastSync,
     apiUsage,
     articleCount,
+    activeNewsSource,
+    switchNewsSource,
     error,
     refresh: fetchNews,
     syncNews
