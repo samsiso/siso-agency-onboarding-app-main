@@ -9,6 +9,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { Button } from "@/components/ui/button";
 
 interface NewsPaginationProps {
   currentPage: number;
@@ -33,10 +34,34 @@ const NewsPagination = ({ currentPage, totalPages, onPageChange }: NewsPaginatio
     <Pagination>
       <PaginationContent>
         <PaginationItem>
-          <PaginationPrevious 
-            onClick={() => onPageChange(Math.max(1, currentPage - 1))}
-            disabled={currentPage === 1}
-          />
+          {/* [Analysis] Fixed disabled property by using a custom Button component */}
+          {currentPage === 1 ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="gap-1 pl-2.5"
+              disabled
+            >
+              <span className="sr-only">Go to previous page</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-4 w-4"
+              >
+                <path d="m15 18-6-6 6-6" />
+              </svg>
+              <span>Previous</span>
+            </Button>
+          ) : (
+            <PaginationPrevious onClick={() => onPageChange(Math.max(1, currentPage - 1))} />
+          )}
         </PaginationItem>
 
         {showLeftEllipsis && (
@@ -83,10 +108,34 @@ const NewsPagination = ({ currentPage, totalPages, onPageChange }: NewsPaginatio
         )}
 
         <PaginationItem>
-          <PaginationNext 
-            onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
-            disabled={currentPage === totalPages}
-          />
+          {/* [Analysis] Fixed disabled property by using a custom Button component */}
+          {currentPage === totalPages ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="gap-1 pr-2.5"
+              disabled
+            >
+              <span>Next</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-4 w-4"
+              >
+                <path d="m9 18 6-6-6-6" />
+              </svg>
+              <span className="sr-only">Go to next page</span>
+            </Button>
+          ) : (
+            <PaginationNext onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))} />
+          )}
         </PaginationItem>
       </PaginationContent>
     </Pagination>

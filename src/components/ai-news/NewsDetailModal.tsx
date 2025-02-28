@@ -43,8 +43,12 @@ export const NewsDetailModal = ({
   };
 
   const handleOpenSource = () => {
+    // [Analysis] Check if url exists before attempting to open it
     if (article.url) {
       window.open(article.url, '_blank', 'noopener,noreferrer');
+    } else {
+      // If there's no URL, we could either disable the button or use the source name as a fallback
+      console.warn('No URL available for article:', article.id);
     }
   };
 
@@ -135,6 +139,8 @@ export const NewsDetailModal = ({
               size="sm"
               onClick={handleOpenSource}
               className="gap-2"
+              // [Analysis] Disable the button if no URL is available
+              disabled={!article.url}
             >
               <ExternalLink className="h-4 w-4" />
               Visit Source
