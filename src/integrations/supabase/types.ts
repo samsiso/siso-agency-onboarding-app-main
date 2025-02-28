@@ -3624,7 +3624,7 @@ export type Database = {
         | "ai_integration"
         | "implementation"
         | "technical_specs"
-      news_source_type: "rss" | "api" | "manual"
+      news_source_type: "rss" | "api" | "manual" | "event_registry"
       nft_mint_status: "pending" | "completed" | "failed"
       nft_tier:
         | "ai_artist"
