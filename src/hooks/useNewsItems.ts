@@ -268,6 +268,7 @@ export const useNewsItems = (
   };
 
   // [Analysis] Function to sync news from a specific API source with improved error handling
+  // Defaulting testMode to false so that articles are actually imported into the database
   const syncNews = async (
     keyword: string = "artificial intelligence", 
     limit: number = 20, 
@@ -294,7 +295,7 @@ export const useNewsItems = (
         body: { 
           keyword: keyword,
           limit: limit,
-          testMode: testMode // Add test mode flag
+          testMode: testMode // Flag to determine if articles should be imported
         },
       });
 
@@ -384,7 +385,7 @@ export const useNewsItems = (
 
       if (data.success) {
         toast({
-          title: "News synced successfully",
+          title: testMode ? "Test sync completed" : "News synced successfully",
           description: `${data.count} articles ${testMode ? 'retrieved' : 'imported'} from ${source === 'event_registry' ? 'Event Registry' : 'News API'}`,
         });
         

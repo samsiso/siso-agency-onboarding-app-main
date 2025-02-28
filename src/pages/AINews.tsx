@@ -49,6 +49,7 @@ const AINews = () => {
   const [testSource, setTestSource] = useState<'event_registry' | 'news_api'>('event_registry');
   const [apiResponse, setApiResponse] = useState<string>('');
   const [isApiResponseOpen, setIsApiResponseOpen] = useState(false);
+  const [testMode, setTestMode] = useState(true); // Added state for test mode
   const itemsPerPage = 12; // Same as PAGE_SIZE in useNewsItems
 
   const { 
@@ -152,7 +153,7 @@ const AINews = () => {
       const startTime = Date.now();
       
       // Capture raw response for debugging
-      const result = await syncNews(testKeyword, testLimit, testSource, true);
+      const result = await syncNews(testKeyword, testLimit, testSource, testMode);
       
       const endTime = Date.now();
       const duration = (endTime - startTime) / 1000;
@@ -160,8 +161,8 @@ const AINews = () => {
       setApiResponse(JSON.stringify(result, null, 2));
       
       toast({
-        title: `API Test ${result.success ? 'Succeeded' : 'Failed'}`,
-        description: `Request took ${duration.toFixed(2)}s. ${result.count || 0} articles returned.`,
+        title: `API ${testMode ? 'Test' : 'Import'} ${result.success ? 'Succeeded' : 'Failed'}`,
+        description: `Request took ${duration.toFixed(2)}s. ${result.count || 0} articles ${testMode ? 'found' : 'imported'}.`,
         variant: result.success ? 'default' : 'destructive'
       });
       
@@ -320,6 +321,23 @@ const AINews = () => {
                           </SelectContent>
                         </Select>
                       </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="testMode">Mode</Label>
+                        <div className="flex items-center justify-between border rounded p-3">
+                          <span className="text-sm">Test Only Mode</span>
+                          <Switch 
+                            id="testMode" 
+                            checked={testMode} 
+                            onCheckedChange={setTestMode} 
+                          />
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          {testMode 
+                            ? "Test mode only retrieves articles without saving to database" 
+                            : "Import mode will save articles to the database"}
+                        </p>
+                      </div>
                     </div>
                     
                     <Collapsible 
@@ -367,7 +385,7 @@ const AINews = () => {
                                 ? "bg-green-500/10 text-green-400" 
                                 : "bg-orange-500/10 text-orange-400"
                             }>
-                              {syncResult.count || 0} articles
+                              {syncResult.count || 0} articles {testMode ? 'found' : 'imported'}
                             </Badge>
                           )}
                         </div>
@@ -469,8 +487,8 @@ const AINews = () => {
                                 <span className="capitalize">{testSource}</span>
                               </div>
                               <div className="flex justify-between">
-                                <span className="text-muted-foreground">Test Mode</span>
-                                <span>Enabled</span>
+                                <span className="text-muted-foreground">Mode</span>
+                                <span>{testMode ? 'Test Only' : 'Import'}</span>
                               </div>
                             </div>
                           </CardContent>
@@ -506,16 +524,17 @@ const AINews = () => {
                   onClick={handleTestAPI} 
                   disabled={syncingNews}
                   className="gap-2"
+                  variant={testMode ? "default" : "destructive"}
                 >
                   {syncingNews ? (
                     <>
                       <RefreshCw className="h-4 w-4 animate-spin" />
-                      Testing...
+                      {testMode ? 'Testing...' : 'Importing...'}
                     </>
                   ) : (
                     <>
                       <Sparkles className="h-4 w-4" />
-                      Test API
+                      {testMode ? 'Test API' : 'Import Articles'}
                     </>
                   )}
                 </Button>
