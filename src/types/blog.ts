@@ -131,7 +131,7 @@ export interface NewsItem {
     avatar_url: string;
   };
   // [Analysis] Added missing properties causing TypeScript errors
-  template_type?: string;
+  template_type?: string; // Added to resolve TypeScript error
   status?: string;
   tags?: string[] | ArticleTag[];
   url?: string; // Added for external links support
