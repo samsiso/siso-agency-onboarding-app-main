@@ -41,7 +41,7 @@ const AINews = () => {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [showRecent, setShowRecent] = useState(false);
-  const [showTestPanel, setShowTestPanel] = useState(false);
+  const [showTestPanel, setShowTestPanel] = useState(true); // Changed to true to make it visible by default
   const [testKeyword, setTestKeyword] = useState('artificial intelligence');
   const [testLimit, setTestLimit] = useState(10);
   const [testSource, setTestSource] = useState<'event_registry' | 'news_api'>('event_registry');
@@ -204,7 +204,7 @@ const AINews = () => {
             <Button 
               variant="outline" 
               size="sm" 
-              className="gap-2 h-8"
+              className="gap-2 h-8 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-500 border-yellow-500/50"
               onClick={() => setShowTestPanel(!showTestPanel)}
             >
               <Sparkles className="h-4 w-4" />
@@ -318,7 +318,7 @@ const AINews = () => {
                                   <div key={article.id || index} className="p-3 hover:bg-white/5">
                                     <h5 className="font-medium truncate">{article.title}</h5>
                                     <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                                      <span>{new Date(article.date).toLocaleDateString()}</span>
+                                      <span>{article.date ? new Date(article.date).toLocaleDateString() : 'No date'}</span>
                                       <span className="capitalize">{article.source}</span>
                                     </div>
                                   </div>
