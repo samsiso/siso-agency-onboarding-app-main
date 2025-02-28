@@ -1,6 +1,6 @@
 
 import { motion } from 'framer-motion';
-import { Calendar, Filter, Search } from 'lucide-react';
+import { Calendar, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { 

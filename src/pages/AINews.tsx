@@ -24,7 +24,6 @@ const AINews = () => {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [showRecent, setShowRecent] = useState(false);
-  const [syncError, setSyncError] = useState<string | null>(null);
   const itemsPerPage = 12; // Same as PAGE_SIZE in useNewsItems
 
   const { 
@@ -33,18 +32,14 @@ const AINews = () => {
     loadingSummaries, 
     generateSummary, 
     loading,
-    syncingNews,
     hasMore,
     totalCount,
     lastSync,
     apiUsage,
     articleCount,
     activeNewsSource,
-    switchNewsSource,
-    loadMore, 
     error,
     refresh,
-    syncNews
   } = useNewsItems(
     selectedCategory, 
     'published', 
@@ -217,7 +212,7 @@ const AINews = () => {
             onGenerateSummary={generateSummary}
             loading={loading}
             hasMore={hasMore}
-            onLoadMore={loadMore}
+            onLoadMore={refresh}
           />
           
           {totalPages > 1 && (

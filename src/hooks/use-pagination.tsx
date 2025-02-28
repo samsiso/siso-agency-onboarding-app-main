@@ -1,3 +1,4 @@
+
 type UsePaginationProps = {
   currentPage: number;
   totalPages: number;
