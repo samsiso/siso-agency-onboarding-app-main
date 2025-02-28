@@ -33,6 +33,18 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: Navigatio
     }
   }, [location.hash]);
 
+  // [Analysis] Enhanced debugging for route matching
+  useEffect(() => {
+    console.log('Current pathname:', location.pathname);
+    
+    // Test some key routes for debugging
+    const testRoutes = ['/economy/leaderboards', '/economy/crypto-exchange', '/economy/earn'];
+    testRoutes.forEach(route => {
+      const isActive = isItemActive(route);
+      console.log(`Route ${route} active?`, isActive);
+    });
+  }, [location.pathname]);
+
   if (!visible) return null;
 
   const containerVariants = {
@@ -46,7 +58,7 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: Navigatio
     }
   };
 
-  // [Analysis] Improved route matching with exact and nested route handling
+  // [Analysis] Improved route matching with exact, nested, and parent path handling
   const isItemActive = (href: string, isMainRoute: boolean = false) => {
     // Handle hash-based navigation
     if (href.startsWith('#')) {
@@ -57,18 +69,26 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: Navigatio
     const currentPath = location.pathname.replace(/\/$/, '');
     const targetPath = href.replace(/\/$/, '');
 
+    // Check if the current path exactly matches the target path
+    const exactMatch = currentPath === targetPath;
+    
+    // Check if the current path is a child of the target path
+    // This is important for sections like /economy/* where we want the parent item to be active
+    const isChildPath = currentPath.startsWith(targetPath + '/');
+    
     // For main routes like /ai-news, match both exact and child routes
     if (isMainRoute) {
-      return currentPath === targetPath || currentPath.startsWith(targetPath + '/');
+      return exactMatch || isChildPath;
     }
-
-    // For section items (like /tools), use exact matching
-    return currentPath === targetPath;
+    
+    // For economy section items, we need special handling to ensure they activate properly
+    if (targetPath.startsWith('/economy/')) {
+      return exactMatch;
+    }
+    
+    // For section items (like /tools), use strict matching by default
+    return exactMatch;
   };
-
-  // [Analysis] Debug route matching
-  console.log('Current pathname:', location.pathname);
-  console.log('Target route matching:', location.pathname.replace(/\/$/, ''));
 
   return (
     <motion.nav

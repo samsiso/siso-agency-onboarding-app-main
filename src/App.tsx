@@ -39,12 +39,17 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 
 function App() {
   const location = useLocation();
-  const { user } = useAuthSession(); // [Analysis] Updated to use 'user' instead of 'session'
+  const { user } = useAuthSession();
 
-  // [Analysis] Log current route for debugging
+  // [Analysis] Enhanced logging to debug route matching issues
   useEffect(() => {
     console.info('Current pathname:', location.pathname);
-    console.info('Target route matching:', location.pathname.startsWith('/ai-news') ? '/ai-news' : 'other');
+    
+    // Test specific route patterns
+    const economyRoutes = ['/economy', '/economy/earn', '/economy/leaderboards', '/economy/crypto-exchange'];
+    economyRoutes.forEach(route => {
+      console.info(`Testing route ${route}:`, location.pathname === route || location.pathname.startsWith(route + '/'));
+    });
   }, [location]);
 
   return (
@@ -105,11 +110,29 @@ function App() {
             <ToolPage />
           </ProtectedRoute>
         } />
+        
+        {/* Economy section routes - grouped together for clarity */}
         <Route path="/economy" element={
           <ProtectedRoute>
             <Economy />
           </ProtectedRoute>
         } />
+        <Route path="/economy/earn" element={
+          <ProtectedRoute>
+            <HowToEarn />
+          </ProtectedRoute>
+        } />
+        <Route path="/economy/leaderboards" element={
+          <ProtectedRoute>
+            <Leaderboards />
+          </ProtectedRoute>
+        } />
+        <Route path="/economy/crypto-exchange" element={
+          <ProtectedRoute>
+            <CryptoExchange />
+          </ProtectedRoute>
+        } />
+        
         <Route path="/community" element={
           <ProtectedRoute>
             <Community />
@@ -128,16 +151,6 @@ function App() {
         <Route path="/learn-network" element={
           <ProtectedRoute>
             <LearnNetwork />
-          </ProtectedRoute>
-        } />
-        <Route path="/economy/earn" element={
-          <ProtectedRoute>
-            <HowToEarn />
-          </ProtectedRoute>
-        } />
-        <Route path="/economy/leaderboards" element={
-          <ProtectedRoute>
-            <Leaderboards />
           </ProtectedRoute>
         } />
         <Route path="/onboarding/social" element={
@@ -160,13 +173,9 @@ function App() {
             <Crypto />
           </ProtectedRoute>
         } />
-        <Route path="/economy/crypto-exchange" element={
-          <ProtectedRoute>
-            <CryptoExchange />
-          </ProtectedRoute>
-        } />
 
-        {/* Fallback route */}
+        {/* Modified fallback route with more specific handling */}
+        <Route path="/economy/*" element={<Navigate to="/economy" replace />} />
         <Route path="*" element={<Navigate to="/ai-news" replace />} />
       </Routes>
 
