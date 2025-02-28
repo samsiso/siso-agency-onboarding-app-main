@@ -20,8 +20,11 @@ const COLORS = ['#ff4b4b', '#ff7425', '#ffaa40', '#4b9eff', '#4bffb8'];
 const gradientId = "statsCardGradient";
 
 export function DailyStatsOverview({ newsItems, lastSync, articleCount }: DailyStatsOverviewProps) {
+  console.log('Rendering DailyStatsOverview with', newsItems.length, 'news items');
+  
   // [Analysis] Calculate statistics from news items for data visualization
   const stats = useMemo(() => {
+    console.log('Calculating stats from news items:', newsItems);
     // Count articles by category
     const categoryMap: Record<string, number> = {};
     const impactMap: Record<string, number> = {};
@@ -51,6 +54,8 @@ export function DailyStatsOverview({ newsItems, lastSync, articleCount }: DailyS
       { name: 'Event Registry', value: Math.floor(newsItems.length * 0.35) },
       { name: 'RSS Feeds', value: Math.floor(newsItems.length * 0.25) },
     ];
+
+    console.log('Generated stats:', { categoryData, impactData, sourceData });
 
     return {
       categoryData,

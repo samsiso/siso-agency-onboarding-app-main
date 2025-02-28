@@ -17,6 +17,7 @@ import { CalendarDays, Clock, AlertCircle } from 'lucide-react';
 import { format, subDays } from 'date-fns';
 import { toast } from '@/hooks/use-toast';
 
+// [Analysis] Main component for the AI News page with improved visualization for news metrics
 const AINews = () => {
   // [Analysis] State for filters, search, and pagination
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -52,6 +53,10 @@ const AINews = () => {
     currentPage, 
     itemsPerPage
   );
+
+  console.log('Rendering AINews component with', newsItems.length, 'news items');
+  console.log('Last sync:', lastSync);
+  console.log('Article count:', articleCount);
 
   // [Analysis] Find featured article with priority on featured flag and then on views
   const featuredArticle = newsItems.find(item => item.featured) || 
