@@ -1,234 +1,243 @@
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.47.13'
-import { corsHeaders } from '../_shared/cors.ts'
+import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
 
-// Get environment variables
-const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
-const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-const eventRegistryApiKey = Deno.env.get('EVENT_REGISTRY_API_KEY') ?? ''
+// [Analysis] Configure environment variables for API access
+const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const eventRegistryApiKey = Deno.env.get("EVENT_REGISTRY_API_KEY")!;
 
-// Initialize Supabase client
-const supabase = createClient(supabaseUrl, supabaseKey)
+interface RequestBody {
+  keyword: string;
+  limit: number;
+}
 
-// Helper to categorize articles based on content
-function categorizeArticle(article: any) {
-  const title = article.title?.toLowerCase() || '';
-  const body = article.body?.toLowerCase() || '';
-  const combinedText = title + ' ' + body;
-  
-  // Define category patterns
-  const categories = {
-    'ai_research': ['neural networks', 'deep learning', 'machine learning', 'ai research', 'reinforcement learning', 'researchers', 'study', 'paper'],
-    'generative_ai': ['generative ai', 'text-to-image', 'diffusion', 'stable diffusion', 'midjourney', 'dall-e', 'text generation'],
-    'llms': ['large language model', 'llm', 'gpt', 'chatgpt', 'claude', 'gemini', 'mistral', 'llama'],
-    'ai_tools': ['ai tool', 'productivity', 'workflow', 'integration', 'software', 'platform', 'saas'],
-    'ai_ethics': ['ethics', 'bias', 'fairness', 'transparency', 'accountability', 'regulation', 'governance'],
-    'startups': ['startup', 'funding', 'investment', 'venture capital', 'series a', 'series b', 'acquisition'],
-    'business': ['business', 'enterprise', 'company', 'corporate', 'industry', 'market'],
-    'policy': ['policy', 'regulation', 'law', 'government', 'compliance', 'legal'],
-    'education': ['education', 'learning', 'training', 'course', 'curriculum', 'student', 'teacher'],
-  };
-  
-  // Check which category has the most matches
-  let bestCategory = 'general';
-  let maxMatches = 0;
-  
-  for (const [category, keywords] of Object.entries(categories)) {
-    const matches = keywords.filter(keyword => combinedText.includes(keyword)).length;
-    if (matches > maxMatches) {
-      maxMatches = matches;
-      bestCategory = category;
+// [Analysis] Create central function to track fetch operations with detailed metrics
+async function recordFetchHistory(
+  supabase: any,
+  source: "event_registry" | "news_api",
+  status: "started" | "completed" | "error",
+  metrics: {
+    articles_fetched?: number;
+    articles_added?: number;
+    articles_updated?: number;
+    duplicates_skipped?: number;
+    execution_time_ms?: number;
+    error_message?: string;
+    metadata?: any;
+  }
+) {
+  if (status === "started") {
+    const { data, error } = await supabase
+      .from("news_fetch_history")
+      .insert({
+        source_type: source,
+        status: "pending",
+        metadata: { started_at: new Date().toISOString() },
+      })
+      .select();
+
+    if (error) console.error("Error recording fetch start:", error);
+    return data?.[0]?.id;
+  } else {
+    // Find the most recent pending record for this source
+    const { data: existing } = await supabase
+      .from("news_fetch_history")
+      .select("*")
+      .eq("source_type", source)
+      .eq("status", "pending")
+      .order("fetch_time", { ascending: false })
+      .limit(1);
+
+    const historyId = existing?.[0]?.id;
+    
+    if (historyId) {
+      const { error } = await supabase
+        .from("news_fetch_history")
+        .update({
+          status: status === "completed" ? "success" : "error",
+          articles_fetched: metrics.articles_fetched || 0,
+          articles_added: metrics.articles_added || 0,
+          articles_updated: metrics.articles_updated || 0,
+          duplicates_skipped: metrics.duplicates_skipped || 0,
+          execution_time_ms: metrics.execution_time_ms || 0,
+          error_message: metrics.error_message || null,
+          metadata: { 
+            ...existing[0].metadata,
+            completed_at: new Date().toISOString(),
+            ...metrics.metadata
+          },
+        })
+        .eq("id", historyId);
+
+      if (error) console.error("Error updating fetch history:", error);
     }
   }
-  
-  return bestCategory;
 }
 
-// Helper to extract relevant tags from article
-function extractTags(article: any) {
-  const concepts = article.concepts || [];
-  return concepts
-    .filter((concept: any) => concept.type === 'keyword' || concept.type === 'entity')
-    .slice(0, 10)
-    .map((concept: any) => concept.name || '');
+// [Analysis] Process Event Registry response into standardized news format
+async function processEventRegistryArticles(
+  articles: any[],
+  supabase: any
+): Promise<{
+  added: number;
+  updated: number;
+  duplicates: number;
+}> {
+  let added = 0;
+  let updated = 0;
+  let duplicates = 0;
+
+  for (const article of articles) {
+    try {
+      // Check if article already exists
+      const { data: existingArticle } = await supabase
+        .from("ai_news")
+        .select("id, title")
+        .eq("title", article.title)
+        .maybeSingle();
+
+      // Default importance and standardize impact values
+      const impact = article.eventImpact 
+        ? (article.eventImpact > 70 ? "high" : article.eventImpact > 40 ? "medium" : "low")
+        : "medium";
+      
+      // Prepare reading time and technical complexity
+      const wordCount = (article.body || "").split(/\s+/).length;
+      const readingTime = Math.max(1, Math.ceil(wordCount / 200)); // Avg reading speed
+      
+      // Determine technical complexity based on content analysis
+      const techTerms = ["neural network", "algorithm", "transformer", "deep learning", "parameter"];
+      const techCount = techTerms.reduce((count: number, term: string) => {
+        return count + (article.body?.toLowerCase().includes(term) ? 1 : 0);
+      }, 0);
+      const technicalComplexity = techCount > 3 ? "advanced" : techCount > 1 ? "intermediate" : "basic";
+
+      const newsItem = {
+        title: article.title,
+        description: article.summary || article.title,
+        content: article.body || article.summary || "",
+        date: new Date(article.dateTime).toISOString().split("T")[0],
+        source: article.source?.title || "Event Registry",
+        category: article.categories?.[0] || "artificial intelligence",
+        impact,
+        reading_time: readingTime,
+        technical_complexity: technicalComplexity,
+        image_url: article.image || null,
+        source_credibility: "verified",
+        article_type: "news",
+        status: "published",
+      };
+
+      if (existingArticle) {
+        // Update existing article
+        await supabase
+          .from("ai_news")
+          .update(newsItem)
+          .eq("id", existingArticle.id);
+        updated++;
+      } else {
+        // Insert new article
+        await supabase.from("ai_news").insert(newsItem);
+        added++;
+      }
+    } catch (error) {
+      console.error("Error processing article:", error);
+      duplicates++;
+    }
+  }
+
+  return { added, updated, duplicates };
 }
 
-// Helper to determine technical complexity
-function determineTechnicalComplexity(article: any) {
-  const text = (article.title + ' ' + article.body || '').toLowerCase();
-  
-  const technicalTerms = [
-    'neural network', 'algorithm', 'transformer', 'attention mechanism', 'gradient descent',
-    'backpropagation', 'optimization', 'diffusion model', 'fine-tuning', 'parameter',
-    'tokenization', 'vector', 'embedding', 'inference', 'latent space', 'multimodal',
-    'architecture', 'framework', 'implementation', 'coefficient', 'regression'
-  ];
-  
-  const technicalCount = technicalTerms.filter(term => text.includes(term)).length;
-  
-  if (technicalCount > 5) return 'advanced';
-  if (technicalCount > 2) return 'intermediate';
-  return 'beginner';
-}
-
-// Helper to determine impact level
-function determineImpactLevel(article: any) {
-  const text = (article.title + ' ' + article.body || '').toLowerCase();
-  
-  // Keywords indicating high impact
-  const highImpactTerms = [
-    'breakthrough', 'revolutionary', 'major advancement', 'game-changing', 'landmark',
-    'significant', 'disruption', 'transform', 'paradigm shift', 'dramatic'
-  ];
-  
-  // Check for high impact terms
-  const hasHighImpact = highImpactTerms.some(term => text.includes(term));
-  
-  return hasHighImpact ? 'high' : 'moderate';
-}
-
-async function fetchNewsFromEventRegistry(keyword: string, limit: number) {
-  console.log(`Fetching news for keyword: ${keyword}, limit: ${limit}`);
-  
-  const today = new Date();
-  const pastDate = new Date();
-  pastDate.setDate(today.getDate() - 7); // Get articles from past week
-  
-  const dateStart = pastDate.toISOString().split('T')[0];
-  const dateEnd = today.toISOString().split('T')[0];
-  
+serve(async (req) => {
   try {
-    const url = `http://eventregistry.org/api/v1/article/getArticles`;
+    const startTime = Date.now();
+    const supabase = createClient(supabaseUrl, supabaseKey);
     
-    const requestBody = {
+    // Parse request body
+    const { keyword = "artificial intelligence", limit = 10 } = await req.json() as RequestBody;
+    
+    // Record the start of the fetch operation
+    const historyId = await recordFetchHistory(supabase, "event_registry", "started", {});
+    
+    // Fetch articles from Event Registry
+    const eventRegistryUrl = new URL("https://eventregistry.org/api/v1/article/getArticles");
+    
+    const params = {
       action: "getArticles",
-      keyword: keyword,
-      articlesPage: 1,
+      keyword,
       articlesCount: limit,
       articlesSortBy: "date",
       articlesSortByAsc: false,
-      articlesArticleBodyLen: -1,
+      articlesArticleBodyLen: -1, // Get full article body
       resultType: "articles",
-      dataType: ["news", "blog"],
-      lang: "eng",
-      dateStart: dateStart,
-      dateEnd: dateEnd,
       apiKey: eventRegistryApiKey,
+      lang: "eng"
     };
     
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestBody),
+    Object.entries(params).forEach(([key, value]) => {
+      eventRegistryUrl.searchParams.append(key, String(value));
     });
     
-    if (!response.ok) {
-      throw new Error(`EventRegistry API error: ${response.status} ${response.statusText}`);
-    }
-    
+    const response = await fetch(eventRegistryUrl.toString());
     const data = await response.json();
-    return data.articles?.results || [];
-  } catch (error) {
-    console.error('Error fetching news from EventRegistry:', error);
-    throw error;
-  }
-}
-
-async function storeArticlesInDatabase(articles: any[]) {
-  if (!articles || articles.length === 0) {
-    return { success: false, message: "No articles to store" };
-  }
-  
-  const transformedArticles = articles.map(article => {
-    const category = categorizeArticle(article);
-    const tags = extractTags(article);
-    const technicalComplexity = determineTechnicalComplexity(article);
-    const impact = determineImpactLevel(article);
     
-    // Format article date
-    const date = new Date(article.date || new Date());
-    const formattedDate = date.toISOString().split('T')[0];
-    
-    return {
-      title: article.title || 'Untitled Article',
-      description: article.body?.substring(0, 300) + '...' || 'No description available',
-      content: article.body || '',
-      image_url: article.image || null,
-      source: article.source?.title || 'Unknown Source',
-      date: formattedDate,
-      category: category,
-      impact: impact,
-      technical_complexity: technicalComplexity,
-      tags: tags,
-      status: 'published', // Default to published
-      article_type: 'news',
-      source_credibility: 'verified',
-      reading_time: Math.ceil((article.body?.length || 0) / 1000), // Rough estimate: 1000 chars per minute
-    };
-  });
-  
-  // Insert transformed articles into the database
-  const { data, error } = await supabase
-    .from('ai_news')
-    .upsert(
-      transformedArticles,
-      {
-        onConflict: 'title',
-        ignoreDuplicates: true
-      }
-    );
-  
-  if (error) {
-    console.error('Error storing articles in database:', error);
-    throw error;
-  }
-  
-  return { success: true, count: transformedArticles.length, message: `Successfully stored ${transformedArticles.length} articles` };
-}
-
-Deno.serve(async (req) => {
-  // Handle CORS preflight request
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
-  
-  try {
-    if (req.method === 'POST') {
-      // Extract parameters from request body
-      const { keyword = "artificial intelligence", limit = 20 } = await req.json();
-      
-      if (!eventRegistryApiKey) {
-        return new Response(
-          JSON.stringify({ success: false, message: "EVENT_REGISTRY_API_KEY is not set" }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
-        );
-      }
-      
-      // Fetch news articles from Event Registry API
-      const articles = await fetchNewsFromEventRegistry(keyword, limit);
-      console.log(`Fetched ${articles.length} articles from EventRegistry`);
-      
-      // Store articles in database
-      const result = await storeArticlesInDatabase(articles);
-      
-      // Return success response
-      return new Response(
-        JSON.stringify(result),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    } else {
-      return new Response(
-        JSON.stringify({ error: 'Method not allowed' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 405 }
-      );
+    if (!response.ok) {
+      throw new Error(`Event Registry API error: ${data.error || response.statusText}`);
     }
-  } catch (error) {
-    console.error('Error in fetch-ai-news function:', error);
+    
+    // Extract articles from response
+    const articles = data.articles?.results || [];
+    
+    // Process and store articles
+    const { added, updated, duplicates } = await processEventRegistryArticles(
+      articles,
+      supabase
+    );
+    
+    // Update news source last_fetched_at
+    await supabase
+      .from("news_sources")
+      .update({ last_fetched_at: new Date().toISOString() })
+      .eq("source_type", "event_registry");
+    
+    // Record the completion of the fetch operation
+    await recordFetchHistory(supabase, "event_registry", "completed", {
+      articles_fetched: articles.length,
+      articles_added: added,
+      articles_updated: updated,
+      duplicates_skipped: duplicates,
+      execution_time_ms: Date.now() - startTime,
+      metadata: {
+        keyword,
+        limit,
+      },
+    });
+    
     return new Response(
-      JSON.stringify({ success: false, message: error.message }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      JSON.stringify({
+        success: true,
+        count: added,
+        message: `Successfully synced ${added} new articles, updated ${updated} existing articles.`,
+      }),
+      { headers: { "Content-Type": "application/json" } }
+    );
+  } catch (error) {
+    console.error("Error in fetch-ai-news:", error);
+    
+    // Record the error
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    await recordFetchHistory(supabase, "event_registry", "error", {
+      error_message: error.message,
+    });
+    
+    return new Response(
+      JSON.stringify({
+        success: false,
+        message: error.message,
+      }),
+      { headers: { "Content-Type": "application/json" }, status: 500 }
     );
   }
 });
