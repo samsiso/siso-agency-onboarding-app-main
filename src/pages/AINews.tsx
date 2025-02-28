@@ -7,11 +7,13 @@ import { NewsContent } from '@/components/ai-news/NewsContent';
 import NewsHeader from '@/components/ai-news/NewsHeader';
 import { NewsErrorBoundary } from '@/components/ai-news/NewsErrorBoundary';
 import { NewsApiStatus } from '@/components/ai-news/NewsApiStatus'; 
+import { DailyStatsOverview } from '@/components/ai-news/DailyStatsOverview';
 import { Helmet } from 'react-helmet';
 import { Sidebar } from '@/components/Sidebar';
 import NewsPagination from '@/components/ai-news/NewsPagination';
 import { Button } from '@/components/ui/button';
-import { CalendarDays, Clock } from 'lucide-react';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { CalendarDays, Clock, AlertCircle } from 'lucide-react';
 import { format, subDays } from 'date-fns';
 import { toast } from '@/hooks/use-toast';
 
@@ -163,8 +165,19 @@ const AINews = () => {
       <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-20">
         <NewsHeader title="AI News" />
         
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
-          <div className="lg:col-span-3">
+        {error && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>
+              {error instanceof Error ? error.message : "There was an error loading the news."}
+            </AlertDescription>
+          </Alert>
+        )}
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {/* Left Column - Filters & News Feed */}
+          <div className="lg:col-span-2">
             <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4">
               <Button 
                 variant={showRecent ? "default" : "outline"}
@@ -193,6 +206,8 @@ const AINews = () => {
               selectedDate={selectedDate}
             />
           </div>
+          
+          {/* Right Column - API Status */}
           <div className="lg:col-span-1">
             <NewsApiStatus 
               onRefresh={refresh}
@@ -209,6 +224,18 @@ const AINews = () => {
         </div>
         
         <NewsErrorBoundary>
+          {/* Daily Stats Overview - Only show on homepage view */}
+          {!searchQuery && !selectedDate && !selectedCategory && currentPage === 1 && (
+            <div className="mb-8">
+              <DailyStatsOverview 
+                newsItems={newsItems} 
+                lastSync={lastSync}
+                articleCount={articleCount}
+              />
+            </div>
+          )}
+          
+          {/* Featured Article - Only show on homepage view */}
           {featuredArticle && !searchQuery && !selectedDate && !selectedCategory && currentPage === 1 && !showRecent && (
             <div className="mb-8">
               <FeaturedNewsHero 

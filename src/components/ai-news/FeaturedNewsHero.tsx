@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Share2, BookmarkPlus, Star, AlertCircle, AlertOctagon, ChartPie, Clock, Info } from 'lucide-react';
 import { NewsItem } from '@/types/blog';
+import { GradientHeading } from '@/components/ui/gradient-heading';
 
 interface FeaturedNewsHeroProps {
   article: NewsItem;
