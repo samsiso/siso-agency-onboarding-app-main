@@ -34,7 +34,7 @@ export const NewsCardMedia = ({
     const observer = new IntersectionObserver(([entry]) => {
       setIsIntersecting(entry.isIntersecting);
     }, {
-      rootMargin: '100px', // Load images a bit earlier
+      rootMargin: '200px', // Increased margin to load images earlier
       threshold: 0.1
     });
     
@@ -61,7 +61,7 @@ export const NewsCardMedia = ({
     } else {
       setError(true);
       setIsLoading(false);
-      console.warn(`Failed to load image for article: ${title}`);
+      console.warn(`Failed to load image for article: ${title}`, imageUrl);
     }
   };
 
@@ -90,7 +90,7 @@ export const NewsCardMedia = ({
             />
           )}
 
-          {/* Error state */}
+          {/* Error state with improved styling */}
           {error && (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-siso-bg/80 p-4">
               <AlertCircle className="h-8 w-8 text-siso-red mb-2" />
