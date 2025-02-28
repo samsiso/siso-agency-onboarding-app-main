@@ -1,4 +1,3 @@
-
 import { motion } from 'framer-motion';
 import { NewsCardMedia } from './NewsCardMedia';
 import { Badge } from '@/components/ui/badge';
@@ -6,27 +5,26 @@ import { Button } from '@/components/ui/button';
 import { Share2, BookmarkPlus, Star, AlertCircle, AlertOctagon, ChartPie, Clock, Info } from 'lucide-react';
 import { NewsItem } from '@/types/blog';
 import { GradientHeading } from '@/components/ui/gradient-heading';
-
 interface FeaturedNewsHeroProps {
   article: NewsItem;
   onGenerateSummary: (id: string) => Promise<void>;
   summary: string;
   loadingSummary: boolean;
 }
-
-const FeaturedNewsHero = ({ 
+const FeaturedNewsHero = ({
   article,
   onGenerateSummary,
   summary,
-  loadingSummary 
+  loadingSummary
 }: FeaturedNewsHeroProps) => {
   // [Analysis] Return placeholder content when article isn't available
-  if (!article) return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="relative w-full rounded-xl overflow-hidden mb-8"
-    >
+  if (!article) return <motion.div initial={{
+    opacity: 0,
+    y: 20
+  }} animate={{
+    opacity: 1,
+    y: 0
+  }} className="relative w-full rounded-xl overflow-hidden mb-8">
       {/* Background gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-siso-red/20 via-siso-orange/10 to-transparent opacity-75" />
       <div className="absolute inset-0 bg-gradient-radial from-siso-red/10 via-siso-orange/5 to-transparent opacity-50" />
@@ -72,8 +70,7 @@ const FeaturedNewsHero = ({
             <div className="mt-6">
               <h3 className="text-xl font-semibold mb-3">Quick Highlights</h3>
               <div className="space-y-3">
-                {["OpenAI's GPT-5 Development", "Google's Quantum Breakthrough", "Meta's AR Progress"].map((highlight, index) => (
-                  <div key={index} className="flex items-start gap-2 bg-white/5 p-3 rounded-lg">
+                {["OpenAI's GPT-5 Development", "Google's Quantum Breakthrough", "Meta's AR Progress"].map((highlight, index) => <div key={index} className="flex items-start gap-2 bg-white/5 p-3 rounded-lg">
                     <Star className="h-5 w-5 text-siso-orange mt-1" />
                     <div>
                       <p className="font-medium">{highlight}</p>
@@ -84,8 +81,7 @@ const FeaturedNewsHero = ({
                         <span className="text-xs text-siso-text/70">Research & Development</span>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  </div>)}
               </div>
             </div>
           </div>
@@ -99,22 +95,37 @@ const FeaturedNewsHero = ({
               <ChartPie className="h-5 w-5 text-siso-orange" />
             </div>
             <div className="space-y-3">
-              {[
-                { category: 'Research', percentage: 40, color: 'bg-blue-500' },
-                { category: 'Applications', percentage: 30, color: 'bg-green-500' },
-                { category: 'Industry', percentage: 20, color: 'bg-yellow-500' },
-                { category: 'Policy', percentage: 10, color: 'bg-purple-500' }
-              ].map(({ category, percentage, color }) => (
-                <div key={category} className="space-y-1">
+              {[{
+              category: 'Research',
+              percentage: 40,
+              color: 'bg-blue-500'
+            }, {
+              category: 'Applications',
+              percentage: 30,
+              color: 'bg-green-500'
+            }, {
+              category: 'Industry',
+              percentage: 20,
+              color: 'bg-yellow-500'
+            }, {
+              category: 'Policy',
+              percentage: 10,
+              color: 'bg-purple-500'
+            }].map(({
+              category,
+              percentage,
+              color
+            }) => <div key={category} className="space-y-1">
                   <div className="flex justify-between text-sm">
                     <span>{category}</span>
                     <span>{percentage}%</span>
                   </div>
                   <div className="h-2 bg-white/5 rounded-full overflow-hidden">
-                    <div className={`h-full ${color}`} style={{ width: `${percentage}%` }} />
+                    <div className={`h-full ${color}`} style={{
+                  width: `${percentage}%`
+                }} />
                   </div>
-                </div>
-              ))}
+                </div>)}
             </div>
           </div>
 
@@ -163,53 +174,20 @@ const FeaturedNewsHero = ({
           </div>
         </div>
       </div>
-    </motion.div>
-  );
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="relative w-full rounded-xl overflow-hidden"
-    >
+    </motion.div>;
+  return <motion.div initial={{
+    opacity: 0,
+    y: 20
+  }} animate={{
+    opacity: 1,
+    y: 0
+  }} className="relative w-full rounded-xl overflow-hidden">
       <NewsCardMedia imageUrl={article.image_url} title={article.title} className="h-64 md:h-96" />
       
-      <div className="absolute inset-0 bg-gradient-to-br from-siso-red/20 via-siso-orange/10 to-transparent opacity-75" />
-      <div className="absolute inset-0 bg-gradient-radial from-siso-red/10 via-siso-orange/5 to-transparent opacity-50" />
       
-      <div className="absolute bottom-0 left-0 p-6 w-full">
-        <div className="flex items-center justify-between mb-3">
-          <Badge variant="secondary">{article.category}</Badge>
-          <div className="flex items-center space-x-2 text-siso-text/70">
-            <Share2 className="h-4 w-4 cursor-pointer hover:text-siso-text" />
-            <BookmarkPlus className="h-4 w-4 cursor-pointer hover:text-siso-text" />
-          </div>
-        </div>
-        
-        <h2 className="text-2xl font-bold text-siso-text-bold mb-2">{article.title}</h2>
-        <p className="text-siso-text/80 line-clamp-2">{article.description}</p>
-        
-        <div className="flex items-center justify-between mt-4">
-          <div className="flex items-center space-x-3">
-            <img 
-              src={article.profiles?.avatar_url || 'https://avatar.vercel.sh/api/new'} 
-              alt={article.profiles?.full_name || 'Author'}
-              className="w-8 h-8 rounded-full object-cover"
-            />
-            <span className="text-sm text-siso-text/90">{article.profiles?.full_name || 'Unknown Author'}</span>
-          </div>
-          <Button variant="outline" size="sm" onClick={() => onGenerateSummary(article.id)}>
-            {loadingSummary ? 'Loading...' : (summary ? 'View Summary' : 'Generate Summary')}
-          </Button>
-        </div>
-        {summary && (
-          <div className="mt-4 p-3 rounded-md bg-siso-bg-alt border border-siso-border">
-            <p className="text-sm text-siso-text/90">{summary}</p>
-          </div>
-        )}
-      </div>
-    </motion.div>
-  );
+      
+      
+      
+    </motion.div>;
 };
-
 export default FeaturedNewsHero;
