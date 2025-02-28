@@ -57,10 +57,18 @@ const AINews = () => {
   console.log('Rendering AINews component with', newsItems.length, 'news items');
   console.log('Last sync:', lastSync);
   console.log('Article count:', articleCount);
+  console.log('Loading state:', loading);
+  console.log('Error state:', error ? (error instanceof Error ? error.message : String(error)) : 'none');
 
   // [Analysis] Find featured article with priority on featured flag and then on views
   const featuredArticle = newsItems.find(item => item.featured) || 
     [...newsItems].sort((a, b) => (b.views || 0) - (a.views || 0))[0];
+
+  if (featuredArticle) {
+    console.log('Featured article found:', featuredArticle.id, featuredArticle.title);
+  } else {
+    console.log('No featured article available');
+  }
 
   // [Analysis] Add scroll restoration to preserve user's position
   useEffect(() => {
@@ -158,6 +166,9 @@ const AINews = () => {
   // [Analysis] Calculate total pages
   const totalPages = totalCount ? Math.ceil(totalCount / itemsPerPage) : 0;
 
+  // Determine when to show the stats and featured article
+  const showStatsAndFeatured = !searchQuery && !selectedDate && !selectedCategory && currentPage === 1;
+
   return (
     <div className="flex min-h-screen bg-siso-bg">
       <Helmet>
@@ -230,18 +241,19 @@ const AINews = () => {
         
         <NewsErrorBoundary>
           {/* Daily Stats Overview - Only show on homepage view */}
-          {!searchQuery && !selectedDate && !selectedCategory && currentPage === 1 && (
+          {showStatsAndFeatured && (
             <div className="mb-8">
               <DailyStatsOverview 
                 newsItems={newsItems} 
                 lastSync={lastSync}
                 articleCount={articleCount}
+                loading={loading}
               />
             </div>
           )}
           
           {/* Featured Article - Only show on homepage view */}
-          {featuredArticle && !searchQuery && !selectedDate && !selectedCategory && currentPage === 1 && !showRecent && (
+          {featuredArticle && showStatsAndFeatured && !showRecent && (
             <div className="mb-8">
               <FeaturedNewsHero 
                 article={featuredArticle}
@@ -253,9 +265,9 @@ const AINews = () => {
           )}
           
           <NewsContent
-            newsItems={searchQuery || selectedDate || selectedCategory || currentPage > 1 || showRecent ? 
-              newsItems : 
-              newsItems.filter(item => item.id !== featuredArticle?.id)}
+            newsItems={showStatsAndFeatured && !showRecent && featuredArticle ? 
+              newsItems.filter(item => item.id !== featuredArticle.id) : 
+              newsItems}
             searchQuery={searchQuery}
             summaries={summaries}
             loadingSummaries={loadingSummaries}
