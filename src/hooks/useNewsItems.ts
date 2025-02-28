@@ -25,6 +25,12 @@ export const useNewsItems = (
   const [apiUsage, setApiUsage] = useState(0);
   const [articleCount, setArticleCount] = useState(0);
   const [activeNewsSource, setActiveNewsSource] = useState<'event_registry' | 'news_api'>('event_registry');
+  const [syncResult, setSyncResult] = useState<{
+    success: boolean;
+    message: string;
+    count?: number;
+    articles?: NewsItem[];
+  } | null>(null);
   const { toast } = useToast();
 
   // [Analysis] Reset when filters change
@@ -198,11 +204,23 @@ export const useNewsItems = (
     }
   };
 
-  // [Analysis] Function to sync news from a specific API source with improved error handling
-  const syncNews = async (keyword: string = "artificial intelligence", limit: number = 20, source: 'event_registry' | 'news_api' = activeNewsSource) => {
+  // [Analysis] Function to sync news from a specific API source with improved error handling and detailed result tracking
+  const syncNews = async (
+    keyword: string = "artificial intelligence", 
+    limit: number = 20, 
+    source: 'event_registry' | 'news_api' = activeNewsSource,
+    testMode: boolean = false
+  ) => {
     setSyncingNews(true);
+    setSyncResult(null);
+    
     try {
-      console.log(`Starting news sync from ${source}...`);
+      console.log(`Starting news sync from ${source}...`, {
+        keyword,
+        limit,
+        source,
+        testMode
+      });
       
       // [Analysis] Determine which edge function to call based on source
       const functionName = source === 'event_registry' ? 'fetch-ai-news' : 'fetch-news';
@@ -212,7 +230,8 @@ export const useNewsItems = (
       const { data, error } = await supabase.functions.invoke(functionName, {
         body: { 
           keyword: keyword,
-          limit: limit
+          limit: limit,
+          testMode: testMode // Add test mode flag
         },
       });
 
@@ -227,6 +246,14 @@ export const useNewsItems = (
       }
 
       console.log('Edge function response:', data);
+
+      // [Analysis] Store the result for testing display
+      setSyncResult({
+        success: data.success,
+        message: data.message,
+        count: data.count,
+        articles: data.articles
+      });
 
       if (data.success) {
         toast({
@@ -243,9 +270,18 @@ export const useNewsItems = (
       } else {
         throw new Error(data.message || "Failed to sync news");
       }
+      
+      return data;
     } catch (error) {
       console.error('Error syncing news:', error);
       setError(error instanceof Error ? error : new Error(String(error)));
+      
+      // [Analysis] Store the error result for testing display
+      setSyncResult({
+        success: false,
+        message: error instanceof Error ? error.message : String(error)
+      });
+      
       toast({
         variant: "destructive",
         title: "Sync Error",
@@ -352,6 +388,7 @@ export const useNewsItems = (
     articleCount,
     activeNewsSource,
     switchNewsSource,
+    syncResult,
     error,
     refresh: fetchNews,
     syncNews

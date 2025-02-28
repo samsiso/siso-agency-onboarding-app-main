@@ -1,243 +1,259 @@
 
-import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.23.0";
 
-// [Analysis] Configure environment variables for API access
-const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const eventRegistryApiKey = Deno.env.get("EVENT_REGISTRY_API_KEY")!;
+// [Analysis] Define CORS headers for cross-origin requests
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
 
-interface RequestBody {
+// [Analysis] Create Supabase client for database operations
+const supabaseClient = createClient(
+  Deno.env.get("SUPABASE_URL") || "",
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || ""
+);
+
+// [Analysis] Define Event Registry API request options
+interface EventRegistryRequestOptions {
   keyword: string;
-  limit: number;
-}
-
-// [Analysis] Create central function to track fetch operations with detailed metrics
-async function recordFetchHistory(
-  supabase: any,
-  source: "event_registry" | "news_api",
-  status: "started" | "completed" | "error",
-  metrics: {
-    articles_fetched?: number;
-    articles_added?: number;
-    articles_updated?: number;
-    duplicates_skipped?: number;
-    execution_time_ms?: number;
-    error_message?: string;
-    metadata?: any;
-  }
-) {
-  if (status === "started") {
-    const { data, error } = await supabase
-      .from("news_fetch_history")
-      .insert({
-        source_type: source,
-        status: "pending",
-        metadata: { started_at: new Date().toISOString() },
-      })
-      .select();
-
-    if (error) console.error("Error recording fetch start:", error);
-    return data?.[0]?.id;
-  } else {
-    // Find the most recent pending record for this source
-    const { data: existing } = await supabase
-      .from("news_fetch_history")
-      .select("*")
-      .eq("source_type", source)
-      .eq("status", "pending")
-      .order("fetch_time", { ascending: false })
-      .limit(1);
-
-    const historyId = existing?.[0]?.id;
-    
-    if (historyId) {
-      const { error } = await supabase
-        .from("news_fetch_history")
-        .update({
-          status: status === "completed" ? "success" : "error",
-          articles_fetched: metrics.articles_fetched || 0,
-          articles_added: metrics.articles_added || 0,
-          articles_updated: metrics.articles_updated || 0,
-          duplicates_skipped: metrics.duplicates_skipped || 0,
-          execution_time_ms: metrics.execution_time_ms || 0,
-          error_message: metrics.error_message || null,
-          metadata: { 
-            ...existing[0].metadata,
-            completed_at: new Date().toISOString(),
-            ...metrics.metadata
-          },
-        })
-        .eq("id", historyId);
-
-      if (error) console.error("Error updating fetch history:", error);
-    }
-  }
-}
-
-// [Analysis] Process Event Registry response into standardized news format
-async function processEventRegistryArticles(
-  articles: any[],
-  supabase: any
-): Promise<{
-  added: number;
-  updated: number;
-  duplicates: number;
-}> {
-  let added = 0;
-  let updated = 0;
-  let duplicates = 0;
-
-  for (const article of articles) {
-    try {
-      // Check if article already exists
-      const { data: existingArticle } = await supabase
-        .from("ai_news")
-        .select("id, title")
-        .eq("title", article.title)
-        .maybeSingle();
-
-      // Default importance and standardize impact values
-      const impact = article.eventImpact 
-        ? (article.eventImpact > 70 ? "high" : article.eventImpact > 40 ? "medium" : "low")
-        : "medium";
-      
-      // Prepare reading time and technical complexity
-      const wordCount = (article.body || "").split(/\s+/).length;
-      const readingTime = Math.max(1, Math.ceil(wordCount / 200)); // Avg reading speed
-      
-      // Determine technical complexity based on content analysis
-      const techTerms = ["neural network", "algorithm", "transformer", "deep learning", "parameter"];
-      const techCount = techTerms.reduce((count: number, term: string) => {
-        return count + (article.body?.toLowerCase().includes(term) ? 1 : 0);
-      }, 0);
-      const technicalComplexity = techCount > 3 ? "advanced" : techCount > 1 ? "intermediate" : "basic";
-
-      const newsItem = {
-        title: article.title,
-        description: article.summary || article.title,
-        content: article.body || article.summary || "",
-        date: new Date(article.dateTime).toISOString().split("T")[0],
-        source: article.source?.title || "Event Registry",
-        category: article.categories?.[0] || "artificial intelligence",
-        impact,
-        reading_time: readingTime,
-        technical_complexity: technicalComplexity,
-        image_url: article.image || null,
-        source_credibility: "verified",
-        article_type: "news",
-        status: "published",
-      };
-
-      if (existingArticle) {
-        // Update existing article
-        await supabase
-          .from("ai_news")
-          .update(newsItem)
-          .eq("id", existingArticle.id);
-        updated++;
-      } else {
-        // Insert new article
-        await supabase.from("ai_news").insert(newsItem);
-        added++;
-      }
-    } catch (error) {
-      console.error("Error processing article:", error);
-      duplicates++;
-    }
-  }
-
-  return { added, updated, duplicates };
+  limit?: number;
+  testMode?: boolean;
 }
 
 serve(async (req) => {
+  // [Analysis] Handle CORS preflight requests
+  if (req.method === "OPTIONS") {
+    return new Response(null, {
+      headers: corsHeaders,
+    });
+  }
+
   try {
-    const startTime = Date.now();
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    // [Analysis] Parse request body for search parameters
+    const { keyword = "artificial intelligence", limit = 20, testMode = false } = await req.json() as EventRegistryRequestOptions;
     
-    // Parse request body
-    const { keyword = "artificial intelligence", limit = 10 } = await req.json() as RequestBody;
-    
-    // Record the start of the fetch operation
-    const historyId = await recordFetchHistory(supabase, "event_registry", "started", {});
-    
-    // Fetch articles from Event Registry
-    const eventRegistryUrl = new URL("https://eventregistry.org/api/v1/article/getArticles");
-    
+    console.log(`Processing fetch-ai-news request with keyword: ${keyword}, limit: ${limit}, testMode: ${testMode}`);
+
+    // [Analysis] Get API key from environment variables
+    const apiKey = Deno.env.get("EVENT_REGISTRY_API_KEY");
+    if (!apiKey) {
+      throw new Error("EVENT_REGISTRY_API_KEY is not set");
+    }
+
+    // [Analysis] Construct Event Registry API query
+    const currentDate = new Date();
+    // Default to past 3 days for test mode, 2 weeks for normal mode
+    const pastDays = testMode ? 3 : 14;
+    const dateFrom = new Date(currentDate);
+    dateFrom.setDate(currentDate.getDate() - pastDays);
+
+    // [Analysis] Format dates in the required format (YYYY-MM-DD)
+    const dateToStr = currentDate.toISOString().split("T")[0];
+    const dateFromStr = dateFrom.toISOString().split("T")[0];
+
+    // [Analysis] Build Event Registry API URL with search parameters
+    const url = `https://eventregistry.org/api/v1/article/getArticles`;
     const params = {
       action: "getArticles",
-      keyword,
+      keyword: keyword,
+      articlesPage: 1,
       articlesCount: limit,
       articlesSortBy: "date",
       articlesSortByAsc: false,
-      articlesArticleBodyLen: -1, // Get full article body
+      articlesArticleBodyLen: -1,
       resultType: "articles",
-      apiKey: eventRegistryApiKey,
-      lang: "eng"
+      dataType: ["news", "blog"],
+      lang: "eng",
+      dateStart: dateFromStr,
+      dateEnd: dateToStr,
+      apiKey: apiKey,
     };
-    
+
+    // [Analysis] Convert params to URL query string
+    const queryParams = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {
-      eventRegistryUrl.searchParams.append(key, String(value));
+      if (Array.isArray(value)) {
+        value.forEach(v => queryParams.append(key, v));
+      } else {
+        queryParams.append(key, String(value));
+      }
     });
+
+    console.log(`Fetching articles from Event Registry API for date range: ${dateFromStr} to ${dateToStr}`);
     
-    const response = await fetch(eventRegistryUrl.toString());
-    const data = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(`Event Registry API error: ${data.error || response.statusText}`);
-    }
-    
-    // Extract articles from response
-    const articles = data.articles?.results || [];
-    
-    // Process and store articles
-    const { added, updated, duplicates } = await processEventRegistryArticles(
-      articles,
-      supabase
-    );
-    
-    // Update news source last_fetched_at
-    await supabase
-      .from("news_sources")
-      .update({ last_fetched_at: new Date().toISOString() })
-      .eq("source_type", "event_registry");
-    
-    // Record the completion of the fetch operation
-    await recordFetchHistory(supabase, "event_registry", "completed", {
-      articles_fetched: articles.length,
-      articles_added: added,
-      articles_updated: updated,
-      duplicates_skipped: duplicates,
-      execution_time_ms: Date.now() - startTime,
-      metadata: {
-        keyword,
-        limit,
+    // [Analysis] Make request to Event Registry API
+    const response = await fetch(`${url}?${queryParams}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
       },
     });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Event Registry API error: ${response.status} ${errorText}`);
+      throw new Error(`Event Registry API error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
     
+    if (!data.articles || !data.articles.results) {
+      console.warn("No articles found in API response");
+      return new Response(
+        JSON.stringify({
+          success: false,
+          message: "No articles found in API response",
+        }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    const articles = data.articles.results;
+    console.log(`Retrieved ${articles.length} articles from Event Registry API`);
+    
+    // [Analysis] Logging first article for testing purposes
+    if (articles.length > 0) {
+      console.log("Sample article:", {
+        title: articles[0].title,
+        date: articles[0].date,
+        source: articles[0].source.title,
+      });
+    }
+
+    // Record fetch in history
+    const { error: historyError } = await supabaseClient
+      .from("news_fetch_history")
+      .insert({
+        source: "event_registry",
+        keyword,
+        count: articles.length,
+        params: {
+          dateStart: dateFromStr,
+          dateEnd: dateToStr,
+          limit,
+        },
+        success: true,
+      });
+
+    if (historyError) {
+      console.error("Error recording fetch history:", historyError);
+    }
+
+    // [Analysis] Also update last_fetched_at in news_sources table
+    const { error: sourceUpdateError } = await supabaseClient
+      .from("news_sources")
+      .upsert({
+        source_type: "event_registry",
+        last_fetched_at: new Date().toISOString(),
+        is_active: true,
+      })
+      .eq("source_type", "event_registry");
+
+    if (sourceUpdateError) {
+      console.error("Error updating news_sources:", sourceUpdateError);
+    }
+
+    // [Analysis] Transform articles to match our database schema
+    const transformedArticles = articles.map((article: any) => ({
+      title: article.title,
+      url: article.url,
+      source: article.source.title || "Event Registry",
+      date: article.date,
+      image_url: article.image || "",
+      description: article.body || article.description || "",
+      content: article.body || "",
+      category: "ai_research",
+      status: "published",
+      author: article.author || "AI News",
+      source_id: article.uri || "",
+      updated_at: new Date().toISOString(),
+    }));
+
+    // In test mode, return the articles without inserting into the database
+    if (testMode) {
+      return new Response(
+        JSON.stringify({
+          success: true,
+          message: "Articles retrieved successfully in test mode",
+          count: transformedArticles.length,
+          articles: transformedArticles,
+        }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    // [Analysis] Insert articles into the database
+    let insertedCount = 0;
+    
+    // [Analysis] Use for...of loop for better async handling
+    for (const article of transformedArticles) {
+      // Check if the article already exists by source_id
+      const { data: existingArticle, error: checkError } = await supabaseClient
+        .from("ai_news")
+        .select("id")
+        .eq("source_id", article.source_id)
+        .maybeSingle();
+
+      if (checkError) {
+        console.error("Error checking existing article:", checkError);
+        continue;
+      }
+
+      if (existingArticle) {
+        console.log(`Article already exists: ${article.title}`);
+        continue;
+      }
+
+      // Insert new article
+      const { error: insertError } = await supabaseClient
+        .from("ai_news")
+        .insert(article);
+
+      if (insertError) {
+        console.error("Error inserting article:", insertError);
+      } else {
+        insertedCount++;
+      }
+    }
+
+    console.log(`Inserted ${insertedCount} new articles into the database`);
+
     return new Response(
       JSON.stringify({
         success: true,
-        count: added,
-        message: `Successfully synced ${added} new articles, updated ${updated} existing articles.`,
+        message: `Retrieved ${articles.length} articles, inserted ${insertedCount} new articles`,
+        count: insertedCount,
       }),
-      { headers: { "Content-Type": "application/json" } }
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      }
     );
   } catch (error) {
-    console.error("Error in fetch-ai-news:", error);
+    console.error("Error in fetch-ai-news function:", error);
     
-    // Record the error
-    const supabase = createClient(supabaseUrl, supabaseKey);
-    await recordFetchHistory(supabase, "event_registry", "error", {
-      error_message: error.message,
-    });
-    
+    // Record error in history
+    await supabaseClient
+      .from("news_fetch_history")
+      .insert({
+        source: "event_registry",
+        success: false,
+        error_message: error.message,
+      });
+      
     return new Response(
       JSON.stringify({
         success: false,
-        message: error.message,
+        message: `Error fetching news: ${error.message}`,
       }),
-      { headers: { "Content-Type": "application/json" }, status: 500 }
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500,
+      }
     );
   }
 });

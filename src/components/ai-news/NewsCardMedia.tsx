@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { useState, useEffect } from 'react';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AlertCircle } from 'lucide-react';
 
 interface NewsCardMediaProps {
   imageUrl: string;
@@ -23,13 +24,17 @@ export const NewsCardMedia = ({
   const [isLoading, setIsLoading] = useState(true);
   const [isIntersecting, setIsIntersecting] = useState(false);
   const [error, setError] = useState(false);
-
-  // [Analysis] Implement intersection observer for lazy loading
+  const [retryCount, setRetryCount] = useState(0);
+  
+  // [Analysis] Use fallback image when original source fails after retries
+  const fallbackImage = '/placeholder.svg';
+  
+  // [Analysis] Enhanced intersection observer for better lazy loading performance
   useEffect(() => {
     const observer = new IntersectionObserver(([entry]) => {
       setIsIntersecting(entry.isIntersecting);
     }, {
-      rootMargin: '50px',
+      rootMargin: '100px', // Load images a bit earlier
       threshold: 0.1
     });
     
@@ -45,6 +50,21 @@ export const NewsCardMedia = ({
     };
   }, [title]);
 
+  // [Analysis] Handle image error with retry logic
+  const handleImageError = () => {
+    if (retryCount < 2) {
+      // Retry loading the image after a short delay
+      setTimeout(() => {
+        setRetryCount(prev => prev + 1);
+        setIsLoading(true);
+      }, 1000);
+    } else {
+      setError(true);
+      setIsLoading(false);
+      console.warn(`Failed to load image for article: ${title}`);
+    }
+  };
+
   return (
     <div className={`${isCompact ? 'w-1/3 max-w-[200px]' : 'w-full'} ${className}`}>
       <AspectRatio ratio={isCompact ? 4 / 3 : 16 / 9}>
@@ -59,17 +79,23 @@ export const NewsCardMedia = ({
           
           {isIntersecting && !error && (
             <motion.img
-              src={imageUrl || '/placeholder.svg'}
+              src={imageUrl || fallbackImage}
               alt={title}
               className="w-full h-full object-cover transition-all duration-300 group-hover:scale-105"
               initial={{ opacity: 0 }}
               animate={{ opacity: isLoading ? 0 : 1 }}
               onLoad={() => setIsLoading(false)}
-              onError={() => {
-                setIsLoading(false);
-                setError(true);
-              }}
+              onError={handleImageError}
+              key={`img-${retryCount}`} // Force re-render on retry
             />
+          )}
+
+          {/* Error state */}
+          {error && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-siso-bg/80 p-4">
+              <AlertCircle className="h-8 w-8 text-siso-red mb-2" />
+              <p className="text-xs text-center text-white/80">Image unavailable</p>
+            </div>
           )}
 
           {/* Enhanced hover overlay with gradient */}
