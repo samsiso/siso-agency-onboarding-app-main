@@ -6,7 +6,6 @@ import FeaturedNewsHero from '@/components/ai-news/FeaturedNewsHero';
 import { NewsContent } from '@/components/ai-news/NewsContent';
 import NewsHeader from '@/components/ai-news/NewsHeader';
 import { NewsErrorBoundary } from '@/components/ai-news/NewsErrorBoundary';
-import { NewsApiStatus } from '@/components/ai-news/NewsApiStatus'; 
 import { DailyStatsOverview } from '@/components/ai-news/DailyStatsOverview';
 import { Helmet } from 'react-helmet';
 import { Sidebar } from '@/components/Sidebar';
@@ -123,46 +122,6 @@ const AINews = () => {
     }
   };
 
-  // [Analysis] Handle news source change with improved error handling
-  const handleSourceChange = (source: 'event_registry' | 'news_api') => {
-    if (switchNewsSource) {
-      try {
-        switchNewsSource(source);
-        // Reset any previous sync errors
-        setSyncError(null);
-        // Optionally refresh the news or reset filters
-        refresh();
-      } catch (err) {
-        console.error("Error switching news source:", err);
-        setSyncError("Failed to switch news source");
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to switch news source. Please try again.",
-        });
-      }
-    }
-  };
-
-  // [Analysis] Handle sync news with better error handling
-  const handleSyncNews = async (keyword: string, limit: number, source?: 'event_registry' | 'news_api') => {
-    setSyncError(null); // Reset error state before attempting sync
-    try {
-      if (syncNews) {
-        await syncNews(keyword, limit, source);
-      }
-    } catch (err) {
-      console.error("Error syncing news:", err);
-      const errorMessage = err instanceof Error ? err.message : "Failed to sync news";
-      setSyncError(errorMessage);
-      toast({
-        variant: "destructive",
-        title: "Sync Error",
-        description: "Failed to send a request to the Edge Function. Please check your network connection and try again.",
-      });
-    }
-  };
-
   // [Analysis] Calculate total pages
   const totalPages = totalCount ? Math.ceil(totalCount / itemsPerPage) : 0;
 
@@ -191,9 +150,8 @@ const AINews = () => {
           </Alert>
         )}
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          {/* Left Column - Filters & News Feed */}
-          <div className="lg:col-span-2">
+        <div className="mb-8">
+          <div className="w-full">
             <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4">
               <Button 
                 variant={showRecent ? "default" : "outline"}
@@ -220,21 +178,6 @@ const AINews = () => {
               onSearchChange={handleSearchChange}
               onDateChange={handleDateChange}
               selectedDate={selectedDate}
-            />
-          </div>
-          
-          {/* Right Column - API Status */}
-          <div className="lg:col-span-1">
-            <NewsApiStatus 
-              onRefresh={refresh}
-              syncNews={handleSyncNews}
-              lastSync={lastSync}
-              articleCount={articleCount}
-              apiUsage={apiUsage}
-              syncingNews={syncingNews}
-              activeNewsSource={activeNewsSource}
-              switchNewsSource={handleSourceChange}
-              syncError={syncError}
             />
           </div>
         </div>
