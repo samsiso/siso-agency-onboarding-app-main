@@ -34,8 +34,11 @@ serve(async (req) => {
     // [Analysis] Get Event Registry API key from environment variable
     const eventRegistryApiKey = Deno.env.get('EVENT_REGISTRY_API_KEY');
     if (!eventRegistryApiKey) {
+      console.error('EVENT_REGISTRY_API_KEY is not configured');
       throw new Error('EVENT_REGISTRY_API_KEY is not configured in environment variables');
     }
+    
+    console.log(`Using API key: ${eventRegistryApiKey.substring(0, 5)}...`);
 
     // Current date and 30 days ago for date range (using UTC to avoid time zone issues)
     const today = new Date();
@@ -66,12 +69,12 @@ serve(async (req) => {
       dateStart: dateStart,
       dateEnd: dateEnd,
       forceMaxDataTimeWindow: 31,
-      ignoreSourceUri: "", // Optional source exclusion
-      sourceLocationUri: "", // Optional location filtering
-      categoryUri: "", // Optional category filtering
-      ignoreCategoryUri: "", // Optional category exclusion
-      sourceUri: "", // Optional source inclusion
     };
+
+    console.log('Request body:', JSON.stringify({
+      ...requestBody,
+      apiKey: '***REDACTED***' // Don't log the actual API key
+    }, null, 2));
 
     // [Analysis] Make request to Event Registry API with enhanced error handling
     const response = await fetch(apiUrl, {
@@ -83,6 +86,8 @@ serve(async (req) => {
       body: JSON.stringify(requestBody),
     });
 
+    console.log(`Event Registry API response status: ${response.status}`);
+    
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Event Registry API error:', response.status, errorText);
@@ -91,14 +96,31 @@ serve(async (req) => {
 
     // Parse API response
     const data = await response.json();
+    console.log('Event Registry API response data structure:', Object.keys(data));
 
-    if (!data || !data.articles || !data.articles.results) {
-      console.error('Invalid response format from Event Registry API:', data);
-      throw new Error('Invalid response format from Event Registry API');
+    if (!data || !data.articles) {
+      console.error('Invalid response format - missing articles field:', data);
+      throw new Error('Invalid response format from Event Registry API - missing articles field');
+    }
+    
+    if (!data.articles.results) {
+      console.error('Invalid response format - missing results field:', data.articles);
+      throw new Error('Invalid response format from Event Registry API - missing results field');
     }
 
     const articles = data.articles.results;
     console.log(`Received ${articles.length} articles from Event Registry API`);
+    
+    // Log first article for debugging if available
+    if (articles.length > 0) {
+      console.log('Sample article:', JSON.stringify({
+        title: articles[0].title,
+        date: articles[0].date,
+        source: articles[0].source?.title
+      }));
+    } else {
+      console.log('No articles found. Full response:', JSON.stringify(data));
+    }
 
     // Test Mode - Return processed results without saving to database
     if (testMode) {

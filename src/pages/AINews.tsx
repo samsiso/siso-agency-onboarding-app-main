@@ -24,7 +24,7 @@ import {
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { CalendarDays, Clock, AlertCircle, Sparkles, Database, RefreshCw } from 'lucide-react';
+import { CalendarDays, Clock, AlertCircle, Sparkles, Database, RefreshCw, Bug, Terminal } from 'lucide-react';
 import { format, subDays } from 'date-fns';
 import { toast } from '@/hooks/use-toast';
 import { Switch } from '@/components/ui/switch';
@@ -32,6 +32,8 @@ import { motion } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Textarea } from '@/components/ui/textarea';
 
 // [Analysis] Main component for the AI News page with improved visualization for news metrics
 const AINews = () => {
@@ -45,6 +47,8 @@ const AINews = () => {
   const [testKeyword, setTestKeyword] = useState('artificial intelligence');
   const [testLimit, setTestLimit] = useState(10);
   const [testSource, setTestSource] = useState<'event_registry' | 'news_api'>('event_registry');
+  const [apiResponse, setApiResponse] = useState<string>('');
+  const [isApiResponseOpen, setIsApiResponseOpen] = useState(false);
   const itemsPerPage = 12; // Same as PAGE_SIZE in useNewsItems
 
   const { 
@@ -141,11 +145,38 @@ const AINews = () => {
     }
   };
 
-  // [Analysis] Handle API test execution
+  // [Analysis] Handle API test execution with enhanced error tracking
   const handleTestAPI = async () => {
+    setApiResponse('');
     try {
-      await syncNews(testKeyword, testLimit, testSource, true);
+      const startTime = Date.now();
+      
+      // Capture raw response for debugging
+      const result = await syncNews(testKeyword, testLimit, testSource, true);
+      
+      const endTime = Date.now();
+      const duration = (endTime - startTime) / 1000;
+      
+      setApiResponse(JSON.stringify(result, null, 2));
+      
+      toast({
+        title: `API Test ${result.success ? 'Succeeded' : 'Failed'}`,
+        description: `Request took ${duration.toFixed(2)}s. ${result.count || 0} articles returned.`,
+        variant: result.success ? 'default' : 'destructive'
+      });
+      
+      // Auto-expand the API response section if there's an error or no articles
+      if (!result.success || (result.articles && result.articles.length === 0)) {
+        setIsApiResponseOpen(true);
+      }
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      setApiResponse(JSON.stringify({ 
+        error: errorMessage,
+        timestamp: new Date().toISOString()
+      }, null, 2));
+      setIsApiResponseOpen(true);
+      
       // Error is already handled in syncNews
     }
   };
@@ -245,6 +276,7 @@ const AINews = () => {
                   <TabsList>
                     <TabsTrigger value="test">Test API</TabsTrigger>
                     <TabsTrigger value="results">Test Results</TabsTrigger>
+                    <TabsTrigger value="debug">Debug</TabsTrigger>
                   </TabsList>
                   
                   <TabsContent value="test" className="space-y-4 mt-4">
@@ -289,6 +321,33 @@ const AINews = () => {
                         </Select>
                       </div>
                     </div>
+                    
+                    <Collapsible 
+                      open={isApiResponseOpen}
+                      onOpenChange={setIsApiResponseOpen}
+                      className="mt-4 border rounded-md"
+                    >
+                      <CollapsibleTrigger asChild>
+                        <div className="p-3 border-b flex justify-between items-center cursor-pointer hover:bg-white/5">
+                          <div className="flex items-center gap-2">
+                            <Terminal className="h-4 w-4 text-blue-400" />
+                            <h4 className="text-sm font-medium">Raw API Response</h4>
+                          </div>
+                          <Badge variant="outline" className={apiResponse ? "bg-blue-500/10" : "bg-gray-500/10"}>
+                            {apiResponse ? "Data Available" : "No Data"}
+                          </Badge>
+                        </div>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <div className="p-3">
+                          <Textarea
+                            value={apiResponse}
+                            readOnly
+                            className="font-mono text-xs h-48 bg-slate-950"
+                          />
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
                   </TabsContent>
                   
                   <TabsContent value="results" className="mt-4">
@@ -303,13 +362,17 @@ const AINews = () => {
                           </div>
                           
                           {syncResult.success && (
-                            <Badge variant="outline" className="bg-green-500/10 text-green-400">
-                              {syncResult.count} articles
+                            <Badge variant="outline" className={
+                              syncResult.count && syncResult.count > 0 
+                                ? "bg-green-500/10 text-green-400" 
+                                : "bg-orange-500/10 text-orange-400"
+                            }>
+                              {syncResult.count || 0} articles
                             </Badge>
                           )}
                         </div>
                         
-                        {syncResult.articles && syncResult.articles.length > 0 && (
+                        {syncResult.articles && syncResult.articles.length > 0 ? (
                           <div className="border rounded-md">
                             <h4 className="text-sm font-medium p-3 border-b">Sample Articles</h4>
                             <ScrollArea className="h-60">
@@ -326,6 +389,21 @@ const AINews = () => {
                               </div>
                             </ScrollArea>
                           </div>
+                        ) : (
+                          <Alert variant="default" className="bg-orange-950/10 border-orange-500/30 text-orange-300">
+                            <AlertCircle className="h-4 w-4" />
+                            <AlertTitle>No Articles Found</AlertTitle>
+                            <AlertDescription>
+                              The API request was successful, but no articles were returned. This could be due to:
+                              <ul className="list-disc pl-5 mt-2 space-y-1 text-sm">
+                                <li>API key configuration issues</li>
+                                <li>No articles matching your search criteria</li>
+                                <li>API rate limiting or quota restrictions</li>
+                                <li>Date range limitations</li>
+                              </ul>
+                              Check the Debug tab for more details.
+                            </AlertDescription>
+                          </Alert>
                         )}
                       </div>
                     ) : (
@@ -333,6 +411,93 @@ const AINews = () => {
                         <p>No test results yet. Run a test to see results here.</p>
                       </div>
                     )}
+                  </TabsContent>
+                  
+                  <TabsContent value="debug" className="mt-4">
+                    <div className="space-y-4">
+                      <Alert variant="default" className="bg-blue-950/10 border-blue-500/30 text-blue-300">
+                        <Bug className="h-4 w-4" />
+                        <AlertTitle>Debug Information</AlertTitle>
+                        <AlertDescription>
+                          This panel shows debugging information to help troubleshoot API issues.
+                        </AlertDescription>
+                      </Alert>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <Card className="bg-slate-950/50">
+                          <CardHeader className="py-3">
+                            <CardTitle className="text-sm">API Status</CardTitle>
+                          </CardHeader>
+                          <CardContent className="py-0">
+                            <div className="space-y-2 text-xs">
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">Last Sync</span>
+                                <span>{lastSync || 'Never'}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">Active Source</span>
+                                <span className="capitalize">{activeNewsSource}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">Database Articles</span>
+                                <span>{articleCount}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">Current Date</span>
+                                <span>{new Date().toISOString().split('T')[0]}</span>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                        
+                        <Card className="bg-slate-950/50">
+                          <CardHeader className="py-3">
+                            <CardTitle className="text-sm">Test Parameters</CardTitle>
+                          </CardHeader>
+                          <CardContent className="py-0">
+                            <div className="space-y-2 text-xs">
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">Keyword</span>
+                                <span>{testKeyword}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">Limit</span>
+                                <span>{testLimit}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">Source</span>
+                                <span className="capitalize">{testSource}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">Test Mode</span>
+                                <span>Enabled</span>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+                      
+                      <div className="border rounded-md overflow-hidden">
+                        <div className="bg-slate-950 p-3 border-b">
+                          <h4 className="text-sm font-medium flex items-center gap-2">
+                            <Terminal className="h-4 w-4" />
+                            Check Edge Function Logs
+                          </h4>
+                        </div>
+                        <div className="p-4 text-sm">
+                          <p className="mb-4">If your test is failing, check the Edge Function logs in the Supabase dashboard for detailed error information.</p>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => window.open(`https://supabase.com/dashboard/project/fzuwsjxjymwcjsbpwfsl/functions/fetch-ai-news/logs`, '_blank')}
+                            className="gap-2"
+                          >
+                            <Terminal className="h-4 w-4" />
+                            View Logs in Supabase
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
                   </TabsContent>
                 </Tabs>
               </CardContent>
