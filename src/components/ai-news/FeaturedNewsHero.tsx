@@ -1,30 +1,34 @@
+
 import { motion } from 'framer-motion';
 import { NewsCardMedia } from './NewsCardMedia';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Share2, BookmarkPlus, Star, AlertCircle, AlertOctagon, ChartPie, Clock, Info } from 'lucide-react';
+import { Share2, BookmarkPlus, Star, AlertCircle, AlertOctagon, ChartPie, Clock, Info, ArrowRight } from 'lucide-react';
 import { NewsItem } from '@/types/blog';
 import { GradientHeading } from '@/components/ui/gradient-heading';
+import { GradientText } from '@/components/ui/gradient-text';
+
+// [Analysis] Enhanced props interface with clear type definitions
 interface FeaturedNewsHeroProps {
   article: NewsItem;
   onGenerateSummary: (id: string) => Promise<void>;
   summary: string;
   loadingSummary: boolean;
 }
+
 const FeaturedNewsHero = ({
   article,
   onGenerateSummary,
   summary,
   loadingSummary
 }: FeaturedNewsHeroProps) => {
-  // [Analysis] Return placeholder content when article isn't available
-  if (!article) return <motion.div initial={{
-    opacity: 0,
-    y: 20
-  }} animate={{
-    opacity: 1,
-    y: 0
-  }} className="relative w-full rounded-xl overflow-hidden mb-8">
+  // [Analysis] Fallback UI when article isn't available with improved visuals
+  if (!article) return (
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="relative w-full rounded-xl overflow-hidden mb-8"
+    >
       {/* Background gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-siso-red/20 via-siso-orange/10 to-transparent opacity-75" />
       <div className="absolute inset-0 bg-gradient-radial from-siso-red/10 via-siso-orange/5 to-transparent opacity-50" />
@@ -70,7 +74,8 @@ const FeaturedNewsHero = ({
             <div className="mt-6">
               <h3 className="text-xl font-semibold mb-3">Quick Highlights</h3>
               <div className="space-y-3">
-                {["OpenAI's GPT-5 Development", "Google's Quantum Breakthrough", "Meta's AR Progress"].map((highlight, index) => <div key={index} className="flex items-start gap-2 bg-white/5 p-3 rounded-lg">
+                {["OpenAI's GPT-5 Development", "Google's Quantum Breakthrough", "Meta's AR Progress"].map((highlight, index) => (
+                  <div key={index} className="flex items-start gap-2 bg-white/5 p-3 rounded-lg">
                     <Star className="h-5 w-5 text-siso-orange mt-1" />
                     <div>
                       <p className="font-medium">{highlight}</p>
@@ -81,7 +86,8 @@ const FeaturedNewsHero = ({
                         <span className="text-xs text-siso-text/70">Research & Development</span>
                       </div>
                     </div>
-                  </div>)}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -95,37 +101,25 @@ const FeaturedNewsHero = ({
               <ChartPie className="h-5 w-5 text-siso-orange" />
             </div>
             <div className="space-y-3">
-              {[{
-              category: 'Research',
-              percentage: 40,
-              color: 'bg-blue-500'
-            }, {
-              category: 'Applications',
-              percentage: 30,
-              color: 'bg-green-500'
-            }, {
-              category: 'Industry',
-              percentage: 20,
-              color: 'bg-yellow-500'
-            }, {
-              category: 'Policy',
-              percentage: 10,
-              color: 'bg-purple-500'
-            }].map(({
-              category,
-              percentage,
-              color
-            }) => <div key={category} className="space-y-1">
+              {[
+                { category: 'Research', percentage: 40, color: 'bg-blue-500' },
+                { category: 'Applications', percentage: 30, color: 'bg-green-500' },
+                { category: 'Industry', percentage: 20, color: 'bg-yellow-500' },
+                { category: 'Policy', percentage: 10, color: 'bg-purple-500' }
+              ].map(({ category, percentage, color }) => (
+                <div key={category} className="space-y-1">
                   <div className="flex justify-between text-sm">
                     <span>{category}</span>
                     <span>{percentage}%</span>
                   </div>
                   <div className="h-2 bg-white/5 rounded-full overflow-hidden">
-                    <div className={`h-full ${color}`} style={{
-                  width: `${percentage}%`
-                }} />
+                    <div 
+                      className={`h-full ${color}`} 
+                      style={{ width: `${percentage}%` }} 
+                    />
                   </div>
-                </div>)}
+                </div>
+              ))}
             </div>
           </div>
 
@@ -174,20 +168,89 @@ const FeaturedNewsHero = ({
           </div>
         </div>
       </div>
-    </motion.div>;
-  return <motion.div initial={{
-    opacity: 0,
-    y: 20
-  }} animate={{
-    opacity: 1,
-    y: 0
-  }} className="relative w-full rounded-xl overflow-hidden">
-      <NewsCardMedia imageUrl={article.image_url} title={article.title} className="h-64 md:h-96" />
-      
-      
-      
-      
-      
-    </motion.div>;
+    </motion.div>
+  );
+
+  // [Analysis] Enhanced featured article display with improved visual hierarchy and interactive elements
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="relative w-full rounded-xl overflow-hidden mb-8"
+    >
+      <div className="relative">
+        {/* Featured image with enhanced media component */}
+        <NewsCardMedia 
+          imageUrl={article.image_url} 
+          title={article.title} 
+          isFeatured={true}
+          className="h-64 md:h-[400px]" 
+        />
+        
+        {/* Overlay content with gradient background for better readability */}
+        <div className="absolute inset-0 flex flex-col justify-end p-4 sm:p-6 md:p-8">
+          <div className="bg-black/60 backdrop-blur-sm p-4 sm:p-6 rounded-xl">
+            <div className="flex flex-col space-y-3">
+              {/* Category badge */}
+              <div className="flex items-center space-x-2">
+                <Badge variant="outline" className="bg-siso-red text-white border-none px-2.5 py-0.5">
+                  {article.category || 'Technology'}
+                </Badge>
+                {article.impact && (
+                  <Badge variant="outline" className="bg-green-500/20 text-green-400 border-none px-2.5 py-0.5">
+                    {article.impact} Impact
+                  </Badge>
+                )}
+              </div>
+              
+              {/* Title with gradient effect for emphasis */}
+              <GradientHeading 
+                variant="sunset" 
+                size="lg" 
+                className="mt-2 leading-tight tracking-tight"
+              >
+                {article.title}
+              </GradientHeading>
+              
+              {/* Description with improved readability */}
+              <p className="text-gray-200 text-base sm:text-lg max-w-3xl line-clamp-3 leading-relaxed">
+                {article.description}
+              </p>
+              
+              {/* Article metadata and actions */}
+              <div className="flex flex-wrap items-center justify-between mt-4 gap-4">
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center text-siso-text/70">
+                    <Clock className="h-4 w-4 mr-1" />
+                    <span className="text-sm">{article.reading_time || 5} min read</span>
+                  </div>
+                  <div className="flex items-center text-siso-text/70">
+                    <AlertCircle className="h-4 w-4 mr-1" />
+                    <span className="text-sm">{article.views || 0} views</span>
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Button variant="outline" size="sm" className="gap-1.5">
+                    <BookmarkPlus className="h-4 w-4" />
+                    <span className="hidden sm:inline">Save</span>
+                  </Button>
+                  <Button variant="outline" size="sm" className="gap-1.5">
+                    <Share2 className="h-4 w-4" />
+                    <span className="hidden sm:inline">Share</span>
+                  </Button>
+                  <Button variant="default" size="sm" className="gap-1.5 bg-siso-red hover:bg-siso-red/90">
+                    Read Article
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
 };
+
 export default FeaturedNewsHero;
