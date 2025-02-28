@@ -2,45 +2,58 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
+// [Analysis] Category list derived from API data patterns
+const CATEGORIES = [
+  { id: "all", label: "All Categories" },
+  { id: "breakthrough_technologies", label: "Breakthrough Tech" },
+  { id: "language_models", label: "Language Models" },
+  { id: "robotics_automation", label: "Robotics & Automation" },
+  { id: "industry_applications", label: "Industry Applications" },
+  { id: "international_developments", label: "International News" },
+  { id: "enterprise_ai", label: "Enterprise AI" },
+  { id: "ai_ethics", label: "AI Ethics" },
+  { id: "research", label: "Research" },
+  { id: "startups", label: "Startups" },
+];
+
 interface NewsCategoriesProps {
   selectedCategory: string | null;
   onCategoryChange: (category: string | null) => void;
 }
 
-const NewsCategories = ({ selectedCategory, onCategoryChange }: NewsCategoriesProps) => {
-  const categories = [
-    "All",
-    "Tech Giants",
-    "Research",
-    "Policy",
-    "Business",
-    "Innovation"
-  ];
+const NewsCategories = ({
+  selectedCategory,
+  onCategoryChange,
+}: NewsCategoriesProps) => {
+  // [Analysis] Handle toggling category selection
+  const handleCategoryClick = (categoryId: string) => {
+    if (categoryId === "all" || selectedCategory === categoryId) {
+      onCategoryChange(null);
+    } else {
+      onCategoryChange(categoryId);
+    }
+  };
 
   return (
-    <div className="relative flex flex-wrap gap-2 mb-6 w-full">
-      {categories.map((category) => (
+    <div className="flex flex-wrap gap-2 py-2">
+      {CATEGORIES.map((category) => (
         <motion.div
-          key={category}
-          layout
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
+          key={category.id}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
         >
           <Button
-            variant={selectedCategory === (category === "All" ? null : category) ? "default" : "outline"}
+            variant={
+              (category.id === "all" && !selectedCategory) ||
+              selectedCategory === category.id
+                ? "default"
+                : "outline"
+            }
             size="sm"
-            onClick={() => onCategoryChange(category === "All" ? null : category)}
-            className={`
-              relative text-xs sm:text-sm font-medium transition-all duration-200
-              ${selectedCategory === (category === "All" ? null : category)
-                ? 'bg-siso-red text-white hover:bg-siso-red/90'
-                : 'hover:bg-siso-red/10 hover:text-siso-red border-siso-border'
-              }
-              min-w-[80px] h-9
-            `}
+            onClick={() => handleCategoryClick(category.id)}
+            className="text-xs sm:text-sm"
           >
-            {category}
+            {category.label}
           </Button>
         </motion.div>
       ))}

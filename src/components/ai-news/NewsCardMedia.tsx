@@ -1,115 +1,90 @@
 
-import { motion } from 'framer-motion';
-import { Badge } from '@/components/ui/badge';
-import { useState, useEffect } from 'react';
-import { AspectRatio } from '@/components/ui/aspect-ratio';
-import { Skeleton } from '@/components/ui/skeleton';
-import { AlertCircle } from 'lucide-react';
+import { memo, useState } from 'react';
+import { Skeleton } from "@/components/ui/skeleton";
+import { CalendarDays } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface NewsCardMediaProps {
-  imageUrl: string;
+  imageUrl?: string;
   title: string;
   isFeatured?: boolean;
   isCompact?: boolean;
-  className?: string;
+  date?: string;
 }
 
-export const NewsCardMedia = ({
-  imageUrl,
+// [Analysis] List of fallback images for articles without images
+const FALLBACK_IMAGES = [
+  "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",
+  "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
+  "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
+  "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7"
+];
+
+export const NewsCardMedia = memo(({ 
+  imageUrl, 
   title,
   isFeatured = false,
   isCompact = false,
-  className = ''
+  date
 }: NewsCardMediaProps) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isIntersecting, setIsIntersecting] = useState(false);
-  const [error, setError] = useState(false);
-  const [retryCount, setRetryCount] = useState(0);
-  
-  // [Analysis] Use fallback image when original source fails after retries
-  const fallbackImage = '/placeholder.svg';
-  
-  // [Analysis] Enhanced intersection observer for better lazy loading performance
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      setIsIntersecting(entry.isIntersecting);
-    }, {
-      rootMargin: '200px', // Increased margin to load images earlier
-      threshold: 0.1
-    });
-    
-    const element = document.getElementById(`news-image-${title.replace(/\s+/g, '-')}`);
-    if (element) {
-      observer.observe(element);
-    }
-    
-    return () => {
-      if (element) {
-        observer.unobserve(element);
-      }
-    };
-  }, [title]);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
-  // [Analysis] Handle image error with retry logic
-  const handleImageError = () => {
-    if (retryCount < 2) {
-      // Retry loading the image after a short delay
-      setTimeout(() => {
-        setRetryCount(prev => prev + 1);
-        setIsLoading(true);
-      }, 1000);
-    } else {
-      setError(true);
-      setIsLoading(false);
-      console.warn(`Failed to load image for article: ${title}`, imageUrl);
-    }
+  // [Analysis] Select a consistent fallback image based on title hash
+  const getFallbackImage = () => {
+    // Simple hash function for the title to pick a consistent image
+    const hashCode = title.split('').reduce(
+      (acc, char) => acc + char.charCodeAt(0), 0
+    );
+    return FALLBACK_IMAGES[hashCode % FALLBACK_IMAGES.length];
   };
 
+  // [Analysis] Determine final image URL with fallback logic
+  const finalImageUrl = imageError || !imageUrl ? getFallbackImage() : imageUrl;
+
+  // [Analysis] For compact cards, return early with no image
+  if (isCompact) {
+    return null;
+  }
+
   return (
-    <div className={`${isCompact ? 'w-1/3 max-w-[200px]' : 'w-full'} ${className}`}>
-      <AspectRatio ratio={isCompact ? 4 / 3 : 16 / 9}>
-        <div 
-          id={`news-image-${title.replace(/\s+/g, '-')}`} 
-          className="relative h-full overflow-hidden rounded-t-lg"
-        >
-          {/* Loading shimmer effect */}
-          {(isLoading || !isIntersecting) && (
-            <Skeleton className="w-full h-full absolute inset-0 bg-gradient-to-r from-siso-bg-alt/60 via-siso-bg/40 to-siso-bg-alt/60 animate-pulse" />
-          )}
-          
-          {isIntersecting && !error && (
-            <motion.img
-              src={imageUrl || fallbackImage}
-              alt={title}
-              className="w-full h-full object-cover transition-all duration-300 group-hover:scale-105"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: isLoading ? 0 : 1 }}
-              onLoad={() => setIsLoading(false)}
-              onError={handleImageError}
-              key={`img-${retryCount}`} // Force re-render on retry
-            />
-          )}
-
-          {/* Error state with improved styling */}
-          {error && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-siso-bg/80 p-4">
-              <AlertCircle className="h-8 w-8 text-siso-red mb-2" />
-              <p className="text-xs text-center text-white/80">Image unavailable</p>
-            </div>
-          )}
-
-          {/* Enhanced hover overlay with gradient */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-300" />
-
-          {isFeatured && (
-            <div className="absolute top-2 left-2 z-10">
-              <Badge variant="outline" className="bg-siso-red/10 text-siso-red border-none text-xs font-semibold px-2 py-1">
-                Featured
-              </Badge>
-            </div>
-          )}
+    <div 
+      className={cn(
+        "relative overflow-hidden bg-slate-900/40",
+        isFeatured ? "h-80 sm:h-96" : "h-48 sm:h-56"
+      )}
+    >
+      {!imageLoaded && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Skeleton className="w-full h-full" />
         </div>
-      </AspectRatio>
+      )}
+      
+      <img
+        src={finalImageUrl}
+        alt={title}
+        className={cn(
+          "w-full h-full object-cover transition-opacity duration-500 hover:opacity-90",
+          !imageLoaded && "opacity-0"
+        )}
+        onLoad={() => setImageLoaded(true)}
+        onError={() => {
+          setImageError(true);
+          setImageLoaded(true);
+        }}
+      />
+      
+      {/* Gradient overlay for better text readability */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+      
+      {date && (
+        <div className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-black/60 text-white text-xs px-2 py-1 rounded-md">
+          <CalendarDays className="h-3 w-3" />
+          <span>{new Date(date).toLocaleDateString()}</span>
+        </div>
+      )}
     </div>
   );
-};
+});
+
+NewsCardMedia.displayName = 'NewsCardMedia';

@@ -1,8 +1,14 @@
 
-import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useMemo } from 'react';
 import { usePagination } from '@/hooks/use-pagination';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationEllipsis,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 interface NewsPaginationProps {
   currentPage: number;
@@ -10,108 +16,80 @@ interface NewsPaginationProps {
   onPageChange: (page: number) => void;
 }
 
-const NewsPagination = ({
-  currentPage,
-  totalPages,
-  onPageChange
-}: NewsPaginationProps) => {
-  // Use our custom hook for pagination logic
+const NewsPagination = ({ currentPage, totalPages, onPageChange }: NewsPaginationProps) => {
+  // [Analysis] Use pagination hook to handle pagination logic
   const { pages, showLeftEllipsis, showRightEllipsis } = usePagination({
     currentPage,
     totalPages,
-    paginationItemsToDisplay: 5,
+    paginationItemsToDisplay: 5, // Show 5 pages at a time
   });
 
-  if (totalPages <= 1) return null;
+  // [Analysis] Don't render pagination if there's only one page
+  if (totalPages <= 1) {
+    return null;
+  }
 
   return (
-    <nav className="flex items-center justify-center space-x-1">
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => onPageChange(currentPage - 1)}
-        disabled={currentPage === 1}
-        className="hidden sm:flex"
-      >
-        <ChevronLeft className="h-4 w-4" />
-        <span className="ml-1">Previous</span>
-      </Button>
-      
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={() => onPageChange(currentPage - 1)}
-        disabled={currentPage === 1}
-        className="sm:hidden"
-      >
-        <ChevronLeft className="h-4 w-4" />
-      </Button>
+    <Pagination>
+      <PaginationContent>
+        <PaginationItem>
+          <PaginationPrevious 
+            onClick={() => onPageChange(Math.max(1, currentPage - 1))}
+            disabled={currentPage === 1}
+          />
+        </PaginationItem>
 
-      {/* First Page */}
-      {showLeftEllipsis && (
-        <>
-          <Button
-            variant={currentPage === 1 ? "default" : "outline"}
-            size="sm"
-            onClick={() => onPageChange(1)}
-          >
-            1
-          </Button>
-          <span className="flex items-center justify-center">
-            <MoreHorizontal className="h-4 w-4" />
-          </span>
-        </>
-      )}
+        {showLeftEllipsis && (
+          <>
+            <PaginationItem>
+              <PaginationLink 
+                onClick={() => onPageChange(1)}
+                isActive={currentPage === 1}
+              >
+                1
+              </PaginationLink>
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationEllipsis />
+            </PaginationItem>
+          </>
+        )}
 
-      {/* Pagination Pages */}
-      {pages.map((page) => (
-        <Button
-          key={page}
-          variant={currentPage === page ? "default" : "outline"}
-          size="sm"
-          onClick={() => onPageChange(page)}
-        >
-          {page}
-        </Button>
-      ))}
+        {pages.map((page) => (
+          <PaginationItem key={page}>
+            <PaginationLink
+              onClick={() => onPageChange(page)}
+              isActive={page === currentPage}
+            >
+              {page}
+            </PaginationLink>
+          </PaginationItem>
+        ))}
 
-      {/* Last Page */}
-      {showRightEllipsis && (
-        <>
-          <span className="flex items-center justify-center">
-            <MoreHorizontal className="h-4 w-4" />
-          </span>
-          <Button
-            variant={currentPage === totalPages ? "default" : "outline"}
-            size="sm"
-            onClick={() => onPageChange(totalPages)}
-          >
-            {totalPages}
-          </Button>
-        </>
-      )}
+        {showRightEllipsis && (
+          <>
+            <PaginationItem>
+              <PaginationEllipsis />
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationLink 
+                onClick={() => onPageChange(totalPages)}
+                isActive={currentPage === totalPages}
+              >
+                {totalPages}
+              </PaginationLink>
+            </PaginationItem>
+          </>
+        )}
 
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
-        className="hidden sm:flex"
-      >
-        <span className="mr-1">Next</span>
-        <ChevronRight className="h-4 w-4" />
-      </Button>
-      
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
-        className="sm:hidden"
-      >
-        <ChevronRight className="h-4 w-4" />
-      </Button>
-    </nav>
+        <PaginationItem>
+          <PaginationNext 
+            onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
+            disabled={currentPage === totalPages}
+          />
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
   );
 };
 

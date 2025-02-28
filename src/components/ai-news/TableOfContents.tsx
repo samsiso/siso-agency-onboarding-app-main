@@ -1,6 +1,8 @@
 
+import { NavLink } from "@/components/ui/nav-link";
+import { cn } from "@/lib/utils";
 import { NewsItem } from '@/types/blog';
-import { motion } from 'framer-motion';
+import { Calendar, ArrowRight } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface TableOfContentsProps {
@@ -9,42 +11,50 @@ interface TableOfContentsProps {
 }
 
 export const TableOfContents = ({ items, activeId }: TableOfContentsProps) => {
-  if (items.length === 0) {
-    return null;
-  }
+  // [Analysis] Group items by date for better organization
+  const groupedByDate = items.reduce((acc, item) => {
+    const date = new Date(item.date).toDateString();
+    if (!acc[date]) {
+      acc[date] = [];
+    }
+    acc[date].push(item);
+    return acc;
+  }, {} as Record<string, NewsItem[]>);
 
   return (
-    <div className="sticky top-24">
-      <h3 className="text-md font-medium mb-4">Table of Contents</h3>
-      <div className="space-y-1">
-        {items.map((item, index) => {
-          const isActive = activeId === item.id;
-          
-          return (
-            <motion.a
-              key={item.id}
-              href={`#${item.id}`}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className={`
-                block py-2 px-3 text-sm rounded-md
-                transition-colors duration-200
-                ${isActive 
-                  ? 'bg-siso-red/10 text-siso-red font-medium' 
-                  : 'hover:bg-muted hover:text-foreground text-muted-foreground'
-                }
-              `}
-            >
-              <div className="flex flex-col">
-                <span className="line-clamp-1">{item.title}</span>
-                <span className="text-xs text-muted-foreground">
-                  {format(new Date(item.date), 'MMM d, yyyy')}
-                </span>
-              </div>
-            </motion.a>
-          );
-        })}
+    <div className="bg-card/50 backdrop-blur-sm rounded-lg border p-4">
+      <h3 className="text-lg font-medium mb-4">Daily Briefs</h3>
+      <div className="space-y-6">
+        {Object.entries(groupedByDate).map(([date, articles]) => (
+          <div key={date} className="space-y-2">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Calendar className="h-4 w-4" />
+              <span>{format(new Date(date), 'MMMM d, yyyy')}</span>
+            </div>
+            <div className="space-y-1.5 ml-2 pl-3 border-l">
+              {articles.map((article) => (
+                <NavLink
+                  key={article.id}
+                  href={`#${article.id}`}
+                  className={cn(
+                    "text-sm py-1 hover:underline flex items-center gap-2 transition-colors",
+                    activeId === article.id
+                      ? "text-primary font-medium"
+                      : "text-muted-foreground"
+                  )}
+                >
+                  <ArrowRight 
+                    className={cn(
+                      "h-3 w-0 transition-all duration-200", 
+                      activeId === article.id && "w-3 text-primary"
+                    )} 
+                  />
+                  <span className="line-clamp-1">{article.title}</span>
+                </NavLink>
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
