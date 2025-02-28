@@ -258,15 +258,17 @@ export const useNewsItems = (
       if (data.success) {
         toast({
           title: "News synced successfully",
-          description: `${data.count} articles imported from ${source === 'event_registry' ? 'Event Registry' : 'News API'}`,
+          description: `${data.count} articles ${testMode ? 'retrieved' : 'imported'} from ${source === 'event_registry' ? 'Event Registry' : 'News API'}`,
         });
         
         // [Analysis] Update active news source
         setActiveNewsSource(source);
         
         // Refresh data and status
-        fetchNews();
-        fetchApiStatus();
+        if (!testMode) {
+          fetchNews();
+          fetchApiStatus();
+        }
       } else {
         throw new Error(data.message || "Failed to sync news");
       }

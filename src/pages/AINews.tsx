@@ -445,4 +445,3 @@ const AINews = () => {
 };
 
 export default AINews;
-
