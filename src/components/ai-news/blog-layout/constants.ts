@@ -3,7 +3,7 @@ import {
   Beaker, 
   Globe, 
   Microscope, 
-  Robot, 
+  Bot, 
   Command, 
   Layers,
   Network,
@@ -32,7 +32,7 @@ export const sectionIcons: Record<string, LucideIcon> = {
   research: Microscope,
   integration: Command,
   medical: Beaker,
-  robotics: Robot,
+  robotics: Bot,
   international: Globe,
   default: Layers,
   network: Network
