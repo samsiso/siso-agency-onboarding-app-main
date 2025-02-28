@@ -53,6 +53,7 @@ export type Database = {
           title: string
           updated_at: string
           upvotes: number | null
+          url: string | null
           views: number | null
         }
         Insert: {
@@ -98,6 +99,7 @@ export type Database = {
           title: string
           updated_at?: string
           upvotes?: number | null
+          url?: string | null
           views?: number | null
         }
         Update: {
@@ -143,6 +145,7 @@ export type Database = {
           title?: string
           updated_at?: string
           upvotes?: number | null
+          url?: string | null
           views?: number | null
         }
         Relationships: [
