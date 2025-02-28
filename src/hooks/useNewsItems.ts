@@ -221,7 +221,8 @@ export const useNewsItems = (
           // but are needed in the UI
           return {
             ...item,
-            template_type: item.template_type || 'article',
+            // Set a default template_type since it doesn't exist in the database schema
+            template_type: 'article',
             article_type: item.article_type || 'article',
             technical_complexity: technicalComplexity,
             reading_time: readingTime,
