@@ -130,12 +130,12 @@ function App() {
             <LearnNetwork />
           </ProtectedRoute>
         } />
-        <Route path="/how-to-earn" element={
+        <Route path="/economy/earn" element={
           <ProtectedRoute>
             <HowToEarn />
           </ProtectedRoute>
         } />
-        <Route path="/leaderboards" element={
+        <Route path="/economy/leaderboards" element={
           <ProtectedRoute>
             <Leaderboards />
           </ProtectedRoute>
@@ -160,7 +160,7 @@ function App() {
             <Crypto />
           </ProtectedRoute>
         } />
-        <Route path="/crypto-exchange" element={
+        <Route path="/economy/crypto-exchange" element={
           <ProtectedRoute>
             <CryptoExchange />
           </ProtectedRoute>
