@@ -366,7 +366,7 @@ export const useNewsItems = (
             bookmarks: Math.floor(Math.random() * 50),
             reading_time: readingTime,
             featured: index === 0, // Mark first article as featured
-            url: article.url,
+            url: article.url || null, // Handle null URLs
             status: 'published',
             template_type: 'article' // Default template type
           };
