@@ -64,7 +64,7 @@ export const useNewsItems = (
         .select('last_fetched_at, source_type')
         .order('last_fetched_at', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
       
       if (sourceData) {
         const syncDate = new Date(sourceData.last_fetched_at);
@@ -77,7 +77,7 @@ export const useNewsItems = (
           .select('created_at')
           .order('created_at', { ascending: false })
           .limit(1)
-          .single();
+          .maybeSingle();
         
         if (latestArticle) {
           const syncDate = new Date(latestArticle.created_at);
@@ -198,12 +198,16 @@ export const useNewsItems = (
     }
   };
 
-  // [Analysis] Function to sync news from a specific API source
+  // [Analysis] Function to sync news from a specific API source with improved error handling
   const syncNews = async (keyword: string = "artificial intelligence", limit: number = 20, source: 'event_registry' | 'news_api' = activeNewsSource) => {
     setSyncingNews(true);
     try {
+      console.log(`Starting news sync from ${source}...`);
+      
       // [Analysis] Determine which edge function to call based on source
       const functionName = source === 'event_registry' ? 'fetch-ai-news' : 'fetch-news';
+      
+      console.log(`Calling edge function: ${functionName}`);
       
       const { data, error } = await supabase.functions.invoke(functionName, {
         body: { 
@@ -212,7 +216,17 @@ export const useNewsItems = (
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error(`Edge function error:`, error);
+        throw new Error(`Edge function error: ${error.message}`);
+      }
+
+      if (!data) {
+        console.error('No data returned from edge function');
+        throw new Error('No data returned from edge function');
+      }
+
+      console.log('Edge function response:', data);
 
       if (data.success) {
         toast({
@@ -231,11 +245,14 @@ export const useNewsItems = (
       }
     } catch (error) {
       console.error('Error syncing news:', error);
+      setError(error instanceof Error ? error : new Error(String(error)));
       toast({
         variant: "destructive",
         title: "Sync Error",
-        description: error.message || "Failed to sync AI news",
+        description: error instanceof Error ? error.message : "Failed to sync AI news",
       });
+      // Re-throw to allow parent components to handle
+      throw error;
     } finally {
       setSyncingNews(false);
     }

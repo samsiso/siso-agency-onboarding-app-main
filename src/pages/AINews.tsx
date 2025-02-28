@@ -22,6 +22,7 @@ const AINews = () => {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [showRecent, setShowRecent] = useState(false);
+  const [syncError, setSyncError] = useState<string | null>(null);
   const itemsPerPage = 12; // Same as PAGE_SIZE in useNewsItems
 
   const { 
@@ -107,12 +108,43 @@ const AINews = () => {
     }
   };
 
-  // [Analysis] Handle news source change
+  // [Analysis] Handle news source change with improved error handling
   const handleSourceChange = (source: 'event_registry' | 'news_api') => {
     if (switchNewsSource) {
-      switchNewsSource(source);
-      // Optionally refresh the news or reset filters
-      refresh();
+      try {
+        switchNewsSource(source);
+        // Reset any previous sync errors
+        setSyncError(null);
+        // Optionally refresh the news or reset filters
+        refresh();
+      } catch (err) {
+        console.error("Error switching news source:", err);
+        setSyncError("Failed to switch news source");
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to switch news source. Please try again.",
+        });
+      }
+    }
+  };
+
+  // [Analysis] Handle sync news with better error handling
+  const handleSyncNews = async (keyword: string, limit: number, source?: 'event_registry' | 'news_api') => {
+    setSyncError(null); // Reset error state before attempting sync
+    try {
+      if (syncNews) {
+        await syncNews(keyword, limit, source);
+      }
+    } catch (err) {
+      console.error("Error syncing news:", err);
+      const errorMessage = err instanceof Error ? err.message : "Failed to sync news";
+      setSyncError(errorMessage);
+      toast({
+        variant: "destructive",
+        title: "Sync Error",
+        description: "Failed to send a request to the Edge Function. Please check your network connection and try again.",
+      });
     }
   };
 
@@ -164,13 +196,14 @@ const AINews = () => {
           <div className="lg:col-span-1">
             <NewsApiStatus 
               onRefresh={refresh}
-              syncNews={syncNews}
+              syncNews={handleSyncNews}
               lastSync={lastSync}
               articleCount={articleCount}
               apiUsage={apiUsage}
               syncingNews={syncingNews}
               activeNewsSource={activeNewsSource}
               switchNewsSource={handleSourceChange}
+              syncError={syncError}
             />
           </div>
         </div>

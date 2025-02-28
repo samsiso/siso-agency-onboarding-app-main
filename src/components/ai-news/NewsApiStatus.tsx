@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { motion } from 'framer-motion';
-import { Info, RefreshCw, Settings, Newspaper } from 'lucide-react';
+import { Info, RefreshCw, Settings, Newspaper, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -30,6 +30,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface NewsApiStatusProps {
   onRefresh?: () => void;
@@ -40,6 +41,7 @@ interface NewsApiStatusProps {
   syncingNews: boolean;
   activeNewsSource?: 'event_registry' | 'news_api';
   switchNewsSource?: (source: 'event_registry' | 'news_api') => void;
+  syncError?: string | null;
 }
 
 export const NewsApiStatus = ({ 
@@ -50,7 +52,8 @@ export const NewsApiStatus = ({
   apiUsage,
   syncingNews,
   activeNewsSource = 'event_registry',
-  switchNewsSource
+  switchNewsSource,
+  syncError
 }: NewsApiStatusProps) => {
   // [Analysis] State for UI settings and form values
   const [showSettings, setShowSettings] = useState(false);
@@ -58,11 +61,19 @@ export const NewsApiStatus = ({
   const [limit, setLimit] = useState("20");
   const [advancedMode, setAdvancedMode] = useState(false);
   const [selectedSource, setSelectedSource] = useState<'event_registry' | 'news_api'>(activeNewsSource);
+  const [isRetrying, setIsRetrying] = useState(false);
 
-  // [Analysis] Handle sync with selected source
+  // [Analysis] Handle sync with selected source and improved error handling
   const handleSync = async () => {
     if (syncNews) {
-      await syncNews(keyword, parseInt(limit), selectedSource);
+      setIsRetrying(true);
+      try {
+        await syncNews(keyword, parseInt(limit), selectedSource);
+        setIsRetrying(false);
+      } catch (error) {
+        console.error("Error in handleSync:", error);
+        setIsRetrying(false);
+      }
     } else if (onRefresh) {
       onRefresh();
     }
@@ -93,14 +104,24 @@ export const NewsApiStatus = ({
             variant="outline" 
             size="sm" 
             onClick={handleSync} 
-            disabled={syncingNews}
+            disabled={syncingNews || isRetrying}
             className="h-8"
           >
-            <RefreshCw className={`h-4 w-4 mr-2 ${syncingNews ? 'animate-spin' : ''}`} />
-            {syncingNews ? 'Syncing...' : 'Sync Now'}
+            <RefreshCw className={`h-4 w-4 mr-2 ${(syncingNews || isRetrying) ? 'animate-spin' : ''}`} />
+            {syncingNews ? 'Syncing...' : isRetrying ? 'Retrying...' : 'Sync Now'}
           </Button>
         </div>
       </div>
+      
+      {syncError && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Sync Error</AlertTitle>
+          <AlertDescription>
+            Failed to sync news. Please try again or check the Edge Function logs.
+          </AlertDescription>
+        </Alert>
+      )}
       
       <div className="flex flex-col space-y-4 mb-3">
         <div className="grid grid-cols-2 gap-4">
