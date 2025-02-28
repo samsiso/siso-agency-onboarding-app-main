@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -216,6 +217,8 @@ export const useNewsItems = (
             }
           }
           
+          // [Analysis] Safely handle properties that might not exist in the database
+          // but are needed in the UI
           return {
             ...item,
             template_type: item.template_type || 'article',
@@ -362,7 +365,8 @@ export const useNewsItems = (
             reading_time: readingTime,
             featured: index === 0, // Mark first article as featured
             url: article.url,
-            status: 'published'
+            status: 'published',
+            template_type: 'article' // Default template type
           };
         });
         

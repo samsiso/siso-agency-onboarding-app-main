@@ -135,4 +135,7 @@ export interface NewsItem {
   status?: string;
   tags?: string[] | ArticleTag[];
   url?: string; // Added for external links support
+  content_blocks?: any; // Added for supporting structured content
+  cover_image?: string; // Added for article cover images
+  banner_template_id?: string; // Added for banner templates
 }
