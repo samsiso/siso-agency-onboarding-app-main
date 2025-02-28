@@ -58,6 +58,9 @@ const AINews = () => {
   console.log('Article count:', articleCount);
   console.log('Loading state:', loading);
   console.log('Error state:', error ? (error instanceof Error ? error.message : String(error)) : 'none');
+  console.log('Show recent filter:', showRecent);
+  console.log('Selected date:', selectedDate);
+  console.log('Active news source:', activeNewsSource);
 
   // [Analysis] Find featured article with priority on featured flag and then on views
   const featuredArticle = newsItems.find(item => item.featured) || 
@@ -101,6 +104,37 @@ const AINews = () => {
       toast({
         title: "Showing recent articles",
         description: "Displaying articles published in the last 7 days",
+      });
+
+      // [Analysis] Test fetching recent news
+      console.log('Toggling recent news filter - now active:', !showRecent);
+    }
+  };
+
+  // [Analysis] Function to manually test syncing recent news
+  const handleTestSyncNews = async () => {
+    try {
+      console.log('Starting news sync test...');
+      setSyncError(null);
+      
+      // Default to event_registry which has better recency
+      await syncNews("artificial intelligence", 10, 'event_registry');
+      
+      console.log('News sync completed successfully');
+      setShowRecent(true); // Automatically show recent view after sync
+      
+      toast({
+        title: "News sync completed",
+        description: "Successfully fetched the latest AI news",
+      });
+    } catch (error) {
+      console.error('Error syncing news:', error);
+      setSyncError(error instanceof Error ? error.message : String(error));
+      
+      toast({
+        variant: "destructive",
+        title: "Sync failed",
+        description: error instanceof Error ? error.message : "Failed to sync latest news",
       });
     }
   };
@@ -150,6 +184,14 @@ const AINews = () => {
           </Alert>
         )}
         
+        {syncError && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Sync Error</AlertTitle>
+            <AlertDescription>{syncError}</AlertDescription>
+          </Alert>
+        )}
+        
         <div className="mb-8">
           <div className="w-full">
             <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4">
@@ -161,6 +203,16 @@ const AINews = () => {
               >
                 <Clock className="h-4 w-4" />
                 Recently Published
+              </Button>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleTestSyncNews}
+                disabled={syncingNews}
+                className="flex items-center gap-2"
+              >
+                {syncingNews ? "Syncing..." : "Sync Latest News"}
               </Button>
               
               {showRecent && (
