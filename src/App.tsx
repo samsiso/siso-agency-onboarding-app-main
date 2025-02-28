@@ -39,7 +39,7 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 
 function App() {
   const location = useLocation();
-  const { session } = useAuthSession();
+  const { user } = useAuthSession(); // [Analysis] Updated to use 'user' instead of 'session'
 
   // [Analysis] Log current route for debugging
   useEffect(() => {
