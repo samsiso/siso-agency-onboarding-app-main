@@ -26,7 +26,7 @@ export type Database = {
           featured: boolean | null
           id: string
           image_url: string | null
-          impact: string
+          impact: string | null
           key_takeaways: Json | null
           linkedin_url: string | null
           meta_description: string | null
@@ -72,7 +72,7 @@ export type Database = {
           featured?: boolean | null
           id?: string
           image_url?: string | null
-          impact: string
+          impact?: string | null
           key_takeaways?: Json | null
           linkedin_url?: string | null
           meta_description?: string | null
@@ -118,7 +118,7 @@ export type Database = {
           featured?: boolean | null
           id?: string
           image_url?: string | null
-          impact?: string
+          impact?: string | null
           key_takeaways?: Json | null
           linkedin_url?: string | null
           meta_description?: string | null
@@ -3601,6 +3601,10 @@ export type Database = {
         Returns: undefined
       }
       refresh_trending_articles: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      safe_refresh_trending_articles: {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
