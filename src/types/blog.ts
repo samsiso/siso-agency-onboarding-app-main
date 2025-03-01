@@ -103,6 +103,7 @@ export interface EnhancedNewsItem {
   views: number;
   source: string;
   sources: any[];
+  url?: string; // Added missing url property
 }
 
 // [Analysis] Added NewsItem type to represent the structure of news items
@@ -138,4 +139,5 @@ export interface NewsItem {
   content_blocks?: any; // Added for supporting structured content
   cover_image?: string; // Added for article cover images
   banner_template_id?: string; // Added for banner templates
+  estimated_reading_time?: number; // Added to fix NewsCard.tsx error
 }

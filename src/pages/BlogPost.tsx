@@ -20,15 +20,17 @@ const BlogPost = () => {
     queryKey: ['blog-post', id],
     queryFn: () => fetchBlogPost(id as string),
     // [Analysis] Add error handling to show user-friendly messages
-    onError: (err) => {
-      console.error('Error loading blog post:', err);
-      toast({
-        variant: "destructive",
-        title: "Failed to load article",
-        description: "There was an error loading this article. Please try again.",
-      });
-    },
     retry: 1,
+    meta: {
+      onError: (err: any) => {
+        console.error('Error loading blog post:', err);
+        toast({
+          variant: "destructive",
+          title: "Failed to load article",
+          description: "There was an error loading this article. Please try again.",
+        });
+      }
+    }
   });
 
   // [Analysis] New function to handle external article links
