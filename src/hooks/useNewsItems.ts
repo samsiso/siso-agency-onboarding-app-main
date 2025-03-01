@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -216,12 +217,12 @@ export const useNewsItems = (
             }
           }
           
-          // [Analysis] Safely handle properties that might not exist in the database
+          // [Analysis] Safely handle properties that might not exist in the database schema
           // but are needed in the UI
           return {
             ...item,
-            // Set a default template_type since it doesn't exist in the database schema
-            template_type: item.template_type || 'article',
+            // Set a default template_type even though it doesn't exist in the database
+            template_type: 'article', // Adding this as a default value instead of accessing it from item
             article_type: item.article_type || 'article',
             technical_complexity: technicalComplexity,
             reading_time: readingTime,
