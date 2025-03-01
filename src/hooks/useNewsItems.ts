@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -222,14 +221,16 @@ export const useNewsItems = (
           return {
             ...item,
             // Set a default template_type since it doesn't exist in the database schema
-            template_type: 'article',
+            template_type: item.template_type || 'article',
             article_type: item.article_type || 'article',
             technical_complexity: technicalComplexity,
             reading_time: readingTime,
             views,
             bookmarks,
             impact,
-            source_credibility: item.source_credibility || 'verified'
+            source_credibility: item.source_credibility || 'verified',
+            // Ensure URL is properly handled
+            url: item.url || null
           };
         });
         
@@ -288,7 +289,7 @@ export const useNewsItems = (
       });
       
       // [Analysis] Determine which edge function to call based on source
-      const functionName = source === 'event_registry' ? 'fetch-ai-news' : 'fetch-news';
+      const functionName = 'fetch-ai-news';
       
       console.log(`Calling edge function: ${functionName}`);
       
@@ -296,7 +297,8 @@ export const useNewsItems = (
         body: { 
           keyword: keyword,
           limit: limit,
-          testMode: testMode // Flag to determine if articles should be imported
+          testMode: testMode, // Flag to determine if articles should be imported
+          source: source
         },
       });
 
@@ -312,6 +314,11 @@ export const useNewsItems = (
 
       console.log('Edge function response:', data);
 
+      // Check for specific errors in the response
+      if (data.errors && data.errors.length > 0) {
+        console.warn('Specific errors occurred during import:', data.errors);
+      }
+
       // [Analysis] Transform API articles to match our NewsItem interface
       if (data.articles && data.articles.length > 0) {
         const processedArticles = data.articles.map((article: any, index: number) => {
@@ -323,6 +330,7 @@ export const useNewsItems = (
               source = urlObj.hostname.replace('www.', '');
             } catch (e) {
               // Keep original source if URL parsing fails
+              console.log(`Could not parse URL for article: ${article.title}`, e);
             }
           }
           

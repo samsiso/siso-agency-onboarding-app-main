@@ -1,269 +1,65 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { corsHeaders } from '../_shared/cors.ts';
 
-// Environment variables
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
-const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!;
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const EVENT_REGISTRY_API_KEY = Deno.env.get('EVENT_REGISTRY_API_KEY')!;
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
+import { XMLParser } from 'https://esm.sh/fast-xml-parser@4.2.7';
 
-// [Analysis] Initialize Supabase with service role to allow write operations
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+// Define CORS headers for browser requests
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
 
-// [Analysis] Serve HTTP requests
-Deno.serve(async (req) => {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+// [Analysis] Use environment variables for API credentials
+const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
-  try {
-    console.log('Starting fetch-ai-news edge function');
-    
-    // [Analysis] Parse request body
-    const { keyword, limit, testMode } = await req.json();
-    
-    console.log(`Parameters: keyword=${keyword}, limit=${limit}, testMode=${testMode}`);
+// [Analysis] We use Event Registry API for news fetching with good article metadata
+const EVENT_REGISTRY_API_KEY = Deno.env.get('EVENT_REGISTRY_API_KEY') ?? '';
+const NEWS_API_KEY = Deno.env.get('NEWS_API_KEY') ?? '';
 
-    // [Analysis] Validate parameters
-    if (!keyword) {
-      throw new Error('Missing keyword parameter');
-    }
-
-    // [Analysis] Update source timestamp before fetching to ensure we record activity
-    await updateDataSourceTimestamp('event_registry');
-
-    // [Analysis] Fetch articles from Event Registry API
-    console.log('Fetching articles from Event Registry API...');
-    const articles = await fetchArticlesFromEventRegistry(keyword, limit || 10);
-    
-    console.log(`Fetched ${articles.length} articles from Event Registry API`);
-
-    // [Analysis] In test mode, just return the articles without importing
-    if (testMode) {
-      console.log('Test mode: returning articles without importing');
-      return new Response(
-        JSON.stringify({
-          success: true,
-          message: 'Successfully fetched articles in test mode',
-          count: articles.length,
-          articles,
-        }),
-        {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      );
-    }
-
-    // [Analysis] Import articles to database
-    console.log('Starting import of articles to database...');
-    let importedCount = 0;
-    const errors = [];
-    const processedArticles = [];
-
-    for (const article of articles) {
-      try {
-        // [Analysis] Transform and validate article
-        const processedArticle = transformArticle(article);
-        
-        // [Analysis] Check if article already exists using title instead of URL
-        const existingArticle = await checkArticleExists(processedArticle.title);
-        
-        if (existingArticle) {
-          console.log(`Article already exists: ${processedArticle.title.substring(0, 30)}...`);
-          continue;
-        }
-
-        // [Analysis] Insert article into database
-        const { data, error } = await supabase
-          .from('ai_news')
-          .insert([processedArticle]);
-
-        if (error) {
-          console.error(`Error inserting article: ${error.message}`, error);
-          errors.push({
-            title: processedArticle.title,
-            error: error.message,
-            details: error
-          });
-          continue;
-        }
-
-        console.log(`Successfully imported article: ${processedArticle.title.substring(0, 30)}...`);
-        importedCount++;
-        processedArticles.push(processedArticle);
-      } catch (err) {
-        console.error(`Error processing article: ${err.message}`);
-        errors.push({
-          article: article?.title || 'Unknown',
-          error: err.message
-        });
-      }
-    }
-
-    // [Analysis] Log import results
-    await logImportResults('event_registry', {
-      keyword,
-      totalFetched: articles.length,
-      imported: importedCount,
-      errors: errors.length,
-    });
-
-    // [Analysis] Return success response
-    console.log(`Import complete. Imported ${importedCount} articles. Errors: ${errors.length}`);
-    
-    return new Response(
-      JSON.stringify({
-        success: true,
-        message: `Successfully imported ${importedCount} out of ${articles.length} articles`,
-        count: importedCount,
-        errors: errors.length > 0 ? errors : undefined,
-        articles: processedArticles,
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    );
-  } catch (error) {
-    // [Analysis] Handle all uncaught errors
-    console.error(`Unhandled error: ${error.message}`, error);
-    
-    return new Response(
-      JSON.stringify({
-        success: false,
-        message: `Error: ${error.message}`,
-        error: error.stack,
-      }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    );
-  }
-});
-
-// [Analysis] Check if article already exists based on title
-async function checkArticleExists(title: string): Promise<boolean> {
-  try {
-    const { data, error } = await supabase
-      .from('ai_news')
-      .select('id')
-      .eq('title', title)
-      .maybeSingle();
-
-    if (error) {
-      console.error(`Error checking if article exists: ${error.message}`);
-      return false;
-    }
-
-    return !!data;
-  } catch (error) {
-    console.error(`Error in checkArticleExists: ${error.message}`);
-    return false;
-  }
+// Format date as YYYY-MM-DD
+function formatDate(date: Date): string {
+  return date.toISOString().split('T')[0];
 }
 
-// [Analysis] Transform raw article data to match database schema
-function transformArticle(article: any) {
-  // [Analysis] Extract domain from URL for source
-  let source = article.source || 'EventRegistry';
-  if (article.url) {
-    try {
-      const urlObj = new URL(article.url);
-      source = urlObj.hostname.replace('www.', '');
-    } catch (e) {
-      // Keep original source if URL parsing fails
-      console.log(`Failed to parse URL: ${article.url}, using original source`);
-    }
-  }
-
-  // [Analysis] Determine article category
-  let category = 'breakthrough_technologies'; // Default category
-  const title = article.title || '';
-  const body = article.body || article.content || article.summary || '';
-  
-  if (title.toLowerCase().includes('language model') || 
-      body.toLowerCase().includes('language model') ||
-      title.toLowerCase().includes('llm') || 
-      body.toLowerCase().includes('llm') ||
-      title.toLowerCase().includes('gpt') || 
-      body.toLowerCase().includes('gpt')) {
-    category = 'language_models';
-  } else if (title.toLowerCase().includes('robot') || 
-      body.toLowerCase().includes('robot') ||
-      title.toLowerCase().includes('automation') || 
-      body.toLowerCase().includes('automation')) {
-    category = 'robotics_automation';
-  } else if (title.toLowerCase().includes('industry') || 
-      body.toLowerCase().includes('industry') ||
-      title.toLowerCase().includes('business') || 
-      body.toLowerCase().includes('business')) {
-    category = 'industry_applications';
-  }
-
-  // [Analysis] Generate description if not present
-  let description = article.description || article.summary || '';
-  if (!description && body) {
-    // Take first 150 characters as description
-    description = body.substring(0, 150) + '...';
-  }
-
-  // [Analysis] Clean up and standardize content
-  const content = article.body || article.content || description || '';
-
-  // [Analysis] Format date properly
-  const date = article.date || article.dateTime || article.published || new Date().toISOString();
-  
-  // [Analysis] Calculate reading time
-  const wordCount = (content.match(/\S+/g) || []).length;
-  const readingTime = Math.max(1, Math.ceil(wordCount / 200));
-
-  // [Analysis] Return properly structured article object
-  return {
-    title: article.title || 'Untitled AI Article',
-    description: description,
-    content: content,
-    date: typeof date === 'string' ? date : new Date(date).toISOString(),
-    category: category,
-    article_type: 'news',
-    status: 'published',
-    source: source,
-    source_credibility: 'verified',
-    featured: false,
-    technical_complexity: 'intermediate',
-    impact: 'medium',
-    reading_time: readingTime,
-    views: 0,
-    bookmarks: 0,
-    url: article.url || null, // Handle null URLs
-    image_url: article.image || article.imageUrl || article.urlToImage || '',
-  };
-}
-
-// [Analysis] Fetch articles from Event Registry API with improved error handling
+// [Analysis] Get articles from Event Registry API
 async function fetchArticlesFromEventRegistry(keyword: string, limit: number) {
-  console.log(`Event Registry API request: keyword=${keyword}, limit=${limit}`);
-  
   try {
-    const apiUrl = 'https://eventregistry.org/api/v1/article/getArticles';
+    console.log(`Fetching articles from Event Registry for keyword: ${keyword}, limit: ${limit}`);
     
-    // [Analysis] Set up request parameters to enhance AI news coverage
+    const url = 'http://eventregistry.org/api/v1/article/getArticles';
+    
+    // Calculate date range for the last 7 days
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(endDate.getDate() - 7);
+    
+    const formattedStartDate = formatDate(startDate);
+    const formattedEndDate = formatDate(endDate);
+    
+    console.log(`Date range: ${formattedStartDate} to ${formattedEndDate}`);
+
+    // [Analysis] Request with comprehensive filtering for AI-related news only
     const requestBody = {
-      action: 'getArticles',
+      action: "getArticles",
       keyword: keyword,
       articlesPage: 1,
       articlesCount: limit,
-      articlesSortBy: 'date',
+      articlesSortBy: "date",
       articlesSortByAsc: false,
-      articlesArticleBodyLen: -1, // Get full article body when available
-      resultType: 'articles',
-      dataType: ['news', 'blog'],
-      lang: 'eng',
+      articlesArticleBodyLen: -1,
+      resultType: "articles",
+      dataType: ["news", "blog"],
       apiKey: EVENT_REGISTRY_API_KEY,
+      forceMaxDataTimeWindow: 31,
+      dateStart: formattedStartDate,
+      dateEnd: formattedEndDate,
+      keywordLoc: "title,body",
+      keywordOper: "or"
     };
 
-    // [Analysis] Make API request
-    const response = await fetch(apiUrl, {
+    // Make API request to Event Registry
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -272,78 +68,320 @@ async function fetchArticlesFromEventRegistry(keyword: string, limit: number) {
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Event Registry API error (${response.status}): ${errorText}`);
+      throw new Error(`Event Registry API failed with status: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log('Event Registry API response data structure:', Object.keys(data));
+    console.log(`Received ${data.articles?.results?.length || 0} articles from Event Registry API`);
+    
+    // [Analysis] Transform the response to our standardized article format
+    if (data.articles && data.articles.results) {
+      return data.articles.results.map((article: any) => {
+        // Extract image if available
+        let imageUrl = null;
+        if (article.image) {
+          imageUrl = article.image;
+        }
+        
+        // Format the date properly
+        let date = new Date();
+        if (article.date) {
+          date = new Date(article.date);
+        }
+        
+        // Clean up and extract source
+        let source = 'Event Registry';
+        if (article.source && article.source.title) {
+          source = article.source.title;
+        }
 
-    // [Analysis] Process and extract articles
-    if (!data.articles || !data.articles.results) {
-      console.error('Unexpected API response structure:', data);
-      return [];
+        // Map categories to our predefined ones
+        let category = 'breakthrough_technologies';
+        if (article.categories) {
+          if (article.categories.includes('robotics') || article.categories.includes('automation')) {
+            category = 'robotics_automation';
+          } else if (article.categories.includes('language') || article.categories.includes('nlp')) {
+            category = 'language_models';
+          } else if (article.categories.includes('industry') || article.categories.includes('business')) {
+            category = 'industry_applications';
+          } else if (article.categories.includes('international') || article.categories.includes('global')) {
+            category = 'international_developments';
+          }
+        }
+
+        return {
+          title: article.title,
+          description: article.description || article.body || article.title,
+          content: article.body || article.description || '',
+          date: formatDate(date),
+          url: article.url || null,
+          source: source,
+          image_url: imageUrl,
+          category: category
+        };
+      });
     }
-
-    // [Analysis] Map articles to consistent format
-    const articles = data.articles.results.map((article: any) => {
-      return {
-        title: article.title,
-        description: article.body || article.summary,
-        content: article.body,
-        source: article.source?.title || 'EventRegistry',
-        url: article.url,
-        image: article.image,
-        date: article.dateTime,
-        category: 'breakthrough_technologies', // Default category, refined later
-      };
-    });
-
-    return articles;
+    return [];
   } catch (error) {
-    console.error(`Error fetching from Event Registry: ${error.message}`);
-    throw error; // Re-throw to be handled by the main function
+    console.error('Error fetching from Event Registry API:', error);
+    throw error;
   }
 }
 
-// [Analysis] Update last_fetched_at timestamp for the data source
-async function updateDataSourceTimestamp(sourceType: string) {
+// [Analysis] Get articles from News API as an alternative source
+async function fetchArticlesFromNewsAPI(keyword: string, limit: number) {
+  try {
+    console.log(`Fetching articles from News API for keyword: ${keyword}, limit: ${limit}`);
+    
+    // Calculate date for 7 days ago
+    const today = new Date();
+    const weekAgo = new Date(today);
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    
+    const fromDate = formatDate(weekAgo);
+    const toDate = formatDate(today);
+    
+    console.log(`Date range: ${fromDate} to ${toDate}`);
+
+    // Construct the News API URL with parameters
+    const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(keyword)}&from=${fromDate}&to=${toDate}&sortBy=publishedAt&pageSize=${limit}&language=en&apiKey=${NEWS_API_KEY}`;
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`News API failed with status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log(`Received ${data.articles?.length || 0} articles from News API`);
+    
+    // Transform News API format to our standardized article format
+    if (data.articles && data.articles.length > 0) {
+      return data.articles.map((article: any) => {
+        // Format the date properly
+        let date = new Date();
+        if (article.publishedAt) {
+          date = new Date(article.publishedAt);
+        }
+
+        // Map to a category based on content analysis
+        let category = 'breakthrough_technologies';
+        const contentLower = (article.content || article.description || '').toLowerCase();
+        
+        if (contentLower.includes('robot') || contentLower.includes('automat')) {
+          category = 'robotics_automation';
+        } else if (contentLower.includes('language') || contentLower.includes('llm') || contentLower.includes('chat')) {
+          category = 'language_models';
+        } else if (contentLower.includes('business') || contentLower.includes('industry') || contentLower.includes('company')) {
+          category = 'industry_applications';
+        } else if (contentLower.includes('country') || contentLower.includes('national') || contentLower.includes('global')) {
+          category = 'international_developments';
+        }
+
+        return {
+          title: article.title,
+          description: article.description || article.title,
+          content: article.content || article.description || '',
+          date: formatDate(date),
+          url: article.url || null,
+          source: article.source?.name || 'News API',
+          image_url: article.urlToImage || null,
+          category: category
+        };
+      });
+    }
+    return [];
+  } catch (error) {
+    console.error('Error fetching from News API:', error);
+    throw error;
+  }
+}
+
+// [Analysis] Async function to check if an article already exists based on title (since URLs might be null)
+async function checkArticleExists(title: string) {
   try {
     const { data, error } = await supabase
+      .from('ai_news')
+      .select('id')
+      .eq('title', title)
+      .limit(1);
+    
+    if (error) {
+      console.error('Error checking for duplicate article:', error);
+      return false;
+    }
+    
+    return data && data.length > 0;
+  } catch (error) {
+    console.error('Unexpected error during duplicate check:', error);
+    return false;
+  }
+}
+
+// [Analysis] Update the news_sources table with the last fetched timestamp
+async function updateNewsSourceTimestamp(sourceType: 'event_registry' | 'news_api') {
+  try {
+    const { error } = await supabase
       .from('news_sources')
       .upsert({
         source_type: sourceType,
         last_fetched_at: new Date().toISOString(),
-      }, { onConflict: 'source_type' });
-
+      }, {
+        onConflict: 'source_type'
+      });
+    
     if (error) {
-      console.error(`Error updating news source timestamp: ${error.message}`);
-    } else {
-      console.log(`Updated last_fetched_at for ${sourceType}`);
+      console.error('Error updating news source timestamp:', error);
     }
   } catch (error) {
-    console.error(`Error in updateDataSourceTimestamp: ${error.message}`);
+    console.error('Unexpected error updating source timestamp:', error);
   }
 }
 
-// [Analysis] Log import results for analytics
-async function logImportResults(sourceType: string, results: any) {
+Deno.serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
   try {
-    const { error } = await supabase
-      .from('news_fetch_history')
-      .insert([{
-        source_type: sourceType,
-        fetch_time: new Date().toISOString(),
-        keyword: results.keyword,
-        total_fetched: results.totalFetched,
-        imported_count: results.imported,
-        error_count: results.errors,
-      }]);
+    // Parse request body
+    const { keyword, limit, testMode, source } = await req.json();
+    
+    // Set defaults if not provided
+    const searchKeyword = keyword || 'artificial intelligence';
+    const articleLimit = limit || 10;
+    const articleSource = source || 'event_registry';
+    const isTestMode = testMode === true; // Explicit boolean check
+    
+    console.log(`Processing request with parameters:`, { 
+      keyword: searchKeyword, 
+      limit: articleLimit, 
+      source: articleSource,
+      testMode: isTestMode 
+    });
 
-    if (error) {
-      console.error(`Error logging import results: ${error.message}`);
+    // Fetch articles from the specified source
+    let fetchedArticles: any[] = [];
+    
+    if (articleSource === 'event_registry') {
+      fetchedArticles = await fetchArticlesFromEventRegistry(searchKeyword, articleLimit);
+    } else {
+      fetchedArticles = await fetchArticlesFromNewsAPI(searchKeyword, articleLimit);
     }
+    
+    console.log(`Retrieved ${fetchedArticles.length} articles`);
+
+    // If in test mode, just return the articles without inserting
+    if (isTestMode) {
+      console.log('Test mode enabled. Returning articles without database insertion.');
+      return new Response(
+        JSON.stringify({
+          success: true,
+          message: `Successfully retrieved ${fetchedArticles.length} articles in test mode`,
+          count: fetchedArticles.length,
+          articles: fetchedArticles
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Process and insert articles
+    let importedCount = 0;
+    const errors: any[] = [];
+    
+    for (const article of fetchedArticles) {
+      try {
+        // Check if article already exists
+        const exists = await checkArticleExists(article.title);
+        if (exists) {
+          console.log(`Article "${article.title}" already exists. Skipping.`);
+          continue;
+        }
+
+        // [Analysis] Prepare article data for insertion
+        const articleData = {
+          title: article.title,
+          description: article.description,
+          content: article.content,
+          date: article.date,
+          category: article.category,
+          article_type: 'news',
+          source: article.source,
+          source_credibility: 'verified',
+          technical_complexity: 'intermediate',
+          impact: 'medium',
+          image_url: article.image_url,
+          url: article.url,
+          status: 'published'
+        };
+
+        // Insert the article
+        console.log(`Inserting article: ${article.title}`);
+        const { error } = await supabase.from('ai_news').insert([articleData]);
+
+        if (error) {
+          console.error(`Failed to insert article "${article.title}":`, error);
+          
+          // Special case for materialized view error
+          if (error.message && error.message.includes('materialized view mv_trending_articles')) {
+            console.warn(`Materialized view permission issue detected. Recording error but continuing.`);
+            errors.push({
+              title: article.title,
+              error: error.message,
+              details: error
+            });
+            continue;
+          }
+          
+          throw error;
+        }
+
+        importedCount++;
+        console.log(`Successfully imported article: ${article.title}`);
+      } catch (error) {
+        console.error(`Error processing article "${article.title}":`, error);
+        errors.push({
+          title: article.title,
+          error: error.message || 'Unknown error',
+          details: error
+        });
+      }
+    }
+
+    // Update the news source timestamp
+    await updateNewsSourceTimestamp(articleSource as 'event_registry' | 'news_api');
+
+    // Return the response
+    return new Response(
+      JSON.stringify({
+        success: true,
+        message: `Successfully imported ${importedCount} out of ${fetchedArticles.length} articles`,
+        count: importedCount,
+        errors: errors,
+        articles: fetchedArticles
+      }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
   } catch (error) {
-    console.error(`Error in logImportResults: ${error.message}`);
+    console.error('Error processing request:', error);
+    
+    return new Response(
+      JSON.stringify({
+        success: false,
+        message: error.message || 'An unexpected error occurred',
+        error: error.toString(),
+        stack: error.stack || 'No stack trace available'
+      }),
+      { 
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    );
   }
-}
+});
