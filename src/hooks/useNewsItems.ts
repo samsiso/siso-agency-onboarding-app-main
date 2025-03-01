@@ -3,10 +3,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { NewsItem } from '@/types/blog';
+import { format, addDays, subDays, isToday, isSameDay } from 'date-fns';
 
 type PostStatus = 'all' | 'draft' | 'published';
 
-// [Analysis] Enhanced hook for managing news items with better API integration
+// [Analysis] Enhanced hook for managing news items with better API integration and date-based navigation
 export const useNewsItems = (
   selectedCategory: string | null, 
   status: PostStatus = 'published',
@@ -15,9 +16,12 @@ export const useNewsItems = (
   pageSize: number = 12
 ) => {
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
+  const [newsByDate, setNewsByDate] = useState<Record<string, NewsItem[]>>({});
+  const [dateRange, setDateRange] = useState<string[]>([]);
   const [summaries, setSummaries] = useState<Record<string, string>>({});
   const [loadingSummaries, setLoadingSummaries] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [syncingNews, setSyncingNews] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [hasMore, setHasMore] = useState(true);
@@ -25,6 +29,7 @@ export const useNewsItems = (
   const [lastSync, setLastSync] = useState<string | null>(null);
   const [apiUsage, setApiUsage] = useState(0);
   const [articleCount, setArticleCount] = useState(0);
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [activeNewsSource, setActiveNewsSource] = useState<'event_registry' | 'news_api'>('event_registry');
   const [syncResult, setSyncResult] = useState<{
     success: boolean;
@@ -34,15 +39,27 @@ export const useNewsItems = (
   } | null>(null);
   const { toast } = useToast();
 
-  // [Analysis] Reset when filters change
-  useEffect(() => {
-    fetchNews();
-  }, [selectedCategory, status, selectedDate, currentPage]);
-
   // [Analysis] Get API status info on mount
   useEffect(() => {
     fetchApiStatus();
   }, []);
+
+  // [Analysis] Initialize with today's articles
+  useEffect(() => {
+    if (selectedDate) {
+      setCurrentDate(new Date(selectedDate));
+    } else {
+      // Start with today's date and fetch articles
+      fetchNewsByDate(new Date());
+    }
+  }, [selectedDate]);
+
+  // [Analysis] Fetch when date, category or status changes
+  useEffect(() => {
+    if (selectedDate) {
+      fetchNews();
+    }
+  }, [selectedCategory, status, selectedDate, currentPage]);
 
   // [Analysis] Fetch API status metrics
   const fetchApiStatus = async () => {
@@ -91,8 +108,33 @@ export const useNewsItems = (
           setLastSync(syncDate.toLocaleString());
         }
       }
+
+      // Fetch available date range for navigation
+      fetchAvailableDates();
     } catch (error) {
       console.error('Error fetching API status:', error);
+    }
+  };
+
+  // [Analysis] Fetch the range of dates that have articles
+  const fetchAvailableDates = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('ai_news')
+        .select('date')
+        .eq('status', 'published')
+        .order('date', { ascending: false })
+        .limit(30);
+      
+      if (error) throw error;
+      
+      if (data && data.length > 0) {
+        // Extract unique dates
+        const uniqueDates = [...new Set(data.map(item => item.date))];
+        setDateRange(uniqueDates);
+      }
+    } catch (error) {
+      console.error('Error fetching available dates:', error);
     }
   };
 
@@ -169,81 +211,224 @@ export const useNewsItems = (
       
       // [Analysis] Transform data for compatibility with UI components
       if (data) {
-        const transformedData = data.map(item => {
-          // Calculate article metrics if not present
-          const views = item.views || Math.floor(Math.random() * 1000);
-          const bookmarks = item.bookmarks || Math.floor(Math.random() * 100);
-          
-          // Determine article complexity based on content length and keywords
-          const content = item.content || item.description || '';
-          const technicalTerms = [
-            'algorithm', 'neural network', 'machine learning', 'deep learning',
-            'transformer', 'parameter', 'optimization', 'gradient descent'
-          ];
-          
-          const technicalTermCount = technicalTerms.reduce((count, term) => {
-            return count + (content.toLowerCase().match(new RegExp(term, 'g')) || []).length;
-          }, 0);
-          
-          let technicalComplexity = item.technical_complexity || 'intermediate';
-          if (!item.technical_complexity) {
-            if (technicalTermCount > 5 || content.length > 3000) {
-              technicalComplexity = 'advanced';
-            } else if (technicalTermCount > 2 || content.length > 1000) {
-              technicalComplexity = 'intermediate';
-            } else {
-              technicalComplexity = 'beginner';
-            }
-          }
-          
-          // Calculate estimated reading time based on content length
-          const wordCount = (content.match(/\S+/g) || []).length;
-          const readingTime = item.reading_time || Math.max(1, Math.ceil(wordCount / 200));
-          
-          // Determine impact based on title and category
-          const highImpactTerms = ['revolutionary', 'breakthrough', 'major', 'groundbreaking'];
-          const titleHasHighImpact = highImpactTerms.some(term => 
-            (item.title || '').toLowerCase().includes(term)
-          );
-          
-          let impact = item.impact || 'medium';
-          if (!item.impact) {
-            if (titleHasHighImpact || item.category === 'breakthrough_technologies') {
-              impact = 'high';
-            } else if (item.category === 'industry_applications') {
-              impact = 'medium';
-            } else {
-              impact = 'low';
-            }
-          }
-          
-          // [Analysis] Safely handle properties that might not exist in the database schema
-          // but are needed in the UI
-          return {
-            ...item,
-            // Set a default template_type even though it doesn't exist in the database
-            template_type: 'article', // Adding this as a default value instead of accessing it from item
-            article_type: item.article_type || 'article',
-            technical_complexity: technicalComplexity,
-            reading_time: readingTime,
-            views,
-            bookmarks,
-            impact,
-            source_credibility: item.source_credibility || 'verified',
-            // Ensure URL is properly handled
-            url: item.url || null
-          };
-        });
-        
+        const transformedData = transformNewsItems(data);
         setNewsItems(transformedData);
       } else {
         setNewsItems([]);
       }
 
       // [Analysis] Fetch associated summaries
+      fetchSummaries();
+    } catch (error) {
+      console.error('Error in fetchNews:', error);
+      setError(error as Error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch news articles. Please try again.",
+      });
+    } finally {
+      setLoading(false);
+      setInitialLoading(false);
+    }
+  };
+
+  // [Analysis] New function to fetch news by specific date
+  const fetchNewsByDate = async (date: Date) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const formattedDate = format(date, 'yyyy-MM-dd');
+      console.log('Fetching news for date:', formattedDate);
+      
+      // Check if we already have this date's data cached
+      if (newsByDate[formattedDate] && newsByDate[formattedDate].length > 0) {
+        console.log('Using cached data for date:', formattedDate);
+        setCurrentDate(date);
+        setLoading(false);
+        return;
+      }
+      
+      let query = supabase
+        .from('ai_news')
+        .select('*, profiles:author_id(full_name, avatar_url)')
+        .eq('date', formattedDate)
+        .order('created_at', { ascending: false });
+
+      if (status !== 'all') {
+        query = query.eq('status', status);
+      }
+
+      if (selectedCategory) {
+        query = query.eq('category', selectedCategory);
+      }
+
+      const { data, error: fetchError } = await query;
+
+      if (fetchError) {
+        console.error('Error fetching news for date:', fetchError);
+        throw fetchError;
+      }
+
+      console.log(`Fetched ${data?.length} articles for ${formattedDate}`);
+      
+      // [Analysis] Transform data and update state
+      if (data && data.length > 0) {
+        const transformedData = transformNewsItems(data);
+        
+        // Update the newsByDate state
+        setNewsByDate(prev => ({
+          ...prev,
+          [formattedDate]: transformedData
+        }));
+        
+        // If this is the first load, also set as current articles
+        if (initialLoading) {
+          setNewsItems(transformedData);
+          setInitialLoading(false);
+        }
+      } else {
+        // If no articles found, store empty array but don't change current view
+        setNewsByDate(prev => ({
+          ...prev,
+          [formattedDate]: []
+        }));
+        
+        // If this is initial load and no articles, try previous day
+        if (initialLoading) {
+          const previousDay = subDays(date, 1);
+          fetchNewsByDate(previousDay);
+          return;
+        }
+      }
+      
+      // Update current date
+      setCurrentDate(date);
+      
+      // [Analysis] Fetch associated summaries
+      fetchSummaries();
+    } catch (error) {
+      console.error('Error in fetchNewsByDate:', error);
+      setError(error as Error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch news articles for the selected date. Please try again.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // [Analysis] Handle changing to the next day (newer articles)
+  const goToNextDay = useCallback(() => {
+    const nextDay = addDays(currentDate, 1);
+    
+    // Don't go beyond today
+    if (nextDay > new Date()) {
+      toast({
+        title: "No newer articles",
+        description: "You're already viewing the most recent articles.",
+      });
+      return;
+    }
+    
+    fetchNewsByDate(nextDay);
+  }, [currentDate]);
+
+  // [Analysis] Handle changing to the previous day (older articles)
+  const goToPreviousDay = useCallback(() => {
+    const previousDay = subDays(currentDate, 1);
+    fetchNewsByDate(previousDay);
+  }, [currentDate]);
+
+  // [Analysis] Jump to a specific date
+  const goToDate = useCallback((date: Date) => {
+    fetchNewsByDate(date);
+  }, []);
+
+  // [Analysis] Function to transform raw news items with derived properties
+  const transformNewsItems = (data: any[]): NewsItem[] => {
+    return data.map(item => {
+      // Calculate article metrics if not present
+      const views = item.views || Math.floor(Math.random() * 1000);
+      const bookmarks = item.bookmarks || Math.floor(Math.random() * 100);
+      
+      // Determine article complexity based on content length and keywords
+      const content = item.content || item.description || '';
+      const technicalTerms = [
+        'algorithm', 'neural network', 'machine learning', 'deep learning',
+        'transformer', 'parameter', 'optimization', 'gradient descent'
+      ];
+      
+      const technicalTermCount = technicalTerms.reduce((count, term) => {
+        return count + (content.toLowerCase().match(new RegExp(term, 'g')) || []).length;
+      }, 0);
+      
+      let technicalComplexity = item.technical_complexity || 'intermediate';
+      if (!item.technical_complexity) {
+        if (technicalTermCount > 5 || content.length > 3000) {
+          technicalComplexity = 'advanced';
+        } else if (technicalTermCount > 2 || content.length > 1000) {
+          technicalComplexity = 'intermediate';
+        } else {
+          technicalComplexity = 'beginner';
+        }
+      }
+      
+      // Calculate estimated reading time based on content length
+      const wordCount = (content.match(/\S+/g) || []).length;
+      const readingTime = item.reading_time || Math.max(1, Math.ceil(wordCount / 200));
+      
+      // Determine impact based on title and category
+      const highImpactTerms = ['revolutionary', 'breakthrough', 'major', 'groundbreaking'];
+      const titleHasHighImpact = highImpactTerms.some(term => 
+        (item.title || '').toLowerCase().includes(term)
+      );
+      
+      let impact = item.impact || 'medium';
+      if (!item.impact) {
+        if (titleHasHighImpact || item.category === 'breakthrough_technologies') {
+          impact = 'high';
+        } else if (item.category === 'industry_applications') {
+          impact = 'medium';
+        } else {
+          impact = 'low';
+        }
+      }
+      
+      // [Analysis] Safely handle properties that might not exist in the database schema
+      // but are needed in the UI
+      return {
+        ...item,
+        // Set a default template_type even though it doesn't exist in the database
+        template_type: 'article', // Adding this as a default value instead of accessing it from item
+        article_type: item.article_type || 'article',
+        technical_complexity: technicalComplexity,
+        reading_time: readingTime,
+        views,
+        bookmarks,
+        impact,
+        source_credibility: item.source_credibility || 'verified',
+        // Ensure URL is properly handled
+        url: item.url || null
+      };
+    });
+  };
+
+  // [Analysis] Fetch summaries for current articles
+  const fetchSummaries = async () => {
+    try {
+      // Extract IDs of current articles
+      const articleIds = newsItems.map(item => item.id);
+      
+      if (articleIds.length === 0) return;
+      
       const { data: summariesData, error: summariesError } = await supabase
         .from('ai_news_summaries')
-        .select('news_id, summary');
+        .select('news_id, summary')
+        .in('news_id', articleIds);
 
       if (summariesError) {
         console.error('Error fetching summaries:', summariesError);
@@ -258,15 +443,7 @@ export const useNewsItems = (
         setSummaries(prev => ({...prev, ...summariesMap}));
       }
     } catch (error) {
-      console.error('Error in fetchNews:', error);
-      setError(error as Error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to fetch news articles. Please try again.",
-      });
-    } finally {
-      setLoading(false);
+      console.error('Error fetching summaries:', error);
     }
   };
 
@@ -361,7 +538,7 @@ export const useNewsItems = (
             title: article.title || 'Untitled Article',
             description: article.description || '',
             content: content,
-            date: article.date || new Date().toISOString(),
+            date: article.date || new Date().toISOString().split('T')[0],
             category: article.category || 'breakthrough_technologies',
             article_type: 'news',
             created_at: article.date || new Date().toISOString(),
@@ -406,6 +583,13 @@ export const useNewsItems = (
         if (!testMode) {
           fetchNews();
           fetchApiStatus();
+          fetchAvailableDates();
+          
+          // If articles were imported for today, refresh the current view
+          const today = new Date();
+          if (isSameDay(currentDate, today)) {
+            fetchNewsByDate(today);
+          }
         }
       } else {
         throw new Error(data.message || "Failed to sync news");
@@ -507,6 +691,12 @@ export const useNewsItems = (
     }
   };
 
+  // [Analysis] Get articles for current date
+  const getCurrentDateArticles = useCallback(() => {
+    const formattedDate = format(currentDate, 'yyyy-MM-dd');
+    return newsByDate[formattedDate] || [];
+  }, [currentDate, newsByDate]);
+
   const loadMore = useCallback(() => {
     if (!loading && hasMore) {
       // This is for infinite scrolling if we want to keep it as an option
@@ -515,11 +705,12 @@ export const useNewsItems = (
   }, [loading, hasMore]);
 
   return {
-    newsItems,
+    newsItems: getCurrentDateArticles().length > 0 ? getCurrentDateArticles() : newsItems,
     summaries,
     loadingSummaries,
     generateSummary,
     loading,
+    initialLoading,
     syncingNews,
     hasMore,
     loadMore,
@@ -531,6 +722,11 @@ export const useNewsItems = (
     switchNewsSource,
     syncResult,
     error,
+    currentDate,
+    dateRange,
+    goToNextDay,
+    goToPreviousDay,
+    goToDate,
     refresh: fetchNews,
     syncNews
   };

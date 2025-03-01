@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNewsItems } from '@/hooks/useNewsItems';
 import NewsFilters from '@/components/ai-news/NewsFilters';
@@ -7,6 +6,8 @@ import { NewsContent } from '@/components/ai-news/NewsContent';
 import NewsHeader from '@/components/ai-news/NewsHeader';
 import { NewsErrorBoundary } from '@/components/ai-news/NewsErrorBoundary';
 import { DailyStatsOverview } from '@/components/ai-news/DailyStatsOverview';
+import { DateNavigation } from '@/components/ai-news/DateNavigation';
+import { NewsDateSection } from '@/components/ai-news/NewsDateSection';
 import { Helmet } from 'react-helmet';
 import { Sidebar } from '@/components/Sidebar';
 import NewsPagination from '@/components/ai-news/NewsPagination';
@@ -25,24 +26,23 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { CalendarDays, Clock, AlertCircle, Sparkles, Database, RefreshCw, Bug, Terminal } from 'lucide-react';
-import { format, subDays } from 'date-fns';
+import { format, subDays, isToday } from 'date-fns';
 import { toast } from '@/hooks/use-toast';
 import { Switch } from '@/components/ui/switch';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Textarea } from '@/components/ui/textarea';
 
-// [Analysis] Main component for the AI News page with improved visualization for news metrics
+// [Analysis] Main component for the AI News page with date-based navigation and testing panel
 const AINews = () => {
   // [Analysis] State for filters, search, and pagination
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [showRecent, setShowRecent] = useState(false);
   const [showTestPanel, setShowTestPanel] = useState(true); // Changed to true to make it visible by default
   const [testKeyword, setTestKeyword] = useState('artificial intelligence');
   const [testLimit, setTestLimit] = useState(10);
@@ -58,6 +58,7 @@ const AINews = () => {
     loadingSummaries, 
     generateSummary, 
     loading,
+    initialLoading,
     syncingNews,
     hasMore,
     totalCount,
@@ -65,6 +66,11 @@ const AINews = () => {
     apiUsage,
     articleCount,
     activeNewsSource,
+    currentDate,
+    dateRange,
+    goToNextDay,
+    goToPreviousDay,
+    goToDate,
     syncResult,
     error,
     refresh,
@@ -72,7 +78,7 @@ const AINews = () => {
   } = useNewsItems(
     selectedCategory, 
     'published', 
-    showRecent ? format(subDays(new Date(), 7), 'yyyy-MM-dd') : selectedDate, 
+    selectedDate, 
     currentPage, 
     itemsPerPage
   );
@@ -80,6 +86,8 @@ const AINews = () => {
   console.log('Rendering AINews component with', newsItems.length, 'news items');
   console.log('Last sync:', lastSync);
   console.log('Article count:', articleCount);
+  console.log('Current date:', format(currentDate, 'yyyy-MM-dd'));
+  console.log('Date range:', dateRange);
   console.log('Loading state:', loading);
   console.log('Error state:', error ? (error instanceof Error ? error.message : String(error)) : 'none');
 
@@ -93,40 +101,15 @@ const AINews = () => {
     console.log('No featured article available');
   }
 
-  // [Analysis] Add scroll restoration to preserve user's position
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [selectedCategory, selectedDate, currentPage, showRecent]);
-
   // [Analysis] Handle search query change
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
     setCurrentPage(1); // Reset to first page on new search
-    
-    // [Analysis] Disable recent filter when searching
-    if (query && showRecent) {
-      setShowRecent(false);
-    }
   };
 
   // [Analysis] Handle page change
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-  };
-
-  // [Analysis] Handle recent toggle
-  const toggleRecent = () => {
-    if (showRecent) {
-      setShowRecent(false);
-    } else {
-      setShowRecent(true);
-      setSelectedDate(null); // Clear any date filter
-      setCurrentPage(1); // Reset to first page
-      toast({
-        title: "Showing recent articles",
-        description: "Displaying articles published in the last 7 days",
-      });
-    }
   };
 
   // [Analysis] Handle category change
@@ -135,14 +118,16 @@ const AINews = () => {
     setCurrentPage(1); // Reset to first page on category change
   };
 
-  // [Analysis] Handle date change
+  // [Analysis] Handle date change through direct date picker
   const handleDateChange = (date: string | null) => {
     setSelectedDate(date);
     setCurrentPage(1); // Reset to first page on date change
-    
-    // [Analysis] Disable recent filter when selecting a specific date
-    if (date && showRecent) {
-      setShowRecent(false);
+  };
+
+  // [Analysis] Handle date navigation via date picker
+  const handleSelectDate = (date: Date) => {
+    if (date) {
+      goToDate(date);
     }
   };
 
@@ -185,8 +170,8 @@ const AINews = () => {
   // [Analysis] Calculate total pages
   const totalPages = totalCount ? Math.ceil(totalCount / itemsPerPage) : 0;
 
-  // Determine when to show the stats and featured article
-  const showStatsAndFeatured = !searchQuery && !selectedDate && !selectedCategory && currentPage === 1;
+  // Determine when to show the stats
+  const showStats = isToday(currentDate) && !searchQuery && !selectedCategory;
 
   return (
     <div className="flex min-h-screen bg-siso-bg">
@@ -484,7 +469,7 @@ const AINews = () => {
                               </div>
                               <div className="flex justify-between">
                                 <span className="text-muted-foreground">Source</span>
-                                <span className="capitalize">{testSource}</span>
+                                <span>{testSource}</span>
                               </div>
                               <div className="flex justify-between">
                                 <span className="text-muted-foreground">Mode</span>
@@ -543,27 +528,8 @@ const AINews = () => {
           </motion.div>
         )}
         
-        <div className="mb-8">
+        <div className="mb-6">
           <div className="w-full">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4">
-              <Button 
-                variant={showRecent ? "default" : "outline"}
-                size="sm"
-                onClick={toggleRecent}
-                className="flex items-center gap-2"
-              >
-                <Clock className="h-4 w-4" />
-                Recently Published
-              </Button>
-              
-              {showRecent && (
-                <div className="text-sm text-muted-foreground flex items-center gap-2">
-                  <CalendarDays className="h-4 w-4" />
-                  <span>Last 7 days</span>
-                </div>
-              )}
-            </div>
-            
             <NewsFilters
               selectedCategory={selectedCategory}
               onCategoryChange={handleCategoryChange}
@@ -575,9 +541,19 @@ const AINews = () => {
           </div>
         </div>
         
+        {/* Date-based Navigation */}
+        <DateNavigation 
+          currentDate={currentDate}
+          dateRange={dateRange}
+          onPreviousDay={goToPreviousDay}
+          onNextDay={goToNextDay}
+          onSelectDate={handleSelectDate}
+          loading={loading}
+        />
+        
         <NewsErrorBoundary>
-          {/* Daily Stats Overview - Only show on homepage view */}
-          {showStatsAndFeatured && (
+          {/* Daily Stats Overview - Only show on homepage view with today's articles */}
+          {showStats && (
             <div className="mb-8">
               <DailyStatsOverview 
                 newsItems={newsItems} 
@@ -588,8 +564,8 @@ const AINews = () => {
             </div>
           )}
           
-          {/* Featured Article - Only show on homepage view */}
-          {featuredArticle && showStatsAndFeatured && !showRecent && (
+          {/* Featured Article - Only show on today's view without filters */}
+          {featuredArticle && showStats && (
             <div className="mb-8">
               <FeaturedNewsHero 
                 article={featuredArticle}
@@ -600,20 +576,45 @@ const AINews = () => {
             </div>
           )}
           
-          <NewsContent
-            newsItems={showStatsAndFeatured && !showRecent && featuredArticle ? 
-              newsItems.filter(item => item.id !== featuredArticle.id) : 
-              newsItems}
-            searchQuery={searchQuery}
-            summaries={summaries}
-            loadingSummaries={loadingSummaries}
-            onGenerateSummary={generateSummary}
-            loading={loading}
-            hasMore={hasMore}
-            onLoadMore={refresh}
-          />
+          {/* News content with AnimatePresence for smooth transitions */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentDate.toISOString() + (searchQuery || '') + (selectedCategory || '')}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {searchQuery ? (
+                // If search query exists, show regular SearchResults
+                <NewsContent
+                  newsItems={newsItems}
+                  searchQuery={searchQuery}
+                  summaries={summaries}
+                  loadingSummaries={loadingSummaries}
+                  onGenerateSummary={generateSummary}
+                  loading={loading}
+                  hasMore={hasMore}
+                  onLoadMore={refresh}
+                />
+              ) : (
+                // Otherwise show date-based content
+                <NewsDateSection
+                  date={currentDate}
+                  items={featuredArticle && showStats ? 
+                    newsItems.filter(item => item.id !== featuredArticle.id) : 
+                    newsItems}
+                  summaries={summaries}
+                  loadingSummaries={loadingSummaries}
+                  onGenerateSummary={generateSummary}
+                  loading={loading}
+                />
+              )}
+            </motion.div>
+          </AnimatePresence>
           
-          {totalPages > 1 && (
+          {/* Only show pagination when using search or filtering */}
+          {searchQuery && totalPages > 1 && (
             <div className="mt-8">
               <NewsPagination 
                 currentPage={currentPage}
