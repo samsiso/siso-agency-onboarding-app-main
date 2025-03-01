@@ -12,3 +12,6 @@ verify_jwt = false
 
 [functions.manual-process-videos]
 verify_jwt = false
+
+[functions.fetch-ai-news]
+verify_jwt = false
