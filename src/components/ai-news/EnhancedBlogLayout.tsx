@@ -10,7 +10,8 @@ import {
   BookmarkPlus,
   Eye,
   Clock,
-  MessageCircle
+  MessageCircle,
+  ExternalLink
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { EventCard } from './blog-layout/EventCard';
@@ -40,12 +41,33 @@ export const EnhancedBlogLayout = ({
 }: EnhancedBlogLayoutProps) => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<string>();
-
-  const sortedSections = [...article.sections].sort((a, b) => {
-    if (a.importance_level === 'high' && b.importance_level !== 'high') return -1;
-    if (a.importance_level !== 'high' && b.importance_level === 'high') return 1;
-    return a.section_order - b.section_order;
-  });
+  
+  // [Analysis] Check if this is an external article (no sections but has content)
+  const isExternalArticle = article.sections.length === 0 && article.content;
+  
+  // For external articles without sections, create a dummy section
+  const sortedSections = isExternalArticle 
+    ? [
+        {
+          id: 'main-content',
+          title: article.title,
+          content: article.content || article.description,
+          order_index: 0,
+          section_order: 0,
+          importance_level: 'high',
+          technical_complexity: article.technical_complexity,
+          subsection_type: 'overview',
+          source_references: {},
+          created_at: article.date,
+          updated_at: article.date,
+          article_id: article.id,
+        }
+      ] 
+    : [...article.sections].sort((a, b) => {
+        if (a.importance_level === 'high' && b.importance_level !== 'high') return -1;
+        if (a.importance_level !== 'high' && b.importance_level === 'high') return 1;
+        return a.section_order - b.section_order;
+      });
 
   // [Analysis] Track which section is currently visible
   useEffect(() => {
@@ -71,6 +93,13 @@ export const EnhancedBlogLayout = ({
     return () => observer.disconnect();
   }, [sortedSections]);
 
+  // [Analysis] Handle external link navigation
+  const handleExternalLink = () => {
+    if (article.url) {
+      window.open(article.url, '_blank', 'noopener,noreferrer');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black">
       <motion.div
@@ -89,6 +118,19 @@ export const EnhancedBlogLayout = ({
           <ChevronLeft className="h-4 w-4 mr-2" />
           Back to News
         </Button>
+
+        {article.url && (
+          <div className="mb-6 flex justify-end">
+            <Button
+              variant="outline"
+              onClick={handleExternalLink}
+              className="gap-2 text-blue-500 border-blue-500/30 hover:bg-blue-500/10"
+            >
+              <ExternalLink className="h-4 w-4" />
+              View Original Source
+            </Button>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-8 space-y-8">
@@ -147,9 +189,28 @@ export const EnhancedBlogLayout = ({
               initial="hidden"
               animate="visible"
             >
-              {sortedSections.map((section, index) => (
-                <EventCard key={section.id} section={section} index={index} />
-              ))}
+              {/* For external articles with just content, render differently */}
+              {isExternalArticle ? (
+                <div className="bg-white/5 rounded-lg p-6 backdrop-blur-sm border border-white/10">
+                  <div className="prose prose-invert prose-lg max-w-none">
+                    <p className="text-gray-200 leading-relaxed whitespace-pre-line">
+                      {article.content || article.description}
+                    </p>
+                    {article.source && (
+                      <div className="mt-6 pt-4 border-t border-white/10">
+                        <p className="text-sm text-gray-400">
+                          Source: {article.source}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                // For regular articles with sections
+                sortedSections.map((section, index) => (
+                  <EventCard key={section.id} section={section} index={index} />
+                ))
+              )}
             </motion.div>
 
             {/* Comments Section */}
@@ -168,6 +229,45 @@ export const EnhancedBlogLayout = ({
                 article={article}
                 activeSection={activeSection}
               />
+              
+              {/* Sharing and bookmarking */}
+              <div className="mt-6 bg-white/5 rounded-lg p-4 backdrop-blur-sm border border-white/10">
+                <h3 className="text-lg font-semibold text-white mb-4">Actions</h3>
+                <div className="flex flex-col gap-3">
+                  {onShare && (
+                    <Button 
+                      variant="outline" 
+                      onClick={onShare} 
+                      className="w-full justify-start gap-2"
+                    >
+                      <Share2 className="h-4 w-4" />
+                      Share Article
+                    </Button>
+                  )}
+                  
+                  {onBookmark && (
+                    <Button 
+                      variant="outline" 
+                      onClick={onBookmark} 
+                      className="w-full justify-start gap-2"
+                    >
+                      <BookmarkPlus className="h-4 w-4" />
+                      Bookmark for Later
+                    </Button>
+                  )}
+                  
+                  {article.url && (
+                    <Button 
+                      variant="outline" 
+                      onClick={handleExternalLink} 
+                      className="w-full justify-start gap-2"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      Visit Original Source
+                    </Button>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>

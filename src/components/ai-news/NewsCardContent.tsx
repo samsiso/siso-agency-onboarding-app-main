@@ -26,6 +26,7 @@ interface NewsCardContentProps {
   sourceCredibility?: string;
   technicalComplexity?: string;
   articleType?: string;
+  url?: string; // External URL for articles from external sources
 }
 
 export const NewsCardContent = ({ 
@@ -46,18 +47,27 @@ export const NewsCardContent = ({
   bookmarks = 0,
   sourceCredibility = 'verified',
   technicalComplexity = 'intermediate',
-  articleType = 'news'
+  articleType = 'news',
+  url
 }: NewsCardContentProps) => {
   const navigate = useNavigate();
 
-  // [Analysis] Improved navigation to use React Router instead of window.open
+  // [Analysis] Improved navigation logic to handle both internal and external articles
   const handleClick = () => {
     if (onReadArticle) {
       onReadArticle();
     }
-    if (newsId) {
+    
+    // If we have an external URL and no newsId, open in new tab
+    if (url && !newsId) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } 
+    // If we have a newsId, navigate to article page
+    else if (newsId) {
       navigate(`/ai-news/${newsId}`);
-    } else {
+    }
+    // Fallback to source URL if nothing else available
+    else if (source && source.startsWith('http')) {
       window.open(source, '_blank', 'noopener,noreferrer');
     }
   };
@@ -85,6 +95,11 @@ export const NewsCardContent = ({
             <Clock className="h-3 w-3 mr-1" />
             {readingTime} min read
           </Badge>
+          {url && (
+            <Badge variant="outline" className="bg-blue-700/10 text-blue-400 border-blue-700/20">
+              External
+            </Badge>
+          )}
         </div>
 
         {/* Interactive title */}
