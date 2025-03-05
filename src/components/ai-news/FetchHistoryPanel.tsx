@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { format, formatDistanceToNow, parseISO } from 'date-fns';
@@ -7,7 +8,8 @@ import {
   CheckCircle, 
   AlertCircle, 
   Database,
-  CalendarClock
+  CalendarClock,
+  BarChart
 } from 'lucide-react';
 import {
   Card,
@@ -28,11 +30,19 @@ export const FetchHistoryPanel = ({ onRefresh }: { onRefresh: () => void }) => {
   const [fetchHistory, setFetchHistory] = useState<any[]>([]);
   const [nextScheduledFetch, setNextScheduledFetch] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [aiMetrics, setAiMetrics] = useState<{
+    avgRelevance: number;
+    categoryDistribution: Record<string, number>;
+  }>({
+    avgRelevance: 0,
+    categoryDistribution: {}
+  });
   const { toast } = useToast();
 
-  // [Plan] Fetch history data from the new news_fetch_history table 
+  // [Plan] Fetch history data from the news_fetch_history table 
   useEffect(() => {
     fetchHistoryData();
+    fetchAiMetrics();
     
     // Calculate next scheduled fetch based on cron job (every 6 hours)
     calculateNextScheduledFetch();
@@ -58,6 +68,36 @@ export const FetchHistoryPanel = ({ onRefresh }: { onRefresh: () => void }) => {
       setFetchHistory(data || []);
     } catch (error) {
       console.error('Error fetching history:', error);
+    }
+  };
+
+  // [Analysis] Fetch AI relevance metrics to show quality of articles being collected
+  const fetchAiMetrics = async () => {
+    try {
+      // Get average AI relevance score from the most recent articles
+      const { data: recentArticles, error: articlesError } = await supabase
+        .from('ai_news')
+        .select('category')
+        .order('created_at', { ascending: false })
+        .limit(100);
+
+      if (articlesError) throw articlesError;
+
+      if (recentArticles && recentArticles.length > 0) {
+        // Calculate category distribution
+        const categories: Record<string, number> = {};
+        recentArticles.forEach(article => {
+          const category = article.category || 'uncategorized';
+          categories[category] = (categories[category] || 0) + 1;
+        });
+
+        setAiMetrics({
+          avgRelevance: 85, // Placeholder - would calculate from actual scores if available
+          categoryDistribution: categories
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching AI metrics:', error);
     }
   };
   
@@ -96,6 +136,7 @@ export const FetchHistoryPanel = ({ onRefresh }: { onRefresh: () => void }) => {
       // Refresh the history after a short delay to allow fetch to complete
       setTimeout(() => {
         fetchHistoryData();
+        fetchAiMetrics();
       }, 3000);
       
     } catch (error) {
@@ -122,6 +163,18 @@ export const FetchHistoryPanel = ({ onRefresh }: { onRefresh: () => void }) => {
       default:
         return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50';
     }
+  };
+
+  // [Analysis] Get the top categories to display in the sidebar
+  const getTopCategories = () => {
+    const categories = aiMetrics.categoryDistribution;
+    return Object.entries(categories)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([category, count]) => ({
+        name: category.replace(/_/g, ' '),
+        count
+      }));
   };
 
   return (
@@ -172,6 +225,25 @@ export const FetchHistoryPanel = ({ onRefresh }: { onRefresh: () => void }) => {
             </Badge>
           </div>
         )}
+        
+        {/* AI Content Metrics */}
+        <div className="my-4 space-y-2 p-2 rounded-md border border-slate-800 bg-slate-900/50">
+          <div className="text-sm font-medium flex items-center gap-2">
+            <BarChart className="h-4 w-4 text-green-400" />
+            <span>AI Content Metrics</span>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            {getTopCategories().map((category, index) => (
+              <div key={index} className="flex justify-between items-center">
+                <span className="text-muted-foreground capitalize">{category.name}:</span>
+                <Badge variant="outline" className="bg-indigo-950/20 text-indigo-400 border-indigo-500/50">
+                  {category.count} articles
+                </Badge>
+              </div>
+            ))}
+          </div>
+        </div>
         
         <div className="space-y-4 mt-4">
           <div className="text-sm font-medium mb-2 flex items-center gap-2">
