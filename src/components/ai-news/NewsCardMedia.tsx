@@ -10,6 +10,9 @@ interface NewsCardMediaProps {
   isFeatured?: boolean;
   isCompact?: boolean;
   date?: string;
+  source?: string; // [Analysis] Added missing source property to fix type error
+  height?: string; // [Analysis] Added height property to match usage in NewsCard
+  featured?: boolean; // [Analysis] Added for compatibility with NewsCard
 }
 
 // [Analysis] List of fallback images for articles without images
@@ -25,7 +28,10 @@ export const NewsCardMedia = memo(({
   title,
   isFeatured = false,
   isCompact = false,
-  date
+  date,
+  source, // [Analysis] Added the source parameter
+  height, // [Analysis] Added height parameter to match usage
+  featured  // [Analysis] Added featured parameter for compatibility
 }: NewsCardMediaProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -51,7 +57,7 @@ export const NewsCardMedia = memo(({
     <div 
       className={cn(
         "relative overflow-hidden bg-slate-900/40",
-        isFeatured ? "h-80 sm:h-96" : "h-48 sm:h-56"
+        height || (isFeatured || featured ? "h-80 sm:h-96" : "h-48 sm:h-56")
       )}
     >
       {!imageLoaded && (
@@ -81,6 +87,13 @@ export const NewsCardMedia = memo(({
         <div className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-black/60 text-white text-xs px-2 py-1 rounded-md">
           <CalendarDays className="h-3 w-3" />
           <span>{new Date(date).toLocaleDateString()}</span>
+        </div>
+      )}
+      
+      {/* [Analysis] Display source if provided */}
+      {source && (
+        <div className="absolute top-3 right-3 bg-black/60 text-white text-xs px-2 py-1 rounded-md">
+          {source}
         </div>
       )}
     </div>
