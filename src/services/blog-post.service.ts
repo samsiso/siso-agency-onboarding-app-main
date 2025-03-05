@@ -1,6 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import type { EnhancedNewsItem, ContentCategory, TechnicalComplexity, ArticleImpact, ArticleSection } from '@/types/blog';
+import type { EnhancedNewsItem, ContentCategory, TechnicalComplexity, ArticleImpact, ArticleSection, NewsComment } from '@/types/blog';
 
 export const fetchBlogPost = async (id: string) => {
   try {
@@ -122,6 +122,21 @@ export const fetchBlogPost = async (id: string) => {
       }
     }));
 
+    // [Analysis] Extract tags as strings, not objects
+    const tags: string[] = (articleData.article_tags || []).map((tag: any) => tag.tag);
+
+    // [Analysis] Transform related articles to proper NewsItem objects
+    const relatedArticles = Array.isArray(articleData.related_articles) 
+      ? articleData.related_articles.map((article: any) => ({
+          id: article.id || '',
+          title: article.title || '',
+          description: article.description || '',
+          content: article.content || '',
+          url: article.url || '',
+          source: article.source || 'unknown'
+        }))
+      : [];
+
     // [Analysis] Transform to EnhancedNewsItem with strongly typed sections and fallbacks
     const enhancedArticle: EnhancedNewsItem = {
       id: articleData.id,
@@ -133,17 +148,11 @@ export const fetchBlogPost = async (id: string) => {
       technical_complexity: (articleData.technical_complexity || 'intermediate') as TechnicalComplexity,
       impact: (articleData.impact || 'medium') as ArticleImpact,
       sections: transformedSections,
-      tags: articleData.article_tags || [],
+      tags: tags,
       key_takeaways: Array.isArray(articleData.key_takeaways) 
         ? articleData.key_takeaways.map((item: any) => String(item))
         : [],
-      related_articles: Array.isArray(articleData.related_articles) 
-        ? articleData.related_articles.map((article: any) => ({
-            id: article.id || '',
-            title: article.title || '',
-            description: article.description || ''
-          }))
-        : [],
+      related_articles: relatedArticles,
       table_of_contents: Array.isArray(articleData.table_of_contents)
         ? articleData.table_of_contents.map((item: any) => ({
             id: item.id || '',
@@ -163,8 +172,13 @@ export const fetchBlogPost = async (id: string) => {
       url: articleData.url // [Analysis] Add URL for external links
     };
 
-    const comments = (articleData.news_comments || []).map((comment: any) => ({
-      ...comment,
+    // [Analysis] Transform comments with proper typing
+    const comments: NewsComment[] = (articleData.news_comments || []).map((comment: any) => ({
+      id: comment.id,
+      content: comment.content,
+      created_at: comment.created_at,
+      user_email: comment.user_email,
+      updated_at: comment.updated_at,
       news_id: id
     }));
 

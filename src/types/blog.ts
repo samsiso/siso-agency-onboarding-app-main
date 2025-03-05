@@ -66,6 +66,7 @@ export interface NewsItem {
   category?: string;
   tags?: string[];
   template_type?: string;
+  sources?: string[];
 }
 
 export interface Summary {
@@ -82,14 +83,20 @@ export interface Views {
   created_at: string;
 }
 
-// Add EnhancedNewsItem interface
+// Updated EnhancedNewsItem interface
 export interface EnhancedNewsItem extends NewsItem {
   sections: ArticleSection[];
   key_takeaways?: string[];
   related_articles?: NewsItem[];
+  table_of_contents?: {
+    id: string;
+    title: string;
+    level: number;
+  }[];
+  technical_details?: Record<string, any>;
 }
 
-// Add ArticleSection interface
+// Updated ArticleSection interface
 export interface ArticleSection {
   id: string;
   article_id: string;
@@ -108,4 +115,43 @@ export interface ArticleSection {
   updated_at?: string;
   last_updated?: string;
   reading_time_minutes?: number;
+  overview?: string;
+  bullet_points?: string[];
+  related_topics?: string[];
+  key_figures?: Record<string, any>;
+  is_featured?: boolean;
+  metadata?: Record<string, any>;
+  ai_analysis?: {
+    market_impact: any;
+    technical_predictions: any[];
+    related_technologies: any[];
+    business_implications: any;
+  };
+  detailed_metadata?: {
+    research_papers: any[];
+    industry_reports: any[];
+    expert_quotes: any[];
+    market_data: any[];
+  };
+  implementation_timeline?: {
+    short_term: any[];
+    medium_term: any[];
+    long_term: any[];
+  };
+  market_analysis?: {
+    market_size: any;
+    growth_projections: any;
+    competitive_landscape: any[];
+    investment_metrics: Record<string, any>;
+  };
+}
+
+// Add NewsComment interface for consistency
+export interface NewsComment {
+  id: string;
+  content: string;
+  created_at: string;
+  user_email: string;
+  updated_at: string;
+  news_id: string;
 }

@@ -9,6 +9,7 @@ import { useBlogPostActions } from '@/hooks/useBlogPostActions';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, ExternalLink, ChevronLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { NewsComment } from '@/types/blog';
 
 const BlogPost = () => {
   const { postId } = useParams(); // [Analysis] Changed from 'id' to 'postId' to match App.tsx route parameter

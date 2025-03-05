@@ -1,9 +1,8 @@
-
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { EnhancedNewsItem } from '@/types/blog';
+import { EnhancedNewsItem, NewsComment } from '@/types/blog';
 import { 
   ChevronLeft, 
   Share2, 
@@ -24,14 +23,7 @@ import { KeyTakeaways } from './blog-layout/KeyTakeaways';
 import { HeroImage } from './blog-layout/HeroImage';
 
 interface EnhancedBlogLayoutProps {
-  article: EnhancedNewsItem & { comments?: Array<{
-    id: string;
-    content: string;
-    created_at: string;
-    user_email: string;
-    updated_at: string;
-    news_id: string;
-  }> };
+  article: EnhancedNewsItem & { comments?: NewsComment[] };
   onShare?: () => void;
   onBookmark?: () => void;
 }
