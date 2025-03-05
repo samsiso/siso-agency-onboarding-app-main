@@ -8,6 +8,7 @@ import { NewsErrorBoundary } from '@/components/ai-news/NewsErrorBoundary';
 import { DailyStatsOverview } from '@/components/ai-news/DailyStatsOverview';
 import { DateNavigation } from '@/components/ai-news/DateNavigation';
 import { NewsDateSection } from '@/components/ai-news/NewsDateSection';
+import { FetchHistoryPanel } from '@/components/ai-news/FetchHistoryPanel';
 import { Helmet } from 'react-helmet';
 import { Sidebar } from '@/components/Sidebar';
 import NewsPagination from '@/components/ai-news/NewsPagination';
@@ -25,7 +26,17 @@ import {
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { CalendarDays, Clock, AlertCircle, Sparkles, Database, RefreshCw, Bug, Terminal } from 'lucide-react';
+import { 
+  CalendarDays, 
+  Clock, 
+  AlertCircle, 
+  Sparkles, 
+  Database, 
+  RefreshCw, 
+  Bug, 
+  Terminal,
+  CalendarClock
+} from 'lucide-react';
 import { format, subDays, isToday } from 'date-fns';
 import { toast } from '@/hooks/use-toast';
 import { Switch } from '@/components/ui/switch';
@@ -51,6 +62,9 @@ const AINews = () => {
   const [isApiResponseOpen, setIsApiResponseOpen] = useState(false);
   const [testMode, setTestMode] = useState(true); // Added state for test mode
   const itemsPerPage = 12; // Same as PAGE_SIZE in useNewsItems
+
+  // Added a new state to control the fetch history panel visibility
+  const [showFetchHistory, setShowFetchHistory] = useState(false);
 
   const { 
     newsItems, 
@@ -220,6 +234,16 @@ const AINews = () => {
             <Button 
               variant="outline" 
               size="sm" 
+              className="gap-2 h-8 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border-purple-500/50"
+              onClick={() => setShowFetchHistory(!showFetchHistory)}
+            >
+              <CalendarClock className="h-4 w-4" />
+              {showFetchHistory ? 'Hide Automation' : 'Fetch History'}
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              size="sm" 
               className="gap-2 h-8 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-500 border-yellow-500/50"
               onClick={() => setShowTestPanel(!showTestPanel)}
             >
@@ -237,6 +261,17 @@ const AINews = () => {
               {error instanceof Error ? error.message : "There was an error loading the news."}
             </AlertDescription>
           </Alert>
+        )}
+        
+        {showFetchHistory && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mb-8"
+          >
+            <FetchHistoryPanel onRefresh={() => syncNews('artificial intelligence', 30, 'event_registry', false)} />
+          </motion.div>
         )}
         
         {showTestPanel && (

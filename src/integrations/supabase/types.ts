@@ -3576,6 +3576,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      fetch_ai_news_automated: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       generate_unique_slug: {
         Args: {
           base_name: string

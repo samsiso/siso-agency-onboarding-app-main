@@ -1,3 +1,4 @@
+
 // Import required modules
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
@@ -49,6 +50,32 @@ serve(async (req) => {
     
     if (typeof limit !== 'number' || limit < 1 || limit > 100) {
       throw new Error("Limit must be a number between 1 and 100");
+    }
+    
+    // Start tracking fetch history if not in test mode
+    let fetchHistoryId = null;
+    const startTime = Date.now();
+    
+    if (!testMode) {
+      // Create a new fetch history record
+      const { data, error } = await supabase
+        .from('news_fetch_history')
+        .insert({
+          source_type: source,
+          status: 'pending',
+          metadata: { 
+            started_at: new Date().toISOString(),
+            parameters: { keyword, limit, source, debug }
+          }
+        })
+        .select();
+        
+      if (error) {
+        console.error("Error creating fetch history record:", error);
+      } else {
+        fetchHistoryId = data[0].id;
+        console.log(`Created fetch history record with ID: ${fetchHistoryId}`);
+      }
     }
     
     // Fetch articles based on selected source
@@ -104,6 +131,43 @@ serve(async (req) => {
     const importResults = await saveArticlesToDatabase(articles);
     
     console.log("Import results:", importResults);
+    
+    // Update fetch history record if available
+    if (fetchHistoryId) {
+      const executionTime = Date.now() - startTime;
+      
+      const { error } = await supabase
+        .from('news_fetch_history')
+        .update({
+          status: importResults.success ? 'success' : 'error',
+          articles_fetched: articles.length,
+          articles_added: importResults.count,
+          duplicates_skipped: (importResults.errors || []).filter(e => e.error && e.error.includes('duplicate')).length,
+          execution_time_ms: executionTime,
+          error_message: importResults.success ? null : importResults.message,
+          metadata: { 
+            completed_at: new Date().toISOString(),
+            execution_time_ms: executionTime
+          }
+        })
+        .eq('id', fetchHistoryId);
+        
+      if (error) {
+        console.error("Error updating fetch history record:", error);
+      }
+    }
+    
+    // Update the last_fetched timestamp in the news_sources table
+    const { error: sourceUpdateError } = await supabase
+      .from('news_sources')
+      .upsert([{
+        source_type: source,
+        last_fetched_at: new Date().toISOString()
+      }]);
+      
+    if (sourceUpdateError) {
+      console.error("Error updating news_sources record:", sourceUpdateError);
+    }
     
     return new Response(
       JSON.stringify({
@@ -541,6 +605,10 @@ async function saveArticlesToDatabase(articles) {
         if (existingArticle) {
           // Skip importing duplicate articles
           console.log(`Skipping duplicate article: ${article.title}`);
+          errors.push({
+            title: article.title,
+            error: "Duplicate article"
+          });
           continue;
         }
         
