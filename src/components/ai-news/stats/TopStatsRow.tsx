@@ -1,90 +1,111 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { LineChart, Line, ResponsiveContainer, Tooltip } from 'recharts';
-import { Zap, Brain, TrendingUp, Shield } from 'lucide-react';
+import { NewsItem } from '@/types/blog';
+import { calculateTopCategories, extractTrendingTopics } from './calculateStats';
+import { BadgeCheck, TrendingUp, Zap } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface TopStatsRowProps {
-  stats: ReturnType<typeof import('./calculateStats').calculateStats>;
+  newsItems: NewsItem[];
+  loading?: boolean;
 }
 
-export const TopStatsRow = ({ stats }: TopStatsRowProps) => {
-  if (!stats) return null;
-
-  const trendData = [
-    { name: '6AM', value: 30 },
-    { name: '9AM', value: 45 },
-    { name: '12PM', value: 75 },
-    { name: '3PM', value: 85 },
-    { name: '6PM', value: 100 },
-  ];
-
+export const TopStatsRow = ({ newsItems, loading = false }: TopStatsRowProps) => {
+  const topCategories = calculateTopCategories(newsItems, 3);
+  const trendingTopics = extractTrendingTopics(newsItems);
+  
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 animate-pulse">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="bg-gray-800/50 rounded-lg p-4 h-24"></div>
+        ))}
+      </div>
+    );
+  }
+  
+  // Animation variants
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+  
+  const item = {
+    hidden: { y: 20, opacity: 0 },
+    show: { y: 0, opacity: 1 }
+  };
+  
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">AI Developments Today</CardTitle>
-          <Zap className="h-4 w-4 text-yellow-500" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{stats.totalDevelopments}</div>
-          <p className="text-xs text-muted-foreground">
-            +12% from yesterday
-          </p>
-        </CardContent>
-      </Card>
+    <motion.div 
+      className="grid grid-cols-1 sm:grid-cols-3 gap-4"
+      variants={container}
+      initial="hidden"
+      animate="show"
+    >
+      {/* Top Categories */}
+      <motion.div 
+        variants={item}
+        className="bg-gradient-to-br from-blue-900/30 to-blue-950/50 rounded-lg p-4 border border-blue-800/30"
+      >
+        <div className="flex items-center gap-2 mb-2">
+          <BadgeCheck className="h-5 w-5 text-blue-400" />
+          <h3 className="text-sm font-medium text-blue-300">Top Categories</h3>
+        </div>
+        
+        <div className="space-y-2">
+          {topCategories.map((cat, idx) => (
+            <div key={cat.category} className="flex items-center justify-between">
+              <span className="text-sm capitalize text-white">{cat.category}</span>
+              <span className="text-xs text-blue-300">{cat.percentage}%</span>
+            </div>
+          ))}
+        </div>
+      </motion.div>
       
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Daily Impact Score</CardTitle>
-          <TrendingUp className="h-4 w-4 text-green-500" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">85%</div>
-          <ResponsiveContainer height={40}>
-            <LineChart data={trendData}>
-              <Line
-                type="monotone"
-                dataKey="value"
-                stroke="#22c55e"
-                strokeWidth={2}
-                dot={false}
-              />
-              <Tooltip />
-            </LineChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Technical Complexity</CardTitle>
-          <Brain className="h-4 w-4 text-blue-500" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">
-            {stats.averageComplexity.toFixed(1)}/3.0
-          </div>
-          <Progress 
-            value={stats.averageComplexity * 33.33} 
-            className="h-2 mt-2" 
-            indicatorClassName="bg-blue-500"
-          />
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Source Credibility</CardTitle>
-          <Shield className="h-4 w-4 text-purple-500" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">92%</div>
-          <p className="text-xs text-muted-foreground">
-            Verified sources
-          </p>
-        </CardContent>
-      </Card>
-    </div>
+      {/* Trending Topics */}
+      <motion.div 
+        variants={item}
+        className="bg-gradient-to-br from-purple-900/30 to-purple-950/50 rounded-lg p-4 border border-purple-800/30"
+      >
+        <div className="flex items-center gap-2 mb-2">
+          <TrendingUp className="h-5 w-5 text-purple-400" />
+          <h3 className="text-sm font-medium text-purple-300">Trending Topics</h3>
+        </div>
+        
+        <div className="flex flex-wrap gap-2">
+          {trendingTopics.slice(0, 5).map((topic) => (
+            <span 
+              key={topic.topic} 
+              className="inline-flex items-center rounded-full bg-purple-900/30 px-2 py-1 text-xs font-medium text-purple-300"
+            >
+              {topic.topic}
+            </span>
+          ))}
+        </div>
+      </motion.div>
+      
+      {/* Latest Updates */}
+      <motion.div 
+        variants={item}
+        className="bg-gradient-to-br from-amber-900/30 to-amber-950/50 rounded-lg p-4 border border-amber-800/30"
+      >
+        <div className="flex items-center gap-2 mb-2">
+          <Zap className="h-5 w-5 text-amber-400" />
+          <h3 className="text-sm font-medium text-amber-300">Latest Updates</h3>
+        </div>
+        
+        <ul className="space-y-1">
+          {newsItems.slice(0, 3).map((item) => (
+            <li key={item.id} className="text-xs truncate text-gray-300">
+              {item.title}
+            </li>
+          ))}
+        </ul>
+      </motion.div>
+    </motion.div>
   );
 };
