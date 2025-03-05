@@ -194,6 +194,19 @@ const AINews = () => {
   // Determine when to show the stats
   const showStats = isToday(currentDate) && !searchQuery && !selectedCategory;
 
+  // [Analysis] Added here to handle tab state for NewsHeader component
+  const [activeTab, setActiveTab] = useState('all');
+  
+  // [Analysis] Handle tab change for NewsHeader
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    // Reset other filters when changing tabs
+    if (searchQuery) {
+      setSearchQuery('');
+    }
+    // We could potentially add other filtering logic here based on the active tab
+  };
+
   return (
     <div className="flex min-h-screen bg-siso-bg">
       <Helmet>
@@ -205,7 +218,11 @@ const AINews = () => {
       
       <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-20">
         <div className="flex justify-between items-center">
-          <NewsHeader title="AI News" />
+          <NewsHeader 
+            title="AI News" 
+            activeTab={activeTab} 
+            onTabChange={handleTabChange}
+          />
           <div className="flex items-center gap-2">
             <Popover>
               <PopoverTrigger asChild>
