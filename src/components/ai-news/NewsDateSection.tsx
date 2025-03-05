@@ -1,7 +1,6 @@
 
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
-import { EmptyResultsMessage } from './EmptyResultsMessage';
 import { NewsLoadingState } from './NewsLoadingState';
 import NewsCard from './NewsCard';
 import { NewsItem } from '@/types/blog';
@@ -16,7 +15,7 @@ interface NewsDateSectionProps {
   loading?: boolean;
 }
 
-// Enhanced component to display news items for a specific date
+// [Analysis] Enhanced component to display news items for a specific date
 export const NewsDateSection = ({
   date,
   items,
@@ -69,7 +68,7 @@ export const NewsDateSection = ({
   );
 };
 
-// Create a simple EmptyResultsMessage component for reuse
+// [Analysis] A separate component for showing empty results message
 export const EmptyResultsMessage = () => {
   return (
     <div className="text-center py-12">
