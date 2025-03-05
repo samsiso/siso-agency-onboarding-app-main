@@ -89,7 +89,8 @@ const AINews = () => {
     syncResult,
     error,
     refresh,
-    syncNews
+    syncNews,
+    testFetchNews
   } = useNewsItems(
     selectedCategory, 
     'published', 
@@ -188,6 +189,23 @@ const AINews = () => {
     }
   };
 
+  // [Analysis] Add the missing handleTestFetch function
+  const handleTestFetch = () => {
+    // Set up test parameters for a non-importing test
+    setTestKeyword('artificial intelligence');
+    setTestLimit(10);
+    setTestMode(true); // Make sure test mode is enabled
+    setShowTestPanel(true); // Show the test panel
+
+    // Run the test API call
+    handleTestAPI();
+    
+    // Show a toast notification
+    toast({
+      title: "Test Fetch Setup",
+      description: "Test parameters configured. Click 'Test API' to run the test.",
+    });
+  };
   
   // [Analysis] Calculate total pages
   const totalPages = totalCount ? Math.ceil(totalCount / itemsPerPage) : 0;
