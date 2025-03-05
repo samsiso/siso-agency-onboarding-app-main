@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { SidebarProvider } from '@/components/ui/sidebar';
@@ -9,7 +8,7 @@ import { useBlogPostActions } from '@/hooks/useBlogPostActions';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, ExternalLink, ChevronLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { NewsComment } from '@/types/blog';
+import { NewsComment, EnhancedNewsItem } from '@/types/blog';
 
 const BlogPost = () => {
   const { postId } = useParams(); // [Analysis] Changed from 'id' to 'postId' to match App.tsx route parameter
@@ -124,7 +123,7 @@ const BlogPost = () => {
   }
 
   // [Analysis] For external articles, add option to visit original source
-  const isExternalArticle = !!post.url;
+  const isExternalArticle = !!post?.url;
 
   return (
     <SidebarProvider>
@@ -145,7 +144,7 @@ const BlogPost = () => {
           )}
           
           <EnhancedBlogLayout
-            article={post}
+            article={post as (EnhancedNewsItem & { comments?: NewsComment[] })}
             onShare={() => handleShare(post.title, post.description)}
             onBookmark={() => handleBookmark(post.id)}
           />

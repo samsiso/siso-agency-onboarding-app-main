@@ -1,6 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import type { EnhancedNewsItem, ContentCategory, TechnicalComplexity, ArticleImpact, ArticleSection, NewsComment } from '@/types/blog';
+import type { EnhancedNewsItem, NewsItem, ContentCategory, TechnicalComplexity, ArticleImpact, ArticleSection, NewsComment } from '@/types/blog';
 
 export const fetchBlogPost = async (id: string) => {
   try {
@@ -182,9 +182,10 @@ export const fetchBlogPost = async (id: string) => {
       news_id: id
     }));
 
+    // Return the enhanced article with comments as a separate property
     return {
       ...enhancedArticle,
-      comments
+      comments // This will be separate from the 'comments' count property in the base NewsItem
     };
   } catch (error) {
     console.error('Error fetching blog post:', error);

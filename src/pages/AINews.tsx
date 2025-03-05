@@ -4,11 +4,12 @@ import { useNewsItems } from '@/hooks/useNewsItems';
 import NewsFilters from '@/components/ai-news/NewsFilters';
 import FeaturedNewsHero from '@/components/ai-news/FeaturedNewsHero';
 import { NewsContent } from '@/components/ai-news/NewsContent';
-import { NewsHeader } from '@/components/ai-news/NewsHeader'; // Fixed import to use named export
+import { NewsHeader } from '@/components/ai-news/NewsHeader'; 
 import { NewsErrorBoundary } from '@/components/ai-news/NewsErrorBoundary';
 import { DailyStatsOverview } from '@/components/ai-news/DailyStatsOverview';
 import { DateNavigation } from '@/components/ai-news/DateNavigation';
 import { NewsDateSection } from '@/components/ai-news/NewsDateSection';
+import { FetchHistoryPanel } from '@/components/ai-news/FetchHistoryPanel'; // Add this import
 import { Helmet } from 'react-helmet';
 import { Sidebar } from '@/components/Sidebar';
 import NewsPagination from '@/components/ai-news/NewsPagination';

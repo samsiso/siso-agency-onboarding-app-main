@@ -83,7 +83,7 @@ export interface Views {
   created_at: string;
 }
 
-// Updated EnhancedNewsItem interface
+// Updated EnhancedNewsItem interface - fixed comments to be optional number
 export interface EnhancedNewsItem extends NewsItem {
   sections: ArticleSection[];
   key_takeaways?: string[];
@@ -94,6 +94,9 @@ export interface EnhancedNewsItem extends NewsItem {
     level: number;
   }[];
   technical_details?: Record<string, any>;
+  
+  // Important: We're intentionally NOT including 'comments' here to avoid conflicts
+  // with the base NewsItem interface's 'comments?: number' property
 }
 
 // Updated ArticleSection interface
