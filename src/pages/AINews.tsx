@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNewsItems } from '@/hooks/useNewsItems';
 import NewsFilters from '@/components/ai-news/NewsFilters';
@@ -309,7 +308,10 @@ const AINews = () => {
             exit={{ opacity: 0, height: 0 }}
             className="mb-8"
           >
-            <FetchHistoryPanel onRefresh={() => syncNews('artificial intelligence', 30, 'event_registry', false)} />
+            <FetchHistoryPanel 
+              onRefresh={() => syncNews('artificial intelligence', 30, 'event_registry', false)} 
+              onTestFetch={handleTestFetch} 
+            />
           </motion.div>
         )}
         
