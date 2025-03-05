@@ -1,11 +1,11 @@
 
-import { memo } from 'react';
+import { format } from 'date-fns';
 import { motion } from 'framer-motion';
-import NewsCard from './NewsCard';
+import { EmptyResultsMessage } from './EmptyResultsMessage';
 import { NewsLoadingState } from './NewsLoadingState';
-import { NewsEmptyState } from './NewsEmptyState';
+import NewsCard from './NewsCard';
 import { NewsItem } from '@/types/blog';
-import { format, isToday } from 'date-fns';
+import { AlertTriangle } from 'lucide-react';
 
 interface NewsDateSectionProps {
   date: Date;
@@ -16,83 +16,70 @@ interface NewsDateSectionProps {
   loading?: boolean;
 }
 
-// [Analysis] Animation variants for staggered card appearance
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: { 
-    opacity: 1,
-    transition: { 
-      staggerChildren: 0.08,
-    }
-  }
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { 
-    opacity: 1, 
-    y: 0,
-    transition: { 
-      duration: 0.5,
-      ease: [0.25, 0.1, 0.25, 1.0] 
-    }
-  }
-};
-
-export const NewsDateSection = memo(({
+// Enhanced component to display news items for a specific date
+export const NewsDateSection = ({
   date,
-  items = [],
+  items,
   summaries,
   loadingSummaries,
   onGenerateSummary,
   loading = false
 }: NewsDateSectionProps) => {
-  const dateDisplay = isToday(date) 
-    ? 'Today' 
-    : format(date, 'MMMM d, yyyy');
-
+  // If loading, show loading state
   if (loading) {
     return <NewsLoadingState />;
   }
 
+  // If no items for this date, show empty state
   if (items.length === 0) {
     return (
-      <NewsEmptyState 
-        message={`No articles found for ${dateDisplay}`}
-        suggestion="Try selecting a different date or syncing new articles."
-      />
+      <div className="bg-gray-900/30 rounded-lg border border-gray-800 p-8 text-center">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-amber-900/20 mb-4">
+          <AlertTriangle className="h-6 w-6 text-amber-500" />
+        </div>
+        <h3 className="text-xl font-semibold mb-2">No Articles Available</h3>
+        <p className="text-gray-400 max-w-md mx-auto mb-6">
+          We couldn't find any articles published on {format(date, 'MMMM d, yyyy')}.
+        </p>
+        <p className="text-sm text-gray-500">
+          Try selecting another date or use the search to find specific topics.
+        </p>
+      </div>
     );
   }
 
   return (
     <motion.div
-      key={date.toISOString()}
-      initial="hidden"
-      animate="visible"
-      variants={containerVariants}
-      className="space-y-8"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
     >
-      <motion.div 
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-        variants={containerVariants}
-      >
-        {items.map((item, index) => (
-          <motion.div
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {items.map((item) => (
+          <NewsCard
             key={item.id}
-            variants={itemVariants}
-            className="h-full"
-          >
-            <NewsCard
-              item={item}
-              summaries={summaries}
-              loadingSummaries={loadingSummaries}
-              onGenerateSummary={onGenerateSummary}
-            />
-          </motion.div>
+            item={item}
+            summaries={summaries}
+            loadingSummaries={loadingSummaries}
+            onGenerateSummary={onGenerateSummary}
+          />
         ))}
-      </motion.div>
+      </div>
     </motion.div>
   );
-});
+};
 
-NewsDateSection.displayName = 'NewsDateSection';
+// Create a simple EmptyResultsMessage component for reuse
+export const EmptyResultsMessage = () => {
+  return (
+    <div className="text-center py-12">
+      <div className="bg-gray-800/50 rounded-full h-16 w-16 flex items-center justify-center mx-auto mb-4">
+        <AlertTriangle className="h-8 w-8 text-amber-500" />
+      </div>
+      <h3 className="text-xl font-semibold mb-2">No Results Found</h3>
+      <p className="text-gray-400 max-w-md mx-auto">
+        We couldn't find any articles matching your criteria. Try adjusting your filters or search terms.
+      </p>
+    </div>
+  );
+};

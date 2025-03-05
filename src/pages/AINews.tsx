@@ -84,22 +84,13 @@ const AINews = () => {
   );
 
   console.log('Rendering AINews component with', newsItems.length, 'news items');
-  console.log('Last sync:', lastSync);
-  console.log('Article count:', articleCount);
   console.log('Current date:', format(currentDate, 'yyyy-MM-dd'));
   console.log('Date range:', dateRange);
   console.log('Loading state:', loading);
-  console.log('Error state:', error ? (error instanceof Error ? error.message : String(error)) : 'none');
 
   // [Analysis] Find featured article with priority on featured flag and then on views
   const featuredArticle = newsItems.find(item => item.featured) || 
     [...newsItems].sort((a, b) => (b.views || 0) - (a.views || 0))[0];
-
-  if (featuredArticle) {
-    console.log('Featured article found:', featuredArticle.id, featuredArticle.title);
-  } else {
-    console.log('No featured article available');
-  }
 
   // [Analysis] Handle search query change
   const handleSearchChange = (query: string) => {
@@ -128,6 +119,14 @@ const AINews = () => {
   const handleSelectDate = (date: Date) => {
     if (date) {
       goToDate(date);
+      // Clear any category filters when changing date
+      if (selectedCategory) {
+        setSelectedCategory(null);
+      }
+      // Clear search query when changing date
+      if (searchQuery) {
+        setSearchQuery('');
+      }
     }
   };
 

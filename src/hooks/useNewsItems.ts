@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { NewsItem } from '@/types/blog';
-import { format, addDays, subDays, isToday, isSameDay } from 'date-fns';
+import { format, addDays, subDays, isToday, isSameDay, parseISO } from 'date-fns';
 
 type PostStatus = 'all' | 'draft' | 'published';
 
@@ -47,6 +47,7 @@ export const useNewsItems = (
   // [Analysis] Initialize with today's articles
   useEffect(() => {
     if (selectedDate) {
+      // If selectedDate is provided, convert to Date object
       setCurrentDate(new Date(selectedDate));
     } else {
       // Start with today's date and fetch articles
@@ -245,6 +246,7 @@ export const useNewsItems = (
       // Check if we already have this date's data cached
       if (newsByDate[formattedDate] && newsByDate[formattedDate].length > 0) {
         console.log('Using cached data for date:', formattedDate);
+        setNewsItems(newsByDate[formattedDate]);
         setCurrentDate(date);
         setLoading(false);
         return;
@@ -283,20 +285,26 @@ export const useNewsItems = (
           [formattedDate]: transformedData
         }));
         
-        // If this is the first load, also set as current articles
-        if (initialLoading) {
-          setNewsItems(transformedData);
-          setInitialLoading(false);
-        }
+        // Update current articles
+        setNewsItems(transformedData);
       } else {
-        // If no articles found, store empty array but don't change current view
+        // If no articles found, store empty array
         setNewsByDate(prev => ({
           ...prev,
           [formattedDate]: []
         }));
         
-        // If this is initial load and no articles, try previous day
+        // Clear current news items
+        setNewsItems([]);
+        
+        // Only show toast for initial load, not for date changes
         if (initialLoading) {
+          toast({
+            title: "No articles found",
+            description: `No articles found for ${format(date, 'MMMM d, yyyy')}. Try another date.`,
+          });
+          
+          // If this is initial load and no articles, try previous day
           const previousDay = subDays(date, 1);
           fetchNewsByDate(previousDay);
           return;
