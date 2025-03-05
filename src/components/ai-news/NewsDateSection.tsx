@@ -1,84 +1,77 @@
 
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { motion } from 'framer-motion';
-import { NewsLoadingState } from './NewsLoadingState';
-import NewsCard from './NewsCard';
 import { NewsItem } from '@/types/blog';
-import { AlertTriangle } from 'lucide-react';
+import { CalendarDays } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 interface NewsDateSectionProps {
-  date: Date;
-  items: NewsItem[];
-  summaries: Record<string, string>;
-  loadingSummaries: Record<string, boolean>;
-  onGenerateSummary: (id: string) => void;
-  loading?: boolean;
+  date: string;
+  newsItems: NewsItem[];
+  onViewAll?: () => void;
 }
 
-// [Analysis] Enhanced component to display news items for a specific date
 export const NewsDateSection = ({
   date,
-  items,
-  summaries,
-  loadingSummaries,
-  onGenerateSummary,
-  loading = false
+  newsItems,
+  onViewAll
 }: NewsDateSectionProps) => {
-  // If loading, show loading state
-  if (loading) {
-    return <NewsLoadingState />;
-  }
-
-  // If no items for this date, show empty state
-  if (items.length === 0) {
-    return (
-      <div className="bg-gray-900/30 rounded-lg border border-gray-800 p-8 text-center">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-amber-900/20 mb-4">
-          <AlertTriangle className="h-6 w-6 text-amber-500" />
-        </div>
-        <h3 className="text-xl font-semibold mb-2">No Articles Available</h3>
-        <p className="text-gray-400 max-w-md mx-auto mb-6">
-          We couldn't find any articles published on {format(date, 'MMMM d, yyyy')}.
-        </p>
-        <p className="text-sm text-gray-500">
-          Try selecting another date or use the search to find specific topics.
-        </p>
-      </div>
-    );
-  }
-
+  const navigate = useNavigate();
+  const parsedDate = parseISO(date);
+  const isToday = new Date().toDateString() === parsedDate.toDateString();
+  
+  // [Analysis] Limit to 5 items for a preview section
+  const displayItems = newsItems.slice(0, 5);
+  
+  const handleArticleClick = (id: string) => {
+    navigate(`/ai-news/${id}`);
+  };
+  
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
+      className="mb-8"
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {items.map((item) => (
-          <NewsCard
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center gap-2">
+          <CalendarDays className="h-5 w-5 text-blue-400" />
+          <h2 className="text-xl font-bold">
+            {isToday ? 'Today' : format(parsedDate, 'EEEE, MMMM d, yyyy')}
+          </h2>
+          <span className="text-sm text-gray-400">
+            ({displayItems.length} articles)
+          </span>
+        </div>
+        
+        {onViewAll && newsItems.length > 5 && (
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={onViewAll}
+          >
+            View all {newsItems.length} articles
+          </Button>
+        )}
+      </div>
+      
+      <div className="space-y-4">
+        {displayItems.map((item) => (
+          <div 
             key={item.id}
-            item={item}
-            summaries={summaries}
-            loadingSummaries={loadingSummaries}
-            onGenerateSummary={onGenerateSummary}
-          />
+            className="p-4 border border-gray-800 rounded-lg bg-gray-950/50 hover:bg-gray-900/50 transition-colors cursor-pointer"
+            onClick={() => handleArticleClick(item.id)}
+          >
+            <h3 className="font-medium mb-1 line-clamp-2">{item.title}</h3>
+            <div className="flex justify-between items-center text-sm text-gray-400">
+              <span>{item.source}</span>
+              <span>{format(new Date(item.date), 'h:mm a')}</span>
+            </div>
+          </div>
         ))}
       </div>
     </motion.div>
-  );
-};
-
-// [Analysis] A separate component for showing empty results message
-export const EmptyResultsMessage = () => {
-  return (
-    <div className="text-center py-12">
-      <div className="bg-gray-800/50 rounded-full h-16 w-16 flex items-center justify-center mx-auto mb-4">
-        <AlertTriangle className="h-8 w-8 text-amber-500" />
-      </div>
-      <h3 className="text-xl font-semibold mb-2">No Results Found</h3>
-      <p className="text-gray-400 max-w-md mx-auto">
-        We couldn't find any articles matching your criteria. Try adjusting your filters or search terms.
-      </p>
-    </div>
   );
 };

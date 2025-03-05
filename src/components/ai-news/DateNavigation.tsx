@@ -25,16 +25,12 @@ export const DateNavigation = ({
   onSelectDate,
   loading = false
 }: DateNavigationProps) => {
-  // [Analysis] Animate date changes
+  // [Analysis] Animate date changes for better UX
   const dateVariants = {
     initial: { opacity: 0, y: -10 },
     animate: { opacity: 1, y: 0, transition: { duration: 0.3 } },
     exit: { opacity: 0, y: 10, transition: { duration: 0.2 } }
   };
-
-  // [Analysis] Debug the date range
-  console.log('Date range:', dateRange);
-  console.log('Loading state:', loading);
 
   const handleSelectDateFromCalendar = (date: Date | undefined) => {
     if (date) {
@@ -119,7 +115,7 @@ export const DateNavigation = ({
                 selected={displayDate}
                 onSelect={handleSelectDateFromCalendar}
                 disabled={(date) => {
-                  // Only disable future dates beyond today, allow all past dates
+                  // Only disable future dates beyond today
                   return date > today;
                 }}
                 initialFocus

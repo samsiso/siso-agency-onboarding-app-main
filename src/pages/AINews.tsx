@@ -102,33 +102,39 @@ const AINews = () => {
   console.log('Date range:', dateRange);
   console.log('Loading state:', loading);
 
+  
   // [Analysis] Find featured article with priority on featured flag and then on views
   const featuredArticle = newsItems.find(item => item.featured) || 
     [...newsItems].sort((a, b) => (b.views || 0) - (a.views || 0))[0];
 
+  
   // [Analysis] Handle search query change
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
     setCurrentPage(1); // Reset to first page on new search
   };
 
+  
   // [Analysis] Handle page change
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
 
+  
   // [Analysis] Handle category change
   const handleCategoryChange = (category: string | null) => {
     setSelectedCategory(category);
     setCurrentPage(1); // Reset to first page on category change
   };
 
+  
   // [Analysis] Handle date change through direct date picker
   const handleDateChange = (date: string | null) => {
     setSelectedDate(date);
     setCurrentPage(1); // Reset to first page on date change
   };
 
+  
   // [Analysis] Handle date navigation via date picker
   const handleSelectDate = (date: Date) => {
     if (date) {
@@ -144,6 +150,7 @@ const AINews = () => {
     }
   };
 
+  
   // [Analysis] Handle API test execution with enhanced error tracking
   const handleTestAPI = async () => {
     setApiResponse('');
@@ -180,6 +187,7 @@ const AINews = () => {
     }
   };
 
+  
   // [Analysis] Calculate total pages
   const totalPages = totalCount ? Math.ceil(totalCount / itemsPerPage) : 0;
 
@@ -273,6 +281,7 @@ const AINews = () => {
             <FetchHistoryPanel onRefresh={() => syncNews('artificial intelligence', 30, 'event_registry', false)} />
           </motion.div>
         )}
+        
         
         {showTestPanel && (
           <motion.div
@@ -473,7 +482,7 @@ const AINews = () => {
                               </div>
                               <div className="flex justify-between">
                                 <span className="text-muted-foreground">Active Source</span>
-                                <span className="capitalize">{activeNewsSource}</span>
+                                <span>{activeNewsSource}</span>
                               </div>
                               <div className="flex justify-between">
                                 <span className="text-muted-foreground">Database Articles</span>
@@ -562,6 +571,17 @@ const AINews = () => {
           </motion.div>
         )}
         
+        
+        <DateNavigation 
+          currentDate={currentDate}
+          dateRange={dateRange}
+          onPreviousDay={goToPreviousDay}
+          onNextDay={goToNextDay}
+          onSelectDate={handleSelectDate}
+          loading={loading}
+        />
+        
+        
         <div className="mb-6">
           <div className="w-full">
             <NewsFilters
@@ -575,42 +595,28 @@ const AINews = () => {
           </div>
         </div>
         
-        {/* Date-based Navigation */}
-        <DateNavigation 
-          currentDate={currentDate}
-          dateRange={dateRange}
-          onPreviousDay={goToPreviousDay}
-          onNextDay={goToNextDay}
-          onSelectDate={handleSelectDate}
-          loading={loading}
-        />
+        
+        {showStats && (
+          <DailyStatsOverview 
+            newsItems={newsItems} 
+            lastSync={lastSync}
+            articleCount={articleCount}
+            loading={loading}
+          />
+        )}
+        
+        
+        {featuredArticle && showStats && (
+          <FeaturedNewsHero 
+            article={featuredArticle}
+            onGenerateSummary={generateSummary}
+            summary={summaries[featuredArticle.id] || ""}
+            loadingSummary={loadingSummaries[featuredArticle.id] || false}
+          />
+        )}
+        
         
         <NewsErrorBoundary>
-          {/* Daily Stats Overview - Only show on homepage view with today's articles */}
-          {showStats && (
-            <div className="mb-8">
-              <DailyStatsOverview 
-                newsItems={newsItems} 
-                lastSync={lastSync}
-                articleCount={articleCount}
-                loading={loading}
-              />
-            </div>
-          )}
-          
-          {/* Featured Article - Only show on today's view without filters */}
-          {featuredArticle && showStats && (
-            <div className="mb-8">
-              <FeaturedNewsHero 
-                article={featuredArticle}
-                onGenerateSummary={generateSummary}
-                summary={summaries[featuredArticle.id] || ""}
-                loadingSummary={loadingSummaries[featuredArticle.id] || false}
-              />
-            </div>
-          )}
-          
-          {/* News content with AnimatePresence for smooth transitions */}
           <AnimatePresence mode="wait">
             <motion.div
               key={currentDate.toISOString() + (searchQuery || '') + (selectedCategory || '')}
@@ -620,7 +626,7 @@ const AINews = () => {
               transition={{ duration: 0.3 }}
             >
               {searchQuery ? (
-                // If search query exists, show regular SearchResults
+                
                 <NewsContent
                   newsItems={newsItems}
                   searchQuery={searchQuery}
@@ -632,12 +638,10 @@ const AINews = () => {
                   onLoadMore={refresh}
                 />
               ) : (
-                // Otherwise show date-based content
+                
                 <NewsDateSection
-                  date={currentDate}
-                  items={featuredArticle && showStats ? 
-                    newsItems.filter(item => item.id !== featuredArticle.id) : 
-                    newsItems}
+                  date={format(currentDate, 'yyyy-MM-dd')}
+                  newsItems={newsItems}
                   summaries={summaries}
                   loadingSummaries={loadingSummaries}
                   onGenerateSummary={generateSummary}
@@ -647,7 +651,7 @@ const AINews = () => {
             </motion.div>
           </AnimatePresence>
           
-          {/* Only show pagination when using search or filtering */}
+          
           {searchQuery && totalPages > 1 && (
             <div className="mt-8">
               <NewsPagination 

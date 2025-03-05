@@ -84,6 +84,20 @@ export const ArticleActions = ({
     }
   };
 
+  // [Analysis] Function to share to LinkedIn specifically
+  const handleShareToLinkedIn = () => {
+    if (!newsId) return;
+    
+    const url = encodeURIComponent(`${window.location.origin}/ai-news/${newsId}`);
+    const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
+    window.open(linkedInUrl, '_blank', 'noopener,noreferrer');
+    
+    toast({
+      title: "Sharing to LinkedIn",
+      description: "Opening LinkedIn to share this article"
+    });
+  };
+
   return (
     <div className="space-y-4 mt-4">
       {/* Summary section */}
