@@ -6,16 +6,25 @@ import { CalendarDays } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 
+// [Analysis] Updated interface to include summaries and loading states for AI generation
 interface NewsDateSectionProps {
   date: string;
   newsItems: NewsItem[];
   onViewAll?: () => void;
+  summaries?: Record<string, string>;
+  loadingSummaries?: Record<string, boolean>;
+  onGenerateSummary?: (id: string) => Promise<void>;
+  loading?: boolean;
 }
 
 export const NewsDateSection = ({
   date,
   newsItems,
-  onViewAll
+  onViewAll,
+  summaries = {},
+  loadingSummaries = {},
+  onGenerateSummary,
+  loading = false
 }: NewsDateSectionProps) => {
   const navigate = useNavigate();
   const parsedDate = parseISO(date);
@@ -28,6 +37,7 @@ export const NewsDateSection = ({
     navigate(`/ai-news/${id}`);
   };
   
+  // [Framework] Use motion.div for smooth animations when date changes
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
