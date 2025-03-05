@@ -1,4 +1,3 @@
-
 export interface Category {
   id: string;
   name: string;
@@ -51,9 +50,13 @@ export interface NewsItem {
   summary?: string;
   has_summary?: boolean;
   position?: number;
+  
+  // Enhanced duplicate detection fields
   isDuplicate?: boolean;
   duplicateOf?: string;
   similarity?: number;
+  duplicateGroup?: string;
+  similarArticles?: string[];
   
   // Add missing properties used in components
   impact?: ArticleImpact;
