@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -234,7 +233,7 @@ export const useNewsItems = (
     }
   };
 
-  // [Analysis] New function to fetch news by specific date
+  // [Analysis] New function to fetch news by specific date - with modifications to handle empty dates better
   const fetchNewsByDate = async (date: Date) => {
     try {
       setLoading(true);
@@ -288,34 +287,25 @@ export const useNewsItems = (
         // Update current articles
         setNewsItems(transformedData);
       } else {
-        // If no articles found, store empty array
+        // If no articles found, store empty array - important for navigation
         setNewsByDate(prev => ({
           ...prev,
           [formattedDate]: []
         }));
         
-        // Clear current news items
+        // Clear current news items - we'll show empty state
         setNewsItems([]);
         
-        // Only show toast for initial load, not for date changes
-        if (initialLoading) {
-          toast({
-            title: "No articles found",
-            description: `No articles found for ${format(date, 'MMMM d, yyyy')}. Try another date.`,
-          });
-          
-          // If this is initial load and no articles, try previous day
-          const previousDay = subDays(date, 1);
-          fetchNewsByDate(previousDay);
-          return;
-        }
+        // No need for toast here anymore - we'll show the empty state UI instead
       }
       
-      // Update current date
+      // Always update current date even if empty
       setCurrentDate(date);
       
-      // [Analysis] Fetch associated summaries
-      fetchSummaries();
+      // [Analysis] Fetch associated summaries if any articles exist
+      if (data && data.length > 0) {
+        fetchSummaries();
+      }
     } catch (error) {
       console.error('Error in fetchNewsByDate:', error);
       setError(error as Error);
@@ -329,7 +319,7 @@ export const useNewsItems = (
     }
   };
 
-  // [Analysis] Handle changing to the next day (newer articles)
+  // [Analysis] Handle changing to the next day (newer articles) - modified to allow navigation even with no articles
   const goToNextDay = useCallback(() => {
     const nextDay = addDays(currentDate, 1);
     
@@ -345,7 +335,7 @@ export const useNewsItems = (
     fetchNewsByDate(nextDay);
   }, [currentDate]);
 
-  // [Analysis] Handle changing to the previous day (older articles)
+  // [Analysis] Handle changing to the previous day (older articles) - now allowing all date navigation
   const goToPreviousDay = useCallback(() => {
     const previousDay = subDays(currentDate, 1);
     fetchNewsByDate(previousDay);

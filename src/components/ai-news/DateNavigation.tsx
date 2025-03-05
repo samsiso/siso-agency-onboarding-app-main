@@ -43,6 +43,10 @@ export const DateNavigation = ({
     onSelectDate(date);
   };
 
+  // Use today's date as a default if no date is available
+  const today = new Date();
+  const displayDate = currentDate || today;
+
   return (
     <div className="flex flex-col space-y-2 mb-6">
       <div className="flex items-center justify-between bg-gray-900/30 p-3 rounded-md border border-gray-800">
@@ -59,7 +63,7 @@ export const DateNavigation = ({
 
         <div className="flex flex-col items-center">
           <motion.div
-            key={currentDate.toISOString()}
+            key={displayDate.toISOString()}
             initial="initial"
             animate="animate"
             exit="exit"
@@ -67,10 +71,10 @@ export const DateNavigation = ({
             className="flex items-center gap-2"
           >
             <span className="text-lg font-semibold">
-              {isToday(currentDate) ? 'Today' : format(currentDate, 'EEEE')}
+              {isToday(displayDate) ? 'Today' : format(displayDate, 'EEEE')}
             </span>
             <Badge variant="outline" className="bg-siso-red/10 text-siso-red border-siso-red/20">
-              {format(currentDate, 'MMMM d, yyyy')}
+              {format(displayDate, 'MMMM d, yyyy')}
             </Badge>
           </motion.div>
           
@@ -83,7 +87,7 @@ export const DateNavigation = ({
           variant="outline"
           size="icon"
           onClick={onNextDay}
-          disabled={loading || isToday(currentDate)}
+          disabled={loading || isToday(displayDate)}
           className="h-8 w-8"
         >
           <ChevronRight className="h-4 w-4" />
@@ -108,12 +112,11 @@ export const DateNavigation = ({
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="single"
-                selected={currentDate}
+                selected={displayDate}
                 onSelect={handleSelectDateFromCalendar}
                 disabled={(date) => {
-                  // Only enable dates that are in our date range or today
-                  if (isToday(date)) return false;
-                  return !dateRange.some(dateStr => isSameDay(parseISO(dateStr), date));
+                  // Only disable future dates beyond today, allow all past dates
+                  return date > today;
                 }}
                 initialFocus
               />
@@ -123,7 +126,7 @@ export const DateNavigation = ({
           {dateRange.length > 0 && (
             <Select 
               onValueChange={handleSelectDateFromDropdown}
-              value={format(currentDate, 'yyyy-MM-dd')}
+              value={format(displayDate, 'yyyy-MM-dd')}
               disabled={loading}
             >
               <SelectTrigger className="w-full sm:w-[180px]">
@@ -142,7 +145,7 @@ export const DateNavigation = ({
           )}
         </div>
         
-        {isToday(currentDate) && (
+        {isToday(displayDate) && (
           <Badge variant="outline" className="bg-green-500/10 text-green-400 border-green-500/20">
             Latest News
           </Badge>
