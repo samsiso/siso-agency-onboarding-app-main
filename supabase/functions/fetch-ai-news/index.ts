@@ -36,9 +36,9 @@ serve(async (req) => {
     const { 
       keyword = "artificial intelligence", 
       limit = 50,
-      testMode = true, 
+      testMode = false, // [Analysis] Changed default to false to ensure articles are imported
       source = "event_registry",
-      debug = false // [Analysis] Added debug flag for additional logging
+      debug = true // [Analysis] Added debug flag and enabled it by default
     } = await req.json();
     
     console.log(`Processing request with parameters:`, { keyword, limit, testMode, source, debug });
@@ -111,6 +111,8 @@ serve(async (req) => {
       // Sample an article to log
       if (articles.length > 0) {
         console.log("Sample article:", JSON.stringify(articles[0]));
+      } else {
+        console.log("No articles found, check API parameters and filters");
       }
       
       return new Response(
@@ -208,6 +210,7 @@ async function fetchFromEventRegistry(keyword, limit, debug = false) {
     const url = new URL("https://eventregistry.org/api/v1/article/getArticles");
     
     // [Analysis] Enhanced request body with more specific AI-related keywords and parameters 
+    // but with LOWER threshold for AI relevance to get more results
     const aiKeywords = [
       "artificial intelligence", "ai", "machine learning", "neural network", 
       "deep learning", "llm", "large language model", "chatgpt", "gpt", 
@@ -218,8 +221,12 @@ async function fetchFromEventRegistry(keyword, limit, debug = false) {
       "transformer model", "gpt-4", "llama", "gemini"
     ];
     
-    // Create a combined keyword query
-    const keywordQuery = aiKeywords.join(" OR ");
+    // [Analysis] Simplified keyword query to match more articles
+    let keywordQuery = keyword;
+    if (keyword === "artificial intelligence") {
+      // Use broader terms for the default query
+      keywordQuery = "AI OR artificial intelligence OR machine learning";
+    }
     
     const requestBody = {
       action: "getArticles",
@@ -227,7 +234,7 @@ async function fetchFromEventRegistry(keyword, limit, debug = false) {
       
       // Set additional parameters for quality and freshness
       articlesPage: 1,
-      articlesCount: limit * 2, // Fetch more to allow for filtering
+      articlesCount: limit * 3, // [Analysis] Fetch more to allow for filtering
       articlesSortBy: "date", // Sort by date to get newest articles
       articlesSortByAsc: false,
       articleBodyLen: -1, // Get full article content
@@ -270,12 +277,18 @@ async function fetchFromEventRegistry(keyword, limit, debug = false) {
     
     // Log the raw response for debugging
     if (debug) {
-      console.log("Event Registry API raw response:", JSON.stringify(data, null, 2));
+      console.log("Event Registry API raw response structure:", Object.keys(data));
+      if (data.articles) {
+        console.log("Articles count:", data.articles.results?.length || 0);
+      }
     }
     
     // Check if the response contains articles
     if (!data.articles || !data.articles.results) {
       console.warn("No articles found in Event Registry response");
+      if (debug && data) {
+        console.log("Response data:", JSON.stringify(data, null, 2).substring(0, 1000) + "...");
+      }
       return [];
     }
     
@@ -393,6 +406,39 @@ async function fetchFromEventRegistry(keyword, limit, debug = false) {
         sourceCred = "verified";
       }
       
+      // Generate key takeaways based on article content if body length is sufficient
+      let keyTakeaways = [];
+      if (body && body.length > 200) {
+        // Extract sentences that might contain key points
+        const sentences = body.split(/[.!?]+/).filter(s => s.trim().length > 30);
+        
+        // Look for sentences with indicators of important information
+        const importantPhrases = [
+          "important", "significant", "key", "critical", "essential", "major",
+          "breakthrough", "discovery", "finding", "result", "concluded", "suggests",
+          "according to", "researchers", "scientists", "study shows", "demonstrates"
+        ];
+        
+        const potentialTakeaways = sentences.filter(s => 
+          importantPhrases.some(phrase => s.toLowerCase().includes(phrase))
+        );
+        
+        // Extract up to 5 key takeaways
+        keyTakeaways = potentialTakeaways
+          .slice(0, Math.min(5, potentialTakeaways.length))
+          .map(s => s.trim());
+          
+        // If we couldn't find good sentences based on important phrases,
+        // just use the first few sentences that are of reasonable length
+        if (keyTakeaways.length < 3 && sentences.length > 3) {
+          const additionalSentences = sentences
+            .filter(s => s.length > 50 && s.length < 200)
+            .slice(0, 3 - keyTakeaways.length);
+            
+          keyTakeaways = [...keyTakeaways, ...additionalSentences];
+        }
+      }
+      
       return {
         title: article.title,
         description: article.body ? article.body.substring(0, 300) + "..." : "",
@@ -407,18 +453,37 @@ async function fetchFromEventRegistry(keyword, limit, debug = false) {
         estimated_reading_time: readingTime,
         source_credibility: sourceCred,
         article_type: "news",
-        ai_relevance_score: aiRelevanceScore
+        ai_relevance_score: aiRelevanceScore,
+        key_takeaways: keyTakeaways
       };
     });
     
-    // [Analysis] Filter articles based on enhanced AI relevance score
-    // Sort by AI relevance score and take the top 'limit' articles
+    // Log the number of articles with high AI relevance for debugging
+    const highRelevanceCount = transformedArticles.filter(a => a.ai_relevance_score > 50).length;
+    const mediumRelevanceCount = transformedArticles.filter(a => a.ai_relevance_score > 20 && a.ai_relevance_score <= 50).length;
+    const lowRelevanceCount = transformedArticles.filter(a => a.ai_relevance_score <= 20).length;
+    
+    console.log(`AI relevance distribution: High: ${highRelevanceCount}, Medium: ${mediumRelevanceCount}, Low: ${lowRelevanceCount}`);
+    
+    // [Analysis] Use a lower AI relevance threshold to get more results (20 instead of 30)
     const filteredArticles = transformedArticles
-      .filter(article => article.ai_relevance_score > 30) // Higher threshold for better AI focus
+      .filter(article => article.ai_relevance_score > 15) // Lower threshold for better results
       .sort((a, b) => b.ai_relevance_score - a.ai_relevance_score)
       .slice(0, limit);
     
-    console.log(`Filtered to ${filteredArticles.length} articles with high AI relevance`);
+    console.log(`Filtered to ${filteredArticles.length} articles with AI relevance > 15`);
+    
+    // If we still have no articles, include some with lower relevance as a fallback
+    if (filteredArticles.length === 0 && transformedArticles.length > 0) {
+      console.log("No articles with sufficient AI relevance found, including some with lower relevance");
+      const fallbackArticles = transformedArticles
+        .sort((a, b) => b.ai_relevance_score - a.ai_relevance_score)
+        .slice(0, Math.min(10, transformedArticles.length));
+        
+      console.log(`Adding ${fallbackArticles.length} fallback articles with lower relevance scores`);
+      return fallbackArticles;
+    }
+    
     return filteredArticles;
     
   } catch (error) {
@@ -466,6 +531,7 @@ async function fetchFromNewsAPI(keyword, limit, debug = false) {
     const toDate = today.toISOString().split('T')[0];
     
     // [Analysis] Create a more comprehensive AI query with multiple terms
+    // Using OR instead of AND to get more results
     const aiQueryTerms = [
       "artificial intelligence", "ai", "machine learning", "neural network", 
       "deep learning", "llm", "large language model", "chatgpt", "gpt", 
@@ -483,18 +549,15 @@ async function fetchFromNewsAPI(keyword, limit, debug = false) {
     url.searchParams.append("language", "en");
     url.searchParams.append("pageSize", (limit * 2).toString()); // Fetch more for filtering
     url.searchParams.append("page", "1");
+    url.searchParams.append("apiKey", NEWS_API_KEY);
     
     // Log request for debugging
     if (debug) {
-      console.log("News API request:", url.toString());
+      console.log("News API request:", url.toString().replace(NEWS_API_KEY, "API_KEY_REDACTED"));
     }
     
     // Make the request to News API
-    const response = await fetch(url, {
-      headers: {
-        "X-Api-Key": NEWS_API_KEY,
-      },
-    });
+    const response = await fetch(url.toString());
     
     // Check if the response is OK
     if (!response.ok) {
@@ -508,126 +571,116 @@ async function fetchFromNewsAPI(keyword, limit, debug = false) {
     
     // Log the raw response for debugging
     if (debug) {
-      console.log("News API raw response:", JSON.stringify(data, null, 2));
+      console.log("News API raw response structure:", Object.keys(data));
+      console.log(`News API returned ${data.totalResults} results, status: ${data.status}`);
+      if (data.articles && data.articles.length > 0) {
+        console.log("Sample article:", JSON.stringify(data.articles[0], null, 2));
+      }
     }
     
     // Check if the response contains articles
-    if (!data.articles || !Array.isArray(data.articles)) {
+    if (!data.articles || data.articles.length === 0) {
       console.warn("No articles found in News API response");
       return [];
     }
     
     console.log(`Retrieved ${data.articles.length} raw articles from News API`);
     
-    // Transform and filter articles for better AI relevance
-    const transformedArticles = data.articles.map((article, index) => {
-      // Combine title and description for text analysis
-      const title = article.title?.toLowerCase() || '';
-      const description = article.description?.toLowerCase() || '';
-      const content = article.content?.toLowerCase() || '';
-      const combinedText = `${title} ${description} ${content}`;
+    // Transform the articles to the common format
+    const transformedArticles = data.articles.map(article => {
+      // Extract text for analysis
+      const title = article.title?.toLowerCase() || "";
+      const description = article.description?.toLowerCase() || "";
+      const content = article.content?.toLowerCase() || "";
+      const combinedText = title + " " + description + " " + content;
       
-      // [Analysis] Enhanced AI terms categorization
-      const aiTerms = {
-        core: ["artificial intelligence", "ai", "machine learning", "neural network", "deep learning", 
-              "llm", "large language model", "chatgpt", "gpt", "openai", "gemini", "anthropic"],
-        technical: ["transformer", "parameter", "training", "fine-tuning", "reinforcement learning",
-                  "computer vision", "natural language processing", "nlp", "algorithm", "vector",
-                  "embedding", "token", "tokenizer", "prompt engineering", "model"],
-        applications: ["generative ai", "ai assistant", "ai model", "ai tool", "ai system",
-                     "ai-powered", "ai solution", "ai application"],
-        companies: ["openai", "anthropic", "google deepmind", "microsoft ai", "meta ai", "stability ai",
-                  "hugging face", "nvidia ai", "cohere", "claude"]
-      };
+      // [Analysis] Similar AI relevance scoring as Event Registry
+      const aiTerms = [
+        "artificial intelligence", "ai", "machine learning", "neural network", 
+        "deep learning", "llm", "large language model", "chatgpt", "gpt",
+        "transformer", "model", "generative", "algorithm"
+      ];
       
-      // Combine all terms for checking
-      const allAiTerms = [...aiTerms.core, ...aiTerms.technical, ...aiTerms.applications, ...aiTerms.companies];
-      
-      // [Analysis] Calculate an enhanced AI relevance score (0-100) with weighted categories
+      // Calculate AI relevance score - simpler for News API
       let aiRelevanceScore = 0;
       
-      // Check title for AI terms (higher weight for title matches)
-      aiTerms.core.forEach(term => {
-        if (title.includes(term)) aiRelevanceScore += 20;
-        if (combinedText.includes(term)) aiRelevanceScore += 5;
-      });
-      
-      aiTerms.technical.forEach(term => {
+      // Check for AI terms in title and content
+      aiTerms.forEach(term => {
         if (title.includes(term)) aiRelevanceScore += 15;
-        if (combinedText.includes(term)) aiRelevanceScore += 3;
+        if (description.includes(term)) aiRelevanceScore += 5;
+        if (content.includes(term)) aiRelevanceScore += 3;
       });
       
-      aiTerms.applications.forEach(term => {
-        if (title.includes(term)) aiRelevanceScore += 15;
-        if (combinedText.includes(term)) aiRelevanceScore += 3;
-      });
-      
-      aiTerms.companies.forEach(term => {
-        if (title.includes(term)) aiRelevanceScore += 10;
-        if (combinedText.includes(term)) aiRelevanceScore += 2;
-      });
-      
-      // Count how many AI terms appear
-      const termCount = allAiTerms.filter(term => combinedText.includes(term)).length;
-      aiRelevanceScore += Math.min(20, termCount * 2); // Up to 20 points for term diversity
-      
-      // Check for term proximity (terms appearing close together)
-      const termProximity = checkTermProximity(combinedText, allAiTerms);
-      aiRelevanceScore += termProximity * 10; // Up to 10 points for term proximity
+      // Count unique AI terms for term diversity
+      const uniqueTermsCount = aiTerms.filter(term => combinedText.includes(term)).length;
+      aiRelevanceScore += uniqueTermsCount * 5;
       
       // Cap at 100
       aiRelevanceScore = Math.min(100, aiRelevanceScore);
       
-      // Determine category based on content with enhanced specificity
-      let category = determineEnhancedCategory(title, description, []);
-      
-      // Determine impact based on title
+      // Determine impact and technical complexity
       let impact = "medium";
-      const highImpactTerms = ["revolutionary", "breakthrough", "major", "groundbreaking", "transformative"];
-      const lowImpactTerms = ["minor", "incremental", "small", "modest"];
+      let technicalComplexity = "intermediate";
       
-      if (highImpactTerms.some(term => title.includes(term))) {
+      // Set impact based on title keywords
+      if (title.includes("breakthrough") || title.includes("revolutionary")) {
         impact = "high";
-      } else if (lowImpactTerms.some(term => title.includes(term))) {
-        impact = "low";
       }
       
-      // Calculate reading time based on content length
-      const contentText = article.content || article.description || "";
-      const wordCount = contentText.split(/\s+/).length;
-      const readingTime = Math.max(1, Math.ceil(wordCount / 200));
-      
-      // Determine technical complexity
-      const technicalTerms = ["algorithm", "neural network", "parameters", "training", "dataset", 
-                             "tensor", "vector", "gradient", "optimization", "architecture"];
-      const technicalCount = technicalTerms.reduce((count, term) => {
-        return count + ((combinedText.match(new RegExp(term, 'g')) || []).length);
-      }, 0);
-      
-      let technicalComplexity;
-      if (technicalCount > 8) {
+      // Set technical complexity based on content keywords
+      const technicalTerms = ["algorithm", "architecture", "parameters", "training", "framework"];
+      if (technicalTerms.some(term => combinedText.includes(term))) {
         technicalComplexity = "advanced";
-      } else if (technicalCount > 4) {
-        technicalComplexity = "intermediate";
-      } else {
-        technicalComplexity = "basic";
       }
       
-      // Extract domain for source with credibility check
-      const source = article.source?.name || extractDomainFromUrl(article.url);
-      
-      // Determine source credibility
-      let sourceCred = "standard";
-      const credibleAiSources = [
-        "arxiv", "ai.googleblog", "openai.com", "deepmind", "distill.pub", "ai.facebook.com",
-        "microsoft research", "nature", "science", "ieee", "mit technology review",
-        "stanford.edu", "berkeley.edu", "oxford.ac.uk", "cam.ac.uk", "anthropic.com",
-        "ai.meta.com", "huggingface.co", "nvidia.com/ai"
+      // Determine category based on content
+      const categoryMapping = [
+        { terms: ["chatgpt", "gpt", "llm", "language model"], category: "language_models" },
+        { terms: ["robot", "automation", "manufacturing"], category: "robotics_automation" },
+        { terms: ["business", "industry", "enterprise", "company"], category: "industry_applications" },
+        { terms: ["research", "paper", "breakthrough", "scientist"], category: "breakthrough_technologies" },
+        { terms: ["global", "country", "nation", "worldwide"], category: "international_developments" }
       ];
       
+      let category = "breakthrough_technologies"; // Default category
+      
+      // Find the best matching category
+      let maxMatches = 0;
+      categoryMapping.forEach(mapping => {
+        const matches = mapping.terms.filter(term => combinedText.includes(term)).length;
+        if (matches > maxMatches) {
+          maxMatches = matches;
+          category = mapping.category;
+        }
+      });
+      
+      // Extract domain from URL for source
       const sourceUrl = article.url || "";
-      if (credibleAiSources.some(s => sourceUrl.includes(s))) {
-        sourceCred = "verified";
+      const source = article.source?.name || extractDomainFromUrl(sourceUrl) || "Unknown";
+      
+      // Calculate reading time
+      const wordCount = ((article.content || "") + (article.description || "")).split(/\s+/).length;
+      const readingTime = Math.max(1, Math.ceil(wordCount / 200));
+      
+      // Generate key takeaways from the content and description
+      let keyTakeaways = [];
+      if (article.description) {
+        keyTakeaways.push(article.description);
+      }
+      
+      if (article.content) {
+        // Extract some sentences from content
+        const contentSentences = (article.content || "")
+          .split(/[.!?]+/)
+          .filter(s => s.trim().length > 30)
+          .slice(0, 2);
+          
+        keyTakeaways = [...keyTakeaways, ...contentSentences];
+      }
+      
+      // Ensure we have at least one takeaway
+      if (keyTakeaways.length === 0 && title) {
+        keyTakeaways = [title];
       }
       
       return {
@@ -638,25 +691,33 @@ async function fetchFromNewsAPI(keyword, limit, debug = false) {
         image_url: article.urlToImage || "",
         source: source,
         date: article.publishedAt ? article.publishedAt.split('T')[0] : new Date().toISOString().split('T')[0],
-        category,
-        impact,
+        category: category,
+        impact: impact,
         technical_complexity: technicalComplexity,
         estimated_reading_time: readingTime,
-        source_credibility: sourceCred,
+        source_credibility: "standard",
         article_type: "news",
         ai_relevance_score: aiRelevanceScore,
-        featured: (index === 0) // Feature first article
+        key_takeaways: keyTakeaways
       };
     });
     
-    // [Analysis] Filter articles based on enhanced AI relevance score
-    // Sort by AI relevance score and take the top 'limit' articles
+    // Filter articles by AI relevance
     const filteredArticles = transformedArticles
-      .filter(article => article.ai_relevance_score > 30) // Higher threshold for better AI focus
+      .filter(article => article.ai_relevance_score > 20) // Lower threshold for News API
       .sort((a, b) => b.ai_relevance_score - a.ai_relevance_score)
       .slice(0, limit);
+      
+    console.log(`Filtered to ${filteredArticles.length} articles with AI relevance > 20`);
     
-    console.log(`Filtered to ${filteredArticles.length} articles with high AI relevance`);
+    // If we still have no articles, include some with lower relevance
+    if (filteredArticles.length === 0 && transformedArticles.length > 0) {
+      console.log("No articles with sufficient AI relevance found, including some with lower relevance");
+      return transformedArticles
+        .sort((a, b) => b.ai_relevance_score - a.ai_relevance_score)
+        .slice(0, Math.min(10, transformedArticles.length));
+    }
+    
     return filteredArticles;
     
   } catch (error) {
@@ -665,190 +726,235 @@ async function fetchFromNewsAPI(keyword, limit, debug = false) {
   }
 }
 
-// [Analysis] Helper function to extract domain from URL
+// [Analysis] Helper to extract domain from URL
 function extractDomainFromUrl(url) {
   if (!url) return null;
   try {
     const hostname = new URL(url).hostname;
     return hostname.replace(/^www\./, '');
   } catch (e) {
-    console.error("Error extracting domain from URL:", e);
     return null;
   }
 }
 
-// [Analysis] Enhanced category determination with more AI-specific categories
-function determineEnhancedCategory(title, content, apiCategories) {
-  title = title.toLowerCase();
-  content = content.toLowerCase();
+// [Analysis] Helper to determine the category of an article
+function determineEnhancedCategory(title, body, concepts) {
+  const combinedText = (title + ' ' + body).toLowerCase();
   
-  // Default category
-  let category = "breakthrough_technologies";
+  // Check for specific categories based on keywords
+  const categoryMappings = [
+    {
+      category: 'language_models',
+      keywords: ['llm', 'language model', 'chatgpt', 'gpt', 'chat ai', 'chatbot', 'llama', 'claude', 'mistral', 'text generation', 'transformer', 'attention mechanism']
+    },
+    {
+      category: 'breakthrough_technologies',
+      keywords: ['breakthrough', 'research', 'paper', 'science', 'discovery', 'novel', 'innovation', 'cutting-edge', 'state-of-the-art', 'sota', 'advancement']
+    },
+    {
+      category: 'robotics_automation',
+      keywords: ['robot', 'robotics', 'automation', 'autonomous', 'self-driving', 'drone', 'manufacturing', 'industrial ai', 'mechanical', 'factory']
+    },
+    {
+      category: 'industry_applications',
+      keywords: ['business', 'enterprise', 'industry', 'company', 'corporate', 'commercial', 'application', 'solution', 'product', 'service', 'market', 'customer']
+    },
+    {
+      category: 'international_developments',
+      keywords: ['global', 'international', 'country', 'nation', 'worldwide', 'regulation', 'policy', 'government', 'law', 'china', 'europe', 'usa', 'india']
+    }
+  ];
+
+  // Count keyword matches for each category
+  const scores = {};
+  categoryMappings.forEach(mapping => {
+    scores[mapping.category] = 0;
+    mapping.keywords.forEach(keyword => {
+      if (combinedText.includes(keyword)) {
+        scores[mapping.category] += 1;
+        
+        // Extra points if the keyword appears in the title
+        if (title.toLowerCase().includes(keyword)) {
+          scores[mapping.category] += 2;
+        }
+      }
+    });
+  });
   
-  // Check for more specific AI categories
-  const categoryIndicators = {
-    "language_models": ["llm", "large language model", "chatgpt", "gpt", "transformer", "bert", "prompt", "text generation"],
-    "robotics_automation": ["robot", "automation", "autonomous", "self-driving", "drone", "manufacturing"],
-    "industry_applications": ["business", "company", "startup", "industry", "market", "enterprise", "corporate"],
-    "research_papers": ["research", "study", "paper", "university", "researchers", "published", "journal"],
-    "ai_ethics": ["ethics", "bias", "policy", "regulation", "governance", "safety", "responsible ai", "fairness"],
-    "international_developments": ["china", "europe", "global", "international", "country", "nation", "worldwide"]
-  };
+  // Add points based on concepts from Event Registry if available
+  if (concepts && concepts.length > 0) {
+    concepts.forEach(concept => {
+      const conceptName = concept.uri || concept.name || "";
+      if (!conceptName) return;
+      
+      const lowerConcept = conceptName.toLowerCase();
+      
+      // Map concepts to categories
+      if (lowerConcept.includes('language') || lowerConcept.includes('gpt') || lowerConcept.includes('chat')) {
+        scores['language_models'] += 3;
+      } else if (lowerConcept.includes('robot') || lowerConcept.includes('automat')) {
+        scores['robotics_automation'] += 3;
+      } else if (lowerConcept.includes('business') || lowerConcept.includes('industry') || lowerConcept.includes('market')) {
+        scores['industry_applications'] += 3;
+      } else if (lowerConcept.includes('research') || lowerConcept.includes('science') || lowerConcept.includes('tech')) {
+        scores['breakthrough_technologies'] += 3;
+      } else if (lowerConcept.includes('global') || lowerConcept.includes('country') || lowerConcept.includes('govern')) {
+        scores['international_developments'] += 3;
+      }
+    });
+  }
+
+  // Find the category with the highest score
+  let bestCategory = 'breakthrough_technologies'; // Default
+  let highestScore = 0;
   
-  // Check for category indicators in the title and content
-  for (const [cat, indicators] of Object.entries(categoryIndicators)) {
-    if (indicators.some(indicator => title.includes(indicator)) || 
-        indicators.some(indicator => content.includes(indicator))) {
-      category = cat;
-      break;
+  for (const [category, score] of Object.entries(scores)) {
+    if (score > highestScore) {
+      highestScore = score;
+      bestCategory = category;
     }
   }
   
-  // Try to use API categories if available
-  if (apiCategories && apiCategories.length > 0) {
-    const categoryStr = JSON.stringify(apiCategories).toLowerCase();
-    
-    if (categoryStr.includes("research") || categoryStr.includes("science")) {
-      category = "research_papers";
-    } else if (categoryStr.includes("business") || categoryStr.includes("economy")) {
-      category = "industry_applications";
-    } else if (categoryStr.includes("ethics") || categoryStr.includes("policy")) {
-      category = "ai_ethics";
-    } else if (categoryStr.includes("international") || categoryStr.includes("global")) {
-      category = "international_developments";
-    } else if (categoryStr.includes("robot") || categoryStr.includes("autonomous")) {
-      category = "robotics_automation";
-    } else if (categoryStr.includes("language") || categoryStr.includes("nlp")) {
-      category = "language_models";
-    }
-  }
-  
-  return category;
+  return bestCategory;
 }
 
-// [Analysis] Function to save articles to the database
+// [Analysis] Function to save articles to the database with better error handling and insertion logic
 async function saveArticlesToDatabase(articles) {
-  console.log(`Attempting to save ${articles.length} articles to the database`);
-  
-  if (!articles || articles.length === 0) {
-    return {
+  try {
+    if (!articles || articles.length === 0) {
+      return { 
+        success: true, 
+        message: "No articles to save", 
+        count: 0 
+      };
+    }
+    
+    console.log(`Attempting to save ${articles.length} articles to database`);
+    
+    // Map articles to the database schema
+    const articlesToInsert = articles.map(article => {
+      const today = new Date().toISOString().split('T')[0];
+      
+      return {
+        title: article.title,
+        description: article.description || "",
+        content: article.content || article.description || "",
+        date: article.date || today,
+        url: article.url || null,
+        image_url: article.image_url || null,
+        source: article.source || "Unknown",
+        category: article.category || "breakthrough_technologies",
+        status: "published",
+        article_type: "news",
+        technical_complexity: article.technical_complexity || "intermediate",
+        impact: article.impact || "medium",
+        source_credibility: article.source_credibility || "standard",
+        key_takeaways: article.key_takeaways || [],
+        reading_time: article.estimated_reading_time || 5,
+        publish_date: today,
+        created_at: new Date().toISOString()
+      };
+    });
+    
+    // Collect insertion results and errors
+    const results = {
       success: true,
-      message: "No articles to import",
+      message: "",
       count: 0,
       errors: []
     };
-  }
-  
-  const successfulImports = [];
-  const errors = [];
-  
-  // Update the last_fetched timestamp in the news_sources table first
-  try {
-    const source_type = articles[0].source.toLowerCase().includes('eventregistry') ? 'event_registry' : 'news_api';
     
-    const { error: sourceUpdateError } = await supabase
-      .from('news_sources')
-      .upsert([
-        {
-          source_type: source_type,
-          last_fetched_at: new Date().toISOString()
-        }
-      ]);
+    // Insert articles in batches to avoid potential RPC errors with large payloads
+    const batchSize = 10;
+    const batches = [];
     
-    if (sourceUpdateError) {
-      console.warn("Could not update news_sources timestamp:", sourceUpdateError);
-      // Continue with the import even if we couldn't update the timestamp
+    for (let i = 0; i < articlesToInsert.length; i += batchSize) {
+      batches.push(articlesToInsert.slice(i, i + batchSize));
     }
     
-    // Process each article and import it to the database
-    for (const article of articles) {
+    console.log(`Inserting articles in ${batches.length} batches of up to ${batchSize} articles each`);
+    
+    for (let i = 0; i < batches.length; i++) {
+      const batch = batches[i];
+      console.log(`Processing batch ${i+1}/${batches.length} with ${batch.length} articles`);
+      
       try {
-        // Check for duplicates - don't import the same article twice
-        const { data: existingArticle, error: duplicateCheckError } = await supabase
-          .from('ai_news')
-          .select('id, title, url')
-          .or(`title.eq."${article.title}",url.eq."${article.url}"`)
-          .maybeSingle();
-        
-        if (duplicateCheckError) {
-          console.warn("Error checking for duplicates:", duplicateCheckError);
-        }
-        
-        if (existingArticle) {
-          // Skip importing duplicate articles
-          console.log(`Skipping duplicate article: ${article.title}`);
-          errors.push({
-            title: article.title,
-            error: "Duplicate article"
-          });
-          continue;
-        }
-        
-        // Prepare the article data for insertion
-        const articleData = {
-          title: article.title,
-          description: article.description,
-          content: article.content,
-          date: article.date,
-          category: article.category,
-          article_type: article.article_type || 'news',
-          image_url: article.image_url,
-          source: article.source,
-          url: article.url,
-          source_credibility: article.source_credibility,
-          technical_complexity: article.technical_complexity,
-          impact: article.impact,
-          estimated_reading_time: article.estimated_reading_time,
-          featured: article.featured || false,
-          // Additional AI-specific metadata
-          status: 'published',
-          created_at: new Date().toISOString(),
-          // Optional fields if available
-          views: 0,
-          bookmarks: 0
-        };
-        
-        // Insert the article into the database
         const { data, error } = await supabase
           .from('ai_news')
-          .insert([articleData])
-          .select('id')
-          .single();
-        
+          .insert(batch)
+          .select('id');
+          
         if (error) {
-          console.error("Error inserting article:", error);
-          errors.push({
-            title: article.title,
-            error: error.message
+          console.error(`Error inserting batch ${i+1}:`, error);
+          results.errors.push({ 
+            batch: i + 1, 
+            error: error.message,
+            articleCount: batch.length
           });
-          continue;
+          
+          // Try inserting one by one to salvage articles that don't have issues
+          console.log(`Attempting individual inserts for batch ${i+1}`);
+          for (let j = 0; j < batch.length; j++) {
+            try {
+              const { data: singleData, error: singleError } = await supabase
+                .from('ai_news')
+                .insert([batch[j]])
+                .select('id');
+                
+              if (singleError) {
+                console.error(`Error inserting article ${j+1} in batch ${i+1}:`, singleError);
+                results.errors.push({ 
+                  batch: i + 1, 
+                  article: j + 1,
+                  error: singleError.message 
+                });
+              } else if (singleData && singleData.length > 0) {
+                results.count++;
+              }
+            } catch (itemError) {
+              console.error(`Exception inserting article ${j+1} in batch ${i+1}:`, itemError);
+              results.errors.push({ 
+                batch: i + 1, 
+                article: j + 1,
+                error: itemError.message 
+              });
+            }
+          }
+        } else if (data) {
+          results.count += data.length;
+          console.log(`Successfully inserted ${data.length} articles from batch ${i+1}`);
         }
-        
-        console.log(`Successfully imported article: ${article.title}`);
-        successfulImports.push(data.id);
-        
-      } catch (error) {
-        console.error("Error processing article for database:", error);
-        errors.push({
-          error: error.message
+      } catch (batchError) {
+        console.error(`Exception processing batch ${i+1}:`, batchError);
+        results.errors.push({ 
+          batch: i + 1, 
+          error: batchError.message,
+          articleCount: batch.length
         });
+        
+        // Continue with other batches despite errors
       }
     }
     
-    return {
-      success: true,
-      message: `Successfully imported ${successfulImports.length} articles`,
-      count: successfulImports.length,
-      errors: errors
-    };
+    // Set success message based on results
+    if (results.count === 0 && results.errors.length > 0) {
+      results.success = false;
+      results.message = `Failed to insert any articles. ${results.errors.length} errors occurred.`;
+    } else if (results.count < articlesToInsert.length) {
+      results.message = `Partially successful: Inserted ${results.count} out of ${articlesToInsert.length} articles. ${results.errors.length} errors occurred.`;
+    } else {
+      results.message = `Successfully inserted all ${results.count} articles.`;
+    }
+    
+    return results;
     
   } catch (error) {
-    console.error("Error in article import process:", error);
+    console.error("Error in saveArticlesToDatabase:", error);
     return {
       success: false,
-      message: `Error importing articles: ${error.message}`,
-      count: successfulImports.length,
-      errors: [...errors, { error: error.message }]
+      message: `Database error: ${error.message}`,
+      count: 0,
+      errors: [{ error: error.message }]
     };
   }
 }
