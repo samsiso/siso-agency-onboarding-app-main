@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNewsItems } from '@/hooks/useNewsItems';
 import NewsFilters from '@/components/ai-news/NewsFilters';
@@ -8,7 +9,6 @@ import { NewsErrorBoundary } from '@/components/ai-news/NewsErrorBoundary';
 import { DailyStatsOverview } from '@/components/ai-news/DailyStatsOverview';
 import { DateNavigation } from '@/components/ai-news/DateNavigation';
 import { NewsDateSection } from '@/components/ai-news/NewsDateSection';
-import { FetchHistoryPanel } from '@/components/ai-news/FetchHistoryPanel';
 import { Helmet } from 'react-helmet';
 import { Sidebar } from '@/components/Sidebar';
 import NewsPagination from '@/components/ai-news/NewsPagination';
@@ -61,10 +61,11 @@ const AINews = () => {
   const [apiResponse, setApiResponse] = useState<string>('');
   const [isApiResponseOpen, setIsApiResponseOpen] = useState(false);
   const [testMode, setTestMode] = useState(true); // Added state for test mode
-  const itemsPerPage = 12; // Same as PAGE_SIZE in useNewsItems
 
-  // Added a new state to control the fetch history panel visibility
+  // Control toggle for fetch history panel visibility - now defaulting to false
   const [showFetchHistory, setShowFetchHistory] = useState(false);
+  
+  const itemsPerPage = 12; // Same as PAGE_SIZE in useNewsItems
 
   const { 
     newsItems, 
@@ -191,7 +192,7 @@ const AINews = () => {
   // [Analysis] Calculate total pages
   const totalPages = totalCount ? Math.ceil(totalCount / itemsPerPage) : 0;
 
-  // Determine when to show the stats
+  // Determine when to show the stats - we'll pass this to NewsHeader instead of using duplicate components
   const showStats = isToday(currentDate) && !searchQuery && !selectedCategory;
 
   // [Analysis] Added here to handle tab state for NewsHeader component
@@ -222,6 +223,18 @@ const AINews = () => {
             title="AI News" 
             activeTab={activeTab} 
             onTabChange={handleTabChange}
+            searchQuery={searchQuery}
+            onSearchChange={handleSearchChange}
+            showStats={false} // Don't show stats here - it's creating duplicates
+            showApiStatus={false} // Don't show API status here - it's creating duplicates
+            showFetchHistory={false} // Don't show fetch history here - it's creating duplicates
+            newsItems={newsItems}
+            lastSync={lastSync}
+            articleCount={articleCount}
+            apiUsage={apiUsage}
+            syncingNews={syncingNews}
+            activeNewsSource={activeNewsSource}
+            syncNews={syncNews}
           />
           <div className="flex items-center gap-2">
             <Popover>
@@ -614,6 +627,7 @@ const AINews = () => {
         </div>
         
         
+        {/* Show the DailyStatsOverview component here if needed */}
         {showStats && (
           <DailyStatsOverview 
             newsItems={newsItems} 

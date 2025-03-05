@@ -1,143 +1,48 @@
-export type ArticleImpact = 'high' | 'medium' | 'low';
-
-export type TechnicalComplexity = 'basic' | 'intermediate' | 'advanced' | 'mixed';
-
-export type ContentCategory = 
-  | 'breakthrough_technologies'
-  | 'language_models'
-  | 'robotics_automation'
-  | 'industry_applications'
-  | 'international_developments';
-
-export interface AIAnalysis {
-  market_impact: string | null;
-  technical_predictions: string[];
-  related_technologies: string[];
-  business_implications: string | null;
-}
-
-export interface DetailedMetadata {
-  research_papers: string[];
-  industry_reports: string[];
-  expert_quotes: string[];
-  market_data: string[];
-}
-
-export interface ImplementationTimeline {
-  short_term: string[];
-  medium_term: string[];
-  long_term: string[];
-}
-
-export interface MarketAnalysis {
-  market_size: string | null;
-  growth_projections: string | null;
-  competitive_landscape: string[];
-  investment_metrics: Record<string, any>;
-}
-
-export interface ArticleSection {
+export interface Category {
   id: string;
-  title: string;
-  content: string;
-  order_index: number;
-  section_order: number;
-  technical_complexity: TechnicalComplexity;
-  importance_level: string;
-  subsection_type: string;
-  source_references: Record<string, any>;
-  created_at: string;
-  updated_at: string;
-  last_updated?: string;
-  article_id: string;
-  overview?: string;
-  key_details?: string[];
-  bullet_points?: string[];
-  implications?: string[];
-  related_topics?: string[];
-  key_figures?: Record<string, any>;
-  reading_time_minutes?: number;
-  category?: string;
-  is_featured?: boolean;
-  metadata?: Record<string, any>;
-  // New fields
-  ai_analysis?: AIAnalysis;
-  detailed_metadata?: DetailedMetadata;
-  implementation_timeline?: ImplementationTimeline;
-  market_analysis?: MarketAnalysis;
-}
-
-export interface ArticleTag {
-  id: string;
-  tag: string;
-  created_at: string;
-}
-
-export interface EnhancedNewsItem {
-  id: string;
-  title: string;
+  name: string;
   description: string;
-  content: string;
-  date: string;
-  category: ContentCategory;
-  technical_complexity: TechnicalComplexity;
-  impact: ArticleImpact;
-  estimated_reading_time: number;
-  key_takeaways: string[];
-  related_articles: Array<{
-    id: string;
-    title: string;
-    description: string;
-  }>;
-  table_of_contents: Array<{
-    id: string;
-    title: string;
-    level: number;
-  }>;
-  technical_details: Record<string, any>;
-  source_credibility: string;
-  tags: ArticleTag[];
-  sections: ArticleSection[];
   image_url?: string;
-  views: number;
-  source: string;
-  sources: any[];
-  url?: string; // Added missing url property
 }
 
-// [Analysis] Added NewsItem type to represent the structure of news items
-// from the database which is different from EnhancedNewsItem
 export interface NewsItem {
   id: string;
   title: string;
   description: string;
   content: string;
-  date: string;
-  category: string;
-  article_type: string;
-  created_at: string;
-  author_id: string;
-  image_url: string;
+  categories?: string[];
+  url: string;
+  image_url?: string;
+  thumbnail_url?: string;
   source: string;
-  source_credibility: string;
-  technical_complexity: string;
-  impact: string;
-  views: number;
-  bookmarks: number;
-  reading_time: number;
-  featured: boolean;
-  profiles?: {
-    full_name: string;
-    avatar_url: string;
-  };
-  // [Analysis] Added missing properties causing TypeScript errors
-  template_type?: string; 
-  status?: string;
-  tags?: string[] | ArticleTag[];
-  url?: string; 
-  content_blocks?: any; 
-  cover_image?: string; 
-  banner_template_id?: string; 
-  estimated_reading_time?: number;
-  isDuplicate?: boolean; // Added this property to fix the TypeScript errors
+  source_icon?: string;
+  date?: string;
+  published_at?: string;
+  author?: string;
+  views?: number;
+  comments?: number;
+  likes?: number;
+  saves?: number;
+  featured?: boolean;
+  sentiment?: 'positive' | 'negative' | 'neutral';
+  summary?: string;
+  has_summary?: boolean;
+  position?: number;
+  isDuplicate?: boolean; // Added here
+  duplicateOf?: string; // Optional reference to the original article
+  similarity?: number; // Optional similarity score
+}
+
+export interface Summary {
+  id: string;
+  article_id: string;
+  summary: string;
+  created_at: string;
+}
+
+export interface Views {
+  id: string;
+  article_id: string;
+  count: number;
+  created_at: string;
 }

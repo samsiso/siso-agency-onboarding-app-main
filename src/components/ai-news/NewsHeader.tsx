@@ -4,7 +4,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { NewsSearchSection } from './NewsSearchSection';
-import { Calendar, Search, RefreshCw, Info } from 'lucide-react'; // Changed Sync to RefreshCw
+import { Calendar, Search, RefreshCw, Info } from 'lucide-react';
 import { DailyStatsOverview } from './DailyStatsOverview';
 import { NewsApiStatus } from './NewsApiStatus';
 import { FetchHistoryPanel } from './FetchHistoryPanel';
@@ -19,6 +19,15 @@ interface NewsHeaderProps {
   showStats?: boolean;
   showApiStatus?: boolean;
   showFetchHistory?: boolean;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
+  newsItems?: NewsItem[];
+  lastSync?: string | null;
+  articleCount?: number;
+  apiUsage?: number;
+  syncingNews?: boolean;
+  activeNewsSource?: 'event_registry' | 'news_api';
+  syncNews?: (keyword?: string, limit?: number, source?: 'event_registry' | 'news_api', testOnly?: boolean, skipDuplicates?: boolean) => Promise<any>;
 }
 
 export function NewsHeader({
@@ -28,28 +37,27 @@ export function NewsHeader({
   showStats = true,
   showApiStatus = true,
   showFetchHistory = true,
+  searchQuery = '',
+  onSearchChange = () => {},
+  newsItems = [],
+  lastSync = null,
+  articleCount = 0,
+  apiUsage = 0,
+  syncingNews = false,
+  activeNewsSource = 'event_registry',
+  syncNews = async () => ({})
 }: NewsHeaderProps) {
   const [showDuplicatesDialog, setShowDuplicatesDialog] = useState(false);
-  const [searchQuery, setSearchQuery] = useState(''); // Added for NewsSearchSection props
-  const { 
-    newsItems, 
-    syncingNews, 
-    syncNews, 
-    syncResult, 
-    testFetchNews,
-    activeNewsSource,
-    lastSync,
-    apiUsage,
-    articleCount
-  } = useNewsItems(null);
   
   const handleSearchChange = (query: string) => {
-    setSearchQuery(query);
+    if (onSearchChange) {
+      onSearchChange(query);
+    }
   };
   
   const handleTestFetch = async () => {
     try {
-      await testFetchNews("artificial intelligence", 10, activeNewsSource);
+      await syncNews("artificial intelligence", 10, activeNewsSource, true);
       setShowDuplicatesDialog(true);
     } catch (error) {
       console.error("Error testing news fetch:", error);
@@ -61,7 +69,7 @@ export function NewsHeader({
   };
   
   return (
-    <div className="space-y-8 mb-8">
+    <div className="space-y-8 mb-8 w-full">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold">{title}</h1>
@@ -116,7 +124,7 @@ export function NewsHeader({
       </div>
       
       {/* Conditional rendering for DailyStatsOverview */}
-      {showStats && (
+      {showStats && newsItems.length > 0 && (
         <DailyStatsOverview 
           newsItems={newsItems} 
           lastSync={lastSync}
@@ -150,7 +158,7 @@ export function NewsHeader({
         open={showDuplicatesDialog}
         onClose={() => setShowDuplicatesDialog(false)}
         onRefresh={handleTestFetch}
-        articles={syncResult?.articles || []}
+        articles={[]}
         loading={syncingNews}
         onImport={handleImport}
       />
