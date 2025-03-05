@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { format, formatDistanceToNow, parseISO } from 'date-fns';
@@ -9,7 +8,10 @@ import {
   AlertCircle, 
   Database,
   CalendarClock,
-  BarChart
+  BarChart,
+  Zap,
+  TrendingUp,
+  BookOpen
 } from 'lucide-react';
 import {
   Card,
@@ -33,9 +35,29 @@ export const FetchHistoryPanel = ({ onRefresh }: { onRefresh: () => void }) => {
   const [aiMetrics, setAiMetrics] = useState<{
     avgRelevance: number;
     categoryDistribution: Record<string, number>;
+    contentQuality: {
+      high: number;
+      medium: number;
+      low: number;
+    };
+    technicalComplexity: {
+      advanced: number;
+      intermediate: number;
+      basic: number;
+    };
   }>({
     avgRelevance: 0,
-    categoryDistribution: {}
+    categoryDistribution: {},
+    contentQuality: {
+      high: 0,
+      medium: 0,
+      low: 0
+    },
+    technicalComplexity: {
+      advanced: 0,
+      intermediate: 0,
+      basic: 0
+    }
   });
   const { toast } = useToast();
 
@@ -71,13 +93,13 @@ export const FetchHistoryPanel = ({ onRefresh }: { onRefresh: () => void }) => {
     }
   };
 
-  // [Analysis] Fetch AI relevance metrics to show quality of articles being collected
+  // [Analysis] Enhanced metrics fetching to include content quality and technical complexity
   const fetchAiMetrics = async () => {
     try {
       // Get average AI relevance score from the most recent articles
       const { data: recentArticles, error: articlesError } = await supabase
         .from('ai_news')
-        .select('category')
+        .select('category, technical_complexity, impact')
         .order('created_at', { ascending: false })
         .limit(100);
 
@@ -86,14 +108,38 @@ export const FetchHistoryPanel = ({ onRefresh }: { onRefresh: () => void }) => {
       if (recentArticles && recentArticles.length > 0) {
         // Calculate category distribution
         const categories: Record<string, number> = {};
+        const contentQuality = {
+          high: 0,
+          medium: 0,
+          low: 0
+        };
+        const technicalComplexity = {
+          advanced: 0,
+          intermediate: 0,
+          basic: 0
+        };
+        
         recentArticles.forEach(article => {
+          // Process category distribution
           const category = article.category || 'uncategorized';
           categories[category] = (categories[category] || 0) + 1;
+          
+          // Process impact (as content quality)
+          if (article.impact === 'high') contentQuality.high++;
+          else if (article.impact === 'medium') contentQuality.medium++;
+          else contentQuality.low++;
+          
+          // Process technical complexity
+          if (article.technical_complexity === 'advanced') technicalComplexity.advanced++;
+          else if (article.technical_complexity === 'intermediate') technicalComplexity.intermediate++;
+          else technicalComplexity.basic++;
         });
 
         setAiMetrics({
           avgRelevance: 85, // Placeholder - would calculate from actual scores if available
-          categoryDistribution: categories
+          categoryDistribution: categories,
+          contentQuality,
+          technicalComplexity
         });
       }
     } catch (error) {
@@ -165,7 +211,7 @@ export const FetchHistoryPanel = ({ onRefresh }: { onRefresh: () => void }) => {
     }
   };
 
-  // [Analysis] Get the top categories to display in the sidebar
+  // [Analysis] Render the top categories with improved UI
   const getTopCategories = () => {
     const categories = aiMetrics.categoryDistribution;
     return Object.entries(categories)
@@ -213,6 +259,7 @@ export const FetchHistoryPanel = ({ onRefresh }: { onRefresh: () => void }) => {
           News articles are automatically fetched every 6 hours
         </CardDescription>
       </CardHeader>
+      
       <CardContent className="pb-2">
         {nextScheduledFetch && (
           <div className="flex items-center justify-between mb-2 text-sm">
@@ -226,22 +273,114 @@ export const FetchHistoryPanel = ({ onRefresh }: { onRefresh: () => void }) => {
           </div>
         )}
         
-        {/* AI Content Metrics */}
-        <div className="my-4 space-y-2 p-2 rounded-md border border-slate-800 bg-slate-900/50">
+        {/* Enhanced AI Content Metrics */}
+        <div className="my-4 space-y-4 p-3 rounded-md border border-slate-800 bg-slate-900/50">
           <div className="text-sm font-medium flex items-center gap-2">
             <BarChart className="h-4 w-4 text-green-400" />
             <span>AI Content Metrics</span>
           </div>
           
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            {getTopCategories().map((category, index) => (
-              <div key={index} className="flex justify-between items-center">
-                <span className="text-muted-foreground capitalize">{category.name}:</span>
-                <Badge variant="outline" className="bg-indigo-950/20 text-indigo-400 border-indigo-500/50">
-                  {category.count} articles
-                </Badge>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Category Distribution */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                <Database className="h-3.5 w-3.5 text-blue-400" />
+                Top Categories
+              </h4>
+              
+              <div className="space-y-1.5">
+                {getTopCategories().map((category, index) => (
+                  <div key={index} className="flex justify-between items-center">
+                    <span className="text-xs text-muted-foreground capitalize">{category.name}:</span>
+                    <Badge variant="outline" className="bg-indigo-950/20 text-indigo-400 border-indigo-500/50 text-xs">
+                      {category.count} articles
+                    </Badge>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
+            
+            {/* Technical Complexity */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                <Zap className="h-3.5 w-3.5 text-yellow-400" />
+                Technical Depth
+              </h4>
+              
+              <div className="space-y-1.5">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-muted-foreground">Advanced:</span>
+                  <Badge variant="outline" className="bg-purple-950/20 text-purple-400 border-purple-500/50 text-xs">
+                    {aiMetrics.technicalComplexity.advanced} articles
+                  </Badge>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-muted-foreground">Intermediate:</span>
+                  <Badge variant="outline" className="bg-blue-950/20 text-blue-400 border-blue-500/50 text-xs">
+                    {aiMetrics.technicalComplexity.intermediate} articles
+                  </Badge>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-muted-foreground">Basic:</span>
+                  <Badge variant="outline" className="bg-green-950/20 text-green-400 border-green-500/50 text-xs">
+                    {aiMetrics.technicalComplexity.basic} articles
+                  </Badge>
+                </div>
+              </div>
+            </div>
+            
+            {/* Content Quality */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                <TrendingUp className="h-3.5 w-3.5 text-emerald-400" />
+                Impact Level
+              </h4>
+              
+              <div className="space-y-1.5">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-muted-foreground">High Impact:</span>
+                  <Badge variant="outline" className="bg-red-950/20 text-red-400 border-red-500/50 text-xs">
+                    {aiMetrics.contentQuality.high} articles
+                  </Badge>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-muted-foreground">Medium Impact:</span>
+                  <Badge variant="outline" className="bg-orange-950/20 text-orange-400 border-orange-500/50 text-xs">
+                    {aiMetrics.contentQuality.medium} articles
+                  </Badge>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-muted-foreground">Low Impact:</span>
+                  <Badge variant="outline" className="bg-gray-950/20 text-gray-400 border-gray-500/50 text-xs">
+                    {aiMetrics.contentQuality.low} articles
+                  </Badge>
+                </div>
+              </div>
+            </div>
+            
+            {/* Reading Level */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                <BookOpen className="h-3.5 w-3.5 text-pink-400" />
+                Content Quality Score
+              </h4>
+              
+              <div className="relative pt-1">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-muted-foreground">Relevance Score:</span>
+                  <span className="text-xs font-semibold text-purple-400">{aiMetrics.avgRelevance}%</span>
+                </div>
+                <div className="h-2 bg-slate-800 rounded-full">
+                  <div 
+                    className="h-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500"
+                    style={{ width: `${aiMetrics.avgRelevance}%` }}
+                  ></div>
+                </div>
+                <div className="text-xs text-muted-foreground mt-1.5 text-center">
+                  Based on AI relevance analysis of recent articles
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         

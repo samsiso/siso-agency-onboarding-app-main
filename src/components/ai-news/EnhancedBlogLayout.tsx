@@ -20,6 +20,8 @@ import { cn } from '@/lib/utils';
 import { ArticleTableOfContents } from './blog-layout/ArticleTableOfContents';
 import { useState, useEffect } from 'react';
 import { NewsCardComments } from './NewsCardComments';
+import { KeyTakeaways } from './blog-layout/KeyTakeaways';
+import { HeroImage } from './blog-layout/HeroImage';
 
 interface EnhancedBlogLayoutProps {
   article: EnhancedNewsItem & { comments?: Array<{
@@ -174,6 +176,12 @@ export const EnhancedBlogLayout = ({
                 </span>
               </div>
             </div>
+            
+            {/* Added Hero Image */}
+            <HeroImage article={article} />
+            
+            {/* Added Key Takeaways */}
+            <KeyTakeaways article={article} />
 
             <motion.div 
               className="grid grid-cols-1 gap-6"
