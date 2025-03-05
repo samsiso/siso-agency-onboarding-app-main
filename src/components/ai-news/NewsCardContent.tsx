@@ -52,11 +52,17 @@ export const NewsCardContent = ({
 }: NewsCardContentProps) => {
   const navigate = useNavigate();
 
+  // [Analysis] Debug the ID issue
+  console.log('NewsCardContent - Article ID:', newsId);
+
   // [Analysis] Improved navigation logic to handle both internal and external articles
   const handleClick = () => {
     if (onReadArticle) {
       onReadArticle();
     }
+    
+    // [Analysis] Log navigation intent
+    console.log('Article click - navigating with ID:', newsId, 'URL:', url);
     
     // If we have an external URL and no newsId, open in new tab
     if (url && !newsId) {

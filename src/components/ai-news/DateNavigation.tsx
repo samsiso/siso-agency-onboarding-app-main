@@ -32,6 +32,10 @@ export const DateNavigation = ({
     exit: { opacity: 0, y: 10, transition: { duration: 0.2 } }
   };
 
+  // [Analysis] Debug the date range
+  console.log('Date range:', dateRange);
+  console.log('Loading state:', loading);
+
   const handleSelectDateFromCalendar = (date: Date | undefined) => {
     if (date) {
       onSelectDate(date);

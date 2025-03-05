@@ -11,14 +11,20 @@ import { AlertTriangle, ExternalLink, ChevronLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const BlogPost = () => {
-  const { id } = useParams();
+  const { postId } = useParams(); // [Analysis] Changed from 'id' to 'postId' to match App.tsx route parameter
   const navigate = useNavigate();
   const { toast } = useToast();
   const { handleShare, handleBookmark } = useBlogPostActions();
 
+  // [Analysis] Added additional logging to debug the ID issue
+  console.log('BlogPost - postId from params:', postId);
+
   const { data: post, isLoading, error } = useQuery({
-    queryKey: ['blog-post', id],
-    queryFn: () => fetchBlogPost(id as string),
+    queryKey: ['blog-post', postId],
+    queryFn: () => fetchBlogPost(postId as string),
+    // [Q] Is there a race condition if postId is undefined during initial render?
+    // [Analysis] Don't fetch if postId is undefined
+    enabled: !!postId,
     // [Analysis] Add error handling to show user-friendly messages
     retry: 1,
     meta: {
@@ -44,6 +50,10 @@ const BlogPost = () => {
   const handleGoBack = () => {
     navigate('/ai-news');
   };
+
+  // [Analysis] More detailed logging for debugging
+  console.log('BlogPost - post data:', post);
+  console.log('BlogPost - error:', error);
 
   // [Analysis] Loading state with improved UI
   if (isLoading) {

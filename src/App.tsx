@@ -63,6 +63,7 @@ function App() {
         <Route path="/" element={<Index />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/ai-news" element={<AINews />} />
+        {/* [Analysis] Modified route to use 'postId' consistent with the BlogPost component */}
         <Route path="/ai-news/:postId" element={<BlogPost />} />
         <Route path="/daily-news" element={<DailyNews />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />

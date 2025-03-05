@@ -4,6 +4,14 @@ import type { EnhancedNewsItem, ContentCategory, TechnicalComplexity, ArticleImp
 
 export const fetchBlogPost = async (id: string) => {
   try {
+    // [Analysis] Validate ID before making the request
+    if (!id) {
+      console.error('Article ID is undefined or empty');
+      throw new Error('Article ID is required');
+    }
+
+    console.log('Fetching blog post with ID:', id);
+
     // [Analysis] Using maybeSingle instead of single to handle potentially missing data
     const { data: articleData, error: articleError } = await supabase
       .from('ai_news')
@@ -47,12 +55,18 @@ export const fetchBlogPost = async (id: string) => {
       .eq('id', id)
       .maybeSingle();
 
-    if (articleError) throw articleError;
+    if (articleError) {
+      console.error('Error fetching article data:', articleError);
+      throw articleError;
+    }
     
     // [Analysis] Handle case where article is not found
     if (!articleData) {
+      console.error('Article not found with ID:', id);
       throw new Error('Article not found');
     }
+
+    console.log('Article data fetched successfully:', articleData);
     
     // [Analysis] Safe transformation with default fallbacks for missing data
     // Transform sections ensuring correct field mapping with fallbacks
