@@ -10,6 +10,8 @@ const newsApiKey = Deno.env.get("NEWS_API_KEY")!;
 interface RequestBody {
   keyword: string;
   limit: number;
+  testMode?: boolean;
+  skipDuplicates?: boolean;
 }
 
 // [Analysis] Create central function to track fetch operations with detailed metrics
@@ -75,22 +77,121 @@ async function recordFetchHistory(
   }
 }
 
+// [Analysis] Enhanced duplicate detection function
+async function isDuplicate(supabase: any, article: any): Promise<boolean> {
+  // Check by title (most reliable method for duplication)
+  const { data: titleMatch, error: titleError } = await supabase
+    .from("ai_news")
+    .select("id")
+    .ilike("title", article.title)
+    .limit(1);
+    
+  if (titleError) {
+    console.error("Error checking for title duplicates:", titleError);
+    return false; // Don't block on error
+  }
+  
+  if (titleMatch && titleMatch.length > 0) {
+    return true;
+  }
+  
+  // If URL is available, also check by URL
+  if (article.url) {
+    const { data: urlMatch, error: urlError } = await supabase
+      .from("ai_news")
+      .select("id")
+      .eq("url", article.url)
+      .limit(1);
+      
+    if (urlError) {
+      console.error("Error checking for URL duplicates:", urlError);
+      return false;
+    }
+    
+    if (urlMatch && urlMatch.length > 0) {
+      return true;
+    }
+  }
+  
+  // Also check for near-duplicates by comparing title similarity
+  // This is a simplified approach - for more advanced duplicate detection,
+  // consider adding a content-based comparison or using embeddings
+  if (article.title) {
+    const titleWords = article.title.toLowerCase().split(/\s+/);
+    if (titleWords.length > 4) { // Only check substantial titles
+      // Get articles from the last 7 days to limit search scope
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      
+      const { data: recentArticles, error: recentError } = await supabase
+        .from("ai_news")
+        .select("title")
+        .gte("created_at", sevenDaysAgo.toISOString())
+        .limit(100); // Reasonable limit for comparison
+      
+      if (recentError) {
+        console.error("Error fetching recent articles:", recentError);
+        return false;
+      }
+      
+      // Check title similarity
+      if (recentArticles) {
+        for (const existingArticle of recentArticles) {
+          const existingTitle = existingArticle.title.toLowerCase();
+          const existingWords = existingTitle.split(/\s+/);
+          
+          // Calculate simple word overlap ratio
+          const shorterLength = Math.min(titleWords.length, existingWords.length);
+          let matchCount = 0;
+          
+          for (const word of titleWords) {
+            if (existingWords.includes(word)) matchCount++;
+          }
+          
+          const similarityRatio = matchCount / shorterLength;
+          
+          // If titles are more than 70% similar, consider it a duplicate
+          if (similarityRatio > 0.7) {
+            console.log(`Near-duplicate detected: "${article.title}" vs "${existingArticle.title}"`);
+            return true;
+          }
+        }
+      }
+    }
+  }
+  
+  return false;
+}
+
 // [Analysis] Process News API response into standardized news format
 async function processNewsApiArticles(
   articles: any[],
-  supabase: any
+  supabase: any,
+  skipDuplicates: boolean = true
 ): Promise<{
   added: number;
   updated: number;
   duplicates: number;
+  processedArticles: any[];
 }> {
   let added = 0;
   let updated = 0;
   let duplicates = 0;
+  const processedArticles = [];
 
   for (const article of articles) {
     try {
-      // Check if article already exists
+      // Check for duplicates if flag is set
+      if (skipDuplicates) {
+        const duplicate = await isDuplicate(supabase, article);
+        if (duplicate) {
+          console.log(`Skipping duplicate article: "${article.title}"`);
+          duplicates++;
+          continue;
+        }
+      }
+
+      // Check if article already exists by title
       const { data: existingArticle } = await supabase
         .from("ai_news")
         .select("id, title")
@@ -123,7 +224,16 @@ async function processNewsApiArticles(
         source_credibility: "verified",
         article_type: "news",
         status: "published",
+        url: article.url || null,
       };
+
+      // Transform the article for the response
+      const transformedArticle = {
+        ...newsItem,
+        id: existingArticle?.id || crypto.randomUUID(),
+      };
+      
+      processedArticles.push(transformedArticle);
 
       if (existingArticle) {
         // Update existing article
@@ -139,11 +249,11 @@ async function processNewsApiArticles(
       }
     } catch (error) {
       console.error("Error processing article:", error);
-      duplicates++;
+      duplicates++; // Count failed processing as duplicates for now
     }
   }
 
-  return { added, updated, duplicates };
+  return { added, updated, duplicates, processedArticles };
 }
 
 serve(async (req) => {
@@ -152,7 +262,12 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey);
     
     // Parse request body
-    const { keyword = "artificial intelligence", limit = 10 } = await req.json() as RequestBody;
+    const { 
+      keyword = "artificial intelligence", 
+      limit = 10,
+      testMode = false,
+      skipDuplicates = true
+    } = await req.json() as RequestBody;
     
     // Record the start of the fetch operation
     const historyId = await recordFetchHistory(supabase, "news_api", "started", {});
@@ -183,16 +298,20 @@ serve(async (req) => {
     const articles = data.articles || [];
     
     // Process and store articles
-    const { added, updated, duplicates } = await processNewsApiArticles(
+    const { added, updated, duplicates, processedArticles } = await processNewsApiArticles(
       articles,
-      supabase
+      supabase,
+      skipDuplicates
     );
     
-    // Update news source last_fetched_at
-    await supabase
-      .from("news_sources")
-      .update({ last_fetched_at: new Date().toISOString() })
-      .eq("source_type", "news_api");
+    // Only update database if not in test mode
+    if (!testMode) {
+      // Update news source last_fetched_at
+      await supabase
+        .from("news_sources")
+        .update({ last_fetched_at: new Date().toISOString() })
+        .eq("source_type", "news_api");
+    }
     
     // Record the completion of the fetch operation
     await recordFetchHistory(supabase, "news_api", "completed", {
@@ -204,6 +323,8 @@ serve(async (req) => {
       metadata: {
         keyword,
         limit,
+        testMode,
+        skipDuplicates
       },
     });
     
@@ -211,7 +332,8 @@ serve(async (req) => {
       JSON.stringify({
         success: true,
         count: added,
-        message: `Successfully synced ${added} new articles, updated ${updated} existing articles.`,
+        message: `Successfully synced ${added} new articles, updated ${updated} existing articles, skipped ${duplicates} duplicates.`,
+        articles: testMode ? processedArticles : undefined,
       }),
       { headers: { "Content-Type": "application/json" } }
     );

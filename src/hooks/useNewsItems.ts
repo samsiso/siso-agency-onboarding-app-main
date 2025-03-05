@@ -35,6 +35,7 @@ export const useNewsItems = (
     message: string;
     count?: number;
     articles?: NewsItem[];
+    duplicatesSkipped?: number;
   } | null>(null);
   const { toast } = useToast();
 
@@ -445,13 +446,105 @@ export const useNewsItems = (
     }
   };
 
+  // [Analysis] Function to test fetch news without actually storing in database
+  const testFetchNews = async (
+    keyword: string = "artificial intelligence",
+    limit: number = 10,
+    source: 'event_registry' | 'news_api' = activeNewsSource
+  ) => {
+    setSyncingNews(true);
+    setSyncResult(null);
+    
+    try {
+      console.log(`Starting test news fetch from ${source}...`);
+      
+      const functionName = 'fetch-ai-news';
+      
+      const { data, error } = await supabase.functions.invoke(functionName, {
+        body: { 
+          keyword: keyword,
+          limit: limit,
+          testMode: true, // Set test mode to true
+          source: source,
+          skipDuplicates: false // Don't filter duplicates in test mode to show all potential articles
+        },
+      });
+
+      if (error) {
+        throw new Error(`Edge function error: ${error.message}`);
+      }
+
+      if (!data) {
+        throw new Error('No data returned from edge function');
+      }
+
+      // Check for duplicates in test results and mark them
+      if (data.articles && data.articles.length > 0) {
+        const existingTitles = new Set<string>();
+        let duplicateCount = 0;
+        
+        // First pass: collect existing titles
+        for (const article of data.articles) {
+          const normalizedTitle = article.title.toLowerCase().trim();
+          if (existingTitles.has(normalizedTitle)) {
+            article.isDuplicate = true;
+            duplicateCount++;
+          } else {
+            existingTitles.add(normalizedTitle);
+            article.isDuplicate = false;
+          }
+        }
+        
+        // Set result with duplicate count
+        setSyncResult({
+          success: data.success,
+          message: `Found ${data.articles.length} articles, with ${duplicateCount} potential duplicates`,
+          count: data.articles.length - duplicateCount,
+          articles: data.articles,
+          duplicatesSkipped: duplicateCount
+        });
+      } else {
+        setSyncResult({
+          success: data.success,
+          message: data.message || "No articles found",
+          count: 0,
+          articles: [],
+          duplicatesSkipped: 0
+        });
+      }
+      
+      toast({
+        title: "Test fetch completed",
+        description: `Found ${data.articles?.length || 0} articles from ${source}`,
+      });
+      
+      return data;
+    } catch (error) {
+      console.error('Error in test fetch:', error);
+      setSyncResult({
+        success: false,
+        message: error instanceof Error ? error.message : String(error)
+      });
+      
+      toast({
+        variant: "destructive",
+        title: "Test Fetch Error",
+        description: error instanceof Error ? error.message : "Failed to test fetch AI news",
+      });
+      throw error;
+    } finally {
+      setSyncingNews(false);
+    }
+  };
+
   // [Analysis] Function to sync news from a specific API source with improved error handling
   // Defaulting testMode to false so that articles are actually imported into the database
   const syncNews = async (
     keyword: string = "artificial intelligence", 
     limit: number = 20, 
     source: 'event_registry' | 'news_api' = activeNewsSource,
-    testMode: boolean = false
+    testMode: boolean = false,
+    skipDuplicates: boolean = true
   ) => {
     setSyncingNews(true);
     setSyncResult(null);
@@ -461,7 +554,8 @@ export const useNewsItems = (
         keyword,
         limit,
         source,
-        testMode
+        testMode,
+        skipDuplicates
       });
       
       // [Analysis] Determine which edge function to call based on source
@@ -474,7 +568,8 @@ export const useNewsItems = (
           keyword: keyword,
           limit: limit,
           testMode: testMode, // Flag to determine if articles should be imported
-          source: source
+          source: source,
+          skipDuplicates: skipDuplicates // Whether to filter duplicates
         },
       });
 
@@ -552,7 +647,8 @@ export const useNewsItems = (
             featured: index === 0, // Mark first article as featured
             url: article.url || null, // Handle null URLs
             status: 'published',
-            template_type: 'article' // Default template type
+            template_type: 'article', // Default template type
+            isDuplicate: article.isDuplicate || false // Mark duplicates for UI highlighting
           };
         });
         
@@ -565,13 +661,14 @@ export const useNewsItems = (
         success: data.success,
         message: data.message,
         count: data.count,
-        articles: data.articles
+        articles: data.articles,
+        duplicatesSkipped: data.duplicatesSkipped || 0
       });
 
       if (data.success) {
         toast({
           title: testMode ? "Test sync completed" : "News synced successfully",
-          description: `${data.count} articles ${testMode ? 'retrieved' : 'imported'} from ${source === 'event_registry' ? 'Event Registry' : 'News API'}`,
+          description: `${data.count} articles ${testMode ? 'retrieved' : 'imported'} from ${source === 'event_registry' ? 'Event Registry' : 'News API'}${data.duplicatesSkipped ? `, ${data.duplicatesSkipped} duplicates skipped` : ''}`,
         });
         
         // [Analysis] Update active news source
@@ -726,6 +823,7 @@ export const useNewsItems = (
     goToPreviousDay,
     goToDate,
     refresh: fetchNews,
-    syncNews
+    syncNews,
+    testFetchNews // Add test function to the hook's return value
   };
 };
