@@ -3,7 +3,7 @@ import { useNewsItems } from '@/hooks/useNewsItems';
 import NewsFilters from '@/components/ai-news/NewsFilters';
 import FeaturedNewsHero from '@/components/ai-news/FeaturedNewsHero';
 import { NewsContent } from '@/components/ai-news/NewsContent';
-import NewsHeader from '@/components/ai-news/NewsHeader';
+import { NewsHeader } from '@/components/ai-news/NewsHeader'; // Fixed import to use named export
 import { NewsErrorBoundary } from '@/components/ai-news/NewsErrorBoundary';
 import { DailyStatsOverview } from '@/components/ai-news/DailyStatsOverview';
 import { DateNavigation } from '@/components/ai-news/DateNavigation';
@@ -443,6 +443,7 @@ const AINews = () => {
                               The API request was successful, but no articles were returned. This could be due to:
                               <ul className="list-disc pl-5 mt-2 space-y-1 text-sm">
                                 <li>API key configuration issues</li>
+                                <li>No articles matching your search criteria</li>
                                 <li>No articles matching your search criteria</li>
                                 <li>API rate limiting or quota restrictions</li>
                                 <li>Date range limitations</li>

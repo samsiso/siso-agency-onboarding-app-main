@@ -4,12 +4,13 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { NewsSearchSection } from './NewsSearchSection';
-import { Calendar, Search, Sync, Info } from 'lucide-react';
+import { Calendar, Search, RefreshCw, Info } from 'lucide-react'; // Changed Sync to RefreshCw
 import { DailyStatsOverview } from './DailyStatsOverview';
 import { NewsApiStatus } from './NewsApiStatus';
 import { FetchHistoryPanel } from './FetchHistoryPanel';
 import { useNewsItems } from '@/hooks/useNewsItems';
 import { DuplicatesCheckDialog } from './DuplicatesCheckDialog';
+import { NewsItem } from '@/types/blog';
 
 interface NewsHeaderProps {
   activeTab: string;
@@ -29,13 +30,22 @@ export function NewsHeader({
   showFetchHistory = true,
 }: NewsHeaderProps) {
   const [showDuplicatesDialog, setShowDuplicatesDialog] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(''); // Added for NewsSearchSection props
   const { 
+    newsItems, 
     syncingNews, 
     syncNews, 
     syncResult, 
     testFetchNews,
-    activeNewsSource
+    activeNewsSource,
+    lastSync,
+    apiUsage,
+    articleCount
   } = useNewsItems(null);
+  
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+  };
   
   const handleTestFetch = async () => {
     try {
@@ -80,7 +90,7 @@ export function NewsHeader({
             onClick={() => syncNews()}
             disabled={syncingNews}
           >
-            <Sync className={`h-4 w-4 ${syncingNews ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-4 w-4 ${syncingNews ? 'animate-spin' : ''}`} />
             <span className="hidden sm:inline">Sync AI News</span>
             <span className="inline sm:hidden">Sync</span>
           </Button>
@@ -98,15 +108,34 @@ export function NewsHeader({
         </Tabs>
         
         <div className="w-full md:w-auto">
-          <NewsSearchSection />
+          <NewsSearchSection 
+            searchQuery={searchQuery} 
+            onSearchChange={handleSearchChange} 
+          />
         </div>
       </div>
       
       {/* Conditional rendering for DailyStatsOverview */}
-      {showStats && <DailyStatsOverview />}
+      {showStats && (
+        <DailyStatsOverview 
+          newsItems={newsItems} 
+          lastSync={lastSync}
+          articleCount={articleCount}
+          loading={false}
+        />
+      )}
       
       {/* Conditional rendering for NewsApiStatus */}
-      {showApiStatus && <NewsApiStatus />}
+      {showApiStatus && (
+        <NewsApiStatus 
+          lastSync={lastSync}
+          articleCount={articleCount}
+          apiUsage={apiUsage}
+          syncingNews={syncingNews}
+          activeNewsSource={activeNewsSource}
+          syncNews={syncNews}
+        />
+      )}
       
       {/* Conditional rendering for FetchHistoryPanel */}
       {showFetchHistory && (

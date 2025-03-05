@@ -1,4 +1,3 @@
-
 export type ArticleImpact = 'high' | 'medium' | 'low';
 
 export type TechnicalComplexity = 'basic' | 'intermediate' | 'advanced' | 'mixed';
@@ -132,12 +131,13 @@ export interface NewsItem {
     avatar_url: string;
   };
   // [Analysis] Added missing properties causing TypeScript errors
-  template_type?: string; // Added to resolve TypeScript error
+  template_type?: string; 
   status?: string;
   tags?: string[] | ArticleTag[];
-  url?: string; // Added for external links support
-  content_blocks?: any; // Added for supporting structured content
-  cover_image?: string; // Added for article cover images
-  banner_template_id?: string; // Added for banner templates
-  estimated_reading_time?: number; // Added to fix NewsCard.tsx error
+  url?: string; 
+  content_blocks?: any; 
+  cover_image?: string; 
+  banner_template_id?: string; 
+  estimated_reading_time?: number;
+  isDuplicate?: boolean; // Added this property to fix the TypeScript errors
 }
