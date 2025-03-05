@@ -34,12 +34,13 @@ serve(async (req) => {
     // Parse request body with default values for AI-specific news
     const { 
       keyword = "artificial intelligence", 
-      limit = 50, // [Analysis] Increased default limit from 10 to 50
+      limit = 50,
       testMode = true, 
-      source = "event_registry" 
+      source = "event_registry",
+      debug = false // [Analysis] Added debug flag for additional logging
     } = await req.json();
     
-    console.log(`Processing request with parameters:`, { keyword, limit, testMode, source });
+    console.log(`Processing request with parameters:`, { keyword, limit, testMode, source, debug });
     
     // Validate inputs
     if (!keyword) {
@@ -59,22 +60,22 @@ serve(async (req) => {
         throw new Error("Event Registry API key is not configured");
       }
       
-      console.log("Fetching articles from Event Registry with enhanced AI filtering");
-      const eventRegistryArticles = await fetchFromEventRegistryWithAIFilter(keyword, limit);
+      console.log("Fetching articles from Event Registry with simplified filters");
+      const eventRegistryArticles = await fetchFromEventRegistry(keyword, limit, debug);
       articles = eventRegistryArticles;
     } else if (source === "news_api") {
       if (!NEWS_API_KEY) {
         throw new Error("News API key is not configured");
       }
       
-      console.log("Fetching articles from News API with enhanced AI filtering");
-      const newsApiArticles = await fetchFromNewsAPIWithAIFilter(keyword, limit);
+      console.log("Fetching articles from News API with simplified filters");
+      const newsApiArticles = await fetchFromNewsAPI(keyword, limit, debug);
       articles = newsApiArticles;
     } else {
       throw new Error(`Invalid source: ${source}`);
     }
     
-    console.log(`Fetched ${articles.length} AI-focused articles from ${source}`);
+    console.log(`Fetched ${articles.length} articles from ${source}`);
     
     // If test mode is enabled, return the articles without saving
     if (testMode) {
@@ -88,7 +89,7 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({
           success: true,
-          message: `Successfully retrieved ${articles.length} AI-focused articles from ${source}`,
+          message: `Successfully retrieved ${articles.length} articles from ${source}`,
           count: articles.length,
           articles: articles,
           errors: errorMessages
@@ -134,96 +135,19 @@ serve(async (req) => {
   }
 });
 
-// [Analysis] Enhanced function to fetch AI-focused articles from Event Registry API
-async function fetchFromEventRegistryWithAIFilter(keyword, limit) {
+// [Analysis] Simplified function to fetch articles from Event Registry API
+async function fetchFromEventRegistry(keyword, limit, debug = false) {
   try {
-    console.log(`Fetching from Event Registry with advanced AI filtering: "${keyword}" and limit ${limit}`);
+    console.log(`Fetching from Event Registry with basic filtering: "${keyword}" and limit ${limit}`);
     
     // Build the Event Registry API URL with parameters
     const url = new URL("https://eventregistry.org/api/v1/article/getArticles");
     
-    // [Analysis] Enhanced request body with AI-specific filtering parameters
+    // [Analysis] Simplified request body with basic filtering parameters 
     const requestBody = {
       action: "getArticles",
-      // Use multiple AI-related keywords with OR operator for broader coverage
-      keyword: [
-        "artificial intelligence", 
-        "machine learning", 
-        "deep learning", 
-        "neural network", 
-        "large language model",
-        "AI model", 
-        "generative AI",
-        "AI research",
-        "AI chip",
-        "AI startup",
-        "AI ethics",
-        "computer vision",
-        "NLP",
-        "natural language processing",
-        "reinforcement learning",
-        "GPT",
-        "LLM",
-        "ChatGPT",
-        "Gemini",
-        "DALL-E",
-        "Midjourney",
-        "Stable Diffusion"
-      ],
-      keywordOper: "or", // Match any of these keywords
-      
-      // Add specific concept URIs for major AI entities and technologies
-      conceptUri: [
-        "http://en.wikipedia.org/wiki/OpenAI",
-        "http://en.wikipedia.org/wiki/Artificial_intelligence",
-        "http://en.wikipedia.org/wiki/Machine_learning",
-        "http://en.wikipedia.org/wiki/Nvidia",
-        "http://en.wikipedia.org/wiki/Meta_Platforms",
-        "http://en.wikipedia.org/wiki/Google",
-        "http://en.wikipedia.org/wiki/Microsoft",
-        "http://en.wikipedia.org/wiki/Deep_learning",
-        "http://en.wikipedia.org/wiki/Natural_language_processing",
-        "http://en.wikipedia.org/wiki/Computer_vision",
-        "http://en.wikipedia.org/wiki/Anthropic_(company)",
-        "http://en.wikipedia.org/wiki/Stable_Diffusion",
-        "http://en.wikipedia.org/wiki/Midjourney",
-        "http://en.wikipedia.org/wiki/DALL-E",
-        "http://en.wikipedia.org/wiki/GPT-4",
-        "http://en.wikipedia.org/wiki/Claude_(chatbot)"
-      ],
-      conceptOper: "or", // Match any of these concepts
-      
-      // Add source filtering to prioritize tech publications
-      sourceGroupUri: "tech/technology_news",
-      
-      // Set category filtering to focus on tech and business
-      categoryUri: [
-        "news/Technology",
-        "news/Computing",
-        "news/Business",
-        "news/Science",
-        "news/Artificial_Intelligence",
-        "news/IT",
-        "news/Innovation"
-      ],
-      categoryOper: "or",
-      
-      // Ignore certain categories to reduce noise
-      ignoreCategoryUri: [
-        "news/Sports",
-        "news/Entertainment",
-        "news/Lifestyle",
-        "news/Weather",
-        "news/Politics"
-      ],
-      
-      // Ignore specific keywords that might create noise
-      ignoreKeyword: [
-        "scam",
-        "fraud",
-        "conspiracy",
-        "hoax"
-      ],
+      // Use simpler keyword approach
+      keyword: keyword,
       
       // Set additional parameters for quality and freshness
       articlesPage: 1,
@@ -232,7 +156,7 @@ async function fetchFromEventRegistryWithAIFilter(keyword, limit) {
       articlesSortByAsc: false,
       articlesArticleBodyLen: -1, // Get full article content
       resultType: "articles",
-      dataType: ["news", "blog", "pr"], // Include press releases for company announcements
+      dataType: ["news", "blog"],
       apiKey: EVENT_REGISTRY_API_KEY,
       forceMaxDataTimeWindow: 31, // Limit to last month for freshness
       lang: "eng", // English articles only
@@ -242,11 +166,12 @@ async function fetchFromEventRegistryWithAIFilter(keyword, limit) {
       includeArticleCategories: true,
       includeArticleSentiment: true,
       isDuplicateFilter: "skipDuplicates", // Filter out duplicate content
-      
-      // Start from higher quality sources (but not too restrictive)
-      startSourceRankPercentile: 0,
-      endSourceRankPercentile: 80
     };
+    
+    // Log request for debugging
+    if (debug) {
+      console.log("Event Registry API request:", JSON.stringify(requestBody, null, 2));
+    }
     
     // Make the request to Event Registry
     const response = await fetch(url, {
@@ -267,6 +192,11 @@ async function fetchFromEventRegistryWithAIFilter(keyword, limit) {
     // Parse the response JSON
     const data = await response.json();
     
+    // Log the raw response for debugging
+    if (debug) {
+      console.log("Event Registry API raw response:", JSON.stringify(data, null, 2));
+    }
+    
     // Check if the response contains articles
     if (!data.articles || !data.articles.results) {
       console.warn("No articles found in Event Registry response");
@@ -275,68 +205,61 @@ async function fetchFromEventRegistryWithAIFilter(keyword, limit) {
     
     console.log(`Retrieved ${data.articles.results.length} raw articles from Event Registry`);
     
-    // [Analysis] Enhanced article transformation with AI relevance scoring
-    return data.articles.results.map(article => {
-      // Extract concepts to determine AI relevance score
+    // Transform and filter articles
+    const transformedArticles = data.articles.results.map(article => {
+      // Extract concepts to determine AI relevance
       const concepts = article.concepts || [];
-      const aiConcepts = concepts.filter(c => 
-        c.uri.includes("Artificial_intelligence") ||
-        c.uri.includes("Machine_learning") ||
-        c.uri.includes("OpenAI") ||
-        c.uri.includes("Neural_network") ||
-        c.uri.includes("Deep_learning") ||
-        c.uri.includes("GPT") ||
-        c.uri.includes("Claude") ||
-        c.uri.includes("Nvidia") ||
-        c.uri.includes("Meta") ||
-        c.uri.includes("Google") ||
-        c.uri.includes("Microsoft")
-      );
+      const aiTerms = ["artificial intelligence", "ai", "machine learning", "neural network", 
+                       "deep learning", "llm", "chatgpt", "gpt", "openai"];
       
-      // Calculate AI relevance score (0-100) - lowered threshold for better inclusion
-      const aiRelevanceScore = Math.min(100, aiConcepts.length * 15);
+      // Simple relevance check - just see if title or content contains AI terms
+      const title = article.title?.toLowerCase() || "";
+      const body = article.body?.toLowerCase() || "";
       
-      // Determine impact based on concepts and sentiment
+      // Calculate a simple AI relevance score (0-100)
+      let aiRelevanceScore = 0;
+      
+      // Check title for AI terms (higher weight)
+      aiTerms.forEach(term => {
+        if (title.includes(term)) {
+          aiRelevanceScore += 30; // Higher weight for title matches
+        } 
+        if (body.includes(term)) {
+          aiRelevanceScore += 10; // Lower weight for body matches
+        }
+      });
+      
+      // Cap at 100
+      aiRelevanceScore = Math.min(100, aiRelevanceScore);
+      
+      // Determine impact based on title
       let impact = "medium";
-      if (aiRelevanceScore > 50 || article.sentiment > 0.5 || article.sentiment < -0.5) {
+      const highImpactTerms = ["revolutionary", "breakthrough", "major", "groundbreaking"];
+      if (highImpactTerms.some(term => title.includes(term))) {
         impact = "high";
-      } else if (aiRelevanceScore < 20 && !article.title.toLowerCase().includes("ai")) {
-        impact = "low";
       }
       
-      // Extract technical complexity from content
-      const technicalTerms = [
-        "algorithm", "neural network", "architecture", "parameters",
-        "transformer", "fine-tuning", "training", "dataset"
-      ];
-      const content = article.body || article.title || "";
-      const technicalTermCount = technicalTerms.reduce((count, term) => {
-        return count + (content.toLowerCase().match(new RegExp(term, 'g')) || []).length;
+      // Determine technical complexity based on content
+      const technicalTerms = ["algorithm", "neural network", "parameters", "training", "dataset"];
+      const technicalCount = technicalTerms.reduce((count, term) => {
+        return count + ((body.match(new RegExp(term, 'g')) || []).length);
       }, 0);
       
-      const technicalComplexity = technicalTermCount > 5 ? "advanced" : 
-                                 technicalTermCount > 2 ? "intermediate" : "basic";
+      const technicalComplexity = technicalCount > 5 ? "advanced" : 
+                                 technicalCount > 2 ? "intermediate" : "basic";
       
-      // Parse categories for better mapping
+      // Parse categories to determine appropriate category
       const categories = article.categories || [];
-      let category = "breakthrough_technologies"; // Default category
-      
-      if (categories.some(c => c.includes("Business") || c.includes("Economy"))) {
-        category = "industry_applications";
-      } else if (categories.some(c => c.includes("Research") || c.includes("Science"))) {
-        category = "research_papers";
-      } else if (categories.some(c => c.includes("Ethics") || c.includes("Policy"))) {
-        category = "ai_ethics";
-      }
+      let category = determineCategory(title, body, categories);
       
       // Calculate reading time based on content length
-      const wordCount = (article.body || "").split(/\s+/).length;
+      const wordCount = (body.match(/\S+/g) || []).length;
       const readingTime = Math.max(1, Math.ceil(wordCount / 200));
       
       return {
         title: article.title,
-        description: article.body ? article.body.substring(0, 300) + "..." : article.summary || "",
-        content: article.body || article.summary || "",
+        description: article.body ? article.body.substring(0, 300) + "..." : "",
+        content: article.body || "",
         url: article.url || "",
         image_url: article.image || "",
         source: article.source?.title || extractDomainFromUrl(article.url) || "Event Registry",
@@ -345,23 +268,20 @@ async function fetchFromEventRegistryWithAIFilter(keyword, limit) {
         impact,
         technical_complexity: technicalComplexity,
         estimated_reading_time: readingTime,
-        source_credibility: article.source?.ranking?.importanceRank < 30 ? "verified" : "standard",
+        source_credibility: article.source?.ranking?.importanceRank < 50 ? "verified" : "standard",
         article_type: "news",
-        // Include additional AI-specific metadata
-        ai_relevance_score: aiRelevanceScore,
-        ai_companies_mentioned: extractAICompanies(article.body || article.title || ""),
-        technologies_mentioned: extractAITechnologies(article.body || article.title || "")
+        ai_relevance_score: aiRelevanceScore
       };
-    }).filter(article => {
-      // [Analysis] More lenient filter to ensure we get enough AI-related content (lowered threshold)
-      return (
-        article.ai_relevance_score > 15 || // Lowered threshold for better inclusion
-        article.title.toLowerCase().includes("ai") ||
-        article.title.toLowerCase().includes("artificial intelligence") ||
-        article.title.toLowerCase().includes("machine learning") ||
-        article.ai_companies_mentioned.length > 0 ||
-        article.technologies_mentioned.length > 0
-      );
+    });
+    
+    // [Analysis] Less strict filtering - include anything with minimal AI relevance
+    return transformedArticles.filter(article => {
+      const title = article.title.toLowerCase();
+      // Keep article if it has ANY AI relevance or AI in the title
+      return article.ai_relevance_score > 0 || 
+             title.includes("ai") ||
+             title.includes("artificial intelligence") ||
+             title.includes("machine learning");
     });
     
   } catch (error) {
@@ -370,10 +290,10 @@ async function fetchFromEventRegistryWithAIFilter(keyword, limit) {
   }
 }
 
-// [Analysis] Enhanced function to fetch AI-focused articles from News API
-async function fetchFromNewsAPIWithAIFilter(keyword, limit) {
+// [Analysis] Simplified function to fetch articles from News API
+async function fetchFromNewsAPI(keyword, limit, debug = false) {
   try {
-    console.log(`Fetching from News API with advanced AI filtering: "${keyword}" and limit ${limit}`);
+    console.log(`Fetching from News API with basic filtering: "${keyword}" and limit ${limit}`);
     
     // Build the News API URL with parameters
     const today = new Date();
@@ -383,19 +303,22 @@ async function fetchFromNewsAPIWithAIFilter(keyword, limit) {
     const fromDate = oneMonthAgo.toISOString().split('T')[0];
     const toDate = today.toISOString().split('T')[0];
     
-    // [Analysis] Create a more sophisticated query for AI news
-    const aiQuery = encodeURIComponent(
-      '("artificial intelligence" OR "machine learning" OR "deep learning" OR "neural network" OR "AI model" OR "large language model" OR "LLM" OR "generative AI" OR "GPT" OR "ChatGPT" OR "Claude" OR "Gemini" OR "DALL-E" OR "Midjourney" OR "Stable Diffusion" OR "AI chip" OR "AI startup") AND (OpenAI OR Anthropic OR Nvidia OR Microsoft OR Google OR Meta OR AI OR technology OR research OR development OR breakthrough OR innovation)'
-    );
+    // [Analysis] Create a simpler query for AI news
+    const aiQuery = encodeURIComponent(`"artificial intelligence" OR "ai" OR "machine learning"`);
     
     const url = new URL("https://newsapi.org/v2/everything");
     url.searchParams.append("q", aiQuery);
     url.searchParams.append("from", fromDate);
     url.searchParams.append("to", toDate);
-    url.searchParams.append("sortBy", "publishedAt"); // Sort by date to get newest articles
+    url.searchParams.append("sortBy", "publishedAt");
     url.searchParams.append("language", "en");
     url.searchParams.append("pageSize", limit.toString());
     url.searchParams.append("page", "1");
+    
+    // Log request for debugging
+    if (debug) {
+      console.log("News API request:", url.toString());
+    }
     
     // Make the request to News API
     const response = await fetch(url, {
@@ -414,6 +337,11 @@ async function fetchFromNewsAPIWithAIFilter(keyword, limit) {
     // Parse the response JSON
     const data = await response.json();
     
+    // Log the raw response for debugging
+    if (debug) {
+      console.log("News API raw response:", JSON.stringify(data, null, 2));
+    }
+    
     // Check if the response contains articles
     if (!data.articles || !Array.isArray(data.articles)) {
       console.warn("No articles found in News API response");
@@ -422,81 +350,45 @@ async function fetchFromNewsAPIWithAIFilter(keyword, limit) {
     
     console.log(`Retrieved ${data.articles.length} raw articles from News API`);
     
-    // [Analysis] Enhanced transformation with AI relevance scoring
+    // Transform articles
     return data.articles.map((article, index) => {
-      // Calculate AI relevance score based on content
-      const combinedText = `${article.title} ${article.description || ''} ${article.content || ''}`.toLowerCase();
+      // Combine title and description for text analysis
+      const combinedText = `${article.title || ''} ${article.description || ''} ${article.content || ''}`.toLowerCase();
       
-      // Key AI terms to look for
-      const aiTerms = [
-        "artificial intelligence", "machine learning", "neural network", "deep learning", 
-        "llm", "large language model", "gpt", "openai", "microsoft", "google", "meta", 
-        "anthropic", "claude", "ai model", "transformer", "diffusion", "stable diffusion",
-        "midjourney", "dall-e", "chatgpt", "gemini", "llama", "ai research", "nvidia"
-      ];
+      // Simple AI relevance check
+      const aiTerms = ["artificial intelligence", "ai", "machine learning", "neural network", 
+                       "deep learning", "llm", "chatgpt", "gpt", "openai"];
       
-      // Calculate score based on AI term frequency - adjusted for better inclusion
-      const aiRelevanceScore = aiTerms.reduce((score, term) => {
-        const matches = (combinedText.match(new RegExp(term, 'g')) || []).length;
-        return score + (matches * 12); // Higher points per match
-      }, 0);
+      // Calculate a simple AI relevance score (0-100)
+      let aiRelevanceScore = 0;
+      
+      // Check combined text for AI terms
+      aiTerms.forEach(term => {
+        if (combinedText.includes(term)) {
+          aiRelevanceScore += 20;
+        }
+      });
       
       // Cap at 100
-      const normalizedScore = Math.min(100, aiRelevanceScore);
+      aiRelevanceScore = Math.min(100, aiRelevanceScore);
       
-      // Extract technical complexity
-      const technicalTerms = [
-        "algorithm", "parameters", "architecture", "embedding", "vector", 
-        "training", "inference", "model", "dataset", "fine-tuning"
-      ];
+      // Determine category based on content
+      let category = determineCategory(article.title || '', article.description || '', []);
       
-      const technicalTermCount = technicalTerms.reduce((count, term) => {
-        return count + (combinedText.match(new RegExp(term, 'g')) || []).length;
-      }, 0);
-      
-      const technicalComplexity = technicalTermCount > 5 ? "advanced" : 
-                                 technicalTermCount > 2 ? "intermediate" : "basic";
+      // Determine impact based on title
+      let impact = "medium";
+      const highImpactTerms = ["revolutionary", "breakthrough", "major", "groundbreaking"];
+      if (highImpactTerms.some(term => combinedText.includes(term))) {
+        impact = "high";
+      }
       
       // Calculate reading time based on content length
       const content = article.content || article.description || "";
       const wordCount = content.split(/\s+/).length;
       const readingTime = Math.max(1, Math.ceil(wordCount / 200));
       
-      // Determine impact level
-      const highImpactTerms = [
-        "breakthrough", "revolutionary", "groundbreaking", "milestone", 
-        "first ever", "record", "outperform", "state-of-the-art"
-      ];
-      
-      const hasHighImpactTerms = highImpactTerms.some(term => combinedText.includes(term));
-      const impact = hasHighImpactTerms || normalizedScore > 70 ? "high" : 
-                    normalizedScore > 40 ? "medium" : "low";
-      
-      // Determine category based on content
-      let category = "breakthrough_technologies"; // Default
-      
-      if (combinedText.includes("business") || combinedText.includes("industry") || 
-          combinedText.includes("company") || combinedText.includes("market")) {
-        category = "industry_applications";
-      } else if (combinedText.includes("research") || combinedText.includes("paper") || 
-                combinedText.includes("study") || combinedText.includes("university")) {
-        category = "research_papers";
-      } else if (combinedText.includes("ethics") || combinedText.includes("bias") || 
-                combinedText.includes("regulation") || combinedText.includes("policy")) {
-        category = "ai_ethics";
-      }
-      
-      // Extract source credibility based on domain
+      // Extract domain for source
       const source = article.source?.name || extractDomainFromUrl(article.url);
-      const highCredibilitySources = [
-        "nature.com", "science.org", "mit.edu", "stanford.edu", "ieee.org",
-        "acm.org", "bbc.com", "reuters.com", "bloomberg.com", "nytimes.com",
-        "washingtonpost.com", "theverge.com", "wired.com", "techcrunch.com",
-        "venturebeat.com", "ai.googleblog.com", "ai.facebook.com", "blogs.microsoft.com"
-      ];
-      
-      const sourceCredibility = highCredibilitySources.some(s => 
-        (article.url || "").includes(s)) ? "verified" : "standard";
       
       return {
         title: article.title,
@@ -508,20 +400,20 @@ async function fetchFromNewsAPIWithAIFilter(keyword, limit) {
         date: article.publishedAt ? article.publishedAt.split('T')[0] : new Date().toISOString().split('T')[0],
         category,
         impact,
-        technical_complexity: technicalComplexity,
+        technical_complexity: "intermediate", // Default value
         estimated_reading_time: readingTime,
-        source_credibility: sourceCredibility,
+        source_credibility: "standard",
         article_type: "news",
-        ai_relevance_score: normalizedScore,
-        ai_companies_mentioned: extractAICompanies(combinedText),
-        technologies_mentioned: extractAITechnologies(combinedText),
-        featured: (index === 0) && (normalizedScore > 60) // Feature high-relevance articles
+        ai_relevance_score: aiRelevanceScore,
+        featured: (index === 0) // Feature first article
       };
     }).filter(article => {
-      // [Analysis] More lenient filter to ensure we get enough AI-related content
-      return article.ai_relevance_score > 20 || // Lowered threshold 
-             article.ai_companies_mentioned.length > 0 ||
-             article.technologies_mentioned.length > 0;
+      // [Analysis] Less strict filtering - include anything with minimal AI relevance
+      const title = article.title.toLowerCase();
+      return article.ai_relevance_score > 0 || 
+             title.includes("ai") ||
+             title.includes("artificial intelligence") ||
+             title.includes("machine learning");
     });
     
   } catch (error) {
@@ -542,94 +434,60 @@ function extractDomainFromUrl(url) {
   }
 }
 
-// [Analysis] Helper function to extract AI companies mentioned in content
-function extractAICompanies(content) {
-  if (!content) return [];
+// [Analysis] Helper function to determine appropriate category
+function determineCategory(title, content, apiCategories) {
+  title = title.toLowerCase();
+  content = content.toLowerCase();
   
-  const aiCompanies = [
-    "OpenAI", "Google", "Microsoft", "Meta", "Anthropic", "Nvidia", "DeepMind",
-    "Amazon", "Apple", "IBM", "Hugging Face", "Stability AI", "Cohere", "Inflection",
-    "Tesla", "Baidu", "Tencent", "Alibaba", "SenseTime", "Midjourney", "Runway"
-  ];
+  // Default category
+  let category = "breakthrough_technologies";
   
-  return aiCompanies.filter(company => 
-    new RegExp(`\\b${company}\\b`, 'i').test(content)
-  );
-}
-
-// [Analysis] Helper function to extract AI technologies mentioned in content
-function extractAITechnologies(content) {
-  if (!content) return [];
+  // Check for business/industry terms
+  if (
+    title.includes("business") || 
+    title.includes("company") || 
+    title.includes("startup") ||
+    content.includes("industry") || 
+    content.includes("market")
+  ) {
+    category = "industry_applications";
+  }
   
-  const aiTechnologies = [
-    "GPT", "BERT", "Transformers", "LLM", "CNN", "GAN", "Diffusion", "RLHF", 
-    "Computer Vision", "NLP", "Large Language Model", "Neural Network", "LLaMA",
-    "Claude", "Mistral", "Gemini", "Stable Diffusion", "DALL-E", "ChatGPT", "Copilot"
-  ];
+  // Check for research terms
+  else if (
+    title.includes("research") || 
+    title.includes("study") || 
+    title.includes("paper") ||
+    content.includes("university") || 
+    content.includes("researchers")
+  ) {
+    category = "research_papers";
+  }
   
-  return aiTechnologies.filter(tech => 
-    new RegExp(`\\b${tech}\\b`, 'i').test(content)
-  );
-}
-
-// [Analysis] Function to map categories to our predefined categories
-function mapCategory(categories, keyword) {
-  // Default category if we can't determine a better one
-  let defaultCategory = "breakthrough_technologies";
+  // Check for ethics terms
+  else if (
+    title.includes("ethics") || 
+    title.includes("bias") || 
+    title.includes("policy") ||
+    content.includes("regulation") || 
+    content.includes("governance")
+  ) {
+    category = "ai_ethics";
+  }
   
-  // Keywords that might indicate specific categories
-  const keywordMappings = {
-    "ethics": "ai_ethics",
-    "regulation": "ai_ethics",
-    "policy": "ai_ethics",
-    "app": "ai_tools",
-    "tool": "ai_tools",
-    "business": "industry_applications",
-    "startup": "industry_applications",
-    "company": "industry_applications",
-    "research": "research_papers",
-    "paper": "research_papers",
-    "study": "research_papers",
-    "development": "ai_in_development",
-    "programming": "ai_in_development",
-    "code": "ai_in_development",
-    "impact": "societal_impact",
-    "society": "societal_impact",
-    "future": "future_possibilities",
-    "crypto": "crypto_ai",
-    "blockchain": "crypto_ai",
-    "nft": "crypto_ai",
-    "health": "healthcare_ai",
-    "medical": "healthcare_ai",
-    "education": "education_ai",
-    "learning": "education_ai",
-    "teach": "education_ai"
-  };
-  
-  // Look for category hints in the provided keyword
-  const lowercaseKeyword = keyword.toLowerCase();
-  for (const [key, value] of Object.entries(keywordMappings)) {
-    if (lowercaseKeyword.includes(key)) {
-      return value;
+  // Try to use API categories if available
+  if (apiCategories && apiCategories.length > 0) {
+    const categoryStr = JSON.stringify(apiCategories).toLowerCase();
+    if (categoryStr.includes("business") || categoryStr.includes("economy")) {
+      category = "industry_applications";
+    } else if (categoryStr.includes("science") || categoryStr.includes("research")) {
+      category = "research_papers";
+    } else if (categoryStr.includes("ethics") || categoryStr.includes("policy")) {
+      category = "ai_ethics";
     }
   }
   
-  // If we have categories from the API, try to map them
-  if (Array.isArray(categories) && categories.length > 0) {
-    // Look at the first few categories to see if any match our mappings
-    for (const category of categories.slice(0, 3)) {
-      const categoryName = typeof category === 'string' ? category.toLowerCase() : 
-                          (category.name ? category.name.toLowerCase() : '');
-      
-      for (const [key, value] of Object.entries(keywordMappings)) {
-        if (categoryName.includes(key)) {
-          return value;
-        }
-      }
-    }
-  }
-  
-  return defaultCategory;
+  return category;
 }
 
 // [Analysis] Function to save articles to the database
@@ -728,23 +586,6 @@ async function saveArticlesToDatabase(articles) {
         
         console.log(`Successfully imported article: ${article.title}`);
         successfulImports.push(data.id);
-        
-        // If we have AI companies mentioned, store them as tags
-        if (article.ai_companies_mentioned && article.ai_companies_mentioned.length > 0) {
-          const tagInserts = article.ai_companies_mentioned.map(company => ({
-            news_id: data.id,
-            tag: company,
-            created_at: new Date().toISOString()
-          }));
-          
-          const { error: tagError } = await supabase
-            .from('article_tags')
-            .insert(tagInserts);
-          
-          if (tagError) {
-            console.warn("Error inserting article tags:", tagError);
-          }
-        }
         
       } catch (error) {
         console.error("Error processing article for database:", error);
