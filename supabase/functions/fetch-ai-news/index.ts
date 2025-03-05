@@ -1,4 +1,3 @@
-
 // Import required modules
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
@@ -35,7 +34,7 @@ serve(async (req) => {
     // Parse request body with default values for AI-specific news
     const { 
       keyword = "artificial intelligence", 
-      limit = 10, 
+      limit = 50, // [Analysis] Increased default limit from 10 to 50
       testMode = true, 
       source = "event_registry" 
     } = await req.json();
@@ -155,7 +154,21 @@ async function fetchFromEventRegistryWithAIFilter(keyword, limit) {
         "large language model",
         "AI model", 
         "generative AI",
-        "AI research"
+        "AI research",
+        "AI chip",
+        "AI startup",
+        "AI ethics",
+        "computer vision",
+        "NLP",
+        "natural language processing",
+        "reinforcement learning",
+        "GPT",
+        "LLM",
+        "ChatGPT",
+        "Gemini",
+        "DALL-E",
+        "Midjourney",
+        "Stable Diffusion"
       ],
       keywordOper: "or", // Match any of these keywords
       
@@ -170,7 +183,13 @@ async function fetchFromEventRegistryWithAIFilter(keyword, limit) {
         "http://en.wikipedia.org/wiki/Microsoft",
         "http://en.wikipedia.org/wiki/Deep_learning",
         "http://en.wikipedia.org/wiki/Natural_language_processing",
-        "http://en.wikipedia.org/wiki/Computer_vision"
+        "http://en.wikipedia.org/wiki/Computer_vision",
+        "http://en.wikipedia.org/wiki/Anthropic_(company)",
+        "http://en.wikipedia.org/wiki/Stable_Diffusion",
+        "http://en.wikipedia.org/wiki/Midjourney",
+        "http://en.wikipedia.org/wiki/DALL-E",
+        "http://en.wikipedia.org/wiki/GPT-4",
+        "http://en.wikipedia.org/wiki/Claude_(chatbot)"
       ],
       conceptOper: "or", // Match any of these concepts
       
@@ -182,15 +201,20 @@ async function fetchFromEventRegistryWithAIFilter(keyword, limit) {
         "news/Technology",
         "news/Computing",
         "news/Business",
-        "news/Science"
+        "news/Science",
+        "news/Artificial_Intelligence",
+        "news/IT",
+        "news/Innovation"
       ],
+      categoryOper: "or",
       
       // Ignore certain categories to reduce noise
       ignoreCategoryUri: [
         "news/Sports",
         "news/Entertainment",
         "news/Lifestyle",
-        "news/Weather"
+        "news/Weather",
+        "news/Politics"
       ],
       
       // Ignore specific keywords that might create noise
@@ -204,7 +228,7 @@ async function fetchFromEventRegistryWithAIFilter(keyword, limit) {
       // Set additional parameters for quality and freshness
       articlesPage: 1,
       articlesCount: limit,
-      articlesSortBy: "rel", // Sort by relevance to our query
+      articlesSortBy: "date", // Sort by date to get newest articles
       articlesSortByAsc: false,
       articlesArticleBodyLen: -1, // Get full article content
       resultType: "articles",
@@ -217,7 +241,11 @@ async function fetchFromEventRegistryWithAIFilter(keyword, limit) {
       includeArticleConcepts: true,
       includeArticleCategories: true,
       includeArticleSentiment: true,
-      isDuplicateFilter: "skipDuplicates" // Filter out duplicate content
+      isDuplicateFilter: "skipDuplicates", // Filter out duplicate content
+      
+      // Start from higher quality sources (but not too restrictive)
+      startSourceRankPercentile: 0,
+      endSourceRankPercentile: 80
     };
     
     // Make the request to Event Registry
@@ -245,6 +273,8 @@ async function fetchFromEventRegistryWithAIFilter(keyword, limit) {
       return [];
     }
     
+    console.log(`Retrieved ${data.articles.results.length} raw articles from Event Registry`);
+    
     // [Analysis] Enhanced article transformation with AI relevance scoring
     return data.articles.results.map(article => {
       // Extract concepts to determine AI relevance score
@@ -254,17 +284,23 @@ async function fetchFromEventRegistryWithAIFilter(keyword, limit) {
         c.uri.includes("Machine_learning") ||
         c.uri.includes("OpenAI") ||
         c.uri.includes("Neural_network") ||
-        c.uri.includes("Deep_learning")
+        c.uri.includes("Deep_learning") ||
+        c.uri.includes("GPT") ||
+        c.uri.includes("Claude") ||
+        c.uri.includes("Nvidia") ||
+        c.uri.includes("Meta") ||
+        c.uri.includes("Google") ||
+        c.uri.includes("Microsoft")
       );
       
-      // Calculate AI relevance score (0-100)
-      const aiRelevanceScore = Math.min(100, aiConcepts.length * 20);
+      // Calculate AI relevance score (0-100) - lowered threshold for better inclusion
+      const aiRelevanceScore = Math.min(100, aiConcepts.length * 15);
       
       // Determine impact based on concepts and sentiment
       let impact = "medium";
-      if (aiRelevanceScore > 60 || article.sentiment > 0.5 || article.sentiment < -0.5) {
+      if (aiRelevanceScore > 50 || article.sentiment > 0.5 || article.sentiment < -0.5) {
         impact = "high";
-      } else if (aiRelevanceScore < 30 && !article.title.toLowerCase().includes("ai")) {
+      } else if (aiRelevanceScore < 20 && !article.title.toLowerCase().includes("ai")) {
         impact = "low";
       }
       
@@ -317,13 +353,14 @@ async function fetchFromEventRegistryWithAIFilter(keyword, limit) {
         technologies_mentioned: extractAITechnologies(article.body || article.title || "")
       };
     }).filter(article => {
-      // Final filter to ensure high quality AI-related content
+      // [Analysis] More lenient filter to ensure we get enough AI-related content (lowered threshold)
       return (
-        article.ai_relevance_score > 20 ||
+        article.ai_relevance_score > 15 || // Lowered threshold for better inclusion
         article.title.toLowerCase().includes("ai") ||
         article.title.toLowerCase().includes("artificial intelligence") ||
         article.title.toLowerCase().includes("machine learning") ||
-        article.ai_companies_mentioned.length > 0
+        article.ai_companies_mentioned.length > 0 ||
+        article.technologies_mentioned.length > 0
       );
     });
     
@@ -348,14 +385,14 @@ async function fetchFromNewsAPIWithAIFilter(keyword, limit) {
     
     // [Analysis] Create a more sophisticated query for AI news
     const aiQuery = encodeURIComponent(
-      '("artificial intelligence" OR "machine learning" OR "deep learning" OR "neural network" OR "AI model" OR "large language model" OR "LLM" OR "generative AI") AND (OpenAI OR Anthropic OR Nvidia OR Microsoft OR Google OR Meta OR AI OR technology OR research OR development OR breakthrough)'
+      '("artificial intelligence" OR "machine learning" OR "deep learning" OR "neural network" OR "AI model" OR "large language model" OR "LLM" OR "generative AI" OR "GPT" OR "ChatGPT" OR "Claude" OR "Gemini" OR "DALL-E" OR "Midjourney" OR "Stable Diffusion" OR "AI chip" OR "AI startup") AND (OpenAI OR Anthropic OR Nvidia OR Microsoft OR Google OR Meta OR AI OR technology OR research OR development OR breakthrough OR innovation)'
     );
     
     const url = new URL("https://newsapi.org/v2/everything");
     url.searchParams.append("q", aiQuery);
     url.searchParams.append("from", fromDate);
     url.searchParams.append("to", toDate);
-    url.searchParams.append("sortBy", "relevancy"); // Sort by relevance to our query
+    url.searchParams.append("sortBy", "publishedAt"); // Sort by date to get newest articles
     url.searchParams.append("language", "en");
     url.searchParams.append("pageSize", limit.toString());
     url.searchParams.append("page", "1");
@@ -383,6 +420,8 @@ async function fetchFromNewsAPIWithAIFilter(keyword, limit) {
       return [];
     }
     
+    console.log(`Retrieved ${data.articles.length} raw articles from News API`);
+    
     // [Analysis] Enhanced transformation with AI relevance scoring
     return data.articles.map((article, index) => {
       // Calculate AI relevance score based on content
@@ -396,10 +435,10 @@ async function fetchFromNewsAPIWithAIFilter(keyword, limit) {
         "midjourney", "dall-e", "chatgpt", "gemini", "llama", "ai research", "nvidia"
       ];
       
-      // Calculate score based on AI term frequency
+      // Calculate score based on AI term frequency - adjusted for better inclusion
       const aiRelevanceScore = aiTerms.reduce((score, term) => {
         const matches = (combinedText.match(new RegExp(term, 'g')) || []).length;
-        return score + (matches * 10); // Each match adds 10 points
+        return score + (matches * 12); // Higher points per match
       }, 0);
       
       // Cap at 100
@@ -479,8 +518,10 @@ async function fetchFromNewsAPIWithAIFilter(keyword, limit) {
         featured: (index === 0) && (normalizedScore > 60) // Feature high-relevance articles
       };
     }).filter(article => {
-      // Final filter to ensure high-quality AI content
-      return article.ai_relevance_score > 30; // Only keep articles with reasonable AI relevance
+      // [Analysis] More lenient filter to ensure we get enough AI-related content
+      return article.ai_relevance_score > 20 || // Lowered threshold 
+             article.ai_companies_mentioned.length > 0 ||
+             article.technologies_mentioned.length > 0;
     });
     
   } catch (error) {
