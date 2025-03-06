@@ -130,6 +130,7 @@ async function callOpenAI(prompt: string): Promise<{ data?: any, error?: Error }
   
   try {
     console.log("Sending request to OpenAI with API key...");
+    // [Plan] Fix: Changed model from gpt-4o-mini to gpt-4o which is a valid model
     const openAIResponse = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -137,7 +138,7 @@ async function callOpenAI(prompt: string): Promise<{ data?: any, error?: Error }
         "Authorization": `Bearer ${openAIKey}`
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini", // [Analysis] Using gpt-4o-mini for faster, cost-effective summarization
+        model: "gpt-4o", // [Analysis] Fixed: Using gpt-4o which is a valid model
         messages: [
           {
             role: "system",
