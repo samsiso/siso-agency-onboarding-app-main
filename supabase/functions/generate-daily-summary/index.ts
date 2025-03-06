@@ -148,10 +148,10 @@ async function callOpenAI(prompt: string, maxRetries = 2): Promise<{ data?: any,
       
       console.log(`API call attempt ${retryCount + 1}/${maxRetries + 1}`);
       console.log("Sending request to OpenAI API...");
-      console.log("Using model: gpt-4o-mini");
+      console.log("Using model: gpt-4o");
       
       const requestBody = JSON.stringify({
-        model: "gpt-4o-mini", // [Analysis] Using gpt-4o-mini which is a valid model
+        model: "gpt-4o", // [Analysis] Updated to gpt-4o which is a valid model
         messages: [
           {
             role: "system",
