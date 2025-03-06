@@ -11,7 +11,7 @@ interface SummaryContentProps {
   loading: boolean;
   summaryData: DailySummaryData | null;
   activeTab: string;
-  setActiveTab?: (value: string) => void; // Made optional to fix the error
+  setActiveTab?: (value: string) => void; // Made optional
 }
 
 // [Analysis] Enhanced content component with tabs and visualizations
@@ -236,3 +236,4 @@ export function SummaryContent({
     </Tabs>
   );
 }
+

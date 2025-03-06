@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 import { NewsItem } from '@/types/blog';
@@ -11,7 +11,8 @@ import {
   Download, 
   Save,
   Maximize2,
-  PieChart
+  PieChart,
+  Sparkles
 } from 'lucide-react';
 import { TopStatsRow } from './stats/TopStatsRow';
 import { ImpactAnalysis } from './stats/ImpactAnalysis';
@@ -30,12 +31,21 @@ import {
 } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { formatNumber } from '@/lib/formatters';
+import { SummaryContent } from './daily-summary/SummaryContent';
+import { useAiDailySummary } from '@/hooks/useAiDailySummary';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
+import { SummaryFooter } from './daily-summary/SummaryFooter';
+import { GeneratePrompt } from './daily-summary/GeneratePrompt';
 
 interface DailyStatsOverviewProps {
   newsItems: NewsItem[];
   lastSync: string | null;
   articleCount: number;
   loading?: boolean;
+  currentDate?: Date;
+  isAdmin?: boolean;
+  refreshSummary?: () => Promise<void>;
 }
 
 // [Analysis] Enhanced component with better organization, tabs, and interactive features
@@ -43,7 +53,10 @@ export const DailyStatsOverview = ({
   newsItems, 
   lastSync, 
   articleCount,
-  loading = false 
+  loading = false,
+  currentDate = new Date(),
+  isAdmin = false,
+  refreshSummary
 }: DailyStatsOverviewProps) => {
   // [Analysis] Only show this component if we have news items or are in loading state
   if (newsItems.length === 0 && !loading) {
@@ -52,6 +65,31 @@ export const DailyStatsOverview = ({
 
   const [expanded, setExpanded] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+  
+  // Get current date formatted as YYYY-MM-DD for the summary
+  const formattedDate = format(currentDate, 'yyyy-MM-dd');
+  
+  // Use the daily summary hook
+  const {
+    summaryData,
+    loading: summaryLoading,
+    generating: summaryGenerating,
+    error: summaryError,
+    fetchSummary,
+    generateSummary
+  } = useAiDailySummary(formattedDate, isAdmin);
+
+  // Handle generate summary click
+  const handleGenerateSummary = async () => {
+    await generateSummary(summaryData !== null);
+  };
+  
+  // Handle refresh button click
+  const handleRefresh = async () => {
+    if (refreshSummary) {
+      await refreshSummary();
+    }
+  };
 
   // [Analysis] Function to export insights as CSV
   const exportInsights = () => {
@@ -77,6 +115,9 @@ export const DailyStatsOverview = ({
     link.click();
     document.body.removeChild(link);
   };
+
+  // If there's no summary data and we've finished loading
+  const shouldShowGeneratePrompt = !summaryLoading && !summaryData;
 
   return (
     <motion.div
@@ -173,6 +214,10 @@ export const DailyStatsOverview = ({
                 <TabsTrigger value="overview">Overview</TabsTrigger>
                 <TabsTrigger value="impact">Impact Analysis</TabsTrigger>
                 <TabsTrigger value="technology">Technology</TabsTrigger>
+                <TabsTrigger value="summary" className="flex items-center gap-1">
+                  <Sparkles className="h-3.5 w-3.5" />
+                  AI Summary
+                </TabsTrigger>
               </TabsList>
               
               <TabsContent value="overview" className="mt-0">
@@ -186,6 +231,39 @@ export const DailyStatsOverview = ({
               <TabsContent value="technology" className="mt-0">
                 <TechnologyBreakdown newsItems={newsItems} loading={loading} />
               </TabsContent>
+
+              <TabsContent value="summary" className="mt-0">
+                {summaryError && (
+                  <Alert variant="default" className="bg-purple-950/20 border-purple-500/30 mb-4">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      {summaryError}
+                    </AlertDescription>
+                  </Alert>
+                )}
+                
+                {shouldShowGeneratePrompt ? (
+                  <GeneratePrompt 
+                    articleCount={articleCount} 
+                    onGenerate={handleGenerateSummary} 
+                    isAdmin={isAdmin}
+                  />
+                ) : (
+                  <>
+                    <SummaryContent 
+                      summaryData={summaryData} 
+                      loading={summaryLoading || summaryGenerating}
+                      activeTab="summary"
+                    />
+                    {summaryData && (
+                      <SummaryFooter
+                        summaryData={summaryData}
+                        date={formattedDate}
+                      />
+                    )}
+                  </>
+                )}
+              </TabsContent>
             </Tabs>
           </div>
         </CollapsibleContent>
@@ -193,3 +271,4 @@ export const DailyStatsOverview = ({
     </motion.div>
   );
 };
+

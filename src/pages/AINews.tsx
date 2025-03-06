@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNewsItems } from '@/hooks/useNewsItems';
 import NewsFilters from '@/components/ai-news/NewsFilters';
@@ -8,7 +9,6 @@ import { DailyStatsOverview } from '@/components/ai-news/DailyStatsOverview';
 import { DateNavigation } from '@/components/ai-news/DateNavigation';
 import { NewsDateSection } from '@/components/ai-news/NewsDateSection';
 import { FetchHistoryPanel } from '@/components/ai-news/FetchHistoryPanel';
-import { DailySummary } from '@/components/ai-news/DailySummary';
 import { AdminControls } from '@/components/ai-news/AdminControls';
 import { Helmet } from 'react-helmet';
 import { Sidebar } from '@/components/Sidebar';
@@ -555,13 +555,17 @@ const AINews = () => {
             </Card>
           </motion.div>}
 
-        {showStats && <DailyStatsOverview newsItems={newsItems} lastSync={lastSync} articleCount={articleCount} loading={loading} />}
-
-        {/* Place the Daily AI Summary right after DailyStatsOverview */}
+        {/* Only show stats and daily summary for today's current view when no filters are applied */}
         {isToday(currentDate) && !searchQuery && !selectedCategory && (
-          <div className="mb-8">
-            <DailySummary date={format(currentDate, 'yyyy-MM-dd')} articleCount={newsItems.length} refreshSummary={refreshDailySummary} isAdmin={isAdmin} />
-          </div>
+          <DailyStatsOverview 
+            newsItems={newsItems} 
+            lastSync={lastSync} 
+            articleCount={articleCount} 
+            loading={loading} 
+            currentDate={currentDate}
+            isAdmin={isAdmin}
+            refreshSummary={refreshDailySummary}
+          />
         )}
 
         <DateNavigation currentDate={currentDate} dateRange={dateRange} onPreviousDay={goToPreviousDay} onNextDay={goToNextDay} onSelectDate={handleSelectDate} loading={loading} />
