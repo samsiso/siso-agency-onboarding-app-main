@@ -1,17 +1,16 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, Clock, BarChart, ExternalLink, FileText } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CardContent } from '@/components/ui/card';
-import { NewsPost } from '@/types/blog';
+import { NewsItem } from '@/types/blog'; // Changed from NewsPost to NewsItem
 import { extractDomain } from '@/lib/utils';
 import AISummaryPopup from './AISummaryPopup';
 import { useAiArticleSummary } from '@/hooks/useAiArticleSummary';
 
 interface NewsCardContentProps {
-  post: NewsPost;
+  post: NewsItem; // Changed from NewsPost to NewsItem
   hideContent?: boolean;
   hideMetadata?: boolean;
   truncateTitle?: boolean;

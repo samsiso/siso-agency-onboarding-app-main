@@ -1,7 +1,7 @@
 
 import { Card } from "@/components/ui/card";
 import { NewsCardMedia } from './NewsCardMedia';
-import { NewsCardContent } from './NewsCardContent';
+import NewsCardContent from './NewsCardContent'; // Fixed import
 import { NewsItem } from '@/types/blog';
 
 interface NewsCardProps {

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { format } from 'date-fns';
@@ -9,6 +10,7 @@ import { GeneratePrompt } from './daily-summary/GeneratePrompt';
 import { useAiDailySummary } from '@/hooks/useAiDailySummary';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from '@/hooks/use-toast';
+
 interface DailySummaryProps {
   date?: string;
   articleCount?: number;
@@ -93,5 +95,53 @@ export function DailySummary({
   const shouldShowGeneratePrompt = !loading && !summaryData;
 
   // [Analysis] Return the JSX for the component with improved error states
-  return;
+  return (
+    <Card className="border bg-card">
+      <CardHeader className="p-4 pb-0">
+        <SummaryHeader
+          date={formattedDate}
+          loading={loading}
+          generating={generating}
+          onRefresh={handleRefresh}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          hasSummary={!!summaryData}
+        />
+      </CardHeader>
+      <CardContent className="p-4">
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              {error}
+            </AlertDescription>
+          </Alert>
+        )}
+        
+        {shouldShowGeneratePrompt ? (
+          <GeneratePrompt 
+            articleCount={articleCount} 
+            onGenerate={handleGenerate} 
+            isAdmin={isAdmin}
+          />
+        ) : (
+          <>
+            <SummaryContent 
+              summaryData={summaryData} 
+              loading={loading || generating}
+              activeTab={activeTab}
+            />
+            {summaryData && (
+              <SummaryFooter
+                summaryData={summaryData}
+                date={date}
+              />
+            )}
+          </>
+        )}
+      </CardContent>
+    </Card>
+  );
 }
+
+export default DailySummary;
