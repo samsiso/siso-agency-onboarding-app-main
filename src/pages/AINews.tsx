@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNewsItems } from '@/hooks/useNewsItems';
 import NewsFilters from '@/components/ai-news/NewsFilters';
-import FeaturedNewsHero from '@/components/ai-news/FeaturedNewsHero';
 import { NewsContent } from '@/components/ai-news/NewsContent';
 import { NewsHeader } from '@/components/ai-news/NewsHeader';
 import { NewsErrorBoundary } from '@/components/ai-news/NewsErrorBoundary';
@@ -558,11 +557,9 @@ const AINews = () => {
 
         {showStats && <DailyStatsOverview newsItems={newsItems} lastSync={lastSync} articleCount={articleCount} loading={loading} />}
 
-        {featuredArticle && showStats && <FeaturedNewsHero article={featuredArticle} onGenerateSummary={generateSummary} summary={summaries[featuredArticle.id] || ""} loadingSummary={loadingSummaries[featuredArticle.id] || false} />}
-
-        {/* Place the Daily AI Summary here, more prominently */}
+        {/* Place the Daily AI Summary right after DailyStatsOverview */}
         {isToday(currentDate) && !searchQuery && !selectedCategory && (
-          <div className="my-8">
+          <div className="mb-8">
             <DailySummary date={format(currentDate, 'yyyy-MM-dd')} articleCount={newsItems.length} refreshSummary={refreshDailySummary} isAdmin={isAdmin} />
           </div>
         )}
