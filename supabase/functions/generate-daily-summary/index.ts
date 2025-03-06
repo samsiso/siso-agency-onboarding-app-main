@@ -122,7 +122,7 @@ async function generateDailySummary(date: string, forceRefresh: boolean = false)
       };
     }
     
-    // Use OpenAI to generate the summary
+    // Use OpenAI to generate the summary (switching to gpt-4o-mini for better efficiency)
     const prompt = `
 You are an AI news analyst specializing in artificial intelligence trends. 
 Analyze these ${articles.length} articles about AI from ${date} and create a comprehensive summary:
@@ -147,7 +147,7 @@ summary (string), key_points (array), practical_applications (array), industry_i
         "Authorization": `Bearer ${openAIKey}`
       },
       body: JSON.stringify({
-        model: "gpt-3.5-turbo",
+        model: "gpt-4o-mini", // [Analysis] Using gpt-4o-mini for faster, cost-effective summarization
         messages: [
           {
             role: "system",

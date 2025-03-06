@@ -49,21 +49,36 @@ export function DailySummary({
     try {
       setLoading(true);
       
+      // Using traditional rpc call instead of typed query to avoid TypeScript errors
       const { data, error } = await supabase
-        .from('ai_news_daily_summaries')
-        .select('*')
-        .eq('date', date)
-        .maybeSingle();
+        .rpc('get_daily_summary', { target_date: date });
         
       if (error) {
         console.error('Error fetching summary:', error);
-        toast({
-          title: 'Error',
-          description: 'Failed to load daily summary. Please try again.',
-          variant: 'destructive',
-        });
+        
+        // Fallback to direct table query if RPC doesn't exist
+        const directResult = await supabase
+          .from('ai_news_daily_summaries')
+          .select('*')
+          .eq('date', date)
+          .maybeSingle();
+          
+        if (directResult.error) {
+          console.error('Error with direct query:', directResult.error);
+          toast({
+            title: 'Error',
+            description: 'Failed to load daily summary. Please try again.',
+            variant: 'destructive',
+          });
+          setLoading(false);
+          return;
+        }
+        
+        if (directResult.data) {
+          setSummaryData(directResult.data as unknown as SummaryData);
+        }
       } else if (data) {
-        setSummaryData(data);
+        setSummaryData(data as unknown as SummaryData);
       }
     } catch (error) {
       console.error('Error in fetchSummary:', error);

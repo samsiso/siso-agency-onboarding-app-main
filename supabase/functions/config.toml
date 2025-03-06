@@ -10,3 +10,6 @@ verify_jwt = false
 
 [functions.generate-daily-summary]
 verify_jwt = false
+
+[functions.chat-with-assistant]
+verify_jwt = false
