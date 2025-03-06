@@ -8,7 +8,8 @@ import { NewsErrorBoundary } from '@/components/ai-news/NewsErrorBoundary';
 import { DailyStatsOverview } from '@/components/ai-news/DailyStatsOverview';
 import { DateNavigation } from '@/components/ai-news/DateNavigation';
 import { NewsDateSection } from '@/components/ai-news/NewsDateSection';
-import { FetchHistoryPanel } from '@/components/ai-news/FetchHistoryPanel'; // Add this import
+import { FetchHistoryPanel } from '@/components/ai-news/FetchHistoryPanel';
+import { DailySummary } from '@/components/ai-news/DailySummary'; // Import the new component
 import { Helmet } from 'react-helmet';
 import { Sidebar } from '@/components/Sidebar';
 import NewsPagination from '@/components/ai-news/NewsPagination';
@@ -35,7 +36,8 @@ import {
   RefreshCw, 
   Bug, 
   Terminal,
-  CalendarClock
+  CalendarClock,
+  Shield
 } from 'lucide-react';
 import { format, subDays, isToday } from 'date-fns';
 import { toast } from '@/hooks/use-toast';
@@ -46,6 +48,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Textarea } from '@/components/ui/textarea';
+import { supabase } from '@/integrations/supabase/client';
 
 // [Analysis] Main component for the AI News page with date-based navigation and testing panel
 const AINews = () => {
@@ -226,6 +229,70 @@ const AINews = () => {
     // We could potentially add other filtering logic here based on the active tab
   };
 
+  // New state to check if user has admin privileges
+  const [isAdmin, setIsAdmin] = useState(false);
+  
+  // Load admin status on component mount
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      try {
+        // Check if user is authenticated
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          // Check admin status - in a real app, you would check a roles table or similar
+          // For now, we'll use a simplified approach
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .maybeSingle();
+            
+          setIsAdmin(profile?.role === 'admin');
+        }
+      } catch (error) {
+        console.error('Error checking admin status:', error);
+        setIsAdmin(false);
+      }
+    };
+    
+    checkAdminStatus();
+  }, []);
+  
+  // Add a new function to refresh the daily summary
+  const refreshDailySummary = async () => {
+    try {
+      const formattedDate = format(currentDate, 'yyyy-MM-dd');
+      
+      const { data, error } = await supabase.functions.invoke('generate-daily-summary', {
+        body: { 
+          date: formattedDate,
+          forceRefresh: false
+        },
+      });
+      
+      if (error) {
+        throw new Error(`Edge function error: ${error.message}`);
+      }
+      
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to refresh summary');
+      }
+      
+      toast({
+        title: 'Success',
+        description: 'Daily summary has been refreshed',
+      });
+    } catch (error) {
+      console.error('Error refreshing summary:', error);
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to refresh summary',
+        variant: 'destructive',
+      });
+    }
+  };
+
   return (
     <div className="flex min-h-screen bg-siso-bg">
       <Helmet>
@@ -287,25 +354,34 @@ const AINews = () => {
               </PopoverContent>
             </Popover>
             
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="gap-2 h-8 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border-purple-500/50"
-              onClick={() => setShowFetchHistory(!showFetchHistory)}
-            >
-              <CalendarClock className="h-4 w-4" />
-              {showFetchHistory ? 'Hide Automation' : 'Fetch History'}
-            </Button>
-            
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="gap-2 h-8 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-500 border-yellow-500/50"
-              onClick={() => setShowTestPanel(!showTestPanel)}
-            >
-              <Sparkles className="h-4 w-4" />
-              {showTestPanel ? 'Hide Test Panel' : 'Test API'}
-            </Button>
+            {isAdmin && (
+              <>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="gap-2 h-8 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border-purple-500/50"
+                  onClick={() => setShowFetchHistory(!showFetchHistory)}
+                >
+                  <CalendarClock className="h-4 w-4" />
+                  {showFetchHistory ? 'Hide Automation' : 'Fetch History'}
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="gap-2 h-8 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-500 border-yellow-500/50"
+                  onClick={() => setShowTestPanel(!showTestPanel)}
+                >
+                  <Sparkles className="h-4 w-4" />
+                  {showTestPanel ? 'Hide Test Panel' : 'Test API'}
+                </Button>
+                
+                <Badge variant="outline" className="bg-red-500/10 text-red-400 border-red-500/50 gap-1">
+                  <Shield className="h-3 w-3" />
+                  Admin
+                </Badge>
+              </>
+            )}
           </div>
         </div>
         
@@ -319,7 +395,7 @@ const AINews = () => {
           </Alert>
         )}
         
-        {showFetchHistory && (
+        {showFetchHistory && isAdmin && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
@@ -333,8 +409,8 @@ const AINews = () => {
           </motion.div>
         )}
         
-        
-        {showTestPanel && (
+        {/* Show test panel only for admin users */}
+        {showTestPanel && isAdmin && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
@@ -623,6 +699,15 @@ const AINews = () => {
           </motion.div>
         )}
         
+        {/* Show the daily summary at the top of the page above date navigation */}
+        {isToday(currentDate) && !searchQuery && !selectedCategory && (
+          <DailySummary 
+            date={format(currentDate, 'yyyy-MM-dd')}
+            articleCount={newsItems.length}
+            refreshSummary={refreshDailySummary}
+            isAdmin={isAdmin}
+          />
+        )}
         
         <DateNavigation 
           currentDate={currentDate}
