@@ -138,7 +138,7 @@ export function useAiDailySummary(date: string, isAdmin: boolean = false) {
       console.log("Calling Supabase function: generate-daily-summary with payload:", {
         date,
         forceRefresh,
-        enhancedAnalysis: true, // Request enhanced analysis with additional metadata
+        enhancedAnalysis: true, // Always request enhanced analysis with additional metadata
       });
       
       try {
@@ -146,7 +146,7 @@ export function useAiDailySummary(date: string, isAdmin: boolean = false) {
           body: { 
             date,
             forceRefresh,
-            enhancedAnalysis: true, // Send flag to enable enhanced analysis
+            enhancedAnalysis: true, // Always send flag to enable enhanced analysis
           },
         });
         

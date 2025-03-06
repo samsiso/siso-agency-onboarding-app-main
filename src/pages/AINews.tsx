@@ -556,7 +556,16 @@ const AINews = () => {
             </Card>
           </motion.div>}
 
-        {isToday(currentDate) && !searchQuery && !selectedCategory && <DailySummary date={format(currentDate, 'yyyy-MM-dd')} articleCount={newsItems.length} refreshSummary={refreshDailySummary} isAdmin={isAdmin} />}
+        {showStats && <DailyStatsOverview newsItems={newsItems} lastSync={lastSync} articleCount={articleCount} loading={loading} />}
+
+        {featuredArticle && showStats && <FeaturedNewsHero article={featuredArticle} onGenerateSummary={generateSummary} summary={summaries[featuredArticle.id] || ""} loadingSummary={loadingSummaries[featuredArticle.id] || false} />}
+
+        {/* Place the Daily AI Summary here, more prominently */}
+        {isToday(currentDate) && !searchQuery && !selectedCategory && (
+          <div className="my-8">
+            <DailySummary date={format(currentDate, 'yyyy-MM-dd')} articleCount={newsItems.length} refreshSummary={refreshDailySummary} isAdmin={isAdmin} />
+          </div>
+        )}
 
         <DateNavigation currentDate={currentDate} dateRange={dateRange} onPreviousDay={goToPreviousDay} onNextDay={goToNextDay} onSelectDate={handleSelectDate} loading={loading} />
 
@@ -565,10 +574,6 @@ const AINews = () => {
             <NewsFilters selectedCategory={selectedCategory} onCategoryChange={handleCategoryChange} searchQuery={searchQuery} onSearchChange={handleSearchChange} onDateChange={handleDateChange} selectedDate={selectedDate} />
           </div>
         </div>
-
-        {showStats && <DailyStatsOverview newsItems={newsItems} lastSync={lastSync} articleCount={articleCount} loading={loading} />}
-
-        {featuredArticle && showStats && <FeaturedNewsHero article={featuredArticle} onGenerateSummary={generateSummary} summary={summaries[featuredArticle.id] || ""} loadingSummary={loadingSummaries[featuredArticle.id] || false} />}
 
         <NewsErrorBoundary>
           <AnimatePresence mode="wait">

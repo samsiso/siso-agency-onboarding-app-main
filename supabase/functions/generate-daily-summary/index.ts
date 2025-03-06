@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
 
@@ -19,7 +18,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-async function generateDailySummary(date: string, forceRefresh: boolean = false, enhancedAnalysis: boolean = false) {
+async function generateDailySummary(date: string, forceRefresh: boolean = false, enhancedAnalysis: boolean = true) {
   try {
     console.log(`⭐️ Starting daily summary generation for ${date}, force refresh: ${forceRefresh}, enhanced: ${enhancedAnalysis}`);
     console.log(`Environment check: SUPABASE_URL exists? ${supabaseUrl ? 'Yes' : 'No'}`);
@@ -99,8 +98,8 @@ async function generateDailySummary(date: string, forceRefresh: boolean = false,
     console.log(`Found ${articles.length} articles for ${date}`);
     
     // Create a prompt that focuses on the enhanced analysis if requested
-    const prompt = enhancedAnalysis ? `
-As an AI analyst for agency owners, provide a comprehensive analysis of these ${articles.length} AI news articles from ${date}:
+    const prompt = `
+As an AI analyst for agency owners and technology professionals, provide a comprehensive analysis of these ${articles.length} AI news articles from ${date}:
 
 ${JSON.stringify(articles.map(a => ({
   title: a.title,
@@ -112,12 +111,12 @@ ${JSON.stringify(articles.map(a => ({
 })), null, 2)}
 
 Format your response as JSON with these keys:
-- "summary": A concise 2-3 paragraph executive summary
+- "summary": A concise 2-3 paragraph executive summary highlighting business implications and trends
 - "sentiment": Overall sentiment of today's news - "positive", "negative", or "neutral"
 - "confidence_score": A number between 0-100 indicating confidence in analysis
-- "categorized_key_points": An object with categories as keys and arrays of string points as values
+- "categorized_key_points": An object with categories like "business_impact", "technology_trends", "research", "policy", etc. as keys and arrays of string points as values
 - "key_points": Array of 5 key points for agency owners (fallback if categorization fails)
-- "practical_applications": Array of 3-4 actionable items for agencies
+- "practical_applications": Array of 3-4 actionable items for agencies and technology businesses
 - "application_details": Matching array of more detailed explanations for each application
 - "industry_impacts": Object with industry names as keys and impact descriptions as values
 - "impact_severity": Object with same industry keys but "high", "medium", or "low" severity values
@@ -127,32 +126,16 @@ Format your response as JSON with these keys:
   * "description": Brief description
   * "maturity": Development stage ("emerging", "growing", "mature")
   * "adoption_rate": Number from 0-100
-- "analysis_depth": "comprehensive" (indicating this is an enhanced analysis)
-` : `
-As an AI analyst for agency owners, summarize these ${articles.length} AI news articles from ${date}:
+- "analysis_depth": "comprehensive"
 
-${JSON.stringify(articles.map(a => ({
-  title: a.title,
-  description: a.description,
-  category: a.category,
-  impact: a.impact
-})), null, 2)}
-
-Create a concise summary FOR AGENCY OWNERS highlighting:
-1. Executive summary (2-3 paragraphs) focusing on business implications
-2. 5 key points that agency owners should know
-3. 3-4 practical applications or action items for agency businesses
-4. Brief impact assessment for different industries (marketing, tech, creative, consulting)
-
-Format your response as JSON with these keys: 
-"summary" (string), "key_points" (array of strings), "practical_applications" (array of strings), "industry_impacts" (object with industry names as keys and impact descriptions as values)
+Ensure the analysis is business-focused with specific, actionable insights rather than generic observations.
 `;
 
     if (!openAIKey) {
       console.warn("OpenAI API key not available. Using placeholder summary.");
       
       // Generate a basic summary without OpenAI
-      const placeholderSummary = enhancedAnalysis ? {
+      const placeholderSummary = {
         summary: `Daily AI News Summary for ${date}. ${articles.length} articles published covering various AI topics relevant to agency owners.`,
         sentiment: "neutral",
         confidence_score: 50,
@@ -225,27 +208,6 @@ Format your response as JSON with these keys:
           }
         ],
         analysis_depth: "comprehensive"
-      } : {
-        summary: `Daily AI News Summary for ${date}. ${articles.length} articles published covering various AI topics relevant to agency owners.`,
-        key_points: [
-          "Multiple AI developments affecting agency operations published today",
-          "Several technological advancements that may impact client deliverables",
-          "New AI tools relevant for marketing and creative agencies",
-          "Potential shifts in AI implementation strategies for agencies",
-          "Industry-wide AI adoption trends to monitor"
-        ],
-        practical_applications: [
-          "Consider evaluating your agency's AI implementation strategy",
-          "Monitor these developments for potential client opportunities",
-          "Explore how these AI tools could enhance your service offerings",
-          "Stay informed on how competitors may leverage these technologies"
-        ],
-        industry_impacts: {
-          "marketing": "New AI capabilities that may affect campaign performance",
-          "technology": "Technical shifts that could impact agency tech stacks",
-          "creative": "AI tools that might enhance or challenge creative processes",
-          "consulting": "Strategic considerations for agencies advising clients on AI"
-        }
       };
       
       // Save the placeholder summary
@@ -275,7 +237,7 @@ Format your response as JSON with these keys:
           messages: [
             {
               role: "system",
-              content: "You are an AI analyst specializing in creating actionable summaries for agency owners."
+              content: "You are an AI analyst specializing in creating actionable summaries for agency owners and technology professionals. You excel at identifying trends, business implications, and practical applications from AI news."
             },
             {
               role: "user",
@@ -283,7 +245,7 @@ Format your response as JSON with these keys:
             }
           ],
           temperature: 0.5,
-          max_tokens: enhancedAnalysis ? 2000 : 1000 // Increase token limit for enhanced analysis
+          max_tokens: 2000 // Increased token limit for enhanced analysis
         })
       });
       
@@ -326,11 +288,6 @@ Format your response as JSON with these keys:
         };
       }
       
-      // Add analysis_depth field if enhanced
-      if (enhancedAnalysis && !summaryData.analysis_depth) {
-        summaryData.analysis_depth = "comprehensive";
-      }
-      
       // Save the summary
       await saveSummary(supabase, date, summaryData, articles.length, "openai");
       
@@ -344,7 +301,7 @@ Format your response as JSON with these keys:
       console.error("Error generating summary with OpenAI:", error);
       
       // Fall back to placeholder if OpenAI fails
-      const placeholderSummary = enhancedAnalysis ? {
+      const placeholderSummary = {
         summary: `Daily AI News Summary for ${date}. ${articles.length} articles published covering various AI topics.`,
         sentiment: "neutral",
         confidence_score: 30,
@@ -409,26 +366,6 @@ Format your response as JSON with these keys:
           }
         ],
         analysis_depth: "partial"
-      } : {
-        summary: `Daily AI News Summary for ${date}. ${articles.length} articles published covering various AI topics.`,
-        key_points: [
-          "Multiple AI developments published today",
-          "Several technological advancements in AI reported",
-          "New AI tools and applications announced",
-          "Potential business impacts across sectors",
-          "Industry trends to monitor"
-        ],
-        practical_applications: [
-          "Stay informed about the latest AI developments",
-          "Consider how these technologies might apply to your business",
-          "Explore potential implementations for your clients"
-        ],
-        industry_impacts: {
-          "marketing": "New capabilities for targeting and personalization",
-          "technology": "Advances in AI infrastructure and tools",
-          "creative": "New AI-powered creative tools and approaches",
-          "consulting": "Emerging advisory opportunities around AI implementation"
-        }
       };
       
       await saveSummary(supabase, date, placeholderSummary, articles.length, "error_fallback");
