@@ -307,38 +307,62 @@ export type Database = {
       }
       ai_news_daily_summaries: {
         Row: {
+          analysis_depth: string | null
+          application_details: string[] | null
           article_count: number | null
+          categorized_key_points: Json | null
+          confidence_score: number | null
           created_at: string | null
           date: string
           generated_with: string | null
           id: string
+          impact_severity: Json | null
+          impact_trends: Json | null
           industry_impacts: Json | null
           key_points: string[] | null
+          key_technologies: Json | null
           practical_applications: string[] | null
+          sentiment: string | null
           summary: string
           updated_at: string | null
         }
         Insert: {
+          analysis_depth?: string | null
+          application_details?: string[] | null
           article_count?: number | null
+          categorized_key_points?: Json | null
+          confidence_score?: number | null
           created_at?: string | null
           date: string
           generated_with?: string | null
           id?: string
+          impact_severity?: Json | null
+          impact_trends?: Json | null
           industry_impacts?: Json | null
           key_points?: string[] | null
+          key_technologies?: Json | null
           practical_applications?: string[] | null
+          sentiment?: string | null
           summary: string
           updated_at?: string | null
         }
         Update: {
+          analysis_depth?: string | null
+          application_details?: string[] | null
           article_count?: number | null
+          categorized_key_points?: Json | null
+          confidence_score?: number | null
           created_at?: string | null
           date?: string
           generated_with?: string | null
           id?: string
+          impact_severity?: Json | null
+          impact_trends?: Json | null
           industry_impacts?: Json | null
           key_points?: string[] | null
+          key_technologies?: Json | null
           practical_applications?: string[] | null
+          sentiment?: string | null
           summary?: string
           updated_at?: string | null
         }
@@ -3668,6 +3692,31 @@ export type Database = {
           base_name: string
         }
         Returns: string
+      }
+      get_daily_summary: {
+        Args: {
+          target_date: string
+        }
+        Returns: {
+          analysis_depth: string | null
+          application_details: string[] | null
+          article_count: number | null
+          categorized_key_points: Json | null
+          confidence_score: number | null
+          created_at: string | null
+          date: string
+          generated_with: string | null
+          id: string
+          impact_severity: Json | null
+          impact_trends: Json | null
+          industry_impacts: Json | null
+          key_points: string[] | null
+          key_technologies: Json | null
+          practical_applications: string[] | null
+          sentiment: string | null
+          summary: string
+          updated_at: string | null
+        }[]
       }
       handle_onboarding_completion: {
         Args: {
