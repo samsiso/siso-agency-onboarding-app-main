@@ -1,34 +1,16 @@
 
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
-import { supabaseClient } from "../_shared/supabase-client.ts";
 
 // [Analysis] Configure environment variables for API access
 const supabaseUrl = Deno.env.get("SUPABASE_URL");
 const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 const openAIKey = Deno.env.get("OPENAI_API_KEY");
 
-// [Analysis] Type definitions for better code organization and error checking
+// [Analysis] Type definitions for better code organization
 interface RequestBody {
   date?: string;
   forceRefresh?: boolean;
-}
-
-interface NewsArticle {
-  title: string;
-  description: string;
-  source: string;
-  category: string;
-  impact: string;
-}
-
-interface SummaryResponse {
-  success: boolean;
-  summary?: string;
-  key_points?: string[];
-  practical_applications?: string[];
-  industry_impacts?: Record<string, string>;
-  error?: string;
 }
 
 const corsHeaders = {
@@ -36,285 +18,257 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// [Framework] Check for existing summary first
-async function getExistingSummary(supabase: any, date: string): Promise<any> {
+async function generateDailySummary(date: string, forceRefresh: boolean = false) {
   try {
-    const { data: existingSummary, error: fetchError } = await supabase
-      .from("ai_news_daily_summaries")
-      .select("*")
-      .eq("date", date)
-      .maybeSingle();
-      
-    if (fetchError) {
-      console.error("Error checking for existing summary:", fetchError);
-      return { error: fetchError };
+    console.log(`⭐️ Starting simplified daily summary generation for ${date}, force refresh: ${forceRefresh}`);
+    
+    // Initialize Supabase client
+    const supabase = createClient(supabaseUrl!, supabaseKey!);
+    
+    // Check if we already have a summary for this date
+    if (!forceRefresh) {
+      const { data: existingSummary, error } = await supabase
+        .from('ai_news_daily_summaries')
+        .select('*')
+        .eq('date', date)
+        .maybeSingle();
+        
+      if (!error && existingSummary) {
+        console.log(`Using existing summary for ${date}`);
+        
+        // Only regenerate fallback summaries unless forced to
+        if (!forceRefresh && (existingSummary.generated_with === 'error_fallback' || existingSummary.generated_with === 'placeholder')) {
+          // Delete the existing fallback summary
+          const { error: deleteError } = await supabase
+            .from("ai_news_daily_summaries")
+            .delete()
+            .eq("date", date);
+            
+          if (deleteError) {
+            console.warn("Failed to delete fallback summary:", deleteError);
+          } else {
+            console.log("Deleted existing fallback summary for regeneration");
+          }
+        } else {
+          // Use the existing valid summary
+          return {
+            success: true,
+            summary: existingSummary.summary,
+            key_points: existingSummary.key_points || [],
+            practical_applications: existingSummary.practical_applications || [],
+            industry_impacts: existingSummary.industry_impacts || {}
+          };
+        }
+      }
     }
     
-    return { data: existingSummary };
-  } catch (error) {
-    console.error("Unexpected error in getExistingSummary:", error);
-    return { error };
-  }
-}
-
-// [Framework] Fetch articles for summary generation
-async function fetchArticles(supabase: any, date: string): Promise<{ data?: NewsArticle[], error?: Error }> {
-  try {
+    // Fetch all published news articles for the date
     const { data: articles, error: articlesError } = await supabase
       .from("ai_news")
-      .select("*")
+      .select("id, title, description, content, source, category, impact")
       .eq("date", date)
-      .eq("status", "published")
-      .order("created_at", { ascending: false });
+      .eq("status", "published");
       
     if (articlesError) {
-      return { error: new Error(`Error fetching news articles: ${articlesError.message}`) };
+      console.error("Error fetching news articles:", articlesError);
+      throw new Error(`Failed to fetch articles: ${articlesError.message}`);
     }
     
     if (!articles || articles.length === 0) {
-      return { error: new Error(`No published articles found for ${date}`) };
+      console.warn(`No published articles found for ${date}`);
+      throw new Error(`No published articles found for ${date}`);
     }
     
     console.log(`Found ${articles.length} articles for ${date}`);
     
-    // Prepare articles data
-    const articlesData = articles.map(article => ({
-      title: article.title,
-      description: article.description,
-      source: article.source,
-      category: article.category,
-      impact: article.impact
-    }));
-    
-    return { data: articlesData };
-  } catch (error) {
-    console.error("Unexpected error in fetchArticles:", error);
-    return { error: error instanceof Error ? error : new Error(String(error)) };
-  }
-}
+    // Create a simplified prompt that focuses on what agency owners need
+    const prompt = `
+As an AI analyst for agency owners, summarize these ${articles.length} AI news articles from ${date}:
 
-// [Analysis] Generate a placeholder summary when OpenAI is unavailable
-function generatePlaceholderSummary(date: string, articleCount: number): any {
-  return {
-    summary: `Daily AI News Summary for ${date}. ${articleCount} articles published covering various AI topics and industry developments.`,
-    key_points: [
-      "Multiple articles published about AI advancements and implementations",
-      "Coverage spans different AI applications and technologies across sectors",
-      "Various industries represented in today's AI news coverage",
-      "Technical and business perspectives on AI developments included",
-      "Latest AI research and commercial applications featured"
-    ],
-    practical_applications: [
-      "Stay informed about the latest AI developments in your industry",
-      "Consider how these technologies might apply to your organization's challenges",
-      "Watch for emerging trends across AI applications to inform strategy",
-      "Identify potential partners or technologies worth exploring further"
-    ],
-    industry_impacts: {
-      "technology": "Ongoing advancements in AI capabilities and infrastructure",
-      "business": "Potential productivity improvements through AI adoption and integration",
-      "research": "New findings contributing to AI development and capabilities",
-      "healthcare": "Applications of AI in improving patient care and outcomes",
-      "education": "Developments in AI tools for personalized learning and education"
-    },
-    generated_with: "placeholder"
-  };
-}
+${JSON.stringify(articles.map(a => ({
+  title: a.title,
+  description: a.description,
+  category: a.category,
+  impact: a.impact
+})), null, 2)}
 
-// [Framework] Call OpenAI API to generate summary with retry logic
-async function callOpenAI(prompt: string, maxRetries = 2): Promise<{ data?: any, error?: Error }> {
-  if (!openAIKey) {
-    console.error("OpenAI API key not available");
-    return { error: new Error("OpenAI API key not available") };
-  }
-  
-  // Verify API key format for debugging (don't log the actual key)
-  console.log(`OpenAI API key available and has length: ${openAIKey.length}`);
-  if (openAIKey.startsWith("sk-") === false) {
-    console.warn("Warning: OpenAI API key does not start with expected prefix 'sk-'");
-  }
-  
-  let retryCount = 0;
-  let lastError: Error | null = null;
-  
-  while (retryCount <= maxRetries) {
-    try {
-      if (retryCount > 0) {
-        // Exponential backoff: wait longer between each retry
-        const delayMs = Math.pow(2, retryCount) * 1000;
-        console.log(`Retry attempt ${retryCount} after ${delayMs}ms delay`);
-        await new Promise(resolve => setTimeout(resolve, delayMs));
-      }
+Create a concise summary FOR AGENCY OWNERS highlighting:
+1. Executive summary (2-3 paragraphs) focusing on business implications
+2. 5 key points that agency owners should know
+3. 3-4 practical applications or action items for agency businesses
+4. Brief impact assessment for different industries (marketing, tech, creative, consulting)
+
+Format your response as JSON with these keys: 
+"summary" (string), "key_points" (array of strings), "practical_applications" (array of strings), "industry_impacts" (object with industry names as keys and impact descriptions as values)
+`;
+
+    if (!openAIKey) {
+      console.warn("OpenAI API key not available. Using placeholder summary.");
       
-      console.log(`API call attempt ${retryCount + 1}/${maxRetries + 1}`);
-      console.log("Sending request to OpenAI API...");
-      console.log("Using model: gpt-4o");
-      
-      const requestBody = JSON.stringify({
-        model: "gpt-4o", // [Analysis] Updated to gpt-4o which is a valid model
-        messages: [
-          {
-            role: "system",
-            content: "You are an AI analyst that summarizes artificial intelligence news and identifies key trends, applications, and implications."
-          },
-          {
-            role: "user",
-            content: prompt
-          }
+      // Generate a basic summary without OpenAI
+      const placeholderSummary = {
+        summary: `Daily AI News Summary for ${date}. ${articles.length} articles published covering various AI topics relevant to agency owners.`,
+        key_points: [
+          "Multiple AI developments affecting agency operations published today",
+          "Several technological advancements that may impact client deliverables",
+          "New AI tools relevant for marketing and creative agencies",
+          "Potential shifts in AI implementation strategies for agencies",
+          "Industry-wide AI adoption trends to monitor"
         ],
-        temperature: 0.5,
-        max_tokens: 1000
-      });
+        practical_applications: [
+          "Consider evaluating your agency's AI implementation strategy",
+          "Monitor these developments for potential client opportunities",
+          "Explore how these AI tools could enhance your service offerings",
+          "Stay informed on how competitors may leverage these technologies"
+        ],
+        industry_impacts: {
+          "marketing": "New AI capabilities that may affect campaign performance",
+          "technology": "Technical shifts that could impact agency tech stacks",
+          "creative": "AI tools that might enhance or challenge creative processes",
+          "consulting": "Strategic considerations for agencies advising clients on AI"
+        }
+      };
       
-      console.log(`Request body: ${requestBody.substring(0, 200)}...`);
+      // Save the placeholder summary
+      await saveSummary(supabase, date, placeholderSummary, articles.length, "placeholder");
       
+      return {
+        success: true,
+        ...placeholderSummary,
+        error: "AI-enhanced summary unavailable. Using basic summary instead."
+      };
+    }
+    
+    // Call OpenAI API with simplified error handling
+    console.log("Calling OpenAI API with prompt...");
+    try {
       const openAIResponse = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${openAIKey}`
         },
-        body: requestBody
+        body: JSON.stringify({
+          model: "gpt-4o-mini", // Using the correct model
+          messages: [
+            {
+              role: "system",
+              content: "You are an AI analyst specializing in creating actionable summaries for agency owners."
+            },
+            {
+              role: "user",
+              content: prompt
+            }
+          ],
+          temperature: 0.5,
+          max_tokens: 1000
+        })
       });
       
-      // [Plan] Enhanced error logging for API responses
       if (!openAIResponse.ok) {
         const errorText = await openAIResponse.text();
-        console.error("OpenAI API error response status:", openAIResponse.status);
-        console.error("OpenAI API error response body:", errorText);
-        
-        try {
-          const errorData = JSON.parse(errorText);
-          const errorMessage = errorData.error?.message || errorData.error?.type || openAIResponse.statusText;
-          console.error(`Parsed API error: ${errorMessage}`);
-          
-          // If we received a rate limit or server error, retry
-          if (openAIResponse.status === 429 || openAIResponse.status >= 500) {
-            lastError = new Error(`OpenAI API error (${openAIResponse.status}): ${errorMessage}`);
-            retryCount++;
-            continue; // Continue to next retry attempt
-          }
-          
-          throw new Error(`OpenAI API error: ${errorMessage}`);
-        } catch (e) {
-          throw new Error(`OpenAI API error: ${openAIResponse.statusText} - ${errorText.substring(0, 200)}`);
-        }
+        console.error("OpenAI API error:", openAIResponse.status, errorText);
+        throw new Error(`OpenAI API error: ${openAIResponse.status} - ${errorText.substring(0, 200)}`);
       }
       
       const openAIData = await openAIResponse.json();
       console.log("Successfully received OpenAI response");
-      console.log(`Response status: ${openAIResponse.status}`);
-      console.log(`Response contains choices: ${openAIData.choices ? openAIData.choices.length : 0}`);
       
       if (!openAIData.choices || !openAIData.choices[0]?.message?.content) {
         console.error("Response missing expected content:", JSON.stringify(openAIData).substring(0, 500));
         throw new Error("OpenAI response missing expected content");
       }
       
-      return { data: openAIData };
-    } catch (error) {
-      console.error(`Error calling OpenAI API (attempt ${retryCount + 1}/${maxRetries + 1}):`, error);
-      lastError = error instanceof Error ? error : new Error(String(error));
+      // Parse the response content
+      const responseContent = openAIData.choices[0].message.content;
+      console.log("Raw OpenAI response:", responseContent.substring(0, 200) + "...");
       
-      if (retryCount >= maxRetries) {
-        return { error: lastError };
-      }
-      
-      retryCount++;
-    }
-  }
-  
-  // This should never be reached due to the return in the loop, but TypeScript needs it
-  return { error: lastError || new Error("Unknown error in OpenAI API call") };
-}
-
-// [Framework] Parse the OpenAI response into structured summary data
-function parseOpenAIResponse(responseContent: string): any {
-  try {
-    // Log the raw response for debugging
-    console.log("Raw OpenAI response to parse:", responseContent.substring(0, 300) + "...");
-    
-    // Extract JSON from the response (handling potential markdown formatting)
-    const jsonMatch = responseContent.match(/```json\n([\s\S]*)\n```/) || 
-                     responseContent.match(/```\n([\s\S]*)\n```/) ||
-                     [null, responseContent];
-                      
-    const jsonString = jsonMatch[1] || responseContent;
-    console.log("Attempting to parse OpenAI response:", jsonString.substring(0, 150) + "...");
-    
-    try {
-      return JSON.parse(jsonString);
-    } catch (parseError) {
-      // First parse attempt failed, try cleanup and retry
-      console.warn("Initial JSON parse failed, trying with cleanup:", parseError);
-      
-      // Try to clean up the string more aggressively
-      const cleanedString = jsonString
-        .replace(/[\u0000-\u001F\u007F-\u009F]/g, "") // Remove control characters
-        .replace(/\\n/g, " ")  // Replace newlines with spaces
-        .replace(/\\/g, "\\\\") // Escape backslashes
-        .replace(/\\"/g, '\\"')  // Fix escaped quotes
-        .trim();
-        
+      // Parse the JSON response with better error handling
+      let summaryData;
       try {
-        return JSON.parse(cleanedString);
-      } catch (secondParseError) {
-        console.error("Cleaned JSON parse also failed:", secondParseError);
-        throw parseError; // Throw the original error
+        // Try to extract JSON if it's wrapped in markdown
+        const jsonMatch = responseContent.match(/```json\n([\s\S]*)\n```/) || 
+                        responseContent.match(/```\n([\s\S]*)\n```/) ||
+                        [null, responseContent];
+        
+        summaryData = JSON.parse(jsonMatch[1] || responseContent);
+      } catch (parseError) {
+        console.error("Error parsing OpenAI response:", parseError);
+        // Create a basic structure from the text response
+        summaryData = {
+          summary: responseContent.substring(0, 500),
+          key_points: responseContent.split('\n').filter(line => line.trim().startsWith('*') || line.trim().startsWith('-')).slice(0, 5),
+          practical_applications: ["Review the latest AI developments with your team", "Consider how these trends affect your clients"],
+          industry_impacts: { "agency": "Stay informed on these developments" }
+        };
       }
+      
+      // Save the summary
+      await saveSummary(supabase, date, summaryData, articles.length, "openai");
+      
+      console.log("✅ Successfully generated and saved summary");
+      
+      return {
+        success: true,
+        summary: summaryData.summary,
+        key_points: summaryData.key_points,
+        practical_applications: summaryData.practical_applications,
+        industry_impacts: summaryData.industry_impacts
+      };
+    } catch (error) {
+      console.error("Error generating summary with OpenAI:", error);
+      
+      // Fall back to placeholder if OpenAI fails
+      const placeholderSummary = {
+        summary: `Daily AI News Summary for ${date}. ${articles.length} articles published covering various AI topics.`,
+        key_points: [
+          "Multiple AI developments published today",
+          "Several technological advancements in AI reported",
+          "New AI tools and applications announced",
+          "Potential business impacts across sectors",
+          "Industry trends to monitor"
+        ],
+        practical_applications: [
+          "Stay informed about the latest AI developments",
+          "Consider how these technologies might apply to your business",
+          "Explore potential implementations for your clients"
+        ],
+        industry_impacts: {
+          "marketing": "New capabilities for targeting and personalization",
+          "technology": "Advances in AI infrastructure and tools",
+          "creative": "New AI-powered creative tools and approaches",
+          "consulting": "Emerging advisory opportunities around AI implementation"
+        }
+      };
+      
+      await saveSummary(supabase, date, placeholderSummary, articles.length, "error_fallback");
+      
+      return {
+        success: true,
+        ...placeholderSummary,
+        error: `Generated fallback summary due to API error: ${error instanceof Error ? error.message : String(error)}`
+      };
     }
-  } catch (parseError) {
-    console.error("Error parsing OpenAI response:", parseError);
-    console.log("Raw response that failed parsing:", responseContent);
-    
-    // Attempt to extract data using regex as a fallback
-    const summary = responseContent.match(/summary["\s:]+([^"]+)/i)?.[1] || 
-                   `AI News Summary`;
-                    
-    const keyPointsMatch = responseContent.match(/key_points["\s:]+\[([\s\S]*?)\]/i)?.[1] || "";
-    const keyPoints = keyPointsMatch
-      .split(/,\s*"/)
-      .map(p => p.replace(/^"/, "").replace(/"$/, "").trim())
-      .filter(p => p.length > 0);
-      
-    const applicationsMatch = responseContent.match(/practical_applications["\s:]+\[([\s\S]*?)\]/i)?.[1] || "";
-    const applications = applicationsMatch
-      .split(/,\s*"/)
-      .map(p => p.replace(/^"/, "").replace(/"$/, "").trim())
-      .filter(p => p.length > 0);
-      
+  } catch (error) {
+    console.error("Unhandled error in generateDailySummary:", error);
     return {
-      summary,
-      key_points: keyPoints.length > 0 ? keyPoints : ["Important AI developments reported today"],
-      practical_applications: applications.length > 0 ? applications : ["Stay informed on AI advancements"],
-      industry_impacts: { "technology": "Ongoing progress in AI capabilities" }
+      success: false,
+      error: error instanceof Error ? error.message : String(error)
     };
   }
 }
 
-// [Framework] Save the summary to the database
-async function saveSummary(supabase: any, date: string, summaryData: any, articleCount: number, generatedWith: string): Promise<{ error?: Error }> {
+// Save the summary to the database
+async function saveSummary(supabase, date, summaryData, articleCount, generatedWith) {
   try {
     console.log(`Saving summary for ${date} with generation method: ${generatedWith}`);
     
     // First check if summary already exists
-    const { data: existingSummary } = await getExistingSummary(supabase, date);
-    
-    // Add better response logging for debugging
-    console.log("Summary data being saved:", {
-      date,
-      summary_length: summaryData.summary?.length || 0,
-      key_points_count: summaryData.key_points?.length || 0,
-      generated_with: generatedWith,
-      articleCount,
-      has_existing: !!existingSummary
-    });
-    
-    // Ensure the data structure is valid
-    if (!summaryData.summary || typeof summaryData.summary !== 'string') {
-      console.error("Invalid summary data - summary missing or not a string:", summaryData);
-      return { error: new Error("Invalid summary data structure - missing required fields") };
-    }
+    const { data: existingSummary } = await supabase
+      .from('ai_news_daily_summaries')
+      .select('*')
+      .eq('date', date)
+      .maybeSingle();
     
     let saveOperation;
     
@@ -353,204 +307,18 @@ async function saveSummary(supabase: any, date: string, summaryData: any, articl
       
     if (saveError) {
       console.error("Error saving summary:", saveError);
-      return { error: new Error(`Failed to save summary: ${saveError.message}`) };
+      throw new Error(`Failed to save summary: ${saveError.message}`);
     }
     
     console.log(`Successfully saved summary for ${date}`);
     return {};
   } catch (error) {
     console.error("Error in saveSummary:", error);
-    return { error: error instanceof Error ? error : new Error(String(error)) };
+    throw error;
   }
 }
 
-// [Framework] Main function to generate a daily summary
-async function generateDailySummary(date: string, forceRefresh: boolean = false): Promise<SummaryResponse> {
-  try {
-    console.log(`⭐️ Starting daily summary generation for ${date}, force refresh: ${forceRefresh}`);
-    
-    // Initialize Supabase client
-    const supabase = supabaseClient || createClient(supabaseUrl!, supabaseKey!);
-    
-    // Check if we already have a summary for this date
-    if (!forceRefresh) {
-      const { data: existingSummary, error } = await getExistingSummary(supabase, date);
-      
-      if (error) {
-        console.warn("Error checking for existing summary, proceeding with generation:", error);
-      } else if (existingSummary) {
-        console.log(`Using existing summary for ${date}`);
-        
-        // Don't return error_fallback summaries unless forced to
-        if (existingSummary.generated_with === 'error_fallback' || existingSummary.generated_with === 'placeholder') {
-          console.log("Existing summary is a fallback/placeholder. Will regenerate unless forced.");
-          
-          // If user is not forcing refresh of a fallback, we'll regenerate
-          if (!forceRefresh) {
-            // Delete the fallback summary before regenerating
-            const { error: deleteError } = await supabase
-              .from("ai_news_daily_summaries")
-              .delete()
-              .eq("date", date);
-              
-            if (deleteError) {
-              console.warn("Failed to delete fallback summary:", deleteError);
-            } else {
-              console.log("Successfully deleted fallback summary. Will regenerate.");
-            }
-            
-            // Continue with generation (don't return here)
-          } else {
-            // User specifically asked for this fallback, so use it
-            return {
-              success: true,
-              summary: existingSummary.summary,
-              key_points: existingSummary.key_points || [],
-              practical_applications: existingSummary.practical_applications || [],
-              industry_impacts: existingSummary.industry_impacts || {}
-            };
-          }
-        } else {
-          // This is a valid summary, return it
-          return {
-            success: true,
-            summary: existingSummary.summary,
-            key_points: existingSummary.key_points || [],
-            practical_applications: existingSummary.practical_applications || [],
-            industry_impacts: existingSummary.industry_impacts || {}
-          };
-        }
-      }
-    }
-    
-    // Fetch today's news articles
-    const { data: articles, error: articlesError } = await fetchArticles(supabase, date);
-    
-    if (articlesError) {
-      return {
-        success: false,
-        error: articlesError.message
-      };
-    }
-    
-    // Check if OpenAI API key is available
-    if (!openAIKey) {
-      console.warn("OpenAI API key not available. Using placeholder summary.");
-      
-      // Generate a basic summary without OpenAI
-      const placeholderSummary = generatePlaceholderSummary(date, articles.length);
-      
-      // Save the placeholder summary
-      const { error: saveError } = await saveSummary(
-        supabase, 
-        date, 
-        placeholderSummary, 
-        articles.length, 
-        "placeholder"
-      );
-      
-      if (saveError) {
-        console.error("Error saving placeholder summary:", saveError);
-      }
-      
-      return {
-        success: true,
-        summary: placeholderSummary.summary,
-        key_points: placeholderSummary.key_points,
-        practical_applications: placeholderSummary.practical_applications,
-        industry_impacts: placeholderSummary.industry_impacts,
-        error: "AI-enhanced summary unavailable. Using basic summary instead."
-      };
-    }
-    
-    // Log that we're using a valid API key
-    console.log("OpenAI API key is available, proceeding with AI-generated summary");
-    
-    // Use OpenAI to generate the summary
-    const prompt = `
-You are an AI news analyst specializing in artificial intelligence trends. 
-Analyze these ${articles.length} articles about AI from ${date} and create a comprehensive summary:
-
-${JSON.stringify(articles, null, 2)}
-
-Please provide:
-1. A concise executive summary (2-3 paragraphs) of today's AI news
-2. 5-7 key points highlighting the most important developments
-3. 3-5 practical applications for professionals in different industries
-4. Industry impact assessment (technology, business, healthcare, education, etc.)
-
-Format your response as JSON with these keys: 
-summary (string), key_points (array), practical_applications (array), industry_impacts (object with industry names as keys and impact descriptions as values)
-`;
-
-    // Call OpenAI API with retry logic
-    const { data: openAIData, error: openAIError } = await callOpenAI(prompt);
-    
-    if (openAIError) {
-      console.error("Error calling OpenAI after all retries:", openAIError);
-      
-      // Fall back to placeholder if OpenAI fails
-      const placeholderSummary = generatePlaceholderSummary(date, articles.length);
-      await saveSummary(supabase, date, placeholderSummary, articles.length, "error_fallback");
-      
-      return {
-        success: true,
-        summary: placeholderSummary.summary,
-        key_points: placeholderSummary.key_points,
-        practical_applications: placeholderSummary.practical_applications,
-        industry_impacts: placeholderSummary.industry_impacts,
-        error: `Generated fallback summary due to API error: ${openAIError.message}`
-      };
-    }
-    
-    const responseContent = openAIData.choices[0]?.message?.content;
-    
-    if (!responseContent) {
-      console.error("Empty response from OpenAI:", openAIData);
-      throw new Error("Empty response from OpenAI");
-    }
-    
-    // Parse the JSON response
-    const summaryData = parseOpenAIResponse(responseContent);
-    
-    // Verify the parsed data has all required fields
-    if (!summaryData.summary || !summaryData.key_points) {
-      console.error("Parsed summary data missing required fields:", summaryData);
-      throw new Error("Parsed summary data missing required fields");
-    }
-    
-    // Save the summary to the database
-    const { error: saveError } = await saveSummary(
-      supabase, 
-      date, 
-      summaryData, 
-      articles.length, 
-      "openai"
-    );
-    
-    if (saveError) {
-      console.warn("Error saving summary, but returning generated data:", saveError);
-    }
-    
-    console.log("✅ Successfully generated and saved summary");
-    
-    return {
-      success: true,
-      summary: summaryData.summary,
-      key_points: summaryData.key_points,
-      practical_applications: summaryData.practical_applications,
-      industry_impacts: summaryData.industry_impacts
-    };
-  } catch (error) {
-    console.error("Error generating daily summary:", error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : String(error)
-    };
-  }
-}
-
-// [Framework] Main handler for HTTP requests
+// Main handler for HTTP requests
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -564,7 +332,6 @@ serve(async (req) => {
     try {
       requestBody = await req.json();
     } catch (e) {
-      // If parsing fails, use default empty object
       console.warn("Failed to parse request body, using defaults");
     }
     
