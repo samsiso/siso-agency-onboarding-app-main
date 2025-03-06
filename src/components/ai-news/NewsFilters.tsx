@@ -1,3 +1,4 @@
+
 import { motion } from 'framer-motion';
 import { Calendar, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -7,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { useState, useCallback } from 'react';
 import NewsCategories from './NewsCategories';
 import { debounce } from '@/lib/utils';
+
 interface NewsFiltersProps {
   selectedCategory: string | null;
   onCategoryChange: (category: string | null) => void;
@@ -30,6 +32,7 @@ const itemVariants = {
     }
   }
 };
+
 export const NewsFilters = ({
   selectedCategory,
   onCategoryChange,
@@ -46,22 +49,90 @@ export const NewsFilters = ({
   const debouncedSearch = useCallback(debounce((value: string) => {
     onSearchChange(value);
   }, 350), [onSearchChange]);
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setInputValue(value);
     debouncedSearch(value);
   };
+
   const handleDateSubmit = () => {
     if (onDateChange) {
       onDateChange(dateFilter || null);
     }
   };
+
   const clearDateFilter = () => {
     setDateFilter('');
     if (onDateChange) {
       onDateChange(null);
     }
   };
-  return;
+
+  // [Analysis] The component was missing a return statement with JSX
+  return (
+    <div className="space-y-6">
+      <motion.div
+        variants={itemVariants}
+        initial="hidden"
+        animate="show"
+        className="flex flex-col md:flex-row gap-4"
+      >
+        <div className="relative flex-grow">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <Input
+            type="text"
+            placeholder="Search AI news..."
+            value={inputValue}
+            onChange={handleSearchChange}
+            className="pl-10 bg-background/50 border-muted"
+          />
+        </div>
+
+        {onDateChange && (
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="gap-2 whitespace-nowrap">
+                <Calendar className="h-4 w-4" />
+                {selectedDate ? selectedDate : "Filter by date"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80 p-4" align="end">
+              <div className="space-y-4">
+                <h3 className="font-medium text-sm">Filter by specific date</h3>
+                <div className="space-y-2">
+                  <Label htmlFor="date-filter">Date (YYYY-MM-DD)</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="date-filter"
+                      type="date"
+                      value={dateFilter}
+                      onChange={(e) => setDateFilter(e.target.value)}
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-between">
+                  <Button variant="ghost" size="sm" onClick={clearDateFilter}>
+                    Clear
+                  </Button>
+                  <Button size="sm" onClick={handleDateSubmit}>
+                    Apply Filter
+                  </Button>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+        )}
+      </motion.div>
+
+      <NewsCategories
+        selectedCategory={selectedCategory}
+        onCategoryChange={onCategoryChange}
+        className="pb-2"
+      />
+    </div>
+  );
 };
+
 export default NewsFilters;
