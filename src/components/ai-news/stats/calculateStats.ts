@@ -1,6 +1,7 @@
 
 // [Analysis] Utility functions to analyze news data and extract meaningful stats
 import { NewsItem } from '@/types/blog';
+import { format, subDays } from 'date-fns';
 
 // [Analysis] Calculates the most common categories among news items
 export const calculateTopCategories = (newsItems: NewsItem[], limit: number = 5) => {
@@ -19,7 +20,7 @@ export const calculateTopCategories = (newsItems: NewsItem[], limit: number = 5)
     .map(([category, count]) => ({
       category,
       count,
-      percentage: Math.round((count / newsItems.length) * 100)
+      percentage: Math.round((count / newsItems.length) * 100) || 0
     }));
 };
 
@@ -39,7 +40,7 @@ export const calculateImpactBreakdown = (newsItems: NewsItem[]) => {
     }
   });
   
-  const total = newsItems.length;
+  const total = newsItems.length || 1; // Avoid division by zero
   return {
     high: {
       count: impacts.high,
@@ -74,12 +75,15 @@ export const calculateComplexityBreakdown = (newsItems: NewsItem[]) => {
     }
   });
   
-  const total = newsItems.length;
-  return Object.entries(complexity).map(([level, count]) => ({
-    level,
-    count,
-    percentage: Math.round((count / total) * 100) || 0
-  })).sort((a, b) => b.count - a.count);
+  const total = newsItems.length || 1; // Avoid division by zero
+  return Object.entries(complexity)
+    .filter(([_, count]) => count > 0) // Only include non-zero counts
+    .map(([level, count]) => ({
+      level,
+      count,
+      percentage: Math.round((count / total) * 100) || 0
+    }))
+    .sort((a, b) => b.count - a.count);
 };
 
 // [Analysis] Extracts commonly mentioned technologies/topics from titles and descriptions
@@ -122,10 +126,80 @@ export const calculateSourceDistribution = (newsItems: NewsItem[]) => {
   
   return Object.entries(sources)
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 5)
+    .slice(0, 10) // Increase to support expanded view
     .map(([source, count]) => ({
       source,
       count,
-      percentage: Math.round((count / newsItems.length) * 100)
+      percentage: Math.round((count / newsItems.length) * 100) || 0
     }));
+};
+
+// [Analysis] NEW: Generate simulated historical data for trend analysis
+// In a real app, this would fetch actual historical data
+export const generateHistoricalTrends = (daysBack: number = 7) => {
+  const trends = [];
+  const today = new Date();
+  
+  for (let i = daysBack - 1; i >= 0; i--) {
+    const date = subDays(today, i);
+    trends.push({
+      date: format(date, 'MMM dd'),
+      high: Math.floor(Math.random() * 30) + 10,
+      medium: Math.floor(Math.random() * 40) + 30,
+      low: Math.floor(Math.random() * 20) + 10
+    });
+  }
+  
+  return trends;
+};
+
+// [Analysis] NEW: Calculate sentiment distribution from news content
+export const calculateSentimentDistribution = (newsItems: NewsItem[]) => {
+  // In a real app, this would use NLP to analyze sentiment
+  // Here we're using a simple keyword-based approach
+  const positiveKeywords = ['breakthrough', 'innovation', 'success', 'advance', 'improve'];
+  const negativeKeywords = ['concern', 'risk', 'danger', 'problem', 'issue', 'controversy'];
+  
+  let positive = 0;
+  let negative = 0;
+  let neutral = 0;
+  
+  newsItems.forEach(item => {
+    const text = `${item.title} ${item.description || ''}`.toLowerCase();
+    
+    const posMatches = positiveKeywords.some(keyword => text.includes(keyword));
+    const negMatches = negativeKeywords.some(keyword => text.includes(keyword));
+    
+    if (posMatches && !negMatches) {
+      positive++;
+    } else if (negMatches && !posMatches) {
+      negative++;
+    } else if (posMatches && negMatches) {
+      // If both positive and negative keywords are found, check which has more
+      const posCount = positiveKeywords.filter(keyword => text.includes(keyword)).length;
+      const negCount = negativeKeywords.filter(keyword => text.includes(keyword)).length;
+      
+      if (posCount > negCount) positive++;
+      else if (negCount > posCount) negative++;
+      else neutral++;
+    } else {
+      neutral++;
+    }
+  });
+  
+  const total = newsItems.length || 1;
+  return {
+    positive: {
+      count: positive,
+      percentage: Math.round((positive / total) * 100)
+    },
+    neutral: {
+      count: neutral,
+      percentage: Math.round((neutral / total) * 100)
+    },
+    negative: {
+      count: negative,
+      percentage: Math.round((negative / total) * 100)
+    }
+  };
 };
