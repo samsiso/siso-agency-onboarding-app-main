@@ -305,6 +305,45 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_news_daily_summaries: {
+        Row: {
+          article_count: number | null
+          created_at: string | null
+          date: string
+          generated_with: string | null
+          id: string
+          industry_impacts: Json | null
+          key_points: string[] | null
+          practical_applications: string[] | null
+          summary: string
+          updated_at: string | null
+        }
+        Insert: {
+          article_count?: number | null
+          created_at?: string | null
+          date: string
+          generated_with?: string | null
+          id?: string
+          industry_impacts?: Json | null
+          key_points?: string[] | null
+          practical_applications?: string[] | null
+          summary: string
+          updated_at?: string | null
+        }
+        Update: {
+          article_count?: number | null
+          created_at?: string | null
+          date?: string
+          generated_with?: string | null
+          id?: string
+          industry_impacts?: Json | null
+          key_points?: string[] | null
+          practical_applications?: string[] | null
+          summary?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       ai_news_reactions: {
         Row: {
           created_at: string | null
