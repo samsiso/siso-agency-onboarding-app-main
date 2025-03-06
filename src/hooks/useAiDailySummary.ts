@@ -31,33 +31,22 @@ export function useAiDailySummary(date: string, isAdmin: boolean = false) {
       
       console.log(`Fetching summary for date: ${date}`);
       
-      // [Framework] First try to use the get_daily_summary function for better error handling
+      // Use direct query instead of RPC
       const { data, error: fetchError } = await supabase
-        .rpc('get_daily_summary', { target_date: date })
+        .from('ai_news_daily_summaries')
+        .select('*')
+        .eq('date', date)
         .maybeSingle();
-        
+      
       if (fetchError) {
-        console.warn("RPC method failed, falling back to direct query:", fetchError);
-        
-        // Fallback to direct query if the function fails
-        const { data: directData, error: directError } = await supabase
-          .from('ai_news_daily_summaries')
-          .select('*')
-          .eq('date', date)
-          .maybeSingle();
-          
-        if (directError) {
-          if (directError.code !== 'PGRST116') { // Not found is expected and not an error to show
-            console.error('Error fetching summary:', directError);
-            setError('Failed to load daily summary');
-            toast({
-              title: "Error",
-              description: "Failed to load daily summary. Please try again.",
-              variant: "destructive",
-            });
-          }
-        } else if (directData) {
-          handleSummaryData(directData);
+        if (fetchError.code !== 'PGRST116') { // Not found is expected and not an error to show
+          console.error('Error fetching summary:', fetchError);
+          setError('Failed to load daily summary');
+          toast({
+            title: "Error",
+            description: "Failed to load daily summary. Please try again.",
+            variant: "destructive",
+          });
         }
       } else if (data) {
         handleSummaryData(data);

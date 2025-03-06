@@ -39,7 +39,7 @@ export const formatPercentage = (value: number): string => {
 export const formatCompactNumber = (num: number): string => {
   if (num < 1000) return num.toString();
   
-  const formatter = Intl.NumberFormat('en', { notation: 'compact' });
+  const formatter = new Intl.NumberFormat('en', { notation: 'compact' });
   return formatter.format(num);
 };
 
