@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-// [Analysis] Interface for the daily summary data with proper types
+// [Analysis] Enhanced interface for the daily summary data with proper types
 export interface DailySummaryData {
   id?: string;
   date: string;
@@ -14,6 +14,21 @@ export interface DailySummaryData {
   article_count: number;
   created_at: string;
   generated_with: string;
+  
+  // Enhanced data structure
+  sentiment?: string;
+  confidence_score?: number;
+  categorized_key_points?: Record<string, string[]>;
+  key_technologies?: Array<{
+    name: string;
+    description: string;
+    maturity?: string;
+    adoption_rate?: number;
+  }>;
+  application_details?: string[];
+  impact_severity?: Record<string, string>;
+  impact_trends?: Record<string, 'up' | 'down' | 'stable'>;
+  analysis_depth?: string;
 }
 
 export function useAiDailySummary(date: string, isAdmin: boolean = false) {
@@ -67,6 +82,16 @@ export function useAiDailySummary(date: string, isAdmin: boolean = false) {
       industry_impacts: data.industry_impacts as Record<string, string>,
       key_points: data.key_points || [],
       practical_applications: data.practical_applications || [],
+      
+      // Handle enhanced data fields
+      sentiment: data.sentiment,
+      confidence_score: data.confidence_score,
+      categorized_key_points: data.categorized_key_points,
+      key_technologies: data.key_technologies,
+      application_details: data.application_details,
+      impact_severity: data.impact_severity,
+      impact_trends: data.impact_trends,
+      analysis_depth: data.analysis_depth || 'standard',
     };
     
     setSummaryData(formattedData);
@@ -112,14 +137,16 @@ export function useAiDailySummary(date: string, isAdmin: boolean = false) {
       // Invoke the edge function with proper error handling and detailed logging
       console.log("Calling Supabase function: generate-daily-summary with payload:", {
         date,
-        forceRefresh
+        forceRefresh,
+        enhancedAnalysis: true, // Request enhanced analysis with additional metadata
       });
       
       try {
         const { data, error: invokeError } = await supabase.functions.invoke('generate-daily-summary', {
           body: { 
             date,
-            forceRefresh
+            forceRefresh,
+            enhancedAnalysis: true, // Send flag to enable enhanced analysis
           },
         });
         

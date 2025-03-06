@@ -11,6 +11,7 @@ const openAIKey = Deno.env.get("OPENAI_API_KEY");
 interface RequestBody {
   date?: string;
   forceRefresh?: boolean;
+  enhancedAnalysis?: boolean;
 }
 
 const corsHeaders = {
@@ -18,9 +19,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-async function generateDailySummary(date: string, forceRefresh: boolean = false) {
+async function generateDailySummary(date: string, forceRefresh: boolean = false, enhancedAnalysis: boolean = false) {
   try {
-    console.log(`⭐️ Starting daily summary generation for ${date}, force refresh: ${forceRefresh}`);
+    console.log(`⭐️ Starting daily summary generation for ${date}, force refresh: ${forceRefresh}, enhanced: ${enhancedAnalysis}`);
     console.log(`Environment check: SUPABASE_URL exists? ${supabaseUrl ? 'Yes' : 'No'}`);
     console.log(`Environment check: SUPABASE_SERVICE_ROLE_KEY exists? ${supabaseKey ? 'Yes' : 'No'}`);
     console.log(`Environment check: OPENAI_API_KEY exists? ${openAIKey ? 'Yes' : 'No'}`);
@@ -64,7 +65,15 @@ async function generateDailySummary(date: string, forceRefresh: boolean = false)
             summary: existingSummary.summary,
             key_points: existingSummary.key_points || [],
             practical_applications: existingSummary.practical_applications || [],
-            industry_impacts: existingSummary.industry_impacts || {}
+            industry_impacts: existingSummary.industry_impacts || {},
+            sentiment: existingSummary.sentiment,
+            confidence_score: existingSummary.confidence_score,
+            categorized_key_points: existingSummary.categorized_key_points,
+            key_technologies: existingSummary.key_technologies,
+            application_details: existingSummary.application_details,
+            impact_severity: existingSummary.impact_severity,
+            impact_trends: existingSummary.impact_trends,
+            analysis_depth: existingSummary.analysis_depth
           };
         }
       }
@@ -73,7 +82,7 @@ async function generateDailySummary(date: string, forceRefresh: boolean = false)
     // Fetch all published news articles for the date
     const { data: articles, error: articlesError } = await supabase
       .from("ai_news")
-      .select("id, title, description, content, source, category, impact")
+      .select("id, title, description, content, source, category, impact, technical_complexity, tags")
       .eq("date", date)
       .eq("status", "published");
       
@@ -89,8 +98,37 @@ async function generateDailySummary(date: string, forceRefresh: boolean = false)
     
     console.log(`Found ${articles.length} articles for ${date}`);
     
-    // Create a simplified prompt that focuses on what agency owners need
-    const prompt = `
+    // Create a prompt that focuses on the enhanced analysis if requested
+    const prompt = enhancedAnalysis ? `
+As an AI analyst for agency owners, provide a comprehensive analysis of these ${articles.length} AI news articles from ${date}:
+
+${JSON.stringify(articles.map(a => ({
+  title: a.title,
+  description: a.description,
+  category: a.category,
+  impact: a.impact,
+  technical_complexity: a.technical_complexity,
+  tags: a.tags
+})), null, 2)}
+
+Format your response as JSON with these keys:
+- "summary": A concise 2-3 paragraph executive summary
+- "sentiment": Overall sentiment of today's news - "positive", "negative", or "neutral"
+- "confidence_score": A number between 0-100 indicating confidence in analysis
+- "categorized_key_points": An object with categories as keys and arrays of string points as values
+- "key_points": Array of 5 key points for agency owners (fallback if categorization fails)
+- "practical_applications": Array of 3-4 actionable items for agencies
+- "application_details": Matching array of more detailed explanations for each application
+- "industry_impacts": Object with industry names as keys and impact descriptions as values
+- "impact_severity": Object with same industry keys but "high", "medium", or "low" severity values
+- "impact_trends": Object with industry keys and "up", "down", or "stable" values for trends
+- "key_technologies": Array of objects, each containing:
+  * "name": Technology name
+  * "description": Brief description
+  * "maturity": Development stage ("emerging", "growing", "mature")
+  * "adoption_rate": Number from 0-100
+- "analysis_depth": "comprehensive" (indicating this is an enhanced analysis)
+` : `
 As an AI analyst for agency owners, summarize these ${articles.length} AI news articles from ${date}:
 
 ${JSON.stringify(articles.map(a => ({
@@ -114,7 +152,80 @@ Format your response as JSON with these keys:
       console.warn("OpenAI API key not available. Using placeholder summary.");
       
       // Generate a basic summary without OpenAI
-      const placeholderSummary = {
+      const placeholderSummary = enhancedAnalysis ? {
+        summary: `Daily AI News Summary for ${date}. ${articles.length} articles published covering various AI topics relevant to agency owners.`,
+        sentiment: "neutral",
+        confidence_score: 50,
+        key_points: [
+          "Multiple AI developments affecting agency operations published today",
+          "Several technological advancements that may impact client deliverables",
+          "New AI tools relevant for marketing and creative agencies",
+          "Potential shifts in AI implementation strategies for agencies",
+          "Industry-wide AI adoption trends to monitor"
+        ],
+        categorized_key_points: {
+          "business_impact": [
+            "Multiple AI developments affecting agency operations published today",
+            "Potential shifts in AI implementation strategies for agencies"
+          ],
+          "technology_trends": [
+            "Several technological advancements that may impact client deliverables",
+            "New AI tools relevant for marketing and creative agencies",
+            "Industry-wide AI adoption trends to monitor"
+          ]
+        },
+        practical_applications: [
+          "Consider evaluating your agency's AI implementation strategy",
+          "Monitor these developments for potential client opportunities",
+          "Explore how these AI tools could enhance your service offerings",
+          "Stay informed on how competitors may leverage these technologies"
+        ],
+        application_details: [
+          "A strategic evaluation will help identify gaps and opportunities",
+          "Client opportunities may arise from emerging capabilities",
+          "Service enhancements could lead to competitive advantages",
+          "Competitive intelligence can inform strategic planning"
+        ],
+        industry_impacts: {
+          "marketing": "New AI capabilities that may affect campaign performance",
+          "technology": "Technical shifts that could impact agency tech stacks",
+          "creative": "AI tools that might enhance or challenge creative processes",
+          "consulting": "Strategic considerations for agencies advising clients on AI"
+        },
+        impact_severity: {
+          "marketing": "medium",
+          "technology": "high",
+          "creative": "medium",
+          "consulting": "low"
+        },
+        impact_trends: {
+          "marketing": "up",
+          "technology": "up",
+          "creative": "stable",
+          "consulting": "up"
+        },
+        key_technologies: [
+          {
+            "name": "Generative AI",
+            "description": "AI systems that can generate new content similar to human-created work",
+            "maturity": "growing",
+            "adoption_rate": 65
+          },
+          {
+            "name": "Natural Language Processing",
+            "description": "Technology enabling computers to understand and process human language",
+            "maturity": "mature",
+            "adoption_rate": 80
+          },
+          {
+            "name": "Computer Vision",
+            "description": "AI capability to interpret and understand visual information",
+            "maturity": "growing",
+            "adoption_rate": 70
+          }
+        ],
+        analysis_depth: "comprehensive"
+      } : {
         summary: `Daily AI News Summary for ${date}. ${articles.length} articles published covering various AI topics relevant to agency owners.`,
         key_points: [
           "Multiple AI developments affecting agency operations published today",
@@ -172,7 +283,7 @@ Format your response as JSON with these keys:
             }
           ],
           temperature: 0.5,
-          max_tokens: 1000
+          max_tokens: enhancedAnalysis ? 2000 : 1000 // Increase token limit for enhanced analysis
         })
       });
       
@@ -215,6 +326,11 @@ Format your response as JSON with these keys:
         };
       }
       
+      // Add analysis_depth field if enhanced
+      if (enhancedAnalysis && !summaryData.analysis_depth) {
+        summaryData.analysis_depth = "comprehensive";
+      }
+      
       // Save the summary
       await saveSummary(supabase, date, summaryData, articles.length, "openai");
       
@@ -222,16 +338,78 @@ Format your response as JSON with these keys:
       
       return {
         success: true,
-        summary: summaryData.summary,
-        key_points: summaryData.key_points,
-        practical_applications: summaryData.practical_applications,
-        industry_impacts: summaryData.industry_impacts
+        ...summaryData
       };
     } catch (error) {
       console.error("Error generating summary with OpenAI:", error);
       
       // Fall back to placeholder if OpenAI fails
-      const placeholderSummary = {
+      const placeholderSummary = enhancedAnalysis ? {
+        summary: `Daily AI News Summary for ${date}. ${articles.length} articles published covering various AI topics.`,
+        sentiment: "neutral",
+        confidence_score: 30,
+        key_points: [
+          "Multiple AI developments published today",
+          "Several technological advancements in AI reported",
+          "New AI tools and applications announced",
+          "Potential business impacts across sectors",
+          "Industry trends to monitor"
+        ],
+        categorized_key_points: {
+          "business": [
+            "Potential business impacts across sectors",
+            "Industry trends to monitor"
+          ],
+          "technology": [
+            "Multiple AI developments published today",
+            "Several technological advancements in AI reported",
+            "New AI tools and applications announced"
+          ]
+        },
+        practical_applications: [
+          "Stay informed about the latest AI developments",
+          "Consider how these technologies might apply to your business",
+          "Explore potential implementations for your clients"
+        ],
+        application_details: [
+          "Maintaining awareness helps strategic decision-making",
+          "Technology alignment with business needs is critical",
+          "Client solutions may benefit from these advances"
+        ],
+        industry_impacts: {
+          "marketing": "New capabilities for targeting and personalization",
+          "technology": "Advances in AI infrastructure and tools",
+          "creative": "New AI-powered creative tools and approaches",
+          "consulting": "Emerging advisory opportunities around AI implementation"
+        },
+        impact_severity: {
+          "marketing": "medium",
+          "technology": "medium",
+          "creative": "medium",
+          "consulting": "low"
+        },
+        impact_trends: {
+          "marketing": "up",
+          "technology": "up",
+          "creative": "stable",
+          "consulting": "stable"
+        },
+        key_technologies: [
+          {
+            "name": "Large Language Models",
+            "description": "Advanced AI systems trained on vast text datasets",
+            "maturity": "growing",
+            "adoption_rate": 50
+          },
+          {
+            "name": "Computer Vision",
+            "description": "AI systems that can interpret visual information",
+            "maturity": "mature",
+            "adoption_rate": 65
+          }
+        ],
+        analysis_depth: "partial"
+      } : {
         summary: `Daily AI News Summary for ${date}. ${articles.length} articles published covering various AI topics.`,
         key_points: [
           "Multiple AI developments published today",
@@ -284,20 +462,33 @@ async function saveSummary(supabase, date, summaryData, articleCount, generatedW
     
     let saveOperation;
     
+    // Prepare the data object with all the enhanced fields if they exist
+    const summaryDataToSave = {
+      summary: summaryData.summary,
+      key_points: summaryData.key_points || [],
+      practical_applications: summaryData.practical_applications || [],
+      industry_impacts: summaryData.industry_impacts || {},
+      generated_with: generatedWith,
+      article_count: articleCount,
+      updated_at: new Date().toISOString(),
+      
+      // Enhanced fields
+      sentiment: summaryData.sentiment,
+      confidence_score: summaryData.confidence_score,
+      categorized_key_points: summaryData.categorized_key_points,
+      key_technologies: summaryData.key_technologies,
+      application_details: summaryData.application_details,
+      impact_severity: summaryData.impact_severity,
+      impact_trends: summaryData.impact_trends,
+      analysis_depth: summaryData.analysis_depth
+    };
+    
     if (existingSummary) {
       // Update existing summary
       console.log(`Updating existing summary for ${date}`);
       saveOperation = supabase
         .from("ai_news_daily_summaries")
-        .update({
-          summary: summaryData.summary,
-          key_points: summaryData.key_points || [],
-          practical_applications: summaryData.practical_applications || [],
-          industry_impacts: summaryData.industry_impacts || {},
-          generated_with: generatedWith,
-          article_count: articleCount,
-          updated_at: new Date().toISOString()
-        })
+        .update(summaryDataToSave)
         .eq("date", date);
     } else {
       // Insert new summary
@@ -306,12 +497,7 @@ async function saveSummary(supabase, date, summaryData, articleCount, generatedW
         .from("ai_news_daily_summaries")
         .insert({
           date,
-          summary: summaryData.summary,
-          key_points: summaryData.key_points || [],
-          practical_applications: summaryData.practical_applications || [],
-          industry_impacts: summaryData.industry_impacts || {},
-          generated_with: generatedWith,
-          article_count: articleCount
+          ...summaryDataToSave
         });
     }
     
@@ -351,16 +537,17 @@ serve(async (req) => {
     // Get the date parameter, defaulting to today
     const targetDate = requestBody.date || new Date().toISOString().split('T')[0];
     const forceRefresh = requestBody.forceRefresh || false;
+    const enhancedAnalysis = requestBody.enhancedAnalysis || false;
     
     console.log(`----- GENERATING SUMMARY -----`);
-    console.log(`Date: ${targetDate}, Force refresh: ${forceRefresh}`);
+    console.log(`Date: ${targetDate}, Force refresh: ${forceRefresh}, Enhanced analysis: ${enhancedAnalysis}`);
     console.log(`OpenAI API key: ${openAIKey ? "Available" : "Not available"}`);
     console.log(`Supabase URL: ${supabaseUrl ? "Available" : "Not available"}`);
     console.log(`Supabase Key: ${supabaseKey ? "Available" : "Not available"}`);
     console.log(`---------------------------`);
     
     // Generate the summary
-    const result = await generateDailySummary(targetDate, forceRefresh);
+    const result = await generateDailySummary(targetDate, forceRefresh, enhancedAnalysis);
     
     console.log("Result:", JSON.stringify(result).substring(0, 300) + "...");
     

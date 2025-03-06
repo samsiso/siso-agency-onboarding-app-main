@@ -225,25 +225,26 @@ const AINews = () => {
     checkAdminStatus();
   }, []);
 
-  // Add a new function to refresh the daily summary
+  // [Analysis] Extract the refreshDailySummary function to improve the implementation
   const refreshDailySummary = async () => {
     try {
       const formattedDate = format(currentDate, 'yyyy-MM-dd');
-      const {
-        data,
-        error
-      } = await supabase.functions.invoke('generate-daily-summary', {
+      const { data, error } = await supabase.functions.invoke('generate-daily-summary', {
         body: {
           date: formattedDate,
-          forceRefresh: false
+          forceRefresh: false,
+          enhancedAnalysis: true // Enable enhanced analysis
         }
       });
+    
       if (error) {
         throw new Error(`Edge function error: ${error.message}`);
       }
+    
       if (!data.success) {
         throw new Error(data.error || 'Failed to refresh summary');
       }
+    
       toast({
         title: 'Success',
         description: 'Daily summary has been refreshed'
@@ -257,6 +258,7 @@ const AINews = () => {
       });
     }
   };
+
   return <div className="flex min-h-screen bg-siso-bg">
       <Helmet>
         <title>AI News | Your One-Stop AI Knowledge Source</title>

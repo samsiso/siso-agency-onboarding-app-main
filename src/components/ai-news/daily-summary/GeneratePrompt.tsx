@@ -1,45 +1,39 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Calendar, Sparkles } from 'lucide-react';
+import { Sparkles, AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface GeneratePromptProps {
-  formattedDate: string;
-  articleCount: number;
-  isAdmin: boolean;
-  generating: boolean;
   onGenerate: () => void;
+  isAdmin: boolean;
 }
 
-// [Analysis] Extracted component for empty state with generate action
-export function GeneratePrompt({
-  formattedDate,
-  articleCount,
-  isAdmin,
-  generating,
-  onGenerate
-}: GeneratePromptProps) {
+export function GeneratePrompt({ onGenerate, isAdmin }: GeneratePromptProps) {
   return (
-    <div className="text-center py-6 space-y-4">
-      <div className="flex flex-col items-center">
-        <Calendar className="h-12 w-12 text-purple-500 mb-3" />
-        <h3 className="text-lg font-medium">No summary available for {formattedDate}</h3>
-        <p className="text-sm text-muted-foreground mt-1 max-w-md">
-          {articleCount > 0 
-            ? `There are ${articleCount} articles published, but no summary has been generated yet.`
-            : 'There are no articles or summary available for this date.'}
-        </p>
-      </div>
-      
-      {isAdmin && articleCount > 0 && (
-        <Button 
-          onClick={onGenerate} 
-          disabled={generating}
-          className="bg-purple-700 hover:bg-purple-600"
-        >
-          <Sparkles className="h-4 w-4 mr-2" />
-          {generating ? 'Generating Summary...' : 'Generate Summary'}
-        </Button>
+    <div className="flex flex-col items-center justify-center py-8 text-center">
+      {isAdmin ? (
+        <>
+          <Sparkles className="h-16 w-16 text-purple-400 mb-4 opacity-60" />
+          <h3 className="text-lg font-medium mb-2">Generate Daily AI News Summary</h3>
+          <p className="text-muted-foreground mb-4 max-w-md">
+            Create an AI-powered summary of today's AI news articles to highlight key developments, industry impacts, and actionable insights.
+          </p>
+          <Button 
+            onClick={onGenerate} 
+            className="bg-purple-700 hover:bg-purple-600"
+          >
+            <Sparkles className="h-4 w-4 mr-2" />
+            Generate Summary
+          </Button>
+        </>
+      ) : (
+        <Alert variant="default" className="bg-purple-950/20 border-purple-500/30">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            No AI summary is available for this date yet. Please check back later or contact an administrator.
+          </AlertDescription>
+        </Alert>
       )}
     </div>
   );

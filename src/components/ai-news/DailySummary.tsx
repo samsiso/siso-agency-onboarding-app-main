@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { format } from 'date-fns';
@@ -8,6 +9,7 @@ import { SummaryFooter } from './daily-summary/SummaryFooter';
 import { GeneratePrompt } from './daily-summary/GeneratePrompt';
 import { useAiDailySummary } from '@/hooks/useAiDailySummary';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+
 interface DailySummaryProps {
   date?: string;
   articleCount?: number;
@@ -61,6 +63,45 @@ export function DailySummary({
   // If there's no summary data and we've finished loading
   const shouldShowGeneratePrompt = !loading && !summaryData;
 
-  // [Analysis] Fixed issue by adding return statement with JSX
-  return;
+  // [Analysis] Return the JSX for the component
+  return (
+    <Card className="border-purple-500/30 bg-purple-950/20 mb-8">
+      <CardHeader className="pb-2">
+        <SummaryHeader 
+          formattedDate={formattedDate}
+          articleCount={articleCount}
+          summaryData={summaryData}
+          generating={generating}
+          isAdmin={isAdmin}
+          onGenerate={handleGenerate}
+          onRefresh={handleRefresh}
+          loading={loading}
+        />
+      </CardHeader>
+      
+      <CardContent>
+        {error && (
+          <Alert variant="destructive" className="mb-4 bg-red-950/30 border-red-500/30">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        
+        {shouldShowGeneratePrompt ? (
+          <GeneratePrompt onGenerate={handleGenerate} isAdmin={isAdmin} />
+        ) : (
+          <SummaryContent
+            loading={loading}
+            summaryData={summaryData}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+          />
+        )}
+      </CardContent>
+      
+      {summaryData && !loading && (
+        <SummaryFooter summaryData={summaryData} />
+      )}
+    </Card>
+  );
 }
