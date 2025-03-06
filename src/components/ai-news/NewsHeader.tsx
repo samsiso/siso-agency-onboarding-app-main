@@ -29,31 +29,5 @@ export function NewsHeader({
       onSearchChange(query);
     }
   };
-  return <div className="space-y-6 mb-6 w-full">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold">{title}</h1>
-          <p className="text-muted-foreground mt-1">
-            Latest updates and breakthroughs in AI technology
-          </p>
-        </div>
-        
-        
-      </div>
-      
-      <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-        <Tabs defaultValue={activeTab} onValueChange={onTabChange} className="w-full md:w-auto">
-          <TabsList>
-            <TabsTrigger value="all">All News</TabsTrigger>
-            <TabsTrigger value="today">Today</TabsTrigger>
-            <TabsTrigger value="trending">Trending</TabsTrigger>
-            <TabsTrigger value="categories">Categories</TabsTrigger>
-          </TabsList>
-        </Tabs>
-        
-        <div className="w-full md:w-auto">
-          <NewsSearchSection searchQuery={searchQuery} onSearchChange={handleSearchChange} />
-        </div>
-      </div>
-    </div>;
+  return;
 }
