@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
 
@@ -302,6 +303,12 @@ serve(async (req) => {
     const startTime = Date.now();
     const supabase = createClient(supabaseUrl, supabaseKey);
     
+    // Validate API key availability
+    if (!newsApiKey) {
+      console.error("NEWS_API_KEY environment variable is not configured");
+      throw new Error("News API key is not configured. Please add it to the edge function secrets.");
+    }
+
     // Parse request body
     const { 
       keyword = "artificial intelligence", 
@@ -329,15 +336,22 @@ serve(async (req) => {
       newsApiUrl.searchParams.append(key, String(value));
     });
     
+    console.log(`Fetching news from ${newsApiUrl.toString().replace(newsApiKey, "API_KEY_HIDDEN")}`);
+    
     const response = await fetch(newsApiUrl.toString());
     const data = await response.json();
     
     if (!response.ok) {
-      throw new Error(`News API error: ${data.message || response.statusText}`);
+      // Log detailed error information
+      console.error(`News API error: Status ${response.status}, Message: ${data.message || response.statusText}`);
+      console.error("Full response:", JSON.stringify(data));
+      
+      throw new Error(`News API error: ${data.message || response.statusText} (Status: ${response.status})`);
     }
     
     // Extract articles from response
     const articles = data.articles || [];
+    console.log(`Received ${articles.length} articles from News API`);
     
     // Process and store articles with improved duplicate detection
     const { added, updated, duplicates, processedArticles, duplicateGroups } = await processNewsApiArticles(
