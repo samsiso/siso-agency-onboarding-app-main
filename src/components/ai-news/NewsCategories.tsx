@@ -1,6 +1,6 @@
 
+import React from "react";
 import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
 
 // [Analysis] Category list derived from API data patterns
 const CATEGORIES = [{

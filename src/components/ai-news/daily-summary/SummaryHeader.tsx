@@ -4,11 +4,12 @@ import { CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Sparkles, RefreshCw } from 'lucide-react';
+import { type DailySummaryData } from '@/hooks/useAiDailySummary';
 
 interface SummaryHeaderProps {
   formattedDate: string;
   articleCount: number;
-  summaryData: any | null;
+  summaryData: DailySummaryData | null;
   generating: boolean;
   isAdmin: boolean;
   onGenerate: () => void;

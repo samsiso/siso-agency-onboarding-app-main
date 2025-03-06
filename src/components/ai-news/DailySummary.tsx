@@ -81,7 +81,7 @@ export function DailySummary({
         </CardContent>
       ) : shouldShowGeneratePrompt ? (
         <GeneratePrompt 
-          date={formattedDate} 
+          formattedDate={formattedDate} 
           articleCount={articleCount} 
           onGenerate={handleGenerate} 
           generating={generating}
@@ -90,20 +90,23 @@ export function DailySummary({
       ) : (
         <>
           <SummaryHeader 
-            date={formattedDate} 
-            activeTab={activeTab} 
-            onTabChange={setActiveTab} 
+            formattedDate={formattedDate}
+            articleCount={articleCount}
+            summaryData={summaryData}
+            generating={generating}
+            isAdmin={isAdmin}
+            onGenerate={handleGenerate}
             onRefresh={handleRefresh}
+            loading={loading}
           />
           <SummaryContent 
+            loading={loading}
             summaryData={summaryData} 
             activeTab={activeTab}
+            setActiveTab={setActiveTab}
           />
           <SummaryFooter 
             summaryData={summaryData}
-            onGenerate={handleGenerate}
-            generating={generating}
-            isAdmin={isAdmin}
           />
         </>
       )}
