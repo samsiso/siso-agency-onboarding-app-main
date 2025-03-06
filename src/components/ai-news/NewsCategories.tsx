@@ -38,11 +38,13 @@ const CATEGORIES = [{
 interface NewsCategoriesProps {
   selectedCategory: string | null;
   onCategoryChange: (category: string | null) => void;
+  className?: string; // [Analysis] Added optional className prop to support external styling
 }
 
 const NewsCategories = ({
   selectedCategory,
-  onCategoryChange
+  onCategoryChange,
+  className = "" // [Analysis] Default to empty string if no className is provided
 }: NewsCategoriesProps) => {
   // [Analysis] Handle toggling category selection
   const handleCategoryClick = (categoryId: string) => {
@@ -55,7 +57,7 @@ const NewsCategories = ({
   
   // [Analysis] Fixed issue by adding return statement with JSX
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className={`flex flex-wrap gap-2 ${className}`}>
       {CATEGORIES.map((category) => (
         <Button
           key={category.id}
