@@ -2,6 +2,7 @@
 import React from 'react';
 import { TestSummaryGenerator } from '@/components/ai-news/daily-summary/TestSummaryGenerator';
 
+// [Analysis] Simple test page that isolates the summary generation functionality
 export default function TestSummaryPage() {
   return (
     <div className="container mx-auto py-8 max-w-4xl">
