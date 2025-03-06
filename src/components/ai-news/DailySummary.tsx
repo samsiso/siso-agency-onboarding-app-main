@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { format } from 'date-fns';
@@ -10,7 +9,6 @@ import { GeneratePrompt } from './daily-summary/GeneratePrompt';
 import { useAiDailySummary } from '@/hooks/useAiDailySummary';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from '@/hooks/use-toast';
-
 interface DailySummaryProps {
   date?: string;
   articleCount?: number;
@@ -52,12 +50,10 @@ export function DailySummary({
         title: "Refreshing summary",
         description: "Fetching the latest AI-generated summary..."
       });
-      
       if (refreshSummary) {
         await refreshSummary();
       }
       await fetchSummary();
-      
       toast({
         title: "Summary refreshed",
         description: "The latest summary data has been loaded."
@@ -76,14 +72,12 @@ export function DailySummary({
   const handleGenerate = async () => {
     try {
       console.log(`DailySummary: Generating summary, exists: ${summaryData !== null}`);
-      
       toast({
         title: "Generating summary",
         description: "This may take up to 30 seconds. Please wait..."
       });
-      
       await generateSummary(summaryData !== null);
-      
+
       // The success toast will be shown in the generateSummary function itself
     } catch (err) {
       console.error("Error generating summary:", err);
@@ -99,44 +93,5 @@ export function DailySummary({
   const shouldShowGeneratePrompt = !loading && !summaryData;
 
   // [Analysis] Return the JSX for the component with improved error states
-  return (
-    <Card className="border-purple-500/30 bg-purple-950/20 mb-8">
-      <CardHeader className="pb-2">
-        <SummaryHeader 
-          formattedDate={formattedDate}
-          articleCount={articleCount}
-          summaryData={summaryData}
-          generating={generating}
-          isAdmin={isAdmin}
-          onGenerate={handleGenerate}
-          onRefresh={handleRefresh}
-          loading={loading}
-        />
-      </CardHeader>
-      
-      <CardContent>
-        {error && (
-          <Alert variant="destructive" className="mb-4 bg-red-950/30 border-red-500/30">
-            <AlertTriangle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-        
-        {shouldShowGeneratePrompt ? (
-          <GeneratePrompt onGenerate={handleGenerate} isAdmin={isAdmin} />
-        ) : (
-          <SummaryContent
-            loading={loading}
-            summaryData={summaryData}
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-          />
-        )}
-      </CardContent>
-      
-      {summaryData && !loading && (
-        <SummaryFooter summaryData={summaryData} />
-      )}
-    </Card>
-  );
+  return;
 }
