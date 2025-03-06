@@ -121,24 +121,36 @@ function generatePlaceholderSummary(date: string, articleCount: number): any {
   };
 }
 
-// [Framework] Call OpenAI API to generate summary
-async function callOpenAI(prompt: string): Promise<{ data?: any, error?: Error }> {
+// [Framework] Call OpenAI API to generate summary with retry logic
+async function callOpenAI(prompt: string, maxRetries = 2): Promise<{ data?: any, error?: Error }> {
   if (!openAIKey) {
     console.error("OpenAI API key not available");
     return { error: new Error("OpenAI API key not available") };
   }
   
-  try {
-    console.log("Sending request to OpenAI with API key...");
-    console.log("Using model: gpt-4o-mini");
-    
-    const openAIResponse = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${openAIKey}`
-      },
-      body: JSON.stringify({
+  // Verify API key format for debugging (don't log the actual key)
+  console.log(`OpenAI API key available and has length: ${openAIKey.length}`);
+  if (openAIKey.startsWith("sk-") === false) {
+    console.warn("Warning: OpenAI API key does not start with expected prefix 'sk-'");
+  }
+  
+  let retryCount = 0;
+  let lastError: Error | null = null;
+  
+  while (retryCount <= maxRetries) {
+    try {
+      if (retryCount > 0) {
+        // Exponential backoff: wait longer between each retry
+        const delayMs = Math.pow(2, retryCount) * 1000;
+        console.log(`Retry attempt ${retryCount} after ${delayMs}ms delay`);
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+      }
+      
+      console.log(`API call attempt ${retryCount + 1}/${maxRetries + 1}`);
+      console.log("Sending request to OpenAI API...");
+      console.log("Using model: gpt-4o-mini");
+      
+      const requestBody = JSON.stringify({
         model: "gpt-4o-mini", // [Analysis] Using gpt-4o-mini which is a valid model
         messages: [
           {
@@ -152,34 +164,76 @@ async function callOpenAI(prompt: string): Promise<{ data?: any, error?: Error }
         ],
         temperature: 0.5,
         max_tokens: 1000
-      })
-    });
-    
-    // [Plan] Enhanced error logging for API responses
-    if (!openAIResponse.ok) {
-      const errorText = await openAIResponse.text();
-      console.error("OpenAI API error response status:", openAIResponse.status);
-      console.error("OpenAI API error response body:", errorText);
-      try {
-        const errorData = JSON.parse(errorText);
-        throw new Error(`OpenAI API error: ${errorData.error?.message || errorData.error?.type || openAIResponse.statusText}`);
-      } catch (e) {
-        throw new Error(`OpenAI API error: ${openAIResponse.statusText} - ${errorText.substring(0, 200)}`);
+      });
+      
+      console.log(`Request body: ${requestBody.substring(0, 200)}...`);
+      
+      const openAIResponse = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${openAIKey}`
+        },
+        body: requestBody
+      });
+      
+      // [Plan] Enhanced error logging for API responses
+      if (!openAIResponse.ok) {
+        const errorText = await openAIResponse.text();
+        console.error("OpenAI API error response status:", openAIResponse.status);
+        console.error("OpenAI API error response body:", errorText);
+        
+        try {
+          const errorData = JSON.parse(errorText);
+          const errorMessage = errorData.error?.message || errorData.error?.type || openAIResponse.statusText;
+          console.error(`Parsed API error: ${errorMessage}`);
+          
+          // If we received a rate limit or server error, retry
+          if (openAIResponse.status === 429 || openAIResponse.status >= 500) {
+            lastError = new Error(`OpenAI API error (${openAIResponse.status}): ${errorMessage}`);
+            retryCount++;
+            continue; // Continue to next retry attempt
+          }
+          
+          throw new Error(`OpenAI API error: ${errorMessage}`);
+        } catch (e) {
+          throw new Error(`OpenAI API error: ${openAIResponse.statusText} - ${errorText.substring(0, 200)}`);
+        }
       }
+      
+      const openAIData = await openAIResponse.json();
+      console.log("Successfully received OpenAI response");
+      console.log(`Response status: ${openAIResponse.status}`);
+      console.log(`Response contains choices: ${openAIData.choices ? openAIData.choices.length : 0}`);
+      
+      if (!openAIData.choices || !openAIData.choices[0]?.message?.content) {
+        console.error("Response missing expected content:", JSON.stringify(openAIData).substring(0, 500));
+        throw new Error("OpenAI response missing expected content");
+      }
+      
+      return { data: openAIData };
+    } catch (error) {
+      console.error(`Error calling OpenAI API (attempt ${retryCount + 1}/${maxRetries + 1}):`, error);
+      lastError = error instanceof Error ? error : new Error(String(error));
+      
+      if (retryCount >= maxRetries) {
+        return { error: lastError };
+      }
+      
+      retryCount++;
     }
-    
-    const openAIData = await openAIResponse.json();
-    console.log("Successfully received OpenAI response");
-    return { data: openAIData };
-  } catch (error) {
-    console.error("Error calling OpenAI API:", error);
-    return { error: error instanceof Error ? error : new Error(String(error)) };
   }
+  
+  // This should never be reached due to the return in the loop, but TypeScript needs it
+  return { error: lastError || new Error("Unknown error in OpenAI API call") };
 }
 
 // [Framework] Parse the OpenAI response into structured summary data
 function parseOpenAIResponse(responseContent: string): any {
   try {
+    // Log the raw response for debugging
+    console.log("Raw OpenAI response to parse:", responseContent.substring(0, 300) + "...");
+    
     // Extract JSON from the response (handling potential markdown formatting)
     const jsonMatch = responseContent.match(/```json\n([\s\S]*)\n```/) || 
                      responseContent.match(/```\n([\s\S]*)\n```/) ||
@@ -187,10 +241,31 @@ function parseOpenAIResponse(responseContent: string): any {
                       
     const jsonString = jsonMatch[1] || responseContent;
     console.log("Attempting to parse OpenAI response:", jsonString.substring(0, 150) + "...");
-    return JSON.parse(jsonString);
+    
+    try {
+      return JSON.parse(jsonString);
+    } catch (parseError) {
+      // First parse attempt failed, try cleanup and retry
+      console.warn("Initial JSON parse failed, trying with cleanup:", parseError);
+      
+      // Try to clean up the string more aggressively
+      const cleanedString = jsonString
+        .replace(/[\u0000-\u001F\u007F-\u009F]/g, "") // Remove control characters
+        .replace(/\\n/g, " ")  // Replace newlines with spaces
+        .replace(/\\/g, "\\\\") // Escape backslashes
+        .replace(/\\"/g, '\\"')  // Fix escaped quotes
+        .trim();
+        
+      try {
+        return JSON.parse(cleanedString);
+      } catch (secondParseError) {
+        console.error("Cleaned JSON parse also failed:", secondParseError);
+        throw parseError; // Throw the original error
+      }
+    }
   } catch (parseError) {
     console.error("Error parsing OpenAI response:", parseError);
-    console.log("Raw response:", responseContent);
+    console.log("Raw response that failed parsing:", responseContent);
     
     // Attempt to extract data using regex as a fallback
     const summary = responseContent.match(/summary["\s:]+([^"]+)/i)?.[1] || 
@@ -235,6 +310,12 @@ async function saveSummary(supabase: any, date: string, summaryData: any, articl
       has_existing: !!existingSummary
     });
     
+    // Ensure the data structure is valid
+    if (!summaryData.summary || typeof summaryData.summary !== 'string') {
+      console.error("Invalid summary data - summary missing or not a string:", summaryData);
+      return { error: new Error("Invalid summary data structure - missing required fields") };
+    }
+    
     let saveOperation;
     
     if (existingSummary) {
@@ -244,9 +325,9 @@ async function saveSummary(supabase: any, date: string, summaryData: any, articl
         .from("ai_news_daily_summaries")
         .update({
           summary: summaryData.summary,
-          key_points: summaryData.key_points,
-          practical_applications: summaryData.practical_applications,
-          industry_impacts: summaryData.industry_impacts,
+          key_points: summaryData.key_points || [],
+          practical_applications: summaryData.practical_applications || [],
+          industry_impacts: summaryData.industry_impacts || {},
           generated_with: generatedWith,
           article_count: articleCount,
           updated_at: new Date().toISOString()
@@ -260,9 +341,9 @@ async function saveSummary(supabase: any, date: string, summaryData: any, articl
         .insert({
           date,
           summary: summaryData.summary,
-          key_points: summaryData.key_points,
-          practical_applications: summaryData.practical_applications,
-          industry_impacts: summaryData.industry_impacts,
+          key_points: summaryData.key_points || [],
+          practical_applications: summaryData.practical_applications || [],
+          industry_impacts: summaryData.industry_impacts || {},
           generated_with: generatedWith,
           article_count: articleCount
         });
@@ -286,6 +367,8 @@ async function saveSummary(supabase: any, date: string, summaryData: any, articl
 // [Framework] Main function to generate a daily summary
 async function generateDailySummary(date: string, forceRefresh: boolean = false): Promise<SummaryResponse> {
   try {
+    console.log(`⭐️ Starting daily summary generation for ${date}, force refresh: ${forceRefresh}`);
+    
     // Initialize Supabase client
     const supabase = supabaseClient || createClient(supabaseUrl!, supabaseKey!);
     
@@ -297,13 +380,46 @@ async function generateDailySummary(date: string, forceRefresh: boolean = false)
         console.warn("Error checking for existing summary, proceeding with generation:", error);
       } else if (existingSummary) {
         console.log(`Using existing summary for ${date}`);
-        return {
-          success: true,
-          summary: existingSummary.summary,
-          key_points: existingSummary.key_points || [],
-          practical_applications: existingSummary.practical_applications || [],
-          industry_impacts: existingSummary.industry_impacts || {}
-        };
+        
+        // Don't return error_fallback summaries unless forced to
+        if (existingSummary.generated_with === 'error_fallback' || existingSummary.generated_with === 'placeholder') {
+          console.log("Existing summary is a fallback/placeholder. Will regenerate unless forced.");
+          
+          // If user is not forcing refresh of a fallback, we'll regenerate
+          if (!forceRefresh) {
+            // Delete the fallback summary before regenerating
+            const { error: deleteError } = await supabase
+              .from("ai_news_daily_summaries")
+              .delete()
+              .eq("date", date);
+              
+            if (deleteError) {
+              console.warn("Failed to delete fallback summary:", deleteError);
+            } else {
+              console.log("Successfully deleted fallback summary. Will regenerate.");
+            }
+            
+            // Continue with generation (don't return here)
+          } else {
+            // User specifically asked for this fallback, so use it
+            return {
+              success: true,
+              summary: existingSummary.summary,
+              key_points: existingSummary.key_points || [],
+              practical_applications: existingSummary.practical_applications || [],
+              industry_impacts: existingSummary.industry_impacts || {}
+            };
+          }
+        } else {
+          // This is a valid summary, return it
+          return {
+            success: true,
+            summary: existingSummary.summary,
+            key_points: existingSummary.key_points || [],
+            practical_applications: existingSummary.practical_applications || [],
+            industry_impacts: existingSummary.industry_impacts || {}
+          };
+        }
       }
     }
     
@@ -367,11 +483,11 @@ Format your response as JSON with these keys:
 summary (string), key_points (array), practical_applications (array), industry_impacts (object with industry names as keys and impact descriptions as values)
 `;
 
-    // Call OpenAI API
+    // Call OpenAI API with retry logic
     const { data: openAIData, error: openAIError } = await callOpenAI(prompt);
     
     if (openAIError) {
-      console.error("Error calling OpenAI:", openAIError);
+      console.error("Error calling OpenAI after all retries:", openAIError);
       
       // Fall back to placeholder if OpenAI fails
       const placeholderSummary = generatePlaceholderSummary(date, articles.length);
@@ -390,11 +506,18 @@ summary (string), key_points (array), practical_applications (array), industry_i
     const responseContent = openAIData.choices[0]?.message?.content;
     
     if (!responseContent) {
+      console.error("Empty response from OpenAI:", openAIData);
       throw new Error("Empty response from OpenAI");
     }
     
     // Parse the JSON response
     const summaryData = parseOpenAIResponse(responseContent);
+    
+    // Verify the parsed data has all required fields
+    if (!summaryData.summary || !summaryData.key_points) {
+      console.error("Parsed summary data missing required fields:", summaryData);
+      throw new Error("Parsed summary data missing required fields");
+    }
     
     // Save the summary to the database
     const { error: saveError } = await saveSummary(
@@ -408,6 +531,8 @@ summary (string), key_points (array), practical_applications (array), industry_i
     if (saveError) {
       console.warn("Error saving summary, but returning generated data:", saveError);
     }
+    
+    console.log("✅ Successfully generated and saved summary");
     
     return {
       success: true,
@@ -447,8 +572,10 @@ serve(async (req) => {
     const targetDate = requestBody.date || new Date().toISOString().split('T')[0];
     const forceRefresh = requestBody.forceRefresh || false;
     
-    console.log(`Generating summary for date: ${targetDate}, force refresh: ${forceRefresh}`);
-    console.log(`Using OpenAI API key: ${openAIKey ? "Available" : "Not available"}`);
+    console.log(`----- GENERATING SUMMARY -----`);
+    console.log(`Date: ${targetDate}, Force refresh: ${forceRefresh}`);
+    console.log(`OpenAI API key: ${openAIKey ? "Available" : "Not available"}`);
+    console.log(`---------------------------`);
     
     // Generate the summary
     const result = await generateDailySummary(targetDate, forceRefresh);
