@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { format } from 'date-fns';
@@ -9,7 +8,6 @@ import { SummaryFooter } from './daily-summary/SummaryFooter';
 import { GeneratePrompt } from './daily-summary/GeneratePrompt';
 import { useAiDailySummary } from '@/hooks/useAiDailySummary';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-
 interface DailySummaryProps {
   date?: string;
   articleCount?: number;
@@ -62,54 +60,7 @@ export function DailySummary({
 
   // If there's no summary data and we've finished loading
   const shouldShowGeneratePrompt = !loading && !summaryData;
-  
+
   // [Analysis] Fixed issue by adding return statement with JSX
-  return (
-    <Card className="mb-8 border-blue-500/20 bg-blue-950/10">
-      {loading ? (
-        <CardContent className="p-6">
-          <div className="flex items-center justify-center h-12">
-            <RefreshCw className="h-5 w-5 animate-spin text-blue-400" />
-          </div>
-        </CardContent>
-      ) : error ? (
-        <CardContent className="p-6">
-          <Alert variant="destructive">
-            <AlertTriangle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        </CardContent>
-      ) : shouldShowGeneratePrompt ? (
-        <GeneratePrompt 
-          formattedDate={formattedDate} 
-          articleCount={articleCount} 
-          onGenerate={handleGenerate} 
-          generating={generating}
-          isAdmin={isAdmin}
-        />
-      ) : (
-        <>
-          <SummaryHeader 
-            formattedDate={formattedDate}
-            articleCount={articleCount}
-            summaryData={summaryData}
-            generating={generating}
-            isAdmin={isAdmin}
-            onGenerate={handleGenerate}
-            onRefresh={handleRefresh}
-            loading={loading}
-          />
-          <SummaryContent 
-            loading={loading}
-            summaryData={summaryData} 
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-          />
-          <SummaryFooter 
-            summaryData={summaryData}
-          />
-        </>
-      )}
-    </Card>
-  );
+  return;
 }
