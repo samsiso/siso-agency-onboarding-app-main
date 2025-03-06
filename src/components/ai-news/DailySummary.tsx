@@ -23,11 +23,9 @@ export function DailySummary({
   date = new Date().toISOString().split('T')[0],
   articleCount = 0,
   refreshSummary,
-  isAdmin = false
+  isAdmin = true // [Plan] Default to true for testing purposes
 }: DailySummaryProps) {
   const [activeTab, setActiveTab] = useState('summary');
-
-  // Format the date for display
   const formattedDate = date ? format(new Date(date), 'MMMM d, yyyy') : 'Today';
 
   // Use our custom hook

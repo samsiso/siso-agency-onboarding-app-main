@@ -93,7 +93,50 @@ async function generateDailySummary(date: string, forceRefresh: boolean = false,
     
     if (!articles || articles.length === 0) {
       console.warn(`No published articles found for ${date}`);
-      throw new Error(`No published articles found for ${date}`);
+      
+      // Create a fallback summary even if no articles are found
+      const emptyPlaceholderSummary = {
+        summary: `No AI news articles were published on ${date}.`,
+        sentiment: "neutral",
+        confidence_score: 100,
+        key_points: [
+          "No articles were published on this date"
+        ],
+        categorized_key_points: {
+          "general": [
+            "No articles were published on this date",
+            "Check back tomorrow for new content"
+          ]
+        },
+        practical_applications: [
+          "Explore articles from previous days",
+          "Subscribe to notifications for new content"
+        ],
+        application_details: [
+          "Previous content may still be relevant",
+          "Stay informed about the latest developments"
+        ],
+        industry_impacts: {
+          "general": "No new impacts to report today"
+        },
+        impact_severity: {
+          "general": "none"
+        },
+        impact_trends: {
+          "general": "stable"
+        },
+        key_technologies: [],
+        analysis_depth: "minimal"
+      };
+      
+      // Save the empty placeholder summary
+      await saveSummary(supabase, date, emptyPlaceholderSummary, 0, "empty_placeholder");
+      
+      return {
+        success: true,
+        ...emptyPlaceholderSummary,
+        message: "No articles found for this date. Created empty placeholder summary."
+      };
     }
     
     console.log(`Found ${articles.length} articles for ${date}`);

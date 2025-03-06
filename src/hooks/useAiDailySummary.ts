@@ -64,7 +64,10 @@ export function useAiDailySummary(date: string, isAdmin: boolean = false) {
           });
         }
       } else if (data) {
+        console.log('Summary data retrieved:', data);
         handleSummaryData(data);
+      } else {
+        console.log('No summary found for date:', date);
       }
     } catch (error) {
       console.error('Error in fetchSummary:', error);
