@@ -1,4 +1,5 @@
 
+-- [Analysis] Breaking down SQL operations to prevent deadlocks with proper sequencing
 -- First, check if the policy already exists to avoid duplicates
 DO $$
 BEGIN
