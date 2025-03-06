@@ -87,25 +87,41 @@ export const calculateComplexityBreakdown = (newsItems: NewsItem[]) => {
 };
 
 // [Analysis] Extracts commonly mentioned technologies/topics from titles and descriptions
+// Improved to prevent duplications and spam
 export const extractTrendingTopics = (newsItems: NewsItem[]) => {
   // Common AI-related keywords to look for
   const keywordRegex = /\b(GPT-4|GPT-5|Gemini|Claude|LLM|multimodal|AI model|transformer|deep learning|neural network|machine learning|NLP|computer vision|OpenAI|Anthropic|Google|Microsoft|Meta|Apple|generative AI|diffusion|prompt|fine-tuning|RAG|retrieval|augmented|embedding|vectorstore|chatbot|agent|autonomous|robotics)\b/gi;
   
-  const topics: Record<string, number> = {};
+  // Create a case-insensitive map to track topics
+  const topicMap = new Map<string, number>();
   
+  // Process each article
   newsItems.forEach(item => {
+    // Combine title and description, or use just title if description is missing
     const text = `${item.title} ${item.description || ''}`;
+    
+    // Find all matches
     const matches = text.match(keywordRegex);
     
     if (matches) {
+      // Track which topics we've already counted for this article
+      const articleTopics = new Set<string>();
+      
       matches.forEach(match => {
+        // Normalize the topic name
         const normalizedMatch = match.toLowerCase();
-        topics[normalizedMatch] = (topics[normalizedMatch] || 0) + 1;
+        
+        // Only count each topic once per article to prevent spam
+        if (!articleTopics.has(normalizedMatch)) {
+          articleTopics.add(normalizedMatch);
+          topicMap.set(normalizedMatch, (topicMap.get(normalizedMatch) || 0) + 1);
+        }
       });
     }
   });
   
-  return Object.entries(topics)
+  // Convert map to array, sort and limit to top 8
+  return Array.from(topicMap.entries())
     .sort((a, b) => b[1] - a[1])
     .slice(0, 8)
     .map(([topic, count]) => ({
@@ -134,7 +150,7 @@ export const calculateSourceDistribution = (newsItems: NewsItem[]) => {
     }));
 };
 
-// [Analysis] NEW: Generate simulated historical data for trend analysis
+// [Analysis] Generate simulated historical data for trend analysis
 // In a real app, this would fetch actual historical data
 export const generateHistoricalTrends = (daysBack: number = 7) => {
   const trends = [];
@@ -153,7 +169,7 @@ export const generateHistoricalTrends = (daysBack: number = 7) => {
   return trends;
 };
 
-// [Analysis] NEW: Calculate sentiment distribution from news content
+// [Analysis] Calculate sentiment distribution from news content
 export const calculateSentimentDistribution = (newsItems: NewsItem[]) => {
   // In a real app, this would use NLP to analyze sentiment
   // Here we're using a simple keyword-based approach

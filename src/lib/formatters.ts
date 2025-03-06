@@ -1,44 +1,52 @@
 
-// [Analysis] Format large numbers to human readable format (e.g., 1.2M)
-export const formatNumber = (num: number) => {
-  if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
-  if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
-  return num.toString();
+/**
+ * [Analysis] Collection of formatting utilities for consistent display across the application
+ */
+
+/**
+ * Formats a number with locale-specific thousands separators
+ */
+export const formatNumber = (num: number): string => {
+  return num.toLocaleString();
 };
 
-// [Analysis] Format dates to a readable format (e.g., "5 days ago")
-export const formatTimeAgo = (date: string | Date) => {
-  const now = new Date();
-  const pastDate = new Date(date);
-  const diffInSeconds = Math.floor((now.getTime() - pastDate.getTime()) / 1000);
-  
-  if (diffInSeconds < 60) return `${diffInSeconds} seconds ago`;
-  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
-  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
-  if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)} days ago`;
-  if (diffInSeconds < 31536000) return `${Math.floor(diffInSeconds / 2592000)} months ago`;
-  return `${Math.floor(diffInSeconds / 31536000)} years ago`;
+/**
+ * Formats a date string to a human-readable format
+ */
+export const formatDate = (dateString: string): string => {
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  } catch (e) {
+    return dateString;
+  }
 };
 
-// [Analysis] Truncate text to a maximum length with ellipsis
-export const truncateText = (text: string, maxLength: number = 100) => {
-  if (!text) return '';
-  if (text.length <= maxLength) return text;
-  return text.substring(0, maxLength) + '...';
-};
-
-// [Analysis] Convert a string to title case
-export const toTitleCase = (str: string) => {
-  if (!str) return '';
-  return str
-    .toLowerCase()
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-};
-
-// [Analysis] Format percentages with a + sign for positive values
-export const formatPercentage = (value: number, showPositive: boolean = true) => {
-  if (value > 0 && showPositive) return `+${value}%`;
+/**
+ * Formats a percentage value with a % symbol
+ */
+export const formatPercentage = (value: number): string => {
   return `${value}%`;
+};
+
+/**
+ * Shortens a large number to a abbreviated format (e.g., 1.2k, 3.5M)
+ */
+export const formatCompactNumber = (num: number): string => {
+  if (num < 1000) return num.toString();
+  
+  const formatter = Intl.NumberFormat('en', { notation: 'compact' });
+  return formatter.format(num);
+};
+
+/**
+ * Truncates text to a specified length and adds ellipsis if needed
+ */
+export const truncateText = (text: string, maxLength: number): string => {
+  if (!text || text.length <= maxLength) return text;
+  return text.slice(0, maxLength) + '...';
 };

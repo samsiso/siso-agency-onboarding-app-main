@@ -29,7 +29,11 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
-import { formatNumber } from '@/lib/formatters';
+
+// Helper function to format numbers consistently
+const formatNumber = (num: number): string => {
+  return num.toLocaleString();
+};
 
 interface DailyStatsOverviewProps {
   newsItems: NewsItem[];
