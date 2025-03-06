@@ -45,20 +45,59 @@ async function recordFetchHistory(
       return data?.[0]?.id;
     } else {
       // Find the most recent pending record for this source
-      const { data: existing } = await supabase
+      const { data: existing, error: fetchError } = await supabase
         .from("news_fetch_history")
         .select("*")
         .eq("source_type", source)
         .eq("status", "pending")
         .order("fetch_time", { ascending: false })
         .limit(1);
-
+      
+      if (fetchError) {
+        console.error("Error fetching existing history record:", fetchError);
+        return;
+      }
+      
       const historyId = existing?.[0]?.id;
       
       if (historyId) {
+        const updateData: any = {
+          status: status === "completed" ? "success" : "error",
+          articles_fetched: metrics.articles_fetched || 0,
+          articles_added: metrics.articles_added || 0,
+          articles_updated: metrics.articles_updated || 0,
+          duplicates_skipped: metrics.duplicates_skipped || 0,
+          execution_time_ms: metrics.execution_time_ms || 0,
+          error_message: metrics.error_message || null,
+        };
+
+        // Safely handle metadata by ensuring existing[0].metadata exists
+        if (existing && existing[0] && existing[0].metadata) {
+          updateData.metadata = {
+            ...existing[0].metadata,
+            completed_at: new Date().toISOString(),
+            ...(metrics.metadata || {})
+          };
+        } else {
+          updateData.metadata = {
+            completed_at: new Date().toISOString(),
+            ...(metrics.metadata || {})
+          };
+        }
+
         const { error } = await supabase
           .from("news_fetch_history")
-          .update({
+          .update(updateData)
+          .eq("id", historyId);
+
+        if (error) console.error("Error updating fetch history:", error);
+      } else {
+        // If no pending record found, create a new one
+        console.log("No pending record found, creating a new one");
+        const { error } = await supabase
+          .from("news_fetch_history")
+          .insert({
+            source_type: source,
             status: status === "completed" ? "success" : "error",
             articles_fetched: metrics.articles_fetched || 0,
             articles_added: metrics.articles_added || 0,
@@ -67,14 +106,12 @@ async function recordFetchHistory(
             execution_time_ms: metrics.execution_time_ms || 0,
             error_message: metrics.error_message || null,
             metadata: { 
-              ...existing[0].metadata,
               completed_at: new Date().toISOString(),
-              ...metrics.metadata
+              ...(metrics.metadata || {})
             },
-          })
-          .eq("id", historyId);
-
-        if (error) console.error("Error updating fetch history:", error);
+          });
+  
+        if (error) console.error("Error creating new fetch history record:", error);
       }
     }
   } catch (error) {
@@ -109,78 +146,83 @@ async function isDuplicate(supabase: any, article: any, threshold = 0.7): Promis
   similarity?: number;
   similarArticles?: any[];
 }> {
-  // Check by URL first (strongest signal)
-  if (article.url) {
-    const { data: urlMatch, error: urlError } = await supabase
+  try {
+    // Check by URL first (strongest signal)
+    if (article.url) {
+      const { data: urlMatch, error: urlError } = await supabase
+        .from("ai_news")
+        .select("id, title, source")
+        .eq("url", article.url)
+        .limit(1);
+        
+      if (urlError) {
+        console.error("Error checking for URL duplicates:", urlError);
+      } else if (urlMatch && urlMatch.length > 0) {
+        return { 
+          isDuplicate: true, 
+          duplicateOf: urlMatch[0].id,
+          similarity: 1.0 // Exact URL match is 100% similarity
+        };
+      }
+    }
+    
+    // Get recent articles to check title similarity
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    
+    const { data: recentArticles, error: recentError } = await supabase
       .from("ai_news")
-      .select("id, title, source")
-      .eq("url", article.url)
-      .limit(1);
+      .select("id, title, source, url")
+      .gte("created_at", sevenDaysAgo.toISOString())
+      .order("created_at", { ascending: false })
+      .limit(100); // Reasonable limit for comparison
+    
+    if (recentError) {
+      console.error("Error fetching recent articles:", recentError);
+      return { isDuplicate: false };
+    }
+    
+    if (!recentArticles || recentArticles.length === 0) {
+      return { isDuplicate: false };
+    }
+    
+    // Compare title similarity using Jaccard index
+    const titleLower = article.title.toLowerCase();
+    const similarityScores = recentArticles.map(existingArticle => ({
+      id: existingArticle.id,
+      title: existingArticle.title,
+      source: existingArticle.source,
+      url: existingArticle.url,
+      similarity: jaccardSimilarity(titleLower, existingArticle.title.toLowerCase())
+    }));
+    
+    // Sort by similarity score
+    similarityScores.sort((a, b) => b.similarity - a.similarity);
+    
+    // Find highest similarity match above threshold
+    const bestMatch = similarityScores[0];
+    
+    if (bestMatch && bestMatch.similarity >= threshold) {
+      console.log(`Duplicate found: "${article.title}" is similar to "${bestMatch.title}" (${bestMatch.similarity.toFixed(2)})`);
       
-    if (urlError) {
-      console.error("Error checking for URL duplicates:", urlError);
-    } else if (urlMatch && urlMatch.length > 0) {
+      // Collect similar articles for grouping
+      const similarArticles = similarityScores
+        .filter(item => item.similarity >= threshold * 0.8) // Include slightly less similar articles too
+        .slice(0, 5); // Limit to top 5 similar articles
+      
       return { 
         isDuplicate: true, 
-        duplicateOf: urlMatch[0].id,
-        similarity: 1.0 // Exact URL match is 100% similarity
+        duplicateOf: bestMatch.id,
+        similarity: bestMatch.similarity,
+        similarArticles: similarArticles
       };
     }
-  }
-  
-  // Get recent articles to check title similarity
-  const sevenDaysAgo = new Date();
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-  
-  const { data: recentArticles, error: recentError } = await supabase
-    .from("ai_news")
-    .select("id, title, source, url")
-    .gte("created_at", sevenDaysAgo.toISOString())
-    .order("created_at", { ascending: false })
-    .limit(100); // Reasonable limit for comparison
-  
-  if (recentError) {
-    console.error("Error fetching recent articles:", recentError);
+    
+    return { isDuplicate: false };
+  } catch (error) {
+    console.error("Error in isDuplicate:", error);
     return { isDuplicate: false };
   }
-  
-  if (!recentArticles || recentArticles.length === 0) {
-    return { isDuplicate: false };
-  }
-  
-  // Compare title similarity using Jaccard index
-  const titleLower = article.title.toLowerCase();
-  const similarityScores = recentArticles.map(existingArticle => ({
-    id: existingArticle.id,
-    title: existingArticle.title,
-    source: existingArticle.source,
-    url: existingArticle.url,
-    similarity: jaccardSimilarity(titleLower, existingArticle.title.toLowerCase())
-  }));
-  
-  // Sort by similarity score
-  similarityScores.sort((a, b) => b.similarity - a.similarity);
-  
-  // Find highest similarity match above threshold
-  const bestMatch = similarityScores[0];
-  
-  if (bestMatch && bestMatch.similarity >= threshold) {
-    console.log(`Duplicate found: "${article.title}" is similar to "${bestMatch.title}" (${bestMatch.similarity.toFixed(2)})`);
-    
-    // Collect similar articles for grouping
-    const similarArticles = similarityScores
-      .filter(item => item.similarity >= threshold * 0.8) // Include slightly less similar articles too
-      .slice(0, 5); // Limit to top 5 similar articles
-    
-    return { 
-      isDuplicate: true, 
-      duplicateOf: bestMatch.id,
-      similarity: bestMatch.similarity,
-      similarArticles: similarArticles
-    };
-  }
-  
-  return { isDuplicate: false };
 }
 
 // [Analysis] Process News API response into standardized news format
@@ -242,11 +284,15 @@ async function processNewsApiArticles(
       };
 
       // Check if article already exists by title
-      const { data: existingArticle } = await supabase
+      const { data: existingArticle, error: existingError } = await supabase
         .from("ai_news")
         .select("id, title")
         .eq("title", article.title)
         .maybeSingle();
+        
+      if (existingError) {
+        console.error("Error checking for existing article:", existingError);
+      }
 
       // Transform the article for the response
       const transformedArticle = {
@@ -272,15 +318,27 @@ async function processNewsApiArticles(
 
       if (existingArticle) {
         // Update existing article
-        await supabase
+        const { error: updateError } = await supabase
           .from("ai_news")
           .update(newsItem)
           .eq("id", existingArticle.id);
-        updated++;
+          
+        if (updateError) {
+          console.error("Error updating article:", updateError);
+        } else {
+          updated++;
+        }
       } else {
         // Insert new article
-        await supabase.from("ai_news").insert(newsItem);
-        added++;
+        const { error: insertError } = await supabase
+          .from("ai_news")
+          .insert(newsItem);
+          
+        if (insertError) {
+          console.error("Error inserting article:", insertError);
+        } else {
+          added++;
+        }
       }
     } catch (error) {
       console.error("Error processing article:", error);
@@ -313,16 +371,29 @@ serve(async (req) => {
     }
 
     // Parse request body
+    let requestBody;
+    try {
+      requestBody = await req.json() as RequestBody;
+    } catch (error) {
+      console.error("Error parsing request body:", error);
+      throw new Error("Invalid request body. Please provide valid JSON.");
+    }
+    
     const { 
       keyword = "artificial intelligence", 
       limit = 10,
       testMode = false,
       skipDuplicates = true,
       deduplicationThreshold = 0.7 // Default threshold
-    } = await req.json() as RequestBody;
+    } = requestBody;
     
     // Record the start of the fetch operation
-    const historyId = await recordFetchHistory(supabase, "news_api", "started", {});
+    console.log("Recording fetch history - start");
+    try {
+      await recordFetchHistory(supabase, "news_api", "started", {});
+    } catch (recordError) {
+      console.error("Failed to record fetch start history, but continuing:", recordError);
+    }
     
     // Fetch articles from News API
     const newsApiUrl = new URL("https://newsapi.org/v2/everything");
@@ -341,109 +412,159 @@ serve(async (req) => {
     
     console.log(`Fetching news from ${newsApiUrl.toString().replace(newsApiKey, "API_KEY_HIDDEN")}`);
     
-    const response = await fetch(newsApiUrl.toString());
+    // Use a reasonable timeout for the fetch
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
     
-    // Check for HTTP errors first
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+    try {
+      const response = await fetch(newsApiUrl.toString(), {
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
       
-      // Log detailed error information
-      console.error(`News API error: Status ${response.status}, Message: ${errorData.message || response.statusText}`);
-      
-      // Special handling for common error codes
-      let errorMessage = `News API error: ${errorData.message || response.statusText} (Status: ${response.status})`;
-      
-      if (response.status === 401) {
-        errorMessage = "Invalid News API key. Please check your API key and make sure it's valid.";
-      } else if (response.status === 429) {
-        errorMessage = "News API rate limit exceeded. Please try again later or upgrade your plan.";
-      } else if (response.status === 403) {
-        errorMessage = "News API access is forbidden. Your key might be restricted.";
+      // Check for HTTP errors first
+      if (!response.ok) {
+        let errorData;
+        try {
+          errorData = await response.json();
+        } catch (parseError) {
+          errorData = { message: "Could not parse error response" };
+        }
+        
+        // Log detailed error information
+        console.error(`News API error: Status ${response.status}, Message: ${errorData.message || response.statusText}`);
+        
+        // Special handling for common error codes
+        let errorMessage = `News API error: ${errorData.message || response.statusText} (Status: ${response.status})`;
+        
+        if (response.status === 401) {
+          errorMessage = "Invalid News API key. Please check your API key and make sure it's valid.";
+        } else if (response.status === 429) {
+          errorMessage = "News API rate limit exceeded. Please try again later or upgrade your plan.";
+        } else if (response.status === 403) {
+          errorMessage = "News API access is forbidden. Your key might be restricted.";
+        }
+        
+        // Record the error
+        try {
+          await recordFetchHistory(supabase, "news_api", "error", {
+            error_message: errorMessage,
+            metadata: {
+              status_code: response.status,
+              api_response: errorData
+            }
+          });
+        } catch (recordError) {
+          console.error("Failed to record fetch error history:", recordError);
+        }
+        
+        throw new Error(errorMessage);
       }
       
-      // Record the error
-      await recordFetchHistory(supabase, "news_api", "error", {
-        error_message: errorMessage,
-        metadata: {
-          status_code: response.status,
-          api_response: errorData
+      // Parse successful response
+      let data;
+      try {
+        data = await response.json();
+      } catch (parseError) {
+        console.error("Error parsing JSON response:", parseError);
+        throw new Error("Failed to parse API response. The service may be experiencing issues.");
+      }
+      
+      // Additional validation of response format
+      if (!data.articles || !Array.isArray(data.articles)) {
+        const errorMessage = "Invalid response format from News API - missing 'articles' array";
+        console.error(errorMessage, data);
+        
+        try {
+          await recordFetchHistory(supabase, "news_api", "error", {
+            error_message: errorMessage,
+            metadata: { api_response: data }
+          });
+        } catch (recordError) {
+          console.error("Failed to record fetch error history:", recordError);
         }
-      });
+        
+        throw new Error(errorMessage);
+      }
       
-      throw new Error(errorMessage);
-    }
-    
-    // Parse successful response
-    const data = await response.json();
-    
-    // Additional validation of response format
-    if (!data.articles || !Array.isArray(data.articles)) {
-      const errorMessage = "Invalid response format from News API - missing 'articles' array";
-      console.error(errorMessage, data);
+      // Extract articles from response
+      const articles = data.articles || [];
+      console.log(`Received ${articles.length} articles from News API`);
       
-      await recordFetchHistory(supabase, "news_api", "error", {
-        error_message: errorMessage,
-        metadata: { api_response: data }
-      });
-      
-      throw new Error(errorMessage);
-    }
-    
-    // Extract articles from response
-    const articles = data.articles || [];
-    console.log(`Received ${articles.length} articles from News API`);
-    
-    // Process and store articles with improved duplicate detection
-    const { added, updated, duplicates, processedArticles, duplicateGroups } = await processNewsApiArticles(
-      articles,
-      supabase,
-      skipDuplicates,
-      deduplicationThreshold
-    );
-    
-    // Only update database if not in test mode
-    if (!testMode) {
-      // Update news source last_fetched_at
-      await supabase
-        .from("news_sources")
-        .update({ last_fetched_at: new Date().toISOString() })
-        .eq("source_type", "news_api");
-    }
-    
-    // Record the completion of the fetch operation
-    await recordFetchHistory(supabase, "news_api", "completed", {
-      articles_fetched: articles.length,
-      articles_added: added,
-      articles_updated: updated,
-      duplicates_skipped: duplicates,
-      execution_time_ms: Date.now() - startTime,
-      metadata: {
-        keyword,
-        limit,
-        testMode,
+      // Process and store articles with improved duplicate detection
+      const { added, updated, duplicates, processedArticles, duplicateGroups } = await processNewsApiArticles(
+        articles,
+        supabase,
         skipDuplicates,
         deduplicationThreshold
-      },
-    });
-    
-    return new Response(
-      JSON.stringify({
-        success: true,
-        count: added,
-        message: `Successfully synced ${added} new articles, updated ${updated} existing articles, skipped ${duplicates} duplicates.`,
-        articles: testMode ? processedArticles : undefined,
-        duplicateGroups: testMode ? duplicateGroups : undefined,
-      }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+      );
+      
+      // Only update database if not in test mode
+      if (!testMode) {
+        try {
+          // Update news source last_fetched_at
+          await supabase
+            .from("news_sources")
+            .update({ last_fetched_at: new Date().toISOString() })
+            .eq("source_type", "news_api");
+        } catch (updateError) {
+          console.error("Error updating news source last_fetched_at:", updateError);
+        }
+      }
+      
+      // Record the completion of the fetch operation
+      try {
+        await recordFetchHistory(supabase, "news_api", "completed", {
+          articles_fetched: articles.length,
+          articles_added: added,
+          articles_updated: updated,
+          duplicates_skipped: duplicates,
+          execution_time_ms: Date.now() - startTime,
+          metadata: {
+            keyword,
+            limit,
+            testMode,
+            skipDuplicates,
+            deduplicationThreshold
+          },
+        });
+      } catch (recordError) {
+        console.error("Failed to record fetch completion history:", recordError);
+      }
+      
+      return new Response(
+        JSON.stringify({
+          success: true,
+          count: added,
+          message: `Successfully synced ${added} new articles, updated ${updated} existing articles, skipped ${duplicates} duplicates.`,
+          articles: testMode ? processedArticles : undefined,
+          duplicateGroups: testMode ? duplicateGroups : undefined,
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+      console.error("Fetch operation failed:", fetchError);
+      
+      // Check if it's an abort error (timeout)
+      if (fetchError.name === "AbortError") {
+        throw new Error("News API request timed out. The service may be experiencing issues.");
+      } else {
+        throw fetchError; // Re-throw the error to be caught by the outer try/catch
+      }
+    }
   } catch (error) {
     console.error("Error in fetch-news:", error);
     
     // Record the error
-    const supabase = createClient(supabaseUrl, supabaseKey);
-    await recordFetchHistory(supabase, "news_api", "error", {
-      error_message: error.message,
-    });
+    try {
+      const supabase = createClient(supabaseUrl, supabaseKey);
+      await recordFetchHistory(supabase, "news_api", "error", {
+        error_message: error.message,
+      });
+    } catch (recordError) {
+      console.error("Failed to record error in catch block:", recordError);
+    }
     
     return new Response(
       JSON.stringify({
