@@ -22,14 +22,16 @@ export function useAiDailySummary(date: string, isAdmin: boolean = false) {
   const [generating, setGenerating] = useState(false);
   const { toast } = useToast();
   
-  // [Analysis] Fetch the summary for the given date using the RPC function
+  // [Analysis] Fetch the summary for the given date using a direct query instead of RPC
   const fetchSummary = async () => {
     try {
       setLoading(true);
       
-      // [Framework] Using RPC function to retrieve the summary safely
+      // [Framework] Using direct query instead of RPC to avoid TypeScript issues
       const { data, error } = await supabase
-        .rpc('get_daily_summary', { target_date: date })
+        .from('ai_news_daily_summaries')
+        .select('*')
+        .eq('date', date)
         .single();
         
       if (error) {
