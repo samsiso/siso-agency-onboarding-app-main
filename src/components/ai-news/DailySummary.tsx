@@ -34,11 +34,13 @@ export function DailySummary({
   
   // Fetch summary on mount and when date changes
   useEffect(() => {
+    console.log(`DailySummary: Fetching summary for date ${date}`);
     fetchSummary();
   }, [date]);
   
   // Handle refresh button click
   const handleRefresh = async () => {
+    console.log("DailySummary: Refreshing summary data");
     if (refreshSummary) {
       await refreshSummary();
     }
@@ -47,6 +49,7 @@ export function DailySummary({
   
   // Handle generate summary click
   const handleGenerate = async () => {
+    console.log(`DailySummary: Generating summary, exists: ${summaryData !== null}`);
     await generateSummary(summaryData !== null);
   };
   

@@ -34,7 +34,7 @@ export function useAiDailySummary(date: string, isAdmin: boolean = false) {
         .from('ai_news_daily_summaries')
         .select('*')
         .eq('date', date)
-        .single();
+        .maybeSingle();
         
       if (fetchError) {
         if (fetchError.code !== 'PGRST116') { // Not found is expected and not an error to show
@@ -63,8 +63,8 @@ export function useAiDailySummary(date: string, isAdmin: boolean = false) {
           
           if (isAdmin) {
             toast({
-              title: 'API Limit Reached',
-              description: 'Using fallback summary as AI service quota exceeded. Consider upgrading your plan.',
+              title: 'API Issue Detected',
+              description: 'Using fallback summary as AI service encountered an issue. Check edge function logs for details.',
               variant: 'destructive',
             });
           }
@@ -86,6 +86,8 @@ export function useAiDailySummary(date: string, isAdmin: boolean = false) {
       setGenerating(true);
       setError(null);
       
+      console.log(`Invoking edge function for date: ${date}, forceRefresh: ${forceRefresh}`);
+      
       const { data, error: invokeError } = await supabase.functions.invoke('generate-daily-summary', {
         body: { 
           date,
@@ -105,8 +107,8 @@ export function useAiDailySummary(date: string, isAdmin: boolean = false) {
       if (data.error && data.error.includes('API error')) {
         setError('AI service unavailable. Using basic summary instead.');
         toast({
-          title: 'API Limit Reached',
-          description: 'Using fallback summary as AI service quota exceeded. Consider upgrading your plan.',
+          title: 'API Issue Detected',
+          description: 'Using fallback summary as AI service encountered an issue. Check edge function logs for details.',
           variant: 'destructive',
         });
       } else {

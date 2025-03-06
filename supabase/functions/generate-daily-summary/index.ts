@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
 import { supabaseClient } from "../_shared/supabase-client.ts";
@@ -123,11 +124,12 @@ function generatePlaceholderSummary(date: string, articleCount: number): any {
 // [Framework] Call OpenAI API to generate summary
 async function callOpenAI(prompt: string): Promise<{ data?: any, error?: Error }> {
   if (!openAIKey) {
+    console.error("OpenAI API key not available");
     return { error: new Error("OpenAI API key not available") };
   }
   
   try {
-    console.log("Sending request to OpenAI...");
+    console.log("Sending request to OpenAI with API key...");
     const openAIResponse = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -152,11 +154,18 @@ async function callOpenAI(prompt: string): Promise<{ data?: any, error?: Error }
     });
     
     if (!openAIResponse.ok) {
-      const errorData = await openAIResponse.json();
-      throw new Error(`OpenAI API error: ${errorData.error?.message || openAIResponse.statusText}`);
+      const errorText = await openAIResponse.text();
+      console.error("OpenAI API error response:", errorText);
+      try {
+        const errorData = JSON.parse(errorText);
+        throw new Error(`OpenAI API error: ${errorData.error?.message || openAIResponse.statusText}`);
+      } catch (e) {
+        throw new Error(`OpenAI API error: ${openAIResponse.statusText} - ${errorText.substring(0, 100)}`);
+      }
     }
     
     const openAIData = await openAIResponse.json();
+    console.log("Successfully received OpenAI response");
     return { data: openAIData };
   } catch (error) {
     console.error("Error calling OpenAI API:", error);
@@ -173,6 +182,7 @@ function parseOpenAIResponse(responseContent: string): any {
                       [null, responseContent];
                       
     const jsonString = jsonMatch[1] || responseContent;
+    console.log("Attempting to parse OpenAI response:", jsonString.substring(0, 150) + "...");
     return JSON.parse(jsonString);
   } catch (parseError) {
     console.error("Error parsing OpenAI response:", parseError);
@@ -206,23 +216,52 @@ function parseOpenAIResponse(responseContent: string): any {
 // [Framework] Save the summary to the database
 async function saveSummary(supabase: any, date: string, summaryData: any, articleCount: number, generatedWith: string): Promise<{ error?: Error }> {
   try {
-    const { error: insertError } = await supabase
-      .from("ai_news_daily_summaries")
-      .insert({
-        date,
-        summary: summaryData.summary,
-        key_points: summaryData.key_points,
-        practical_applications: summaryData.practical_applications,
-        industry_impacts: summaryData.industry_impacts,
-        generated_with: generatedWith,
-        article_count: articleCount
-      });
-      
-    if (insertError) {
-      console.error("Error saving summary:", insertError);
-      return { error: new Error(`Failed to save summary: ${insertError.message}`) };
+    console.log(`Saving summary for ${date} with generation method: ${generatedWith}`);
+    
+    // First check if summary already exists
+    const { data: existingSummary } = await getExistingSummary(supabase, date);
+    
+    let saveOperation;
+    
+    if (existingSummary) {
+      // Update existing summary
+      console.log(`Updating existing summary for ${date}`);
+      saveOperation = supabase
+        .from("ai_news_daily_summaries")
+        .update({
+          summary: summaryData.summary,
+          key_points: summaryData.key_points,
+          practical_applications: summaryData.practical_applications,
+          industry_impacts: summaryData.industry_impacts,
+          generated_with: generatedWith,
+          article_count: articleCount,
+          updated_at: new Date().toISOString()
+        })
+        .eq("date", date);
+    } else {
+      // Insert new summary
+      console.log(`Inserting new summary for ${date}`);
+      saveOperation = supabase
+        .from("ai_news_daily_summaries")
+        .insert({
+          date,
+          summary: summaryData.summary,
+          key_points: summaryData.key_points,
+          practical_applications: summaryData.practical_applications,
+          industry_impacts: summaryData.industry_impacts,
+          generated_with: generatedWith,
+          article_count: articleCount
+        });
     }
     
+    const { error: saveError } = await saveOperation;
+      
+    if (saveError) {
+      console.error("Error saving summary:", saveError);
+      return { error: new Error(`Failed to save summary: ${saveError.message}`) };
+    }
+    
+    console.log(`Successfully saved summary for ${date}`);
     return {};
   } catch (error) {
     console.error("Error in saveSummary:", error);
@@ -293,6 +332,9 @@ async function generateDailySummary(date: string, forceRefresh: boolean = false)
         error: "AI-enhanced summary unavailable. Using basic summary instead."
       };
     }
+    
+    // Log that we're using a valid API key
+    console.log("OpenAI API key is available, proceeding with AI-generated summary");
     
     // Use OpenAI to generate the summary
     const prompt = `
@@ -392,6 +434,7 @@ serve(async (req) => {
     const forceRefresh = requestBody.forceRefresh || false;
     
     console.log(`Generating summary for date: ${targetDate}, force refresh: ${forceRefresh}`);
+    console.log(`Using OpenAI API key: ${openAIKey ? "Available" : "Not available"}`);
     
     // Generate the summary
     const result = await generateDailySummary(targetDate, forceRefresh);
