@@ -306,10 +306,10 @@ serve(async (req) => {
     const startTime = Date.now();
     const supabase = createClient(supabaseUrl, supabaseKey);
     
-    // Validate API key availability
-    if (!newsApiKey) {
-      console.error("NEWS_API_KEY environment variable is not configured");
-      throw new Error("News API key is not configured. Please add it to the edge function secrets.");
+    // [Analysis] Added better API key validation
+    if (!newsApiKey || newsApiKey === "undefined" || newsApiKey === "null") {
+      console.error("NEWS_API_KEY environment variable is not configured or is invalid");
+      throw new Error("News API key is not configured or is invalid. Please add a valid key to the edge function secrets.");
     }
 
     // Parse request body
@@ -342,14 +342,51 @@ serve(async (req) => {
     console.log(`Fetching news from ${newsApiUrl.toString().replace(newsApiKey, "API_KEY_HIDDEN")}`);
     
     const response = await fetch(newsApiUrl.toString());
+    
+    // Check for HTTP errors first
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      
+      // Log detailed error information
+      console.error(`News API error: Status ${response.status}, Message: ${errorData.message || response.statusText}`);
+      
+      // Special handling for common error codes
+      let errorMessage = `News API error: ${errorData.message || response.statusText} (Status: ${response.status})`;
+      
+      if (response.status === 401) {
+        errorMessage = "Invalid News API key. Please check your API key and make sure it's valid.";
+      } else if (response.status === 429) {
+        errorMessage = "News API rate limit exceeded. Please try again later or upgrade your plan.";
+      } else if (response.status === 403) {
+        errorMessage = "News API access is forbidden. Your key might be restricted.";
+      }
+      
+      // Record the error
+      await recordFetchHistory(supabase, "news_api", "error", {
+        error_message: errorMessage,
+        metadata: {
+          status_code: response.status,
+          api_response: errorData
+        }
+      });
+      
+      throw new Error(errorMessage);
+    }
+    
+    // Parse successful response
     const data = await response.json();
     
-    if (!response.ok) {
-      // Log detailed error information
-      console.error(`News API error: Status ${response.status}, Message: ${data.message || response.statusText}`);
-      console.error("Full response:", JSON.stringify(data));
+    // Additional validation of response format
+    if (!data.articles || !Array.isArray(data.articles)) {
+      const errorMessage = "Invalid response format from News API - missing 'articles' array";
+      console.error(errorMessage, data);
       
-      throw new Error(`News API error: ${data.message || response.statusText} (Status: ${response.status})`);
+      await recordFetchHistory(supabase, "news_api", "error", {
+        error_message: errorMessage,
+        metadata: { api_response: data }
+      });
+      
+      throw new Error(errorMessage);
     }
     
     // Extract articles from response
