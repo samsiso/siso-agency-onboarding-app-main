@@ -65,7 +65,7 @@ export function useAiDailySummary(date: string, isAdmin: boolean = false) {
             toast({
               title: 'API Limit Reached',
               description: 'Using fallback summary as AI service quota exceeded. Consider upgrading your plan.',
-              variant: 'warning',
+              variant: 'destructive',
             });
           }
         }
@@ -107,7 +107,7 @@ export function useAiDailySummary(date: string, isAdmin: boolean = false) {
         toast({
           title: 'API Limit Reached',
           description: 'Using fallback summary as AI service quota exceeded. Consider upgrading your plan.',
-          variant: 'warning',
+          variant: 'destructive',
         });
       } else {
         toast({

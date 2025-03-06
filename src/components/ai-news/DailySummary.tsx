@@ -70,7 +70,7 @@ export function DailySummary({
       
       <CardContent className="pt-4">
         {error && (
-          <Alert variant="warning" className="mb-4 bg-amber-900/20 border-amber-600/30">
+          <Alert variant="destructive" className="mb-4 bg-amber-900/20 border-amber-600/30">
             <AlertTriangle className="h-4 w-4 text-amber-500" />
             <AlertDescription className="text-amber-200">{error}</AlertDescription>
           </Alert>
