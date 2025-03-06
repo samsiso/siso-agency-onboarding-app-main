@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
 import { supabaseClient } from "../_shared/supabase-client.ts";
@@ -93,24 +92,29 @@ async function fetchArticles(supabase: any, date: string): Promise<{ data?: News
   }
 }
 
-// [Framework] Generate a placeholder summary when OpenAI is unavailable
+// [Analysis] Generate a placeholder summary when OpenAI is unavailable
 function generatePlaceholderSummary(date: string, articleCount: number): any {
   return {
-    summary: `Daily AI News Summary for ${date}. ${articleCount} articles published covering various AI topics.`,
+    summary: `Daily AI News Summary for ${date}. ${articleCount} articles published covering various AI topics and industry developments.`,
     key_points: [
-      "Multiple articles published about AI advancements",
-      "Coverage spans different AI applications and technologies",
-      "Various industries represented in today's news"
+      "Multiple articles published about AI advancements and implementations",
+      "Coverage spans different AI applications and technologies across sectors",
+      "Various industries represented in today's AI news coverage",
+      "Technical and business perspectives on AI developments included",
+      "Latest AI research and commercial applications featured"
     ],
     practical_applications: [
-      "Stay informed about the latest AI developments",
-      "Consider how these technologies might apply to your work",
-      "Watch for emerging trends across AI applications"
+      "Stay informed about the latest AI developments in your industry",
+      "Consider how these technologies might apply to your organization's challenges",
+      "Watch for emerging trends across AI applications to inform strategy",
+      "Identify potential partners or technologies worth exploring further"
     ],
     industry_impacts: {
-      "technology": "Ongoing advancements in AI capabilities",
-      "business": "Potential productivity improvements through AI adoption",
-      "research": "New findings contributing to AI development"
+      "technology": "Ongoing advancements in AI capabilities and infrastructure",
+      "business": "Potential productivity improvements through AI adoption and integration",
+      "research": "New findings contributing to AI development and capabilities",
+      "healthcare": "Applications of AI in improving patient care and outcomes",
+      "education": "Developments in AI tools for personalized learning and education"
     },
     generated_with: "placeholder"
   };
@@ -285,7 +289,8 @@ async function generateDailySummary(date: string, forceRefresh: boolean = false)
         summary: placeholderSummary.summary,
         key_points: placeholderSummary.key_points,
         practical_applications: placeholderSummary.practical_applications,
-        industry_impacts: placeholderSummary.industry_impacts
+        industry_impacts: placeholderSummary.industry_impacts,
+        error: "AI-enhanced summary unavailable. Using basic summary instead."
       };
     }
     

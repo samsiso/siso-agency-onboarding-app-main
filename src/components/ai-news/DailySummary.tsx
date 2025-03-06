@@ -1,12 +1,14 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { format } from 'date-fns';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, AlertTriangle } from 'lucide-react';
 import { SummaryHeader } from './daily-summary/SummaryHeader';
 import { SummaryContent } from './daily-summary/SummaryContent';
 import { SummaryFooter } from './daily-summary/SummaryFooter';
 import { GeneratePrompt } from './daily-summary/GeneratePrompt';
 import { useAiDailySummary } from '@/hooks/useAiDailySummary';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface DailySummaryProps {
   date?: string;
@@ -28,7 +30,7 @@ export function DailySummary({
   const formattedDate = date ? format(new Date(date), 'MMMM d, yyyy') : 'Today';
   
   // Use our custom hook
-  const { summaryData, loading, generating, fetchSummary, generateSummary } = useAiDailySummary(date, isAdmin);
+  const { summaryData, loading, generating, error, fetchSummary, generateSummary } = useAiDailySummary(date, isAdmin);
   
   // Fetch summary on mount and when date changes
   useEffect(() => {
@@ -67,6 +69,13 @@ export function DailySummary({
       </CardHeader>
       
       <CardContent className="pt-4">
+        {error && (
+          <Alert variant="warning" className="mb-4 bg-amber-900/20 border-amber-600/30">
+            <AlertTriangle className="h-4 w-4 text-amber-500" />
+            <AlertDescription className="text-amber-200">{error}</AlertDescription>
+          </Alert>
+        )}
+        
         {loading ? (
           <div className="flex items-center justify-center py-8">
             <RefreshCw className="h-8 w-8 animate-spin text-purple-500" />
