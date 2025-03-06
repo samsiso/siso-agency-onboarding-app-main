@@ -16,7 +16,7 @@ import { Sidebar } from '@/components/Sidebar';
 import NewsPagination from '@/components/ai-news/NewsPagination';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Card } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { 
   AlertCircle, 
@@ -35,9 +35,14 @@ import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 
 // [Analysis] Main component for the AI News page with cleaned UI and better organization
 const AINews = () => {
+  
   // [Analysis] State for filters, search, and pagination
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -372,7 +377,6 @@ const AINews = () => {
           </motion.div>
         )}
         
-        {/* Show test panel only for admin users */}
         {showTestPanel && isAdmin && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
@@ -662,7 +666,6 @@ const AINews = () => {
           </motion.div>
         )}
         
-        {/* Show the daily summary at the top of the page above date navigation */}
         {isToday(currentDate) && !searchQuery && !selectedCategory && (
           <DailySummary 
             date={format(currentDate, 'yyyy-MM-dd')}
@@ -694,7 +697,6 @@ const AINews = () => {
           </div>
         </div>
         
-        {/* Show the DailyStatsOverview component if needed */}
         {showStats && (
           <DailyStatsOverview 
             newsItems={newsItems} 
