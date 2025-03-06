@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { format } from 'date-fns';
 
 // [Analysis] Interface for the daily summary data with proper types
 export interface DailySummaryData {
@@ -23,17 +22,15 @@ export function useAiDailySummary(date: string, isAdmin: boolean = false) {
   const [generating, setGenerating] = useState(false);
   const { toast } = useToast();
   
-  // [Analysis] Fetch the summary for the given date
+  // [Analysis] Fetch the summary for the given date using the RPC function
   const fetchSummary = async () => {
     try {
       setLoading(true);
       
-      // [Framework] Direct table query approach that works with TypeScript
+      // [Framework] Using RPC function to retrieve the summary safely
       const { data, error } = await supabase
-        .from('ai_news_daily_summaries')
-        .select('*')
-        .eq('date', date)
-        .maybeSingle();
+        .rpc('get_daily_summary', { target_date: date })
+        .single();
         
       if (error) {
         console.error('Error fetching summary:', error);
@@ -52,7 +49,7 @@ export function useAiDailySummary(date: string, isAdmin: boolean = false) {
     }
   };
   
-  // [Analysis] Generate a new summary for the date
+  // [Analysis] Generate a new summary for the date with improved error handling
   const generateSummary = async (forceRefresh = false) => {
     if (!isAdmin) return;
     
