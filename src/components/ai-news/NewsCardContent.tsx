@@ -1,166 +1,153 @@
 
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Calendar, Clock, BarChart, ExternalLink, FileText } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { motion } from 'framer-motion';
-import { Shield, Clock, Eye, BookmarkPlus, MessageSquare } from 'lucide-react';
-import { ArticleMetadata } from './ArticleMetadata';
-import { ArticleActions } from './ArticleActions';
-import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { CardContent } from '@/components/ui/card';
+import { NewsPost } from '@/types/blog';
+import { extractDomain } from '@/lib/utils';
+import AISummaryPopup from './AISummaryPopup';
+import { useAiArticleSummary } from '@/hooks/useAiArticleSummary';
 
-// [Analysis] Added comprehensive type definitions for better maintainability
 interface NewsCardContentProps {
-  title: string;
-  description: string;
-  date: string;
-  source: string;
-  impact: string;
-  onReadArticle?: () => void;
-  isCompact?: boolean;
-  summary?: string;
-  loadingSummary?: boolean;
-  onGenerateSummary?: () => void;
-  newsId?: string;
-  comments?: any[];
-  readingTime?: number;
-  views?: number;
-  bookmarks?: number;
-  sourceCredibility?: string;
-  technicalComplexity?: string;
-  articleType?: string;
-  url?: string; // External URL for articles from external sources
+  post: NewsPost;
+  hideContent?: boolean;
+  hideMetadata?: boolean;
+  truncateTitle?: boolean;
 }
 
-export const NewsCardContent = ({ 
-  title, 
-  description, 
-  date, 
-  source, 
-  impact,
-  onReadArticle,
-  isCompact = false,
-  summary,
-  loadingSummary,
-  onGenerateSummary,
-  newsId,
-  comments = [],
-  readingTime = 5,
-  views = 0,
-  bookmarks = 0,
-  sourceCredibility = 'verified',
-  technicalComplexity = 'intermediate',
-  articleType = 'news',
-  url
-}: NewsCardContentProps) => {
-  const navigate = useNavigate();
+// [Analysis] Enhanced to add AI summary popup functionality
+const NewsCardContent: React.FC<NewsCardContentProps> = ({
+  post,
+  hideContent = false,
+  hideMetadata = false,
+  truncateTitle = true,
+}) => {
+  // [Analysis] New state for managing the summary popup
+  const [isSummaryOpen, setIsSummaryOpen] = useState(false);
+  const { isLoading, summary, generateSummary, resetSummary } = useAiArticleSummary();
 
-  // [Analysis] Debug the ID issue
-  console.log('NewsCardContent - Article ID:', newsId);
-
-  // [Analysis] Improved navigation logic to handle both internal and external articles
-  const handleClick = () => {
-    if (onReadArticle) {
-      onReadArticle();
-    }
-    
-    // [Analysis] Log navigation intent
-    console.log('Article click - navigating with ID:', newsId, 'URL:', url);
-    
-    // If we have an external URL and no newsId, open in new tab
-    if (url && !newsId) {
-      window.open(url, '_blank', 'noopener,noreferrer');
-    } 
-    // If we have a newsId, navigate to article page
-    else if (newsId) {
-      navigate(`/ai-news/${newsId}`);
-    }
-    // Fallback to source URL if nothing else available
-    else if (source && source.startsWith('http')) {
-      window.open(source, '_blank', 'noopener,noreferrer');
+  const handleOpenSummary = () => {
+    setIsSummaryOpen(true);
+    if (!summary) {
+      generateSummary(post.title, post.content);
     }
   };
 
+  const handleCloseSummary = () => {
+    setIsSummaryOpen(false);
+  };
+
+  const displayDate = post.published_date
+    ? new Date(post.published_date).toLocaleDateString()
+    : 'Unknown date';
+
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className={`flex flex-col h-full ${isCompact ? 'pl-0' : 'px-4'}`}
-    >
-      <div className="space-y-2 sm:space-y-3 mb-4">
-        {/* Enhanced metadata badges */}
-        <div className="flex items-center gap-2 flex-wrap mb-2">
-          <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20 capitalize">
-            {articleType}
-          </Badge>
-          {sourceCredibility === 'verified' && (
-            <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20">
-              <Shield className="h-3 w-3 mr-1" />
-              Verified Source
-            </Badge>
-          )}
-          <Badge variant="outline" className="bg-purple-500/10 text-purple-500 border-purple-500/20">
-            <Clock className="h-3 w-3 mr-1" />
-            {readingTime} min read
-          </Badge>
-          {url && (
-            <Badge variant="outline" className="bg-blue-700/10 text-blue-400 border-blue-700/20">
-              External
-            </Badge>
-          )}
-        </div>
-
-        {/* Interactive title */}
-        <motion.button 
-          onClick={handleClick}
-          className="group block w-full text-left"
-          whileHover={{ scale: 1.01 }}
-          whileTap={{ scale: 0.99 }}
+    <CardContent className="p-4 pt-0 h-full flex flex-col justify-between">
+      {/* Title Section */}
+      <div>
+        <Link
+          to={`/ai-news/${post.id}`}
+          className="hover:text-primary transition-colors"
         >
-          <h2 className={`
-            font-bold text-siso-text-bold group-hover:text-siso-red transition-colors
-            leading-snug tracking-tight
-            ${isCompact 
-              ? 'text-base sm:text-lg line-clamp-2' 
-              : 'text-xl sm:text-2xl md:text-[28px] line-clamp-3'
-            }
-          `}>
-            {title}
+          <h2
+            className={`font-bold text-base sm:text-lg mb-2 ${
+              truncateTitle ? 'line-clamp-2' : ''
+            }`}
+          >
+            {post.title}
           </h2>
-        </motion.button>
+        </Link>
 
-        {/* Enhanced description with better visibility */}
-        {!isCompact && (
-          <p className="text-sm sm:text-base text-siso-text/80 line-clamp-2 leading-relaxed max-w-[95%] bg-siso-bg-alt/50 p-2 rounded-md">
-            {description}
+        {/* Content Section */}
+        {!hideContent && post.content && (
+          <p className="text-muted-foreground text-sm line-clamp-2 mb-4">
+            {post.content}
           </p>
         )}
       </div>
-      
-      <div className="mt-auto">
-        <ArticleMetadata
-          date={date}
-          source={source}
-          impact={impact}
-          views={views}
-          bookmarks={bookmarks}
-          readingTime={readingTime}
-          sourceCredibility={sourceCredibility}
-          technicalComplexity={technicalComplexity}
-          articleType={articleType}
-          isCompact={isCompact}
-        />
 
-        {!isCompact && (
-          <ArticleActions
-            onReadArticle={handleClick}
-            summary={summary}
-            loadingSummary={loadingSummary}
-            onGenerateSummary={onGenerateSummary}
-            newsId={newsId}
-            comments={comments}
-            title={title}
-          />
-        )}
-      </div>
-    </motion.div>
+      {/* Footer Section */}
+      {!hideMetadata && (
+        <div className="mt-auto">
+          {/* Tags */}
+          {post.tags && post.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-3">
+              {post.tags.slice(0, 3).map((tag, index) => (
+                <Badge
+                  key={index}
+                  variant="outline"
+                  className="text-xs px-2 py-0 h-5 bg-muted/50"
+                >
+                  {tag}
+                </Badge>
+              ))}
+              {post.tags.length > 3 && (
+                <Badge variant="outline" className="text-xs px-2 py-0 h-5">
+                  +{post.tags.length - 3}
+                </Badge>
+              )}
+            </div>
+          )}
+
+          {/* Metadata and Sources */}
+          <div className="flex flex-wrap justify-between items-center text-xs text-muted-foreground">
+            <div className="flex items-center gap-3">
+              {post.published_date && (
+                <span className="flex items-center gap-1">
+                  <Calendar size={12} />
+                  {displayDate}
+                </span>
+              )}
+              {post.read_time && (
+                <span className="flex items-center gap-1">
+                  <Clock size={12} />
+                  {post.read_time} min read
+                </span>
+              )}
+            </div>
+
+            <div className="flex gap-3 ml-auto">
+              {/* AI Summary Button - New addition */}
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-7 px-2 text-xs" 
+                onClick={handleOpenSummary}
+              >
+                <FileText size={14} className="mr-1" />
+                AI Summary
+              </Button>
+
+              {post.source_url && (
+                <a
+                  href={post.source_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 hover:text-primary transition-colors"
+                >
+                  <ExternalLink size={12} />
+                  {extractDomain(post.source_url)}
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AI Summary Popup */}
+      <AISummaryPopup
+        isOpen={isSummaryOpen}
+        onClose={handleCloseSummary}
+        title={post.title}
+        content={post.content}
+        isLoading={isLoading}
+        summary={summary}
+        onGenerate={() => generateSummary(post.title, post.content)}
+      />
+    </CardContent>
   );
 };
+
+export default NewsCardContent;
