@@ -88,6 +88,21 @@ export function useAiDailySummary(date: string, isAdmin: boolean = false) {
       
       console.log(`Invoking edge function for date: ${date}, forceRefresh: ${forceRefresh}`);
       
+      // First, clear existing fallback summary if it exists and we're doing a force refresh
+      if (forceRefresh && summaryData?.generated_with === 'error_fallback') {
+        const { error: deleteError } = await supabase
+          .from('ai_news_daily_summaries')
+          .delete()
+          .eq('date', date);
+          
+        if (deleteError) {
+          console.warn("Could not delete existing fallback summary:", deleteError);
+        } else {
+          console.log("Deleted existing fallback summary for regeneration");
+        }
+      }
+      
+      // Invoke the edge function with proper error handling
       const { data, error: invokeError } = await supabase.functions.invoke('generate-daily-summary', {
         body: { 
           date,

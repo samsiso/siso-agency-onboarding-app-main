@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
 import { supabaseClient } from "../_shared/supabase-client.ts";
@@ -224,6 +223,16 @@ async function saveSummary(supabase: any, date: string, summaryData: any, articl
     
     // First check if summary already exists
     const { data: existingSummary } = await getExistingSummary(supabase, date);
+    
+    // Add better response logging for debugging
+    console.log("Summary data being saved:", {
+      date,
+      summary_length: summaryData.summary?.length || 0,
+      key_points_count: summaryData.key_points?.length || 0,
+      generated_with: generatedWith,
+      articleCount,
+      has_existing: !!existingSummary
+    });
     
     let saveOperation;
     
