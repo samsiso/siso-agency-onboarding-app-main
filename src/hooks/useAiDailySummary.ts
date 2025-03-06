@@ -27,7 +27,7 @@ export interface DailySummaryData {
   }>;
   application_details?: string[];
   impact_severity?: Record<string, string>;
-  impact_trends?: Record<string, 'up' | 'down' | 'stable'>;
+  impact_trends?: Record<string, string>;
   analysis_depth?: string;
 }
 
@@ -113,7 +113,7 @@ export function useAiDailySummary(date: string, isAdmin: boolean = false) {
     }
   };
   
-  // [Analysis] Generate a new summary for the date with improved error handling
+  // [Analysis] Generate a new summary for the date with improved error handling and retries
   const generateSummary = async (forceRefresh = false) => {
     if (!isAdmin) return;
     
@@ -145,11 +145,15 @@ export function useAiDailySummary(date: string, isAdmin: boolean = false) {
       });
       
       try {
+        // Add a timestamp to avoid caching issues with the Edge Function
+        const timestamp = new Date().getTime();
+        
         const { data, error: invokeError } = await supabase.functions.invoke('generate-daily-summary', {
           body: { 
             date,
             forceRefresh,
             enhancedAnalysis: true, // Always send flag to enable enhanced analysis
+            timestamp, // Add timestamp to avoid caching
           },
         });
         

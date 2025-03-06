@@ -12,6 +12,7 @@ interface RequestBody {
   date?: string;
   forceRefresh?: boolean;
   enhancedAnalysis?: boolean;
+  timestamp?: number; // Added to prevent caching issues
 }
 
 const corsHeaders = {
