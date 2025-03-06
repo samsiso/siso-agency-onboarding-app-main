@@ -102,13 +102,20 @@ export function useAiDailySummary(date: string, isAdmin: boolean = false) {
         }
       }
       
-      // Invoke the edge function with proper error handling
+      // Invoke the edge function with proper error handling and detailed logging
+      console.log("Calling Supabase function: generate-daily-summary with payload:", {
+        date,
+        forceRefresh
+      });
+      
       const { data, error: invokeError } = await supabase.functions.invoke('generate-daily-summary', {
         body: { 
           date,
           forceRefresh
         },
       });
+      
+      console.log("Edge function response received:", data);
       
       if (invokeError) {
         console.error("Edge function invoke error:", invokeError);

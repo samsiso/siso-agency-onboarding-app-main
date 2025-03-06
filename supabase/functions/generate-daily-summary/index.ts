@@ -20,10 +20,18 @@ const corsHeaders = {
 
 async function generateDailySummary(date: string, forceRefresh: boolean = false) {
   try {
-    console.log(`⭐️ Starting simplified daily summary generation for ${date}, force refresh: ${forceRefresh}`);
+    console.log(`⭐️ Starting daily summary generation for ${date}, force refresh: ${forceRefresh}`);
+    console.log(`Environment check: SUPABASE_URL exists? ${supabaseUrl ? 'Yes' : 'No'}`);
+    console.log(`Environment check: SUPABASE_SERVICE_ROLE_KEY exists? ${supabaseKey ? 'Yes' : 'No'}`);
+    console.log(`Environment check: OPENAI_API_KEY exists? ${openAIKey ? 'Yes' : 'No'}`);
+    
+    if (!supabaseUrl || !supabaseKey) {
+      console.error("Missing Supabase credentials");
+      throw new Error("Server configuration error: Missing Supabase credentials");
+    }
     
     // Initialize Supabase client
-    const supabase = createClient(supabaseUrl!, supabaseKey!);
+    const supabase = createClient(supabaseUrl, supabaseKey);
     
     // Check if we already have a summary for this date
     if (!forceRefresh) {
@@ -139,7 +147,7 @@ Format your response as JSON with these keys:
       };
     }
     
-    // Call OpenAI API with simplified error handling
+    // Call OpenAI API with improved error handling
     console.log("Calling OpenAI API with prompt...");
     try {
       // [Framework] Improved logging for API debugging
@@ -335,8 +343,9 @@ serve(async (req) => {
     
     try {
       requestBody = await req.json();
+      console.log("Request body:", JSON.stringify(requestBody));
     } catch (e) {
-      console.warn("Failed to parse request body, using defaults");
+      console.warn("Failed to parse request body, using defaults:", e);
     }
     
     // Get the date parameter, defaulting to today
@@ -346,10 +355,14 @@ serve(async (req) => {
     console.log(`----- GENERATING SUMMARY -----`);
     console.log(`Date: ${targetDate}, Force refresh: ${forceRefresh}`);
     console.log(`OpenAI API key: ${openAIKey ? "Available" : "Not available"}`);
+    console.log(`Supabase URL: ${supabaseUrl ? "Available" : "Not available"}`);
+    console.log(`Supabase Key: ${supabaseKey ? "Available" : "Not available"}`);
     console.log(`---------------------------`);
     
     // Generate the summary
     const result = await generateDailySummary(targetDate, forceRefresh);
+    
+    console.log("Result:", JSON.stringify(result).substring(0, 300) + "...");
     
     // Return appropriate response
     return new Response(
