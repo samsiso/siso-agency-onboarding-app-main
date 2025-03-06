@@ -142,6 +142,9 @@ Format your response as JSON with these keys:
     // Call OpenAI API with simplified error handling
     console.log("Calling OpenAI API with prompt...");
     try {
+      // [Framework] Improved logging for API debugging
+      console.log(`Using OpenAI model: gpt-4o-mini`);
+      
       const openAIResponse = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -149,7 +152,7 @@ Format your response as JSON with these keys:
           "Authorization": `Bearer ${openAIKey}`
         },
         body: JSON.stringify({
-          model: "gpt-4o-mini", // Using the correct model
+          model: "gpt-4o-mini", // [Analysis] Using the correct model name
           messages: [
             {
               role: "system",
@@ -165,6 +168,7 @@ Format your response as JSON with these keys:
         })
       });
       
+      // [Framework] Better error handling with response status and content logging
       if (!openAIResponse.ok) {
         const errorText = await openAIResponse.text();
         console.error("OpenAI API error:", openAIResponse.status, errorText);
