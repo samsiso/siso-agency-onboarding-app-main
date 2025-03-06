@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
@@ -33,10 +34,12 @@ const CATEGORIES = [{
   id: "startups",
   label: "Startups"
 }];
+
 interface NewsCategoriesProps {
   selectedCategory: string | null;
   onCategoryChange: (category: string | null) => void;
 }
+
 const NewsCategories = ({
   selectedCategory,
   onCategoryChange
@@ -49,6 +52,23 @@ const NewsCategories = ({
       onCategoryChange(categoryId);
     }
   };
-  return;
+  
+  // [Analysis] Fixed issue by adding return statement with JSX
+  return (
+    <div className="flex flex-wrap gap-2">
+      {CATEGORIES.map((category) => (
+        <Button
+          key={category.id}
+          size="sm"
+          variant={selectedCategory === category.id ? "default" : "outline"}
+          onClick={() => handleCategoryClick(category.id)}
+          className="text-sm"
+        >
+          {category.label}
+        </Button>
+      ))}
+    </div>
+  );
 };
+
 export default NewsCategories;

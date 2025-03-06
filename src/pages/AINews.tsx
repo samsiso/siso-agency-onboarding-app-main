@@ -257,22 +257,33 @@ const AINews = () => {
       });
     }
   };
-  return <div className="flex min-h-screen bg-siso-bg">
+  return (
+    <div className="flex min-h-screen bg-siso-bg">
       <Helmet>
         <title>AI News | Your One-Stop AI Knowledge Source</title>
         <meta name="description" content="Stay updated with the latest news in artificial intelligence, machine learning, and AI tools." />
       </Helmet>
-      
+
       <Sidebar />
-      
+
       <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-20">
         <div className="flex justify-between items-center mb-6">
-          <NewsHeader title="AI News" activeTab={activeTab} onTabChange={handleTabChange} searchQuery={searchQuery} onSearchChange={handleSearchChange} syncingNews={syncingNews} syncNews={syncNews} />
-          
+          <NewsHeader
+            title="AI News"
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+            searchQuery={searchQuery}
+            onSearchChange={handleSearchChange}
+            syncingNews={syncingNews}
+            syncNews={syncNews}
+          />
+
           <div className="flex items-center gap-2">
             <Popover>
               <PopoverTrigger asChild>
-                
+                <Button variant="outline" size="sm">
+                  API Status
+                </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80" align="end">
                 <div className="space-y-2">
@@ -298,42 +309,50 @@ const AINews = () => {
                 </div>
               </PopoverContent>
             </Popover>
-            
-            {isAdmin && <AdminControls showFetchHistory={showFetchHistory} setShowFetchHistory={setShowFetchHistory} showTestPanel={showTestPanel} setShowTestPanel={setShowTestPanel} onTestFetch={handleTestFetch} />}
+
+            {isAdmin && (
+              <AdminControls
+                showFetchHistory={showFetchHistory}
+                setShowFetchHistory={setShowFetchHistory}
+                showTestPanel={showTestPanel}
+                setShowTestPanel={setShowTestPanel}
+                onTestFetch={handleTestFetch}
+              />
+            )}
           </div>
         </div>
-        
-        {error && <Alert variant="destructive" className="mb-6">
+
+        {error && (
+          <Alert variant="destructive" className="mb-6">
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Error</AlertTitle>
             <AlertDescription>
               {error instanceof Error ? error.message : "There was an error loading the news."}
             </AlertDescription>
-          </Alert>}
-        
-        {showFetchHistory && isAdmin && <motion.div initial={{
-        opacity: 0,
-        height: 0
-      }} animate={{
-        opacity: 1,
-        height: 'auto'
-      }} exit={{
-        opacity: 0,
-        height: 0
-      }} className="mb-8">
-            <FetchHistoryPanel onRefresh={() => syncNews('artificial intelligence', 30, 'event_registry', false)} onTestFetch={handleTestFetch} />
-          </motion.div>}
-        
-        {showTestPanel && isAdmin && <motion.div initial={{
-        opacity: 0,
-        height: 0
-      }} animate={{
-        opacity: 1,
-        height: 'auto'
-      }} exit={{
-        opacity: 0,
-        height: 0
-      }} className="mb-8">
+          </Alert>
+        )}
+
+        {showFetchHistory && isAdmin && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mb-8"
+          >
+            <FetchHistoryPanel
+              onRefresh={() => syncNews('artificial intelligence', 30, 'event_registry', false)}
+              onTestFetch={handleTestFetch}
+            />
+          </motion.div>
+        )}
+
+        {showTestPanel && isAdmin && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mb-8"
+          >
             <Card className="border-dashed border-yellow-500/30 bg-yellow-950/10">
               <CardHeader>
                 <CardTitle className="text-yellow-400 flex items-center gap-2">
@@ -351,22 +370,39 @@ const AINews = () => {
                     <TabsTrigger value="results">Test Results</TabsTrigger>
                     <TabsTrigger value="debug">Debug</TabsTrigger>
                   </TabsList>
-                  
+
                   <TabsContent value="test" className="space-y-4 mt-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="keyword">Keyword</Label>
-                        <Input id="keyword" value={testKeyword} onChange={e => setTestKeyword(e.target.value)} placeholder="e.g., artificial intelligence" className="w-full" />
+                        <Input
+                          id="keyword"
+                          value={testKeyword}
+                          onChange={(e) => setTestKeyword(e.target.value)}
+                          placeholder="e.g., artificial intelligence"
+                          className="w-full"
+                        />
                       </div>
-                      
+
                       <div className="space-y-2">
                         <Label htmlFor="limit">Article Limit</Label>
-                        <Input id="limit" type="number" value={testLimit} onChange={e => setTestLimit(parseInt(e.target.value) || 10)} min={1} max={50} className="w-full" />
+                        <Input
+                          id="limit"
+                          type="number"
+                          value={testLimit}
+                          onChange={(e) => setTestLimit(parseInt(e.target.value) || 10)}
+                          min={1}
+                          max={50}
+                          className="w-full"
+                        />
                       </div>
-                      
+
                       <div className="space-y-2">
                         <Label htmlFor="source">News Source</Label>
-                        <Select value={testSource} onValueChange={value => setTestSource(value as 'event_registry' | 'news_api')}>
+                        <Select
+                          value={testSource}
+                          onValueChange={(value) => setTestSource(value as 'event_registry' | 'news_api')}
+                        >
                           <SelectTrigger id="source" className="w-full">
                             <SelectValue placeholder="Select news source" />
                           </SelectTrigger>
@@ -376,7 +412,7 @@ const AINews = () => {
                           </SelectContent>
                         </Select>
                       </div>
-                      
+
                       <div className="space-y-2">
                         <Label htmlFor="testMode">Mode</Label>
                         <div className="flex items-center justify-between border rounded p-3">
@@ -384,11 +420,13 @@ const AINews = () => {
                           <Switch id="testMode" checked={testMode} onCheckedChange={setTestMode} />
                         </div>
                         <p className="text-xs text-muted-foreground">
-                          {testMode ? "Test mode only retrieves articles without saving to database" : "Import mode will save articles to the database"}
+                          {testMode
+                            ? "Test mode only retrieves articles without saving to database"
+                            : "Import mode will save articles to the database"}
                         </p>
                       </div>
                     </div>
-                    
+
                     <Collapsible open={isApiResponseOpen} onOpenChange={setIsApiResponseOpen} className="mt-4 border rounded-md">
                       <CollapsibleTrigger asChild>
                         <div className="p-3 border-b flex justify-between items-center cursor-pointer hover:bg-white/5">
@@ -408,9 +446,10 @@ const AINews = () => {
                       </CollapsibleContent>
                     </Collapsible>
                   </TabsContent>
-                  
+
                   <TabsContent value="results" className="mt-4">
-                    {syncResult ? <div className="space-y-4">
+                    {syncResult ? (
+                      <div className="space-y-4">
                         <div className="flex justify-between items-center">
                           <div>
                             <h3 className={`text-lg font-medium ${syncResult.success ? 'text-green-400' : 'text-red-400'}`}>
@@ -418,26 +457,40 @@ const AINews = () => {
                             </h3>
                             <p className="text-sm text-muted-foreground">{syncResult.message}</p>
                           </div>
-                          
-                          {syncResult.success && <Badge variant="outline" className={syncResult.count && syncResult.count > 0 ? "bg-green-500/10 text-green-400" : "bg-orange-500/10 text-orange-400"}>
+
+                          {syncResult.success && (
+                            <Badge
+                              variant="outline"
+                              className={
+                                syncResult.count && syncResult.count > 0
+                                  ? "bg-green-500/10 text-green-400"
+                                  : "bg-orange-500/10 text-orange-400"
+                              }
+                            >
                               {syncResult.count || 0} articles {testMode ? 'found' : 'imported'}
-                            </Badge>}
+                            </Badge>
+                          )}
                         </div>
-                        
-                        {syncResult.articles && syncResult.articles.length > 0 ? <div className="border rounded-md">
+
+                        {syncResult.articles && syncResult.articles.length > 0 ? (
+                          <div className="border rounded-md">
                             <h4 className="text-sm font-medium p-3 border-b">Sample Articles</h4>
                             <ScrollArea className="h-60">
                               <div className="divide-y">
-                                {syncResult.articles.slice(0, 5).map((article, index) => <div key={article.id || index} className="p-3 hover:bg-white/5">
+                                {syncResult.articles.slice(0, 5).map((article, index) => (
+                                  <div key={article.id || index} className="p-3 hover:bg-white/5">
                                     <h5 className="font-medium truncate">{article.title}</h5>
                                     <div className="flex justify-between text-xs text-muted-foreground mt-1">
                                       <span>{article.date ? new Date(article.date).toLocaleDateString() : 'No date'}</span>
                                       <span className="capitalize">{article.source}</span>
                                     </div>
-                                  </div>)}
+                                  </div>
+                                ))}
                               </div>
                             </ScrollArea>
-                          </div> : <Alert variant="default" className="bg-orange-950/10 border-orange-500/30 text-orange-300">
+                          </div>
+                        ) : (
+                          <Alert variant="default" className="bg-orange-950/10 border-orange-500/30 text-orange-300">
                             <AlertCircle className="h-4 w-4" />
                             <AlertTitle>No Articles Found</AlertTitle>
                             <AlertDescription>
@@ -451,12 +504,16 @@ const AINews = () => {
                               </ul>
                               Check the Debug tab for more details.
                             </AlertDescription>
-                          </Alert>}
-                      </div> : <div className="text-center py-8 text-muted-foreground">
+                          </Alert>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-muted-foreground">
                         <p>No test results yet. Run a test to see results here.</p>
-                      </div>}
+                      </div>
+                    )}
                   </TabsContent>
-                  
+
                   <TabsContent value="debug" className="mt-4">
                     <div className="space-y-4">
                       <Alert variant="default" className="bg-blue-950/10 border-blue-500/30 text-blue-300">
@@ -466,7 +523,7 @@ const AINews = () => {
                           This panel shows debugging information to help troubleshoot API issues.
                         </AlertDescription>
                       </Alert>
-                      
+
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Card className="bg-slate-950/50">
                           <CardHeader className="py-3">
@@ -493,7 +550,7 @@ const AINews = () => {
                             </div>
                           </CardContent>
                         </Card>
-                        
+
                         <Card className="bg-slate-950/50">
                           <CardHeader className="py-3">
                             <CardTitle className="text-sm">Test Parameters</CardTitle>
@@ -520,7 +577,7 @@ const AINews = () => {
                           </CardContent>
                         </Card>
                       </div>
-                      
+
                       <div className="border rounded-md overflow-hidden">
                         <div className="bg-slate-950 p-3 border-b">
                           <h4 className="text-sm font-medium flex items-center gap-2">
@@ -530,7 +587,17 @@ const AINews = () => {
                         </div>
                         <div className="p-4 text-sm">
                           <p className="mb-4">If your test is failing, check the Edge Function logs in the Supabase dashboard for detailed error information.</p>
-                          <Button variant="outline" size="sm" onClick={() => window.open(`https://supabase.com/dashboard/project/fzuwsjxjymwcjsbpwfsl/functions/fetch-ai-news/logs`, '_blank')} className="gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              window.open(
+                                `https://supabase.com/dashboard/project/fzuwsjxjymwcjsbpwfsl/functions/fetch-ai-news/logs`,
+                                '_blank'
+                              )
+                            }
+                            className="gap-2"
+                          >
                             <Terminal className="h-4 w-4" />
                             View Logs in Supabase
                           </Button>
@@ -542,52 +609,122 @@ const AINews = () => {
               </CardContent>
               <CardFooter className="justify-end pt-0">
                 <Button onClick={handleTestAPI} disabled={syncingNews} className="gap-2" variant={testMode ? "default" : "destructive"}>
-                  {syncingNews ? <>
+                  {syncingNews ? (
+                    <>
                       <RefreshCw className="h-4 w-4 animate-spin" />
                       {testMode ? 'Testing...' : 'Importing...'}
-                    </> : <>
+                    </>
+                  ) : (
+                    <>
                       <Sparkles className="h-4 w-4" />
                       {testMode ? 'Test API' : 'Import Articles'}
-                    </>}
+                    </>
+                  )}
                 </Button>
               </CardFooter>
             </Card>
-          </motion.div>}
-        
-        {isToday(currentDate) && !searchQuery && !selectedCategory && <DailySummary date={format(currentDate, 'yyyy-MM-dd')} articleCount={newsItems.length} refreshSummary={refreshDailySummary} isAdmin={isAdmin} />}
-        
-        <DateNavigation currentDate={currentDate} dateRange={dateRange} onPreviousDay={goToPreviousDay} onNextDay={goToNextDay} onSelectDate={handleSelectDate} loading={loading} />
-        
+          </motion.div>
+        )}
+
+        {isToday(currentDate) && !searchQuery && !selectedCategory && (
+          <DailySummary
+            date={format(currentDate, 'yyyy-MM-dd')}
+            articleCount={newsItems.length}
+            refreshSummary={refreshDailySummary}
+            isAdmin={isAdmin}
+          />
+        )}
+
+        <DateNavigation
+          currentDate={currentDate}
+          dateRange={dateRange}
+          onPreviousDay={goToPreviousDay}
+          onNextDay={goToNextDay}
+          onSelectDate={handleSelectDate}
+          loading={loading}
+        />
+
         <div className="mb-6">
           <div className="w-full">
-            <NewsFilters selectedCategory={selectedCategory} onCategoryChange={handleCategoryChange} searchQuery={searchQuery} onSearchChange={handleSearchChange} onDateChange={handleDateChange} selectedDate={selectedDate} />
+            <NewsFilters
+              selectedCategory={selectedCategory}
+              onCategoryChange={handleCategoryChange}
+              searchQuery={searchQuery}
+              onSearchChange={handleSearchChange}
+              onDateChange={handleDateChange}
+              selectedDate={selectedDate}
+            />
           </div>
         </div>
-        
-        {showStats && <DailyStatsOverview newsItems={newsItems} lastSync={lastSync} articleCount={articleCount} loading={loading} />}
-        
-        {featuredArticle && showStats && <FeaturedNewsHero article={featuredArticle} onGenerateSummary={generateSummary} summary={summaries[featuredArticle.id] || ""} loadingSummary={loadingSummaries[featuredArticle.id] || false} />}
-        
+
+        {showStats && (
+          <DailyStatsOverview
+            newsItems={newsItems}
+            lastSync={lastSync}
+            articleCount={articleCount}
+            loading={loading}
+          />
+        )}
+
+        {featuredArticle && showStats && (
+          <FeaturedNewsHero
+            article={featuredArticle}
+            onGenerateSummary={generateSummary}
+            summary={summaries[featuredArticle.id] || ""}
+            loadingSummary={loadingSummaries[featuredArticle.id] || false}
+          />
+        )}
+
         <NewsErrorBoundary>
           <AnimatePresence mode="wait">
-            <motion.div key={currentDate.toISOString() + (searchQuery || '') + (selectedCategory || '')} initial={{
-            opacity: 0
-          }} animate={{
-            opacity: 1
-          }} exit={{
-            opacity: 0
-          }} transition={{
-            duration: 0.3
-          }}>
-              {searchQuery ? <NewsContent newsItems={newsItems} searchQuery={searchQuery} summaries={summaries} loadingSummaries={loadingSummaries} onGenerateSummary={generateSummary} loading={loading} hasMore={hasMore} onLoadMore={refresh} /> : <NewsDateSection date={format(currentDate, 'yyyy-MM-dd')} newsItems={newsItems} summaries={summaries} loadingSummaries={loadingSummaries} onGenerateSummary={generateSummary} loading={loading} />}
+            <motion.div
+              key={currentDate.toISOString() + (searchQuery || '') + (selectedCategory || '')}
+              initial={{
+                opacity: 0
+              }}
+              animate={{
+                opacity: 1
+              }}
+              exit={{
+                opacity: 0
+              }}
+              transition={{
+                duration: 0.3
+              }}
+            >
+              {searchQuery ? (
+                <NewsContent
+                  newsItems={newsItems}
+                  searchQuery={searchQuery}
+                  summaries={summaries}
+                  loadingSummaries={loadingSummaries}
+                  onGenerateSummary={generateSummary}
+                  loading={loading}
+                  hasMore={hasMore}
+                  onLoadMore={refresh}
+                />
+              ) : (
+                <NewsDateSection
+                  date={format(currentDate, 'yyyy-MM-dd')}
+                  newsItems={newsItems}
+                  summaries={summaries}
+                  loadingSummaries={loadingSummaries}
+                  onGenerateSummary={generateSummary}
+                  loading={loading}
+                />
+              )}
             </motion.div>
           </AnimatePresence>
-          
-          {searchQuery && totalPages > 1 && <div className="mt-8">
+
+          {searchQuery && totalPages > 1 && (
+            <div className="mt-8">
               <NewsPagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
-            </div>}
+            </div>
+          )}
         </NewsErrorBoundary>
       </main>
-    </div>;
+    </div>
+  );
 };
+
 export default AINews;

@@ -58,13 +58,13 @@ export const DailyStatsOverview = ({
     // This would generate and download a CSV file with the insight data
     const csvContent = "data:text/csv;charset=utf-8," + 
       "Category,Count,Percentage\n" + 
-      newsItems
+      Object.entries(newsItems
         .reduce((acc, item) => {
           const category = item.category || 'unknown';
           acc[category] = (acc[category] || 0) + 1;
           return acc;
-        }, {} as Record<string, number>)
-        .map((count, category) => 
+        }, {} as Record<string, number>))
+        .map(([category, count]) => 
           `${category},${count},${Math.round((count / newsItems.length) * 100)}%`
         )
         .join("\n");

@@ -17,7 +17,8 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip as RechartsTooltip
+  Tooltip as RechartsTooltip,
+  Cell
 } from 'recharts';
 
 interface ImpactAnalysisProps {
