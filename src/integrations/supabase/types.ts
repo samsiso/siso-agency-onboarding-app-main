@@ -22,11 +22,13 @@ export type Database = {
           created_at: string
           date: string
           description: string
+          duplicate_of: string | null
           estimated_reading_time: number | null
           featured: boolean | null
           id: string
           image_url: string | null
           impact: string | null
+          is_duplicate: boolean | null
           key_takeaways: Json | null
           linkedin_url: string | null
           meta_description: string | null
@@ -40,6 +42,7 @@ export type Database = {
           scheduled_for: string | null
           seo_description: string | null
           share_count: number | null
+          similarity_score: number | null
           slug: string | null
           source: string
           source_credibility: string | null
@@ -68,11 +71,13 @@ export type Database = {
           created_at?: string
           date: string
           description: string
+          duplicate_of?: string | null
           estimated_reading_time?: number | null
           featured?: boolean | null
           id?: string
           image_url?: string | null
           impact?: string | null
+          is_duplicate?: boolean | null
           key_takeaways?: Json | null
           linkedin_url?: string | null
           meta_description?: string | null
@@ -86,6 +91,7 @@ export type Database = {
           scheduled_for?: string | null
           seo_description?: string | null
           share_count?: number | null
+          similarity_score?: number | null
           slug?: string | null
           source: string
           source_credibility?: string | null
@@ -114,11 +120,13 @@ export type Database = {
           created_at?: string
           date?: string
           description?: string
+          duplicate_of?: string | null
           estimated_reading_time?: number | null
           featured?: boolean | null
           id?: string
           image_url?: string | null
           impact?: string | null
+          is_duplicate?: boolean | null
           key_takeaways?: Json | null
           linkedin_url?: string | null
           meta_description?: string | null
@@ -132,6 +140,7 @@ export type Database = {
           scheduled_for?: string | null
           seo_description?: string | null
           share_count?: number | null
+          similarity_score?: number | null
           slug?: string | null
           source?: string
           source_credibility?: string | null
@@ -154,6 +163,41 @@ export type Database = {
             columns: ["author_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_duplicate_of_fkey"
+            columns: ["duplicate_of"]
+            isOneToOne: false
+            referencedRelation: "ai_news"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_duplicate_of_fkey"
+            columns: ["duplicate_of"]
+            isOneToOne: false
+            referencedRelation: "featured_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_duplicate_of_fkey"
+            columns: ["duplicate_of"]
+            isOneToOne: false
+            referencedRelation: "mv_trending_articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_duplicate_of_fkey"
+            columns: ["duplicate_of"]
+            isOneToOne: false
+            referencedRelation: "upcoming_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_duplicate_of_fkey"
+            columns: ["duplicate_of"]
+            isOneToOne: false
+            referencedRelation: "upcoming_scheduled_posts"
             referencedColumns: ["id"]
           },
           {

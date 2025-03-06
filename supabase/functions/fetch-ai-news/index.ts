@@ -30,51 +30,55 @@ async function recordFetchHistory(
     metadata?: any;
   }
 ) {
-  if (status === "started") {
-    const { data, error } = await supabase
-      .from("news_fetch_history")
-      .insert({
-        source_type: source,
-        status: "pending",
-        metadata: { started_at: new Date().toISOString() },
-      })
-      .select();
-
-    if (error) console.error("Error recording fetch start:", error);
-    return data?.[0]?.id;
-  } else {
-    // Find the most recent pending record for this source
-    const { data: existing } = await supabase
-      .from("news_fetch_history")
-      .select("*")
-      .eq("source_type", source)
-      .eq("status", "pending")
-      .order("fetch_time", { ascending: false })
-      .limit(1);
-
-    const historyId = existing?.[0]?.id;
-    
-    if (historyId) {
-      const { error } = await supabase
+  try {
+    if (status === "started") {
+      const { data, error } = await supabase
         .from("news_fetch_history")
-        .update({
-          status: status === "completed" ? "success" : "error",
-          articles_fetched: metrics.articles_fetched || 0,
-          articles_added: metrics.articles_added || 0,
-          articles_updated: metrics.articles_updated || 0,
-          duplicates_skipped: metrics.duplicates_skipped || 0,
-          execution_time_ms: metrics.execution_time_ms || 0,
-          error_message: metrics.error_message || null,
-          metadata: { 
-            ...existing[0].metadata,
-            completed_at: new Date().toISOString(),
-            ...metrics.metadata
-          },
+        .insert({
+          source_type: source,
+          status: "pending",
+          metadata: { started_at: new Date().toISOString() },
         })
-        .eq("id", historyId);
+        .select();
 
-      if (error) console.error("Error updating fetch history:", error);
+      if (error) console.error("Error recording fetch start:", error);
+      return data?.[0]?.id;
+    } else {
+      // Find the most recent pending record for this source
+      const { data: existing } = await supabase
+        .from("news_fetch_history")
+        .select("*")
+        .eq("source_type", source)
+        .eq("status", "pending")
+        .order("fetch_time", { ascending: false })
+        .limit(1);
+
+      const historyId = existing?.[0]?.id;
+      
+      if (historyId) {
+        const { error } = await supabase
+          .from("news_fetch_history")
+          .update({
+            status: status === "completed" ? "success" : "error",
+            articles_fetched: metrics.articles_fetched || 0,
+            articles_added: metrics.articles_added || 0,
+            articles_updated: metrics.articles_updated || 0,
+            duplicates_skipped: metrics.duplicates_skipped || 0,
+            execution_time_ms: metrics.execution_time_ms || 0,
+            error_message: metrics.error_message || null,
+            metadata: { 
+              ...existing[0].metadata,
+              completed_at: new Date().toISOString(),
+              ...metrics.metadata
+            },
+          })
+          .eq("id", historyId);
+
+        if (error) console.error("Error updating fetch history:", error);
+      }
     }
+  } catch (error) {
+    console.error("Error in recordFetchHistory:", error);
   }
 }
 
@@ -232,10 +236,9 @@ async function processNewsApiArticles(
         status: "published",
         url: article.url || null,
         // Add duplicate information
-        isDuplicate: duplicateCheck.isDuplicate,
-        duplicateOf: duplicateCheck.duplicateOf,
-        similarity: duplicateCheck.similarity,
-        duplicateGroup: duplicateCheck.duplicateOf || null,
+        is_duplicate: duplicateCheck.isDuplicate,
+        duplicate_of: duplicateCheck.duplicateOf,
+        similarity_score: duplicateCheck.similarity,
       };
 
       // Check if article already exists by title
