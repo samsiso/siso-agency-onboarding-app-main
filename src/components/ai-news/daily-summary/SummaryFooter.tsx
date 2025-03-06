@@ -12,9 +12,10 @@ interface SummaryFooterProps {
 }
 
 export function SummaryFooter({ summaryData }: SummaryFooterProps) {
-  // Generate time ago text
-  const timeAgo = summaryData.updated_at 
-    ? formatDistanceToNow(new Date(summaryData.updated_at), { addSuffix: true })
+  // [Analysis] Safely handle updated_at which might not be in the type definition
+  // Generate time ago text using created_at as fallback
+  const timeAgo = summaryData.created_at 
+    ? formatDistanceToNow(new Date(summaryData.created_at), { addSuffix: true })
     : 'recently';
   
   // Handle share functionality
