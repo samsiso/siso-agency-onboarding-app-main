@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -54,13 +53,18 @@ export function SummaryContent({
   };
   
   // Helper function to render trend direction indicator
-  const renderTrendIndicator = (direction: 'up' | 'down' | 'stable') => {
-    switch (direction) {
+  // Modified to accept string but ensure it's treated as the expected union type
+  const renderTrendIndicator = (direction: string) => {
+    // Normalize the direction to ensure it's one of our expected values
+    const normalizedDirection = direction.toLowerCase();
+    
+    switch (normalizedDirection) {
       case 'up':
         return <TrendingUp className="h-4 w-4 text-green-400" />;
       case 'down':
         return <TrendingUp className="h-4 w-4 text-red-400 transform rotate-180" />;
       default:
+        // Default to stable for any other value
         return <BarChart2 className="h-4 w-4 text-blue-400" />;
     }
   };
@@ -170,9 +174,9 @@ export function SummaryContent({
                   <div className="flex items-center gap-1 mt-2">
                     {renderTrendIndicator(summaryData.impact_trends[industry])}
                     <span className="text-xs text-muted-foreground">
-                      {summaryData.impact_trends[industry] === 'up' 
+                      {summaryData.impact_trends[industry].toLowerCase() === 'up' 
                         ? 'Increasing Trend' 
-                        : summaryData.impact_trends[industry] === 'down' 
+                        : summaryData.impact_trends[industry].toLowerCase() === 'down' 
                           ? 'Decreasing Trend' 
                           : 'Stable Trend'}
                     </span>
