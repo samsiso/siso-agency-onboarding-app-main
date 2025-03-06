@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
 
@@ -434,7 +435,8 @@ async function saveSummary(supabase, date, summaryData, articleCount, generatedW
         .from("ai_news_daily_summaries")
         .insert({
           date,
-          ...summaryDataToSave
+          ...summaryDataToSave,
+          created_at: new Date().toISOString()  // Explicitly set created_at to ensure it's set
         });
     }
     

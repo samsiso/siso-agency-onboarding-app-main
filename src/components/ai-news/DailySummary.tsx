@@ -9,6 +9,7 @@ import { SummaryFooter } from './daily-summary/SummaryFooter';
 import { GeneratePrompt } from './daily-summary/GeneratePrompt';
 import { useAiDailySummary } from '@/hooks/useAiDailySummary';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { toast } from '@/hooks/use-toast';
 
 interface DailySummaryProps {
   date?: string;
@@ -17,7 +18,7 @@ interface DailySummaryProps {
   isAdmin?: boolean;
 }
 
-// [Analysis] Main component that orchestrates the summary display
+// [Analysis] Main component that orchestrates the summary display with enhanced error handling
 export function DailySummary({
   date = new Date().toISOString().split('T')[0],
   articleCount = 0,
@@ -45,25 +46,61 @@ export function DailySummary({
     fetchSummary();
   }, [date, fetchSummary]);
 
-  // Handle refresh button click
+  // Handle refresh button click with better feedback
   const handleRefresh = async () => {
-    console.log("DailySummary: Refreshing summary data");
-    if (refreshSummary) {
-      await refreshSummary();
+    try {
+      console.log("DailySummary: Refreshing summary data");
+      toast({
+        title: "Refreshing summary",
+        description: "Fetching the latest AI-generated summary..."
+      });
+      
+      if (refreshSummary) {
+        await refreshSummary();
+      }
+      await fetchSummary();
+      
+      toast({
+        title: "Summary refreshed",
+        description: "The latest summary data has been loaded."
+      });
+    } catch (err) {
+      console.error("Error refreshing summary:", err);
+      toast({
+        title: "Refresh failed",
+        description: "Could not refresh the summary. Please try again.",
+        variant: "destructive"
+      });
     }
-    await fetchSummary();
   };
 
-  // Handle generate summary click
+  // Handle generate summary click with enhanced error handling
   const handleGenerate = async () => {
-    console.log(`DailySummary: Generating summary, exists: ${summaryData !== null}`);
-    await generateSummary(summaryData !== null);
+    try {
+      console.log(`DailySummary: Generating summary, exists: ${summaryData !== null}`);
+      
+      toast({
+        title: "Generating summary",
+        description: "This may take up to 30 seconds. Please wait..."
+      });
+      
+      await generateSummary(summaryData !== null);
+      
+      // The success toast will be shown in the generateSummary function itself
+    } catch (err) {
+      console.error("Error generating summary:", err);
+      toast({
+        title: "Generation failed",
+        description: "Could not generate the summary. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   // If there's no summary data and we've finished loading
   const shouldShowGeneratePrompt = !loading && !summaryData;
 
-  // [Analysis] Return the JSX for the component
+  // [Analysis] Return the JSX for the component with improved error states
   return (
     <Card className="border-purple-500/30 bg-purple-950/20 mb-8">
       <CardHeader className="pb-2">
