@@ -1,11 +1,9 @@
-
 import React from 'react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { NewsSearchSection } from './NewsSearchSection';
 import { RefreshCw } from 'lucide-react';
 import { NewsItem } from '@/types/blog';
-
 interface NewsHeaderProps {
   activeTab: string;
   onTabChange: (value: string) => void;
@@ -20,21 +18,18 @@ interface NewsHeaderProps {
 export function NewsHeader({
   activeTab,
   onTabChange,
-  title = "AI News Dashboard", 
+  title = "AI News Dashboard",
   searchQuery = '',
   onSearchChange = () => {},
   syncingNews = false,
   syncNews = async () => ({})
 }: NewsHeaderProps) {
-  
   const handleSearchChange = (query: string) => {
     if (onSearchChange) {
       onSearchChange(query);
     }
   };
-  
-  return (
-    <div className="space-y-6 mb-6 w-full">
+  return <div className="space-y-6 mb-6 w-full">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold">{title}</h1>
@@ -43,17 +38,7 @@ export function NewsHeader({
           </p>
         </div>
         
-        <Button
-          variant="default"
-          size="sm"
-          className="gap-2"
-          onClick={() => syncNews()}
-          disabled={syncingNews}
-        >
-          <RefreshCw className={`h-4 w-4 ${syncingNews ? 'animate-spin' : ''}`} />
-          <span className="hidden sm:inline">Sync AI News</span>
-          <span className="inline sm:hidden">Sync</span>
-        </Button>
+        
       </div>
       
       <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
@@ -67,12 +52,8 @@ export function NewsHeader({
         </Tabs>
         
         <div className="w-full md:w-auto">
-          <NewsSearchSection 
-            searchQuery={searchQuery} 
-            onSearchChange={handleSearchChange} 
-          />
+          <NewsSearchSection searchQuery={searchQuery} onSearchChange={handleSearchChange} />
         </div>
       </div>
-    </div>
-  );
+    </div>;
 }

@@ -3,7 +3,7 @@ import { useNewsItems } from '@/hooks/useNewsItems';
 import NewsFilters from '@/components/ai-news/NewsFilters';
 import FeaturedNewsHero from '@/components/ai-news/FeaturedNewsHero';
 import { NewsContent } from '@/components/ai-news/NewsContent';
-import { NewsHeader } from '@/components/ai-news/NewsHeader'; 
+import { NewsHeader } from '@/components/ai-news/NewsHeader';
 import { NewsErrorBoundary } from '@/components/ai-news/NewsErrorBoundary';
 import { DailyStatsOverview } from '@/components/ai-news/DailyStatsOverview';
 import { DateNavigation } from '@/components/ai-news/DateNavigation';
@@ -18,14 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { 
-  AlertCircle, 
-  Database,
-  RefreshCw,
-  Bug, 
-  Terminal,
-  Sparkles
-} from 'lucide-react';
+import { AlertCircle, Database, RefreshCw, Bug, Terminal, Sparkles } from 'lucide-react';
 import { format, isToday } from 'date-fns';
 import { toast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -42,20 +35,19 @@ import { Switch } from '@/components/ui/switch';
 
 // [Analysis] Main component for the AI News page with cleaned UI and better organization
 const AINews = () => {
-  
   // [Analysis] State for filters, search, and pagination
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  
+
   // [Analysis] Added here to handle tab state for NewsHeader component
   const [activeTab, setActiveTab] = useState('all');
-  
+
   // [Analysis] UI visibility state
   const [showTestPanel, setShowTestPanel] = useState(false);
   const [showFetchHistory, setShowFetchHistory] = useState(false);
-  
+
   // [Analysis] State for API test execution
   const [testKeyword, setTestKeyword] = useState('artificial intelligence');
   const [testLimit, setTestLimit] = useState(10);
@@ -63,14 +55,14 @@ const AINews = () => {
   const [apiResponse, setApiResponse] = useState<string>('');
   const [isApiResponseOpen, setIsApiResponseOpen] = useState(false);
   const [testMode, setTestMode] = useState(true); // Added state for test mode
-  
+
   const itemsPerPage = 12; // Same as PAGE_SIZE in useNewsItems
 
-  const { 
-    newsItems, 
-    summaries, 
-    loadingSummaries, 
-    generateSummary, 
+  const {
+    newsItems,
+    summaries,
+    loadingSummaries,
+    generateSummary,
     loading,
     initialLoading,
     syncingNews,
@@ -90,52 +82,38 @@ const AINews = () => {
     refresh,
     syncNews,
     testFetchNews
-  } = useNewsItems(
-    selectedCategory, 
-    'published', 
-    selectedDate, 
-    currentPage, 
-    itemsPerPage
-  );
-
+  } = useNewsItems(selectedCategory, 'published', selectedDate, currentPage, itemsPerPage);
   console.log('Rendering AINews component with', newsItems.length, 'news items');
   console.log('Current date:', format(currentDate, 'yyyy-MM-dd'));
   console.log('Date range:', dateRange);
   console.log('Loading state:', loading);
 
-  
   // [Analysis] Find featured article with priority on featured flag and then on views
-  const featuredArticle = newsItems.find(item => item.featured) || 
-    [...newsItems].sort((a, b) => (b.views || 0) - (a.views || 0))[0];
+  const featuredArticle = newsItems.find(item => item.featured) || [...newsItems].sort((a, b) => (b.views || 0) - (a.views || 0))[0];
 
-  
   // [Analysis] Handle search query change
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
     setCurrentPage(1); // Reset to first page on new search
   };
 
-  
   // [Analysis] Handle page change
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
 
-  
   // [Analysis] Handle category change
   const handleCategoryChange = (category: string | null) => {
     setSelectedCategory(category);
     setCurrentPage(1); // Reset to first page on category change
   };
 
-  
   // [Analysis] Handle date change through direct date picker
   const handleDateChange = (date: string | null) => {
     setSelectedDate(date);
     setCurrentPage(1); // Reset to first page on date change
   };
 
-  
   // [Analysis] Handle date navigation via date picker
   const handleSelectDate = (date: Date) => {
     if (date) {
@@ -151,39 +129,35 @@ const AINews = () => {
     }
   };
 
-  
   // [Analysis] Handle API test execution with enhanced error tracking
   const handleTestAPI = async () => {
     setApiResponse('');
     try {
       const startTime = Date.now();
-      
+
       // Capture raw response for debugging
       const result = await syncNews(testKeyword, testLimit, testSource, testMode);
-      
       const endTime = Date.now();
       const duration = (endTime - startTime) / 1000;
-      
       setApiResponse(JSON.stringify(result, null, 2));
-      
       toast({
         title: `API ${testMode ? 'Test' : 'Import'} ${result.success ? 'Succeeded' : 'Failed'}`,
         description: `Request took ${duration.toFixed(2)}s. ${result.count || 0} articles ${testMode ? 'found' : 'imported'}.`,
         variant: result.success ? 'default' : 'destructive'
       });
-      
+
       // Auto-expand the API response section if there's an error or no articles
-      if (!result.success || (result.articles && result.articles.length === 0)) {
+      if (!result.success || result.articles && result.articles.length === 0) {
         setIsApiResponseOpen(true);
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      setApiResponse(JSON.stringify({ 
+      setApiResponse(JSON.stringify({
         error: errorMessage,
         timestamp: new Date().toISOString()
       }, null, 2));
       setIsApiResponseOpen(true);
-      
+
       // Error is already handled in syncNews
     }
   };
@@ -198,21 +172,20 @@ const AINews = () => {
 
     // Run the test API call
     handleTestAPI();
-    
+
     // Show a toast notification
     toast({
       title: "Test Fetch Setup",
-      description: "Test parameters configured. Click 'Test API' to run the test.",
+      description: "Test parameters configured. Click 'Test API' to run the test."
     });
   };
-  
+
   // [Analysis] Calculate total pages
   const totalPages = totalCount ? Math.ceil(totalCount / itemsPerPage) : 0;
 
   // Determine when to show the stats - we'll pass this to NewsHeader instead of using duplicate components
   const showStats = isToday(currentDate) && !searchQuery && !selectedCategory;
 
-  
   // [Analysis] Handle tab change for NewsHeader
   const handleTabChange = (value: string) => {
     setActiveTab(value);
@@ -225,23 +198,23 @@ const AINews = () => {
 
   // New state to check if user has admin privileges
   const [isAdmin, setIsAdmin] = useState(false);
-  
+
   // Load admin status on component mount
   useEffect(() => {
     const checkAdminStatus = async () => {
       try {
         // Check if user is authenticated
-        const { data: { user } } = await supabase.auth.getUser();
-        
+        const {
+          data: {
+            user
+          }
+        } = await supabase.auth.getUser();
         if (user) {
           // Check admin status - in a real app, you would check a roles table or similar
           // For now, we'll use a simplified approach
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', user.id)
-            .maybeSingle();
-            
+          const {
+            data: profile
+          } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
           setIsAdmin(profile?.role === 'admin');
         }
       } catch (error) {
@@ -249,46 +222,42 @@ const AINews = () => {
         setIsAdmin(false);
       }
     };
-    
     checkAdminStatus();
   }, []);
-  
+
   // Add a new function to refresh the daily summary
   const refreshDailySummary = async () => {
     try {
       const formattedDate = format(currentDate, 'yyyy-MM-dd');
-      
-      const { data, error } = await supabase.functions.invoke('generate-daily-summary', {
-        body: { 
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('generate-daily-summary', {
+        body: {
           date: formattedDate,
           forceRefresh: false
-        },
+        }
       });
-      
       if (error) {
         throw new Error(`Edge function error: ${error.message}`);
       }
-      
       if (!data.success) {
         throw new Error(data.error || 'Failed to refresh summary');
       }
-      
       toast({
         title: 'Success',
-        description: 'Daily summary has been refreshed',
+        description: 'Daily summary has been refreshed'
       });
     } catch (error) {
       console.error('Error refreshing summary:', error);
       toast({
         title: 'Error',
         description: error instanceof Error ? error.message : 'Failed to refresh summary',
-        variant: 'destructive',
+        variant: 'destructive'
       });
     }
   };
-
-  return (
-    <div className="flex min-h-screen bg-siso-bg">
+  return <div className="flex min-h-screen bg-siso-bg">
       <Helmet>
         <title>AI News | Your One-Stop AI Knowledge Source</title>
         <meta name="description" content="Stay updated with the latest news in artificial intelligence, machine learning, and AI tools." />
@@ -298,23 +267,12 @@ const AINews = () => {
       
       <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-20">
         <div className="flex justify-between items-center mb-6">
-          <NewsHeader 
-            title="AI News" 
-            activeTab={activeTab} 
-            onTabChange={handleTabChange}
-            searchQuery={searchQuery}
-            onSearchChange={handleSearchChange}
-            syncingNews={syncingNews}
-            syncNews={syncNews}
-          />
+          <NewsHeader title="AI News" activeTab={activeTab} onTabChange={handleTabChange} searchQuery={searchQuery} onSearchChange={handleSearchChange} syncingNews={syncingNews} syncNews={syncNews} />
           
           <div className="flex items-center gap-2">
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2 h-8">
-                  <Database className="h-4 w-4" />
-                  API Status
-                </Button>
+                
               </PopoverTrigger>
               <PopoverContent className="w-80" align="end">
                 <div className="space-y-2">
@@ -341,49 +299,41 @@ const AINews = () => {
               </PopoverContent>
             </Popover>
             
-            {isAdmin && (
-              <AdminControls 
-                showFetchHistory={showFetchHistory}
-                setShowFetchHistory={setShowFetchHistory}
-                showTestPanel={showTestPanel}
-                setShowTestPanel={setShowTestPanel}
-                onTestFetch={handleTestFetch}
-              />
-            )}
+            {isAdmin && <AdminControls showFetchHistory={showFetchHistory} setShowFetchHistory={setShowFetchHistory} showTestPanel={showTestPanel} setShowTestPanel={setShowTestPanel} onTestFetch={handleTestFetch} />}
           </div>
         </div>
         
-        {error && (
-          <Alert variant="destructive" className="mb-6">
+        {error && <Alert variant="destructive" className="mb-6">
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Error</AlertTitle>
             <AlertDescription>
               {error instanceof Error ? error.message : "There was an error loading the news."}
             </AlertDescription>
-          </Alert>
-        )}
+          </Alert>}
         
-        {showFetchHistory && isAdmin && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="mb-8"
-          >
-            <FetchHistoryPanel 
-              onRefresh={() => syncNews('artificial intelligence', 30, 'event_registry', false)} 
-              onTestFetch={handleTestFetch} 
-            />
-          </motion.div>
-        )}
+        {showFetchHistory && isAdmin && <motion.div initial={{
+        opacity: 0,
+        height: 0
+      }} animate={{
+        opacity: 1,
+        height: 'auto'
+      }} exit={{
+        opacity: 0,
+        height: 0
+      }} className="mb-8">
+            <FetchHistoryPanel onRefresh={() => syncNews('artificial intelligence', 30, 'event_registry', false)} onTestFetch={handleTestFetch} />
+          </motion.div>}
         
-        {showTestPanel && isAdmin && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="mb-8"
-          >
+        {showTestPanel && isAdmin && <motion.div initial={{
+        opacity: 0,
+        height: 0
+      }} animate={{
+        opacity: 1,
+        height: 'auto'
+      }} exit={{
+        opacity: 0,
+        height: 0
+      }} className="mb-8">
             <Card className="border-dashed border-yellow-500/30 bg-yellow-950/10">
               <CardHeader>
                 <CardTitle className="text-yellow-400 flex items-center gap-2">
@@ -406,34 +356,17 @@ const AINews = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="keyword">Keyword</Label>
-                        <Input 
-                          id="keyword" 
-                          value={testKeyword} 
-                          onChange={(e) => setTestKeyword(e.target.value)}
-                          placeholder="e.g., artificial intelligence"
-                          className="w-full" 
-                        />
+                        <Input id="keyword" value={testKeyword} onChange={e => setTestKeyword(e.target.value)} placeholder="e.g., artificial intelligence" className="w-full" />
                       </div>
                       
                       <div className="space-y-2">
                         <Label htmlFor="limit">Article Limit</Label>
-                        <Input 
-                          id="limit" 
-                          type="number" 
-                          value={testLimit} 
-                          onChange={(e) => setTestLimit(parseInt(e.target.value) || 10)}
-                          min={1}
-                          max={50}
-                          className="w-full" 
-                        />
+                        <Input id="limit" type="number" value={testLimit} onChange={e => setTestLimit(parseInt(e.target.value) || 10)} min={1} max={50} className="w-full" />
                       </div>
                       
                       <div className="space-y-2">
                         <Label htmlFor="source">News Source</Label>
-                        <Select 
-                          value={testSource} 
-                          onValueChange={(value) => setTestSource(value as 'event_registry' | 'news_api')}
-                        >
+                        <Select value={testSource} onValueChange={value => setTestSource(value as 'event_registry' | 'news_api')}>
                           <SelectTrigger id="source" className="w-full">
                             <SelectValue placeholder="Select news source" />
                           </SelectTrigger>
@@ -448,25 +381,15 @@ const AINews = () => {
                         <Label htmlFor="testMode">Mode</Label>
                         <div className="flex items-center justify-between border rounded p-3">
                           <span className="text-sm">Test Only Mode</span>
-                          <Switch 
-                            id="testMode" 
-                            checked={testMode} 
-                            onCheckedChange={setTestMode} 
-                          />
+                          <Switch id="testMode" checked={testMode} onCheckedChange={setTestMode} />
                         </div>
                         <p className="text-xs text-muted-foreground">
-                          {testMode 
-                            ? "Test mode only retrieves articles without saving to database" 
-                            : "Import mode will save articles to the database"}
+                          {testMode ? "Test mode only retrieves articles without saving to database" : "Import mode will save articles to the database"}
                         </p>
                       </div>
                     </div>
                     
-                    <Collapsible 
-                      open={isApiResponseOpen}
-                      onOpenChange={setIsApiResponseOpen}
-                      className="mt-4 border rounded-md"
-                    >
+                    <Collapsible open={isApiResponseOpen} onOpenChange={setIsApiResponseOpen} className="mt-4 border rounded-md">
                       <CollapsibleTrigger asChild>
                         <div className="p-3 border-b flex justify-between items-center cursor-pointer hover:bg-white/5">
                           <div className="flex items-center gap-2">
@@ -480,19 +403,14 @@ const AINews = () => {
                       </CollapsibleTrigger>
                       <CollapsibleContent>
                         <div className="p-3">
-                          <Textarea
-                            value={apiResponse}
-                            readOnly
-                            className="font-mono text-xs h-48 bg-slate-950"
-                          />
+                          <Textarea value={apiResponse} readOnly className="font-mono text-xs h-48 bg-slate-950" />
                         </div>
                       </CollapsibleContent>
                     </Collapsible>
                   </TabsContent>
                   
                   <TabsContent value="results" className="mt-4">
-                    {syncResult ? (
-                      <div className="space-y-4">
+                    {syncResult ? <div className="space-y-4">
                         <div className="flex justify-between items-center">
                           <div>
                             <h3 className={`text-lg font-medium ${syncResult.success ? 'text-green-400' : 'text-red-400'}`}>
@@ -501,36 +419,25 @@ const AINews = () => {
                             <p className="text-sm text-muted-foreground">{syncResult.message}</p>
                           </div>
                           
-                          {syncResult.success && (
-                            <Badge variant="outline" className={
-                              syncResult.count && syncResult.count > 0 
-                                ? "bg-green-500/10 text-green-400" 
-                                : "bg-orange-500/10 text-orange-400"
-                            }>
+                          {syncResult.success && <Badge variant="outline" className={syncResult.count && syncResult.count > 0 ? "bg-green-500/10 text-green-400" : "bg-orange-500/10 text-orange-400"}>
                               {syncResult.count || 0} articles {testMode ? 'found' : 'imported'}
-                            </Badge>
-                          )}
+                            </Badge>}
                         </div>
                         
-                        {syncResult.articles && syncResult.articles.length > 0 ? (
-                          <div className="border rounded-md">
+                        {syncResult.articles && syncResult.articles.length > 0 ? <div className="border rounded-md">
                             <h4 className="text-sm font-medium p-3 border-b">Sample Articles</h4>
                             <ScrollArea className="h-60">
                               <div className="divide-y">
-                                {syncResult.articles.slice(0, 5).map((article, index) => (
-                                  <div key={article.id || index} className="p-3 hover:bg-white/5">
+                                {syncResult.articles.slice(0, 5).map((article, index) => <div key={article.id || index} className="p-3 hover:bg-white/5">
                                     <h5 className="font-medium truncate">{article.title}</h5>
                                     <div className="flex justify-between text-xs text-muted-foreground mt-1">
                                       <span>{article.date ? new Date(article.date).toLocaleDateString() : 'No date'}</span>
                                       <span className="capitalize">{article.source}</span>
                                     </div>
-                                  </div>
-                                ))}
+                                  </div>)}
                               </div>
                             </ScrollArea>
-                          </div>
-                        ) : (
-                          <Alert variant="default" className="bg-orange-950/10 border-orange-500/30 text-orange-300">
+                          </div> : <Alert variant="default" className="bg-orange-950/10 border-orange-500/30 text-orange-300">
                             <AlertCircle className="h-4 w-4" />
                             <AlertTitle>No Articles Found</AlertTitle>
                             <AlertDescription>
@@ -544,14 +451,10 @@ const AINews = () => {
                               </ul>
                               Check the Debug tab for more details.
                             </AlertDescription>
-                          </Alert>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="text-center py-8 text-muted-foreground">
+                          </Alert>}
+                      </div> : <div className="text-center py-8 text-muted-foreground">
                         <p>No test results yet. Run a test to see results here.</p>
-                      </div>
-                    )}
+                      </div>}
                   </TabsContent>
                   
                   <TabsContent value="debug" className="mt-4">
@@ -627,12 +530,7 @@ const AINews = () => {
                         </div>
                         <div className="p-4 text-sm">
                           <p className="mb-4">If your test is failing, check the Edge Function logs in the Supabase dashboard for detailed error information.</p>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => window.open(`https://supabase.com/dashboard/project/fzuwsjxjymwcjsbpwfsl/functions/fetch-ai-news/logs`, '_blank')}
-                            className="gap-2"
-                          >
+                          <Button variant="outline" size="sm" onClick={() => window.open(`https://supabase.com/dashboard/project/fzuwsjxjymwcjsbpwfsl/functions/fetch-ai-news/logs`, '_blank')} className="gap-2">
                             <Terminal className="h-4 w-4" />
                             View Logs in Supabase
                           </Button>
@@ -643,124 +541,53 @@ const AINews = () => {
                 </Tabs>
               </CardContent>
               <CardFooter className="justify-end pt-0">
-                <Button 
-                  onClick={handleTestAPI} 
-                  disabled={syncingNews}
-                  className="gap-2"
-                  variant={testMode ? "default" : "destructive"}
-                >
-                  {syncingNews ? (
-                    <>
+                <Button onClick={handleTestAPI} disabled={syncingNews} className="gap-2" variant={testMode ? "default" : "destructive"}>
+                  {syncingNews ? <>
                       <RefreshCw className="h-4 w-4 animate-spin" />
                       {testMode ? 'Testing...' : 'Importing...'}
-                    </>
-                  ) : (
-                    <>
+                    </> : <>
                       <Sparkles className="h-4 w-4" />
                       {testMode ? 'Test API' : 'Import Articles'}
-                    </>
-                  )}
+                    </>}
                 </Button>
               </CardFooter>
             </Card>
-          </motion.div>
-        )}
+          </motion.div>}
         
-        {isToday(currentDate) && !searchQuery && !selectedCategory && (
-          <DailySummary 
-            date={format(currentDate, 'yyyy-MM-dd')}
-            articleCount={newsItems.length}
-            refreshSummary={refreshDailySummary}
-            isAdmin={isAdmin}
-          />
-        )}
+        {isToday(currentDate) && !searchQuery && !selectedCategory && <DailySummary date={format(currentDate, 'yyyy-MM-dd')} articleCount={newsItems.length} refreshSummary={refreshDailySummary} isAdmin={isAdmin} />}
         
-        <DateNavigation 
-          currentDate={currentDate}
-          dateRange={dateRange}
-          onPreviousDay={goToPreviousDay}
-          onNextDay={goToNextDay}
-          onSelectDate={handleSelectDate}
-          loading={loading}
-        />
+        <DateNavigation currentDate={currentDate} dateRange={dateRange} onPreviousDay={goToPreviousDay} onNextDay={goToNextDay} onSelectDate={handleSelectDate} loading={loading} />
         
         <div className="mb-6">
           <div className="w-full">
-            <NewsFilters
-              selectedCategory={selectedCategory}
-              onCategoryChange={handleCategoryChange}
-              searchQuery={searchQuery}
-              onSearchChange={handleSearchChange}
-              onDateChange={handleDateChange}
-              selectedDate={selectedDate}
-            />
+            <NewsFilters selectedCategory={selectedCategory} onCategoryChange={handleCategoryChange} searchQuery={searchQuery} onSearchChange={handleSearchChange} onDateChange={handleDateChange} selectedDate={selectedDate} />
           </div>
         </div>
         
-        {showStats && (
-          <DailyStatsOverview 
-            newsItems={newsItems} 
-            lastSync={lastSync}
-            articleCount={articleCount}
-            loading={loading}
-          />
-        )}
+        {showStats && <DailyStatsOverview newsItems={newsItems} lastSync={lastSync} articleCount={articleCount} loading={loading} />}
         
-        {featuredArticle && showStats && (
-          <FeaturedNewsHero 
-            article={featuredArticle}
-            onGenerateSummary={generateSummary}
-            summary={summaries[featuredArticle.id] || ""}
-            loadingSummary={loadingSummaries[featuredArticle.id] || false}
-          />
-        )}
+        {featuredArticle && showStats && <FeaturedNewsHero article={featuredArticle} onGenerateSummary={generateSummary} summary={summaries[featuredArticle.id] || ""} loadingSummary={loadingSummaries[featuredArticle.id] || false} />}
         
         <NewsErrorBoundary>
           <AnimatePresence mode="wait">
-            <motion.div
-              key={currentDate.toISOString() + (searchQuery || '') + (selectedCategory || '')}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              {searchQuery ? (
-                <NewsContent
-                  newsItems={newsItems}
-                  searchQuery={searchQuery}
-                  summaries={summaries}
-                  loadingSummaries={loadingSummaries}
-                  onGenerateSummary={generateSummary}
-                  loading={loading}
-                  hasMore={hasMore}
-                  onLoadMore={refresh}
-                />
-              ) : (
-                <NewsDateSection
-                  date={format(currentDate, 'yyyy-MM-dd')}
-                  newsItems={newsItems}
-                  summaries={summaries}
-                  loadingSummaries={loadingSummaries}
-                  onGenerateSummary={generateSummary}
-                  loading={loading}
-                />
-              )}
+            <motion.div key={currentDate.toISOString() + (searchQuery || '') + (selectedCategory || '')} initial={{
+            opacity: 0
+          }} animate={{
+            opacity: 1
+          }} exit={{
+            opacity: 0
+          }} transition={{
+            duration: 0.3
+          }}>
+              {searchQuery ? <NewsContent newsItems={newsItems} searchQuery={searchQuery} summaries={summaries} loadingSummaries={loadingSummaries} onGenerateSummary={generateSummary} loading={loading} hasMore={hasMore} onLoadMore={refresh} /> : <NewsDateSection date={format(currentDate, 'yyyy-MM-dd')} newsItems={newsItems} summaries={summaries} loadingSummaries={loadingSummaries} onGenerateSummary={generateSummary} loading={loading} />}
             </motion.div>
           </AnimatePresence>
           
-          {searchQuery && totalPages > 1 && (
-            <div className="mt-8">
-              <NewsPagination 
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-              />
-            </div>
-          )}
+          {searchQuery && totalPages > 1 && <div className="mt-8">
+              <NewsPagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+            </div>}
         </NewsErrorBoundary>
       </main>
-    </div>
-  );
+    </div>;
 };
-
 export default AINews;
