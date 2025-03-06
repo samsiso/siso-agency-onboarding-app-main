@@ -1,11 +1,10 @@
-
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
 
 // [Analysis] Configure environment variables for API access
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const newsApiKey = Deno.env.get("NEWS_API_KEY")!;
+const eventRegistryKey = Deno.env.get("EVENT_REGISTRY_API_KEY")!;
 
 interface RequestBody {
   keyword: string;
@@ -225,8 +224,8 @@ async function isDuplicate(supabase: any, article: any, threshold = 0.7): Promis
   }
 }
 
-// [Analysis] Process News API response into standardized news format
-async function processNewsApiArticles(
+// [Analysis] Process Event Registry articles into standardized news format
+async function processEventRegistryArticles(
   articles: any[],
   supabase: any,
   skipDuplicates: boolean = true,
@@ -244,19 +243,16 @@ async function processNewsApiArticles(
   const processedArticles = [];
   const duplicateGroups: Record<string, any[]> = {};
 
-  // First pass: check for duplicates and group them
   for (const article of articles) {
     try {
-      // Enhanced duplicate detection
       const duplicateCheck = await isDuplicate(supabase, article, deduplicationThreshold);
       
-      // Prepare reading time and technical complexity
-      const wordCount = (article.content || "").split(/\s+/).length;
-      const readingTime = Math.max(1, Math.ceil(wordCount / 200)); // Avg reading speed
+      // Calculate reading time and technical complexity
+      const wordCount = (article.body || "").split(/\s+/).length;
+      const readingTime = Math.max(1, Math.ceil(wordCount / 200));
       
-      // Determine technical complexity based on content analysis
-      const techTerms = ["neural network", "algorithm", "transformer", "deep learning", "parameter"];
-      const techContent = article.content?.toLowerCase() || article.description?.toLowerCase() || "";
+      const techTerms = ["neural network", "algorithm", "transformer", "deep learning"];
+      const techContent = article.body?.toLowerCase() || "";
       const techCount = techTerms.reduce((count: number, term: string) => {
         return count + (techContent.includes(term) ? 1 : 0);
       }, 0);
@@ -264,20 +260,19 @@ async function processNewsApiArticles(
 
       const newsItem = {
         title: article.title,
-        description: article.description || article.title,
-        content: article.content || article.description || "",
-        date: new Date(article.publishedAt).toISOString().split("T")[0],
-        source: article.source?.name || "News API",
+        description: article.body?.substring(0, 300) || article.title,
+        content: article.body || article.title,
+        date: new Date(article.dateTime).toISOString().split("T")[0],
+        source: article.source?.title || "Event Registry",
         category: "artificial intelligence",
-        impact: "medium", // Default impact level
+        impact: "medium",
         reading_time: readingTime,
         technical_complexity: technicalComplexity,
-        image_url: article.urlToImage || null,
+        image_url: article.image || null,
         source_credibility: "verified",
         article_type: "news",
         status: "published",
         url: article.url || null,
-        // Add duplicate information
         is_duplicate: duplicateCheck.isDuplicate,
         duplicate_of: duplicateCheck.duplicateOf,
         similarity_score: duplicateCheck.similarity,
@@ -294,13 +289,11 @@ async function processNewsApiArticles(
         console.error("Error checking for existing article:", existingError);
       }
 
-      // Transform the article for the response
       const transformedArticle = {
         ...newsItem,
         id: existingArticle?.id || crypto.randomUUID(),
       };
       
-      // Group duplicates
       if (duplicateCheck.isDuplicate && duplicateCheck.duplicateOf) {
         if (!duplicateGroups[duplicateCheck.duplicateOf]) {
           duplicateGroups[duplicateCheck.duplicateOf] = [];
@@ -310,14 +303,12 @@ async function processNewsApiArticles(
       
       processedArticles.push(transformedArticle);
 
-      // Skip duplicates if requested
       if (duplicateCheck.isDuplicate && skipDuplicates) {
         duplicates++;
         continue;
       }
 
       if (existingArticle) {
-        // Update existing article
         const { error: updateError } = await supabase
           .from("ai_news")
           .update(newsItem)
@@ -329,7 +320,6 @@ async function processNewsApiArticles(
           updated++;
         }
       } else {
-        // Insert new article
         const { error: insertError } = await supabase
           .from("ai_news")
           .insert(newsItem);
@@ -342,7 +332,7 @@ async function processNewsApiArticles(
       }
     } catch (error) {
       console.error("Error processing article:", error);
-      duplicates++; // Count failed processing as duplicates for now
+      duplicates++;
     }
   }
 
@@ -355,7 +345,6 @@ serve(async (req) => {
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   };
   
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -364,13 +353,11 @@ serve(async (req) => {
     const startTime = Date.now();
     const supabase = createClient(supabaseUrl, supabaseKey);
     
-    // [Analysis] Added better API key validation
-    if (!newsApiKey || newsApiKey === "undefined" || newsApiKey === "null") {
-      console.error("NEWS_API_KEY environment variable is not configured or is invalid");
-      throw new Error("News API key is not configured or is invalid. Please add a valid key to the edge function secrets.");
+    if (!eventRegistryKey) {
+      console.error("EVENT_REGISTRY_API_KEY environment variable is not configured");
+      throw new Error("Event Registry API key is not configured. Please add a valid key to the edge function secrets.");
     }
 
-    // Parse request body
     let requestBody;
     try {
       requestBody = await req.json() as RequestBody;
@@ -384,45 +371,51 @@ serve(async (req) => {
       limit = 10,
       testMode = false,
       skipDuplicates = true,
-      deduplicationThreshold = 0.7 // Default threshold
+      deduplicationThreshold = 0.7
     } = requestBody;
     
-    // Record the start of the fetch operation
     console.log("Recording fetch history - start");
     try {
-      await recordFetchHistory(supabase, "news_api", "started", {});
+      await recordFetchHistory(supabase, "event_registry", "started", {});
     } catch (recordError) {
       console.error("Failed to record fetch start history, but continuing:", recordError);
     }
     
-    // Fetch articles from News API
-    const newsApiUrl = new URL("https://newsapi.org/v2/everything");
+    // [Analysis] Using Event Registry API
+    const eventRegistryUrl = new URL("http://eventregistry.org/api/v1/article/getArticles");
     
-    const params = {
-      q: keyword,
-      apiKey: newsApiKey,
-      language: "en",
-      sortBy: "publishedAt",
-      pageSize: limit.toString(),
+    const queryParams = {
+      keyword,
+      articlesPage: 1,
+      articlesCount: limit,
+      articlesSortBy: "date",
+      articlesSortByAsc: false,
+      articlesArticleBodyLen: -1,
+      resultType: "articles",
+      dataType: ["news", "blog"],
+      lang: "eng",
+      apiKey: eventRegistryKey,
     };
     
-    Object.entries(params).forEach(([key, value]) => {
-      newsApiUrl.searchParams.append(key, String(value));
+    Object.entries(queryParams).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        value.forEach(v => eventRegistryUrl.searchParams.append(key, v));
+      } else {
+        eventRegistryUrl.searchParams.append(key, String(value));
+      }
     });
     
-    console.log(`Fetching news from ${newsApiUrl.toString().replace(newsApiKey, "API_KEY_HIDDEN")}`);
+    console.log(`Fetching news from Event Registry (endpoint hidden)`);
     
-    // Use a reasonable timeout for the fetch
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
     
     try {
-      const response = await fetch(newsApiUrl.toString(), {
+      const response = await fetch(eventRegistryUrl.toString(), {
         signal: controller.signal
       });
       clearTimeout(timeoutId);
       
-      // Check for HTTP errors first
       if (!response.ok) {
         let errorData;
         try {
@@ -431,23 +424,18 @@ serve(async (req) => {
           errorData = { message: "Could not parse error response" };
         }
         
-        // Log detailed error information
-        console.error(`News API error: Status ${response.status}, Message: ${errorData.message || response.statusText}`);
+        console.error(`Event Registry API error: Status ${response.status}, Message:`, errorData);
         
-        // Special handling for common error codes
-        let errorMessage = `News API error: ${errorData.message || response.statusText} (Status: ${response.status})`;
+        let errorMessage = `Event Registry API error: ${errorData.message || response.statusText} (Status: ${response.status})`;
         
         if (response.status === 401) {
-          errorMessage = "Invalid News API key. Please check your API key and make sure it's valid.";
+          errorMessage = "Invalid Event Registry API key. Please check your API key and make sure it's valid.";
         } else if (response.status === 429) {
-          errorMessage = "News API rate limit exceeded. Please try again later or upgrade your plan.";
-        } else if (response.status === 403) {
-          errorMessage = "News API access is forbidden. Your key might be restricted.";
+          errorMessage = "Event Registry API rate limit exceeded. Please try again later or upgrade your plan.";
         }
         
-        // Record the error
         try {
-          await recordFetchHistory(supabase, "news_api", "error", {
+          await recordFetchHistory(supabase, "event_registry", "error", {
             error_message: errorMessage,
             metadata: {
               status_code: response.status,
@@ -461,7 +449,6 @@ serve(async (req) => {
         throw new Error(errorMessage);
       }
       
-      // Parse successful response
       let data;
       try {
         data = await response.json();
@@ -470,13 +457,12 @@ serve(async (req) => {
         throw new Error("Failed to parse API response. The service may be experiencing issues.");
       }
       
-      // Additional validation of response format
-      if (!data.articles || !Array.isArray(data.articles)) {
-        const errorMessage = "Invalid response format from News API - missing 'articles' array";
+      if (!data.articles || !Array.isArray(data.articles.results)) {
+        const errorMessage = "Invalid response format from Event Registry - missing articles array";
         console.error(errorMessage, data);
         
         try {
-          await recordFetchHistory(supabase, "news_api", "error", {
+          await recordFetchHistory(supabase, "event_registry", "error", {
             error_message: errorMessage,
             metadata: { api_response: data }
           });
@@ -487,34 +473,25 @@ serve(async (req) => {
         throw new Error(errorMessage);
       }
       
-      // Extract articles from response
-      const articles = data.articles || [];
-      console.log(`Received ${articles.length} articles from News API`);
+      const articles = data.articles.results || [];
+      console.log(`Received ${articles.length} articles from Event Registry`);
       
-      // Process and store articles with improved duplicate detection
-      const { added, updated, duplicates, processedArticles, duplicateGroups } = await processNewsApiArticles(
-        articles,
-        supabase,
-        skipDuplicates,
-        deduplicationThreshold
-      );
+      const { added, updated, duplicates, processedArticles, duplicateGroups } = 
+        await processEventRegistryArticles(articles, supabase, skipDuplicates, deduplicationThreshold);
       
-      // Only update database if not in test mode
       if (!testMode) {
         try {
-          // Update news source last_fetched_at
           await supabase
             .from("news_sources")
             .update({ last_fetched_at: new Date().toISOString() })
-            .eq("source_type", "news_api");
+            .eq("source_type", "event_registry");
         } catch (updateError) {
           console.error("Error updating news source last_fetched_at:", updateError);
         }
       }
       
-      // Record the completion of the fetch operation
       try {
-        await recordFetchHistory(supabase, "news_api", "completed", {
+        await recordFetchHistory(supabase, "event_registry", "completed", {
           articles_fetched: articles.length,
           articles_added: added,
           articles_updated: updated,
@@ -546,20 +523,18 @@ serve(async (req) => {
       clearTimeout(timeoutId);
       console.error("Fetch operation failed:", fetchError);
       
-      // Check if it's an abort error (timeout)
       if (fetchError.name === "AbortError") {
-        throw new Error("News API request timed out. The service may be experiencing issues.");
+        throw new Error("Event Registry API request timed out. The service may be experiencing issues.");
       } else {
-        throw fetchError; // Re-throw the error to be caught by the outer try/catch
+        throw fetchError;
       }
     }
   } catch (error) {
     console.error("Error in fetch-news:", error);
     
-    // Record the error
     try {
       const supabase = createClient(supabaseUrl, supabaseKey);
-      await recordFetchHistory(supabase, "news_api", "error", {
+      await recordFetchHistory(supabase, "event_registry", "error", {
         error_message: error.message,
       });
     } catch (recordError) {
