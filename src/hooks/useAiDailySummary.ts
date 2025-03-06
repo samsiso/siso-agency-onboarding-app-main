@@ -41,9 +41,9 @@ export function useAiDailySummary(date: string, isAdmin: boolean = false) {
           console.error('Error fetching summary:', fetchError);
           setError('Failed to load daily summary');
           toast({
-            title: 'Error',
-            description: 'Failed to load daily summary. Please try again.',
-            variant: 'destructive',
+            title: "Error",
+            description: "Failed to load daily summary. Please try again.",
+            variant: "destructive",
           });
         }
       } else if (data) {
@@ -96,11 +96,14 @@ export function useAiDailySummary(date: string, isAdmin: boolean = false) {
       });
       
       if (invokeError) {
+        console.error("Edge function invoke error:", invokeError);
         throw new Error(`Edge function error: ${invokeError.message}`);
       }
       
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to generate summary');
+      if (!data || !data.success) {
+        const errorMsg = data?.error || 'Failed to generate summary';
+        console.error("Generate summary error:", errorMsg);
+        throw new Error(errorMsg);
       }
       
       // Check if this was a fallback/placeholder summary

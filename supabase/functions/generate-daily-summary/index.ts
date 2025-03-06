@@ -130,7 +130,8 @@ async function callOpenAI(prompt: string): Promise<{ data?: any, error?: Error }
   
   try {
     console.log("Sending request to OpenAI with API key...");
-    // [Plan] Fix: Changed model from gpt-4o-mini to gpt-4o which is a valid model
+    console.log("Using model: gpt-4o");
+    
     const openAIResponse = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -138,7 +139,7 @@ async function callOpenAI(prompt: string): Promise<{ data?: any, error?: Error }
         "Authorization": `Bearer ${openAIKey}`
       },
       body: JSON.stringify({
-        model: "gpt-4o", // [Analysis] Fixed: Using gpt-4o which is a valid model
+        model: "gpt-4o", // [Analysis] Using gpt-4o which is a valid model
         messages: [
           {
             role: "system",
@@ -154,14 +155,16 @@ async function callOpenAI(prompt: string): Promise<{ data?: any, error?: Error }
       })
     });
     
+    // [Plan] Enhanced error logging for API responses
     if (!openAIResponse.ok) {
       const errorText = await openAIResponse.text();
-      console.error("OpenAI API error response:", errorText);
+      console.error("OpenAI API error response status:", openAIResponse.status);
+      console.error("OpenAI API error response body:", errorText);
       try {
         const errorData = JSON.parse(errorText);
-        throw new Error(`OpenAI API error: ${errorData.error?.message || openAIResponse.statusText}`);
+        throw new Error(`OpenAI API error: ${errorData.error?.message || errorData.error?.type || openAIResponse.statusText}`);
       } catch (e) {
-        throw new Error(`OpenAI API error: ${openAIResponse.statusText} - ${errorText.substring(0, 100)}`);
+        throw new Error(`OpenAI API error: ${openAIResponse.statusText} - ${errorText.substring(0, 200)}`);
       }
     }
     
