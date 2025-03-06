@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
 import { supabaseClient } from "../_shared/supabase-client.ts";
@@ -129,7 +130,7 @@ async function callOpenAI(prompt: string): Promise<{ data?: any, error?: Error }
   
   try {
     console.log("Sending request to OpenAI with API key...");
-    console.log("Using model: gpt-4o");
+    console.log("Using model: gpt-4o-mini");
     
     const openAIResponse = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -138,7 +139,7 @@ async function callOpenAI(prompt: string): Promise<{ data?: any, error?: Error }
         "Authorization": `Bearer ${openAIKey}`
       },
       body: JSON.stringify({
-        model: "gpt-4o", // [Analysis] Using gpt-4o which is a valid model
+        model: "gpt-4o-mini", // [Analysis] Using gpt-4o-mini which is a valid model
         messages: [
           {
             role: "system",
@@ -181,8 +182,8 @@ function parseOpenAIResponse(responseContent: string): any {
   try {
     // Extract JSON from the response (handling potential markdown formatting)
     const jsonMatch = responseContent.match(/```json\n([\s\S]*)\n```/) || 
-                      responseContent.match(/```\n([\s\S]*)\n```/) ||
-                      [null, responseContent];
+                     responseContent.match(/```\n([\s\S]*)\n```/) ||
+                     [null, responseContent];
                       
     const jsonString = jsonMatch[1] || responseContent;
     console.log("Attempting to parse OpenAI response:", jsonString.substring(0, 150) + "...");
@@ -193,7 +194,7 @@ function parseOpenAIResponse(responseContent: string): any {
     
     // Attempt to extract data using regex as a fallback
     const summary = responseContent.match(/summary["\s:]+([^"]+)/i)?.[1] || 
-                    `AI News Summary`;
+                   `AI News Summary`;
                     
     const keyPointsMatch = responseContent.match(/key_points["\s:]+\[([\s\S]*?)\]/i)?.[1] || "";
     const keyPoints = keyPointsMatch
