@@ -1,16 +1,17 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, Clock, BarChart, ExternalLink, FileText } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CardContent } from '@/components/ui/card';
-import { NewsItem } from '@/types/blog'; // Changed from NewsPost to NewsItem
+import { NewsItem } from '@/types/blog';
 import { extractDomain } from '@/lib/utils';
 import AISummaryPopup from './AISummaryPopup';
 import { useAiArticleSummary } from '@/hooks/useAiArticleSummary';
 
 interface NewsCardContentProps {
-  post: NewsItem; // Changed from NewsPost to NewsItem
+  post: NewsItem;
   hideContent?: boolean;
   hideMetadata?: boolean;
   truncateTitle?: boolean;
@@ -38,9 +39,12 @@ const NewsCardContent: React.FC<NewsCardContentProps> = ({
     setIsSummaryOpen(false);
   };
 
-  const displayDate = post.published_date
-    ? new Date(post.published_date).toLocaleDateString()
-    : 'Unknown date';
+  // Use published_at instead of published_date
+  const displayDate = post.published_at
+    ? new Date(post.published_at).toLocaleDateString()
+    : post.date 
+      ? new Date(post.date).toLocaleDateString()
+      : 'Unknown date';
 
   return (
     <CardContent className="p-4 pt-0 h-full flex flex-col justify-between">
@@ -93,16 +97,16 @@ const NewsCardContent: React.FC<NewsCardContentProps> = ({
           {/* Metadata and Sources */}
           <div className="flex flex-wrap justify-between items-center text-xs text-muted-foreground">
             <div className="flex items-center gap-3">
-              {post.published_date && (
+              {(post.published_at || post.date) && (
                 <span className="flex items-center gap-1">
                   <Calendar size={12} />
                   {displayDate}
                 </span>
               )}
-              {post.read_time && (
+              {(post.reading_time || post.estimated_reading_time) && (
                 <span className="flex items-center gap-1">
                   <Clock size={12} />
-                  {post.read_time} min read
+                  {post.reading_time || post.estimated_reading_time} min read
                 </span>
               )}
             </div>
@@ -119,15 +123,15 @@ const NewsCardContent: React.FC<NewsCardContentProps> = ({
                 AI Summary
               </Button>
 
-              {post.source_url && (
+              {post.url && (
                 <a
-                  href={post.source_url}
+                  href={post.url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-1 hover:text-primary transition-colors"
                 >
                   <ExternalLink size={12} />
-                  {extractDomain(post.source_url)}
+                  {extractDomain(post.url)}
                 </a>
               )}
             </div>

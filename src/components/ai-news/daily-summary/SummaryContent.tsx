@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -10,14 +11,14 @@ interface SummaryContentProps {
   loading: boolean;
   summaryData: DailySummaryData | null;
   activeTab: string;
-  setActiveTab: (value: string) => void;
+  setActiveTab?: (value: string) => void; // Made optional to fix the error
 }
 
 // [Analysis] Enhanced content component with tabs and visualizations
 export function SummaryContent({ 
   loading, 
   summaryData, 
-  activeTab, 
+  activeTab,
   setActiveTab 
 }: SummaryContentProps) {
   if (loading) {
@@ -68,9 +69,15 @@ export function SummaryContent({
         return <BarChart2 className="h-4 w-4 text-blue-400" />;
     }
   };
+
+  const handleTabChange = (value: string) => {
+    if (setActiveTab) {
+      setActiveTab(value);
+    }
+  };
   
   return (
-    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+    <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
       <TabsList className="bg-purple-900/30 border-purple-500/30">
         <TabsTrigger value="summary">Summary</TabsTrigger>
         <TabsTrigger value="key-points">Key Points</TabsTrigger>

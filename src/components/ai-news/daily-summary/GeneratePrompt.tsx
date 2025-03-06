@@ -7,9 +7,10 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 interface GeneratePromptProps {
   onGenerate: () => void;
   isAdmin: boolean;
+  articleCount: number; // Added the missing property
 }
 
-export function GeneratePrompt({ onGenerate, isAdmin }: GeneratePromptProps) {
+export function GeneratePrompt({ onGenerate, isAdmin, articleCount }: GeneratePromptProps) {
   return (
     <div className="flex flex-col items-center justify-center py-8 text-center">
       {isAdmin ? (
@@ -17,7 +18,7 @@ export function GeneratePrompt({ onGenerate, isAdmin }: GeneratePromptProps) {
           <Sparkles className="h-16 w-16 text-purple-400 mb-4 opacity-60" />
           <h3 className="text-lg font-medium mb-2">Generate Daily AI News Summary</h3>
           <p className="text-muted-foreground mb-4 max-w-md">
-            Create an AI-powered summary of today's AI news articles to highlight key developments, industry impacts, and actionable insights.
+            Create an AI-powered summary of today's {articleCount} AI news {articleCount === 1 ? 'article' : 'articles'} to highlight key developments, industry impacts, and actionable insights.
           </p>
           <Button 
             onClick={onGenerate} 

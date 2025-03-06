@@ -31,22 +31,10 @@ const NewsCard = ({ item, summaries, loadingSummaries, onGenerateSummary, isComp
         
         <div className="flex-1 p-4 flex flex-col">
           <NewsCardContent
-            title={item.title}
-            description={item.description}
-            date={item.date}
-            source={item.source}
-            impact={item.impact}
-            isCompact={isCompact}
-            summary={summaries[item.id]}
-            loadingSummary={loadingSummaries[item.id]}
-            onGenerateSummary={() => onGenerateSummary(item.id)}
-            newsId={item.id} // [Analysis] This is critical - ensure we pass the ID
-            readingTime={item.estimated_reading_time || item.reading_time}
-            views={item.views}
-            sourceCredibility={item.source_credibility}
-            technicalComplexity={item.technical_complexity}
-            articleType={item.article_type}
-            url={item.url} // [Analysis] Pass URL for external articles
+            post={item}
+            hideContent={isCompact}
+            hideMetadata={false}
+            truncateTitle={true}
           />
         </div>
       </div>

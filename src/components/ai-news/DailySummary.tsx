@@ -99,7 +99,7 @@ export function DailySummary({
     <Card className="border bg-card">
       <CardHeader className="p-4 pb-0">
         <SummaryHeader
-          date={formattedDate}
+          formattedDate={formattedDate}
           loading={loading}
           generating={generating}
           onRefresh={handleRefresh}
@@ -130,6 +130,7 @@ export function DailySummary({
               summaryData={summaryData} 
               loading={loading || generating}
               activeTab={activeTab}
+              setActiveTab={setActiveTab}
             />
             {summaryData && (
               <SummaryFooter
