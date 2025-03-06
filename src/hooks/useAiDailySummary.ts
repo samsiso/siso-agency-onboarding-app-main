@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -160,6 +160,13 @@ export function useAiDailySummary(date: string, isAdmin: boolean = false) {
       setGenerating(false);
     }
   };
+
+  // [Analysis] Automatically fetch summary when component mounts or date changes
+  useEffect(() => {
+    if (date) {
+      fetchSummary();
+    }
+  }, [date]);
 
   return {
     summaryData,

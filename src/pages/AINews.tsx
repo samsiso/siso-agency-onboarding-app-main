@@ -9,39 +9,25 @@ import { DailyStatsOverview } from '@/components/ai-news/DailyStatsOverview';
 import { DateNavigation } from '@/components/ai-news/DateNavigation';
 import { NewsDateSection } from '@/components/ai-news/NewsDateSection';
 import { FetchHistoryPanel } from '@/components/ai-news/FetchHistoryPanel';
-import { DailySummary } from '@/components/ai-news/DailySummary'; // Import the new component
+import { DailySummary } from '@/components/ai-news/DailySummary';
+import { AdminControls } from '@/components/ai-news/AdminControls';
 import { Helmet } from 'react-helmet';
 import { Sidebar } from '@/components/Sidebar';
 import NewsPagination from '@/components/ai-news/NewsPagination';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
-} from "@/components/ui/card";
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card } from "@/components/ui/card";
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { 
-  CalendarDays, 
-  Clock, 
   AlertCircle, 
-  Sparkles, 
-  Database, 
-  RefreshCw, 
+  Database,
+  RefreshCw,
   Bug, 
   Terminal,
-  CalendarClock,
-  Shield
+  Sparkles
 } from 'lucide-react';
-import { format, subDays, isToday } from 'date-fns';
+import { format, isToday } from 'date-fns';
 import { toast } from '@/hooks/use-toast';
-import { Switch } from '@/components/ui/switch';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -50,23 +36,28 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 
-// [Analysis] Main component for the AI News page with date-based navigation and testing panel
+// [Analysis] Main component for the AI News page with cleaned UI and better organization
 const AINews = () => {
   // [Analysis] State for filters, search, and pagination
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [showTestPanel, setShowTestPanel] = useState(true); // Changed to true to make it visible by default
+  
+  // [Analysis] Added here to handle tab state for NewsHeader component
+  const [activeTab, setActiveTab] = useState('all');
+  
+  // [Analysis] UI visibility state
+  const [showTestPanel, setShowTestPanel] = useState(false);
+  const [showFetchHistory, setShowFetchHistory] = useState(false);
+  
+  // [Analysis] State for API test execution
   const [testKeyword, setTestKeyword] = useState('artificial intelligence');
   const [testLimit, setTestLimit] = useState(10);
   const [testSource, setTestSource] = useState<'event_registry' | 'news_api'>('event_registry');
   const [apiResponse, setApiResponse] = useState<string>('');
   const [isApiResponseOpen, setIsApiResponseOpen] = useState(false);
   const [testMode, setTestMode] = useState(true); // Added state for test mode
-
-  // Control toggle for fetch history panel visibility - now defaulting to false
-  const [showFetchHistory, setShowFetchHistory] = useState(false);
   
   const itemsPerPage = 12; // Same as PAGE_SIZE in useNewsItems
 
@@ -216,8 +207,6 @@ const AINews = () => {
   // Determine when to show the stats - we'll pass this to NewsHeader instead of using duplicate components
   const showStats = isToday(currentDate) && !searchQuery && !selectedCategory;
 
-  // [Analysis] Added here to handle tab state for NewsHeader component
-  const [activeTab, setActiveTab] = useState('all');
   
   // [Analysis] Handle tab change for NewsHeader
   const handleTabChange = (value: string) => {
@@ -303,24 +292,17 @@ const AINews = () => {
       <Sidebar />
       
       <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-20">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center mb-6">
           <NewsHeader 
             title="AI News" 
             activeTab={activeTab} 
             onTabChange={handleTabChange}
             searchQuery={searchQuery}
             onSearchChange={handleSearchChange}
-            showStats={false} // Don't show stats here - it's creating duplicates
-            showApiStatus={false} // Don't show API status here - it's creating duplicates
-            showFetchHistory={false} // Don't show fetch history here - it's creating duplicates
-            newsItems={newsItems}
-            lastSync={lastSync}
-            articleCount={articleCount}
-            apiUsage={apiUsage}
             syncingNews={syncingNews}
-            activeNewsSource={activeNewsSource}
             syncNews={syncNews}
           />
+          
           <div className="flex items-center gap-2">
             <Popover>
               <PopoverTrigger asChild>
@@ -355,32 +337,13 @@ const AINews = () => {
             </Popover>
             
             {isAdmin && (
-              <>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="gap-2 h-8 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border-purple-500/50"
-                  onClick={() => setShowFetchHistory(!showFetchHistory)}
-                >
-                  <CalendarClock className="h-4 w-4" />
-                  {showFetchHistory ? 'Hide Automation' : 'Fetch History'}
-                </Button>
-                
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="gap-2 h-8 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-500 border-yellow-500/50"
-                  onClick={() => setShowTestPanel(!showTestPanel)}
-                >
-                  <Sparkles className="h-4 w-4" />
-                  {showTestPanel ? 'Hide Test Panel' : 'Test API'}
-                </Button>
-                
-                <Badge variant="outline" className="bg-red-500/10 text-red-400 border-red-500/50 gap-1">
-                  <Shield className="h-3 w-3" />
-                  Admin
-                </Badge>
-              </>
+              <AdminControls 
+                showFetchHistory={showFetchHistory}
+                setShowFetchHistory={setShowFetchHistory}
+                showTestPanel={showTestPanel}
+                setShowTestPanel={setShowTestPanel}
+                onTestFetch={handleTestFetch}
+              />
             )}
           </div>
         </div>
@@ -718,7 +681,6 @@ const AINews = () => {
           loading={loading}
         />
         
-        
         <div className="mb-6">
           <div className="w-full">
             <NewsFilters
@@ -732,8 +694,7 @@ const AINews = () => {
           </div>
         </div>
         
-        
-        {/* Show the DailyStatsOverview component here if needed */}
+        {/* Show the DailyStatsOverview component if needed */}
         {showStats && (
           <DailyStatsOverview 
             newsItems={newsItems} 
@@ -743,7 +704,6 @@ const AINews = () => {
           />
         )}
         
-        
         {featuredArticle && showStats && (
           <FeaturedNewsHero 
             article={featuredArticle}
@@ -752,7 +712,6 @@ const AINews = () => {
             loadingSummary={loadingSummaries[featuredArticle.id] || false}
           />
         )}
-        
         
         <NewsErrorBoundary>
           <AnimatePresence mode="wait">
@@ -764,7 +723,6 @@ const AINews = () => {
               transition={{ duration: 0.3 }}
             >
               {searchQuery ? (
-                
                 <NewsContent
                   newsItems={newsItems}
                   searchQuery={searchQuery}
@@ -776,7 +734,6 @@ const AINews = () => {
                   onLoadMore={refresh}
                 />
               ) : (
-                
                 <NewsDateSection
                   date={format(currentDate, 'yyyy-MM-dd')}
                   newsItems={newsItems}
@@ -788,7 +745,6 @@ const AINews = () => {
               )}
             </motion.div>
           </AnimatePresence>
-          
           
           {searchQuery && totalPages > 1 && (
             <div className="mt-8">
