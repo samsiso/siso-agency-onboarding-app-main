@@ -11,6 +11,8 @@ import { format } from 'date-fns';
 import { CalendarIcon, RefreshCw, AlertTriangle, CheckCircle2, ChevronUp, ChevronDown } from 'lucide-react';
 import { NewsItem } from '@/types/blog';
 import { DuplicatesCheckDialog } from './DuplicatesCheckDialog';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 // [Analysis] Enhanced admin panel with more visualization of where articles come from
 interface AdminControlsProps {
@@ -51,6 +53,7 @@ export const AdminControls = ({
   const [bulkArticlesPerDay, setBulkArticlesPerDay] = useState('100');
   const [bulkGenerating, setBulkGenerating] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const { toast } = useToast();
   
   const handleSync = async () => {
     if (syncingNews) return;
@@ -69,6 +72,30 @@ export const AdminControls = ({
       );
     } catch (error) {
       console.error('Error syncing news:', error);
+    }
+  };
+
+  // Add function to delete test articles
+  const deleteTestArticles = async () => {
+    try {
+      if (confirm('Are you sure you want to delete all test articles from March 7th? This action cannot be undone.')) {
+        // Call the edge function to delete test articles
+        const response = await supabase.functions.invoke('delete-test-articles', {});
+        
+        if (response.error) {
+          throw new Error(response.error.message);
+        }
+        
+        // Show success message with count of deleted articles
+        if (response.data && response.data.success) {
+          toast.success(response.data.message);
+        } else {
+          toast.info(response.data?.message || 'No articles were deleted');
+        }
+      }
+    } catch (error) {
+      console.error('Error deleting test articles:', error);
+      toast.error(`Failed to delete test articles: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
   
@@ -157,6 +184,7 @@ export const AdminControls = ({
               <TabsTrigger value="bulk">Bulk Generation</TabsTrigger>
               <TabsTrigger value="results">Results</TabsTrigger>
               <TabsTrigger value="status">API Status</TabsTrigger>
+              <TabsTrigger value="cleanup">Cleanup</TabsTrigger>
             </TabsList>
             
             <TabsContent value="settings" className="space-y-4">
@@ -497,6 +525,36 @@ export const AdminControls = ({
                       Note: All data is currently generated using mock generators for testing purposes.
                     </div>
                   </div>
+                </div>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="cleanup" className="space-y-4">
+              <div className="bg-red-900/20 border border-red-800 rounded-md p-3 mb-4">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="h-5 w-5 text-red-400 mt-0.5" />
+                  <div>
+                    <h4 className="font-medium text-red-400">Danger Zone</h4>
+                    <p className="text-sm text-muted-foreground">
+                      These actions will permanently delete data and cannot be undone.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 gap-4">
+                <div className="bg-gray-800/50 p-4 rounded-md">
+                  <h4 className="font-medium mb-2">Delete Test Articles</h4>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Remove all test articles from March 7th, including their summaries and AI analysis data.
+                  </p>
+                  <Button 
+                    onClick={deleteTestArticles}
+                    variant="destructive"
+                    className="w-full"
+                  >
+                    Delete March 7th Test Articles
+                  </Button>
                 </div>
               </div>
             </TabsContent>
