@@ -3,8 +3,10 @@ import React from 'react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { NewsSearchSection } from './NewsSearchSection';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Info } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { NewsItem } from '@/types/blog';
+
 interface NewsHeaderProps {
   activeTab: string;
   onTabChange: (value: string) => void;
@@ -13,9 +15,11 @@ interface NewsHeaderProps {
   onSearchChange?: (query: string) => void;
   syncingNews?: boolean;
   syncNews?: () => Promise<any>;
+  lastSyncInfo?: string;
+  articleCount?: number;
 }
 
-// [Analysis] Simplified header component with focused functionality
+// [Analysis] Enhanced header component with more feedback on article generation process
 export function NewsHeader({
   activeTab,
   onTabChange,
@@ -23,7 +27,9 @@ export function NewsHeader({
   searchQuery = '',
   onSearchChange = () => {},
   syncingNews = false,
-  syncNews = async () => ({})
+  syncNews = async () => ({}),
+  lastSyncInfo = '',
+  articleCount = 0
 }: NewsHeaderProps) {
   const handleSearchChange = (query: string) => {
     if (onSearchChange) {
@@ -39,6 +45,36 @@ export function NewsHeader({
             Latest updates and breakthroughs in AI technology
           </p>
         </div>
+        
+        {lastSyncInfo && (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center gap-1 cursor-help">
+                    <Info className="h-4 w-4" />
+                    <span>Last sync: {lastSyncInfo}</span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Total articles in database: {articleCount}</p>
+                  <p>Articles are generated using the mock generator in the edge function</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={syncNews}
+              disabled={syncingNews}
+              className="ml-2"
+            >
+              <RefreshCw className={`h-4 w-4 mr-1 ${syncingNews ? 'animate-spin' : ''}`} />
+              {syncingNews ? 'Syncing...' : 'Sync News'}
+            </Button>
+          </div>
+        )}
       </div>
       
       <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">

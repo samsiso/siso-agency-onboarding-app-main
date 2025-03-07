@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 
@@ -6,35 +7,172 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Mock data generator for articles
-function generateMockArticles(keyword: string, count: number) {
-  const categories = ['breakthrough_technologies', 'industry_applications', 'ai_ethics', 'machine_learning', 'deep_learning', 'computer_vision', 'nlp'];
-  const sources = ['techcrunch.com', 'wired.com', 'thenextweb.com', 'venturebeat.com', 'forbes.com', 'medium.com', 'towardsdatascience.com'];
+// [Analysis] Enhanced mock data generator with more transparency about source data
+function generateMockArticles(keyword: string, count: number, dateOverride: string | null = null) {
+  // Sources for mock data generation - making these more transparent and descriptive
+  const categories = [
+    'breakthrough_technologies', 
+    'industry_applications', 
+    'ai_ethics', 
+    'machine_learning', 
+    'deep_learning', 
+    'computer_vision', 
+    'nlp',
+    'generative_ai',
+    'robotics',
+    'reinforcement_learning'
+  ];
+  
+  const sources = [
+    {name: 'techcrunch.com', credibility: 'high'},
+    {name: 'wired.com', credibility: 'high'},
+    {name: 'thenextweb.com', credibility: 'medium'},
+    {name: 'venturebeat.com', credibility: 'medium'},
+    {name: 'forbes.com', credibility: 'high'},
+    {name: 'medium.com', credibility: 'medium'},
+    {name: 'towardsdatascience.com', credibility: 'high'},
+    {name: 'arxiv.org', credibility: 'high'},
+    {name: 'ai-news.io', credibility: 'medium'},
+    {name: 'research.google', credibility: 'high'}
+  ];
+  
   const impacts = ['high', 'medium', 'low'];
   const complexities = ['beginner', 'intermediate', 'advanced'];
   
+  // Use predefined AI topics to make content more realistic
+  const aiTopics = [
+    'Large Language Models', 
+    'Neural Networks', 
+    'Computer Vision',
+    'Reinforcement Learning',
+    'GANs',
+    'Transformers',
+    'Robotics',
+    'Self-Driving Cars',
+    'AI Ethics',
+    'AI Regulation',
+    'Healthcare AI',
+    'AI in Finance',
+    'Explainable AI',
+    'AI Research',
+    'AI Tools',
+    'Open Source AI',
+    'AI Privacy',
+    'AI Assistants',
+    'Multimodal AI',
+    'Edge AI'
+  ];
+  
+  // Generate article titles based on real-world patterns
+  const titlePatterns = [
+    `New ${keyword} breakthrough could revolutionize FIELD`,
+    `COMPANY unveils cutting-edge ${keyword} system`,
+    `Researchers develop novel approach to ${keyword}`,
+    `The future of FIELD: How ${keyword} is changing everything`,
+    `PERSON announces groundbreaking work in ${keyword}`,
+    `${keyword} adoption reaches new milestone`,
+    `Study shows ${keyword} outperforms traditional methods in FIELD`,
+    `COUNTRY invests billions in ${keyword} research`,
+    `Ethical considerations for ${keyword} applications`,
+    `How ${keyword} is transforming FIELD`
+  ];
+  
+  const companies = [
+    'OpenAI', 'Google DeepMind', 'Meta AI', 'Microsoft Research', 'Apple', 
+    'Anthropic', 'Cohere', 'Stability AI', 'Hugging Face', 'IBM Research'
+  ];
+  
+  const researchers = [
+    'Dr. Emily Chen', 'Dr. James Smith', 'Prof. Yoshua Bengio', 'Dr. Fei-Fei Li',
+    'Dr. Andrew Ng', 'Dr. Demis Hassabis', 'Prof. Yann LeCun', 'Dr. Sarah Johnson',
+    'Prof. Geoffrey Hinton', 'Dr. Ian Goodfellow'
+  ];
+  
+  const fields = [
+    'healthcare', 'finance', 'transportation', 'education', 'manufacturing',
+    'entertainment', 'cybersecurity', 'climate science', 'drug discovery', 'robotics'
+  ];
+  
+  const countries = [
+    'US', 'China', 'EU', 'UK', 'Japan', 'South Korea', 'Canada', 'Israel', 'Singapore', 'Germany'
+  ];
+  
   const articles = [];
+  const generationDate = dateOverride ? new Date(dateOverride) : new Date();
+  
+  console.log(`Generating ${count} mock articles for date: ${generationDate.toISOString().split('T')[0]}`);
   
   for (let i = 0; i < count; i++) {
     const randomCategory = categories[Math.floor(Math.random() * categories.length)];
     const randomSource = sources[Math.floor(Math.random() * sources.length)];
     const randomImpact = impacts[Math.floor(Math.random() * impacts.length)];
     const randomComplexity = complexities[Math.floor(Math.random() * complexities.length)];
+    const randomTopic = aiTopics[Math.floor(Math.random() * aiTopics.length)];
+    
+    // Generate a more realistic title
+    let titlePattern = titlePatterns[Math.floor(Math.random() * titlePatterns.length)];
+    titlePattern = titlePattern.replace('COMPANY', companies[Math.floor(Math.random() * companies.length)]);
+    titlePattern = titlePattern.replace('PERSON', researchers[Math.floor(Math.random() * researchers.length)]);
+    titlePattern = titlePattern.replace('FIELD', fields[Math.floor(Math.random() * fields.length)]);
+    titlePattern = titlePattern.replace('COUNTRY', countries[Math.floor(Math.random() * countries.length)]);
+    
+    // Generate a unique ID
+    const uniqueId = `generated-${Date.now()}-${i}-${Math.random().toString(36).substring(2, 9)}`;
+    
+    // Calculate a realistic date - if not overridden, use a random date in the past week
+    let articleDate;
+    if (dateOverride) {
+      articleDate = new Date(dateOverride);
+    } else {
+      // Random date in the past 7 days
+      const daysBack = Math.floor(Math.random() * 7);
+      articleDate = new Date();
+      articleDate.setDate(articleDate.getDate() - daysBack);
+    }
+    
+    // Format for display
+    const formattedDate = articleDate.toISOString().split('T')[0];
+    
+    // Create more realistic content with paragraphs
+    const paragraphs = [
+      `This article discusses recent advancements in ${randomTopic} with a focus on ${randomCategory.replace('_', ' ')}.`,
+      `Researchers at leading institutions have been exploring new approaches to solve challenges in ${fields[Math.floor(Math.random() * fields.length)]} using ${keyword}.`,
+      `The technology demonstrates ${randomImpact} impact potential for industry applications, particularly in ${fields[Math.floor(Math.random() * fields.length)]}.`,
+      `"This represents a significant step forward in our understanding of ${randomTopic}," said ${researchers[Math.floor(Math.random() * researchers.length)]}, who wasn't involved in the research.`,
+      `Critics note that further validation is needed before widespread adoption, especially regarding ethical considerations and real-world performance.`
+    ];
+    
+    const content = paragraphs.join('\n\n');
+    
+    // Generate a more descriptive summary
+    const description = `${titlePattern} - New research explores applications in ${fields[Math.floor(Math.random() * fields.length)]} with potential ${randomImpact} impact.`;
     
     articles.push({
-      id: `generated-${Date.now()}-${i}`,
-      title: `${keyword} ${randomCategory.replace('_', ' ')} breakthrough - Article ${i + 1}`,
-      description: `This is a generated article about ${keyword} focusing on ${randomCategory.replace('_', ' ')} with ${randomImpact} impact.`,
-      content: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nisl eget ultricies tincidunt, nisl nisl aliquam nisl, eget aliquet nisl nisl sit amet nisl. Nullam auctor, nisl eget ultricies tincidunt, nisl nisl aliquam nisl, eget aliquet nisl nisl sit amet nisl. This article discusses ${keyword} with a focus on the latest developments in ${randomCategory.replace('_', ' ')}. This is a ${randomComplexity} level explanation of the technology.`,
-      image_url: `https://picsum.photos/seed/${i + 1}/800/600`,
-      source: randomSource,
+      id: uniqueId,
+      title: titlePattern,
+      description: description,
+      content: content,
+      date: formattedDate,
+      published_at: new Date(articleDate.getTime() + Math.floor(Math.random() * 86400000)).toISOString(), // Random time during the day
+      image_url: `https://picsum.photos/seed/${uniqueId}/800/600`,
+      source: randomSource.name,
+      source_credibility: randomSource.credibility,
       category: randomCategory,
       impact: randomImpact,
       technical_complexity: randomComplexity,
-      url: `https://${randomSource}/article-${i + 1}`
+      url: `https://${randomSource.name}/article-${uniqueId}`,
+      reading_time: Math.floor(Math.random() * 10) + 3, // 3-12 minute read time
+      views: Math.floor(Math.random() * 1000) + 50, // 50-1050 views
+      bookmarks: Math.floor(Math.random() * 100) + 5, // 5-105 bookmarks
+      featured: i < 3, // First 3 articles are featured
+      tags: [randomTopic, randomCategory.replace('_', ' '), keyword],
+      author_id: null,
+      article_type: 'news',
+      status: 'published'
     });
   }
   
+  console.log(`Successfully generated ${articles.length} mock articles`);
   return articles;
 }
 
@@ -45,7 +183,14 @@ serve(async (req) => {
   }
 
   try {
-    const { keyword = "artificial intelligence", limit = 20, testMode = false, skipDuplicates = true, source = "event_registry", dateOverride = null } = await req.json();
+    const { 
+      keyword = "artificial intelligence", 
+      limit = 100, // Default to generating 100 articles
+      testMode = false, 
+      skipDuplicates = true, 
+      source = "event_registry", 
+      dateOverride = null 
+    } = await req.json();
     
     // Get Supabase client with admin privileges to write to the database
     const supabaseClient = createClient(
@@ -55,9 +200,8 @@ serve(async (req) => {
     
     console.log(`Processing request for ${keyword}, limit: ${limit}, testMode: ${testMode}, source: ${source}, dateOverride: ${dateOverride}`);
     
-    // Generate mock articles instead of making an actual API call
-    // This helps us avoid rate limits and costs during testing
-    const articles = generateMockArticles(keyword, limit);
+    // Generate mock articles
+    const articles = generateMockArticles(keyword, limit, dateOverride);
     
     console.log(`Generated ${articles.length} mock articles`);
     
@@ -93,20 +237,22 @@ serve(async (req) => {
             title: article.title,
             description: article.description,
             content: article.content,
-            date: dateOverride || new Date().toISOString().split('T')[0],
+            date: article.date,
+            published_at: article.published_at,
             category: article.category,
             source: article.source,
             image_url: article.image_url,
-            source_credibility: 'verified',
+            source_credibility: article.source_credibility,
             technical_complexity: article.technical_complexity,
             impact: article.impact,
-            article_type: 'news',
-            status: 'published',
-            views: Math.floor(Math.random() * 500),
-            bookmarks: Math.floor(Math.random() * 50),
-            reading_time: Math.floor(Math.random() * 10) + 2,
+            article_type: article.article_type,
+            status: article.status,
+            views: article.views,
+            bookmarks: article.bookmarks,
+            reading_time: article.reading_time,
             url: article.url,
-            featured: addedCount === 0 // Mark first article as featured
+            featured: article.featured,
+            tags: article.tags
           });
           
         if (insertError) {
@@ -119,13 +265,30 @@ serve(async (req) => {
       // Update the last_fetched_at timestamp for the news source
       const { error: updateError } = await supabaseClient
         .from('news_sources')
-        .update({ last_fetched_at: new Date().toISOString() })
+        .update({ 
+          last_fetched_at: new Date().toISOString(),
+          source_details: { 
+            last_keyword: keyword,
+            articles_count: addedCount,
+            mock_generated: true,
+            generation_date: new Date().toISOString()
+          }
+        })
         .eq('source_type', source);
         
       if (updateError) {
         console.error('Error updating news source last_fetched_at:', updateError);
       }
     }
+    
+    // Add more detailed information about the mock generation process
+    const sourceDetails = {
+      generationType: "Mock data generation",
+      generatedFor: dateOverride || new Date().toISOString().split('T')[0],
+      categories: "breakthrough_technologies, industry_applications, etc.",
+      sources: "techcrunch.com, wired.com, etc.",
+      generated_at: new Date().toISOString()
+    };
     
     return new Response(
       JSON.stringify({
@@ -135,7 +298,8 @@ serve(async (req) => {
           : `Successfully added ${addedCount} articles, skipped ${duplicatesSkipped} duplicates`,
         count: testMode ? articles.length : addedCount,
         articles: articles,
-        duplicatesSkipped: duplicatesSkipped
+        duplicatesSkipped: duplicatesSkipped,
+        sourceDetails: sourceDetails
       }),
       { 
         headers: { 

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { Star } from 'lucide-react';
+import { Star, ExternalLink } from 'lucide-react';
 import { formatDistance } from 'date-fns';
 import { truncateText } from '@/lib/formatters';
 import { NewsItem } from '@/types/blog';
@@ -35,7 +35,17 @@ const NewsCardContent = ({
   // Format the category for display
   const formatCategory = (category?: string) => {
     if (!category) return 'General';
-    return category.charAt(0).toUpperCase() + category.slice(1).toLowerCase();
+    return category.split('_').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    ).join(' ');
+  };
+
+  // Get source domain display
+  const getSourceDisplay = () => {
+    if (!post.source) return 'Unknown Source';
+    
+    // Remove www. and handle common domains
+    return post.source.replace('www.', '');
   };
 
   return (
@@ -79,7 +89,19 @@ const NewsCardContent = ({
                 {formatCategory(post.category)}
               </Badge>
             )}
+            {post.source && (
+              <Badge variant="outline" className="text-xs px-2 py-0 h-5 bg-gray-800">
+                {getSourceDisplay()}
+              </Badge>
+            )}
           </div>
+        </div>
+      )}
+      
+      {/* External link indicator for clarity */}
+      {post.url && !hideMetadata && (
+        <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">
+          <ExternalLink className="h-3 w-3" />
         </div>
       )}
     </div>

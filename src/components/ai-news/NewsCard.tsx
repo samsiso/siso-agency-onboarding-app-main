@@ -12,7 +12,7 @@ interface NewsCardProps {
   isCompact?: boolean;
 }
 
-// [Analysis] Added debugging log to understand article IDs
+// [Analysis] Updated to correctly handle article source and other metadata
 const NewsCard = ({ item, summaries, loadingSummaries, onGenerateSummary, isCompact = false }: NewsCardProps) => {
   console.log('NewsCard rendering with ID:', item.id);
   
