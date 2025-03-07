@@ -18,6 +18,7 @@ import {
   XAxis,
   YAxis,
   Tooltip as RechartsTooltip,
+  Cell,
 } from 'recharts';
 
 interface TechnologyBreakdownProps {
@@ -77,6 +78,11 @@ export const TechnologyBreakdown = ({ newsItems, loading = false }: TechnologyBr
     intermediate: "#3b82f6", // blue
     advanced: "#8b5cf6",  // purple
     mixed: "#f59e0b"      // amber
+  };
+
+  // [Analysis] Helper function to get color based on complexity level
+  const getComplexityColor = (level: string): string => {
+    return complexityColors[level as keyof typeof complexityColors] || "#3b82f6";
   };
 
   return (
@@ -144,14 +150,14 @@ export const TechnologyBreakdown = ({ newsItems, loading = false }: TechnologyBr
               <Bar 
                 dataKey="percentage" 
                 radius={[0, 4, 4, 0]}
-                fill={(data) => {
-                  // [Analysis] Fixed type error by using a rendering function that returns the color
-                  // based on the complexity level of each data point
-                  const level = data.level as keyof typeof complexityColors;
-                  return complexityColors[level] || "#3b82f6";
-                }}
+                fill="#3b82f6" // Default color
                 animationDuration={800}
-              />
+              >
+                {/* [Analysis] Use Cell components to assign colors to individual bars instead of a function */}
+                {complexityData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={getComplexityColor(entry.level)} />
+                ))}
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
