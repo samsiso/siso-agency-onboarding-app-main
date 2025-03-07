@@ -57,6 +57,7 @@ export const EventCard = ({ section, index }: EventCardProps) => {
     setIsExpanded(prev => !prev);
   };
 
+  // [Analysis] Added a better query config with improved error handling and stale time
   const { data: analysis, isLoading: isAnalysisLoading } = useQuery({
     queryKey: ['section-analysis', section.id],
     queryFn: async () => {
@@ -73,6 +74,12 @@ export const EventCard = ({ section, index }: EventCardProps) => {
           return existingAnalysis;
         }
 
+        // Toast notification to inform user of analysis in progress
+        toast({
+          title: "Analyzing content...",
+          description: "AI is processing this section - results will appear shortly."
+        });
+
         const { data: analysisData, error: invokeError } = await supabase.functions.invoke('analyze-news', {
           body: {
             content: section.content,
@@ -85,15 +92,34 @@ export const EventCard = ({ section, index }: EventCardProps) => {
         });
 
         if (invokeError) throw invokeError;
+        
+        // Inform the user that analysis is ready
+        toast({
+          title: "Analysis completed",
+          description: "AI insights are now available"
+        });
+        
         return analysisData?.analysis;
       } catch (error) {
         console.error('Error in analysis flow:', error);
+        toast({
+          title: "Analysis failed",
+          description: "Couldn't generate AI insights for this content"
+        });
         throw error;
       }
     },
+    staleTime: 1000 * 60 * 30, // Cache for 30 minutes for better performance
     retry: 1,
-    enabled: !!section.id
+    enabled: false, // Don't run the query automatically
   });
+
+  // [Analysis] Improved handler to prevent default behavior and provide better feedback
+  const handleViewAnalysis = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowAnalysisDialog(true);
+  };
 
   return (
     <motion.div
@@ -150,7 +176,7 @@ export const EventCard = ({ section, index }: EventCardProps) => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setShowAnalysisDialog(true)}
+                onClick={handleViewAnalysis}
                 className="text-xs border-blue-800 hover:bg-blue-900/50 text-blue-300 gap-2"
               >
                 <Brain className="h-3 w-3" />

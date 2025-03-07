@@ -37,9 +37,23 @@ export const AIAnalysisDialog: React.FC<AIAnalysisDialogProps> = ({
   // [Framework] Prevent page refresh by using local state management 
   const [refreshCounter, setRefreshCounter] = useState(0);
   
+  // [Analysis] Add a flag to prevent redundant API calls
+  const [isAnalysisRequested, setIsAnalysisRequested] = useState(false);
+  
+  // [Analysis] Cache analyzed articles to make them load instantly for repeat views
+  const [cachedAnalyses, setCachedAnalyses] = useState<Record<string, any>>({});
+  
   // [Analysis] Fetch fresh analysis data when dialog opens or when explicitly refreshed
   useEffect(() => {
     if (isOpen && articleId) {
+      // Check for cached result first
+      if (cachedAnalyses[articleId]) {
+        console.log("Using cached analysis");
+        setAnalysis(cachedAnalyses[articleId]);
+        setIsLoading(false);
+        return;
+      }
+      
       setIsLoading(true);
       
       const fetchAnalysis = async () => {
@@ -60,6 +74,11 @@ export const AIAnalysisDialog: React.FC<AIAnalysisDialogProps> = ({
             // Check if ai_analysis exists safely
             if ('ai_analysis' in data && data.ai_analysis) {
               setAnalysis(data.ai_analysis);
+              // Cache the result for future use
+              setCachedAnalyses(prev => ({
+                ...prev,
+                [articleId]: data.ai_analysis
+              }));
             } else {
               console.log('No AI analysis found for this article');
               setAnalysis(null);
@@ -74,21 +93,27 @@ export const AIAnalysisDialog: React.FC<AIAnalysisDialogProps> = ({
       
       fetchAnalysis();
     }
-  }, [isOpen, articleId, refreshCounter]); // Add refreshCounter to dependencies
+  }, [isOpen, articleId, refreshCounter, cachedAnalyses]); 
   
   // [Analysis] Reset state when dialog closes
   useEffect(() => {
     if (!isOpen) {
-      setAnalysis(initialAnalysis);
-      setIsLoading(initialLoading);
+      setIsAnalysisRequested(false);
     }
-  }, [isOpen, initialAnalysis, initialLoading]);
+  }, [isOpen]);
   
-  // [Analysis] Handle manual refresh of analysis
+  // [Analysis] Handle manual refresh of analysis with optimized performance
   const handleRefreshAnalysis = async () => {
+    if (isLoading || isAnalysisRequested) return;
+    
     try {
       setIsLoading(true);
-      toast.info('Refreshing analysis...');
+      setIsAnalysisRequested(true);
+      
+      toast.info('Analyzing article...', {
+        description: 'This might take a few seconds',
+        duration: 3000,
+      });
       
       const response = await supabase.functions.invoke('analyze-article', {
         body: { 
@@ -102,14 +127,31 @@ export const AIAnalysisDialog: React.FC<AIAnalysisDialogProps> = ({
         throw new Error(response.error.message);
       }
       
-      // [Framework] Update the refresh counter to trigger the useEffect
-      setRefreshCounter(prev => prev + 1);
+      // Check if we received a cached result
+      if (response.data.cached) {
+        toast.success('Analysis loaded from cache', {
+          duration: 2000,
+        });
+      } else {
+        toast.success('Analysis completed');
+      }
       
-      toast.success('Analysis refresh initiated successfully');
+      // Update cache and state with the new analysis
+      setCachedAnalyses(prev => ({
+        ...prev,
+        [articleId]: response.data.analysis
+      }));
+      
+      setAnalysis(response.data.analysis);
+      
+      // Use refresh counter to trigger state update just once
+      setRefreshCounter(prev => prev + 1);
     } catch (error) {
       console.error('Error initiating analysis refresh:', error);
       toast.error('Failed to refresh analysis');
+    } finally {
       setIsLoading(false);
+      setIsAnalysisRequested(false);
     }
   };
 

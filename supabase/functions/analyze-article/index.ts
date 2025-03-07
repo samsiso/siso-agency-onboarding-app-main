@@ -25,10 +25,37 @@ serve(async (req) => {
     }
     
     console.log(`Processing analysis for article: ${articleId}`);
-    console.log(`Title: ${title}`);
     
-    // [Q] Should we add additional validation of the article content?
-    // [Plan] Consider adding sentiment analysis in future iterations
+    // [Framework] First check if analysis already exists to avoid reprocessing
+    try {
+      const { data: existingAnalysis, error: checkError } = await supabaseClient
+        .from("ai_news")
+        .select("id, ai_analysis, has_ai_analysis")
+        .eq("id", articleId)
+        .single();
+        
+      if (!checkError && existingAnalysis && existingAnalysis.ai_analysis) {
+        console.log("Analysis already exists, returning cached result");
+        return new Response(
+          JSON.stringify({
+            success: true,
+            message: "Returning existing analysis",
+            analysis: existingAnalysis.ai_analysis,
+            articleId,
+            cached: true
+          }),
+          { 
+            headers: { 
+              ...corsHeaders,
+              "Content-Type": "application/json" 
+            } 
+          }
+        );
+      }
+    } catch (checkError) {
+      console.log("Error checking for existing analysis:", checkError);
+      // Continue with analysis generation if check fails
+    }
     
     // [Analysis] Get OpenAI API key from environment variables
     const openAIKey = Deno.env.get("OPENAI_API_KEY");
@@ -58,7 +85,7 @@ serve(async (req) => {
       - business_implications: A paragraph explaining strategic business implications for AI agencies
     `;
     
-    // [Analysis] Call OpenAI API for enhanced analysis
+    // [Analysis] Call OpenAI API for enhanced analysis with reduced temperature for faster responses
     const openAIResponse = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -66,18 +93,19 @@ serve(async (req) => {
         "Authorization": `Bearer ${openAIKey}`,
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini", // [Analysis] Using an available model from OpenAI
+        model: "gpt-4o-mini", // [Analysis] Using faster model for quicker responses
         messages: [
           {
             role: "system",
-            content: "You are an AI technology analyst specialized in extracting business insights from news articles for AI agencies. Provide detailed, actionable analysis in JSON format."
+            content: "You are an AI technology analyst specialized in extracting business insights from news articles for AI agencies. Provide concise, actionable analysis in JSON format."
           },
           {
             role: "user",
             content: prompt
           }
         ],
-        temperature: 0.3, // [Analysis] Lower temperature for more consistent, analytical responses
+        temperature: 0.2, // [Analysis] Lower temperature for faster, more consistent responses
+        max_tokens: 800, // [Analysis] Limit response length for faster generation
       }),
     });
     
@@ -121,24 +149,6 @@ serve(async (req) => {
         related_technologies: ["AI"],
         business_implications: "Unable to extract business implications at this time."
       };
-    }
-    
-    // [Analysis] Check that the database has the required columns before updating
-    try {
-      console.log("Checking for ai_analysis column before update");
-      const checkResult = await supabaseClient
-        .from("ai_news")
-        .select("ai_analysis")
-        .eq("id", articleId)
-        .limit(1)
-        .maybeSingle();
-        
-      if (checkResult.error && checkResult.error.message.includes("column \"ai_analysis\" does not exist")) {
-        throw new Error("Database schema is missing ai_analysis column - please run migrations");
-      }
-    } catch (checkError) {
-      console.error("Error checking database schema:", checkError);
-      throw new Error(`Database error during schema check: ${checkError.message}`);
     }
     
     // [Analysis] Update the article with the analysis results
