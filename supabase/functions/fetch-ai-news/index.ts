@@ -1,6 +1,7 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
+import { tokenBudgetManager } from "../_shared/token-budget.ts";
+import { scoreContent, shouldProcessArticle } from "../_shared/content-scorer.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -8,6 +9,7 @@ const corsHeaders = {
 };
 
 // [Analysis] Enhanced mock data generator with more transparency about source data
+// and focused on agency-relevant content
 function generateMockArticles(keyword: string, count: number, dateOverride: string | null = null) {
   // Sources for mock data generation - making these more transparent and descriptive
   const categories = [
@@ -39,42 +41,42 @@ function generateMockArticles(keyword: string, count: number, dateOverride: stri
   const impacts = ['high', 'medium', 'low'];
   const complexities = ['beginner', 'intermediate', 'advanced'];
   
-  // Use predefined AI topics to make content more realistic
+  // Use predefined AI topics to make content more relevant for agencies
   const aiTopics = [
-    'Large Language Models', 
-    'Neural Networks', 
-    'Computer Vision',
-    'Reinforcement Learning',
-    'GANs',
-    'Transformers',
-    'Robotics',
-    'Self-Driving Cars',
-    'AI Ethics',
-    'AI Regulation',
-    'Healthcare AI',
-    'AI in Finance',
-    'Explainable AI',
-    'AI Research',
-    'AI Tools',
-    'Open Source AI',
-    'AI Privacy',
-    'AI Assistants',
-    'Multimodal AI',
-    'Edge AI'
+    'LLM Implementation', 
+    'AI for Client Services',
+    'Generative AI ROI',
+    'Client AI Solutions',
+    'AI Marketing Automation',
+    'AI in Agency Workflows',
+    'AI Client Deliverables',
+    'AI Business Strategy',
+    'Agency AI Integration',
+    'AI Revenue Opportunities',
+    'Business AI Applications',
+    'AI Product Strategy',
+    'AI Client Acquisition',
+    'AI Competitive Advantage',
+    'AI Service Offerings',
+    'AI for Client Results',
+    'AI Implementation Timeline',
+    'AI Cost Analysis',
+    'AI Agency Toolkit',
+    'Enterprise AI Solutions'
   ];
   
-  // Generate article titles based on real-world patterns
+  // Generate agency-focused article titles
   const titlePatterns = [
-    `New ${keyword} breakthrough could revolutionize FIELD`,
-    `COMPANY unveils cutting-edge ${keyword} system`,
-    `Researchers develop novel approach to ${keyword}`,
-    `The future of FIELD: How ${keyword} is changing everything`,
-    `PERSON announces groundbreaking work in ${keyword}`,
-    `${keyword} adoption reaches new milestone`,
-    `Study shows ${keyword} outperforms traditional methods in FIELD`,
-    `COUNTRY invests billions in ${keyword} research`,
-    `Ethical considerations for ${keyword} applications`,
-    `How ${keyword} is transforming FIELD`
+    `New ${keyword} strategy increases agency client retention by 40%`,
+    `How ${keyword} is transforming client deliverables for FIELD agencies`,
+    `COMPANY unveils agency-focused ${keyword} tools with impressive ROI`,
+    `Implementing ${keyword} for agency clients: A practical guide`,
+    `How agencies are using ${keyword} to boost revenue by 30%`,
+    `${keyword} implementation timeline: What agencies need to know`,
+    `PERSON shows how ${keyword} can transform client results in FIELD`,
+    `Agency case study: ${keyword} delivers 5x ROI for clients`,
+    `The business impact of ${keyword} for marketing agencies`,
+    `${keyword} best practices for client-facing implementations`
   ];
   
   const companies = [
@@ -100,7 +102,7 @@ function generateMockArticles(keyword: string, count: number, dateOverride: stri
   const articles = [];
   const generationDate = dateOverride ? new Date(dateOverride) : new Date();
   
-  console.log(`Generating ${count} mock articles for date: ${generationDate.toISOString().split('T')[0]}`);
+  console.log(`Generating ${count} agency-focused mock articles for date: ${generationDate.toISOString().split('T')[0]}`);
   
   for (let i = 0; i < count; i++) {
     const randomCategory = categories[Math.floor(Math.random() * categories.length)];
@@ -109,12 +111,11 @@ function generateMockArticles(keyword: string, count: number, dateOverride: stri
     const randomComplexity = complexities[Math.floor(Math.random() * complexities.length)];
     const randomTopic = aiTopics[Math.floor(Math.random() * aiTopics.length)];
     
-    // Generate a more realistic title
+    // Generate a more agency-focused title
     let titlePattern = titlePatterns[Math.floor(Math.random() * titlePatterns.length)];
     titlePattern = titlePattern.replace('COMPANY', companies[Math.floor(Math.random() * companies.length)]);
     titlePattern = titlePattern.replace('PERSON', researchers[Math.floor(Math.random() * researchers.length)]);
     titlePattern = titlePattern.replace('FIELD', fields[Math.floor(Math.random() * fields.length)]);
-    titlePattern = titlePattern.replace('COUNTRY', countries[Math.floor(Math.random() * countries.length)]);
     
     // Generate a unique ID
     const uniqueId = `generated-${Date.now()}-${i}-${Math.random().toString(36).substring(2, 9)}`;
@@ -133,195 +134,347 @@ function generateMockArticles(keyword: string, count: number, dateOverride: stri
     // Format for display
     const formattedDate = articleDate.toISOString().split('T')[0];
     
-    // Create more realistic content with paragraphs
+    // Create more realistic content with agency-focused paragraphs
     const paragraphs = [
-      `This article discusses recent advancements in ${randomTopic} with a focus on ${randomCategory.replace('_', ' ')}.`,
-      `Researchers at leading institutions have been exploring new approaches to solve challenges in ${fields[Math.floor(Math.random() * fields.length)]} using ${keyword}.`,
-      `The technology demonstrates ${randomImpact} impact potential for industry applications, particularly in ${fields[Math.floor(Math.random() * fields.length)]}.`,
-      `"This represents a significant step forward in our understanding of ${randomTopic}," said ${researchers[Math.floor(Math.random() * researchers.length)]}, who wasn't involved in the research.`,
-      `Critics note that further validation is needed before widespread adoption, especially regarding ethical considerations and real-world performance.`
+      `This article explores how ${randomTopic} is being implemented by leading agencies to transform client deliverables in ${randomCategory.replace('_', ' ')}.`,
+      `For agency owners, the key opportunities include revenue expansion, service differentiation, and improved client outcomes through strategic implementation.`,
+      `Implementation costs range from $5,000-50,000 depending on scope, with ROI typically seen within 3-6 months for most client engagements.`,
+      // Additional paragraphs...
     ];
     
     const content = paragraphs.join('\n\n');
     
-    // Generate a more descriptive summary
-    const description = `${titlePattern} - New research explores applications in ${fields[Math.floor(Math.random() * fields.length)]} with potential ${randomImpact} impact.`;
+    // Score the generated article
+    const articleData = {
+      title: titlePattern,
+      description: paragraphs[0],
+      content,
+      category: randomCategory
+    };
     
+    const relevanceScore = scoreContent(articleData);
+    const highRelevance = relevanceScore > 20;
+    
+    // Set impact based on relevance score
+    let impact = 'medium';
+    if (relevanceScore > 30) {
+      impact = 'high';
+    } else if (relevanceScore > 15) {
+      impact = 'medium';
+    } else {
+      impact = 'low';
+    }
+    
+    // Add agency-specific metadata 
     articles.push({
       id: uniqueId,
       title: titlePattern,
-      description: description,
+      description: paragraphs[0],
       content: content,
       date: formattedDate,
-      published_at: new Date(articleDate.getTime() + Math.floor(Math.random() * 86400000)).toISOString(), // Random time during the day
-      image_url: `https://picsum.photos/seed/${uniqueId}/800/600`,
+      category: randomCategory,
+      technical_complexity: randomComplexity,
+      impact,
       source: randomSource.name,
       source_credibility: randomSource.credibility,
-      category: randomCategory,
-      impact: randomImpact,
-      technical_complexity: randomComplexity,
-      url: `https://${randomSource.name}/article-${uniqueId}`,
-      reading_time: Math.floor(Math.random() * 10) + 3, // 3-12 minute read time
-      views: Math.floor(Math.random() * 1000) + 50, // 50-1050 views
-      bookmarks: Math.floor(Math.random() * 100) + 5, // 5-105 bookmarks
-      featured: i < 3, // First 3 articles are featured
-      tags: [randomTopic, randomCategory.replace('_', ' '), keyword],
-      author_id: null,
-      article_type: 'news',
-      status: 'published'
+      url: `https://example.com/ai-news/${uniqueId}`,
+      // New agency-specific fields
+      agency_relevance_score: relevanceScore,
+      implementation_cost_range: "$5,000-50,000",
+      estimated_roi_timeline: "3-6 months",
+      client_application: highRelevance ? "Immediate" : "Future consideration",
+      service_integration_difficulty: randomComplexity
     });
   }
   
-  console.log(`Successfully generated ${articles.length} mock articles`);
-  return articles;
+  // Sort by relevance score and return
+  return articles.sort((a, b) => 
+    (b.agency_relevance_score || 0) - (a.agency_relevance_score || 0)
+  );
 }
 
-serve(async (req) => {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
-
+// [Analysis] New function to check for duplicates with improved similarity detection
+async function checkForDuplicateArticle(supabase, articleTitle, threshold = 0.7) {
   try {
-    const { 
-      keyword = "artificial intelligence", 
-      limit = 100, // Default to generating 100 articles
-      testMode = false, 
-      skipDuplicates = true, 
-      source = "event_registry", 
-      dateOverride = null 
-    } = await req.json();
+    // Get recent articles (last 14 days) to check for duplicates
+    const twoWeeksAgo = new Date();
+    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+    const formattedDate = twoWeeksAgo.toISOString().split('T')[0];
     
-    // Get Supabase client with admin privileges to write to the database
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
-    
-    console.log(`Processing request for ${keyword}, limit: ${limit}, testMode: ${testMode}, source: ${source}, dateOverride: ${dateOverride}`);
-    
-    // Generate mock articles
-    const articles = generateMockArticles(keyword, limit, dateOverride);
-    
-    console.log(`Generated ${articles.length} mock articles`);
-    
-    let addedCount = 0;
-    let duplicatesSkipped = 0;
-    
-    // If not in test mode, actually save the articles to the database
-    if (!testMode) {
-      for (const article of articles) {
-        // Check if article already exists based on title (simple duplicate check)
-        if (skipDuplicates) {
-          const { data: existing, error: existingError } = await supabaseClient
-            .from('ai_news')
-            .select('id')
-            .ilike('title', article.title)
-            .maybeSingle();
-            
-          if (existingError) {
-            console.error('Error checking for duplicates:', existingError);
-          }
-          
-          if (existing) {
-            console.log(`Skipping duplicate article: ${article.title}`);
-            duplicatesSkipped++;
-            continue;
-          }
-        }
-        
-        // Add the article to the database
-        const { error: insertError } = await supabaseClient
-          .from('ai_news')
-          .insert({
-            title: article.title,
-            description: article.description,
-            content: article.content,
-            date: article.date,
-            published_at: article.published_at,
-            category: article.category,
-            source: article.source,
-            image_url: article.image_url,
-            source_credibility: article.source_credibility,
-            technical_complexity: article.technical_complexity,
-            impact: article.impact,
-            article_type: article.article_type,
-            status: article.status,
-            views: article.views,
-            bookmarks: article.bookmarks,
-            reading_time: article.reading_time,
-            url: article.url,
-            featured: article.featured,
-            tags: article.tags
-          });
-          
-        if (insertError) {
-          console.error('Error inserting article:', insertError);
-        } else {
-          addedCount++;
-        }
-      }
+    const { data: existingArticles, error } = await supabase
+      .from('ai_news')
+      .select('id, title')
+      .gte('date', formattedDate);
       
-      // Update the last_fetched_at timestamp for the news source
-      const { error: updateError } = await supabaseClient
-        .from('news_sources')
-        .update({ 
-          last_fetched_at: new Date().toISOString(),
-          source_details: { 
-            last_keyword: keyword,
-            articles_count: addedCount,
-            mock_generated: true,
-            generation_date: new Date().toISOString()
-          }
-        })
-        .eq('source_type', source);
-        
-      if (updateError) {
-        console.error('Error updating news source last_fetched_at:', updateError);
+    if (error) throw error;
+    
+    // Simple similarity check function
+    function calcSimilarity(str1, str2) {
+      str1 = str1.toLowerCase();
+      str2 = str2.toLowerCase();
+      
+      // Remove common filler words
+      const fillerWords = ['the', 'a', 'an', 'and', 'or', 'but', 'for', 'with', 'in', 'on', 'at'];
+      fillerWords.forEach(word => {
+        str1 = str1.replace(new RegExp(`\\b${word}\\b`, 'g'), '');
+        str2 = str2.replace(new RegExp(`\\b${word}\\b`, 'g'), '');
+      });
+      
+      // Count common words
+      const words1 = str1.split(/\s+/).filter(w => w.length > 0);
+      const words2 = str2.split(/\s+/).filter(w => w.length > 0);
+      
+      let commonWords = 0;
+      words1.forEach(word => {
+        if (words2.includes(word)) commonWords++;
+      });
+      
+      // Calculate similarity score
+      const maxWords = Math.max(words1.length, words2.length);
+      return maxWords > 0 ? commonWords / maxWords : 0;
+    }
+    
+    // Check for duplicates
+    for (const article of existingArticles) {
+      const similarity = calcSimilarity(articleTitle, article.title);
+      if (similarity >= threshold) {
+        return {
+          isDuplicate: true,
+          duplicateOf: article.id,
+          similarity
+        };
       }
     }
     
-    // Add more detailed information about the mock generation process
-    const sourceDetails = {
-      generationType: "Mock data generation",
-      generatedFor: dateOverride || new Date().toISOString().split('T')[0],
-      categories: "breakthrough_technologies, industry_applications, etc.",
-      sources: "techcrunch.com, wired.com, etc.",
-      generated_at: new Date().toISOString()
+    return { isDuplicate: false };
+  } catch (error) {
+    console.error("Error checking for duplicates:", error);
+    return { isDuplicate: false }; // Fail open
+  }
+}
+
+// [Analysis] New function to track token usage
+async function trackTokenUsage(supabase, operation, tokenCost) {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Get current usage for today
+    const { data, error } = await supabase
+      .from('api_token_usage')
+      .select('*')
+      .eq('date', today)
+      .single();
+      
+    if (error && error.code !== 'PGSQL_ERROR_NO_ROWS') {
+      console.error("Error tracking token usage:", error);
+      return;
+    }
+    
+    // If no record exists for today, create one
+    if (!data) {
+      await supabase
+        .from('api_token_usage')
+        .insert([{
+          date: today,
+          tokens_used: tokenCost,
+          operations: [{type: operation, count: 1}]
+        }]);
+    } else {
+      // Update existing record
+      const operations = data.operations || [];
+      const existingOpIdx = operations.findIndex(op => op.type === operation);
+      
+      if (existingOpIdx >= 0) {
+        operations[existingOpIdx].count += 1;
+      } else {
+        operations.push({type: operation, count: 1});
+      }
+      
+      await supabase
+        .from('api_token_usage')
+        .update({
+          tokens_used: (data.tokens_used || 0) + tokenCost,
+          operations
+        })
+        .eq('date', today);
+    }
+  } catch (error) {
+    console.error("Error tracking token usage:", error);
+  }
+}
+
+serve(async (req) => {
+  try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    
+    // Parse request parameters
+    const { 
+      keyword = "artificial intelligence for agencies", 
+      limit = 20, 
+      testMode = false,
+      source = 'event_registry',
+      skipDuplicates = true,
+      dateOverride = null,
+      minRelevanceScore = 15  // [Analysis] Minimum relevance threshold
+    } = await req.json();
+    
+    console.log("AI News fetch parameters:", {
+      keyword, limit, testMode, source, skipDuplicates, dateOverride, minRelevanceScore
+    });
+    
+    // [Analysis] Check token budget before proceeding
+    const { data: todayUsage, error: usageError } = await supabase
+      .from('api_token_usage')
+      .select('tokens_used')
+      .eq('date', new Date().toISOString().split('T')[0])
+      .single();
+      
+    const currentUsage = todayUsage?.tokens_used || 0;
+    
+    if (!tokenBudgetManager.hasEnoughBudget(currentUsage, 'fetch')) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          message: "Daily API token budget exceeded. Try again tomorrow.",
+          remaining_budget: tokenBudgetManager.DAILY_SAFE_LIMIT - currentUsage
+        }),
+        { headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    // Determine safe article limit based on token budget
+    const maxArticles = Math.min(
+      tokenBudgetManager.getMaxDailyArticles(),
+      limit
+    );
+    
+    // Generate mock articles (in a real implementation, fetch from actual source)
+    let articles = generateMockArticles(keyword, maxArticles * 2, dateOverride); // Generate more than needed for filtering
+    
+    console.log(`Generated ${articles.length} articles before filtering`);
+    
+    // [Analysis] Filter by agency relevance score
+    articles = articles.filter(article => {
+      const score = article.agency_relevance_score || 
+        scoreContent({
+          title: article.title,
+          description: article.description,
+          content: article.content,
+          category: article.category
+        });
+      
+      return score >= minRelevanceScore;
+    });
+    
+    // Limit to requested number
+    articles = articles.slice(0, maxArticles);
+    
+    console.log(`Filtered to ${articles.length} articles with minimum relevance score of ${minRelevanceScore}`);
+    
+    // If we're in test mode, just return the filtered articles
+    if (testMode) {
+      await trackTokenUsage(supabase, 'test_fetch', tokenBudgetManager.ARTICLE_ESTIMATE);
+      
+      return new Response(
+        JSON.stringify({
+          success: true,
+          message: `Found ${articles.length} relevant articles in test mode`,
+          articles,
+          count: articles.length
+        }),
+        { headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    // Process and insert articles
+    const results = {
+      success: true,
+      message: "",
+      count: 0,
+      duplicatesSkipped: 0,
+      lowRelevanceSkipped: 0,
+      articles: []
     };
+    
+    for (const article of articles) {
+      // Check for duplicates
+      const dupeCheck = await checkForDuplicateArticle(supabase, article.title);
+      
+      if (dupeCheck.isDuplicate && skipDuplicates) {
+        console.log(`Skipping duplicate article: ${article.title} (${dupeCheck.similarity.toFixed(2)} similarity)`);
+        results.duplicatesSkipped++;
+        continue;
+      }
+      
+      // Insert the article
+      const { error: insertError } = await supabase
+        .from('ai_news')
+        .insert([{
+          title: article.title,
+          description: article.description,
+          content: article.content,
+          date: article.date,
+          category: article.category,
+          technical_complexity: article.technical_complexity,
+          impact: article.impact,
+          source: article.source,
+          source_credibility: article.source_credibility,
+          url: article.url,
+          status: 'published'
+        }]);
+        
+      if (insertError) {
+        console.error(`Error inserting article '${article.title}':`, insertError);
+        continue;
+      }
+      
+      results.count++;
+      results.articles.push(article);
+    }
+    
+    // Record API usage in the news_fetch_history table
+    await supabase
+      .from('news_fetch_history')
+      .insert([{
+        source_type: source,
+        status: 'completed',
+        fetch_time: new Date().toISOString(),
+        articles_fetched: articles.length,
+        articles_added: results.count,
+        duplicates_skipped: results.duplicatesSkipped,
+        metadata: {
+          keyword,
+          min_relevance_score: minRelevanceScore,
+          date_override: dateOverride
+        }
+      }]);
+      
+    // Track token usage
+    await trackTokenUsage(supabase, 'fetch', tokenBudgetManager.ARTICLE_ESTIMATE);
+    
+    results.message = `Successfully imported ${results.count} articles`;
+    if (results.duplicatesSkipped > 0) {
+      results.message += `, skipped ${results.duplicatesSkipped} duplicates`;
+    }
+    
+    console.log(results.message);
+    
+    return new Response(
+      JSON.stringify(results),
+      { headers: { 'Content-Type': 'application/json' } }
+    );
+  } catch (error) {
+    console.error("Error in fetch-ai-news:", error);
     
     return new Response(
       JSON.stringify({
-        success: true,
-        message: testMode 
-          ? `Found ${articles.length} articles matching "${keyword}"` 
-          : `Successfully added ${addedCount} articles, skipped ${duplicatesSkipped} duplicates`,
-        count: testMode ? articles.length : addedCount,
-        articles: articles,
-        duplicatesSkipped: duplicatesSkipped,
-        sourceDetails: sourceDetails
+        success: false,
+        message: error.message,
       }),
       { 
-        headers: { 
-          ...corsHeaders,
-          'Content-Type': 'application/json' 
-        } 
-      }
-    );
-  } catch (error) {
-    console.error('Error processing request:', error);
-    
-    return new Response(
-      JSON.stringify({ 
-        success: false, 
-        message: error.message || 'An error occurred during processing',
-        error: String(error)
-      }),
-      { 
-        headers: { 
-          ...corsHeaders,
-          'Content-Type': 'application/json' 
-        },
+        headers: { 'Content-Type': 'application/json' },
         status: 500
       }
     );
