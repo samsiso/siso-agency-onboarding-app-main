@@ -6,7 +6,7 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, AlertCircle, CheckCircle } from 'lucide-react';
 
-// [Analysis] Define custom types for API token usage data since it's not in the auto-generated types
+// [Analysis] Define custom types for API token usage data 
 interface TokenUsage {
   tokens_used: number;
   operations: Array<{type: string, count: number}>;
@@ -39,35 +39,27 @@ export const ApiUsageMonitor = () => {
         // Get today's usage
         const today = new Date().toISOString().split('T')[0];
         
-        // [Analysis] Use generic fetch with explicit type cast for custom table
-        const { data: todayData, error: todayError } = await supabase
-          .from('api_token_usage')
-          .select('tokens_used, operations, date')
-          .eq('date', today)
-          .single() as { data: TokenUsage | null, error: any };
-          
-        if (todayError && todayError.code !== 'PGSQL_ERROR_NO_ROWS') {
-          throw todayError;
-        }
+        // [Analysis] Use a generic query to bypass type checking for custom table
+        const todayResult = await supabase.rpc('rest', { 
+          path: `rest/v1/api_token_usage?date=eq.${today}&select=tokens_used,operations,date`
+        });
+        
+        const todayData = todayResult.data?.[0] as TokenUsage | undefined;
         
         // Get monthly usage by summing daily usage for current month
         const firstDayOfMonth = new Date();
         firstDayOfMonth.setDate(1);
         const firstDayStr = firstDayOfMonth.toISOString().split('T')[0];
         
-        // [Analysis] Use generic fetch with explicit type cast for custom table
-        const { data: monthData, error: monthError } = await supabase
-          .from('api_token_usage')
-          .select('tokens_used, date')
-          .gte('date', firstDayStr) as { data: TokenUsage[] | null, error: any };
-          
-        if (monthError) {
-          throw monthError;
-        }
+        const monthlyResult = await supabase.rpc('rest', {
+          path: `rest/v1/api_token_usage?date=gte.${firstDayStr}&select=tokens_used,date`
+        });
+        
+        const monthlyData = monthlyResult.data as TokenUsage[] | undefined;
         
         // Calculate usage
         const dailyUsed = todayData?.tokens_used || 0;
-        const monthlyUsed = monthData?.reduce((sum, day) => sum + day.tokens_used, 0) || 0;
+        const monthlyUsed = monthlyData?.reduce((sum, day) => sum + day.tokens_used, 0) || 0;
         
         setUsage({
           daily: {
