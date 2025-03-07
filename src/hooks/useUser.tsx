@@ -2,7 +2,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-// [Analysis] Simple hook to get current user data
+// [Analysis] Custom hook that provides the current authenticated user data
+// [Q] Should we add more user-related functionality here?
 export const useUser = () => {
   const [user, setUser] = useState<{
     id: string | null;
@@ -11,6 +12,7 @@ export const useUser = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // [Framework] Setup auth state tracking with cleanup on unmount
     const getUser = async () => {
       try {
         setLoading(true);

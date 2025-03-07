@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Share2, Bookmark, Download, Brain, Loader2 } from 'lucide-react';
+import { Share2, Bookmark, Brain, Loader2 } from 'lucide-react';
 import { useBlogPostActions } from '@/hooks/useBlogPostActions';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -38,7 +38,7 @@ export const AIAnalysisDialog: React.FC<AIAnalysisDialogProps> = ({
       
       const fetchAnalysis = async () => {
         try {
-          // [Framework] Using explicit column selection to avoid type errors
+          // [Framework] Using explicit column selection to avoid type errors and ensure ai_analysis is retrieved
           const { data, error } = await supabase
             .from('ai_news')
             .select('id, ai_analysis, has_ai_analysis')
@@ -50,8 +50,13 @@ export const AIAnalysisDialog: React.FC<AIAnalysisDialogProps> = ({
             throw error;
           }
           
-          if (data && data.ai_analysis) {
-            setAnalysis(data.ai_analysis);
+          if (data) {
+            // Check if ai_analysis exists safely
+            if ('ai_analysis' in data && data.ai_analysis) {
+              setAnalysis(data.ai_analysis);
+            } else {
+              console.log('No AI analysis found for this article');
+            }
           }
         } catch (error) {
           console.error('Error fetching analysis:', error);
@@ -90,7 +95,7 @@ export const AIAnalysisDialog: React.FC<AIAnalysisDialogProps> = ({
         throw new Error(response.error.message);
       }
       
-      // Fetch the updated analysis with explicit column selection
+      // Fetch the updated analysis with explicit column selection and type checking
       const { data, error } = await supabase
         .from('ai_news')
         .select('id, ai_analysis')
@@ -102,9 +107,14 @@ export const AIAnalysisDialog: React.FC<AIAnalysisDialogProps> = ({
         throw error;
       }
       
-      if (data && data.ai_analysis) {
-        setAnalysis(data.ai_analysis);
-        toast.success('Analysis refreshed successfully');
+      if (data) {
+        // Type-safe check for ai_analysis
+        if ('ai_analysis' in data && data.ai_analysis) {
+          setAnalysis(data.ai_analysis);
+          toast.success('Analysis refreshed successfully');
+        } else {
+          toast.error('No analysis data was returned');
+        }
       }
     } catch (error) {
       console.error('Error refreshing analysis:', error);
