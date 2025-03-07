@@ -17,6 +17,7 @@ import { DailyStatsOverview } from '@/components/ai-news/DailyStatsOverview';
 import { NewsErrorBoundary } from '@/components/ai-news/NewsErrorBoundary';
 import { DateNavigation } from '@/components/ai-news/DateNavigation';
 import { supabase } from '@/integrations/supabase/client';
+import { MainLayout } from '@/components/assistants/layout/MainLayout';
 
 // [Analysis] Improved UI to provide more transparency about article generation and added AI analysis feature
 const AINews: React.FC = () => {
@@ -136,96 +137,98 @@ const AINews: React.FC = () => {
   };
   
   return (
-    <div className="container mx-auto px-4 py-6 max-w-7xl">
-      <NewsErrorBoundary>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="space-y-8"
-        >
-          {/* Main header and search */}
-          <NewsHeader 
-            activeTab={activeTab} 
-            onTabChange={handleTabChange} 
-            searchQuery={searchQuery}
-            onSearchChange={handleSearchChange}
-            syncingNews={syncingNews}
-            syncNews={handleSyncNews}
-            lastSyncInfo={lastSync}
-            articleCount={articleCount}
-            onToggleAdminPanel={toggleAdminPanel}
-            showAdminPanel={showAdminPanel}
-          />
-          
-          {/* Date navigation */}
-          <DateNavigation 
-            currentDate={currentDate}
-            dateRange={dateRange}
-            onNextDay={goToNextDay}
-            onPreviousDay={goToPreviousDay}
-            onSelectDate={goToDate}
-          />
-          
-          {/* Daily statistics overview */}
-          <DailyStatsOverview 
-            newsItems={newsItems} 
-            loading={loading}
-          />
-          
-          {/* Improved category filters with enhanced UI */}
-          <div className="space-y-6">
-            <NewsFilters 
-              selectedCategory={selectedCategory}
-              onCategoryChange={handleCategorySelect}
+    <MainLayout>
+      <div className="container mx-auto px-4 py-6 max-w-7xl">
+        <NewsErrorBoundary>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="space-y-8"
+          >
+            {/* Main header and search */}
+            <NewsHeader 
+              activeTab={activeTab} 
+              onTabChange={handleTabChange} 
               searchQuery={searchQuery}
               onSearchChange={handleSearchChange}
-            />
-          </div>
-          
-          {/* Admin panel for testing and managing news sync - only shown when toggled */}
-          {showAdminPanel && (
-            <AdminControls 
-              dateRange={dateRange}
-              syncNews={syncNews}
               syncingNews={syncingNews}
-              syncResult={syncResult}
+              syncNews={handleSyncNews}
+              lastSyncInfo={lastSync}
+              articleCount={articleCount}
+              onToggleAdminPanel={toggleAdminPanel}
+              showAdminPanel={showAdminPanel}
+            />
+            
+            {/* Date navigation */}
+            <DateNavigation 
+              currentDate={currentDate}
+              dateRange={dateRange}
+              onNextDay={goToNextDay}
+              onPreviousDay={goToPreviousDay}
+              onSelectDate={goToDate}
+            />
+            
+            {/* Daily statistics overview */}
+            <DailyStatsOverview 
+              newsItems={newsItems} 
+              loading={loading}
+            />
+            
+            {/* Improved category filters with enhanced UI */}
+            <div className="space-y-6">
+              <NewsFilters 
+                selectedCategory={selectedCategory}
+                onCategoryChange={handleCategorySelect}
+                searchQuery={searchQuery}
+                onSearchChange={handleSearchChange}
+              />
+            </div>
+            
+            {/* Admin panel for testing and managing news sync - only shown when toggled */}
+            {showAdminPanel && (
+              <AdminControls 
+                dateRange={dateRange}
+                syncNews={syncNews}
+                syncingNews={syncingNews}
+                syncResult={syncResult}
+                apiUsage={articleCount > 0 ? (articleCount / 10000) * 100 : 0}
+                lastSync={lastSync}
+                articleCount={articleCount}
+              />
+            )}
+            
+            {/* Main news content with added AI analysis capability */}
+            <NewsContent 
+              newsItems={newsItems}
+              searchQuery={searchQuery}
+              summaries={summaries}
+              loadingSummaries={loadingSummaries}
+              onGenerateSummary={generateSummary}
+              onAnalyzeArticle={analyzeArticle}
+              loading={loading}
+              hasMore={hasMore}
+              onLoadMore={loadMore}
+            />
+            
+            {/* Pagination */}
+            <NewsPagination 
+              currentPage={currentPage}
+              totalPages={Math.ceil(newsItems.length / 10)}
+              onPageChange={setCurrentPage}
+            />
+            
+            {/* API status indicator for transparency */}
+            <NewsApiStatus
               apiUsage={articleCount > 0 ? (articleCount / 10000) * 100 : 0}
               lastSync={lastSync}
               articleCount={articleCount}
+              syncingNews={syncingNews}
             />
-          )}
-          
-          {/* Main news content with added AI analysis capability */}
-          <NewsContent 
-            newsItems={newsItems}
-            searchQuery={searchQuery}
-            summaries={summaries}
-            loadingSummaries={loadingSummaries}
-            onGenerateSummary={generateSummary}
-            onAnalyzeArticle={analyzeArticle}
-            loading={loading}
-            hasMore={hasMore}
-            onLoadMore={loadMore}
-          />
-          
-          {/* Pagination */}
-          <NewsPagination 
-            currentPage={currentPage}
-            totalPages={Math.ceil(newsItems.length / 10)}
-            onPageChange={setCurrentPage}
-          />
-          
-          {/* API status indicator for transparency */}
-          <NewsApiStatus
-            apiUsage={articleCount > 0 ? (articleCount / 10000) * 100 : 0}
-            lastSync={lastSync}
-            articleCount={articleCount}
-            syncingNews={syncingNews}
-          />
-        </motion.div>
-      </NewsErrorBoundary>
-    </div>
+          </motion.div>
+        </NewsErrorBoundary>
+      </div>
+    </MainLayout>
   );
 };
 
