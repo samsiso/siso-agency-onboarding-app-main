@@ -23,7 +23,7 @@ const AINews: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [showAdminPanel, setShowAdminPanel] = useState(true); // Always show admin panel for better transparency
+  const [showAdminPanel, setShowAdminPanel] = useState(false); // Hide admin panel by default
   
   // Using the enhanced useNewsItems hook
   const {
@@ -77,6 +77,11 @@ const AINews: React.FC = () => {
     setSelectedCategory(category);
   };
   
+  // Toggle admin panel visibility
+  const toggleAdminPanel = () => {
+    setShowAdminPanel(!showAdminPanel);
+  };
+  
   // Handle manual sync with confirmation
   const handleSyncNews = async () => {
     if (syncingNews) return;
@@ -115,6 +120,8 @@ const AINews: React.FC = () => {
             syncNews={handleSyncNews}
             lastSyncInfo={lastSync}
             articleCount={articleCount}
+            onToggleAdminPanel={toggleAdminPanel}
+            showAdminPanel={showAdminPanel}
           />
           
           {/* Date navigation */}
@@ -132,21 +139,17 @@ const AINews: React.FC = () => {
             loading={loading}
           />
           
-          {/* Horizontal filter row */}
-          <div className="flex flex-wrap items-center gap-4">
+          {/* Improved category filters with enhanced UI */}
+          <div className="space-y-6">
             <NewsFilters 
               selectedCategory={selectedCategory}
               onCategoryChange={handleCategorySelect}
               searchQuery={searchQuery}
               onSearchChange={handleSearchChange}
             />
-            <NewsCategories 
-              selectedCategory={selectedCategory}
-              onCategoryChange={handleCategorySelect}
-            />
           </div>
           
-          {/* Admin panel for testing and managing news sync */}
+          {/* Admin panel for testing and managing news sync - only shown when toggled */}
           {showAdminPanel && (
             <AdminControls 
               dateRange={dateRange}
