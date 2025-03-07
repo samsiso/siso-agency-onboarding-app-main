@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { EnhancedNewsItem, AIAnalysis } from '@/types/blog';
 import { Brain, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -17,10 +17,21 @@ interface AIAnalysisSectionProps {
 export const AIAnalysisSection = ({ article, onAnalyze }: AIAnalysisSectionProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isGeneratingAnalysis, setIsGeneratingAnalysis] = useState(false);
+  const [hasAnalysisData, setHasAnalysisData] = useState(false);
   const supabase = useSupabaseClient();
   
-  // [Analysis] Check if analysis exists and has data
-  const hasAnalysis = article.ai_analysis && Object.keys(article.ai_analysis).length > 0;
+  // [Analysis] Check if analysis exists and has meaningful data
+  useEffect(() => {
+    const analysisExists = article.ai_analysis && 
+      Object.keys(article.ai_analysis).length > 0 &&
+      // Check for at least one key property that should have data
+      (article.ai_analysis.key_points?.length > 0 || 
+       article.ai_analysis.market_impact || 
+       article.ai_analysis.business_implications);
+       
+    setHasAnalysisData(!!analysisExists);
+    console.log('[AIAnalysisSection] Analysis exists:', !!analysisExists, article.ai_analysis);
+  }, [article]);
   
   // [Analysis] Function to generate analysis using Edge Function
   const handleGenerateAnalysis = async () => {
@@ -32,6 +43,7 @@ export const AIAnalysisSection = ({ article, onAnalyze }: AIAnalysisSectionProps
     setIsGeneratingAnalysis(true);
     
     try {
+      console.log('Generating analysis for article:', article.id);
       const { data, error } = await supabase.functions.invoke('analyze-article', {
         body: { articleId: article.id }
       });
@@ -63,7 +75,9 @@ export const AIAnalysisSection = ({ article, onAnalyze }: AIAnalysisSectionProps
     setIsDialogOpen(true);
   };
   
-  if (!hasAnalysis) {
+  // Don't render anything if there's no analysis data
+  if (!hasAnalysisData) {
+    console.log('[AIAnalysisSection] No analysis data, not rendering section');
     return null;
   }
   
@@ -100,19 +114,21 @@ export const AIAnalysisSection = ({ article, onAnalyze }: AIAnalysisSectionProps
       
       <div className="space-y-4">
         {/* Key Points */}
-        <div className="bg-card rounded-lg p-4 border border-border">
-          <h4 className="text-sm font-medium text-muted-foreground mb-3">Key Points</h4>
-          <ul className="space-y-2">
-            {(article.ai_analysis?.key_points || []).slice(0, 3).map((point, index) => (
-              <li key={index} className="flex items-start gap-2">
-                <span className="bg-primary/10 text-primary rounded-full w-5 h-5 flex items-center justify-center text-xs mt-0.5">
-                  {index + 1}
-                </span>
-                <span>{point}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        {article.ai_analysis?.key_points && article.ai_analysis.key_points.length > 0 && (
+          <div className="bg-card rounded-lg p-4 border border-border">
+            <h4 className="text-sm font-medium text-muted-foreground mb-3">Key Points</h4>
+            <ul className="space-y-2">
+              {article.ai_analysis.key_points.slice(0, 3).map((point, index) => (
+                <li key={index} className="flex items-start gap-2">
+                  <span className="bg-primary/10 text-primary rounded-full w-5 h-5 flex items-center justify-center text-xs mt-0.5">
+                    {index + 1}
+                  </span>
+                  <span>{point}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
         
         {/* Market Impact */}
         {article.ai_analysis?.market_impact && (

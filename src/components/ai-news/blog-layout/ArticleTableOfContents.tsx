@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { EnhancedNewsItem } from '@/types/blog';
-import { ListRestart, ArrowUpDown } from 'lucide-react';
+import { ListRestart } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
@@ -30,6 +30,8 @@ export const ArticleTableOfContents = ({
     { id: 'ai-analysis-section', title: 'AI Analysis', level: 1 },
     { id: 'community-notes', title: 'Community Notes', level: 1 },
   ];
+  
+  console.log('[ArticleTableOfContents] AI Analysis data:', article.ai_analysis);
   
   return (
     <div className="space-y-6">

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { AIAnalysis as AIAnalysisType } from '@/types/blog';
 import { Brain, TrendingUp, Briefcase, Share2, RefreshCw } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
@@ -23,9 +23,20 @@ export const AIAnalysis = ({
 }: AIAnalysisComponentProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [hasData, setHasData] = useState(false);
   
-  // Check if we have analysis data
-  const hasAnalysis = analysis && Object.keys(analysis).length > 0;
+  // Check if we have meaningful analysis data
+  useEffect(() => {
+    const hasAnalysisData = !!analysis && 
+      Object.keys(analysis).length > 0 &&
+      // Check for at least one key property that should have data
+      (analysis.key_points?.length > 0 || 
+       analysis.market_impact || 
+       analysis.business_implications);
+       
+    setHasData(hasAnalysisData);
+    console.log('[AIAnalysis-Sidebar] Analysis exists:', hasAnalysisData, analysis);
+  }, [analysis]);
   
   // Get confidence score as a number between 0-100
   let confidenceScore = 0;
@@ -41,6 +52,7 @@ export const AIAnalysis = ({
     if (!onRefresh) return;
     
     setIsRefreshing(true);
+    console.log('Attempting to refresh AI Analysis...');
     try {
       await onRefresh();
     } finally {
@@ -53,7 +65,7 @@ export const AIAnalysis = ({
     setIsDialogOpen(true);
   };
   
-  if (!hasAnalysis) {
+  if (!hasData) {
     return (
       <div className="bg-white/5 rounded-lg p-4 backdrop-blur-sm border border-white/10">
         <div className="flex items-center gap-2 mb-2">

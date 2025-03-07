@@ -45,7 +45,8 @@ const BlogPost = () => {
   const handleAnalysisRefresh = async () => {
     console.log('Refreshing article data after analysis...');
     try {
-      await refetch();
+      const refreshedData = await refetch();
+      console.log('Analysis data refreshed:', refreshedData.data?.ai_analysis);
       toast({
         title: "Analysis refreshed",
         description: "The AI analysis has been updated.",

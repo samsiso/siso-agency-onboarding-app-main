@@ -145,8 +145,16 @@ export const EnhancedBlogLayout = ({
     }
   };
 
+  // [Analysis] Check for meaningful analysis data with multiple properties
+  const hasAnalysis = currentArticle.ai_analysis && 
+    Object.keys(currentArticle.ai_analysis || {}).length > 0 &&
+    // Check for at least one key property that should have data
+    (currentArticle.ai_analysis.key_points?.length > 0 || 
+     currentArticle.ai_analysis.market_impact || 
+     currentArticle.ai_analysis.business_implications);
+
   // Determine if we should show the AI analysis button
-  const showAnalysisButton = !currentArticle.ai_analysis || Object.keys(currentArticle.ai_analysis || {}).length === 0;
+  const showAnalysisButton = !hasAnalysis;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black">
@@ -339,7 +347,7 @@ export const EnhancedBlogLayout = ({
               {/* AI Analysis Button (only shown if no analysis exists) */}
               {showAnalysisButton && (
                 <AIAnalysisButton 
-                  article={article}
+                  article={currentArticle}
                   onAnalyze={handleGenerateAnalysis}
                   isGenerating={isGeneratingAnalysis}
                 />

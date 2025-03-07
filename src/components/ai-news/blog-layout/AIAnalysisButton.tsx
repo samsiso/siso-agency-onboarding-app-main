@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { EnhancedNewsItem } from '@/types/blog';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,6 +17,24 @@ export const AIAnalysisButton = ({
   onAnalyze, 
   isGenerating 
 }: AIAnalysisButtonProps) => {
+  // [Analysis] Check if analysis exists to prevent showing this button unnecessarily
+  const [showButton, setShowButton] = useState(true);
+  
+  useEffect(() => {
+    // Check if analysis exists and has meaningful data
+    const hasAnalysis = article.ai_analysis && 
+      Object.keys(article.ai_analysis).length > 0 &&
+      // Check for at least one key property that should have data
+      (article.ai_analysis.key_points?.length > 0 || 
+       article.ai_analysis.market_impact || 
+       article.ai_analysis.business_implications);
+       
+    setShowButton(!hasAnalysis);
+  }, [article]);
+  
+  // Don't render if we shouldn't show the button
+  if (!showButton) return null;
+  
   return (
     <Card className="bg-white/5 p-6 backdrop-blur-sm border border-white/10">
       <div className="flex items-center gap-3 mb-4">
