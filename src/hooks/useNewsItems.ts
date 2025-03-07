@@ -9,7 +9,7 @@ type PostStatus = 'all' | 'draft' | 'published';
 // [Analysis] Enhanced hook for managing news items with better API integration and date-based navigation
 export const useNewsItems = (
   selectedCategory: string | null, 
-  status: PostStatus = 'all' | 'draft' | 'published',
+  status: PostStatus = 'published',
   selectedDate?: string | null,
   currentPage: number = 1,
   pageSize: number = 12
