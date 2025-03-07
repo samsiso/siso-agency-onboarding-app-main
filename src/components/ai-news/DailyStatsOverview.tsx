@@ -28,8 +28,13 @@ export const DailyStatsOverview = ({
   // [Analysis] Added state for tracking the active AI summary tab
   const [activeTab, setActiveTab] = useState('overview');
   
-  // [Analysis] Use the AI summary hook to fetch summary data based on news items
-  const { summaryData, isLoading: summaryLoading } = useAiDailySummary(newsItems);
+  // [Analysis] Extract the date from the first news item or use current date
+  const currentDate = newsItems.length > 0 && newsItems[0].date 
+    ? newsItems[0].date 
+    : new Date().toISOString().split('T')[0];
+    
+  // [Analysis] Use the AI summary hook to fetch summary data based on the date
+  const { summaryData, loading: summaryLoading } = useAiDailySummary(currentDate);
   
   return (
     <Card className="bg-gray-900/30 border-gray-800">
