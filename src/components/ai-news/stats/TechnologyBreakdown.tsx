@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { NewsItem } from '@/types/blog';
 import { calculateComplexityBreakdown, calculateSourceDistribution } from './calculateStats';
@@ -23,7 +22,9 @@ import {
   XAxis,
   YAxis,
   RadialBar,
-  RadialBarChart
+  RadialBarChart,
+  Area,
+  AreaChart
 } from 'recharts';
 
 interface TechnologyBreakdownProps {
@@ -102,6 +103,31 @@ export const TechnologyBreakdown = ({ newsItems, loading = false }: TechnologyBr
     return null;
   };
   
+  const renderRadialBarChart = () => {
+    return (
+      <ResponsiveContainer width="100%" height="100%">
+        <RadialBarChart 
+          innerRadius="30%" 
+          outerRadius="100%" 
+          data={radialData} 
+          startAngle={90} 
+          endAngle={-270}
+          className="chart-load"
+        >
+          <RadialBar
+            background={{ fill: 'rgba(17, 24, 39, 0.4)' }}
+            clockWise
+            dataKey="value"
+            animationBegin={300}
+            animationDuration={1200}
+            animationEasing="ease-out"
+          />
+          <RechartsTooltip content={<CustomRadialTooltip />} />
+        </RadialBarChart>
+      </ResponsiveContainer>
+    );
+  };
+
   return (
     <motion.div 
       className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4"
@@ -141,28 +167,7 @@ export const TechnologyBreakdown = ({ newsItems, loading = false }: TechnologyBr
         
         <div className="flex items-start">
           <div className="w-28 h-28">
-            <ResponsiveContainer width="100%" height="100%">
-              <RadialBarChart 
-                innerRadius="30%" 
-                outerRadius="100%" 
-                data={radialData} 
-                startAngle={90} 
-                endAngle={-270}
-                className="chart-load"
-              >
-                <RadialBar
-                  minAngle={15}
-                  background={{ fill: 'rgba(17, 24, 39, 0.4)' }}
-                  clockWise
-                  dataKey="value"
-                  cornerRadius={10}
-                  animationBegin={300}
-                  animationDuration={1200}
-                  animationEasing="ease-out"
-                />
-                <RechartsTooltip content={<CustomRadialTooltip />} />
-              </RadialBarChart>
-            </ResponsiveContainer>
+            {renderRadialBarChart()}
           </div>
           
           <div className="ml-3 space-y-2 flex-1">

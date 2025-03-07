@@ -11,6 +11,7 @@ import { Info, Maximize2, TrendingUp, ChevronRight, ArrowUpRight, ArrowDownRight
 import { motion } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { 
   Tooltip as UITooltip,
   TooltipContent,
