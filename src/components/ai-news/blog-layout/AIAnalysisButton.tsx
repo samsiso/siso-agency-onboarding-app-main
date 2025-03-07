@@ -56,9 +56,9 @@ export const AIAnalysisButton = ({
       await onAnalyze();
     } catch (error) {
       console.error('Error generating AI analysis:', error);
-      toast.error('Failed to analyze article', {
+      // Fix: Don't use 'description' property with react-hot-toast
+      toast.error(`Failed to analyze article: ${error instanceof Error ? error.message : 'An unknown error occurred'}`, {
         id: 'analyze-toast',
-        description: error instanceof Error ? error.message : 'An unknown error occurred'
       });
     } finally {
       setLoading(false);
