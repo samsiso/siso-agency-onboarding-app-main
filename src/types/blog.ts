@@ -1,4 +1,3 @@
-
 export interface Category {
   id: string;
   name: string;
@@ -196,7 +195,6 @@ export interface NewsAnalysis {
   created_at: string;
 }
 
-// [Analysis] Enhanced AIAnalysis interface with all required fields for agency owners
 export interface AIAnalysis {
   // Original fields
   market_impact?: string;

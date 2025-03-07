@@ -1,3 +1,4 @@
+
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { ChevronRight, ArrowUp, List, ChevronDown, Zap, Lightbulb, TrendingUp, Layers, Brain, LineChart } from 'lucide-react';
@@ -6,7 +7,6 @@ import { EnhancedNewsItem } from '@/types/blog';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
-import { LucideIcon } from 'lucide-react';
 
 interface ArticleTableOfContentsProps {
   article: EnhancedNewsItem;
@@ -25,7 +25,7 @@ type TableItem = {
 };
 
 // [Framework] Icons mapping for different AI analysis sections to enhance visual navigation
-const ANALYSIS_ICONS: Record<string, LucideIcon> = {
+const ANALYSIS_ICONS: Record<string, React.ElementType> = {
   market_impact: TrendingUp,
   technical_predictions: Brain,
   related_technologies: Layers,
@@ -85,10 +85,10 @@ export const ArticleTableOfContents = ({ article, activeSection }: ArticleTableO
       
       // [Plan] Filter only sections that actually exist in the analysis
       const availableKeys = aiAnalysisKeys.filter(key => 
-        article.ai_analysis && article.ai_analysis[key as keyof typeof article.ai_analysis] && 
-        (typeof article.ai_analysis[key as keyof typeof article.ai_analysis] === 'string' || 
-         Array.isArray(article.ai_analysis[key as keyof typeof article.ai_analysis]) || 
-         typeof article.ai_analysis[key as keyof typeof article.ai_analysis] === 'object')
+        article.ai_analysis && article.ai_analysis[key] && 
+        (typeof article.ai_analysis[key] === 'string' || 
+         Array.isArray(article.ai_analysis[key]) || 
+         typeof article.ai_analysis[key] === 'object')
       );
       
       // Add available sections to TOC
@@ -100,12 +100,11 @@ export const ArticleTableOfContents = ({ article, activeSection }: ArticleTableO
           .join(' ');
         
         // Get relevance score if available
-        let relevanceScore;
-        if (key === 'agency_relevance_score' && article.ai_analysis?.agency_relevance_score) {
-          relevanceScore = article.ai_analysis.agency_relevance_score;
-        } else if (key === 'market_opportunity' && article.ai_analysis?.market_opportunity?.score) {
-          relevanceScore = article.ai_analysis.market_opportunity.score;
-        }
+        const relevanceScore = key === 'agency_relevance_score' 
+          ? article.ai_analysis?.agency_relevance_score 
+          : key === 'market_opportunity' && article.ai_analysis?.market_opportunity?.score
+            ? article.ai_analysis.market_opportunity.score
+            : undefined;
         
         items.push({
           id: `ai-analysis-${key}`,
@@ -220,7 +219,7 @@ export const ArticleTableOfContents = ({ article, activeSection }: ArticleTableO
                   : false;
                 
                 // Get appropriate icon for AI analysis sections
-                let Icon: LucideIcon = List;
+                let Icon = List;
                 if (item.type === 'ai_analysis' && item.id.startsWith('ai-analysis-')) {
                   const analysisType = item.id.replace('ai-analysis-', '');
                   Icon = ANALYSIS_ICONS[analysisType] || ANALYSIS_ICONS.default;

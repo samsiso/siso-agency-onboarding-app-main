@@ -1,3 +1,4 @@
+
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -487,7 +488,7 @@ export const EnhancedBlogLayout = ({
                           </div>
                         </AccordionTrigger>
                         <AccordionContent className="px-4 pb-4 pt-0">
-                          {article.ai_analysis?.implementation_timeline && renderAnalysisObject(article.ai_analysis?.implementation_timeline, 'timeline')}
+                          {renderAnalysisObject(article.ai_analysis.implementation_timeline, 'timeline')}
                         </AccordionContent>
                       </AccordionItem>
                     )}
@@ -504,16 +505,16 @@ export const EnhancedBlogLayout = ({
                             <TrendingUp className="h-4 w-4 text-green-400" />
                             <span className="text-blue-300 font-medium">
                               Market Opportunity
-                              {article.ai_analysis?.market_opportunity?.score && (
+                              {article.ai_analysis.market_opportunity.score && (
                                 <span className="ml-2 text-xs bg-green-500/10 text-green-400 py-0.5 px-2 rounded-full">
-                                  {article.ai_analysis?.market_opportunity?.score}% Potential
+                                  {article.ai_analysis.market_opportunity.score}% Potential
                                 </span>
                               )}
                             </span>
                           </div>
                         </AccordionTrigger>
                         <AccordionContent className="px-4 pb-4 pt-0">
-                          {article.ai_analysis?.market_opportunity && renderAnalysisObject(article.ai_analysis?.market_opportunity, 'opportunity')}
+                          {renderAnalysisObject(article.ai_analysis.market_opportunity, 'opportunity')}
                         </AccordionContent>
                       </AccordionItem>
                     )}
@@ -532,7 +533,7 @@ export const EnhancedBlogLayout = ({
                           </div>
                         </AccordionTrigger>
                         <AccordionContent className="px-4 pb-4 pt-0">
-                          {article.ai_analysis?.competitive_analysis && renderAnalysisObject(article.ai_analysis?.competitive_analysis, 'competitive')}
+                          {renderAnalysisObject(article.ai_analysis.competitive_analysis, 'competitive')}
                         </AccordionContent>
                       </AccordionItem>
                     )}
@@ -551,7 +552,7 @@ export const EnhancedBlogLayout = ({
                           </div>
                         </AccordionTrigger>
                         <AccordionContent className="px-4 pb-4 pt-0">
-                          {article.ai_analysis?.client_messaging && renderAnalysisObject(article.ai_analysis?.client_messaging, 'messaging')}
+                          {renderAnalysisObject(article.ai_analysis.client_messaging, 'messaging')}
                         </AccordionContent>
                       </AccordionItem>
                     )}
@@ -570,7 +571,7 @@ export const EnhancedBlogLayout = ({
                           </div>
                         </AccordionTrigger>
                         <AccordionContent className="px-4 pb-4 pt-0">
-                          {article.ai_analysis?.implementation_details && renderAnalysisObject(article.ai_analysis?.implementation_details, 'implementation')}
+                          {renderAnalysisObject(article.ai_analysis.implementation_details, 'implementation')}
                         </AccordionContent>
                       </AccordionItem>
                     )}
@@ -589,7 +590,7 @@ export const EnhancedBlogLayout = ({
                           </div>
                         </AccordionTrigger>
                         <AccordionContent className="px-4 pb-4 pt-0">
-                          {article.ai_analysis?.cost_benefit_analysis && renderAnalysisObject(article.ai_analysis?.cost_benefit_analysis, 'cost-benefit')}
+                          {renderAnalysisObject(article.ai_analysis.cost_benefit_analysis, 'cost-benefit')}
                         </AccordionContent>
                       </AccordionItem>
                     )}
