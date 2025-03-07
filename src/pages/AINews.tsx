@@ -6,9 +6,10 @@ import { format } from 'date-fns';
 import { useNewsItems } from '@/hooks/useNewsItems';
 import { NewsHeader } from '@/components/ai-news/NewsHeader';
 import { NewsContent } from '@/components/ai-news/NewsContent';
-import { NewsFilters } from '@/components/ai-news/NewsFilters';
-import { NewsCategories } from '@/components/ai-news/NewsCategories';
-import { NewsPagination } from '@/components/ai-news/NewsPagination';
+// Corrected imports for default exports
+import NewsFilters from '@/components/ai-news/NewsFilters';
+import NewsCategories from '@/components/ai-news/NewsCategories';
+import NewsPagination from '@/components/ai-news/NewsPagination';
 import { NewsDateSection } from '@/components/ai-news/NewsDateSection';
 import { NewsApiStatus } from '@/components/ai-news/NewsApiStatus';
 import { AdminControls } from '@/components/ai-news/AdminControls';
@@ -37,6 +38,7 @@ const AINews: React.FC = () => {
     dateRange,
     goToNextDay,
     goToPreviousDay,
+    goToDate,
     syncNews,
     syncingNews,
     lastSync,
@@ -118,23 +120,29 @@ const AINews: React.FC = () => {
           {/* Date navigation */}
           <DateNavigation 
             currentDate={currentDate}
+            dateRange={dateRange}
             onNextDay={goToNextDay}
             onPreviousDay={goToPreviousDay}
+            onSelectDate={goToDate}
           />
           
           {/* Daily statistics overview */}
           <DailyStatsOverview 
             newsItems={newsItems} 
-            loading={loading} 
-            date={format(currentDate, 'yyyy-MM-dd')}
+            loading={loading}
           />
           
           {/* Horizontal filter row */}
           <div className="flex flex-wrap items-center gap-4">
-            <NewsFilters />
+            <NewsFilters 
+              selectedCategory={selectedCategory}
+              onCategoryChange={handleCategorySelect}
+              searchQuery={searchQuery}
+              onSearchChange={handleSearchChange}
+            />
             <NewsCategories 
               selectedCategory={selectedCategory}
-              onSelectCategory={handleCategorySelect}
+              onCategoryChange={handleCategorySelect}
             />
           </div>
           
@@ -166,8 +174,8 @@ const AINews: React.FC = () => {
           {/* Pagination */}
           <NewsPagination 
             currentPage={currentPage}
+            totalPages={Math.ceil(newsItems.length / 10)}
             onPageChange={setCurrentPage}
-            hasMore={hasMore}
           />
           
           {/* API status indicator for transparency */}
@@ -175,6 +183,7 @@ const AINews: React.FC = () => {
             apiUsage={articleCount > 0 ? (articleCount / 10000) * 100 : 0}
             lastSync={lastSync}
             articleCount={articleCount}
+            syncingNews={syncingNews}
           />
         </motion.div>
       </NewsErrorBoundary>

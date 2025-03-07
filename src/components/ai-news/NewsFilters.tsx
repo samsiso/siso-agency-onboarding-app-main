@@ -33,7 +33,7 @@ const itemVariants = {
   }
 };
 
-export const NewsFilters = ({
+const NewsFilters = ({
   selectedCategory,
   onCategoryChange,
   searchQuery,

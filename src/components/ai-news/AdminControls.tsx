@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -490,8 +489,14 @@ export const AdminControls = ({
       
       {showDuplicatesDialog && syncResult?.articles && (
         <DuplicatesCheckDialog
+          open={showDuplicatesDialog}
           articles={syncResult.articles}
           onClose={() => setShowDuplicatesDialog(false)}
+          onRefresh={() => syncNews(keyword, parseInt(limit), source, testMode)}
+          loading={syncingNews}
+          onImport={async (skipDuplicates) => {
+            await syncNews(keyword, parseInt(limit), source, false, skipDuplicates);
+          }}
         />
       )}
     </Card>

@@ -19,7 +19,7 @@ interface DateNavigationProps {
 
 export const DateNavigation = ({
   currentDate,
-  dateRange,
+  dateRange = [],
   onPreviousDay,
   onNextDay,
   onSelectDate,
