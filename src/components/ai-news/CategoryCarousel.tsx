@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Cpu, Database, Braces, BrainCircuit, LayoutGrid, Workflow, BookOpen, Building, Code, 
-  Lightbulb, ExternalLink, Rocket, Layers, Circuit } from 'lucide-react';
+  Lightbulb, ExternalLink, Rocket, Layers, Cpu as Microchip } from 'lucide-react';
 
 // [Analysis] Interactive carousel for category selection with improved visual design
 interface CategoryCarouselProps {
@@ -31,7 +31,7 @@ export const CategoryCarousel: React.FC<CategoryCarouselProps> = ({
     "Education": <BookOpen className="h-4 w-4" />,
     "Startups": <Rocket className="h-4 w-4" />,
     "Architecture": <Layers className="h-4 w-4" />,
-    "Hardware": <Circuit className="h-4 w-4" />,
+    "Hardware": <Microchip className="h-4 w-4" />,
   };
   
   const categories = Object.keys(categoryIcons);
@@ -81,3 +81,4 @@ export const CategoryCarousel: React.FC<CategoryCarouselProps> = ({
     </div>
   );
 };
+
