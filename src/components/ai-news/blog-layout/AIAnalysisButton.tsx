@@ -1,3 +1,4 @@
+
 import { Brain } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -121,7 +122,7 @@ export const AIAnalysisButton = ({
         </div>
       </div>
 
-      {/* Analysis Dialog */}
+      {/* Analysis Dialog - passing the full article object */}
       <AIAnalysisDialog
         article={article}
         isOpen={showDialog}

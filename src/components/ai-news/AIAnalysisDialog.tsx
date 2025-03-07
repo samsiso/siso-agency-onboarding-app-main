@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { EnhancedNewsItem } from '@/types/blog';
+import { EnhancedNewsItem, AIAnalysis } from '@/types/blog';
 import { Button } from '@/components/ui/button';
 import { Brain, RefreshCw, Download, FileText, TrendingUp, Briefcase, Target, Clock, DollarSign } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
@@ -15,23 +15,39 @@ import { MessageLoading } from '@/components/ui/message-loading';
 // [Plan] In the future, add export to PDF functionality
 
 interface AIAnalysisDialogProps {
-  article: EnhancedNewsItem;
+  // [Analysis] We're making the article prop optional to allow passing analysis directly
+  article?: EnhancedNewsItem;
+  // [Analysis] Added direct analysis prop for components that don't have the full article
+  analysis?: AIAnalysis;
   isOpen: boolean;
   onClose: () => void;
   onRefreshAnalysis?: () => Promise<void>;
+  // [Analysis] Added optional props to support components without article object
+  articleTitle?: string;
+  articleId?: string;
+  isLoading?: boolean;
 }
 
 export const AIAnalysisDialog = ({ 
   article, 
+  analysis: passedAnalysis,
   isOpen, 
   onClose,
-  onRefreshAnalysis 
+  onRefreshAnalysis,
+  articleTitle,
+  articleId,
+  isLoading = false
 }: AIAnalysisDialogProps) => {
   const [activeTab, setActiveTab] = useState<string>('overview');
   const [isRefreshing, setIsRefreshing] = useState(false);
   
-  const analysis = article.ai_analysis;
+  // [Analysis] Get analysis either from article or direct prop
+  const analysis = passedAnalysis || (article?.ai_analysis);
+  const title = articleTitle || article?.title;
+  const id = articleId || article?.id;
+  
   const hasAnalysis = !!analysis && Object.keys(analysis).length > 0;
+  const showLoadingState = isLoading || (!hasAnalysis && article?.has_ai_analysis);
   
   // [Analysis] Handle refresh button click
   const handleRefresh = async () => {
@@ -55,7 +71,7 @@ export const AIAnalysisDialog = ({
     
     const a = document.createElement('a');
     a.href = url;
-    a.download = `analysis-${article.id.slice(0, 8)}.json`;
+    a.download = `analysis-${id?.slice(0, 8) || 'export'}.json`;
     document.body.appendChild(a);
     a.click();
     
@@ -79,7 +95,7 @@ export const AIAnalysisDialog = ({
                 <DialogTitle className="text-xl font-semibold">AI Analysis</DialogTitle>
               </div>
               <DialogDescription className="text-sm max-w-lg">
-                Enhanced AI analysis for agency owners based on "{article.title}"
+                Enhanced AI analysis for agency owners based on "{title}"
               </DialogDescription>
             </div>
             
@@ -110,12 +126,19 @@ export const AIAnalysisDialog = ({
           </div>
         </DialogHeader>
         
-        {!hasAnalysis ? (
+        {showLoadingState ? (
           <div className="flex flex-col items-center justify-center p-12 h-full">
             <MessageLoading />
             <p className="text-lg font-medium mt-6">Generating Analysis</p>
             <p className="text-sm text-muted-foreground mt-2">
               This may take a minute as we're analyzing the article in depth...
+            </p>
+          </div>
+        ) : !hasAnalysis ? (
+          <div className="flex flex-col items-center justify-center p-12 h-full">
+            <p className="text-lg font-medium">No Analysis Available</p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Click the refresh button to generate an analysis for this article.
             </p>
           </div>
         ) : (
@@ -486,3 +509,4 @@ export const AIAnalysisDialog = ({
     </Dialog>
   );
 };
+
