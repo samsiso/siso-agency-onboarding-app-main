@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Brain } from 'lucide-react';
+import { Brain, Share2, Bookmark, RefreshCw, Download } from 'lucide-react';
 import { useBlogPostActions } from '@/hooks/useBlogPostActions';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -10,7 +10,7 @@ import { AnalysisLoading } from './analysis/AnalysisLoading';
 import { AnalysisEmptyState } from './analysis/AnalysisEmptyState';
 import { AnalysisActions } from './analysis/AnalysisActions';
 
-// [Analysis] Improved dialog component with better separation of concerns
+// [Analysis] Improved dialog component with enhanced agency-focused analysis 
 export interface AIAnalysisDialogProps {
   isOpen: boolean;
   onClose: () => void;
@@ -110,7 +110,7 @@ export const AIAnalysisDialog: React.FC<AIAnalysisDialogProps> = ({
       setIsLoading(true);
       setIsAnalysisRequested(true);
       
-      toast.info('Analyzing article...', {
+      toast.info('Analyzing article for agency insights...', {
         description: 'This might take a few seconds',
         duration: 3000,
       });
@@ -133,7 +133,10 @@ export const AIAnalysisDialog: React.FC<AIAnalysisDialogProps> = ({
           duration: 2000,
         });
       } else {
-        toast.success('Analysis completed');
+        toast.success('Agency-focused analysis completed', {
+          description: 'Insights for impacting your agency business are ready',
+          duration: 3000,
+        });
       }
       
       // Update cache and state with the new analysis
@@ -155,25 +158,75 @@ export const AIAnalysisDialog: React.FC<AIAnalysisDialogProps> = ({
     }
   };
 
+  // [Analysis] Handle exporting the analysis as PDF or JSON
+  const handleExportAnalysis = (format: 'json' | 'pdf') => {
+    if (!analysis) return;
+    
+    if (format === 'json') {
+      // Generate a JSON file
+      const dataStr = JSON.stringify(analysis, null, 2);
+      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+      
+      const exportFileDefaultName = `${articleTitle.replace(/\s+/g, '-').toLowerCase()}-analysis.json`;
+      
+      const linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', exportFileDefaultName);
+      linkElement.click();
+      
+      toast.success('Analysis exported as JSON', {
+        description: 'The file has been downloaded to your device',
+      });
+    } else {
+      // For PDF we'd need a PDF generation library
+      // This is a placeholder - in a real implementation you'd use a library like jsPDF
+      toast.info('PDF export coming soon', {
+        description: 'This feature is under development',
+      });
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl bg-gray-950 border-gray-800 text-white overflow-y-auto max-h-[90vh]">
+      <DialogContent className="max-w-4xl bg-gray-950 border-gray-800 text-white overflow-y-auto max-h-[90vh]">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold flex items-center gap-2">
             <Brain className="h-5 w-5 text-blue-400" />
-            AI Analysis: {articleTitle}
+            AI Analysis for Agencies: {articleTitle}
           </DialogTitle>
           <DialogDescription className="text-gray-400">
-            Detailed AI-powered analysis of this article and its implications for AI agencies
+            Detailed AI-powered analysis with strategic insights, market opportunities, and implementation guidance for agency owners
           </DialogDescription>
         </DialogHeader>
 
-        <AnalysisActions 
-          isLoading={isLoading}
-          onRefresh={handleRefreshAnalysis}
-          onShare={() => handleShare(articleTitle, articleDescription)}
-          onBookmark={() => handleBookmark(articleId)}
-        />
+        <div className="flex justify-between items-center border-t border-b border-gray-800 py-2 px-1 my-2">
+          <AnalysisActions 
+            isLoading={isLoading}
+            onRefresh={handleRefreshAnalysis}
+            onShare={() => handleShare(articleTitle, articleDescription)}
+            onBookmark={() => handleBookmark(articleId)}
+          />
+          
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => handleExportAnalysis('json')}
+              className="flex items-center gap-1 text-xs text-gray-400 hover:text-white bg-gray-900 hover:bg-gray-800 px-2 py-1 rounded"
+              title="Export as JSON"
+            >
+              <Download className="h-3 w-3" />
+              JSON
+            </button>
+            <button
+              onClick={() => handleExportAnalysis('pdf')}
+              className="flex items-center gap-1 text-xs text-gray-400 hover:text-white bg-gray-900 hover:bg-gray-800 px-2 py-1 rounded"
+              title="Export as PDF"
+              disabled
+            >
+              <Download className="h-3 w-3" />
+              PDF
+            </button>
+          </div>
+        </div>
 
         {isLoading ? (
           <AnalysisLoading />
