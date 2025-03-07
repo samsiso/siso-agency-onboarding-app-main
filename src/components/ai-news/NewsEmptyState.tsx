@@ -1,37 +1,34 @@
 
-import { CalendarX, RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import React from 'react';
+import { Search, FileX2 } from 'lucide-react';
 
-interface NewsEmptyStateProps {
-  message?: string;
-  suggestion?: string;
-  onRefresh?: () => void;
+export interface NewsEmptyStateProps {
+  searchQuery: string;
 }
 
-export const NewsEmptyState = ({ 
-  message = "No articles found", 
-  suggestion = "Try changing your filters or syncing new content.",
-  onRefresh
-}: NewsEmptyStateProps) => {
+// [Analysis] Improved empty state UI to show different messages based on search query
+export function NewsEmptyState({ searchQuery }: NewsEmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center py-16 text-center space-y-4">
-      <div className="bg-gray-800/30 rounded-full p-3">
-        <CalendarX className="h-10 w-10 text-gray-400" />
+    <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+      <div className="bg-gray-800/50 rounded-full p-6 mb-6">
+        {searchQuery ? (
+          <Search className="h-12 w-12 text-gray-500" />
+        ) : (
+          <FileX2 className="h-12 w-12 text-gray-500" />
+        )}
       </div>
-      <h3 className="text-xl font-medium">{message}</h3>
+      
+      <h3 className="text-xl font-semibold text-white mb-2">
+        {searchQuery ? 'No articles found' : 'No articles available'}
+      </h3>
+      
       <p className="text-gray-400 max-w-md">
-        {suggestion}
+        {searchQuery ? (
+          <>We couldn't find any articles matching "<span className="text-blue-400">{searchQuery}</span>".</>
+        ) : (
+          'There are no articles available for this date. Try selecting a different date or sync new articles.'
+        )}
       </p>
-      {onRefresh && (
-        <Button 
-          variant="outline" 
-          onClick={onRefresh}
-          className="mt-4 gap-2"
-        >
-          <RefreshCw className="h-4 w-4" />
-          Refresh Content
-        </Button>
-      )}
     </div>
   );
-};
+}

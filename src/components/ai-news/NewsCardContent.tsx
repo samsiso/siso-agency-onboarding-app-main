@@ -1,157 +1,152 @@
 
 import React, { useState } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { ExternalLink, Zap, ChartBar } from 'lucide-react';
 import { format } from 'date-fns';
-import { truncateText } from '@/lib/formatters';
+import { MoreHorizontal, Share2, Bookmark, Heart, MessageSquare, BarChart } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { NewsItem } from '@/types/blog';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Badge } from '@/components/ui/badge';
 
 interface NewsCardContentProps {
   post: NewsItem;
   hideContent?: boolean;
   hideMetadata?: boolean;
   truncateTitle?: boolean;
-  onAnalyze?: (id: string) => void;
+  onAnalyze?: (id: string) => Promise<void> | void;
 }
 
-// [Analysis] Fixed property access to match NewsItem interface and improved date display
+// [Analysis] Component to display article metadata with cleaner implementation
 const NewsCardContent = ({ 
-  post,
-  hideContent = false,
+  post, 
+  hideContent = false, 
   hideMetadata = false,
-  truncateTitle = false,
+  truncateTitle = true,
   onAnalyze
 }: NewsCardContentProps) => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   
-  // Generate a random importance score between 60-95 for demo
-  // [Plan] Replace with actual AI-calculated importance from backend
-  const importanceScore = post.ai_importance_score || Math.floor(60 + Math.random() * 35);
-
-  // Handle formatting the date properly
-  const formatPublishDate = () => {
-    if (!post.published_at) {
-      // If no published_at date, use creation date or current date
-      const fallbackDate = post.date || post.created_at || new Date().toISOString();
-      return format(new Date(fallbackDate), 'MMM d, yyyy');
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'Unknown date';
+    try {
+      // [Q] Is this the correct format expected by the app?
+      // Try to parse as ISO string first
+      const date = new Date(dateString);
+      return format(date, 'MMM d, yyyy');
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return dateString;
     }
+  };
+  
+  const handleAnalyze = async () => {
+    if (!onAnalyze || isAnalyzing) return;
     
     try {
-      return format(new Date(post.published_at), 'MMM d, yyyy');
-    } catch (error) {
-      console.error('Error formatting date for article:', post.id, error);
-      return format(new Date(), 'MMM d, yyyy');
-    }
-  };
-
-  // Format the category for display
-  const formatCategory = (category?: string) => {
-    if (!category) return 'General';
-    return category.split('_').map(word => 
-      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-    ).join(' ');
-  };
-
-  // Get source domain display
-  const getSourceDisplay = () => {
-    if (!post.source) return 'Unknown Source';
-    
-    // Remove www. and handle common domains
-    return post.source.replace('www.', '');
-  };
-
-  // Handle AI analysis button click
-  const handleAnalyze = () => {
-    if (onAnalyze && post.id) {
       setIsAnalyzing(true);
-      onAnalyze(post.id).finally(() => {
-        setIsAnalyzing(false);
-      });
+      await onAnalyze(post.id);
+    } catch (error) {
+      console.error('Error analyzing article:', error);
+    } finally {
+      setIsAnalyzing(false);
     }
   };
-
+  
   return (
-    <div className="flex flex-col h-full">
-      {/* Title section */}
-      <h3 className={`font-medium leading-tight ${truncateTitle ? 'line-clamp-2' : ''}`}>
-        <a 
-          href={post.url} 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="hover:text-blue-400 transition-colors duration-200"
-        >
-          {post.title}
-        </a>
-      </h3>
-
-      {/* Article content (if available and not hidden) */}
-      {!hideContent && post.content && (
-        <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
-          {truncateText(post.content, 120)}
+    <div className="flex flex-col gap-2 h-full">
+      <div className="flex justify-between items-start">
+        <div className="flex flex-col gap-1">
+          <h3 className={`font-semibold text-white ${truncateTitle ? 'line-clamp-2' : ''}`}>
+            {post.title}
+          </h3>
+          
+          {!hideMetadata && (
+            <div className="flex flex-wrap gap-2 mt-1 items-center">
+              <span className="text-xs text-gray-400">
+                {formatDate(post.date)}
+              </span>
+              
+              <span className="text-xs text-gray-400">•</span>
+              
+              <span className="text-xs text-gray-400">
+                {post.reading_time || 5} min read
+              </span>
+              
+              {post.source && (
+                <>
+                  <span className="text-xs text-gray-400">•</span>
+                  <span className="text-xs text-blue-400">
+                    {post.source}
+                  </span>
+                </>
+              )}
+              
+              {post.ai_importance_score && (
+                <>
+                  <span className="text-xs text-gray-400">•</span>
+                  <Badge variant="outline" className="bg-blue-900/30 text-blue-400 text-xs border-blue-800">
+                    {post.ai_importance_score}% importance
+                  </Badge>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+      
+      {!hideContent && post.description && (
+        <p className="text-sm text-gray-300 mt-1 line-clamp-3">
+          {post.description}
         </p>
       )}
-
-      {/* Metadata section */}
-      {!hideMetadata && (
-        <div className="mt-auto pt-3 flex flex-wrap justify-between items-center">
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <span>{formatPublishDate()}</span>
-            <span className="mx-1">•</span>
-            <span>{post.reading_time || 3} min read</span>
-          </div>
+      
+      <div className="flex justify-between items-center mt-auto pt-3">
+        <div className="flex items-center gap-3">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-8 w-8 rounded-full"
+          >
+            <Heart className="h-4 w-4 text-gray-400" />
+          </Button>
           
-          <div className="flex items-center gap-1.5 mt-2 sm:mt-0">
-            {/* AI Importance Score */}
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Badge variant="outline" className="text-xs px-2 py-0 h-5 bg-blue-950/30 flex items-center gap-1">
-                    <ChartBar className="h-3 w-3 text-blue-400" />
-                    <span>{importanceScore}%</span>
-                  </Badge>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>AI Importance Score: {importanceScore}%</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            
-            {post.category && (
-              <Badge variant="outline" className="text-xs px-2 py-0 h-5 bg-blue-950/30">
-                {formatCategory(post.category)}
-              </Badge>
-            )}
-            {post.source && (
-              <Badge variant="outline" className="text-xs px-2 py-0 h-5 bg-gray-800">
-                {getSourceDisplay()}
-              </Badge>
-            )}
-          </div>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-8 w-8 rounded-full"
+          >
+            <MessageSquare className="h-4 w-4 text-gray-400" />
+          </Button>
+          
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-8 w-8 rounded-full"
+          >
+            <Share2 className="h-4 w-4 text-gray-400" />
+          </Button>
         </div>
-      )}
-      
-      {/* Analysis Action Button */}
-      {!hideMetadata && onAnalyze && (
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="mt-3 w-full bg-blue-950/30 hover:bg-blue-900/40 text-xs gap-1.5"
-          onClick={handleAnalyze}
-          disabled={isAnalyzing}
-        >
-          <Zap className="h-3.5 w-3.5 text-blue-400" />
-          {isAnalyzing ? 'Analyzing...' : 'AI Analysis'}
-        </Button>
-      )}
-      
-      {/* External link indicator for clarity */}
-      {post.url && !hideMetadata && (
-        <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">
-          <ExternalLink className="h-3 w-3" />
-        </div>
-      )}
+        
+        {onAnalyze && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleAnalyze}
+            disabled={isAnalyzing}
+            className="text-xs border-blue-800 hover:bg-blue-900/50 text-blue-300"
+          >
+            {isAnalyzing ? (
+              <>
+                <span className="mr-1">Analyzing</span>
+                <span className="loading loading-dots"></span>
+              </>
+            ) : (
+              <>
+                <BarChart className="h-3 w-3 mr-1" />
+                AI Analysis
+              </>
+            )}
+          </Button>
+        )}
+      </div>
     </div>
   );
 };
