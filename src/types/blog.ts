@@ -1,3 +1,4 @@
+
 export interface Category {
   id: string;
   name: string;
@@ -78,17 +79,7 @@ export interface NewsItem {
   analysis_date?: string;
   
   // AI analysis content structure - enhanced for richer information
-  ai_analysis?: {
-    market_impact?: string;
-    technical_predictions?: string[];
-    related_technologies?: string[];
-    business_implications?: string;
-    key_points?: string[];
-    confidence_score?: number;
-    summary?: string;
-    industry_impacts?: Record<string, string>;
-    recommended_actions?: string[];
-  };
+  ai_analysis?: AIAnalysis;
 }
 
 export interface Summary {

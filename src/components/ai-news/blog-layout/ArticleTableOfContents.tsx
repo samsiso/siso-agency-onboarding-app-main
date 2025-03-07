@@ -1,331 +1,203 @@
-
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Button } from '@/components/ui/button';
-import { ChevronRight, ArrowUp, List, ChevronDown, Zap, Lightbulb, TrendingUp, Layers, Brain, LineChart } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { EnhancedNewsItem } from '@/types/blog';
-import { useState, useEffect } from 'react';
+import { 
+  FileText, 
+  Lightbulb, 
+  Brain, 
+  TrendingUp, 
+  Layers, 
+  LineChart,
+  MessageCircle,
+  Zap,
+  LucideIcon
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Progress } from '@/components/ui/progress';
 
 interface ArticleTableOfContentsProps {
   article: EnhancedNewsItem;
   activeSection?: string;
 }
 
-// [Analysis] Enhanced types for section and content items with support for AI analysis sections
-type TableItem = {
-  id: string;
-  title: string;
-  type: 'section' | 'content' | 'ai_analysis';
-  importance?: string;
-  relevanceScore?: number;
-  parentId?: string;
-  order?: number;
-};
+export const ArticleTableOfContents = ({ 
+  article,
+  activeSection
+}: ArticleTableOfContentsProps) => {
+  // Skip rendering if there are no sections
+  if (article.sections.length === 0 && !article.key_takeaways?.length) {
+    return null;
+  }
 
-// [Framework] Icons mapping for different AI analysis sections to enhance visual navigation
-const ANALYSIS_ICONS: Record<string, React.ElementType> = {
-  market_impact: TrendingUp,
-  technical_predictions: Brain,
-  related_technologies: Layers,
-  business_implications: LineChart,
-  key_points: Lightbulb,
-  agency_relevance_score: Zap,
-  default: Lightbulb
-};
+  // Filter out sections with importance_level = 'low' for the ToC
+  const visibleSections = article.sections.filter(
+    section => section.importance_level !== 'low'
+  );
 
-export const ArticleTableOfContents = ({ article, activeSection }: ArticleTableOfContentsProps) => {
-  const [isTOCExpanded, setIsTOCExpanded] = useState(true);
-  const [aiSectionsExpanded, setAiSectionsExpanded] = useState(true);
-  
-  // [Analysis] Generate comprehensive table of contents items from article sections, 
-  // key takeaways and AI analysis data if available
-  const generateTableItems = (): TableItem[] => {
-    const items: TableItem[] = [
-      { id: 'key-takeaways', title: 'Key Takeaways', type: 'section', order: 0 } as const
-    ];
-    
-    // Add regular content sections
-    const contentSections = article.sections.map((section, index) => ({
-      id: section.id,
-      title: section.title,
-      type: 'content' as const,
-      importance: section.importance_level,
-      order: index + 1
-    }));
-    
-    items.push(...contentSections);
-    
-    // [Analysis] Check if AI analysis exists and add those sections
-    if (article.ai_analysis && Object.keys(article.ai_analysis).length > 0) {
-      // Add a parent section for AI Analysis
-      const aiAnalysisParentId = 'ai-analysis-parent';
-      items.push({
-        id: aiAnalysisParentId,
-        title: 'AI Analysis',
-        type: 'section',
-        order: items.length + 1
-      });
-      
-      // Add individual AI analysis sections
-      const aiAnalysisKeys = [
-        'market_impact', 
-        'business_implications',
-        'technical_predictions',
-        'related_technologies',
-        'key_points',
-        'implementation_timeline',
-        'market_opportunity',
-        'competitive_analysis',
-        'client_messaging',
-        'implementation_details',
-        'cost_benefit_analysis'
-      ];
-      
-      // [Plan] Filter only sections that actually exist in the analysis
-      const availableKeys = aiAnalysisKeys.filter(key => 
-        article.ai_analysis && article.ai_analysis[key] && 
-        (typeof article.ai_analysis[key] === 'string' || 
-         Array.isArray(article.ai_analysis[key]) || 
-         typeof article.ai_analysis[key] === 'object')
-      );
-      
-      // Add available sections to TOC
-      availableKeys.forEach((key, index) => {
-        // Format the title from the key (e.g., "market_impact" -> "Market Impact")
-        const title = key
-          .split('_')
-          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(' ');
-        
-        // Get relevance score if available
-        const relevanceScore = key === 'agency_relevance_score' 
-          ? article.ai_analysis?.agency_relevance_score 
-          : key === 'market_opportunity' && article.ai_analysis?.market_opportunity?.score
-            ? article.ai_analysis.market_opportunity.score
-            : undefined;
-        
-        items.push({
-          id: `ai-analysis-${key}`,
-          title,
-          type: 'ai_analysis',
-          parentId: aiAnalysisParentId,
-          relevanceScore,
-          order: items.length + 1 + index
-        });
-      });
-    }
-    
-    // Sort items by order
-    return items.sort((a, b) => (a.order || 0) - (b.order || 0));
+  // Determine if we have AI analysis sections to display
+  const hasAiAnalysis = article.ai_analysis && Object.keys(article.ai_analysis).length > 0;
+
+  // Determine if key takeaways should be shown
+  const showKeyTakeaways = article.key_takeaways && article.key_takeaways.length > 0;
+
+  // Create a mapping for AI analysis section titles
+  const aiAnalysisSectionTitles: Record<string, string> = {
+    market_impact: 'Market Impact',
+    technical_predictions: 'Technical Predictions',
+    related_technologies: 'Related Technologies',
+    business_implications: 'Business Implications',
+    key_points: 'Key Points',
+    implementation_timeline: 'Implementation Timeline',
+    market_opportunity: 'Market Opportunity',
+    competitive_analysis: 'Competitive Analysis',
+    client_messaging: 'Client Messaging',
+    implementation_details: 'Implementation Details',
+    cost_benefit_analysis: 'Cost-Benefit Analysis',
+    agency_relevance_score: 'Agency Relevance'
   };
 
-  const tableItems = generateTableItems();
-
-  // Calculate reading progress
-  const currentIndex = activeSection 
-    ? tableItems.findIndex(item => item.id === activeSection) 
-    : 0;
-  const readingProgress = Math.max(0, Math.min(100, 
-    (currentIndex / Math.max(1, tableItems.length - 1)) * 100
-  ));
-
-  // [Analysis] Scroll to section with enhanced ID handling for AI analysis sections
-  const scrollToSection = (id: string) => {
-    // For AI analysis sections, create the proper element ID
-    let elementId = id;
-    
-    // If it's an AI analysis section, modify the ID to match the DOM structure
-    if (id.startsWith('ai-analysis-') && id !== 'ai-analysis-parent') {
-      const analysisType = id.replace('ai-analysis-', '');
-      elementId = `ai-analysis-section-${analysisType}`;
-    }
-    
-    const element = document.getElementById(elementId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } else {
-      console.log(`Element with ID "${elementId}" not found`);
-    }
+  // Create a mapping for AI analysis section icons
+  const aiAnalysisSectionIcons: Record<string, LucideIcon> = {
+    market_impact: TrendingUp,
+    technical_predictions: Brain,
+    related_technologies: Layers,
+    business_implications: LineChart,
+    key_points: Lightbulb,
+    agency_relevance_score: Zap,
+    market_opportunity: TrendingUp,
+    default: Lightbulb
   };
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  // [Analysis] Enhanced importance visualization with more meaningful colors and labels
-  const getImportanceColor = (importance?: string) => {
-    switch (importance?.toLowerCase()) {
-      case 'high':
-        return 'bg-red-500/10 text-red-500 border-red-500/20';
-      case 'medium':
-        return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
-      case 'low':
-        return 'bg-green-500/10 text-green-500 border-green-500/20';
-      default:
-        return 'bg-siso-text/10 text-siso-text border-siso-text/20';
-    }
-  };
-
-  // [Analysis] Display relevance score with appropriate colors
-  const getRelevanceColor = (score?: number) => {
-    if (score === undefined) return '';
-    
-    if (score >= 80) return 'bg-green-500/10 text-green-500 border-green-500/20';
-    if (score >= 50) return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
-    return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
-  };
+  // Check if we have any important AI analysis sections
+  const hasImportantAnalysis = 
+    hasAiAnalysis && 
+    (article.ai_analysis?.agency_relevance_score !== undefined || 
+     article.ai_analysis?.market_opportunity !== undefined);
 
   return (
-    <div className="sticky top-8 space-y-8">
-      <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-4">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <List className="h-5 w-5 text-blue-400" />
-            <h3 className="text-lg font-semibold text-white">Contents</h3>
-          </div>
+    <div className="bg-white/5 rounded-lg p-4 backdrop-blur-sm border border-white/10">
+      <h3 className="text-lg font-semibold text-white mb-2">Contents</h3>
+      
+      <ScrollArea className="h-[350px] pr-3">
+        <div className="flex flex-col gap-1.5">
+          {/* Key Takeaways Link - Always first when present */}
+          {showKeyTakeaways && (
+            <a 
+              href="#key-takeaways"
+              className={cn(
+                "flex items-center gap-2 text-sm py-1.5 px-3 rounded-md transition-colors",
+                activeSection === 'key-takeaways'
+                  ? "bg-blue-900/30 text-blue-200"
+                  : "text-gray-300 hover:bg-white/5 hover:text-white"
+              )}
+            >
+              <Lightbulb className="h-4 w-4 text-blue-400" />
+              <span>Key Takeaways</span>
+            </a>
+          )}
           
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsTOCExpanded(!isTOCExpanded)}
-            className="h-7 w-7 p-0 rounded-full"
-          >
-            {isTOCExpanded ? (
-              <ChevronDown className="h-4 w-4 text-gray-400" />
-            ) : (
-              <ChevronRight className="h-4 w-4 text-gray-400" />
-            )}
-          </Button>
-        </div>
-        
-        {/* Reading progress bar */}
-        <div className="mb-4">
-          <div className="flex justify-between text-xs text-gray-400 mb-1.5">
-            <span>Progress</span>
-            <span>{Math.round(readingProgress)}%</span>
-          </div>
-          <Progress value={readingProgress} className="h-1.5 bg-gray-800" indicatorClassName="bg-blue-500" />
-        </div>
-        
-        {isTOCExpanded && (
-          <ScrollArea className="h-[calc(100vh-300px)]">
-            <div className="space-y-1">
-              {tableItems.map((item, index) => {
-                const isActive = activeSection === item.id;
-                const isPassed = activeSection 
-                  ? tableItems.findIndex(i => i.id === activeSection) > index
-                  : false;
-                
-                // Get appropriate icon for AI analysis sections
-                let Icon = List;
-                if (item.type === 'ai_analysis' && item.id.startsWith('ai-analysis-')) {
-                  const analysisType = item.id.replace('ai-analysis-', '');
-                  Icon = ANALYSIS_ICONS[analysisType] || ANALYSIS_ICONS.default;
-                }
-                
-                // Determine if this is a parent section
-                const isParent = item.id === 'ai-analysis-parent';
-                
-                // Skip child items if parent is collapsed
-                if (item.parentId === 'ai-analysis-parent' && !aiSectionsExpanded) {
-                  return null;
-                }
-                
-                return (
-                  <motion.button
-                    key={item.id}
-                    onClick={() => {
-                      if (isParent) {
-                        setAiSectionsExpanded(!aiSectionsExpanded);
-                      } else {
-                        scrollToSection(item.id);
-                      }
-                    }}
-                    className={cn(
-                      "w-full text-left p-2.5 rounded-lg transition-all duration-200 flex items-start gap-2",
-                      isActive 
-                        ? "bg-blue-900/30 shadow-sm border border-blue-500/20" 
-                        : isPassed 
-                          ? "text-gray-400 hover:bg-gray-800/40" 
-                          : "hover:bg-gray-800/40",
-                      item.parentId && "ml-3", // Indent child items
-                      isParent && "bg-gray-800/30" // Style for parent items
-                    )}
-                    whileHover={{ x: 2 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <div className={cn(
-                      "w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0",
-                      isActive 
-                        ? "bg-blue-400" 
-                        : isPassed 
-                          ? "bg-gray-500" 
-                          : "bg-gray-700"
-                    )} />
-                    
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        {item.type === 'ai_analysis' && (
-                          <Icon className="h-3.5 w-3.5 text-blue-400" />
-                        )}
-                        
-                        <p className={cn(
-                          "text-sm font-medium line-clamp-2",
-                          isActive 
-                            ? "text-blue-300" 
-                            : isPassed 
-                              ? "text-gray-400" 
-                              : item.type === 'ai_analysis'
-                                ? "text-blue-300"
-                                : isParent
-                                  ? "text-purple-300"
-                                  : "text-gray-300"
-                        )}>
-                          {item.title}
-                          
-                          {isParent && (
-                            <span className="ml-2">
-                              {aiSectionsExpanded ? (
-                                <ChevronDown className="inline h-3 w-3 text-gray-400" />
-                              ) : (
-                                <ChevronRight className="inline h-3 w-3 text-gray-400" />
-                              )}
-                            </span>
-                          )}
-                        </p>
-                      </div>
-                      
-                      {item.type === 'content' && item.importance && (
-                        <span className={`text-xs px-2 py-0.5 rounded-full mt-1 inline-block ${getImportanceColor(item.importance)}`}>
-                          {item.importance} Priority
-                        </span>
-                      )}
-                      
-                      {item.type === 'ai_analysis' && item.relevanceScore !== undefined && (
-                        <span className={`text-xs px-2 py-0.5 rounded-full mt-1 inline-block ${getRelevanceColor(item.relevanceScore)}`}>
-                          {item.relevanceScore}% Relevance
-                        </span>
-                      )}
+          {/* Article Section Links */}
+          {visibleSections.map((section, index) => (
+            <a
+              key={section.id}
+              href={`#${section.id}`}
+              className={cn(
+                "flex items-center gap-2 text-sm py-1.5 px-3 rounded-md transition-colors",
+                activeSection === section.id
+                  ? "bg-blue-900/30 text-blue-200"
+                  : "text-gray-300 hover:bg-white/5 hover:text-white"
+              )}
+            >
+              <FileText className="h-4 w-4 text-gray-400" />
+              <span>{section.title}</span>
+            </a>
+          ))}
+          
+          {/* AI Analysis Parent Section */}
+          {hasAiAnalysis && (
+            <>
+              <div className="mt-2 mb-1 border-t border-white/10 pt-2">
+                <div className={cn(
+                  "flex items-center gap-2 text-sm py-1.5 px-3 rounded-md transition-colors font-medium",
+                  activeSection === 'ai-analysis-parent'
+                    ? "bg-blue-900/30 text-blue-200"
+                    : "text-blue-300"
+                )}>
+                  <Brain className="h-4 w-4 text-blue-400" />
+                  <span>AI Analysis</span>
+                </div>
+              </div>
+              
+              {/* Important AI Analysis Metrics - when available */}
+              {hasImportantAnalysis && (
+                <div className="ml-4 mb-1 space-y-1">
+                  {article.ai_analysis?.agency_relevance_score !== undefined && (
+                    <div className="flex items-center justify-between text-xs py-1 px-2 rounded-md bg-indigo-900/20 text-indigo-300">
+                      <span>Agency Relevance</span>
+                      <span className="font-medium">{article.ai_analysis?.agency_relevance_score}%</span>
                     </div>
-                  </motion.button>
-                );
-              })}
-            </div>
-          </ScrollArea>
-        )}
-        
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={scrollToTop}
-          className="w-full mt-4 gap-2 border-white/10 bg-white/5 backdrop-blur-sm text-white hover:bg-white/10"
-        >
-          <ArrowUp className="w-4 h-4" />
-          Back to Top
-        </Button>
-      </div>
+                  )}
+                  {article.ai_analysis?.market_opportunity?.score !== undefined && (
+                    <div className="flex items-center justify-between text-xs py-1 px-2 rounded-md bg-green-900/20 text-green-300">
+                      <span>Market Opportunity</span>
+                      <span className="font-medium">{article.ai_analysis?.market_opportunity?.score}%</span>
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              {/* AI Analysis Section Links */}
+              <div className="ml-4 space-y-0.5">
+                {article.ai_analysis && Object.keys(article.ai_analysis).map(key => {
+                  // Skip rendering some metadata fields directly in the TOC
+                  if (['confidence_score', 'summary', 'score'].includes(key)) {
+                    return null;
+                  }
+                  
+                  // Skip empty arrays or objects
+                  const value = article.ai_analysis?.[key];
+                  if (!value || 
+                      (Array.isArray(value) && value.length === 0) || 
+                      (typeof value === 'object' && Object.keys(value).length === 0)) {
+                    return null;
+                  }
+                  
+                  // Get the icon for this section
+                  const IconComponent = aiAnalysisSectionIcons[key] || aiAnalysisSectionIcons.default;
+                  
+                  return (
+                    <a
+                      key={`ai-analysis-${key}`}
+                      href={`#ai-analysis-section-${key}`}
+                      className={cn(
+                        "flex items-center gap-2 text-xs py-1.5 px-3 rounded-md transition-colors",
+                        activeSection === `ai-analysis-section-${key}`
+                          ? "bg-blue-900/20 text-blue-200"
+                          : "text-gray-400 hover:bg-white/5 hover:text-gray-200"
+                      )}
+                    >
+                      <IconComponent className="h-3.5 w-3.5 text-blue-400" />
+                      <span>{aiAnalysisSectionTitles[key] || key.replace(/_/g, ' ')}</span>
+                    </a>
+                  );
+                })}
+              </div>
+            </>
+          )}
+          
+          {/* Community Notes Link */}
+          <div className="mt-2 pt-2 border-t border-white/10">
+            <a 
+              href="#community-notes"
+              className={cn(
+                "flex items-center gap-2 text-sm py-1.5 px-3 rounded-md transition-colors",
+                "text-gray-300 hover:bg-white/5 hover:text-white"
+              )}
+            >
+              <MessageCircle className="h-4 w-4 text-blue-400" />
+              <span>Community Notes ({article.comments?.length || 0})</span>
+            </a>
+          </div>
+        </div>
+      </ScrollArea>
     </div>
   );
 };
