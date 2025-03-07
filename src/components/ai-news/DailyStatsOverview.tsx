@@ -27,6 +27,7 @@ export const DailyStatsOverview = ({
   
   // [Analysis] Added state for tracking the active AI summary tab
   const [activeTab, setActiveTab] = useState('overview');
+  const [summaryActiveTab, setSummaryActiveTab] = useState('summary');
   
   // [Analysis] Extract the date from the first news item or use current date
   const currentDate = newsItems.length > 0 && newsItems[0].date 
@@ -37,28 +38,42 @@ export const DailyStatsOverview = ({
   const { summaryData, loading: summaryLoading } = useAiDailySummary(currentDate);
   
   return (
-    <Card className="bg-gray-900/30 border-gray-800">
+    <Card className="bg-gradient-to-br from-gray-900/50 to-purple-950/20 border-gray-800 shadow-lg shadow-purple-900/5">
       <CardContent className="p-4">
         <Tabs defaultValue="overview" onValueChange={setActiveTab}>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-medium flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-blue-400" />
-              Today's AI News Insights
+              <span className="bg-gradient-to-r from-blue-300 to-purple-300 bg-clip-text text-transparent">
+                Today's AI News Insights
+              </span>
             </h2>
-            <TabsList>
-              <TabsTrigger value="overview">
+            <TabsList className="bg-gray-900/70 border border-gray-800">
+              <TabsTrigger 
+                value="overview"
+                className="data-[state=active]:bg-purple-900/30 data-[state=active]:text-white"
+              >
                 <Activity className="h-4 w-4 mr-2" />
                 Overview
               </TabsTrigger>
-              <TabsTrigger value="impact">
+              <TabsTrigger 
+                value="impact"
+                className="data-[state=active]:bg-purple-900/30 data-[state=active]:text-white"
+              >
                 <BarChart3 className="h-4 w-4 mr-2" />
-                Impact Analysis
+                Impact
               </TabsTrigger>
-              <TabsTrigger value="technology">
+              <TabsTrigger 
+                value="technology"
+                className="data-[state=active]:bg-purple-900/30 data-[state=active]:text-white"
+              >
                 <LineChart className="h-4 w-4 mr-2" />
                 Technology
               </TabsTrigger>
-              <TabsTrigger value="ai-summary">
+              <TabsTrigger 
+                value="ai-summary"
+                className="data-[state=active]:bg-purple-900/30 data-[state=active]:text-white"
+              >
                 <Brain className="h-4 w-4 mr-2" />
                 AI Summary
               </TabsTrigger>
@@ -81,8 +96,8 @@ export const DailyStatsOverview = ({
             <SummaryContent 
               loading={summaryLoading || loading} 
               summaryData={summaryData}
-              activeTab="summary"
-              setActiveTab={() => {}}
+              activeTab={summaryActiveTab}
+              setActiveTab={setSummaryActiveTab}
             />
           </TabsContent>
         </Tabs>
