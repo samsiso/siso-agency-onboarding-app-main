@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { NewsItem } from '@/types/blog';
 import { calculateComplexityBreakdown, calculateSourceDistribution } from './calculateStats';
@@ -116,8 +117,8 @@ export const TechnologyBreakdown = ({ newsItems, loading = false }: TechnologyBr
         >
           <RadialBar
             background={{ fill: 'rgba(17, 24, 39, 0.4)' }}
-            clockWise
             dataKey="value"
+            isAnimationActive={true}
             animationBegin={300}
             animationDuration={1200}
             animationEasing="ease-out"
