@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+// [Analysis] Use type-only import for AIAnalysis type to avoid naming conflicts
 import type { AIAnalysis as AIAnalysisType } from '@/types/blog';
 import { Brain, TrendingUp, Briefcase, Share2, RefreshCw } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
@@ -34,7 +35,8 @@ export const AIAnalysis = ({
        analysis.market_impact || 
        analysis.business_implications);
        
-    setHasData(hasAnalysisData);
+    // [Analysis] Fix TypeScript error - ensuring we set boolean value
+    setHasData(Boolean(hasAnalysisData));
     console.log('[AIAnalysis-Sidebar] Analysis exists:', hasAnalysisData, analysis);
   }, [analysis]);
   
