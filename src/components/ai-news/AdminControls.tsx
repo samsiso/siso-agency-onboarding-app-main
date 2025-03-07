@@ -75,7 +75,7 @@ export const AdminControls = ({
     }
   };
 
-  // Add function to delete test articles
+  // Add function to delete test articles - Fixed toast usage
   const deleteTestArticles = async () => {
     try {
       if (confirm('Are you sure you want to delete all test articles from March 7th? This action cannot be undone.')) {
@@ -88,18 +88,29 @@ export const AdminControls = ({
         
         // Show success message with count of deleted articles
         if (response.data && response.data.success) {
-          toast.success(response.data.message);
+          toast({
+            title: "Success",
+            description: response.data.message,
+            variant: "default",
+          });
         } else {
-          toast.info(response.data?.message || 'No articles were deleted');
+          toast({
+            title: "Information",
+            description: response.data?.message || 'No articles were deleted',
+            variant: "default",
+          });
         }
       }
     } catch (error) {
       console.error('Error deleting test articles:', error);
-      toast.error(`Failed to delete test articles: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      toast({
+        title: "Error",
+        description: `Failed to delete test articles: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        variant: "destructive",
+      });
     }
   };
   
-  // Bulk generation function to create articles for a date range
   const handleBulkGeneration = async () => {
     if (syncingNews || bulkGenerating || !bulkStartDate || !bulkEndDate) return;
     
