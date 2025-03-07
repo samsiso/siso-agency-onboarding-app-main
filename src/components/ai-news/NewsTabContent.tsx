@@ -12,6 +12,7 @@ interface NewsTabContentProps {
   loadingSummaries: Record<string, boolean>;
   onGenerateSummary: (id: string) => void;
   loading?: boolean;
+  searchQuery?: string; // [Analysis] Added searchQuery prop to fix type error
 }
 
 // [Analysis] Animation variants for staggered card appearance
@@ -32,14 +33,15 @@ export const NewsTabContent = memo(({
   summaries,
   loadingSummaries,
   onGenerateSummary,
-  loading = false
+  loading = false,
+  searchQuery = '' // [Analysis] Added default value to searchQuery
 }: NewsTabContentProps) => {
   if (loading) {
     return <NewsLoadingState />;
   }
 
   if (items.length === 0) {
-    return <NewsEmptyState />;
+    return <NewsEmptyState searchQuery={searchQuery} />;
   }
 
   return (

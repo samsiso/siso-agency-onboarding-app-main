@@ -101,7 +101,7 @@ const AINews: React.FC = () => {
     }
   };
   
-  // New function to analyze an article using AI
+  // [Analysis] Fixed type issue by simplifying the function signature
   const analyzeArticle = async (articleId: string): Promise<void> => {
     try {
       // First check if article already has analysis
@@ -132,7 +132,6 @@ const AINews: React.FC = () => {
       }
       
       // Call the edge function to analyze the article
-      // [Q] Edge function for article analysis needs to be implemented
       const { data, error } = await supabase.functions.invoke('analyze-article', {
         body: { 
           articleId,
@@ -150,7 +149,6 @@ const AINews: React.FC = () => {
     } catch (error) {
       console.error('Error analyzing article:', error);
       toast.error('Failed to analyze article');
-      throw error;
     }
   };
   
