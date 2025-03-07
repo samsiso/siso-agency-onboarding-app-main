@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -16,8 +15,9 @@ import { AdminControls } from '@/components/ai-news/AdminControls';
 import { DailyStatsOverview } from '@/components/ai-news/DailyStatsOverview';
 import { NewsErrorBoundary } from '@/components/ai-news/NewsErrorBoundary';
 import { DateNavigation } from '@/components/ai-news/DateNavigation';
+import { supabase } from '@/integrations/supabase/client';
 
-// [Analysis] Improved UI to provide more transparency about article generation
+// [Analysis] Improved UI to provide more transparency about article generation and added AI analysis feature
 const AINews: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('today');
   const [currentPage, setCurrentPage] = useState(1);
@@ -101,6 +101,59 @@ const AINews: React.FC = () => {
     }
   };
   
+  // New function to analyze an article using AI
+  const analyzeArticle = async (articleId: string): Promise<void> => {
+    try {
+      // First check if article already has analysis
+      const { data: existingAnalysis, error: checkError } = await supabase
+        .from('news_ai_analysis')
+        .select('*')
+        .eq('article_id', articleId)
+        .maybeSingle();
+        
+      if (checkError) throw checkError;
+      
+      // If analysis exists and is not too old, return it
+      if (existingAnalysis) {
+        const analysisDate = new Date(existingAnalysis.created_at);
+        const now = new Date();
+        const hoursSinceAnalysis = (now.getTime() - analysisDate.getTime()) / (1000 * 60 * 60);
+        
+        if (hoursSinceAnalysis < 24) {
+          toast.success('Analysis loaded from cache');
+          return;
+        }
+      }
+      
+      // Find the article details
+      const article = newsItems.find(item => item.id === articleId);
+      if (!article) {
+        throw new Error('Article not found');
+      }
+      
+      // Call the edge function to analyze the article
+      // [Q] Edge function for article analysis needs to be implemented
+      const { data, error } = await supabase.functions.invoke('analyze-article', {
+        body: { 
+          articleId,
+          title: article.title,
+          content: article.content || article.description || '',
+          source: article.source,
+          category: article.category
+        }
+      });
+      
+      if (error) throw error;
+      
+      toast.success('Article analyzed successfully');
+      
+    } catch (error) {
+      console.error('Error analyzing article:', error);
+      toast.error('Failed to analyze article');
+      throw error;
+    }
+  };
+  
   return (
     <div className="container mx-auto px-4 py-6 max-w-7xl">
       <NewsErrorBoundary>
@@ -162,13 +215,14 @@ const AINews: React.FC = () => {
             />
           )}
           
-          {/* Main news content */}
+          {/* Main news content with added AI analysis capability */}
           <NewsContent 
             newsItems={newsItems}
             searchQuery={searchQuery}
             summaries={summaries}
             loadingSummaries={loadingSummaries}
             onGenerateSummary={generateSummary}
+            onAnalyzeArticle={analyzeArticle}
             loading={loading}
             hasMore={hasMore}
             onLoadMore={loadMore}

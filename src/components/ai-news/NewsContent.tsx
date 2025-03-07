@@ -1,32 +1,11 @@
 
-import { lazy, Suspense, useEffect, useMemo, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2 } from 'lucide-react';
-import { useInView } from 'react-intersection-observer';
-import NewsTabs from './NewsTabs';
-import { NewsLoadingState } from './NewsLoadingState';
-import { NewsEmptyState } from './NewsEmptyState';
+import React from 'react';
+import { motion } from 'framer-motion';
+import NewsCard from './NewsCard';
+import { Button } from '@/components/ui/button';
 import { NewsItem } from '@/types/blog';
-
-const NewsCard = lazy(() => import('@/components/ai-news/NewsCard'));
-
-const LoadingSpinner = () => (
-  <div className="flex items-center justify-center p-8">
-    <Loader2 className="h-6 w-6 animate-spin text-siso-red" />
-  </div>
-);
-
-// [Analysis] Added stagger effect for smoother content transitions
-const containerVariants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.05,
-      duration: 0.3
-    }
-  }
-};
+import { NewsEmptyState } from './NewsEmptyState';
+import { NewsLoadingState } from './NewsLoadingState';
 
 interface NewsContentProps {
   newsItems: NewsItem[];
@@ -34,101 +13,74 @@ interface NewsContentProps {
   summaries: Record<string, string>;
   loadingSummaries: Record<string, boolean>;
   onGenerateSummary: (id: string) => void;
-  loading?: boolean;
-  hasMore?: boolean;
-  onLoadMore?: () => void;
+  onAnalyzeArticle?: (id: string) => Promise<void>;
+  loading: boolean;
+  hasMore: boolean;
+  onLoadMore: () => void;
 }
 
-export const NewsContent = ({
+// [Analysis] Updated to include AI analysis functionality
+export function NewsContent({
   newsItems,
   searchQuery,
   summaries,
   loadingSummaries,
   onGenerateSummary,
-  loading = false,
-  hasMore = false,
+  onAnalyzeArticle,
+  loading,
+  hasMore,
   onLoadMore
-}: NewsContentProps) => {
-  const [ref, inView] = useInView({
-    threshold: 0.5,
-    triggerOnce: false
-  });
-
-  const handleLoadMore = useCallback(() => {
-    if (!loading && hasMore && onLoadMore) {
-      onLoadMore();
-    }
-  }, [loading, hasMore, onLoadMore]);
-
-  const filteredNewsItems = useMemo(() => {
-    if (!searchQuery) return newsItems;
-    const searchLower = searchQuery.toLowerCase();
-    return newsItems.filter(item => 
-      item.title?.toLowerCase().includes(searchLower) ||
-      item.description?.toLowerCase().includes(searchLower) ||
-      item.content?.toLowerCase().includes(searchLower) ||
-      item.category?.toLowerCase().includes(searchLower) ||
-      (item.tags && item.tags.some(tag => 
-        typeof tag === 'string' && tag.toLowerCase().includes(searchLower)
-      ))
-    );
-  }, [newsItems, searchQuery]);
-
-  // [Analysis] Sort trending items by views
-  const trendingItems = useMemo(() => {
-    return [...filteredNewsItems]
-      .sort((a, b) => (b.views || 0) - (a.views || 0))
-      .slice(0, 6);
-  }, [filteredNewsItems]);
-
-  // [Analysis] Sort most discussed items by bookmarks/comments metrics
-  const mostDiscussedItems = useMemo(() => {
-    return [...filteredNewsItems]
-      .sort((a, b) => (b.bookmarks || 0) - (a.bookmarks || 0))
-      .slice(0, 6);
-  }, [filteredNewsItems]);
-
-  useEffect(() => {
-    if (inView) {
-      handleLoadMore();
-    }
-  }, [inView, handleLoadMore]);
+}: NewsContentProps) {
+  // Filter news items by search query if provided
+  const filteredItems = searchQuery 
+    ? newsItems.filter(item => 
+        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (item.content && item.content.toLowerCase().includes(searchQuery.toLowerCase())))
+    : newsItems;
+    
+  // Show loading state when fetching news
+  if (loading && filteredItems.length === 0) {
+    return <NewsLoadingState />;
+  }
+  
+  // Show empty state when no news items match search
+  if (filteredItems.length === 0) {
+    return <NewsEmptyState searchQuery={searchQuery} />;
+  }
 
   return (
-    <Suspense fallback={<LoadingSpinner />}>
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={searchQuery}
-          initial="hidden"
-          animate="show"
-          exit="hidden"
-          variants={containerVariants}
-          className="space-y-8"
-        >
-          {filteredNewsItems.length > 0 ? (
-            <NewsTabs
-              latestItems={filteredNewsItems}
-              trendingItems={trendingItems}
-              mostDiscussedItems={mostDiscussedItems}
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {filteredItems.map((item, index) => (
+          <motion.div
+            key={item.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: index * 0.05 }}
+          >
+            <NewsCard 
+              item={item} 
               summaries={summaries}
               loadingSummaries={loadingSummaries}
               onGenerateSummary={onGenerateSummary}
+              onAnalyzeArticle={onAnalyzeArticle}
             />
-          ) : loading ? (
-            <NewsLoadingState />
-          ) : (
-            <NewsEmptyState />
-          )}
-
-          {/* Infinite Scroll Trigger */}
-          {hasMore && !loading && filteredNewsItems.length > 0 && (
-            <div ref={ref} className="h-10" />
-          )}
-
-          {/* Loading State */}
-          {loading && filteredNewsItems.length > 0 && <NewsLoadingState />}
-        </motion.div>
-      </AnimatePresence>
-    </Suspense>
+          </motion.div>
+        ))}
+      </div>
+      
+      {/* Load more button */}
+      {hasMore && (
+        <div className="flex justify-center mt-8">
+          <Button 
+            variant="outline" 
+            onClick={onLoadMore}
+            className="border-blue-800 hover:border-blue-700 hover:bg-blue-950/30"
+          >
+            Load More Articles
+          </Button>
+        </div>
+      )}
+    </div>
   );
-};
+}

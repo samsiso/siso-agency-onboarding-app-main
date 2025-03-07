@@ -70,6 +70,12 @@ export interface NewsItem {
   tags?: string[];
   template_type?: string;
   sources?: string[];
+
+  // Add AI analysis properties
+  ai_importance_score?: number;
+  ai_analysis_id?: string;
+  has_ai_analysis?: boolean;
+  analysis_date?: string;
 }
 
 export interface Summary {
@@ -160,4 +166,18 @@ export interface NewsComment {
   user_email: string;
   updated_at: string;
   news_id: string;
+}
+
+// Add NewsAnalysis interface
+export interface NewsAnalysis {
+  id: string;
+  article_id: string;
+  summary: string;
+  key_points: string[];
+  technical_significance: string;
+  market_impact: string;
+  source_credibility: string;
+  ai_importance_score: number;
+  metadata: Record<string, any>;
+  created_at: string;
 }
