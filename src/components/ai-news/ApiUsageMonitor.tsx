@@ -6,7 +6,8 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, AlertCircle, CheckCircle } from 'lucide-react';
 
-// [Analysis] Define custom types for API token usage data 
+// [Analysis] Custom interface for API token usage data
+// [Framework] Data Transfer Object pattern for type safety
 interface TokenUsage {
   tokens_used: number;
   operations: Array<{type: string, count: number}>;
@@ -39,27 +40,41 @@ export const ApiUsageMonitor = () => {
         // Get today's usage
         const today = new Date().toISOString().split('T')[0];
         
-        // [Analysis] Use a generic query to bypass type checking for custom table
-        const todayResult = await supabase.rpc('rest', { 
-          path: `rest/v1/api_token_usage?date=eq.${today}&select=tokens_used,operations,date`
-        });
+        // [Analysis] Direct fetch with type casting to bypass TypeScript limitations
+        // [Q] Should we create a custom RPC function for more type safety?
+        const { data: todayUsageData, error: todayError } = await supabase
+          .from('api_token_usage' as any)
+          .select('tokens_used, operations, date')
+          .eq('date', today)
+          .single() as unknown as { 
+            data: TokenUsage | null, 
+            error: any 
+          };
         
-        const todayData = todayResult.data?.[0] as TokenUsage | undefined;
+        if (todayError && todayError.code !== 'PGSQL_ERROR_NO_ROWS') {
+          throw todayError;
+        }
         
         // Get monthly usage by summing daily usage for current month
         const firstDayOfMonth = new Date();
         firstDayOfMonth.setDate(1);
         const firstDayStr = firstDayOfMonth.toISOString().split('T')[0];
         
-        const monthlyResult = await supabase.rpc('rest', {
-          path: `rest/v1/api_token_usage?date=gte.${firstDayStr}&select=tokens_used,date`
-        });
+        const { data: monthlyUsageData, error: monthlyError } = await supabase
+          .from('api_token_usage' as any)
+          .select('tokens_used, date')
+          .gte('date', firstDayStr) as unknown as {
+            data: TokenUsage[] | null,
+            error: any
+          };
         
-        const monthlyData = monthlyResult.data as TokenUsage[] | undefined;
+        if (monthlyError) {
+          throw monthlyError;
+        }
         
         // Calculate usage
-        const dailyUsed = todayData?.tokens_used || 0;
-        const monthlyUsed = monthlyData?.reduce((sum, day) => sum + day.tokens_used, 0) || 0;
+        const dailyUsed = todayUsageData?.tokens_used || 0;
+        const monthlyUsed = monthlyUsageData?.reduce((sum, day) => sum + day.tokens_used, 0) || 0;
         
         setUsage({
           daily: {
@@ -72,7 +87,7 @@ export const ApiUsageMonitor = () => {
             limit: 2000,
             percentage: Math.min(Math.round((monthlyUsed / 2000) * 100), 100)
           },
-          operations: todayData?.operations || []
+          operations: todayUsageData?.operations || []
         });
         
         setError(null);
