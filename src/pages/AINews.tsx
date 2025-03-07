@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -66,11 +67,14 @@ const AINews: React.FC = () => {
     setCurrentPage(1);
   }, [activeTab, selectedCategory]);
 
-  // Handle range changes with improved date logic
+  // [Analysis] Handle range changes with improved date logic and explicit logging
   useEffect(() => {
+    console.log('Current range changed to:', currentRange);
+    
     if (currentRange === 'day') {
-      // Single day view - already handled by useNewsItems
-      // This uses the current date and shows just that day's articles
+      // Single day view - use the current date
+      console.log('Fetching single day view for:', format(currentDate, 'yyyy-MM-dd'));
+      // No need to call fetchNewsInRange for day view, it's handled by the date change
     } else if (currentRange === 'week') {
       // Get the week's start (Sunday) and end (Saturday) for the current date
       const weekStart = startOfWeek(currentDate);
@@ -84,7 +88,7 @@ const AINews: React.FC = () => {
       console.log(`Month range: ${format(monthStart, 'yyyy-MM-dd')} to ${format(monthEnd, 'yyyy-MM-dd')}`);
       fetchNewsInRange(monthStart, monthEnd);
     }
-  }, [currentRange, currentDate, selectedCategory]);
+  }, [currentRange, currentDate, fetchNewsInRange, selectedCategory]);
   
   // Handle search changes
   const handleSearchChange = (query: string) => {
@@ -107,8 +111,9 @@ const AINews: React.FC = () => {
     setShowAdminPanel(!showAdminPanel);
   };
   
-  // Handle range selection
+  // [Analysis] Improved range selection handler with logging
   const handleRangeSelect = (range: 'day' | 'week' | 'month') => {
+    console.log('Range selection changed from', currentRange, 'to', range);
     setCurrentRange(range);
   };
   
@@ -197,6 +202,7 @@ const AINews: React.FC = () => {
               onSelectDate={goToDate}
               onSelectRange={handleRangeSelect}
               currentRange={currentRange}
+              loading={loading}
             />
             
             {/* Daily statistics overview */}

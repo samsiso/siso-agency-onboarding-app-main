@@ -19,6 +19,7 @@ interface DateNavigationProps {
   loading?: boolean;
 }
 
+// [Analysis] Enhanced DateNavigation component with better range selection handling
 export const DateNavigation = ({
   currentDate,
   dateRange = [],
@@ -36,18 +37,34 @@ export const DateNavigation = ({
     exit: { opacity: 0, y: 10, transition: { duration: 0.2 } }
   };
 
+  // [Analysis] Handle date selection from calendar with proper feedback
   const handleSelectDateFromCalendar = (date: Date | undefined) => {
     if (date) {
+      // If we're not in day mode, switch to day mode when selecting a specific date
+      if (currentRange !== 'day') {
+        onSelectRange('day');
+      }
       onSelectDate(date);
     }
   };
 
+  // [Analysis] Handle date selection from dropdown with proper feedback
   const handleSelectDateFromDropdown = (dateString: string) => {
+    // If we're not in day mode, switch to day mode when selecting a specific date
+    if (currentRange !== 'day') {
+      onSelectRange('day');
+    }
     const date = parseISO(dateString);
     onSelectDate(date);
   };
 
-  // [Analysis] Get range text based on current selection
+  // [Analysis] Handle range selection with improved feedback
+  const handleRangeChange = (value: string) => {
+    console.log('Range changed to:', value);
+    onSelectRange(value as 'day' | 'week' | 'month');
+  };
+
+  // [Analysis] Get range text based on current selection with better formatting
   const getRangeText = () => {
     if (currentRange === 'day') {
       return isToday(currentDate) ? 'Today' : format(currentDate, 'EEEE');
@@ -131,7 +148,7 @@ export const DateNavigation = ({
       <div className="flex flex-col sm:flex-row justify-between items-center gap-2">
         <div className="flex items-center gap-2 w-full sm:w-auto">
           <Select
-            onValueChange={(value) => onSelectRange(value as 'day' | 'week' | 'month')}
+            onValueChange={handleRangeChange}
             value={currentRange}
             disabled={loading}
           >

@@ -15,7 +15,7 @@ interface DailyStatsOverviewProps {
   loading: boolean;
 }
 
-// [Analysis] Added AI Summary tab to provide overview of the day's news
+// [Analysis] Enhanced stats overview with dynamic data handling based on date range
 export const DailyStatsOverview = ({
   newsItems,
   loading
@@ -37,6 +37,26 @@ export const DailyStatsOverview = ({
   // [Analysis] Use the AI summary hook to fetch summary data based on the date
   const { summaryData, loading: summaryLoading } = useAiDailySummary(currentDate);
   
+  // [Analysis] Determine the range text to display based on data
+  const getRangeText = () => {
+    if (newsItems.length === 0) return "Today's";
+    
+    // Check if all articles have the same date
+    const firstDate = newsItems[0].date;
+    const allSameDate = newsItems.every(item => item.date === firstDate);
+    
+    if (allSameDate) {
+      return `${new Date(firstDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}'s`;
+    } else {
+      // If dates vary, it's a range view
+      const dateSet = new Set(newsItems.map(item => item.date));
+      if (dateSet.size > 1) {
+        return 'Periodic';
+      }
+      return "Today's";
+    }
+  };
+  
   return (
     <Card className="bg-gradient-to-br from-gray-900/50 to-purple-950/20 border-gray-800 shadow-lg shadow-purple-900/5">
       <CardContent className="p-4">
@@ -45,7 +65,7 @@ export const DailyStatsOverview = ({
             <h2 className="text-lg font-medium flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-blue-400" />
               <span className="bg-gradient-to-r from-blue-300 to-purple-300 bg-clip-text text-transparent">
-                Today's AI News Insights
+                {getRangeText()} AI News Insights
               </span>
             </h2>
             <TabsList className="bg-gray-900/70 border border-gray-800">
