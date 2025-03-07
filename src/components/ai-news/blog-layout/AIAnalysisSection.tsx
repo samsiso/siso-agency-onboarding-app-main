@@ -1,320 +1,152 @@
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { 
-  Brain, 
-  TrendingUp, 
-  Lightbulb, 
-  Layers, 
-  LineChart,
-  MessageCircle,
-  Zap,
-  Clock
-} from 'lucide-react';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { EnhancedNewsItem } from '@/types/blog';
+import React, { useState } from 'react';
+import { EnhancedNewsItem, AIAnalysis } from '@/types/blog';
+import { Brain, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { AIAnalysisDialog } from '../AIAnalysisDialog';
+import { cn } from '@/lib/utils';
+import { useSupabaseClient } from '@supabase/auth-helpers-react';
+import { toast } from 'react-hot-toast';
 
-// [Analysis] This component displays AI analysis in a dedicated section
-// [Plan] Could be enhanced with visual charts/graphs for deeper insights
-
+// [Analysis] This component renders the AI analysis section in the blog layout
 interface AIAnalysisSectionProps {
   article: EnhancedNewsItem;
+  onAnalyze?: () => Promise<void>;
 }
 
-export const AIAnalysisSection = ({ article }: AIAnalysisSectionProps) => {
-  const [expandedSection, setExpandedSection] = useState<string | null>(null);
+export const AIAnalysisSection = ({ article, onAnalyze }: AIAnalysisSectionProps) => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isGeneratingAnalysis, setIsGeneratingAnalysis] = useState(false);
+  const supabase = useSupabaseClient();
   
-  // If no AI analysis exists, don't render this component
-  if (!article.ai_analysis || Object.keys(article.ai_analysis).length === 0) {
-    return null;
-  }
-
-  // Helper function to render AI analysis key points as list items
-  const renderListItems = (items: string[] | undefined) => {
-    if (!items || !Array.isArray(items) || items.length === 0) return null;
+  // [Analysis] Check if analysis exists and has data
+  const hasAnalysis = article.ai_analysis && Object.keys(article.ai_analysis).length > 0;
+  
+  // [Analysis] Function to generate analysis using Edge Function
+  const handleGenerateAnalysis = async () => {
+    if (!article.id) {
+      toast.error('Article ID not found');
+      return;
+    }
     
-    return (
-      <ul className="mt-3 space-y-2">
-        {items.map((item, index) => (
-          <li key={index} className="flex items-start gap-2">
-            <div className="bg-blue-500/20 text-blue-400 p-1 rounded-full mt-0.5">
-              <Lightbulb className="h-3 w-3" />
-            </div>
-            <span className="text-gray-300">{item}</span>
-          </li>
-        ))}
-      </ul>
-    );
-  };
-
-  // Helper function to render complex objects from AI analysis
-  const renderAnalysisObject = (obj: Record<string, any> | undefined, parentKey: string) => {
-    if (!obj || typeof obj !== 'object') return null;
+    setIsGeneratingAnalysis(true);
     
-    return (
-      <div className="mt-4 space-y-4">
-        {Object.entries(obj).map(([key, value]) => {
-          // Skip rendering score directly as it's displayed elsewhere
-          if (key === 'score') return null;
-          
-          // Format the title from the key
-          const title = key
-            .split('_')
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ');
-          
-          return (
-            <div key={key} className="border-l-2 border-blue-500/30 pl-4 py-1">
-              <h5 className="font-medium text-blue-300 mb-1">{title}</h5>
-              {renderAnalysisValue(value, `${parentKey}-${key}`)}
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
-
-  // Helper function to render different types of AI analysis values 
-  const renderAnalysisValue = (value: any, key: string) => {
-    if (!value) return null;
-    
-    if (Array.isArray(value)) {
-      return renderListItems(value);
-    } else if (typeof value === 'object') {
-      return renderAnalysisObject(value, key);
-    } else {
-      return <p className="text-gray-300">{value}</p>;
+    try {
+      const { data, error } = await supabase.functions.invoke('analyze-article', {
+        body: { articleId: article.id }
+      });
+      
+      if (error) {
+        throw error;
+      }
+      
+      if (data?.success) {
+        toast.success('Analysis generated successfully');
+        
+        // Refresh article data if callback is provided
+        if (onAnalyze) {
+          await onAnalyze();
+        }
+      } else {
+        throw new Error(data?.message || 'Failed to generate analysis');
+      }
+    } catch (error) {
+      console.error('Error generating analysis:', error);
+      toast.error('Failed to generate analysis');
+    } finally {
+      setIsGeneratingAnalysis(false);
     }
   };
-
+  
+  // [Analysis] Open the dialog when clicking on analysis
+  const handleOpenDialog = () => {
+    setIsDialogOpen(true);
+  };
+  
+  if (!hasAnalysis) {
+    return null;
+  }
+  
   return (
-    <motion.div
-      id="ai-analysis-section"
-      className="my-12 bg-gradient-to-br from-blue-950/30 to-purple-950/20 border border-blue-500/20 rounded-lg overflow-hidden"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: 0.2 }}
-    >
-      <div className="p-5 border-b border-blue-500/20">
+    <div id="ai-analysis-section" className="bg-white/5 rounded-lg p-6 backdrop-blur-sm border border-white/10">
+      <div className="flex justify-between items-center mb-4">
         <div className="flex items-center gap-2">
           <div className="bg-blue-500/20 p-2 rounded-full">
             <Brain className="h-5 w-5 text-blue-400" />
           </div>
-          <div>
-            <h3 className="text-xl font-semibold text-blue-300">AI Analysis</h3>
-            <p className="text-xs text-blue-400/80">
-              Enhanced insights and implications for AI agency owners
-            </p>
-          </div>
+          <h3 className="text-xl font-semibold text-white">AI Analysis</h3>
+        </div>
+        
+        <div className="flex gap-2 items-center">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleGenerateAnalysis}
+            disabled={isGeneratingAnalysis}
+          >
+            <RefreshCw className={cn("h-4 w-4 mr-2", isGeneratingAnalysis && "animate-spin")} />
+            Refresh Analysis
+          </Button>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleOpenDialog}
+          >
+            View Full Analysis
+          </Button>
         </div>
       </div>
       
-      <div className="p-5 space-y-4">
-        {/* Render AI analysis sections using Accordion for better organization */}
-        <Accordion type="single" collapsible className="border-none space-y-3">
-          {/* Market Impact Section */}
-          {article.ai_analysis?.market_impact && (
-            <AccordionItem 
-              value="market_impact" 
-              id="ai-analysis-section-market_impact"
-              className="border border-blue-500/20 rounded-lg overflow-hidden bg-blue-950/10 px-0"
-            >
-              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-blue-900/20">
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-blue-400" />
-                  <span className="text-blue-300 font-medium">Market Impact</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4 pt-0 text-gray-300">
-                <p>{article.ai_analysis.market_impact}</p>
-              </AccordionContent>
-            </AccordionItem>
-          )}
-          
-          {/* Business Implications Section */}
-          {article.ai_analysis?.business_implications && (
-            <AccordionItem 
-              value="business_implications" 
-              id="ai-analysis-section-business_implications"
-              className="border border-blue-500/20 rounded-lg overflow-hidden bg-blue-950/10 px-0"
-            >
-              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-blue-900/20">
-                <div className="flex items-center gap-2">
-                  <LineChart className="h-4 w-4 text-blue-400" />
-                  <span className="text-blue-300 font-medium">Business Implications</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4 pt-0 text-gray-300">
-                <p>{article.ai_analysis.business_implications}</p>
-              </AccordionContent>
-            </AccordionItem>
-          )}
-          
-          {/* Technical Predictions Section */}
-          {article.ai_analysis?.technical_predictions && Array.isArray(article.ai_analysis.technical_predictions) && (
-            <AccordionItem 
-              value="technical_predictions" 
-              id="ai-analysis-section-technical_predictions"
-              className="border border-blue-500/20 rounded-lg overflow-hidden bg-blue-950/10 px-0"
-            >
-              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-blue-900/20">
-                <div className="flex items-center gap-2">
-                  <Brain className="h-4 w-4 text-blue-400" />
-                  <span className="text-blue-300 font-medium">Technical Predictions</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4 pt-0">
-                {renderListItems(article.ai_analysis.technical_predictions)}
-              </AccordionContent>
-            </AccordionItem>
-          )}
-          
-          {/* Related Technologies Section */}
-          {article.ai_analysis?.related_technologies && Array.isArray(article.ai_analysis.related_technologies) && (
-            <AccordionItem 
-              value="related_technologies" 
-              id="ai-analysis-section-related_technologies"
-              className="border border-blue-500/20 rounded-lg overflow-hidden bg-blue-950/10 px-0"
-            >
-              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-blue-900/20">
-                <div className="flex items-center gap-2">
-                  <Layers className="h-4 w-4 text-blue-400" />
-                  <span className="text-blue-300 font-medium">Related Technologies</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4 pt-0">
-                {renderListItems(article.ai_analysis.related_technologies)}
-              </AccordionContent>
-            </AccordionItem>
-          )}
-          
-          {/* Key Points Section */}
-          {article.ai_analysis?.key_points && Array.isArray(article.ai_analysis.key_points) && (
-            <AccordionItem 
-              value="key_points" 
-              id="ai-analysis-section-key_points"
-              className="border border-blue-500/20 rounded-lg overflow-hidden bg-blue-950/10 px-0"
-            >
-              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-blue-900/20">
-                <div className="flex items-center gap-2">
-                  <Lightbulb className="h-4 w-4 text-blue-400" />
-                  <span className="text-blue-300 font-medium">Key Points</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4 pt-0">
-                {renderListItems(article.ai_analysis.key_points)}
-              </AccordionContent>
-            </AccordionItem>
-          )}
-          
-          {/* Implementation Timeline Section */}
-          {article.ai_analysis?.implementation_timeline && (
-            <AccordionItem 
-              value="implementation_timeline" 
-              id="ai-analysis-section-implementation_timeline"
-              className="border border-blue-500/20 rounded-lg overflow-hidden bg-blue-950/10 px-0"
-            >
-              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-blue-900/20">
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-blue-400" />
-                  <span className="text-blue-300 font-medium">Implementation Timeline</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4 pt-0">
-                {article.ai_analysis?.implementation_timeline && renderAnalysisObject(article.ai_analysis?.implementation_timeline, 'timeline')}
-              </AccordionContent>
-            </AccordionItem>
-          )}
-          
-          {/* Market Opportunity Section */}
-          {article.ai_analysis?.market_opportunity && (
-            <AccordionItem 
-              value="market_opportunity" 
-              id="ai-analysis-section-market_opportunity"
-              className="border border-blue-500/20 rounded-lg overflow-hidden bg-blue-950/10 px-0"
-            >
-              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-blue-900/20">
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-green-400" />
-                  <span className="text-blue-300 font-medium">
-                    Market Opportunity
-                    {article.ai_analysis?.market_opportunity?.score && (
-                      <span className="ml-2 text-xs bg-green-500/10 text-green-400 py-0.5 px-2 rounded-full">
-                        {article.ai_analysis?.market_opportunity?.score}% Potential
-                      </span>
-                    )}
-                  </span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4 pt-0">
-                {article.ai_analysis?.market_opportunity && renderAnalysisObject(article.ai_analysis?.market_opportunity, 'opportunity')}
-              </AccordionContent>
-            </AccordionItem>
-          )}
-          
-          {/* Competitive Analysis Section */}
-          {article.ai_analysis?.competitive_analysis && (
-            <AccordionItem 
-              value="competitive_analysis" 
-              id="ai-analysis-section-competitive_analysis"
-              className="border border-blue-500/20 rounded-lg overflow-hidden bg-blue-950/10 px-0"
-            >
-              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-blue-900/20">
-                <div className="flex items-center gap-2">
-                  <LineChart className="h-4 w-4 text-blue-400" />
-                  <span className="text-blue-300 font-medium">Competitive Analysis</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4 pt-0">
-                {article.ai_analysis?.competitive_analysis && renderAnalysisObject(article.ai_analysis?.competitive_analysis, 'competitive')}
-              </AccordionContent>
-            </AccordionItem>
-          )}
-          
-          {/* Agency Relevance Section */}
-          {article.ai_analysis?.agency_relevance_score !== undefined && (
-            <AccordionItem 
-              value="agency_relevance" 
-              id="ai-analysis-section-agency_relevance"
-              className="border border-blue-500/20 rounded-lg overflow-hidden bg-blue-950/10 px-0"
-            >
-              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-blue-900/20">
-                <div className="flex items-center gap-2">
-                  <Zap className="h-4 w-4 text-yellow-400" />
-                  <span className="text-blue-300 font-medium">
-                    Agency Relevance
-                    <span className="ml-2 text-xs bg-yellow-500/10 text-yellow-400 py-0.5 px-2 rounded-full">
-                      {article.ai_analysis?.agency_relevance_score}% Relevance
-                    </span>
-                  </span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4 pt-0 text-gray-300">
-                <p>How relevant this technology is for agency owners and their clients.</p>
-              </AccordionContent>
-            </AccordionItem>
-          )}
-          
-          {/* Client Messaging Section */}
-          {article.ai_analysis?.client_messaging && (
-            <AccordionItem 
-              value="client_messaging" 
-              id="ai-analysis-section-client_messaging"
-              className="border border-blue-500/20 rounded-lg overflow-hidden bg-blue-950/10 px-0"
-            >
-              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-blue-900/20">
-                <div className="flex items-center gap-2">
-                  <MessageCircle className="h-4 w-4 text-blue-400" />
-                  <span className="text-blue-300 font-medium">Client Messaging</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4 pt-0">
-                {article.ai_analysis?.client_messaging && renderAnalysisObject(article.ai_analysis?.client_messaging, 'messaging')}
-              </AccordionContent>
-            </AccordionItem>
-          )}
-        </Accordion>
+      <div className="space-y-4">
+        {/* Key Points */}
+        <div className="bg-card rounded-lg p-4 border border-border">
+          <h4 className="text-sm font-medium text-muted-foreground mb-3">Key Points</h4>
+          <ul className="space-y-2">
+            {(article.ai_analysis?.key_points || []).slice(0, 3).map((point, index) => (
+              <li key={index} className="flex items-start gap-2">
+                <span className="bg-primary/10 text-primary rounded-full w-5 h-5 flex items-center justify-center text-xs mt-0.5">
+                  {index + 1}
+                </span>
+                <span>{point}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        
+        {/* Market Impact */}
+        {article.ai_analysis?.market_impact && (
+          <div className="bg-card rounded-lg p-4 border border-border">
+            <h4 className="text-sm font-medium text-muted-foreground mb-3">Market Impact</h4>
+            <p className="text-sm">{article.ai_analysis.market_impact}</p>
+          </div>
+        )}
+        
+        {/* Related Technologies */}
+        {article.ai_analysis?.related_technologies && article.ai_analysis.related_technologies.length > 0 && (
+          <div className="bg-card rounded-lg p-4 border border-border">
+            <h4 className="text-sm font-medium text-muted-foreground mb-3">Related Technologies</h4>
+            <div className="flex flex-wrap gap-2">
+              {article.ai_analysis.related_technologies.map((tech, index) => (
+                <span 
+                  key={index} 
+                  className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                >
+                  {tech}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
-    </motion.div>
+      
+      {/* AI Analysis Dialog */}
+      <AIAnalysisDialog
+        article={article}
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        onRefreshAnalysis={handleGenerateAnalysis}
+      />
+    </div>
   );
 };

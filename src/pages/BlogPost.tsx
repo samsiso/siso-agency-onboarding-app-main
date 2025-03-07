@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { SidebarProvider } from '@/components/ui/sidebar';
@@ -45,7 +44,20 @@ const BlogPost = () => {
   // [Analysis] New function to handle refreshing of article data after AI analysis
   const handleAnalysisRefresh = async () => {
     console.log('Refreshing article data after analysis...');
-    await refetch();
+    try {
+      await refetch();
+      toast({
+        title: "Analysis refreshed",
+        description: "The AI analysis has been updated.",
+      });
+    } catch (error) {
+      console.error('Error refreshing article data:', error);
+      toast({
+        variant: "destructive",
+        title: "Refresh failed",
+        description: "Failed to refresh the article data. Please try again.",
+      });
+    }
   };
 
   // [Analysis] New function to handle external article links
