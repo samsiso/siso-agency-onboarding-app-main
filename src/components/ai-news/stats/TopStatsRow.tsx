@@ -1,9 +1,9 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NewsItem } from '@/types/blog';
 import { calculateTopCategories, extractTrendingTopics } from './calculateStats';
-import { BadgeCheck, TrendingUp, Zap, Info, ExternalLink } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { BadgeCheck, TrendingUp, Zap, Info, ExternalLink, BarChart3, ChevronRight, Award } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Tooltip,
   TooltipContent,
@@ -20,7 +20,9 @@ import {
   Line,
   XAxis,
   YAxis,
-  Tooltip as RechartsTooltip
+  Tooltip as RechartsTooltip,
+  Area,
+  AreaChart
 } from 'recharts';
 
 interface TopStatsRowProps {
@@ -28,9 +30,16 @@ interface TopStatsRowProps {
   loading?: boolean;
 }
 
-// [Analysis] Enhanced component with interactive visualizations
+// [Analysis] Enhanced component with interactive visualizations and animations
 export const TopStatsRow = ({ newsItems, loading = false }: TopStatsRowProps) => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
+  
+  // Add animation trigger after component mounts
+  useEffect(() => {
+    const timer = setTimeout(() => setIsVisible(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
   
   // Skip processing if loading
   if (loading) {
@@ -46,12 +55,14 @@ export const TopStatsRow = ({ newsItems, loading = false }: TopStatsRowProps) =>
   const topCategories = calculateTopCategories(newsItems, 5);
   const trendingTopics = extractTrendingTopics(newsItems);
   
-  // [Analysis] Generate simulated trend data for visualization
+  // [Analysis] Generate enhanced trend data for visualization with smoother curves
   const generateTrendData = (topicName: string) => {
     // In a real app, this would come from historical data
+    const baseValue = Math.floor(Math.random() * 5) + 3;
+    
     return Array(7).fill(0).map((_, i) => ({
       day: i,
-      value: Math.floor(Math.random() * 10) + 1
+      value: baseValue + Math.sin(i * 0.5) * 2 + Math.random() * 1.5
     }));
   };
   
@@ -71,7 +82,7 @@ export const TopStatsRow = ({ newsItems, loading = false }: TopStatsRowProps) =>
     show: { y: 0, opacity: 1 }
   };
 
-  // Colors for the pie chart
+  // Colors for the pie chart with gradients
   const CATEGORY_COLORS = [
     '#3b82f6', // blue
     '#8b5cf6', // purple
@@ -80,17 +91,29 @@ export const TopStatsRow = ({ newsItems, loading = false }: TopStatsRowProps) =>
     '#f59e0b', // amber
   ];
   
+  // Custom tooltip for charts
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="chart-tooltip">
+          <p className="text-xs font-medium text-white">{payload[0].value.toFixed(1)}</p>
+        </div>
+      );
+    }
+    return null;
+  };
+  
   return (
     <motion.div 
       className="grid grid-cols-1 sm:grid-cols-3 gap-4"
       variants={container}
       initial="hidden"
-      animate="show"
+      animate={isVisible ? "show" : "hidden"}
     >
       {/* Top Categories with pie chart */}
       <motion.div 
         variants={item}
-        className="bg-gradient-to-br from-blue-900/30 to-blue-950/50 rounded-lg p-4 border border-blue-800/30"
+        className="bg-gradient-to-br from-blue-900/30 to-blue-950/50 rounded-lg p-4 border border-blue-800/30 gradient-chart-bg"
       >
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
@@ -112,7 +135,22 @@ export const TopStatsRow = ({ newsItems, loading = false }: TopStatsRowProps) =>
         <div className="flex items-center">
           <div className="w-24 h-24">
             <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
+              <PieChart className="pie-reveal">
+                <defs>
+                  {topCategories.map((_, index) => (
+                    <linearGradient 
+                      key={`pieGradient-${index}`} 
+                      id={`pieGradient-${index}`} 
+                      x1="0" 
+                      y1="0" 
+                      x2="0" 
+                      y2="1"
+                    >
+                      <stop offset="0%" stopColor={CATEGORY_COLORS[index % CATEGORY_COLORS.length]} stopOpacity={0.8}/>
+                      <stop offset="100%" stopColor={CATEGORY_COLORS[index % CATEGORY_COLORS.length]} stopOpacity={0.5}/>
+                    </linearGradient>
+                  ))}
+                </defs>
                 <Pie
                   data={topCategories}
                   dataKey="percentage"
@@ -121,12 +159,16 @@ export const TopStatsRow = ({ newsItems, loading = false }: TopStatsRowProps) =>
                   cy="50%"
                   outerRadius={36}
                   innerRadius={24}
+                  animationBegin={300}
+                  animationDuration={1200}
+                  animationEasing="ease-out"
                 >
                   {topCategories.map((entry, index) => (
                     <Cell 
                       key={`cell-${index}`} 
-                      fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]} 
+                      fill={`url(#pieGradient-${index})`} 
                       strokeWidth={1}
+                      stroke="rgba(30, 41, 59, 0.5)"
                     />
                   ))}
                 </Pie>
@@ -135,30 +177,36 @@ export const TopStatsRow = ({ newsItems, loading = false }: TopStatsRowProps) =>
           </div>
           
           <div className="ml-2 space-y-1 flex-1">
-            {topCategories.slice(0, 3).map((cat, idx) => (
-              <div 
-                key={cat.category} 
-                className="flex items-center justify-between text-xs cursor-pointer hover:bg-blue-900/30 p-1 rounded-sm transition-colors"
-                onClick={() => setSelectedCategory(cat.category)}
-              >
-                <div className="flex items-center">
-                  <span 
-                    className="inline-block w-2 h-2 rounded-full mr-2"
-                    style={{backgroundColor: CATEGORY_COLORS[idx % CATEGORY_COLORS.length]}}
-                  ></span>
-                  <span className="capitalize truncate max-w-[85px]">{cat.category}</span>
-                </div>
-                <span className="text-blue-300">{cat.percentage}%</span>
-              </div>
-            ))}
+            <AnimatePresence>
+              {topCategories.slice(0, 3).map((cat, idx) => (
+                <motion.div 
+                  key={cat.category} 
+                  className="flex items-center justify-between text-xs cursor-pointer hover:bg-blue-900/30 p-1 rounded-sm transition-colors"
+                  onClick={() => setSelectedCategory(cat.category)}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: idx * 0.1 + 0.3 }}
+                  whileHover={{ x: 3 }}
+                >
+                  <div className="flex items-center">
+                    <span 
+                      className="inline-block w-2 h-2 rounded-full mr-2"
+                      style={{backgroundColor: CATEGORY_COLORS[idx % CATEGORY_COLORS.length]}}
+                    ></span>
+                    <span className="capitalize truncate max-w-[85px]">{cat.category}</span>
+                  </div>
+                  <span className="text-blue-300">{cat.percentage}%</span>
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
         </div>
       </motion.div>
       
-      {/* Trending Topics with mini trend charts */}
+      {/* Trending Topics with enhanced trend charts */}
       <motion.div 
         variants={item}
-        className="bg-gradient-to-br from-purple-900/30 to-purple-950/50 rounded-lg p-4 border border-purple-800/30"
+        className="bg-gradient-to-br from-purple-900/30 to-purple-950/50 rounded-lg p-4 border border-purple-800/30 gradient-chart-bg"
       >
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
@@ -178,39 +226,57 @@ export const TopStatsRow = ({ newsItems, loading = false }: TopStatsRowProps) =>
         </div>
         
         <div className="space-y-2">
-          {trendingTopics.slice(0, 3).map((topic, idx) => (
-            <div key={topic.topic} className="group">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-xs">{topic.topic}</span>
-                <div className="flex items-center">
-                  <span className="text-xs text-purple-300 mr-1">{topic.count} mentions</span>
-                  <ExternalLink className="h-3 w-3 text-purple-400/0 group-hover:text-purple-400/70 transition-colors" />
+          <AnimatePresence>
+            {trendingTopics.slice(0, 3).map((topic, idx) => (
+              <motion.div 
+                key={topic.topic} 
+                className="group"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.1 + 0.3 }}
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs">{topic.topic}</span>
+                  <div className="flex items-center">
+                    <span className="text-xs text-purple-300 mr-1">{topic.count} mentions</span>
+                    <ExternalLink className="h-3 w-3 text-purple-400/0 group-hover:text-purple-400/70 transition-colors" />
+                  </div>
                 </div>
-              </div>
-              <div className="h-8 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={generateTrendData(topic.topic)}>
-                    <Line 
-                      type="monotone" 
-                      dataKey="value" 
-                      stroke="#a78bfa" 
-                      strokeWidth={2} 
-                      dot={false}
-                    />
-                    <XAxis dataKey="day" hide={true} />
-                    <YAxis hide={true} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          ))}
+                <div className="h-8 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={generateTrendData(topic.topic)}>
+                      <defs>
+                        <linearGradient id={`trendGradient-${idx}`} x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#a78bfa" stopOpacity={0.3}/>
+                          <stop offset="100%" stopColor="#a78bfa" stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
+                      <Area
+                        type="monotone" 
+                        dataKey="value" 
+                        stroke="#a78bfa" 
+                        strokeWidth={2}
+                        fillOpacity={1}
+                        fill={`url(#trendGradient-${idx})`}
+                        dot={false}
+                        className="line-draw"
+                      />
+                      <RechartsTooltip content={<CustomTooltip />} />
+                      <XAxis dataKey="day" hide={true} />
+                      <YAxis hide={true} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
       </motion.div>
       
-      {/* Latest Updates with better organization */}
+      {/* Latest Updates with enhanced visuals */}
       <motion.div 
         variants={item}
-        className="bg-gradient-to-br from-amber-900/30 to-amber-950/50 rounded-lg p-4 border border-amber-800/30"
+        className="bg-gradient-to-br from-amber-900/30 to-amber-950/50 rounded-lg p-4 border border-amber-800/30 gradient-chart-bg"
       >
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
@@ -223,17 +289,26 @@ export const TopStatsRow = ({ newsItems, loading = false }: TopStatsRowProps) =>
         </div>
         
         <ul className="space-y-2">
-          {newsItems.slice(0, 3).map((item) => (
-            <li key={item.id} className="group cursor-pointer hover:bg-amber-900/20 p-1.5 rounded transition-colors">
-              <p className="text-xs truncate text-gray-300 font-medium">{item.title}</p>
-              <div className="flex justify-between items-center mt-1 text-[10px] text-gray-400">
-                <span>{item.source}</span>
-                <span className="opacity-0 group-hover:opacity-100 transition-opacity text-amber-300 flex items-center gap-1">
-                  Read more <ExternalLink className="h-3 w-3" />
-                </span>
-              </div>
-            </li>
-          ))}
+          <AnimatePresence>
+            {newsItems.slice(0, 3).map((item, idx) => (
+              <motion.li 
+                key={item.id} 
+                className="group cursor-pointer hover:bg-amber-900/20 p-1.5 rounded transition-colors"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: idx * 0.1 + 0.3 }}
+                whileHover={{ x: 3 }}
+              >
+                <p className="text-xs truncate text-gray-300 font-medium">{item.title}</p>
+                <div className="flex justify-between items-center mt-1 text-[10px] text-gray-400">
+                  <span>{item.source}</span>
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity text-amber-300 flex items-center gap-1">
+                    Read more <ChevronRight className="h-3 w-3" />
+                  </span>
+                </div>
+              </motion.li>
+            ))}
+          </AnimatePresence>
         </ul>
       </motion.div>
     </motion.div>

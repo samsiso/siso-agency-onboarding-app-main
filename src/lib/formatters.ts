@@ -1,52 +1,83 @@
 
-/**
- * [Analysis] Collection of formatting utilities for consistent display across the application
- */
+// [Analysis] Common formatting utilities for consistent display across the app
 
 /**
- * Formats a number with locale-specific thousands separators
+ * Formats a number as a percentage string (e.g., "42%")
  */
-export const formatNumber = (num: number): string => {
-  return num.toLocaleString();
-};
-
-/**
- * Formats a date string to a human-readable format
- */
-export const formatDate = (dateString: string): string => {
-  try {
-    const date = new Date(dateString);
-    return date.toLocaleDateString(undefined, {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  } catch (e) {
-    return dateString;
-  }
-};
-
-/**
- * Formats a percentage value with a % symbol
- */
-export const formatPercentage = (value: number): string => {
+export function formatPercentage(value: number): string {
   return `${value}%`;
-};
+}
 
 /**
- * Shortens a large number to a abbreviated format (e.g., 1.2k, 3.5M)
+ * Formats a number with commas as thousands separators
  */
-export const formatCompactNumber = (num: number): string => {
-  if (num < 1000) return num.toString();
+export function formatNumber(value: number): string {
+  return new Intl.NumberFormat().format(value);
+}
+
+/**
+ * Formats a currency value with specified currency symbol
+ */
+export function formatCurrency(value: number, currency: string = 'USD'): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+/**
+ * Formats a date into a readable string
+ */
+export function formatDate(date: Date | string): string {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  return d.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
+
+/**
+ * Truncates text with ellipsis if it exceeds maxLength
+ */
+export function truncateText(text: string, maxLength: number): string {
+  if (text.length <= maxLength) return text;
+  return `${text.substring(0, maxLength)}...`;
+}
+
+/**
+ * Formats a number with appropriate suffix (K, M, B)
+ */
+export function formatNumberWithSuffix(value: number): string {
+  if (value >= 1_000_000_000) {
+    return (value / 1_000_000_000).toFixed(1) + 'B';
+  }
+  if (value >= 1_000_000) {
+    return (value / 1_000_000).toFixed(1) + 'M';
+  }
+  if (value >= 1_000) {
+    return (value / 1_000).toFixed(1) + 'K';
+  }
+  return value.toString();
+}
+
+/**
+ * Formats a decimal number with specified precision
+ */
+export function formatDecimal(value: number, precision: number = 2): string {
+  return value.toFixed(precision);
+}
+
+/**
+ * Converts minutes to a human-readable time format (e.g., "1h 30m")
+ */
+export function formatMinutes(minutes: number): string {
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
   
-  const formatter = new Intl.NumberFormat('en', { notation: 'compact' });
-  return formatter.format(num);
-};
-
-/**
- * Truncates text to a specified length and adds ellipsis if needed
- */
-export const truncateText = (text: string, maxLength: number): string => {
-  if (!text || text.length <= maxLength) return text;
-  return text.slice(0, maxLength) + '...';
-};
+  if (hours === 0) return `${mins}m`;
+  if (mins === 0) return `${hours}h`;
+  return `${hours}h ${mins}m`;
+}
