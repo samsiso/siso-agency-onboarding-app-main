@@ -25,6 +25,8 @@ interface AIAnalysisDialogProps {
   // [Analysis] Added optional props to support components without article object
   articleTitle?: string;
   articleId?: string;
+  // [Analysis] Added articleDescription to fix TypeScript errors in components using this dialog
+  articleDescription?: string;
   isLoading?: boolean;
 }
 
@@ -36,6 +38,7 @@ export const AIAnalysisDialog = ({
   onRefreshAnalysis,
   articleTitle,
   articleId,
+  articleDescription,
   isLoading = false
 }: AIAnalysisDialogProps) => {
   const [activeTab, setActiveTab] = useState<string>('overview');
@@ -509,4 +512,3 @@ export const AIAnalysisDialog = ({
     </Dialog>
   );
 };
-
