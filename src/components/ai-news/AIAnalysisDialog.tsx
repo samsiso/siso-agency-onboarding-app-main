@@ -2,17 +2,14 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { EnhancedNewsItem, AIAnalysis } from '@/types/blog';
+import { EnhancedNewsItem } from '@/types/blog';
 import { Button } from '@/components/ui/button';
-import { Brain, RefreshCw, Share2, BookmarkPlus, Download, ArrowLeft, FileText, PieChart, BarChart, TrendingUp, Briefcase, Target, Clock, DollarSign } from 'lucide-react';
+import { Brain, RefreshCw, Download, FileText, TrendingUp, Briefcase, Target, Clock, DollarSign } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
-import { Skeleton } from '@/components/ui/skeleton';
-import { MessageLoading } from '@/components/ui/message-loading';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import { MessageLoading } from '@/components/ui/message-loading';
 
 // [Analysis] This component presents AI analysis in a dialog with different sections
 // [Plan] In the future, add export to PDF functionality
@@ -158,6 +155,7 @@ export const AIAnalysisDialog = ({
                           <div className="flex flex-col gap-2">
                             <Progress
                               value={analysis?.agency_relevance_score || 0}
+                              className="h-2 mb-1"
                               indicatorClassName={cn(
                                 analysis?.agency_relevance_score && analysis.agency_relevance_score > 75 
                                   ? "bg-green-500" 
@@ -165,7 +163,6 @@ export const AIAnalysisDialog = ({
                                     ? "bg-amber-500"
                                     : "bg-red-500"
                               )}
-                              className="h-2 mb-1"
                             />
                             <span className="text-xl font-bold">{analysis?.agency_relevance_score || 0}%</span>
                           </div>
@@ -176,6 +173,7 @@ export const AIAnalysisDialog = ({
                           <div className="flex flex-col gap-2">
                             <Progress
                               value={analysis?.market_opportunity?.score || 0}
+                              className="h-2 mb-1"
                               indicatorClassName={cn(
                                 analysis?.market_opportunity?.score && analysis.market_opportunity.score > 75 
                                   ? "bg-green-500" 
@@ -183,7 +181,6 @@ export const AIAnalysisDialog = ({
                                     ? "bg-amber-500"
                                     : "bg-red-500"
                               )}
-                              className="h-2 mb-1"
                             />
                             <span className="text-xl font-bold">{analysis?.market_opportunity?.score || 0}%</span>
                           </div>
@@ -301,7 +298,7 @@ export const AIAnalysisDialog = ({
                         
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
                           <div className="bg-background p-3 rounded border border-border">
-                            <h4 className="text-xs font-medium text-muted-foreground mb-2">Short Term (<3 months)</h4>
+                            <h4 className="text-xs font-medium text-muted-foreground mb-2">Short Term ({"<"}3 months)</h4>
                             <ul className="space-y-1">
                               {analysis?.implementation_timeline?.short_term?.map((item, index) => (
                                 <li key={index} className="text-sm">• {item}</li>
@@ -461,19 +458,21 @@ export const AIAnalysisDialog = ({
                             </ul>
                           </div>
                           
-                          {analysis?.client_messaging?.objection_handling && Object.keys(analysis.client_messaging.objection_handling).length > 0 && (
-                            <div>
-                              <h4 className="text-xs font-medium text-muted-foreground mb-2">Objection Handling</h4>
-                              <div className="space-y-3">
-                                {Object.entries(analysis.client_messaging.objection_handling).map(([objection, response], index) => (
-                                  <div key={index} className="bg-background p-3 rounded border border-border">
-                                    <h5 className="text-xs font-medium mb-1">{objection}</h5>
-                                    <p className="text-sm">{response}</p>
-                                  </div>
-                                ))}
+                          {analysis?.client_messaging?.objection_handling && 
+                            Object.keys(analysis.client_messaging.objection_handling).length > 0 && (
+                              <div>
+                                <h4 className="text-xs font-medium text-muted-foreground mb-2">Objection Handling</h4>
+                                <div className="space-y-3">
+                                  {Object.entries(analysis.client_messaging.objection_handling).map(([objection, response], index) => (
+                                    <div key={index} className="bg-background p-3 rounded border border-border">
+                                      <h5 className="text-xs font-medium mb-1">{objection}</h5>
+                                      <p className="text-sm">{response as string}</p>
+                                    </div>
+                                  ))}
+                                </div>
                               </div>
-                            </div>
-                          )}
+                            )
+                          }
                         </div>
                       </div>
                     </div>
