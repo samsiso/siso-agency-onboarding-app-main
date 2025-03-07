@@ -7,6 +7,7 @@ import { Clock, Share2, BookmarkPlus, BarChart, Tag, Bookmark, MessageSquare } f
 import { Button } from '@/components/ui/button';
 import { NewsItem } from '@/types/blog';
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 
 // [Analysis] Card component with enhanced animations and visual hierarchy
 interface EnhancedNewsCardProps {
@@ -21,6 +22,16 @@ export const EnhancedNewsCard: React.FC<EnhancedNewsCardProps> = ({
   className
 }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const navigate = useNavigate();
+  
+  // [Framework] Added explicit navigation function to handle click events
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Don't navigate if clicking on a button
+    if ((e.target as HTMLElement).closest('button')) {
+      return;
+    }
+    navigate(`/ai-news/${item.id}`);
+  };
   
   // Get category color based on category name
   const getCategoryColor = (category?: string) => {
@@ -43,7 +54,8 @@ export const EnhancedNewsCard: React.FC<EnhancedNewsCardProps> = ({
     return "from-blue-500/20 to-blue-700/20 border-blue-500/30 text-blue-400";
   };
   
-  const handleAnalyze = async () => {
+  const handleAnalyze = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click
     if (onAnalyzeArticle) {
       await onAnalyzeArticle(item.id);
     }
@@ -58,10 +70,11 @@ export const EnhancedNewsCard: React.FC<EnhancedNewsCardProps> = ({
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
       className={cn("h-full", className)}
+      onClick={handleCardClick} // Added onClick to the outer container
     >
       <Card className={cn(
         "overflow-hidden h-full bg-gray-900/30 backdrop-blur-sm border-gray-800/80 flex flex-col",
-        "transition-all duration-300 relative group",
+        "transition-all duration-300 relative group cursor-pointer",
         isHovered && "border-gray-700 shadow-xl shadow-purple-900/10"
       )}>
         {/* Top glowing border */}
@@ -147,15 +160,36 @@ export const EnhancedNewsCard: React.FC<EnhancedNewsCardProps> = ({
           {/* Actions */}
           <div className="mt-auto flex justify-between items-center">
             <div className="flex items-center gap-1">
-              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-gray-800/80">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 rounded-full hover:bg-gray-800/80"
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent card click
+                }}
+              >
                 <Bookmark className="h-4 w-4 text-gray-400" />
               </Button>
               
-              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-gray-800/80">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 rounded-full hover:bg-gray-800/80"
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent card click
+                }}
+              >
                 <MessageSquare className="h-4 w-4 text-gray-400" />
               </Button>
               
-              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-gray-800/80">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 rounded-full hover:bg-gray-800/80"
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent card click
+                }}
+              >
                 <Share2 className="h-4 w-4 text-gray-400" />
               </Button>
             </div>
