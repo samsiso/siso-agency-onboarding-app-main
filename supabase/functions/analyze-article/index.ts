@@ -126,19 +126,27 @@ serve(async (req) => {
     // [Analysis] Update the article with the analysis results
     const supabase = supabaseClient;
     
-    const { data: updatedArticle, error: updateError } = await supabase
-      .from("ai_news")
-      .update({
-        has_ai_analysis: true,
-        ai_analysis: analysis,
-        analysis_date: new Date().toISOString()
-      })
-      .eq("id", articleId)
-      .select();
-    
-    if (updateError) {
-      console.error("Error updating article with analysis:", updateError);
-      throw updateError;
+    // First check if the ai_analysis column exists
+    try {
+      // [Analysis] Update directly to the ai_news table with the analysis data
+      // Using explicit column update to add the analysis JSON
+      const { data: updatedArticle, error: updateError } = await supabase
+        .from("ai_news")
+        .update({
+          has_ai_analysis: true,
+          ai_analysis: analysis,
+          analysis_date: new Date().toISOString()
+        })
+        .eq("id", articleId)
+        .select();
+      
+      if (updateError) {
+        console.error("Error updating article with analysis:", updateError);
+        throw updateError;
+      }
+    } catch (dbError) {
+      console.error("Database error:", dbError);
+      throw new Error(`Database error: ${dbError.message || "Unknown database error"}`);
     }
     
     return new Response(

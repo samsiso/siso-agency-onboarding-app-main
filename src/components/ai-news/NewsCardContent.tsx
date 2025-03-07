@@ -7,6 +7,8 @@ import { NewsItem } from '@/types/blog';
 import { Badge } from '@/components/ui/badge';
 import { AIAnalysisDialog } from './AIAnalysisDialog';
 import { useBlogPostActions } from '@/hooks/useBlogPostActions';
+import { usePoints } from '@/hooks/usePoints';
+import { useUser } from '@/hooks/useUser';
 
 interface NewsCardContentProps {
   post: NewsItem;
@@ -27,6 +29,8 @@ const NewsCardContent = ({
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showAnalysisDialog, setShowAnalysisDialog] = useState(false);
   const { handleShare, handleBookmark } = useBlogPostActions();
+  const { user } = useUser();
+  const { awardPoints } = usePoints(user?.id);
   
   const formatDate = (dateString?: string) => {
     if (!dateString) return 'Unknown date';
@@ -45,6 +49,16 @@ const NewsCardContent = ({
     try {
       setIsAnalyzing(true);
       await onAnalyze(post.id);
+      
+      // Award points for analyzing an article
+      if (user?.id) {
+        try {
+          await awardPoints('analyze_article');
+        } catch (error) {
+          console.error('Error awarding points:', error);
+        }
+      }
+      
       // Open the analysis dialog after analysis is complete
       setShowAnalysisDialog(true);
     } catch (error) {

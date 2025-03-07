@@ -38,9 +38,10 @@ export const AIAnalysisDialog: React.FC<AIAnalysisDialogProps> = ({
       
       const fetchAnalysis = async () => {
         try {
+          // [Framework] Using explicit column selection to avoid type errors
           const { data, error } = await supabase
             .from('ai_news')
-            .select('ai_analysis, has_ai_analysis')
+            .select('id, ai_analysis, has_ai_analysis')
             .eq('id', articleId)
             .single();
             
@@ -86,10 +87,10 @@ export const AIAnalysisDialog: React.FC<AIAnalysisDialogProps> = ({
         throw new Error(response.error.message);
       }
       
-      // Fetch the updated analysis
+      // Fetch the updated analysis with explicit column selection
       const { data, error } = await supabase
         .from('ai_news')
-        .select('ai_analysis')
+        .select('id, ai_analysis')
         .eq('id', articleId)
         .single();
         
