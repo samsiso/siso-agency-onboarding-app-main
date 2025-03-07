@@ -8,6 +8,14 @@ export type TechnicalComplexity =
   | 'expert'
   | 'mixed';
 
+export type ContentCategory = 
+  | 'ai_research'
+  | 'breakthrough_technologies'
+  | 'industry_applications'
+  | 'policy_ethics'
+  | 'products_launches'
+  | 'tutorial_guides';
+
 export type ArticleImpact = 
   | 'low'
   | 'medium'
