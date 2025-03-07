@@ -1,4 +1,3 @@
-
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { ChevronRight, ArrowUp, List, ChevronDown, Zap, Lightbulb, TrendingUp, Layers, Brain, LineChart } from 'lucide-react';
