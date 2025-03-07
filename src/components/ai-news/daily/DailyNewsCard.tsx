@@ -1,386 +1,217 @@
-
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  ChevronDown, 
-  ChevronUp, 
-  ExternalLink, 
-  Share2, 
-  Eye, 
-  Clock, 
-  TrendingUp,
-  Zap,
-  Target,
-  BookOpen,
-  ArrowRight,
-  Code,
-  Link,
-  FileText,
-  Database,
-  BarChart4,
-  Lightbulb,
-  ScrollText,
-  MessagesSquare,
-  Brain
-} from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { format } from 'date-fns';
+import { Share2, Bookmark, MessageSquare, BarChart, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { cn } from '@/lib/utils';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { NewsItem } from '@/types/blog';
+import { useBlogPostActions } from '@/hooks/useBlogPostActions';
 import { AIAnalysisDialog } from '../AIAnalysisDialog';
-import { NewsCardComments } from '../NewsCardComments';
 
 interface DailyNewsCardProps {
-  article: {
-    id: string;
-    title: string;
-    description: string;
-    image_url?: string;
-    date: string;
-    category: string;
-    impact: string;
-    technical_complexity: string;
-    source: string;
-    key_takeaways: string[];
-    reading_time: number;
-    technical_details?: Record<string, any>;
-    source_credibility?: string;
-    sources: { title: string; url: string }[];
-    comments?: Array<{
-      id: string;
-      content: string;
-      created_at: string;
-      user_email: string;
-      updated_at: string;
-      news_id: string;
-    }>;
-  };
+  newsItem: NewsItem;
+  onAnalyze?: (id: string) => Promise<void>;
+  isCompact?: boolean;
 }
 
-export const DailyNewsCard = ({ article }: DailyNewsCardProps) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [showSources, setShowSources] = useState(false);
-  const [activeSection, setActiveSection] = useState<string | null>(null);
-  const [showAIAnalysis, setShowAIAnalysis] = useState(false);
-
-  const getImpactColor = (impact: string) => {
-    switch (impact.toLowerCase()) {
-      case 'high':
-        return 'bg-red-500/10 text-red-500 border-red-500/20';
-      case 'medium':
-        return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
-      case 'low':
-        return 'bg-green-500/10 text-green-500 border-green-500/20';
-      default:
-        return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
+export const DailyNewsCard = ({ 
+  newsItem, 
+  onAnalyze,
+  isCompact = false 
+}: DailyNewsCardProps) => {
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [showAnalysisDialog, setShowAnalysisDialog] = useState(false);
+  const { handleShare, handleBookmark } = useBlogPostActions();
+  
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'Unknown date';
+    try {
+      const date = new Date(dateString);
+      return format(date, 'MMM d, yyyy');
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return dateString;
     }
   };
-
-  // [Analysis] Mock research data for the deep research features
-  const researchData = {
-    performance: 85,
-    adoption: 62,
-    impact: 73,
-    technologies: ['AI', 'Machine Learning', 'Neural Networks'],
-    researchSignificance: 88,
-    implementationFeasibility: 76,
-    industryAdoption: 65,
-    innovationIndex: 82,
-    primarySources: [
-      { title: 'Original Research Paper', url: 'https://example.com/paper' },
-      { title: 'Technical Documentation', url: 'https://example.com/docs' },
-      { title: 'Implementation Guide', url: 'https://example.com/guide' }
-    ],
-    methodology: {
-      approach: 'Quantitative Analysis',
-      sampleSize: '10,000 data points',
-      timeframe: '12 months',
-      validationMethod: 'Cross-validation'
+  
+  const handleAnalyze = async () => {
+    if (!onAnalyze || isAnalyzing) return;
+    
+    try {
+      setIsAnalyzing(true);
+      await onAnalyze(newsItem.id);
+      // Open the analysis dialog after analysis is complete
+      setShowAnalysisDialog(true);
+    } catch (error) {
+      console.error('Error analyzing article:', error);
+    } finally {
+      setIsAnalyzing(false);
     }
   };
-
+  
+  const handleExternalLink = () => {
+    if (newsItem.url) {
+      window.open(newsItem.url, '_blank', 'noopener,noreferrer');
+    }
+  };
+  
   return (
-    <Card className="overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors duration-300">
-      <motion.div
-        layout
-        className="p-4 space-y-4"
-        animate={{ height: 'auto' }}
-      >
-        {/* Research Context Header */}
-        <div className="space-y-4">
-          {/* Credibility & Impact Badges */}
-          <div className="flex flex-wrap items-center gap-2">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Badge variant="outline" className={cn(
-                    getImpactColor(article.impact),
-                    "flex items-center gap-1"
-                  )}>
-                    <Zap className="h-3 w-3" />
-                    {article.impact} Impact
-                  </Badge>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Research impact assessment</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Badge variant="outline" className="bg-purple-500/10 text-purple-500 border-purple-500/20 flex items-center gap-1">
-                    <Code className="h-3 w-3" />
-                    {article.technical_complexity}
-                  </Badge>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Technical implementation complexity</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-
-            <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20 flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              {article.reading_time}m read
-            </Badge>
+    <Card className="overflow-hidden bg-gray-900/30 border-gray-800 hover:border-gray-700 transition-all duration-300 hover:shadow-lg h-full flex flex-col">
+      <div className="flex flex-col h-full">
+        {/* Card Image */}
+        <div className={isCompact ? 'h-20' : 'h-44 md:h-52'}>
+          <div className="relative w-full h-full overflow-hidden">
+            {newsItem.image_url ? (
+              <img 
+                src={newsItem.image_url} 
+                alt={newsItem.title} 
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-blue-900/50 to-purple-900/50 flex items-center justify-center">
+                <span className="text-lg font-medium text-blue-300">{newsItem.source || 'AI News'}</span>
+              </div>
+            )}
+            
+            <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-80"></div>
+            
+            {newsItem.featured && (
+              <div className="absolute top-2 left-2">
+                <Badge variant="outline" className="bg-blue-900/80 text-blue-200 border-blue-700">
+                  Featured
+                </Badge>
+              </div>
+            )}
+            
+            {newsItem.source && (
+              <div className="absolute bottom-2 left-2 flex items-center gap-1.5">
+                <div className="w-5 h-5 rounded-full bg-gray-800 flex items-center justify-center overflow-hidden">
+                  {newsItem.source_icon ? (
+                    <img src={newsItem.source_icon} alt={newsItem.source} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-xs font-bold text-white">{newsItem.source.charAt(0).toUpperCase()}</span>
+                  )}
+                </div>
+                <span className="text-xs font-medium text-gray-300">{newsItem.source}</span>
+              </div>
+            )}
           </div>
-
-          {/* Title & Quick Actions */}
-          <div className="space-y-2">
-            <h3 className="text-lg font-semibold text-white line-clamp-2">
-              {article.title}
-            </h3>
-            <p className="text-sm text-gray-300 line-clamp-2">
-              {article.description}
-            </p>
-          </div>
-
-          {/* Research Metrics Dashboard */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-black/20 rounded-lg p-3">
-            {/* Performance Metrics */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs text-gray-400">
-                <span>Research Impact</span>
-                <span>{researchData.researchSignificance}%</span>
+        </div>
+        
+        {/* Card Content */}
+        <div className="flex-1 p-4 flex flex-col">
+          <div className="flex flex-col gap-2 h-full">
+            <div className="flex justify-between items-start">
+              <div className="flex flex-col gap-1">
+                <h3 className={`font-semibold text-white ${isCompact ? 'line-clamp-2' : ''}`}>
+                  {newsItem.title}
+                </h3>
+                
+                <div className="flex flex-wrap gap-2 mt-1 items-center">
+                  <span className="text-xs text-gray-400">
+                    {formatDate(newsItem.date)}
+                  </span>
+                  
+                  <span className="text-xs text-gray-400">•</span>
+                  
+                  <span className="text-xs text-gray-400">
+                    {newsItem.reading_time || 5} min read
+                  </span>
+                  
+                  {newsItem.ai_importance_score && (
+                    <>
+                      <span className="text-xs text-gray-400">•</span>
+                      <Badge variant="outline" className="bg-blue-900/30 text-blue-400 text-xs border-blue-800">
+                        {newsItem.ai_importance_score}% importance
+                      </Badge>
+                    </>
+                  )}
+                </div>
               </div>
-              <Progress value={researchData.researchSignificance} className="h-1" 
-                indicatorClassName="bg-orange-500" />
             </div>
-            {/* Implementation Feasibility */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs text-gray-400">
-                <span>Feasibility</span>
-                <span>{researchData.implementationFeasibility}%</span>
+            
+            {!isCompact && newsItem.description && (
+              <p className="text-sm text-gray-300 mt-1 line-clamp-3">
+                {newsItem.description}
+              </p>
+            )}
+            
+            <div className="flex justify-between items-center mt-auto pt-3">
+              <div className="flex items-center gap-3">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8 rounded-full"
+                  onClick={() => handleBookmark(newsItem.id)}
+                >
+                  <Bookmark className="h-4 w-4 text-gray-400" />
+                </Button>
+                
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8 rounded-full"
+                >
+                  <MessageSquare className="h-4 w-4 text-gray-400" />
+                </Button>
+                
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8 rounded-full"
+                  onClick={() => handleShare(newsItem.title, newsItem.description)}
+                >
+                  <Share2 className="h-4 w-4 text-gray-400" />
+                </Button>
+                
+                {newsItem.url && (
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-8 w-8 rounded-full"
+                    onClick={handleExternalLink}
+                  >
+                    <ExternalLink className="h-4 w-4 text-gray-400" />
+                  </Button>
+                )}
               </div>
-              <Progress value={researchData.implementationFeasibility} className="h-1" 
-                indicatorClassName="bg-green-500" />
-            </div>
-            {/* Industry Adoption */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs text-gray-400">
-                <span>Industry Adoption</span>
-                <span>{researchData.industryAdoption}%</span>
-              </div>
-              <Progress value={researchData.industryAdoption} className="h-1" 
-                indicatorClassName="bg-blue-500" />
-            </div>
-            {/* Innovation Index */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs text-gray-400">
-                <span>Innovation</span>
-                <span>{researchData.innovationIndex}%</span>
-              </div>
-              <Progress value={researchData.innovationIndex} className="h-1" 
-                indicatorClassName="bg-purple-500" />
-            </div>
-          </div>
-
-          {/* Research Content Sections */}
-          <Accordion type="single" collapsible className="w-full space-y-2">
-            {/* Methodology Section */}
-            <AccordionItem value="methodology" className="border border-white/10 rounded-lg px-4">
-              <AccordionTrigger className="hover:no-underline">
-                <div className="flex items-center gap-2">
-                  <ScrollText className="h-4 w-4 text-blue-400" />
-                  <span>Research Methodology</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="text-sm text-gray-300 space-y-2">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <p className="text-gray-400">Approach</p>
-                    <p>{researchData.methodology.approach}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-gray-400">Sample Size</p>
-                    <p>{researchData.methodology.sampleSize}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-gray-400">Timeframe</p>
-                    <p>{researchData.methodology.timeframe}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-gray-400">Validation</p>
-                    <p>{researchData.methodology.validationMethod}</p>
-                  </div>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-
-            {/* Technologies Section */}
-            <AccordionItem value="technologies" className="border border-white/10 rounded-lg px-4">
-              <AccordionTrigger className="hover:no-underline">
-                <div className="flex items-center gap-2">
-                  <Database className="h-4 w-4 text-purple-400" />
-                  <span>Technologies & Implementation</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent>
-                <div className="flex flex-wrap gap-2">
-                  {researchData.technologies.map((tech, index) => (
-                    <Badge 
-                      key={index}
-                      variant="outline" 
-                      className="bg-white/5 text-gray-300 border-white/10"
-                    >
-                      {tech}
-                    </Badge>
-                  ))}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-
-            {/* Key Findings Section */}
-            <AccordionItem value="findings" className="border border-white/10 rounded-lg px-4">
-              <AccordionTrigger className="hover:no-underline">
-                <div className="flex items-center gap-2">
-                  <Lightbulb className="h-4 w-4 text-yellow-400" />
-                  <span>Key Findings</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent>
-                <ul className="space-y-2">
-                  {article.key_takeaways.map((takeaway, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <span className="text-xs bg-white/10 rounded-full px-2 py-0.5 mt-0.5">
-                        {index + 1}
-                      </span>
-                      <span className="text-gray-300 text-sm">{takeaway}</span>
-                    </li>
-                  ))}
-                </ul>
-              </AccordionContent>
-            </AccordionItem>
-
-            {/* Sources Section */}
-            <AccordionItem value="sources" className="border border-white/10 rounded-lg px-4">
-              <AccordionTrigger className="hover:no-underline">
-                <div className="flex items-center gap-2">
-                  <Link className="h-4 w-4 text-green-400" />
-                  <span>Sources & References</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent>
-                <div className="space-y-2">
-                  {article.sources?.map((source, index) => (
-                    <a
-                      key={index}
-                      href={source.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-sm text-gray-300 hover:text-white transition-colors"
-                    >
-                      <ExternalLink className="h-3 w-3" />
-                      {source.title}
-                    </a>
-                  ))}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-
-          {/* Action Buttons */}
-          <div className="flex items-center justify-between pt-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-white hover:bg-white/10"
-              onClick={() => setIsExpanded(!isExpanded)}
-            >
-              {isExpanded ? (
-                <>
-                  <ChevronUp className="h-4 w-4 mr-2" />
-                  Show Less
-                </>
-              ) : (
-                <>
-                  <ChevronDown className="h-4 w-4 mr-2" />
-                  Show More
-                </>
+              
+              {onAnalyze && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleAnalyze}
+                  disabled={isAnalyzing}
+                  className="text-xs border-blue-800 hover:bg-blue-900/50 text-blue-300"
+                >
+                  {isAnalyzing ? (
+                    <>
+                      <span className="mr-1">Analyzing</span>
+                      <span className="loading loading-dots"></span>
+                    </>
+                  ) : (
+                    <>
+                      <BarChart className="h-3 w-3 mr-1" />
+                      AI Analysis
+                    </>
+                  )}
+                </Button>
               )}
-            </Button>
-            <div className="flex items-center gap-2">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-white hover:bg-white/10"
-                      onClick={() => setShowAIAnalysis(true)}
-                    >
-                      <Brain className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>AI Analysis</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="relative">
-                      <NewsCardComments 
-                        newsId={article.id}
-                        comments={article.comments || []}
-                      />
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Discuss this research</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-white hover:bg-white/10"
-                    >
-                      <Share2 className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Share research</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
             </div>
           </div>
         </div>
-      </motion.div>
-      <AIAnalysisDialog 
-        open={showAIAnalysis} 
-        onOpenChange={setShowAIAnalysis}
-        newsId={article.id}
+      </div>
+
+      {/* Analysis Dialog */}
+      <AIAnalysisDialog
+        isOpen={showAnalysisDialog}
+        onClose={() => setShowAnalysisDialog(false)}
+        analysis={newsItem.ai_analysis}
+        isLoading={isAnalyzing}
+        articleTitle={newsItem.title}
+        articleDescription={newsItem.description}
+        articleId={newsItem.id}
       />
     </Card>
   );

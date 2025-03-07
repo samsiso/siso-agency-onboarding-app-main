@@ -2,184 +2,130 @@
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Brain, Share2, Bookmark, Facebook, Twitter, Linkedin, X, RefreshCcw } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Share2, Bookmark, Download, Brain } from 'lucide-react';
 import { useBlogPostActions } from '@/hooks/useBlogPostActions';
 
-// [Analysis] Dialog-based AI analysis component for better UX and screen space utilization
-interface AIAnalysisDialogProps {
+export interface AIAnalysisDialogProps {
   isOpen: boolean;
   onClose: () => void;
   analysis: any;
   isLoading: boolean;
   articleTitle?: string;
   articleDescription?: string;
-  articleId?: string;
+  articleId: string;
 }
 
-export const AIAnalysisDialog = ({ 
-  isOpen, 
-  onClose, 
-  analysis, 
+export const AIAnalysisDialog: React.FC<AIAnalysisDialogProps> = ({
+  isOpen,
+  onClose,
+  analysis,
   isLoading,
-  articleTitle,
-  articleDescription,
+  articleTitle = "Article",
+  articleDescription = "",
   articleId
-}: AIAnalysisDialogProps) => {
+}) => {
   const { handleShare, handleBookmark } = useBlogPostActions();
-  
-  // [Plan] Centralize sharing functionality to reduce code duplication
-  const handleShareClick = (platform?: string) => {
-    const shareText = `${articleTitle} - AI Analysis`;
-    
-    if (platform === 'twitter') {
-      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(window.location.href)}`, '_blank');
-    } else if (platform === 'facebook') {
-      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, '_blank');
-    } else if (platform === 'linkedin') {
-      window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`, '_blank');
-    } else {
-      // Use the generic sharing function
-      handleShare(articleTitle, articleDescription);
-    }
-  };
-  
-  const handleBookmarkClick = () => {
-    if (articleId) {
-      handleBookmark(articleId);
-    }
-  };
-  
+
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[600px] bg-gray-950 border-gray-800 text-white">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-3xl bg-gray-950 border-gray-800 text-white overflow-y-auto max-h-[90vh]">
         <DialogHeader>
-          <div className="flex justify-between items-start">
-            <DialogTitle className="text-xl flex items-center gap-2">
-              <Brain className="h-5 w-5 text-blue-400" />
-              <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                AI Analysis
-              </span>
-            </DialogTitle>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-8 w-8 rounded-full bg-gray-900 border-gray-700"
-                onClick={handleBookmarkClick}
-              >
-                <Bookmark className="h-4 w-4 text-blue-400" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-8 w-8 rounded-full bg-gray-900 border-gray-700"
-                onClick={() => handleShareClick()}
-              >
-                <Share2 className="h-4 w-4 text-blue-400" />
-              </Button>
-            </div>
-          </div>
+          <DialogTitle className="text-xl font-bold flex items-center gap-2">
+            <Brain className="h-5 w-5 text-blue-400" />
+            AI Analysis: {articleTitle}
+          </DialogTitle>
           <DialogDescription className="text-gray-400">
-            {articleTitle || 'AI-powered insights for this article'}
+            Detailed AI-powered analysis of this article and its implications
           </DialogDescription>
         </DialogHeader>
-        
+
+        <div className="flex justify-end gap-2 mb-4">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="bg-transparent border-gray-700 text-gray-300 hover:bg-gray-800"
+            onClick={() => handleShare(articleTitle, articleDescription)}
+          >
+            <Share2 className="h-4 w-4 mr-2" />
+            Share
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="bg-transparent border-gray-700 text-gray-300 hover:bg-gray-800"
+            onClick={() => handleBookmark(articleId)}
+          >
+            <Bookmark className="h-4 w-4 mr-2" />
+            Bookmark
+          </Button>
+        </div>
+
         {isLoading ? (
-          <div className="flex items-center justify-center py-8">
-            <RefreshCcw className="w-6 h-6 text-blue-400 animate-spin" />
+          <div className="p-8 flex flex-col items-center justify-center min-h-[300px]">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
+            <p className="text-gray-400">Analyzing article content...</p>
           </div>
         ) : analysis ? (
-          <div className="space-y-6 pt-2">
-            <div className="space-y-3">
-              <h4 className="text-sm font-medium text-white/80">Key Insights</h4>
-              <ul className="space-y-2">
-                {analysis.key_insights?.map((insight: string, i: number) => (
-                  <li key={i} className="text-sm text-white/70 flex items-start gap-2 bg-white/5 p-3 rounded-lg">
-                    <span className="text-blue-400 mt-1">•</span>
-                    <span>{insight}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="space-y-3">
-              <h4 className="text-sm font-medium text-white/80">Market Impact</h4>
-              <p className="text-sm text-white/70 bg-white/5 p-3 rounded-lg">{analysis.market_impact}</p>
-            </div>
-
-            <div className="space-y-3">
-              <h4 className="text-sm font-medium text-white/80">Technology Predictions</h4>
-              <ul className="space-y-2">
-                {analysis.tech_predictions?.map((prediction: string, i: number) => (
-                  <li key={i} className="text-sm text-white/70 flex items-start gap-2 bg-white/5 p-3 rounded-lg">
-                    <span className="text-emerald-400 mt-1">→</span>
-                    <span>{prediction}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="space-y-3">
-              <h4 className="text-sm font-medium text-white/80">Related Technologies</h4>
-              <div className="flex flex-wrap gap-2 bg-white/5 p-3 rounded-lg">
-                {analysis.related_technologies?.map((tech: string, i: number) => (
-                  <Badge key={i} variant="outline" className="bg-white/10 border-blue-900/50">
-                    {tech}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between pt-4 border-t border-white/10">
-              <span className="text-sm text-white/60">Analysis Confidence</span>
-              <Badge variant="outline" className={cn(
-                "bg-white/5",
-                analysis.confidence_score >= 0.8 ? "text-green-400" :
-                analysis.confidence_score >= 0.6 ? "text-yellow-400" :
-                "text-red-400"
-              )}>
-                {Math.round((analysis.confidence_score || 0.7) * 100)}%
-              </Badge>
-            </div>
+          <Tabs defaultValue="market" className="w-full">
+            <TabsList className="grid grid-cols-4 bg-gray-900/50 border border-gray-800 rounded-md p-1">
+              <TabsTrigger value="market" className="data-[state=active]:bg-blue-900/30 data-[state=active]:text-blue-300">
+                Market Impact
+              </TabsTrigger>
+              <TabsTrigger value="technical" className="data-[state=active]:bg-blue-900/30 data-[state=active]:text-blue-300">
+                Technical
+              </TabsTrigger>
+              <TabsTrigger value="related" className="data-[state=active]:bg-blue-900/30 data-[state=active]:text-blue-300">
+                Related Tech
+              </TabsTrigger>
+              <TabsTrigger value="business" className="data-[state=active]:bg-blue-900/30 data-[state=active]:text-blue-300">
+                Business
+              </TabsTrigger>
+            </TabsList>
             
-            <div className="flex flex-col pt-4 space-y-2">
-              <h4 className="text-sm font-medium text-white/80">Share Analysis</h4>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline" 
-                  size="sm"
-                  className="bg-blue-900/20 border-blue-800 hover:bg-blue-800/30"
-                  onClick={() => handleShareClick('twitter')}
-                >
-                  <Twitter className="h-4 w-4 mr-2" />
-                  Twitter
-                </Button>
-                <Button
-                  variant="outline" 
-                  size="sm"
-                  className="bg-blue-900/20 border-blue-800 hover:bg-blue-800/30"
-                  onClick={() => handleShareClick('facebook')}
-                >
-                  <Facebook className="h-4 w-4 mr-2" />
-                  Facebook
-                </Button>
-                <Button
-                  variant="outline" 
-                  size="sm"
-                  className="bg-blue-900/20 border-blue-800 hover:bg-blue-800/30"
-                  onClick={() => handleShareClick('linkedin')}
-                >
-                  <Linkedin className="h-4 w-4 mr-2" />
-                  LinkedIn
-                </Button>
-              </div>
-            </div>
-          </div>
+            <TabsContent value="market" className="bg-gray-900/30 p-4 rounded-md mt-4 border border-gray-800">
+              <h3 className="text-lg font-medium mb-2 text-blue-300">Market Impact Analysis</h3>
+              <p className="text-gray-300">{analysis?.market_impact || "No market impact analysis available"}</p>
+            </TabsContent>
+            
+            <TabsContent value="technical" className="bg-gray-900/30 p-4 rounded-md mt-4 border border-gray-800">
+              <h3 className="text-lg font-medium mb-2 text-blue-300">Technical Predictions</h3>
+              {analysis?.technical_predictions && analysis.technical_predictions.length > 0 ? (
+                <ul className="list-disc pl-5 space-y-2 text-gray-300">
+                  {analysis.technical_predictions.map((prediction: string, index: number) => (
+                    <li key={index}>{prediction}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-gray-300">No technical predictions available</p>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="related" className="bg-gray-900/30 p-4 rounded-md mt-4 border border-gray-800">
+              <h3 className="text-lg font-medium mb-2 text-blue-300">Related Technologies</h3>
+              {analysis?.related_technologies && analysis.related_technologies.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {analysis.related_technologies.map((tech: string, index: number) => (
+                    <span key={index} className="bg-gray-800 text-blue-300 px-3 py-1 rounded-full text-sm">
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-300">No related technologies identified</p>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="business" className="bg-gray-900/30 p-4 rounded-md mt-4 border border-gray-800">
+              <h3 className="text-lg font-medium mb-2 text-blue-300">Business Implications</h3>
+              <p className="text-gray-300">{analysis?.business_implications || "No business implications analysis available"}</p>
+            </TabsContent>
+          </Tabs>
         ) : (
-          <div className="py-8 text-sm text-white/60 text-center">
-            No analysis available for this article
+          <div className="p-6 text-center text-gray-400 bg-gray-900/30 rounded-md">
+            <Brain className="h-10 w-10 text-gray-600 mx-auto mb-4" />
+            <h3 className="text-lg font-medium mb-1">No Analysis Available</h3>
+            <p>This article hasn't been analyzed by our AI system yet.</p>
           </div>
         )}
       </DialogContent>

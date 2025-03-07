@@ -76,6 +76,14 @@ export interface NewsItem {
   ai_analysis_id?: string;
   has_ai_analysis?: boolean;
   analysis_date?: string;
+  
+  // Add the missing ai_analysis property
+  ai_analysis?: {
+    market_impact?: any;
+    technical_predictions?: any[];
+    related_technologies?: any[];
+    business_implications?: any;
+  };
 }
 
 export interface Summary {
