@@ -45,7 +45,10 @@ export const AIAnalysisDialog: React.FC<AIAnalysisDialogProps> = ({
             .eq('id', articleId)
             .single();
             
-          if (error) throw error;
+          if (error) {
+            console.error('Error fetching analysis:', error);
+            throw error;
+          }
           
           if (data && data.ai_analysis) {
             setAnalysis(data.ai_analysis);
@@ -94,7 +97,10 @@ export const AIAnalysisDialog: React.FC<AIAnalysisDialogProps> = ({
         .eq('id', articleId)
         .single();
         
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching updated analysis:', error);
+        throw error;
+      }
       
       if (data && data.ai_analysis) {
         setAnalysis(data.ai_analysis);
