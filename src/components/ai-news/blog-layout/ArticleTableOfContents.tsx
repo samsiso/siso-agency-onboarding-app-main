@@ -1,3 +1,4 @@
+
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { EnhancedNewsItem } from '@/types/blog';
 import { 
@@ -193,7 +194,7 @@ export const ArticleTableOfContents = ({
               )}
             >
               <MessageCircle className="h-4 w-4 text-blue-400" />
-              <span>Community Notes ({article.comments?.length || 0})</span>
+              <span>Community Notes ({article.comments ? (Array.isArray(article.comments) ? article.comments.length : 0) : 0})</span>
             </a>
           </div>
         </div>
