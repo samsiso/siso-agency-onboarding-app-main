@@ -1,3 +1,4 @@
+
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { SidebarProvider } from '@/components/ui/sidebar';
@@ -41,16 +42,22 @@ const BlogPost = () => {
     }
   });
 
-  // [Analysis] New function to handle refreshing of article data after AI analysis
+  // [Analysis] Function to handle refreshing of article data after AI analysis
   const handleAnalysisRefresh = async () => {
     console.log('Refreshing article data after analysis...');
     try {
       const refreshedData = await refetch();
       console.log('Analysis data refreshed:', refreshedData.data?.ai_analysis);
+      
+      // Force refetch from server by invalidating the query
+      await queryClient.invalidateQueries({queryKey: ['blog-post', postId]});
+      
       toast({
         title: "Analysis refreshed",
         description: "The AI analysis has been updated.",
       });
+      
+      return refreshedData;
     } catch (error) {
       console.error('Error refreshing article data:', error);
       toast({
@@ -58,6 +65,7 @@ const BlogPost = () => {
         title: "Refresh failed",
         description: "Failed to refresh the article data. Please try again.",
       });
+      throw error;
     }
   };
 

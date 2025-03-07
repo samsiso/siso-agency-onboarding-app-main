@@ -20,6 +20,8 @@ serve(async (req) => {
     // [Analysis] Parse request for article data
     const { articleId, title, content, sections, source, category } = await req.json();
     
+    console.log('Received analyze request for article:', { articleId, title, hasContent: !!content, sectionsCount: sections?.length });
+    
     if (!articleId || !title) {
       throw new Error("Missing required fields - articleId and title must be provided");
     }
@@ -34,7 +36,10 @@ serve(async (req) => {
         .eq("id", articleId)
         .single();
         
-      if (!checkError && existingAnalysis && existingAnalysis.ai_analysis) {
+      console.log('Checking for existing analysis:', existingAnalysis?.ai_analysis ? 'Found' : 'Not found');
+        
+      if (!checkError && existingAnalysis && existingAnalysis.ai_analysis && 
+          Object.keys(existingAnalysis.ai_analysis).length > 0) {
         console.log("Analysis already exists, returning cached result");
         return new Response(
           JSON.stringify({
@@ -216,7 +221,7 @@ serve(async (req) => {
     
     // [Analysis] Update the article with the enhanced analysis results
     try {
-      console.log("Updating article with enhanced agency analysis:", { articleId, hasAnalysis: true });
+      console.log("Checking for ai_analysis column before update");
       
       // [Analysis] Update directly to the ai_news table with the analysis data
       const { data: updatedArticle, error: updateError } = await supabaseClient

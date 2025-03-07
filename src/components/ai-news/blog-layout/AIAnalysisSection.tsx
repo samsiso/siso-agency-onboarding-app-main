@@ -44,13 +44,29 @@ export const AIAnalysisSection = ({ article, onAnalyze }: AIAnalysisSectionProps
     
     try {
       console.log('Generating analysis for article:', article.id);
+      
+      // Preparing content data
+      const analysisData = {
+        articleId: article.id,
+        title: article.title,
+        content: article.content || article.description,
+        sections: article.sections,
+        source: article.source,
+        category: article.category
+      };
+      
+      console.log('Sending data to analyze-article:', analysisData);
+      
       const { data, error } = await supabase.functions.invoke('analyze-article', {
-        body: { articleId: article.id }
+        body: analysisData
       });
       
       if (error) {
+        console.error('Error calling analyze-article function:', error);
         throw error;
       }
+      
+      console.log('Analyze article response:', data);
       
       if (data?.success) {
         toast.success('Analysis generated successfully');

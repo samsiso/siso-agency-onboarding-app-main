@@ -1,3 +1,4 @@
+
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -123,23 +124,56 @@ export const EnhancedBlogLayout = ({
     setLiked(!liked);
   };
 
-  // [Analysis] Handle AI analysis generation with improved data refresh
+  // [Analysis] Handle AI analysis generation with detailed error handling
   const handleGenerateAnalysis = async () => {
-    if (!onAnalyze) {
-      console.error('No onAnalyze handler provided');
+    if (!article.id) {
+      console.error('No article ID available for analysis');
+      toast.error('Cannot generate analysis: article ID missing');
       return;
     }
 
     setIsGeneratingAnalysis(true);
     
     try {
-      // Refresh the article data through the parent component
-      await onAnalyze();
+      console.log('Generating analysis for article:', article.id);
       
-      toast.success('AI analysis loaded successfully!');
+      // Preparing content data for analysis
+      const analysisData = {
+        articleId: article.id,
+        title: article.title,
+        content: article.content || article.description,
+        sections: article.sections,
+        source: article.source,
+        category: article.category
+      };
+      
+      console.log('Sending data to analyze-article:', analysisData);
+      
+      // Call the Supabase Edge Function
+      const { data, error } = await supabase.functions.invoke('analyze-article', {
+        body: analysisData
+      });
+      
+      if (error) {
+        console.error('Error calling analyze-article function:', error);
+        throw error;
+      }
+      
+      console.log('Analysis generation response:', data);
+      
+      if (data?.success) {
+        toast.success('AI analysis generated successfully!');
+        
+        // Refresh the article data through the parent component
+        if (onAnalyze) {
+          await onAnalyze();
+        }
+      } else {
+        throw new Error(data?.message || 'Failed to generate analysis');
+      }
     } catch (error) {
-      console.error('Error refreshing article data:', error);
-      toast.error('Failed to load AI analysis. Please try again.');
+      console.error('Error generating article analysis:', error);
+      toast.error('Failed to generate AI analysis. Please try again.');
     } finally {
       setIsGeneratingAnalysis(false);
     }
@@ -321,7 +355,7 @@ export const EnhancedBlogLayout = ({
             </motion.div>
             
             {/* AI Analysis Section */}
-            <AIAnalysisSection article={currentArticle} />
+            <AIAnalysisSection article={currentArticle} onAnalyze={onAnalyze} />
 
             {/* Comments Section now named Community Notes */}
             <div id="community-notes" className="mt-12 bg-white/5 rounded-lg p-6 backdrop-blur-sm border border-white/10">
@@ -342,6 +376,7 @@ export const EnhancedBlogLayout = ({
               <ArticleTableOfContents 
                 article={article}
                 activeSection={activeSection}
+                onRefreshAnalysis={handleGenerateAnalysis}
               />
               
               {/* AI Analysis Button (only shown if no analysis exists) */}

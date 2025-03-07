@@ -30,6 +30,7 @@ export const AIAnalysisButton = ({
        article.ai_analysis.business_implications);
        
     setShowButton(!hasAnalysis);
+    console.log('[AIAnalysisButton] Should show button:', !hasAnalysis, 'Analysis:', article.ai_analysis);
   }, [article]);
   
   // Don't render if we shouldn't show the button
