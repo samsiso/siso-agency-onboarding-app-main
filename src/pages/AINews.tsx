@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import { format } from 'date-fns';
+import { format, startOfWeek, startOfMonth, endOfWeek, endOfMonth } from 'date-fns';
 import { useNewsItems } from '@/hooks/useNewsItems';
 import { NewsHeader } from '@/components/ai-news/NewsHeader';
 import { NewsContent } from '@/components/ai-news/NewsContent';
@@ -19,13 +19,14 @@ import { DateNavigation } from '@/components/ai-news/DateNavigation';
 import { supabase } from '@/integrations/supabase/client';
 import { MainLayout } from '@/components/assistants/layout/MainLayout';
 
-// [Analysis] Improved UI to provide more transparency about article generation and added AI analysis feature
+// [Analysis] Enhanced UI to handle different time ranges for news viewing
 const AINews: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('today');
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showAdminPanel, setShowAdminPanel] = useState(false); // Hide admin panel by default
+  const [currentRange, setCurrentRange] = useState<'day' | 'week' | 'month'>('day');
   
   // Using the enhanced useNewsItems hook
   const {
@@ -45,13 +46,15 @@ const AINews: React.FC = () => {
     syncingNews,
     lastSync,
     articleCount,
-    syncResult
+    syncResult,
+    fetchNewsInRange
   } = useNewsItems(selectedCategory);
   
   console.log('Rendering AINews component with', newsItems.length, 'news items');
   console.log('Current date:', format(currentDate, 'yyyy-MM-dd'));
   console.log('Date range:', dateRange);
   console.log('Loading state:', loading);
+  console.log('Current range:', currentRange);
   
   // Update page title 
   useEffect(() => {
@@ -62,6 +65,21 @@ const AINews: React.FC = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [activeTab, selectedCategory]);
+
+  // Handle range changes
+  useEffect(() => {
+    if (currentRange === 'day') {
+      // Single day view - already handled by useNewsItems
+    } else if (currentRange === 'week') {
+      const weekStart = startOfWeek(currentDate);
+      const weekEnd = endOfWeek(currentDate);
+      fetchNewsInRange(weekStart, weekEnd);
+    } else if (currentRange === 'month') {
+      const monthStart = startOfMonth(currentDate);
+      const monthEnd = endOfMonth(currentDate);
+      fetchNewsInRange(monthStart, monthEnd);
+    }
+  }, [currentRange, currentDate, selectedCategory]);
   
   // Handle search changes
   const handleSearchChange = (query: string) => {
@@ -82,6 +100,11 @@ const AINews: React.FC = () => {
   // Toggle admin panel visibility
   const toggleAdminPanel = () => {
     setShowAdminPanel(!showAdminPanel);
+  };
+  
+  // Handle range selection
+  const handleRangeSelect = (range: 'day' | 'week' | 'month') => {
+    setCurrentRange(range);
   };
   
   // Handle manual sync with confirmation
@@ -167,6 +190,8 @@ const AINews: React.FC = () => {
               onNextDay={goToNextDay}
               onPreviousDay={goToPreviousDay}
               onSelectDate={goToDate}
+              onSelectRange={handleRangeSelect}
+              currentRange={currentRange}
             />
             
             {/* Daily statistics overview */}

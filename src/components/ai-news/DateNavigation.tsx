@@ -5,7 +5,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from '@/components/ui/badge';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from "lucide-react";
-import { format, isToday, isSameDay, parseISO } from "date-fns";
+import { format, isToday, isSameDay, parseISO, startOfWeek, startOfMonth, endOfWeek, endOfMonth, isWithinInterval } from "date-fns";
 import { motion } from "framer-motion";
 
 interface DateNavigationProps {
@@ -14,6 +14,8 @@ interface DateNavigationProps {
   onPreviousDay: () => void;
   onNextDay: () => void;
   onSelectDate: (date: Date) => void;
+  onSelectRange: (range: 'day' | 'week' | 'month') => void;
+  currentRange: 'day' | 'week' | 'month';
   loading?: boolean;
 }
 
@@ -23,6 +25,8 @@ export const DateNavigation = ({
   onPreviousDay,
   onNextDay,
   onSelectDate,
+  onSelectRange,
+  currentRange = 'day',
   loading = false
 }: DateNavigationProps) => {
   // [Analysis] Animate date changes for better UX
@@ -43,6 +47,22 @@ export const DateNavigation = ({
     onSelectDate(date);
   };
 
+  // [Analysis] Get range text based on current selection
+  const getRangeText = () => {
+    if (currentRange === 'day') {
+      return isToday(currentDate) ? 'Today' : format(currentDate, 'EEEE');
+    } else if (currentRange === 'week') {
+      const weekStart = startOfWeek(currentDate);
+      const weekEnd = endOfWeek(currentDate);
+      return `${format(weekStart, 'MMM d')} - ${format(weekEnd, 'MMM d, yyyy')}`;
+    } else if (currentRange === 'month') {
+      const monthStart = startOfMonth(currentDate);
+      const monthEnd = endOfMonth(currentDate);
+      return `${format(monthStart, 'MMMM d')} - ${format(monthEnd, 'MMMM d, yyyy')}`;
+    }
+    return '';
+  };
+
   // Use today's date as a default if no date is available
   const today = new Date();
   const displayDate = currentDate || today;
@@ -58,12 +78,12 @@ export const DateNavigation = ({
           className="h-8 w-8"
         >
           <ChevronLeft className="h-4 w-4" />
-          <span className="sr-only">Previous day</span>
+          <span className="sr-only">Previous {currentRange}</span>
         </Button>
 
         <div className="flex flex-col items-center">
           <motion.div
-            key={displayDate.toISOString()}
+            key={`${currentRange}-${displayDate.toISOString()}`}
             initial="initial"
             animate="animate"
             exit="exit"
@@ -71,15 +91,19 @@ export const DateNavigation = ({
             className="flex items-center gap-2"
           >
             <span className="text-lg font-semibold">
-              {isToday(displayDate) ? 'Today' : format(displayDate, 'EEEE')}
+              {getRangeText()}
             </span>
             <Badge variant="outline" className="bg-siso-red/10 text-siso-red border-siso-red/20">
-              {format(displayDate, 'MMMM d, yyyy')}
+              {currentRange === 'day' 
+                ? format(displayDate, 'MMMM d, yyyy') 
+                : currentRange === 'week'
+                  ? 'This Week'
+                  : 'This Month'}
             </Badge>
           </motion.div>
           
           <span className="text-xs text-gray-400 mt-1">
-            Showing articles published on this date
+            Showing articles published {currentRange === 'day' ? 'on this date' : `in this ${currentRange}`}
           </span>
         </div>
 
@@ -87,16 +111,40 @@ export const DateNavigation = ({
           variant="outline"
           size="icon"
           onClick={onNextDay}
-          disabled={loading || isToday(displayDate)}
+          disabled={loading || 
+            (currentRange === 'day' && isToday(displayDate)) || 
+            (currentRange === 'week' && isWithinInterval(today, {
+              start: startOfWeek(displayDate),
+              end: endOfWeek(displayDate)
+            })) ||
+            (currentRange === 'month' && isWithinInterval(today, {
+              start: startOfMonth(displayDate),
+              end: endOfMonth(displayDate)
+            }))}
           className="h-8 w-8"
         >
           <ChevronRight className="h-4 w-4" />
-          <span className="sr-only">Next day</span>
+          <span className="sr-only">Next {currentRange}</span>
         </Button>
       </div>
 
       <div className="flex flex-col sm:flex-row justify-between items-center gap-2">
         <div className="flex items-center gap-2 w-full sm:w-auto">
+          <Select
+            onValueChange={(value) => onSelectRange(value as 'day' | 'week' | 'month')}
+            value={currentRange}
+            disabled={loading}
+          >
+            <SelectTrigger className="w-[140px]">
+              <SelectValue placeholder="Select range" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="day">Daily</SelectItem>
+              <SelectItem value="week">This Week</SelectItem>
+              <SelectItem value="month">This Month</SelectItem>
+            </SelectContent>
+          </Select>
+          
           <Popover>
             <PopoverTrigger asChild>
               <Button 
@@ -123,7 +171,7 @@ export const DateNavigation = ({
             </PopoverContent>
           </Popover>
 
-          {dateRange.length > 0 && (
+          {dateRange.length > 0 && currentRange === 'day' && (
             <Select 
               onValueChange={handleSelectDateFromDropdown}
               value={format(displayDate, 'yyyy-MM-dd')}
@@ -145,7 +193,7 @@ export const DateNavigation = ({
           )}
         </div>
         
-        {isToday(displayDate) && (
+        {isToday(displayDate) && currentRange === 'day' && (
           <Badge variant="outline" className="bg-green-500/10 text-green-400 border-green-500/20">
             Latest News
           </Badge>

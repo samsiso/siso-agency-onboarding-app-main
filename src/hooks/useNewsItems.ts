@@ -2,14 +2,14 @@ import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { NewsItem } from '@/types/blog';
-import { format, addDays, subDays, isToday, isSameDay, parseISO } from 'date-fns';
+import { format, addDays, subDays, isToday, isSameDay, parseISO, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns';
 
 type PostStatus = 'all' | 'draft' | 'published';
 
 // [Analysis] Enhanced hook for managing news items with better API integration and date-based navigation
 export const useNewsItems = (
   selectedCategory: string | null, 
-  status: PostStatus = 'published',
+  status: PostStatus = 'all' | 'draft' | 'published',
   selectedDate?: string | null,
   currentPage: number = 1,
   pageSize: number = 12
@@ -317,6 +317,93 @@ export const useNewsItems = (
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  // [Analysis] New function to fetch news within a date range (for week/month views)
+  const fetchNewsInRange = async (startDate: Date, endDate: Date) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const formattedStartDate = format(startDate, 'yyyy-MM-dd');
+      const formattedEndDate = format(endDate, 'yyyy-MM-dd');
+      
+      console.log(`Fetching news from ${formattedStartDate} to ${formattedEndDate}`);
+      
+      let query = supabase
+        .from('ai_news')
+        .select('*, profiles:author_id(full_name, avatar_url)')
+        .gte('date', formattedStartDate)
+        .lte('date', formattedEndDate)
+        .order('date', { ascending: false })
+        .order('created_at', { ascending: false });
+
+      if (status !== 'all') {
+        query = query.eq('status', status);
+      }
+
+      if (selectedCategory) {
+        query = query.eq('category', selectedCategory);
+      }
+
+      const { data, error: fetchError } = await query;
+
+      if (fetchError) {
+        console.error('Error fetching news for date range:', fetchError);
+        throw fetchError;
+      }
+
+      console.log(`Fetched ${data?.length} articles for range ${formattedStartDate} to ${formattedEndDate}`);
+      
+      // [Analysis] Transform data and update state
+      if (data && data.length > 0) {
+        const transformedData = transformNewsItems(data);
+        setNewsItems(transformedData);
+        
+        // Fetch summaries for these articles
+        const articleIds = transformedData.map(item => item.id);
+        fetchSummariesByIds(articleIds);
+      } else {
+        setNewsItems([]);
+        toast({
+          description: `No articles found for this ${startDate === endDate ? 'date' : 'period'}.`,
+        });
+      }
+    } catch (error) {
+      console.error('Error in fetchNewsInRange:', error);
+      setError(error as Error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch news articles for the selected range. Please try again.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch summaries by article IDs
+  const fetchSummariesByIds = async (articleIds: string[]) => {
+    if (!articleIds.length) return;
+    
+    try {
+      const { data: summariesData, error: summariesError } = await supabase
+        .from('ai_news_summaries')
+        .select('news_id, summary')
+        .in('news_id', articleIds);
+
+      if (summariesError) throw summariesError;
+
+      if (summariesData) {
+        const summariesMap = summariesData.reduce((acc: Record<string, string>, curr) => {
+          acc[curr.news_id] = curr.summary;
+          return acc;
+        }, {});
+        setSummaries(prev => ({...prev, ...summariesMap}));
+      }
+    } catch (error) {
+      console.error('Error fetching summaries by IDs:', error);
     }
   };
 
@@ -836,6 +923,7 @@ export const useNewsItems = (
     goToDate,
     refresh: fetchNews,
     syncNews,
-    testFetchNews // Add test function to the hook's return value
+    testFetchNews, // Add test function to the hook's return value
+    fetchNewsInRange // Add the new function for fetching date ranges
   };
 };
