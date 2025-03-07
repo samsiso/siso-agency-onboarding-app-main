@@ -538,13 +538,14 @@ export const useNewsItems = (
   };
 
   // [Analysis] Function to sync news from a specific API source with improved error handling
-  // Defaulting testMode to false so that articles are actually imported into the database
+  // Added support for date override to generate articles for specific dates
   const syncNews = async (
     keyword: string = "artificial intelligence", 
     limit: number = 20, 
     source: 'event_registry' | 'news_api' = activeNewsSource,
     testMode: boolean = false,
-    skipDuplicates: boolean = true
+    skipDuplicates: boolean = true,
+    dateOverride: string | null = null  // New parameter for date override
   ) => {
     setSyncingNews(true);
     setSyncResult(null);
@@ -555,7 +556,8 @@ export const useNewsItems = (
         limit,
         source,
         testMode,
-        skipDuplicates
+        skipDuplicates,
+        dateOverride
       });
       
       // [Analysis] Determine which edge function to call based on source
@@ -569,7 +571,8 @@ export const useNewsItems = (
           limit: limit,
           testMode: testMode, // Flag to determine if articles should be imported
           source: source,
-          skipDuplicates: skipDuplicates // Whether to filter duplicates
+          skipDuplicates: skipDuplicates, // Whether to filter duplicates
+          dateOverride: dateOverride // Pass date override to edge function
         },
       });
 
@@ -626,12 +629,15 @@ export const useNewsItems = (
             impact = 'high';
           }
           
+          // Use the date override if provided, otherwise use the article date or today
+          const articleDate = dateOverride || article.date || new Date().toISOString().split('T')[0];
+          
           return {
             id,
             title: article.title || 'Untitled Article',
             description: article.description || '',
             content: content,
-            date: article.date || new Date().toISOString().split('T')[0],
+            date: articleDate,
             category: article.category || 'breakthrough_technologies',
             article_type: 'news',
             created_at: article.date || new Date().toISOString(),
@@ -680,10 +686,16 @@ export const useNewsItems = (
           fetchApiStatus();
           fetchAvailableDates();
           
+          // If date override is used, make sure to refresh data for that date
+          if (dateOverride) {
+            const dateObj = new Date(dateOverride);
+            if (isSameDay(currentDate, dateObj)) {
+              fetchNewsByDate(dateObj);
+            }
+          } 
           // If articles were imported for today, refresh the current view
-          const today = new Date();
-          if (isSameDay(currentDate, today)) {
-            fetchNewsByDate(today);
+          else if (isSameDay(currentDate, new Date())) {
+            fetchNewsByDate(new Date());
           }
         }
       } else {

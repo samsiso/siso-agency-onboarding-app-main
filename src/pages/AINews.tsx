@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNewsItems } from '@/hooks/useNewsItems';
 import NewsFilters from '@/components/ai-news/NewsFilters';
@@ -43,17 +42,22 @@ const AINews = () => {
   // [Analysis] Added here to handle tab state for NewsHeader component
   const [activeTab, setActiveTab] = useState('all');
 
-  // [Analysis] UI visibility state
-  const [showTestPanel, setShowTestPanel] = useState(false);
+  // [Analysis] UI visibility state - ALWAYS show the test panel now
+  const [showTestPanel, setShowTestPanel] = useState(true);
   const [showFetchHistory, setShowFetchHistory] = useState(false);
 
   // [Analysis] State for API test execution
   const [testKeyword, setTestKeyword] = useState('artificial intelligence');
-  const [testLimit, setTestLimit] = useState(10);
+  const [testLimit, setTestLimit] = useState(100); // Default to 100 articles
   const [testSource, setTestSource] = useState<'event_registry' | 'news_api'>('event_registry');
   const [apiResponse, setApiResponse] = useState<string>('');
   const [isApiResponseOpen, setIsApiResponseOpen] = useState(false);
-  const [testMode, setTestMode] = useState(true); // Added state for test mode
+  const [testMode, setTestMode] = useState(false); // Default to import mode (not test mode)
+  
+  // New state for bulk import settings
+  const [daysToGenerate, setDaysToGenerate] = useState(1);
+  const [startDate, setStartDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const [isBulkImporting, setIsBulkImporting] = useState(false);
 
   const itemsPerPage = 12; // Same as PAGE_SIZE in useNewsItems
 
@@ -128,7 +132,7 @@ const AINews = () => {
     }
   };
 
-  // [Analysis] Handle API test execution with enhanced error tracking
+  // Enhanced function to handle API test execution
   const handleTestAPI = async () => {
     setApiResponse('');
     try {
@@ -158,6 +162,69 @@ const AINews = () => {
       setIsApiResponseOpen(true);
 
       // Error is already handled in syncNews
+    }
+  };
+
+  // New function for bulk importing articles for multiple days
+  const handleBulkImport = async () => {
+    setIsBulkImporting(true);
+    
+    try {
+      const startDateObj = new Date(startDate);
+      let successCount = 0;
+      let totalArticles = 0;
+      
+      for (let i = 0; i < daysToGenerate; i++) {
+        const currentDate = new Date(startDateObj);
+        currentDate.setDate(startDateObj.getDate() - i);
+        const formattedDate = format(currentDate, 'yyyy-MM-dd');
+        
+        // Override the date in the data with our generated date
+        const result = await syncNews(
+          testKeyword, 
+          testLimit, 
+          testSource, 
+          false, // Force to real import mode
+          true,  // Skip duplicates
+          formattedDate // Set the specific date
+        );
+        
+        if (result.success) {
+          successCount++;
+          totalArticles += result.count || 0;
+          toast({
+            title: `Day ${i+1}/${daysToGenerate} Success`,
+            description: `Imported ${result.count} articles for ${formattedDate}`,
+          });
+        } else {
+          toast({
+            title: `Failed on day ${i+1}/${daysToGenerate}`,
+            description: result.message,
+            variant: 'destructive'
+          });
+        }
+        
+        // Add a small delay to avoid rate limits
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+      
+      toast({
+        title: `Bulk Import Completed`,
+        description: `Successfully imported ${totalArticles} articles across ${successCount} days.`,
+      });
+      
+      // Refresh the data
+      refresh();
+      
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      toast({
+        title: "Bulk Import Error",
+        description: errorMessage,
+        variant: 'destructive'
+      });
+    } finally {
+      setIsBulkImporting(false);
     }
   };
 
@@ -273,7 +340,10 @@ const AINews = () => {
           <div className="flex items-center gap-2">
             <Popover>
               <PopoverTrigger asChild>
-                
+                <Button variant="outline" size="sm" className="gap-1.5">
+                  <Database className="h-4 w-4" />
+                  API Status
+                </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80" align="end">
                 <div className="space-y-2">
@@ -300,7 +370,7 @@ const AINews = () => {
               </PopoverContent>
             </Popover>
 
-            {isAdmin && <AdminControls showFetchHistory={showFetchHistory} setShowFetchHistory={setShowFetchHistory} showTestPanel={showTestPanel} setShowTestPanel={setShowTestPanel} onTestFetch={handleTestFetch} />}
+            <AdminControls showFetchHistory={showFetchHistory} setShowFetchHistory={setShowFetchHistory} showTestPanel={showTestPanel} setShowTestPanel={setShowTestPanel} onTestFetch={handleTestFetch} />
           </div>
         </div>
 
@@ -325,7 +395,7 @@ const AINews = () => {
             <FetchHistoryPanel onRefresh={() => syncNews('artificial intelligence', 30, 'event_registry', false)} onTestFetch={handleTestFetch} />
           </motion.div>}
 
-        {showTestPanel && isAdmin && <motion.div initial={{
+        {showTestPanel && <motion.div initial={{
         opacity: 0,
         height: 0
       }} animate={{
@@ -339,21 +409,22 @@ const AINews = () => {
               <CardHeader>
                 <CardTitle className="text-yellow-400 flex items-center gap-2">
                   <Sparkles className="h-5 w-5" />
-                  API Testing Panel
+                  News Article Generator
                 </CardTitle>
                 <CardDescription>
-                  Test the Event Registry API integration to retrieve fresh news articles
+                  Generate and import AI news articles to populate your dashboard
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Tabs defaultValue="test" className="w-full">
-                  <TabsList>
-                    <TabsTrigger value="test">Test API</TabsTrigger>
-                    <TabsTrigger value="results">Test Results</TabsTrigger>
+                <Tabs defaultValue="import" className="w-full">
+                  <TabsList className="mb-2">
+                    <TabsTrigger value="import">Import Articles</TabsTrigger>
+                    <TabsTrigger value="bulk">Bulk Generation</TabsTrigger>
+                    <TabsTrigger value="results">Results</TabsTrigger>
                     <TabsTrigger value="debug">Debug</TabsTrigger>
                   </TabsList>
 
-                  <TabsContent value="test" className="space-y-4 mt-4">
+                  <TabsContent value="import" className="space-y-4 mt-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="keyword">Keyword</Label>
@@ -362,7 +433,7 @@ const AINews = () => {
 
                       <div className="space-y-2">
                         <Label htmlFor="limit">Article Limit</Label>
-                        <Input id="limit" type="number" value={testLimit} onChange={e => setTestLimit(parseInt(e.target.value) || 10)} min={1} max={50} className="w-full" />
+                        <Input id="limit" type="number" value={testLimit} onChange={e => setTestLimit(parseInt(e.target.value) || 100)} min={1} max={250} className="w-full" />
                       </div>
 
                       <div className="space-y-2">
@@ -390,24 +461,81 @@ const AINews = () => {
                       </div>
                     </div>
 
-                    <Collapsible open={isApiResponseOpen} onOpenChange={setIsApiResponseOpen} className="mt-4 border rounded-md">
-                      <CollapsibleTrigger asChild>
-                        <div className="p-3 border-b flex justify-between items-center cursor-pointer hover:bg-white/5">
-                          <div className="flex items-center gap-2">
-                            <Terminal className="h-4 w-4 text-blue-400" />
-                            <h4 className="text-sm font-medium">Raw API Response</h4>
-                          </div>
-                          <Badge variant="outline" className={apiResponse ? "bg-blue-500/10" : "bg-gray-500/10"}>
-                            {apiResponse ? "Data Available" : "No Data"}
-                          </Badge>
-                        </div>
-                      </CollapsibleTrigger>
-                      <CollapsibleContent>
-                        <div className="p-3">
-                          <Textarea value={apiResponse} readOnly className="font-mono text-xs h-48 bg-slate-950" />
-                        </div>
-                      </CollapsibleContent>
-                    </Collapsible>
+                    <Button onClick={handleTestAPI} disabled={syncingNews} className="gap-2 w-full mt-4" variant={testMode ? "default" : "default"}>
+                      {syncingNews ? <>
+                          <RefreshCw className="h-4 w-4 animate-spin" />
+                          {testMode ? 'Testing...' : 'Importing...'}
+                        </> : <>
+                          <Sparkles className="h-4 w-4" />
+                          {testMode ? 'Test API' : 'Import Articles'}
+                        </>}
+                    </Button>
+                  </TabsContent>
+
+                  <TabsContent value="bulk" className="space-y-4 mt-4">
+                    <Alert variant="default" className="bg-blue-950/20 border-blue-500/30 mb-4">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle>Bulk Import</AlertTitle>
+                      <AlertDescription>
+                        Generate articles for multiple days at once. This will create a set of articles for each day with the specified date.
+                      </AlertDescription>
+                    </Alert>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="startDate">Start Date</Label>
+                        <Input id="startDate" type="date" value={startDate} onChange={e => setStartDate(e.target.value)} className="w-full" />
+                        <p className="text-xs text-muted-foreground">The first date to generate articles for</p>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="daysToGenerate">Number of Days</Label>
+                        <Input id="daysToGenerate" type="number" value={daysToGenerate} onChange={e => setDaysToGenerate(parseInt(e.target.value) || 1)} min={1} max={30} className="w-full" />
+                        <p className="text-xs text-muted-foreground">Will generate articles for this many consecutive days, starting from the selected date and going backward</p>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="bulkKeyword">Keyword</Label>
+                        <Input id="bulkKeyword" value={testKeyword} onChange={e => setTestKeyword(e.target.value)} placeholder="e.g., artificial intelligence" className="w-full" />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="bulkLimit">Articles Per Day</Label>
+                        <Input id="bulkLimit" type="number" value={testLimit} onChange={e => setTestLimit(parseInt(e.target.value) || 100)} min={1} max={250} className="w-full" />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="bulkSource">News Source</Label>
+                        <Select value={testSource} onValueChange={value => setTestSource(value as 'event_registry' | 'news_api')}>
+                          <SelectTrigger id="bulkSource" className="w-full">
+                            <SelectValue placeholder="Select news source" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="event_registry">Event Registry</SelectItem>
+                            <SelectItem value="news_api">News API</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    
+                    <Button 
+                      onClick={handleBulkImport} 
+                      disabled={isBulkImporting} 
+                      className="gap-2 w-full mt-4" 
+                      variant="default"
+                    >
+                      {isBulkImporting ? (
+                        <>
+                          <RefreshCw className="h-4 w-4 animate-spin" />
+                          Generating ({daysToGenerate} days)...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="h-4 w-4" />
+                          Generate {testLimit} Articles × {daysToGenerate} Days
+                        </>
+                      )}
+                    </Button>
                   </TabsContent>
 
                   <TabsContent value="results" className="mt-4">
@@ -445,7 +573,6 @@ const AINews = () => {
                               The API request was successful, but no articles were returned. This could be due to:
                               <ul className="list-disc pl-5 mt-2 space-y-1 text-sm">
                                 <li>API key configuration issues</li>
-                                <li>No articles matching your search criteria</li>
                                 <li>No articles matching your search criteria</li>
                                 <li>API rate limiting or quota restrictions</li>
                                 <li>Date range limitations</li>
@@ -522,6 +649,25 @@ const AINews = () => {
                         </Card>
                       </div>
 
+                      <Collapsible open={isApiResponseOpen} onOpenChange={setIsApiResponseOpen} className="mt-4 border rounded-md">
+                        <CollapsibleTrigger asChild>
+                          <div className="p-3 border-b flex justify-between items-center cursor-pointer hover:bg-white/5">
+                            <div className="flex items-center gap-2">
+                              <Terminal className="h-4 w-4 text-blue-400" />
+                              <h4 className="text-sm font-medium">Raw API Response</h4>
+                            </div>
+                            <Badge variant="outline" className={apiResponse ? "bg-blue-500/10" : "bg-gray-500/10"}>
+                              {apiResponse ? "Data Available" : "No Data"}
+                            </Badge>
+                          </div>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <div className="p-3">
+                            <Textarea value={apiResponse} readOnly className="font-mono text-xs h-48 bg-slate-950" />
+                          </div>
+                        </CollapsibleContent>
+                      </Collapsible>
+
                       <div className="border rounded-md overflow-hidden">
                         <div className="bg-slate-950 p-3 border-b">
                           <h4 className="text-sm font-medium flex items-center gap-2">
@@ -541,17 +687,6 @@ const AINews = () => {
                   </TabsContent>
                 </Tabs>
               </CardContent>
-              <CardFooter className="justify-end pt-0">
-                <Button onClick={handleTestAPI} disabled={syncingNews} className="gap-2" variant={testMode ? "default" : "destructive"}>
-                  {syncingNews ? <>
-                      <RefreshCw className="h-4 w-4 animate-spin" />
-                      {testMode ? 'Testing...' : 'Importing...'}
-                    </> : <>
-                      <Sparkles className="h-4 w-4" />
-                      {testMode ? 'Test API' : 'Import Articles'}
-                    </>}
-                </Button>
-              </CardFooter>
             </Card>
           </motion.div>}
 
