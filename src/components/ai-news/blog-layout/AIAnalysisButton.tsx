@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { RainbowButton } from '@/components/ui/rainbow-button';
 import { EnhancedNewsItem } from '@/types/blog';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'react-hot-toast';
 
 // [Analysis] This component handles the generation of AI analysis for articles
 // [Plan] In the future, we can add more granular control over what aspects to analyze
@@ -26,9 +28,38 @@ export const AIAnalysisButton = ({
   const handleAnalyze = async () => {
     setLoading(true);
     try {
+      // [Analysis] Call the edge function directly instead of relying on the parent onAnalyze
+      toast.loading('Analyzing article with AI...', { id: 'analyze-toast' });
+      
+      // [Analysis] Call the edge function to analyze the article with proper error handling
+      const response = await supabase.functions.invoke('analyze-article', {
+        body: { 
+          articleId: article.id,
+          title: article.title,
+          content: article.content || article.description || '',
+          source: article.source,
+          category: article.category,
+          sections: article.sections
+        }
+      });
+      
+      if (response.error) {
+        throw new Error(response.error.message);
+      }
+      
+      toast.success('Article analyzed successfully', {
+        id: 'analyze-toast',
+        duration: 3000,
+      });
+      
+      // After successful analysis, call the onAnalyze prop to refresh the article data
       await onAnalyze();
     } catch (error) {
       console.error('Error generating AI analysis:', error);
+      toast.error('Failed to analyze article', {
+        id: 'analyze-toast',
+        description: error instanceof Error ? error.message : 'An unknown error occurred'
+      });
     } finally {
       setLoading(false);
     }

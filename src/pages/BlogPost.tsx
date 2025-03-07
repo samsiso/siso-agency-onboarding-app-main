@@ -12,7 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { NewsComment, EnhancedNewsItem } from '@/types/blog';
 
 const BlogPost = () => {
-  const { postId } = useParams(); // [Analysis] Changed from 'id' to 'postId' to match App.tsx route parameter
+  const { postId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { handleShare, handleBookmark } = useBlogPostActions();

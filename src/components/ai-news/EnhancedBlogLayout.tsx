@@ -1,4 +1,3 @@
-
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -117,30 +116,13 @@ export const EnhancedBlogLayout = ({
     setLiked(!liked);
   };
 
-  // [Analysis] Handle AI analysis generation
+  // [Analysis] Handle AI analysis generation with improved data refresh
   const handleGenerateAnalysis = async () => {
     setIsGeneratingAnalysis(true);
     
     try {
-      // Call Edge Function to generate AI analysis
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/analyze-article`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
-        },
-        body: JSON.stringify({ 
-          articleId: article.id,
-          title: article.title,
-          content: article.content,
-          sections: article.sections,
-          category: article.category
-        })
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to generate AI analysis');
-      }
+      // [Analysis] Instead of calling the edge function here (now done in AIAnalysisButton),
+      // we'll just fetch the updated article data after the analysis is complete
       
       // Refresh the article data to get the updated AI analysis
       const { data, error } = await supabase
@@ -160,10 +142,10 @@ export const EnhancedBlogLayout = ({
         has_ai_analysis: true
       });
       
-      toast.success('AI analysis generated successfully!');
+      toast.success('AI analysis loaded successfully!');
     } catch (error) {
-      console.error('Error generating AI analysis:', error);
-      toast.error('Failed to generate AI analysis. Please try again.');
+      console.error('Error refreshing article data:', error);
+      toast.error('Failed to load AI analysis. Please try again.');
     } finally {
       setIsGeneratingAnalysis(false);
     }

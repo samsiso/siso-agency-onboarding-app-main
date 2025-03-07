@@ -18,7 +18,7 @@ serve(async (req) => {
   
   try {
     // [Analysis] Parse request for article data
-    const { articleId, title, content, source, category } = await req.json();
+    const { articleId, title, content, sections, source, category } = await req.json();
     
     if (!articleId || !title) {
       throw new Error("Missing required fields - articleId and title must be provided");
