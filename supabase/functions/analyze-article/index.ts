@@ -123,14 +123,30 @@ serve(async (req) => {
       };
     }
     
-    // [Analysis] Update the article with the analysis results
-    const supabase = supabaseClient;
-    
-    // First check if the ai_analysis column exists
+    // [Analysis] Check that the database has the required columns before updating
     try {
+      console.log("Checking for ai_analysis column before update");
+      const checkResult = await supabaseClient
+        .from("ai_news")
+        .select("ai_analysis")
+        .eq("id", articleId)
+        .limit(1)
+        .maybeSingle();
+        
+      if (checkResult.error && checkResult.error.message.includes("column \"ai_analysis\" does not exist")) {
+        throw new Error("Database schema is missing ai_analysis column - please run migrations");
+      }
+    } catch (checkError) {
+      console.error("Error checking database schema:", checkError);
+      throw new Error(`Database error during schema check: ${checkError.message}`);
+    }
+    
+    // [Analysis] Update the article with the analysis results
+    try {
+      console.log("Updating article with analysis:", { articleId, hasAnalysis: true });
+      
       // [Analysis] Update directly to the ai_news table with the analysis data
-      // Using explicit column update to add the analysis JSON
-      const { data: updatedArticle, error: updateError } = await supabase
+      const { data: updatedArticle, error: updateError } = await supabaseClient
         .from("ai_news")
         .update({
           has_ai_analysis: true,
@@ -144,6 +160,8 @@ serve(async (req) => {
         console.error("Error updating article with analysis:", updateError);
         throw updateError;
       }
+      
+      console.log("Analysis successfully stored in database");
     } catch (dbError) {
       console.error("Database error:", dbError);
       throw new Error(`Database error: ${dbError.message || "Unknown database error"}`);

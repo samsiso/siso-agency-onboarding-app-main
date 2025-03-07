@@ -11,6 +11,8 @@ export type Database = {
     Tables: {
       ai_news: {
         Row: {
+          ai_analysis: Json | null
+          analysis_date: string | null
           article_type: string | null
           author_id: string | null
           banner_template_id: string | null
@@ -25,6 +27,7 @@ export type Database = {
           duplicate_of: string | null
           estimated_reading_time: number | null
           featured: boolean | null
+          has_ai_analysis: boolean | null
           id: string
           image_url: string | null
           impact: string | null
@@ -60,6 +63,8 @@ export type Database = {
           views: number | null
         }
         Insert: {
+          ai_analysis?: Json | null
+          analysis_date?: string | null
           article_type?: string | null
           author_id?: string | null
           banner_template_id?: string | null
@@ -74,6 +79,7 @@ export type Database = {
           duplicate_of?: string | null
           estimated_reading_time?: number | null
           featured?: boolean | null
+          has_ai_analysis?: boolean | null
           id?: string
           image_url?: string | null
           impact?: string | null
@@ -109,6 +115,8 @@ export type Database = {
           views?: number | null
         }
         Update: {
+          ai_analysis?: Json | null
+          analysis_date?: string | null
           article_type?: string | null
           author_id?: string | null
           banner_template_id?: string | null
@@ -123,6 +131,7 @@ export type Database = {
           duplicate_of?: string | null
           estimated_reading_time?: number | null
           featured?: boolean | null
+          has_ai_analysis?: boolean | null
           id?: string
           image_url?: string | null
           impact?: string | null
