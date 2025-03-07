@@ -1,35 +1,18 @@
 
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
-import { EnhancedNewsItem, NewsComment } from '@/types/blog';
-import { 
-  ChevronLeft, 
-  Share2, 
-  BookmarkPlus,
-  Eye,
-  Clock,
-  MessageCircle,
-  ExternalLink,
-  Heart,
-} from 'lucide-react';
-import { motion } from 'framer-motion';
-import { EventCard } from './blog-layout/EventCard';
-import { complexityColors } from './blog-layout/constants';
-import { cn } from '@/lib/utils';
-import { ArticleTableOfContents } from './blog-layout/ArticleTableOfContents';
-import { useState, useEffect } from 'react';
-import { NewsCardComments } from './NewsCardComments';
-import { KeyTakeaways } from './blog-layout/KeyTakeaways';
+import React, { useState, useEffect } from 'react';
+import { EnhancedNewsItem, NewsComment, ArticleSection } from '@/types/blog';
 import { HeroImage } from './blog-layout/HeroImage';
 import { ReadingProgressBar } from './blog-layout/ReadingProgressBar';
 import { BackToTopButton } from './blog-layout/BackToTopButton';
-import { AIAnalysisButton } from './blog-layout/AIAnalysisButton';
-import { AIAnalysisSection } from './blog-layout/AIAnalysisSection';
-import { useSupabaseClient } from '@supabase/auth-helpers-react';
 import { toast } from 'react-hot-toast';
+import { useSupabaseClient } from '@supabase/auth-helpers-react';
+import { ArticleTableOfContents } from './blog-layout/ArticleTableOfContents';
+import { BlogHeader } from './blog-layout/components/BlogHeader';
+import { QuickActionsBar } from './blog-layout/components/QuickActionsBar';
+import { BlogContent } from './blog-layout/components/BlogContent';
+import { SidebarActions } from './blog-layout/components/SidebarActions';
 
+// [Analysis] Main blog layout component that orchestrates all the pieces
 interface EnhancedBlogLayoutProps {
   article: EnhancedNewsItem & { comments?: NewsComment[] };
   onShare?: () => void;
@@ -43,7 +26,6 @@ export const EnhancedBlogLayout = ({
   onBookmark,
   onAnalyze
 }: EnhancedBlogLayoutProps) => {
-  const navigate = useNavigate();
   const supabase = useSupabaseClient();
   const [activeSection, setActiveSection] = useState<string>();
   const [liked, setLiked] = useState(false);
@@ -55,35 +37,16 @@ export const EnhancedBlogLayout = ({
     setCurrentArticle(article);
   }, [article]);
   
-  // [Analysis] Check if this is an external article (no sections but has content)
-  const isExternalArticle = article.sections.length === 0 && article.content;
-  
-  // For external articles without sections, create a dummy section
-  const sortedSections = isExternalArticle 
-    ? [
-        {
-          id: 'main-content',
-          title: article.title,
-          content: article.content || article.description,
-          order_index: 0,
-          section_order: 0,
-          importance_level: 'high',
-          technical_complexity: article.technical_complexity,
-          subsection_type: 'overview',
-          source_references: {},
-          created_at: article.date,
-          updated_at: article.date,
-          article_id: article.id,
-        }
-      ] 
-    : [...article.sections].sort((a, b) => {
-        if (a.importance_level === 'high' && b.importance_level !== 'high') return -1;
-        if (a.importance_level !== 'high' && b.importance_level === 'high') return 1;
-        return a.section_order - b.section_order;
-      });
-
   // [Analysis] Track which section is currently visible
   useEffect(() => {
+    // Get all sections including special ones
+    const sections = [
+      'key-takeaways', 
+      ...article.sections.map(section => section.id),
+      'ai-analysis-section',
+      'community-notes'
+    ];
+    
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -96,14 +59,7 @@ export const EnhancedBlogLayout = ({
     );
 
     // Observe all content sections
-    const ids = [
-      'key-takeaways', 
-      ...sortedSections.map(section => section.id),
-      'ai-analysis-section',
-      'community-notes'
-    ];
-    
-    ids.forEach((id) => {
+    sections.forEach((id) => {
       const element = document.getElementById(id);
       if (element) {
         observer.observe(element);
@@ -111,7 +67,7 @@ export const EnhancedBlogLayout = ({
     });
 
     return () => observer.disconnect();
-  }, [sortedSections, currentArticle.ai_analysis]);
+  }, [article.sections, currentArticle.ai_analysis]);
 
   // [Analysis] Handle external link navigation
   const handleExternalLink = () => {
@@ -124,71 +80,18 @@ export const EnhancedBlogLayout = ({
     setLiked(!liked);
   };
 
-  // [Analysis] Handle AI analysis generation with detailed error handling
-  const handleGenerateAnalysis = async () => {
-    if (!article.id) {
-      console.error('No article ID available for analysis');
-      toast.error('Cannot generate analysis: article ID missing');
-      return;
-    }
-
-    setIsGeneratingAnalysis(true);
+  // [Analysis] Generate content for active section title
+  const getActiveSectionTitle = () => {
+    if (!activeSection) return undefined;
     
-    try {
-      console.log('Generating analysis for article:', article.id);
-      
-      // Preparing content data for analysis
-      const analysisData = {
-        articleId: article.id,
-        title: article.title,
-        content: article.content || article.description,
-        sections: article.sections,
-        source: article.source,
-        category: article.category
-      };
-      
-      console.log('Sending data to analyze-article:', analysisData);
-      
-      // Call the Supabase Edge Function
-      const { data, error } = await supabase.functions.invoke('analyze-article', {
-        body: analysisData
-      });
-      
-      if (error) {
-        console.error('Error calling analyze-article function:', error);
-        throw error;
-      }
-      
-      console.log('Analysis generation response:', data);
-      
-      if (data?.success) {
-        toast.success('AI analysis generated successfully!');
-        
-        // Refresh the article data through the parent component
-        if (onAnalyze) {
-          await onAnalyze();
-        }
-      } else {
-        throw new Error(data?.message || 'Failed to generate analysis');
-      }
-    } catch (error) {
-      console.error('Error generating article analysis:', error);
-      toast.error('Failed to generate AI analysis. Please try again.');
-    } finally {
-      setIsGeneratingAnalysis(false);
-    }
-  };
-
-  // [Analysis] Check for meaningful analysis data with multiple properties
-  const hasAnalysis = currentArticle.ai_analysis && 
-    Object.keys(currentArticle.ai_analysis || {}).length > 0 &&
-    // Check for at least one key property that should have data
-    (currentArticle.ai_analysis.key_points?.length > 0 || 
-     currentArticle.ai_analysis.market_impact || 
-     currentArticle.ai_analysis.business_implications);
-
-  // Determine if we should show the AI analysis button
-  const showAnalysisButton = !hasAnalysis;
+    if (activeSection === 'key-takeaways') return 'Key Takeaways';
+    if (activeSection === 'ai-analysis-section') return 'AI Analysis';
+    if (activeSection === 'community-notes') return 'Community Notes';
+    
+    // Find in sections array
+    const section = article.sections.find(s => s.id === activeSection);
+    return section?.title;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black">
@@ -199,233 +102,52 @@ export const EnhancedBlogLayout = ({
       <BackToTopButton />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Button
-          variant="ghost"
-          onClick={() => navigate('/ai-news')}
-          className="mb-6 group"
-        >
-          <ChevronLeft className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-          Back to News
-        </Button>
-
-        {article.url && (
-          <div className="mb-6 flex justify-end">
-            <Button
-              variant="outline"
-              onClick={handleExternalLink}
-              className="gap-2 text-blue-500 border-blue-500/30 hover:bg-blue-500/10"
-            >
-              <ExternalLink className="h-4 w-4" />
-              View Original Source
-            </Button>
-          </div>
-        )}
+        {/* Blog Header */}
+        <BlogHeader 
+          article={article}
+          handleExternalLink={handleExternalLink}
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Main Content */}
           <div className="lg:col-span-8 space-y-8">
-            <div className="space-y-4">
-              <div className="flex flex-wrap gap-2">
-                <Badge variant="outline" className={cn(
-                  complexityColors[article.technical_complexity]
-                )}>
-                  {article.technical_complexity}
-                </Badge>
-                <Badge variant="outline" 
-                  className="bg-blue-500/10 text-blue-500 border-none">
-                  {article.category.replace('_', ' ')}
-                </Badge>
-                <Badge variant="outline" 
-                  className="bg-siso-orange/10 text-siso-orange border-none">
-                  {article.impact} Impact
-                </Badge>
-              </div>
-
-              <h1 className="text-4xl font-bold text-white bg-clip-text">
-                {article.title}
-              </h1>
-
-              <div className="flex items-center flex-wrap gap-4 text-sm text-gray-400">
-                <span>{new Date(article.date).toLocaleDateString()}</span>
-                <span>•</span>
-                <span className="flex items-center gap-1">
-                  <Clock className="h-4 w-4" />
-                  {article.estimated_reading_time} min read
-                </span>
-                <span>•</span>
-                <span className="flex items-center gap-1">
-                  <Eye className="h-4 w-4" />
-                  {article.views} views
-                </span>
-                <span>•</span>
-                <span className="flex items-center gap-1">
-                  <MessageCircle className="h-4 w-4" />
-                  {article.comments ? (Array.isArray(article.comments) ? article.comments.length : 0) : 0} comments
-                </span>
-              </div>
-            </div>
-            
             {/* Enhanced Hero Image */}
             <HeroImage article={article} />
             
             {/* Quick Actions Bar */}
-            <div className="sticky top-2 z-30 bg-gray-900/80 backdrop-blur-md border border-gray-800/80 rounded-full p-1.5 flex justify-between items-center shadow-lg">
-              <div className="flex items-center space-x-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleLike}
-                  className={cn(
-                    "h-9 rounded-full gap-2", 
-                    liked ? "text-red-400 hover:text-red-500" : "text-gray-400 hover:text-gray-300"
-                  )}
-                >
-                  <Heart className={cn("h-4 w-4", liked && "fill-red-400")} />
-                  <span>Like</span>
-                </Button>
-                
-                {onBookmark && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={onBookmark}
-                    className="h-9 rounded-full gap-2"
-                  >
-                    <BookmarkPlus className="h-4 w-4" />
-                    <span>Save</span>
-                  </Button>
-                )}
-                
-                {onShare && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={onShare}
-                    className="h-9 rounded-full gap-2"
-                  >
-                    <Share2 className="h-4 w-4" />
-                    <span>Share</span>
-                  </Button>
-                )}
-              </div>
-              
-              <div className="text-xs text-gray-400 bg-gray-800/50 px-3 py-1 rounded-full">
-                {activeSection ? sortedSections.find(s => s.id === activeSection)?.title || 'Reading' : 'Start Reading'}
-              </div>
-            </div>
+            <QuickActionsBar 
+              activeSection={activeSection}
+              sectionTitle={getActiveSectionTitle()}
+              liked={liked}
+              handleLike={handleLike}
+              onBookmark={onBookmark}
+              onShare={onShare}
+            />
             
-            {/* Enhanced Key Takeaways */}
-            <KeyTakeaways article={article} />
-
-            <motion.div 
-              className="grid grid-cols-1 gap-8"
-              variants={{
-                hidden: { opacity: 0 },
-                visible: {
-                  opacity: 1,
-                  transition: {
-                    staggerChildren: 0.1
-                  }
-                }
-              }}
-              initial="hidden"
-              animate="visible"
-            >
-              {/* For external articles with just content, render differently */}
-              {isExternalArticle ? (
-                <div className="bg-white/5 rounded-lg p-6 backdrop-blur-sm border border-white/10">
-                  <div className="prose prose-invert prose-lg max-w-none">
-                    <p className="text-gray-200 leading-relaxed whitespace-pre-line">
-                      {article.content || article.description}
-                    </p>
-                    {article.source && (
-                      <div className="mt-6 pt-4 border-t border-white/10">
-                        <p className="text-sm text-gray-400">
-                          Source: {article.source}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                // For regular articles with sections - enhanced with EventCard
-                sortedSections.map((section, index) => (
-                  <EventCard key={section.id} section={section} index={index} />
-                ))
-              )}
-            </motion.div>
-            
-            {/* AI Analysis Section */}
-            <AIAnalysisSection article={currentArticle} onAnalyze={onAnalyze} />
-
-            {/* Comments Section now named Community Notes */}
-            <div id="community-notes" className="mt-12 bg-white/5 rounded-lg p-6 backdrop-blur-sm border border-white/10">
-              <h3 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
-                <MessageCircle className="h-5 w-5 text-blue-400" />
-                Community Notes ({article.comments ? (Array.isArray(article.comments) ? article.comments.length : 0) : 0})
-              </h3>
-              <NewsCardComments 
-                newsId={article.id}
-                comments={article.comments || []}
-              />
-            </div>
+            {/* Main Blog Content */}
+            <BlogContent 
+              article={currentArticle}
+              onAnalyze={onAnalyze}
+            />
           </div>
 
+          {/* Sidebar */}
           <div className="lg:col-span-4">
             <div className="sticky top-8 space-y-6">
               {/* Enhanced Article Table of Contents */}
               <ArticleTableOfContents 
                 article={article}
                 activeSection={activeSection}
-                onRefreshAnalysis={handleGenerateAnalysis}
+                onRefreshAnalysis={onAnalyze}
               />
               
-              {/* AI Analysis Button (only shown if no analysis exists) */}
-              {showAnalysisButton && (
-                <AIAnalysisButton 
-                  article={currentArticle}
-                  onAnalyze={handleGenerateAnalysis}
-                  isGenerating={isGeneratingAnalysis}
-                />
-              )}
-              
               {/* Sharing and bookmarking */}
-              <div className="bg-white/5 rounded-lg p-4 backdrop-blur-sm border border-white/10">
-                <h3 className="text-lg font-semibold text-white mb-4">Actions</h3>
-                <div className="flex flex-col gap-3">
-                  {onShare && (
-                    <Button 
-                      variant="outline" 
-                      onClick={onShare} 
-                      className="w-full justify-start gap-2 hover:bg-blue-900/20 hover:text-blue-300 transition-colors"
-                    >
-                      <Share2 className="h-4 w-4" />
-                      Share Article
-                    </Button>
-                  )}
-                  
-                  {onBookmark && (
-                    <Button 
-                      variant="outline" 
-                      onClick={onBookmark} 
-                      className="w-full justify-start gap-2 hover:bg-purple-900/20 hover:text-purple-300 transition-colors"
-                    >
-                      <BookmarkPlus className="h-4 w-4" />
-                      Bookmark for Later
-                    </Button>
-                  )}
-                  
-                  {article.url && (
-                    <Button 
-                      variant="outline" 
-                      onClick={handleExternalLink} 
-                      className="w-full justify-start gap-2 hover:bg-amber-900/20 hover:text-amber-300 transition-colors"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                      Visit Original Source
-                    </Button>
-                  )}
-                </div>
-              </div>
+              <SidebarActions 
+                onShare={onShare}
+                onBookmark={onBookmark}
+                handleExternalLink={handleExternalLink}
+                hasExternalUrl={!!article.url}
+              />
             </div>
           </div>
         </div>
