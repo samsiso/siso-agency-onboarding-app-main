@@ -144,7 +144,12 @@ export const TechnologyBreakdown = ({ newsItems, loading = false }: TechnologyBr
               <Bar 
                 dataKey="percentage" 
                 radius={[0, 4, 4, 0]}
-                fill={({ level }) => complexityColors[level as keyof typeof complexityColors] || "#3b82f6"}
+                fill={(data) => {
+                  // [Analysis] Fixed type error by using a rendering function that returns the color
+                  // based on the complexity level of each data point
+                  const level = data.level as keyof typeof complexityColors;
+                  return complexityColors[level] || "#3b82f6";
+                }}
                 animationDuration={800}
               />
             </BarChart>
