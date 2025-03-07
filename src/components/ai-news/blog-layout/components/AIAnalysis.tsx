@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { AIAnalysis } from '@/types/blog';
+import type { AIAnalysis as AIAnalysisType } from '@/types/blog';
 import { Brain, TrendingUp, Briefcase, Share2, RefreshCw } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
@@ -8,8 +8,8 @@ import { AIAnalysisDialog } from '../../AIAnalysisDialog';
 import { cn } from '@/lib/utils';
 
 // [Analysis] This component renders a summary of the AI analysis
-interface AIAnalysisProps {
-  analysis: AIAnalysis | undefined | null;
+interface AIAnalysisComponentProps {
+  analysis: AIAnalysisType | undefined | null;
   articleTitle: string;
   articleId: string;
   onRefresh?: () => Promise<void>;
@@ -20,7 +20,7 @@ export const AIAnalysis = ({
   articleTitle,
   articleId,
   onRefresh 
-}: AIAnalysisProps) => {
+}: AIAnalysisComponentProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   
