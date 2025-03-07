@@ -1,4 +1,3 @@
-
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -599,11 +598,11 @@ export const EnhancedBlogLayout = ({
               </motion.div>
             )}
 
-            {/* Comments Section */}
+            {/* Comments Section - Updated heading from "Discussion" to "Community Notes" */}
             <div className="mt-12 bg-white/5 rounded-lg p-6 backdrop-blur-sm border border-white/10">
               <h3 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
                 <MessageCircle className="h-5 w-5 text-blue-400" />
-                Discussion ({article.comments?.length || 0})
+                Community Notes ({article.comments?.length || 0})
               </h3>
               <NewsCardComments 
                 newsId={article.id}
