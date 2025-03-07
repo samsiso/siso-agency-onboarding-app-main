@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -17,8 +18,10 @@ import { NewsErrorBoundary } from '@/components/ai-news/NewsErrorBoundary';
 import { DateNavigation } from '@/components/ai-news/DateNavigation';
 import { supabase } from '@/integrations/supabase/client';
 import { MainLayout } from '@/components/assistants/layout/MainLayout';
+import { FeaturedNewsSection } from '@/components/ai-news/FeaturedNewsSection';
+import { CategoryCarousel } from '@/components/ai-news/CategoryCarousel';
 
-// [Analysis] Enhanced UI to handle different time ranges for news viewing
+// [Analysis] Enhanced UI with new visual components
 const AINews: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('today');
   const [currentPage, setCurrentPage] = useState(1);
@@ -236,10 +239,22 @@ const AINews: React.FC = () => {
               loading={loading}
             />
             
+            {/* Category carousel */}
+            <CategoryCarousel
+              selectedCategory={selectedCategory}
+              onCategoryChange={handleCategorySelect}
+            />
+            
             {/* Daily statistics overview */}
             <DailyStatsOverview 
               newsItems={newsItems} 
               loading={loading}
+            />
+            
+            {/* Featured news section */}
+            <FeaturedNewsSection 
+              newsItems={newsItems}
+              onAnalyzeArticle={analyzeArticle}
             />
             
             {/* Improved category filters with enhanced UI */}
