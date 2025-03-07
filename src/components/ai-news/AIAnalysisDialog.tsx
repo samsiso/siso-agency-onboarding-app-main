@@ -34,9 +34,12 @@ export const AIAnalysisDialog: React.FC<AIAnalysisDialogProps> = ({
   const [analysis, setAnalysis] = useState(initialAnalysis);
   const [isLoading, setIsLoading] = useState(initialLoading);
   
-  // [Analysis] Fetch fresh analysis data when dialog opens
+  // [Framework] Prevent page refresh by using local state management 
+  const [refreshCounter, setRefreshCounter] = useState(0);
+  
+  // [Analysis] Fetch fresh analysis data when dialog opens or when explicitly refreshed
   useEffect(() => {
-    if (isOpen && articleId && !analysis) {
+    if (isOpen && articleId) {
       setIsLoading(true);
       
       const fetchAnalysis = async () => {
@@ -59,6 +62,7 @@ export const AIAnalysisDialog: React.FC<AIAnalysisDialogProps> = ({
               setAnalysis(data.ai_analysis);
             } else {
               console.log('No AI analysis found for this article');
+              setAnalysis(null);
             }
           }
         } catch (error) {
@@ -70,7 +74,7 @@ export const AIAnalysisDialog: React.FC<AIAnalysisDialogProps> = ({
       
       fetchAnalysis();
     }
-  }, [isOpen, articleId, analysis]);
+  }, [isOpen, articleId, refreshCounter]); // Add refreshCounter to dependencies
   
   // [Analysis] Reset state when dialog closes
   useEffect(() => {
@@ -98,31 +102,13 @@ export const AIAnalysisDialog: React.FC<AIAnalysisDialogProps> = ({
         throw new Error(response.error.message);
       }
       
-      // Fetch the updated analysis with explicit column selection and type checking
-      const { data, error } = await supabase
-        .from('ai_news')
-        .select('id, ai_analysis')
-        .eq('id', articleId)
-        .single();
-        
-      if (error) {
-        console.error('Error fetching updated analysis:', error);
-        throw error;
-      }
+      // [Framework] Update the refresh counter to trigger the useEffect
+      setRefreshCounter(prev => prev + 1);
       
-      if (data) {
-        // Type-safe check for ai_analysis
-        if ('ai_analysis' in data && data.ai_analysis) {
-          setAnalysis(data.ai_analysis);
-          toast.success('Analysis refreshed successfully');
-        } else {
-          toast.error('No analysis data was returned');
-        }
-      }
+      toast.success('Analysis refresh initiated successfully');
     } catch (error) {
-      console.error('Error refreshing analysis:', error);
+      console.error('Error initiating analysis refresh:', error);
       toast.error('Failed to refresh analysis');
-    } finally {
       setIsLoading(false);
     }
   };

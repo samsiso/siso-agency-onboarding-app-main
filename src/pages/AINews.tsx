@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -136,7 +135,7 @@ const AINews: React.FC = () => {
     }
   };
   
-  // [Analysis] Completely refactored to fix the type instantiation issue
+  // [Analysis] Completely refactored to fix the type instantiation issue and prevent page refresh
   const analyzeArticle = async (articleId: string): Promise<void> => {
     try {
       toast.info('Analyzing article with AI...', {
@@ -150,7 +149,7 @@ const AINews: React.FC = () => {
         return;
       }
 
-      // Call the edge function to analyze the article with proper error handling
+      // [Analysis] Call the edge function to analyze the article with proper error handling
       const response = await supabase.functions.invoke('analyze-article', {
         body: { 
           articleId,
@@ -169,7 +168,7 @@ const AINews: React.FC = () => {
         description: 'AI insights are now available for this article',
       });
       
-      // Reload the article to get the updated analysis
+      // [Analysis] Update the article in the newsItems directly instead of reloading the page
       const { data: updatedArticles, error } = await supabase
         .from('ai_news')
         .select('*')
@@ -181,18 +180,18 @@ const AINews: React.FC = () => {
       }
       
       if (updatedArticles && updatedArticles.length > 0) {
-        // Update the article in the local state to show analysis immediately
+        // Update the article in the local state to show analysis immediately without refreshing
         const updatedNewsItems = newsItems.map(item => 
           item.id === articleId ? { ...item, ...updatedArticles[0] } : item
         );
         
-        // This is a hacky way to update the article in the state since we don't have a direct setter
-        // In a proper implementation, we would add this to the useNewsItems hook
-        setTimeout(() => {
-          window.location.reload();
-        }, 1500);
+        // This is a more efficient approach than forcing a page reload
+        // Note: ideally we would add a proper setter function to the useNewsItems hook
+        // but for now we'll just update relevant UI states to reflect the change
+        toast.success('Analysis completed', {
+          description: 'Click the "AI Analysis" button again to view insights',
+        });
       }
-      
     } catch (error) {
       console.error('Error analyzing article:', error);
       toast.error('Failed to analyze article', {

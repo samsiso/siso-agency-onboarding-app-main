@@ -16,12 +16,19 @@ export const AnalysisActions: React.FC<AnalysisActionsProps> = ({
   onShare, 
   onBookmark 
 }) => {
+  // [Analysis] Prevent default action for all button clicks to avoid page refresh
+  const handleButtonClick = (callback: () => void) => (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    callback();
+  };
+
   return (
     <div className="flex justify-between items-center gap-2 mb-4">
       <Button 
         variant="outline" 
         size="sm"
-        onClick={onRefresh}
+        onClick={handleButtonClick(onRefresh)}
         disabled={isLoading}
         className="bg-transparent border-gray-700 text-gray-300 hover:bg-gray-800"
       >
@@ -45,7 +52,7 @@ export const AnalysisActions: React.FC<AnalysisActionsProps> = ({
           variant="outline" 
           size="sm" 
           className="bg-transparent border-gray-700 text-gray-300 hover:bg-gray-800"
-          onClick={onShare}
+          onClick={handleButtonClick(onShare)}
         >
           <Share2 className="h-4 w-4 mr-2" />
           Share
@@ -54,7 +61,7 @@ export const AnalysisActions: React.FC<AnalysisActionsProps> = ({
           variant="outline" 
           size="sm" 
           className="bg-transparent border-gray-700 text-gray-300 hover:bg-gray-800"
-          onClick={onBookmark}
+          onClick={handleButtonClick(onBookmark)}
         >
           <Bookmark className="h-4 w-4 mr-2" />
           Bookmark
