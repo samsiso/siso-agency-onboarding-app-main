@@ -1,6 +1,6 @@
 
 import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Sidebar } from '@/components/Sidebar';
 import { EnhancedBlogLayout } from '@/components/ai-news/EnhancedBlogLayout';
@@ -10,17 +10,19 @@ import { Button } from '@/components/ui/button';
 import { AlertTriangle, ExternalLink, ChevronLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { NewsComment, EnhancedNewsItem } from '@/types/blog';
+import { useState } from 'react';
 
 const BlogPost = () => {
   const { postId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { handleShare, handleBookmark } = useBlogPostActions();
+  const queryClient = useQueryClient();
 
   // [Analysis] Added additional logging to debug the ID issue
   console.log('BlogPost - postId from params:', postId);
 
-  const { data: post, isLoading, error } = useQuery({
+  const { data: post, isLoading, error, refetch } = useQuery({
     queryKey: ['blog-post', postId],
     queryFn: () => fetchBlogPost(postId as string),
     // [Q] Is there a race condition if postId is undefined during initial render?
@@ -39,6 +41,12 @@ const BlogPost = () => {
       }
     }
   });
+
+  // [Analysis] New function to handle refreshing of article data after AI analysis
+  const handleAnalysisRefresh = async () => {
+    console.log('Refreshing article data after analysis...');
+    await refetch();
+  };
 
   // [Analysis] New function to handle external article links
   const handleExternalLink = () => {
@@ -148,6 +156,7 @@ const BlogPost = () => {
             article={post as (EnhancedNewsItem & { comments?: NewsComment[] })}
             onShare={() => handleShare(post.title, post.description)}
             onBookmark={() => handleBookmark(post.id)}
+            onAnalyze={handleAnalysisRefresh}
           />
         </div>
       </div>

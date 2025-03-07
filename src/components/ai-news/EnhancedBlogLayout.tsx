@@ -33,12 +33,14 @@ interface EnhancedBlogLayoutProps {
   article: EnhancedNewsItem & { comments?: NewsComment[] };
   onShare?: () => void;
   onBookmark?: () => void;
+  onAnalyze?: () => Promise<void>;
 }
 
 export const EnhancedBlogLayout = ({
   article,
   onShare,
-  onBookmark
+  onBookmark,
+  onAnalyze
 }: EnhancedBlogLayoutProps) => {
   const navigate = useNavigate();
   const supabase = useSupabaseClient();
@@ -46,6 +48,11 @@ export const EnhancedBlogLayout = ({
   const [liked, setLiked] = useState(false);
   const [isGeneratingAnalysis, setIsGeneratingAnalysis] = useState(false);
   const [currentArticle, setCurrentArticle] = useState(article);
+  
+  // [Analysis] Update current article when prop changes
+  useEffect(() => {
+    setCurrentArticle(article);
+  }, [article]);
   
   // [Analysis] Check if this is an external article (no sections but has content)
   const isExternalArticle = article.sections.length === 0 && article.content;
@@ -118,29 +125,16 @@ export const EnhancedBlogLayout = ({
 
   // [Analysis] Handle AI analysis generation with improved data refresh
   const handleGenerateAnalysis = async () => {
+    if (!onAnalyze) {
+      console.error('No onAnalyze handler provided');
+      return;
+    }
+
     setIsGeneratingAnalysis(true);
     
     try {
-      // [Analysis] Instead of calling the edge function here (now done in AIAnalysisButton),
-      // we'll just fetch the updated article data after the analysis is complete
-      
-      // Refresh the article data to get the updated AI analysis
-      const { data, error } = await supabase
-        .from('ai_news')
-        .select('*, sections(*)')
-        .eq('id', article.id)
-        .single();
-        
-      if (error) {
-        throw error;
-      }
-      
-      // Update the article with the new data
-      setCurrentArticle({
-        ...currentArticle,
-        ai_analysis: data.ai_analysis,
-        has_ai_analysis: true
-      });
+      // Refresh the article data through the parent component
+      await onAnalyze();
       
       toast.success('AI analysis loaded successfully!');
     } catch (error) {
