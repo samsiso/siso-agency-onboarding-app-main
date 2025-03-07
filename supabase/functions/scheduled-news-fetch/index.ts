@@ -2,8 +2,9 @@
 // [Analysis] Scheduled function to fetch AI news while respecting token limits
 // [Plan] This runs on a schedule via Supabase cron jobs
 
-import { tokenBudgetManager } from "../_shared/token-budget.ts";
+import { tokenBudgetManager, trackTokenUsage } from "../_shared/token-budget.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
+import { corsHeaders } from "../_shared/cors.ts";
 
 // Configuration
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
@@ -14,6 +15,11 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 // Main function
 Deno.serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+  
   try {
     console.log("Running scheduled news fetch");
     
@@ -23,6 +29,10 @@ Deno.serve(async (req) => {
       .select('tokens_used')
       .eq('date', new Date().toISOString().split('T')[0])
       .single();
+    
+    if (usageError && usageError.code !== 'PGSQL_ERROR_NO_ROWS') {
+      console.error("Error checking token usage:", usageError);
+    }
       
     const currentUsage = todayUsage?.tokens_used || 0;
     
@@ -31,7 +41,10 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({
         success: false,
         message: "Daily token budget exceeded"
-      }), { status: 200 });
+      }), { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200 
+      });
     }
     
     // Determine how many articles to fetch based on remaining budget
@@ -62,8 +75,12 @@ Deno.serve(async (req) => {
     });
     
     if (error) {
+      console.error("Error invoking fetch-ai-news:", error);
       throw error;
     }
+    
+    // Update token usage
+    await trackTokenUsage(supabase, 'scheduled_fetch', tokenBudgetManager.ARTICLE_ESTIMATE);
     
     console.log(`Scheduled fetch completed: ${data.count} articles added`);
     
@@ -72,13 +89,20 @@ Deno.serve(async (req) => {
       success: true,
       message: `Scheduled fetch completed: ${data.count} articles added`,
       articles_count: data.count
-    }), { status: 200 });
+    }), { 
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200 
+    });
   } catch (error) {
     console.error("Error in scheduled news fetch:", error);
     
     return new Response(JSON.stringify({
       success: false,
-      message: error.message
-    }), { status: 500 });
+      message: error instanceof Error ? error.message : "An unknown error occurred",
+      error: error
+    }), { 
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 500 
+    });
   }
 });

@@ -1,12 +1,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
-import { tokenBudgetManager } from "../_shared/token-budget.ts";
+import { tokenBudgetManager, trackTokenUsage } from "../_shared/token-budget.ts";
 import { scoreContent, shouldProcessArticle } from "../_shared/content-scorer.ts";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { corsHeaders } from "../_shared/cors.ts";
 
 // [Analysis] Enhanced mock data generator with more transparency about source data
 // and focused on agency-relevant content
@@ -194,7 +190,7 @@ function generateMockArticles(keyword: string, count: number, dateOverride: stri
 }
 
 // [Analysis] New function to check for duplicates with improved similarity detection
-async function checkForDuplicateArticle(supabase, articleTitle, threshold = 0.7) {
+async function checkForDuplicateArticle(supabase: any, articleTitle: string, threshold = 0.7) {
   try {
     // Get recent articles (last 14 days) to check for duplicates
     const twoWeeksAgo = new Date();
@@ -253,57 +249,12 @@ async function checkForDuplicateArticle(supabase, articleTitle, threshold = 0.7)
   }
 }
 
-// [Analysis] New function to track token usage
-async function trackTokenUsage(supabase, operation, tokenCost) {
-  try {
-    const today = new Date().toISOString().split('T')[0];
-    
-    // Get current usage for today
-    const { data, error } = await supabase
-      .from('api_token_usage')
-      .select('*')
-      .eq('date', today)
-      .single();
-      
-    if (error && error.code !== 'PGSQL_ERROR_NO_ROWS') {
-      console.error("Error tracking token usage:", error);
-      return;
-    }
-    
-    // If no record exists for today, create one
-    if (!data) {
-      await supabase
-        .from('api_token_usage')
-        .insert([{
-          date: today,
-          tokens_used: tokenCost,
-          operations: [{type: operation, count: 1}]
-        }]);
-    } else {
-      // Update existing record
-      const operations = data.operations || [];
-      const existingOpIdx = operations.findIndex(op => op.type === operation);
-      
-      if (existingOpIdx >= 0) {
-        operations[existingOpIdx].count += 1;
-      } else {
-        operations.push({type: operation, count: 1});
-      }
-      
-      await supabase
-        .from('api_token_usage')
-        .update({
-          tokens_used: (data.tokens_used || 0) + tokenCost,
-          operations
-        })
-        .eq('date', today);
-    }
-  } catch (error) {
-    console.error("Error tracking token usage:", error);
-  }
-}
-
 serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -325,156 +276,177 @@ serve(async (req) => {
     });
     
     // [Analysis] Check token budget before proceeding
-    const { data: todayUsage, error: usageError } = await supabase
-      .from('api_token_usage')
-      .select('tokens_used')
-      .eq('date', new Date().toISOString().split('T')[0])
-      .single();
+    try {
+      const { data: todayUsage, error: usageError } = await supabase
+        .from('api_token_usage')
+        .select('tokens_used')
+        .eq('date', new Date().toISOString().split('T')[0])
+        .single();
+        
+      if (usageError && usageError.code !== 'PGSQL_ERROR_NO_ROWS') {
+        console.error("Error checking token usage:", usageError);
+      }
       
-    const currentUsage = todayUsage?.tokens_used || 0;
-    
-    if (!tokenBudgetManager.hasEnoughBudget(currentUsage, 'fetch')) {
+      const currentUsage = todayUsage?.tokens_used || 0;
+      
+      if (!tokenBudgetManager.hasEnoughBudget(currentUsage, 'fetch')) {
+        return new Response(
+          JSON.stringify({
+            success: false,
+            message: "Daily API token budget exceeded. Try again tomorrow.",
+            remaining_budget: tokenBudgetManager.DAILY_SAFE_LIMIT - currentUsage
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      // Determine safe article limit based on token budget
+      const maxArticles = Math.min(
+        tokenBudgetManager.getMaxDailyArticles(),
+        limit
+      );
+      
+      // Generate mock articles (in a real implementation, fetch from actual source)
+      let articles = generateMockArticles(keyword, maxArticles * 2, dateOverride); // Generate more than needed for filtering
+      
+      console.log(`Generated ${articles.length} articles before filtering`);
+      
+      // [Analysis] Filter by agency relevance score
+      articles = articles.filter(article => {
+        const score = article.agency_relevance_score || 
+          scoreContent({
+            title: article.title,
+            description: article.description,
+            content: article.content,
+            category: article.category
+          });
+        
+        return score >= minRelevanceScore;
+      });
+      
+      // Limit to requested number
+      articles = articles.slice(0, maxArticles);
+      
+      console.log(`Filtered to ${articles.length} articles with minimum relevance score of ${minRelevanceScore}`);
+      
+      // If we're in test mode, just return the filtered articles
+      if (testMode) {
+        await trackTokenUsage(supabase, 'test_fetch', tokenBudgetManager.ARTICLE_ESTIMATE);
+        
+        return new Response(
+          JSON.stringify({
+            success: true,
+            message: `Found ${articles.length} relevant articles in test mode`,
+            articles,
+            count: articles.length
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      // Process and insert articles
+      const results = {
+        success: true,
+        message: "",
+        count: 0,
+        duplicatesSkipped: 0,
+        lowRelevanceSkipped: 0,
+        articles: []
+      };
+      
+      for (const article of articles) {
+        // Check for duplicates
+        const dupeCheck = await checkForDuplicateArticle(supabase, article.title);
+        
+        if (dupeCheck.isDuplicate && skipDuplicates) {
+          console.log(`Skipping duplicate article: ${article.title} (${dupeCheck.similarity.toFixed(2)} similarity)`);
+          results.duplicatesSkipped++;
+          continue;
+        }
+        
+        // Insert the article
+        const { error: insertError } = await supabase
+          .from('ai_news')
+          .insert([{
+            title: article.title,
+            description: article.description,
+            content: article.content,
+            date: article.date,
+            category: article.category,
+            technical_complexity: article.technical_complexity,
+            impact: article.impact,
+            source: article.source,
+            source_credibility: article.source_credibility,
+            url: article.url,
+            status: 'published'
+          }]);
+          
+        if (insertError) {
+          console.error(`Error inserting article '${article.title}':`, insertError);
+          continue;
+        }
+        
+        results.count++;
+        results.articles.push(article);
+      }
+      
+      // Record API usage in the news_fetch_history table
+      await supabase
+        .from('news_fetch_history')
+        .insert([{
+          source_type: source,
+          status: 'completed',
+          fetch_time: new Date().toISOString(),
+          articles_fetched: articles.length,
+          articles_added: results.count,
+          duplicates_skipped: results.duplicatesSkipped,
+          metadata: {
+            keyword,
+            min_relevance_score: minRelevanceScore,
+            date_override: dateOverride
+          }
+        }]);
+        
+      // Track token usage
+      await trackTokenUsage(supabase, 'fetch', tokenBudgetManager.ARTICLE_ESTIMATE);
+      
+      results.message = `Successfully imported ${results.count} articles`;
+      if (results.duplicatesSkipped > 0) {
+        results.message += `, skipped ${results.duplicatesSkipped} duplicates`;
+      }
+      
+      console.log(results.message);
+      
+      return new Response(
+        JSON.stringify(results),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    } catch (innerError) {
+      console.error("Error processing articles:", innerError);
+      
       return new Response(
         JSON.stringify({
           success: false,
-          message: "Daily API token budget exceeded. Try again tomorrow.",
-          remaining_budget: tokenBudgetManager.DAILY_SAFE_LIMIT - currentUsage
+          message: innerError instanceof Error ? innerError.message : "An unknown error occurred while processing articles",
+          error: innerError,
         }),
-        { headers: { 'Content-Type': 'application/json' } }
-      );
-    }
-    
-    // Determine safe article limit based on token budget
-    const maxArticles = Math.min(
-      tokenBudgetManager.getMaxDailyArticles(),
-      limit
-    );
-    
-    // Generate mock articles (in a real implementation, fetch from actual source)
-    let articles = generateMockArticles(keyword, maxArticles * 2, dateOverride); // Generate more than needed for filtering
-    
-    console.log(`Generated ${articles.length} articles before filtering`);
-    
-    // [Analysis] Filter by agency relevance score
-    articles = articles.filter(article => {
-      const score = article.agency_relevance_score || 
-        scoreContent({
-          title: article.title,
-          description: article.description,
-          content: article.content,
-          category: article.category
-        });
-      
-      return score >= minRelevanceScore;
-    });
-    
-    // Limit to requested number
-    articles = articles.slice(0, maxArticles);
-    
-    console.log(`Filtered to ${articles.length} articles with minimum relevance score of ${minRelevanceScore}`);
-    
-    // If we're in test mode, just return the filtered articles
-    if (testMode) {
-      await trackTokenUsage(supabase, 'test_fetch', tokenBudgetManager.ARTICLE_ESTIMATE);
-      
-      return new Response(
-        JSON.stringify({
-          success: true,
-          message: `Found ${articles.length} relevant articles in test mode`,
-          articles,
-          count: articles.length
-        }),
-        { headers: { 'Content-Type': 'application/json' } }
-      );
-    }
-    
-    // Process and insert articles
-    const results = {
-      success: true,
-      message: "",
-      count: 0,
-      duplicatesSkipped: 0,
-      lowRelevanceSkipped: 0,
-      articles: []
-    };
-    
-    for (const article of articles) {
-      // Check for duplicates
-      const dupeCheck = await checkForDuplicateArticle(supabase, article.title);
-      
-      if (dupeCheck.isDuplicate && skipDuplicates) {
-        console.log(`Skipping duplicate article: ${article.title} (${dupeCheck.similarity.toFixed(2)} similarity)`);
-        results.duplicatesSkipped++;
-        continue;
-      }
-      
-      // Insert the article
-      const { error: insertError } = await supabase
-        .from('ai_news')
-        .insert([{
-          title: article.title,
-          description: article.description,
-          content: article.content,
-          date: article.date,
-          category: article.category,
-          technical_complexity: article.technical_complexity,
-          impact: article.impact,
-          source: article.source,
-          source_credibility: article.source_credibility,
-          url: article.url,
-          status: 'published'
-        }]);
-        
-      if (insertError) {
-        console.error(`Error inserting article '${article.title}':`, insertError);
-        continue;
-      }
-      
-      results.count++;
-      results.articles.push(article);
-    }
-    
-    // Record API usage in the news_fetch_history table
-    await supabase
-      .from('news_fetch_history')
-      .insert([{
-        source_type: source,
-        status: 'completed',
-        fetch_time: new Date().toISOString(),
-        articles_fetched: articles.length,
-        articles_added: results.count,
-        duplicates_skipped: results.duplicatesSkipped,
-        metadata: {
-          keyword,
-          min_relevance_score: minRelevanceScore,
-          date_override: dateOverride
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 500
         }
-      }]);
-      
-    // Track token usage
-    await trackTokenUsage(supabase, 'fetch', tokenBudgetManager.ARTICLE_ESTIMATE);
-    
-    results.message = `Successfully imported ${results.count} articles`;
-    if (results.duplicatesSkipped > 0) {
-      results.message += `, skipped ${results.duplicatesSkipped} duplicates`;
+      );
     }
-    
-    console.log(results.message);
-    
-    return new Response(
-      JSON.stringify(results),
-      { headers: { 'Content-Type': 'application/json' } }
-    );
   } catch (error) {
     console.error("Error in fetch-ai-news:", error);
     
     return new Response(
       JSON.stringify({
         success: false,
-        message: error.message,
+        message: error instanceof Error ? error.message : "An unknown error occurred",
+        error: error,
       }),
       { 
-        headers: { 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500
       }
     );

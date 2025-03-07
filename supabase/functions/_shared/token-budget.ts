@@ -32,3 +32,66 @@ export const tokenBudgetManager = {
   // [Q] Should we implement a more granular tracking system with database persistence?
   // [Plan] Consider implementing actual token tracking in production
 };
+
+/**
+ * Track token usage in the database
+ * @param supabase Supabase client
+ * @param operation Operation type (fetch, analyze, etc)
+ * @param tokenCost Cost in tokens
+ */
+export async function trackTokenUsage(supabase: any, operation: string, tokenCost: number) {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Get current usage for today
+    const { data, error } = await supabase
+      .from('api_token_usage')
+      .select('*')
+      .eq('date', today)
+      .single();
+      
+    if (error && error.code !== 'PGSQL_ERROR_NO_ROWS') {
+      console.error("Error tracking token usage:", error);
+      return;
+    }
+    
+    // If no record exists for today, create one
+    if (!data) {
+      const { error: insertError } = await supabase
+        .from('api_token_usage')
+        .insert([{
+          date: today,
+          tokens_used: tokenCost,
+          operations: [{type: operation, count: 1}]
+        }]);
+        
+      if (insertError) {
+        console.error("Error creating token usage record:", insertError);
+      }
+    } else {
+      // Update existing record
+      const operations = data.operations || [];
+      const existingOpIdx = operations.findIndex((op: any) => op.type === operation);
+      
+      if (existingOpIdx >= 0) {
+        operations[existingOpIdx].count += 1;
+      } else {
+        operations.push({type: operation, count: 1});
+      }
+      
+      const { error: updateError } = await supabase
+        .from('api_token_usage')
+        .update({
+          tokens_used: (data.tokens_used || 0) + tokenCost,
+          operations
+        })
+        .eq('date', today);
+        
+      if (updateError) {
+        console.error("Error updating token usage record:", updateError);
+      }
+    }
+  } catch (error) {
+    console.error("Error in trackTokenUsage function:", error);
+  }
+}
