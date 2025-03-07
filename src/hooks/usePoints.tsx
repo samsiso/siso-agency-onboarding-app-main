@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -5,8 +6,11 @@ import { Database } from '@/integrations/supabase/types';
 import { useQuery } from '@tanstack/react-query';
 import { showPointsEarnedToast } from '@/components/points/PointsEarnedToast';
 
-// [Analysis] Expanded type to include 'bookmark_article'
-type PointActionType = Database['public']['Enums']['point_action_type'] | 'bookmark_article';
+// [Analysis] Expanded type to include 'bookmark_article' and other actions
+type PointActionType = 
+  | Database['public']['Enums']['point_action_type'] 
+  | 'bookmark_article'
+  | 'analyze_article';
 
 export const usePoints = (userId: string | undefined) => {
   console.log('[usePoints] Hook called with userId:', userId);

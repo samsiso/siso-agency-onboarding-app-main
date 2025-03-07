@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { format } from 'date-fns';
-import { MoreHorizontal, Share2, Bookmark, Heart, MessageSquare, BarChart } from 'lucide-react';
+import { MoreHorizontal, Share2, Bookmark, Heart, MessageSquare, BarChart, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { NewsItem } from '@/types/blog';
 import { Badge } from '@/components/ui/badge';
@@ -91,6 +91,15 @@ const NewsCardContent = ({
                   </Badge>
                 </>
               )}
+              
+              {post.has_ai_analysis && (
+                <>
+                  <span className="text-xs text-gray-400">•</span>
+                  <Badge variant="outline" className="bg-green-900/30 text-green-400 text-xs border-green-800">
+                    AI Analyzed
+                  </Badge>
+                </>
+              )}
             </div>
           )}
         </div>
@@ -137,17 +146,19 @@ const NewsCardContent = ({
             size="sm"
             onClick={handleAnalyze}
             disabled={isAnalyzing}
-            className="text-xs border-blue-800 hover:bg-blue-900/50 text-blue-300"
+            className={`text-xs ${post.has_ai_analysis 
+              ? 'border-green-800 hover:bg-green-900/50 text-green-300' 
+              : 'border-blue-800 hover:bg-blue-900/50 text-blue-300'}`}
           >
             {isAnalyzing ? (
               <>
-                <span className="mr-1">Analyzing</span>
-                <span className="loading loading-dots"></span>
+                <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                Analyzing...
               </>
             ) : (
               <>
                 <BarChart className="h-3 w-3 mr-1" />
-                AI Analysis
+                {post.has_ai_analysis ? 'View Analysis' : 'AI Analysis'}
               </>
             )}
           </Button>

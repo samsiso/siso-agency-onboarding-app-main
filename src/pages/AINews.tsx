@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -138,6 +139,10 @@ const AINews: React.FC = () => {
   // [Analysis] Completely refactored to fix the type instantiation issue
   const analyzeArticle = async (articleId: string): Promise<void> => {
     try {
+      toast.info('Analyzing article with AI...', {
+        duration: 3000,
+      });
+      
       // Find the article details
       const article = newsItems.find(item => item.id === articleId);
       if (!article) {
@@ -160,11 +165,39 @@ const AINews: React.FC = () => {
         throw new Error(response.error.message);
       }
       
-      toast.success('Article analyzed successfully');
+      toast.success('Article analyzed successfully', {
+        description: 'AI insights are now available for this article',
+      });
+      
+      // Reload the article to get the updated analysis
+      const { data: updatedArticles, error } = await supabase
+        .from('ai_news')
+        .select('*')
+        .eq('id', articleId);
+        
+      if (error) {
+        console.error('Error fetching updated article:', error);
+        return;
+      }
+      
+      if (updatedArticles && updatedArticles.length > 0) {
+        // Update the article in the local state to show analysis immediately
+        const updatedNewsItems = newsItems.map(item => 
+          item.id === articleId ? { ...item, ...updatedArticles[0] } : item
+        );
+        
+        // This is a hacky way to update the article in the state since we don't have a direct setter
+        // In a proper implementation, we would add this to the useNewsItems hook
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      }
       
     } catch (error) {
       console.error('Error analyzing article:', error);
-      toast.error('Failed to analyze article');
+      toast.error('Failed to analyze article', {
+        description: error instanceof Error ? error.message : 'An unknown error occurred',
+      });
     }
   };
   

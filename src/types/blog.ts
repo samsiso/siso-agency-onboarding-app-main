@@ -71,18 +71,23 @@ export interface NewsItem {
   template_type?: string;
   sources?: string[];
 
-  // Add AI analysis properties
+  // AI analysis properties
   ai_importance_score?: number;
   ai_analysis_id?: string;
   has_ai_analysis?: boolean;
   analysis_date?: string;
   
-  // Add the missing ai_analysis property
+  // AI analysis content structure - enhanced for richer information
   ai_analysis?: {
-    market_impact?: any;
-    technical_predictions?: any[];
-    related_technologies?: any[];
-    business_implications?: any;
+    market_impact?: string;
+    technical_predictions?: string[];
+    related_technologies?: string[];
+    business_implications?: string;
+    key_points?: string[];
+    confidence_score?: number;
+    summary?: string;
+    industry_impacts?: Record<string, string>;
+    recommended_actions?: string[];
   };
 }
 
