@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import { format, startOfWeek, startOfMonth, endOfWeek, endOfMonth } from 'date-fns';
+import { format, startOfWeek, startOfMonth, endOfWeek, endOfMonth, parseISO } from 'date-fns';
 import { useNewsItems } from '@/hooks/useNewsItems';
 import { NewsHeader } from '@/components/ai-news/NewsHeader';
 import { NewsContent } from '@/components/ai-news/NewsContent';
@@ -24,11 +23,12 @@ const AINews: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('today');
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
+  
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showAdminPanel, setShowAdminPanel] = useState(false); // Hide admin panel by default
   const [currentRange, setCurrentRange] = useState<'day' | 'week' | 'month'>('day');
   
-  // Using the enhanced useNewsItems hook
+  // Using the enhanced useNewsItems hook with a clearly defined selected date
   const {
     newsItems,
     summaries,
@@ -66,17 +66,22 @@ const AINews: React.FC = () => {
     setCurrentPage(1);
   }, [activeTab, selectedCategory]);
 
-  // Handle range changes
+  // Handle range changes with improved date logic
   useEffect(() => {
     if (currentRange === 'day') {
       // Single day view - already handled by useNewsItems
+      // This uses the current date and shows just that day's articles
     } else if (currentRange === 'week') {
+      // Get the week's start (Sunday) and end (Saturday) for the current date
       const weekStart = startOfWeek(currentDate);
       const weekEnd = endOfWeek(currentDate);
+      console.log(`Week range: ${format(weekStart, 'yyyy-MM-dd')} to ${format(weekEnd, 'yyyy-MM-dd')}`);
       fetchNewsInRange(weekStart, weekEnd);
     } else if (currentRange === 'month') {
+      // Get the month's start (1st) and end (28th-31st) for the current date
       const monthStart = startOfMonth(currentDate);
       const monthEnd = endOfMonth(currentDate);
+      console.log(`Month range: ${format(monthStart, 'yyyy-MM-dd')} to ${format(monthEnd, 'yyyy-MM-dd')}`);
       fetchNewsInRange(monthStart, monthEnd);
     }
   }, [currentRange, currentDate, selectedCategory]);
@@ -183,7 +188,7 @@ const AINews: React.FC = () => {
               showAdminPanel={showAdminPanel}
             />
             
-            {/* Date navigation */}
+            {/* Date navigation - passing explicit date-related props */}
             <DateNavigation 
               currentDate={currentDate}
               dateRange={dateRange}

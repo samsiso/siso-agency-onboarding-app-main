@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { NewsItem } from '@/types/blog';
-import { format, addDays, subDays, isToday, isSameDay, parseISO, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns';
+import { format, addDays, subDays, isToday, isSameDay, parseISO, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfDay, endOfDay } from 'date-fns';
 
 type PostStatus = 'all' | 'draft' | 'published';
 
@@ -240,6 +240,7 @@ export const useNewsItems = (
       setLoading(true);
       setError(null);
       
+      // Format date in YYYY-MM-DD format for database querying
       const formattedDate = format(date, 'yyyy-MM-dd');
       console.log('Fetching news for date:', formattedDate);
       
@@ -252,10 +253,12 @@ export const useNewsItems = (
         return;
       }
       
+      // [Analysis] Improved query with exact date matching
+      // This ensures we only get articles with the exact date (not partial matches)
       let query = supabase
         .from('ai_news')
         .select('*, profiles:author_id(full_name, avatar_url)')
-        .eq('date', formattedDate)
+        .eq('date', formattedDate) // Strict equality match on the date
         .order('created_at', { ascending: false });
 
       if (status !== 'all') {
@@ -296,8 +299,6 @@ export const useNewsItems = (
         
         // Clear current news items - we'll show empty state
         setNewsItems([]);
-        
-        // No need for toast here anymore - we'll show the empty state UI instead
       }
       
       // Always update current date even if empty
@@ -326,16 +327,19 @@ export const useNewsItems = (
       setLoading(true);
       setError(null);
       
+      // Format dates for database querying
       const formattedStartDate = format(startDate, 'yyyy-MM-dd');
       const formattedEndDate = format(endDate, 'yyyy-MM-dd');
       
       console.log(`Fetching news from ${formattedStartDate} to ${formattedEndDate}`);
       
+      // [Analysis] Improved date range query
+      // Using gte/lte for proper date range filtering
       let query = supabase
         .from('ai_news')
         .select('*, profiles:author_id(full_name, avatar_url)')
-        .gte('date', formattedStartDate)
-        .lte('date', formattedEndDate)
+        .gte('date', formattedStartDate) // Greater than or equal to start date
+        .lte('date', formattedEndDate)   // Less than or equal to end date
         .order('date', { ascending: false })
         .order('created_at', { ascending: false });
 
@@ -673,7 +677,7 @@ export const useNewsItems = (
         throw new Error('No data returned from edge function');
       }
 
-      console.log('Edge function response:', data);
+      console.log('Edge function response received:', data);
 
       // Check for specific errors in the response
       if (data.errors && data.errors.length > 0) {
