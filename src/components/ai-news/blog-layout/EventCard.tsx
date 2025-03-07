@@ -1,210 +1,168 @@
 
 import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import { useToast } from '@/hooks/use-toast';
+import { BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
-import { ArticleSection } from '@/types/blog';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { sectionIcons, subsectionColors } from './constants';
-import { cardVariants } from './animations';
-import { CardHeader } from './components/CardHeader';
-import { KeyDetails } from './components/KeyDetails';
-import { CardFooter } from './components/CardFooter';
-import { AIAnalysisDialog } from '../AIAnalysisDialog';
-import { Button } from '@/components/ui/button';
-import { Brain } from 'lucide-react';
+import { complexityColors } from './constants';
+import { cn } from '@/lib/utils';
+
+interface Section {
+  id: string;
+  title: string;
+  content?: string;
+  order_index: number;
+  section_order: number;
+  importance_level?: string;
+  technical_complexity?: string;
+  subsection_type?: string;
+  source_references?: Record<string, any>;
+  created_at?: string;
+  updated_at?: string;
+  article_id?: string;
+}
 
 interface EventCardProps {
-  section: ArticleSection;
+  section: Section;
   index: number;
 }
 
+// [Analysis] Enhanced content card with better typography and readability
 export const EventCard = ({ section, index }: EventCardProps) => {
-  const [hasReacted, setHasReacted] = useState(false);
   const [isExpanded, setIsExpanded] = useState(true);
-  const [showAnalysisDialog, setShowAnalysisDialog] = useState(false);
-  const { toast } = useToast();
-
-  const sectionType = section.title.toLowerCase().includes('research') ? 'research'
-    : section.title.toLowerCase().includes('integration') ? 'integration'
-    : section.title.toLowerCase().includes('medical') ? 'medical'
-    : section.title.toLowerCase().includes('robot') ? 'robotics'
-    : section.title.toLowerCase().includes('international') ? 'international'
-    : 'default';
-
-  const Icon = sectionIcons[sectionType];
-
-  const handleCopyContent = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast({
-      title: "Content copied!",
-      description: "The text has been copied to your clipboard.",
+  
+  // [Analysis] Parse any code blocks in the content for syntax highlighting
+  const renderContent = (content: string) => {
+    if (!content) return null;
+    
+    // Replace code blocks with styled versions
+    return content.split(/```([a-zA-Z]*)\n([\s\S]*?)```/).map((part, idx) => {
+      if (idx % 3 === 0) {
+        // Regular text between code blocks, preserve line breaks
+        return part.split('\n').map((line, lineIdx) => (
+          <p key={`text-${idx}-${lineIdx}`} className="mb-4 leading-relaxed">
+            {line}
+          </p>
+        ));
+      } else if (idx % 3 === 1) {
+        // This is the language identifier, we'll skip it
+        return null;
+      } else {
+        // This is a code block
+        const language = content.split(/```([a-zA-Z]*)\n/)[idx - 1] || '';
+        return (
+          <div key={`code-${idx}`} className="my-6 rounded-lg overflow-hidden">
+            {language && (
+              <div className="bg-gray-800 px-4 py-1 text-xs text-gray-400 border-b border-gray-700">
+                {language}
+              </div>
+            )}
+            <pre className="bg-gray-900 p-4 overflow-x-auto text-sm text-gray-300 whitespace-pre">
+              <code>{part}</code>
+            </pre>
+          </div>
+        );
+      }
     });
   };
 
-  const handleReaction = (type: 'like' | 'dislike') => {
-    if (!hasReacted) {
-      setHasReacted(true);
-      toast({
-        title: "Thanks for your feedback!",
-        description: `You ${type}d this section.`,
-      });
+  const getImportanceColor = (importance?: string) => {
+    switch (importance?.toLowerCase()) {
+      case 'high':
+        return 'bg-red-500/10 text-red-400 border-red-500/30';
+      case 'medium':
+        return 'bg-amber-500/10 text-amber-400 border-amber-500/30';
+      case 'low':
+        return 'bg-green-500/10 text-green-400 border-green-500/30';
+      default:
+        return 'bg-blue-500/10 text-blue-400 border-blue-500/30';
     }
   };
 
-  const handleToggle = () => {
-    setIsExpanded(prev => !prev);
+  const getComplexityColor = (complexity?: string) => {
+    if (!complexity) return 'bg-blue-500/10 text-blue-400 border-blue-500/30';
+    return complexityColors[complexity as keyof typeof complexityColors] || '';
   };
 
-  // [Analysis] Added a better query config with improved error handling and stale time
-  const { data: analysis, isLoading: isAnalysisLoading } = useQuery({
-    queryKey: ['section-analysis', section.id],
-    queryFn: async () => {
-      try {
-        const { data: existingAnalysis, error: fetchError } = await supabase
-          .from('news_ai_analysis')
-          .select('*')
-          .eq('id', section.id)
-          .maybeSingle();
-
-        if (fetchError) throw fetchError;
-
-        if (existingAnalysis) {
-          return existingAnalysis;
-        }
-
-        // Toast notification to inform user of analysis in progress
-        toast({
-          title: "Analyzing content...",
-          description: "AI is processing this section - results will appear shortly."
-        });
-
-        const { data: analysisData, error: invokeError } = await supabase.functions.invoke('analyze-news', {
-          body: {
-            content: section.content,
-            title: section.title,
-            key_details: section.key_details || [],
-            implications: section.implications || [],
-            section_id: section.id,
-            news_id: section.article_id
-          },
-        });
-
-        if (invokeError) throw invokeError;
-        
-        // Inform the user that analysis is ready
-        toast({
-          title: "Analysis completed",
-          description: "AI insights are now available"
-        });
-        
-        return analysisData?.analysis;
-      } catch (error) {
-        console.error('Error in analysis flow:', error);
-        toast({
-          title: "Analysis failed",
-          description: "Couldn't generate AI insights for this content"
-        });
-        throw error;
-      }
-    },
-    staleTime: 1000 * 60 * 30, // Cache for 30 minutes for better performance
-    retry: 1,
-    enabled: false, // Don't run the query automatically
-  });
-
-  // [Analysis] Improved handler to prevent default behavior and provide better feedback
-  const handleViewAnalysis = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setShowAnalysisDialog(true);
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
   };
 
   return (
     <motion.div
-      variants={cardVariants}
-      initial="hidden"
-      animate="visible"
-      transition={{ delay: index * 0.1 }}
-      whileHover={{ scale: 1.01 }}
-      className={cn(
-        "rounded-xl overflow-hidden backdrop-blur-lg border border-white/10",
-        "bg-gradient-to-br shadow-lg transition-all duration-300",
-        "hover:shadow-xl hover:border-white/20",
-        "group relative",
-        subsectionColors[section.subsection_type as keyof typeof subsectionColors] || subsectionColors.default
-      )}
+      id={section.id}
+      className="bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 hover:border-white/20 transition-colors overflow-hidden"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
+      viewport={{ once: true, margin: "-100px" }}
     >
-      {sectionType === 'research' && (
-        <div className="relative w-full h-[200px] overflow-hidden">
-          <img 
-            src="/lovable-uploads/05fd06bb-d4a1-4caf-81e9-3572f608b3a6.png"
-            alt="Deep Research Banner"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-900/90" />
+      <div 
+        className="p-5 border-b border-white/10 flex justify-between items-center cursor-pointer"
+        onClick={toggleExpand}
+      >
+        <div className="flex items-center gap-3">
+          <div className="bg-blue-900/30 p-2 rounded-full">
+            <BookOpen className="h-5 w-5 text-blue-400" />
+          </div>
+          
+          <div>
+            <h2 className="text-xl font-semibold text-white">{section.title}</h2>
+            <div className="flex flex-wrap gap-2 mt-1.5">
+              {section.importance_level && (
+                <Badge variant="outline" className={getImportanceColor(section.importance_level)}>
+                  {section.importance_level} priority
+                </Badge>
+              )}
+              
+              {section.technical_complexity && (
+                <Badge variant="outline" className={getComplexityColor(section.technical_complexity)}>
+                  {section.technical_complexity} complexity
+                </Badge>
+              )}
+              
+              {section.subsection_type && (
+                <Badge variant="outline" className="bg-gray-500/10 text-gray-400 border-gray-500/30">
+                  {section.subsection_type}
+                </Badge>
+              )}
+            </div>
+          </div>
+        </div>
+        
+        <button 
+          className="h-8 w-8 flex items-center justify-center rounded-full bg-gray-800/50 text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleExpand();
+          }}
+        >
+          {isExpanded ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+        </button>
+      </div>
+      
+      {isExpanded && section.content && (
+        <div className={cn(
+          "p-5 text-gray-200 prose prose-invert max-w-none prose-headings:text-blue-300",
+          "prose-blockquote:border-blue-700 prose-blockquote:bg-blue-900/20 prose-blockquote:p-4 prose-blockquote:rounded-lg",
+          "prose-li:marker:text-blue-400"
+        )}>
+          {renderContent(section.content)}
+          
+          {Object.keys(section.source_references || {}).length > 0 && (
+            <div className="mt-6 pt-4 border-t border-white/10">
+              <h4 className="text-sm font-medium text-gray-400 mb-2">Sources:</h4>
+              <ul className="text-sm text-gray-500 space-y-1">
+                {Object.entries(section.source_references || {}).map(([key, value]) => (
+                  <li key={key} className="flex items-start gap-2">
+                    <span className="text-blue-400">{key}:</span>
+                    <span>{String(value)}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       )}
-
-      <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-white/0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-[shimmer_2s_infinite]" />
-
-      <div className="p-8 space-y-6 relative z-10">
-        <CardHeader 
-          title={section.title}
-          icon={Icon}
-          importanceLevel={section.importance_level}
-          isExpanded={isExpanded}
-          onToggle={handleToggle}
-        />
-
-        {isExpanded && (
-          <>
-            <KeyDetails 
-              details={section.key_details || []}
-              onCopy={handleCopyContent}
-            />
-
-            <div className="prose prose-invert prose-lg max-w-none">
-              <div 
-                dangerouslySetInnerHTML={{ __html: section.content }}
-                className="text-gray-200 leading-relaxed"
-              />
-            </div>
-
-            <div className="flex justify-end">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleViewAnalysis}
-                className="text-xs border-blue-800 hover:bg-blue-900/50 text-blue-300 gap-2"
-              >
-                <Brain className="h-3 w-3" />
-                View AI Analysis
-              </Button>
-            </div>
-          </>
-        )}
-
-        <CardFooter 
-          lastUpdated={section.last_updated || section.updated_at}
-          readingTime={section.reading_time_minutes}
-          category={section.category}
-          hasReacted={hasReacted}
-          onReaction={handleReaction}
-          sourceReferences={section.source_references}
-        />
-      </div>
-
-      {/* Analysis Dialog */}
-      <AIAnalysisDialog
-        isOpen={showAnalysisDialog}
-        onClose={() => setShowAnalysisDialog(false)}
-        analysis={analysis}
-        isLoading={isAnalysisLoading}
-        articleTitle={section.title}
-        articleId={section.id}
-      />
     </motion.div>
   );
 };

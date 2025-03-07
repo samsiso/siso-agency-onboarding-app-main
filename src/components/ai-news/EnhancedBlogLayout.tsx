@@ -1,3 +1,4 @@
+
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -10,7 +11,8 @@ import {
   Eye,
   Clock,
   MessageCircle,
-  ExternalLink
+  ExternalLink,
+  Heart
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { EventCard } from './blog-layout/EventCard';
@@ -21,6 +23,8 @@ import { useState, useEffect } from 'react';
 import { NewsCardComments } from './NewsCardComments';
 import { KeyTakeaways } from './blog-layout/KeyTakeaways';
 import { HeroImage } from './blog-layout/HeroImage';
+import { ReadingProgressBar } from './blog-layout/ReadingProgressBar';
+import { BackToTopButton } from './blog-layout/BackToTopButton';
 
 interface EnhancedBlogLayoutProps {
   article: EnhancedNewsItem & { comments?: NewsComment[] };
@@ -35,6 +39,7 @@ export const EnhancedBlogLayout = ({
 }: EnhancedBlogLayoutProps) => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<string>();
+  const [liked, setLiked] = useState(false);
   
   // [Analysis] Check if this is an external article (no sections but has content)
   const isExternalArticle = article.sections.length === 0 && article.content;
@@ -73,12 +78,13 @@ export const EnhancedBlogLayout = ({
           }
         });
       },
-      { threshold: 0.5 }
+      { threshold: 0.3, rootMargin: '-100px 0px -100px 0px' }
     );
 
     // Observe all content sections
-    sortedSections.forEach((section) => {
-      const element = document.getElementById(section.id);
+    const ids = ['key-takeaways', ...sortedSections.map(section => section.id)];
+    ids.forEach((id) => {
+      const element = document.getElementById(id);
       if (element) {
         observer.observe(element);
       }
@@ -93,23 +99,26 @@ export const EnhancedBlogLayout = ({
       window.open(article.url, '_blank', 'noopener,noreferrer');
     }
   };
+  
+  const handleLike = () => {
+    setLiked(!liked);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black">
-      <motion.div
-        className="fixed top-0 left-0 right-0 h-1 bg-siso-red/20 origin-left z-50"
-        initial={{ scaleX: 0 }}
-        animate={{ scaleX: 1 }}
-        transition={{ duration: 0.2 }}
-      />
+      {/* Reading Progress Indicator */}
+      <ReadingProgressBar />
+      
+      {/* Back to Top Button */}
+      <BackToTopButton />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Button
           variant="ghost"
           onClick={() => navigate('/ai-news')}
-          className="mb-6"
+          className="mb-6 group"
         >
-          <ChevronLeft className="h-4 w-4 mr-2" />
+          <ChevronLeft className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform" />
           Back to News
         </Button>
 
@@ -149,7 +158,7 @@ export const EnhancedBlogLayout = ({
                 {article.title}
               </h1>
 
-              <div className="flex items-center gap-4 text-sm text-gray-400">
+              <div className="flex items-center flex-wrap gap-4 text-sm text-gray-400">
                 <span>{new Date(article.date).toLocaleDateString()}</span>
                 <span>•</span>
                 <span className="flex items-center gap-1">
@@ -169,14 +178,60 @@ export const EnhancedBlogLayout = ({
               </div>
             </div>
             
-            {/* Added Hero Image */}
+            {/* Enhanced Hero Image */}
             <HeroImage article={article} />
             
-            {/* Added Key Takeaways */}
+            {/* Quick Actions Bar */}
+            <div className="sticky top-2 z-30 bg-gray-900/80 backdrop-blur-md border border-gray-800/80 rounded-full p-1.5 flex justify-between items-center shadow-lg">
+              <div className="flex items-center space-x-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleLike}
+                  className={cn(
+                    "h-9 rounded-full gap-2", 
+                    liked ? "text-red-400 hover:text-red-500" : "text-gray-400 hover:text-gray-300"
+                  )}
+                >
+                  <Heart className={cn("h-4 w-4", liked && "fill-red-400")} />
+                  <span>Like</span>
+                </Button>
+                
+                {onBookmark && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={onBookmark}
+                    className="h-9 rounded-full gap-2"
+                  >
+                    <BookmarkPlus className="h-4 w-4" />
+                    <span>Save</span>
+                  </Button>
+                )}
+                
+                {onShare && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={onShare}
+                    className="h-9 rounded-full gap-2"
+                  >
+                    <Share2 className="h-4 w-4" />
+                    <span>Share</span>
+                  </Button>
+                )}
+              </div>
+              
+              <div className="text-xs text-gray-400 bg-gray-800/50 px-3 py-1 rounded-full">
+                {activeSection ? sortedSections.find(s => s.id === activeSection)?.title || 'Reading' : 'Start Reading'}
+              </div>
+            </div>
+            
+            {/* Enhanced Key Takeaways */}
             <KeyTakeaways article={article} />
 
             <motion.div 
-              className="grid grid-cols-1 gap-6"
+              className="grid grid-cols-1 gap-8"
               variants={{
                 hidden: { opacity: 0 },
                 visible: {
@@ -206,7 +261,7 @@ export const EnhancedBlogLayout = ({
                   </div>
                 </div>
               ) : (
-                // For regular articles with sections
+                // For regular articles with sections - enhanced with EventCard
                 sortedSections.map((section, index) => (
                   <EventCard key={section.id} section={section} index={index} />
                 ))
@@ -215,7 +270,10 @@ export const EnhancedBlogLayout = ({
 
             {/* Comments Section */}
             <div className="mt-12 bg-white/5 rounded-lg p-6 backdrop-blur-sm border border-white/10">
-              <h3 className="text-xl font-semibold text-white mb-6">Discussion</h3>
+              <h3 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
+                <MessageCircle className="h-5 w-5 text-blue-400" />
+                Discussion ({article.comments?.length || 0})
+              </h3>
               <NewsCardComments 
                 newsId={article.id}
                 comments={article.comments || []}
@@ -225,6 +283,7 @@ export const EnhancedBlogLayout = ({
 
           <div className="lg:col-span-4">
             <div className="sticky top-8">
+              {/* Enhanced Article Table of Contents */}
               <ArticleTableOfContents 
                 article={article}
                 activeSection={activeSection}
@@ -238,7 +297,7 @@ export const EnhancedBlogLayout = ({
                     <Button 
                       variant="outline" 
                       onClick={onShare} 
-                      className="w-full justify-start gap-2"
+                      className="w-full justify-start gap-2 hover:bg-blue-900/20 hover:text-blue-300 transition-colors"
                     >
                       <Share2 className="h-4 w-4" />
                       Share Article
@@ -249,7 +308,7 @@ export const EnhancedBlogLayout = ({
                     <Button 
                       variant="outline" 
                       onClick={onBookmark} 
-                      className="w-full justify-start gap-2"
+                      className="w-full justify-start gap-2 hover:bg-purple-900/20 hover:text-purple-300 transition-colors"
                     >
                       <BookmarkPlus className="h-4 w-4" />
                       Bookmark for Later
@@ -260,7 +319,7 @@ export const EnhancedBlogLayout = ({
                     <Button 
                       variant="outline" 
                       onClick={handleExternalLink} 
-                      className="w-full justify-start gap-2"
+                      className="w-full justify-start gap-2 hover:bg-amber-900/20 hover:text-amber-300 transition-colors"
                     >
                       <ExternalLink className="h-4 w-4" />
                       Visit Original Source
