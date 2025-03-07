@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -106,6 +105,12 @@ export default {
           "0%": { opacity: "0", transform: "translateY(10px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
+        "loadingBar": {
+          "0%": { width: "0%" },
+          "50%": { width: "70%" },
+          "70%": { width: "90%" },
+          "100%": { width: "95%" }
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -115,6 +120,7 @@ export default {
         "float-slow": "float-slow 6s ease-in-out infinite",
         "float-slower": "float-slower 8s ease-in-out infinite",
         "fade-in": "fade-in 0.5s ease-out forwards",
+        "loadingBar": "loadingBar 2s ease-in-out infinite",
       },
     },
   },
