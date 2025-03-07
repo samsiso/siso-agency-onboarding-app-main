@@ -6,6 +6,13 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, AlertCircle, CheckCircle } from 'lucide-react';
 
+// [Analysis] Define custom types for API token usage data since it's not in the auto-generated types
+interface TokenUsage {
+  tokens_used: number;
+  operations: Array<{type: string, count: number}>;
+  date: string;
+}
+
 // [Analysis] Component to monitor API token usage and stay within limits
 export const ApiUsageMonitor = () => {
   const [loading, setLoading] = useState(true);
@@ -31,11 +38,13 @@ export const ApiUsageMonitor = () => {
         
         // Get today's usage
         const today = new Date().toISOString().split('T')[0];
+        
+        // [Analysis] Use generic fetch with explicit type cast for custom table
         const { data: todayData, error: todayError } = await supabase
           .from('api_token_usage')
-          .select('tokens_used, operations')
+          .select('tokens_used, operations, date')
           .eq('date', today)
-          .single();
+          .single() as { data: TokenUsage | null, error: any };
           
         if (todayError && todayError.code !== 'PGSQL_ERROR_NO_ROWS') {
           throw todayError;
@@ -46,10 +55,11 @@ export const ApiUsageMonitor = () => {
         firstDayOfMonth.setDate(1);
         const firstDayStr = firstDayOfMonth.toISOString().split('T')[0];
         
+        // [Analysis] Use generic fetch with explicit type cast for custom table
         const { data: monthData, error: monthError } = await supabase
           .from('api_token_usage')
-          .select('tokens_used')
-          .gte('date', firstDayStr);
+          .select('tokens_used, date')
+          .gte('date', firstDayStr) as { data: TokenUsage[] | null, error: any };
           
         if (monthError) {
           throw monthError;
@@ -74,7 +84,7 @@ export const ApiUsageMonitor = () => {
         });
         
         setError(null);
-      } catch (err) {
+      } catch (err: any) {
         console.error("Error fetching token usage:", err);
         setError("Failed to load API usage data");
       } finally {
