@@ -5,6 +5,8 @@ import { MoreHorizontal, Share2, Bookmark, Heart, MessageSquare, BarChart } from
 import { Button } from '@/components/ui/button';
 import { NewsItem } from '@/types/blog';
 import { Badge } from '@/components/ui/badge';
+import { AIAnalysisDialog } from './AIAnalysisDialog';
+import { useBlogPostActions } from '@/hooks/useBlogPostActions';
 
 interface NewsCardContentProps {
   post: NewsItem;
@@ -14,7 +16,7 @@ interface NewsCardContentProps {
   onAnalyze?: (id: string) => Promise<void> | void;
 }
 
-// [Analysis] Component to display article metadata with cleaner implementation
+// [Analysis] Component to display article metadata with cleaner implementation and dialog integration
 const NewsCardContent = ({ 
   post, 
   hideContent = false, 
@@ -23,12 +25,12 @@ const NewsCardContent = ({
   onAnalyze
 }: NewsCardContentProps) => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [showAnalysisDialog, setShowAnalysisDialog] = useState(false);
+  const { handleShare, handleBookmark } = useBlogPostActions();
   
   const formatDate = (dateString?: string) => {
     if (!dateString) return 'Unknown date';
     try {
-      // [Q] Is this the correct format expected by the app?
-      // Try to parse as ISO string first
       const date = new Date(dateString);
       return format(date, 'MMM d, yyyy');
     } catch (error) {
@@ -43,6 +45,8 @@ const NewsCardContent = ({
     try {
       setIsAnalyzing(true);
       await onAnalyze(post.id);
+      // Open the analysis dialog after analysis is complete
+      setShowAnalysisDialog(true);
     } catch (error) {
       console.error('Error analyzing article:', error);
     } finally {
@@ -104,8 +108,9 @@ const NewsCardContent = ({
             variant="ghost" 
             size="icon" 
             className="h-8 w-8 rounded-full"
+            onClick={() => handleBookmark(post.id)}
           >
-            <Heart className="h-4 w-4 text-gray-400" />
+            <Bookmark className="h-4 w-4 text-gray-400" />
           </Button>
           
           <Button 
@@ -120,6 +125,7 @@ const NewsCardContent = ({
             variant="ghost" 
             size="icon" 
             className="h-8 w-8 rounded-full"
+            onClick={() => handleShare(post.title, post.description)}
           >
             <Share2 className="h-4 w-4 text-gray-400" />
           </Button>
@@ -147,6 +153,17 @@ const NewsCardContent = ({
           </Button>
         )}
       </div>
+
+      {/* Analysis Dialog */}
+      <AIAnalysisDialog
+        isOpen={showAnalysisDialog}
+        onClose={() => setShowAnalysisDialog(false)}
+        analysis={post.ai_analysis}
+        isLoading={isAnalyzing}
+        articleTitle={post.title}
+        articleDescription={post.description}
+        articleId={post.id}
+      />
     </div>
   );
 };

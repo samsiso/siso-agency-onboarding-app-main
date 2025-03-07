@@ -1,203 +1,187 @@
 
-import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Brain, TrendingUp, Code2, Lightbulb, X } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import React from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Brain, Share2, Bookmark, Facebook, Twitter, Linkedin, X, RefreshCcw } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useBlogPostActions } from '@/hooks/useBlogPostActions';
 
+// [Analysis] Dialog-based AI analysis component for better UX and screen space utilization
 interface AIAnalysisDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  newsId: string;
+  isOpen: boolean;
+  onClose: () => void;
+  analysis: any;
+  isLoading: boolean;
+  articleTitle?: string;
+  articleDescription?: string;
+  articleId?: string;
 }
 
-interface AnalysisStage {
-  icon: React.ReactNode;
-  text: string;
-}
-
-const stages: AnalysisStage[] = [
-  { icon: <Brain className="w-5 h-5" />, text: "Extracting key insights..." },
-  { icon: <TrendingUp className="w-5 h-5" />, text: "Evaluating market impact..." },
-  { icon: <Code2 className="w-5 h-5" />, text: "Identifying tech trends..." },
-  { icon: <Lightbulb className="w-5 h-5" />, text: "Generating recommendations..." },
-];
-
-export const AIAnalysisDialog = ({ open, onOpenChange, newsId }: AIAnalysisDialogProps) => {
-  const [currentStage, setCurrentStage] = useState(0);
-  const [analysis, setAnalysis] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
-  const { toast } = useToast();
-
-  const runAnalysis = async () => {
-    try {
-      setError(null);
-      setAnalysis(null);
-      setCurrentStage(0);
-
-      // Start stage animation sequence
-      const stageInterval = setInterval(() => {
-        setCurrentStage(prev => (prev < stages.length - 1 ? prev + 1 : prev));
-      }, 2000);
-
-      const { data: existingAnalysis } = await supabase
-        .from('news_ai_analysis')
-        .select('*')
-        .eq('news_id', newsId)
-        .maybeSingle();
-
-      if (existingAnalysis) {
-        clearInterval(stageInterval);
-        setAnalysis(existingAnalysis);
-        return;
-      }
-
-      const response = await supabase.functions.invoke('analyze-news', {
-        body: { newsId },
-      });
-
-      clearInterval(stageInterval);
-      
-      if (response.error) {
-        throw new Error(response.error.message);
-      }
-
-      setAnalysis(response.data);
-    } catch (err) {
-      setError(err.message);
-      toast({
-        title: "Analysis Failed",
-        description: "Unable to complete the analysis. Please try again.",
-        variant: "destructive",
-      });
+export const AIAnalysisDialog = ({ 
+  isOpen, 
+  onClose, 
+  analysis, 
+  isLoading,
+  articleTitle,
+  articleDescription,
+  articleId
+}: AIAnalysisDialogProps) => {
+  const { handleShare, handleBookmark } = useBlogPostActions();
+  
+  // [Plan] Centralize sharing functionality to reduce code duplication
+  const handleShareClick = (platform?: string) => {
+    const shareText = `${articleTitle} - AI Analysis`;
+    
+    if (platform === 'twitter') {
+      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(window.location.href)}`, '_blank');
+    } else if (platform === 'facebook') {
+      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, '_blank');
+    } else if (platform === 'linkedin') {
+      window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`, '_blank');
+    } else {
+      // Use the generic sharing function
+      handleShare(articleTitle, articleDescription);
     }
   };
-
+  
+  const handleBookmarkClick = () => {
+    if (articleId) {
+      handleBookmark(articleId);
+    }
+  };
+  
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] relative overflow-hidden">
-        {/* Background pattern */}
-        <div 
-          className="absolute inset-0 -z-10"
-          style={{
-            backgroundImage: "url('/lovable-uploads/d08f5142-c0ad-4700-bd7a-c035da96ec0b.png')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            opacity: 0.15
-          }}
-        />
-        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm -z-10" />
-
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-[600px] bg-gray-950 border-gray-800 text-white">
         <DialogHeader>
-          <DialogTitle className="text-siso-text-bold">AI Analysis</DialogTitle>
+          <div className="flex justify-between items-start">
+            <DialogTitle className="text-xl flex items-center gap-2">
+              <Brain className="h-5 w-5 text-blue-400" />
+              <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                AI Analysis
+              </span>
+            </DialogTitle>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8 rounded-full bg-gray-900 border-gray-700"
+                onClick={handleBookmarkClick}
+              >
+                <Bookmark className="h-4 w-4 text-blue-400" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8 rounded-full bg-gray-900 border-gray-700"
+                onClick={() => handleShareClick()}
+              >
+                <Share2 className="h-4 w-4 text-blue-400" />
+              </Button>
+            </div>
+          </div>
+          <DialogDescription className="text-gray-400">
+            {articleTitle || 'AI-powered insights for this article'}
+          </DialogDescription>
         </DialogHeader>
         
-        <div className="mt-4">
-          <AnimatePresence mode="wait">
-            {!analysis && !error ? (
-              <motion.div
-                key="loading"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="space-y-6"
-              >
-                {stages.map((stage, index) => (
-                  <motion.div
-                    key={index}
-                    className={`flex items-center space-x-3 ${
-                      index === currentStage ? 'text-siso-red' : 'text-gray-400'
-                    }`}
-                    animate={{
-                      scale: index === currentStage ? 1.05 : 1,
-                      opacity: index <= currentStage ? 1 : 0.5,
-                    }}
-                  >
-                    <div className={`p-2 rounded-full ${
-                      index === currentStage ? 'bg-siso-red/10' : 'bg-gray-100'
-                    }`}>
-                      {stage.icon}
-                    </div>
-                    <span>{stage.text}</span>
-                  </motion.div>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-8">
+            <RefreshCcw className="w-6 h-6 text-blue-400 animate-spin" />
+          </div>
+        ) : analysis ? (
+          <div className="space-y-6 pt-2">
+            <div className="space-y-3">
+              <h4 className="text-sm font-medium text-white/80">Key Insights</h4>
+              <ul className="space-y-2">
+                {analysis.key_insights?.map((insight: string, i: number) => (
+                  <li key={i} className="text-sm text-white/70 flex items-start gap-2 bg-white/5 p-3 rounded-lg">
+                    <span className="text-blue-400 mt-1">•</span>
+                    <span>{insight}</span>
+                  </li>
                 ))}
-              </motion.div>
-            ) : error ? (
-              <motion.div
-                key="error"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="text-center space-y-4"
-              >
-                <X className="w-12 h-12 text-red-500 mx-auto" />
-                <p className="text-red-500">{error}</p>
-                <button
-                  onClick={runAnalysis}
-                  className="px-4 py-2 bg-siso-red text-white rounded-md hover:bg-siso-red/90 transition-colors"
+              </ul>
+            </div>
+
+            <div className="space-y-3">
+              <h4 className="text-sm font-medium text-white/80">Market Impact</h4>
+              <p className="text-sm text-white/70 bg-white/5 p-3 rounded-lg">{analysis.market_impact}</p>
+            </div>
+
+            <div className="space-y-3">
+              <h4 className="text-sm font-medium text-white/80">Technology Predictions</h4>
+              <ul className="space-y-2">
+                {analysis.tech_predictions?.map((prediction: string, i: number) => (
+                  <li key={i} className="text-sm text-white/70 flex items-start gap-2 bg-white/5 p-3 rounded-lg">
+                    <span className="text-emerald-400 mt-1">→</span>
+                    <span>{prediction}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="space-y-3">
+              <h4 className="text-sm font-medium text-white/80">Related Technologies</h4>
+              <div className="flex flex-wrap gap-2 bg-white/5 p-3 rounded-lg">
+                {analysis.related_technologies?.map((tech: string, i: number) => (
+                  <Badge key={i} variant="outline" className="bg-white/10 border-blue-900/50">
+                    {tech}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-4 border-t border-white/10">
+              <span className="text-sm text-white/60">Analysis Confidence</span>
+              <Badge variant="outline" className={cn(
+                "bg-white/5",
+                analysis.confidence_score >= 0.8 ? "text-green-400" :
+                analysis.confidence_score >= 0.6 ? "text-yellow-400" :
+                "text-red-400"
+              )}>
+                {Math.round((analysis.confidence_score || 0.7) * 100)}%
+              </Badge>
+            </div>
+            
+            <div className="flex flex-col pt-4 space-y-2">
+              <h4 className="text-sm font-medium text-white/80">Share Analysis</h4>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline" 
+                  size="sm"
+                  className="bg-blue-900/20 border-blue-800 hover:bg-blue-800/30"
+                  onClick={() => handleShareClick('twitter')}
                 >
-                  Retry Analysis
-                </button>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="results"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="space-y-6"
-              >
-                <div className="space-y-4">
-                  <h3 className="font-semibold text-siso-text-bold">Key Insights</h3>
-                  <ul className="list-disc pl-5 space-y-2">
-                    {analysis.key_insights.map((insight: string, index: number) => (
-                      <li key={index} className="text-siso-text">{insight}</li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div>
-                  <h3 className="font-semibold text-siso-text-bold">Market Impact</h3>
-                  <p className="mt-2 text-siso-text">{analysis.market_impact}</p>
-                </div>
-
-                <div>
-                  <h3 className="font-semibold text-siso-text-bold">Tech Predictions</h3>
-                  <ul className="mt-2 list-disc pl-5 space-y-2">
-                    {analysis.tech_predictions.map((prediction: string, index: number) => (
-                      <li key={index} className="text-siso-text">{prediction}</li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div>
-                  <h3 className="font-semibold text-siso-text-bold">Related Technologies</h3>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {analysis.related_technologies.map((tech: string, index: number) => (
-                      <span
-                        key={index}
-                        className="px-2 py-1 bg-siso-red/10 text-siso-red rounded-full text-sm"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="font-semibold text-siso-text-bold">Business Implications</h3>
-                  <p className="mt-2 text-siso-text">{analysis.business_implications}</p>
-                </div>
-
-                <div className="flex items-center justify-between text-sm text-siso-text/70">
-                  <span>Confidence Score</span>
-                  <span>{(analysis.confidence_score * 100).toFixed(1)}%</span>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+                  <Twitter className="h-4 w-4 mr-2" />
+                  Twitter
+                </Button>
+                <Button
+                  variant="outline" 
+                  size="sm"
+                  className="bg-blue-900/20 border-blue-800 hover:bg-blue-800/30"
+                  onClick={() => handleShareClick('facebook')}
+                >
+                  <Facebook className="h-4 w-4 mr-2" />
+                  Facebook
+                </Button>
+                <Button
+                  variant="outline" 
+                  size="sm"
+                  className="bg-blue-900/20 border-blue-800 hover:bg-blue-800/30"
+                  onClick={() => handleShareClick('linkedin')}
+                >
+                  <Linkedin className="h-4 w-4 mr-2" />
+                  LinkedIn
+                </Button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="py-8 text-sm text-white/60 text-center">
+            No analysis available for this article
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

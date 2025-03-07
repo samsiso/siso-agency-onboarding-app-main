@@ -10,8 +10,10 @@ import { sectionIcons, subsectionColors } from './constants';
 import { cardVariants } from './animations';
 import { CardHeader } from './components/CardHeader';
 import { KeyDetails } from './components/KeyDetails';
-import { AIAnalysis } from './components/AIAnalysis';
 import { CardFooter } from './components/CardFooter';
+import { AIAnalysisDialog } from '../AIAnalysisDialog';
+import { Button } from '@/components/ui/button';
+import { Brain } from 'lucide-react';
 
 interface EventCardProps {
   section: ArticleSection;
@@ -21,6 +23,7 @@ interface EventCardProps {
 export const EventCard = ({ section, index }: EventCardProps) => {
   const [hasReacted, setHasReacted] = useState(false);
   const [isExpanded, setIsExpanded] = useState(true);
+  const [showAnalysisDialog, setShowAnalysisDialog] = useState(false);
   const { toast } = useToast();
 
   const sectionType = section.title.toLowerCase().includes('research') ? 'research'
@@ -143,10 +146,17 @@ export const EventCard = ({ section, index }: EventCardProps) => {
               />
             </div>
 
-            <AIAnalysis 
-              analysis={analysis}
-              isLoading={isAnalysisLoading}
-            />
+            <div className="flex justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowAnalysisDialog(true)}
+                className="text-xs border-blue-800 hover:bg-blue-900/50 text-blue-300 gap-2"
+              >
+                <Brain className="h-3 w-3" />
+                View AI Analysis
+              </Button>
+            </div>
           </>
         )}
 
@@ -159,6 +169,16 @@ export const EventCard = ({ section, index }: EventCardProps) => {
           sourceReferences={section.source_references}
         />
       </div>
+
+      {/* Analysis Dialog */}
+      <AIAnalysisDialog
+        isOpen={showAnalysisDialog}
+        onClose={() => setShowAnalysisDialog(false)}
+        analysis={analysis}
+        isLoading={isAnalysisLoading}
+        articleTitle={section.title}
+        articleId={section.id}
+      />
     </motion.div>
   );
 };

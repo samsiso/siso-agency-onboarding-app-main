@@ -19,7 +19,7 @@ interface NewsContentProps {
   onLoadMore: () => void;
 }
 
-// [Analysis] Updated to include AI analysis functionality
+// [Analysis] Updated to correctly pass analysis function to NewsCard
 export function NewsContent({
   newsItems,
   searchQuery,
