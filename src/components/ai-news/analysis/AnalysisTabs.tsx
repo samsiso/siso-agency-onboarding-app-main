@@ -4,10 +4,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Clock, Target, Zap, BrainCircuit, Users, Scale, Building, LineChart, ArrowBigUp } from 'lucide-react';
+import { AIAnalysis } from '@/types/blog';
 
 // [Analysis] Enhanced component to display comprehensive analysis data for agency owners
 interface AnalysisTabsProps {
-  analysis: any;
+  analysis: AIAnalysis;
 }
 
 // [Framework] Helper to render opportunity score with appropriate color
@@ -477,10 +478,10 @@ export const AnalysisTabs: React.FC<AnalysisTabsProps> = ({ analysis }) => {
             {analysis?.client_messaging?.objection_handling && 
             Object.keys(analysis.client_messaging.objection_handling).length > 0 ? (
               <div className="space-y-3">
-                {Object.entries(analysis.client_messaging.objection_handling).map(([objection, response], i) => (
+                {Object.entries(analysis.client_messaging.objection_handling || {}).map(([objection, response], i) => (
                   <div key={i} className="bg-gray-900/50 p-3 rounded-md">
                     <h5 className="text-sm font-medium text-orange-300 mb-1">"{objection}"</h5>
-                    <p className="text-sm text-gray-300">{response}</p>
+                    <p className="text-sm text-gray-300">{response as React.ReactNode}</p>
                   </div>
                 ))}
               </div>
