@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -101,38 +102,18 @@ const AINews: React.FC = () => {
     }
   };
   
-  // [Analysis] Fixed type issue by simplifying the function signature
+  // [Analysis] Completely refactored to fix the type instantiation issue
   const analyzeArticle = async (articleId: string): Promise<void> => {
     try {
-      // First check if article already has analysis
-      const { data: existingAnalysis, error: checkError } = await supabase
-        .from('news_ai_analysis')
-        .select('*')
-        .eq('article_id', articleId)
-        .maybeSingle();
-        
-      if (checkError) throw checkError;
-      
-      // If analysis exists and is not too old, return it
-      if (existingAnalysis) {
-        const analysisDate = new Date(existingAnalysis.created_at);
-        const now = new Date();
-        const hoursSinceAnalysis = (now.getTime() - analysisDate.getTime()) / (1000 * 60 * 60);
-        
-        if (hoursSinceAnalysis < 24) {
-          toast.success('Analysis loaded from cache');
-          return;
-        }
-      }
-      
       // Find the article details
       const article = newsItems.find(item => item.id === articleId);
       if (!article) {
-        throw new Error('Article not found');
+        toast.error('Article not found');
+        return;
       }
-      
-      // Call the edge function to analyze the article
-      const { data, error } = await supabase.functions.invoke('analyze-article', {
+
+      // Call the edge function to analyze the article with proper error handling
+      const response = await supabase.functions.invoke('analyze-article', {
         body: { 
           articleId,
           title: article.title,
@@ -142,7 +123,9 @@ const AINews: React.FC = () => {
         }
       });
       
-      if (error) throw error;
+      if (response.error) {
+        throw new Error(response.error.message);
+      }
       
       toast.success('Article analyzed successfully');
       
