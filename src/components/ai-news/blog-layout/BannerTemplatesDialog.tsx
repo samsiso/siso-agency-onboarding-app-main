@@ -51,6 +51,8 @@ export function BannerTemplatesDialog() {
 
         return {
           ...template,
+          // Make sure to include description field, even if it's empty
+          description: template.description || '',
           text_overlay: parsedTextOverlay as BannerTemplate['text_overlay'],
           metadata: parsedMetadata,
           is_default: template.is_default || false
@@ -84,7 +86,7 @@ export function BannerTemplatesDialog() {
       setLoading(true);
       const insertData = {
         name: newTemplate.name,
-        description: newTemplate.description,
+        description: newTemplate.description,  // Make sure this is included
         template_type: newTemplate.template_type,
         text_overlay: JSON.stringify(newTemplate.text_overlay),
         metadata: JSON.stringify(newTemplate.metadata),
@@ -121,6 +123,7 @@ export function BannerTemplatesDialog() {
 
       const transformedTemplate: BannerTemplate = {
         ...data,
+        description: data.description || '',  // Ensure description is defined
         text_overlay: validTextOverlay,
         metadata: typeof data.metadata === 'string'
           ? JSON.parse(data.metadata)
