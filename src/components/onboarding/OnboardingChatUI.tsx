@@ -134,7 +134,7 @@ export function OnboardingChatUI() {
               >
                 {question}
               </Button>
-            )))}
+            ))}
           </div>
         )}
         
