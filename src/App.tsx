@@ -32,6 +32,7 @@ import DailyNews from '@/pages/DailyNews';
 import Index from '@/pages/Index';
 import Terms from '@/pages/Terms';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
+import OnboardingChat from '@/pages/OnboardingChat';
 
 import { Toaster } from '@/components/ui/toaster';
 import { useAuthSession } from '@/hooks/useAuthSession';
@@ -63,12 +64,12 @@ function App() {
         <Route path="/" element={<Index />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/ai-news" element={<AINews />} />
-        {/* [Analysis] Modified route to use 'postId' consistent with the BlogPost component */}
         <Route path="/ai-news/:postId" element={<BlogPost />} />
         <Route path="/daily-news" element={<DailyNews />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/thank-you" element={<ThankYou />} />
+        <Route path="/onboarding-chat" element={<OnboardingChat />} />
 
         {/* Protected routes */}
         <Route path="/home" element={

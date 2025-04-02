@@ -34,9 +34,9 @@ function Hero() {
   };
 
   const handleTryAI = () => {
-    console.log('Try AI clicked - navigating to /home');
+    console.log('Try AI clicked - navigating to /onboarding-chat');
     try {
-      navigate('/home');
+      navigate('/onboarding-chat');
     } catch (error) {
       console.error('Navigation error:', error);
     }
