@@ -366,6 +366,7 @@ export type Database = {
       banner_templates: {
         Row: {
           created_at: string
+          description: string | null
           id: string
           image_url: string | null
           is_default: boolean | null
@@ -377,6 +378,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          description?: string | null
           id?: string
           image_url?: string | null
           is_default?: boolean | null
@@ -388,6 +390,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          description?: string | null
           id?: string
           image_url?: string | null
           is_default?: boolean | null
@@ -1807,6 +1810,7 @@ export type Database = {
           referral_count: number | null
           role: Database["public"]["Enums"]["app_role"]
           siso_tokens: number | null
+          solana_wallet_address: string | null
           twitter_url: string | null
           updated_at: string | null
           user_id: string | null
@@ -1837,6 +1841,7 @@ export type Database = {
           referral_count?: number | null
           role?: Database["public"]["Enums"]["app_role"]
           siso_tokens?: number | null
+          solana_wallet_address?: string | null
           twitter_url?: string | null
           updated_at?: string | null
           user_id?: string | null
@@ -1867,6 +1872,7 @@ export type Database = {
           referral_count?: number | null
           role?: Database["public"]["Enums"]["app_role"]
           siso_tokens?: number | null
+          solana_wallet_address?: string | null
           twitter_url?: string | null
           updated_at?: string | null
           user_id?: string | null
@@ -2584,6 +2590,7 @@ export type Database = {
       }
       video_progress: {
         Row: {
+          completed: boolean | null
           created_at: string | null
           id: string
           progress: number | null
@@ -2593,6 +2600,7 @@ export type Database = {
           watched: boolean | null
         }
         Insert: {
+          completed?: boolean | null
           created_at?: string | null
           id?: string
           progress?: number | null
@@ -2602,6 +2610,7 @@ export type Database = {
           watched?: boolean | null
         }
         Update: {
+          completed?: boolean | null
           created_at?: string | null
           id?: string
           progress?: number | null
@@ -2695,6 +2704,63 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      wallet_nonces: {
+        Row: {
+          created_at: string | null
+          id: string
+          nonce: string
+          public_key: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          nonce: string
+          public_key: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          nonce?: string
+          public_key?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      welcome_nft_mints: {
+        Row: {
+          created_at: string | null
+          error_message: string | null
+          id: string
+          metadata: Json | null
+          status: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          status?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          status?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       youtube_videos: {
         Row: {

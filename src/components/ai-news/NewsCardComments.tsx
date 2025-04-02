@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { MessageCircle } from 'lucide-react';
 import { useState } from 'react';
@@ -12,9 +11,10 @@ interface NewsComment {
   id: string;
   content: string;
   created_at: string;
-  user_email: string;
-  news_id: string;
+  user_id: string; // Changed from user_email to user_id
   updated_at: string;
+  news_id: string;
+  user_email?: string; // Made optional for backward compatibility
 }
 
 interface NewsCardCommentsProps {
@@ -50,20 +50,19 @@ export const NewsCardComments = ({ newsId, comments }: NewsCardCommentsProps) =>
         return;
       }
 
-      // Modify the insert to match the database schema
+      // Insert with user_id instead of user_email to match schema
       const { error } = await supabase
         .from('news_comments')
         .insert({
           news_id: newsId,
           content: newComment.trim(),
-          user_id: session.user.id // Changed from user_email to user_id to match schema
+          user_id: session.user.id
         });
 
       if (error) throw error;
 
       try {
-        // Cast the parameter to any to bypass TypeScript checking
-        // This is a temporary fix until we can update the database or update the usePoints hook
+        // Use type assertion for the action parameter
         await awardPoints('comment_article' as any);
         setNewComment('');
         toast({
@@ -123,7 +122,7 @@ export const NewsCardComments = ({ newsId, comments }: NewsCardCommentsProps) =>
                     className="bg-background p-3 rounded-lg border border-siso-border"
                   >
                     <div className="flex justify-between items-start mb-2">
-                      <p className="text-xs text-siso-text-muted">{comment.user_email}</p>
+                      <p className="text-xs text-siso-text-muted">{comment.user_email || comment.user_id}</p>
                       <p className="text-xs text-siso-text-muted">{formatDate(comment.created_at)}</p>
                     </div>
                     <p className="text-sm text-siso-text">{comment.content}</p>

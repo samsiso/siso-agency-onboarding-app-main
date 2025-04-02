@@ -23,7 +23,7 @@ export const ShareButtons = ({ summary, title }: ShareButtonsProps) => {
       
       if (session) {
         try {
-          // Award points for sharing - Use type assertion to bypass TypeScript
+          // Use type assertion for the action parameter
           await awardPoints('share_article' as any);
           toast({
             title: "Points awarded!",

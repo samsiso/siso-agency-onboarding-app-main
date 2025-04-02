@@ -11,11 +11,6 @@ interface NFTCollection {
   weekly_bonus?: number | null;
 }
 
-interface UserNFTData {
-  id: string;
-  nft_collections: NFTCollection | null;
-}
-
 interface NFT {
   id: string;
   name: string;
@@ -29,6 +24,15 @@ interface NFTStatusProps {
   nfts: NFT[];
 }
 
+// Declare a type for user NFTs that matches the database schema
+interface UserNFT {
+  id: string;
+  user_id: string;
+  nft_collection_id: string;
+  created_at: string;
+  nft_collections?: NFTCollection;
+}
+
 export const NFTStatus = ({ nfts }: NFTStatusProps) => {
   const [userNfts, setUserNfts] = useState<NFT[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,45 +42,46 @@ export const NFTStatus = ({ nfts }: NFTStatusProps) => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
-
-        const { data, error } = await supabase
-          .from('user_nfts')
-          .select(`
-            id,
-            nft_collections (
-              name,
-              image_url,
-              tier,
-              points_multiplier,
-              weekly_bonus
-            )
-          `)
-          .eq('user_id', user.id);
-
-        if (error) throw error;
-
-        // First cast to unknown, then to our expected type
-        const typedData = (data as unknown) as UserNFTData[];
         
-        const transformedNfts = typedData?.map(nft => ({
-          id: nft.id,
-          name: nft.nft_collections?.name || 'Unknown NFT',
-          imageUrl: nft.nft_collections?.image_url || undefined,
-          tier: nft.nft_collections?.tier || undefined,
-          points_multiplier: nft.nft_collections?.points_multiplier || undefined,
-          weekly_bonus: nft.nft_collections?.weekly_bonus || undefined
-        })) || [];
+        // Direct query with type assertion to handle the missing table
+        const { data, error } = await supabase
+          .rpc('get_user_nfts', { user_id_param: user.id });
+        
+        if (error) {
+          console.error('Error fetching NFTs:', error);
+          // Fallback to the provided NFTs prop if RPC fails
+          setUserNfts(nfts);
+          return;
+        }
+        
+        // Handle user NFTs data or fall back to provided NFTs prop
+        if (data && Array.isArray(data) && data.length > 0) {
+          // Cast the data to match our expected format
+          const typedData = data as unknown as UserNFT[];
+          
+          const transformedNfts = typedData?.map(nft => ({
+            id: nft.id,
+            name: nft.nft_collections?.name || 'Unknown NFT',
+            imageUrl: nft.nft_collections?.image_url || undefined,
+            tier: nft.nft_collections?.tier || undefined,
+            points_multiplier: nft.nft_collections?.points_multiplier || undefined,
+            weekly_bonus: nft.nft_collections?.weekly_bonus || undefined
+          })) || [];
 
-        setUserNfts(transformedNfts);
+          setUserNfts(transformedNfts);
+        } else {
+          setUserNfts(nfts);
+        }
       } catch (error) {
         console.error('Error fetching NFTs:', error);
+        setUserNfts(nfts);
       } finally {
         setLoading(false);
       }
     };
 
     fetchUserNFTs();
-  }, []);
+  }, [nfts]);
 
   return (
     <Card className="bg-black/20 border-siso-text/10">
