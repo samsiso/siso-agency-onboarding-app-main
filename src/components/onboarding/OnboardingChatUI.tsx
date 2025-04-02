@@ -19,7 +19,7 @@ const INITIAL_MESSAGES: Message[] = [
   {
     id: '1',
     role: 'assistant',
-    content: 'Hi there! 👋 I'm SISO AI, your assistant for agency growth. I can help with tools, education, and networking to scale your business. What would you like to explore today?',
+    content: "Hi there! 👋 I'm SISO AI, your assistant for agency growth. I can help with tools, education, and networking to scale your business. What would you like to explore today?",
     timestamp: new Date(),
   },
 ];
