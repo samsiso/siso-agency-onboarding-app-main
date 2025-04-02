@@ -9,357 +9,1124 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      agencies: {
+      ai_news: {
         Row: {
-          address: string | null
-          contact_email: string | null
+          ai_analysis: Json | null
+          analysis_date: string | null
+          article_type: string | null
+          author_id: string | null
+          banner_template_id: string | null
+          bookmarks: number | null
+          category: string
+          content: string | null
+          content_blocks: Json | null
+          cover_image: string | null
           created_at: string
-          description: string | null
+          date: string
+          description: string
+          duplicate_of: string | null
+          estimated_reading_time: number | null
+          featured: boolean | null
+          has_ai_analysis: boolean | null
           id: string
-          logo_url: string | null
-          name: string
-          phone_number: string | null
-          primary_color: string | null
-          secondary_color: string | null
-          slug: string
+          image_url: string | null
+          impact: string | null
+          is_duplicate: boolean | null
+          key_takeaways: Json | null
+          linkedin_url: string | null
+          meta_description: string | null
+          meta_keywords: string[] | null
+          meta_title: string | null
+          priority: number | null
+          publish_date: string | null
+          reading_progress: number | null
+          reading_time: number | null
+          related_articles: string[] | null
+          scheduled_for: string | null
+          seo_description: string | null
+          share_count: number | null
+          similarity_score: number | null
+          slug: string | null
+          source: string
+          source_credibility: string | null
+          sources: Json | null
+          status: string | null
+          table_of_contents: Json | null
+          tags: string[] | null
+          technical_analysis_id: string | null
+          technical_complexity: string | null
+          technical_details: Json | null
+          title: string
           updated_at: string
-          user_id: string
-          website: string | null
+          upvotes: number | null
+          url: string | null
+          views: number | null
         }
         Insert: {
-          address?: string | null
-          contact_email?: string | null
+          ai_analysis?: Json | null
+          analysis_date?: string | null
+          article_type?: string | null
+          author_id?: string | null
+          banner_template_id?: string | null
+          bookmarks?: number | null
+          category: string
+          content?: string | null
+          content_blocks?: Json | null
+          cover_image?: string | null
           created_at?: string
-          description?: string | null
+          date: string
+          description: string
+          duplicate_of?: string | null
+          estimated_reading_time?: number | null
+          featured?: boolean | null
+          has_ai_analysis?: boolean | null
           id?: string
-          logo_url?: string | null
-          name: string
-          phone_number?: string | null
-          primary_color?: string | null
-          secondary_color?: string | null
-          slug: string
+          image_url?: string | null
+          impact?: string | null
+          is_duplicate?: boolean | null
+          key_takeaways?: Json | null
+          linkedin_url?: string | null
+          meta_description?: string | null
+          meta_keywords?: string[] | null
+          meta_title?: string | null
+          priority?: number | null
+          publish_date?: string | null
+          reading_progress?: number | null
+          reading_time?: number | null
+          related_articles?: string[] | null
+          scheduled_for?: string | null
+          seo_description?: string | null
+          share_count?: number | null
+          similarity_score?: number | null
+          slug?: string | null
+          source: string
+          source_credibility?: string | null
+          sources?: Json | null
+          status?: string | null
+          table_of_contents?: Json | null
+          tags?: string[] | null
+          technical_analysis_id?: string | null
+          technical_complexity?: string | null
+          technical_details?: Json | null
+          title: string
           updated_at?: string
-          user_id: string
-          website?: string | null
+          upvotes?: number | null
+          url?: string | null
+          views?: number | null
         }
         Update: {
-          address?: string | null
-          contact_email?: string | null
+          ai_analysis?: Json | null
+          analysis_date?: string | null
+          article_type?: string | null
+          author_id?: string | null
+          banner_template_id?: string | null
+          bookmarks?: number | null
+          category?: string
+          content?: string | null
+          content_blocks?: Json | null
+          cover_image?: string | null
           created_at?: string
-          description?: string | null
+          date?: string
+          description?: string
+          duplicate_of?: string | null
+          estimated_reading_time?: number | null
+          featured?: boolean | null
+          has_ai_analysis?: boolean | null
           id?: string
-          logo_url?: string | null
-          name?: string
-          phone_number?: string | null
-          primary_color?: string | null
-          secondary_color?: string | null
-          slug?: string
+          image_url?: string | null
+          impact?: string | null
+          is_duplicate?: boolean | null
+          key_takeaways?: Json | null
+          linkedin_url?: string | null
+          meta_description?: string | null
+          meta_keywords?: string[] | null
+          meta_title?: string | null
+          priority?: number | null
+          publish_date?: string | null
+          reading_progress?: number | null
+          reading_time?: number | null
+          related_articles?: string[] | null
+          scheduled_for?: string | null
+          seo_description?: string | null
+          share_count?: number | null
+          similarity_score?: number | null
+          slug?: string | null
+          source?: string
+          source_credibility?: string | null
+          sources?: Json | null
+          status?: string | null
+          table_of_contents?: Json | null
+          tags?: string[] | null
+          technical_analysis_id?: string | null
+          technical_complexity?: string | null
+          technical_details?: Json | null
+          title?: string
           updated_at?: string
-          user_id?: string
-          website?: string | null
+          upvotes?: number | null
+          url?: string | null
+          views?: number | null
         }
         Relationships: [
           {
-            foreignKeyName: "agencies_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: "ai_news_author_id_fkey"
+            columns: ["author_id"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_duplicate_of_fkey"
+            columns: ["duplicate_of"]
+            isOneToOne: false
+            referencedRelation: "ai_news"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_duplicate_of_fkey"
+            columns: ["duplicate_of"]
+            isOneToOne: false
+            referencedRelation: "featured_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_duplicate_of_fkey"
+            columns: ["duplicate_of"]
+            isOneToOne: false
+            referencedRelation: "mv_trending_articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_duplicate_of_fkey"
+            columns: ["duplicate_of"]
+            isOneToOne: false
+            referencedRelation: "upcoming_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_duplicate_of_fkey"
+            columns: ["duplicate_of"]
+            isOneToOne: false
+            referencedRelation: "upcoming_scheduled_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_technical_analysis_id_fkey"
+            columns: ["technical_analysis_id"]
+            isOneToOne: false
+            referencedRelation: "news_ai_analysis"
             referencedColumns: ["id"]
           },
         ]
-      }
-      ai_chat_messages: {
-        Row: {
-          ai_response: string
-          created_at: string
-          id: string
-          user_message: string
-        }
-        Insert: {
-          ai_response: string
-          created_at?: string
-          id?: string
-          user_message: string
-        }
-        Update: {
-          ai_response?: string
-          created_at?: string
-          id?: string
-          user_message?: string
-        }
-        Relationships: []
-      }
-      ai_news: {
-        Row: {
-          content: string
-          created_at: string | null
-          id: string
-          published_at: string | null
-          source: string | null
-          title: string
-          updated_at: string | null
-        }
-        Insert: {
-          content: string
-          created_at?: string | null
-          id?: string
-          published_at?: string | null
-          source?: string | null
-          title: string
-          updated_at?: string | null
-        }
-        Update: {
-          content?: string
-          created_at?: string | null
-          id?: string
-          published_at?: string | null
-          source?: string | null
-          title?: string
-          updated_at?: string | null
-        }
-        Relationships: []
       }
       ai_news_bookmarks: {
         Row: {
           created_at: string | null
           id: string
-          news_id: string
-          user_id: string
+          news_id: string | null
+          user_id: string | null
         }
         Insert: {
           created_at?: string | null
           id?: string
-          news_id: string
-          user_id: string
+          news_id?: string | null
+          user_id?: string | null
         }
         Update: {
           created_at?: string | null
           id?: string
-          news_id?: string
-          user_id?: string
+          news_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_news_bookmarks_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "ai_news"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_bookmarks_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "featured_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_bookmarks_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "mv_trending_articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_bookmarks_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_bookmarks_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_scheduled_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_news_channels: {
+        Row: {
+          channel_id: string
+          channel_name: string
+          channel_url: string
+          content_quality_score: number | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          last_sync_at: string | null
+          sync_frequency_minutes: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          channel_id: string
+          channel_name: string
+          channel_url: string
+          content_quality_score?: number | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          sync_frequency_minutes?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          channel_id?: string
+          channel_name?: string
+          channel_url?: string
+          content_quality_score?: number | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          sync_frequency_minutes?: number | null
+          updated_at?: string | null
         }
         Relationships: []
       }
       ai_news_daily_summaries: {
         Row: {
-          action_items: string[] | null
+          analysis_depth: string | null
+          application_details: string[] | null
+          article_count: number | null
+          categorized_key_points: Json | null
+          confidence_score: number | null
           created_at: string | null
           date: string
-          executive_summary: string | null
-          generated_with: string
+          generated_with: string | null
           id: string
+          impact_severity: Json | null
+          impact_trends: Json | null
           industry_impacts: Json | null
-          key_developments: string[] | null
+          key_points: string[] | null
+          key_technologies: Json | null
+          practical_applications: string[] | null
+          sentiment: string | null
           summary: string
           updated_at: string | null
         }
         Insert: {
-          action_items?: string[] | null
+          analysis_depth?: string | null
+          application_details?: string[] | null
+          article_count?: number | null
+          categorized_key_points?: Json | null
+          confidence_score?: number | null
           created_at?: string | null
           date: string
-          executive_summary?: string | null
-          generated_with: string
+          generated_with?: string | null
           id?: string
+          impact_severity?: Json | null
+          impact_trends?: Json | null
           industry_impacts?: Json | null
-          key_developments?: string[] | null
+          key_points?: string[] | null
+          key_technologies?: Json | null
+          practical_applications?: string[] | null
+          sentiment?: string | null
           summary: string
           updated_at?: string | null
         }
         Update: {
-          action_items?: string[] | null
+          analysis_depth?: string | null
+          application_details?: string[] | null
+          article_count?: number | null
+          categorized_key_points?: Json | null
+          confidence_score?: number | null
           created_at?: string | null
           date?: string
-          executive_summary?: string | null
-          generated_with?: string
+          generated_with?: string | null
           id?: string
+          impact_severity?: Json | null
+          impact_trends?: Json | null
           industry_impacts?: Json | null
-          key_developments?: string[] | null
+          key_points?: string[] | null
+          key_technologies?: Json | null
+          practical_applications?: string[] | null
+          sentiment?: string | null
           summary?: string
           updated_at?: string | null
         }
         Relationships: []
       }
-      ai_news_video_processing: {
+      ai_news_reactions: {
         Row: {
           created_at: string | null
-          error_message: string | null
           id: string
-          status: string
-          updated_at: string | null
-          video_id: string
+          news_id: string | null
+          reaction_type: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string | null
-          error_message?: string | null
           id?: string
-          status?: string
-          updated_at?: string | null
-          video_id: string
+          news_id?: string | null
+          reaction_type: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string | null
-          error_message?: string | null
           id?: string
-          status?: string
-          updated_at?: string | null
-          video_id?: string
-        }
-        Relationships: []
-      }
-      app_plans: {
-        Row: {
-          agency_id: string
-          created_at: string
-          description: string | null
-          features: Json
-          id: string
-          status: string
-          title: string
-          total_cost: number | null
-          updated_at: string
-        }
-        Insert: {
-          agency_id: string
-          created_at?: string
-          description?: string | null
-          features?: Json
-          id?: string
-          status?: string
-          title: string
-          total_cost?: number | null
-          updated_at?: string
-        }
-        Update: {
-          agency_id?: string
-          created_at?: string
-          description?: string | null
-          features?: Json
-          id?: string
-          status?: string
-          title?: string
-          total_cost?: number | null
-          updated_at?: string
+          news_id?: string | null
+          reaction_type?: string
+          user_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "app_plans_agency_id_fkey"
-            columns: ["agency_id"]
+            foreignKeyName: "ai_news_reactions_news_id_fkey"
+            columns: ["news_id"]
             isOneToOne: false
-            referencedRelation: "agencies"
+            referencedRelation: "ai_news"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_reactions_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "featured_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_reactions_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "mv_trending_articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_reactions_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_reactions_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_scheduled_posts"
             referencedColumns: ["id"]
           },
         ]
       }
-      assistant_metadata: {
+      ai_news_summaries: {
         Row: {
-          assistant_id: string
           created_at: string
           id: string
-          instructions: string | null
-          metadata: Json | null
-          model: string
-          name: string
-          tools: Json | null
+          news_id: string
+          summary: string
           updated_at: string
         }
         Insert: {
-          assistant_id: string
           created_at?: string
           id?: string
-          instructions?: string | null
-          metadata?: Json | null
-          model: string
-          name: string
-          tools?: Json | null
+          news_id: string
+          summary: string
           updated_at?: string
         }
         Update: {
-          assistant_id?: string
           created_at?: string
           id?: string
-          instructions?: string | null
-          metadata?: Json | null
-          model?: string
-          name?: string
-          tools?: Json | null
+          news_id?: string
+          summary?: string
           updated_at?: string
-        }
-        Relationships: []
-      }
-      assistant_versions: {
-        Row: {
-          assistant_id: string
-          configuration: Json
-          created_at: string
-          id: string
-          is_active: boolean
-          updated_at: string
-          version: string
-        }
-        Insert: {
-          assistant_id: string
-          configuration?: Json
-          created_at?: string
-          id?: string
-          is_active?: boolean
-          updated_at?: string
-          version: string
-        }
-        Update: {
-          assistant_id?: string
-          configuration?: Json
-          created_at?: string
-          id?: string
-          is_active?: boolean
-          updated_at?: string
-          version?: string
         }
         Relationships: [
           {
-            foreignKeyName: "assistant_versions_assistant_id_fkey"
-            columns: ["assistant_id"]
-            isOneToOne: false
-            referencedRelation: "assistant_metadata"
-            referencedColumns: ["assistant_id"]
+            foreignKeyName: "ai_news_summaries_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: true
+            referencedRelation: "ai_news"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_summaries_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: true
+            referencedRelation: "featured_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_summaries_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: true
+            referencedRelation: "mv_trending_articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_summaries_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: true
+            referencedRelation: "upcoming_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_summaries_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: true
+            referencedRelation: "upcoming_scheduled_posts"
+            referencedColumns: ["id"]
           },
         ]
+      }
+      ai_news_video_processing: {
+        Row: {
+          article_id: string | null
+          created_at: string | null
+          error_message: string | null
+          id: string
+          processed_at: string | null
+          processing_metadata: Json | null
+          retry_count: number | null
+          source_id: string | null
+          status: string | null
+          transcript: string | null
+          updated_at: string | null
+          video_id: string
+        }
+        Insert: {
+          article_id?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          processed_at?: string | null
+          processing_metadata?: Json | null
+          retry_count?: number | null
+          source_id?: string | null
+          status?: string | null
+          transcript?: string | null
+          updated_at?: string | null
+          video_id: string
+        }
+        Update: {
+          article_id?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          processed_at?: string | null
+          processing_metadata?: Json | null
+          retry_count?: number | null
+          source_id?: string | null
+          status?: string | null
+          transcript?: string | null
+          updated_at?: string | null
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_news_video_processing_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "ai_news"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_video_processing_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "featured_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_video_processing_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "mv_trending_articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_video_processing_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_video_processing_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_scheduled_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_video_processing_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "ai_news_youtube_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_news_video_segments: {
+        Row: {
+          channel_id: string
+          confidence_score: number | null
+          created_at: string | null
+          description: string | null
+          end_time: number
+          id: string
+          news_article_id: string | null
+          processed_at: string | null
+          source_urls: string[] | null
+          start_time: number
+          technical_complexity: string | null
+          title: string | null
+          topic_tags: string[] | null
+          transcript_text: string
+          video_id: string
+        }
+        Insert: {
+          channel_id: string
+          confidence_score?: number | null
+          created_at?: string | null
+          description?: string | null
+          end_time: number
+          id?: string
+          news_article_id?: string | null
+          processed_at?: string | null
+          source_urls?: string[] | null
+          start_time: number
+          technical_complexity?: string | null
+          title?: string | null
+          topic_tags?: string[] | null
+          transcript_text: string
+          video_id: string
+        }
+        Update: {
+          channel_id?: string
+          confidence_score?: number | null
+          created_at?: string | null
+          description?: string | null
+          end_time?: number
+          id?: string
+          news_article_id?: string | null
+          processed_at?: string | null
+          source_urls?: string[] | null
+          start_time?: number
+          technical_complexity?: string | null
+          title?: string | null
+          topic_tags?: string[] | null
+          transcript_text?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_news_video_segments_news_article_id_fkey"
+            columns: ["news_article_id"]
+            isOneToOne: false
+            referencedRelation: "ai_news"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_video_segments_news_article_id_fkey"
+            columns: ["news_article_id"]
+            isOneToOne: false
+            referencedRelation: "featured_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_video_segments_news_article_id_fkey"
+            columns: ["news_article_id"]
+            isOneToOne: false
+            referencedRelation: "mv_trending_articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_video_segments_news_article_id_fkey"
+            columns: ["news_article_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_news_video_segments_news_article_id_fkey"
+            columns: ["news_article_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_scheduled_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_news_youtube_sources: {
+        Row: {
+          auto_process: boolean | null
+          channel_id: string
+          channel_name: string
+          channel_url: string | null
+          created_at: string | null
+          id: string
+          last_synced_at: string | null
+          processing_config: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          auto_process?: boolean | null
+          channel_id: string
+          channel_name: string
+          channel_url?: string | null
+          created_at?: string | null
+          id?: string
+          last_synced_at?: string | null
+          processing_config?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          auto_process?: boolean | null
+          channel_id?: string
+          channel_name?: string
+          channel_url?: string | null
+          created_at?: string | null
+          id?: string
+          last_synced_at?: string | null
+          processing_config?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      article_reading_progress: {
+        Row: {
+          article_id: string | null
+          created_at: string | null
+          id: string
+          last_read_at: string | null
+          progress: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          article_id?: string | null
+          created_at?: string | null
+          id?: string
+          last_read_at?: string | null
+          progress?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          article_id?: string | null
+          created_at?: string | null
+          id?: string
+          last_read_at?: string | null
+          progress?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "article_reading_progress_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "ai_news"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "article_reading_progress_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "featured_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "article_reading_progress_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "mv_trending_articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "article_reading_progress_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "article_reading_progress_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_scheduled_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      article_sections: {
+        Row: {
+          ai_analysis: Json | null
+          article_id: string | null
+          content: string
+          created_at: string
+          detailed_metadata: Json | null
+          id: string
+          implementation_timeline: Json | null
+          implications: string[] | null
+          importance_level: string | null
+          key_details: string[] | null
+          last_updated: string | null
+          market_analysis: Json | null
+          order_index: number
+          overview: string | null
+          section_order: number
+          source_references: Json | null
+          subsection_type: string | null
+          technical_complexity:
+            | Database["public"]["Enums"]["technical_complexity"]
+            | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          ai_analysis?: Json | null
+          article_id?: string | null
+          content: string
+          created_at?: string
+          detailed_metadata?: Json | null
+          id?: string
+          implementation_timeline?: Json | null
+          implications?: string[] | null
+          importance_level?: string | null
+          key_details?: string[] | null
+          last_updated?: string | null
+          market_analysis?: Json | null
+          order_index: number
+          overview?: string | null
+          section_order?: number
+          source_references?: Json | null
+          subsection_type?: string | null
+          technical_complexity?:
+            | Database["public"]["Enums"]["technical_complexity"]
+            | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          ai_analysis?: Json | null
+          article_id?: string | null
+          content?: string
+          created_at?: string
+          detailed_metadata?: Json | null
+          id?: string
+          implementation_timeline?: Json | null
+          implications?: string[] | null
+          importance_level?: string | null
+          key_details?: string[] | null
+          last_updated?: string | null
+          market_analysis?: Json | null
+          order_index?: number
+          overview?: string | null
+          section_order?: number
+          source_references?: Json | null
+          subsection_type?: string | null
+          technical_complexity?:
+            | Database["public"]["Enums"]["technical_complexity"]
+            | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "article_sections_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "ai_news"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "article_sections_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "featured_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "article_sections_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "mv_trending_articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "article_sections_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "article_sections_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_scheduled_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      article_tags: {
+        Row: {
+          article_id: string | null
+          created_at: string
+          id: string
+          tag: string
+        }
+        Insert: {
+          article_id?: string | null
+          created_at?: string
+          id?: string
+          tag: string
+        }
+        Update: {
+          article_id?: string | null
+          created_at?: string
+          id?: string
+          tag?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "article_tags_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "ai_news"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "article_tags_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "featured_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "article_tags_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "mv_trending_articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "article_tags_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "article_tags_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_scheduled_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      article_upvotes: {
+        Row: {
+          article_id: string | null
+          created_at: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          article_id?: string | null
+          created_at?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          article_id?: string | null
+          created_at?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "article_upvotes_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "ai_news"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "article_upvotes_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "featured_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "article_upvotes_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "mv_trending_articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "article_upvotes_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "article_upvotes_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_scheduled_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assistant_analytics: {
+        Row: {
+          assistant_id: string
+          average_rating: number | null
+          created_at: string | null
+          id: string
+          interactions: number | null
+          searches: number | null
+          updated_at: string | null
+          views: number | null
+        }
+        Insert: {
+          assistant_id: string
+          average_rating?: number | null
+          created_at?: string | null
+          id?: string
+          interactions?: number | null
+          searches?: number | null
+          updated_at?: string | null
+          views?: number | null
+        }
+        Update: {
+          assistant_id?: string
+          average_rating?: number | null
+          created_at?: string | null
+          id?: string
+          interactions?: number | null
+          searches?: number | null
+          updated_at?: string | null
+          views?: number | null
+        }
+        Relationships: []
+      }
+      assistant_collection_items: {
+        Row: {
+          assistant_id: string
+          collection_id: string | null
+          created_at: string | null
+          id: string
+        }
+        Insert: {
+          assistant_id: string
+          collection_id?: string | null
+          created_at?: string | null
+          id?: string
+        }
+        Update: {
+          assistant_id?: string
+          collection_id?: string | null
+          created_at?: string | null
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assistant_collection_items_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "assistant_collections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assistant_collections: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_featured: boolean | null
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_featured?: boolean | null
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_featured?: boolean | null
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       automations: {
         Row: {
           category: string
-          created_at: string | null
+          created_at: string
           description: string | null
-          difficulty: string
           id: string
+          integration_url: string | null
           name: string
-          platform: string
-          pricing: string | null
-          setup_time: string
-          updated_at: string | null
+          platform: string | null
+          profile_image_url: string | null
+          setup_guide: string | null
+          updated_at: string
         }
         Insert: {
           category: string
-          created_at?: string | null
+          created_at?: string
           description?: string | null
-          difficulty: string
           id?: string
+          integration_url?: string | null
           name: string
-          platform: string
-          pricing?: string | null
-          setup_time: string
-          updated_at?: string | null
+          platform?: string | null
+          profile_image_url?: string | null
+          setup_guide?: string | null
+          updated_at?: string
         }
         Update: {
           category?: string
-          created_at?: string | null
+          created_at?: string
           description?: string | null
-          difficulty?: string
           id?: string
+          integration_url?: string | null
           name?: string
-          platform?: string
-          pricing?: string | null
-          setup_time?: string
-          updated_at?: string | null
+          platform?: string | null
+          profile_image_url?: string | null
+          setup_guide?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -372,7 +1139,7 @@ export type Database = {
           is_default: boolean | null
           metadata: Json | null
           name: string
-          template_type: string
+          template_type: string | null
           text_overlay: Json | null
           updated_at: string
         }
@@ -384,7 +1151,7 @@ export type Database = {
           is_default?: boolean | null
           metadata?: Json | null
           name: string
-          template_type: string
+          template_type?: string | null
           text_overlay?: Json | null
           updated_at?: string
         }
@@ -396,411 +1163,37 @@ export type Database = {
           is_default?: boolean | null
           metadata?: Json | null
           name?: string
-          template_type?: string
+          template_type?: string | null
           text_overlay?: Json | null
           updated_at?: string
         }
         Relationships: []
       }
-      chat_users: {
+      content: {
         Row: {
-          airtable_id: string | null
-          chat_history: string | null
-          chat_url: string | null
-          client_page_data: string | null
-          created_at: string | null
-          id: string
-          last_message: string | null
-          last_message_date: string | null
-          name: string
-          notes: string | null
-          profile_url: string | null
-          recent_message: string | null
-          status: string | null
-          title: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          airtable_id?: string | null
-          chat_history?: string | null
-          chat_url?: string | null
-          client_page_data?: string | null
-          created_at?: string | null
-          id?: string
-          last_message?: string | null
-          last_message_date?: string | null
-          name: string
-          notes?: string | null
-          profile_url?: string | null
-          recent_message?: string | null
-          status?: string | null
-          title?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          airtable_id?: string | null
-          chat_history?: string | null
-          chat_url?: string | null
-          client_page_data?: string | null
-          created_at?: string | null
-          id?: string
-          last_message?: string | null
-          last_message_date?: string | null
-          name?: string
-          notes?: string | null
-          profile_url?: string | null
-          recent_message?: string | null
-          status?: string | null
-          title?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      client_notes: {
-        Row: {
-          client_id: string
-          content: string | null
           created_at: string
-          created_by: string
           id: string
           title: string
-          updated_at: string
+          views: number | null
         }
         Insert: {
-          client_id: string
-          content?: string | null
           created_at?: string
-          created_by: string
           id?: string
           title: string
-          updated_at?: string
+          views?: number | null
         }
         Update: {
-          client_id?: string
-          content?: string | null
           created_at?: string
-          created_by?: string
           id?: string
           title?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "client_notes_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      client_pages: {
-        Row: {
-          client_id: string
-          content: Json | null
-          created_at: string
-          created_by: string
-          icon: string | null
-          id: string
-          last_edited_by: string | null
-          page_type: string | null
-          parent_id: string | null
-          title: string
-          updated_at: string
-        }
-        Insert: {
-          client_id: string
-          content?: Json | null
-          created_at?: string
-          created_by: string
-          icon?: string | null
-          id?: string
-          last_edited_by?: string | null
-          page_type?: string | null
-          parent_id?: string | null
-          title: string
-          updated_at?: string
-        }
-        Update: {
-          client_id?: string
-          content?: Json | null
-          created_at?: string
-          created_by?: string
-          icon?: string | null
-          id?: string
-          last_edited_by?: string | null
-          page_type?: string | null
-          parent_id?: string | null
-          title?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "client_pages_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "client_pages_parent_id_fkey"
-            columns: ["parent_id"]
-            isOneToOne: false
-            referencedRelation: "client_pages"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      clients: {
-        Row: {
-          assigned_admin: string | null
-          company: string | null
-          created_at: string
-          created_by: string
-          email: string | null
-          id: string
-          industry: string | null
-          logo_url: string | null
-          name: string
-          notes: string | null
-          phone: string | null
-          status: string | null
-          updated_at: string
-        }
-        Insert: {
-          assigned_admin?: string | null
-          company?: string | null
-          created_at?: string
-          created_by: string
-          email?: string | null
-          id?: string
-          industry?: string | null
-          logo_url?: string | null
-          name: string
-          notes?: string | null
-          phone?: string | null
-          status?: string | null
-          updated_at?: string
-        }
-        Update: {
-          assigned_admin?: string | null
-          company?: string | null
-          created_at?: string
-          created_by?: string
-          email?: string | null
-          id?: string
-          industry?: string | null
-          logo_url?: string | null
-          name?: string
-          notes?: string | null
-          phone?: string | null
-          status?: string | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      company_profiles: {
-        Row: {
-          accent_color: string | null
-          banner_url: string | null
-          company_name: string | null
-          company_type: string | null
-          created_at: string | null
-          description: string | null
-          email: string | null
-          employee_count: number | null
-          id: string
-          industry: string | null
-          location: string | null
-          logo_url: string | null
-          mission: string | null
-          phone: string | null
-          primary_color: string | null
-          secondary_color: string | null
-          social_links: Json | null
-          updated_at: string | null
-          user_id: string
-          vision: string | null
-          website: string | null
-          year_founded: number | null
-        }
-        Insert: {
-          accent_color?: string | null
-          banner_url?: string | null
-          company_name?: string | null
-          company_type?: string | null
-          created_at?: string | null
-          description?: string | null
-          email?: string | null
-          employee_count?: number | null
-          id?: string
-          industry?: string | null
-          location?: string | null
-          logo_url?: string | null
-          mission?: string | null
-          phone?: string | null
-          primary_color?: string | null
-          secondary_color?: string | null
-          social_links?: Json | null
-          updated_at?: string | null
-          user_id: string
-          vision?: string | null
-          website?: string | null
-          year_founded?: number | null
-        }
-        Update: {
-          accent_color?: string | null
-          banner_url?: string | null
-          company_name?: string | null
-          company_type?: string | null
-          created_at?: string | null
-          description?: string | null
-          email?: string | null
-          employee_count?: number | null
-          id?: string
-          industry?: string | null
-          location?: string | null
-          logo_url?: string | null
-          mission?: string | null
-          phone?: string | null
-          primary_color?: string | null
-          secondary_color?: string | null
-          social_links?: Json | null
-          updated_at?: string | null
-          user_id?: string
-          vision?: string | null
-          website?: string | null
-          year_founded?: number | null
-        }
-        Relationships: []
-      }
-      connection_list: {
-        Row: {
-          airtable_id: string | null
-          created_at: string | null
-          id: string
-          page_number: string
-          page_url: string | null
-          page_url_long: string | null
-          record_id: string | null
-          search_term: string | null
-          status: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          airtable_id?: string | null
-          created_at?: string | null
-          id?: string
-          page_number: string
-          page_url?: string | null
-          page_url_long?: string | null
-          record_id?: string | null
-          search_term?: string | null
-          status?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          airtable_id?: string | null
-          created_at?: string | null
-          id?: string
-          page_number?: string
-          page_url?: string | null
-          page_url_long?: string | null
-          record_id?: string | null
-          search_term?: string | null
-          status?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      connections: {
-        Row: {
-          airtable_id: string | null
-          company: string | null
-          connected: string | null
-          created_at: string | null
-          id: string
-          location: string | null
-          name: string
-          notes: string | null
-          status: string | null
-          title: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          airtable_id?: string | null
-          company?: string | null
-          connected?: string | null
-          created_at?: string | null
-          id?: string
-          location?: string | null
-          name: string
-          notes?: string | null
-          status?: string | null
-          title?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          airtable_id?: string | null
-          company?: string | null
-          connected?: string | null
-          created_at?: string | null
-          id?: string
-          location?: string | null
-          name?: string
-          notes?: string | null
-          status?: string | null
-          title?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      content_schedule: {
-        Row: {
-          airtable_id: string | null
-          created_at: string | null
-          date: string | null
-          id: string
-          post_content: string | null
-          status: string | null
-          time: string | null
-          transcription: string | null
-          updated_at: string | null
-          url: string | null
-          video_name: string
-        }
-        Insert: {
-          airtable_id?: string | null
-          created_at?: string | null
-          date?: string | null
-          id?: string
-          post_content?: string | null
-          status?: string | null
-          time?: string | null
-          transcription?: string | null
-          updated_at?: string | null
-          url?: string | null
-          video_name: string
-        }
-        Update: {
-          airtable_id?: string | null
-          created_at?: string | null
-          date?: string | null
-          id?: string
-          post_content?: string | null
-          status?: string | null
-          time?: string | null
-          transcription?: string | null
-          updated_at?: string | null
-          url?: string | null
-          video_name?: string
+          views?: number | null
         }
         Relationships: []
       }
       core_tools: {
         Row: {
-          category: string | null
-          created_at: string | null
+          category: string
+          created_at: string
           description: string | null
           downloads_count: number | null
           icon_url: string | null
@@ -811,12 +1204,15 @@ export type Database = {
           profile_image_url: string | null
           rating: number | null
           reviews_count: number | null
-          updated_at: string | null
+          updated_at: string
+          use_cases: string[] | null
           website_url: string | null
+          youtube_url: string | null
+          youtube_videos: Json | null
         }
         Insert: {
-          category?: string | null
-          created_at?: string | null
+          category: string
+          created_at?: string
           description?: string | null
           downloads_count?: number | null
           icon_url?: string | null
@@ -827,12 +1223,15 @@ export type Database = {
           profile_image_url?: string | null
           rating?: number | null
           reviews_count?: number | null
-          updated_at?: string | null
+          updated_at?: string
+          use_cases?: string[] | null
           website_url?: string | null
+          youtube_url?: string | null
+          youtube_videos?: Json | null
         }
         Update: {
-          category?: string | null
-          created_at?: string | null
+          category?: string
+          created_at?: string
           description?: string | null
           downloads_count?: number | null
           icon_url?: string | null
@@ -843,549 +1242,487 @@ export type Database = {
           profile_image_url?: string | null
           rating?: number | null
           reviews_count?: number | null
-          updated_at?: string | null
+          updated_at?: string
+          use_cases?: string[] | null
           website_url?: string | null
+          youtube_url?: string | null
+          youtube_videos?: Json | null
         }
         Relationships: []
+      }
+      creator_tool_links: {
+        Row: {
+          created_at: string
+          creator_id: string | null
+          expertise_level: string | null
+          id: string
+          tool_id: string | null
+          tutorial_count: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          creator_id?: string | null
+          expertise_level?: string | null
+          id?: string
+          tool_id?: string | null
+          tutorial_count?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string | null
+          expertise_level?: string | null
+          id?: string
+          tool_id?: string | null
+          tutorial_count?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_tool_links_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "education_creators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "creator_tool_links_tool_id_fkey"
+            columns: ["tool_id"]
+            isOneToOne: false
+            referencedRelation: "core_tools"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       crypto_transactions: {
         Row: {
           created_at: string
           id: string
-          metadata: Json | null
           points_exchanged: number
-          status: string
+          status: string | null
           tokens_received: number
-          transaction_type: string
+          transaction_hash: string | null
+          transaction_type: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
-          metadata?: Json | null
           points_exchanged: number
-          status?: string
+          status?: string | null
           tokens_received: number
-          transaction_type: string
+          transaction_hash?: string | null
+          transaction_type?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           created_at?: string
           id?: string
-          metadata?: Json | null
           points_exchanged?: number
-          status?: string
+          status?: string | null
           tokens_received?: number
-          transaction_type?: string
+          transaction_hash?: string | null
+          transaction_type?: string | null
           updated_at?: string
           user_id?: string
         }
         Relationships: []
-      }
-      daily_metrics: {
-        Row: {
-          airtable_id: string | null
-          connection_requests: number | null
-          created_at: string | null
-          date: string
-          follow_requests: number | null
-          followers_count: number | null
-          id: string
-          post_comments: number | null
-          post_likes: number | null
-          profile_views: number | null
-          updated_at: string | null
-        }
-        Insert: {
-          airtable_id?: string | null
-          connection_requests?: number | null
-          created_at?: string | null
-          date: string
-          follow_requests?: number | null
-          followers_count?: number | null
-          id?: string
-          post_comments?: number | null
-          post_likes?: number | null
-          profile_views?: number | null
-          updated_at?: string | null
-        }
-        Update: {
-          airtable_id?: string | null
-          connection_requests?: number | null
-          created_at?: string | null
-          date?: string
-          follow_requests?: number | null
-          followers_count?: number | null
-          id?: string
-          post_comments?: number | null
-          post_likes?: number | null
-          profile_views?: number | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      direct_connections: {
-        Row: {
-          airtable_id: string | null
-          company: string | null
-          connected_date: string | null
-          created_at: string | null
-          created_time: string | null
-          id: string
-          location: string | null
-          name: string
-          notes: string | null
-          record_id: string | null
-          status: string | null
-          title: string | null
-          updated_at: string | null
-          username: string | null
-          week: string | null
-          week_identifier: string | null
-          weekly_link: string | null
-        }
-        Insert: {
-          airtable_id?: string | null
-          company?: string | null
-          connected_date?: string | null
-          created_at?: string | null
-          created_time?: string | null
-          id?: string
-          location?: string | null
-          name: string
-          notes?: string | null
-          record_id?: string | null
-          status?: string | null
-          title?: string | null
-          updated_at?: string | null
-          username?: string | null
-          week?: string | null
-          week_identifier?: string | null
-          weekly_link?: string | null
-        }
-        Update: {
-          airtable_id?: string | null
-          company?: string | null
-          connected_date?: string | null
-          created_at?: string | null
-          created_time?: string | null
-          id?: string
-          location?: string | null
-          name?: string
-          notes?: string | null
-          record_id?: string | null
-          status?: string | null
-          title?: string | null
-          updated_at?: string | null
-          username?: string | null
-          week?: string | null
-          week_identifier?: string | null
-          weekly_link?: string | null
-        }
-        Relationships: []
-      }
-      documentation_articles: {
-        Row: {
-          category_id: string
-          content: string | null
-          created_at: string | null
-          difficulty: string | null
-          display_order: number | null
-          excerpt: string | null
-          id: string
-          last_updated: string | null
-          slug: string
-          title: string
-          updated_at: string | null
-        }
-        Insert: {
-          category_id: string
-          content?: string | null
-          created_at?: string | null
-          difficulty?: string | null
-          display_order?: number | null
-          excerpt?: string | null
-          id?: string
-          last_updated?: string | null
-          slug: string
-          title: string
-          updated_at?: string | null
-        }
-        Update: {
-          category_id?: string
-          content?: string | null
-          created_at?: string | null
-          difficulty?: string | null
-          display_order?: number | null
-          excerpt?: string | null
-          id?: string
-          last_updated?: string | null
-          slug?: string
-          title?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "documentation_articles_category_id_fkey"
-            columns: ["category_id"]
-            isOneToOne: false
-            referencedRelation: "documentation_categories"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      documentation_categories: {
-        Row: {
-          created_at: string | null
-          description: string | null
-          display_order: number | null
-          icon: string | null
-          id: string
-          slug: string
-          title: string
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          description?: string | null
-          display_order?: number | null
-          icon?: string | null
-          id?: string
-          slug: string
-          title: string
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          description?: string | null
-          display_order?: number | null
-          icon?: string | null
-          id?: string
-          slug?: string
-          title?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      documentation_feedback: {
-        Row: {
-          created_at: string | null
-          feedback_type: string
-          id: string
-          question_id: string
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          feedback_type: string
-          id?: string
-          question_id: string
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          feedback_type?: string
-          id?: string
-          question_id?: string
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "documentation_feedback_question_id_fkey"
-            columns: ["question_id"]
-            isOneToOne: false
-            referencedRelation: "documentation_questions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      documentation_questions: {
-        Row: {
-          answer: string
-          created_at: string | null
-          display_order: number | null
-          id: string
-          question: string
-          section_id: string
-          slug: string
-          updated_at: string | null
-        }
-        Insert: {
-          answer: string
-          created_at?: string | null
-          display_order?: number | null
-          id?: string
-          question: string
-          section_id: string
-          slug: string
-          updated_at?: string | null
-        }
-        Update: {
-          answer?: string
-          created_at?: string | null
-          display_order?: number | null
-          id?: string
-          question?: string
-          section_id?: string
-          slug?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "documentation_questions_section_id_fkey"
-            columns: ["section_id"]
-            isOneToOne: false
-            referencedRelation: "documentation_sections"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      documentation_sections: {
-        Row: {
-          article_id: string
-          created_at: string | null
-          display_order: number | null
-          id: string
-          title: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          article_id: string
-          created_at?: string | null
-          display_order?: number | null
-          id?: string
-          title?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          article_id?: string
-          created_at?: string | null
-          display_order?: number | null
-          id?: string
-          title?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "documentation_sections_article_id_fkey"
-            columns: ["article_id"]
-            isOneToOne: false
-            referencedRelation: "documentation_articles"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       education_creators: {
         Row: {
+          auto_feature_videos: boolean | null
+          categories: string[] | null
           channel_avatar_url: string | null
-          channel_id: string
-          created_at: string | null
+          channel_banner_url: string | null
+          channel_description: string | null
+          channel_description_links: Json | null
+          channel_id: string | null
+          channel_joined_date: string | null
+          channel_location: string | null
+          channel_name: string | null
+          channel_total_videos: number | null
+          channel_total_views: number | null
+          channel_url: string | null
+          content_themes: string[] | null
+          created_at: string
           description: string | null
+          engagement_rate: number | null
+          expertise_areas: string[] | null
+          expertise_level: string | null
+          featured_videos: Json | null
+          following_count: number | null
           id: string
-          last_sync_error: string | null
+          implementation_guides: Json | null
+          is_featured: boolean | null
+          last_sync_id: string | null
           last_synced_at: string | null
+          member_count: number | null
+          member_type: string | null
           name: string
+          niche: string | null
           number_of_subscribers: number | null
+          primary_category: string | null
+          profile_color: string | null
+          profile_image_url: string | null
+          relevant: string | null
+          secondary_categories: string[] | null
           slug: string
+          social_links: Json | null
           specialization: string[] | null
+          subscriber_count_history: Json[] | null
+          success_cases: Json | null
           sync_completed_at: string | null
           sync_started_at: string | null
           sync_status: string | null
-          updated_at: string | null
+          tool_stack: Json | null
+          tools_covered: string[] | null
+          updated_at: string
+          url: string | null
+          video_count: number | null
+          video_upload_frequency: string | null
+          website_url: string | null
+          youtube_url: string | null
+          youtube_videos: Json | null
         }
         Insert: {
+          auto_feature_videos?: boolean | null
+          categories?: string[] | null
           channel_avatar_url?: string | null
-          channel_id: string
-          created_at?: string | null
+          channel_banner_url?: string | null
+          channel_description?: string | null
+          channel_description_links?: Json | null
+          channel_id?: string | null
+          channel_joined_date?: string | null
+          channel_location?: string | null
+          channel_name?: string | null
+          channel_total_videos?: number | null
+          channel_total_views?: number | null
+          channel_url?: string | null
+          content_themes?: string[] | null
+          created_at?: string
           description?: string | null
+          engagement_rate?: number | null
+          expertise_areas?: string[] | null
+          expertise_level?: string | null
+          featured_videos?: Json | null
+          following_count?: number | null
           id?: string
-          last_sync_error?: string | null
+          implementation_guides?: Json | null
+          is_featured?: boolean | null
+          last_sync_id?: string | null
           last_synced_at?: string | null
+          member_count?: number | null
+          member_type?: string | null
           name: string
+          niche?: string | null
           number_of_subscribers?: number | null
+          primary_category?: string | null
+          profile_color?: string | null
+          profile_image_url?: string | null
+          relevant?: string | null
+          secondary_categories?: string[] | null
           slug: string
+          social_links?: Json | null
           specialization?: string[] | null
+          subscriber_count_history?: Json[] | null
+          success_cases?: Json | null
           sync_completed_at?: string | null
           sync_started_at?: string | null
           sync_status?: string | null
-          updated_at?: string | null
+          tool_stack?: Json | null
+          tools_covered?: string[] | null
+          updated_at?: string
+          url?: string | null
+          video_count?: number | null
+          video_upload_frequency?: string | null
+          website_url?: string | null
+          youtube_url?: string | null
+          youtube_videos?: Json | null
         }
         Update: {
+          auto_feature_videos?: boolean | null
+          categories?: string[] | null
           channel_avatar_url?: string | null
-          channel_id?: string
-          created_at?: string | null
+          channel_banner_url?: string | null
+          channel_description?: string | null
+          channel_description_links?: Json | null
+          channel_id?: string | null
+          channel_joined_date?: string | null
+          channel_location?: string | null
+          channel_name?: string | null
+          channel_total_videos?: number | null
+          channel_total_views?: number | null
+          channel_url?: string | null
+          content_themes?: string[] | null
+          created_at?: string
           description?: string | null
+          engagement_rate?: number | null
+          expertise_areas?: string[] | null
+          expertise_level?: string | null
+          featured_videos?: Json | null
+          following_count?: number | null
           id?: string
-          last_sync_error?: string | null
+          implementation_guides?: Json | null
+          is_featured?: boolean | null
+          last_sync_id?: string | null
           last_synced_at?: string | null
+          member_count?: number | null
+          member_type?: string | null
           name?: string
+          niche?: string | null
           number_of_subscribers?: number | null
+          primary_category?: string | null
+          profile_color?: string | null
+          profile_image_url?: string | null
+          relevant?: string | null
+          secondary_categories?: string[] | null
           slug?: string
+          social_links?: Json | null
           specialization?: string[] | null
+          subscriber_count_history?: Json[] | null
+          success_cases?: Json | null
           sync_completed_at?: string | null
           sync_started_at?: string | null
           sync_status?: string | null
-          updated_at?: string | null
+          tool_stack?: Json | null
+          tools_covered?: string[] | null
+          updated_at?: string
+          url?: string | null
+          video_count?: number | null
+          video_upload_frequency?: string | null
+          website_url?: string | null
+          youtube_url?: string | null
+          youtube_videos?: Json | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "education_creators_last_sync_id_fkey"
+            columns: ["last_sync_id"]
+            isOneToOne: false
+            referencedRelation: "video_sync_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
-      events: {
+      educator_chat_threads: {
         Row: {
           created_at: string
-          date: string
-          description: string | null
+          educator_id: string | null
           id: string
-          time: string
           title: string
-          type: string
-          updated_at: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
-          date: string
-          description?: string | null
+          educator_id?: string | null
           id?: string
-          time: string
           title: string
-          type: string
-          updated_at?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
-          date?: string
-          description?: string | null
+          educator_id?: string | null
           id?: string
-          time?: string
           title?: string
-          type?: string
-          updated_at?: string
-          user_id?: string
+          user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "educator_chat_threads_educator_id_fkey"
+            columns: ["educator_id"]
+            isOneToOne: false
+            referencedRelation: "education_creators"
+            referencedColumns: ["id"]
+          },
+        ]
       }
-      features: {
+      gpt_resources: {
         Row: {
-          base_cost: number
+          assistant_type: string | null
           category: string
           created_at: string
           description: string | null
-          icon: string | null
+          downloads_count: number | null
+          gpt_id: string | null
+          gpt_url: string | null
           id: string
+          input_variables: string[] | null
+          likes_count: number | null
+          model_type: string | null
           name: string
+          num_conversations_str: string | null
+          profile_image_url: string | null
+          prompt_template: string | null
+          rating: number | null
+          response_format: string | null
+          review_average: number | null
+          review_count: number | null
+          review_total: number | null
+          reviews_count: number | null
+          short_url: string | null
           updated_at: string
+          use_cases: string[] | null
         }
         Insert: {
-          base_cost: number
+          assistant_type?: string | null
           category: string
           created_at?: string
           description?: string | null
-          icon?: string | null
+          downloads_count?: number | null
+          gpt_id?: string | null
+          gpt_url?: string | null
           id?: string
+          input_variables?: string[] | null
+          likes_count?: number | null
+          model_type?: string | null
           name: string
+          num_conversations_str?: string | null
+          profile_image_url?: string | null
+          prompt_template?: string | null
+          rating?: number | null
+          response_format?: string | null
+          review_average?: number | null
+          review_count?: number | null
+          review_total?: number | null
+          reviews_count?: number | null
+          short_url?: string | null
           updated_at?: string
+          use_cases?: string[] | null
         }
         Update: {
-          base_cost?: number
+          assistant_type?: string | null
           category?: string
           created_at?: string
           description?: string | null
-          icon?: string | null
+          downloads_count?: number | null
+          gpt_id?: string | null
+          gpt_url?: string | null
           id?: string
+          input_variables?: string[] | null
+          likes_count?: number | null
+          model_type?: string | null
           name?: string
+          num_conversations_str?: string | null
+          profile_image_url?: string | null
+          prompt_template?: string | null
+          rating?: number | null
+          response_format?: string | null
+          review_average?: number | null
+          review_count?: number | null
+          review_total?: number | null
+          reviews_count?: number | null
+          short_url?: string | null
           updated_at?: string
+          use_cases?: string[] | null
         }
         Relationships: []
       }
-      followed_connections: {
+      leaderboard: {
         Row: {
-          airtable_id: string | null
-          company: string | null
-          created_at: string | null
-          created_time: string | null
-          followed_date: string | null
+          achievement_score: number | null
+          achievements: Json | null
+          activity_score: number | null
+          avatar_url: string | null
+          contribution_count: number | null
+          created_at: string
           id: string
-          location: string | null
-          name: string
-          notes: string | null
-          record_id: string | null
-          status: string | null
-          title: string | null
-          updated_at: string | null
-          username: string | null
-          week: string | null
-          week_identifier: string | null
-          week_link: string | null
+          kda: number | null
+          last_active: string | null
+          losses: number | null
+          points: number | null
+          rank: string | null
+          referral_count: number | null
+          season_rank: string | null
+          siso_tokens: number | null
+          streak_count: number | null
+          total_contributions: number | null
+          updated_at: string
+          user_id: string
+          wins: number | null
         }
         Insert: {
-          airtable_id?: string | null
-          company?: string | null
-          created_at?: string | null
-          created_time?: string | null
-          followed_date?: string | null
+          achievement_score?: number | null
+          achievements?: Json | null
+          activity_score?: number | null
+          avatar_url?: string | null
+          contribution_count?: number | null
+          created_at?: string
           id?: string
-          location?: string | null
-          name: string
-          notes?: string | null
-          record_id?: string | null
-          status?: string | null
-          title?: string | null
-          updated_at?: string | null
-          username?: string | null
-          week?: string | null
-          week_identifier?: string | null
-          week_link?: string | null
+          kda?: number | null
+          last_active?: string | null
+          losses?: number | null
+          points?: number | null
+          rank?: string | null
+          referral_count?: number | null
+          season_rank?: string | null
+          siso_tokens?: number | null
+          streak_count?: number | null
+          total_contributions?: number | null
+          updated_at?: string
+          user_id: string
+          wins?: number | null
         }
         Update: {
-          airtable_id?: string | null
-          company?: string | null
-          created_at?: string | null
-          created_time?: string | null
-          followed_date?: string | null
+          achievement_score?: number | null
+          achievements?: Json | null
+          activity_score?: number | null
+          avatar_url?: string | null
+          contribution_count?: number | null
+          created_at?: string
           id?: string
-          location?: string | null
-          name?: string
-          notes?: string | null
-          record_id?: string | null
-          status?: string | null
-          title?: string | null
-          updated_at?: string | null
-          username?: string | null
-          week?: string | null
-          week_identifier?: string | null
-          week_link?: string | null
+          kda?: number | null
+          last_active?: string | null
+          losses?: number | null
+          points?: number | null
+          rank?: string | null
+          referral_count?: number | null
+          season_rank?: string | null
+          siso_tokens?: number | null
+          streak_count?: number | null
+          total_contributions?: number | null
+          updated_at?: string
+          user_id?: string
+          wins?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "leaderboard_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       login_streaks: {
         Row: {
-          created_at: string | null
+          created_at: string
           current_streak: number | null
           id: string
           last_login: string | null
           longest_streak: number | null
-          updated_at: string | null
+          updated_at: string
           user_id: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           current_streak?: number | null
           id?: string
           last_login?: string | null
           longest_streak?: number | null
-          updated_at?: string | null
+          updated_at?: string
           user_id: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           current_streak?: number | null
           id?: string
           last_login?: string | null
           longest_streak?: number | null
-          updated_at?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -1393,29 +1730,138 @@ export type Database = {
       networking_resources: {
         Row: {
           category: string
-          community_count: number | null
-          created_at: string | null
+          created_at: string
+          description: string | null
+          featured: boolean | null
           id: string
+          join_count_last_week: number | null
+          join_url: string | null
+          last_activity_at: string | null
+          member_count: number | null
           name: string
-          updated_at: string | null
+          platform: string | null
+          profile_image_url: string | null
+          total_weekly_activity: number | null
+          updated_at: string
         }
         Insert: {
           category: string
-          community_count?: number | null
-          created_at?: string | null
+          created_at?: string
+          description?: string | null
+          featured?: boolean | null
           id?: string
+          join_count_last_week?: number | null
+          join_url?: string | null
+          last_activity_at?: string | null
+          member_count?: number | null
           name: string
-          updated_at?: string | null
+          platform?: string | null
+          profile_image_url?: string | null
+          total_weekly_activity?: number | null
+          updated_at?: string
         }
         Update: {
           category?: string
-          community_count?: number | null
-          created_at?: string | null
+          created_at?: string
+          description?: string | null
+          featured?: boolean | null
           id?: string
+          join_count_last_week?: number | null
+          join_url?: string | null
+          last_activity_at?: string | null
+          member_count?: number | null
           name?: string
-          updated_at?: string | null
+          platform?: string | null
+          profile_image_url?: string | null
+          total_weekly_activity?: number | null
+          updated_at?: string
         }
         Relationships: []
+      }
+      news_ai_analysis: {
+        Row: {
+          business_implications: string
+          confidence_score: number
+          created_at: string
+          id: string
+          key_insights: string[]
+          market_impact: string
+          news_id: string | null
+          related_technologies: string[]
+          section_id: string | null
+          tech_predictions: string[]
+          updated_at: string
+        }
+        Insert: {
+          business_implications: string
+          confidence_score: number
+          created_at?: string
+          id?: string
+          key_insights?: string[]
+          market_impact: string
+          news_id?: string | null
+          related_technologies?: string[]
+          section_id?: string | null
+          tech_predictions?: string[]
+          updated_at?: string
+        }
+        Update: {
+          business_implications?: string
+          confidence_score?: number
+          created_at?: string
+          id?: string
+          key_insights?: string[]
+          market_impact?: string
+          news_id?: string | null
+          related_technologies?: string[]
+          section_id?: string | null
+          tech_predictions?: string[]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "news_ai_analysis_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "ai_news"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "news_ai_analysis_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "featured_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "news_ai_analysis_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "mv_trending_articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "news_ai_analysis_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "news_ai_analysis_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_scheduled_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "news_ai_analysis_section_id_fkey"
+            columns: ["section_id"]
+            isOneToOne: false
+            referencedRelation: "article_sections"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       news_comments: {
         Row: {
@@ -1424,7 +1870,7 @@ export type Database = {
           id: string
           news_id: string
           updated_at: string
-          user_id: string
+          user_email: string
         }
         Insert: {
           content: string
@@ -1432,7 +1878,7 @@ export type Database = {
           id?: string
           news_id: string
           updated_at?: string
-          user_id: string
+          user_email: string
         }
         Update: {
           content?: string
@@ -1440,785 +1886,727 @@ export type Database = {
           id?: string
           news_id?: string
           updated_at?: string
-          user_id?: string
+          user_email?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "news_comments_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "ai_news"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "news_comments_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "featured_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "news_comments_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "mv_trending_articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "news_comments_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "news_comments_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_scheduled_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      news_fetch_history: {
+        Row: {
+          articles_added: number | null
+          articles_fetched: number | null
+          articles_updated: number | null
+          duplicates_skipped: number | null
+          error_message: string | null
+          execution_time_ms: number | null
+          fetch_time: string
+          id: string
+          metadata: Json | null
+          source_type: Database["public"]["Enums"]["news_source_type"]
+          status: string
+        }
+        Insert: {
+          articles_added?: number | null
+          articles_fetched?: number | null
+          articles_updated?: number | null
+          duplicates_skipped?: number | null
+          error_message?: string | null
+          execution_time_ms?: number | null
+          fetch_time?: string
+          id?: string
+          metadata?: Json | null
+          source_type: Database["public"]["Enums"]["news_source_type"]
+          status?: string
+        }
+        Update: {
+          articles_added?: number | null
+          articles_fetched?: number | null
+          articles_updated?: number | null
+          duplicates_skipped?: number | null
+          error_message?: string | null
+          execution_time_ms?: number | null
+          fetch_time?: string
+          id?: string
+          metadata?: Json | null
+          source_type?: Database["public"]["Enums"]["news_source_type"]
+          status?: string
         }
         Relationships: []
       }
-      notifications: {
+      news_sources: {
+        Row: {
+          api_key: string | null
+          created_at: string
+          fetch_frequency_minutes: number | null
+          id: string
+          is_active: boolean | null
+          last_fetched_at: string | null
+          name: string
+          source_type: Database["public"]["Enums"]["news_source_type"]
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          api_key?: string | null
+          created_at?: string
+          fetch_frequency_minutes?: number | null
+          id?: string
+          is_active?: boolean | null
+          last_fetched_at?: string | null
+          name: string
+          source_type: Database["public"]["Enums"]["news_source_type"]
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          api_key?: string | null
+          created_at?: string
+          fetch_frequency_minutes?: number | null
+          id?: string
+          is_active?: boolean | null
+          last_fetched_at?: string | null
+          name?: string
+          source_type?: Database["public"]["Enums"]["news_source_type"]
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
+      nft_collections: {
+        Row: {
+          benefits: Json
+          chain_id: string
+          contract_address: string
+          created_at: string
+          crypto_cost: number
+          description: string | null
+          id: string
+          image_url: string | null
+          name: string
+          opensea_url: string
+          points_cost: number
+          points_multiplier: number
+          quantity: number
+          tier: Database["public"]["Enums"]["nft_tier"]
+          updated_at: string
+          weekly_bonus: number
+        }
+        Insert: {
+          benefits: Json
+          chain_id: string
+          contract_address: string
+          created_at?: string
+          crypto_cost: number
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          opensea_url: string
+          points_cost: number
+          points_multiplier: number
+          quantity: number
+          tier: Database["public"]["Enums"]["nft_tier"]
+          updated_at?: string
+          weekly_bonus: number
+        }
+        Update: {
+          benefits?: Json
+          chain_id?: string
+          contract_address?: string
+          created_at?: string
+          crypto_cost?: number
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          opensea_url?: string
+          points_cost?: number
+          points_multiplier?: number
+          quantity?: number
+          tier?: Database["public"]["Enums"]["nft_tier"]
+          updated_at?: string
+          weekly_bonus?: number
+        }
+        Relationships: []
+      }
+      nfts: {
         Row: {
           created_at: string
           id: string
-          message: string
-          read: boolean
-          title: string
-          type: string
+          metadata: Json
+          mint_address: string
+          owner_id: string | null
           updated_at: string
-          user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
-          message: string
-          read?: boolean
-          title: string
-          type: string
+          metadata: Json
+          mint_address: string
+          owner_id?: string | null
           updated_at?: string
-          user_id: string
         }
         Update: {
           created_at?: string
           id?: string
-          message?: string
-          read?: boolean
-          title?: string
-          type?: string
+          metadata?: Json
+          mint_address?: string
+          owner_id?: string | null
           updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }
       performance_metrics: {
         Row: {
-          created_at: string | null
+          cls: number | null
+          created_at: string
+          fid: number | null
           id: string
+          lcp: number | null
           page_url: string
-          ttfb: number
+          ttfb: number | null
+          user_id: string | null
         }
         Insert: {
-          created_at?: string | null
+          cls?: number | null
+          created_at?: string
+          fid?: number | null
           id?: string
+          lcp?: number | null
           page_url: string
-          ttfb: number
+          ttfb?: number | null
+          user_id?: string | null
         }
         Update: {
-          created_at?: string | null
+          cls?: number | null
+          created_at?: string
+          fid?: number | null
           id?: string
+          lcp?: number | null
           page_url?: string
-          ttfb?: number
+          ttfb?: number | null
+          user_id?: string | null
         }
         Relationships: []
-      }
-      plan_chat_history: {
-        Row: {
-          ai_response: string
-          conversation_id: string | null
-          created_at: string
-          form_data: Json | null
-          id: string
-          message_order: number | null
-          metadata: Json | null
-          plan_id: string | null
-          user_id: string | null
-          user_message: string
-        }
-        Insert: {
-          ai_response: string
-          conversation_id?: string | null
-          created_at?: string
-          form_data?: Json | null
-          id?: string
-          message_order?: number | null
-          metadata?: Json | null
-          plan_id?: string | null
-          user_id?: string | null
-          user_message: string
-        }
-        Update: {
-          ai_response?: string
-          conversation_id?: string | null
-          created_at?: string
-          form_data?: Json | null
-          id?: string
-          message_order?: number | null
-          metadata?: Json | null
-          plan_id?: string | null
-          user_id?: string | null
-          user_message?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "plan_chat_history_plan_id_fkey"
-            columns: ["plan_id"]
-            isOneToOne: false
-            referencedRelation: "project_plans"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       point_configurations: {
         Row: {
           action: string
-          created_at: string | null
+          cooldown_minutes: number | null
+          created_at: string
           description: string | null
           id: string
+          is_active: boolean | null
           points: number
+          requirements: Json | null
+          updated_at: string
         }
         Insert: {
           action: string
-          created_at?: string | null
+          cooldown_minutes?: number | null
+          created_at?: string
           description?: string | null
           id?: string
-          points?: number
+          is_active?: boolean | null
+          points: number
+          requirements?: Json | null
+          updated_at?: string
         }
         Update: {
           action?: string
-          created_at?: string | null
+          cooldown_minutes?: number | null
+          created_at?: string
           description?: string | null
           id?: string
+          is_active?: boolean | null
           points?: number
+          requirements?: Json | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      points_audit_log: {
+        Row: {
+          change_amount: number
+          created_at: string
+          id: string
+          points_after: number
+          points_before: number
+          source: string
+          user_id: string
+        }
+        Insert: {
+          change_amount: number
+          created_at?: string
+          id?: string
+          points_after: number
+          points_before: number
+          source: string
+          user_id: string
+        }
+        Update: {
+          change_amount?: number
+          created_at?: string
+          id?: string
+          points_after?: number
+          points_before?: number
+          source?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      points_history: {
+        Row: {
+          id: string
+          points: number
+          recorded_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          points: number
+          recorded_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          points?: number
+          recorded_at?: string
+          user_id?: string
         }
         Relationships: []
       }
       points_log: {
         Row: {
           action: string
-          created_at: string | null
+          created_at: string
           id: string
           points_earned: number
+          updated_at: string
           user_id: string
         }
         Insert: {
           action: string
-          created_at?: string | null
+          created_at?: string
           id?: string
           points_earned: number
+          updated_at?: string
           user_id: string
         }
         Update: {
           action?: string
-          created_at?: string | null
+          created_at?: string
           id?: string
           points_earned?: number
+          updated_at?: string
           user_id?: string
-        }
-        Relationships: []
-      }
-      portfolio_categories: {
-        Row: {
-          created_at: string
-          description: string | null
-          id: string
-          name: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          name: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          name?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      portfolio_projects: {
-        Row: {
-          challenge: string
-          client: string
-          created_at: string
-          date: string
-          description: string
-          duration: string
-          featured: boolean
-          features: string[]
-          full_description: string
-          gallery: string[]
-          id: string
-          image: string
-          results: string
-          solution: string
-          tags: string[]
-          technologies: string[]
-          testimonial: Json | null
-          title: string
-          updated_at: string
-        }
-        Insert: {
-          challenge: string
-          client: string
-          created_at?: string
-          date: string
-          description: string
-          duration: string
-          featured?: boolean
-          features?: string[]
-          full_description: string
-          gallery?: string[]
-          id?: string
-          image: string
-          results: string
-          solution: string
-          tags?: string[]
-          technologies?: string[]
-          testimonial?: Json | null
-          title: string
-          updated_at?: string
-        }
-        Update: {
-          challenge?: string
-          client?: string
-          created_at?: string
-          date?: string
-          description?: string
-          duration?: string
-          featured?: boolean
-          features?: string[]
-          full_description?: string
-          gallery?: string[]
-          id?: string
-          image?: string
-          results?: string
-          solution?: string
-          tags?: string[]
-          technologies?: string[]
-          testimonial?: Json | null
-          title?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      post_interactions: {
-        Row: {
-          action: string | null
-          airtable_id: string | null
-          comment: string | null
-          created_at: string | null
-          id: string
-          interaction_date: string | null
-          interaction_type: string | null
-          name: string
-          notes: string | null
-          post_comments: string | null
-          post_content: string | null
-          post_likes: string | null
-          post_type: string | null
-          post_url: string | null
-          post_user: string | null
-          title: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          action?: string | null
-          airtable_id?: string | null
-          comment?: string | null
-          created_at?: string | null
-          id?: string
-          interaction_date?: string | null
-          interaction_type?: string | null
-          name: string
-          notes?: string | null
-          post_comments?: string | null
-          post_content?: string | null
-          post_likes?: string | null
-          post_type?: string | null
-          post_url?: string | null
-          post_user?: string | null
-          title?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          action?: string | null
-          airtable_id?: string | null
-          comment?: string | null
-          created_at?: string | null
-          id?: string
-          interaction_date?: string | null
-          interaction_type?: string | null
-          name?: string
-          notes?: string | null
-          post_comments?: string | null
-          post_content?: string | null
-          post_likes?: string | null
-          post_type?: string | null
-          post_url?: string | null
-          post_user?: string | null
-          title?: string | null
-          updated_at?: string | null
         }
         Relationships: []
       }
       products: {
         Row: {
-          categories: string[] | null
+          care_instructions: string[] | null
+          collection: string | null
+          colors: string[] | null
           created_at: string
           description: string | null
+          dimensions: string | null
+          features: string[] | null
           id: string
           images: string[] | null
-          marketing_strategy: string | null
+          materials: string[] | null
           name: string
-          offering_type: string | null
-          pricing: string | null
-          product_link: string | null
+          nft_benefits: string[] | null
+          opensea_url: string | null
+          price_crypto: number
+          price_usd: number
+          related_products: string[] | null
+          sizes: string[] | null
+          slug: string
+          specifications: Json | null
+          stock: number
+          stripe_product_id: string | null
+          tags: string[] | null
           updated_at: string
         }
         Insert: {
-          categories?: string[] | null
+          care_instructions?: string[] | null
+          collection?: string | null
+          colors?: string[] | null
           created_at?: string
           description?: string | null
+          dimensions?: string | null
+          features?: string[] | null
           id?: string
           images?: string[] | null
-          marketing_strategy?: string | null
+          materials?: string[] | null
           name: string
-          offering_type?: string | null
-          pricing?: string | null
-          product_link?: string | null
+          nft_benefits?: string[] | null
+          opensea_url?: string | null
+          price_crypto: number
+          price_usd: number
+          related_products?: string[] | null
+          sizes?: string[] | null
+          slug: string
+          specifications?: Json | null
+          stock?: number
+          stripe_product_id?: string | null
+          tags?: string[] | null
           updated_at?: string
         }
         Update: {
-          categories?: string[] | null
+          care_instructions?: string[] | null
+          collection?: string | null
+          colors?: string[] | null
           created_at?: string
           description?: string | null
+          dimensions?: string | null
+          features?: string[] | null
           id?: string
           images?: string[] | null
-          marketing_strategy?: string | null
+          materials?: string[] | null
           name?: string
-          offering_type?: string | null
-          pricing?: string | null
-          product_link?: string | null
+          nft_benefits?: string[] | null
+          opensea_url?: string | null
+          price_crypto?: number
+          price_usd?: number
+          related_products?: string[] | null
+          sizes?: string[] | null
+          slug?: string
+          specifications?: Json | null
+          stock?: number
+          stripe_product_id?: string | null
+          tags?: string[] | null
           updated_at?: string
         }
         Relationships: []
       }
       profiles: {
         Row: {
-          achievements: Json | null
+          ai_budget_range: string | null
+          ai_expertise_level: string | null
+          ai_implementation_priorities: string[] | null
+          annual_revenue_range: string | null
+          automation_priorities: string[] | null
           avatar_url: string | null
           banner_url: string | null
           bio: string | null
+          business_challenges: string[] | null
           business_name: string | null
+          business_size: string | null
           business_type: string | null
-          contribution_count: number | null
           created_at: string
+          current_tools_used: string[] | null
+          departments: string[] | null
+          email: string | null
           full_name: string | null
+          geographic_markets: string[] | null
+          google_auth_completed: boolean | null
+          growth_targets: Json | null
+          has_completed_social_info: boolean | null
           id: string
           industry: string | null
           instagram_url: string | null
           interests: string[] | null
+          last_seen: string | null
           linkedin_url: string | null
+          long_term_goals: string[] | null
+          metadata: Json | null
+          moralis_provider_id: string | null
           onboarding_completed: boolean | null
-          onboarding_step: number | null
-          phone_number: string | null
+          onboarding_step: string | null
           points: number | null
+          preferences: Json | null
           professional_role: string | null
           rank: string | null
-          referral_count: number | null
-          role: Database["public"]["Enums"]["app_role"]
+          role: string | null
+          short_term_goals: string[] | null
           siso_tokens: number | null
+          social_info_completed_at: string | null
           solana_wallet_address: string | null
+          target_market: string[] | null
+          team_size: number | null
           twitter_url: string | null
-          updated_at: string | null
-          user_id: string | null
+          updated_at: string
+          wallet_address: string | null
+          web3_metadata: Json | null
           website_url: string | null
           youtube_url: string | null
         }
         Insert: {
-          achievements?: Json | null
+          ai_budget_range?: string | null
+          ai_expertise_level?: string | null
+          ai_implementation_priorities?: string[] | null
+          annual_revenue_range?: string | null
+          automation_priorities?: string[] | null
           avatar_url?: string | null
           banner_url?: string | null
           bio?: string | null
+          business_challenges?: string[] | null
           business_name?: string | null
+          business_size?: string | null
           business_type?: string | null
-          contribution_count?: number | null
           created_at?: string
+          current_tools_used?: string[] | null
+          departments?: string[] | null
+          email?: string | null
           full_name?: string | null
+          geographic_markets?: string[] | null
+          google_auth_completed?: boolean | null
+          growth_targets?: Json | null
+          has_completed_social_info?: boolean | null
           id: string
           industry?: string | null
           instagram_url?: string | null
           interests?: string[] | null
+          last_seen?: string | null
           linkedin_url?: string | null
+          long_term_goals?: string[] | null
+          metadata?: Json | null
+          moralis_provider_id?: string | null
           onboarding_completed?: boolean | null
-          onboarding_step?: number | null
-          phone_number?: string | null
+          onboarding_step?: string | null
           points?: number | null
+          preferences?: Json | null
           professional_role?: string | null
           rank?: string | null
-          referral_count?: number | null
-          role?: Database["public"]["Enums"]["app_role"]
+          role?: string | null
+          short_term_goals?: string[] | null
           siso_tokens?: number | null
+          social_info_completed_at?: string | null
           solana_wallet_address?: string | null
+          target_market?: string[] | null
+          team_size?: number | null
           twitter_url?: string | null
-          updated_at?: string | null
-          user_id?: string | null
+          updated_at?: string
+          wallet_address?: string | null
+          web3_metadata?: Json | null
           website_url?: string | null
           youtube_url?: string | null
         }
         Update: {
-          achievements?: Json | null
+          ai_budget_range?: string | null
+          ai_expertise_level?: string | null
+          ai_implementation_priorities?: string[] | null
+          annual_revenue_range?: string | null
+          automation_priorities?: string[] | null
           avatar_url?: string | null
           banner_url?: string | null
           bio?: string | null
+          business_challenges?: string[] | null
           business_name?: string | null
+          business_size?: string | null
           business_type?: string | null
-          contribution_count?: number | null
           created_at?: string
+          current_tools_used?: string[] | null
+          departments?: string[] | null
+          email?: string | null
           full_name?: string | null
+          geographic_markets?: string[] | null
+          google_auth_completed?: boolean | null
+          growth_targets?: Json | null
+          has_completed_social_info?: boolean | null
           id?: string
           industry?: string | null
           instagram_url?: string | null
           interests?: string[] | null
+          last_seen?: string | null
           linkedin_url?: string | null
+          long_term_goals?: string[] | null
+          metadata?: Json | null
+          moralis_provider_id?: string | null
           onboarding_completed?: boolean | null
-          onboarding_step?: number | null
-          phone_number?: string | null
+          onboarding_step?: string | null
           points?: number | null
+          preferences?: Json | null
           professional_role?: string | null
           rank?: string | null
-          referral_count?: number | null
-          role?: Database["public"]["Enums"]["app_role"]
+          role?: string | null
+          short_term_goals?: string[] | null
           siso_tokens?: number | null
+          social_info_completed_at?: string | null
           solana_wallet_address?: string | null
+          target_market?: string[] | null
+          team_size?: number | null
           twitter_url?: string | null
-          updated_at?: string | null
-          user_id?: string | null
+          updated_at?: string
+          wallet_address?: string | null
+          web3_metadata?: Json | null
           website_url?: string | null
           youtube_url?: string | null
         }
         Relationships: []
-      }
-      project_details: {
-        Row: {
-          business_context: Json | null
-          created_at: string
-          features: Json | null
-          goals: string | null
-          id: string
-          project_id: string
-          updated_at: string
-        }
-        Insert: {
-          business_context?: Json | null
-          created_at?: string
-          features?: Json | null
-          goals?: string | null
-          id?: string
-          project_id: string
-          updated_at?: string
-        }
-        Update: {
-          business_context?: Json | null
-          created_at?: string
-          features?: Json | null
-          goals?: string | null
-          id?: string
-          project_id?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "project_details_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       project_documentation: {
         Row: {
-          content: string
-          created_at: string | null
+          content: Json
+          created_at: string
           id: string
-          implementation_status: string
-          priority: string
+          implementation_status: string | null
+          priority: number | null
           related_components: string[] | null
-          section: string
-          updated_at: string | null
+          section: Database["public"]["Enums"]["doc_section_type"]
+          title: string
+          updated_at: string
         }
         Insert: {
-          content: string
-          created_at?: string | null
+          content?: Json
+          created_at?: string
           id?: string
-          implementation_status: string
-          priority: string
+          implementation_status?: string | null
+          priority?: number | null
           related_components?: string[] | null
-          section: string
-          updated_at?: string | null
+          section: Database["public"]["Enums"]["doc_section_type"]
+          title: string
+          updated_at?: string
         }
         Update: {
-          content?: string
-          created_at?: string | null
+          content?: Json
+          created_at?: string
           id?: string
-          implementation_status?: string
-          priority?: string
+          implementation_status?: string | null
+          priority?: number | null
           related_components?: string[] | null
-          section?: string
-          updated_at?: string | null
+          section?: Database["public"]["Enums"]["doc_section_type"]
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
-      project_plans: {
+      referrals: {
         Row: {
-          budget: string | null
           created_at: string
-          description: string | null
-          features: Json | null
           id: string
-          requirements: Json | null
+          milestone_reached: boolean | null
+          referred_id: string
+          referrer_id: string
           status: string | null
-          technical_specs: Json | null
-          timeline: Json | null
-          title: string
-          updated_at: string
-          user_id: string | null
-        }
-        Insert: {
-          budget?: string | null
-          created_at?: string
-          description?: string | null
-          features?: Json | null
-          id?: string
-          requirements?: Json | null
-          status?: string | null
-          technical_specs?: Json | null
-          timeline?: Json | null
-          title?: string
-          updated_at?: string
-          user_id?: string | null
-        }
-        Update: {
-          budget?: string | null
-          created_at?: string
-          description?: string | null
-          features?: Json | null
-          id?: string
-          requirements?: Json | null
-          status?: string | null
-          technical_specs?: Json | null
-          timeline?: Json | null
-          title?: string
-          updated_at?: string
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      project_threads: {
-        Row: {
-          created_at: string
-          id: string
-          metadata: Json | null
-          project_id: string
-          thread_id: string
-          thread_status: string
           updated_at: string
         }
         Insert: {
           created_at?: string
           id?: string
-          metadata?: Json | null
-          project_id: string
-          thread_id: string
-          thread_status?: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          metadata?: Json | null
-          project_id?: string
-          thread_id?: string
-          thread_status?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "project_threads_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: true
-            referencedRelation: "project_plans"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      projects: {
-        Row: {
-          client_id: string | null
-          created_at: string
-          description: string | null
-          id: string
-          status: string | null
-          title: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          client_id?: string | null
-          created_at?: string
-          description?: string | null
-          id?: string
+          milestone_reached?: boolean | null
+          referred_id: string
+          referrer_id: string
           status?: string | null
-          title?: string
           updated_at?: string
-          user_id: string
         }
         Update: {
-          client_id?: string | null
           created_at?: string
-          description?: string | null
           id?: string
+          milestone_reached?: boolean | null
+          referred_id?: string
+          referrer_id?: string
           status?: string | null
-          title?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "projects_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      resource_categories: {
-        Row: {
-          created_at: string
-          description: string | null
-          icon: string | null
-          id: string
-          slug: string
-          title: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          icon?: string | null
-          id?: string
-          slug: string
-          title: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          icon?: string | null
-          id?: string
-          slug?: string
-          title?: string
           updated_at?: string
         }
         Relationships: []
-      }
-      resources: {
-        Row: {
-          category_id: string | null
-          content: string | null
-          created_at: string
-          description: string | null
-          icon: string | null
-          id: string
-          title: string
-          updated_at: string
-          url: string | null
-        }
-        Insert: {
-          category_id?: string | null
-          content?: string | null
-          created_at?: string
-          description?: string | null
-          icon?: string | null
-          id?: string
-          title: string
-          updated_at?: string
-          url?: string | null
-        }
-        Update: {
-          category_id?: string | null
-          content?: string | null
-          created_at?: string
-          description?: string | null
-          icon?: string | null
-          id?: string
-          title?: string
-          updated_at?: string
-          url?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "resources_category_id_fkey"
-            columns: ["category_id"]
-            isOneToOne: false
-            referencedRelation: "resource_categories"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       skill_paths: {
         Row: {
-          created_at: string | null
-          description: string
+          created_at: string
+          description: string | null
           icon: string | null
           id: string
-          level: number | null
+          level: number
           name: string
-          updated_at: string | null
-          xp_required: number | null
+          updated_at: string
         }
         Insert: {
-          created_at?: string | null
-          description: string
+          created_at?: string
+          description?: string | null
           icon?: string | null
           id?: string
-          level?: number | null
+          level?: number
           name: string
-          updated_at?: string | null
-          xp_required?: number | null
+          updated_at?: string
         }
         Update: {
-          created_at?: string | null
-          description?: string
+          created_at?: string
+          description?: string | null
           icon?: string | null
           id?: string
-          level?: number | null
+          level?: number
           name?: string
-          updated_at?: string | null
-          xp_required?: number | null
+          updated_at?: string
         }
         Relationships: []
       }
       skills: {
         Row: {
-          category: string
-          created_at: string | null
-          description: string
-          icon: string | null
+          cooldown_minutes: number | null
+          created_at: string
+          description: string | null
           id: string
+          level: number
           name: string
           path_id: string | null
-          skill_id: string
-          updated_at: string | null
-          xp_value: number | null
+          points: number
+          prerequisites: string[] | null
+          requirements: Json | null
+          updated_at: string
         }
         Insert: {
-          category: string
-          created_at?: string | null
-          description: string
-          icon?: string | null
+          cooldown_minutes?: number | null
+          created_at?: string
+          description?: string | null
           id?: string
+          level?: number
           name: string
           path_id?: string | null
-          skill_id: string
-          updated_at?: string | null
-          xp_value?: number | null
+          points?: number
+          prerequisites?: string[] | null
+          requirements?: Json | null
+          updated_at?: string
         }
         Update: {
-          category?: string
-          created_at?: string | null
-          description?: string
-          icon?: string | null
+          cooldown_minutes?: number | null
+          created_at?: string
+          description?: string | null
           id?: string
+          level?: number
           name?: string
           path_id?: string | null
-          skill_id?: string
-          updated_at?: string | null
-          xp_value?: number | null
+          points?: number
+          prerequisites?: string[] | null
+          requirements?: Json | null
+          updated_at?: string
         }
         Relationships: [
           {
@@ -2230,166 +2618,241 @@ export type Database = {
           },
         ]
       }
-      task_steps: {
+      sync_history: {
         Row: {
-          created_at: string
-          description: string
-          id: string
-          output: string | null
-          status: Database["public"]["Enums"]["task_status"] | null
-          step_number: number
-          task_id: string | null
-          updated_at: string
+          channel_id: string | null
+          created_at: string | null
+          error_message: string | null
+          id: number
+          sync_status: string | null
+          videos_processed: number | null
         }
         Insert: {
-          created_at?: string
-          description: string
-          id?: string
-          output?: string | null
-          status?: Database["public"]["Enums"]["task_status"] | null
-          step_number: number
-          task_id?: string | null
-          updated_at?: string
+          channel_id?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: number
+          sync_status?: string | null
+          videos_processed?: number | null
         }
         Update: {
-          created_at?: string
-          description?: string
-          id?: string
-          output?: string | null
-          status?: Database["public"]["Enums"]["task_status"] | null
-          step_number?: number
-          task_id?: string | null
-          updated_at?: string
+          channel_id?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: number
+          sync_status?: string | null
+          videos_processed?: number | null
         }
         Relationships: [
           {
-            foreignKeyName: "task_steps_task_id_fkey"
-            columns: ["task_id"]
+            foreignKeyName: "fk_channel_id"
+            columns: ["channel_id"]
             isOneToOne: false
-            referencedRelation: "tasks"
-            referencedColumns: ["id"]
+            referencedRelation: "ai_news_youtube_sources"
+            referencedColumns: ["channel_id"]
           },
         ]
       }
-      tasks: {
+      tools: {
         Row: {
+          assistant_type: string | null
+          category: string
+          content_themes: string[] | null
           created_at: string
           description: string | null
-          due_date: string | null
+          downloads_count: number | null
+          gpt_id: string | null
+          gpt_url: string | null
+          icon_url: string | null
           id: string
-          priority: string | null
-          project_id: string | null
-          status: Database["public"]["Enums"]["task_status"] | null
-          title: string
+          input_variables: string[] | null
+          likes_count: number | null
+          member_type: string | null
+          model_type: string | null
+          name: string
+          num_conversations_str: string | null
+          pricing_type: string | null
+          profile_image_url: string | null
+          prompt_template: string | null
+          rating: number | null
+          resource_type: string
+          response_format: string | null
+          review_average: number | null
+          review_count: number | null
+          review_total: number | null
+          reviews_count: number | null
+          short_url: string | null
+          specialization: string[] | null
           updated_at: string
+          use_cases: string[] | null
+          website_url: string | null
+          youtube_url: string | null
+          youtube_videos: Json | null
+        }
+        Insert: {
+          assistant_type?: string | null
+          category: string
+          content_themes?: string[] | null
+          created_at?: string
+          description?: string | null
+          downloads_count?: number | null
+          gpt_id?: string | null
+          gpt_url?: string | null
+          icon_url?: string | null
+          id?: string
+          input_variables?: string[] | null
+          likes_count?: number | null
+          member_type?: string | null
+          model_type?: string | null
+          name: string
+          num_conversations_str?: string | null
+          pricing_type?: string | null
+          profile_image_url?: string | null
+          prompt_template?: string | null
+          rating?: number | null
+          resource_type?: string
+          response_format?: string | null
+          review_average?: number | null
+          review_count?: number | null
+          review_total?: number | null
+          reviews_count?: number | null
+          short_url?: string | null
+          specialization?: string[] | null
+          updated_at?: string
+          use_cases?: string[] | null
+          website_url?: string | null
+          youtube_url?: string | null
+          youtube_videos?: Json | null
+        }
+        Update: {
+          assistant_type?: string | null
+          category?: string
+          content_themes?: string[] | null
+          created_at?: string
+          description?: string | null
+          downloads_count?: number | null
+          gpt_id?: string | null
+          gpt_url?: string | null
+          icon_url?: string | null
+          id?: string
+          input_variables?: string[] | null
+          likes_count?: number | null
+          member_type?: string | null
+          model_type?: string | null
+          name?: string
+          num_conversations_str?: string | null
+          pricing_type?: string | null
+          profile_image_url?: string | null
+          prompt_template?: string | null
+          rating?: number | null
+          resource_type?: string
+          response_format?: string | null
+          review_average?: number | null
+          review_count?: number | null
+          review_total?: number | null
+          reviews_count?: number | null
+          short_url?: string | null
+          specialization?: string[] | null
+          updated_at?: string
+          use_cases?: string[] | null
+          website_url?: string | null
+          youtube_url?: string | null
+          youtube_videos?: Json | null
+        }
+        Relationships: []
+      }
+      user_assistant_interactions: {
+        Row: {
+          assistant_id: string
+          created_at: string | null
+          id: string
+          interaction_type: string
+          metadata: Json | null
           user_id: string | null
         }
         Insert: {
-          created_at?: string
-          description?: string | null
-          due_date?: string | null
+          assistant_id: string
+          created_at?: string | null
           id?: string
-          priority?: string | null
-          project_id?: string | null
-          status?: Database["public"]["Enums"]["task_status"] | null
-          title: string
-          updated_at?: string
+          interaction_type: string
+          metadata?: Json | null
           user_id?: string | null
         }
         Update: {
-          created_at?: string
-          description?: string | null
-          due_date?: string | null
+          assistant_id?: string
+          created_at?: string | null
           id?: string
-          priority?: string | null
-          project_id?: string | null
-          status?: Database["public"]["Enums"]["task_status"] | null
-          title?: string
-          updated_at?: string
+          interaction_type?: string
+          metadata?: Json | null
           user_id?: string | null
         }
         Relationships: []
       }
-      tools: {
+      user_nfts: {
         Row: {
-          category: string
+          collection_id: string | null
           created_at: string
-          description: string | null
           id: string
-          name: string
+          points_multiplier: number | null
+          rank: Database["public"]["Enums"]["user_rank"]
+          tier: Database["public"]["Enums"]["nft_tier"] | null
+          token_id: string
           updated_at: string
+          user_id: string | null
+          verified_at: string | null
+          weekly_bonus: number | null
         }
         Insert: {
-          category: string
+          collection_id?: string | null
           created_at?: string
-          description?: string | null
           id?: string
-          name: string
+          points_multiplier?: number | null
+          rank?: Database["public"]["Enums"]["user_rank"]
+          tier?: Database["public"]["Enums"]["nft_tier"] | null
+          token_id: string
           updated_at?: string
+          user_id?: string | null
+          verified_at?: string | null
+          weekly_bonus?: number | null
         }
         Update: {
-          category?: string
+          collection_id?: string | null
           created_at?: string
-          description?: string | null
           id?: string
-          name?: string
+          points_multiplier?: number | null
+          rank?: Database["public"]["Enums"]["user_rank"]
+          tier?: Database["public"]["Enums"]["nft_tier"] | null
+          token_id?: string
           updated_at?: string
-        }
-        Relationships: []
-      }
-      user_crypto_history: {
-        Row: {
-          created_at: string | null
-          id: string
-          points_exchanged: number
-          status: string
-          tokens_received: number
-          transaction_type: string
-          updated_at: string | null
-          user_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          points_exchanged: number
-          status?: string
-          tokens_received: number
-          transaction_type: string
-          updated_at?: string | null
-          user_id: string
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          points_exchanged?: number
-          status?: string
-          tokens_received?: number
-          transaction_type?: string
-          updated_at?: string | null
-          user_id?: string
+          user_id?: string | null
+          verified_at?: string | null
+          weekly_bonus?: number | null
         }
         Relationships: []
       }
       user_search_history: {
         Row: {
-          created_at: string | null
+          created_at: string
           id: string
           query: string
-          result_type: string
+          result_id: string | null
+          result_type: string | null
           user_id: string | null
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           id?: string
           query: string
-          result_type: string
+          result_id?: string | null
+          result_type?: string | null
           user_id?: string | null
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           id?: string
           query?: string
-          result_type?: string
+          result_id?: string | null
+          result_type?: string | null
           user_id?: string | null
         }
         Relationships: []
@@ -2397,162 +2860,178 @@ export type Database = {
       user_skill_progress: {
         Row: {
           completed_at: string | null
-          created_at: string | null
+          created_at: string
           id: string
           last_completed_at: string | null
-          level: number | null
           progress: number | null
-          skill_id: string
-          skill_name: string
+          skill_id: string | null
           times_completed: number | null
-          updated_at: string | null
-          user_id: string
+          updated_at: string
+          user_id: string | null
         }
         Insert: {
           completed_at?: string | null
-          created_at?: string | null
+          created_at?: string
           id?: string
           last_completed_at?: string | null
-          level?: number | null
           progress?: number | null
-          skill_id: string
-          skill_name: string
+          skill_id?: string | null
           times_completed?: number | null
-          updated_at?: string | null
-          user_id: string
+          updated_at?: string
+          user_id?: string | null
         }
         Update: {
           completed_at?: string | null
-          created_at?: string | null
+          created_at?: string
           id?: string
           last_completed_at?: string | null
-          level?: number | null
           progress?: number | null
-          skill_id?: string
-          skill_name?: string
+          skill_id?: string | null
           times_completed?: number | null
-          updated_at?: string | null
-          user_id?: string
+          updated_at?: string
+          user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "user_skill_progress_skill_id_fkey"
+            columns: ["skill_id"]
+            isOneToOne: false
+            referencedRelation: "skills"
+            referencedColumns: ["id"]
+          },
+        ]
       }
-      user_threads: {
+      users_private: {
         Row: {
-          assistant_id: string
-          created_at: string | null
-          description: string | null
-          id: string
-          last_message_at: string | null
-          message_count: number | null
-          metadata: Json | null
-          status: string | null
-          thread_id: string
-          title: string | null
-          updated_at: string | null
-          user_id: string
-        }
-        Insert: {
-          assistant_id: string
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          last_message_at?: string | null
-          message_count?: number | null
-          metadata?: Json | null
-          status?: string | null
-          thread_id: string
-          title?: string | null
-          updated_at?: string | null
-          user_id: string
-        }
-        Update: {
-          assistant_id?: string
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          last_message_at?: string | null
-          message_count?: number | null
-          metadata?: Json | null
-          status?: string | null
-          thread_id?: string
-          title?: string | null
-          updated_at?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
-      users: {
-        Row: {
-          avatar_url: string | null
           created_at: string
-          email: string
-          full_name: string
+          email: string | null
           id: string
-          role: string
           updated_at: string
         }
         Insert: {
-          avatar_url?: string | null
           created_at?: string
-          email: string
-          full_name: string
+          email?: string | null
           id: string
-          role?: string
           updated_at?: string
         }
         Update: {
-          avatar_url?: string | null
           created_at?: string
-          email?: string
-          full_name?: string
+          email?: string | null
           id?: string
-          role?: string
           updated_at?: string
         }
         Relationships: []
       }
-      vector_storage: {
+      video_analysis: {
         Row: {
-          content: string
-          created_at: string
-          embedding: string | null
+          business_metrics: Json | null
+          chapters: Json | null
+          client_resources: Json | null
+          code_quality_metrics: Json | null
+          code_segments: Json | null
+          community_insights: Json | null
+          complexity_score: number | null
+          content_timeline: Json | null
+          created_at: string | null
+          difficulty_level: string | null
+          estimated_completion_time: number | null
+          external_resources: Json | null
           id: string
-          metadata: Json | null
+          key_concepts: string[] | null
+          learning_outcomes: string[] | null
+          learning_path: Json | null
+          practice_exercises: Json | null
+          prerequisites: string[] | null
+          sentiment_analysis: Json | null
+          supplementary_materials: Json | null
+          team_collaboration: Json | null
+          technologies_mentioned: string[] | null
+          updated_at: string | null
+          video_id: string
+          visual_aids: Json | null
         }
         Insert: {
-          content: string
-          created_at?: string
-          embedding?: string | null
+          business_metrics?: Json | null
+          chapters?: Json | null
+          client_resources?: Json | null
+          code_quality_metrics?: Json | null
+          code_segments?: Json | null
+          community_insights?: Json | null
+          complexity_score?: number | null
+          content_timeline?: Json | null
+          created_at?: string | null
+          difficulty_level?: string | null
+          estimated_completion_time?: number | null
+          external_resources?: Json | null
           id?: string
-          metadata?: Json | null
+          key_concepts?: string[] | null
+          learning_outcomes?: string[] | null
+          learning_path?: Json | null
+          practice_exercises?: Json | null
+          prerequisites?: string[] | null
+          sentiment_analysis?: Json | null
+          supplementary_materials?: Json | null
+          team_collaboration?: Json | null
+          technologies_mentioned?: string[] | null
+          updated_at?: string | null
+          video_id: string
+          visual_aids?: Json | null
         }
         Update: {
-          content?: string
-          created_at?: string
-          embedding?: string | null
+          business_metrics?: Json | null
+          chapters?: Json | null
+          client_resources?: Json | null
+          code_quality_metrics?: Json | null
+          code_segments?: Json | null
+          community_insights?: Json | null
+          complexity_score?: number | null
+          content_timeline?: Json | null
+          created_at?: string | null
+          difficulty_level?: string | null
+          estimated_completion_time?: number | null
+          external_resources?: Json | null
           id?: string
-          metadata?: Json | null
+          key_concepts?: string[] | null
+          learning_outcomes?: string[] | null
+          learning_path?: Json | null
+          practice_exercises?: Json | null
+          prerequisites?: string[] | null
+          sentiment_analysis?: Json | null
+          supplementary_materials?: Json | null
+          team_collaboration?: Json | null
+          technologies_mentioned?: string[] | null
+          updated_at?: string | null
+          video_id?: string
+          visual_aids?: Json | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "video_analysis_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: true
+            referencedRelation: "youtube_videos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       video_bookmarks: {
         Row: {
-          created_at: string | null
+          created_at: string
           id: string
-          user_id: string
-          video_id: string
+          user_id: string | null
+          video_id: string | null
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           id?: string
-          user_id: string
-          video_id: string
+          user_id?: string | null
+          video_id?: string | null
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           id?: string
-          user_id?: string
-          video_id?: string
+          user_id?: string | null
+          video_id?: string | null
         }
         Relationships: [
           {
@@ -2566,58 +3045,173 @@ export type Database = {
       }
       video_categories: {
         Row: {
-          created_at: string | null
+          created_at: string
           description: string | null
+          icon: string | null
           id: string
           name: string
-          updated_at: string | null
+          parent_id: string | null
+          slug: string
+          updated_at: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           description?: string | null
+          icon?: string | null
           id?: string
           name: string
-          updated_at?: string | null
+          parent_id?: string | null
+          slug: string
+          updated_at?: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           description?: string | null
+          icon?: string | null
           id?: string
           name?: string
-          updated_at?: string | null
+          parent_id?: string | null
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_categories_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "video_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      video_category_relations: {
+        Row: {
+          category_id: string
+          video_id: string
+        }
+        Insert: {
+          category_id: string
+          video_id: string
+        }
+        Update: {
+          category_id?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_category_relations_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "video_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "video_category_relations_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "youtube_videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      video_discussions: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          sentiment_score: number | null
+          updated_at: string
+          user_id: string | null
+          video_id: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          sentiment_score?: number | null
+          updated_at?: string
+          user_id?: string | null
+          video_id?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          sentiment_score?: number | null
+          updated_at?: string
+          user_id?: string | null
+          video_id?: string | null
         }
         Relationships: []
+      }
+      video_engagement_history: {
+        Row: {
+          comment_count: number | null
+          id: string
+          likes_count: number | null
+          recorded_at: string | null
+          video_id: string | null
+          view_count: number | null
+        }
+        Insert: {
+          comment_count?: number | null
+          id?: string
+          likes_count?: number | null
+          recorded_at?: string | null
+          video_id?: string | null
+          view_count?: number | null
+        }
+        Update: {
+          comment_count?: number | null
+          id?: string
+          likes_count?: number | null
+          recorded_at?: string | null
+          video_id?: string | null
+          view_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_engagement_history_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "youtube_videos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       video_progress: {
         Row: {
           completed: boolean | null
+          completed_at: string | null
           created_at: string | null
           id: string
+          last_watched_at: string | null
           progress: number | null
           updated_at: string | null
-          user_id: string
-          video_id: string
-          watched: boolean | null
+          user_id: string | null
+          video_id: string | null
         }
         Insert: {
           completed?: boolean | null
+          completed_at?: string | null
           created_at?: string | null
           id?: string
+          last_watched_at?: string | null
           progress?: number | null
           updated_at?: string | null
-          user_id: string
-          video_id: string
-          watched?: boolean | null
+          user_id?: string | null
+          video_id?: string | null
         }
         Update: {
           completed?: boolean | null
+          completed_at?: string | null
           created_at?: string | null
           id?: string
+          last_watched_at?: string | null
           progress?: number | null
           updated_at?: string | null
-          user_id?: string
-          video_id?: string
-          watched?: boolean | null
+          user_id?: string | null
+          video_id?: string | null
         }
         Relationships: [
           {
@@ -2631,73 +3225,71 @@ export type Database = {
       }
       video_summaries: {
         Row: {
-          created_at: string | null
+          created_at: string
           id: string
-          key_points: Json | null
-          summary: string | null
-          updated_at: string | null
+          key_points: string[] | null
+          summary: string
+          updated_at: string
           video_id: string | null
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           id?: string
-          key_points?: Json | null
-          summary?: string | null
-          updated_at?: string | null
+          key_points?: string[] | null
+          summary: string
+          updated_at?: string
           video_id?: string | null
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           id?: string
-          key_points?: Json | null
-          summary?: string | null
-          updated_at?: string | null
+          key_points?: string[] | null
+          summary?: string
+          updated_at?: string
           video_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "video_summaries_video_id_fkey"
-            columns: ["video_id"]
-            isOneToOne: false
-            referencedRelation: "youtube_videos"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
-      video_sync_history: {
+      video_sync_jobs: {
         Row: {
-          api_quota_used: number | null
-          completed_at: string | null
+          created_at: string | null
           creator_id: string | null
           error_message: string | null
           id: string
-          started_at: string | null
-          status: string
-          videos_synced: number | null
+          last_page_token: string | null
+          status: string | null
+          sync_options: Json | null
+          synced_videos: number | null
+          total_videos: number | null
+          updated_at: string | null
         }
         Insert: {
-          api_quota_used?: number | null
-          completed_at?: string | null
+          created_at?: string | null
           creator_id?: string | null
           error_message?: string | null
           id?: string
-          started_at?: string | null
-          status?: string
-          videos_synced?: number | null
+          last_page_token?: string | null
+          status?: string | null
+          sync_options?: Json | null
+          synced_videos?: number | null
+          total_videos?: number | null
+          updated_at?: string | null
         }
         Update: {
-          api_quota_used?: number | null
-          completed_at?: string | null
+          created_at?: string | null
           creator_id?: string | null
           error_message?: string | null
           id?: string
-          started_at?: string | null
-          status?: string
-          videos_synced?: number | null
+          last_page_token?: string | null
+          status?: string | null
+          sync_options?: Json | null
+          synced_videos?: number | null
+          total_videos?: number | null
+          updated_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "video_sync_history_creator_id_fkey"
+            foreignKeyName: "video_sync_jobs_creator_id_fkey"
             columns: ["creator_id"]
             isOneToOne: false
             referencedRelation: "education_creators"
@@ -2708,327 +3300,528 @@ export type Database = {
       wallet_nonces: {
         Row: {
           created_at: string | null
+          expires_at: string | null
           id: string
           nonce: string
           public_key: string
-          updated_at: string | null
-          user_id: string | null
         }
         Insert: {
           created_at?: string | null
+          expires_at?: string | null
           id?: string
           nonce: string
           public_key: string
-          updated_at?: string | null
-          user_id?: string | null
         }
         Update: {
           created_at?: string | null
+          expires_at?: string | null
           id?: string
           nonce?: string
           public_key?: string
-          updated_at?: string | null
-          user_id?: string | null
+        }
+        Relationships: []
+      }
+      web3_users: {
+        Row: {
+          created_at: string
+          id: string
+          metadata: Json
+          moralis_provider_id: string
+          updated_at: string
+          wallet_address: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metadata?: Json
+          moralis_provider_id: string
+          updated_at?: string
+          wallet_address: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metadata?: Json
+          moralis_provider_id?: string
+          updated_at?: string
+          wallet_address?: string
         }
         Relationships: []
       }
       welcome_nft_mints: {
         Row: {
-          created_at: string | null
+          attempted_at: string | null
+          completed_at: string | null
           error_message: string | null
           id: string
           metadata: Json | null
-          status: string
-          updated_at: string | null
+          status: Database["public"]["Enums"]["nft_mint_status"] | null
           user_id: string
         }
         Insert: {
-          created_at?: string | null
+          attempted_at?: string | null
+          completed_at?: string | null
           error_message?: string | null
           id?: string
           metadata?: Json | null
-          status?: string
-          updated_at?: string | null
+          status?: Database["public"]["Enums"]["nft_mint_status"] | null
           user_id: string
         }
         Update: {
-          created_at?: string | null
+          attempted_at?: string | null
+          completed_at?: string | null
           error_message?: string | null
           id?: string
           metadata?: Json | null
-          status?: string
-          updated_at?: string | null
+          status?: Database["public"]["Enums"]["nft_mint_status"] | null
           user_id?: string
         }
         Relationships: []
       }
       youtube_videos: {
         Row: {
-          channel_id: string
-          created_at: string | null
+          category: string | null
+          category_id: string | null
+          channel_id: string | null
+          comment_count: number | null
+          created_at: string
           date: string | null
+          difficulty_level: string | null
           duration: string | null
-          education_creators: Json | null
+          estimated_duration: number | null
+          featured: boolean | null
+          full_description: string | null
+          has_captions: boolean | null
+          hd_thumbnail_url: string | null
           id: string
-          thumbnail_url: string | null
-          thumbnailurl: string | null
-          title: string
-          updated_at: string | null
-          url: string
-          viewcount: number | null
+          language: string | null
+          likes_count: number | null
+          order: number | null
+          preview_gif_url: string | null
+          published_at: string | null
+          published_timestamp: string | null
+          sync_id: string | null
+          sync_timestamp: string | null
+          tags: string[] | null
+          thumbnailUrl: string | null
+          title: string | null
+          updated_at: string
+          url: string | null
+          usecase_category: string | null
+          viewCount: number | null
+          views: number | null
         }
         Insert: {
-          channel_id: string
-          created_at?: string | null
+          category?: string | null
+          category_id?: string | null
+          channel_id?: string | null
+          comment_count?: number | null
+          created_at?: string
           date?: string | null
+          difficulty_level?: string | null
           duration?: string | null
-          education_creators?: Json | null
+          estimated_duration?: number | null
+          featured?: boolean | null
+          full_description?: string | null
+          has_captions?: boolean | null
+          hd_thumbnail_url?: string | null
           id: string
-          thumbnail_url?: string | null
-          thumbnailurl?: string | null
-          title: string
-          updated_at?: string | null
-          url: string
-          viewcount?: number | null
+          language?: string | null
+          likes_count?: number | null
+          order?: number | null
+          preview_gif_url?: string | null
+          published_at?: string | null
+          published_timestamp?: string | null
+          sync_id?: string | null
+          sync_timestamp?: string | null
+          tags?: string[] | null
+          thumbnailUrl?: string | null
+          title?: string | null
+          updated_at?: string
+          url?: string | null
+          usecase_category?: string | null
+          viewCount?: number | null
+          views?: number | null
         }
         Update: {
-          channel_id?: string
-          created_at?: string | null
+          category?: string | null
+          category_id?: string | null
+          channel_id?: string | null
+          comment_count?: number | null
+          created_at?: string
           date?: string | null
+          difficulty_level?: string | null
           duration?: string | null
-          education_creators?: Json | null
+          estimated_duration?: number | null
+          featured?: boolean | null
+          full_description?: string | null
+          has_captions?: boolean | null
+          hd_thumbnail_url?: string | null
           id?: string
-          thumbnail_url?: string | null
-          thumbnailurl?: string | null
-          title?: string
-          updated_at?: string | null
-          url?: string
-          viewcount?: number | null
+          language?: string | null
+          likes_count?: number | null
+          order?: number | null
+          preview_gif_url?: string | null
+          published_at?: string | null
+          published_timestamp?: string | null
+          sync_id?: string | null
+          sync_timestamp?: string | null
+          tags?: string[] | null
+          thumbnailUrl?: string | null
+          title?: string | null
+          updated_at?: string
+          url?: string | null
+          usecase_category?: string | null
+          viewCount?: number | null
+          views?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "youtube_videos_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "education_creators"
+            referencedColumns: ["channel_id"]
+          },
+        ]
       }
     }
     Views: {
-      leaderboard: {
+      category_stats: {
         Row: {
-          avatar_url: string | null
-          full_name: string | null
+          category: string | null
+          community_count: number | null
+          featured_count: number | null
+          total_activity: number | null
+          total_members: number | null
+        }
+        Relationships: []
+      }
+      featured_posts: {
+        Row: {
+          article_type: string | null
+          author_id: string | null
+          bookmarks: number | null
+          category: string | null
+          content: string | null
+          cover_image: string | null
+          created_at: string | null
+          date: string | null
+          description: string | null
+          featured: boolean | null
           id: string | null
-          points: number | null
-          rank: string | null
-          siso_tokens: number | null
+          image_url: string | null
+          impact: string | null
+          linkedin_url: string | null
+          meta_description: string | null
+          priority: number | null
+          reading_time: number | null
+          slug: string | null
+          source: string | null
+          source_credibility: string | null
+          status: string | null
+          tags: string[] | null
+          technical_complexity: string | null
+          title: string | null
+          updated_at: string | null
+          views: number | null
         }
         Insert: {
-          avatar_url?: string | null
-          full_name?: string | null
+          article_type?: string | null
+          author_id?: string | null
+          bookmarks?: number | null
+          category?: string | null
+          content?: string | null
+          cover_image?: string | null
+          created_at?: string | null
+          date?: string | null
+          description?: string | null
+          featured?: boolean | null
           id?: string | null
-          points?: number | null
-          rank?: string | null
-          siso_tokens?: number | null
+          image_url?: string | null
+          impact?: string | null
+          linkedin_url?: string | null
+          meta_description?: string | null
+          priority?: number | null
+          reading_time?: number | null
+          slug?: string | null
+          source?: string | null
+          source_credibility?: string | null
+          status?: string | null
+          tags?: string[] | null
+          technical_complexity?: string | null
+          title?: string | null
+          updated_at?: string | null
+          views?: number | null
         }
         Update: {
-          avatar_url?: string | null
-          full_name?: string | null
+          article_type?: string | null
+          author_id?: string | null
+          bookmarks?: number | null
+          category?: string | null
+          content?: string | null
+          cover_image?: string | null
+          created_at?: string | null
+          date?: string | null
+          description?: string | null
+          featured?: boolean | null
           id?: string | null
-          points?: number | null
-          rank?: string | null
-          siso_tokens?: number | null
+          image_url?: string | null
+          impact?: string | null
+          linkedin_url?: string | null
+          meta_description?: string | null
+          priority?: number | null
+          reading_time?: number | null
+          slug?: string | null
+          source?: string | null
+          source_credibility?: string | null
+          status?: string | null
+          tags?: string[] | null
+          technical_complexity?: string | null
+          title?: string | null
+          updated_at?: string | null
+          views?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_news_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mv_trending_articles: {
+        Row: {
+          article_type: string | null
+          category: string | null
+          date: string | null
+          description: string | null
+          id: string | null
+          image_url: string | null
+          impact: string | null
+          reading_time: number | null
+          source: string | null
+          source_credibility: string | null
+          technical_complexity: string | null
+          title: string | null
+          views: number | null
+        }
+        Relationships: []
+      }
+      upcoming_posts: {
+        Row: {
+          banner_template_id: string | null
+          description: string | null
+          id: string | null
+          scheduled_for: string | null
+          status: string | null
+          title: string | null
+        }
+        Insert: {
+          banner_template_id?: string | null
+          description?: string | null
+          id?: string | null
+          scheduled_for?: string | null
+          status?: string | null
+          title?: string | null
+        }
+        Update: {
+          banner_template_id?: string | null
+          description?: string | null
+          id?: string | null
+          scheduled_for?: string | null
+          status?: string | null
+          title?: string | null
+        }
+        Relationships: []
+      }
+      upcoming_scheduled_posts: {
+        Row: {
+          banner_template_id: string | null
+          created_at: string | null
+          id: string | null
+          scheduled_for: string | null
+          status: string | null
+          title: string | null
+        }
+        Insert: {
+          banner_template_id?: string | null
+          created_at?: string | null
+          id?: string | null
+          scheduled_for?: string | null
+          status?: string | null
+          title?: string | null
+        }
+        Update: {
+          banner_template_id?: string | null
+          created_at?: string | null
+          id?: string | null
+          scheduled_for?: string | null
+          status?: string | null
+          title?: string | null
+        }
+        Relationships: []
+      }
+      user_crypto_history: {
+        Row: {
+          created_at: string | null
+          current_balance: number | null
+          id: string | null
+          points_exchanged: number | null
+          status: string | null
+          tokens_received: number | null
+          transaction_type: string | null
+          updated_at: string | null
+          user_id: string | null
         }
         Relationships: []
       }
     }
     Functions: {
-      binary_quantize:
-        | {
-            Args: {
-              "": string
-            }
-            Returns: unknown
-          }
-        | {
-            Args: {
-              "": unknown
-            }
-            Returns: unknown
-          }
-      create_user_threads_table_if_not_exists: {
+      archive_old_news_articles: {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
-      halfvec_avg: {
-        Args: {
-          "": number[]
-        }
-        Returns: unknown
+      cleanup_news_fetch_history: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
-      halfvec_out: {
-        Args: {
-          "": unknown
-        }
-        Returns: unknown
+      create_news_images_bucket: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
-      halfvec_send: {
+      fetch_ai_news_automated: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      generate_unique_slug: {
         Args: {
-          "": unknown
+          base_name: string
         }
         Returns: string
       }
-      halfvec_typmod_in: {
+      get_daily_summary: {
         Args: {
-          "": unknown[]
+          target_date: string
         }
-        Returns: number
+        Returns: {
+          analysis_depth: string | null
+          application_details: string[] | null
+          article_count: number | null
+          categorized_key_points: Json | null
+          confidence_score: number | null
+          created_at: string | null
+          date: string
+          generated_with: string | null
+          id: string
+          impact_severity: Json | null
+          impact_trends: Json | null
+          industry_impacts: Json | null
+          key_points: string[] | null
+          key_technologies: Json | null
+          practical_applications: string[] | null
+          sentiment: string | null
+          summary: string
+          updated_at: string | null
+        }[]
       }
-      hnsw_bit_support: {
+      handle_onboarding_completion: {
         Args: {
-          "": unknown
+          user_id: string
         }
-        Returns: unknown
+        Returns: undefined
       }
-      hnsw_halfvec_support: {
-        Args: {
-          "": unknown
-        }
-        Returns: unknown
+      handle_single_page_app: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
-      hnsw_sparsevec_support: {
-        Args: {
-          "": unknown
-        }
-        Returns: unknown
+      publish_scheduled_posts: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
-      hnswhandler: {
-        Args: {
-          "": unknown
-        }
-        Returns: unknown
+      refresh_materialized_views: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
-      ivfflat_bit_support: {
-        Args: {
-          "": unknown
-        }
-        Returns: unknown
+      refresh_trending_articles: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
-      ivfflat_halfvec_support: {
-        Args: {
-          "": unknown
-        }
-        Returns: unknown
+      safe_refresh_trending_articles: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
-      ivfflathandler: {
+      update_creator_featured_videos: {
         Args: {
-          "": unknown
+          creator_id: string
         }
-        Returns: unknown
-      }
-      l2_norm:
-        | {
-            Args: {
-              "": unknown
-            }
-            Returns: number
-          }
-        | {
-            Args: {
-              "": unknown
-            }
-            Returns: number
-          }
-      l2_normalize:
-        | {
-            Args: {
-              "": string
-            }
-            Returns: string
-          }
-        | {
-            Args: {
-              "": unknown
-            }
-            Returns: unknown
-          }
-        | {
-            Args: {
-              "": unknown
-            }
-            Returns: unknown
-          }
-      sparsevec_out: {
-        Args: {
-          "": unknown
-        }
-        Returns: unknown
-      }
-      sparsevec_send: {
-        Args: {
-          "": unknown
-        }
-        Returns: string
-      }
-      sparsevec_typmod_in: {
-        Args: {
-          "": unknown[]
-        }
-        Returns: number
-      }
-      vector_avg: {
-        Args: {
-          "": number[]
-        }
-        Returns: string
-      }
-      vector_dims:
-        | {
-            Args: {
-              "": string
-            }
-            Returns: number
-          }
-        | {
-            Args: {
-              "": unknown
-            }
-            Returns: number
-          }
-      vector_norm: {
-        Args: {
-          "": string
-        }
-        Returns: number
-      }
-      vector_out: {
-        Args: {
-          "": string
-        }
-        Returns: unknown
-      }
-      vector_send: {
-        Args: {
-          "": string
-        }
-        Returns: string
-      }
-      vector_typmod_in: {
-        Args: {
-          "": unknown[]
-        }
-        Returns: number
+        Returns: undefined
       }
     }
     Enums: {
-      app_role: "admin" | "user"
+      article_impact: "high" | "medium" | "low"
+      content_category:
+        | "breakthrough_technologies"
+        | "language_models"
+        | "robotics_automation"
+        | "industry_applications"
+        | "international_developments"
+      doc_section_type:
+        | "overview"
+        | "features"
+        | "backend_design"
+        | "data_flow"
+        | "ai_integration"
+        | "implementation"
+        | "technical_specs"
+      news_source_type: "rss" | "api" | "manual" | "event_registry" | "news_api"
+      nft_mint_status: "pending" | "completed" | "failed"
+      nft_tier:
+        | "ai_artist"
+        | "system_synthesizer"
+        | "algo_architect"
+        | "code_crafter"
       point_action_type:
-        | "login"
-        | "complete_task"
-        | "bookmark_article"
-        | "analyze_article"
         | "daily_login"
-        | "streak_bonus"
-        | "create_project"
-        | "share_content"
-        | "watch_video"
-        | "contribute"
-      task_status: "pending" | "in_progress" | "completed" | "failed"
+        | "login_streak"
+        | "referral_signup"
+        | "referral_milestone"
+        | "read_article"
+        | "share_article"
+        | "comment_article"
+        | "suggest_article"
+        | "use_tool"
+        | "submit_tool"
+        | "receive_tool_like"
+        | "receive_tool_star"
+        | "write_tool_review"
+        | "watch_tutorial"
+        | "submit_education"
+        | "receive_education_like"
+        | "receive_education_star"
+        | "create_tutorial"
+        | "use_automation"
+        | "submit_automation"
+        | "receive_automation_like"
+        | "receive_automation_star"
+        | "share_workflow"
+        | "network_reply"
+        | "network_discussion"
+        | "network_referral"
+        | "host_event"
+        | "use_assistant"
+        | "suggest_assistant"
+        | "assistant_feedback"
+        | "train_assistant"
+        | "complete_challenge"
+        | "beta_testing"
+        | "report_bug"
+        | "promotional_share"
+        | "article_upvote"
+      technical_complexity: "basic" | "intermediate" | "advanced" | "mixed"
+      user_rank: "bronze" | "silver" | "gold" | "diamond"
     }
     CompositeTypes: {
       [_ in never]: never

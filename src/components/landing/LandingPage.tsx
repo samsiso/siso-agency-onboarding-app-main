@@ -17,6 +17,12 @@ const FeaturesSection = lazy(() => import('./sections/FeaturesSection').then(m =
 const GettingStartedSection = lazy(() => import('./sections/GettingStartedSection').then(m => ({ 
   default: memo(m.GettingStartedSection) 
 })));
+const PricingSection = lazy(() => import('./sections/PricingSection').then(m => ({ 
+  default: memo(m.PricingSection) 
+})));
+const TestimonialsSection = lazy(() => import('./sections/TestimonialsSection').then(m => ({ 
+  default: memo(m.TestimonialsSection) 
+})));
 const CallToActionSection = lazy(() => import('./sections/CallToActionSection').then(m => ({ 
   default: memo(m.CallToActionSection) 
 })));
@@ -32,6 +38,8 @@ const LandingPage = () => {
   const whyChoose = useViewportLoading({ threshold: 0.1 });
   const features = useViewportLoading({ threshold: 0.1 });
   const gettingStarted = useViewportLoading({ threshold: 0.1 });
+  const pricing = useViewportLoading({ threshold: 0.1 });
+  const testimonials = useViewportLoading({ threshold: 0.1 });
   const cta = useViewportLoading({ threshold: 0.1 });
 
   console.log('[LandingPage] Rendering landing page'); // Debug log
@@ -95,6 +103,18 @@ const LandingPage = () => {
           <section id="getting-started" ref={gettingStarted.elementRef}>
             <Suspense fallback={<LoadingFallback />}>
               {(gettingStarted.isVisible || gettingStarted.isLoaded) && <GettingStartedSection />}
+            </Suspense>
+          </section>
+
+          <section id="pricing" ref={pricing.elementRef}>
+            <Suspense fallback={<LoadingFallback />}>
+              {(pricing.isVisible || pricing.isLoaded) && <PricingSection />}
+            </Suspense>
+          </section>
+
+          <section id="testimonials" ref={testimonials.elementRef}>
+            <Suspense fallback={<LoadingFallback />}>
+              {(testimonials.isVisible || testimonials.isLoaded) && <TestimonialsSection />}
             </Suspense>
           </section>
 

@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,16 +19,6 @@ interface WelcomeNFTStatus {
   status: 'pending' | 'completed' | 'failed';
   error_message?: string;
   metadata?: NFTMetadata;
-}
-
-interface WelcomeNFTMint {
-  id: string;
-  user_id: string;
-  status: 'pending' | 'completed' | 'failed';
-  error_message?: string;
-  metadata?: NFTMetadata;
-  created_at: string;
-  updated_at: string;
 }
 
 // Type guard to check if metadata has the correct shape
@@ -54,7 +45,6 @@ export const WelcomeNFTStatus = () => {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) return;
 
-        // Use type assertion since we know the table structure
         const { data, error } = await supabase
           .from('welcome_nft_mints')
           .select('*')
@@ -63,18 +53,15 @@ export const WelcomeNFTStatus = () => {
 
         if (error) throw error;
 
-        // Safely handle the data with type casting
-        const nftData = data as unknown as WelcomeNFTMint;
-
         const nftStatus: WelcomeNFTStatus = {
-          status: nftData.status,
-          error_message: nftData.error_message,
-          metadata: isValidNFTMetadata(nftData.metadata) ? nftData.metadata : undefined
+          status: data.status,
+          error_message: data.error_message,
+          metadata: isValidNFTMetadata(data.metadata) ? data.metadata : undefined
         };
 
         setStatus(nftStatus);
 
-        if (nftData.status === 'completed' && isValidNFTMetadata(nftData.metadata)) {
+        if (data?.status === 'completed' && isValidNFTMetadata(data.metadata)) {
           confettiRef.current?.fire();
           toast({
             title: "Welcome NFT Minted!",
@@ -90,7 +77,6 @@ export const WelcomeNFTStatus = () => {
 
     fetchStatus();
 
-    // Set up real-time subscription
     const channel = supabase
       .channel('welcome-nft-status')
       .on(
@@ -102,7 +88,7 @@ export const WelcomeNFTStatus = () => {
           filter: `user_id=eq.${supabase.auth.getUser()}`
         },
         (payload) => {
-          const newData = payload.new as unknown as WelcomeNFTMint;
+          const newData = payload.new;
           const nftStatus: WelcomeNFTStatus = {
             status: newData.status,
             error_message: newData.error_message,

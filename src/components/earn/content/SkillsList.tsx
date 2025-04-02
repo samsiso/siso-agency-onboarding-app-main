@@ -76,13 +76,11 @@ export const SkillsList = ({
 
         if (error) throw error;
       } else {
-        // Add skill_name field to match the database schema requirement
         const { error } = await supabase
           .from('user_skill_progress')
           .insert({
             user_id: user.id,
             skill_id: skill.id,
-            skill_name: skill.name, // Add the required field
             completed_at: now,
             last_completed_at: now,
             times_completed: 1,

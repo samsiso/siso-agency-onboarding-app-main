@@ -1,165 +1,157 @@
-
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { Connection, Ed25519Keypair, PublicKey } from '@solana/web3.js';
 import { supabase } from '@/integrations/supabase/client';
+import { Loader2, Wallet, Check } from 'lucide-react';
 
-interface ConnectWalletButtonProps {
-  className?: string;
-}
-
-export const ConnectWalletButton = ({ className }: ConnectWalletButtonProps) => {
-  const [isConnecting, setIsConnecting] = useState(false);
+export const ConnectWalletButton = () => {
+  const [loading, setLoading] = useState(false);
+  const [connectedAddress, setConnectedAddress] = useState<string | null>(null);
   const { toast } = useToast();
-  const [walletAddress, setWalletAddress] = useState<string | null>(null);
 
-  // Check if user has already connected a wallet
-  const checkExistingWallet = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      
-      const { data } = await supabase
-        .from('profiles')
-        .select('solana_wallet_address')
-        .eq('id', user.id)
-        .single();
+  // Check if wallet is already connected on component mount
+  useEffect(() => {
+    const checkWalletConnection = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('solana_wallet_address')
+          .eq('id', session.user.id)
+          .single();
         
-      if (data && data.solana_wallet_address) {
-        setWalletAddress(data.solana_wallet_address);
+        if (profile?.solana_wallet_address) {
+          setConnectedAddress(profile.solana_wallet_address);
+        }
       }
-    } catch (error) {
-      console.error('Error checking wallet status:', error);
-    }
+    };
+
+    checkWalletConnection();
+  }, []);
+
+  const generateNonce = () => {
+    // Generate a random string for the nonce
+    return Array.from(crypto.getRandomValues(new Uint8Array(32)))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
   };
 
-  // Call checkExistingWallet on component mount
-  useState(() => {
-    checkExistingWallet();
-  });
-
-  const connectWallet = async () => {
+  const handleConnect = async () => {
     try {
-      setIsConnecting(true);
-
-      // Check if user is authenticated
-      const { data: { session } } = await supabase.auth.getSession();
+      setLoading(true);
+      console.log("[Wallet] Attempting to connect to Phantom");
+      const { solana } = window as any;
+      if (!solana?.isPhantom) {
+        window.open("https://phantom.app/", "_blank");
+        throw new Error("Please install Phantom Wallet");
+      }
+      
+      // Get the current session
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) throw sessionError;
+      
       if (!session) {
-        toast({
-          variant: "destructive",
-          title: "Authentication Required",
-          description: "Please sign in to connect your wallet.",
-        });
-        return;
+        throw new Error("Please sign in to connect your wallet");
       }
 
-      // Generate a random nonce for the user to sign
-      const nonce = crypto.randomUUID();
-      
-      // Store the nonce in the database
-      await supabase
+      // Connect to Phantom wallet
+      const response = await solana.connect();
+      const publicKey = response.publicKey.toString();
+      console.log("[Wallet] Connected to wallet:", publicKey);
+
+      // Generate and insert nonce
+      const nonce = generateNonce();
+      const { data: nonceData, error: nonceError } = await supabase
         .from('wallet_nonces')
-        .insert({
-          user_id: session.user.id,
-          public_key: 'pending', // Will be updated after wallet connection
-          nonce: nonce,
-          expires_at: new Date(Date.now() + 5 * 60 * 1000).toISOString(), // 5 minutes
-        });
+        .insert({ 
+          public_key: publicKey,
+          nonce: nonce
+        })
+        .select()
+        .single();
 
-      // Request wallet signature (mock implementation for now)
-      const mockSignature = "mock-signature";
-      const mockPublicKey = "mock-public-key";
-      
-      // Verify the signature using Supabase edge function
-      const { data, error } = await supabase.functions.invoke('verify-wallet-signature', {
-        body: {
-          publicKey: mockPublicKey,
-          signature: mockSignature,
-          nonce: nonce,
-        },
-        headers: {
-          'x-user-id': session.user.id,
-        },
-      });
+      if (nonceError) throw nonceError;
+      console.log("[Wallet] Generated nonce:", nonceData);
 
-      if (error) throw error;
-      
-      // Update wallet address in state
-      setWalletAddress(mockPublicKey);
-      
-      // Update profile with wallet address
-      await supabase
+      // Sign the nonce
+      const encodedMessage = new TextEncoder().encode(nonce);
+      const signedMessage = await solana.signMessage(encodedMessage, "utf8");
+      console.log("[Wallet] Signed message:", signedMessage);
+
+      // Verify the signature
+      const { error: verifyError } = await supabase.functions.invoke(
+        'verify-wallet-signature',
+        {
+          body: {
+            publicKey,
+            signature: signedMessage.signature,
+            nonce: nonce,
+            userId: session.user.id
+          }
+        }
+      );
+
+      if (verifyError) throw verifyError;
+
+      // Update the user's profile
+      const { error: updateError } = await supabase
         .from('profiles')
         .update({ 
-          solana_wallet_address: mockPublicKey 
+          solana_wallet_address: publicKey,
         })
         .eq('id', session.user.id);
 
+      if (updateError) throw updateError;
+
+      setConnectedAddress(publicKey);
       toast({
-        title: "Wallet Connected",
-        description: `Your wallet has been successfully connected.`,
+        title: "Success!",
+        description: "Wallet connected successfully",
       });
 
+      console.log("[Wallet] Connection process completed successfully");
     } catch (error: any) {
-      console.error('Error connecting wallet:', error);
+      console.error("[Wallet] Error:", error);
       toast({
         variant: "destructive",
-        title: "Connection Error",
-        description: error.message || "Failed to connect wallet. Please try again.",
+        title: "Error",
+        description: error.message || "Failed to connect wallet",
       });
     } finally {
-      setIsConnecting(false);
+      setLoading(false);
     }
   };
 
-  const disconnectWallet = async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
-
-      // Update profile to remove wallet address
-      await supabase
-        .from('profiles')
-        .update({ solana_wallet_address: null })
-        .eq('id', session.user.id);
-
-      setWalletAddress(null);
-      
-      toast({
-        title: "Wallet Disconnected",
-        description: "Your wallet has been disconnected.",
-      });
-    } catch (error: any) {
-      console.error('Error disconnecting wallet:', error);
-      toast({
-        variant: "destructive",
-        title: "Disconnect Error",
-        description: error.message || "Failed to disconnect wallet.",
-      });
-    }
-  };
+  if (connectedAddress) {
+    return (
+      <Button 
+        variant="outline"
+        className="bg-green-500/10 text-green-500 hover:bg-green-500/20 border-green-500/20"
+        disabled
+      >
+        <Check className="mr-2 h-4 w-4" />
+        Connected: {connectedAddress.slice(0, 4)}...{connectedAddress.slice(-4)}
+      </Button>
+    );
+  }
 
   return (
-    <>
-      {walletAddress ? (
-        <Button
-          variant="outline"
-          className={className}
-          onClick={disconnectWallet}
-        >
-          {walletAddress.slice(0, 4)}...{walletAddress.slice(-4)} (Disconnect)
-        </Button>
+    <Button 
+      onClick={handleConnect} 
+      disabled={loading}
+      className="bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 transition-colors duration-300 hover:scale-105"
+    >
+      {loading ? (
+        <>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          Connecting...
+        </>
       ) : (
-        <Button
-          variant="default"
-          className={className}
-          onClick={connectWallet}
-          disabled={isConnecting}
-        >
-          {isConnecting ? "Connecting..." : "Connect Wallet"}
-        </Button>
+        <>
+          <Wallet className="mr-2 h-4 w-4" />
+          Connect Phantom Wallet
+        </>
       )}
-    </>
+    </Button>
   );
 };

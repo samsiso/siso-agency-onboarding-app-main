@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { Twitter, Share2, Instagram } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -22,16 +21,12 @@ export const ShareButtons = ({ summary, title }: ShareButtonsProps) => {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session) {
-        try {
-          // Use type assertion for the action parameter
-          await awardPoints('share_article' as any);
-          toast({
-            title: "Points awarded!",
-            description: `You earned 5 points for sharing on ${platform}!`,
-          });
-        } catch (error) {
-          console.error('Error awarding points:', error);
-        }
+        // Award points for sharing
+        await awardPoints('share_article');
+        toast({
+          title: "Points awarded!",
+          description: `You earned 5 points for sharing on ${platform}!`,
+        });
       }
 
       switch (platform) {
