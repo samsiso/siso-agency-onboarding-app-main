@@ -4,7 +4,6 @@ import { LoadingFallback } from './sections/LoadingFallback';
 import Footer from '@/components/Footer';
 import { ErrorBoundary } from 'react-error-boundary';
 import { HeroSection } from './sections/HeroSection';
-import { FeaturesSection } from './sections/FeaturesSection';
 import { useViewportLoading } from '@/hooks/useViewportLoading';
 
 // Only lazy load non-critical sections
@@ -43,8 +42,6 @@ const LandingPage = () => {
     };
   }, []);
 
-  const { elementRef: featuresRef, isLoaded: featuresLoaded } = useViewportLoading({ threshold: 0.1 });
-
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-black via-siso-bg to-black overflow-x-hidden">
       {/* Optimized background elements */}
@@ -71,10 +68,6 @@ const LandingPage = () => {
         >
           <HeroSection />
         </ErrorBoundary>
-        
-        <div ref={featuresRef} className="transition-opacity duration-500" style={{ opacity: featuresLoaded ? 1 : 0 }}>
-          <FeaturesSection />
-        </div>
 
         <ErrorBoundary
           fallback={<div>Error loading sections</div>}
