@@ -10,18 +10,13 @@ const Footer: React.FC = () => {
   return (
     <footer className="bg-siso-bg border-t border-gray-800 py-16">
       <div className="container mx-auto px-4 flex flex-col items-center text-center">
-        {/* Logo and description */}
+        {/* Logo only - bigger and centered */}
         <div className="flex flex-col items-center space-y-4 mb-10">
-          <div className="flex items-center space-x-2">
-            <img 
-              src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png" 
-              alt="SISO Logo" 
-              className="w-12 h-12"
-            />
-            <span className="text-2xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
-              SISO
-            </span>
-          </div>
+          <img 
+            src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png" 
+            alt="SISO Logo" 
+            className="w-20 h-20" // Increased size from w-12 h-12 to w-20 h-20
+          />
           <p className="text-base text-siso-text-muted max-w-md">
             Your one-stop AI knowledge source for agencies looking to scale with the latest technology
           </p>
