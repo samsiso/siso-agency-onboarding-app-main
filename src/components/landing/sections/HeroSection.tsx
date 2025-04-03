@@ -3,22 +3,46 @@ import { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Hero } from '@/components/ui/animated-hero';
 import { Waves } from '@/components/ui/waves-background';
+import { motion } from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
 
 export const HeroSection = memo(() => {
   console.log('[HeroSection] Rendering hero section'); // Debug log
   const navigate = useNavigate();
 
+  const handleCalloutClick = () => {
+    console.log('Callout clicked - navigating to contact');
+    navigate('/auth');
+  };
+
   return (
     <section id="hero" className="min-h-screen">
-      {/* New Callout Text */}
-      <div className="relative z-50 w-full flex justify-center pt-12">
-        <div className="inline-block bg-[#1A1A1A]/80 border border-siso-orange rounded-lg px-4 py-2 backdrop-blur-sm mb-4">
-          <p className="text-center text-lg">
-            We build out your MVP in <span className="text-siso-orange font-medium">48 hours</span> <span className="text-siso-orange font-medium">Free of charge</span>
-          </p>
-        </div>
-      </div>
       <Hero />
+      
+      {/* Improved Callout - Positioned to overlay on the hero */}
+      <div className="absolute top-32 md:top-40 left-0 right-0 z-50 flex justify-center pointer-events-none">
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="pointer-events-auto"
+          onClick={handleCalloutClick}
+        >
+          <div 
+            className="inline-flex items-center px-5 py-2 rounded-full 
+              bg-black/40 backdrop-blur-md border border-siso-orange/30
+              shadow-lg hover:shadow-siso-orange/20 hover:border-siso-orange/50 
+              cursor-pointer transition-all duration-300 group"
+          >
+            <p className="text-base sm:text-lg text-white/90">
+              We build out your MVP in <span className="font-semibold bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent">48 hours</span>{" "}
+              <span className="font-semibold bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent">Free of charge</span>
+            </p>
+            <ArrowRight className="w-4 h-4 ml-2 text-siso-orange opacity-70 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
+          </div>
+        </motion.div>
+      </div>
+      
       <Waves 
         lineColor="rgba(255, 87, 34, 0.2)"
         backgroundColor="transparent"
