@@ -26,7 +26,7 @@ const LandingPage = () => {
       <link rel="preconnect" href="https://avdgyrepwrvsvwgxrccr.supabase.co" crossOrigin="anonymous" />
       
       <ErrorBoundary 
-        fallback={<LoadingFallback error={new Error()} />}
+        fallback={<div>Error loading scroll navigation</div>}
         onError={(error) => console.error('[LandingPage] Error in ScrollNav:', error)}
       >
         <Suspense fallback={<LoadingFallback />}>
@@ -53,14 +53,14 @@ const LandingPage = () => {
       {/* Progressive section loading */}
       <div className="relative z-10 px-4 md:px-0 space-y-12 md:space-y-24">
         <ErrorBoundary
-          fallback={<LoadingFallback error={new Error()} />}
+          fallback={<div>Error loading hero section</div>}
           onError={(error) => console.error('[LandingPage] Error in HeroSection:', error)}
         >
           <HeroSection />
         </ErrorBoundary>
 
         <ErrorBoundary
-          fallback={<LoadingFallback error={new Error()} />}
+          fallback={<div>Error loading sections</div>}
           onError={(error) => console.error('[LandingPage] Error in other sections:', error)}
         >
           <Suspense fallback={<LoadingFallback />}>

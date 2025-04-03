@@ -1,7 +1,7 @@
 
 import { Routes, Route } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import Index from '@/pages/Index';
+import LandingPage from '@/components/landing/LandingPage';
 import { Toaster } from '@/components/ui/toaster';
 
 function App() {
@@ -13,7 +13,7 @@ function App() {
       </Helmet>
 
       <Routes>
-        <Route path="*" element={<Index />} />
+        <Route path="*" element={<LandingPage />} />
       </Routes>
 
       <Toaster />
