@@ -21,8 +21,6 @@ const queryClient = new QueryClient({
 
 // Configure allowed origins for postMessage
 const ALLOWED_ORIGINS = [
-  'https://gptengineer.app',
-  'http://localhost:3000',
   'https://lovable.dev',
   'https://www.siso.agency',
   'https://siso.agency'

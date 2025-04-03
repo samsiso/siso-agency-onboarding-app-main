@@ -2,53 +2,34 @@
 import { lazy, Suspense, memo } from 'react';
 import { LoadingFallback } from './sections/LoadingFallback';
 import Footer from '@/components/Footer';
-import { useViewportLoading } from '@/hooks/useViewportLoading';
-import { usePerformanceMetrics } from '@/hooks/usePerformanceMetrics';
 import { ErrorBoundary } from 'react-error-boundary';
 import { HeroSection } from './sections/HeroSection';
 
-// [Analysis] Only lazy load non-critical sections
-const WhyChooseSection = lazy(() => import('./sections/WhyChooseSection').then(m => ({ 
-  default: memo(m.WhyChooseSection) 
+// Only lazy load non-critical sections
+const WhyChooseSection = lazy(() => import('./sections/WhyChooseSection').then(m => ({
+  default: memo(m.WhyChooseSection)
 })));
-const FeaturesSection = lazy(() => import('./sections/FeaturesSection').then(m => ({ 
-  default: memo(m.FeaturesSection) 
+const FeaturesSection = lazy(() => import('./sections/FeaturesSection').then(m => ({
+  default: memo(m.FeaturesSection)
 })));
-const GettingStartedSection = lazy(() => import('./sections/GettingStartedSection').then(m => ({ 
-  default: memo(m.GettingStartedSection) 
+const TestimonialsSection = lazy(() => import('./sections/TestimonialsSection').then(m => ({
+  default: memo(m.TestimonialsSection)
 })));
-const PricingSection = lazy(() => import('./sections/PricingSection').then(m => ({ 
-  default: memo(m.PricingSection) 
+const CallToActionSection = lazy(() => import('./sections/CallToActionSection').then(m => ({
+  default: memo(m.CallToActionSection)
 })));
-const TestimonialsSection = lazy(() => import('./sections/TestimonialsSection').then(m => ({ 
-  default: memo(m.TestimonialsSection) 
-})));
-const CallToActionSection = lazy(() => import('./sections/CallToActionSection').then(m => ({ 
-  default: memo(m.CallToActionSection) 
-})));
-const ScrollNav = lazy(() => import('@/components/ui/scroll-nav.tsx').then(m => ({ 
-  default: memo(m.ScrollNav) 
+const ScrollNav = lazy(() => import('@/components/ui/scroll-nav.tsx').then(m => ({
+  default: memo(m.ScrollNav)
 })));
 
 const LandingPage = () => {
-  // Initialize performance monitoring
-  usePerformanceMetrics();
-
-  // Setup viewport loading for each section
-  const whyChoose = useViewportLoading({ threshold: 0.1 });
-  const features = useViewportLoading({ threshold: 0.1 });
-  const gettingStarted = useViewportLoading({ threshold: 0.1 });
-  const pricing = useViewportLoading({ threshold: 0.1 });
-  const testimonials = useViewportLoading({ threshold: 0.1 });
-  const cta = useViewportLoading({ threshold: 0.1 });
-
-  console.log('[LandingPage] Rendering landing page'); // Debug log
+  console.log('[LandingPage] Rendering landing page');
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-black via-siso-bg to-black overflow-x-hidden">
       {/* DNS prefetch and preconnect optimizations */}
-      <link rel="dns-prefetch" href="https://fzuwsjxjymwcjsbpwfsl.supabase.co" />
-      <link rel="preconnect" href="https://fzuwsjxjymwcjsbpwfsl.supabase.co" crossOrigin="anonymous" />
+      <link rel="dns-prefetch" href="https://avdgyrepwrvsvwgxrccr.supabase.co" />
+      <link rel="preconnect" href="https://avdgyrepwrvsvwgxrccr.supabase.co" crossOrigin="anonymous" />
       
       <ErrorBoundary 
         fallback={<LoadingFallback error={new Error()} />}
@@ -88,41 +69,21 @@ const LandingPage = () => {
           fallback={<LoadingFallback error={new Error()} />}
           onError={(error) => console.error('[LandingPage] Error in other sections:', error)}
         >
-          <section id="why-choose" ref={whyChoose.elementRef}>
-            <Suspense fallback={<LoadingFallback />}>
-              {(whyChoose.isVisible || whyChoose.isLoaded) && <WhyChooseSection />}
-            </Suspense>
-          </section>
-
-          <section id="features" ref={features.elementRef}>
-            <Suspense fallback={<LoadingFallback />}>
-              {(features.isVisible || features.isLoaded) && <FeaturesSection />}
-            </Suspense>
-          </section>
-
-          <section id="getting-started" ref={gettingStarted.elementRef}>
-            <Suspense fallback={<LoadingFallback />}>
-              {(gettingStarted.isVisible || gettingStarted.isLoaded) && <GettingStartedSection />}
-            </Suspense>
-          </section>
-
-          <section id="pricing" ref={pricing.elementRef}>
-            <Suspense fallback={<LoadingFallback />}>
-              {(pricing.isVisible || pricing.isLoaded) && <PricingSection />}
-            </Suspense>
-          </section>
-
-          <section id="testimonials" ref={testimonials.elementRef}>
-            <Suspense fallback={<LoadingFallback />}>
-              {(testimonials.isVisible || testimonials.isLoaded) && <TestimonialsSection />}
-            </Suspense>
-          </section>
-
-          <section id="cta" ref={cta.elementRef}>
-            <Suspense fallback={<LoadingFallback />}>
-              {(cta.isVisible || cta.isLoaded) && <CallToActionSection />}
-            </Suspense>
-          </section>
+          <Suspense fallback={<LoadingFallback />}>
+            <WhyChooseSection />
+          </Suspense>
+          
+          <Suspense fallback={<LoadingFallback />}>
+            <FeaturesSection />
+          </Suspense>
+          
+          <Suspense fallback={<LoadingFallback />}>
+            <TestimonialsSection />
+          </Suspense>
+          
+          <Suspense fallback={<LoadingFallback />}>
+            <CallToActionSection />
+          </Suspense>
         </ErrorBoundary>
 
         <Footer />
