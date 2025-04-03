@@ -131,7 +131,7 @@ const OnboardingChat = () => {
         setOnboardingState(prev => ({ ...prev, appIdea: input, step: 'complete' }));
         
         // Add bot response for completion step after a delay
-        setTimeout(() => {
+        setTimeout(async () => {
           setMessages(prev => [
             ...prev,
             {
