@@ -1,7 +1,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { PhoneCall, MoveRight } from "lucide-react";
+import { MoveRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -28,18 +28,9 @@ function Hero() {
   }, [titleNumber, titles]);
 
   const handleGetStarted = () => {
-    console.log('Get Started clicked - navigating to /auth');
+    console.log('Create MVP clicked - navigating to /auth');
     try {
       navigate('/auth');
-    } catch (error) {
-      console.error('Navigation error:', error);
-    }
-  };
-
-  const handleTryAI = () => {
-    console.log('Try AI clicked - navigating to /home');
-    try {
-      navigate('/home');
     } catch (error) {
       console.error('Navigation error:', error);
     }
@@ -48,9 +39,9 @@ function Hero() {
   return (
     <div className="w-full">
       <div className="container mx-auto">
-        <div className="flex gap-6 sm:gap-8 py-16 sm:py-20 lg:py-40 items-center justify-center flex-col">
+        <div className="flex gap-6 sm:gap-8 py-16 sm:py-20 lg:py-32 min-h-[80vh] items-center justify-center flex-col">
           <div className="flex gap-3 sm:gap-4 flex-col items-center">
-            <h1 className={`text-4xl sm:text-5xl md:text-6xl lg:text-8xl max-w-5xl tracking-tighter text-center font-regular ${isMobile ? 'mt-8' : ''}`}>
+            <h1 className={`text-4xl sm:text-5xl md:text-6xl lg:text-8xl max-w-5xl tracking-tighter text-center font-regular`}>
               <span className="text-siso-text-bold whitespace-nowrap">Built for Agencies to</span>
               <div className={`relative ${isMobile ? 'h-[100px]' : 'h-[150px]'} md:h-[200px] flex w-full justify-center overflow-hidden text-center`}>
                 {titles.map((title, index) => (
@@ -81,18 +72,10 @@ function Hero() {
               Trusted by 40+ agencies to deliver fast MVPs.
             </p>
           </div>
-          <div className="flex flex-col sm:flex-row gap-3 w-full justify-center">
-            <Button 
-              size={isMobile ? "default" : "lg"} 
-              className="gap-2 sm:gap-4" 
-              variant="outline"
-              onClick={handleTryAI}
-            >
-              Jump on Call <PhoneCall className="w-4 h-4" />
-            </Button>
+          <div className="flex flex-col w-full justify-center">
             <Button 
               size={isMobile ? "default" : "lg"}
-              className="gap-2 sm:gap-4 bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90"
+              className="mx-auto gap-2 sm:gap-4 bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 sm:min-w-[200px] sm:py-6 text-base sm:text-lg"
               onClick={handleGetStarted}
             >
               Create MVP <MoveRight className="w-4 h-4" />

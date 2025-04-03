@@ -18,7 +18,7 @@ export const HeroSection = memo(() => {
   };
 
   return (
-    <section id="hero" className="min-h-screen">
+    <section id="hero" className="min-h-screen flex items-center justify-center">
       <Hero />
       
       {/* Mobile-optimized Callout */}

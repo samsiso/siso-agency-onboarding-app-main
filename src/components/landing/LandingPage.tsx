@@ -1,9 +1,11 @@
 
-import { lazy, Suspense, memo } from 'react';
+import { lazy, Suspense, memo, useEffect } from 'react';
 import { LoadingFallback } from './sections/LoadingFallback';
 import Footer from '@/components/Footer';
 import { ErrorBoundary } from 'react-error-boundary';
 import { HeroSection } from './sections/HeroSection';
+import { FeaturesSection } from './sections/FeaturesSection';
+import { useViewportLoading } from '@/hooks/useViewportLoading';
 
 // Only lazy load non-critical sections
 const WhyChooseSection = lazy(() => import('./sections/WhyChooseSection').then(m => ({
@@ -13,12 +15,38 @@ const WhyChooseSection = lazy(() => import('./sections/WhyChooseSection').then(m
 const LandingPage = () => {
   console.log('[LandingPage] Rendering landing page');
 
+  // Preload critical assets
+  useEffect(() => {
+    // Preload key images or scripts
+    const preconnectLinks = [
+      'https://avdgyrepwrvsvwgxrccr.supabase.co'
+    ];
+    
+    preconnectLinks.forEach(url => {
+      const link = document.createElement('link');
+      link.rel = 'preconnect';
+      link.href = url;
+      link.crossOrigin = 'anonymous';
+      document.head.appendChild(link);
+      
+      const dnsPrefetch = document.createElement('link');
+      dnsPrefetch.rel = 'dns-prefetch';
+      dnsPrefetch.href = url;
+      document.head.appendChild(dnsPrefetch);
+    });
+    
+    return () => {
+      // Clean up preconnect links on unmount
+      document.querySelectorAll('link[rel="preconnect"], link[rel="dns-prefetch"]').forEach(el => {
+        el.remove();
+      });
+    };
+  }, []);
+
+  const { elementRef: featuresRef, isLoaded: featuresLoaded } = useViewportLoading({ threshold: 0.1 });
+
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-black via-siso-bg to-black overflow-x-hidden">
-      {/* DNS prefetch and preconnect optimizations */}
-      <link rel="dns-prefetch" href="https://avdgyrepwrvsvwgxrccr.supabase.co" />
-      <link rel="preconnect" href="https://avdgyrepwrvsvwgxrccr.supabase.co" crossOrigin="anonymous" />
-      
       {/* Optimized background elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 -left-1/4 w-[250px] md:w-[600px] h-[250px] md:h-[600px] 
@@ -43,6 +71,10 @@ const LandingPage = () => {
         >
           <HeroSection />
         </ErrorBoundary>
+        
+        <div ref={featuresRef} className="transition-opacity duration-500" style={{ opacity: featuresLoaded ? 1 : 0 }}>
+          <FeaturesSection />
+        </div>
 
         <ErrorBoundary
           fallback={<div>Error loading sections</div>}
