@@ -1,3 +1,4 @@
+
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { PhoneCall, MoveRight } from "lucide-react";
@@ -9,7 +10,7 @@ function Hero() {
   const navigate = useNavigate();
   
   const titles = useMemo(
-    () => ["Innovate, Scale, Succeed", "Collaborate with 1M+ Agencies", "Future-Proof Your Agency"],
+    () => ["Innovate, Scale, Succeed", "Future-Proof Agencies", "Launch MVPs in 48 Hours"],
     []
   );
 
@@ -75,9 +76,7 @@ function Hero() {
             </h1>
 
             <p className="text-lg md:text-xl leading-relaxed tracking-tight text-siso-text max-w-2xl text-center mx-auto">
-              Your gateway to tools, education, networking, and AI-powered innovation—crafted 
-              to help your agency thrive in the digital age. Access our curated collection 
-              of resources designed for modern business growth.
+              Trusted by 40+ agencies to deliver fast MVPs.
             </p>
           </div>
           <div className="flex flex-row gap-3">
@@ -87,14 +86,14 @@ function Hero() {
               variant="outline"
               onClick={handleTryAI}
             >
-              Try SISO AI Now <PhoneCall className="w-4 h-4" />
+              Jump on Call <PhoneCall className="w-4 h-4" />
             </Button>
             <Button 
               size="lg" 
               className="gap-4 bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90"
               onClick={handleGetStarted}
             >
-              Get Started <MoveRight className="w-4 h-4" />
+              Create MVP <MoveRight className="w-4 h-4" />
             </Button>
           </div>
         </div>
