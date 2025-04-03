@@ -9,9 +9,6 @@ import { HeroSection } from './sections/HeroSection';
 const WhyChooseSection = lazy(() => import('./sections/WhyChooseSection').then(m => ({
   default: memo(m.WhyChooseSection)
 })));
-const CallToActionSection = lazy(() => import('./sections/CallToActionSection').then(m => ({
-  default: memo(m.CallToActionSection)
-})));
 
 const LandingPage = () => {
   console.log('[LandingPage] Rendering landing page');
@@ -53,10 +50,6 @@ const LandingPage = () => {
         >
           <Suspense fallback={<LoadingFallback />}>
             <WhyChooseSection />
-          </Suspense>
-          
-          <Suspense fallback={<LoadingFallback />}>
-            <CallToActionSection />
           </Suspense>
         </ErrorBoundary>
 
