@@ -9,12 +9,6 @@ import { HeroSection } from './sections/HeroSection';
 const WhyChooseSection = lazy(() => import('./sections/WhyChooseSection').then(m => ({
   default: memo(m.WhyChooseSection)
 })));
-const FeaturesSection = lazy(() => import('./sections/FeaturesSection').then(m => ({
-  default: memo(m.FeaturesSection)
-})));
-const TestimonialsSection = lazy(() => import('./sections/TestimonialsSection').then(m => ({
-  default: memo(m.TestimonialsSection)
-})));
 const CallToActionSection = lazy(() => import('./sections/CallToActionSection').then(m => ({
   default: memo(m.CallToActionSection)
 })));
@@ -71,14 +65,6 @@ const LandingPage = () => {
         >
           <Suspense fallback={<LoadingFallback />}>
             <WhyChooseSection />
-          </Suspense>
-          
-          <Suspense fallback={<LoadingFallback />}>
-            <FeaturesSection />
-          </Suspense>
-          
-          <Suspense fallback={<LoadingFallback />}>
-            <TestimonialsSection />
           </Suspense>
           
           <Suspense fallback={<LoadingFallback />}>

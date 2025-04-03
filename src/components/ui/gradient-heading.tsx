@@ -1,73 +1,29 @@
-import React from "react"
-import { Slot } from "@radix-ui/react-slot"
-import { cva, type VariantProps } from "class-variance-authority"
-import { cn } from "@/lib/utils"
 
-const headingVariants = cva(
-  "tracking-tight pb-3 bg-clip-text text-transparent animate-gradient bg-[length:200%_auto]",
-  {
-    variants: {
-      variant: {
-        default: "bg-gradient-to-r from-siso-red via-siso-orange to-siso-red",
-        pink: "bg-gradient-to-r from-siso-orange via-siso-red to-siso-orange",
-        light: "bg-gradient-to-r from-siso-red via-[#FF7043] to-siso-red",
-        secondary: "bg-gradient-to-r from-siso-orange via-[#FF7043] to-siso-orange",
-        rainbow: "bg-gradient-to-r from-siso-red via-siso-orange to-siso-red",
-        sunset: "bg-gradient-to-r from-siso-orange via-siso-red to-siso-orange",
-        ocean: "bg-gradient-to-r from-siso-red via-siso-orange to-siso-red",
-      },
-      size: {
-        default: "text-2xl sm:text-3xl lg:text-4xl",
-        xxs: "text-base sm:text-lg lg:text-lg",
-        xs: "text-lg sm:text-xl lg:text-2xl",
-        sm: "text-xl sm:text-2xl lg:text-3xl",
-        md: "text-2xl sm:text-3xl lg:text-4xl",
-        lg: "text-3xl sm:text-4xl lg:text-5xl",
-        xl: "text-4xl sm:text-5xl lg:text-6xl",
-        xll: "text-5xl sm:text-6xl lg:text-[5.4rem] lg:leading-[0.5rem]",
-        xxl: "text-5xl sm:text-6xl lg:text-[6rem]",
-        xxxl: "text-5xl sm:text-6xl lg:text-[8rem]",
-      },
-      weight: {
-        default: "font-bold",
-        thin: "font-thin",
-        base: "font-base",
-        semi: "font-semibold",
-        bold: "font-bold",
-        black: "font-black",
-      },
-    },
-    defaultVariants: {
-      variant: "rainbow",
-      size: "default",
-      weight: "bold",
-    },
-  }
-)
+import { HTMLAttributes } from 'react';
+import { cn } from '@/lib/utils';
 
-export interface HeadingProps extends VariantProps<typeof headingVariants> {
-  asChild?: boolean
-  children: React.ReactNode
-  className?: string
+interface GradientHeadingProps extends HTMLAttributes<HTMLHeadingElement> {
+  variant?: 'primary' | 'secondary';
 }
 
-const GradientHeading = React.forwardRef<HTMLHeadingElement, HeadingProps>(
-  ({ asChild, variant, weight, size, className, children, ...props }, ref) => {
-    const Comp = asChild ? Slot : "h3"
-    return (
-      <Comp ref={ref} {...props} className={className}>
-        <span className={cn(headingVariants({ variant, size, weight }))}>
-          {children}
-        </span>
-      </Comp>
-    )
-  }
-)
-
-GradientHeading.displayName = "GradientHeading"
-
-export type Variant = "default" | "pink" | "light" | "secondary" | "rainbow" | "sunset" | "ocean"
-export type Size = "default" | "xxs" | "xs" | "sm" | "md" | "lg" | "xl" | "xxl" | "xxxl"
-export type Weight = "default" | "thin" | "base" | "semi" | "bold" | "black"
-
-export { GradientHeading, headingVariants }
+export function GradientHeading({ 
+  children, 
+  className, 
+  variant = 'primary', 
+  ...props 
+}: GradientHeadingProps) {
+  return (
+    <h2 
+      className={cn(
+        "font-bold tracking-tight bg-clip-text text-transparent",
+        variant === 'primary' 
+          ? "bg-gradient-to-r from-siso-red to-siso-orange" 
+          : "bg-gradient-to-r from-siso-orange to-siso-red",
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </h2>
+  );
+}
