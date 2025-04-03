@@ -19,8 +19,8 @@ export const HeroSection = memo(() => {
     <section id="hero" className="min-h-screen">
       <Hero />
       
-      {/* Improved Callout - Positioned to overlay on the hero */}
-      <div className="absolute top-32 md:top-40 left-0 right-0 z-50 flex justify-center pointer-events-none">
+      {/* Improved Callout - Positioned higher up to avoid overlapping hero text */}
+      <div className="absolute top-20 md:top-24 left-0 right-0 z-50 flex justify-center pointer-events-none">
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
