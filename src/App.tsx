@@ -1,22 +1,26 @@
-
 import { Routes, Route } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
-import LandingPage from '@/components/landing/LandingPage';
+import Index from './pages/Index';
+import Auth from './pages/Auth';
+import Profile from './pages/Profile';
+import OnboardingSocial from './pages/OnboardingSocial';
+import { Toast } from '@/components/ui/toast';
 import { Toaster } from '@/components/ui/toaster';
+import OnboardingChat from '@/pages/OnboardingChat';
+import ThankYou from '@/pages/ThankYou';
 
 function App() {
   return (
     <>
-      <Helmet>
-        <title>SISO - Your one-stop AI Knowledge source</title>
-        <meta name="description" content="SISO is the premier platform for AI learning, resources, and community." />
-      </Helmet>
-
-      <Routes>
-        <Route path="*" element={<LandingPage />} />
-      </Routes>
-
+      <Toast />
       <Toaster />
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/onboarding-chat" element={<OnboardingChat />} />
+        <Route path="/thankyou" element={<ThankYou />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/onboarding/social" element={<OnboardingSocial />} />
+      </Routes>
     </>
   );
 }

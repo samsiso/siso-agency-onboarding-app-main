@@ -28,9 +28,9 @@ function Hero() {
   }, [titleNumber, titles]);
 
   const handleGetStarted = () => {
-    console.log('Create MVP clicked - navigating to /auth');
+    console.log('Create MVP clicked - navigating to /onboarding-chat');
     try {
-      navigate('/auth');
+      navigate('/onboarding-chat');
     } catch (error) {
       console.error('Navigation error:', error);
     }
