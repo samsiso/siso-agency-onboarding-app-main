@@ -12,7 +12,7 @@ const WhyChooseSection = lazy(() => import('./sections/WhyChooseSection').then(m
 const CallToActionSection = lazy(() => import('./sections/CallToActionSection').then(m => ({
   default: memo(m.CallToActionSection)
 })));
-const ScrollNav = lazy(() => import('@/components/ui/scroll-nav.tsx').then(m => ({
+const ScrollNav = lazy(() => import('@/components/ui/scroll-nav').then(m => ({
   default: memo(m.ScrollNav)
 })));
 

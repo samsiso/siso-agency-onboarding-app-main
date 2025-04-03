@@ -18,7 +18,7 @@ interface NewsFiltersProps {
   selectedDate?: string | null;
 }
 
-// [Analysis] Animation variants for filter components to enhance UX
+// Animation variants for filter components to enhance UX
 const itemVariants = {
   hidden: {
     opacity: 0,
@@ -44,8 +44,7 @@ const NewsFilters = ({
   const [dateFilter, setDateFilter] = useState<string>(selectedDate || '');
   const [inputValue, setInputValue] = useState(searchQuery);
 
-  // [Analysis] Use debounce to prevent too many search requests
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // Use debounce to prevent too many search requests
   const debouncedSearch = useCallback(debounce((value: string) => {
     onSearchChange(value);
   }, 350), [onSearchChange]);
@@ -69,7 +68,6 @@ const NewsFilters = ({
     }
   };
 
-  // [Analysis] The component was missing a return statement with JSX
   return (
     <div className="space-y-6">
       <motion.div
