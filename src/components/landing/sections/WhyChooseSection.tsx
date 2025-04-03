@@ -7,31 +7,31 @@ export const WhyChooseSection = () => {
   const features = [
     {
       icon: Bot,
-      title: "Custom AI Agency Agent",
-      description: "Experience our AI agent that learns your agency's unique needs, analyzes our resource bank, and delivers personalized recommendations for tools and growth strategies.",
+      title: "AI Development Assistant",
+      description: "Work with our AI assistant that understands your project needs, suggests optimal architectures, and provides real-time guidance.",
       stats: "95% accuracy in recommendations",
       highlight: "Powered by GPT-4"
     },
     {
       icon: Users,
-      title: "Community Insights",
-      description: "Learn from over 1,000 successful agency owners. See exactly which solutions are driving results for agencies like yours and implement proven strategies in your business.",
-      stats: "1,000+ active members",
-      highlight: "Real success stories"
+      title: "Agency-Proven Expertise",
+      description: "We've built apps for 40+ agencies like yours, turning feedback and know-how into custom solutions that work.",
+      stats: "Trusted by 40+ Agencies",
+      highlight: "Experience That Delivers"
     },
     {
       icon: Zap,
-      title: "Real-time Updates",
-      description: "Stay ahead with a platform that updates multiple times daily. Get instant access to new technologies and implementation guides as soon as they become available.",
-      stats: "24/7 updates",
-      highlight: "Always current"
+      title: "Rapid MVP Delivery",
+      description: "From idea to app in just 48-72 hours—our streamlined process gets your MVP live faster than your next pitch meeting.",
+      stats: "48-72 Hour Turnaround",
+      highlight: "Speed That Wins Deals"
     },
     {
       icon: Globe,
-      title: "Integrated Resource Hub",
-      description: "Access a comprehensive suite of agency tools, step-by-step implementation guides, and educational resources - all designed to help you scale efficiently.",
-      stats: "500+ resources",
-      highlight: "All-in-one solution"
+      title: "Zero-Risk Commitment",
+      description: "No upfront costs—see your app, tweak it, love it, then pay. We deliver to your standard, risk-free.",
+      stats: "Pay When You're Happy",
+      highlight: "Your Vision, Your Terms"
     }
   ];
 
@@ -92,7 +92,7 @@ export const WhyChooseSection = () => {
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-gradient-to-r from-siso-red/5 to-siso-orange/5 rounded-full filter blur-[50px]" />
           
           <GradientHeading variant="secondary" className="text-4xl md:text-5xl font-bold mb-6 relative">
-            Supercharge Your Agency Growth
+            Why Build With SISO
           </GradientHeading>
 
           {/* Enhanced separator with animation */}
@@ -102,7 +102,7 @@ export const WhyChooseSection = () => {
           </div>
           
           <p className="text-lg text-siso-text-muted max-w-2xl mx-auto relative">
-            Transform your business with AI-powered tools and proven strategies from successful agency owners
+            Experience the future of app development with AI-powered tools and battle-tested development workflows
           </p>
         </motion.div>
 
