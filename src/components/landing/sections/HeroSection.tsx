@@ -10,6 +10,14 @@ export const HeroSection = memo(() => {
 
   return (
     <section id="hero" className="min-h-screen">
+      {/* New Callout Text */}
+      <div className="relative z-50 w-full flex justify-center pt-12">
+        <div className="inline-block bg-[#1A1A1A]/80 border border-siso-orange rounded-lg px-4 py-2 backdrop-blur-sm mb-4">
+          <p className="text-center text-lg">
+            We build out your MVP in <span className="text-siso-orange font-medium">48 hours</span> <span className="text-siso-orange font-medium">Free of charge</span>
+          </p>
+        </div>
+      </div>
       <Hero />
       <Waves 
         lineColor="rgba(255, 87, 34, 0.2)"
