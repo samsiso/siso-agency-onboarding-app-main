@@ -12,9 +12,6 @@ const WhyChooseSection = lazy(() => import('./sections/WhyChooseSection').then(m
 const CallToActionSection = lazy(() => import('./sections/CallToActionSection').then(m => ({
   default: memo(m.CallToActionSection)
 })));
-const ScrollNav = lazy(() => import('@/components/ui/scroll-nav').then(m => ({
-  default: memo(m.ScrollNav)
-})));
 
 const LandingPage = () => {
   console.log('[LandingPage] Rendering landing page');
@@ -24,15 +21,6 @@ const LandingPage = () => {
       {/* DNS prefetch and preconnect optimizations */}
       <link rel="dns-prefetch" href="https://avdgyrepwrvsvwgxrccr.supabase.co" />
       <link rel="preconnect" href="https://avdgyrepwrvsvwgxrccr.supabase.co" crossOrigin="anonymous" />
-      
-      <ErrorBoundary 
-        fallback={<div>Error loading scroll navigation</div>}
-        onError={(error) => console.error('[LandingPage] Error in ScrollNav:', error)}
-      >
-        <Suspense fallback={<LoadingFallback />}>
-          <ScrollNav />
-        </Suspense>
-      </ErrorBoundary>
       
       {/* Optimized background elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
