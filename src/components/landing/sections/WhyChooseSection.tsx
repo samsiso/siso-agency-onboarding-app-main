@@ -8,30 +8,30 @@ export const WhyChooseSection = () => {
     {
       icon: Bot,
       title: "AI Development Assistant",
-      description: "Work with our AI assistant that understands your project needs, suggests optimal architectures, and provides real-time guidance.",
-      stats: "95% accuracy in recommendations",
+      description: "AI assistant that understands your needs and provides real-time guidance.",
+      stats: "95% accuracy",
       highlight: "Powered by GPT-4"
     },
     {
       icon: Users,
       title: "Agency-Proven Expertise",
-      description: "We've built apps for 40+ agencies like yours, turning feedback and know-how into custom solutions that work.",
-      stats: "Trusted by 40+ Agencies",
-      highlight: "Experience That Delivers"
+      description: "Built apps for 40+ agencies, turning feedback into solutions that work.",
+      stats: "40+ Agencies",
+      highlight: "Proven Experience"
     },
     {
       icon: Zap,
       title: "Rapid MVP Delivery",
-      description: "From idea to app in just 48-72 hours—our streamlined process gets your MVP live faster than your next pitch meeting.",
-      stats: "48-72 Hour Turnaround",
-      highlight: "Speed That Wins Deals"
+      description: "From idea to app in just 48-72 hours—faster than your next pitch meeting.",
+      stats: "48hr Turnaround",
+      highlight: "Speed That Wins"
     },
     {
       icon: Globe,
       title: "Zero-Risk Commitment",
-      description: "No upfront costs—see your app, tweak it, love it, then pay. We deliver to your standard, risk-free.",
-      stats: "Pay When You're Happy",
-      highlight: "Your Vision, Your Terms"
+      description: "No upfront costs—see your app, tweak it, love it, then pay.",
+      stats: "Pay When Happy",
+      highlight: "Risk Free"
     }
   ];
 
@@ -41,32 +41,32 @@ export const WhyChooseSection = () => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2
+        staggerChildren: 0.15
       }
     }
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 15 },
     visible: {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 0.5
+        duration: 0.4
       }
     }
   };
 
   return (
-    <section className="py-24 relative overflow-hidden">
+    <section className="py-16 relative overflow-hidden">
       {/* Enhanced Background Elements */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/4 -left-1/4 w-[500px] h-[500px] bg-gradient-to-r from-siso-red/10 to-siso-orange/10 rounded-full filter blur-[100px] animate-float-slow" />
-        <div className="absolute bottom-1/4 -right-1/4 w-[500px] h-[500px] bg-gradient-to-r from-siso-orange/10 to-siso-red/10 rounded-full filter blur-[100px] animate-float-slower" />
+        <div className="absolute top-1/4 -left-1/4 w-[400px] h-[400px] bg-gradient-to-r from-siso-red/10 to-siso-orange/10 rounded-full filter blur-[100px] animate-float-slow" />
+        <div className="absolute bottom-1/4 -right-1/4 w-[400px] h-[400px] bg-gradient-to-r from-siso-orange/10 to-siso-red/10 rounded-full filter blur-[100px] animate-float-slower" />
         
         {/* Added particle-like decorative elements */}
         <div className="absolute inset-0 overflow-hidden">
-          {[...Array(20)].map((_, i) => (
+          {[...Array(15)].map((_, i) => (
             <div
               key={i}
               className="absolute w-1 h-1 bg-siso-orange/20 rounded-full animate-float-slow"
@@ -86,23 +86,23 @@ export const WhyChooseSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16 relative"
+          className="text-center mb-12 relative"
         >
           {/* Enhanced decorative ring behind heading */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-gradient-to-r from-siso-red/5 to-siso-orange/5 rounded-full filter blur-[50px]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[250px] h-[250px] bg-gradient-to-r from-siso-red/5 to-siso-orange/5 rounded-full filter blur-[40px]" />
           
-          <GradientHeading variant="secondary" className="text-4xl md:text-5xl font-bold mb-6 relative">
+          <GradientHeading variant="secondary" className="text-3xl md:text-4xl font-bold mb-4 relative">
             Why Build With SISO
           </GradientHeading>
 
           {/* Enhanced separator with animation */}
-          <div className="relative h-1 w-24 mx-auto mb-6">
+          <div className="relative h-1 w-20 mx-auto mb-4">
             <div className="absolute inset-0 bg-gradient-to-r from-siso-red to-siso-orange rounded-full animate-pulse" />
             <div className="absolute inset-0 bg-gradient-to-r from-siso-orange to-siso-red rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
           </div>
           
-          <p className="text-lg text-siso-text-muted max-w-2xl mx-auto relative">
-            Experience the future of app development with AI-powered tools and battle-tested development workflows
+          <p className="text-base text-siso-text-muted max-w-xl mx-auto relative">
+            AI-powered tools and battle-tested development workflows
           </p>
         </motion.div>
 
@@ -111,9 +111,9 @@ export const WhyChooseSection = () => {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-5 max-w-5xl mx-auto"
         >
-          {features.map((feature, index) => (
+          {features.map((feature) => (
             <motion.div 
               key={feature.title}
               variants={itemVariants}
@@ -123,46 +123,45 @@ export const WhyChooseSection = () => {
               }}
               className="relative group"
             >
-              {/* Enhanced card background with multiple layers */}
-              <div className="absolute inset-0 bg-gradient-to-r from-siso-red/5 to-siso-orange/5 rounded-xl transform group-hover:scale-105 transition-transform duration-300 blur-xl" />
-              <div className="absolute inset-0 bg-gradient-to-br from-siso-red/3 to-siso-orange/3 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              {/* Optimized card background with streamlined layers */}
+              <div className="absolute inset-0 bg-gradient-to-r from-siso-red/5 to-siso-orange/5 rounded-lg transform group-hover:scale-105 transition-transform duration-300 blur-md" />
               
-              <div className="relative bg-black/20 backdrop-blur-sm border border-siso-text/10 rounded-xl p-6 hover:border-siso-orange/20 transition-all duration-300">
-                <div className="flex flex-col gap-4">
-                  {/* Enhanced icon container with animations */}
-                  <div className="relative w-12 h-12">
-                    <div className="absolute inset-0 bg-gradient-to-br from-siso-red to-siso-orange opacity-20 rounded-lg blur-md transform group-hover:scale-110 transition-transform duration-300" />
-                    <div className="relative h-full p-3 rounded-lg bg-gradient-to-br from-siso-red/10 to-siso-orange/10 group-hover:from-siso-red/20 group-hover:to-siso-orange/20 transition-colors duration-300">
-                      <feature.icon className="w-full h-full text-siso-orange animate-float-subtle" />
+              <div className="relative bg-black/20 backdrop-blur-sm border border-siso-text/10 rounded-lg p-4 hover:border-siso-orange/20 transition-all duration-300 h-full">
+                <div className="flex items-start gap-4">
+                  {/* Compact icon container */}
+                  <div className="flex-shrink-0 relative w-10 h-10">
+                    <div className="absolute inset-0 bg-gradient-to-br from-siso-red to-siso-orange opacity-20 rounded-lg blur-sm group-hover:opacity-30 transition-opacity duration-300" />
+                    <div className="relative h-full rounded-lg bg-gradient-to-br from-siso-red/10 to-siso-orange/10 p-2 group-hover:from-siso-red/20 group-hover:to-siso-orange/20 transition-colors duration-300">
+                      <feature.icon className="w-full h-full text-siso-orange" />
                     </div>
                   </div>
                   
-                  <div className="space-y-2">
-                    <h3 className="text-xl font-semibold text-siso-text-bold bg-gradient-to-r from-white to-white/90 bg-clip-text">
+                  <div className="space-y-1 flex-grow">
+                    <h3 className="text-lg font-semibold text-siso-text-bold">
                       {feature.title}
                     </h3>
                     
                     {/* Stats badge */}
-                    <div className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-siso-red/10 to-siso-orange/10 text-sm text-siso-orange">
+                    <div className="inline-block px-2 py-0.5 rounded-full bg-gradient-to-r from-siso-red/10 to-siso-orange/10 text-xs text-siso-orange">
                       {feature.stats}
                     </div>
                     
-                    <p className="text-siso-text/80 leading-relaxed">
+                    <p className="text-sm text-siso-text/80 leading-relaxed">
                       {feature.description}
                     </p>
                     
                     {/* Highlight tag */}
-                    <div className="flex items-center gap-2 mt-4">
-                      <div className="w-1.5 h-1.5 rounded-full bg-siso-orange animate-pulse" />
-                      <span className="text-sm text-siso-text-bold">{feature.highlight}</span>
+                    <div className="flex items-center gap-1.5 mt-2">
+                      <div className="w-1 h-1 rounded-full bg-siso-orange animate-pulse" />
+                      <span className="text-xs text-siso-text-bold">{feature.highlight}</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Corner decorative elements */}
-                <div className="absolute top-0 right-0 w-16 h-16 pointer-events-none">
-                  <div className="absolute top-4 right-4 w-2 h-2 bg-siso-orange/20 rounded-full animate-pulse" />
-                  <div className="absolute top-6 right-6 w-1 h-1 bg-siso-red/20 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }} />
+                <div className="absolute top-0 right-0 w-12 h-12 pointer-events-none">
+                  <div className="absolute top-3 right-3 w-1.5 h-1.5 bg-siso-orange/20 rounded-full animate-pulse" />
+                  <div className="absolute top-5 right-5 w-1 h-1 bg-siso-red/20 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }} />
                 </div>
               </div>
             </motion.div>
