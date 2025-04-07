@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -465,6 +464,7 @@ const Plan = () => {
         {/* Main content */}
         <div className="bg-black/40 backdrop-blur-md rounded-lg border border-siso-text/10 shadow-xl overflow-hidden">
           <div className="p-6 md:p-8">
+            {/* Header with App Plan and Logo */}
             <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-6">
               <div>
                 <GradientHeading className="text-3xl md:text-4xl mb-2">
@@ -487,6 +487,7 @@ const Plan = () => {
               )}
             </div>
             
+            {/* Key Info Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
                 <div className="flex items-start">
@@ -521,6 +522,43 @@ const Plan = () => {
             
             {isDecoraPlan ? (
               <div className="mb-8">
+                {/* Pain Points Solved - MOVED UP */}
+                <div className="mb-6">
+                  <h2 className="text-2xl font-semibold text-white mb-4 flex items-center">
+                    <Shield className="h-5 w-5 mr-2 text-siso-orange" />
+                    Pain Points Solved
+                  </h2>
+                  <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {painPoints.map((point, index) => (
+                        <motion.div 
+                          key={index} 
+                          className="p-4 border border-siso-text/10 rounded-lg bg-black/20"
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.1 * index, duration: 0.5 }}
+                        >
+                          <h3 className="text-white font-medium mb-2">{point.problem}</h3>
+                          <p className="text-siso-text text-sm">{point.solution}</p>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Target Users - MOVED UP */}
+                <div className="mb-6">
+                  <h2 className="text-2xl font-semibold text-white mb-4 flex items-center">
+                    <Target className="h-5 w-5 mr-2 text-siso-orange" />
+                    Target Users
+                  </h2>
+                  <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
+                    <p className="text-siso-text">
+                      This app is designed specifically for <span className="text-siso-orange font-semibold">OnlyFans Management Agencies</span> who need to efficiently manage creators, content, and fan interactions. It's perfect for agencies like Decora who are looking to scale operations while maintaining high-quality service.
+                    </p>
+                  </div>
+                </div>
+                
                 {/* Branding Customization Section */}
                 <div className="mb-6">
                   <h2 className="text-2xl font-semibold text-white mb-4">Customize Your Branding</h2>
@@ -568,110 +606,8 @@ const Plan = () => {
                   />
                 </div>
                 
-                {/* Case Studies Section */}
-                <div className="mb-6">
-                  <h2 className="text-2xl font-semibold text-white mb-4 flex items-center">
-                    <FileText className="h-5 w-5 mr-2 text-siso-orange" />
-                    Case Studies
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {caseStudies.map((study, index) => (
-                      <CaseStudy
-                        key={index}
-                        title={study.title}
-                        description={study.description}
-                        imageUrl={study.imageUrl}
-                        notionUrl={study.notionUrl}
-                      />
-                    ))}
-                  </div>
-                </div>
-                
-                <div className="mb-6">
-                  <h2 className="text-2xl font-semibold text-white mb-4 flex items-center">
-                    <Target className="h-5 w-5 mr-2 text-siso-orange" />
-                    Target Users
-                  </h2>
-                  <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
-                    <p className="text-siso-text">
-                      This app is designed specifically for <span className="text-siso-orange font-semibold">OnlyFans Management Agencies</span> who need to efficiently manage creators, content, and fan interactions. It's perfect for agencies like Decora who are looking to scale operations while maintaining high-quality service.
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="mb-6">
-                  <h2 className="text-2xl font-semibold text-white mb-4 flex items-center">
-                    <Shield className="h-5 w-5 mr-2 text-siso-orange" />
-                    Pain Points Solved
-                  </h2>
-                  <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {painPoints.map((point, index) => (
-                        <motion.div 
-                          key={index} 
-                          className="p-4 border border-siso-text/10 rounded-lg bg-black/20"
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.1 * index, duration: 0.5 }}
-                        >
-                          <h3 className="text-white font-medium mb-2">{point.problem}</h3>
-                          <p className="text-siso-text text-sm">{point.solution}</p>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Testimonials Section */}
-                <div className="mb-6">
-                  <h2 className="text-2xl font-semibold text-white mb-4 flex items-center">
-                    <Heart className="h-5 w-5 mr-2 text-siso-orange" />
-                    What Other Agencies Are Saying
-                  </h2>
-                  <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {testimonials.map((testimonial, index) => (
-                        <motion.div 
-                          key={index} 
-                          className="p-4 border border-siso-text/10 rounded-lg bg-gradient-to-br from-siso-red/5 to-siso-orange/5"
-                          initial={{ opacity: 0, scale: 0.9 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: 0.15 * index, duration: 0.5 }}
-                        >
-                          <p className="text-siso-text text-sm italic mb-3">{`"${testimonial.content}"`}</p>
-                          <div className="mb-3">
-                            <p className="text-white font-medium">{testimonial.author}</p>
-                            <p className="text-siso-text/70 text-xs">{testimonial.position}</p>
-                          </div>
-                          <div className="flex gap-2">
-                            {testimonial.instagram && (
-                              <a 
-                                href={testimonial.instagram} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="text-xs text-siso-orange flex items-center hover:underline"
-                              >
-                                Instagram <ExternalLink className="h-3 w-3 ml-1" />
-                              </a>
-                            )}
-                            {testimonial.appLink && (
-                              <a 
-                                href={testimonial.appLink} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="text-xs text-siso-orange flex items-center hover:underline"
-                              >
-                                App Link <ExternalLink className="h-3 w-3 ml-1" />
-                              </a>
-                            )}
-                          </div>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                {/* Features and Technical Details Tabs */}
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mb-6">
                   <TabsList className="w-full grid grid-cols-2 mb-6 bg-black/20">
                     <TabsTrigger value="features" className="data-[state=active]:bg-siso-orange/20">
                       Feature Categories
@@ -771,71 +707,60 @@ const Plan = () => {
                     </div>
                   </TabsContent>
                 </Tabs>
-              </div>
-            ) : (
-              <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5 mb-8">
-                <h3 className="text-xl font-semibold text-white mb-2">Features</h3>
-                <ul className="space-y-1">
-                  {regularFeatures.map((feature, index) => (
-                    <li key={index} className="flex items-center text-siso-text">
-                      <CheckCircle className="h-4 w-4 mr-2 text-siso-orange" />
-                      <span className="capitalize">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            
-            <motion.div 
-              className="mt-8 text-center"
-              whileHover={{ scale: plan.status !== 'approved' && !submitting ? 1.02 : 1 }}
-            >
-              <Button
-                onClick={handleSubmitPlan}
-                disabled={submitting || plan.status === 'approved'}
-                className="w-full md:w-auto px-8 py-6 text-lg bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 disabled:opacity-50"
-              >
-                {submitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Processing...
-                  </>
-                ) : plan.status === 'approved' ? (
-                  <>
-                    <CheckCircle className="mr-2 h-5 w-5" />
-                    Plan Approved
-                  </>
-                ) : (
-                  <>
-                    Approve This Plan
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </>
-                )}
-              </Button>
-              
-              {plan.status === 'approved' ? (
-                <motion.p 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="mt-4 text-siso-text"
-                >
-                  Your plan has been approved. We're getting everything ready for you!
-                </motion.p>
-              ) : (
-                <motion.p 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="mt-4 text-siso-text/70 text-sm"
-                >
-                  By approving this plan, you'll begin the implementation process for your custom OnlyFans Management Suite.
-                </motion.p>
-              )}
-            </motion.div>
-          </div>
-        </div>
-      </motion.div>
-    </div>
-  );
-};
+                
+                {/* Case Studies Section */}
+                <div className="mb-6">
+                  <h2 className="text-2xl font-semibold text-white mb-4 flex items-center">
+                    <FileText className="h-5 w-5 mr-2 text-siso-orange" />
+                    Case Studies
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {caseStudies.map((study, index) => (
+                      <CaseStudy
+                        key={index}
+                        title={study.title}
+                        description={study.description}
+                        imageUrl={study.imageUrl}
+                        notionUrl={study.notionUrl}
+                      />
+                    ))}
+                  </div>
+                </div>
 
-export default Plan;
+                {/* Testimonials Section - MOVED TO BOTTOM */}
+                <div className="mb-6">
+                  <h2 className="text-2xl font-semibold text-white mb-4 flex items-center">
+                    <Heart className="h-5 w-5 mr-2 text-siso-orange" />
+                    What Other Agencies Are Saying
+                  </h2>
+                  <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {testimonials.map((testimonial, index) => (
+                        <motion.div 
+                          key={index} 
+                          className="p-4 border border-siso-text/10 rounded-lg bg-gradient-to-br from-siso-red/5 to-siso-orange/5"
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.15 * index, duration: 0.5 }}
+                        >
+                          <p className="text-siso-text text-sm italic mb-3">{`"${testimonial.content}"`}</p>
+                          <div className="mb-3">
+                            <p className="text-white font-medium">{testimonial.author}</p>
+                            <p className="text-siso-text/70 text-xs">{testimonial.position}</p>
+                          </div>
+                          <div className="flex gap-2">
+                            {testimonial.instagram && (
+                              <a 
+                                href={testimonial.instagram} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-xs text-siso-orange flex items-center hover:underline"
+                              >
+                                Instagram <ExternalLink className="h-3 w-3 ml-1" />
+                              </a>
+                            )}
+                            {testimonial.appLink && (
+                              <a 
+                                href={testimonial.appLink} 
+                                target="_blank" 
+                                rel="noopener noreferrer
