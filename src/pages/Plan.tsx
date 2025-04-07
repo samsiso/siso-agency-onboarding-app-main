@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -462,6 +461,7 @@ const Plan = () => {
           </motion.div>
         )}
 
+        {/* Main content */}
         <div className="bg-black/40 backdrop-blur-md rounded-lg border border-siso-text/10 shadow-xl overflow-hidden">
           <div className="p-6 md:p-8">
             <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-6">
@@ -767,74 +767,3 @@ const Plan = () => {
                         <p>All system components adhere to industry best practices for security and performance, ensuring a reliable platform for your business operations. The white-label options allow you to fully brand the platform as your own, enhancing your professional image with clients.</p>
                         <p>After approval, we'll work closely with your team to customize the platform to your specific workflow and processes, ensuring a seamless transition and maximum adoption across your organization.</p>
                       </div>
-                    </div>
-                  </TabsContent>
-                </Tabs>
-              </div>
-            ) : (
-              <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5 mb-8">
-                <h3 className="text-xl font-semibold text-white mb-2">Features</h3>
-                <ul className="space-y-1">
-                  {regularFeatures.map((feature, index) => (
-                    <li key={index} className="flex items-center text-siso-text">
-                      <CheckCircle className="h-4 w-4 mr-2 text-siso-orange" />
-                      <span className="capitalize">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            
-            <motion.div 
-              className="mt-8 text-center"
-              whileHover={{ scale: plan.status !== 'approved' && !submitting ? 1.02 : 1 }}
-            >
-              <Button
-                onClick={handleSubmitPlan}
-                disabled={submitting || plan.status === 'approved'}
-                className="w-full md:w-auto px-8 py-6 text-lg bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 disabled:opacity-50"
-              >
-                {submitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Processing...
-                  </>
-                ) : plan.status === 'approved' ? (
-                  <>
-                    <CheckCircle className="mr-2 h-5 w-5" />
-                    Plan Approved
-                  </>
-                ) : (
-                  <>
-                    Approve This Plan
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </>
-                )}
-              </Button>
-              
-              {plan.status === 'approved' ? (
-                <motion.p 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="mt-4 text-siso-text"
-                >
-                  Your plan has been approved. We're getting everything ready for you!
-                </motion.p>
-              ) : (
-                <motion.p 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="mt-4 text-siso-text/70 text-sm"
-                >
-                  By approving this plan, you'll begin the implementation process for your custom OnlyFans Management Suite.
-                </motion.p>
-              )}
-            </motion.div>
-          </div>
-        </div>
-      </motion.div>
-    </div>
-  );
-};
-
-export default Plan;
