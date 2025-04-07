@@ -19,13 +19,17 @@ import {
   Settings, 
   Target,
   Smartphone,
-  Heart
+  Heart,
+  ExternalLink
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { MessageLoading } from '@/components/ui/message-loading';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { ColorPicker } from '@/components/plan/ColorPicker';
+import { FeatureSelection, Feature } from '@/components/plan/FeatureSelection';
+import { CaseStudy } from '@/components/plan/CaseStudy';
 
 interface PlanData {
   id: string;
@@ -62,7 +66,83 @@ interface Testimonial {
   content: string;
   author: string;
   position: string;
+  instagram?: string;
+  appLink?: string;
 }
+
+// Define color options
+const brandColorOptions = [
+  { name: 'Classic Red', value: '#E53E3E' },
+  { name: 'Vibrant Orange', value: '#ED8936' },
+  { name: 'Royal Purple', value: '#805AD5' },
+  { name: 'Ocean Blue', value: '#3182CE' },
+  { name: 'Emerald Green', value: '#38A169' },
+  { name: 'Hot Pink', value: '#D53F8C' },
+  { name: 'Slate Gray', value: '#4A5568' },
+  { name: 'Midnight Black', value: '#1A202C' },
+  { name: 'Modern Teal', value: '#319795' }
+];
+
+// Case studies data
+const caseStudies = [
+  {
+    title: 'OnlyFans Management Platform for Agency X',
+    description: 'How we helped Agency X increase their client retention by 40% and double their revenue with our custom platform.',
+    imageUrl: '/lovable-uploads/c7ac43fd-bc3e-478d-8b4f-809beafb6838.png',
+    notionUrl: 'https://www.notion.so/Case-Study-OnlyFans-Management-Platform-123456'
+  },
+  {
+    title: 'Creator Content Management System',
+    description: 'A dedicated content scheduling and management system that improved workflow efficiency by 60%.',
+    imageUrl: '/lovable-uploads/1f9eba1e-c2af-4ed8-84e7-a375872c9182.png',
+    notionUrl: 'https://www.notion.so/Case-Study-Content-Management-System-789012'
+  },
+  {
+    title: 'Fan Engagement & Analytics Dashboard',
+    description: 'How our analytics tools helped boost fan engagement and increase subscription renewal rates.',
+    imageUrl: '/lovable-uploads/19ca8c73-3736-4506-bfb2-de867b272e12.png',
+    notionUrl: 'https://www.notion.so/Case-Study-Fan-Engagement-Analytics-345678'
+  }
+];
+
+// Additional features that can be added
+const additionalFeatures: Feature[] = [
+  {
+    id: 'white-label',
+    name: 'White Label Branding',
+    description: 'Remove all Siso branding and use your own logo and colors throughout the platform.',
+    price: 1200,
+    included: false
+  },
+  {
+    id: 'mobile-apps',
+    name: 'Native Mobile Apps',
+    description: 'iOS and Android mobile apps for your team and clients to access the platform on the go.',
+    price: 2500,
+    included: false
+  },
+  {
+    id: 'api-integration',
+    name: 'Custom API Integrations',
+    description: 'Connect with additional platforms and services beyond our standard integrations.',
+    price: 1800,
+    included: false
+  },
+  {
+    id: 'ai-insights',
+    name: 'AI Content Insights',
+    description: 'Advanced AI tools to analyze content performance and suggest improvements.',
+    price: 1500,
+    included: false
+  },
+  {
+    id: 'premium-support',
+    name: 'Premium Support Package',
+    description: '24/7 dedicated support team with 1-hour response time and monthly strategy calls.',
+    price: 950,
+    included: false
+  }
+];
 
 const Plan = () => {
   const { username } = useParams();
@@ -72,6 +152,12 @@ const Plan = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState('features');
+  
+  // New state for customization
+  const [primaryColor, setPrimaryColor] = useState('#ED8936');
+  const [secondaryColor, setSecondaryColor] = useState('#E53E3E');
+  const [selectedFeatures, setSelectedFeatures] = useState<Feature[]>(additionalFeatures);
+  const [totalCost, setTotalCost] = useState<number | null>(null);
   
   useEffect(() => {
     const fetchPlan = async () => {
@@ -93,6 +179,19 @@ const Plan = () => {
         }
         
         setPlan(data);
+        
+        // Initialize colors if available in the plan
+        if (data?.branding?.primary_color) {
+          setPrimaryColor(data.branding.primary_color);
+        }
+        
+        if (data?.branding?.secondary_color) {
+          setSecondaryColor(data.branding.secondary_color);
+        }
+        
+        // Calculate initial total cost
+        setTotalCost(data?.estimated_cost || 0);
+        
       } catch (error) {
         console.error('Error fetching plan:', error);
         toast({
@@ -108,15 +207,35 @@ const Plan = () => {
     fetchPlan();
   }, [username, toast]);
   
+  // Calculate total cost when selected features change
+  useEffect(() => {
+    if (plan) {
+      const additionalCost = selectedFeatures
+        .filter(feature => feature.included)
+        .reduce((total, feature) => total + feature.price, 0);
+        
+      setTotalCost((plan.estimated_cost || 0) + additionalCost);
+    }
+  }, [selectedFeatures, plan]);
+  
   const handleSubmitPlan = async () => {
     if (!plan) return;
     
     try {
       setSubmitting(true);
       
+      // Update the plan with the new colors and total cost
       const { error } = await supabase
         .from('plans')
-        .update({ status: 'approved' })
+        .update({ 
+          status: 'approved',
+          estimated_cost: totalCost,
+          branding: {
+            ...plan.branding,
+            primary_color: primaryColor,
+            secondary_color: secondaryColor
+          }
+        })
         .eq('id', plan.id);
         
       if (error) {
@@ -286,22 +405,26 @@ const Plan = () => {
     }
   ] : [];
 
-  // Sample testimonials for Decora plan
+  // Sample testimonials for Decora plan with social links
   const testimonials: Testimonial[] = isDecoraPlan ? [
     {
       content: "This platform has completely transformed how we manage our creator clients. Our retention rate has increased by 35% since implementation.",
       author: "Sarah Johnson",
-      position: "Agency Owner"
+      position: "Agency Owner",
+      instagram: "https://instagram.com/sarahj_agency",
+      appLink: "https://apps.apple.com/us/app/onlymgmt"
     },
     {
       content: "The content management tools alone have saved us countless hours every week. Our team can now handle twice as many clients with the same resources.",
       author: "Michael Rodriguez",
-      position: "Operations Manager"
+      position: "Operations Manager",
+      instagram: "https://instagram.com/mike_rodriguez"
     },
     {
       content: "The detailed analytics help us show our clients exactly how we're helping them grow. It's made all the difference in justifying our fees.",
       author: "Taylor Williams",
-      position: "Client Success Manager"
+      position: "Client Success Manager",
+      appLink: "https://play.google.com/store/apps/details?id=com.onlymgmt"
     }
   ] : [];
 
@@ -334,7 +457,7 @@ const Plan = () => {
               We've crafted this custom OnlyFans Management Suite specifically for your agency needs. This platform addresses your unique challenges and will help you scale your operations while improving client retention.
             </p>
             <p className="text-siso-text/80 text-sm">
-              Review the plan below and click "Approve This Plan" when you're ready to get started. Our team is excited to work with you!
+              Review the plan below, customize it to your needs, and click "Approve This Plan" when you're ready to get started. Our team is excited to work with you!
             </p>
           </motion.div>
         )}
@@ -389,14 +512,80 @@ const Plan = () => {
                   <DollarSign className="h-5 w-5 mr-2 text-siso-orange mt-1" />
                   <div>
                     <h3 className="text-xl font-semibold text-white mb-2">Investment</h3>
-                    <p className="text-siso-orange">£{plan.estimated_cost}</p>
+                    <p className="text-siso-orange">£{totalCost}</p>
                   </div>
                 </div>
               </div>
             </div>
             
-            {isDecoraPlan ? (
+            {isDecoraPlan && (
               <div className="mb-8">
+                {/* Branding Customization Section */}
+                <div className="mb-6">
+                  <h2 className="text-2xl font-semibold text-white mb-4">Customize Your Branding</h2>
+                  <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
+                    <p className="text-siso-text mb-4">
+                      Select the colors that match your brand identity. These colors will be used throughout your app.
+                    </p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <ColorPicker
+                          title="Primary Color"
+                          colors={brandColorOptions}
+                          selectedColor={primaryColor}
+                          onChange={setPrimaryColor}
+                        />
+                      </div>
+                      
+                      <div>
+                        <ColorPicker
+                          title="Secondary Color"
+                          colors={brandColorOptions}
+                          selectedColor={secondaryColor}
+                          onChange={setSecondaryColor}
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="mt-6 p-4 rounded-lg" style={{ background: `linear-gradient(135deg, ${primaryColor}10, ${secondaryColor}10)` }}>
+                      <div className="flex gap-3">
+                        <div className="h-12 w-12 rounded-full" style={{ backgroundColor: primaryColor }}></div>
+                        <div className="h-12 w-12 rounded-full" style={{ backgroundColor: secondaryColor }}></div>
+                      </div>
+                      <p className="mt-2 text-sm text-siso-text">Preview of your selected brand colors</p>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Additional Features Section */}
+                <div className="mb-6">
+                  <h2 className="text-2xl font-semibold text-white mb-4">Customize Your Plan</h2>
+                  <FeatureSelection 
+                    features={selectedFeatures} 
+                    onChange={setSelectedFeatures}
+                  />
+                </div>
+                
+                {/* Case Studies Section */}
+                <div className="mb-6">
+                  <h2 className="text-2xl font-semibold text-white mb-4 flex items-center">
+                    <FileText className="h-5 w-5 mr-2 text-siso-orange" />
+                    Case Studies
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {caseStudies.map((study, index) => (
+                      <CaseStudy
+                        key={index}
+                        title={study.title}
+                        description={study.description}
+                        imageUrl={study.imageUrl}
+                        notionUrl={study.notionUrl}
+                      />
+                    ))}
+                  </div>
+                </div>
+                
                 <div className="mb-6">
                   <h2 className="text-2xl font-semibold text-white mb-4 flex items-center">
                     <Target className="h-5 w-5 mr-2 text-siso-orange" />
@@ -449,9 +638,31 @@ const Plan = () => {
                           transition={{ delay: 0.15 * index, duration: 0.5 }}
                         >
                           <p className="text-siso-text text-sm italic mb-3">"{testimonial.content}"</p>
-                          <div>
+                          <div className="mb-3">
                             <p className="text-white font-medium">{testimonial.author}</p>
                             <p className="text-siso-text/70 text-xs">{testimonial.position}</p>
+                          </div>
+                          <div className="flex gap-2">
+                            {testimonial.instagram && (
+                              <a 
+                                href={testimonial.instagram} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-xs text-siso-orange flex items-center hover:underline"
+                              >
+                                Instagram <ExternalLink className="h-3 w-3 ml-1" />
+                              </a>
+                            )}
+                            {testimonial.appLink && (
+                              <a 
+                                href={testimonial.appLink} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-xs text-siso-orange flex items-center hover:underline"
+                              >
+                                App Link <ExternalLink className="h-3 w-3 ml-1" />
+                              </a>
+                            )}
                           </div>
                         </motion.div>
                       ))}
