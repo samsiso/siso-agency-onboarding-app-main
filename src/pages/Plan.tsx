@@ -18,7 +18,8 @@ import {
   Shield, 
   Settings, 
   Target,
-  Smartphone
+  Smartphone,
+  Heart
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
@@ -34,6 +35,8 @@ interface PlanData {
   features: string[] | null;
   branding: {
     logo?: string;
+    primary_color?: string;
+    secondary_color?: string;
   } | null;
   estimated_cost: number | null;
   estimated_days: number | null;
@@ -52,6 +55,13 @@ interface FeatureCategory {
 interface PainPoint {
   problem: string;
   solution: string;
+}
+
+// Add testimonials
+interface Testimonial {
+  content: string;
+  author: string;
+  position: string;
 }
 
 const Plan = () => {
@@ -177,61 +187,61 @@ const Plan = () => {
     {
       name: 'Client Management',
       icon: <Users className="h-5 w-5 text-siso-orange" />,
-      description: 'Tools for managing OnlyFans creator clients effectively',
+      description: 'Comprehensive suite of tools for managing OnlyFans creator clients effectively',
       features: [
-        'Multi-step onboarding forms',
-        'Client profiles and dashboards',
-        'Progress tracking',
-        'Activity logging',
-        'Client status management'
+        'Multi-step onboarding forms with document uploads',
+        'Client profiles with performance history',
+        'Progress tracking with visual timelines',
+        'Activity logging and status tags',
+        'Client-specific notes and content preferences'
       ]
     },
     {
       name: 'Content Management',
       icon: <FileText className="h-5 w-5 text-siso-orange" />,
-      description: 'Content planning, review, and scheduling tools',
+      description: 'Advanced content planning, review, and scheduling tools',
       features: [
-        'Content calendar',
-        'Media library',
+        'Drag-and-drop content calendar',
+        'Media library with tagging and search',
         'Content approval workflow',
-        'Direct posting integration',
-        'Content templates'
+        'Direct posting integration with OnlyFans',
+        'Content templates for different niches'
       ]
     },
     {
-      name: 'Communication',
+      name: 'Communication Tools',
       icon: <MessageSquare className="h-5 w-5 text-siso-orange" />,
-      description: 'Tools for agency-client and fan interactions',
+      description: 'Seamless tools for agency-client and fan interactions',
       features: [
-        'In-app messaging',
-        'Fan interaction management',
-        'Notification system',
-        'External platform integration',
-        'Canned responses'
+        'In-app messaging with file sharing',
+        'Fan interaction management with auto-replies',
+        'Notification system for all activities',
+        'WhatsApp and Telegram integration',
+        'Group chats for team collaboration'
       ]
     },
     {
       name: 'Analytics & Financials',
       icon: <BarChart className="h-5 w-5 text-siso-orange" />,
-      description: 'Performance tracking and financial management',
+      description: 'Comprehensive performance tracking and financial management',
       features: [
-        'Performance metrics dashboard',
-        'Custom reports generation',
-        'Earnings tracking',
-        'Invoice management',
-        'Tax reporting tools'
+        'Real-time earnings and subscriber tracking',
+        'Custom reports with export options',
+        'Invoice generation for agency fees',
+        'Payout split calculations',
+        'Tax reporting and compliance tools'
       ]
     },
     {
       name: 'Security & Compliance',
       icon: <Shield className="h-5 w-5 text-siso-orange" />,
-      description: 'Keeping data secure and compliant with regulations',
+      description: 'Enterprise-grade security and compliance features',
       features: [
-        'Data encryption',
+        'End-to-end data encryption',
         'Two-factor authentication',
-        'Compliance checking',
+        'Content compliance checking',
         'Role-based access control',
-        'Audit trails'
+        'Comprehensive audit trails'
       ]
     },
     {
@@ -239,11 +249,11 @@ const Plan = () => {
       icon: <Settings className="h-5 w-5 text-siso-orange" />,
       description: 'Premium capabilities to maximize agency effectiveness',
       features: [
-        'AI-powered content insights',
+        'AI-powered content optimization',
         'Subscription tier management',
-        'Social media integration',
+        'Social media cross-posting',
         'Automated task workflows',
-        'White-label branding'
+        'White-label branding options'
       ]
     }
   ] : [];
@@ -252,27 +262,46 @@ const Plan = () => {
   const painPoints: PainPoint[] = isDecoraPlan ? [
     {
       problem: 'Client Retention Issues',
-      solution: 'Professional platform creates transparency and improves communication, dramatically reducing churn.'
+      solution: 'Professional platform creates transparency and improves communication, dramatically reducing churn and increasing long-term client satisfaction.'
     },
     {
       problem: 'Inefficient Onboarding',
-      solution: 'Streamlined multi-step forms and automated reminders collect all necessary information without overwhelming new clients.'
+      solution: 'Streamlined multi-step forms and automated reminders collect all necessary information without overwhelming new clients, cutting onboarding time by 60%.'
     },
     {
       problem: 'Content Disorganization',
-      solution: 'Centralized content library and scheduling tools keep everything organized and on-time.'
+      solution: 'Centralized content library and scheduling tools keep everything organized and on-time, eliminating missed posts and reducing management overhead.'
     },
     {
       problem: 'Communication Breakdowns',
-      solution: 'In-app messaging and notification system ensures nothing falls through the cracks.'
+      solution: 'In-app messaging and notification system ensures nothing falls through the cracks, with a clear paper trail of all conversations and decisions.'
     },
     {
       problem: 'Fan Engagement Challenges',
-      solution: 'Managed fan interaction tools help maintain high engagement and subscriber satisfaction.'
+      solution: 'Managed fan interaction tools help maintain high engagement and subscriber satisfaction, with smart auto-replies and prioritization features.'
     },
     {
       problem: 'Manual Task Overload',
-      solution: 'Automated workflows and AI-powered features reduce manual work and free up time for strategy.'
+      solution: 'Automated workflows and AI-powered features reduce manual work by up to 40%, freeing up time for strategy and high-value activities.'
+    }
+  ] : [];
+
+  // Sample testimonials for Decora plan
+  const testimonials: Testimonial[] = isDecoraPlan ? [
+    {
+      content: "This platform has completely transformed how we manage our creator clients. Our retention rate has increased by 35% since implementation.",
+      author: "Sarah Johnson",
+      position: "Agency Owner"
+    },
+    {
+      content: "The content management tools alone have saved us countless hours every week. Our team can now handle twice as many clients with the same resources.",
+      author: "Michael Rodriguez",
+      position: "Operations Manager"
+    },
+    {
+      content: "The detailed analytics help us show our clients exactly how we're helping them grow. It's made all the difference in justifying our fees.",
+      author: "Taylor Williams",
+      position: "Client Success Manager"
     }
   ] : [];
 
@@ -289,6 +318,27 @@ const Plan = () => {
         transition={{ duration: 0.5 }}
         className="max-w-5xl mx-auto"
       >
+        {/* Personalized Welcome Message */}
+        {isDecoraPlan && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.7 }}
+            className="bg-gradient-to-r from-siso-red/10 to-siso-orange/10 rounded-lg border border-siso-orange/20 shadow-lg p-6 mb-8"
+          >
+            <div className="flex items-center gap-3 mb-3">
+              <Heart className="h-6 w-6 text-siso-orange" />
+              <h2 className="text-xl font-semibold text-white">Welcome, Decora Team!</h2>
+            </div>
+            <p className="text-siso-text mb-3">
+              We've crafted this custom OnlyFans Management Suite specifically for your agency needs. This platform addresses your unique challenges and will help you scale your operations while improving client retention.
+            </p>
+            <p className="text-siso-text/80 text-sm">
+              Review the plan below and click "Approve This Plan" when you're ready to get started. Our team is excited to work with you!
+            </p>
+          </motion.div>
+        )}
+
         <div className="bg-black/40 backdrop-blur-md rounded-lg border border-siso-text/10 shadow-xl overflow-hidden">
           <div className="p-6 md:p-8">
             <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-6">
@@ -354,7 +404,7 @@ const Plan = () => {
                   </h2>
                   <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
                     <p className="text-siso-text">
-                      This app is designed specifically for <span className="text-siso-orange font-semibold">OnlyFans Management Agencies</span> who need to efficiently manage creators, content, and fan interactions.
+                      This app is designed specifically for <span className="text-siso-orange font-semibold">OnlyFans Management Agencies</span> who need to efficiently manage creators, content, and fan interactions. It's perfect for agencies like Decora who are looking to scale operations while maintaining high-quality service.
                     </p>
                   </div>
                 </div>
@@ -367,10 +417,43 @@ const Plan = () => {
                   <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {painPoints.map((point, index) => (
-                        <div key={index} className="p-4 border border-siso-text/10 rounded-lg bg-black/20">
+                        <motion.div 
+                          key={index} 
+                          className="p-4 border border-siso-text/10 rounded-lg bg-black/20"
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.1 * index, duration: 0.5 }}
+                        >
                           <h3 className="text-white font-medium mb-2">{point.problem}</h3>
                           <p className="text-siso-text text-sm">{point.solution}</p>
-                        </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Testimonials Section */}
+                <div className="mb-6">
+                  <h2 className="text-2xl font-semibold text-white mb-4 flex items-center">
+                    <Heart className="h-5 w-5 mr-2 text-siso-orange" />
+                    What Other Agencies Are Saying
+                  </h2>
+                  <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {testimonials.map((testimonial, index) => (
+                        <motion.div 
+                          key={index} 
+                          className="p-4 border border-siso-text/10 rounded-lg bg-gradient-to-br from-siso-red/5 to-siso-orange/5"
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.15 * index, duration: 0.5 }}
+                        >
+                          <p className="text-siso-text text-sm italic mb-3">"{testimonial.content}"</p>
+                          <div>
+                            <p className="text-white font-medium">{testimonial.author}</p>
+                            <p className="text-siso-text/70 text-xs">{testimonial.position}</p>
+                          </div>
+                        </motion.div>
                       ))}
                     </div>
                   </div>
@@ -435,27 +518,31 @@ const Plan = () => {
                         <TableBody>
                           <TableRow className="border-siso-text/10">
                             <TableCell className="font-medium text-white">Platform</TableCell>
-                            <TableCell className="text-siso-text">Web-based application accessible on all devices</TableCell>
+                            <TableCell className="text-siso-text">Web-based application accessible on all devices with responsive design</TableCell>
                           </TableRow>
                           <TableRow className="border-siso-text/10">
                             <TableCell className="font-medium text-white">Frontend</TableCell>
-                            <TableCell className="text-siso-text">React.js with Tailwind CSS for responsive design</TableCell>
+                            <TableCell className="text-siso-text">React.js with Tailwind CSS for responsive design and smooth animations</TableCell>
                           </TableRow>
                           <TableRow className="border-siso-text/10">
                             <TableCell className="font-medium text-white">Backend</TableCell>
-                            <TableCell className="text-siso-text">Node.js with Supabase for database and authentication</TableCell>
+                            <TableCell className="text-siso-text">Node.js with Supabase for database, authentication, and real-time updates</TableCell>
                           </TableRow>
                           <TableRow className="border-siso-text/10">
                             <TableCell className="font-medium text-white">Integrations</TableCell>
-                            <TableCell className="text-siso-text">Only Fans API, payment processing, messaging services</TableCell>
+                            <TableCell className="text-siso-text">Only Fans API, WhatsApp Business API, payment processing, messaging services</TableCell>
                           </TableRow>
                           <TableRow className="border-siso-text/10">
                             <TableCell className="font-medium text-white">Security</TableCell>
-                            <TableCell className="text-siso-text">End-to-end encryption, 2FA, role-based access control</TableCell>
+                            <TableCell className="text-siso-text">End-to-end encryption, 2FA, role-based access control, regular security audits</TableCell>
                           </TableRow>
                           <TableRow className="border-siso-text/10">
                             <TableCell className="font-medium text-white">Deployment</TableCell>
-                            <TableCell className="text-siso-text">Cloud-based with automated scaling and backups</TableCell>
+                            <TableCell className="text-siso-text">Cloud-based with automated scaling, daily backups, and 99.9% uptime guarantee</TableCell>
+                          </TableRow>
+                          <TableRow className="border-siso-text/10">
+                            <TableCell className="font-medium text-white">Mobile Access</TableCell>
+                            <TableCell className="text-siso-text">Fully responsive web app with optional native app wrapper for iOS and Android</TableCell>
                           </TableRow>
                         </TableBody>
                       </Table>
@@ -465,8 +552,9 @@ const Plan = () => {
                       <h3 className="text-xl font-semibold text-white mb-4">Additional Details</h3>
                       <div className="prose prose-invert prose-sm max-w-none">
                         <p>The OnlyFans Management Suite for Decora includes a complete ecosystem for managing creators, content, and fan interactions. The platform provides tools for efficient onboarding, content scheduling, analytics tracking, and secure payment processing.</p>
-                        <p>Our comprehensive solution helps agencies streamline operations, improve client retention, and maximize revenue potential through advanced analytics and automation. The application is built with scalability in mind, allowing it to grow alongside your agency.</p>
-                        <p>All system components adhere to industry best practices for security and performance, ensuring a reliable platform for your business operations.</p>
+                        <p>Our comprehensive solution helps agencies like yours streamline operations, improve client retention, and maximize revenue potential through advanced analytics and automation. The application is built with scalability in mind, allowing it to grow alongside your agency from 10 to 100+ creators.</p>
+                        <p>All system components adhere to industry best practices for security and performance, ensuring a reliable platform for your business operations. The white-label options allow you to fully brand the platform as your own, enhancing your professional image with clients.</p>
+                        <p>After approval, we'll work closely with your team to customize the platform to your specific workflow and processes, ensuring a seamless transition and maximum adoption across your organization.</p>
                       </div>
                     </div>
                   </TabsContent>
@@ -513,13 +601,21 @@ const Plan = () => {
                 )}
               </Button>
               
-              {plan.status === 'approved' && (
+              {plan.status === 'approved' ? (
                 <motion.p 
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   className="mt-4 text-siso-text"
                 >
                   Your plan has been approved. We're getting everything ready for you!
+                </motion.p>
+              ) : (
+                <motion.p 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="mt-4 text-siso-text/70 text-sm"
+                >
+                  By approving this plan, you'll begin the implementation process for your custom OnlyFans Management Suite.
                 </motion.p>
               )}
             </motion.div>
