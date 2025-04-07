@@ -5,8 +5,10 @@ import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { GradientHeading } from '@/components/ui/gradient-heading';
-import { CheckCircle, Loader2 } from 'lucide-react';
+import { CheckCircle, Loader2, ArrowRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Card, CardContent } from '@/components/ui/card';
+import { MessageLoading } from '@/components/ui/message-loading';
 
 interface PlanData {
   id: string;
@@ -106,7 +108,7 @@ const Plan = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-black via-siso-bg to-black p-4">
         <div className="text-center">
-          <Loader2 className="h-10 w-10 animate-spin text-siso-orange mx-auto mb-4" />
+          <MessageLoading className="mx-auto mb-4" />
           <p className="text-siso-text">Loading your plan...</p>
         </div>
       </div>
@@ -117,18 +119,20 @@ const Plan = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-black via-siso-bg to-black p-4">
         <div className="text-center max-w-md mx-auto">
-          <div className="p-6 bg-black/40 backdrop-blur-md rounded-lg border border-siso-text/10 shadow-xl">
-            <h1 className="text-2xl font-bold text-white mb-4">Plan Not Found</h1>
-            <p className="text-siso-text mb-6">
-              We couldn't find a plan with this username. Please check the URL and try again.
-            </p>
-            <Button 
-              onClick={() => navigate('/')}
-              className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90"
-            >
-              Return Home
-            </Button>
-          </div>
+          <Card className="bg-black/40 backdrop-blur-md border-siso-text/10 shadow-xl">
+            <CardContent className="p-6">
+              <h1 className="text-2xl font-bold text-white mb-4">Plan Not Found</h1>
+              <p className="text-siso-text mb-6">
+                We couldn't find a plan with this username. Please check the URL and try again.
+              </p>
+              <Button 
+                onClick={() => navigate('/')}
+                className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90"
+              >
+                Return Home
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
@@ -192,7 +196,10 @@ const Plan = () => {
               </div>
             </div>
             
-            <div className="mt-8 text-center">
+            <motion.div 
+              className="mt-8 text-center"
+              whileHover={{ scale: plan.status !== 'approved' && !submitting ? 1.02 : 1 }}
+            >
               <Button
                 onClick={handleSubmitPlan}
                 disabled={submitting || plan.status === 'approved'}
@@ -209,16 +216,23 @@ const Plan = () => {
                     Plan Approved
                   </>
                 ) : (
-                  "Approve This Plan"
+                  <>
+                    Approve This Plan
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </>
                 )}
               </Button>
               
               {plan.status === 'approved' && (
-                <p className="mt-4 text-siso-text">
+                <motion.p 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="mt-4 text-siso-text"
+                >
                   Your plan has been approved. We're getting everything ready for you!
-                </p>
+                </motion.p>
               )}
-            </div>
+            </motion.div>
           </div>
         </div>
       </motion.div>

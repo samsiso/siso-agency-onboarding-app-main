@@ -1,44 +1,23 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bot, User, Send, Edit2 } from 'lucide-react';
+import { Bot, User, Send } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { SignOutButton } from '@/components/auth/SignOutButton';
-import { useGoogleAuth } from '@/hooks/useGoogleAuth';
-import { supabase } from '@/integrations/supabase/client';
-import { ChatMessageList } from '@/components/ui/chat-message-list';
-import { ChatBubble, ChatBubbleAvatar, ChatBubbleMessage } from '@/components/ui/chat-bubble';
 import { Button } from '@/components/ui/button';
+import { MessageLoading } from '@/components/ui/message-loading';
 
 interface Message {
   id: string;
   role: 'assistant' | 'user';
   content: string;
-  isEditable?: boolean;
-}
-
-interface OnboardingState {
-  name: string;
-  organization: string;
-  appIdea: string;
-  step: 'name' | 'organization' | 'appIdea' | 'complete';
 }
 
 const OnboardingChat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
-  const { handleSignOut, loading } = useGoogleAuth();
+  const [loading, setLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-
-  const [onboardingState, setOnboardingState] = useState<OnboardingState>({
-    name: '',
-    organization: '',
-    appIdea: '',
-    step: 'name'
-  });
 
   useEffect(() => {
     // Initialize chat with welcome message
@@ -46,235 +25,140 @@ const OnboardingChat = () => {
       {
         id: '1',
         role: 'assistant',
-        content: "Hey there! I'm your SISO assistant, here to help you build your MVP in 48 hours. What's your name?"
+        content: "Welcome to your app development journey! I'm your SISO assistant, and I'll be guiding you through the onboarding process. Let's get started by collecting some basic information about your app requirements."
       }
     ]);
   }, []);
 
-  const handleSendMessage = async () => {
-    if (!input.trim() || isSubmitting) return;
+  useEffect(() => {
+    // Scroll to bottom when messages change
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const handleSendMessage = () => {
+    if (!input.trim() || loading) return;
     
-    setIsSubmitting(true);
-    const userMessageId = Date.now().toString();
+    // Add user message
+    const userMessage = {
+      id: Date.now().toString(),
+      role: 'user' as const,
+      content: input
+    };
     
-    // If editing a message
-    if (editingMessageId) {
-      const updatedMessages = messages.map(msg => 
-        msg.id === editingMessageId 
-          ? { ...msg, content: input } 
-          : msg
-      );
-      setMessages(updatedMessages);
-      setEditingMessageId(null);
-      
-      // Also update the onboarding state based on which message was edited
-      const editedMessage = messages.find(msg => msg.id === editingMessageId);
-      if (editedMessage) {
-        const userMessageIndex = messages.findIndex(msg => msg.id === editingMessageId);
-        if (userMessageIndex > 0) {
-          const botPrompt = messages[userMessageIndex - 1].content.toLowerCase();
-          
-          if (botPrompt.includes("what's your name")) {
-            setOnboardingState(prev => ({ ...prev, name: input, step: 'organization' }));
-          } else if (botPrompt.includes("organization")) {
-            setOnboardingState(prev => ({ ...prev, organization: input, step: 'appIdea' }));
-          } else if (botPrompt.includes("mvp")) {
-            setOnboardingState(prev => ({ ...prev, appIdea: input, step: 'complete' }));
-          }
-        }
-      }
-    } else {
-      // Add user message
-      const newUserMessage = {
-        id: userMessageId,
-        role: 'user' as const,
-        content: input,
-        isEditable: true
+    setMessages(prev => [...prev, userMessage]);
+    setInput('');
+    setLoading(true);
+    
+    // Simulate assistant response after a delay
+    setTimeout(() => {
+      const assistantMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant' as const,
+        content: "Thank you for sharing that! I've recorded your preferences. We'll now move on to the next steps of your app development journey."
       };
       
-      setMessages(prev => [...prev, newUserMessage]);
-      
-      // Update onboarding state based on current step
-      if (onboardingState.step === 'name') {
-        setOnboardingState(prev => ({ ...prev, name: input, step: 'organization' }));
-        
-        // Add bot response for organization step after a delay
-        setTimeout(() => {
-          setMessages(prev => [
-            ...prev,
-            {
-              id: Date.now().toString(),
-              role: 'assistant',
-              content: `Nice to meet you, ${input}! I'm excited to work with your team. What's your organization's name?`
-            }
-          ]);
-          setIsSubmitting(false);
-        }, 1000);
-        
-      } else if (onboardingState.step === 'organization') {
-        setOnboardingState(prev => ({ ...prev, organization: input, step: 'appIdea' }));
-        
-        // Add bot response for app idea step after a delay
-        setTimeout(() => {
-          setMessages(prev => [
-            ...prev,
-            {
-              id: Date.now().toString(),
-              role: 'assistant',
-              content: `Thanks! Now let's get to the fun part. What kind of MVP are you looking to build for ${input}?`
-            }
-          ]);
-          setIsSubmitting(false);
-        }, 1000);
-        
-      } else if (onboardingState.step === 'appIdea') {
-        setOnboardingState(prev => ({ ...prev, appIdea: input, step: 'complete' }));
-        
-        // Add bot response for completion step after a delay
-        setTimeout(async () => {
-          setMessages(prev => [
-            ...prev,
-            {
-              id: Date.now().toString(),
-              role: 'assistant',
-              content: `Perfect! We'll help you build a ${input} for ${onboardingState.organization}. Our team will reach out to you shortly to get started on your 48-hour MVP journey.`
-            }
-          ]);
-          
-          // Save onboarding data to Supabase
-          try {
-            await supabase.from('onboarding').insert([
-              {
-                name: onboardingState.name,
-                organization: onboardingState.organization,
-                app_idea: input
-              }
-            ]);
-          } catch (error) {
-            console.error('Error saving onboarding data:', error);
-          }
-          
-          setIsSubmitting(false);
-          
-          // Redirect to thank you page after a delay
-          setTimeout(() => {
-            navigate('/thankyou');
-          }, 5000);
-        }, 1000);
-      }
-    }
-    
-    // Clear input after sending message
-    setInput('');
-  };
-  
-  const handleEditMessage = (message: Message) => {
-    setInput(message.content);
-    setEditingMessageId(message.id);
-    setTimeout(() => {
-      inputRef.current?.focus();
-    }, 100);
+      setMessages(prev => [...prev, assistantMessage]);
+      setLoading(false);
+    }, 1500);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
   };
 
+  const handleContinue = () => {
+    navigate('/thankyou');
+  };
+
   return (
-    <div className="flex flex-col h-screen bg-black">
+    <div className="flex flex-col h-screen bg-gradient-to-b from-black via-siso-bg to-black">
       {/* Header */}
-      <div className="p-4 flex items-center">
-        <SignOutButton 
-          onClick={handleSignOut} 
-          disabled={loading}
-        />
-        <div className="flex-1 text-center">
-          <h1 className="text-xl font-semibold text-white">SISO Onboarding</h1>
-        </div>
-        <div className="w-[72px]"></div> {/* Empty div for balance */}
+      <div className="p-4 border-b border-siso-text/10">
+        <h1 className="text-xl text-center font-semibold text-white">SISO Onboarding</h1>
       </div>
       
       {/* Chat area */}
-      <div className="flex-1 overflow-hidden flex flex-col p-4 md:p-6 mx-auto w-full max-w-3xl">
-        <ChatMessageList>
-          {messages.map((message, index) => (
-            <ChatBubble 
-              key={message.id} 
-              variant={message.role === 'assistant' ? 'received' : 'sent'}
-            >
-              {message.role === 'assistant' ? (
-                <ChatBubbleAvatar 
-                  fallback="S" 
-                  className="bg-gradient-to-r from-siso-red to-siso-orange"
-                />
-              ) : (
-                <ChatBubbleAvatar 
-                  fallback={onboardingState.name.charAt(0).toUpperCase() || 'U'} 
-                  className="bg-siso-text/30"
-                />
-              )}
-              
-              <div className="flex flex-col">
-                <ChatBubbleMessage variant={message.role === 'assistant' ? 'received' : 'sent'}>
-                  {message.content}
-                </ChatBubbleMessage>
-                
-                {message.isEditable && (
-                  <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="self-end mt-1"
-                  >
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-5 w-5 text-siso-text/50 hover:text-siso-text"
-                      onClick={() => handleEditMessage(message)}
-                    >
-                      <Edit2 className="h-3 w-3" />
-                    </Button>
-                  </motion.div>
-                )}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {messages.map((message) => (
+          <motion.div
+            key={message.id}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+          >
+            <div className={`flex max-w-[80%] ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+              <div className={`flex items-center justify-center h-8 w-8 rounded-full shrink-0 ${
+                message.role === 'assistant' 
+                  ? 'bg-gradient-to-r from-siso-red to-siso-orange' 
+                  : 'bg-siso-text/30'
+              } ${message.role === 'user' ? 'ml-2' : 'mr-2'}`}>
+                {message.role === 'assistant' ? <Bot size={16} /> : <User size={16} />}
               </div>
-            </ChatBubble>
-          ))}
-        </ChatMessageList>
+              
+              <div className={`rounded-lg p-3 ${
+                message.role === 'assistant'
+                  ? 'bg-black/40 text-white border border-siso-text/10'
+                  : 'bg-siso-orange/90 text-black'
+              }`}>
+                {message.content}
+              </div>
+            </div>
+          </motion.div>
+        ))}
+        
+        {loading && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex justify-start"
+          >
+            <div className="flex max-w-[80%] flex-row">
+              <div className="flex items-center justify-center h-8 w-8 rounded-full shrink-0 bg-gradient-to-r from-siso-red to-siso-orange mr-2">
+                <Bot size={16} />
+              </div>
+              
+              <div className="rounded-lg p-3 bg-black/40 text-white border border-siso-text/10">
+                <MessageLoading />
+              </div>
+            </div>
+          </motion.div>
+        )}
+        
+        <div ref={messagesEndRef} />
       </div>
       
       {/* Input area */}
-      <div className="p-4 border-t border-siso-text/10 bg-black/50">
-        <div className="mx-auto max-w-3xl">
-          <div className="flex items-center gap-2">
-            <div className="relative flex-1">
-              <textarea
-                ref={inputRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Type your message..."
-                className="min-h-[52px] w-full resize-none rounded-lg bg-siso-text/10 border border-siso-text/20 px-4 py-3 text-white placeholder:text-siso-text/50 focus:outline-none focus:ring-2 focus:ring-siso-red/50"
-                disabled={isSubmitting}
-                rows={1}
-              />
-            </div>
-            <Button 
-              onClick={handleSendMessage}
-              disabled={isSubmitting || !input.trim()}
-              className="bg-gradient-to-r from-siso-red to-siso-orange text-white rounded-full h-[52px] w-[52px] p-0 flex items-center justify-center"
-            >
-              <Send className="h-5 w-5" />
-            </Button>
-          </div>
-          
-          <div className="mt-3 text-center text-xs text-siso-text/50">
-            Need help? Reach out to{' '}
-            <a href="mailto:support@sisoinnovatorshub.io" className="text-siso-orange hover:text-siso-red transition-colors">
-              support@sisoinnovatorshub.io
-            </a>
-          </div>
+      <div className="p-4 border-t border-siso-text/10">
+        <div className="flex items-center space-x-2">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Type your message..."
+            className="flex-1 bg-black/20 border border-siso-text/20 rounded-lg p-3 text-white placeholder:text-siso-text/50 focus:outline-none focus:ring-2 focus:ring-siso-orange/50"
+            disabled={loading}
+          />
+          <Button
+            onClick={handleSendMessage}
+            disabled={loading || !input.trim()}
+            className="bg-gradient-to-r from-siso-red to-siso-orange text-white rounded-full h-10 w-10 p-0 flex items-center justify-center"
+          >
+            <Send size={16} />
+          </Button>
+        </div>
+        
+        <div className="mt-4 text-center">
+          <Button 
+            onClick={handleContinue} 
+            variant="outline" 
+            className="text-siso-text border-siso-text/30 hover:bg-siso-text/10"
+          >
+            Skip Onboarding
+          </Button>
         </div>
       </div>
     </div>
