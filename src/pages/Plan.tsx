@@ -519,7 +519,7 @@ const Plan = () => {
               </div>
             </div>
             
-            {isDecoraPlan && (
+            {isDecoraPlan ? (
               <div className="mb-8">
                 {/* Branding Customization Section */}
                 <div className="mb-6">
