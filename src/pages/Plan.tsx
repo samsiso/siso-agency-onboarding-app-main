@@ -637,7 +637,7 @@ const Plan = () => {
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{ delay: 0.15 * index, duration: 0.5 }}
                         >
-                          <p className="text-siso-text text-sm italic mb-3">"{testimonial.content}"</p>
+                          <p className="text-siso-text text-sm italic mb-3">{`"${testimonial.content}"`}</p>
                           <div className="mb-3">
                             <p className="text-white font-medium">{testimonial.author}</p>
                             <p className="text-siso-text/70 text-xs">{testimonial.position}</p>
