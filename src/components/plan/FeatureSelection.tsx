@@ -15,12 +15,14 @@ interface FeatureSelectionProps {
   features: Feature[];
   onChange: (features: Feature[]) => void;
   readOnly?: boolean;
+  showPricing?: boolean;
 }
 
 export const FeatureSelection = ({ 
   features, 
   onChange,
-  readOnly = false
+  readOnly = false,
+  showPricing = false
 }: FeatureSelectionProps) => {
   const toggleFeature = (featureId: string) => {
     if (readOnly) return;
@@ -64,7 +66,9 @@ export const FeatureSelection = ({
               <div className="flex-grow">
                 <div className="flex items-center justify-between">
                   <h4 className="font-medium text-white">{feature.name}</h4>
-                  <span className="text-sm text-siso-orange">+£{feature.price}</span>
+                  {showPricing && (
+                    <span className="text-sm text-siso-orange">+£{feature.price}</span>
+                  )}
                 </div>
                 <p className="mt-1 text-sm text-siso-text">{feature.description}</p>
               </div>

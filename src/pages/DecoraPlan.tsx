@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MessageLoading } from '@/components/ui/message-loading';
-import { FileText, Users, MessageSquare, BarChart } from 'lucide-react';
+import { FileText, Users, MessageSquare, BarChart, CheckCircle, Loader2, Sparkles, Heart } from 'lucide-react';
 
 const DecoraPlan = () => {
   const navigate = useNavigate();
@@ -43,6 +43,7 @@ const DecoraPlan = () => {
         transition={{ duration: 0.5 }}
         className="text-center mb-6"
       >
+        <Sparkles className="h-16 w-16 text-siso-orange mx-auto mb-4" />
         <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">
           Creating Your OnlyFans Management Suite
         </h1>
@@ -53,6 +54,21 @@ const DecoraPlan = () => {
       
       <div className="max-w-md w-full bg-black/40 border border-siso-text/10 rounded-lg p-6 backdrop-blur-sm">
         <MessageLoading className="mx-auto mb-6" />
+        
+        <motion.div className="mb-6">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-siso-text">Loading your plan</span>
+            <span className="text-sm text-siso-orange">{Math.min(25 * loadingStep, 100)}%</span>
+          </div>
+          <div className="h-2 bg-black/30 rounded-full overflow-hidden">
+            <motion.div 
+              className="h-full bg-gradient-to-r from-siso-red to-siso-orange"
+              initial={{ width: "0%" }}
+              animate={{ width: `${Math.min(25 * loadingStep, 100)}%` }}
+              transition={{ duration: 0.5 }}
+            />
+          </div>
+        </motion.div>
         
         <div className="space-y-4">
           {loadingSteps.map((step, index) => (
@@ -69,7 +85,13 @@ const DecoraPlan = () => {
               <div className={`flex items-center justify-center w-8 h-8 rounded-full ${
                 loadingStep > index ? 'bg-siso-orange/20' : 'bg-siso-text/5'
               }`}>
-                {step.icon}
+                {loadingStep > index ? (
+                  <CheckCircle className="h-4 w-4 text-siso-orange" />
+                ) : loadingStep === index + 1 ? (
+                  <Loader2 className="h-4 w-4 text-siso-orange animate-spin" />
+                ) : (
+                  step.icon
+                )}
               </div>
               <p className={`text-sm ${
                 loadingStep > index ? 'text-siso-text' : 'text-siso-text/50'
@@ -79,6 +101,18 @@ const DecoraPlan = () => {
             </motion.div>
           ))}
         </div>
+        
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8, duration: 0.5 }}
+          className="mt-6 rounded-lg bg-siso-orange/5 border border-siso-orange/20 p-4 text-sm text-siso-text"
+        >
+          <p className="flex items-center gap-2">
+            <Heart className="h-4 w-4 text-siso-orange shrink-0" />
+            <span>We've included premium features specifically for OnlyFans management agencies like yours!</span>
+          </p>
+        </motion.div>
       </div>
     </div>
   );
