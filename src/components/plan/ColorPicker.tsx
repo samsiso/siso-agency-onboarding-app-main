@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Check, ColorPicker as ColorPickerIcon } from 'lucide-react';
+import { Check, Palette } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ColorOption {
@@ -26,7 +26,7 @@ export const ColorPicker = ({
   return (
     <div className="relative">
       <div className="mb-2 flex items-center gap-2">
-        <ColorPickerIcon className="h-4 w-4 text-siso-orange" />
+        <Palette className="h-4 w-4 text-siso-orange" />
         <span className="text-sm font-medium text-white">{title}</span>
       </div>
       
