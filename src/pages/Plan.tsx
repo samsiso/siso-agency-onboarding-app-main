@@ -160,6 +160,9 @@ const Plan = () => {
   
   const featuresRef = useRef<HTMLDivElement>(null);
   
+  const [selectedPainPoint, setSelectedPainPoint] = useState<PainPointDetailProps | null>(null);
+  const [isPainPointModalOpen, setIsPainPointModalOpen] = useState(false);
+  
   const loadingAnimationSteps = [
     "Analyzing your business needs...",
     "Customizing platform features...",
@@ -632,9 +635,6 @@ const Plan = () => {
       caseStudyLink: "https://notion.so/case-study/automation-efficiency"
     }
   ] : [];
-
-  const [selectedPainPoint, setSelectedPainPoint] = useState<PainPointDetailProps | null>(null);
-  const [isPainPointModalOpen, setIsPainPointModalOpen] = useState(false);
 
   const handlePainPointClick = (index: number) => {
     if (detailedPainPoints[index]) {
