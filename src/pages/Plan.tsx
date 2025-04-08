@@ -229,31 +229,34 @@ const Plan = () => {
         return;
       }
       
-      let loadingInterval: NodeJS.Timeout; 
-      
+      // For non-decora plans, we'll show the loading animation
       const loadingAnimationSteps = [
         "Analyzing your business needs...",
         "Customizing platform features...",
         "Finalizing your tailored solution...",
         "Almost ready to showcase your plan!"
       ];
-      const [loadingStep, setLoadingStep] = useState(0);
-      const [loadingProgress, setLoadingProgress] = useState(0);
-      const [loadingComplete, setLoadingComplete] = useState(false);
       
-      loadingInterval = setInterval(() => {
-        setLoadingStep(prevStep => {
-          const nextStep = prevStep + 1 < loadingAnimationSteps.length ? prevStep + 1 : prevStep;
+      let loadingInterval: NodeJS.Timeout;
+      
+      const runLoadingAnimation = () => {
+        let loadingStep = 0;
+        let loadingProgress = 0;
+        let loadingComplete = false;
+        
+        loadingInterval = setInterval(() => {
+          loadingStep = loadingStep + 1 < loadingAnimationSteps.length ? loadingStep + 1 : loadingStep;
           
-          setLoadingProgress(Math.floor((nextStep + 1) * 25));
+          loadingProgress = Math.floor((loadingStep + 1) * 25);
           
-          if (nextStep === loadingAnimationSteps.length - 1) {
-            setLoadingComplete(true);
+          if (loadingStep === loadingAnimationSteps.length - 1) {
+            loadingComplete = true;
           }
-          
-          return nextStep;
-        });
-      }, 1200); // Slightly faster animation
+        }, 1200); // Slightly faster animation
+      };
+      
+      // Start the loading animation
+      runLoadingAnimation();
       
       if (!username) {
         throw new Error('Username is required');
@@ -299,9 +302,6 @@ const Plan = () => {
       
       setTimeout(() => {
         clearInterval(loadingInterval);
-        setLoadingProgress(100);
-        setLoadingStep(loadingAnimationSteps.length - 1);
-        setLoadingComplete(true);
         
         setTimeout(() => {
           console.log("Transitioning to plan view...");
@@ -737,3 +737,6 @@ const Plan = () => {
       images: [
         { url: "/lovable-uploads/c7ac43fd-bc3e-478d-8b4f-809beafb6838.png", caption: "Fan engagement dashboard with priority sorting" }
       ],
+      caseStudyLink: "https://notion.so/case-study/fan-engagement"
+    }
+  ] : [];
