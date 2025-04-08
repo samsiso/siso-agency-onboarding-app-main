@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageLoading } from '@/components/ui/message-loading';
 import { 
   Users, 
   MessageSquare, 
@@ -144,13 +143,12 @@ const DecoraPlan = () => {
   const [loadingStep, setLoadingStep] = useState(0);
   const [showWelcome, setShowWelcome] = useState(true);
   const [showClickThroughPrompt, setShowClickThroughPrompt] = useState(true);
-  const [showPainPointsPrompt, setShowPainPointsPrompt] = useState(false);
   const [showProblemSolution, setShowProblemSolution] = useState(false);
   const [showFinalScreen, setShowFinalScreen] = useState(false);
   const [agencyName] = useState("Decora");
   const [skipAnimation, setSkipAnimation] = useState(false);
   
-  const [activeSolutions, setActiveSolutions] = useState([false, false, false, false]);
+  const [activeSolutions, setActiveSolutions] = useState([true, true, true, true]);
   
   const analysisSteps = [
     { icon: <Users className="h-5 w-5 text-siso-orange" />, text: "Analyzing client management needs...", tooltip: "Manage multiple creators efficiently" },
@@ -162,11 +160,6 @@ const DecoraPlan = () => {
   
   const handleGetStarted = () => {
     setShowClickThroughPrompt(false);
-    setShowPainPointsPrompt(true);
-  };
-  
-  const handlePainPointsComplete = () => {
-    setShowPainPointsPrompt(false);
     startOnboardingSequence();
   };
   
@@ -177,38 +170,19 @@ const DecoraPlan = () => {
     }
     
     setShowProblemSolution(true);
-    const solutionTimers = [];
-    for (let i = 0; i < 4; i++) {
-      solutionTimers.push(setTimeout(() => {
-        setActiveSolutions(prev => {
-          const newState = [...prev];
-          newState[i] = true;
-          return newState;
-        });
-      }, 500 + i * 1000));
-    }
     
-    const stepTimers = [];
-    for (let i = 0; i < 5; i++) {
-      stepTimers.push(setTimeout(() => {
-        setLoadingStep(i + 1);
-      }, i * 1200));
-    }
+    setLoadingStep(2);
     
-    const finalScreenTimer = setTimeout(() => {
-      setShowProblemSolution(false);
-      setShowFinalScreen(true);
-    }, 6000);
-    
-    const navigationTimer = setTimeout(() => {
-      navigate('/plan/decora');
-    }, 8000);
+    const stepTimer = setTimeout(() => {
+      setLoadingStep(5);
+      
+      setTimeout(() => {
+        navigate('/plan/decora');
+      }, 2000);
+    }, 1500);
     
     return () => {
-      solutionTimers.forEach(timer => clearTimeout(timer));
-      stepTimers.forEach(timer => clearTimeout(timer));
-      clearTimeout(finalScreenTimer);
-      clearTimeout(navigationTimer);
+      clearTimeout(stepTimer);
     };
   };
   
@@ -263,13 +237,6 @@ const DecoraPlan = () => {
           />
         )}
         
-        {showPainPointsPrompt && (
-          <PainPointsPrompt 
-            onComplete={handlePainPointsComplete} 
-            autoAdvance={false}
-          />
-        )}
-        
         {showProblemSolution && (
           <motion.div 
             key="problem-solution"
@@ -307,8 +274,6 @@ const DecoraPlan = () => {
                   />
                 ))}
               </div>
-              
-              <MessageLoading className="mx-auto mb-5" />
               
               <motion.div className="mb-6">
                 <div className="flex items-center justify-between mb-2">
@@ -348,35 +313,16 @@ const DecoraPlan = () => {
                   <span>Agencies using our platform see a <span className="font-semibold text-white">40% increase</span> in revenue within 90 days</span>
                 </p>
               </motion.div>
-            </div>
-          </motion.div>
-        )}
-        
-        {showFinalScreen && (
-          <motion.div 
-            key="final"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="max-w-xl w-full bg-black/60 border border-siso-orange/20 rounded-lg p-6 backdrop-blur-md"
-          >
-            <div className="text-center">
-              <Sparkles className="h-14 w-14 text-siso-orange mx-auto mb-3" />
-              <h2 className="text-2xl font-bold text-white mb-2">Your Dashboard is Ready!</h2>
-              <p className="text-siso-text mb-6">We've customized everything for your OnlyFans management business</p>
               
-              <motion.div 
-                className="flex justify-center"
-                initial={{ y: 10, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.3 }}
-              >
+              <div className="mt-6 flex justify-center">
                 <Button 
+                  onClick={() => navigate('/plan/decora')}
                   className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-white px-6 py-2"
                 >
-                  Explore Your Plan
+                  View Your Plan
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
-              </motion.div>
+              </div>
             </div>
           </motion.div>
         )}

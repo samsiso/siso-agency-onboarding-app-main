@@ -9,6 +9,7 @@ import OnboardingChat from '@/pages/OnboardingChat';
 import ThankYou from '@/pages/ThankYou';
 import Plan from './pages/Plan';
 import DecoraPlan from './pages/DecoraPlan';
+import Congratulations from './pages/onboarding/congratulations';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/thankyou" element={<ThankYou />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/onboarding/social" element={<OnboardingSocial />} />
+        <Route path="/onboarding/congratulations" element={<Congratulations />} />
         <Route path="/plan/:username" element={<Plan />} />
         <Route path="/decora-plan" element={<DecoraPlan />} />
       </Routes>

@@ -17,6 +17,7 @@ export const ClickThroughPrompt = ({ agencyName, onContinue }: ClickThroughPromp
     if (welcomeTextRef.current) {
       const text = agencyName;
       let i = 0;
+      // Speed up the typewriter effect
       const interval = setInterval(() => {
         if (i <= text.length) {
           welcomeTextRef.current!.innerText = text.substring(0, i);
@@ -24,7 +25,7 @@ export const ClickThroughPrompt = ({ agencyName, onContinue }: ClickThroughPromp
         } else {
           clearInterval(interval);
         }
-      }, 100);
+      }, 50); // Reduced from 100ms to 50ms
       
       return () => clearInterval(interval);
     }
@@ -41,36 +42,58 @@ export const ClickThroughPrompt = ({ agencyName, onContinue }: ClickThroughPromp
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.2 }}
           className="mb-5"
         >
           <Sparkles className="h-16 w-16 text-siso-orange mx-auto mb-4" />
         </motion.div>
         
-        <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
+        <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
           Welcome, <span ref={welcomeTextRef} className="text-siso-orange"></span>!
         </h1>
         
-        <motion.p 
+        <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="text-siso-text mx-auto mt-3 text-lg mb-6"
+          transition={{ delay: 0.5 }}
+          className="text-siso-text mx-auto mt-3 text-lg mb-6 space-y-4"
         >
-          Ready to transform your OnlyFans management?
-        </motion.p>
+          <p>Ready to transform your OnlyFans management?</p>
+          
+          <div className="bg-black/30 p-4 rounded-lg border border-siso-orange/10 text-left">
+            <h3 className="text-white text-lg font-semibold mb-2">Your plan includes:</h3>
+            <ul className="space-y-2">
+              <li className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-siso-orange"></div>
+                <span>Complete creator management system</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-siso-orange"></div>
+                <span>Automated content scheduling</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-siso-orange"></div>
+                <span>Unified messaging platform</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-siso-orange"></div>
+                <span>Real-time analytics dashboard</span>
+              </li>
+            </ul>
+          </div>
+        </motion.div>
         
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.2 }}
-          className="mt-8"
+          transition={{ delay: 0.8 }}
+          className="mt-6"
         >
           <Button 
             onClick={onContinue}
             className="px-8 py-6 text-lg bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-white"
           >
-            Let's Get Started
+            View Your Plan
           </Button>
         </motion.div>
       </div>
