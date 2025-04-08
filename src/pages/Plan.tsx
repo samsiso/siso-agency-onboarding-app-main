@@ -32,6 +32,7 @@ import { FeatureSelection, Feature } from '@/components/plan/FeatureSelection';
 import { CaseStudy } from '@/components/plan/CaseStudy';
 import { WelcomeMessage } from '@/components/plan/WelcomeMessage';
 import { Skeleton } from '@/components/ui/skeleton';
+import { InteractiveCallout } from '@/components/plan/InteractiveCallout';
 
 interface PlanData {
   id: string;
@@ -580,38 +581,64 @@ const Plan = () => {
               )}
             </div>
             
-            {/* Plan summary cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
-                <div className="flex items-start">
-                  <FileText className="h-5 w-5 mr-2 text-siso-orange mt-1" />
-                  <div>
-                    <h3 className="text-xl font-semibold text-white mb-2">App Name</h3>
-                    <p className="text-siso-orange">{plan.app_name}</p>
+            {/* Interactive Callout Boxes for Decora plan */}
+            {isDecoraPlan ? (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
+                <InteractiveCallout 
+                  title="Agency Niche" 
+                  value="OnlyFans Management" 
+                  type="niche"
+                  description="Our platform is specifically designed for agencies managing OnlyFans creators, with features tailored to the unique needs of content management and creator relationships in this space."
+                />
+                
+                <InteractiveCallout 
+                  title="Company Name" 
+                  value={plan.company_name || ''} 
+                  type="company"
+                  description="Your agency dashboard will be fully customized with your branding, workflows, and specific requirements to ensure it perfectly aligns with how Decora operates."
+                />
+                
+                <InteractiveCallout 
+                  title="Product" 
+                  value="Agency Dashboard" 
+                  type="product"
+                  description="A comprehensive dashboard that combines client management, content scheduling, communication tools, and analytics in one seamless platform designed specifically for OnlyFans agency operations."
+                />
+              </div>
+            ) : (
+              // Standard Plan summary cards for non-Decora plans
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
+                  <div className="flex items-start">
+                    <FileText className="h-5 w-5 mr-2 text-siso-orange mt-1" />
+                    <div>
+                      <h3 className="text-xl font-semibold text-white mb-2">App Name</h3>
+                      <p className="text-siso-orange">{plan.app_name}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
+                  <div className="flex items-start">
+                    <Calendar className="h-5 w-5 mr-2 text-siso-orange mt-1" />
+                    <div>
+                      <h3 className="text-xl font-semibold text-white mb-2">Timeline</h3>
+                      <p className="text-siso-orange">{plan.estimated_days} days</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
+                  <div className="flex items-start">
+                    <DollarSign className="h-5 w-5 mr-2 text-siso-orange mt-1" />
+                    <div>
+                      <h3 className="text-xl font-semibold text-white mb-2">Investment</h3>
+                      <p className="text-siso-orange">£{totalCost}</p>
+                    </div>
                   </div>
                 </div>
               </div>
-              
-              <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
-                <div className="flex items-start">
-                  <Calendar className="h-5 w-5 mr-2 text-siso-orange mt-1" />
-                  <div>
-                    <h3 className="text-xl font-semibold text-white mb-2">Timeline</h3>
-                    <p className="text-siso-orange">{plan.estimated_days} days</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
-                <div className="flex items-start">
-                  <DollarSign className="h-5 w-5 mr-2 text-siso-orange mt-1" />
-                  <div>
-                    <h3 className="text-xl font-semibold text-white mb-2">Investment</h3>
-                    <p className="text-siso-orange">£{totalCost}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            )}
             
             {/* Main content - conditional on plan type */}
             {isDecoraPlan ? (
