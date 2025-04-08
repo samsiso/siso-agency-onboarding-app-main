@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -789,4 +790,192 @@ const Plan = () => {
                             <TableCell className="font-medium text-white">Frontend</TableCell>
                             <TableCell className="text-siso-text">React.js with Tailwind CSS for responsive design and smooth animations</TableCell>
                           </TableRow>
-                          <TableRow className="border-siso-text/10
+                          <TableRow className="border-siso-text/10">
+                            <TableCell className="font-medium text-white">Backend</TableCell>
+                            <TableCell className="text-siso-text">Node.js with Supabase for database, authentication, and real-time updates</TableCell>
+                          </TableRow>
+                          <TableRow className="border-siso-text/10">
+                            <TableCell className="font-medium text-white">Integrations</TableCell>
+                            <TableCell className="text-siso-text">Only Fans API, WhatsApp Business API, payment processing, messaging services</TableCell>
+                          </TableRow>
+                          <TableRow className="border-siso-text/10">
+                            <TableCell className="font-medium text-white">Security</TableCell>
+                            <TableCell className="text-siso-text">End-to-end encryption, 2FA, role-based access control, regular security audits</TableCell>
+                          </TableRow>
+                          <TableRow className="border-siso-text/10">
+                            <TableCell className="font-medium text-white">Deployment</TableCell>
+                            <TableCell className="text-siso-text">Cloud-based with automated scaling, daily backups, and 99.9% uptime guarantee</TableCell>
+                          </TableRow>
+                          <TableRow className="border-siso-text/10">
+                            <TableCell className="font-medium text-white">Mobile Access</TableCell>
+                            <TableCell className="text-siso-text">Fully responsive web app with optional native app wrapper for iOS and Android</TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                    </div>
+                    
+                    <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
+                      <h3 className="text-xl font-semibold text-white mb-4">Additional Details</h3>
+                      <div className="prose prose-invert prose-sm max-w-none">
+                        <p>The OnlyFans Management Suite for Decora includes a complete ecosystem for managing creators, content, and fan interactions. The platform provides tools for efficient onboarding, content scheduling, analytics tracking, and secure payment processing.</p>
+                        <p>Our comprehensive solution helps agencies like yours streamline operations, improve client retention, and maximize revenue potential through advanced analytics and automation. The application is built with scalability in mind, allowing it to grow alongside your agency from 10 to 100+ creators.</p>
+                        <p>All system components adhere to industry best practices for security and performance, ensuring a reliable platform for your business operations. The white-label options allow you to fully brand the platform as your own, enhancing your professional image with clients.</p>
+                        <p>After approval, we'll work closely with your team to customize the platform to your specific workflow and processes, ensuring a seamless transition and maximum adoption across your organization.</p>
+                      </div>
+                    </div>
+                  </TabsContent>
+                </Tabs>
+                
+                {/* Case Studies Section */}
+                <div className="mb-6">
+                  <h2 className="text-2xl font-semibold text-white mb-4 flex items-center">
+                    <FileText className="h-5 w-5 mr-2 text-siso-orange" />
+                    Case Studies
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {caseStudies.map((study, index) => (
+                      <CaseStudy
+                        key={index}
+                        title={study.title}
+                        description={study.description}
+                        imageUrl={study.imageUrl}
+                        notionUrl={study.notionUrl}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Testimonials Section - MOVED TO BOTTOM */}
+                <div className="mb-6">
+                  <h2 className="text-2xl font-semibold text-white mb-4 flex items-center">
+                    <Heart className="h-5 w-5 mr-2 text-siso-orange" />
+                    What Other Agencies Are Saying
+                  </h2>
+                  <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {testimonials.map((testimonial, index) => (
+                        <motion.div 
+                          key={index} 
+                          className="p-4 border border-siso-text/10 rounded-lg bg-gradient-to-br from-siso-red/5 to-siso-orange/5"
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.15 * index, duration: 0.5 }}
+                        >
+                          <p className="text-siso-text text-sm italic mb-3">{`"${testimonial.content}"`}</p>
+                          <div className="mb-3">
+                            <p className="text-white font-medium">{testimonial.author}</p>
+                            <p className="text-siso-text/70 text-xs">{testimonial.position}</p>
+                          </div>
+                          <div className="flex gap-2">
+                            {testimonial.instagram && (
+                              <a 
+                                href={testimonial.instagram} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-xs text-siso-orange flex items-center hover:underline"
+                              >
+                                Instagram <ExternalLink className="h-3 w-3 ml-1" />
+                              </a>
+                            )}
+                            {testimonial.appLink && (
+                              <a 
+                                href={testimonial.appLink} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-xs text-siso-orange flex items-center hover:underline"
+                              >
+                                App <ExternalLink className="h-3 w-3 ml-1" />
+                              </a>
+                            )}
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="mb-8">
+                {/* Regular Plan Features */}
+                <div className="mb-6">
+                  <h2 className="text-2xl font-semibold text-white mb-4">Features</h2>
+                  <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
+                    <ul className="space-y-2">
+                      {regularFeatures.map((feature, index) => (
+                        <li key={index} className="flex items-start">
+                          <CheckCircle className="h-4 w-4 mr-2 text-siso-orange shrink-0 mt-0.5" />
+                          <span className="text-siso-text">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+                
+                {/* Branding Customization For Regular Plan */}
+                <div className="mb-6">
+                  <h2 className="text-2xl font-semibold text-white mb-4">Customize Your Branding</h2>
+                  <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
+                    <p className="text-siso-text mb-4">
+                      Select the colors that match your brand identity. These colors will be used throughout your app.
+                    </p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <ColorPicker
+                          title="Primary Color"
+                          colors={brandColorOptions}
+                          selectedColor={primaryColor}
+                          onChange={setPrimaryColor}
+                        />
+                      </div>
+                      
+                      <div>
+                        <ColorPicker
+                          title="Secondary Color"
+                          colors={brandColorOptions}
+                          selectedColor={secondaryColor}
+                          onChange={setSecondaryColor}
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="mt-6 p-4 rounded-lg" style={{ background: `linear-gradient(135deg, ${primaryColor}10, ${secondaryColor}10)` }}>
+                      <div className="flex gap-3">
+                        <div className="h-12 w-12 rounded-full" style={{ backgroundColor: primaryColor }}></div>
+                        <div className="h-12 w-12 rounded-full" style={{ backgroundColor: secondaryColor }}></div>
+                      </div>
+                      <p className="mt-2 text-sm text-siso-text">Preview of your selected brand colors</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Approve Plan Button */}
+            <div className="mt-8 flex justify-end">
+              <Button
+                onClick={handleSubmitPlan}
+                disabled={submitting}
+                className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-white px-6 py-2 rounded-md flex items-center gap-2 disabled:opacity-70"
+              >
+                {submitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>Processing...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Approve This Plan</span>
+                    <ArrowRight className="h-4 w-4" />
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
+
+export default Plan;
