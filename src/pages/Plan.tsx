@@ -605,7 +605,7 @@ const Plan = () => {
       metrics: [
         { label: "Response Time", value: "75% faster", icon: <MessageSquare className="h-4 w-4 text-siso-orange" /> },
         { label: "Message Organization", value: "100%", icon: <CheckCircle className="h-4 w-4 text-siso-orange" /> },
-        { label: "Client Satisfaction", value: "88%\", icon: <Heart className="h-4 w-4 text-siso-orange" /> },
+        { label: "Client Satisfaction", value: "88%", icon: <Heart className="h-4 w-4 text-siso-orange" /> },
         { label: "Missed Messages", value: "0%", icon: <Users className="h-4 w-4 text-siso-orange" /> }
       ],
       images: [
@@ -625,7 +625,7 @@ const Plan = () => {
         "Optimize fan interactions for maximum satisfaction"
       ],
       metrics: [
-        { label: "Fan Retention Rate", value: "58%\", icon: <Heart className="h-4 w-4 text-siso-orange" /> },
+        { label: "Fan Retention Rate", value: "58% higher", icon: <Heart className="h-4 w-4 text-siso-orange" /> },
         { label: "Message Response Rate", value: "100%", icon: <MessageSquare className="h-4 w-4 text-siso-orange" /> },
         { label: "Fan Satisfaction Score", value: "94%", icon: <CheckCircle className="h-4 w-4 text-siso-orange" /> },
         { label: "Resubscription Rate", value: "72% increase", icon: <TrendingUp className="h-4 w-4 text-siso-orange" /> }
@@ -684,4 +684,103 @@ const Plan = () => {
       caseStudyLink: "https://notion.so/case-study/client-retention",
       videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
       researchSources: [
-        { name:
+        { name: "OnlyFans Creator Agency Survey 2023", url: "https://example.com/research1" },
+        { name: "Industry Report on Talent Management", url: "https://example.com/research2" }
+      ]
+    }
+  ] : [];
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-black via-siso-bg to-black p-4">
+      <div className="max-w-md w-full bg-black/40 border border-siso-text/10 rounded-lg p-6 backdrop-blur-sm">
+        <div className="text-center mb-6">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <Sparkles className="h-12 w-12 text-siso-orange mx-auto mb-3" />
+            <h2 className="text-2xl font-bold text-white mb-1">
+              {username === 'decora' ? 'Welcome, Decora Agency!' : 'Preparing Your Custom Plan'}
+            </h2>
+            <p className="text-siso-text text-sm">
+              {username === 'decora' 
+                ? "We're finalizing your custom OnlyFans Management Suite"
+                : "We're tailoring a solution just for your business needs"}
+            </p>
+          </motion.div>
+        </div>
+        
+        <MessageLoading className="mx-auto mb-6" />
+        
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+          className="mb-6"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-siso-text">Loading your custom plan</span>
+            <span className="text-sm text-siso-orange">{loadingProgress}%</span>
+          </div>
+          <div className="h-2 bg-black/30 rounded-full overflow-hidden">
+            <motion.div 
+              className="h-full bg-gradient-to-r from-siso-red to-siso-orange"
+              initial={{ width: "0%" }}
+              animate={{ width: `${loadingProgress}%` }}
+              transition={{ duration: 0.5 }}
+            />
+          </div>
+        </motion.div>
+        
+        <div className="space-y-3">
+          {loadingAnimationSteps.map((step, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ 
+                opacity: loadingStep >= index ? 1 : 0.4,
+                x: 0
+              }}
+              transition={{ delay: index * 0.2, duration: 0.4 }}
+              className="flex items-center gap-3"
+            >
+              <div className={`flex items-center justify-center w-8 h-8 rounded-full ${
+                loadingStep >= index ? 'bg-siso-orange/20' : 'bg-siso-text/5'
+              }`}>
+                {loadingStep > index ? (
+                  <CheckCircle className="h-4 w-4 text-siso-orange" />
+                ) : loadingStep === index ? (
+                  <Loader2 className="h-4 w-4 text-siso-orange animate-spin" />
+                ) : (
+                  <div className="h-4 w-4 rounded-full bg-siso-text/20" />
+                )}
+              </div>
+              <p className={`text-sm ${
+                loadingStep >= index ? 'text-siso-text' : 'text-siso-text/50'
+              }`}>
+                {step}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+        
+        {username === 'decora' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8, duration: 0.5 }}
+            className="mt-6 rounded-lg bg-siso-orange/5 border border-siso-orange/20 p-4 text-sm text-siso-text"
+          >
+            <p className="flex items-center gap-2">
+              <Heart className="h-4 w-4 text-siso-orange shrink-0" />
+              <span>Your OnlyFans management platform is almost ready. We've added special features just for agencies like yours!</span>
+            </p>
+          </motion.div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default Plan;
