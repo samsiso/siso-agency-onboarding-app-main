@@ -56,7 +56,13 @@ export type Database = {
       };
     };
     Views: {};
-    Functions: {};
+    Functions: {
+      // Add type definition for the handle_onboarding_completion function
+      handle_onboarding_completion: {
+        Args: { user_id: string };
+        Returns: undefined;
+      };
+    };
     Enums: {};
     CompositeTypes: {};
   };

@@ -61,6 +61,7 @@ export default function Congratulations() {
         const { data: { user } } = await supabase.auth.getUser();
         
         if (user?.id) {
+          // Fix: Ensure correct typing for RPC function call
           const { error } = await supabase.rpc('handle_onboarding_completion', {
             user_id: user.id
           });
