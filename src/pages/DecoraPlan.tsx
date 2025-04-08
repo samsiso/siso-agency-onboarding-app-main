@@ -250,7 +250,34 @@ const DecoraPlan = () => {
         { url: "/lovable-uploads/c7ac43fd-bc3e-478d-8b4f-809beafb6838.png", caption: "Client retention dashboard showing performance metrics" },
         { url: "/lovable-uploads/1f9eba1e-c2af-4ed8-84e7-a375872c9182.png", caption: "Transparent reporting shared with creators" }
       ],
-      caseStudyLink: "https://notion.so/case-study/client-retention"
+      caseStudyLink: "https://notion.so/case-study/client-retention",
+      videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+      researchSources: [
+        {
+          title: "Creator Economy Retention Research Report 2023",
+          url: "https://example.com/research/creator-economy-2023",
+          description: "A comprehensive study of 250+ OnlyFans agencies showing the correlation between transparency and client retention rates."
+        },
+        {
+          title: "The Value of Analytics in Creator Management",
+          url: "https://example.com/analytics-value",
+          description: "Research demonstrating how performance visibility leads to 40% longer client relationships in creator management."
+        }
+      ],
+      testimonials: [
+        {
+          content: "Before using this platform, we lost 30% of our creators every quarter. Now our retention rate has improved dramatically, and our creators appreciate seeing exactly how we're helping them grow.",
+          author: "Sarah Johnson",
+          company: "Elite Creators Agency",
+          imageUrl: "/lovable-uploads/c7ac43fd-bc3e-478d-8b4f-809beafb6838.png"
+        },
+        {
+          content: "The transparent reporting has transformed our relationships with creators. They can see their growth in real-time, which has eliminated the trust issues we used to face.",
+          author: "Michael Rodriguez",
+          company: "Creator Success Partners",
+          imageUrl: "/lovable-uploads/1f9eba1e-c2af-4ed8-84e7-a375872c9182.png"
+        }
+      ]
     },
     {
       problem: "Content Disorganization",
@@ -272,7 +299,18 @@ const DecoraPlan = () => {
       images: [
         { url: "/lovable-uploads/19ca8c73-3736-4506-bfb2-de867b272e12.png", caption: "Content calendar with drag-and-drop functionality" }
       ],
-      caseStudyLink: "https://notion.so/case-study/content-management"
+      caseStudyLink: "https://notion.so/case-study/content-management",
+      videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+      comparisonChart: {
+        title: "Content Management Efficiency",
+        description: "Key improvements after implementing centralized content management",
+        items: [
+          { metric: "Missed Deadlines", before: "5-8 weekly", after: "0-1 weekly" },
+          { metric: "Time Spent Organizing", before: "18 hours/week", after: "3 hours/week" },
+          { metric: "Content Approval Time", before: "36 hours", after: "4 hours" },
+          { metric: "Content Findability", before: "42% success rate", after: "98% success rate" }
+        ]
+      }
     },
     {
       problem: "Inefficient Onboarding",
@@ -293,6 +331,23 @@ const DecoraPlan = () => {
       ],
       images: [
         { url: "/lovable-uploads/66b63935-28a0-4212-8e2a-ab375279b188.png", caption: "Multi-step onboarding workflow" }
+      ],
+      implementationSteps: [
+        { 
+          title: "Workflow Design", 
+          description: "Map out your ideal onboarding process including all required documents and information.",
+          icon: <FileText className="h-4 w-4 text-siso-orange" />
+        },
+        { 
+          title: "Form Creation", 
+          description: "Build intuitive, branded forms for creator information collection.",
+          icon: <CheckCircle className="h-4 w-4 text-siso-orange" />
+        },
+        { 
+          title: "Automation Setup", 
+          description: "Configure automatic reminders and progress tracking to keep creators moving forward.",
+          icon: <Clock className="h-4 w-4 text-siso-orange" />
+        }
       ]
     },
     {
@@ -315,7 +370,15 @@ const DecoraPlan = () => {
       images: [
         { url: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png", caption: "Unified messaging interface with priority sorting" }
       ],
-      caseStudyLink: "https://notion.so/case-study/communication"
+      caseStudyLink: "https://notion.so/case-study/communication",
+      testimonials: [
+        {
+          content: "The unified inbox has eliminated the communication chaos we were dealing with. Our team can now collaborate efficiently, and our creators always get timely responses.",
+          author: "Jessica Martinez",
+          company: "Creator Collective Agency",
+          imageUrl: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png"
+        }
+      ]
     }
   ];
   
