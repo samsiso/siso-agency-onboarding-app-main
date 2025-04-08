@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -344,6 +345,13 @@ const Plan = () => {
     }
   };
   
+  // Fix for navigation from loading screen to actual plan view
+  const handleViewPlanNowClick = () => {
+    console.log("Plan: Handling View Plan Now button click");
+    setLoading(false);
+    setForceRender(prev => !prev); // Force re-render to ensure UI updates
+  };
+  
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-black via-siso-bg to-black p-4">
@@ -442,7 +450,7 @@ const Plan = () => {
           {loadingComplete && (
             <div className="mt-6 flex justify-center">
               <Button 
-                onClick={() => setLoading(false)}
+                onClick={handleViewPlanNowClick}
                 className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-white"
               >
                 View Your Plan Now
