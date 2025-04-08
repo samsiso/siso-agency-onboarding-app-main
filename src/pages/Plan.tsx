@@ -684,4 +684,4 @@ const Plan = () => {
       caseStudyLink: "https://notion.so/case-study/client-retention",
       videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
       researchSources: [
-        {
+        { name: "
