@@ -82,8 +82,20 @@ const ProblemSolutionCard = ({ problem, solution, icon, active, delay }) => {
   );
 };
 
+// Define a type for the analysis step props
+interface AnalysisStepProps {
+  step: {
+    icon: React.ReactNode;
+    text: string;
+    tooltip: string;
+  };
+  isActive: boolean;
+  isCompleted: boolean;
+  index: number;
+}
+
 // Analysis step component
-const AnalysisStep = ({ step, isActive, isCompleted, index }) => {
+const AnalysisStep = ({ step, isActive, isCompleted, index }: AnalysisStepProps) => {
   const steps = [
     { icon: <Users className="h-5 w-5 text-siso-orange" />, text: "Analyzing client management needs...", tooltip: "Manage multiple creators efficiently" },
     { icon: <Calendar className="h-5 w-5 text-siso-orange" />, text: "Optimizing content scheduling...", tooltip: "Automate content planning and posting" },
@@ -91,8 +103,6 @@ const AnalysisStep = ({ step, isActive, isCompleted, index }) => {
     { icon: <BarChart className="h-5 w-5 text-siso-orange" />, text: "Finalizing analytics dashboard...", tooltip: "Track performance in real-time" },
     { icon: <DollarSign className="h-5 w-5 text-siso-orange" />, text: "Calculating revenue potential...", tooltip: "Identify new income opportunities" }
   ];
-  
-  const currentStep = steps[index];
   
   return (
     <TooltipProvider delayDuration={300}>
@@ -115,18 +125,18 @@ const AnalysisStep = ({ step, isActive, isCompleted, index }) => {
               ) : isActive ? (
                 <Loader2 className="h-4 w-4 text-siso-orange animate-spin" />
               ) : (
-                currentStep.icon
+                step.icon
               )}
             </div>
             <p className={`text-sm ${
               isActive || isCompleted ? 'text-siso-text' : 'text-siso-text/50'
             }`}>
-              {currentStep.text}
+              {step.text}
             </p>
           </motion.div>
         </TooltipTrigger>
         <TooltipContent side="right" className="bg-black/90 border-siso-orange/20 text-white">
-          {currentStep.tooltip}
+          {step.tooltip}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
@@ -145,6 +155,15 @@ const DecoraPlan = () => {
   
   // Track which solutions are active
   const [activeSolutions, setActiveSolutions] = useState([false, false, false, false]);
+  
+  // Analysis steps data
+  const analysisSteps = [
+    { icon: <Users className="h-5 w-5 text-siso-orange" />, text: "Analyzing client management needs...", tooltip: "Manage multiple creators efficiently" },
+    { icon: <Calendar className="h-5 w-5 text-siso-orange" />, text: "Optimizing content scheduling...", tooltip: "Automate content planning and posting" },
+    { icon: <MessageSquare className="h-5 w-5 text-siso-orange" />, text: "Enhancing communication tools...", tooltip: "Streamline creator interactions" },
+    { icon: <BarChart className="h-5 w-5 text-siso-orange" />, text: "Finalizing analytics dashboard...", tooltip: "Track performance in real-time" },
+    { icon: <DollarSign className="h-5 w-5 text-siso-orange" />, text: "Calculating revenue potential...", tooltip: "Identify new income opportunities" }
+  ];
   
   // Typed text animation for welcome screen
   useEffect(() => {
@@ -335,9 +354,10 @@ const DecoraPlan = () => {
               </motion.div>
               
               <div className="space-y-4">
-                {Array.from({ length: 5 }).map((_, index) => (
+                {analysisSteps.map((step, index) => (
                   <AnalysisStep
                     key={index}
+                    step={step}
                     index={index}
                     isActive={loadingStep === index + 1}
                     isCompleted={loadingStep > index + 1}
