@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -541,6 +542,7 @@ const Plan = () => {
 
         <div className="bg-black/40 backdrop-blur-md rounded-lg border border-siso-text/10 shadow-xl overflow-hidden">
           <div className="p-6 md:p-8">
+            {/* App plan header */}
             <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-6">
               <div>
                 <GradientHeading className="text-3xl md:text-4xl mb-2">
@@ -563,6 +565,7 @@ const Plan = () => {
               )}
             </div>
             
+            {/* Plan summary cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
                 <div className="flex items-start">
@@ -595,8 +598,10 @@ const Plan = () => {
               </div>
             </div>
             
+            {/* Main content - conditional on plan type */}
             {isDecoraPlan ? (
               <div className="mb-8" ref={featuresRef}>
+                {/* Pain points section */}
                 <div className="mb-6">
                   <h2 className="text-2xl font-semibold text-white mb-4 flex items-center">
                     <Shield className="h-5 w-5 mr-2 text-siso-orange" />
@@ -620,6 +625,7 @@ const Plan = () => {
                   </div>
                 </div>
                 
+                {/* Target users section */}
                 <div className="mb-6">
                   <h2 className="text-2xl font-semibold text-white mb-4 flex items-center">
                     <Target className="h-5 w-5 mr-2 text-siso-orange" />
@@ -632,6 +638,7 @@ const Plan = () => {
                   </div>
                 </div>
                 
+                {/* Branding customization section */}
                 <div className="mb-6">
                   <h2 className="text-2xl font-semibold text-white mb-4">Customize Your Branding</h2>
                   <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
@@ -669,6 +676,7 @@ const Plan = () => {
                   </div>
                 </div>
                 
+                {/* Feature customization section */}
                 <div className="mb-6">
                   <h2 className="text-2xl font-semibold text-white mb-4">Customize Your Plan</h2>
                   <FeatureSelection 
@@ -678,6 +686,7 @@ const Plan = () => {
                   />
                 </div>
                 
+                {/* Feature tabs section */}
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mb-6">
                   <TabsList className="w-full grid grid-cols-2 mb-6 bg-black/20">
                     <TabsTrigger value="features" className="data-[state=active]:bg-siso-orange/20">
@@ -772,4 +781,58 @@ const Plan = () => {
                       <div className="prose prose-invert prose-sm max-w-none">
                         <p>The OnlyFans Management Suite for Decora includes a complete ecosystem for managing creators, content, and fan interactions. The platform provides tools for efficient onboarding, content scheduling, analytics tracking, and secure payment processing.</p>
                         <p>Our comprehensive solution helps agencies like yours streamline operations, improve client retention, and maximize revenue potential through advanced analytics and automation. The application is built with scalability in mind, allowing it to grow alongside your agency from 10 to 100+ creators.</p>
-                        <p>All system components adhere to industry best practices for security and performance, ensuring a reliable platform for your business operations.
+                        <p>All system components adhere to industry best practices for security and performance, ensuring a reliable platform for your business operations.</p>
+                      </div>
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              </div>
+            ) : (
+              // Regular features display for non-Decora plans
+              <div className="mb-8">
+                <h2 className="text-2xl font-semibold text-white mb-4">Selected Features</h2>
+                <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
+                  <ul className="space-y-2">
+                    {regularFeatures.map((feature, index) => (
+                      <li key={index} className="flex items-start">
+                        <CheckCircle className="h-4 w-4 mr-2 text-siso-orange shrink-0 mt-0.5" />
+                        <span className="text-siso-text">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
+            
+            {/* Submit button */}
+            <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <Button
+                onClick={handleSubmitPlan}
+                disabled={submitting}
+                className="w-full sm:w-auto bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-white"
+              >
+                {submitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    Approve Plan & Continue
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </>
+                )}
+              </Button>
+              
+              <p className="text-siso-text text-sm">
+                By approving this plan, you're confirming you'd like to proceed with the app development.
+              </p>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
+
+export default Plan;
