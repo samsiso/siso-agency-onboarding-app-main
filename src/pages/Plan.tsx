@@ -21,11 +21,7 @@ import {
   Smartphone,
   Heart,
   ExternalLink,
-  Sparkles,
-  Zap,
-  LayoutDashboard,
-  CheckCheck,
-  Activity
+  Sparkles
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
@@ -34,11 +30,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ColorPicker } from '@/components/plan/ColorPicker';
 import { FeatureSelection, Feature } from '@/components/plan/FeatureSelection';
-import { PriceSlider } from '@/components/plan/PriceSlider';
 import { CaseStudy } from '@/components/plan/CaseStudy';
 import { Skeleton } from '@/components/ui/skeleton';
-import { cn } from '@/lib/utils';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface PlanData {
   id: string;
@@ -114,151 +107,42 @@ const caseStudies = [
   }
 ];
 
-// Define the base price and maximum price
-const BASE_PRICE = 249;
-const MAX_PRICE = 2490;
-
-// Additional features with categories and time estimates
+// Additional features that can be added
 const additionalFeatures: Feature[] = [
-  // MVP Features (Core)
-  {
-    id: 'landing-page',
-    name: 'Custom Landing Page',
-    description: 'Professional landing page designed for your brand to convert visitors.',
-    price: 0, // Included in base price
-    timeEstimate: 5,
-    included: true,
-    category: 'mvp'
-  },
-  {
-    id: 'authentication',
-    name: 'Authentication System',
-    description: 'Secure login, registration, and password recovery flows.',
-    price: 0, // Included in base price
-    timeEstimate: 3,
-    included: true,
-    category: 'mvp'
-  },
-  {
-    id: 'onboarding-flow',
-    name: 'User Onboarding',
-    description: 'Step-by-step onboarding process for new users with progress tracking.',
-    price: 0, // Included in base price
-    timeEstimate: 4,
-    included: true,
-    category: 'mvp'
-  },
-  {
-    id: 'dashboard',
-    name: 'Basic Dashboard',
-    description: 'User dashboard with overview of key metrics and information.',
-    price: 0, // Included in base price
-    timeEstimate: 5,
-    included: true,
-    category: 'mvp'
-  },
-  {
-    id: 'profile-management',
-    name: 'Profile Management',
-    description: 'User profile editing, preferences, and settings.',
-    price: 0, // Included in base price
-    timeEstimate: 2,
-    included: true,
-    category: 'mvp'
-  },
-  
-  // Advanced Features
-  {
-    id: 'client-management',
-    name: 'Client Management',
-    description: 'Complete system to add, track, and manage your clients with custom fields.',
-    price: 400,
-    timeEstimate: 8,
-    included: false,
-    category: 'advanced'
-  },
-  {
-    id: 'content-calendar',
-    name: 'Content Calendar',
-    description: 'Visual content planning calendar with scheduling and management tools.',
-    price: 350,
-    timeEstimate: 6,
-    included: false,
-    category: 'advanced'
-  },
-  {
-    id: 'messaging-system',
-    name: 'Messaging System',
-    description: 'Internal messaging system for client-agency communication.',
-    price: 300,
-    timeEstimate: 7,
-    included: false,
-    category: 'advanced'
-  },
-  {
-    id: 'analytics-dashboard',
-    name: 'Analytics Dashboard',
-    description: 'Detailed performance analytics with visual reports and insights.',
-    price: 380,
-    timeEstimate: 7,
-    included: false,
-    category: 'advanced'
-  },
-  {
-    id: 'file-management',
-    name: 'File Management',
-    description: 'Upload, organize, and share files with clients securely.',
-    price: 270,
-    timeEstimate: 5,
-    included: false,
-    category: 'advanced'
-  },
-  
-  // Premium Features
   {
     id: 'white-label',
     name: 'White Label Branding',
     description: 'Remove all Siso branding and use your own logo and colors throughout the platform.',
-    price: 600,
-    timeEstimate: 3,
-    included: false,
-    category: 'premium'
+    price: 1200,
+    included: false
   },
   {
     id: 'mobile-apps',
     name: 'Native Mobile Apps',
     description: 'iOS and Android mobile apps for your team and clients to access the platform on the go.',
-    price: 900,
-    timeEstimate: 14,
-    included: false,
-    category: 'premium'
+    price: 2500,
+    included: false
   },
   {
     id: 'api-integration',
     name: 'Custom API Integrations',
     description: 'Connect with additional platforms and services beyond our standard integrations.',
-    price: 700,
-    timeEstimate: 10,
-    included: false,
-    category: 'premium'
+    price: 1800,
+    included: false
   },
   {
     id: 'ai-insights',
     name: 'AI Content Insights',
     description: 'Advanced AI tools to analyze content performance and suggest improvements.',
-    price: 800,
-    timeEstimate: 12,
-    included: false,
-    category: 'premium'
+    price: 1500,
+    included: false
   },
   {
     id: 'premium-support',
     name: 'Premium Support Package',
     description: '24/7 dedicated support team with 1-hour response time and monthly strategy calls.',
-    price: 550,
-    timeEstimate: 0, // Ongoing service
-    included: false,
-    category: 'premium'
+    price: 950,
+    included: false
   }
 ];
 
@@ -275,9 +159,7 @@ const Plan = () => {
   const [primaryColor, setPrimaryColor] = useState('#ED8936');
   const [secondaryColor, setSecondaryColor] = useState('#E53E3E');
   const [selectedFeatures, setSelectedFeatures] = useState<Feature[]>(additionalFeatures);
-  const [totalCost, setTotalCost] = useState<number>(BASE_PRICE);
-  const [totalDays, setTotalDays] = useState<number>(0);
-  const [priceLevel, setPriceLevel] = useState<number>(BASE_PRICE);
+  const [totalCost, setTotalCost] = useState<number | null>(null);
   
   // Enhanced loading screen animations
   const loadingAnimationSteps = [
@@ -323,12 +205,8 @@ const Plan = () => {
           setSecondaryColor(data.branding.secondary_color);
         }
         
-        // Initialize selected features based on plan data if available
-        // For now, we'll just use the default additionalFeatures
-        
-        // Calculate initial total cost and days
-        calculateTotalCost();
-        calculateTotalDays();
+        // Calculate initial total cost
+        setTotalCost(data?.estimated_cost || 0);
         
         // Clear loading interval after a small delay to show the final step
         setTimeout(() => {
@@ -350,37 +228,16 @@ const Plan = () => {
     fetchPlan();
   }, [username, toast, loadingAnimationSteps.length]);
   
-  // Calculate total cost when selected features change or price level changes
+  // Calculate total cost when selected features change
   useEffect(() => {
-    calculateTotalCost();
-  }, [selectedFeatures, priceLevel]);
-  
-  // Calculate total days when selected features change
-  useEffect(() => {
-    calculateTotalDays();
-  }, [selectedFeatures]);
-  
-  // Function to calculate total cost
-  const calculateTotalCost = () => {
-    const additionalCost = selectedFeatures
-      .filter(feature => feature.included && feature.category !== 'mvp') // MVP features are included in base price
-      .reduce((total, feature) => total + feature.price, 0);
-      
-    setTotalCost(priceLevel + additionalCost);
-  };
-  
-  // Function to calculate total days
-  const calculateTotalDays = () => {
-    const days = selectedFeatures
-      .filter(feature => feature.included && feature.timeEstimate)
-      .reduce((total, feature) => total + (feature.timeEstimate || 0), 0);
-      
-    setTotalDays(days);
-  };
-  
-  const handlePriceChange = (newPrice: number) => {
-    setPriceLevel(newPrice);
-  };
+    if (plan) {
+      const additionalCost = selectedFeatures
+        .filter(feature => feature.included)
+        .reduce((total, feature) => total + feature.price, 0);
+        
+      setTotalCost((plan.estimated_cost || 0) + additionalCost);
+    }
+  }, [selectedFeatures, plan]);
   
   const handleSubmitPlan = async () => {
     if (!plan) return;
@@ -394,7 +251,6 @@ const Plan = () => {
         .update({ 
           status: 'approved',
           estimated_cost: totalCost,
-          estimated_days: totalDays,
           branding: {
             ...plan.branding,
             primary_color: primaryColor,
@@ -681,57 +537,17 @@ const Plan = () => {
     ? (plan.features || [])
     : [];
   
-  // Benefits of different pricing tiers
-  const pricingTierBenefits = [
-    {
-      name: "MVP",
-      price: BASE_PRICE,
-      features: [
-        "Authentication system",
-        "User profiles",
-        "Basic dashboard",
-        "Simple content management",
-        "Standard support"
-      ],
-      icon: <LayoutDashboard className="h-6 w-6" />
-    },
-    {
-      name: "Standard",
-      price: Math.round(BASE_PRICE + ((MAX_PRICE - BASE_PRICE) / 3)),
-      features: [
-        "Everything in MVP",
-        "Advanced user management",
-        "Content calendar",
-        "Analytics dashboard",
-        "API access"
-      ],
-      icon: <CheckCheck className="h-6 w-6" />
-    },
-    {
-      name: "Premium",
-      price: Math.round(BASE_PRICE + (2 * (MAX_PRICE - BASE_PRICE) / 3)),
-      features: [
-        "Everything in Standard",
-        "White label solution",
-        "Advanced integrations",
-        "Priority support",
-        "Regular updates"
-      ],
-      icon: <Sparkles className="h-6 w-6" />
-    },
-    {
-      name: "Enterprise",
-      price: MAX_PRICE,
-      features: [
-        "Everything in Premium",
-        "Custom development",
-        "Mobile apps",
-        "Dedicated account manager",
-        "24/7 support"
-      ],
-      icon: <Zap className="h-6 w-6" />
-    }
-  ];
+  // Just modify the FeatureSelection component usage to hide pricing
+  const originalFeatureSelectionSection = (
+    <div className="mb-6">
+      <h2 className="text-2xl font-semibold text-white mb-4">Customize Your Plan</h2>
+      <FeatureSelection 
+        features={selectedFeatures} 
+        onChange={setSelectedFeatures}
+        showPricing={false} // Hide pricing
+      />
+    </div>
+  );
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-siso-bg to-black p-4 md:p-8">
@@ -788,118 +604,369 @@ const Plan = () => {
               )}
             </div>
             
-            {/* Investment Slider */}
-            <div className="mb-8">
-              <h2 className="text-2xl font-semibold text-white mb-4">Choose Your Investment Level</h2>
+            {/* Key Info Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
-                <PriceSlider 
-                  minPrice={BASE_PRICE}
-                  maxPrice={MAX_PRICE}
-                  currentPrice={priceLevel}
-                  onChange={handlePriceChange}
-                />
-                
-                <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-                  {pricingTierBenefits.map((tier, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.1 * index, duration: 0.5 }}
-                      className={cn(
-                        "rounded-lg p-4 border transition-all",
-                        priceLevel >= tier.price 
-                          ? "border-siso-orange/30 bg-siso-orange/5" 
-                          : "border-siso-text/5 bg-black/20 opacity-60"
-                      )}
-                    >
-                      <div className="flex items-center gap-2 mb-3">
-                        <div className={cn(
-                          "p-2 rounded-full",
-                          priceLevel >= tier.price ? "bg-siso-orange/20" : "bg-siso-text/10"
-                        )}>
-                          {tier.icon}
-                        </div>
-                        <h3 className="font-semibold text-white">{tier.name}</h3>
-                      </div>
-                      <ul className="space-y-1 text-sm">
-                        {tier.features.map((feature, fIndex) => (
-                          <li key={fIndex} className="flex items-start">
-                            <CheckCircle className={cn(
-                              "h-3.5 w-3.5 mr-2 shrink-0 mt-0.5",
-                              priceLevel >= tier.price ? "text-siso-orange" : "text-siso-text/50"
-                            )} />
-                            <span className="text-siso-text">{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </motion.div>
-                  ))}
+                <div className="flex items-start">
+                  <FileText className="h-5 w-5 mr-2 text-siso-orange mt-1" />
+                  <div>
+                    <h3 className="text-xl font-semibold text-white mb-2">App Name</h3>
+                    <p className="text-siso-orange">{plan.app_name}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
+                <div className="flex items-start">
+                  <Calendar className="h-5 w-5 mr-2 text-siso-orange mt-1" />
+                  <div>
+                    <h3 className="text-xl font-semibold text-white mb-2">Timeline</h3>
+                    <p className="text-siso-orange">{plan.estimated_days} days</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
+                <div className="flex items-start">
+                  <DollarSign className="h-5 w-5 mr-2 text-siso-orange mt-1" />
+                  <div>
+                    <h3 className="text-xl font-semibold text-white mb-2">Investment</h3>
+                    <p className="text-siso-orange">£{totalCost}</p>
+                  </div>
                 </div>
               </div>
             </div>
             
-            {/* Key Info Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <TooltipProvider>
-                <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
-                  <div className="flex items-start">
-                    <FileText className="h-5 w-5 mr-2 text-siso-orange mt-1" />
-                    <div>
-                      <h3 className="text-xl font-semibold text-white mb-2">App Name</h3>
-                      <p className="text-siso-orange">{plan.app_name}</p>
+            {isDecoraPlan ? (
+              <div className="mb-8">
+                {/* Pain Points Solved - MOVED UP */}
+                <div className="mb-6">
+                  <h2 className="text-2xl font-semibold text-white mb-4 flex items-center">
+                    <Shield className="h-5 w-5 mr-2 text-siso-orange" />
+                    Pain Points Solved
+                  </h2>
+                  <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {painPoints.map((point, index) => (
+                        <motion.div 
+                          key={index} 
+                          className="p-4 border border-siso-text/10 rounded-lg bg-black/20"
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.1 * index, duration: 0.5 }}
+                        >
+                          <h3 className="text-white font-medium mb-2">{point.problem}</h3>
+                          <p className="text-siso-text text-sm">{point.solution}</p>
+                        </motion.div>
+                      ))}
                     </div>
                   </div>
                 </div>
                 
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5 cursor-help">
-                      <div className="flex items-start">
-                        <Calendar className="h-5 w-5 mr-2 text-siso-orange mt-1" />
-                        <div>
-                          <h3 className="text-xl font-semibold text-white mb-2">Development Timeline</h3>
-                          <p className="text-siso-orange">{totalDays} days</p>
-                        </div>
+                {/* Target Users - MOVED UP */}
+                <div className="mb-6">
+                  <h2 className="text-2xl font-semibold text-white mb-4 flex items-center">
+                    <Target className="h-5 w-5 mr-2 text-siso-orange" />
+                    Target Users
+                  </h2>
+                  <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
+                    <p className="text-siso-text">
+                      This app is designed specifically for <span className="text-siso-orange font-semibold">OnlyFans Management Agencies</span> who need to efficiently manage creators, content, and fan interactions. It's perfect for agencies like Decora who are looking to scale operations while maintaining high-quality service.
+                    </p>
+                  </div>
+                </div>
+                
+                {/* Branding Customization Section */}
+                <div className="mb-6">
+                  <h2 className="text-2xl font-semibold text-white mb-4">Customize Your Branding</h2>
+                  <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
+                    <p className="text-siso-text mb-4">
+                      Select the colors that match your brand identity. These colors will be used throughout your app.
+                    </p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <ColorPicker
+                          title="Primary Color"
+                          colors={brandColorOptions}
+                          selectedColor={primaryColor}
+                          onChange={setPrimaryColor}
+                        />
+                      </div>
+                      
+                      <div>
+                        <ColorPicker
+                          title="Secondary Color"
+                          colors={brandColorOptions}
+                          selectedColor={secondaryColor}
+                          onChange={setSecondaryColor}
+                        />
                       </div>
                     </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="text-sm">Estimated time to develop all selected features</p>
-                  </TooltipContent>
-                </Tooltip>
-                
-                <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
-                  <div className="flex items-start">
-                    <DollarSign className="h-5 w-5 mr-2 text-siso-orange mt-1" />
-                    <div>
-                      <h3 className="text-xl font-semibold text-white mb-2">Total Investment</h3>
-                      <p className="text-siso-orange">£{totalCost}</p>
+                    
+                    <div className="mt-6 p-4 rounded-lg" style={{ background: `linear-gradient(135deg, ${primaryColor}10, ${secondaryColor}10)` }}>
+                      <div className="flex gap-3">
+                        <div className="h-12 w-12 rounded-full" style={{ backgroundColor: primaryColor }}></div>
+                        <div className="h-12 w-12 rounded-full" style={{ backgroundColor: secondaryColor }}></div>
+                      </div>
+                      <p className="mt-2 text-sm text-siso-text">Preview of your selected brand colors</p>
                     </div>
                   </div>
                 </div>
-              </TooltipProvider>
-            </div>
+                
+                {/* Additional Features Section - Updated to hide pricing */}
+                <div className="mb-6">
+                  <h2 className="text-2xl font-semibold text-white mb-4">Customize Your Plan</h2>
+                  <FeatureSelection 
+                    features={selectedFeatures} 
+                    onChange={setSelectedFeatures}
+                    showPricing={false}
+                  />
+                </div>
+                
+                {/* Features and Technical Details Tabs */}
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mb-6">
+                  <TabsList className="w-full grid grid-cols-2 mb-6 bg-black/20">
+                    <TabsTrigger value="features" className="data-[state=active]:bg-siso-orange/20">
+                      Feature Categories
+                    </TabsTrigger>
+                    <TabsTrigger value="details" className="data-[state=active]:bg-siso-orange/20">
+                      Technical Details
+                    </TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="features" className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {featureCategories.map((category, index) => (
+                        <motion.div
+                          key={index}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                          className="bg-black/30 rounded-lg p-5 border border-siso-text/5 flex flex-col h-full"
+                        >
+                          <div className="flex items-center mb-4">
+                            <div className="p-2 rounded-lg bg-siso-orange/10 mr-3">
+                              {category.icon}
+                            </div>
+                            <h3 className="text-lg font-semibold text-white">{category.name}</h3>
+                          </div>
+                          
+                          <p className="text-siso-text/80 text-sm mb-4">{category.description}</p>
+                          
+                          <ul className="space-y-2 mt-auto">
+                            {category.features.map((feature, featureIndex) => (
+                              <li key={featureIndex} className="flex items-start">
+                                <CheckCircle className="h-4 w-4 mr-2 text-siso-orange shrink-0 mt-0.5" />
+                                <span className="text-siso-text text-sm">{feature}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </TabsContent>
+                  
+                  <TabsContent value="details">
+                    <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5 mb-6">
+                      <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
+                        <Smartphone className="h-5 w-5 mr-2 text-siso-orange" />
+                        Technical Implementation
+                      </h3>
+                      
+                      <Table>
+                        <TableHeader>
+                          <TableRow className="border-siso-text/10">
+                            <TableHead className="text-siso-text">Component</TableHead>
+                            <TableHead className="text-siso-text">Details</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          <TableRow className="border-siso-text/10">
+                            <TableCell className="font-medium text-white">Platform</TableCell>
+                            <TableCell className="text-siso-text">Web-based application accessible on all devices with responsive design</TableCell>
+                          </TableRow>
+                          <TableRow className="border-siso-text/10">
+                            <TableCell className="font-medium text-white">Frontend</TableCell>
+                            <TableCell className="text-siso-text">React.js with Tailwind CSS for responsive design and smooth animations</TableCell>
+                          </TableRow>
+                          <TableRow className="border-siso-text/10">
+                            <TableCell className="font-medium text-white">Backend</TableCell>
+                            <TableCell className="text-siso-text">Node.js with Supabase for database, authentication, and real-time updates</TableCell>
+                          </TableRow>
+                          <TableRow className="border-siso-text/10">
+                            <TableCell className="font-medium text-white">Integrations</TableCell>
+                            <TableCell className="text-siso-text">Only Fans API, WhatsApp Business API, payment processing, messaging services</TableCell>
+                          </TableRow>
+                          <TableRow className="border-siso-text/10">
+                            <TableCell className="font-medium text-white">Security</TableCell>
+                            <TableCell className="text-siso-text">End-to-end encryption, 2FA, role-based access control, regular security audits</TableCell>
+                          </TableRow>
+                          <TableRow className="border-siso-text/10">
+                            <TableCell className="font-medium text-white">Deployment</TableCell>
+                            <TableCell className="text-siso-text">Cloud-based with automated scaling, daily backups, and 99.9% uptime guarantee</TableCell>
+                          </TableRow>
+                          <TableRow className="border-siso-text/10">
+                            <TableCell className="font-medium text-white">Mobile Access</TableCell>
+                            <TableCell className="text-siso-text">Fully responsive web app with optional native app wrapper for iOS and Android</TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                    </div>
+                    
+                    <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
+                      <h3 className="text-xl font-semibold text-white mb-4">Additional Details</h3>
+                      <div className="prose prose-invert prose-sm max-w-none">
+                        <p>The OnlyFans Management Suite for Decora includes a complete ecosystem for managing creators, content, and fan interactions. The platform provides tools for efficient onboarding, content scheduling, analytics tracking, and secure payment processing.</p>
+                        <p>Our comprehensive solution helps agencies like yours streamline operations, improve client retention, and maximize revenue potential through advanced analytics and automation. The application is built with scalability in mind, allowing it to grow alongside your agency from 10 to 100+ creators.</p>
+                        <p>All system components adhere to industry best practices for security and performance, ensuring a reliable platform for your business operations. The white-label options allow you to fully brand the platform as your own, enhancing your professional image with clients.</p>
+                        <p>After approval, we'll work closely with your team to customize the platform to your specific workflow and processes, ensuring a seamless transition and maximum adoption across your organization.</p>
+                      </div>
+                    </div>
+                  </TabsContent>
+                </Tabs>
+                
+                {/* Case Studies Section */}
+                <div className="mb-6">
+                  <h2 className="text-2xl font-semibold text-white mb-4 flex items-center">
+                    <FileText className="h-5 w-5 mr-2 text-siso-orange" />
+                    Case Studies
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {caseStudies.map((study, index) => (
+                      <CaseStudy
+                        key={index}
+                        title={study.title}
+                        description={study.description}
+                        imageUrl={study.imageUrl}
+                        notionUrl={study.notionUrl}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Testimonials Section - MOVED TO BOTTOM */}
+                <div className="mb-6">
+                  <h2 className="text-2xl font-semibold text-white mb-4 flex items-center">
+                    <Heart className="h-5 w-5 mr-2 text-siso-orange" />
+                    What Other Agencies Are Saying
+                  </h2>
+                  <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {testimonials.map((testimonial, index) => (
+                        <motion.div 
+                          key={index} 
+                          className="p-4 border border-siso-text/10 rounded-lg bg-gradient-to-br from-siso-red/5 to-siso-orange/5"
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.15 * index, duration: 0.5 }}
+                        >
+                          <p className="text-siso-text text-sm italic mb-3">{`"${testimonial.content}"`}</p>
+                          <div className="mb-3">
+                            <p className="text-white font-medium">{testimonial.author}</p>
+                            <p className="text-siso-text/70 text-xs">{testimonial.position}</p>
+                          </div>
+                          <div className="flex gap-2">
+                            {testimonial.instagram && (
+                              <a 
+                                href={testimonial.instagram} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-xs text-siso-orange flex items-center hover:underline"
+                              >
+                                Instagram <ExternalLink className="h-3 w-3 ml-1" />
+                              </a>
+                            )}
+                            {testimonial.appLink && (
+                              <a 
+                                href={testimonial.appLink} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-xs text-siso-orange flex items-center hover:underline"
+                              >
+                                App <ExternalLink className="h-3 w-3 ml-1" />
+                              </a>
+                            )}
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="mb-8">
+                {/* Regular Plan Features */}
+                <div className="mb-6">
+                  <h2 className="text-2xl font-semibold text-white mb-4">Features</h2>
+                  <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
+                    <ul className="space-y-2">
+                      {regularFeatures.map((feature, index) => (
+                        <li key={index} className="flex items-start">
+                          <CheckCircle className="h-4 w-4 mr-2 text-siso-orange shrink-0 mt-0.5" />
+                          <span className="text-siso-text">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+                
+                {/* Branding Customization For Regular Plan */}
+                <div className="mb-6">
+                  <h2 className="text-2xl font-semibold text-white mb-4">Customize Your Branding</h2>
+                  <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
+                    <p className="text-siso-text mb-4">
+                      Select the colors that match your brand identity. These colors will be used throughout your app.
+                    </p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <ColorPicker
+                          title="Primary Color"
+                          colors={brandColorOptions}
+                          selectedColor={primaryColor}
+                          onChange={setPrimaryColor}
+                        />
+                      </div>
+                      
+                      <div>
+                        <ColorPicker
+                          title="Secondary Color"
+                          colors={brandColorOptions}
+                          selectedColor={secondaryColor}
+                          onChange={setSecondaryColor}
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="mt-6 p-4 rounded-lg" style={{ background: `linear-gradient(135deg, ${primaryColor}10, ${secondaryColor}10)` }}>
+                      <div className="flex gap-3">
+                        <div className="h-12 w-12 rounded-full" style={{ backgroundColor: primaryColor }}></div>
+                        <div className="h-12 w-12 rounded-full" style={{ backgroundColor: secondaryColor }}></div>
+                      </div>
+                      <p className="mt-2 text-sm text-siso-text">Preview of your selected brand colors</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
             
-            {/* Rest of your component... */}
-            
-            {/* Action Button */}
-            <div className="flex justify-end mt-8">
+            {/* Approve Plan Button */}
+            <div className="mt-8 flex justify-end">
               <Button
-                size="lg"
                 onClick={handleSubmitPlan}
                 disabled={submitting}
-                className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90"
+                className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-white px-6 py-2 rounded-md flex items-center gap-2 disabled:opacity-70"
               >
                 {submitting ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Processing...
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>Processing...</span>
                   </>
                 ) : (
                   <>
-                    Approve This Plan
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                    <span>Approve This Plan</span>
+                    <ArrowRight className="h-4 w-4" />
                   </>
                 )}
               </Button>
