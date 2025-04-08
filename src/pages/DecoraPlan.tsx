@@ -1,20 +1,39 @@
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Sparkles, Heart, CheckCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 
 const DecoraPlan = () => {
   const navigate = useNavigate();
+  const [progress, setProgress] = useState(0);
+  const [isRedirecting, setIsRedirecting] = useState(false);
   
   useEffect(() => {
-    // Automatically redirect to the plan page after a short delay
-    const timer = setTimeout(() => {
+    // Start progress animation
+    const progressInterval = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(progressInterval);
+          setIsRedirecting(true);
+          return 100;
+        }
+        return prev + 4; // Increment by 4% each time (25 steps to reach 100%)
+      });
+    }, 100);
+    
+    // Redirect to the plan page after animation completes
+    const redirectTimer = setTimeout(() => {
       navigate('/plan/decora');
     }, 3500); // Show loading screen for 3.5 seconds then redirect
     
-    return () => clearTimeout(timer);
+    // Clean up timers
+    return () => {
+      clearInterval(progressInterval);
+      clearTimeout(redirectTimer);
+    };
   }, [navigate]);
   
   return (
@@ -37,7 +56,11 @@ const DecoraPlan = () => {
         </div>
         
         <div className="flex justify-center mb-6">
-          <div className="w-12 h-12 border-4 border-siso-orange border-t-transparent rounded-full animate-spin" />
+          {isRedirecting ? (
+            <CheckCircle className="h-12 w-12 text-siso-orange animate-pulse" />
+          ) : (
+            <div className="w-12 h-12 border-4 border-siso-orange border-t-transparent rounded-full animate-spin" />
+          )}
         </div>
         
         <motion.div
@@ -48,18 +71,15 @@ const DecoraPlan = () => {
         >
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-siso-text">Loading your custom plan</span>
-            <span className="text-sm text-siso-orange">Preparing...</span>
+            <span className="text-sm text-siso-orange">
+              {isRedirecting ? 'Ready!' : `${progress}%`}
+            </span>
           </div>
-          <div className="h-2 bg-black/30 rounded-full overflow-hidden">
-            <motion.div 
-              className="h-full bg-gradient-to-r from-siso-red to-siso-orange"
-              initial={{ width: "0%" }}
-              animate={{ 
-                width: ["0%", "100%"],
-                transition: { duration: 3, ease: "easeInOut" }
-              }}
-            />
-          </div>
+          <Progress 
+            value={progress} 
+            className="h-2 bg-black/30" 
+            indicatorClassName="bg-gradient-to-r from-siso-red to-siso-orange" 
+          />
         </motion.div>
         
         <motion.div
@@ -78,8 +98,9 @@ const DecoraPlan = () => {
           <Button 
             onClick={() => navigate('/plan/decora')}
             className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-white"
+            disabled={progress < 100}
           >
-            View Your Plan Now
+            {isRedirecting ? 'Redirecting...' : 'View Your Plan Now'}
           </Button>
         </div>
       </div>

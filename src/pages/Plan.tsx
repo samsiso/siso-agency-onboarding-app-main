@@ -36,6 +36,7 @@ import { WelcomeMessage } from '@/components/plan/WelcomeMessage';
 import { Skeleton } from '@/components/ui/skeleton';
 import { InteractiveCallout } from '@/components/plan/InteractiveCallout';
 import { PainPointsModal, PainPointDetailProps } from '@/components/plan/PainPointsModal';
+import { Progress } from '@/components/ui/progress';
 
 interface PlanData {
   id: string;
@@ -178,6 +179,7 @@ const Plan = () => {
   const [loadingStep, setLoadingStep] = useState(0);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [loadingComplete, setLoadingComplete] = useState(false);
+  const [forceRender, setForceRender] = useState(false);
   
   const loadPlan = async () => {
     let loadingInterval: NodeJS.Timeout; 
@@ -186,6 +188,7 @@ const Plan = () => {
       setLoading(true);
       setLoadingProgress(0);
       setLoadingStep(0);
+      setLoadingComplete(false);
       
       loadingInterval = setInterval(() => {
         setLoadingStep(prevStep => {
@@ -250,10 +253,12 @@ const Plan = () => {
         setLoadingStep(loadingAnimationSteps.length - 1);
         setLoadingComplete(true);
         
-        // Add a short delay before transitioning to ensure user sees 100%
+        // Add a forced delay before transitioning to ensure user sees 100%
         setTimeout(() => {
+          console.log("Transitioning to plan view...");
           setLoading(false);
-        }, 800);
+          setForceRender(prev => !prev); // Toggle to force re-render
+        }, 1000); // Extended delay to ensure UI updates properly
       }, 2500);
       
     } catch (error) {
@@ -263,15 +268,21 @@ const Plan = () => {
         description: "We couldn't load the plan details. Please try again later.",
         variant: "destructive"
       });
-      if (loadingInterval) clearInterval(loadingInterval); 
+      if (loadingInterval) clearInterval(loadingInterval);
       setLoading(false);
       setLoadingProgress(0);
     }
   };
   
   useEffect(() => {
+    console.log("Loading plan for", username);
     loadPlan();
-  }, [username, toast, loadingAnimationSteps.length]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [username]); // Only re-run when username changes
+  
+  useEffect(() => {
+    console.log("Loading state:", loading, "Loading complete:", loadingComplete, "Progress:", loadingProgress);
+  }, [loading, loadingComplete, loadingProgress]);
   
   useEffect(() => {
     if (plan) {
@@ -353,7 +364,13 @@ const Plan = () => {
             </motion.div>
           </div>
           
-          <MessageLoading className="mx-auto mb-6" />
+          <div className="flex justify-center mb-6">
+            {loadingComplete ? (
+              <CheckCircle className="h-12 w-12 text-siso-orange animate-pulse" />
+            ) : (
+              <div className="w-12 h-12 border-4 border-siso-orange border-t-transparent rounded-full animate-spin" />
+            )}
+          </div>
           
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -363,16 +380,15 @@ const Plan = () => {
           >
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-siso-text">Loading your custom plan</span>
-              <span className="text-sm text-siso-orange">{loadingProgress}%</span>
+              <span className="text-sm text-siso-orange">
+                {loadingComplete ? 'Ready!' : `${loadingProgress}%`}
+              </span>
             </div>
-            <div className="h-2 bg-black/30 rounded-full overflow-hidden">
-              <motion.div 
-                className="h-full bg-gradient-to-r from-siso-red to-siso-orange"
-                initial={{ width: "0%" }}
-                animate={{ width: `${loadingProgress}%` }}
-                transition={{ duration: 0.5 }}
-              />
-            </div>
+            <Progress 
+              value={loadingProgress} 
+              className="h-2 bg-black/30" 
+              indicatorClassName="bg-gradient-to-r from-siso-red to-siso-orange" 
+            />
           </motion.div>
           
           <div className="space-y-3">
@@ -419,6 +435,17 @@ const Plan = () => {
                 <span>Your OnlyFans management platform is almost ready. We've added special features just for agencies like yours!</span>
               </p>
             </motion.div>
+          )}
+          
+          {loadingComplete && (
+            <div className="mt-6 flex justify-center">
+              <Button 
+                onClick={() => setLoading(false)}
+                className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-white"
+              >
+                View Your Plan Now
+              </Button>
+            </div>
           )}
         </div>
       </div>
@@ -627,7 +654,7 @@ const Plan = () => {
         "Optimize fan interactions for maximum satisfaction"
       ],
       metrics: [
-        { label: "Fan Retention Rate", value: "58% higher", icon: <Heart className="h-4 w-4 text-siso-orange" /> },
+        { label: "Fan Retention Rate", value: "58%", icon: <Heart className="h-4 w-4 text-siso-orange" /> },
         { label: "Message Response Rate", value: "100%", icon: <MessageSquare className="h-4 w-4 text-siso-orange" /> },
         { label: "Fan Satisfaction Score", value: "94%", icon: <CheckCircle className="h-4 w-4 text-siso-orange" /> },
         { label: "Resubscription Rate", value: "72% increase", icon: <TrendingUp className="h-4 w-4 text-siso-orange" /> }
@@ -674,123 +701,4 @@ const Plan = () => {
         "Reduce churn and stabilize your revenue"
       ],
       metrics: [
-        { label: "Average Retention Increase", value: "40%", icon: <TrendingUp className="h-4 w-4 text-siso-orange" /> },
-        { label: "Client Satisfaction Score", value: "92%", icon: <Heart className="h-4 w-4 text-siso-orange" /> },
-        { label: "Revenue Growth", value: "35%", icon: <DollarSign className="h-4 w-4 text-siso-orange" /> },
-        { label: "Client Lifetime Value", value: "2.4x higher", icon: <Users className="h-4 w-4 text-siso-orange" /> }
-      ],
-      images: [
-        { url: "/lovable-uploads/c7ac43fd-bc3e-478d-8b4f-809beafb6838.png", caption: "Client retention dashboard showing performance metrics" },
-        { url: "/lovable-uploads/1f9eba1e-c2af-4ed8-84e7-a375872c9182.png", caption: "Transparent reporting shared with creators" }
-      ],
-      caseStudyLink: "https://notion.so/case-study/client-retention",
-      videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-      researchSources: [
-        { 
-          title: "OnlyFans Creator Agency Survey 2023", 
-          url: "https://example.com/research1",
-          description: "A comprehensive survey of OnlyFans management agencies and their retention challenges"
-        },
-        { 
-          title: "Industry Report on Talent Management", 
-          url: "https://example.com/research2",
-          description: "Analysis of creator retention in digital content industries"
-        }
-      ]
-    }
-  ] : [];
-
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-black via-siso-bg to-black p-4">
-      <div className="max-w-md w-full bg-black/40 border border-siso-text/10 rounded-lg p-6 backdrop-blur-sm">
-        <div className="text-center mb-6">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            <Sparkles className="h-12 w-12 text-siso-orange mx-auto mb-3" />
-            <h2 className="text-2xl font-bold text-white mb-1">
-              {username === 'decora' ? 'Welcome, Decora Agency!' : 'Preparing Your Custom Plan'}
-            </h2>
-            <p className="text-siso-text text-sm">
-              {username === 'decora' 
-                ? "We're finalizing your custom OnlyFans Management Suite"
-                : "We're tailoring a solution just for your business needs"}
-            </p>
-          </motion.div>
-        </div>
-        
-        <MessageLoading className="mx-auto mb-6" />
-        
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-          className="mb-6"
-        >
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-siso-text">Loading your custom plan</span>
-            <span className="text-sm text-siso-orange">{loadingProgress}%</span>
-          </div>
-          <div className="h-2 bg-black/30 rounded-full overflow-hidden">
-            <motion.div 
-              className="h-full bg-gradient-to-r from-siso-red to-siso-orange"
-              initial={{ width: "0%" }}
-              animate={{ width: `${loadingProgress}%` }}
-              transition={{ duration: 0.5 }}
-            />
-          </div>
-        </motion.div>
-        
-        <div className="space-y-3">
-          {loadingAnimationSteps.map((step, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ 
-                opacity: loadingStep >= index ? 1 : 0.4,
-                x: 0
-              }}
-              transition={{ delay: index * 0.2, duration: 0.4 }}
-              className="flex items-center gap-3"
-            >
-              <div className={`flex items-center justify-center w-8 h-8 rounded-full ${
-                loadingStep >= index ? 'bg-siso-orange/20' : 'bg-siso-text/5'
-              }`}>
-                {loadingStep > index ? (
-                  <CheckCircle className="h-4 w-4 text-siso-orange" />
-                ) : loadingStep === index ? (
-                  <Loader2 className="h-4 w-4 text-siso-orange animate-spin" />
-                ) : (
-                  <div className="h-4 w-4 rounded-full bg-siso-text/20" />
-                )}
-              </div>
-              <p className={`text-sm ${
-                loadingStep >= index ? 'text-siso-text' : 'text-siso-text/50'
-              }`}>
-                {step}
-              </p>
-            </motion.div>
-          ))}
-        </div>
-        
-        {username === 'decora' && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8, duration: 0.5 }}
-            className="mt-6 rounded-lg bg-siso-orange/5 border border-siso-orange/20 p-4 text-sm text-siso-text"
-          >
-            <p className="flex items-center gap-2">
-              <Heart className="h-4 w-4 text-siso-orange shrink-0" />
-              <span>Your OnlyFans management platform is almost ready. We've added special features just for agencies like yours!</span>
-            </p>
-          </motion.div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-export default Plan;
+        { label: "Average Retention Increase", value: "40%", icon: <TrendingUp className="h-4 w-4 text-siso
