@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -193,6 +192,51 @@ const Plan = () => {
       setLoadingStep(0);
       setLoadingComplete(false);
       
+      if (username === 'decora' && window.location.pathname === '/plan/decora') {
+        console.log("Detected direct access to /plan/decora - bypassing loading animation");
+        
+        const { data, error } = await supabase
+          .from('plans')
+          .select('*')
+          .eq('username', username)
+          .maybeSingle();
+          
+        if (error) {
+          throw error;
+        }
+        
+        const safeData: PlanData = {
+          id: data?.id || '',
+          username: data?.username || '',
+          company_name: data?.company_name || null,
+          app_name: data?.app_name || null,
+          features: data?.features || null,
+          branding: {
+            logo: data?.branding?.logo || undefined,
+            primary_color: typeof data?.branding === 'object' ? data?.branding.primary_color : '#ED8936',
+            secondary_color: typeof data?.branding === 'object' ? data?.branding.secondary_color : '#E53E3E'
+          },
+          estimated_cost: data?.estimated_cost || null,
+          estimated_days: data?.estimated_days || null,
+          status: data?.status || null,
+        };
+        
+        setPlan(safeData);
+        
+        if (safeData.branding?.primary_color) {
+          setPrimaryColor(safeData.branding.primary_color);
+        }
+        
+        if (safeData.branding?.secondary_color) {
+          setSecondaryColor(safeData.branding.secondary_color);
+        }
+        
+        setTotalCost(safeData.estimated_cost || 0);
+        setLoading(false);
+        console.log("Plan data loaded and loading animation bypassed");
+        return;
+      }
+      
       loadingInterval = setInterval(() => {
         setLoadingStep(prevStep => {
           const nextStep = prevStep + 1 < loadingAnimationSteps.length ? prevStep + 1 : prevStep;
@@ -249,20 +293,18 @@ const Plan = () => {
       
       setTotalCost(safeData.estimated_cost || 0);
       
-      // Ensure loading animation completes and then transition
       setTimeout(() => {
         clearInterval(loadingInterval);
         setLoadingProgress(100);
         setLoadingStep(loadingAnimationSteps.length - 1);
         setLoadingComplete(true);
         
-        // Add a forced delay before transitioning to ensure user sees 100%
         setTimeout(() => {
           console.log("Transitioning to plan view...");
           setLoading(false);
           setForceRender(prev => !prev); // Toggle to force re-render
-        }, 1000); // Extended delay to ensure UI updates properly
-      }, 2500);
+        }, 800); // Shorter delay to ensure UI updates properly
+      }, 2000); // Shorter animation
       
     } catch (error) {
       console.error('Error fetching plan:', error);
@@ -278,24 +320,10 @@ const Plan = () => {
   };
   
   useEffect(() => {
-    console.log("Loading plan for", username);
+    console.log("Loading plan for", username, "at path", window.location.pathname);
     loadPlan();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [username]); // Only re-run when username changes
-  
-  useEffect(() => {
-    console.log("Loading state:", loading, "Loading complete:", loadingComplete, "Progress:", loadingProgress);
-  }, [loading, loadingComplete, loadingProgress]);
-  
-  useEffect(() => {
-    if (plan) {
-      const additionalCost = selectedFeatures
-        .filter(feature => feature.included)
-        .reduce((total, feature) => total + feature.price, 0);
-        
-      setTotalCost((plan.estimated_cost || 0) + additionalCost);
-    }
-  }, [selectedFeatures, plan]);
   
   const scrollToFeatures = () => {
     featuresRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -345,13 +373,23 @@ const Plan = () => {
     }
   };
   
-  // Fix for navigation from loading screen to actual plan view
   const handleViewPlanNowClick = () => {
     console.log("Plan: Handling View Plan Now button click");
     setLoading(false);
     setForceRender(prev => !prev); // Force re-render to ensure UI updates
   };
   
+  useEffect(() => {
+    const securityTimeout = setTimeout(() => {
+      if (loading && plan) {
+        console.log("Security check: Unsticking loading state after timeout");
+        setLoading(false);
+      }
+    }, 5000);
+    
+    return () => clearTimeout(securityTimeout);
+  }, [loading, plan]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-black via-siso-bg to-black p-4">

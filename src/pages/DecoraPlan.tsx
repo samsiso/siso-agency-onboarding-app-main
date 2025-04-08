@@ -27,8 +27,9 @@ const DecoraPlan = () => {
     // Redirect to the plan page after animation completes
     const redirectTimer = setTimeout(() => {
       console.log("DecoraPlan: Redirecting to /plan/decora");
-      navigate('/plan/decora');
-    }, 3500); // Show loading screen for 3.5 seconds then redirect
+      // Force immediate navigation rather than waiting
+      navigate('/plan/decora', { replace: true });
+    }, 2500); // Reduced time to 2.5 seconds for faster redirection
     
     // Clean up timers
     return () => {
@@ -43,7 +44,7 @@ const DecoraPlan = () => {
     setIsRedirecting(true);
     
     // Force immediate navigation rather than waiting
-    navigate('/plan/decora');
+    navigate('/plan/decora', { replace: true });
   };
   
   return (
