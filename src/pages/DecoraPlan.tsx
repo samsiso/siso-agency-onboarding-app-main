@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -22,7 +23,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import '../components/ai-news/animations.css';
 import { WelcomeBackground } from '@/components/plan/BackgroundElements';
 import { ClickThroughPrompt } from '@/components/plan/ClickThroughPrompt';
-import { PainPointsPrompt } from '@/components/plan/PainPointsPrompt';
+import { InteractiveCallout } from '@/components/plan/InteractiveCallout';
 
 const ParticleBackground = () => {
   return (
@@ -246,7 +247,7 @@ const DecoraPlan = () => {
             className="max-w-xl w-full"
           >
             <div className="bg-black/40 border border-siso-text/10 rounded-lg p-6 backdrop-blur-sm">
-              <div className="mb-2 flex justify-between items-center">
+              <div className="mb-4 flex justify-between items-center">
                 <motion.div 
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -260,6 +261,30 @@ const DecoraPlan = () => {
                   <Trophy className="h-4 w-4" />
                   <span>500+ Agencies</span>
                 </motion.div>
+              </div>
+              
+              {/* Interactive Callout Boxes */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+                <InteractiveCallout 
+                  title="Agency Niche" 
+                  value="OnlyFans Management" 
+                  type="niche"
+                  description="Our platform is specifically designed for agencies managing OnlyFans creators, with features tailored to the unique needs of content management and creator relationships in this space."
+                />
+                
+                <InteractiveCallout 
+                  title="Company Name" 
+                  value={agencyName} 
+                  type="company"
+                  description="Your agency dashboard will be fully customized with your branding, workflows, and specific requirements to ensure it perfectly aligns with how Decora operates."
+                />
+                
+                <InteractiveCallout 
+                  title="Product" 
+                  value="Agency Dashboard" 
+                  type="product"
+                  description="A comprehensive dashboard that combines client management, content scheduling, communication tools, and analytics in one seamless platform designed specifically for OnlyFans agency operations."
+                />
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
