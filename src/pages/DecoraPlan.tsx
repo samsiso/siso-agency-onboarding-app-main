@@ -23,8 +23,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import '../components/ai-news/animations.css';
 import { WelcomeBackground } from '@/components/plan/BackgroundElements';
 import { ClickThroughPrompt } from '@/components/plan/ClickThroughPrompt';
+import { PainPointsPrompt } from '@/components/plan/PainPointsPrompt';
 
-// Particle background component
 const ParticleBackground = () => {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -53,7 +53,6 @@ const ParticleBackground = () => {
   );
 };
 
-// Problem-solution card component
 const ProblemSolutionCard = ({ problem, solution, icon, active, delay }) => {
   const Icon = icon;
   return (
@@ -81,7 +80,6 @@ const ProblemSolutionCard = ({ problem, solution, icon, active, delay }) => {
   );
 };
 
-// Define a type for the analysis step props
 interface AnalysisStepProps {
   step: {
     icon: React.ReactNode;
@@ -93,7 +91,6 @@ interface AnalysisStepProps {
   index: number;
 }
 
-// Analysis step component
 const AnalysisStep = ({ step, isActive, isCompleted, index }: AnalysisStepProps) => {
   const steps = [
     { icon: <Users className="h-5 w-5 text-siso-orange" />, text: "Analyzing client management needs...", tooltip: "Manage multiple creators efficiently" },
@@ -147,15 +144,14 @@ const DecoraPlan = () => {
   const [loadingStep, setLoadingStep] = useState(0);
   const [showWelcome, setShowWelcome] = useState(true);
   const [showClickThroughPrompt, setShowClickThroughPrompt] = useState(true);
+  const [showPainPointsPrompt, setShowPainPointsPrompt] = useState(false);
   const [showProblemSolution, setShowProblemSolution] = useState(false);
   const [showFinalScreen, setShowFinalScreen] = useState(false);
   const [agencyName] = useState("Decora");
   const [skipAnimation, setSkipAnimation] = useState(false);
   
-  // Track which solutions are active
   const [activeSolutions, setActiveSolutions] = useState([false, false, false, false]);
   
-  // Analysis steps data
   const analysisSteps = [
     { icon: <Users className="h-5 w-5 text-siso-orange" />, text: "Analyzing client management needs...", tooltip: "Manage multiple creators efficiently" },
     { icon: <Calendar className="h-5 w-5 text-siso-orange" />, text: "Optimizing content scheduling...", tooltip: "Automate content planning and posting" },
@@ -164,20 +160,22 @@ const DecoraPlan = () => {
     { icon: <DollarSign className="h-5 w-5 text-siso-orange" />, text: "Calculating revenue potential...", tooltip: "Identify new income opportunities" }
   ];
   
-  // Handle the "Let's Get Started" button click
   const handleGetStarted = () => {
     setShowClickThroughPrompt(false);
+    setShowPainPointsPrompt(true);
+  };
+  
+  const handlePainPointsComplete = () => {
+    setShowPainPointsPrompt(false);
     startOnboardingSequence();
   };
   
-  // Start the onboarding sequence after click-through
   const startOnboardingSequence = () => {
     if (skipAnimation) {
       navigate('/plan/decora');
       return;
     }
     
-    // Problem solution screen (show for 5 seconds, activate solutions one by one)
     setShowProblemSolution(true);
     const solutionTimers = [];
     for (let i = 0; i < 4; i++) {
@@ -190,7 +188,6 @@ const DecoraPlan = () => {
       }, 500 + i * 1000));
     }
     
-    // Analysis steps (1 second per step)
     const stepTimers = [];
     for (let i = 0; i < 5; i++) {
       stepTimers.push(setTimeout(() => {
@@ -198,13 +195,11 @@ const DecoraPlan = () => {
       }, i * 1200));
     }
     
-    // Final screen (show for 2 seconds before navigating)
     const finalScreenTimer = setTimeout(() => {
       setShowProblemSolution(false);
       setShowFinalScreen(true);
     }, 6000);
     
-    // Navigate to plan page
     const navigationTimer = setTimeout(() => {
       navigate('/plan/decora');
     }, 8000);
@@ -222,7 +217,6 @@ const DecoraPlan = () => {
     navigate('/plan/decora');
   };
   
-  // Problem solution pairs
   const problemSolutions = [
     { 
       problem: "Client Retention Issues", 
@@ -266,6 +260,13 @@ const DecoraPlan = () => {
           <ClickThroughPrompt 
             agencyName={agencyName} 
             onContinue={handleGetStarted} 
+          />
+        )}
+        
+        {showPainPointsPrompt && (
+          <PainPointsPrompt 
+            onComplete={handlePainPointsComplete} 
+            autoAdvance={false}
           />
         )}
         
