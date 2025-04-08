@@ -20,7 +20,9 @@ import {
   Smartphone,
   Heart,
   ExternalLink,
-  Sparkles
+  Sparkles,
+  TrendingUp,
+  Clock
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
@@ -33,6 +35,7 @@ import { CaseStudy } from '@/components/plan/CaseStudy';
 import { WelcomeMessage } from '@/components/plan/WelcomeMessage';
 import { Skeleton } from '@/components/ui/skeleton';
 import { InteractiveCallout } from '@/components/plan/InteractiveCallout';
+import { PainPointsModal, PainPointDetailProps } from '@/components/plan/PainPointsModal';
 
 interface PlanData {
   id: string;
@@ -536,6 +539,110 @@ const Plan = () => {
     }
   ] : [];
 
+  const detailedPainPoints: PainPointDetailProps[] = isDecoraPlan ? [
+    {
+      problem: "Client Retention Issues",
+      solution: "Professional platform creates transparency and improves communication, dramatically reducing churn and increasing long-term client satisfaction.",
+      detailedSolution: "OnlyFans agencies often struggle with client retention because creators don't see the full value of their services. Our platform provides transparent performance tracking and reporting that agencies can share with creators, showing exactly how your team is helping them grow. Real-time dashboards display subscriber growth, content performance, and revenue increases, building trust and demonstrating your agency's value.",
+      metrics: [
+        { label: "Client Retention Increase", value: "40%", icon: <Heart className="h-4 w-4 text-siso-orange" /> },
+        { label: "Churn Reduction", value: "65%", icon: <Users className="h-4 w-4 text-siso-orange" /> },
+        { label: "Client Satisfaction", value: "92%", icon: <CheckCircle className="h-4 w-4 text-siso-orange" /> },
+        { label: "Revenue Growth", value: "35%", icon: <DollarSign className="h-4 w-4 text-siso-orange" /> }
+      ],
+      images: [
+        { url: "/lovable-uploads/c7ac43fd-bc3e-478d-8b4f-809beafb6838.png", caption: "Client performance dashboard with growth metrics" },
+        { url: "/lovable-uploads/1f9eba1e-c2af-4ed8-84e7-a375872c9182.png", caption: "Transparent reporting interface shared with clients" }
+      ],
+      caseStudyLink: "https://notion.so/case-study/client-retention"
+    },
+    {
+      problem: "Inefficient Onboarding",
+      solution: "Streamlined multi-step forms and automated reminders collect all necessary information without overwhelming new clients, cutting onboarding time by 60%.",
+      detailedSolution: "The traditional onboarding process for new creators is often manual, disorganized, and overwhelming. Our platform provides a step-by-step guided onboarding workflow with progress tracking, automated reminders, and document collection. New creators are guided through each phase of the process at a comfortable pace, ensuring nothing falls through the cracks while creating a professional first impression.",
+      metrics: [
+        { label: "Onboarding Time Saved", value: "60%", icon: <Clock className="h-4 w-4 text-siso-orange" /> },
+        { label: "Document Completion Rate", value: "100%", icon: <FileText className="h-4 w-4 text-siso-orange" /> },
+        { label: "Information Accuracy", value: "95%", icon: <CheckCircle className="h-4 w-4 text-siso-orange" /> },
+        { label: "Time to First Content", value: "40% faster", icon: <Calendar className="h-4 w-4 text-siso-orange" /> }
+      ],
+      images: [
+        { url: "/lovable-uploads/66b63935-28a0-4212-8e2a-ab375279b188.png", caption: "Multi-step creator onboarding workflow" }
+      ],
+      caseStudyLink: "https://notion.so/case-study/onboarding-optimization"
+    },
+    {
+      problem: "Content Disorganization",
+      solution: "Centralized content library and scheduling tools keep everything organized and on-time, eliminating missed posts and reducing management overhead.",
+      detailedSolution: "Managing content for multiple creators across platforms leads to confusion, missed posts, and inefficient workflows. Our platform provides a centralized content library and scheduling system that allows your team to organize assets by creator, content type, and posting date. The visual calendar interface makes it easy to identify gaps and ensure consistent posting for all clients.",
+      metrics: [
+        { label: "Time Saved Weekly", value: "15+ hours", icon: <Clock className="h-4 w-4 text-siso-orange" /> },
+        { label: "Content Organization", value: "100%", icon: <FileText className="h-4 w-4 text-siso-orange" /> },
+        { label: "Posting Consistency", value: "98%", icon: <CheckCircle className="h-4 w-4 text-siso-orange" /> },
+        { label: "Team Productivity", value: "62% increase", icon: <Users className="h-4 w-4 text-siso-orange" /> }
+      ],
+      images: [
+        { url: "/lovable-uploads/19ca8c73-3736-4506-bfb2-de867b272e12.png", caption: "Content calendar with drag-and-drop scheduling" }
+      ],
+      caseStudyLink: "https://notion.so/case-study/content-management"
+    },
+    {
+      problem: "Communication Breakdowns",
+      solution: "In-app messaging and notification system ensures nothing falls through the cracks, with a clear paper trail of all conversations and decisions.",
+      detailedSolution: "Communication scattered across emails, texts, and DMs leads to missed messages and delayed responses. Our unified inbox consolidates all communications in one place, with thread organization by creator and topic. Automated prioritization ensures urgent messages get immediate attention, while notification systems alert team members to new messages in their assigned areas.",
+      metrics: [
+        { label: "Response Time", value: "75% faster", icon: <MessageSquare className="h-4 w-4 text-siso-orange" /> },
+        { label: "Message Organization", value: "100%", icon: <CheckCircle className="h-4 w-4 text-siso-orange" /> },
+        { label: "Client Satisfaction", value: "88%", icon: <Heart className="h-4 w-4 text-siso-orange" /> },
+        { label: "Missed Messages", value: "0%", icon: <TrendingUp className="h-4 w-4 text-siso-orange" /> }
+      ],
+      images: [
+        { url: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png", caption: "Unified messaging interface with priority sorting" }
+      ],
+      caseStudyLink: "https://notion.so/case-study/communication-management"
+    },
+    {
+      problem: "Fan Engagement Challenges",
+      solution: "Managed fan interaction tools help maintain high engagement and subscriber satisfaction, with smart auto-replies and prioritization features.",
+      detailedSolution: "Keeping fans engaged and reducing subscription cancellations is a constant challenge for creators. Our platform includes fan interaction tools that help prioritize high-value subscribers, manage message volume with smart auto-replies, and analyze engagement patterns to identify at-risk subscribers before they cancel. This proactive approach maintains satisfaction and reduces subscription churn.",
+      metrics: [
+        { label: "Fan Retention Rate", value: "58% higher", icon: <Heart className="h-4 w-4 text-siso-orange" /> },
+        { label: "Message Response Rate", value: "100%", icon: <MessageSquare className="h-4 w-4 text-siso-orange" /> },
+        { label: "Fan Satisfaction Score", value: "94%", icon: <CheckCircle className="h-4 w-4 text-siso-orange" /> },
+        { label: "Resubscription Rate", value: "72% increase", icon: <TrendingUp className="h-4 w-4 text-siso-orange" /> }
+      ],
+      images: [
+        { url: "/lovable-uploads/c7ac43fd-bc3e-478d-8b4f-809beafb6838.png", caption: "Fan engagement dashboard with priority sorting" }
+      ],
+      caseStudyLink: "https://notion.so/case-study/fan-engagement"
+    },
+    {
+      problem: "Manual Task Overload",
+      solution: "Automated workflows and AI-powered features reduce manual work by up to 40%, freeing up time for strategy and high-value activities.",
+      detailedSolution: "Agencies waste countless hours on repetitive tasks like scheduling posts, sending reminders, and generating reports. Our platform uses automation and AI to handle these routine activities, allowing your team to focus on strategy and creative work. From auto-scheduling similar content across platforms to generating performance reports with a single click, these time-saving features dramatically increase your team's efficiency.",
+      metrics: [
+        { label: "Manual Tasks Reduced", value: "40%", icon: <Settings className="h-4 w-4 text-siso-orange" /> },
+        { label: "Time Saved Per Creator", value: "5.5 hours weekly", icon: <Clock className="h-4 w-4 text-siso-orange" /> },
+        { label: "Team Capacity Increase", value: "45%", icon: <Users className="h-4 w-4 text-siso-orange" /> },
+        { label: "Administrative Costs", value: "32% reduction", icon: <DollarSign className="h-4 w-4 text-siso-orange" /> }
+      ],
+      images: [
+        { url: "/lovable-uploads/19ca8c73-3736-4506-bfb2-de867b272e12.png", caption: "Automated workflow configuration interface" }
+      ],
+      caseStudyLink: "https://notion.so/case-study/automation-efficiency"
+    }
+  ] : [];
+
+  const [selectedPainPoint, setSelectedPainPoint] = useState<PainPointDetailProps | null>(null);
+  const [isPainPointModalOpen, setIsPainPointModalOpen] = useState(false);
+
+  const handlePainPointClick = (index: number) => {
+    if (detailedPainPoints[index]) {
+      setSelectedPainPoint(detailedPainPoints[index]);
+      setIsPainPointModalOpen(true);
+    }
+  };
+
   const regularFeatures = !isDecoraPlan
     ? (plan.features || [])
     : [];
@@ -654,10 +761,11 @@ const Plan = () => {
                       {painPoints.map((point, index) => (
                         <motion.div 
                           key={index} 
-                          className="p-4 border border-siso-text/10 rounded-lg bg-black/20"
+                          className="p-4 border border-siso-text/10 rounded-lg bg-black/20 cursor-pointer hover:bg-black/30 hover:border-siso-orange/20 transition-all"
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.1 * index, duration: 0.5 }}
+                          onClick={() => handlePainPointClick(index)}
                         >
                           <h3 className="text-white font-medium mb-2">{point.problem}</h3>
                           <p className="text-siso-text text-sm">{point.solution}</p>
@@ -873,6 +981,14 @@ const Plan = () => {
           </div>
         </div>
       </motion.div>
+      
+      {isDecoraPlan && (
+        <PainPointsModal
+          painPoint={selectedPainPoint}
+          open={isPainPointModalOpen}
+          onOpenChange={setIsPainPointModalOpen}
+        />
+      )}
     </div>
   );
 };
