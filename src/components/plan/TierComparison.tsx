@@ -50,63 +50,69 @@ export const TierComparison = ({ features, activeTier }: TierComparisonProps) =>
               <TableHead className="text-center text-siso-text">Enterprise</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody as={motion.tbody} variants={container} initial="hidden" animate="show">
-            {features.map((feature, index) => (
-              <TableRow 
-                key={index} 
-                className="border-siso-text/10"
-                as={motion.tr}
-                variants={item}
-              >
-                <TableCell className="font-medium text-white">
-                  <div className="flex items-center">
-                    {feature.name}
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button className="ml-1 text-siso-text hover:text-siso-orange">
-                          <Info className="h-3.5 w-3.5" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p className="max-w-xs">{feature.description}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-                </TableCell>
-                
-                <TableCell className="text-center">
-                  {feature.tiers.mvp ? (
-                    <Check className={`h-4 w-4 mx-auto ${activeTier === 'mvp' ? 'text-siso-orange' : 'text-green-500/70'}`} />
-                  ) : (
-                    <Minus className="h-4 w-4 mx-auto text-siso-text/30" />
-                  )}
-                </TableCell>
-                
-                <TableCell className="text-center">
-                  {feature.tiers.standard ? (
-                    <Check className={`h-4 w-4 mx-auto ${activeTier === 'standard' ? 'text-siso-orange' : 'text-green-500/70'}`} />
-                  ) : (
-                    <Minus className="h-4 w-4 mx-auto text-siso-text/30" />
-                  )}
-                </TableCell>
-                
-                <TableCell className="text-center">
-                  {feature.tiers.premium ? (
-                    <Check className={`h-4 w-4 mx-auto ${activeTier === 'premium' ? 'text-siso-orange' : 'text-green-500/70'}`} />
-                  ) : (
-                    <Minus className="h-4 w-4 mx-auto text-siso-text/30" />
-                  )}
-                </TableCell>
-                
-                <TableCell className="text-center">
-                  {feature.tiers.enterprise ? (
-                    <Check className={`h-4 w-4 mx-auto ${activeTier === 'enterprise' ? 'text-siso-orange' : 'text-green-500/70'}`} />
-                  ) : (
-                    <Minus className="h-4 w-4 mx-auto text-siso-text/30" />
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
+          <TableBody>
+            <motion.div
+              variants={container}
+              initial="hidden"
+              animate="show"
+              className="contents"
+            >
+              {features.map((feature, index) => (
+                <motion.tr
+                  key={index}
+                  variants={item}
+                  className="border-siso-text/10"
+                >
+                  <TableCell className="font-medium text-white">
+                    <div className="flex items-center">
+                      {feature.name}
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button className="ml-1 text-siso-text hover:text-siso-orange">
+                            <Info className="h-3.5 w-3.5" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="max-w-xs">{feature.description}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  </TableCell>
+                  
+                  <TableCell className="text-center">
+                    {feature.tiers.mvp ? (
+                      <Check className={`h-4 w-4 mx-auto ${activeTier === 'mvp' ? 'text-siso-orange' : 'text-green-500/70'}`} />
+                    ) : (
+                      <Minus className="h-4 w-4 mx-auto text-siso-text/30" />
+                    )}
+                  </TableCell>
+                  
+                  <TableCell className="text-center">
+                    {feature.tiers.standard ? (
+                      <Check className={`h-4 w-4 mx-auto ${activeTier === 'standard' ? 'text-siso-orange' : 'text-green-500/70'}`} />
+                    ) : (
+                      <Minus className="h-4 w-4 mx-auto text-siso-text/30" />
+                    )}
+                  </TableCell>
+                  
+                  <TableCell className="text-center">
+                    {feature.tiers.premium ? (
+                      <Check className={`h-4 w-4 mx-auto ${activeTier === 'premium' ? 'text-siso-orange' : 'text-green-500/70'}`} />
+                    ) : (
+                      <Minus className="h-4 w-4 mx-auto text-siso-text/30" />
+                    )}
+                  </TableCell>
+                  
+                  <TableCell className="text-center">
+                    {feature.tiers.enterprise ? (
+                      <Check className={`h-4 w-4 mx-auto ${activeTier === 'enterprise' ? 'text-siso-orange' : 'text-green-500/70'}`} />
+                    ) : (
+                      <Minus className="h-4 w-4 mx-auto text-siso-text/30" />
+                    )}
+                  </TableCell>
+                </motion.tr>
+              ))}
+            </motion.div>
           </TableBody>
         </Table>
       </div>
