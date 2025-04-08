@@ -62,7 +62,13 @@ interface FeatureCategory {
 
 interface PainPoint {
   problem: string;
+  statistic: string;
   solution: string;
+  detailedSolution: string;
+  benefits: string[];
+  metrics: { label: string; value: string; icon: JSX.Element }[];
+  images: { url: string; caption: string }[];
+  caseStudyLink: string;
 }
 
 interface Testimonial {
@@ -496,118 +502,104 @@ const Plan = () => {
   const painPoints: PainPoint[] = isDecoraPlan ? [
     {
       problem: 'Client Retention Issues',
-      solution: 'Professional platform creates transparency and improves communication, dramatically reducing churn and increasing long-term client satisfaction.'
-    },
-    {
-      problem: 'Inefficient Onboarding',
-      solution: 'Streamlined multi-step forms and automated reminders collect all necessary information without overwhelming new clients, cutting onboarding time by 60%.'
-    },
-    {
-      problem: 'Content Disorganization',
-      solution: 'Centralized content library and scheduling tools keep everything organized and on-time, eliminating missed posts and reducing management overhead.'
-    },
-    {
-      problem: 'Communication Breakdowns',
-      solution: 'In-app messaging and notification system ensures nothing falls through the cracks, with a clear paper trail of all conversations and decisions.'
-    },
-    {
-      problem: 'Fan Engagement Challenges',
-      solution: 'Managed fan interaction tools help maintain high engagement and subscriber satisfaction, with smart auto-replies and prioritization features.'
-    },
-    {
-      problem: 'Manual Task Overload',
-      solution: 'Automated workflows and AI-powered features reduce manual work by up to 40%, freeing up time for strategy and high-value activities.'
-    }
-  ] : [];
-
-  const testimonials: Testimonial[] = isDecoraPlan ? [
-    {
-      content: "This platform has completely transformed how we manage our creator clients. Our retention rate has increased by 35% since implementation.",
-      author: "Sarah Johnson",
-      position: "Agency Owner",
-      instagram: "https://instagram.com/sarahj_agency",
-      appLink: "https://apps.apple.com/us/app/onlymgmt"
-    },
-    {
-      content: "The content management tools alone have saved us countless hours every week. Our team can now handle twice as many clients with the same resources.",
-      author: "Michael Rodriguez",
-      position: "Operations Manager",
-      instagram: "https://instagram.com/mike_rodriguez"
-    },
-    {
-      content: "The detailed analytics help us show our clients exactly how we're helping them grow. It's made all the difference in justifying our fees.",
-      author: "Taylor Williams",
-      position: "Client Success Manager",
-      appLink: "https://play.google.com/store/apps/details?id=com.onlymgmt"
-    }
-  ] : [];
-
-  const detailedPainPoints: PainPointDetailProps[] = isDecoraPlan ? [
-    {
-      problem: "Client Retention Issues",
-      solution: "Professional platform creates transparency and improves communication, dramatically reducing churn and increasing long-term client satisfaction.",
-      detailedSolution: "OnlyFans agencies often struggle with client retention because creators don't see the full value of their services. Our platform provides transparent performance tracking and reporting that agencies can share with creators, showing exactly how your team is helping them grow. Real-time dashboards display subscriber growth, content performance, and revenue increases, building trust and demonstrating your agency's value.",
+      statistic: "80% of agencies report the average model lifecycle with an agency is 3-6 months",
+      solution: "Increase client retention by 40% with transparent reporting",
+      detailedSolution: "OnlyFans agencies often struggle with client churn due to lack of transparency and unclear performance metrics. Our platform solves this by providing real-time dashboards showing creator performance, revenue tracking, and activity metrics that agencies can share with clients. This transparency builds trust and demonstrates the agency's value, keeping creators loyal to your services.",
+      benefits: [
+        "Build trust through transparent performance reporting",
+        "Demonstrate your agency's value with clear metrics",
+        "Establish longer-term relationships with creators",
+        "Reduce churn and stabilize your revenue"
+      ],
       metrics: [
-        { label: "Client Retention Increase", value: "40%", icon: <Heart className="h-4 w-4 text-siso-orange" /> },
-        { label: "Churn Reduction", value: "65%", icon: <Users className="h-4 w-4 text-siso-orange" /> },
-        { label: "Client Satisfaction", value: "92%", icon: <CheckCircle className="h-4 w-4 text-siso-orange" /> },
-        { label: "Revenue Growth", value: "35%", icon: <DollarSign className="h-4 w-4 text-siso-orange" /> }
+        { label: "Average Retention Increase", value: "40%", icon: <TrendingUp className="h-4 w-4 text-siso-orange" /> },
+        { label: "Client Satisfaction Score", value: "92%", icon: <Heart className="h-4 w-4 text-siso-orange" /> },
+        { label: "Revenue Growth", value: "35%", icon: <DollarSign className="h-4 w-4 text-siso-orange" /> },
+        { label: "Client Lifetime Value", value: "2.4x higher", icon: <Users className="h-4 w-4 text-siso-orange" /> }
       ],
       images: [
-        { url: "/lovable-uploads/c7ac43fd-bc3e-478d-8b4f-809beafb6838.png", caption: "Client performance dashboard with growth metrics" },
-        { url: "/lovable-uploads/1f9eba1e-c2af-4ed8-84e7-a375872c9182.png", caption: "Transparent reporting interface shared with clients" }
+        { url: "/lovable-uploads/c7ac43fd-bc3e-478d-8b4f-809beafb6838.png", caption: "Client retention dashboard showing performance metrics" },
+        { url: "/lovable-uploads/1f9eba1e-c2af-4ed8-84e7-a375872c9182.png", caption: "Transparent reporting shared with creators" }
       ],
       caseStudyLink: "https://notion.so/case-study/client-retention"
     },
     {
       problem: "Inefficient Onboarding",
-      solution: "Streamlined multi-step forms and automated reminders collect all necessary information without overwhelming new clients, cutting onboarding time by 60%.",
-      detailedSolution: "The traditional onboarding process for new creators is often manual, disorganized, and overwhelming. Our platform provides a step-by-step guided onboarding workflow with progress tracking, automated reminders, and document collection. New creators are guided through each phase of the process at a comfortable pace, ensuring nothing falls through the cracks while creating a professional first impression.",
+      statistic: "Agencies spend an average of 10 hours per new client on manual onboarding tasks",
+      solution: "Cut onboarding time by 60% with automated flows",
+      detailedSolution: "Traditional onboarding processes for new creators are manual, time-consuming, and often inconsistent. Our platform provides customizable onboarding workflows with automated reminders, document collection, and progress tracking. New creators are guided through each step of the process, ensuring all necessary information and assets are collected without overwhelming them with paperwork all at once.",
+      benefits: [
+        "Streamline client setup with guided multi-step workflows",
+        "Collect all necessary documents and information efficiently",
+        "Create a professional first impression for new creators",
+        "Free up staff time previously spent on manual onboarding"
+      ],
       metrics: [
-        { label: "Onboarding Time Saved", value: "60%", icon: <Clock className="h-4 w-4 text-siso-orange" /> },
-        { label: "Document Completion Rate", value: "100%", icon: <FileText className="h-4 w-4 text-siso-orange" /> },
+        { label: "Onboarding Time Reduction", value: "60%", icon: <Clock className="h-4 w-4 text-siso-orange" /> },
         { label: "Information Accuracy", value: "95%", icon: <CheckCircle className="h-4 w-4 text-siso-orange" /> },
+        { label: "Document Completion Rate", value: "100%", icon: <FileText className="h-4 w-4 text-siso-orange" /> },
         { label: "Time to First Content", value: "40% faster", icon: <Calendar className="h-4 w-4 text-siso-orange" /> }
       ],
       images: [
-        { url: "/lovable-uploads/66b63935-28a0-4212-8e2a-ab375279b188.png", caption: "Multi-step creator onboarding workflow" }
+        { url: "/lovable-uploads/66b63935-28a0-4212-8e2a-ab375279b188.png", caption: "Multi-step onboarding workflow" }
       ],
       caseStudyLink: "https://notion.so/case-study/onboarding-optimization"
     },
     {
       problem: "Content Disorganization",
-      solution: "Centralized content library and scheduling tools keep everything organized and on-time, eliminating missed posts and reducing management overhead.",
-      detailedSolution: "Managing content for multiple creators across platforms leads to confusion, missed posts, and inefficient workflows. Our platform provides a centralized content library and scheduling system that allows your team to organize assets by creator, content type, and posting date. The visual calendar interface makes it easy to identify gaps and ensure consistent posting for all clients.",
+      statistic: "60% of agencies miss at least one content deadline per week due to disorganization",
+      solution: "Save 15+ hours weekly with centralized content management",
+      detailedSolution: "Managing content for multiple creators across different platforms leads to confusion, missed posts, and inefficient workflows. Our centralized content library and scheduling system allows your team to organize assets by creator, content type, and posting date. The visual calendar interface makes it easy to spot gaps in your content schedule and ensure consistent posting for all your clients.",
+      benefits: [
+        "Keep all content organized in a central, searchable library",
+        "Never miss a posting deadline with visual scheduling tools",
+        "Maintain consistency across multiple creator accounts",
+        "Reduce time spent locating and organizing content"
+      ],
       metrics: [
         { label: "Time Saved Weekly", value: "15+ hours", icon: <Clock className="h-4 w-4 text-siso-orange" /> },
-        { label: "Content Organization", value: "100%", icon: <FileText className="h-4 w-4 text-siso-orange" /> },
         { label: "Posting Consistency", value: "98%", icon: <CheckCircle className="h-4 w-4 text-siso-orange" /> },
+        { label: "Content Organization", value: "100%", icon: <Calendar className="h-4 w-4 text-siso-orange" /> },
         { label: "Team Productivity", value: "62% increase", icon: <Users className="h-4 w-4 text-siso-orange" /> }
       ],
       images: [
-        { url: "/lovable-uploads/19ca8c73-3736-4506-bfb2-de867b272e12.png", caption: "Content calendar with drag-and-drop scheduling" }
+        { url: "/lovable-uploads/19ca8c73-3736-4506-bfb2-de867b272e12.png", caption: "Content calendar with drag-and-drop functionality" }
       ],
       caseStudyLink: "https://notion.so/case-study/content-management"
     },
     {
       problem: "Communication Breakdowns",
-      solution: "In-app messaging and notification system ensures nothing falls through the cracks, with a clear paper trail of all conversations and decisions.",
+      statistic: "75% of agencies experience miscommunication that leads to client dissatisfaction monthly",
+      solution: "Never miss important messages with unified inbox",
       detailedSolution: "Communication scattered across emails, texts, and DMs leads to missed messages and delayed responses. Our unified inbox consolidates all communications in one place, with thread organization by creator and topic. Automated prioritization ensures urgent messages get immediate attention, while notification systems alert team members to new messages in their assigned areas.",
+      benefits: [
+        "Track all client conversations in one centralized system",
+        "Respond faster with prioritized messages and notifications",
+        "Maintain clear communication records for accountability",
+        "Eliminate crossed wires between team members and clients"
+      ],
       metrics: [
         { label: "Response Time", value: "75% faster", icon: <MessageSquare className="h-4 w-4 text-siso-orange" /> },
         { label: "Message Organization", value: "100%", icon: <CheckCircle className="h-4 w-4 text-siso-orange" /> },
         { label: "Client Satisfaction", value: "88%", icon: <Heart className="h-4 w-4 text-siso-orange" /> },
-        { label: "Missed Messages", value: "0%", icon: <TrendingUp className="h-4 w-4 text-siso-orange" /> }
+        { label: "Missed Messages", value: "0%", icon: <Users className="h-4 w-4 text-siso-orange" /> }
       ],
       images: [
         { url: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png", caption: "Unified messaging interface with priority sorting" }
       ],
-      caseStudyLink: "https://notion.so/case-study/communication-management"
+      caseStudyLink: "https://notion.so/case-study/communication"
     },
     {
       problem: "Fan Engagement Challenges",
-      solution: "Managed fan interaction tools help maintain high engagement and subscriber satisfaction, with smart auto-replies and prioritization features.",
+      statistic: "Agencies see a 20% drop in subscriber retention without consistent engagement strategies",
+      solution: "Boost subscriber satisfaction and retention by 25%",
       detailedSolution: "Keeping fans engaged and reducing subscription cancellations is a constant challenge for creators. Our platform includes fan interaction tools that help prioritize high-value subscribers, manage message volume with smart auto-replies, and analyze engagement patterns to identify at-risk subscribers before they cancel. This proactive approach maintains satisfaction and reduces subscription churn.",
+      benefits: [
+        "Identify and prioritize high-value subscribers",
+        "Maintain engagement with automated response systems",
+        "Reduce subscription cancellations with proactive retention",
+        "Optimize fan interactions for maximum satisfaction"
+      ],
       metrics: [
         { label: "Fan Retention Rate", value: "58% higher", icon: <Heart className="h-4 w-4 text-siso-orange" /> },
         { label: "Message Response Rate", value: "100%", icon: <MessageSquare className="h-4 w-4 text-siso-orange" /> },
@@ -621,8 +613,15 @@ const Plan = () => {
     },
     {
       problem: "Manual Task Overload",
-      solution: "Automated workflows and AI-powered features reduce manual work by up to 40%, freeing up time for strategy and high-value activities.",
+      statistic: "Agency staff spend 15-20 hours weekly on repetitive tasks that could be automated",
+      solution: "Reduce manual work by up to 40% with automation",
       detailedSolution: "Agencies waste countless hours on repetitive tasks like scheduling posts, sending reminders, and generating reports. Our platform uses automation and AI to handle these routine activities, allowing your team to focus on strategy and creative work. From auto-scheduling similar content across platforms to generating performance reports with a single click, these time-saving features dramatically increase your team's efficiency.",
+      benefits: [
+        "Automate repetitive tasks to focus on high-value work",
+        "Generate reports and analytics with a single click",
+        "Schedule content more efficiently with templates",
+        "Scale your agency without proportionally increasing staff"
+      ],
       metrics: [
         { label: "Manual Tasks Reduced", value: "40%", icon: <Settings className="h-4 w-4 text-siso-orange" /> },
         { label: "Time Saved Per Creator", value: "5.5 hours weekly", icon: <Clock className="h-4 w-4 text-siso-orange" /> },
@@ -641,6 +640,52 @@ const Plan = () => {
       setSelectedPainPoint(detailedPainPoints[index]);
       setIsPainPointModalOpen(true);
     }
+  };
+
+  const renderPainPointsSection = () => {
+    if (!isDecoraPlan) return null;
+    
+    return (
+      <div className="mb-6">
+        <h2 className="text-2xl font-semibold text-white mb-4 flex items-center">
+          <Shield className="h-5 w-5 mr-2 text-siso-orange" />
+          Pain Points Solved
+        </h2>
+        <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
+          <p className="text-siso-text mb-4">
+            We've identified the key challenges faced by OnlyFans management agencies and designed solutions to address each one. 
+            Click on any pain point to see the detailed solution.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {detailedPainPoints.map((point, index) => (
+              <motion.div 
+                key={index} 
+                className="p-4 border border-siso-text/10 rounded-lg bg-black/20 cursor-pointer hover:bg-black/30 hover:border-siso-orange/20 hover:translate-y-[-2px] transition-all duration-200"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 * index, duration: 0.5 }}
+                onClick={() => handlePainPointClick(index)}
+              >
+                <h3 className="text-white font-medium mb-2 flex items-center">
+                  {index === 0 && <Users className="h-4 w-4 mr-2 text-siso-orange" />}
+                  {index === 1 && <Clock className="h-4 w-4 mr-2 text-siso-orange" />}
+                  {index === 2 && <Calendar className="h-4 w-4 mr-2 text-siso-orange" />}
+                  {index === 3 && <MessageSquare className="h-4 w-4 mr-2 text-siso-orange" />}
+                  {index === 4 && <Heart className="h-4 w-4 mr-2 text-siso-orange" />}
+                  {index === 5 && <Settings className="h-4 w-4 mr-2 text-siso-orange" />}
+                  {point.problem}
+                </h3>
+                <p className="text-siso-text text-sm mb-3">{point.statistic}</p>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-siso-orange">View solution</span>
+                  <ArrowRight className="h-3 w-3 text-siso-orange" />
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   };
 
   const regularFeatures = !isDecoraPlan
@@ -750,30 +795,8 @@ const Plan = () => {
             {/* Main content - conditional on plan type */}
             {isDecoraPlan ? (
               <div className="mb-8" ref={featuresRef}>
-                {/* Pain points section */}
-                <div className="mb-6">
-                  <h2 className="text-2xl font-semibold text-white mb-4 flex items-center">
-                    <Shield className="h-5 w-5 mr-2 text-siso-orange" />
-                    Pain Points Solved
-                  </h2>
-                  <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {painPoints.map((point, index) => (
-                        <motion.div 
-                          key={index} 
-                          className="p-4 border border-siso-text/10 rounded-lg bg-black/20 cursor-pointer hover:bg-black/30 hover:border-siso-orange/20 transition-all"
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.1 * index, duration: 0.5 }}
-                          onClick={() => handlePainPointClick(index)}
-                        >
-                          <h3 className="text-white font-medium mb-2">{point.problem}</h3>
-                          <p className="text-siso-text text-sm">{point.solution}</p>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+                {/* Pain points section - replaced with enhanced version */}
+                {renderPainPointsSection()}
                 
                 {/* Target users section */}
                 <div className="mb-6">

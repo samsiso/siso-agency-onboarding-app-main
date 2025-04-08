@@ -55,7 +55,7 @@ const ParticleBackground = () => {
   );
 };
 
-const ProblemSolutionCard = ({ problem, solution, icon, active, delay, onClick }) => {
+const ProblemSolutionCard = ({ problem, solution, statistic, icon, active, delay, onClick }) => {
   const Icon = icon;
   return (
     <motion.div
@@ -65,20 +65,23 @@ const ProblemSolutionCard = ({ problem, solution, icon, active, delay, onClick }
         x: 0,
         transition: { delay: delay * 0.15 }
       }}
-      className={`flex items-start gap-3 bg-black/20 rounded-lg p-3 border ${active ? 'border-siso-orange/30' : 'border-siso-text/10'} cursor-pointer hover:bg-black/30 hover:border-siso-orange/20 transition-all`}
+      className={`flex flex-col gap-3 bg-black/20 rounded-lg p-3 border ${active ? 'border-siso-orange/30' : 'border-siso-text/10'} cursor-pointer hover:bg-black/30 hover:border-siso-orange/20 transition-all hover:translate-y-[-2px]`}
       onClick={onClick}
     >
-      <div className={`flex items-center justify-center w-10 h-10 rounded-full ${active ? 'bg-siso-orange/20' : 'bg-siso-text/5'}`}>
-        {active ? (
-          <Icon className="h-5 w-5 text-siso-orange" />
-        ) : (
-          <div className="h-5 w-5 rounded-full bg-siso-text/20" />
-        )}
+      <div className="flex items-start gap-3">
+        <div className={`flex items-center justify-center w-10 h-10 rounded-full ${active ? 'bg-siso-orange/20' : 'bg-siso-text/5'}`}>
+          {active ? (
+            <Icon className="h-5 w-5 text-siso-orange" />
+          ) : (
+            <div className="h-5 w-5 rounded-full bg-siso-text/20" />
+          )}
+        </div>
+        <div>
+          <h3 className={`font-medium ${active ? 'text-white' : 'text-siso-text/50'}`}>{problem}</h3>
+          <p className={`text-sm mt-1 ${active ? 'text-siso-text' : 'text-siso-text/30'}`}>{solution}</p>
+        </div>
       </div>
-      <div>
-        <h3 className={`font-medium ${active ? 'text-white' : 'text-siso-text/50'}`}>{problem}</h3>
-        <p className={`text-sm mt-1 ${active ? 'text-siso-text' : 'text-siso-text/30'}`}>{solution}</p>
-      </div>
+      <p className={`text-xs ${active ? 'text-siso-orange' : 'text-siso-text/30'}`}>{statistic}</p>
     </motion.div>
   );
 };
@@ -154,7 +157,6 @@ const DecoraPlan = () => {
   
   const [activeSolutions, setActiveSolutions] = useState([true, true, true, true]);
   
-  // New state for the pain point modal
   const [selectedPainPoint, setSelectedPainPoint] = useState<PainPointDetailProps | null>(null);
   const [isPainPointModalOpen, setIsPainPointModalOpen] = useState(false);
   
@@ -203,31 +205,41 @@ const DecoraPlan = () => {
     { 
       problem: "Client Retention Issues", 
       solution: "40% improved client retention with transparent reporting",
+      statistic: "80% of agencies report the average model lifecycle with an agency is 3-6 months",
       icon: Users
     },
     { 
       problem: "Content Disorganization", 
       solution: "Save 15+ hours weekly with centralized management",
+      statistic: "60% of agencies miss at least one content deadline per week due to disorganization",
       icon: Calendar
     },
     { 
       problem: "Inefficient Onboarding", 
       solution: "Cut onboarding time by 60% with automated flows",
+      statistic: "Agencies spend an average of 10 hours per new client on manual onboarding tasks",
       icon: Clock
     },
     { 
       problem: "Communication Breakdowns", 
       solution: "Never miss important messages with unified inbox",
+      statistic: "75% of agencies experience miscommunication that leads to client dissatisfaction monthly",
       icon: MessageSquare
     }
   ];
   
-  // Detailed pain point information
   const detailedPainPoints: PainPointDetailProps[] = [
     {
       problem: "Client Retention Issues",
+      statistic: "80% of agencies report the average model lifecycle with an agency is 3-6 months",
       solution: "40% improved client retention with transparent reporting",
       detailedSolution: "OnlyFans agencies often struggle with client churn due to lack of transparency and unclear performance metrics. Our platform solves this by providing real-time dashboards showing creator performance, revenue tracking, and activity metrics that agencies can share with clients. This transparency builds trust and demonstrates the agency's value, keeping creators loyal to your services.",
+      benefits: [
+        "Build trust through transparent performance reporting",
+        "Demonstrate your agency's value with clear metrics",
+        "Establish longer-term relationships with creators",
+        "Reduce churn and stabilize your revenue"
+      ],
       metrics: [
         { label: "Average Retention Increase", value: "40%", icon: <TrendingUp className="h-4 w-4 text-siso-orange" /> },
         { label: "Client Satisfaction Score", value: "92%", icon: <Heart className="h-4 w-4 text-siso-orange" /> },
@@ -242,8 +254,15 @@ const DecoraPlan = () => {
     },
     {
       problem: "Content Disorganization",
+      statistic: "60% of agencies miss at least one content deadline per week due to disorganization",
       solution: "Save 15+ hours weekly with centralized management",
       detailedSolution: "Managing content for multiple creators across different platforms leads to confusion, missed posts, and inefficient workflows. Our centralized content library and scheduling system allows your team to organize assets by creator, content type, and posting date. The visual calendar interface makes it easy to spot gaps in your content schedule and ensure consistent posting for all your clients.",
+      benefits: [
+        "Keep all content organized in a central, searchable library",
+        "Never miss a posting deadline with visual scheduling tools",
+        "Maintain consistency across multiple creator accounts",
+        "Reduce time spent locating and organizing content"
+      ],
       metrics: [
         { label: "Time Saved Weekly", value: "15+ hours", icon: <Clock className="h-4 w-4 text-siso-orange" /> },
         { label: "Posting Consistency", value: "98%", icon: <CheckCircle className="h-4 w-4 text-siso-orange" /> },
@@ -257,8 +276,15 @@ const DecoraPlan = () => {
     },
     {
       problem: "Inefficient Onboarding",
+      statistic: "Agencies spend an average of 10 hours per new client on manual onboarding tasks",
       solution: "Cut onboarding time by 60% with automated flows",
       detailedSolution: "Traditional onboarding processes for new creators are manual, time-consuming, and often inconsistent. Our platform provides customizable onboarding workflows with automated reminders, document collection, and progress tracking. New creators are guided through each step of the process, ensuring all necessary information and assets are collected without overwhelming them with paperwork all at once.",
+      benefits: [
+        "Streamline client setup with guided multi-step workflows",
+        "Collect all necessary documents and information efficiently",
+        "Create a professional first impression for new creators",
+        "Free up staff time previously spent on manual onboarding"
+      ],
       metrics: [
         { label: "Onboarding Time Reduction", value: "60%", icon: <Clock className="h-4 w-4 text-siso-orange" /> },
         { label: "Information Accuracy", value: "95%", icon: <CheckCircle className="h-4 w-4 text-siso-orange" /> },
@@ -271,8 +297,15 @@ const DecoraPlan = () => {
     },
     {
       problem: "Communication Breakdowns",
+      statistic: "75% of agencies experience miscommunication that leads to client dissatisfaction monthly",
       solution: "Never miss important messages with unified inbox",
       detailedSolution: "Communication scattered across emails, texts, and DMs leads to missed messages and delayed responses. Our unified inbox consolidates all communications in one place, with thread organization by creator and topic. Automated prioritization ensures urgent messages get immediate attention, while notification systems alert team members to new messages in their assigned areas.",
+      benefits: [
+        "Track all client conversations in one centralized system",
+        "Respond faster with prioritized messages and notifications",
+        "Maintain clear communication records for accountability",
+        "Eliminate crossed wires between team members and clients"
+      ],
       metrics: [
         { label: "Response Time", value: "75% faster", icon: <MessageSquare className="h-4 w-4 text-siso-orange" /> },
         { label: "Message Organization", value: "100%", icon: <CheckCircle className="h-4 w-4 text-siso-orange" /> },
@@ -286,7 +319,6 @@ const DecoraPlan = () => {
     }
   ];
   
-  // Handle opening the pain point modal
   const handlePainPointClick = (index: number) => {
     setSelectedPainPoint(detailedPainPoints[index]);
     setIsPainPointModalOpen(true);
@@ -340,7 +372,6 @@ const DecoraPlan = () => {
                 </motion.div>
               </div>
               
-              {/* Interactive Callout Boxes */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
                 <InteractiveCallout 
                   title="Agency Niche" 
@@ -369,7 +400,8 @@ const DecoraPlan = () => {
                   <ProblemSolutionCard 
                     key={index} 
                     problem={item.problem} 
-                    solution={item.solution} 
+                    solution={item.solution}
+                    statistic={item.statistic}
                     icon={item.icon}
                     active={activeSolutions[index]}
                     delay={index}
@@ -431,7 +463,6 @@ const DecoraPlan = () => {
         )}
       </AnimatePresence>
       
-      {/* Pain Point Modal */}
       <PainPointsModal
         painPoint={selectedPainPoint}
         open={isPainPointModalOpen}
