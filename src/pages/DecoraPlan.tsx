@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -16,7 +15,9 @@ import {
   ArrowRight,
   FastForward,
   Trophy,
-  TrendingUp
+  TrendingUp,
+  ExternalLink,
+  FileText
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -24,6 +25,7 @@ import '../components/ai-news/animations.css';
 import { WelcomeBackground } from '@/components/plan/BackgroundElements';
 import { ClickThroughPrompt } from '@/components/plan/ClickThroughPrompt';
 import { InteractiveCallout } from '@/components/plan/InteractiveCallout';
+import { PainPointsModal, PainPointDetailProps } from '@/components/plan/PainPointsModal';
 
 const ParticleBackground = () => {
   return (
@@ -53,7 +55,7 @@ const ParticleBackground = () => {
   );
 };
 
-const ProblemSolutionCard = ({ problem, solution, icon, active, delay }) => {
+const ProblemSolutionCard = ({ problem, solution, icon, active, delay, onClick }) => {
   const Icon = icon;
   return (
     <motion.div
@@ -63,7 +65,8 @@ const ProblemSolutionCard = ({ problem, solution, icon, active, delay }) => {
         x: 0,
         transition: { delay: delay * 0.15 }
       }}
-      className={`flex items-start gap-3 bg-black/20 rounded-lg p-3 border ${active ? 'border-siso-orange/30' : 'border-siso-text/10'}`}
+      className={`flex items-start gap-3 bg-black/20 rounded-lg p-3 border ${active ? 'border-siso-orange/30' : 'border-siso-text/10'} cursor-pointer hover:bg-black/30 hover:border-siso-orange/20 transition-all`}
+      onClick={onClick}
     >
       <div className={`flex items-center justify-center w-10 h-10 rounded-full ${active ? 'bg-siso-orange/20' : 'bg-siso-text/5'}`}>
         {active ? (
@@ -151,6 +154,10 @@ const DecoraPlan = () => {
   
   const [activeSolutions, setActiveSolutions] = useState([true, true, true, true]);
   
+  // New state for the pain point modal
+  const [selectedPainPoint, setSelectedPainPoint] = useState<PainPointDetailProps | null>(null);
+  const [isPainPointModalOpen, setIsPainPointModalOpen] = useState(false);
+  
   const analysisSteps = [
     { icon: <Users className="h-5 w-5 text-siso-orange" />, text: "Analyzing client management needs...", tooltip: "Manage multiple creators efficiently" },
     { icon: <Calendar className="h-5 w-5 text-siso-orange" />, text: "Optimizing content scheduling...", tooltip: "Automate content planning and posting" },
@@ -214,6 +221,76 @@ const DecoraPlan = () => {
       icon: MessageSquare
     }
   ];
+  
+  // Detailed pain point information
+  const detailedPainPoints: PainPointDetailProps[] = [
+    {
+      problem: "Client Retention Issues",
+      solution: "40% improved client retention with transparent reporting",
+      detailedSolution: "OnlyFans agencies often struggle with client churn due to lack of transparency and unclear performance metrics. Our platform solves this by providing real-time dashboards showing creator performance, revenue tracking, and activity metrics that agencies can share with clients. This transparency builds trust and demonstrates the agency's value, keeping creators loyal to your services.",
+      metrics: [
+        { label: "Average Retention Increase", value: "40%", icon: <TrendingUp className="h-4 w-4 text-siso-orange" /> },
+        { label: "Client Satisfaction Score", value: "92%", icon: <Heart className="h-4 w-4 text-siso-orange" /> },
+        { label: "Revenue Growth", value: "35%", icon: <DollarSign className="h-4 w-4 text-siso-orange" /> },
+        { label: "Client Lifetime Value", value: "2.4x higher", icon: <Users className="h-4 w-4 text-siso-orange" /> }
+      ],
+      images: [
+        { url: "/lovable-uploads/c7ac43fd-bc3e-478d-8b4f-809beafb6838.png", caption: "Client retention dashboard showing performance metrics" },
+        { url: "/lovable-uploads/1f9eba1e-c2af-4ed8-84e7-a375872c9182.png", caption: "Transparent reporting shared with creators" }
+      ],
+      caseStudyLink: "https://notion.so/case-study/client-retention"
+    },
+    {
+      problem: "Content Disorganization",
+      solution: "Save 15+ hours weekly with centralized management",
+      detailedSolution: "Managing content for multiple creators across different platforms leads to confusion, missed posts, and inefficient workflows. Our centralized content library and scheduling system allows your team to organize assets by creator, content type, and posting date. The visual calendar interface makes it easy to spot gaps in your content schedule and ensure consistent posting for all your clients.",
+      metrics: [
+        { label: "Time Saved Weekly", value: "15+ hours", icon: <Clock className="h-4 w-4 text-siso-orange" /> },
+        { label: "Posting Consistency", value: "98%", icon: <CheckCircle className="h-4 w-4 text-siso-orange" /> },
+        { label: "Content Organization", value: "100%", icon: <Calendar className="h-4 w-4 text-siso-orange" /> },
+        { label: "Team Productivity", value: "62% increase", icon: <Users className="h-4 w-4 text-siso-orange" /> }
+      ],
+      images: [
+        { url: "/lovable-uploads/19ca8c73-3736-4506-bfb2-de867b272e12.png", caption: "Content calendar with drag-and-drop functionality" }
+      ],
+      caseStudyLink: "https://notion.so/case-study/content-management"
+    },
+    {
+      problem: "Inefficient Onboarding",
+      solution: "Cut onboarding time by 60% with automated flows",
+      detailedSolution: "Traditional onboarding processes for new creators are manual, time-consuming, and often inconsistent. Our platform provides customizable onboarding workflows with automated reminders, document collection, and progress tracking. New creators are guided through each step of the process, ensuring all necessary information and assets are collected without overwhelming them with paperwork all at once.",
+      metrics: [
+        { label: "Onboarding Time Reduction", value: "60%", icon: <Clock className="h-4 w-4 text-siso-orange" /> },
+        { label: "Information Accuracy", value: "95%", icon: <CheckCircle className="h-4 w-4 text-siso-orange" /> },
+        { label: "Document Completion Rate", value: "100%", icon: <FileText className="h-4 w-4 text-siso-orange" /> },
+        { label: "Time to First Content", value: "40% faster", icon: <Calendar className="h-4 w-4 text-siso-orange" /> }
+      ],
+      images: [
+        { url: "/lovable-uploads/66b63935-28a0-4212-8e2a-ab375279b188.png", caption: "Multi-step onboarding workflow" }
+      ]
+    },
+    {
+      problem: "Communication Breakdowns",
+      solution: "Never miss important messages with unified inbox",
+      detailedSolution: "Communication scattered across emails, texts, and DMs leads to missed messages and delayed responses. Our unified inbox consolidates all communications in one place, with thread organization by creator and topic. Automated prioritization ensures urgent messages get immediate attention, while notification systems alert team members to new messages in their assigned areas.",
+      metrics: [
+        { label: "Response Time", value: "75% faster", icon: <MessageSquare className="h-4 w-4 text-siso-orange" /> },
+        { label: "Message Organization", value: "100%", icon: <CheckCircle className="h-4 w-4 text-siso-orange" /> },
+        { label: "Client Satisfaction", value: "88%", icon: <Heart className="h-4 w-4 text-siso-orange" /> },
+        { label: "Missed Messages", value: "0%", icon: <Users className="h-4 w-4 text-siso-orange" /> }
+      ],
+      images: [
+        { url: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png", caption: "Unified messaging interface with priority sorting" }
+      ],
+      caseStudyLink: "https://notion.so/case-study/communication"
+    }
+  ];
+  
+  // Handle opening the pain point modal
+  const handlePainPointClick = (index: number) => {
+    setSelectedPainPoint(detailedPainPoints[index]);
+    setIsPainPointModalOpen(true);
+  };
   
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-black via-siso-bg to-black p-4 relative overflow-hidden">
@@ -296,6 +373,7 @@ const DecoraPlan = () => {
                     icon={item.icon}
                     active={activeSolutions[index]}
                     delay={index}
+                    onClick={() => handlePainPointClick(index)}
                   />
                 ))}
               </div>
@@ -352,6 +430,13 @@ const DecoraPlan = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      
+      {/* Pain Point Modal */}
+      <PainPointsModal
+        painPoint={selectedPainPoint}
+        open={isPainPointModalOpen}
+        onOpenChange={setIsPainPointModalOpen}
+      />
     </div>
   );
 };
