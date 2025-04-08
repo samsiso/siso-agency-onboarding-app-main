@@ -180,12 +180,14 @@ const Plan = () => {
   const [loadingComplete, setLoadingComplete] = useState(false);
   
   const loadPlan = async () => {
+    let loadingInterval: NodeJS.Timeout; 
+    
     try {
       setLoading(true);
       setLoadingProgress(0);
       setLoadingStep(0);
       
-      const loadingInterval = setInterval(() => {
+      loadingInterval = setInterval(() => {
         setLoadingStep(prevStep => {
           const nextStep = prevStep + 1 < loadingAnimationSteps.length ? prevStep + 1 : prevStep;
           
@@ -261,7 +263,7 @@ const Plan = () => {
         description: "We couldn't load the plan details. Please try again later.",
         variant: "destructive"
       });
-      clearInterval(loadingInterval); // Ensure interval is cleared on error
+      if (loadingInterval) clearInterval(loadingInterval); 
       setLoading(false);
       setLoadingProgress(0);
     }
@@ -684,8 +686,16 @@ const Plan = () => {
       caseStudyLink: "https://notion.so/case-study/client-retention",
       videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
       researchSources: [
-        { name: "OnlyFans Creator Agency Survey 2023", url: "https://example.com/research1" },
-        { name: "Industry Report on Talent Management", url: "https://example.com/research2" }
+        { 
+          title: "OnlyFans Creator Agency Survey 2023", 
+          url: "https://example.com/research1",
+          description: "A comprehensive survey of OnlyFans management agencies and their retention challenges"
+        },
+        { 
+          title: "Industry Report on Talent Management", 
+          url: "https://example.com/research2",
+          description: "Analysis of creator retention in digital content industries"
+        }
       ]
     }
   ] : [];
