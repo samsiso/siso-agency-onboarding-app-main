@@ -24,6 +24,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import '../components/ai-news/animations.css';
+import { WelcomeBackground } from '@/components/plan/BackgroundElements';
 
 // Particle background component
 const ParticleBackground = () => {
@@ -276,7 +277,8 @@ const DecoraPlan = () => {
         Skip
       </Button>
       
-      <ParticleBackground />
+      {showWelcome && <WelcomeBackground />}
+      {!showWelcome && <ParticleBackground />}
       
       <AnimatePresence>
         {showWelcome && (
@@ -286,15 +288,42 @@ const DecoraPlan = () => {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.5 }}
-            className="text-center mb-6 max-w-xl"
+            className="text-center mb-6 max-w-xl z-10"
           >
-            <Sparkles className="h-16 w-16 text-siso-orange mx-auto mb-4" />
-            <h1 ref={welcomeTextRef} className="text-3xl md:text-4xl font-bold text-white mb-3">
-              Welcome!
-            </h1>
-            <p className="text-siso-text max-w-md mx-auto mt-3 text-lg">
-              We're building your custom OnlyFans Management Dashboard
-            </p>
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="mb-4"
+            >
+              <Sparkles className="h-16 w-16 text-siso-orange mx-auto mb-2" />
+            </motion.div>
+            
+            <div className="bg-black/40 backdrop-blur-sm rounded-lg p-6 border border-siso-orange/20">
+              <h1 ref={welcomeTextRef} className="text-3xl md:text-4xl font-bold text-white mb-3 min-h-[40px]">
+                Welcome!
+              </h1>
+              <motion.p 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6 }}
+                className="text-siso-text max-w-md mx-auto mt-3 text-lg"
+              >
+                We're building your custom OnlyFans Management Dashboard
+              </motion.p>
+              
+              <motion.div 
+                className="mt-5 flex justify-center"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8 }}
+              >
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-siso-orange/10 border border-siso-orange/20">
+                  <Clock className="h-4 w-4 text-siso-orange" />
+                  <span className="text-sm text-siso-text">Personalized setup in progress</span>
+                </div>
+              </motion.div>
+            </div>
           </motion.div>
         )}
         
