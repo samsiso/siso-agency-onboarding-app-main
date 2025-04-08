@@ -176,13 +176,27 @@ const Plan = () => {
     "Almost ready to showcase your plan!"
   ];
   const [loadingStep, setLoadingStep] = useState(0);
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [loadingComplete, setLoadingComplete] = useState(false);
   
   const loadPlan = async () => {
     try {
       setLoading(true);
+      setLoadingProgress(0);
+      setLoadingStep(0);
       
       const loadingInterval = setInterval(() => {
-        setLoadingStep(prev => (prev + 1) % loadingAnimationSteps.length);
+        setLoadingStep(prevStep => {
+          const nextStep = prevStep + 1 < loadingAnimationSteps.length ? prevStep + 1 : prevStep;
+          
+          setLoadingProgress(Math.floor((nextStep + 1) * 25));
+          
+          if (nextStep === loadingAnimationSteps.length - 1) {
+            setLoadingComplete(true);
+          }
+          
+          return nextStep;
+        });
       }, 1500);
       
       if (!username) {
@@ -228,9 +242,15 @@ const Plan = () => {
       setTotalCost(safeData.estimated_cost || 0);
       
       setTimeout(() => {
-        clearInterval(loadingInterval);
-        setLoading(false);
-      }, 1200);
+        setLoadingProgress(100);
+        setLoadingStep(loadingAnimationSteps.length - 1);
+        setLoadingComplete(true);
+        
+        setTimeout(() => {
+          clearInterval(loadingInterval);
+          setLoading(false);
+        }, 1000);
+      }, 3000);
       
     } catch (error) {
       console.error('Error fetching plan:', error);
@@ -240,6 +260,7 @@ const Plan = () => {
         variant: "destructive"
       });
       setLoading(false);
+      setLoadingProgress(0);
     }
   };
   
@@ -337,13 +358,13 @@ const Plan = () => {
           >
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-siso-text">Loading your custom plan</span>
-              <span className="text-sm text-siso-orange">{Math.min(25 * (loadingStep + 1), 100)}%</span>
+              <span className="text-sm text-siso-orange">{loadingProgress}%</span>
             </div>
             <div className="h-2 bg-black/30 rounded-full overflow-hidden">
               <motion.div 
                 className="h-full bg-gradient-to-r from-siso-red to-siso-orange"
                 initial={{ width: "0%" }}
-                animate={{ width: `${Math.min(25 * (loadingStep + 1), 100)}%` }}
+                animate={{ width: `${loadingProgress}%` }}
                 transition={{ duration: 0.5 }}
               />
             </div>
@@ -829,13 +850,13 @@ const Plan = () => {
         >
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-siso-text">Loading your custom plan</span>
-            <span className="text-sm text-siso-orange">{Math.min(25 * (loadingStep + 1), 100)}%</span>
+            <span className="text-sm text-siso-orange">{loadingProgress}%</span>
           </div>
           <div className="h-2 bg-black/30 rounded-full overflow-hidden">
             <motion.div 
               className="h-full bg-gradient-to-r from-siso-red to-siso-orange"
               initial={{ width: "0%" }}
-              animate={{ width: `${Math.min(25 * (loadingStep + 1), 100)}%` }}
+              animate={{ width: `${loadingProgress}%` }}
               transition={{ duration: 0.5 }}
             />
           </div>
