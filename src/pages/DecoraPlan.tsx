@@ -37,6 +37,12 @@ const DecoraPlan = () => {
     };
   }, [navigate]);
   
+  // Function to handle manual navigation when button is clicked
+  const handleViewPlanClick = () => {
+    console.log("DecoraPlan: Manual button click, navigating to /plan/decora");
+    navigate('/plan/decora');
+  };
+  
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-black via-siso-bg to-black p-4">
       <div className="max-w-md w-full bg-black/40 border border-siso-text/10 rounded-lg p-6 backdrop-blur-sm">
@@ -97,7 +103,7 @@ const DecoraPlan = () => {
         
         <div className="mt-6 flex justify-center">
           <Button 
-            onClick={() => navigate('/plan/decora')}
+            onClick={handleViewPlanClick}
             className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-white"
             disabled={progress < 100}
           >

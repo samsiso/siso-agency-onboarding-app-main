@@ -24,7 +24,6 @@ function App() {
         <Route path="/onboarding/social" element={<OnboardingSocial />} />
         <Route path="/onboarding/congratulations" element={<Congratulations />} />
         <Route path="/plan/:username" element={<Plan />} />
-        {/* Making DecoraPlan redirect directly to the plan page */}
         <Route path="/decora-plan" element={<DecoraPlan />} />
       </Routes>
     </>
