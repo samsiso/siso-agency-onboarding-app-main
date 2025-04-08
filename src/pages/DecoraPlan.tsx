@@ -40,6 +40,9 @@ const DecoraPlan = () => {
   // Function to handle manual navigation when button is clicked
   const handleViewPlanClick = () => {
     console.log("DecoraPlan: Manual button click, navigating to /plan/decora");
+    setIsRedirecting(true);
+    
+    // Force immediate navigation rather than waiting
     navigate('/plan/decora');
   };
   
