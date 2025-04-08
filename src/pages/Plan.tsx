@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -780,59 +779,4 @@ const Plan = () => {
                       <h3 className="text-xl font-semibold text-white mb-4">Additional Details</h3>
                       <div className="prose prose-invert prose-sm max-w-none">
                         <p>The OnlyFans Management Suite for Decora includes a complete ecosystem for managing creators, content, and fan interactions. The platform provides tools for efficient onboarding, content scheduling, analytics tracking, and secure payment processing.</p>
-                        <p>Our comprehensive solution helps agencies like yours streamline operations, improve client retention, and maximize revenue potential through advanced analytics and automation. The application is built with scalability in mind, allowing it to grow alongside your agency from 10 to 100+ creators.</p>
-                        <p>All system components adhere to industry best practices for security and performance, ensuring a reliable platform for your business operations.</p>
-                      </div>
-                    </div>
-                  </TabsContent>
-                </Tabs>
-              </div>
-            ) : (
-              // Regular features display for non-Decora plans
-              <div className="mb-8">
-                <h2 className="text-2xl font-semibold text-white mb-4">Selected Features</h2>
-                <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
-                  <ul className="space-y-2">
-                    {regularFeatures.map((feature, index) => (
-                      <li key={index} className="flex items-start">
-                        <CheckCircle className="h-4 w-4 mr-2 text-siso-orange shrink-0 mt-0.5" />
-                        <span className="text-siso-text">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            )}
-            
-            {/* Submit button */}
-            <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <Button
-                onClick={handleSubmitPlan}
-                disabled={submitting}
-                className="w-full sm:w-auto bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-white"
-              >
-                {submitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Processing...
-                  </>
-                ) : (
-                  <>
-                    Approve Plan & Continue
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </>
-                )}
-              </Button>
-              
-              <p className="text-siso-text text-sm">
-                By approving this plan, you're confirming you'd like to proceed with the app development.
-              </p>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-    </div>
-  );
-};
-
-export default Plan;
+                        <p>Our comprehensive solution helps agencies like yours streamline operations,
