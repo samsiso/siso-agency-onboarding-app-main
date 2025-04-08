@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MessageLoading } from '@/components/ui/message-loading';
-import { FileText, Users, MessageSquare, BarChart, CheckCircle, Loader2, Sparkles, Heart } from 'lucide-react';
+import { FileText, Users, MessageSquare, BarChart, CheckCircle, Loader2, Sparkles, Heart, DollarSign, Check } from 'lucide-react';
 
 const DecoraPlan = () => {
   const navigate = useNavigate();
@@ -14,16 +14,18 @@ const DecoraPlan = () => {
     const step1 = setTimeout(() => setLoadingStep(2), 1500);
     const step2 = setTimeout(() => setLoadingStep(3), 3000);
     const step3 = setTimeout(() => setLoadingStep(4), 4500);
+    const step4 = setTimeout(() => setLoadingStep(5), 5500);
     
     // Final navigation
     const navigationTimer = setTimeout(() => {
       navigate('/plan/decora');
-    }, 6000);
+    }, 7000);
     
     return () => {
       clearTimeout(step1);
       clearTimeout(step2);
       clearTimeout(step3);
+      clearTimeout(step4);
       clearTimeout(navigationTimer);
     };
   }, [navigate]);
@@ -32,7 +34,16 @@ const DecoraPlan = () => {
     { icon: <Users className="h-5 w-5 text-siso-orange" />, text: "Analyzing Decora's client management needs..." },
     { icon: <FileText className="h-5 w-5 text-siso-orange" />, text: "Customizing content management features..." },
     { icon: <MessageSquare className="h-5 w-5 text-siso-orange" />, text: "Optimizing communication tools..." },
-    { icon: <BarChart className="h-5 w-5 text-siso-orange" />, text: "Finalizing analytics and reporting..." }
+    { icon: <BarChart className="h-5 w-5 text-siso-orange" />, text: "Finalizing analytics and reporting..." },
+    { icon: <DollarSign className="h-5 w-5 text-siso-orange" />, text: "Calculating investment tiers..." }
+  ];
+  
+  // Price tier animation
+  const tiers = [
+    { name: "MVP", price: "£249", features: 5 },
+    { name: "Standard", price: "£999", features: 12 },
+    { name: "Premium", price: "£1,749", features: 18 },
+    { name: "Enterprise", price: "£2,490", features: 25 }
   ];
   
   return (
@@ -58,13 +69,13 @@ const DecoraPlan = () => {
         <motion.div className="mb-6">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-siso-text">Loading your plan</span>
-            <span className="text-sm text-siso-orange">{Math.min(25 * loadingStep, 100)}%</span>
+            <span className="text-sm text-siso-orange">{Math.min(20 * loadingStep, 100)}%</span>
           </div>
           <div className="h-2 bg-black/30 rounded-full overflow-hidden">
             <motion.div 
               className="h-full bg-gradient-to-r from-siso-red to-siso-orange"
               initial={{ width: "0%" }}
-              animate={{ width: `${Math.min(25 * loadingStep, 100)}%` }}
+              animate={{ width: `${Math.min(20 * loadingStep, 100)}%` }}
               transition={{ duration: 0.5 }}
             />
           </div>
@@ -101,6 +112,43 @@ const DecoraPlan = () => {
             </motion.div>
           ))}
         </div>
+        
+        {loadingStep >= 5 && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            transition={{ duration: 0.5 }}
+            className="mt-6 overflow-hidden"
+          >
+            <h3 className="text-white font-medium mb-2">Available Investment Tiers:</h3>
+            <div className="space-y-3">
+              {tiers.map((tier, index) => (
+                <motion.div 
+                  key={index}
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.1 * index, duration: 0.4 }}
+                  className="flex items-center justify-between p-2 rounded-lg border border-siso-text/10 bg-black/20"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 flex items-center justify-center rounded-full bg-siso-orange/10 text-siso-orange">
+                      {index === 0 ? (
+                        <Check className="w-4 h-4" />
+                      ) : (
+                        <span className="text-xs font-medium">{index+1}</span>
+                      )}
+                    </div>
+                    <div>
+                      <span className="text-white">{tier.name}</span>
+                      <div className="text-xs text-siso-text/70">{tier.features} features</div>
+                    </div>
+                  </div>
+                  <span className="text-siso-orange font-medium">{tier.price}</span>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        )}
         
         <motion.div
           initial={{ opacity: 0 }}
