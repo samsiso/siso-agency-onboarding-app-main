@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -856,3 +857,58 @@ const Plan = () => {
                     <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5 cursor-help">
                       <div className="flex items-start">
                         <Calendar className="h-5 w-5 mr-2 text-siso-orange mt-1" />
+                        <div>
+                          <h3 className="text-xl font-semibold text-white mb-2">Development Timeline</h3>
+                          <p className="text-siso-orange">{totalDays} days</p>
+                        </div>
+                      </div>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-sm">Estimated time to develop all selected features</p>
+                  </TooltipContent>
+                </Tooltip>
+                
+                <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
+                  <div className="flex items-start">
+                    <DollarSign className="h-5 w-5 mr-2 text-siso-orange mt-1" />
+                    <div>
+                      <h3 className="text-xl font-semibold text-white mb-2">Total Investment</h3>
+                      <p className="text-siso-orange">£{totalCost}</p>
+                    </div>
+                  </div>
+                </div>
+              </TooltipProvider>
+            </div>
+            
+            {/* Rest of your component... */}
+            
+            {/* Action Button */}
+            <div className="flex justify-end mt-8">
+              <Button
+                size="lg"
+                onClick={handleSubmitPlan}
+                disabled={submitting}
+                className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90"
+              >
+                {submitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    Approve This Plan
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
+
+export default Plan;
