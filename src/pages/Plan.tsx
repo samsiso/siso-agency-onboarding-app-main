@@ -36,6 +36,7 @@ import { FeatureSelection, Feature } from '@/components/plan/FeatureSelection';
 import { PriceSlider } from '@/components/plan/PriceSlider';
 import { CaseStudy } from '@/components/plan/CaseStudy';
 import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface PlanData {
@@ -855,5 +856,3 @@ const Plan = () => {
                     <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5 cursor-help">
                       <div className="flex items-start">
                         <Calendar className="h-5 w-5 mr-2 text-siso-orange mt-1" />
-                        <div>
-                          <h3 className="text
