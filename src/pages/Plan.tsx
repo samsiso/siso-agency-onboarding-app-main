@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
@@ -31,6 +30,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { ColorPicker } from '@/components/plan/ColorPicker';
 import { FeatureSelection, Feature } from '@/components/plan/FeatureSelection';
 import { CaseStudy } from '@/components/plan/CaseStudy';
+import { WelcomeMessage } from '@/components/plan/WelcomeMessage';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface PlanData {
@@ -49,7 +49,6 @@ interface PlanData {
   status: string | null;
 }
 
-// Add categories for features
 interface FeatureCategory {
   name: string;
   icon: JSX.Element;
@@ -57,13 +56,11 @@ interface FeatureCategory {
   features: string[];
 }
 
-// Add pain points
 interface PainPoint {
   problem: string;
   solution: string;
 }
 
-// Add testimonials
 interface Testimonial {
   content: string;
   author: string;
@@ -72,7 +69,6 @@ interface Testimonial {
   appLink?: string;
 }
 
-// Define color options
 const brandColorOptions = [
   { name: 'Classic Red', value: '#E53E3E' },
   { name: 'Vibrant Orange', value: '#ED8936' },
@@ -85,7 +81,6 @@ const brandColorOptions = [
   { name: 'Modern Teal', value: '#319795' }
 ];
 
-// Case studies data
 const caseStudies = [
   {
     title: 'OnlyFans Management Platform for Agency X',
@@ -107,7 +102,6 @@ const caseStudies = [
   }
 ];
 
-// Additional features that can be added
 const additionalFeatures: Feature[] = [
   {
     id: 'white-label',
@@ -155,13 +149,13 @@ const Plan = () => {
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState('features');
   
-  // New state for customization
   const [primaryColor, setPrimaryColor] = useState('#ED8936');
   const [secondaryColor, setSecondaryColor] = useState('#E53E3E');
   const [selectedFeatures, setSelectedFeatures] = useState<Feature[]>(additionalFeatures);
   const [totalCost, setTotalCost] = useState<number | null>(null);
   
-  // Enhanced loading screen animations
+  const featuresRef = useRef<HTMLDivElement>(null);
+  
   const loadingAnimationSteps = [
     "Analyzing your business needs...",
     "Customizing platform features...",
@@ -175,7 +169,6 @@ const Plan = () => {
       try {
         setLoading(true);
         
-        // Create loading animation steps
         const loadingInterval = setInterval(() => {
           setLoadingStep(prev => (prev + 1) % loadingAnimationSteps.length);
         }, 1500);
@@ -196,7 +189,6 @@ const Plan = () => {
         
         setPlan(data);
         
-        // Initialize colors if available in the plan
         if (data?.branding?.primary_color) {
           setPrimaryColor(data.branding.primary_color);
         }
@@ -205,10 +197,8 @@ const Plan = () => {
           setSecondaryColor(data.branding.secondary_color);
         }
         
-        // Calculate initial total cost
         setTotalCost(data?.estimated_cost || 0);
         
-        // Clear loading interval after a small delay to show the final step
         setTimeout(() => {
           clearInterval(loadingInterval);
           setLoading(false);
@@ -228,7 +218,6 @@ const Plan = () => {
     fetchPlan();
   }, [username, toast, loadingAnimationSteps.length]);
   
-  // Calculate total cost when selected features change
   useEffect(() => {
     if (plan) {
       const additionalCost = selectedFeatures
@@ -239,13 +228,16 @@ const Plan = () => {
     }
   }, [selectedFeatures, plan]);
   
+  const scrollToFeatures = () => {
+    featuresRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+  
   const handleSubmitPlan = async () => {
     if (!plan) return;
     
     try {
       setSubmitting(true);
       
-      // Update the plan with the new colors and total cost
       const { error } = await supabase
         .from('plans')
         .update({ 
@@ -268,7 +260,6 @@ const Plan = () => {
         description: "Your plan has been submitted successfully. Let's get started!",
       });
       
-      // Navigate to onboarding
       setTimeout(() => {
         navigate(`/onboarding-chat`);
       }, 1500);
@@ -402,10 +393,8 @@ const Plan = () => {
     );
   }
   
-  // Check if this is the Decora plan to show enhanced features
   const isDecoraPlan = plan.username === 'decora';
   
-  // Define feature categories for the Decora plan
   const featureCategories: FeatureCategory[] = isDecoraPlan ? [
     {
       name: 'Client Management',
@@ -481,7 +470,6 @@ const Plan = () => {
     }
   ] : [];
 
-  // Define pain points solved for Decora plan
   const painPoints: PainPoint[] = isDecoraPlan ? [
     {
       problem: 'Client Retention Issues',
@@ -509,7 +497,6 @@ const Plan = () => {
     }
   ] : [];
 
-  // Sample testimonials for Decora plan with social links
   const testimonials: Testimonial[] = isDecoraPlan ? [
     {
       content: "This platform has completely transformed how we manage our creator clients. Our retention rate has increased by 35% since implementation.",
@@ -532,22 +519,9 @@ const Plan = () => {
     }
   ] : [];
 
-  // Group features for non-Decora plans
   const regularFeatures = !isDecoraPlan
     ? (plan.features || [])
     : [];
-  
-  // Just modify the FeatureSelection component usage to hide pricing
-  const originalFeatureSelectionSection = (
-    <div className="mb-6">
-      <h2 className="text-2xl font-semibold text-white mb-4">Customize Your Plan</h2>
-      <FeatureSelection 
-        features={selectedFeatures} 
-        onChange={setSelectedFeatures}
-        showPricing={false} // Hide pricing
-      />
-    </div>
-  );
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-siso-bg to-black p-4 md:p-8">
@@ -557,31 +531,16 @@ const Plan = () => {
         transition={{ duration: 0.5 }}
         className="max-w-5xl mx-auto"
       >
-        {/* Personalized Welcome Message */}
         {isDecoraPlan && (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.7 }}
-            className="bg-gradient-to-r from-siso-red/10 to-siso-orange/10 rounded-lg border border-siso-orange/20 shadow-lg p-6 mb-8"
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <Heart className="h-6 w-6 text-siso-orange" />
-              <h2 className="text-xl font-semibold text-white">Welcome, Decora Team!</h2>
-            </div>
-            <p className="text-siso-text mb-3">
-              We've crafted this custom OnlyFans Management Suite specifically for your agency needs. This platform addresses your unique challenges and will help you scale your operations while improving client retention.
-            </p>
-            <p className="text-siso-text/80 text-sm">
-              Review the plan below, customize it to your needs, and click "Approve This Plan" when you're ready to get started. Our team is excited to work with you!
-            </p>
-          </motion.div>
+          <WelcomeMessage 
+            agencyName="Decora Team" 
+            industryType="OnlyFans" 
+            scrollToFeatures={scrollToFeatures}
+          />
         )}
 
-        {/* Main content */}
         <div className="bg-black/40 backdrop-blur-md rounded-lg border border-siso-text/10 shadow-xl overflow-hidden">
           <div className="p-6 md:p-8">
-            {/* Header with App Plan and Logo */}
             <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-6">
               <div>
                 <GradientHeading className="text-3xl md:text-4xl mb-2">
@@ -604,7 +563,6 @@ const Plan = () => {
               )}
             </div>
             
-            {/* Key Info Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
                 <div className="flex items-start">
@@ -638,8 +596,7 @@ const Plan = () => {
             </div>
             
             {isDecoraPlan ? (
-              <div className="mb-8">
-                {/* Pain Points Solved - MOVED UP */}
+              <div className="mb-8" ref={featuresRef}>
                 <div className="mb-6">
                   <h2 className="text-2xl font-semibold text-white mb-4 flex items-center">
                     <Shield className="h-5 w-5 mr-2 text-siso-orange" />
@@ -663,7 +620,6 @@ const Plan = () => {
                   </div>
                 </div>
                 
-                {/* Target Users - MOVED UP */}
                 <div className="mb-6">
                   <h2 className="text-2xl font-semibold text-white mb-4 flex items-center">
                     <Target className="h-5 w-5 mr-2 text-siso-orange" />
@@ -676,7 +632,6 @@ const Plan = () => {
                   </div>
                 </div>
                 
-                {/* Branding Customization Section */}
                 <div className="mb-6">
                   <h2 className="text-2xl font-semibold text-white mb-4">Customize Your Branding</h2>
                   <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
@@ -714,7 +669,6 @@ const Plan = () => {
                   </div>
                 </div>
                 
-                {/* Additional Features Section - Updated to hide pricing */}
                 <div className="mb-6">
                   <h2 className="text-2xl font-semibold text-white mb-4">Customize Your Plan</h2>
                   <FeatureSelection 
@@ -724,7 +678,6 @@ const Plan = () => {
                   />
                 </div>
                 
-                {/* Features and Technical Details Tabs */}
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mb-6">
                   <TabsList className="w-full grid grid-cols-2 mb-6 bg-black/20">
                     <TabsTrigger value="features" className="data-[state=active]:bg-siso-orange/20">
@@ -819,163 +772,4 @@ const Plan = () => {
                       <div className="prose prose-invert prose-sm max-w-none">
                         <p>The OnlyFans Management Suite for Decora includes a complete ecosystem for managing creators, content, and fan interactions. The platform provides tools for efficient onboarding, content scheduling, analytics tracking, and secure payment processing.</p>
                         <p>Our comprehensive solution helps agencies like yours streamline operations, improve client retention, and maximize revenue potential through advanced analytics and automation. The application is built with scalability in mind, allowing it to grow alongside your agency from 10 to 100+ creators.</p>
-                        <p>All system components adhere to industry best practices for security and performance, ensuring a reliable platform for your business operations. The white-label options allow you to fully brand the platform as your own, enhancing your professional image with clients.</p>
-                        <p>After approval, we'll work closely with your team to customize the platform to your specific workflow and processes, ensuring a seamless transition and maximum adoption across your organization.</p>
-                      </div>
-                    </div>
-                  </TabsContent>
-                </Tabs>
-                
-                {/* Case Studies Section */}
-                <div className="mb-6">
-                  <h2 className="text-2xl font-semibold text-white mb-4 flex items-center">
-                    <FileText className="h-5 w-5 mr-2 text-siso-orange" />
-                    Case Studies
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {caseStudies.map((study, index) => (
-                      <CaseStudy
-                        key={index}
-                        title={study.title}
-                        description={study.description}
-                        imageUrl={study.imageUrl}
-                        notionUrl={study.notionUrl}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                {/* Testimonials Section - MOVED TO BOTTOM */}
-                <div className="mb-6">
-                  <h2 className="text-2xl font-semibold text-white mb-4 flex items-center">
-                    <Heart className="h-5 w-5 mr-2 text-siso-orange" />
-                    What Other Agencies Are Saying
-                  </h2>
-                  <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {testimonials.map((testimonial, index) => (
-                        <motion.div 
-                          key={index} 
-                          className="p-4 border border-siso-text/10 rounded-lg bg-gradient-to-br from-siso-red/5 to-siso-orange/5"
-                          initial={{ opacity: 0, scale: 0.9 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: 0.15 * index, duration: 0.5 }}
-                        >
-                          <p className="text-siso-text text-sm italic mb-3">{`"${testimonial.content}"`}</p>
-                          <div className="mb-3">
-                            <p className="text-white font-medium">{testimonial.author}</p>
-                            <p className="text-siso-text/70 text-xs">{testimonial.position}</p>
-                          </div>
-                          <div className="flex gap-2">
-                            {testimonial.instagram && (
-                              <a 
-                                href={testimonial.instagram} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="text-xs text-siso-orange flex items-center hover:underline"
-                              >
-                                Instagram <ExternalLink className="h-3 w-3 ml-1" />
-                              </a>
-                            )}
-                            {testimonial.appLink && (
-                              <a 
-                                href={testimonial.appLink} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="text-xs text-siso-orange flex items-center hover:underline"
-                              >
-                                App <ExternalLink className="h-3 w-3 ml-1" />
-                              </a>
-                            )}
-                          </div>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="mb-8">
-                {/* Regular Plan Features */}
-                <div className="mb-6">
-                  <h2 className="text-2xl font-semibold text-white mb-4">Features</h2>
-                  <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
-                    <ul className="space-y-2">
-                      {regularFeatures.map((feature, index) => (
-                        <li key={index} className="flex items-start">
-                          <CheckCircle className="h-4 w-4 mr-2 text-siso-orange shrink-0 mt-0.5" />
-                          <span className="text-siso-text">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-                
-                {/* Branding Customization For Regular Plan */}
-                <div className="mb-6">
-                  <h2 className="text-2xl font-semibold text-white mb-4">Customize Your Branding</h2>
-                  <div className="bg-black/30 rounded-lg p-5 border border-siso-text/5">
-                    <p className="text-siso-text mb-4">
-                      Select the colors that match your brand identity. These colors will be used throughout your app.
-                    </p>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <ColorPicker
-                          title="Primary Color"
-                          colors={brandColorOptions}
-                          selectedColor={primaryColor}
-                          onChange={setPrimaryColor}
-                        />
-                      </div>
-                      
-                      <div>
-                        <ColorPicker
-                          title="Secondary Color"
-                          colors={brandColorOptions}
-                          selectedColor={secondaryColor}
-                          onChange={setSecondaryColor}
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className="mt-6 p-4 rounded-lg" style={{ background: `linear-gradient(135deg, ${primaryColor}10, ${secondaryColor}10)` }}>
-                      <div className="flex gap-3">
-                        <div className="h-12 w-12 rounded-full" style={{ backgroundColor: primaryColor }}></div>
-                        <div className="h-12 w-12 rounded-full" style={{ backgroundColor: secondaryColor }}></div>
-                      </div>
-                      <p className="mt-2 text-sm text-siso-text">Preview of your selected brand colors</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-            
-            {/* Approve Plan Button */}
-            <div className="mt-8 flex justify-end">
-              <Button
-                onClick={handleSubmitPlan}
-                disabled={submitting}
-                className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-white px-6 py-2 rounded-md flex items-center gap-2 disabled:opacity-70"
-              >
-                {submitting ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Processing...</span>
-                  </>
-                ) : (
-                  <>
-                    <span>Approve This Plan</span>
-                    <ArrowRight className="h-4 w-4" />
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-    </div>
-  );
-};
-
-export default Plan;
+                        <p>All system components adhere to industry best practices for security and performance, ensuring a reliable platform for your business operations.
