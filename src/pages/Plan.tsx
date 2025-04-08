@@ -675,4 +675,4 @@ const Plan = () => {
         {
           content: "Before using this platform, we lost 30% of our creators every quarter. Now our retention rate has improved dramatically, and our creators appreciate seeing exactly how we're helping them grow.",
           author: "Sarah Johnson",
-          company: "Elite
+          company: "Elite Creators
