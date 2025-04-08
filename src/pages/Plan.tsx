@@ -172,7 +172,6 @@ const Plan = () => {
   const [selectedPainPoint, setSelectedPainPoint] = useState<PainPointDetailProps | null>(null);
   const [isPainPointModalOpen, setIsPainPointModalOpen] = useState(false);
   
-  // Skip loading animation for 'decora' plan - it will be loaded directly
   const isDecoraPlan = username === 'decora';
   const [forceRender, setForceRender] = useState(false);
   
@@ -181,7 +180,6 @@ const Plan = () => {
       console.log(`Loading plan for username: ${username}, path: ${window.location.pathname}`);
       setLoading(true);
       
-      // Skip loading animation for 'decora' plan
       if (isDecoraPlan) {
         console.log("Detected decora plan - bypassing loading animation");
         
@@ -223,13 +221,11 @@ const Plan = () => {
         
         setTotalCost(safeData.estimated_cost || 0);
         
-        // Important: Immediately set loading to false for decora plan
         setLoading(false);
         console.log("Decora plan data loaded and displayed immediately");
         return;
       }
       
-      // For non-decora plans, we'll show the loading animation
       const loadingAnimationSteps = [
         "Analyzing your business needs...",
         "Customizing platform features...",
@@ -252,10 +248,9 @@ const Plan = () => {
           if (loadingStep === loadingAnimationSteps.length - 1) {
             loadingComplete = true;
           }
-        }, 1200); // Slightly faster animation
+        }, 1200);
       };
       
-      // Start the loading animation
       runLoadingAnimation();
       
       if (!username) {
@@ -306,10 +301,9 @@ const Plan = () => {
         setTimeout(() => {
           console.log("Transitioning to plan view...");
           setLoading(false);
-          setForceRender(prev => !prev); // Toggle to force re-render
-        }, 800); // Shorter delay to ensure UI updates properly
-      }, 2000); // Shorter animation
-      
+          setForceRender(prev => !prev);
+        }, 800);
+      }, 2000);
     } catch (error) {
       console.error('Error fetching plan:', error);
       toast({
@@ -325,7 +319,6 @@ const Plan = () => {
     console.log("Plan component mounted, username:", username, "at path:", window.location.pathname);
     loadPlan();
     
-    // Safety timeout to prevent infinite loading state
     const safetyTimeout = setTimeout(() => {
       if (loading) {
         console.log("Safety timeout triggered - forcing loading state to complete");
@@ -334,7 +327,6 @@ const Plan = () => {
     }, 5000);
     
     return () => clearTimeout(safetyTimeout);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [username]);
   
   const scrollToFeatures = () => {
@@ -388,16 +380,14 @@ const Plan = () => {
   const handleViewPlanNowClick = () => {
     console.log("Plan: Handling View Plan Now button click");
     setLoading(false);
-    setForceRender(prev => !prev); // Force re-render to ensure UI updates
+    setForceRender(prev => !prev);
   };
 
-  // For non-decora plans that get stuck, provide a direct button to bypass loading
   const handleSkipLoading = () => {
     console.log("User manually skipped loading");
     setLoading(false);
   };
 
-  // Immediately render content for decora plan, skip loading UI
   if (loading && !isDecoraPlan) {
     const loadingAnimationSteps = [
       "Analyzing your business needs...",
@@ -513,7 +503,6 @@ const Plan = () => {
             </div>
           )}
           
-          {/* Add a skip button for users if loading takes too long */}
           <div className="mt-6 flex justify-center">
             <Button 
               onClick={handleSkipLoading}
@@ -740,3 +729,14 @@ const Plan = () => {
       caseStudyLink: "https://notion.so/case-study/fan-engagement"
     }
   ] : [];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-black via-siso-bg to-black">
+      <div className="container mx-auto py-8 px-4">
+        <h1 className="text-3xl font-bold text-white">Your Plan</h1>
+      </div>
+    </div>
+  );
+};
+
+export default Plan;
