@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -165,58 +164,74 @@ const Plan = () => {
   ];
   const [loadingStep, setLoadingStep] = useState(0);
   
-  useEffect(() => {
-    const fetchPlan = async () => {
-      try {
-        setLoading(true);
-        
-        const loadingInterval = setInterval(() => {
-          setLoadingStep(prev => (prev + 1) % loadingAnimationSteps.length);
-        }, 1500);
-        
-        if (!username) {
-          throw new Error('Username is required');
-        }
-        
-        const { data, error } = await supabase
-          .from('plans')
-          .select('*')
-          .eq('username', username)
-          .maybeSingle();
-          
-        if (error) {
-          throw error;
-        }
-        
-        setPlan(data);
-        
-        if (data?.branding?.primary_color) {
-          setPrimaryColor(data.branding.primary_color);
-        }
-        
-        if (data?.branding?.secondary_color) {
-          setSecondaryColor(data.branding.secondary_color);
-        }
-        
-        setTotalCost(data?.estimated_cost || 0);
-        
-        setTimeout(() => {
-          clearInterval(loadingInterval);
-          setLoading(false);
-        }, 1200);
-        
-      } catch (error) {
-        console.error('Error fetching plan:', error);
-        toast({
-          title: "Error loading plan",
-          description: "We couldn't load the plan details. Please try again later.",
-          variant: "destructive"
-        });
-        setLoading(false);
+  const loadPlan = async () => {
+    try {
+      setLoading(true);
+      
+      const loadingInterval = setInterval(() => {
+        setLoadingStep(prev => (prev + 1) % loadingAnimationSteps.length);
+      }, 1500);
+      
+      if (!username) {
+        throw new Error('Username is required');
       }
-    };
-    
-    fetchPlan();
+      
+      const { data, error } = await supabase
+        .from('plans')
+        .select('*')
+        .eq('username', username)
+        .maybeSingle();
+        
+      if (error) {
+        throw error;
+      }
+      
+      const safeData: PlanData = {
+        id: data?.id || '',
+        username: data?.username || '',
+        company_name: data?.company_name || null,
+        app_name: data?.app_name || null,
+        features: data?.features || null,
+        branding: {
+          logo: data?.branding?.logo || undefined,
+          primary_color: typeof data?.branding === 'object' ? data?.branding.primary_color : '#ED8936',
+          secondary_color: typeof data?.branding === 'object' ? data?.branding.secondary_color : '#E53E3E'
+        },
+        estimated_cost: data?.estimated_cost || null,
+        estimated_days: data?.estimated_days || null,
+        status: data?.status || null,
+      };
+      
+      setPlan(safeData);
+      
+      if (safeData.branding?.primary_color) {
+        setPrimaryColor(safeData.branding.primary_color);
+      }
+      
+      if (safeData.branding?.secondary_color) {
+        setSecondaryColor(safeData.branding.secondary_color);
+      }
+      
+      setTotalCost(safeData.estimated_cost || 0);
+      
+      setTimeout(() => {
+        clearInterval(loadingInterval);
+        setLoading(false);
+      }, 1200);
+      
+    } catch (error) {
+      console.error('Error fetching plan:', error);
+      toast({
+        title: "Error loading plan",
+        description: "We couldn't load the plan details. Please try again later.",
+        variant: "destructive"
+      });
+      setLoading(false);
+    }
+  };
+  
+  useEffect(() => {
+    loadPlan();
   }, [username, toast, loadingAnimationSteps.length]);
   
   useEffect(() => {
