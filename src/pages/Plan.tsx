@@ -605,7 +605,7 @@ const Plan = () => {
       metrics: [
         { label: "Response Time", value: "75% faster", icon: <MessageSquare className="h-4 w-4 text-siso-orange" /> },
         { label: "Message Organization", value: "100%", icon: <CheckCircle className="h-4 w-4 text-siso-orange" /> },
-        { label: "Client Satisfaction", value: "88%", icon: <Heart className="h-4 w-4 text-siso-orange" /> },
+        { label: "Client Satisfaction", value: "88%\", icon: <Heart className="h-4 w-4 text-siso-orange" /> },
         { label: "Missed Messages", value: "0%", icon: <Users className="h-4 w-4 text-siso-orange" /> }
       ],
       images: [
@@ -625,7 +625,7 @@ const Plan = () => {
         "Optimize fan interactions for maximum satisfaction"
       ],
       metrics: [
-        { label: "Fan Retention Rate", value: "58% higher", icon: <Heart className="h-4 w-4 text-siso-orange" /> },
+        { label: "Fan Retention Rate", value: "58%\", icon: <Heart className="h-4 w-4 text-siso-orange" /> },
         { label: "Message Response Rate", value: "100%", icon: <MessageSquare className="h-4 w-4 text-siso-orange" /> },
         { label: "Fan Satisfaction Score", value: "94%", icon: <CheckCircle className="h-4 w-4 text-siso-orange" /> },
         { label: "Resubscription Rate", value: "72% increase", icon: <TrendingUp className="h-4 w-4 text-siso-orange" /> }
@@ -684,4 +684,4 @@ const Plan = () => {
       caseStudyLink: "https://notion.so/case-study/client-retention",
       videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
       researchSources: [
-        { name: "
+        { name:
