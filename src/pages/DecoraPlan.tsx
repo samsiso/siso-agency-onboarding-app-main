@@ -1,10 +1,8 @@
-
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageLoading } from '@/components/ui/message-loading';
 import { 
-  FileText, 
   Users, 
   MessageSquare, 
   BarChart, 
@@ -13,7 +11,6 @@ import {
   Sparkles, 
   Heart, 
   DollarSign, 
-  Check, 
   Calendar, 
   Clock, 
   ArrowRight,
@@ -25,6 +22,7 @@ import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import '../components/ai-news/animations.css';
 import { WelcomeBackground } from '@/components/plan/BackgroundElements';
+import { ClickThroughPrompt } from '@/components/plan/ClickThroughPrompt';
 
 // Particle background component
 const ParticleBackground = () => {
@@ -148,11 +146,11 @@ const DecoraPlan = () => {
   const navigate = useNavigate();
   const [loadingStep, setLoadingStep] = useState(0);
   const [showWelcome, setShowWelcome] = useState(true);
+  const [showClickThroughPrompt, setShowClickThroughPrompt] = useState(true);
   const [showProblemSolution, setShowProblemSolution] = useState(false);
   const [showFinalScreen, setShowFinalScreen] = useState(false);
   const [agencyName] = useState("Decora");
   const [skipAnimation, setSkipAnimation] = useState(false);
-  const welcomeTextRef = useRef(null);
   
   // Track which solutions are active
   const [activeSolutions, setActiveSolutions] = useState([false, false, false, false]);
@@ -166,38 +164,21 @@ const DecoraPlan = () => {
     { icon: <DollarSign className="h-5 w-5 text-siso-orange" />, text: "Calculating revenue potential...", tooltip: "Identify new income opportunities" }
   ];
   
-  // Typed text animation for welcome screen
-  useEffect(() => {
-    if (showWelcome && welcomeTextRef.current) {
-      const text = `Welcome, ${agencyName} Team!`;
-      let i = 0;
-      const interval = setInterval(() => {
-        if (i <= text.length) {
-          welcomeTextRef.current.innerText = text.substring(0, i);
-          i++;
-        } else {
-          clearInterval(interval);
-        }
-      }, 50);
-      
-      return () => clearInterval(interval);
-    }
-  }, [showWelcome, agencyName]);
+  // Handle the "Let's Get Started" button click
+  const handleGetStarted = () => {
+    setShowClickThroughPrompt(false);
+    startOnboardingSequence();
+  };
   
-  // Set up animation sequence
-  useEffect(() => {
+  // Start the onboarding sequence after click-through
+  const startOnboardingSequence = () => {
     if (skipAnimation) {
       navigate('/plan/decora');
       return;
     }
     
-    // Welcome screen (show for 2 seconds)
-    const welcomeTimer = setTimeout(() => {
-      setShowWelcome(false);
-      setShowProblemSolution(true);
-    }, 2000);
-    
     // Problem solution screen (show for 5 seconds, activate solutions one by one)
+    setShowProblemSolution(true);
     const solutionTimers = [];
     for (let i = 0; i < 4; i++) {
       solutionTimers.push(setTimeout(() => {
@@ -206,7 +187,7 @@ const DecoraPlan = () => {
           newState[i] = true;
           return newState;
         });
-      }, 2500 + i * 1000));
+      }, 500 + i * 1000));
     }
     
     // Analysis steps (1 second per step)
@@ -214,31 +195,31 @@ const DecoraPlan = () => {
     for (let i = 0; i < 5; i++) {
       stepTimers.push(setTimeout(() => {
         setLoadingStep(i + 1);
-      }, 2000 + i * 1200));
+      }, i * 1200));
     }
     
     // Final screen (show for 2 seconds before navigating)
     const finalScreenTimer = setTimeout(() => {
       setShowProblemSolution(false);
       setShowFinalScreen(true);
-    }, 8000);
+    }, 6000);
     
     // Navigate to plan page
     const navigationTimer = setTimeout(() => {
       navigate('/plan/decora');
-    }, 10000);
+    }, 8000);
     
     return () => {
-      clearTimeout(welcomeTimer);
       solutionTimers.forEach(timer => clearTimeout(timer));
       stepTimers.forEach(timer => clearTimeout(timer));
       clearTimeout(finalScreenTimer);
       clearTimeout(navigationTimer);
     };
-  }, [navigate, skipAnimation]);
+  };
   
   const handleSkip = () => {
     setSkipAnimation(true);
+    navigate('/plan/decora');
   };
   
   // Problem solution pairs
@@ -251,7 +232,7 @@ const DecoraPlan = () => {
     { 
       problem: "Content Disorganization", 
       solution: "Save 15+ hours weekly with centralized management",
-      icon: FileText
+      icon: Calendar
     },
     { 
       problem: "Inefficient Onboarding", 
@@ -277,54 +258,15 @@ const DecoraPlan = () => {
         Skip
       </Button>
       
-      {showWelcome && <WelcomeBackground />}
-      {!showWelcome && <ParticleBackground />}
+      <WelcomeBackground />
+      {!showWelcome && !showClickThroughPrompt && <ParticleBackground />}
       
       <AnimatePresence>
-        {showWelcome && (
-          <motion.div 
-            key="welcome"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.5 }}
-            className="text-center mb-6 max-w-xl z-10"
-          >
-            <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="mb-4"
-            >
-              <Sparkles className="h-16 w-16 text-siso-orange mx-auto mb-2" />
-            </motion.div>
-            
-            <div className="bg-black/40 backdrop-blur-sm rounded-lg p-6 border border-siso-orange/20">
-              <h1 ref={welcomeTextRef} className="text-3xl md:text-4xl font-bold text-white mb-3 min-h-[40px]">
-                Welcome!
-              </h1>
-              <motion.p 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.6 }}
-                className="text-siso-text max-w-md mx-auto mt-3 text-lg"
-              >
-                We're building your custom OnlyFans Management Dashboard
-              </motion.p>
-              
-              <motion.div 
-                className="mt-5 flex justify-center"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8 }}
-              >
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-siso-orange/10 border border-siso-orange/20">
-                  <Clock className="h-4 w-4 text-siso-orange" />
-                  <span className="text-sm text-siso-text">Personalized setup in progress</span>
-                </div>
-              </motion.div>
-            </div>
-          </motion.div>
+        {showWelcome && showClickThroughPrompt && (
+          <ClickThroughPrompt 
+            agencyName={agencyName} 
+            onContinue={handleGetStarted} 
+          />
         )}
         
         {showProblemSolution && (
