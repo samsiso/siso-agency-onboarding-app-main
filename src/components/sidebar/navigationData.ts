@@ -1,15 +1,17 @@
 
 import { 
   Home,
-  GraduationCap,
-  Network,
+  Layout,
+  Briefcase,
+  Folder,
+  CreditCard,
   Trophy,
-  BarChart,
+  Users,
   BookOpen,
   Bot,
   Wrench,
-  Users,
-  Newspaper
+  HelpCircle,
+  Settings
 } from 'lucide-react';
 import { MenuSection } from './types';
 
@@ -18,44 +20,39 @@ export const menuSections: MenuSection[] = [
     type: 'main',
     href: '/home',
     icon: Home,
-    label: 'Home',
+    label: 'Dashboard',
   },
   {
     type: 'section',
-    title: 'Resources',
-    icon: BookOpen,
+    title: 'Projects',
+    icon: Briefcase,
     items: [
       {
-        href: '/education',
-        icon: GraduationCap,
-        label: 'Education',
+        href: '/plan-builder',
+        icon: Layout,
+        label: 'Plan Builder',
       },
       {
-        href: '/assistants',
-        icon: Bot,
-        label: 'AI Assistants',
+        href: '/my-projects',
+        icon: Folder,
+        label: 'My Projects',
       },
       {
-        href: '/tools',
-        icon: Wrench,
-        label: 'Tools',
-      },
-      {
-        href: '/networking',
-        icon: Network,
-        label: 'Networking',
+        href: '/portfolio',
+        icon: Users,
+        label: 'Portfolio',
       }
     ]
   },
   {
     type: 'section',
-    title: 'Economy',
-    icon: Users,
+    title: 'Financial',
+    icon: CreditCard,
     items: [
       {
-        href: '/economy/crypto-exchange',
-        icon: Network,
-        label: 'Crypto Exchange',
+        href: '/payments',
+        icon: CreditCard,
+        label: 'Payments',
       },
       {
         href: '/economy/earn',
@@ -64,15 +61,36 @@ export const menuSections: MenuSection[] = [
       },
       {
         href: '/economy/leaderboards',
-        icon: BarChart,
+        icon: Trophy,
         label: 'Leaderboards',
       }
     ]
   },
   {
-    type: 'main',
-    href: '/ai-news',
-    icon: Newspaper,
-    label: 'AI News',
+    type: 'section',
+    title: 'Tools & Support',
+    icon: Wrench,
+    items: [
+      {
+        href: '/assistants',
+        icon: Bot,
+        label: 'AI Assistants',
+      },
+      {
+        href: '/education',
+        icon: BookOpen,
+        label: 'Education',
+      },
+      {
+        href: '/help',
+        icon: HelpCircle,
+        label: 'Help & Support',
+      },
+      {
+        href: '/settings',
+        icon: Settings,
+        label: 'Settings',
+      }
+    ]
   }
 ];

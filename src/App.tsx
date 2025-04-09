@@ -29,8 +29,96 @@ function App() {
         <Route path="/onboarding/congratulations" element={<Congratulations />} />
         <Route path="/plan/:username" element={<Plan />} />
         <Route path="/decora-plan" element={<DecoraPlan />} />
+        
+        {/* Protected Dashboard Routes */}
         <Route 
           path="/home" 
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          } 
+        />
+        
+        {/* Protected Project Routes */}
+        <Route 
+          path="/plan-builder" 
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/my-projects" 
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/portfolio" 
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          } 
+        />
+        
+        {/* Protected Financial Routes */}
+        <Route 
+          path="/payments" 
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/economy/earn" 
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/economy/leaderboards" 
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          } 
+        />
+        
+        {/* Protected Tools & Support Routes */}
+        <Route 
+          path="/assistants" 
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/education" 
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/help" 
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/settings" 
           element={
             <ProtectedRoute>
               <Home />

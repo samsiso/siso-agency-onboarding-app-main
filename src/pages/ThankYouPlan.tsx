@@ -359,37 +359,37 @@ const ThankYouPlan = () => {
           {showVideoSection && (
             <>
               <GradientHeading className="text-3xl mb-4 text-center">
-                Welcome to Decora!
+                Welcome to Our Agency Platform!
               </GradientHeading>
               
               <p className="text-siso-text text-center mb-6">
-                A message from our CEO about your OnlyFans Management platform
+                A message from our CEO about your new Agency Management Platform
               </p>
               
               <div className="aspect-video rounded-lg bg-black/50 mb-6 overflow-hidden flex items-center justify-center">
                 <div className="text-center p-4">
                   <h3 className="text-white font-semibold mb-2">CEO Welcome Video</h3>
                   <p className="text-siso-text text-sm">
-                    The video will be available once your account is confirmed
+                    Welcome to your new platform! We're excited to help you build amazing apps for your clients.
                   </p>
                 </div>
               </div>
               
               <div className="space-y-4">
                 <Button 
-                  onClick={() => navigate('/onboarding-chat')}
+                  onClick={() => navigate('/home')}
                   className="w-full bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90"
                 >
-                  Continue to Onboarding
+                  Go to Dashboard
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
                 
                 <Button 
                   variant="outline"
-                  onClick={() => navigate('/home')}
+                  onClick={() => navigate('/onboarding-chat')}
                   className="w-full border-siso-orange/30 text-siso-orange hover:bg-siso-orange/10"
                 >
-                  Go to Dashboard
+                  Complete Onboarding
                 </Button>
                 
                 <p className="text-xs text-siso-text/60 text-center">
