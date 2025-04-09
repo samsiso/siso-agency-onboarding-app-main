@@ -12,6 +12,8 @@ import Plan from './pages/Plan';
 import DecoraPlan from './pages/DecoraPlan';
 import Congratulations from './pages/onboarding/congratulations';
 import Home from './pages/Home';
+import CryptoExchange from './pages/CryptoExchange';
+import HowToEarn from './pages/HowToEarn';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 
 function App() {
@@ -71,7 +73,7 @@ function App() {
           path="/payments" 
           element={
             <ProtectedRoute>
-              <Home />
+              <CryptoExchange />
             </ProtectedRoute>
           } 
         />
@@ -79,7 +81,7 @@ function App() {
           path="/economy/earn" 
           element={
             <ProtectedRoute>
-              <Home />
+              <HowToEarn />
             </ProtectedRoute>
           } 
         />
@@ -87,28 +89,12 @@ function App() {
           path="/economy/leaderboards" 
           element={
             <ProtectedRoute>
-              <Home />
+              <HowToEarn />
             </ProtectedRoute>
           } 
         />
         
-        {/* Protected Tools & Support Routes */}
-        <Route 
-          path="/assistants" 
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          } 
-        />
-        <Route 
-          path="/education" 
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          } 
-        />
+        {/* Protected Support & Settings Routes */}
         <Route 
           path="/help" 
           element={

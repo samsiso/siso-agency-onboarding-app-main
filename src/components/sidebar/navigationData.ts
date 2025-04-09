@@ -7,9 +7,6 @@ import {
   CreditCard,
   Trophy,
   Users,
-  BookOpen,
-  Bot,
-  Wrench,
   HelpCircle,
   Settings
 } from 'lucide-react';
@@ -68,19 +65,9 @@ export const menuSections: MenuSection[] = [
   },
   {
     type: 'section',
-    title: 'Tools & Support',
-    icon: Wrench,
+    title: 'Support & Settings',
+    icon: Settings,
     items: [
-      {
-        href: '/assistants',
-        icon: Bot,
-        label: 'AI Assistants',
-      },
-      {
-        href: '/education',
-        icon: BookOpen,
-        label: 'Education',
-      },
       {
         href: '/help',
         icon: HelpCircle,
