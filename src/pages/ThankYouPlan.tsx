@@ -1,0 +1,367 @@
+
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { CheckCircle, ArrowRight, Clock, DollarSign, Send } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { GradientHeading } from '@/components/ui/gradient-heading';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useOnboardingAuth } from '@/hooks/useOnboardingAuth';
+import { useGoogleAuth } from '@/hooks/useGoogleAuth';
+
+const ThankYouPlan = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { toast } = useToast();
+  const [whatsappNumber, setWhatsappNumber] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showLoginForm, setShowLoginForm] = useState(false);
+  const [showVideoSection, setShowVideoSection] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const { userId, isLoading } = useOnboardingAuth();
+  const { handleGoogleSignIn, loading: googleLoading } = useGoogleAuth();
+  
+  // Get the plan data from the location state
+  const planData = location.state?.planData || {
+    totalCost: 0,
+    timeline: 30,
+    agencyName: 'Your Agency'
+  };
+  
+  useEffect(() => {
+    // If user is already logged in, show the video section
+    if (userId) {
+      setShowVideoSection(true);
+    }
+  }, [userId]);
+  
+  const handleWhatsappSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!whatsappNumber.trim()) {
+      toast({
+        variant: "destructive",
+        title: "WhatsApp number required",
+        description: "Please enter your WhatsApp number to continue",
+      });
+      return;
+    }
+    
+    try {
+      setIsSubmitting(true);
+      
+      // Store the WhatsApp number in the database
+      const { error } = await supabase
+        .from('onboarding')
+        .insert([
+          { 
+            name: planData.agencyName || 'Unknown',
+            organization: planData.agencyName || 'Unknown',
+            app_idea: 'OnlyFans Management Platform',
+            social_links: { whatsapp: whatsappNumber },
+            status: 'confirmed'
+          }
+        ]);
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Information saved",
+        description: "Your WhatsApp number has been saved",
+      });
+      
+      // Show login form if user is not logged in
+      if (!userId) {
+        setShowLoginForm(true);
+      } else {
+        setShowVideoSection(true);
+      }
+      
+    } catch (error: any) {
+      console.error('Error saving WhatsApp number:', error);
+      toast({
+        variant: "destructive",
+        title: "Error saving information",
+        description: error.message || "There was a problem saving your WhatsApp number",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email.trim() || !password.trim()) {
+      toast({
+        variant: "destructive",
+        title: "All fields required",
+        description: "Please fill in all fields to continue",
+      });
+      return;
+    }
+    
+    try {
+      setIsSubmitting(true);
+      
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Account created",
+        description: "Your account has been created successfully!",
+      });
+      
+      setShowVideoSection(true);
+      
+    } catch (error: any) {
+      console.error('Error signing up:', error);
+      toast({
+        variant: "destructive",
+        title: "Error creating account",
+        description: error.message || "There was a problem creating your account",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email.trim() || !password.trim()) {
+      toast({
+        variant: "destructive",
+        title: "All fields required",
+        description: "Please fill in all fields to continue",
+      });
+      return;
+    }
+    
+    try {
+      setIsSubmitting(true);
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Signed in",
+        description: "You have successfully signed in!",
+      });
+      
+      setShowVideoSection(true);
+      
+    } catch (error: any) {
+      console.error('Error signing in:', error);
+      toast({
+        variant: "destructive",
+        title: "Error signing in",
+        description: error.message || "There was a problem signing in",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-black via-siso-bg to-black p-4">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-md w-full"
+      >
+        <div className="bg-black/40 backdrop-blur-md rounded-lg border border-siso-text/10 shadow-xl p-8">
+          {!showLoginForm && !showVideoSection && (
+            <>
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2, type: "spring" }}
+                className="mx-auto bg-gradient-to-r from-siso-red to-siso-orange w-16 h-16 rounded-full flex items-center justify-center mb-6"
+              >
+                <CheckCircle className="h-8 w-8 text-white" />
+              </motion.div>
+              
+              <GradientHeading className="text-3xl mb-4 text-center">
+                Plan Confirmed!
+              </GradientHeading>
+              
+              <div className="space-y-6 mb-8">
+                <div className="bg-black/30 rounded-lg p-4 border border-siso-text/10">
+                  <h3 className="font-semibold text-white mb-2">MVP Information</h3>
+                  
+                  <div className="flex items-center text-siso-text mb-2">
+                    <DollarSign className="h-4 w-4 text-siso-orange mr-2" />
+                    <span>Estimated Cost: <span className="text-white">FREE</span></span>
+                  </div>
+                  
+                  <div className="flex items-center text-siso-text">
+                    <Clock className="h-4 w-4 text-siso-orange mr-2" />
+                    <span>Build Time: <span className="text-white">{planData.timeline || 30} days</span></span>
+                  </div>
+                </div>
+                
+                <form onSubmit={handleWhatsappSubmit}>
+                  <h3 className="font-medium text-white mb-2">Connect with Us</h3>
+                  <p className="text-sm text-siso-text mb-4">
+                    Enter your WhatsApp number to receive updates about your project
+                  </p>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <Input
+                        type="text"
+                        placeholder="WhatsApp Number (with country code)"
+                        value={whatsappNumber}
+                        onChange={(e) => setWhatsappNumber(e.target.value)}
+                        className="bg-black/20 border-siso-text/20 text-white"
+                      />
+                    </div>
+                    
+                    <Button 
+                      type="submit"
+                      className="w-full bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? (
+                        <>Processing...</>
+                      ) : (
+                        <>
+                          Continue
+                          <ArrowRight className="ml-2 h-4 w-4" />
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              </div>
+            </>
+          )}
+          
+          {showLoginForm && !showVideoSection && (
+            <>
+              <GradientHeading className="text-3xl mb-4 text-center">
+                Create an Account
+              </GradientHeading>
+              
+              <p className="text-siso-text text-center mb-6">
+                Sign up to access your dashboard and project updates
+              </p>
+              
+              <form className="space-y-4 mb-6" onSubmit={handleSignUp}>
+                <div>
+                  <Input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="bg-black/20 border-siso-text/20 text-white"
+                  />
+                </div>
+                
+                <div>
+                  <Input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="bg-black/20 border-siso-text/20 text-white"
+                  />
+                </div>
+                
+                <Button 
+                  type="submit"
+                  className="w-full bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'Creating Account...' : 'Create Account'}
+                </Button>
+              </form>
+              
+              <div className="relative flex items-center justify-center mb-6">
+                <div className="border-t border-siso-text/10 absolute w-full"></div>
+                <span className="bg-black/40 px-2 text-siso-text text-xs relative">OR</span>
+              </div>
+              
+              <Button
+                onClick={handleGoogleSignIn}
+                disabled={googleLoading}
+                className="w-full bg-white text-black hover:bg-gray-100 mb-6"
+              >
+                {googleLoading ? 'Connecting...' : 'Continue with Google'}
+              </Button>
+              
+              <div className="text-center">
+                <p className="text-sm text-siso-text mb-2">Already have an account?</p>
+                <Button
+                  variant="link"
+                  className="text-siso-orange p-0"
+                  onClick={handleSignIn}
+                >
+                  Sign In
+                </Button>
+              </div>
+            </>
+          )}
+          
+          {showVideoSection && (
+            <>
+              <GradientHeading className="text-3xl mb-4 text-center">
+                Welcome to Decora!
+              </GradientHeading>
+              
+              <p className="text-siso-text text-center mb-6">
+                A message from our CEO about your OnlyFans Management platform
+              </p>
+              
+              <div className="aspect-video rounded-lg bg-black/50 mb-6 overflow-hidden flex items-center justify-center">
+                <div className="text-center p-4">
+                  <h3 className="text-white font-semibold mb-2">CEO Welcome Video</h3>
+                  <p className="text-siso-text text-sm">
+                    The video will be available once your account is confirmed
+                  </p>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <Button 
+                  onClick={() => navigate('/onboarding-chat')}
+                  className="w-full bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90"
+                >
+                  Continue to Onboarding
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+                
+                <Button 
+                  variant="outline"
+                  onClick={() => navigate('/profile')}
+                  className="w-full border-siso-orange/30 text-siso-orange hover:bg-siso-orange/10"
+                >
+                  Go to Dashboard
+                </Button>
+                
+                <p className="text-xs text-siso-text/60 text-center">
+                  Have questions? Contact us on WhatsApp for support
+                </p>
+              </div>
+            </>
+          )}
+        </div>
+      </motion.div>
+    </div>
+  );
+};
+
+export default ThankYouPlan;

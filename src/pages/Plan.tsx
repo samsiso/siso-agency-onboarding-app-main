@@ -410,12 +410,21 @@ const Plan = () => {
       
       toast({
         title: "Plan approved!",
-        description: "Your plan has been submitted successfully. Let's get started!",
+        description: "Your plan has been submitted successfully.",
       });
       
       setTimeout(() => {
-        navigate(`/onboarding-chat`);
-      }, 1500);
+        navigate(`/thankyou-plan`, { 
+          replace: true,
+          state: { 
+            planData: {
+              totalCost: totalCost,
+              timeline: plan.estimated_days,
+              agencyName: plan.company_name
+            }
+          }
+        });
+      }, 1000);
       
     } catch (error) {
       console.error('Error updating plan:', error);
