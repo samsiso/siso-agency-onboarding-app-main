@@ -14,6 +14,9 @@ import Congratulations from './pages/onboarding/congratulations';
 import Home from './pages/Home';
 import CryptoExchange from './pages/CryptoExchange';
 import HowToEarn from './pages/HowToEarn';
+import LeaderboardPage from './pages/LeaderboardPage';
+import SettingsPage from './pages/SettingsPage';
+import HelpPage from './pages/HelpPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 
 function App() {
@@ -89,7 +92,7 @@ function App() {
           path="/economy/leaderboards" 
           element={
             <ProtectedRoute>
-              <HowToEarn />
+              <LeaderboardPage />
             </ProtectedRoute>
           } 
         />
@@ -99,7 +102,7 @@ function App() {
           path="/help" 
           element={
             <ProtectedRoute>
-              <Home />
+              <HelpPage />
             </ProtectedRoute>
           } 
         />
@@ -107,7 +110,7 @@ function App() {
           path="/settings" 
           element={
             <ProtectedRoute>
-              <Home />
+              <SettingsPage />
             </ProtectedRoute>
           } 
         />
