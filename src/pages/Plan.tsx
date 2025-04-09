@@ -188,10 +188,8 @@ const Plan = () => {
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [loadingComplete, setLoadingComplete] = useState(false);
   
-  // New scroll progress tracker
   const [scrollProgress, setScrollProgress] = useState(0);
   
-  // Track scroll position
   useEffect(() => {
     const handleScroll = () => {
       const totalHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
@@ -799,7 +797,6 @@ const Plan = () => {
           painPoint={selectedPainPoint}
         />
         
-        {/* Progress bar that shows how far down the page you've scrolled */}
         <div className="fixed top-0 left-0 right-0 h-1.5 z-50 bg-black/30">
           <div 
             className="h-full bg-gradient-to-r from-siso-red to-siso-orange transition-all duration-300"
@@ -809,7 +806,6 @@ const Plan = () => {
         
         <div className="container mx-auto py-8 px-4">
           <div className="flex flex-col space-y-8">
-            {/* Welcome section moved to the top */}
             <div className="mb-6">
               <WelcomeMessage 
                 agencyName="Decora" 
@@ -818,7 +814,6 @@ const Plan = () => {
               />
             </div>
             
-            {/* New heading and description below welcome */}
             <div className="text-center mb-8">
               <GradientHeading className="text-4xl md:text-5xl lg:text-6xl mb-4">
                 Your OnlyFans Management Suite
@@ -1100,8 +1095,8 @@ const Plan = () => {
                 
                 <PlanReviewSummary
                   selectedFeatures={['Client Management', 'Content Management', 'Communication Tools', 'Analytics & Financials']}
-                  timeline={plan.estimated_days || 30}
-                  totalCost={totalCost || plan.estimated_cost || 0}
+                  timeline={plan?.estimated_days || 30}
+                  totalCost={totalCost || plan?.estimated_cost || 0}
                   onApprove={handleSubmitPlan}
                   isSubmitting={submitting}
                 />
