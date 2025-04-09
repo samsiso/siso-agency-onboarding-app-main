@@ -11,8 +11,12 @@ const DecoraPlan = () => {
     navigate('/plan/decora', { replace: true });
   }, [navigate]);
   
-  // Return null as this component will immediately redirect
-  return null;
+  // Return a loading indicator or null, but always return something consistent
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <p className="text-white">Redirecting to your plan...</p>
+    </div>
+  );
 };
 
 export default DecoraPlan;
