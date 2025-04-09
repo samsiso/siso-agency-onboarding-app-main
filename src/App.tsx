@@ -17,103 +17,43 @@ import HowToEarn from './pages/HowToEarn';
 import LeaderboardPage from './pages/LeaderboardPage';
 import SettingsPage from './pages/SettingsPage';
 import HelpPage from './pages/HelpPage';
-import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import { AuthGuard } from './components/auth/AuthGuard';
 
 function App() {
   return (
     <>
       <Toaster />
       <Routes>
+        {/* Public routes */}
         <Route path="/" element={<Index />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/onboarding-chat" element={<OnboardingChat />} />
         <Route path="/thankyou" element={<ThankYou />} />
         <Route path="/thankyou-plan" element={<ThankYouPlan />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/onboarding/social" element={<OnboardingSocial />} />
-        <Route path="/onboarding/congratulations" element={<Congratulations />} />
         <Route path="/plan/:username" element={<Plan />} />
         <Route path="/decora-plan" element={<DecoraPlan />} />
         
+        {/* Protected routes */}
+        <Route path="/profile" element={<AuthGuard><Profile /></AuthGuard>} />
+        <Route path="/onboarding/social" element={<AuthGuard><OnboardingSocial /></AuthGuard>} />
+        <Route path="/onboarding/congratulations" element={<AuthGuard><Congratulations /></AuthGuard>} />
+        
         {/* Protected Dashboard Routes */}
-        <Route 
-          path="/home" 
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          } 
-        />
+        <Route path="/home" element={<AuthGuard><Home /></AuthGuard>} />
         
         {/* Protected Project Routes */}
-        <Route 
-          path="/plan-builder" 
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          } 
-        />
-        <Route 
-          path="/my-projects" 
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          } 
-        />
-        <Route 
-          path="/portfolio" 
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          } 
-        />
+        <Route path="/plan-builder" element={<AuthGuard><Home /></AuthGuard>} />
+        <Route path="/my-projects" element={<AuthGuard><Home /></AuthGuard>} />
+        <Route path="/portfolio" element={<AuthGuard><Home /></AuthGuard>} />
         
         {/* Protected Financial Routes */}
-        <Route 
-          path="/payments" 
-          element={
-            <ProtectedRoute>
-              <CryptoExchange />
-            </ProtectedRoute>
-          } 
-        />
-        <Route 
-          path="/economy/earn" 
-          element={
-            <ProtectedRoute>
-              <HowToEarn />
-            </ProtectedRoute>
-          } 
-        />
-        <Route 
-          path="/economy/leaderboards" 
-          element={
-            <ProtectedRoute>
-              <LeaderboardPage />
-            </ProtectedRoute>
-          } 
-        />
+        <Route path="/payments" element={<AuthGuard><CryptoExchange /></AuthGuard>} />
+        <Route path="/economy/earn" element={<AuthGuard><HowToEarn /></AuthGuard>} />
+        <Route path="/economy/leaderboards" element={<AuthGuard><LeaderboardPage /></AuthGuard>} />
         
         {/* Protected Support & Settings Routes */}
-        <Route 
-          path="/help" 
-          element={
-            <ProtectedRoute>
-              <HelpPage />
-            </ProtectedRoute>
-          } 
-        />
-        <Route 
-          path="/settings" 
-          element={
-            <ProtectedRoute>
-              <SettingsPage />
-            </ProtectedRoute>
-          } 
-        />
+        <Route path="/help" element={<AuthGuard><HelpPage /></AuthGuard>} />
+        <Route path="/settings" element={<AuthGuard><SettingsPage /></AuthGuard>} />
       </Routes>
     </>
   );

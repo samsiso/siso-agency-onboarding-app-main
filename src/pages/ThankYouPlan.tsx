@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -31,6 +32,7 @@ const ThankYouPlan = () => {
   
   useEffect(() => {
     if (userId) {
+      // If user is already logged in, show video section directly
       setShowVideoSection(true);
     }
   }, [userId]);
@@ -50,8 +52,7 @@ const ThankYouPlan = () => {
     try {
       setIsSubmitting(true);
       
-      console.log('Saving WhatsApp number:', whatsappNumber);
-      
+      // Save WhatsApp number to database
       const { error } = await supabase
         .from('onboarding')
         .insert([
@@ -77,8 +78,10 @@ const ThankYouPlan = () => {
       });
       
       if (!userId) {
+        // If user is not logged in, show login/signup form
         setShowLoginForm(true);
       } else {
+        // If user is already logged in, show welcome video section
         setShowVideoSection(true);
       }
       
@@ -134,6 +137,7 @@ const ThankYouPlan = () => {
     
     try {
       if (isSignUp) {
+        // Handle sign up
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
@@ -151,6 +155,7 @@ const ThankYouPlan = () => {
           description: "Your account has been created successfully!",
         });
         
+        // Update onboarding record with user ID if needed
         if (data.user) {
           const { error: updateError } = await supabase
             .from('onboarding')
@@ -164,6 +169,7 @@ const ThankYouPlan = () => {
         
         setShowVideoSection(true);
       } else {
+        // Handle sign in
         const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -176,6 +182,7 @@ const ThankYouPlan = () => {
           description: "You have successfully signed in!",
         });
         
+        // Update onboarding record with user ID if needed
         if (data.user) {
           const { error: updateError } = await supabase
             .from('onboarding')

@@ -295,7 +295,7 @@ const OnboardingChat = () => {
                   </li>
                 </ul>
                 <Button 
-                  onClick={() => navigate('/thankyou')}
+                  onClick={() => navigate('/thankyou-plan')}
                   className="w-full bg-gradient-to-r from-siso-red to-siso-orange text-white"
                 >
                   Get Started
@@ -488,11 +488,11 @@ const OnboardingChat = () => {
       {currentStep === 'complete' && (
         <div className="text-center mt-4 pb-6">
           <Button 
-            onClick={() => navigate('/thankyou')} 
+            onClick={() => navigate('/thankyou-plan')} 
             variant="outline" 
             className="text-siso-text border-siso-text/30 hover:bg-siso-text/10"
           >
-            Skip Onboarding
+            Continue to Next Step
           </Button>
         </div>
       )}
