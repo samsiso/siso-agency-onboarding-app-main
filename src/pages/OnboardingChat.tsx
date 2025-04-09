@@ -1,14 +1,13 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bot, User, Send, ArrowLeft, X, Building, Briefcase } from 'lucide-react';
+import { Bot, User, X, ArrowLeft, Send } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { MessageLoading } from '@/components/ui/message-loading';
 import { useOnboardingAuth } from '@/hooks/useOnboardingAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { ChatInput } from '@/components/chat/ChatInput';
+import { SisoIcon } from '@/components/ui/icons/SisoIcon';
 
 interface Message {
   id: string;
@@ -186,29 +185,29 @@ const OnboardingChat = () => {
             <div className="mt-3 w-full space-y-3">
               <div className="flex items-center space-x-2">
                 <span className="text-siso-text w-24">LinkedIn:</span>
-                <Input 
+                <input 
                   placeholder="Your LinkedIn URL"
                   value={formData.linkedin}
                   onChange={(e) => handleInputChange('linkedin', e.target.value)}
-                  className="bg-black/30 border-siso-text/20 text-white"
+                  className="w-full bg-black/30 border border-siso-text/20 text-white rounded px-3 py-2"
                 />
               </div>
               <div className="flex items-center space-x-2">
                 <span className="text-siso-text w-24">Twitter:</span>
-                <Input 
+                <input 
                   placeholder="Your Twitter URL"
                   value={formData.twitter}
                   onChange={(e) => handleInputChange('twitter', e.target.value)}
-                  className="bg-black/30 border-siso-text/20 text-white"
+                  className="w-full bg-black/30 border border-siso-text/20 text-white rounded px-3 py-2"
                 />
               </div>
               <div className="flex items-center space-x-2">
                 <span className="text-siso-text w-24">Website:</span>
-                <Input 
+                <input 
                   placeholder="Your Website URL"
                   value={formData.website}
                   onChange={(e) => handleInputChange('website', e.target.value)}
-                  className="bg-black/30 border-siso-text/20 text-white"
+                  className="w-full bg-black/30 border border-siso-text/20 text-white rounded px-3 py-2"
                 />
               </div>
               <div className="mt-2 flex justify-end">
@@ -351,7 +350,6 @@ const OnboardingChat = () => {
         >
           <ArrowLeft size={20} />
         </Button>
-        <h1 className="text-xl font-semibold text-white">Get Started</h1>
         <Button
           variant="ghost"
           size="icon"
@@ -363,11 +361,11 @@ const OnboardingChat = () => {
       </header>
       
       {/* Main chat container */}
-      <main className="flex-1 max-w-2xl w-full mx-auto px-4 pt-20 pb-24">
+      <main className="flex-1 max-w-2xl w-full mx-auto px-4 pt-20 pb-6">
         {/* Chat messages */}
-        <div className="flex-1 space-y-6 py-4">
+        <div className="flex-1 space-y-4 py-4">
           <AnimatePresence>
-            {messages.map((message) => (
+            {messages.map((message, index) => (
               <motion.div
                 key={message.id}
                 initial={{ opacity: 0, y: 10 }}
@@ -382,16 +380,21 @@ const OnboardingChat = () => {
                       ? 'bg-gradient-to-r from-siso-red to-siso-orange' 
                       : 'bg-siso-text/30'
                   } ${message.role === 'user' ? 'ml-3' : 'mr-3'}`}>
-                    {message.role === 'assistant' ? <Bot size={20} /> : <User size={20} />}
+                    {message.role === 'assistant' ? <SisoIcon className="w-6 h-6 text-white" /> : <User size={20} />}
                   </div>
                   
-                  <div className={`rounded-2xl p-4 ${
-                    message.role === 'assistant'
-                      ? 'bg-black/40 text-white border border-siso-text/10'
-                      : 'bg-siso-orange/90 text-black'
-                  }`}>
-                    {message.content}
-                    {message.actionComponent}
+                  <div className="flex flex-col">
+                    {message.role === 'assistant' && (
+                      <span className="text-xs text-siso-text-muted ml-2 mb-1">SISO</span>
+                    )}
+                    <div className={`rounded-2xl p-4 ${
+                      message.role === 'assistant'
+                        ? 'bg-black/40 text-white border border-siso-text/10'
+                        : 'bg-siso-orange/90 text-black'
+                    }`}>
+                      {message.content}
+                      {message.actionComponent}
+                    </div>
                   </div>
                 </div>
               </motion.div>
@@ -406,11 +409,14 @@ const OnboardingChat = () => {
               >
                 <div className="flex max-w-[80%] flex-row">
                   <div className="flex items-center justify-center h-10 w-10 rounded-full shrink-0 bg-gradient-to-r from-siso-red to-siso-orange mr-3">
-                    <Bot size={20} />
+                    <SisoIcon className="w-6 h-6 text-white" />
                   </div>
                   
-                  <div className="rounded-2xl p-4 bg-black/40 text-white border border-siso-text/10">
-                    <MessageLoading />
+                  <div className="flex flex-col">
+                    <span className="text-xs text-siso-text-muted ml-2 mb-1">SISO</span>
+                    <div className="rounded-2xl p-4 bg-black/40 text-white border border-siso-text/10">
+                      <MessageLoading />
+                    </div>
                   </div>
                 </div>
               </motion.div>
@@ -424,11 +430,51 @@ const OnboardingChat = () => {
               >
                 <div className="flex max-w-[80%] flex-row">
                   <div className="flex items-center justify-center h-10 w-10 rounded-full shrink-0 bg-gradient-to-r from-siso-red to-siso-orange mr-3">
-                    <Bot size={20} />
+                    <SisoIcon className="w-6 h-6 text-white" />
                   </div>
                   
-                  <div className="rounded-2xl p-4 bg-black/40 text-white border border-siso-text/10">
-                    <MessageLoading />
+                  <div className="flex flex-col">
+                    <span className="text-xs text-siso-text-muted ml-2 mb-1">SISO</span>
+                    <div className="rounded-2xl p-4 bg-black/40 text-white border border-siso-text/10">
+                      <MessageLoading />
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Input field */}
+            {waitingForUserInput && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex justify-end mt-4"
+              >
+                <div className="flex w-full max-w-[90%] flex-row-reverse">
+                  <div className="flex items-center justify-center h-10 w-10 rounded-full shrink-0 bg-siso-text/30 ml-3">
+                    <User size={20} />
+                  </div>
+                  <div className="flex-1 relative">
+                    <input
+                      type="text"
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && input.trim()) {
+                          handleChatSubmit(input);
+                        }
+                      }}
+                      placeholder="Type your message..."
+                      className="w-full rounded-2xl p-4 pr-12 bg-black/30 border border-siso-text/20 text-white placeholder:text-siso-text/50 focus:outline-none focus:ring-1 focus:ring-siso-red/50"
+                      disabled={loading || !waitingForUserInput}
+                    />
+                    <button
+                      onClick={() => handleChatSubmit(input)}
+                      disabled={!input.trim() || loading || !waitingForUserInput}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-siso-text disabled:opacity-50 hover:text-siso-orange transition-colors"
+                    >
+                      <Send className="w-5 h-5" />
+                    </button>
                   </div>
                 </div>
               </motion.div>
@@ -439,34 +485,17 @@ const OnboardingChat = () => {
         </div>
       </main>
       
-      {/* Chat input area */}
-      <div className="p-4 border-t border-siso-text/10 bg-black/30 backdrop-blur-sm fixed bottom-0 left-0 right-0">
-        <div className="max-w-2xl mx-auto">
-          <ChatInput 
-            isLoading={loading || !waitingForUserInput}
-            onSubmit={handleChatSubmit}
-            placeholder={waitingForUserInput ? "Type your response here..." : "Waiting for SISO..."}
-          />
-          
-          {!waitingForUserInput && !loading && currentStep !== 'complete' && (
-            <p className="text-xs text-center mt-2 text-siso-text/70">
-              Please wait for SISO to respond...
-            </p>
-          )}
-          
-          {currentStep === 'complete' && (
-            <div className="text-center mt-4">
-              <Button 
-                onClick={() => navigate('/thankyou')} 
-                variant="outline" 
-                className="text-siso-text border-siso-text/30 hover:bg-siso-text/10"
-              >
-                Skip Onboarding
-              </Button>
-            </div>
-          )}
+      {currentStep === 'complete' && (
+        <div className="text-center mt-4 pb-6">
+          <Button 
+            onClick={() => navigate('/thankyou')} 
+            variant="outline" 
+            className="text-siso-text border-siso-text/30 hover:bg-siso-text/10"
+          >
+            Skip Onboarding
+          </Button>
         </div>
-      </div>
+      )}
     </div>
   );
 };
