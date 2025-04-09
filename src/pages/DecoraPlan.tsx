@@ -14,6 +14,19 @@ const DecoraPlan = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [loadingComplete, setLoadingComplete] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  
+  // Track scroll position
+  useEffect(() => {
+    const handleScroll = () => {
+      const totalHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const progress = (window.scrollY / totalHeight) * 100;
+      setScrollProgress(progress);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
   
   useEffect(() => {
     // Simulating loading progress
@@ -60,6 +73,14 @@ const DecoraPlan = () => {
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-siso-bg to-black flex items-center justify-center p-4">
+      {/* Progress bar that shows how far down the page you've scrolled */}
+      <div className="fixed top-0 left-0 right-0 h-1.5 z-50 bg-black/30">
+        <div 
+          className="h-full bg-gradient-to-r from-siso-red to-siso-orange transition-all duration-300"
+          style={{ width: `${scrollProgress}%` }}
+        />
+      </div>
+      
       {showPrompts ? (
         <motion.div
           initial={{ opacity: 0 }}

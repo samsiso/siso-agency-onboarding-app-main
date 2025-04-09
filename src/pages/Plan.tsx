@@ -188,6 +188,21 @@ const Plan = () => {
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [loadingComplete, setLoadingComplete] = useState(false);
   
+  // New scroll progress tracker
+  const [scrollProgress, setScrollProgress] = useState(0);
+  
+  // Track scroll position
+  useEffect(() => {
+    const handleScroll = () => {
+      const totalHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const progress = (window.scrollY / totalHeight) * 100;
+      setScrollProgress(progress);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+  
   const loadPlan = async () => {
     try {
       console.log(`Loading plan for username: ${username}, path: ${window.location.pathname}`);
@@ -784,123 +799,37 @@ const Plan = () => {
           painPoint={selectedPainPoint}
         />
         
+        {/* Progress bar that shows how far down the page you've scrolled */}
+        <div className="fixed top-0 left-0 right-0 h-1.5 z-50 bg-black/30">
+          <div 
+            className="h-full bg-gradient-to-r from-siso-red to-siso-orange transition-all duration-300"
+            style={{ width: `${scrollProgress}%` }}
+          />
+        </div>
+        
         <div className="container mx-auto py-8 px-4">
           <div className="flex flex-col space-y-8">
-            <div className="bg-black/30 rounded-lg p-4 mb-6 border border-siso-text/10">
-              <div className="flex flex-nowrap overflow-x-auto gap-2">
-                {[
-                  { key: 'welcome', label: 'Welcome' },
-                  { key: 'solutions', label: 'Solutions' },
-                  { key: 'features', label: 'Features' },
-                  { key: 'customize', label: 'Customize' },
-                  { key: 'review', label: 'Review' }
-                ].map((step, index) => (
-                  <div 
-                    key={step.key} 
-                    className={`flex items-center ${index !== 0 ? 'ml-1' : ''}`}
-                  >
-                    {index !== 0 && (
-                      <div className="h-0.5 w-4 bg-siso-text/20 mx-1" />
-                    )}
-                    <Button
-                      variant={currentFlowStep === step.key ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => navigateToSection(step.key as any)}
-                      className={`
-                        whitespace-nowrap
-                        ${currentFlowStep === step.key ? 
-                          'bg-gradient-to-r from-siso-red to-siso-orange border-none' : 
-                          'border-siso-text/20 text-siso-text hover:text-white'
-                        }
-                      `}
-                    >
-                      {step.label}
-                    </Button>
-                  </div>
-                ))}
-              </div>
+            {/* Welcome section moved to the top */}
+            <div className="mb-6">
+              <WelcomeMessage 
+                agencyName="Decora" 
+                industryType="OnlyFans" 
+                scrollToFeatures={() => navigateToSection('solutions')} 
+              />
             </div>
             
-            <div className="flex flex-col lg:flex-row justify-between gap-8">
-              <div className="flex-1">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <GradientHeading className="text-4xl md:text-5xl lg:text-6xl mb-4">
-                    {isDecoraPlanFromUsername ? 'Your OnlyFans Management Suite' : 'Your Custom Plan'}
-                  </GradientHeading>
-                  
-                  <p className="text-siso-text text-lg mb-6">
-                    {isDecoraPlanFromUsername
-                      ? "Elevate your OnlyFans management agency with our comprehensive solution tailored for agencies like yours."
-                      : "We've crafted a custom solution to address your specific business needs."}
-                  </p>
-                </motion.div>
-                
-                <WelcomeMessage 
-                  agencyName="Decora" 
-                  industryType="OnlyFans" 
-                  scrollToFeatures={() => navigateToSection('solutions')} 
-                />
-              </div>
+            {/* New heading and description below welcome */}
+            <div className="text-center mb-8">
+              <GradientHeading className="text-4xl md:text-5xl lg:text-6xl mb-4">
+                Your OnlyFans Management Suite
+              </GradientHeading>
               
-              <div className="lg:w-2/5">
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.2, duration: 0.5 }}
-                  className="bg-black/30 backdrop-blur-sm rounded-lg p-6 border border-siso-text/10"
-                >
-                  <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
-                    <DollarSign className="h-5 w-5 mr-2 text-siso-orange" />
-                    Plan Investment
-                  </h2>
-                  
-                  <div className="mb-6">
-                    <motion.div 
-                      className="text-4xl font-bold text-siso-orange mb-1"
-                      initial={{ scale: 0.9 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: 0.3, type: "spring" }}
-                    >
-                      £{totalCost || plan.estimated_cost || 0}
-                    </motion.div>
-                    <p className="text-siso-text text-sm">Estimated total for development and setup</p>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-siso-text">Development Time:</span>
-                      <span className="text-sm font-medium text-white">{plan.estimated_days || 30} days</span>
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-siso-text">Includes:</span>
-                      <span className="text-sm font-medium text-white">Custom Development</span>
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-siso-text">App Type:</span>
-                      <span className="text-sm font-medium text-white">{plan.app_name || "Web Application"}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-6">
-                    <Button 
-                      onClick={() => navigateToSection('solutions')}
-                      className="w-full bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90"
-                    >
-                      Explore Solutions
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </div>
-                </motion.div>
-              </div>
+              <p className="text-siso-text text-lg max-w-3xl mx-auto">
+                Elevate your OnlyFans management agency with our comprehensive solution tailored for agencies like yours.
+              </p>
             </div>
             
-            <div ref={solutionsRef} className="pt-12 mt-8 border-t border-siso-text/10">
+            <div ref={solutionsRef} className="pt-6">
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
