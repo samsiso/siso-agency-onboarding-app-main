@@ -732,9 +732,299 @@ const Plan = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-siso-bg to-black">
-      <div className="container mx-auto py-8 px-4">
-        <h1 className="text-3xl font-bold text-white">Your Plan</h1>
-      </div>
+      {!plan ? (
+        <div className="text-center max-w-md mx-auto">
+          <Card className="bg-black/40 backdrop-blur-md border-siso-text/10 shadow-xl">
+            <CardContent className="p-6">
+              <h1 className="text-2xl font-bold text-white mb-4">Plan Not Found</h1>
+              <p className="text-siso-text mb-6">
+                We couldn't find a plan with this username. Please check the URL and try again.
+              </p>
+              <Button 
+                onClick={() => navigate('/')}
+                className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90"
+              >
+                Return Home
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      ) : (
+        <>
+          <PainPointsModal 
+            isOpen={isPainPointModalOpen} 
+            onClose={() => setIsPainPointModalOpen(false)}
+            painPoint={selectedPainPoint}
+          />
+          
+          <div className="container mx-auto py-8 px-4">
+            <div className="flex flex-col space-y-8">
+              <div className="flex flex-col lg:flex-row justify-between gap-8">
+                <div className="flex-1">
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <GradientHeading className="text-4xl md:text-5xl lg:text-6xl mb-4">
+                      {isDecoraPlanFromUsername ? 'Your OnlyFans Management Suite' : 'Your Custom Plan'}
+                    </GradientHeading>
+                    
+                    <p className="text-siso-text text-lg mb-6">
+                      {isDecoraPlanFromUsername
+                        ? "Elevate your OnlyFans management agency with our comprehensive solution tailored for agencies like yours."
+                        : "We've crafted a custom solution to address your specific business needs."}
+                    </p>
+                  </motion.div>
+                  
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3, duration: 0.5 }}
+                    className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8"
+                  >
+                    <InteractiveCallout
+                      title="Agency Type"
+                      value={isDecoraPlanFromUsername ? "OnlyFans Management" : plan.company_name || "Custom"}
+                      type="niche"
+                      description="We've tailored your solution specifically for the unique challenges of OnlyFans management agencies."
+                    />
+                    
+                    <InteractiveCallout
+                      title="Estimated Timeline"
+                      value={`${plan.estimated_days || 30} days`}
+                      type="company"
+                      description="This is our estimated development timeline to get your platform up and running."
+                    />
+                  </motion.div>
+                  
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.5, duration: 0.5 }}
+                  >
+                    <Button
+                      onClick={scrollToFeatures}
+                      className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90"
+                    >
+                      Explore Features
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </motion.div>
+                </div>
+                
+                <div className="lg:w-2/5">
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.2, duration: 0.5 }}
+                    className="bg-black/30 backdrop-blur-sm rounded-lg p-6 border border-siso-text/10"
+                  >
+                    <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
+                      <DollarSign className="h-5 w-5 mr-2 text-siso-orange" />
+                      Plan Investment
+                    </h2>
+                    
+                    <div className="mb-6">
+                      <motion.div 
+                        className="text-4xl font-bold text-siso-orange mb-1"
+                        initial={{ scale: 0.9 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 0.3, type: "spring" }}
+                      >
+                        £{totalCost || plan.estimated_cost || 0}
+                      </motion.div>
+                      <p className="text-siso-text text-sm">Estimated total for development and setup</p>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-siso-text">Development Time:</span>
+                        <span className="text-sm font-medium text-white">{plan.estimated_days || 30} days</span>
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-siso-text">Includes:</span>
+                        <span className="text-sm font-medium text-white">Custom Development</span>
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-siso-text">App Type:</span>
+                        <span className="text-sm font-medium text-white">{plan.app_name || "Web Application"}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-6">
+                      <Button 
+                        onClick={handleSubmitPlan}
+                        disabled={submitting}
+                        className="w-full bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90"
+                      >
+                        {submitting ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Processing...
+                          </>
+                        ) : (
+                          'Approve This Plan'
+                        )}
+                      </Button>
+                    </div>
+                  </motion.div>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                <Card className="bg-black/20 border-siso-text/10">
+                  <CardContent className="p-4">
+                    <ColorPicker
+                      title="Primary Brand Color"
+                      colors={brandColorOptions}
+                      selectedColor={primaryColor}
+                      onChange={setPrimaryColor}
+                    />
+                  </CardContent>
+                </Card>
+                
+                <Card className="bg-black/20 border-siso-text/10">
+                  <CardContent className="p-4">
+                    <ColorPicker
+                      title="Secondary Brand Color"
+                      colors={brandColorOptions}
+                      selectedColor={secondaryColor}
+                      onChange={setSecondaryColor}
+                    />
+                  </CardContent>
+                </Card>
+              </div>
+              
+              {isDecoraPlanFromUsername && (
+                <motion.div 
+                  ref={featuresRef}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3, duration: 0.5 }}
+                  className="mt-12"
+                >
+                  <GradientHeading className="text-3xl mb-6">
+                    Key Features
+                  </GradientHeading>
+                  
+                  <Tabs defaultValue="features" className="w-full">
+                    <TabsList className="bg-black/30 border border-siso-text/10">
+                      <TabsTrigger value="features" onClick={() => setActiveTab('features')}>Feature Categories</TabsTrigger>
+                      <TabsTrigger value="pain-points" onClick={() => setActiveTab('pain-points')}>Solutions</TabsTrigger>
+                      <TabsTrigger value="customize" onClick={() => setActiveTab('customize')}>Customize</TabsTrigger>
+                      <TabsTrigger value="case-studies" onClick={() => setActiveTab('case-studies')}>Case Studies</TabsTrigger>
+                    </TabsList>
+                    
+                    <TabsContent value="features" className="border-0 p-0 mt-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {featureCategories.map((category, index) => (
+                          <motion.div
+                            key={category.name}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.1, duration: 0.4 }}
+                          >
+                            <Card className="h-full bg-black/20 border-siso-text/10 hover:border-siso-orange/30 transition-all">
+                              <CardContent className="p-5">
+                                <div className="flex items-center mb-3">
+                                  <div className="p-2 rounded-full bg-siso-orange/10 mr-3">
+                                    {category.icon}
+                                  </div>
+                                  <h3 className="font-semibold text-white">{category.name}</h3>
+                                </div>
+                                <p className="text-sm text-siso-text mb-4">{category.description}</p>
+                                <div className="space-y-2">
+                                  {category.features.map((feature, i) => (
+                                    <div key={i} className="flex items-start">
+                                      <CheckCircle className="h-4 w-4 text-siso-orange shrink-0 mt-0.5 mr-2" />
+                                      <span className="text-sm text-siso-text">{feature}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </CardContent>
+                            </Card>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </TabsContent>
+                    
+                    <TabsContent value="pain-points" className="border-0 p-0 mt-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {painPoints.map((painPoint, index) => (
+                          <motion.div
+                            key={painPoint.problem}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.1, duration: 0.4 }}
+                          >
+                            <Card 
+                              className="h-full bg-black/20 border-siso-text/10 hover:border-siso-orange/30 transition-all cursor-pointer"
+                              onClick={() => {
+                                setSelectedPainPoint({
+                                  title: painPoint.problem,
+                                  description: painPoint.detailedSolution,
+                                  benefits: painPoint.benefits,
+                                  metrics: painPoint.metrics,
+                                  images: painPoint.images
+                                });
+                                setIsPainPointModalOpen(true);
+                              }}
+                            >
+                              <CardContent className="p-5">
+                                <div className="bg-siso-orange/10 text-siso-orange text-xs font-medium px-2.5 py-0.5 rounded mb-3 inline-block">
+                                  {painPoint.statistic}
+                                </div>
+                                <h3 className="font-semibold text-white mb-2">{painPoint.problem}</h3>
+                                <p className="text-sm text-siso-text mb-4">{painPoint.solution}</p>
+                                
+                                <div className="flex justify-between items-center mt-auto">
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    className="border-siso-orange/30 bg-black/50 text-siso-orange transition-all hover:bg-siso-orange/10"
+                                  >
+                                    Learn More
+                                    <ArrowRight className="ml-1 h-3 w-3" />
+                                  </Button>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </TabsContent>
+                    
+                    <TabsContent value="customize" className="border-0 p-0 mt-6">
+                      <FeatureSelection 
+                        features={selectedFeatures} 
+                        onChange={setSelectedFeatures}
+                        showPricing={true}
+                      />
+                    </TabsContent>
+                    
+                    <TabsContent value="case-studies" className="border-0 p-0 mt-6">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {caseStudies.map((caseStudy, index) => (
+                          <CaseStudy 
+                            key={index} 
+                            title={caseStudy.title} 
+                            description={caseStudy.description} 
+                            imageUrl={caseStudy.imageUrl} 
+                            notionUrl={caseStudy.notionUrl} 
+                          />
+                        ))}
+                      </div>
+                    </TabsContent>
+                  </Tabs>
+                </motion.div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
