@@ -17,6 +17,7 @@ import HowToEarn from './pages/HowToEarn';
 import LeaderboardPage from './pages/LeaderboardPage';
 import SettingsPage from './pages/SettingsPage';
 import HelpPage from './pages/HelpPage';
+import Economy from './pages/Economy';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 
 function App() {
@@ -77,6 +78,14 @@ function App() {
           element={
             <ProtectedRoute>
               <CryptoExchange />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/economy" 
+          element={
+            <ProtectedRoute>
+              <Economy />
             </ProtectedRoute>
           } 
         />

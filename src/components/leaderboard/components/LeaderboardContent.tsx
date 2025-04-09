@@ -1,45 +1,55 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LeaderboardFilters } from '../LeaderboardFilters';
-import { LeaderboardTable } from '../LeaderboardTable';
-import type { LeaderboardEntry } from '../types';
+import { LeaderboardStats } from "../LeaderboardStats";
+import { LeaderboardFilters } from "../LeaderboardFilters";
+import { LeaderboardTable } from "../LeaderboardTable";
+import { EarnMoreCard } from "./EarnMoreCard";
+import type { LeaderboardEntry } from "../types";
 
 interface LeaderboardContentProps {
+  leaderboardData: LeaderboardEntry[];
   filteredData: LeaderboardEntry[];
-  onUserClick: (user: LeaderboardEntry) => void;
-  onSearchChange: (search: string) => void;
-  onPeriodChange: (period: string) => void;
-  onCategoryChange: (category: string) => void;
+  setFilteredData: (data: LeaderboardEntry[]) => void;
+  totalUsers: number;
+  totalPoints: number;
+  totalTokens: number;
+  trends: {
+    users: number;
+    points: number;
+    tokens: number;
+  };
 }
 
-export const LeaderboardContent = ({
+export function LeaderboardContent({
+  leaderboardData,
   filteredData,
-  onUserClick,
-  onSearchChange,
-  onPeriodChange,
-  onCategoryChange,
-}: LeaderboardContentProps) => {
+  setFilteredData,
+  totalUsers,
+  totalPoints,
+  totalTokens,
+  trends
+}: LeaderboardContentProps) {
   return (
-    <Card className="border-siso-border">
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <span className="text-siso-text-bold">Leaderboard Rankings</span>
-          <span className="text-sm font-normal text-siso-text-muted">
-            Top {Math.min(filteredData.length, 100)} Users
-          </span>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <LeaderboardFilters
-          onSearchChange={onSearchChange}
-          onPeriodChange={onPeriodChange}
-          onCategoryChange={onCategoryChange}
-        />
-        <LeaderboardTable 
-          leaderboardData={filteredData} 
-          onUserClick={onUserClick}
-        />
-      </CardContent>
-    </Card>
+    <div className="w-full">
+      <LeaderboardStats
+        totalUsers={totalUsers}
+        totalPoints={totalPoints}
+        totalTokens={totalTokens}
+        trends={trends}
+      />
+      
+      <div className="grid md:grid-cols-3 gap-6">
+        <div className="md:col-span-2">
+          <LeaderboardFilters 
+            onFilterChange={setFilteredData} 
+            leaderboardData={leaderboardData} 
+          />
+          <LeaderboardTable data={filteredData} />
+        </div>
+        
+        <div className="mt-0 md:mt-[52px]">
+          <EarnMoreCard />
+        </div>
+      </div>
+    </div>
   );
-};
+}

@@ -74,9 +74,9 @@ export const menuSections: MenuSection[] = [
         label: 'Help & Support',
       },
       {
-        href: '/profile',
+        href: '/settings',
         icon: Settings,
-        label: 'Profile',
+        label: 'Settings',
       }
     ]
   }
