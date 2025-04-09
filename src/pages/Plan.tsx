@@ -752,8 +752,8 @@ const Plan = () => {
       ) : (
         <>
           <PainPointsModal 
-            isOpen={isPainPointModalOpen} 
-            onClose={() => setIsPainPointModalOpen(false)}
+            open={isPainPointModalOpen} 
+            onOpenChange={setIsPainPointModalOpen}
             painPoint={selectedPainPoint}
           />
           
@@ -964,11 +964,14 @@ const Plan = () => {
                               className="h-full bg-black/20 border-siso-text/10 hover:border-siso-orange/30 transition-all cursor-pointer"
                               onClick={() => {
                                 setSelectedPainPoint({
-                                  title: painPoint.problem,
-                                  description: painPoint.detailedSolution,
+                                  problem: painPoint.problem,
+                                  statistic: painPoint.statistic,
+                                  solution: painPoint.solution,
+                                  detailedSolution: painPoint.detailedSolution,
                                   benefits: painPoint.benefits,
                                   metrics: painPoint.metrics,
-                                  images: painPoint.images
+                                  images: painPoint.images,
+                                  caseStudyLink: painPoint.caseStudyLink
                                 });
                                 setIsPainPointModalOpen(true);
                               }}
