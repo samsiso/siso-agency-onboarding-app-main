@@ -37,6 +37,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { InteractiveCallout } from '@/components/plan/InteractiveCallout';
 import { PainPointsModal, PainPointDetailProps } from '@/components/plan/PainPointsModal';
 import { Progress } from '@/components/ui/progress';
+import { SolutionsShowcase } from '@/components/plan/SolutionsShowcase';
+import { PlanReviewSummary } from '@/components/plan/PlanReviewSummary';
 
 interface PlanData {
   id: string;
@@ -181,6 +183,10 @@ const Plan = () => {
   
   const isDecoraPlan = username === 'decora';
   const [forceRender, setForceRender] = useState(false);
+  
+  const [loadingStep, setLoadingStep] = useState(0);
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [loadingComplete, setLoadingComplete] = useState(false);
   
   const loadPlan = async () => {
     try {
