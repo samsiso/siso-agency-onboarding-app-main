@@ -9,8 +9,6 @@ import { GradientHeading } from '@/components/ui/gradient-heading';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useOnboardingAuth } from '@/hooks/useOnboardingAuth';
-import { useGoogleAuth } from '@/hooks/useGoogleAuth';
-import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 
 const ThankYouPlan = () => {
   const navigate = useNavigate();
@@ -22,8 +20,9 @@ const ThankYouPlan = () => {
   const [showVideoSection, setShowVideoSection] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isSignUp, setIsSignUp] = useState(true); // Default to sign up form
   const { userId, isLoading } = useOnboardingAuth();
-  const { handleGoogleSignIn, loading: googleLoading } = useGoogleAuth();
   
   // Get the plan data from the location state
   const planData = location.state?.planData || {
@@ -65,7 +64,9 @@ const ThankYouPlan = () => {
             organization: planData.agencyName || 'Unknown',
             app_idea: 'OnlyFans Management Platform',
             social_links: { whatsapp: whatsappNumber },
-            status: 'confirmed'
+            whatsapp_number: whatsappNumber,
+            status: 'confirmed',
+            user_id: userId // Associate with user if logged in
           }
         ]);
       
@@ -98,86 +99,122 @@ const ThankYouPlan = () => {
     }
   };
   
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!email.trim() || !password.trim()) {
+  const validatePassword = () => {
+    if (password.length < 6) {
       toast({
         variant: "destructive",
-        title: "All fields required",
-        description: "Please fill in all fields to continue",
+        title: "Password too short",
+        description: "Password must be at least 6 characters long",
+      });
+      return false;
+    }
+    
+    if (isSignUp && password !== confirmPassword) {
+      toast({
+        variant: "destructive",
+        title: "Passwords don't match",
+        description: "Please ensure your passwords match",
+      });
+      return false;
+    }
+    
+    return true;
+  };
+  
+  const handleAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Email required",
+        description: "Please enter your email address",
       });
       return;
     }
     
+    if (!validatePassword()) return;
+    
+    setIsSubmitting(true);
+    
     try {
-      setIsSubmitting(true);
-      
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-      
-      if (error) throw error;
-      
-      toast({
-        title: "Account created",
-        description: "Your account has been created successfully!",
-      });
-      
-      setShowVideoSection(true);
-      
+      if (isSignUp) {
+        // Sign up process
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              full_name: planData.agencyName || 'Decora User'
+            }
+          }
+        });
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Account created",
+          description: "Your account has been created successfully!",
+        });
+        
+        // Update onboarding entry with user ID
+        if (data.user) {
+          const { error: updateError } = await supabase
+            .from('onboarding')
+            .update({ user_id: data.user.id })
+            .eq('whatsapp_number', whatsappNumber);
+            
+          if (updateError) {
+            console.error('Error updating onboarding entry:', updateError);
+          }
+        }
+        
+        setShowVideoSection(true);
+      } else {
+        // Sign in process
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Signed in",
+          description: "You have successfully signed in!",
+        });
+        
+        // Update onboarding entry with user ID if it exists
+        if (data.user) {
+          const { error: updateError } = await supabase
+            .from('onboarding')
+            .update({ user_id: data.user.id })
+            .eq('whatsapp_number', whatsappNumber)
+            .is('user_id', null);
+            
+          if (updateError) {
+            console.error('Error updating onboarding entry:', updateError);
+          }
+        }
+        
+        setShowVideoSection(true);
+      }
     } catch (error: any) {
-      console.error('Error signing up:', error);
+      console.error('Auth error:', error);
       toast({
         variant: "destructive",
-        title: "Error creating account",
-        description: error.message || "There was a problem creating your account",
+        title: `Error ${isSignUp ? 'creating account' : 'signing in'}`,
+        description: error.message || "There was a problem with authentication",
       });
     } finally {
       setIsSubmitting(false);
     }
   };
   
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!email.trim() || !password.trim()) {
-      toast({
-        variant: "destructive",
-        title: "All fields required",
-        description: "Please fill in all fields to continue",
-      });
-      return;
-    }
-    
-    try {
-      setIsSubmitting(true);
-      
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      
-      if (error) throw error;
-      
-      toast({
-        title: "Signed in",
-        description: "You have successfully signed in!",
-      });
-      
-      setShowVideoSection(true);
-      
-    } catch (error: any) {
-      console.error('Error signing in:', error);
-      toast({
-        variant: "destructive",
-        title: "Error signing in",
-        description: error.message || "There was a problem signing in",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+  const toggleAuthMode = () => {
+    setIsSignUp(!isSignUp);
+    setPassword('');
+    setConfirmPassword('');
   };
   
   return (
@@ -259,14 +296,16 @@ const ThankYouPlan = () => {
           {showLoginForm && !showVideoSection && (
             <>
               <GradientHeading className="text-3xl mb-4 text-center">
-                Create an Account
+                {isSignUp ? 'Create an Account' : 'Sign In'}
               </GradientHeading>
               
               <p className="text-siso-text text-center mb-6">
-                Sign up to access your dashboard and project updates
+                {isSignUp 
+                  ? 'Sign up to access your dashboard and project updates' 
+                  : 'Sign in to access your dashboard and project updates'}
               </p>
               
-              <form className="space-y-4 mb-6" onSubmit={handleSignUp}>
+              <form className="space-y-4 mb-6" onSubmit={handleAuth}>
                 <div>
                   <Input
                     type="email"
@@ -287,34 +326,40 @@ const ThankYouPlan = () => {
                   />
                 </div>
                 
+                {isSignUp && (
+                  <div>
+                    <Input
+                      type="password"
+                      placeholder="Confirm Password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="bg-black/20 border-siso-text/20 text-white"
+                    />
+                  </div>
+                )}
+                
                 <Button 
                   type="submit"
                   className="w-full bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? 'Creating Account...' : 'Create Account'}
+                  {isSubmitting 
+                    ? (isSignUp ? 'Creating Account...' : 'Signing In...') 
+                    : (isSignUp ? 'Create Account' : 'Sign In')}
                 </Button>
               </form>
               
-              <div className="relative flex items-center justify-center mb-6">
-                <div className="border-t border-siso-text/10 absolute w-full"></div>
-                <span className="bg-black/40 px-2 text-siso-text text-xs relative">OR</span>
-              </div>
-              
-              <GoogleSignInButton
-                onClick={handleGoogleSignIn}
-                disabled={googleLoading}
-              />
-              
               <div className="text-center mt-6">
-                <p className="text-sm text-siso-text mb-2">Already have an account?</p>
+                <p className="text-sm text-siso-text mb-2">
+                  {isSignUp ? 'Already have an account?' : "Don't have an account?"}
+                </p>
                 <Button
                   variant="link"
                   className="text-siso-orange p-0"
-                  onClick={handleSignIn}
+                  onClick={toggleAuthMode}
                   type="button"
                 >
-                  Sign In
+                  {isSignUp ? 'Sign In' : 'Create Account'}
                 </Button>
               </div>
             </>

@@ -9,6 +9,42 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      onboarding: {
+        Row: {
+          app_idea: string | null
+          created_at: string
+          id: string
+          name: string | null
+          organization: string | null
+          social_links: Json | null
+          status: string | null
+          user_id: string | null
+          whatsapp_number: string | null
+        }
+        Insert: {
+          app_idea?: string | null
+          created_at?: string
+          id?: string
+          name?: string | null
+          organization?: string | null
+          social_links?: Json | null
+          status?: string | null
+          user_id?: string | null
+          whatsapp_number?: string | null
+        }
+        Update: {
+          app_idea?: string | null
+          created_at?: string
+          id?: string
+          name?: string | null
+          organization?: string | null
+          social_links?: Json | null
+          status?: string | null
+          user_id?: string | null
+          whatsapp_number?: string | null
+        }
+        Relationships: []
+      }
       plans: {
         Row: {
           app_name: string | null
@@ -45,6 +81,36 @@ export type Database = {
           id?: string
           status?: string | null
           username?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          business_name: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          onboarding_completed: boolean | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          business_name?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          onboarding_completed?: boolean | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          business_name?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          onboarding_completed?: boolean | null
+          updated_at?: string
         }
         Relationships: []
       }
