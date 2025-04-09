@@ -1,43 +1,148 @@
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuthSession } from '@/hooks/useAuthSession';
-import { useGoogleAuth } from '@/hooks/useGoogleAuth';
 import { useToast } from '@/hooks/use-toast';
 import { Waves } from '@/components/ui/waves-background';
 import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+const authSchema = z.object({
+  email: z.string().email({ message: "Please enter a valid email address" }),
+  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+});
+
+type AuthFormValues = z.infer<typeof authSchema>;
 
 export default function Auth() {
-  const { user } = useAuthSession();
-  const { handleGoogleSignIn, loading } = useGoogleAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  useEffect(() => {
-    // Only redirect to profile if user exists and we're not in the middle of onboarding
-    const currentPath = window.location.pathname;
-    if (user && !currentPath.includes('onboarding')) {
-      navigate('/profile');
-    }
-  }, [user, navigate]);
+  const form = useForm<AuthFormValues>({
+    resolver: zodResolver(authSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
 
-  const handleSignIn = async () => {
+  useEffect(() => {
+    // Check if user is already logged in
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        navigate('/home', { replace: true });
+      }
+    };
+    
+    checkSession();
+  }, [navigate]);
+
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true);
     try {
-      console.log('Starting Google sign in...');
-      await handleGoogleSignIn();
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin + '/api/auth/callback',
+        },
+      });
       
-      // Toast will be shown after successful redirect
+      if (error) throw error;
+      
       toast({
-        title: "Signing in...",
-        description: "Redirecting you to complete your profile...",
+        title: "Signing in with Google...",
+        description: "You'll be redirected shortly",
       });
     } catch (error: any) {
-      console.error('Sign in error:', error);
+      console.error('Google sign in error:', error);
       toast({
         variant: "destructive",
         title: "Error signing in",
         description: error.message || "Please try again",
       });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleEmailAuth = async (values: AuthFormValues) => {
+    setIsLoading(true);
+    try {
+      if (isSignUp) {
+        // Handle sign up
+        const { data, error } = await supabase.auth.signUp({
+          email: values.email,
+          password: values.password,
+          options: {
+            data: {
+              full_name: values.email.split('@')[0], // Default name from email
+            },
+          },
+        });
+        
+        if (error) throw error;
+        
+        if (data.user && !data.user.confirmed_at) {
+          toast({
+            title: "Check your email",
+            description: "We've sent you a confirmation link to verify your email address",
+          });
+        } else {
+          toast({
+            title: "Account created",
+            description: "Welcome to SISO Agency Platform",
+          });
+          navigate('/home');
+        }
+      } else {
+        // Handle sign in
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: values.email,
+          password: values.password,
+        });
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Welcome back!",
+          description: "Successfully signed in",
+        });
+        
+        navigate('/home');
+      }
+    } catch (error: any) {
+      console.error('Auth error:', error);
+      
+      // Handle specific error messages
+      if (error.message.includes('Email not confirmed')) {
+        toast({
+          variant: "destructive",
+          title: "Email not verified",
+          description: "Please check your email and click the verification link",
+        });
+      } else if (error.message.includes('Invalid login')) {
+        toast({
+          variant: "destructive",
+          title: "Invalid credentials",
+          description: "Please check your email and password",
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Authentication error",
+          description: error.message || "Please try again",
+        });
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -72,17 +177,82 @@ export default function Auth() {
             <h1 className="text-2xl font-bold bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent">
               Welcome to SISO Agency
             </h1>
-            <p className="text-siso-text">Sign in with your Google account to get started</p>
+            <p className="text-siso-text">{isSignUp ? 'Create your account' : 'Sign in to your account'}</p>
+          </div>
+
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleEmailAuth)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-siso-text">Email</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="youremail@example.com" 
+                        {...field} 
+                        className="bg-black/20 border-siso-text/20 text-white"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-siso-text">Password</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="password" 
+                        placeholder="••••••••" 
+                        {...field} 
+                        className="bg-black/20 border-siso-text/20 text-white"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <Button 
+                type="submit"
+                className="w-full bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Processing...' : isSignUp ? 'Create Account' : 'Sign In'}
+              </Button>
+            </form>
+          </Form>
+
+          <div className="flex items-center gap-2 my-6">
+            <div className="h-px flex-1 bg-siso-text/20"></div>
+            <span className="text-sm text-siso-text/60">OR</span>
+            <div className="h-px flex-1 bg-siso-text/20"></div>
           </div>
 
           <div className="flex justify-center">
             <GoogleSignInButton
-              onClick={handleSignIn}
-              disabled={loading}
+              onClick={handleGoogleSignIn}
+              disabled={isLoading}
             />
           </div>
 
-          <div className="text-center text-sm text-siso-text/70">
+          <div className="text-center">
+            <Button 
+              variant="ghost" 
+              className="text-siso-text hover:text-siso-orange"
+              onClick={() => setIsSignUp(!isSignUp)}
+            >
+              {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
+            </Button>
+          </div>
+
+          <div className="text-center text-sm text-siso-text/70 mt-6">
             By signing in, you agree to our{" "}
             <a href="/terms" className="text-siso-red hover:text-siso-orange transition-colors">
               Terms of Service
