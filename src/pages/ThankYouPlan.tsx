@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useOnboardingAuth } from '@/hooks/useOnboardingAuth';
 import { useGoogleAuth } from '@/hooks/useGoogleAuth';
+import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 
 const ThankYouPlan = () => {
   const navigate = useNavigate();
@@ -53,6 +54,8 @@ const ThankYouPlan = () => {
     try {
       setIsSubmitting(true);
       
+      console.log('Saving WhatsApp number:', whatsappNumber);
+      
       // Store the WhatsApp number in the database
       const { error } = await supabase
         .from('onboarding')
@@ -66,7 +69,10 @@ const ThankYouPlan = () => {
           }
         ]);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Database error:', error);
+        throw error;
+      }
       
       toast({
         title: "Information saved",
@@ -295,20 +301,18 @@ const ThankYouPlan = () => {
                 <span className="bg-black/40 px-2 text-siso-text text-xs relative">OR</span>
               </div>
               
-              <Button
+              <GoogleSignInButton
                 onClick={handleGoogleSignIn}
                 disabled={googleLoading}
-                className="w-full bg-white text-black hover:bg-gray-100 mb-6"
-              >
-                {googleLoading ? 'Connecting...' : 'Continue with Google'}
-              </Button>
+              />
               
-              <div className="text-center">
+              <div className="text-center mt-6">
                 <p className="text-sm text-siso-text mb-2">Already have an account?</p>
                 <Button
                   variant="link"
                   className="text-siso-orange p-0"
                   onClick={handleSignIn}
+                  type="button"
                 >
                   Sign In
                 </Button>
