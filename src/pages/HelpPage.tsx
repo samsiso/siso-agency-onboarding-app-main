@@ -1,5 +1,4 @@
 
-import { useState, useEffect } from 'react';
 import { MainLayout } from '@/components/assistants/layout/MainLayout';
 import { 
   Card, 
@@ -18,49 +17,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { SearchIcon, BookOpen, MessageCircle, Video, FileText } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 
 export default function HelpPage() {
-  const [helpArticles, setHelpArticles] = useState<any[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-  const { toast } = useToast();
-
-  useEffect(() => {
-    const fetchHelpArticles = async () => {
-      try {
-        setIsLoading(true);
-        const { data, error } = await supabase
-          .from('help_articles')
-          .select('*')
-          .order('is_pinned', { ascending: false })
-          .order('created_at', { ascending: false });
-          
-        if (error) throw error;
-        
-        setHelpArticles(data || []);
-      } catch (error) {
-        console.error('Error fetching help articles:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load help articles",
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    fetchHelpArticles();
-  }, [toast]);
-  
-  const filteredArticles = helpArticles.filter(article => 
-    article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    article.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    article.category.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   return (
     <MainLayout>
       <div className="container mx-auto px-4 py-8">
@@ -74,8 +32,6 @@ export default function HelpPage() {
             <Input 
               placeholder="Search help articles..." 
               className="pl-10 bg-black/30 border border-siso-text/10 text-siso-text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
         </div>
@@ -111,23 +67,28 @@ export default function HelpPage() {
           <h2 className="text-2xl font-semibold text-siso-text-bold mb-4">Frequently Asked Questions</h2>
           <Card className="bg-black/30 border border-siso-text/10">
             <CardContent className="pt-6">
-              {isLoading ? (
-                <div className="py-4 text-center text-siso-text">Loading help articles...</div>
-              ) : filteredArticles.length === 0 ? (
-                <div className="py-4 text-center text-siso-text">
-                  {searchTerm ? "No matching help articles found." : "No help articles available."}
-                </div>
-              ) : (
-                <Accordion type="single" collapsible className="w-full">
-                  {filteredArticles.map((article) => (
-                    <FaqItem
-                      key={article.id}
-                      question={article.title}
-                      answer={article.content}
-                    />
-                  ))}
-                </Accordion>
-              )}
+              <Accordion type="single" collapsible className="w-full">
+                <FaqItem
+                  question="How do I create my first project?"
+                  answer="To create your first project, navigate to the Plan Builder from the Dashboard. Click on 'Create New Plan' and follow the guided process to set up your project details, requirements, and budget."
+                />
+                <FaqItem
+                  question="How do I earn points on the platform?"
+                  answer="You can earn points by completing projects, participating in the community, referring new users, and maintaining a streak of daily logins. Visit the 'How to Earn' page for more detailed information on earning opportunities."
+                />
+                <FaqItem
+                  question="How do I change my account settings?"
+                  answer="To change your account settings, go to the Settings page from the sidebar menu. There you can update your profile information, notification preferences, privacy settings, and appearance options."
+                />
+                <FaqItem
+                  question="How do payments work on the platform?"
+                  answer="Our platform uses a token-based payment system. You can convert your earned points to tokens on the Payments page, and then use these tokens to pay for services or withdraw them to external wallets. We support multiple payment methods for security and convenience."
+                />
+                <FaqItem
+                  question="How can I contact customer support?"
+                  answer="You can contact our customer support team through the chat option on this page, by submitting a support ticket, or by emailing support@example.com. Our support team is available 24/7 to assist you with any issues or questions."
+                />
+              </Accordion>
             </CardContent>
           </Card>
         </div>

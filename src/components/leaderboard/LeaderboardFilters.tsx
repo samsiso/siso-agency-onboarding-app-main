@@ -2,112 +2,84 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Filter } from "lucide-react";
-import { useState } from "react";
-import type { LeaderboardEntry } from "./types";
+import { Calendar, Filter, Search, Timer } from "lucide-react";
 
 interface LeaderboardFiltersProps {
-  onFilterChange: (filtered: LeaderboardEntry[]) => void;
-  leaderboardData: LeaderboardEntry[];
+  onPeriodChange: (period: string) => void;
+  onSearchChange: (search: string) => void;
+  onCategoryChange: (category: string) => void;
 }
 
-export function LeaderboardFilters({ onFilterChange, leaderboardData }: LeaderboardFiltersProps) {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState("points");
-  
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchTerm(value);
-    
-    applyFilters(value, sortBy);
-  };
-  
-  const handleSortChange = (value: string) => {
-    setSortBy(value);
-    applyFilters(searchTerm, value);
-  };
-  
-  const applyFilters = (search: string, sort: string) => {
-    let filtered = [...leaderboardData];
-    
-    // Apply search filter
-    if (search) {
-      filtered = filtered.filter(entry => 
-        entry.profile.full_name?.toLowerCase().includes(search.toLowerCase()) || 
-        entry.profile.email?.toLowerCase().includes(search.toLowerCase()) ||
-        entry.profile.professional_role?.toLowerCase().includes(search.toLowerCase())
-      );
-    }
-    
-    // Apply sorting
-    filtered.sort((a, b) => {
-      switch (sort) {
-        case "points":
-          return b.points - a.points;
-        case "tokens":
-          return b.siso_tokens - a.siso_tokens;
-        case "contributions":
-          return b.contribution_count - a.contribution_count;
-        case "referrals":
-          return b.referral_count - a.referral_count;
-        default:
-          return 0;
-      }
-    });
-    
-    onFilterChange(filtered);
-  };
-  
-  const clearFilters = () => {
-    setSearchTerm("");
-    setSortBy("points");
-    onFilterChange(leaderboardData);
-  };
-  
+export const LeaderboardFilters = ({
+  onPeriodChange,
+  onSearchChange,
+  onCategoryChange
+}: LeaderboardFiltersProps) => {
   return (
-    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
-      <div className="relative flex-1 max-w-md">
-        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-siso-text/50" />
-        <Input
-          placeholder="Search by name or email..."
-          className="pl-9 bg-black/20 border-siso-text/10"
-          value={searchTerm}
-          onChange={handleSearch}
-        />
-      </div>
-      
-      <div className="flex items-center gap-2">
-        <div className="w-[180px]">
-          <Select
-            value={sortBy}
-            onValueChange={handleSortChange}
-          >
-            <SelectTrigger className="bg-black/20 border-siso-text/10">
-              <div className="flex items-center gap-2">
-                <Filter className="h-4 w-4 text-siso-text/70" />
-                <SelectValue placeholder="Sort by" />
-              </div>
+    <div className="mb-6 space-y-4">
+      <div className="flex flex-col md:flex-row gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-siso-text/50" />
+          <Input
+            placeholder="Search players..."
+            className="pl-9 bg-black/20 border-siso-border"
+            onChange={(e) => onSearchChange(e.target.value)}
+          />
+        </div>
+        
+        <div className="flex gap-2">
+          <Select onValueChange={onPeriodChange} defaultValue="all-time">
+            <SelectTrigger className="w-[140px] bg-black/20 border-siso-border">
+              <Timer className="mr-2 h-4 w-4" />
+              <SelectValue placeholder="Time Period" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="points">Sort by Points</SelectItem>
-              <SelectItem value="tokens">Sort by Tokens</SelectItem>
-              <SelectItem value="contributions">Sort by Contributions</SelectItem>
-              <SelectItem value="referrals">Sort by Referrals</SelectItem>
+              <SelectItem value="daily">Daily</SelectItem>
+              <SelectItem value="weekly">Weekly</SelectItem>
+              <SelectItem value="monthly">Monthly</SelectItem>
+              <SelectItem value="all-time">All Time</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select onValueChange={onCategoryChange} defaultValue="points">
+            <SelectTrigger className="w-[140px] bg-black/20 border-siso-border">
+              <Filter className="mr-2 h-4 w-4" />
+              <SelectValue placeholder="Category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="points">Points</SelectItem>
+              <SelectItem value="contributions">Contributions</SelectItem>
+              <SelectItem value="referrals">Referrals</SelectItem>
+              <SelectItem value="achievements">Achievements</SelectItem>
             </SelectContent>
           </Select>
         </div>
-        
-        {(searchTerm || sortBy !== "points") && (
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={clearFilters}
-            className="border-siso-text/10"
-          >
-            Clear
-          </Button>
-        )}
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          className="bg-black/20 border-siso-border hover:bg-siso-bg-alt"
+        >
+          <Calendar className="mr-2 h-4 w-4" />
+          Season 1
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="bg-black/20 border-siso-border hover:bg-siso-bg-alt"
+        >
+          Jump to My Position
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="bg-black/20 border-siso-border hover:bg-siso-bg-alt"
+        >
+          Export Leaderboard
+        </Button>
       </div>
     </div>
   );
-}
+};

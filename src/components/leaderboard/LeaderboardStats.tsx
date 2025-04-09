@@ -1,87 +1,102 @@
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowDownIcon, ArrowUpIcon, Users, Coins, Wallet } from "lucide-react";
+import { Trophy, Users, Coins, TrendingUp } from 'lucide-react';
+import { Card, CardContent } from "@/components/ui/card";
+import CountUp from 'react-countup';
 
 interface LeaderboardStatsProps {
   totalUsers: number;
   totalPoints: number;
-  totalTokens: number;
-  trends: {
-    users: number;
-    points: number;
-    tokens: number;
-  };
+  totalSisoTokens: number;
 }
 
-export function LeaderboardStats({ totalUsers, totalPoints, totalTokens, trends }: LeaderboardStatsProps) {
+export const LeaderboardStats = ({ totalUsers, totalPoints, totalSisoTokens }: LeaderboardStatsProps) => {
   const formatNumber = (num: number) => {
-    return new Intl.NumberFormat().format(num);
+    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+    if (num >= 1000) return `${(num / 1000).toFixed(1)}k`;
+    return num.toString();
   };
-  
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-      <StatCard 
-        title="Total Users" 
-        value={formatNumber(totalUsers)}
-        description="Active participants"
-        icon={<Users className="h-4 w-4" />}
-        trend={trends.users}
-      />
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <Card className="bg-gradient-to-br from-siso-bg-alt to-siso-bg-alt/50 hover:border-siso-border-hover transition-all duration-300">
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-siso-text/70">Total Users</p>
+              <div className="flex items-baseline gap-2">
+                <p className="text-2xl font-bold text-siso-text-bold">
+                  <CountUp end={totalUsers} duration={2} separator="," />
+                </p>
+                <span className="text-xs text-green-500 flex items-center">
+                  <TrendingUp className="w-3 h-3 mr-1" />
+                  +5%
+                </span>
+              </div>
+            </div>
+            <Users className="h-8 w-8 text-siso-orange opacity-80" />
+          </div>
+        </CardContent>
+      </Card>
       
-      <StatCard 
-        title="Total Points" 
-        value={formatNumber(totalPoints)}
-        description="Points earned by community"
-        icon={<Coins className="h-4 w-4" />}
-        trend={trends.points}
-      />
+      <Card className="bg-gradient-to-br from-siso-bg-alt to-siso-bg-alt/50 hover:border-siso-border-hover transition-all duration-300">
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-siso-text/70">Total Points</p>
+              <div className="flex items-baseline gap-2">
+                <p className="text-2xl font-bold text-siso-text-bold">
+                  <CountUp end={totalPoints} duration={2} separator="," />
+                </p>
+                <span className="text-xs text-green-500 flex items-center">
+                  <TrendingUp className="w-3 h-3 mr-1" />
+                  +12%
+                </span>
+              </div>
+            </div>
+            <Trophy className="h-8 w-8 text-siso-orange opacity-80" />
+          </div>
+        </CardContent>
+      </Card>
       
-      <StatCard 
-        title="Total SISO Tokens" 
-        value={formatNumber(totalTokens)}
-        description="Tokens issued to users"
-        icon={<Wallet className="h-4 w-4" />}
-        trend={trends.tokens}
-      />
+      <Card className="bg-gradient-to-br from-siso-bg-alt to-siso-bg-alt/50 hover:border-siso-border-hover transition-all duration-300">
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-siso-text/70">Total SISO Tokens</p>
+              <div className="flex items-baseline gap-2">
+                <p className="text-2xl font-bold text-siso-text-bold">
+                  <CountUp end={totalSisoTokens} duration={2} separator="," />
+                </p>
+                <span className="text-xs text-green-500 flex items-center">
+                  <TrendingUp className="w-3 h-3 mr-1" />
+                  +8%
+                </span>
+              </div>
+            </div>
+            <Coins className="h-8 w-8 text-siso-orange opacity-80" />
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="bg-gradient-to-br from-siso-bg-alt to-siso-bg-alt/50 hover:border-siso-border-hover transition-all duration-300">
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-siso-text/70">Daily Active Users</p>
+              <div className="flex items-baseline gap-2">
+                <p className="text-2xl font-bold text-siso-text-bold">
+                  <CountUp end={Math.floor(totalUsers * 0.4)} duration={2} separator="," />
+                </p>
+                <span className="text-xs text-green-500 flex items-center">
+                  <TrendingUp className="w-3 h-3 mr-1" />
+                  +15%
+                </span>
+              </div>
+            </div>
+            <Users className="h-8 w-8 text-siso-orange opacity-80" />
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
-}
-
-interface StatCardProps {
-  title: string;
-  value: string;
-  description: string;
-  icon: React.ReactNode;
-  trend: number;
-}
-
-function StatCard({ title, value, description, icon, trend }: StatCardProps) {
-  return (
-    <Card className="bg-black/30 border border-siso-text/10">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium text-siso-text-bold">
-          {title}
-        </CardTitle>
-        <div className="h-4 w-4 text-siso-orange">
-          {icon}
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold text-siso-text-bold">{value}</div>
-        <p className="text-xs text-siso-text/70">{description}</p>
-        {trend !== 0 && (
-          <div className="flex items-center pt-1">
-            {trend > 0 ? (
-              <ArrowUpIcon className="h-3 w-3 text-green-500" />
-            ) : (
-              <ArrowDownIcon className="h-3 w-3 text-red-500" />
-            )}
-            <span className={`text-xs ${trend > 0 ? 'text-green-500' : 'text-red-500'}`}>
-              {Math.abs(trend)}% from last period
-            </span>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
+};
