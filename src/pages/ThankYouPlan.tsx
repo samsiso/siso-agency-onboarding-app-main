@@ -1,8 +1,7 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { CheckCircle, ArrowRight, Clock, DollarSign, Send } from 'lucide-react';
+import { CheckCircle, ArrowRight, Clock, DollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { GradientHeading } from '@/components/ui/gradient-heading';
@@ -21,10 +20,9 @@ const ThankYouPlan = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [isSignUp, setIsSignUp] = useState(true); // Default to sign up form
+  const [isSignUp, setIsSignUp] = useState(true);
   const { userId, isLoading } = useOnboardingAuth();
   
-  // Get the plan data from the location state
   const planData = location.state?.planData || {
     totalCost: 0,
     timeline: 30,
@@ -32,7 +30,6 @@ const ThankYouPlan = () => {
   };
   
   useEffect(() => {
-    // If user is already logged in, show the video section
     if (userId) {
       setShowVideoSection(true);
     }
@@ -55,7 +52,6 @@ const ThankYouPlan = () => {
       
       console.log('Saving WhatsApp number:', whatsappNumber);
       
-      // Store the WhatsApp number in the database
       const { error } = await supabase
         .from('onboarding')
         .insert([
@@ -66,7 +62,7 @@ const ThankYouPlan = () => {
             social_links: { whatsapp: whatsappNumber },
             whatsapp_number: whatsappNumber,
             status: 'confirmed',
-            user_id: userId // Associate with user if logged in
+            user_id: userId
           }
         ]);
       
@@ -80,7 +76,6 @@ const ThankYouPlan = () => {
         description: "Your WhatsApp number has been saved",
       });
       
-      // Show login form if user is not logged in
       if (!userId) {
         setShowLoginForm(true);
       } else {
@@ -139,7 +134,6 @@ const ThankYouPlan = () => {
     
     try {
       if (isSignUp) {
-        // Sign up process
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
@@ -157,7 +151,6 @@ const ThankYouPlan = () => {
           description: "Your account has been created successfully!",
         });
         
-        // Update onboarding entry with user ID
         if (data.user) {
           const { error: updateError } = await supabase
             .from('onboarding')
@@ -171,7 +164,6 @@ const ThankYouPlan = () => {
         
         setShowVideoSection(true);
       } else {
-        // Sign in process
         const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -184,7 +176,6 @@ const ThankYouPlan = () => {
           description: "You have successfully signed in!",
         });
         
-        // Update onboarding entry with user ID if it exists
         if (data.user) {
           const { error: updateError } = await supabase
             .from('onboarding')
@@ -395,7 +386,7 @@ const ThankYouPlan = () => {
                 
                 <Button 
                   variant="outline"
-                  onClick={() => navigate('/profile')}
+                  onClick={() => navigate('/home')}
                   className="w-full border-siso-orange/30 text-siso-orange hover:bg-siso-orange/10"
                 >
                   Go to Dashboard

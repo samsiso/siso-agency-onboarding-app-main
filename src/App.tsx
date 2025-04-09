@@ -11,6 +11,8 @@ import ThankYouPlan from '@/pages/ThankYouPlan';
 import Plan from './pages/Plan';
 import DecoraPlan from './pages/DecoraPlan';
 import Congratulations from './pages/onboarding/congratulations';
+import Home from './pages/Home';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
 
 function App() {
   return (
@@ -27,6 +29,14 @@ function App() {
         <Route path="/onboarding/congratulations" element={<Congratulations />} />
         <Route path="/plan/:username" element={<Plan />} />
         <Route path="/decora-plan" element={<DecoraPlan />} />
+        <Route 
+          path="/home" 
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          } 
+        />
       </Routes>
     </>
   );
