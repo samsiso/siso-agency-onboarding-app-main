@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Heart, Sparkles, TrendingUp, Trophy, CheckCircle2, Clock, Info, ArrowRight, Users } from 'lucide-react';
+import { Heart, Sparkles, TrendingUp, Trophy, CheckCircle2, Clock, Info, ArrowRight, Users, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
