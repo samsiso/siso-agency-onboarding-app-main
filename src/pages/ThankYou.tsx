@@ -37,8 +37,8 @@ const ThankYou = () => {
               asChild
               className="w-full bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90"
             >
-              <Link to="/">
-                Return Home
+              <Link to="/home">
+                Go to Dashboard
               </Link>
             </Button>
             
