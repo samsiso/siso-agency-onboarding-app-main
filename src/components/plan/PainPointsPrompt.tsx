@@ -1,13 +1,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Calendar, MessageSquare, ArrowRight } from 'lucide-react';
+import { Users, Calendar, MessageSquare, ArrowRight, Award, ChevronRight, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface PainPointsPromptProps {
   onComplete: () => void;
   autoAdvance?: boolean;
   autoAdvanceDelay?: number;
+  currentStep?: number;
+  onNextStep?: () => void;
 }
 
 interface PainPoint {
@@ -15,56 +17,83 @@ interface PainPoint {
   solution: string;
   icon: React.ReactNode;
   buttonText: string;
+  benefits: string[];
 }
 
 export const PainPointsPrompt = ({ 
   onComplete, 
   autoAdvance = false,
-  autoAdvanceDelay = 1500 
+  autoAdvanceDelay = 1500,
+  currentStep = 0,
+  onNextStep
 }: PainPointsPromptProps) => {
-  const [currentStep, setCurrentStep] = useState(0);
+  const [animatingBenefits, setAnimatingBenefits] = useState(false);
   
   const painPoints: PainPoint[] = [
     {
-      text: "Struggling with creator churn?",
-      solution: "Boost retention by 60% with our tools.",
+      text: "Agency struggle with creator retention?",
+      solution: "Boost retention by 60% with our platform",
       icon: <Users className="h-12 w-12 text-siso-orange" />,
-      buttonText: "Next"
+      buttonText: "Tell me more",
+      benefits: [
+        "Transparent reporting to build trust",
+        "Automated check-ins to maintain engagement",
+        "Clear ROI metrics for creators to see value",
+        "Customized dashboards for each creator"
+      ]
     },
     {
-      text: "Disorganized content?",
-      solution: "Save 15+ hours weekly with streamlined workflows.",
+      text: "Disorganized content workflows?",
+      solution: "Save 15+ hours weekly with streamlined management",
       icon: <Calendar className="h-12 w-12 text-siso-orange" />,
-      buttonText: "Next"
+      buttonText: "Show me how",
+      benefits: [
+        "Centralized content library with search",
+        "Automated scheduling across platforms",
+        "Content performance analytics",
+        "Team collaboration tools"
+      ]
     },
     {
-      text: "Communication delays?",
-      solution: "Centralize all messages and cut delays by 50%.",
+      text: "Communication delays with clients?",
+      solution: "Cut response times by 50% with unified messaging",
       icon: <MessageSquare className="h-12 w-12 text-siso-orange" />,
-      buttonText: "See the Value"
+      buttonText: "See the Solution",
+      benefits: [
+        "Unified inbox for all client communications",
+        "Automated responses for common questions",
+        "Priority notifications for urgent messages",
+        "Message templates for consistent communication"
+      ]
     }
   ];
   
-  // Auto advance through screens if enabled
   useEffect(() => {
-    if (!autoAdvance) return;
-    
-    const timer = setTimeout(() => {
-      if (currentStep < painPoints.length - 1) {
-        setCurrentStep(prev => prev + 1);
-      } else {
-        onComplete();
-      }
-    }, autoAdvanceDelay);
-    
-    return () => clearTimeout(timer);
-  }, [currentStep, autoAdvance, autoAdvanceDelay, painPoints.length, onComplete]);
+    if (autoAdvance) {
+      const timer = setTimeout(() => {
+        if (onNextStep) {
+          onNextStep();
+        } else if (currentStep < painPoints.length - 1) {
+          // This is a fallback if onNextStep isn't provided
+        } else {
+          onComplete();
+        }
+      }, autoAdvanceDelay);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [currentStep, autoAdvance, autoAdvanceDelay, painPoints.length, onComplete, onNextStep]);
   
   const handleNext = () => {
-    if (currentStep < painPoints.length - 1) {
-      setCurrentStep(prev => prev + 1);
+    if (animatingBenefits) {
+      setAnimatingBenefits(false);
+      if (onNextStep) {
+        onNextStep();
+      } else {
+        // This is a fallback if onNextStep isn't provided
+      }
     } else {
-      onComplete();
+      setAnimatingBenefits(true);
     }
   };
   
@@ -79,46 +108,85 @@ export const PainPointsPrompt = ({
     >
       <AnimatePresence mode="wait">
         <motion.div
-          key={currentStep}
+          key={`${currentStep}-${animatingBenefits ? 'benefits' : 'main'}`}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.3 }}
           className="text-center"
         >
-          <div className="flex justify-center mb-6">
-            <motion.div
-              className="p-4 bg-siso-orange/10 rounded-full"
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              transition={{ 
-                type: "spring",
-                stiffness: 260,
-                damping: 20
-              }}
-            >
-              {currentPoint.icon}
-            </motion.div>
-          </div>
-          
-          <h2 className="text-2xl font-bold text-white mb-2">
-            {currentPoint.text}
-          </h2>
-          <p className="text-lg text-siso-text mb-8">
-            {currentPoint.solution}
-          </p>
-          
-          <div className="flex justify-center">
-            <Button 
-              onClick={handleNext}
-              className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-white min-w-[120px]"
-            >
-              {currentPoint.buttonText}
-              {currentStep < painPoints.length - 1 && (
-                <ArrowRight className="ml-2 h-4 w-4" />
-              )}
-            </Button>
-          </div>
+          {!animatingBenefits ? (
+            <>
+              <div className="flex justify-center mb-6">
+                <motion.div
+                  className="p-4 bg-siso-orange/10 rounded-full"
+                  initial={{ scale: 0.8 }}
+                  animate={{ scale: 1 }}
+                  transition={{ 
+                    type: "spring",
+                    stiffness: 260,
+                    damping: 20
+                  }}
+                >
+                  {currentPoint.icon}
+                </motion.div>
+              </div>
+              
+              <h2 className="text-2xl font-bold text-white mb-2">
+                {currentPoint.text}
+              </h2>
+              <p className="text-lg text-siso-text mb-8">
+                {currentPoint.solution}
+              </p>
+              
+              <div className="flex justify-center">
+                <Button 
+                  onClick={handleNext}
+                  className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-white min-w-[120px]"
+                >
+                  {currentPoint.buttonText}
+                  <ChevronRight className="ml-1 h-4 w-4" />
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex justify-center mb-6">
+                <div className="p-4 bg-siso-orange/10 rounded-full">
+                  <Award className="h-12 w-12 text-siso-orange" />
+                </div>
+              </div>
+              
+              <h2 className="text-2xl font-bold text-white mb-4">
+                Key Benefits
+              </h2>
+              
+              <div className="space-y-3 mb-6 text-left">
+                {currentPoint.benefits.map((benefit, index) => (
+                  <motion.div 
+                    key={index}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.15 }}
+                    className="flex items-start gap-2"
+                  >
+                    <CheckCircle className="h-5 w-5 text-siso-orange shrink-0 mt-0.5" />
+                    <span className="text-siso-text">{benefit}</span>
+                  </motion.div>
+                ))}
+              </div>
+              
+              <div className="flex justify-center">
+                <Button 
+                  onClick={handleNext}
+                  className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-white min-w-[120px]"
+                >
+                  {currentStep < painPoints.length - 1 ? 'Next Pain Point' : 'See Your Custom Plan'}
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            </>
+          )}
           
           <div className="flex justify-center mt-6 gap-2">
             {painPoints.map((_, index) => (

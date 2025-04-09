@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -173,10 +172,12 @@ const Plan = () => {
   const [selectedPainPoint, setSelectedPainPoint] = useState<PainPointDetailProps | null>(null);
   const [isPainPointModalOpen, setIsPainPointModalOpen] = useState(false);
   
-  // Declare all loading-related states at the component level, outside of any conditional blocks
-  const [loadingStep, setLoadingStep] = useState(0);
-  const [loadingProgress, setLoadingProgress] = useState(0);
-  const [loadingComplete, setLoadingComplete] = useState(false);
+  const [activeSolution, setActiveSolution] = useState<any>(null);
+  const [showSolutionModal, setShowSolutionModal] = useState(false);
+  const [currentFlowStep, setCurrentFlowStep] = useState<'welcome' | 'solutions' | 'features' | 'customize' | 'review'>('welcome');
+  const solutionsRef = useRef<HTMLDivElement>(null);
+  const customizeRef = useRef<HTMLDivElement>(null);
+  const reviewRef = useRef<HTMLDivElement>(null);
   
   const isDecoraPlan = username === 'decora';
   const [forceRender, setForceRender] = useState(false);
@@ -340,8 +341,29 @@ const Plan = () => {
     return () => clearTimeout(safetyTimeout);
   }, [username]);
   
+  const handleSelectSolution = (solution: any) => {
+    setActiveSolution(solution);
+    setShowSolutionModal(true);
+  };
+  
+  const navigateToSection = (section: 'welcome' | 'solutions' | 'features' | 'customize' | 'review') => {
+    setCurrentFlowStep(section);
+    
+    setTimeout(() => {
+      if (section === 'solutions' && solutionsRef.current) {
+        solutionsRef.current.scrollIntoView({ behavior: 'smooth' });
+      } else if (section === 'features' && featuresRef.current) {
+        featuresRef.current.scrollIntoView({ behavior: 'smooth' });
+      } else if (section === 'customize' && customizeRef.current) {
+        customizeRef.current.scrollIntoView({ behavior: 'smooth' });
+      } else if (section === 'review' && reviewRef.current) {
+        reviewRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
+  };
+  
   const scrollToFeatures = () => {
-    featuresRef.current?.scrollIntoView({ behavior: 'smooth' });
+    navigateToSection('features');
   };
   
   const handleSubmitPlan = async () => {
@@ -399,7 +421,6 @@ const Plan = () => {
     setLoading(false);
   };
 
-  // Move the loading UI into its own separate render branch to avoid conditional hook issues
   const renderLoadingUI = () => {
     const loadingAnimationSteps = [
       "Analyzing your business needs...",
@@ -526,7 +547,6 @@ const Plan = () => {
     );
   };
 
-  // Separate rendering path for when no plan is found
   const renderNoPlanUI = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-black via-siso-bg to-black p-4">
@@ -550,12 +570,10 @@ const Plan = () => {
     );
   };
   
-  // If still loading and not a decora plan, show loading UI
   if (loading && !isDecoraPlan) {
     return renderLoadingUI();
   }
   
-  // If plan is not loaded (after loading attempt), show no plan UI
   if (!plan) {
     return renderNoPlanUI();
   }
@@ -762,6 +780,41 @@ const Plan = () => {
         
         <div className="container mx-auto py-8 px-4">
           <div className="flex flex-col space-y-8">
+            <div className="bg-black/30 rounded-lg p-4 mb-6 border border-siso-text/10">
+              <div className="flex flex-nowrap overflow-x-auto gap-2">
+                {[
+                  { key: 'welcome', label: 'Welcome' },
+                  { key: 'solutions', label: 'Solutions' },
+                  { key: 'features', label: 'Features' },
+                  { key: 'customize', label: 'Customize' },
+                  { key: 'review', label: 'Review' }
+                ].map((step, index) => (
+                  <div 
+                    key={step.key} 
+                    className={`flex items-center ${index !== 0 ? 'ml-1' : ''}`}
+                  >
+                    {index !== 0 && (
+                      <div className="h-0.5 w-4 bg-siso-text/20 mx-1" />
+                    )}
+                    <Button
+                      variant={currentFlowStep === step.key ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => navigateToSection(step.key as any)}
+                      className={`
+                        whitespace-nowrap
+                        ${currentFlowStep === step.key ? 
+                          'bg-gradient-to-r from-siso-red to-siso-orange border-none' : 
+                          'border-siso-text/20 text-siso-text hover:text-white'
+                        }
+                      `}
+                    >
+                      {step.label}
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
             <div className="flex flex-col lg:flex-row justify-between gap-8">
               <div className="flex-1">
                 <motion.div
@@ -780,40 +833,11 @@ const Plan = () => {
                   </p>
                 </motion.div>
                 
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.3, duration: 0.5 }}
-                  className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8"
-                >
-                  <InteractiveCallout
-                    title="Agency Type"
-                    value={isDecoraPlanFromUsername ? "OnlyFans Management" : plan.company_name || "Custom"}
-                    type="niche"
-                    description="We've tailored your solution specifically for the unique challenges of OnlyFans management agencies."
-                  />
-                  
-                  <InteractiveCallout
-                    title="Estimated Timeline"
-                    value={`${plan.estimated_days || 30} days`}
-                    type="company"
-                    description="This is our estimated development timeline to get your platform up and running."
-                  />
-                </motion.div>
-                
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.5, duration: 0.5 }}
-                >
-                  <Button
-                    onClick={scrollToFeatures}
-                    className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90"
-                  >
-                    Explore Features
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </motion.div>
+                <WelcomeMessage 
+                  agencyName="Decora" 
+                  industryType="OnlyFans" 
+                  scrollToFeatures={() => navigateToSection('solutions')} 
+                />
               </div>
               
               <div className="lg:w-2/5">
@@ -859,55 +883,49 @@ const Plan = () => {
                   
                   <div className="mt-6">
                     <Button 
-                      onClick={handleSubmitPlan}
-                      disabled={submitting}
+                      onClick={() => navigateToSection('solutions')}
                       className="w-full bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90"
                     >
-                      {submitting ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Processing...
-                        </>
-                      ) : (
-                        'Approve This Plan'
-                      )}
+                      Explore Solutions
+                      <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </div>
                 </motion.div>
               </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-              <Card className="bg-black/20 border-siso-text/10">
-                <CardContent className="p-4">
-                  <ColorPicker
-                    title="Primary Brand Color"
-                    colors={brandColorOptions}
-                    selectedColor={primaryColor}
-                    onChange={setPrimaryColor}
-                  />
-                </CardContent>
-              </Card>
-              
-              <Card className="bg-black/20 border-siso-text/10">
-                <CardContent className="p-4">
-                  <ColorPicker
-                    title="Secondary Brand Color"
-                    colors={brandColorOptions}
-                    selectedColor={secondaryColor}
-                    onChange={setSecondaryColor}
-                  />
-                </CardContent>
-              </Card>
+            <div ref={solutionsRef} className="pt-12 mt-8 border-t border-siso-text/10">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                <GradientHeading className="text-3xl mb-6">
+                  Solutions for Your Agency
+                </GradientHeading>
+                
+                <SolutionsShowcase onSelectSolution={handleSelectSolution} />
+                
+                <div className="mt-8 flex justify-center">
+                  <Button
+                    onClick={() => navigateToSection('features')}
+                    className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90"
+                  >
+                    See All Features
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+              </motion.div>
             </div>
             
-            {isDecoraPlanFromUsername && (
+            <div 
+              ref={featuresRef}
+              className="pt-12 mt-8 border-t border-siso-text/10"
+            >
               <motion.div 
-                ref={featuresRef}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3, duration: 0.5 }}
-                className="mt-12"
               >
                 <GradientHeading className="text-3xl mb-6">
                   Key Features
@@ -1025,8 +1043,135 @@ const Plan = () => {
                     </div>
                   </TabsContent>
                 </Tabs>
+                
+                <div className="mt-8 flex justify-center">
+                  <Button
+                    onClick={() => navigateToSection('customize')}
+                    className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90"
+                  >
+                    Customize Your Plan
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
               </motion.div>
-            )}
+            </div>
+            
+            <div 
+              ref={customizeRef}
+              className="pt-12 mt-8 border-t border-siso-text/10"
+            >
+              <GradientHeading className="text-3xl mb-6">
+                Customize Your Plan
+              </GradientHeading>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card className="bg-black/20 border-siso-text/10">
+                  <CardContent className="p-4">
+                    <ColorPicker
+                      title="Primary Brand Color"
+                      colors={brandColorOptions}
+                      selectedColor={primaryColor}
+                      onChange={setPrimaryColor}
+                    />
+                  </CardContent>
+                </Card>
+                
+                <Card className="bg-black/20 border-siso-text/10">
+                  <CardContent className="p-4">
+                    <ColorPicker
+                      title="Secondary Brand Color"
+                      colors={brandColorOptions}
+                      selectedColor={secondaryColor}
+                      onChange={setSecondaryColor}
+                    />
+                  </CardContent>
+                </Card>
+              </div>
+              
+              <div className="mt-6">
+                <FeatureSelection 
+                  features={selectedFeatures} 
+                  onChange={setSelectedFeatures}
+                  showPricing={true}
+                />
+              </div>
+              
+              <div className="mt-8 flex justify-center">
+                <Button
+                  onClick={() => navigateToSection('review')}
+                  className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90"
+                >
+                  Review Your Plan
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            
+            <div 
+              ref={reviewRef}
+              className="pt-12 mt-8 border-t border-siso-text/10"
+            >
+              <GradientHeading className="text-3xl mb-6">
+                Review & Approve Your Plan
+              </GradientHeading>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div>
+                  <h3 className="text-xl font-semibold text-white mb-4">Your Custom Solution</h3>
+                  <p className="text-siso-text mb-6">
+                    We've created a comprehensive plan tailored specifically for your OnlyFans management agency. 
+                    Review the details below and approve your plan to begin the development process.
+                  </p>
+                  
+                  <div className="bg-black/30 p-4 rounded-lg border border-siso-text/10 mb-6">
+                    <h4 className="text-white font-medium mb-2">Need Assistance?</h4>
+                    <p className="text-sm text-siso-text mb-3">
+                      Have questions before approving? Our team is ready to help.
+                    </p>
+                    <Button 
+                      variant="outline"
+                      className="w-full border-siso-orange/30 text-siso-orange hover:bg-siso-orange/10"
+                      onClick={() => window.open('https://wa.me/1234567890', '_blank')}
+                    >
+                      Contact Us on WhatsApp
+                      <ExternalLink className="ml-2 h-4 w-4" />
+                    </Button>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <h4 className="text-white font-medium">After Approval</h4>
+                    <ol className="space-y-3">
+                      <li className="flex items-start gap-3">
+                        <div className="bg-siso-orange/10 text-siso-orange rounded-full h-6 w-6 flex items-center justify-center shrink-0 mt-0.5">1</div>
+                        <div>
+                          <p className="text-siso-text">You'll be connected with your dedicated project manager</p>
+                        </div>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <div className="bg-siso-orange/10 text-siso-orange rounded-full h-6 w-6 flex items-center justify-center shrink-0 mt-0.5">2</div>
+                        <div>
+                          <p className="text-siso-text">We'll schedule a kickoff meeting within 48 hours</p>
+                        </div>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <div className="bg-siso-orange/10 text-siso-orange rounded-full h-6 w-6 flex items-center justify-center shrink-0 mt-0.5">3</div>
+                        <div>
+                          <p className="text-siso-text">Development begins with weekly progress updates</p>
+                        </div>
+                      </li>
+                    </ol>
+                  </div>
+                </div>
+                
+                <PlanReviewSummary
+                  selectedFeatures={['Client Management', 'Content Management', 'Communication Tools', 'Analytics & Financials']}
+                  timeline={plan.estimated_days || 30}
+                  totalCost={totalCost || plan.estimated_cost || 0}
+                  onApprove={handleSubmitPlan}
+                  isSubmitting={submitting}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </>

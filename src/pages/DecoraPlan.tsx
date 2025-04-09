@@ -3,14 +3,17 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { PainPointsPrompt } from '@/components/plan/PainPointsPrompt';
-import { Sparkles, ArrowRight } from 'lucide-react';
+import { Sparkles, ArrowRight, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { WelcomeLoader } from '@/components/plan/WelcomeLoader';
 
 const DecoraPlan = () => {
   const navigate = useNavigate();
   const [showPrompts, setShowPrompts] = useState(true);
+  const [currentStep, setCurrentStep] = useState(0);
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const [loadingComplete, setLoadingComplete] = useState(false);
   
   useEffect(() => {
     // Simulating loading progress
@@ -18,6 +21,7 @@ const DecoraPlan = () => {
       setLoadingProgress(prev => {
         if (prev >= 100) {
           clearInterval(progressInterval);
+          setLoadingComplete(true);
           return 100;
         }
         return prev + 5;
@@ -40,6 +44,20 @@ const DecoraPlan = () => {
     navigate('/plan/decora', { replace: true });
   };
   
+  const handleNextStep = () => {
+    if (currentStep < 2) {
+      setCurrentStep(prev => prev + 1);
+    } else {
+      handlePromptsComplete();
+    }
+  };
+  
+  const steps = [
+    "Personalizing your experience...",
+    "Mapping solutions to your agency needs...",
+    "Finalizing your custom OnlyFans Management Suite..."
+  ];
+  
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-siso-bg to-black flex items-center justify-center p-4">
       {showPrompts ? (
@@ -49,7 +67,11 @@ const DecoraPlan = () => {
           exit={{ opacity: 0 }}
           className="w-full max-w-4xl"
         >
-          <PainPointsPrompt onComplete={handlePromptsComplete} />
+          <PainPointsPrompt 
+            onComplete={handlePromptsComplete} 
+            currentStep={currentStep}
+            onNextStep={handleNextStep}
+          />
           
           <div className="mt-6 text-center">
             <Button 
@@ -78,7 +100,7 @@ const DecoraPlan = () => {
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-siso-text">Loading your custom plan</span>
               <span className="text-sm text-siso-orange">
-                {loadingProgress}%
+                {loadingComplete ? 'Ready!' : `${loadingProgress}%`}
               </span>
             </div>
             <Progress 
@@ -87,6 +109,37 @@ const DecoraPlan = () => {
               indicatorClassName="bg-gradient-to-r from-siso-red to-siso-orange" 
             />
           </div>
+          
+          <div className="space-y-3 mb-6">
+            {steps.map((step, index) => (
+              <div key={index} className="flex items-center gap-3">
+                <div className={`flex items-center justify-center w-8 h-8 rounded-full ${
+                  loadingProgress >= (index + 1) * 33 ? 'bg-siso-orange/20' : 'bg-siso-text/5'
+                }`}>
+                  {loadingProgress >= (index + 1) * 33 ? (
+                    <CheckCircle className="h-4 w-4 text-siso-orange" />
+                  ) : (
+                    <div className="h-4 w-4 rounded-full bg-siso-text/20" />
+                  )}
+                </div>
+                <p className={`text-sm ${
+                  loadingProgress >= (index + 1) * 33 ? 'text-siso-text' : 'text-siso-text/50'
+                }`}>
+                  {step}
+                </p>
+              </div>
+            ))}
+          </div>
+          
+          {loadingComplete && (
+            <Button 
+              onClick={handleSkipToFullPlan}
+              className="w-full bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-white"
+            >
+              View Your Personalized Plan
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          )}
         </div>
       )}
     </div>
