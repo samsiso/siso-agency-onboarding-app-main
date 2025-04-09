@@ -1,173 +1,341 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bot, User, Send, ArrowLeft, X } from 'lucide-react';
+import { Bot, User, Send, ArrowLeft, X, Building, Briefcase } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { MessageLoading } from '@/components/ui/message-loading';
 import { useOnboardingAuth } from '@/hooks/useOnboardingAuth';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Message {
   id: string;
   role: 'assistant' | 'user';
   content: string;
+  input?: React.ReactNode;
 }
-
-interface PlanOption {
-  id: string;
-  title: string;
-  description: string;
-  price: string;
-}
-
-const planOptions: PlanOption[] = [
-  {
-    id: 'basic',
-    title: 'Basic Plan',
-    description: 'Perfect for individuals just getting started',
-    price: '$19/month'
-  },
-  {
-    id: 'pro',
-    title: 'Pro Plan',
-    description: 'For professionals with advanced needs',
-    price: '$49/month'
-  },
-  {
-    id: 'enterprise',
-    title: 'Enterprise',
-    description: 'For teams and organizations with custom requirements',
-    price: 'Custom pricing'
-  }
-];
 
 const OnboardingChat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState<'welcome' | 'questions' | 'plans'>('welcome');
-  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+  const [currentStep, setCurrentStep] = useState<'name' | 'company' | 'industry' | 'app_idea' | 'social' | 'complete'>('name');
+  const [formData, setFormData] = useState({
+    name: '',
+    company: '',
+    industry: '',
+    app_idea: '',
+    linkedin: '',
+    twitter: '',
+    website: ''
+  });
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { userId, isLoading: authLoading } = useOnboardingAuth();
 
+  // Initialize the chat with welcome message
   useEffect(() => {
-    // Initialize chat with welcome message
-    setMessages([
-      {
-        id: '1',
-        role: 'assistant',
-        content: "👋 Welcome to SISO! I'm your personal assistant, and I'll guide you through setting up your account. Let's start by understanding your needs so I can recommend the best plan for you."
-      }
-    ]);
+    const welcomeMessage = {
+      id: '1',
+      role: 'assistant' as const,
+      content: "👋 Hi there! I'm SISO, your personal assistant. I'll help you get started with our platform by asking a few quick questions. Let's begin with your name."
+    };
+    
+    const nameInputMessage = {
+      id: '2',
+      role: 'assistant' as const,
+      content: "What's your name?",
+      input: (
+        <div className="mt-3 w-full">
+          <Input 
+            placeholder="Enter your name"
+            value={formData.name}
+            onChange={(e) => handleInputChange('name', e.target.value)}
+            className="bg-black/30 border-siso-text/20 text-white"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && formData.name.trim()) {
+                handleContinue();
+              }
+            }}
+          />
+          <div className="mt-2 flex justify-end">
+            <Button 
+              onClick={handleContinue}
+              disabled={!formData.name.trim()}
+              className="bg-gradient-to-r from-siso-red to-siso-orange text-white"
+            >
+              Continue
+            </Button>
+          </div>
+        </div>
+      )
+    };
+    
+    setMessages([welcomeMessage, nameInputMessage]);
   }, []);
 
+  // Scroll to bottom when messages change
   useEffect(() => {
-    // Scroll to bottom when messages change
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSendMessage = () => {
-    if (!input.trim() || loading) return;
-    
-    // Add user message
-    const userMessage = {
-      id: Date.now().toString(),
-      role: 'user' as const,
-      content: input
-    };
-    
-    setMessages(prev => [...prev, userMessage]);
-    setInput('');
-    setLoading(true);
-    
-    // Simulate assistant response after a delay
-    setTimeout(() => {
-      let assistantResponse = "Thanks for sharing that! Could you tell me a bit more about your specific needs?";
-      
-      // Logic to determine appropriate responses based on user input and current step
-      if (step === 'welcome') {
-        assistantResponse = "Great! I'd like to know more about your business. What industry are you in and what are your main goals with our platform?";
-        setStep('questions');
-      } else if (step === 'questions' && messages.length > 3) {
-        assistantResponse = "Based on what you've told me, I have some plan recommendations that would be perfect for your needs. Please take a look:";
-        setStep('plans');
-      }
-      
-      const assistantMessage = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant' as const,
-        content: assistantResponse
-      };
-      
-      setMessages(prev => [...prev, assistantMessage]);
-      setLoading(false);
-    }, 1500);
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
+  const handleContinue = async () => {
+    // Add user response to chat
+    if (currentStep === 'name' && formData.name) {
+      addUserResponse(formData.name);
+      
+      // Move to company step after brief delay
+      setTimeout(() => {
+        addAssistantMessage(
+          "Thanks, " + formData.name + "! What company or organization are you with?",
+          <div className="mt-3 w-full">
+            <Input 
+              placeholder="Enter your company or organization"
+              value={formData.company}
+              onChange={(e) => handleInputChange('company', e.target.value)}
+              className="bg-black/30 border-siso-text/20 text-white"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && formData.company.trim()) {
+                  handleContinue();
+                }
+              }}
+            />
+            <div className="mt-2 flex justify-end">
+              <Button 
+                onClick={handleContinue}
+                disabled={!formData.company.trim()}
+                className="bg-gradient-to-r from-siso-red to-siso-orange text-white"
+              >
+                Continue
+              </Button>
+            </div>
+          </div>
+        );
+        setCurrentStep('company');
+      }, 500);
+    }
+    else if (currentStep === 'company' && formData.company) {
+      addUserResponse(formData.company);
+      
+      // Move to industry step after brief delay
+      setTimeout(() => {
+        addAssistantMessage(
+          "Great! What industry is " + formData.company + " in?",
+          <div className="mt-3 w-full">
+            <Input 
+              placeholder="Enter your industry"
+              value={formData.industry}
+              onChange={(e) => handleInputChange('industry', e.target.value)}
+              className="bg-black/30 border-siso-text/20 text-white"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && formData.industry.trim()) {
+                  handleContinue();
+                }
+              }}
+            />
+            <div className="mt-2 flex justify-end">
+              <Button 
+                onClick={handleContinue}
+                disabled={!formData.industry.trim()}
+                className="bg-gradient-to-r from-siso-red to-siso-orange text-white"
+              >
+                Continue
+              </Button>
+            </div>
+          </div>
+        );
+        setCurrentStep('industry');
+      }, 500);
+    }
+    else if (currentStep === 'industry' && formData.industry) {
+      addUserResponse(formData.industry);
+      
+      // Move to app idea step after brief delay
+      setTimeout(() => {
+        addAssistantMessage(
+          "Tell me briefly about the app or solution you're looking to build:",
+          <div className="mt-3 w-full">
+            <Input 
+              placeholder="Describe your app idea"
+              value={formData.app_idea}
+              onChange={(e) => handleInputChange('app_idea', e.target.value)}
+              className="bg-black/30 border-siso-text/20 text-white"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && formData.app_idea.trim()) {
+                  handleContinue();
+                }
+              }}
+            />
+            <div className="mt-2 flex justify-end">
+              <Button 
+                onClick={handleContinue}
+                disabled={!formData.app_idea.trim()}
+                className="bg-gradient-to-r from-siso-red to-siso-orange text-white"
+              >
+                Continue
+              </Button>
+            </div>
+          </div>
+        );
+        setCurrentStep('app_idea');
+      }, 500);
+    }
+    else if (currentStep === 'app_idea' && formData.app_idea) {
+      addUserResponse(formData.app_idea);
+      
+      // Move to social links step after brief delay
+      setTimeout(() => {
+        addAssistantMessage(
+          "Let's connect! Would you like to share any social or professional links? (Optional)",
+          <div className="mt-3 w-full space-y-3">
+            <div className="flex items-center space-x-2">
+              <span className="text-siso-text w-24">LinkedIn:</span>
+              <Input 
+                placeholder="Your LinkedIn URL"
+                value={formData.linkedin}
+                onChange={(e) => handleInputChange('linkedin', e.target.value)}
+                className="bg-black/30 border-siso-text/20 text-white"
+              />
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-siso-text w-24">Twitter:</span>
+              <Input 
+                placeholder="Your Twitter URL"
+                value={formData.twitter}
+                onChange={(e) => handleInputChange('twitter', e.target.value)}
+                className="bg-black/30 border-siso-text/20 text-white"
+              />
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-siso-text w-24">Website:</span>
+              <Input 
+                placeholder="Your Website URL"
+                value={formData.website}
+                onChange={(e) => handleInputChange('website', e.target.value)}
+                className="bg-black/30 border-siso-text/20 text-white"
+              />
+            </div>
+            <div className="mt-2 flex justify-end">
+              <Button 
+                onClick={handleContinue}
+                className="bg-gradient-to-r from-siso-red to-siso-orange text-white"
+              >
+                Continue
+              </Button>
+            </div>
+          </div>
+        );
+        setCurrentStep('social');
+      }, 500);
+    }
+    else if (currentStep === 'social') {
+      // Social links are optional, so we don't check if they're filled
+      
+      // Save data to Supabase
+      setLoading(true);
+      try {
+        const { error } = await supabase.from('onboarding').insert({
+          name: formData.name,
+          organization: formData.company,
+          app_idea: formData.app_idea,
+          user_id: userId,
+          social_links: {
+            linkedin: formData.linkedin,
+            twitter: formData.twitter,
+            website: formData.website
+          }
+        });
+        
+        if (error) throw error;
+        
+        // Show completion message
+        addAssistantMessage(
+          "Thanks for sharing! Based on what you've told me, we can build an MVP for your " + 
+          formData.app_idea + " at no cost initially. Would you like to proceed?",
+          <div className="mt-4 grid grid-cols-1 gap-4">
+            <div className="border rounded-lg p-4 bg-black/20 border-siso-text/10">
+              <h3 className="font-semibold text-lg text-siso-text-bold mb-2">Free MVP Plan</h3>
+              <ul className="space-y-2 mb-4">
+                <li className="flex items-start">
+                  <span className="inline-block w-5 h-5 bg-gradient-to-r from-siso-red to-siso-orange rounded-full mr-2 shrink-0" />
+                  <span>Full development of core features</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="inline-block w-5 h-5 bg-gradient-to-r from-siso-red to-siso-orange rounded-full mr-2 shrink-0" />
+                  <span>Modern, responsive design</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="inline-block w-5 h-5 bg-gradient-to-r from-siso-red to-siso-orange rounded-full mr-2 shrink-0" />
+                  <span>Build completed in 2-4 weeks</span>
+                </li>
+              </ul>
+              <Button 
+                onClick={() => {
+                  addUserResponse("I'm interested in the Free MVP Plan");
+                  setTimeout(() => {
+                    addAssistantMessage(
+                      "Excellent choice! Let's get started on your project. I'll create an account for you and you'll receive login details shortly.",
+                      <div className="mt-4">
+                        <Button 
+                          onClick={() => navigate('/thankyou')}
+                          className="w-full bg-gradient-to-r from-siso-red to-siso-orange text-white"
+                        >
+                          Complete Onboarding
+                        </Button>
+                      </div>
+                    );
+                    setCurrentStep('complete');
+                  }, 500);
+                }}
+                className="w-full bg-gradient-to-r from-siso-red to-siso-orange text-white"
+              >
+                Get Started
+              </Button>
+            </div>
+          </div>
+        );
+        
+      } catch (error) {
+        console.error('Error saving onboarding data:', error);
+        addAssistantMessage("I'm sorry, there was an error saving your information. Please try again.");
+      } finally {
+        setLoading(false);
+        setCurrentStep('complete');
+      }
+    }
+    else if (currentStep === 'complete') {
+      navigate('/thankyou');
     }
   };
 
-  const handleSelectPlan = (planId: string) => {
-    setSelectedPlan(planId);
-    
-    const planMessage = {
+  const addUserResponse = (content: string) => {
+    const userMessage = {
       id: Date.now().toString(),
       role: 'user' as const,
-      content: `I'm interested in the ${planOptions.find(p => p.id === planId)?.title}.`
+      content: content
     };
     
-    setMessages(prev => [...prev, planMessage]);
-    
-    setTimeout(() => {
-      const responseMessage = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant' as const,
-        content: `Excellent choice! The ${planOptions.find(p => p.id === planId)?.title} is perfect for your needs. Let's get you set up right away.`
-      };
-      
-      setMessages(prev => [...prev, responseMessage]);
-    }, 1000);
+    setMessages(prev => [...prev, userMessage]);
   };
 
-  const handleContinue = () => {
-    navigate('/thankyou');
+  const addAssistantMessage = (content: string, inputComponent?: React.ReactNode) => {
+    const assistantMessage = {
+      id: Date.now().toString(),
+      role: 'assistant' as const,
+      content: content,
+      input: inputComponent
+    };
+    
+    setMessages(prev => [...prev, assistantMessage]);
   };
 
   const handleBack = () => {
     navigate('/');
-  };
-
-  const renderPlans = () => {
-    if (step !== 'plans') return null;
-    
-    return (
-      <div className="w-full space-y-4 my-6">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {planOptions.map((plan) => (
-            <motion.div
-              key={plan.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className={`border rounded-lg p-4 cursor-pointer transition-all duration-300 ${
-                selectedPlan === plan.id 
-                  ? 'border-siso-orange bg-gradient-to-r from-siso-red/10 to-siso-orange/10' 
-                  : 'border-siso-text/10 hover:border-siso-text/30 bg-black/20'
-              }`}
-              onClick={() => handleSelectPlan(plan.id)}
-            >
-              <h3 className="font-semibold text-lg text-siso-text-bold">{plan.title}</h3>
-              <p className="text-sm text-siso-text/80 mt-1">{plan.description}</p>
-              <div className="mt-3 text-siso-orange font-medium">{plan.price}</div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    );
   };
 
   if (authLoading) {
@@ -190,11 +358,11 @@ const OnboardingChat = () => {
         >
           <ArrowLeft size={20} />
         </Button>
-        <h1 className="text-xl font-semibold text-white">SISO Onboarding</h1>
+        <h1 className="text-xl font-semibold text-white">Get Started</h1>
         <Button
           variant="ghost"
           size="icon"
-          onClick={handleContinue}
+          onClick={() => navigate('/thankyou')}
           className="text-siso-text hover:text-siso-text-bold hover:bg-black/20"
         >
           <X size={20} />
@@ -202,7 +370,7 @@ const OnboardingChat = () => {
       </header>
       
       {/* Main chat container */}
-      <main className="flex-1 max-w-3xl w-full mx-auto px-4 pt-20 pb-24">
+      <main className="flex-1 max-w-2xl w-full mx-auto px-4 pt-20 pb-24">
         {/* Chat messages */}
         <div className="flex-1 space-y-6 py-4">
           <AnimatePresence>
@@ -215,7 +383,7 @@ const OnboardingChat = () => {
                 transition={{ duration: 0.3 }}
                 className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
-                <div className={`flex max-w-[80%] ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                <div className={`flex max-w-[90%] ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
                   <div className={`flex items-center justify-center h-10 w-10 rounded-full shrink-0 ${
                     message.role === 'assistant' 
                       ? 'bg-gradient-to-r from-siso-red to-siso-orange' 
@@ -230,6 +398,7 @@ const OnboardingChat = () => {
                       : 'bg-siso-orange/90 text-black'
                   }`}>
                     {message.content}
+                    {message.input}
                   </div>
                 </div>
               </motion.div>
@@ -254,37 +423,16 @@ const OnboardingChat = () => {
             )}
           </AnimatePresence>
           
-          {renderPlans()}
-          
           <div ref={messagesEndRef} />
         </div>
       </main>
       
-      {/* Input area */}
+      {/* Footer Skip button */}
       <div className="p-4 border-t border-siso-text/10 bg-black/30 backdrop-blur-sm fixed bottom-0 left-0 right-0">
-        <div className="max-w-3xl mx-auto">
-          <div className="flex items-center space-x-2">
-            <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Type your message..."
-              className="flex-1 bg-black/30 border border-siso-text/20 rounded-lg p-3 text-white placeholder:text-siso-text/50 focus:outline-none focus:ring-2 focus:ring-siso-orange/50 resize-none min-h-[50px] max-h-[100px]"
-              disabled={loading || step === 'plans' && selectedPlan !== null}
-              rows={1}
-            />
-            <Button
-              onClick={handleSendMessage}
-              disabled={loading || !input.trim() || (step === 'plans' && selectedPlan !== null)}
-              className="bg-gradient-to-r from-siso-red to-siso-orange text-white rounded-full h-12 w-12 p-0 flex items-center justify-center"
-            >
-              <Send size={20} />
-            </Button>
-          </div>
-          
-          <div className="mt-4 text-center">
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center">
             <Button 
-              onClick={handleContinue} 
+              onClick={() => navigate('/thankyou')} 
               variant="outline" 
               className="text-siso-text border-siso-text/30 hover:bg-siso-text/10"
             >
