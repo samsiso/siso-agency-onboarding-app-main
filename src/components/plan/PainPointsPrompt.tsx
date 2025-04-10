@@ -22,12 +22,13 @@ interface PainPoint {
 
 export const PainPointsPrompt = ({ 
   onComplete, 
-  autoAdvance = false,
-  autoAdvanceDelay = 1500,
+  autoAdvance = true, // Default to auto-advance
+  autoAdvanceDelay = 4000, // Default delay of 4 seconds
   currentStep = 0,
   onNextStep
 }: PainPointsPromptProps) => {
   const [animatingBenefits, setAnimatingBenefits] = useState(false);
+  const [autoProgressTimer, setAutoProgressTimer] = useState<NodeJS.Timeout | null>(null);
   
   const painPoints: PainPoint[] = [
     {
@@ -68,34 +69,62 @@ export const PainPointsPrompt = ({
     }
   ];
   
+  // Handle auto-advancement
   useEffect(() => {
     if (autoAdvance) {
+      // Clear any existing timer when component updates
+      if (autoProgressTimer) {
+        clearTimeout(autoProgressTimer);
+      }
+      
+      // Set timer for auto-advancement
       const timer = setTimeout(() => {
-        if (onNextStep) {
-          onNextStep();
-        } else if (currentStep < painPoints.length - 1) {
-          // This is a fallback if onNextStep isn't provided
+        if (animatingBenefits) {
+          // If showing benefits, go to next step
+          setAnimatingBenefits(false);
+          if (onNextStep) {
+            onNextStep();
+          } else if (currentStep < painPoints.length - 1) {
+            // This is a fallback if onNextStep isn't provided
+          } else {
+            onComplete();
+          }
         } else {
-          onComplete();
+          // If showing main card, show benefits
+          setAnimatingBenefits(true);
+          
+          // Set another timer to automatically progress to next step
+          const benefitsTimer = setTimeout(() => {
+            setAnimatingBenefits(false);
+            if (onNextStep) {
+              onNextStep();
+            } else if (currentStep < painPoints.length - 1) {
+              // This is a fallback if onNextStep isn't provided
+            } else {
+              onComplete();
+            }
+          }, autoAdvanceDelay);
+          
+          setAutoProgressTimer(benefitsTimer);
         }
       }, autoAdvanceDelay);
       
-      return () => clearTimeout(timer);
-    }
-  }, [currentStep, autoAdvance, autoAdvanceDelay, painPoints.length, onComplete, onNextStep]);
-  
-  useEffect(() => {
-    // Auto transition from main card to benefits when in auto advance mode
-    if (autoAdvance && !animatingBenefits) {
-      const benefitsTimer = setTimeout(() => {
-        setAnimatingBenefits(true);
-      }, autoAdvanceDelay / 2);
+      setAutoProgressTimer(timer);
       
-      return () => clearTimeout(benefitsTimer);
+      return () => {
+        if (autoProgressTimer) clearTimeout(autoProgressTimer);
+        if (timer) clearTimeout(timer);
+      };
     }
-  }, [currentStep, autoAdvance, autoAdvanceDelay, animatingBenefits]);
+  }, [currentStep, autoAdvance, autoAdvanceDelay, animatingBenefits, onNextStep, painPoints.length, onComplete]);
   
   const handleNext = () => {
+    // Clear any auto-progress timers when manually advancing
+    if (autoProgressTimer) {
+      clearTimeout(autoProgressTimer);
+      setAutoProgressTimer(null);
+    }
+    
     if (animatingBenefits) {
       setAnimatingBenefits(false);
       if (onNextStep) {

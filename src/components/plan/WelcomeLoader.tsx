@@ -36,6 +36,17 @@ export const WelcomeLoader = ({
     show: { opacity: 1, y: 0 }
   };
 
+  // Pulse animation for progress indicator
+  const pulseAnimation = {
+    scale: [1, 1.05, 1],
+    opacity: [0.7, 1, 0.7],
+    transition: {
+      duration: 2,
+      repeat: Infinity,
+      ease: "easeInOut"
+    }
+  };
+
   return (
     <motion.div 
       className="max-w-md w-full bg-black/40 border border-siso-text/10 rounded-lg p-6 backdrop-blur-sm shine-effect"
@@ -79,14 +90,17 @@ export const WelcomeLoader = ({
       >
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm text-siso-text">Loading your plan</span>
-          <span className="text-sm text-siso-orange pulse-animation">
+          <motion.span 
+            className="text-sm text-siso-orange" 
+            animate={complete ? {} : pulseAnimation}
+          >
             {complete ? 'Ready!' : `${progress}%`}
-          </span>
+          </motion.span>
         </div>
         <Progress 
           value={progress} 
           className="h-2 bg-black/30" 
-          indicatorClassName="bg-gradient-to-r from-siso-red to-siso-orange gradient-bg" 
+          indicatorClassName="bg-gradient-to-r from-siso-red to-siso-orange gradient-bg glow-effect" 
         />
       </motion.div>
       

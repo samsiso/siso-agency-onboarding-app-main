@@ -21,7 +21,7 @@ const DecoraPlan = () => {
   const [loadingComplete, setLoadingComplete] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   
-  // Auto-advance settings
+  // Auto-advance settings - now enabled by default
   const AUTO_ADVANCE = true;
   const AUTO_ADVANCE_DELAY = 4000; // 4 seconds between steps
   
