@@ -43,6 +43,7 @@ import { SolutionsShowcase } from '@/components/plan/SolutionsShowcase';
 import { PlanReviewSummary } from '@/components/plan/PlanReviewSummary';
 import { AgencyPainPoints } from '@/components/plan/AgencyPainPoints';
 import { TierFeatureSelection, FeatureItem } from '@/components/plan/TierFeatureSelection';
+import { ROICalculator } from '@/components/plan/ROICalculator';
 
 interface PlanData {
   id: string;
