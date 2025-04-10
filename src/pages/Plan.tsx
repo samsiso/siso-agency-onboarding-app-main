@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -32,6 +33,7 @@ import { PlanReviewSummary } from '@/components/plan/PlanReviewSummary';
 import { AgencyPainPoints } from '@/components/plan/AgencyPainPoints';
 import { ROICalculator } from '@/components/plan/ROICalculator';
 import { FeatureSection } from '@/components/plan/FeatureSection';
+import { InteractiveCallout } from '@/components/plan/InteractiveCallout';
 import { caseStudies } from '@/data/plan/featureData';
 
 interface PlanData {
