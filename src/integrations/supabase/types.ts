@@ -9,6 +9,42 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      banner_templates: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          is_default: boolean | null
+          metadata: Json | null
+          name: string
+          template_type: string
+          text_overlay: Json | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_default?: boolean | null
+          metadata?: Json | null
+          name: string
+          template_type: string
+          text_overlay?: Json | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_default?: boolean | null
+          metadata?: Json | null
+          name?: string
+          template_type?: string
+          text_overlay?: Json | null
+        }
+        Relationships: []
+      }
       help_articles: {
         Row: {
           category: string
@@ -65,6 +101,33 @@ export type Database = {
           rank?: number | null
           streak_days?: number
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      news_comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          news_id: string
+          user_email: string | null
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          news_id: string
+          user_email?: string | null
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          news_id?: string
+          user_email?: string | null
           user_id?: string
         }
         Relationships: []
@@ -185,30 +248,57 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          bio: string | null
           business_name: string | null
           created_at: string
           full_name: string | null
           id: string
+          instagram_url: string | null
+          linkedin_url: string | null
           onboarding_completed: boolean | null
+          professional_role: string | null
+          siso_tokens: number | null
+          solana_wallet_address: string | null
+          twitter_url: string | null
           updated_at: string
+          website_url: string | null
+          youtube_url: string | null
         }
         Insert: {
           avatar_url?: string | null
+          bio?: string | null
           business_name?: string | null
           created_at?: string
           full_name?: string | null
           id: string
+          instagram_url?: string | null
+          linkedin_url?: string | null
           onboarding_completed?: boolean | null
+          professional_role?: string | null
+          siso_tokens?: number | null
+          solana_wallet_address?: string | null
+          twitter_url?: string | null
           updated_at?: string
+          website_url?: string | null
+          youtube_url?: string | null
         }
         Update: {
           avatar_url?: string | null
+          bio?: string | null
           business_name?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
+          instagram_url?: string | null
+          linkedin_url?: string | null
           onboarding_completed?: boolean | null
+          professional_role?: string | null
+          siso_tokens?: number | null
+          solana_wallet_address?: string | null
+          twitter_url?: string | null
           updated_at?: string
+          website_url?: string | null
+          youtube_url?: string | null
         }
         Relationships: []
       }
