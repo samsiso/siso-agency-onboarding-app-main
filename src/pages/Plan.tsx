@@ -479,6 +479,22 @@ const Plan = () => {
                 onApprove={handleApprovePlan}
                 isSubmitting={isSubmitting}
               />
+              
+              <div className="mt-8">
+                <GradientHeading 
+                  className="text-xl font-bold mb-4" 
+                  variant="primary"
+                >
+                  Calculate Your Return on Investment
+                </GradientHeading>
+                
+                <ROICalculator
+                  selectedFeatures={selectedFeatures}
+                  featuresTimeEstimate={totalTime}
+                  tier={selectedTier}
+                  basePrice={totalPrice}
+                />
+              </div>
             </section>
           )}
           
