@@ -1,8 +1,10 @@
+
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { safeQuery } from '@/utils/typeHelpers';
+import FeatureFlags from '@/utils/featureFlags';
 
 interface ProjectDoc {
   id: string;
@@ -18,13 +20,25 @@ export function ProjectDocumentation() {
   const { data: docs, isLoading } = useQuery({
     queryKey: ['project-documentation'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('project_documentation')
+      // Only fetch if education feature is enabled
+      if (!FeatureFlags.education) {
+        return [];
+      }
+      
+      const { data, error } = await safeQuery('project_documentation', 'education')
         .select('*')
         .order('priority', { ascending: true });
       
       if (error) throw error;
-      return data as ProjectDoc[];
+      
+      // Add mock implementation_status and priority if they don't exist
+      const enhancedData = (data || []).map(doc => ({
+        ...doc,
+        implementation_status: doc.implementation_status || 'planned',
+        priority: doc.priority || 1
+      })) as ProjectDoc[];
+      
+      return enhancedData;
     },
   });
 
@@ -72,6 +86,19 @@ export function ProjectDocumentation() {
     );
   };
 
+  if (!docs || docs.length === 0) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>YouTube Resources Page Documentation</CardTitle>
+          <CardDescription>
+            No documentation available at this time.
+          </CardDescription>
+        </CardHeader>
+      </Card>
+    );
+  }
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -81,7 +108,7 @@ export function ProjectDocumentation() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="overview" className="w-full">
+        <Tabs defaultValue={docs[0]?.section || "overview"} className="w-full">
           <TabsList className="w-full">
             {docs?.map((doc) => (
               <TabsTrigger key={doc.id} value={doc.section}>

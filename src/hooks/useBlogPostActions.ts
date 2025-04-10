@@ -2,13 +2,15 @@
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { usePoints } from '@/hooks/usePoints';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { safeSupabase } from '@/utils/supabaseHelpers';
+import FeatureFlags from '@/utils/featureFlags';
 
-// [Analysis] Enhanced hook with improved social sharing capabilities
+// Enhanced hook with improved social sharing capabilities
 export const useBlogPostActions = () => {
   const { toast } = useToast();
   const { user } = useAuthSession();
   const { awardPoints } = usePoints(user?.id);
+  const isDailyNewsEnabled = FeatureFlags.dailyNews;
 
   const handleShare = async (title?: string, description?: string) => {
     const shareData = {
@@ -44,6 +46,15 @@ export const useBlogPostActions = () => {
   };
 
   const handleBookmark = async (newsId: string) => {
+    if (!isDailyNewsEnabled) {
+      toast({
+        title: "Feature disabled",
+        description: "The Daily News feature is currently disabled",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     if (!user) {
       toast({
         title: "Authentication required",
@@ -55,7 +66,7 @@ export const useBlogPostActions = () => {
 
     try {
       // Check if already bookmarked
-      const { data: existingBookmark, error: checkError } = await supabase
+      const { data: existingBookmark, error: checkError } = await safeSupabase
         .from('ai_news_bookmarks')
         .select('id')
         .eq('news_id', newsId)
@@ -66,7 +77,7 @@ export const useBlogPostActions = () => {
       
       if (existingBookmark) {
         // Remove bookmark if it exists
-        const { error: deleteError } = await supabase
+        const { error: deleteError } = await safeSupabase
           .from('ai_news_bookmarks')
           .delete()
           .eq('id', existingBookmark.id);
@@ -79,7 +90,7 @@ export const useBlogPostActions = () => {
         });
       } else {
         // Add bookmark if it doesn't exist
-        const { error: insertError } = await supabase
+        const { error: insertError } = await safeSupabase
           .from('ai_news_bookmarks')
           .insert([
             {

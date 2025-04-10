@@ -1,9 +1,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { safeSupabase } from '@/utils/supabaseHelpers';
 import { useToast } from '@/hooks/use-toast';
+import FeatureFlags from '@/utils/featureFlags';
 
-// [Analysis] Enhanced interface for the daily summary data with proper types
+// Enhanced interface for the daily summary data with proper types
 export interface DailySummaryData {
   id?: string;
   date: string;
@@ -31,6 +32,33 @@ export interface DailySummaryData {
   analysis_depth?: string;
 }
 
+// Create mock data for daily summary
+const createMockDailySummary = (date: string): DailySummaryData => {
+  return {
+    id: `mock-${date}`,
+    date: date,
+    summary: "This is a mock daily summary for AI news. The daily news feature is currently disabled.",
+    key_points: [
+      "Feature flag for daily news is currently disabled",
+      "Mock data is being displayed",
+      "Enable the feature in feature flags to see real data"
+    ],
+    practical_applications: [
+      "Enable the feature to see practical applications"
+    ],
+    industry_impacts: {
+      "tech": "Sample impact on the tech industry.",
+      "finance": "Sample impact on the finance industry."
+    },
+    article_count: 0,
+    created_at: new Date().toISOString(),
+    generated_with: "mock_data",
+    sentiment: "neutral",
+    confidence_score: 75,
+    analysis_depth: "basic"
+  };
+};
+
 export function useAiDailySummary(date: string, isAdmin: boolean = false) {
   const [summaryData, setSummaryData] = useState<DailySummaryData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -38,7 +66,10 @@ export function useAiDailySummary(date: string, isAdmin: boolean = false) {
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   
-  // [Analysis] Fetch the summary for the given date using a direct query instead of RPC
+  // Only enable real data fetching if dailyNews feature is enabled
+  const isFeatureEnabled = FeatureFlags.dailyNews;
+  
+  // Fetch the summary for the given date using either real or mock data
   const fetchSummary = useCallback(async () => {
     try {
       setLoading(true);
@@ -46,8 +77,16 @@ export function useAiDailySummary(date: string, isAdmin: boolean = false) {
       
       console.log(`Fetching summary for date: ${date}`);
       
-      // Use direct query instead of RPC
-      const { data, error: fetchError } = await supabase
+      // If feature is disabled, use mock data
+      if (!isFeatureEnabled) {
+        console.log('Daily News feature is disabled, using mock data');
+        const mockData = createMockDailySummary(date);
+        setSummaryData(mockData);
+        return;
+      }
+      
+      // Use direct query for real data when feature is enabled
+      const { data, error: fetchError } = await safeSupabase
         .from('ai_news_daily_summaries')
         .select('*')
         .eq('date', date)
@@ -75,7 +114,7 @@ export function useAiDailySummary(date: string, isAdmin: boolean = false) {
     } finally {
       setLoading(false);
     }
-  }, [date, toast]);
+  }, [date, toast, isFeatureEnabled]);
   
   // Helper to handle the summary data formatting
   const handleSummaryData = (data: any) => {
@@ -113,9 +152,16 @@ export function useAiDailySummary(date: string, isAdmin: boolean = false) {
     }
   };
   
-  // [Analysis] Generate a new summary for the date with improved error handling and retries
+  // Generate a new summary for the date with improved error handling and retries
   const generateSummary = async (forceRefresh = false) => {
-    if (!isAdmin) return;
+    if (!isAdmin || !isFeatureEnabled) {
+      toast({
+        title: "Feature Disabled",
+        description: "The Daily News feature is currently disabled",
+        variant: "destructive",
+      });
+      return;
+    }
     
     try {
       setGenerating(true);
@@ -125,7 +171,7 @@ export function useAiDailySummary(date: string, isAdmin: boolean = false) {
       
       // First, clear existing fallback summary if it exists and we're doing a force refresh
       if (forceRefresh && summaryData?.generated_with === 'error_fallback') {
-        const { error: deleteError } = await supabase
+        const { error: deleteError } = await safeSupabase
           .from('ai_news_daily_summaries')
           .delete()
           .eq('date', date);
@@ -148,7 +194,7 @@ export function useAiDailySummary(date: string, isAdmin: boolean = false) {
         // Add a timestamp to avoid caching issues with the Edge Function
         const timestamp = new Date().getTime();
         
-        const { data, error: invokeError } = await supabase.functions.invoke('generate-daily-summary', {
+        const { data, error: invokeError } = await safeSupabase.functions.invoke('generate-daily-summary', {
           body: { 
             date,
             forceRefresh,
@@ -235,7 +281,7 @@ export function useAiDailySummary(date: string, isAdmin: boolean = false) {
     }
   };
 
-  // [Analysis] Automatically fetch summary when component mounts or date changes
+  // Automatically fetch summary when component mounts or date changes
   useEffect(() => {
     if (date) {
       fetchSummary();

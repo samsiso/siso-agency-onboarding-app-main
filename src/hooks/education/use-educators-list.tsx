@@ -1,23 +1,62 @@
 
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { Educator } from './types';
+import { safeSupabase } from '@/utils/supabaseHelpers';
+import FeatureFlags from '@/utils/featureFlags';
 
 interface EducatorPage {
   educators: Educator[];
   nextCursor: string | undefined;
 }
 
+// Create mock educators data
+const getMockEducators = (page: number = 1): Educator[] => {
+  const startIdx = (page - 1) * 12;
+  return Array.from({ length: 12 }, (_, i) => {
+    const idx = startIdx + i;
+    return {
+      id: `mock-educator-${idx}`,
+      name: `Educator ${idx + 1}`,
+      description: `This is a description for Educator ${idx + 1}`,
+      specialization: ['React', 'TypeScript', 'JavaScript'],
+      profile_image_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${idx}`,
+      channel_avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${idx}`,
+      channel_banner_url: '',
+      number_of_subscribers: Math.floor(Math.random() * 100000),
+      channel_total_videos: Math.floor(Math.random() * 200),
+      channel_location: 'United States',
+      slug: `educator-${idx + 1}`,
+      featured_videos: [],
+      is_featured: idx < 3,
+      member_count: Math.floor(Math.random() * 5000)
+    };
+  });
+};
+
 // [Analysis] Convert to infinite query for better UX and performance
-// [Plan] Add caching layer at 10k+ users
 export const useEducatorsList = (searchQuery: string) => {
+  // Only fetch if education feature is enabled
+  const isEnabled = FeatureFlags.education;
+
   return useInfiniteQuery<EducatorPage>({
-    queryKey: ['educators', searchQuery],
+    queryKey: ['educators', searchQuery, isEnabled],
     initialPageParam: null as string | null,
     queryFn: async ({ pageParam }) => {
       console.log('Fetching educators for cursor:', pageParam); // Debug log
       
-      let query = supabase
+      // If feature is disabled, use mock data
+      if (!isEnabled) {
+        const page = pageParam ? parseInt(pageParam.split('-')[1]) : 1;
+        const mockEducators = getMockEducators(page);
+        
+        return {
+          educators: mockEducators,
+          nextCursor: page < 3 ? `page-${page + 1}` : undefined
+        };
+      }
+      
+      // Feature is enabled, fetch from the database
+      let query = safeSupabase
         .from('education_creators')
         .select(`
           id,
@@ -57,8 +96,8 @@ export const useEducatorsList = (searchQuery: string) => {
 
       // Transform the data to match Educator type
       const educators = (data || []).map(item => ({
-        id: item.id,
-        name: item.name,
+        id: item.id || `mock-${Math.random()}`,
+        name: item.name || 'Unnamed Educator',
         description: item.description || '',
         specialization: item.specialization || [],
         profile_image_url: item.profile_image_url || '',

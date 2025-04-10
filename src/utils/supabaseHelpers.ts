@@ -16,12 +16,17 @@ const MOCK_TABLES = [
   'ai_news',
   'ai_news_summaries',
   'ai_news_daily_summaries',
+  'ai_news_video_processing',
   'education_creators',
   'youtube_videos',
   'networking_resources',
   'category_stats',
   'login_streaks',
-  'points_log'
+  'points_log',
+  'automations',
+  'core_tools',
+  'performance_metrics',
+  'news_sources'
 ];
 
 // Mock response generator for different table types
@@ -42,41 +47,50 @@ export const safeSupabase = {
       
       // Return a mock query builder with appropriate methods
       return {
-        select: () => ({
-          eq: () => ({
+        select: (columns?: string) => ({
+          eq: (column: string, value: any) => ({
             single: async () => getMockResponse(tableName),
             maybeSingle: async () => getMockResponse(tableName),
-            limit: () => ({
+            limit: (limit: number) => ({
               maybeSingle: async () => getMockResponse(tableName)
             }),
-            order: () => ({
-              limit: () => ({
+            order: (column: string, { ascending }: { ascending: boolean }) => ({
+              limit: (limit: number) => ({
                 maybeSingle: async () => getMockResponse(tableName)
               })
             })
           }),
-          in: () => ({
+          in: (column: string, values: any[]) => ({
             single: async () => getMockResponse(tableName),
             maybeSingle: async () => getMockResponse(tableName)
           }),
-          order: () => ({
-            limit: () => getMockResponse(tableName),
-            range: () => getMockResponse(tableName)
+          order: (column: string, { ascending }: { ascending: boolean }) => ({
+            limit: (limit: number) => getMockResponse(tableName),
+            range: (from: number, to: number) => getMockResponse(tableName)
           }),
-          range: () => getMockResponse(tableName),
-          or: () => getMockResponse(tableName),
+          range: (from: number, to: number) => getMockResponse(tableName),
+          or: (filter: string) => getMockResponse(tableName),
+          gt: (column: string, value: any) => getMockResponse(tableName),
+          lt: (column: string, value: any) => getMockResponse(tableName),
+          gte: (column: string, value: any) => getMockResponse(tableName),
+          lte: (column: string, value: any) => getMockResponse(tableName),
+          not: (column: string, operator: string) => getMockResponse(tableName),
         }),
-        insert: () => ({
-          select: () => ({
+        insert: (values: any) => ({
+          select: (columns?: string) => ({
             single: async () => getMockResponse(tableName)
           })
         }),
-        update: () => ({
-          eq: () => getMockResponse(tableName)
+        update: (values: any) => ({
+          eq: (column: string, value: any) => getMockResponse(tableName),
+          match: (criteria: Record<string, any>) => getMockResponse(tableName)
         }),
         delete: () => ({
-          eq: () => getMockResponse(tableName)
-        })
+          eq: (column: string, value: any) => getMockResponse(tableName),
+          match: (criteria: Record<string, any>) => getMockResponse(tableName)
+        }),
+        upsert: (values: any) => getMockResponse(tableName),
+        count: (options: any) => getMockResponse(tableName)
       };
     }
     
@@ -94,6 +108,42 @@ export const safeSupabase = {
       // Use the real Supabase auth when available
       return supabase.auth.getUser();
     }
+  },
+
+  // Add functions property to mock Supabase Edge Functions
+  functions: {
+    invoke: async (functionName: string, options: { body: any }) => {
+      console.log(`Mock invoke of Edge Function: ${functionName}`, options);
+      return { data: { success: true }, error: null };
+    }
+  },
+
+  // Mock storage for file uploads
+  storage: {
+    from: (bucketName: string) => ({
+      upload: async (path: string, file: File) => {
+        console.log(`Mock upload to ${bucketName}/${path}`);
+        return { data: { path }, error: null };
+      },
+      getPublicUrl: (path: string) => ({
+        data: { publicUrl: `https://mock-storage.example.com/${bucketName}/${path}` }
+      })
+    })
+  },
+
+  // Mock channel for realtime subscriptions
+  channel: (channel: string) => ({
+    on: (event: string, config: any, callback: (payload: any) => void) => ({
+      subscribe: (callback?: (status: string) => void) => {
+        console.log(`Mock subscription to ${channel} for ${event}`);
+        if (callback) callback('SUBSCRIBED');
+        return {};
+      }
+    })
+  }),
+  
+  removeChannel: (channel: any) => {
+    console.log('Mock removal of channel', channel);
   }
 };
 

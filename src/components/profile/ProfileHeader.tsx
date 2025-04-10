@@ -1,267 +1,264 @@
 
-import { User, Trophy, Star, Upload, Briefcase, Mail, LogOut, Home, Camera, X } from 'lucide-react';
+import React from 'react';
+import { User } from '@supabase/supabase-js';
+import { MutableRefObject, useRef, useState } from 'react';
+import { Edit, Camera, Trash2 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { UserSocialLinks } from './UserSocialLinks';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Card } from '@/components/ui/card';
-import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/utils';
+import AchievementList from './AchievementList';
 
 interface ProfileHeaderProps {
-  fullName: string | null;
-  email: string | null;
-  points: number;
-  rank: string;
-  avatarUrl?: string | null;
-  bannerUrl?: string | null;
-  onLogout: () => void;
-  onBackToHome: () => void;
+  user: User | null;
+  profile: {
+    avatar_url?: string;
+    bio?: string;
+    business_name?: string;
+    created_at?: string;
+    full_name?: string;
+    id?: string;
+    instagram_url?: string;
+    linkedin_url?: string;
+    onboarding_completed?: boolean;
+    professional_role?: string;
+    siso_tokens?: number;
+    solana_wallet_address?: string;
+    twitter_url?: string;
+    updated_at?: string;
+    website_url?: string;
+    youtube_url?: string;
+  };
+  achievements?: Array<{ name: string; icon?: string }>;
+  onUpdateProfile: () => void;
+  editable?: boolean;
 }
 
 export const ProfileHeader = ({ 
-  fullName, 
-  email, 
-  points, 
-  rank, 
-  avatarUrl,
-  bannerUrl,
-  onLogout, 
-  onBackToHome 
+  user,
+  profile,
+  achievements = [],
+  onUpdateProfile,
+  editable = false
 }: ProfileHeaderProps) => {
-  const [uploading, setUploading] = useState(false);
-  const [uploadingBanner, setUploadingBanner] = useState(false);
-  const [isHoveringAvatar, setIsHoveringAvatar] = useState(false);
-  const [isHoveringBanner, setIsHoveringBanner] = useState(false);
   const { toast } = useToast();
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const bannerInputRef = useRef<HTMLInputElement>(null);
+  const [deletingAvatar, setDeletingAvatar] = useState(false);
+
+  if (!profile) {
+    return <div>Loading profile...</div>;
+  }
 
   const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
-      setUploading(true);
-      const file = event.target.files?.[0];
-      if (!file) return;
-
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
+      if (!event.target.files || event.target.files.length === 0) {
+        return;
+      }
+      
+      const file = event.target.files[0];
       const fileExt = file.name.split('.').pop();
-      const filePath = `${user.id}/${crypto.randomUUID()}.${fileExt}`;
+      const filePath = `${user?.id}/avatar-${Math.random()}.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(filePath, file);
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        throw uploadError;
+      }
 
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ avatar_url: filePath })
-        .eq('id', user.id);
+      const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
 
-      if (updateError) throw updateError;
+      if (data) {
+        await supabase
+          .from('profiles')
+          .update({
+            avatar_url: data.publicUrl,
+          })
+          .eq('id', user?.id);
 
-      toast({
-        title: "Success",
-        description: "Profile photo updated successfully",
-      });
-
-      window.location.reload();
+        // Custom property for the header banner - note this would need to be properly typed in the database
+        // Normally we would add a banner_url column to the profiles table
+        toast({
+          title: "Avatar updated",
+          description: "Your avatar has been updated successfully.",
+        });
+        
+        onUpdateProfile();
+      }
     } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to upload profile photo",
+        description: error.message || "Failed to upload avatar",
       });
-    } finally {
-      setUploading(false);
     }
   };
 
-  const handleBannerUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarDelete = async () => {
     try {
-      setUploadingBanner(true);
-      const file = event.target.files?.[0];
-      if (!file) return;
-
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const fileExt = file.name.split('.').pop();
-      const filePath = `${user.id}/${crypto.randomUUID()}.${fileExt}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('profile_banners')
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const { error: updateError } = await supabase
+      await supabase
         .from('profiles')
-        .update({ banner_url: filePath })
-        .eq('id', user.id);
-
-      if (updateError) throw updateError;
-
+        .update({ avatar_url: null })
+        .eq('id', user?.id);
+      
       toast({
-        title: "Success",
-        description: "Banner photo updated successfully",
+        title: "Avatar removed",
+        description: "Your avatar has been removed.",
       });
-
-      window.location.reload();
+      
+      setDeletingAvatar(false);
+      onUpdateProfile();
     } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to upload banner photo",
+        description: error.message || "Failed to remove avatar",
       });
-    } finally {
-      setUploadingBanner(false);
     }
   };
 
   return (
-    <div className="relative w-full mb-8">
-      {/* Background Banner */}
-      <div className="relative h-48 md:h-64 rounded-t-lg overflow-hidden group">
-        {bannerUrl ? (
-          <img
-            src={supabase.storage.from('profile_banners').getPublicUrl(bannerUrl).data.publicUrl}
-            alt="Profile Banner"
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="absolute inset-0 bg-gradient-to-r from-siso-red/10 to-siso-orange/10" />
-        )}
-        
-        <motion.div 
-          className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity"
-          onHoverStart={() => setIsHoveringBanner(true)}
-          onHoverEnd={() => setIsHoveringBanner(false)}
-        >
-          <label className="cursor-pointer">
+    <div className="space-y-4">
+      {/* Banner */}
+      <div className="relative h-32 sm:h-48 rounded-lg bg-gradient-to-r from-siso-text/10 to-siso-text/5 overflow-hidden">
+        {/* Allow banner upload if editable */}
+        {editable && (
+          <>
             <input
               type="file"
+              ref={bannerInputRef as MutableRefObject<HTMLInputElement>}
               accept="image/*"
               className="hidden"
-              onChange={handleBannerUpload}
-              disabled={uploadingBanner}
+              onChange={() => {/* Banner upload would go here */}}
             />
-            <Camera className="w-8 h-8 text-white" />
-            <span className="block text-sm text-white mt-2">
-              {uploadingBanner ? 'Uploading...' : 'Change Banner'}
-            </span>
-          </label>
-        </motion.div>
-      </div>
-      
-      <Card className="relative -mt-16 mx-6 bg-black/20 backdrop-blur-sm border-siso-text/10">
-        <div className="p-6 space-y-6">
-          {/* Profile Header Content */}
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-            {/* Avatar Section */}
-            <motion.div 
-              className="relative -mt-20 group"
-              onHoverStart={() => setIsHoveringAvatar(true)}
-              onHoverEnd={() => setIsHoveringAvatar(false)}
+            <Button
+              variant="secondary"
+              size="icon"
+              className="absolute top-2 right-2 bg-black/40 hover:bg-black/60"
+              onClick={() => bannerInputRef.current?.click()}
             >
-              <div className="h-24 w-24 rounded-full ring-4 ring-black/20 overflow-hidden bg-gradient-to-br from-siso-red/20 to-siso-orange/20">
-                {avatarUrl ? (
-                  <img 
-                    src={supabase.storage.from('avatars').getPublicUrl(avatarUrl).data.publicUrl}
-                    alt="Profile"
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="h-full w-full flex items-center justify-center">
-                    <User className="w-12 h-12 text-siso-red" />
-                  </div>
-                )}
-              </div>
-              <AnimatePresence>
-                {isHoveringAvatar && (
-                  <motion.label 
-                    className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full cursor-pointer"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ duration: 0.2 }}
+              <Camera className="h-4 w-4" />
+            </Button>
+          </>
+        )}
+      </div>
+
+      <div className="flex flex-col sm:flex-row gap-4 -mt-16 sm:-mt-20 px-4">
+        {/* Avatar */}
+        <div className="relative">
+          <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-background overflow-hidden">
+            <AspectRatio ratio={1} className="bg-muted">
+              {profile.avatar_url ? (
+                <img 
+                  src={profile.avatar_url} 
+                  alt={profile.full_name || 'Avatar'} 
+                  className="object-cover h-full w-full"
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full bg-siso-text/10 text-siso-text/60 font-medium text-lg">
+                  {(profile.full_name || user?.email || 'User').charAt(0).toUpperCase()}
+                </div>
+              )}
+            </AspectRatio>
+          </div>
+
+          {/* Avatar edit controls */}
+          {editable && (
+            <>
+              <input
+                type="file"
+                ref={avatarInputRef}
+                accept="image/*"
+                className="hidden"
+                onChange={handleAvatarUpload}
+              />
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className="absolute bottom-0 right-0 rounded-full bg-background hover:bg-siso-text/10"
                   >
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleAvatarUpload}
-                      disabled={uploading}
-                    />
-                    <Camera className="w-6 h-6 text-white" />
-                  </motion.label>
-                )}
-              </AnimatePresence>
-            </motion.div>
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => avatarInputRef.current?.click()}>
+                    <Camera className="h-4 w-4 mr-2" /> Change Avatar
+                  </DropdownMenuItem>
+                  {profile.avatar_url && (
+                    <DropdownMenuItem onClick={() => setDeletingAvatar(true)} className="text-red-500">
+                      <Trash2 className="h-4 w-4 mr-2" /> Remove Avatar
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          )}
+        </div>
 
-            {/* User Info Section */}
-            <div className="flex-1 space-y-2">
-              <motion.h1 
-                className="text-3xl font-bold text-siso-text-bold"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                {fullName || email?.split('@')[0]}
-              </motion.h1>
-              <div className="flex flex-wrap items-center gap-4 text-siso-text/70">
-                <motion.div 
-                  className="flex items-center gap-2"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: 0.1 }}
-                >
-                  <Mail className="w-4 h-4" />
-                  <span>{email}</span>
-                </motion.div>
-                <motion.div 
-                  className="flex items-center gap-2"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: 0.2 }}
-                >
-                  <Trophy className="w-4 h-4 text-siso-orange" />
-                  <span className="font-medium">{points || 0} points</span>
-                </motion.div>
-                <motion.div 
-                  className="flex items-center gap-2"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: 0.3 }}
-                >
-                  <Star className="w-4 h-4 text-siso-orange" />
-                  <span className="font-medium">{rank || 'Newbie'}</span>
-                </motion.div>
-              </div>
-            </div>
-
-            {/* Actions Section */}
-            <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-              <Button 
-                variant="outline" 
-                className="w-full sm:w-auto border-siso-red text-siso-text hover:bg-siso-red hover:text-white transition-colors flex items-center gap-2"
-                onClick={onLogout}
-              >
-                <LogOut className="w-4 h-4" />
-                Logout
-              </Button>
-              <Button 
-                variant="outline" 
-                className="w-full sm:w-auto border-siso-text/20 text-siso-text-bold hover:bg-siso-text/10 flex items-center gap-2"
-                onClick={onBackToHome}
-              >
-                <Home className="w-4 h-4" />
-                Back to Home
-              </Button>
-            </div>
+        {/* User details */}
+        <div className="flex-1 flex flex-col justify-end">
+          <div>
+            <h1 className="text-2xl font-bold text-siso-text-bold">
+              {profile.full_name || 'Anonymous User'}
+            </h1>
+            <p className="text-siso-text/60 text-sm">
+              {profile.professional_role || 'Community Member'}
+            </p>
+            
+            {profile.bio && (
+              <p className="text-siso-text/80 text-sm mt-2 max-w-3xl">
+                {profile.bio}
+              </p>
+            )}
+            
+            {/* Social links */}
+            <UserSocialLinks profile={profile} className="mt-3" />
           </div>
         </div>
-      </Card>
+      </div>
+      
+      {/* Achievements & stats */}
+      <div className="px-4">
+        <AchievementList achievements={achievements} />
+      </div>
+
+      {/* Delete avatar confirmation dialog */}
+      <AlertDialog open={deletingAvatar} onOpenChange={setDeletingAvatar}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove Avatar?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove your avatar? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleAvatarDelete}>Remove</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

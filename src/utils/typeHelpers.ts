@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { safeSupabase } from "./supabaseHelpers";
 import FeatureFlags from "./featureFlags";
@@ -46,4 +47,15 @@ export function safeJsonAccess<T>(obj: any, key: string, defaultValue: T): T {
   } catch (e) {
     return defaultValue;
   }
+}
+
+/**
+ * Safely cast data to a specific type when the structure doesn't match exactly
+ * This helps with tables that don't exist in the database but we need to type them
+ * 
+ * @param data Any data structure
+ * @returns The data cast to the specified type
+ */
+export function safeCast<T>(data: any): T {
+  return data as unknown as T;
 }

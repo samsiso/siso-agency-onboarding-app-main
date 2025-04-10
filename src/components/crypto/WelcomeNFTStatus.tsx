@@ -1,12 +1,12 @@
-
 import { useEffect, useState, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Gift, Loader2, Share2, Twitter } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Confetti } from '@/components/ui/confetti';
+import { safeSupabase } from '@/utils/supabaseHelpers';
+import FeatureFlags from '@/utils/featureFlags';
 
 interface NFTMetadata {
   name: string;
@@ -15,8 +15,10 @@ interface NFTMetadata {
   mint_address: string;
 }
 
+type NFTStatusType = 'pending' | 'completed' | 'failed';
+
 interface WelcomeNFTStatus {
-  status: 'pending' | 'completed' | 'failed';
+  status: NFTStatusType;
   error_message?: string;
   metadata?: NFTMetadata;
 }
@@ -40,12 +42,18 @@ export const WelcomeNFTStatus = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    if (!FeatureFlags.nft) {
+      setStatus({ status: 'pending' });
+      setLoading(false);
+      return;
+    }
+
     const fetchStatus = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await safeSupabase.auth.getSession();
         if (!session) return;
 
-        const { data, error } = await supabase
+        const { data, error } = await safeSupabase
           .from('welcome_nft_mints')
           .select('*')
           .eq('user_id', session.user.id)
@@ -53,13 +61,18 @@ export const WelcomeNFTStatus = () => {
 
         if (error) throw error;
 
-        const nftStatus: WelcomeNFTStatus = {
-          status: data.status,
+        // Ensure status is one of our allowed types
+        const nftStatus: NFTStatusType = ['pending', 'completed', 'failed'].includes(data.status) 
+          ? data.status as NFTStatusType 
+          : 'pending';
+
+        const nftData: WelcomeNFTStatus = {
+          status: nftStatus,
           error_message: data.error_message,
           metadata: isValidNFTMetadata(data.metadata) ? data.metadata : undefined
         };
 
-        setStatus(nftStatus);
+        setStatus(nftData);
 
         if (data?.status === 'completed' && isValidNFTMetadata(data.metadata)) {
           confettiRef.current?.fire();
@@ -77,7 +90,7 @@ export const WelcomeNFTStatus = () => {
 
     fetchStatus();
 
-    const channel = supabase
+    const channel = safeSupabase
       .channel('welcome-nft-status')
       .on(
         'postgres_changes',
@@ -85,17 +98,23 @@ export const WelcomeNFTStatus = () => {
           event: 'UPDATE',
           schema: 'public',
           table: 'welcome_nft_mints',
-          filter: `user_id=eq.${supabase.auth.getUser()}`
+          filter: `user_id=eq.${safeSupabase.auth.getUser()}`
         },
         (payload) => {
           const newData = payload.new;
-          const nftStatus: WelcomeNFTStatus = {
-            status: newData.status,
+          
+          // Ensure status is one of our allowed types
+          const nftStatus: NFTStatusType = ['pending', 'completed', 'failed'].includes(newData.status) 
+            ? newData.status as NFTStatusType 
+            : 'pending';
+            
+          const nftData: WelcomeNFTStatus = {
+            status: nftStatus,
             error_message: newData.error_message,
             metadata: isValidNFTMetadata(newData.metadata) ? newData.metadata : undefined
           };
           
-          setStatus(nftStatus);
+          setStatus(nftData);
           
           if (newData.status === 'completed' && isValidNFTMetadata(newData.metadata)) {
             confettiRef.current?.fire();
@@ -193,6 +212,7 @@ export const WelcomeNFTStatus = () => {
             )}
 
             {status.status === 'completed' && status.metadata && (
+              
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
