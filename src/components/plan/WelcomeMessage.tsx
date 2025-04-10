@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Heart, Sparkles, TrendingUp, Trophy, CheckCircle2, Clock, Info, ArrowRight, Users, Calendar } from 'lucide-react';
@@ -239,3 +240,4 @@ export const WelcomeMessage = ({
     </>
   );
 };
+

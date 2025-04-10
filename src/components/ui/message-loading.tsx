@@ -15,3 +15,4 @@ export function MessageLoading({ className, ...props }: MessageLoadingProps) {
     </div>
   );
 }
+

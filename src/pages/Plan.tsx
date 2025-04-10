@@ -239,10 +239,11 @@ const Plan = () => {
   if (loading) {
     return (
       <div className="flex min-h-screen w-full flex-col items-center justify-center bg-gradient-to-b from-black via-siso-bg to-black p-4 md:p-8">
-        <MessageLoading 
-          message="Loading your personalized plan..." 
-          subMessage="We're preparing everything just for you"
-        />
+        <div className="text-center space-y-4">
+          <MessageLoading className="justify-center mb-4" />
+          <h2 className="text-xl font-semibold text-white">Loading your personalized plan...</h2>
+          <p className="text-siso-text">We're preparing everything just for you</p>
+        </div>
       </div>
     );
   }
@@ -266,17 +267,15 @@ const Plan = () => {
       <div className="mx-auto max-w-5xl">
         <div ref={mainContentRef} className="space-y-8">
           <WelcomeMessage 
-            companyName={planData.company_name || 'Your Company'} 
-            appName={planData.app_name || 'Your App'}
-            brandColor={selectedColor}
+            agencyName={planData.company_name || 'Your Company'} 
+            industryType="OnlyFans"
+            scrollToFeatures={() => {}}
           />
           
           <section className="space-y-4">
             <GradientHeading 
-              as="h2" 
               className="text-2xl font-bold" 
-              from={selectedColor} 
-              to="#ED8936"
+              variant="primary"
             >
               Understanding Your Agency's Challenges
             </GradientHeading>
@@ -293,10 +292,8 @@ const Plan = () => {
           {showSolutionsSection && (
             <section id="solutions-section" className="space-y-4 pt-6">
               <GradientHeading 
-                as="h2" 
                 className="text-2xl font-bold" 
-                from={selectedColor} 
-                to="#ED8936"
+                variant="primary"
               >
                 Our Complete Solution
               </GradientHeading>
@@ -405,10 +402,8 @@ const Plan = () => {
           
           <section className="space-y-4">
             <GradientHeading 
-              as="h2" 
               className="text-2xl font-bold" 
-              from={selectedColor} 
-              to="#ED8936"
+              variant="primary"
             >
               Proven Success Stories
             </GradientHeading>
@@ -432,10 +427,8 @@ const Plan = () => {
           
           <section className="space-y-4">
             <GradientHeading 
-              as="h2" 
               className="text-2xl font-bold" 
-              from={selectedColor} 
-              to="#ED8936"
+              variant="primary"
             >
               Your Implementation Plan
             </GradientHeading>
@@ -530,10 +523,8 @@ const Plan = () => {
           
           <section className="space-y-4">
             <GradientHeading 
-              as="h2" 
               className="text-2xl font-bold" 
-              from={selectedColor} 
-              to="#ED8936"
+              variant="primary"
             >
               Next Steps
             </GradientHeading>
@@ -582,3 +573,4 @@ const Plan = () => {
 };
 
 export default Plan;
+

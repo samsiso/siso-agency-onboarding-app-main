@@ -27,3 +27,4 @@ export function GradientHeading({
     </h2>
   );
 }
+
