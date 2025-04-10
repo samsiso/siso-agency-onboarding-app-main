@@ -16,41 +16,23 @@ import {
   BarChart, 
   Shield, 
   Settings, 
-  Target,
-  Smartphone,
-  Heart,
   ExternalLink,
   Sparkles,
   TrendingUp,
   Clock,
   Info,
-  AlertTriangle,
-  Search,
-  ChevronDown,
-  Zap
+  Target
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { Card, CardContent } from '@/components/ui/card';
 import { MessageLoading } from '@/components/ui/message-loading';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ColorPicker } from '@/components/plan/ColorPicker';
-import { FeatureSelection, Feature } from '@/components/plan/FeatureSelection';
 import { CaseStudy } from '@/components/plan/CaseStudy';
 import { WelcomeMessage } from '@/components/plan/WelcomeMessage';
-import { Skeleton } from '@/components/ui/skeleton';
-import { InteractiveCallout } from '@/components/plan/InteractiveCallout';
 import { PainPointsModal, PainPointDetailProps } from '@/components/plan/PainPointsModal';
-import { Progress } from '@/components/ui/progress';
-import { SolutionsShowcase } from '@/components/plan/SolutionsShowcase';
 import { PlanReviewSummary } from '@/components/plan/PlanReviewSummary';
 import { AgencyPainPoints } from '@/components/plan/AgencyPainPoints';
-import { TierFeatureSelection, FeatureItem } from '@/components/plan/TierFeatureSelection';
 import { ROICalculator } from '@/components/plan/ROICalculator';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { FeatureSection } from '@/components/plan/FeatureSection';
+import { caseStudies } from '@/data/plan/featureData';
 
 interface PlanData {
   id: string;
@@ -68,178 +50,6 @@ interface PlanData {
   status: string | null;
 }
 
-interface FeatureCategory {
-  name: string;
-  icon: JSX.Element;
-  description: string;
-  features: string[];
-}
-
-interface PainPoint {
-  problem: string;
-  statistic: string;
-  solution: string;
-  detailedSolution: string;
-  benefits: string[];
-  metrics: { label: string; value: string; icon: JSX.Element }[];
-  images: { url: string; caption: string }[];
-  caseStudyLink: string;
-  videoUrl?: string;
-  researchSources?: { title: string; url: string; description: string }[];
-}
-
-interface Testimonial {
-  content: string;
-  author: string;
-  position: string;
-  instagram?: string;
-  appLink?: string;
-}
-
-const brandColorOptions = [
-  { name: 'Classic Red', value: '#E53E3E' },
-  { name: 'Vibrant Orange', value: '#ED8936' },
-  { name: 'Royal Purple', value: '#805AD5' },
-  { name: 'Ocean Blue', value: '#3182CE' },
-  { name: 'Emerald Green', value: '#38A169' },
-  { name: 'Hot Pink', value: '#D53F8C' },
-  { name: 'Slate Gray', value: '#4A5568' },
-  { name: 'Midnight Black', value: '#1A202C' },
-  { name: 'Modern Teal', value: '#319795' }
-];
-
-const caseStudies = [
-  {
-    title: 'OnlyFans Management Platform for Agency X',
-    description: 'How we helped Agency X increase their client retention by 40% and double their revenue with our custom platform.',
-    imageUrl: '/lovable-uploads/c7ac43fd-bc3e-478d-8b4f-809beafb6838.png',
-    notionUrl: 'https://www.notion.so/Case-Study-OnlyFans-Management-Platform-123456'
-  },
-  {
-    title: 'Creator Content Management System',
-    description: 'A dedicated content scheduling and management system that improved workflow efficiency by 60%.',
-    imageUrl: '/lovable-uploads/1f9eba1e-c2af-4ed8-84e7-a375872c9182.png',
-    notionUrl: 'https://www.notion.so/Case-Study-Content-Management-System-789012'
-  },
-  {
-    title: 'Fan Engagement & Analytics Dashboard',
-    description: 'How our analytics tools helped boost fan engagement and increase subscription renewal rates.',
-    imageUrl: '/lovable-uploads/19ca8c73-3736-4506-bfb2-de867b272e12.png',
-    notionUrl: 'https://www.notion.so/Case-Study-Fan-Engagement-Analytics-345678'
-  }
-];
-
-const additionalFeatures: Feature[] = [
-  {
-    id: 'white-label',
-    name: 'White Label Branding',
-    description: 'Remove all Siso branding and use your own logo and colors throughout the platform.',
-    price: 1200,
-    included: false
-  },
-  {
-    id: 'mobile-apps',
-    name: 'Native Mobile Apps',
-    description: 'iOS and Android mobile apps for your team and clients to access the platform on the go.',
-    price: 2500,
-    included: false
-  },
-  {
-    id: 'api-integration',
-    name: 'Custom API Integrations',
-    description: 'Connect with additional platforms and services beyond our standard integrations.',
-    price: 1800,
-    included: false
-  },
-  {
-    id: 'ai-insights',
-    name: 'AI Content Insights',
-    description: 'Advanced AI tools to analyze content performance and suggest improvements.',
-    price: 1500,
-    included: false
-  },
-  {
-    id: 'premium-support',
-    name: 'Premium Support Package',
-    description: '24/7 dedicated support team with 1-hour response time and monthly strategy calls.',
-    price: 950,
-    included: false
-  }
-];
-
-const featureCategories = [
-  {
-    id: 'client',
-    name: 'Client Management',
-    icon: <Users className="h-5 w-5" />,
-    features: [
-      { id: 'client-profiles', name: 'Client Profiles', description: 'Detailed profiles for each creator with basic information.', timeEstimate: 0.5 },
-      { id: 'performance-dashboard', name: 'Basic Performance Dashboard', description: 'View key metrics like earnings and subscriber count.', timeEstimate: 1 },
-      { id: 'earnings-tracking', name: 'Earnings Tracking', description: 'Monitor creator revenue over time with basic charts.', timeEstimate: 1.5 },
-      { id: 'subscriber-tracking', name: 'Subscriber Count Tracking', description: 'Track subscriber growth or decline over time.', timeEstimate: 1 },
-      { id: 'advanced-analytics', name: 'Advanced Creator Analytics', description: 'In-depth performance insights with predictive trends.', timeEstimate: 3 },
-    ]
-  },
-  {
-    id: 'content',
-    name: 'Content Management',
-    icon: <FileText className="h-5 w-5" />,
-    features: [
-      { id: 'content-calendar', name: 'Simple Content Calendar', description: 'Plan posts with a basic scheduling tool.', timeEstimate: 1.5 },
-      { id: 'media-library', name: 'Media Library with Basic Tagging', description: 'Store and categorize assets with simple tags.', timeEstimate: 2 },
-      { id: 'content-approval', name: 'Content Approval Workflow', description: 'Approve or reject creator content before posting.', timeEstimate: 1.5 },
-      { id: 'ai-content-optimization', name: 'AI Content Optimization', description: 'Get suggestions to improve content based on trending topics.', timeEstimate: 4 },
-    ]
-  },
-  {
-    id: 'communication',
-    name: 'Communication Tools',
-    icon: <MessageSquare className="h-5 w-5" />,
-    features: [
-      { id: 'in-app-messaging', name: 'In-App Messaging', description: 'Direct messaging between agency and creators.', timeEstimate: 3 },
-      { id: 'notification-system', name: 'Notification System', description: 'Alerts for deadlines, updates, and important events.', timeEstimate: 2 },
-      { id: 'fan-interaction', name: 'Fan Interaction Tools', description: 'Manage fan messages and interactions efficiently.', timeEstimate: 4 },
-    ]
-  },
-  {
-    id: 'analytics',
-    name: 'Analytics',
-    icon: <BarChart className="h-5 w-5" />,
-    features: [
-      { id: 'basic-earnings', name: 'Basic Earnings Report', description: 'Simple revenue overview with basic filtering.', timeEstimate: 1 },
-      { id: 'subscriber-growth', name: 'Subscriber Growth Chart', description: 'Visualize subscriber trends over time.', timeEstimate: 1 },
-      { id: 'content-performance', name: 'Content Performance Metrics', description: 'Track likes, views, and engagement for each post.', timeEstimate: 2 },
-    ]
-  },
-  {
-    id: 'security',
-    name: 'Security',
-    icon: <Shield className="h-5 w-5" />,
-    features: [
-      { id: 'user-authentication', name: 'User Authentication', description: 'Secure login for agency staff and creators.', timeEstimate: 1 },
-      { id: 'role-based-access', name: 'Role-Based Access Control', description: 'Limit access based on user roles within the agency.', timeEstimate: 2 },
-      { id: 'two-factor', name: 'Two-Factor Authentication', description: 'Extra layer of security for account access.', timeEstimate: 1.5 },
-    ]
-  },
-  {
-    id: 'automation',
-    name: 'Automation',
-    icon: <Settings className="h-5 w-5" />,
-    features: [
-      { id: 'automated-reminders', name: 'Automated Reminders', description: 'Notify creators of upcoming deadlines automatically.', timeEstimate: 1 },
-      { id: 'workflow-automation', name: 'Basic Workflow Automation', description: 'Automate repetitive steps like content approvals.', timeEstimate: 2.5 },
-      { id: 'fan-engagement', name: 'Automated Fan Engagement', description: 'Schedule and automate fan outreach campaigns.', timeEstimate: 4 },
-    ]
-  }
-];
-
-const tierComparison = [
-  { name: 'Max Features', mvp: '10', advanced: 'Unlimited', premium: 'All Features' },
-  { name: 'Base Timeline', mvp: '90 days', advanced: '60 days', premium: '21 days' },
-  { name: 'Support Level', mvp: 'Standard', advanced: 'Standard', premium: 'Priority' },
-  { name: 'Price', mvp: 'Free', advanced: '£249', premium: '£499' }
-];
-
 const Plan = () => {
   const { username } = useParams<{ username: string }>();
   const navigate = useNavigate();
@@ -253,18 +63,9 @@ const Plan = () => {
   const [selectedPainPoint, setSelectedPainPoint] = useState<PainPointDetailProps | null>(null);
   const [showSolutionsSection, setShowSolutionsSection] = useState(false);
   const [showFeatureSelection, setShowFeatureSelection] = useState(true);
-  
-  const [selectedTierFeatures, setSelectedTierFeatures] = useState<FeatureItem[]>([]);
-  const [selectedTier, setSelectedTier] = useState<string>('mvp');
   const [totalTime, setTotalTime] = useState<number>(14);
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedFeatureIds, setSelectedFeatureIds] = useState<string[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
-  const [currentTier, setCurrentTier] = useState('mvp');
   
   const mainContentRef = useRef<HTMLDivElement>(null);
   
@@ -328,14 +129,8 @@ const Plan = () => {
     }, 100);
   };
   
-  const handleFeatureSelection = (features: FeatureItem[], tier: string, time: number, price: number) => {
-    setSelectedTierFeatures(features);
-    setSelectedTier(tier);
-    setTotalTime(time);
-    setTotalPrice(price);
-    
-    const featureNames = features.map(f => f.name);
-    setSelectedFeatures(featureNames);
+  const handleFinalizeFeatures = (features: string[]) => {
+    setSelectedFeatures(features);
     
     setTimeout(() => {
       const reviewSection = document.getElementById('review-section');
@@ -345,58 +140,17 @@ const Plan = () => {
     }, 300);
   };
   
-  const handleFeatureToggle = (featureId: string) => {
-    const newSelectedFeatures = [...selectedFeatureIds];
-    const featureIndex = newSelectedFeatures.indexOf(featureId);
+  const handleShowFeatures = () => {
+    setShowFeatureSelection(true);
     
-    if (featureIndex === -1) {
-      if (currentTier === 'mvp' && newSelectedFeatures.length >= 10) {
-        setShowUpgradePrompt(true);
-        return;
-      }
-      
-      newSelectedFeatures.push(featureId);
-    } else {
-      newSelectedFeatures.splice(featureIndex, 1);
-    }
-    
-    setSelectedFeatureIds(newSelectedFeatures);
-  };
-  
-  const calculateTotalTime = () => {
-    let baseDays = 90;
-    
-    if (currentTier === 'advanced') baseDays = 60;
-    if (currentTier === 'premium') baseDays = 21;
-    
-    let additionalTime = 0;
-    selectedFeatureIds.forEach(featureId => {
-      for (const category of featureCategories) {
-        const feature = category.features.find(f => f.id === featureId);
-        if (feature) {
-          additionalTime += feature.timeEstimate;
-          break;
+    setTimeout(() => {
+      if (mainContentRef.current) {
+        const featuresSection = mainContentRef.current.querySelector('#features-section');
+        if (featuresSection) {
+          featuresSection.scrollIntoView({ behavior: 'smooth' });
         }
       }
-    });
-    
-    return { baseDays, additionalTime };
-  };
-  
-  const { baseDays, additionalTime } = calculateTotalTime();
-  const totalDays = baseDays + Math.floor(additionalTime);
-  const additionalHours = (additionalTime % 1) * 24;
-  
-  const handleTierChange = (tier: string) => {
-    setCurrentTier(tier);
-    setShowUpgradePrompt(false);
-  };
-  
-  const getFilteredFeatures = (category: any) => {
-    return category.features.filter((feature: any) => 
-      feature.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      feature.description.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    }, 100);
   };
   
   const handleApprovePlan = () => {
@@ -411,19 +165,6 @@ const Plan = () => {
       
       navigate('/dashboard');
     }, 2000);
-  };
-  
-  const handleShowFeatures = () => {
-    setShowFeatureSelection(true);
-    
-    setTimeout(() => {
-      if (mainContentRef.current) {
-        const featuresSection = mainContentRef.current.querySelector('#features-section');
-        if (featuresSection) {
-          featuresSection.scrollIntoView({ behavior: 'smooth' });
-        }
-      }
-    }, 100);
   };
   
   if (loading) {
@@ -591,274 +332,7 @@ const Plan = () => {
           )}
           
           {showFeatureSelection && (
-            <section id="features-section" className="space-y-4 pt-6">
-              <GradientHeading 
-                className="text-2xl font-bold" 
-                variant="primary"
-              >
-                Customize Your Features
-              </GradientHeading>
-              
-              <div className="bg-black/20 backdrop-blur-sm border border-siso-text/10 rounded-lg p-6 mb-6">
-                <div className="flex items-start gap-4">
-                  <div className="rounded-full bg-siso-orange/20 p-3 shrink-0">
-                    <Settings className="h-6 w-6 text-siso-orange" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-white mb-2">Feature Selection</h3>
-                    <p className="text-siso-text mb-4">
-                      Pick up to 10 features for the free MVP tier. Each feature adds time to the 90-day base timeline.
-                      Need more features or a faster delivery? Upgrade to Advanced or Premium.
-                    </p>
-                    
-                    <div className="overflow-x-auto mb-4">
-                      <table className="w-full border-collapse">
-                        <thead>
-                          <tr>
-                            <th className="text-left text-xs font-medium text-siso-text p-2 border-b border-siso-text/10"></th>
-                            <th className="text-center text-xs font-medium text-siso-text p-2 border-b border-siso-text/10">MVP</th>
-                            <th className="text-center text-xs font-medium text-siso-text p-2 border-b border-siso-text/10">Advanced</th>
-                            <th className="text-center text-xs font-medium text-siso-text p-2 border-b border-siso-text/10">Premium</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {tierComparison.map((row, index) => (
-                            <tr key={index}>
-                              <td className="text-left text-xs text-white p-2 border-b border-siso-text/10">{row.name}</td>
-                              <td className="text-center text-xs text-siso-text p-2 border-b border-siso-text/10">{row.mvp}</td>
-                              <td className="text-center text-xs text-siso-text p-2 border-b border-siso-text/10">{row.advanced}</td>
-                              <td className="text-center text-xs text-siso-text p-2 border-b border-siso-text/10">{row.premium}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                    
-                    <div className="flex space-x-2 mb-4">
-                      <Button 
-                        size="sm"
-                        variant={currentTier === 'mvp' ? 'default' : 'outline'}
-                        className={currentTier === 'mvp' ? 'bg-siso-orange hover:bg-siso-orange/90' : 'border-siso-text/20'}
-                        onClick={() => handleTierChange('mvp')}
-                      >
-                        MVP (Free)
-                      </Button>
-                      <Button 
-                        size="sm"
-                        variant={currentTier === 'advanced' ? 'default' : 'outline'}
-                        className={currentTier === 'advanced' ? 'bg-siso-orange hover:bg-siso-orange/90' : 'border-siso-text/20'}
-                        onClick={() => handleTierChange('advanced')}
-                      >
-                        Advanced (£249)
-                      </Button>
-                      <Button 
-                        size="sm"
-                        variant={currentTier === 'premium' ? 'default' : 'outline'}
-                        className={currentTier === 'premium' ? 'bg-siso-orange hover:bg-siso-orange/90' : 'border-siso-text/20'}
-                        onClick={() => handleTierChange('premium')}
-                      >
-                        Premium (£499)
-                      </Button>
-                    </div>
-                    
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center">
-                        <span className="text-sm font-medium text-white mr-2">Selected Features:</span>
-                        <Badge variant="outline" className="bg-siso-orange/10 text-siso-orange border-siso-orange/30">
-                          {selectedFeatureIds.length} {currentTier === 'mvp' ? `/ 10` : ''}
-                        </Badge>
-                      </div>
-                      
-                      <div className="flex items-center">
-                        <span className="text-sm font-medium text-white mr-2">Estimated Timeline:</span>
-                        <Badge variant="outline" className="bg-siso-orange/10 text-siso-orange border-siso-orange/30">
-                          {totalDays} days {additionalHours > 0 ? `+ ${Math.round(additionalHours)} hours` : ''}
-                        </Badge>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                <div className="relative flex-grow">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-siso-text" />
-                  <Input 
-                    placeholder="Search features..." 
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 bg-black/30 border-siso-text/20 text-white"
-                  />
-                </div>
-                
-                <div className="flex space-x-2 overflow-x-auto pb-2 sm:pb-0">
-                  <Button 
-                    size="sm"
-                    variant={selectedCategory === 'all' ? 'default' : 'outline'}
-                    className={selectedCategory === 'all' ? 'bg-siso-orange hover:bg-siso-orange/90' : 'border-siso-text/20'}
-                    onClick={() => setSelectedCategory('all')}
-                  >
-                    All
-                  </Button>
-                  
-                  {featureCategories.map((category) => (
-                    <Button 
-                      key={category.id}
-                      size="sm"
-                      variant={selectedCategory === category.id ? 'default' : 'outline'}
-                      className={selectedCategory === category.id ? 'bg-siso-orange hover:bg-siso-orange/90' : 'border-siso-text/20'}
-                      onClick={() => setSelectedCategory(category.id)}
-                    >
-                      {category.name}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-              
-              <div className="space-y-3">
-                <TooltipProvider>
-                  <Accordion type="multiple" className="space-y-3">
-                    {featureCategories
-                      .filter(category => selectedCategory === 'all' || category.id === selectedCategory)
-                      .map((category) => (
-                        <AccordionItem 
-                          key={category.id} 
-                          value={category.id}
-                          className="rounded-lg border border-siso-text/10 bg-black/20 overflow-hidden"
-                        >
-                          <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-black/40">
-                            <div className="flex items-center gap-2">
-                              <div className="rounded-full bg-siso-orange/10 p-1.5">
-                                {category.icon}
-                              </div>
-                              <span className="font-medium text-white">{category.name}</span>
-                            </div>
-                          </AccordionTrigger>
-                          <AccordionContent className="px-4 pb-4 pt-0">
-                            <div className="space-y-2 mt-2">
-                              {getFilteredFeatures(category).length === 0 ? (
-                                <p className="text-siso-text text-sm italic">No features match your search.</p>
-                              ) : (
-                                getFilteredFeatures(category).map((feature: any) => (
-                                  <div 
-                                    key={feature.id}
-                                    onClick={() => handleFeatureToggle(feature.id)}
-                                    className={`flex items-start gap-3 p-3 rounded-md cursor-pointer transition-colors ${
-                                      selectedFeatureIds.includes(feature.id) 
-                                        ? 'bg-siso-orange/10 border border-siso-orange/30' 
-                                        : 'bg-black/30 border border-siso-text/10 hover:bg-black/40'
-                                    }`}
-                                  >
-                                    <div className="mt-0.5 flex-shrink-0">
-                                      {selectedFeatureIds.includes(feature.id) ? (
-                                        <CheckCircle className="h-5 w-5 text-siso-orange" />
-                                      ) : (
-                                        <div className="h-5 w-5 rounded-full border-2 border-siso-text/50" />
-                                      )}
-                                    </div>
-                                    
-                                    <div className="flex-grow">
-                                      <div className="flex items-center justify-between">
-                                        <h4 className="font-medium text-white">{feature.name}</h4>
-                                        
-                                        <Tooltip>
-                                          <TooltipTrigger asChild>
-                                            <Badge variant="outline" className="bg-black/40 text-siso-text border-siso-text/20 flex items-center gap-1">
-                                              <Clock className="h-3 w-3" />
-                                              {feature.timeEstimate < 1 
-                                                ? `+${Math.round(feature.timeEstimate * 24)} hours` 
-                                                : `+${feature.timeEstimate} day${feature.timeEstimate !== 1 ? 's' : ''}`}
-                                            </Badge>
-                                          </TooltipTrigger>
-                                          <TooltipContent>
-                                            <p>This feature adds {feature.timeEstimate < 1 
-                                              ? `${Math.round(feature.timeEstimate * 24)} hours` 
-                                              : `${feature.timeEstimate} day${feature.timeEstimate !== 1 ? 's' : ''}`} to your timeline</p>
-                                          </TooltipContent>
-                                        </Tooltip>
-                                      </div>
-                                      <p className="text-sm text-siso-text mt-1">{feature.description}</p>
-                                    </div>
-                                  </div>
-                                ))
-                              )}
-                            </div>
-                          </AccordionContent>
-                        </AccordionItem>
-                      ))}
-                  </Accordion>
-                </TooltipProvider>
-              </div>
-              
-              {showUpgradePrompt && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mt-4 p-4 bg-siso-orange/10 border border-siso-orange/30 rounded-lg"
-                >
-                  <div className="flex items-start gap-3">
-                    <AlertTriangle className="h-5 w-5 text-siso-orange shrink-0 mt-1" />
-                    <div>
-                      <h4 className="text-white font-medium mb-1">Feature Limit Reached</h4>
-                      <p className="text-sm text-siso-text mb-3">
-                        You've reached the 10-feature limit for the MVP tier. Upgrade to Advanced or Premium for unlimited features.
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        <Button
-                          size="sm"
-                          onClick={() => handleTierChange('advanced')}
-                          className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90"
-                        >
-                          Upgrade to Advanced
-                          <Zap className="ml-2 h-3 w-3" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => setShowUpgradePrompt(false)}
-                          className="border-siso-text/20 text-siso-text"
-                        >
-                          Deselect Features
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-              
-              <div className="mt-6">
-                <Button 
-                  className="w-full bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90"
-                  size="lg"
-                  onClick={() => {
-                    const selectedFeatureNames = selectedFeatureIds.map(id => {
-                      for (const category of featureCategories) {
-                        const feature = category.features.find(f => f.id === id);
-                        if (feature) return feature.name;
-                      }
-                      return '';
-                    }).filter(Boolean);
-                    
-                    setSelectedFeatures(selectedFeatureNames);
-                    
-                    const reviewSection = document.getElementById('review-section');
-                    if (reviewSection) {
-                      reviewSection.scrollIntoView({ behavior: 'smooth' });
-                    } else {
-                      setTimeout(() => {
-                        const reviewSection = document.getElementById('review-section');
-                        if (reviewSection) {
-                          reviewSection.scrollIntoView({ behavior: 'smooth' });
-                        }
-                      }, 100);
-                    }
-                  }}
-                >
-                  Finalize Feature Selection
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-              </div>
-            </section>
+            <FeatureSection onFinalizeFeatures={handleFinalizeFeatures} />
           )}
           
           {selectedFeatures.length > 0 && (
@@ -872,8 +346,8 @@ const Plan = () => {
               
               <PlanReviewSummary
                 selectedFeatures={selectedFeatures}
-                timeline={totalDays}
-                totalCost={currentTier === 'mvp' ? 0 : (currentTier === 'advanced' ? 249 : 499)}
+                timeline={totalTime}
+                totalCost={0}
                 onApprove={handleApprovePlan}
                 isSubmitting={isSubmitting}
               />
@@ -888,9 +362,9 @@ const Plan = () => {
                 
                 <ROICalculator
                   selectedFeatures={selectedFeatures}
-                  featuresTimeEstimate={totalDays}
-                  tier={currentTier}
-                  basePrice={currentTier === 'mvp' ? 0 : (currentTier === 'advanced' ? 249 : 499)}
+                  featuresTimeEstimate={totalTime}
+                  tier="mvp"
+                  basePrice={0}
                 />
               </div>
             </section>
