@@ -52,9 +52,10 @@ export const handleAuthCallback = async () => {
           .eq('id', session.user.id)
           .single();
 
-        // Using safer access pattern
+        // Using safer access pattern with hasOwnProperty check
         const hasCompletedOnboarding = profile && 
-          (profile.onboarding_completed === true || profile.onboarding_step === 'completed');
+          (profile.onboarding_completed === true || 
+           (profile.hasOwnProperty('onboarding_step') && profile.onboarding_step === 'completed'));
           
         if (!hasCompletedOnboarding) {
           console.log('Redirecting to social onboarding...');

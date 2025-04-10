@@ -29,7 +29,8 @@ export const useGoogleAuth = () => {
 
         // Handle profile data safely
         const hasCompletedOnboarding = profile && 
-          (profile.onboarding_completed === true || profile.onboarding_step === 'completed');
+          (profile.onboarding_completed === true || 
+           (profile.hasOwnProperty('onboarding_step') && profile.onboarding_step === 'completed'));
 
         if (!hasCompletedOnboarding) {
           navigate('/onboarding/social');

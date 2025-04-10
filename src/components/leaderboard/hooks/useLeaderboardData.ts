@@ -54,6 +54,7 @@ export const useLeaderboardData = () => {
         ],
         profile: {
           full_name: `User ${i + 1}`,
+          email: `user${i+1}@example.com`, // Added email which was missing
           avatar_url: '',
           bio: `This is user ${i + 1}'s bio`,
           professional_role: 'Developer'

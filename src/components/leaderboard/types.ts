@@ -46,3 +46,9 @@ export interface TrendStats {
   users: number;
   tokens: number;
 }
+
+export interface LeaderboardFilter {
+  timeframe?: string;
+  timeRange?: 'all' | 'week' | 'month' | 'year';
+  category?: string;
+}
