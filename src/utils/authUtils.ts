@@ -1,25 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
 
-export const initiateGoogleSignIn = async () => {
-  const currentUrl = window.location.origin;
-  console.log('Current origin:', currentUrl);
-  
-  // Clear any existing session data before starting new auth flow
-  localStorage.removeItem('siso-auth-token');
-  
-  return await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: `${currentUrl}/api/auth/callback`,
-      queryParams: {
-        access_type: 'offline',
-        prompt: 'consent',
-      },
-    },
-  });
-};
-
 export const signOut = async () => {
   // Clear session data on sign out
   localStorage.removeItem('siso-auth-token');
@@ -52,10 +33,8 @@ export const handleAuthCallback = async () => {
           .eq('id', session.user.id)
           .single();
 
-        // Using safer access pattern with hasOwnProperty check
-        const hasCompletedOnboarding = profile && 
-          (profile.onboarding_completed === true || 
-           (profile.hasOwnProperty('onboarding_step') && profile.onboarding_step === 'completed'));
+        // Using safer access pattern with direct property check
+        const hasCompletedOnboarding = profile && profile.onboarding_completed === true;
           
         if (!hasCompletedOnboarding) {
           console.log('Redirecting to social onboarding...');
