@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { MessageCircle } from 'lucide-react';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from "@/integrations/supabase/client";
+import { safeSupabase } from '@/utils/supabaseHelpers';
 import { Input } from '@/components/ui/input';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePoints } from '@/hooks/usePoints';
@@ -39,7 +39,7 @@ export const NewsCardComments = ({ newsId, comments }: NewsCardCommentsProps) =>
     }
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await safeSupabase.auth.getSession();
       
       if (!session) {
         toast({
@@ -50,15 +50,17 @@ export const NewsCardComments = ({ newsId, comments }: NewsCardCommentsProps) =>
         return;
       }
 
-      const { error } = await supabase
+      // Fixed insertion to use singular object not array, and include user_id
+      const { error } = await safeSupabase
         .from('news_comments')
-        .insert([
-          {
-            news_id: newsId,
-            content: newComment.trim(),
-            user_email: session.user.email
-          }
-        ]);
+        .insert({
+          news_id: newsId,
+          content: newComment.trim(),
+          user_email: session.user.email,
+          user_id: session.user.id
+        })
+        .select()
+        .single();
 
       if (error) throw error;
 

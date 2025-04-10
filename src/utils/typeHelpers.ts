@@ -1,16 +1,23 @@
-
 import { supabase } from "@/integrations/supabase/client";
+import { safeSupabase } from "./supabaseHelpers";
+import FeatureFlags from "./featureFlags";
 
 /**
  * Helper function to handle TypeScript errors when querying tables not defined in the Database type.
- * This is a temporary solution until proper types are generated from the Supabase schema.
+ * Uses the feature flags to determine whether to use the real supabase client or the mock client.
  * 
  * @param tableName The name of the table to query
+ * @param feature The feature flag to check (optional)
  * @returns A typed query builder for the specified table
  */
-export function safeQuery(tableName: string) {
-  // We use type assertion to bypass TypeScript's type checking
-  // This is not ideal, but is a pragmatic workaround until complete types are generated
+export function safeQuery(tableName: string, feature?: keyof typeof FeatureFlags) {
+  // If a feature is specified and disabled, use the mock client
+  if (feature && !FeatureFlags[feature]) {
+    console.log(`Feature ${feature} is disabled. Using mock data for ${tableName}`);
+    return safeSupabase.from(tableName);
+  }
+  
+  // Otherwise use the real client with type assertion
   return supabase.from(tableName) as any;
 }
 
