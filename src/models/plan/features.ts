@@ -25,6 +25,8 @@ export interface FeatureItem {
   name: string;
   description: string;
   timeEstimate: number;
+  recommended?: boolean;
+  roi?: string;
 }
 
 export interface PlanTier {
