@@ -1,6 +1,6 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { safeSupabase } from '@/utils/supabaseHelpers';
 
 export interface VideoCategory {
   id: string;
@@ -16,7 +16,7 @@ export const useVideoCategories = () => {
     queryFn: async () => {
       console.log('[useVideoCategories] Fetching categories');
       
-      const { data: categories, error } = await supabase
+      const { data: categories, error } = await safeSupabase
         .from('video_categories')
         .select('*')
         .order('name');

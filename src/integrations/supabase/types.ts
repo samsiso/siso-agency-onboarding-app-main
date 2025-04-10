@@ -45,6 +45,99 @@ export type Database = {
         }
         Relationships: []
       }
+      category_stats: {
+        Row: {
+          category: string
+          community_count: number | null
+          id: string
+          total_members: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          community_count?: number | null
+          id?: string
+          total_members?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          community_count?: number | null
+          id?: string
+          total_members?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      crypto_transactions: {
+        Row: {
+          created_at: string | null
+          id: string
+          points_exchanged: number
+          status: string | null
+          tokens_received: number
+          transaction_type: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          points_exchanged: number
+          status?: string | null
+          tokens_received: number
+          transaction_type: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          points_exchanged?: number
+          status?: string | null
+          tokens_received?: number
+          transaction_type?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      education_creators: {
+        Row: {
+          channel_avatar_url: string | null
+          channel_id: string | null
+          created_at: string | null
+          description: string | null
+          expertise: string[] | null
+          id: string
+          name: string
+          slug: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          channel_avatar_url?: string | null
+          channel_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          expertise?: string[] | null
+          id?: string
+          name: string
+          slug?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          channel_avatar_url?: string | null
+          channel_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          expertise?: string[] | null
+          id?: string
+          name?: string
+          slug?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       help_articles: {
         Row: {
           category: string
@@ -105,6 +198,78 @@ export type Database = {
         }
         Relationships: []
       }
+      login_streaks: {
+        Row: {
+          created_at: string | null
+          current_streak: number | null
+          id: string
+          last_login: string | null
+          longest_streak: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          current_streak?: number | null
+          id?: string
+          last_login?: string | null
+          longest_streak?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          current_streak?: number | null
+          id?: string
+          last_login?: string | null
+          longest_streak?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      networking_resources: {
+        Row: {
+          category: string
+          created_at: string | null
+          description: string | null
+          id: string
+          is_featured: boolean | null
+          join_url: string | null
+          member_count: number | null
+          metadata: Json | null
+          name: string
+          platform: string
+          profile_image_url: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_featured?: boolean | null
+          join_url?: string | null
+          member_count?: number | null
+          metadata?: Json | null
+          name: string
+          platform: string
+          profile_image_url?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_featured?: boolean | null
+          join_url?: string | null
+          member_count?: number | null
+          metadata?: Json | null
+          name?: string
+          platform?: string
+          profile_image_url?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       news_comments: {
         Row: {
           content: string
@@ -129,6 +294,39 @@ export type Database = {
           news_id?: string
           user_email?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      nft_collections: {
+        Row: {
+          created_at: string | null
+          id: string
+          image_url: string | null
+          name: string
+          points_multiplier: number | null
+          tier: string | null
+          updated_at: string | null
+          weekly_bonus: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          points_multiplier?: number | null
+          tier?: string | null
+          updated_at?: string | null
+          weekly_bonus?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          points_multiplier?: number | null
+          tier?: string | null
+          updated_at?: string | null
+          weekly_bonus?: number | null
         }
         Relationships: []
       }
@@ -204,6 +402,66 @@ export type Database = {
           id?: string
           status?: string | null
           username?: string
+        }
+        Relationships: []
+      }
+      point_configurations: {
+        Row: {
+          action: string
+          cooldown_minutes: number | null
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          max_daily: number | null
+          points_value: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          action: string
+          cooldown_minutes?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_daily?: number | null
+          points_value?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          action?: string
+          cooldown_minutes?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_daily?: number | null
+          points_value?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      points_log: {
+        Row: {
+          action: string
+          created_at: string | null
+          id: string
+          points_earned: number
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          id?: string
+          points_earned: number
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          id?: string
+          points_earned?: number
+          user_id?: string
         }
         Relationships: []
       }
@@ -301,6 +559,50 @@ export type Database = {
           youtube_url?: string | null
         }
         Relationships: []
+      }
+      project_documentation: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          order_index: number | null
+          project_id: string | null
+          related_components: string[] | null
+          section: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          order_index?: number | null
+          project_id?: string | null
+          related_components?: string[] | null
+          section: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          order_index?: number | null
+          project_id?: string | null
+          related_components?: string[] | null
+          section?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_documentation_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       projects: {
         Row: {
@@ -409,6 +711,48 @@ export type Database = {
           },
         ]
       }
+      tools: {
+        Row: {
+          assistant_type: string
+          category: string
+          created_at: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          is_featured: boolean | null
+          metadata: Json | null
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          assistant_type: string
+          category: string
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          metadata?: Json | null
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          assistant_type?: string
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          metadata?: Json | null
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       transactions: {
         Row: {
           amount: number
@@ -438,6 +782,95 @@ export type Database = {
           metadata?: Json | null
           status?: string
           transaction_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_crypto_history: {
+        Row: {
+          created_at: string | null
+          id: string
+          points_exchanged: number
+          status: string | null
+          tokens_received: number
+          transaction_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          points_exchanged: number
+          status?: string | null
+          tokens_received: number
+          transaction_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          points_exchanged?: number
+          status?: string | null
+          tokens_received?: number
+          transaction_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_nfts: {
+        Row: {
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          mint_address: string | null
+          nft_collections: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          mint_address?: string | null
+          nft_collections?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          mint_address?: string | null
+          nft_collections?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_nfts_nft_collections_fkey"
+            columns: ["nft_collections"]
+            isOneToOne: false
+            referencedRelation: "nft_collections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_search_history: {
+        Row: {
+          created_at: string | null
+          id: string
+          query: string
+          result_type: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          query: string
+          result_type?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          query?: string
+          result_type?: string | null
           user_id?: string
         }
         Relationships: []
@@ -482,6 +915,228 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      video_bookmarks: {
+        Row: {
+          created_at: string | null
+          id: string
+          user_id: string
+          video_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          user_id: string
+          video_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          user_id?: string
+          video_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_bookmarks_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "youtube_videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      video_progress: {
+        Row: {
+          completed: boolean | null
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          last_position: number | null
+          progress: number | null
+          updated_at: string | null
+          user_id: string
+          video_id: string | null
+        }
+        Insert: {
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          last_position?: number | null
+          progress?: number | null
+          updated_at?: string | null
+          user_id: string
+          video_id?: string | null
+        }
+        Update: {
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          last_position?: number | null
+          progress?: number | null
+          updated_at?: string | null
+          user_id?: string
+          video_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_progress_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "youtube_videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      video_summaries: {
+        Row: {
+          created_at: string | null
+          difficulty_level: string | null
+          id: string
+          key_points: string[] | null
+          sentiment_score: number | null
+          summary: string | null
+          topics: string[] | null
+          updated_at: string | null
+          video_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          difficulty_level?: string | null
+          id?: string
+          key_points?: string[] | null
+          sentiment_score?: number | null
+          summary?: string | null
+          topics?: string[] | null
+          updated_at?: string | null
+          video_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          difficulty_level?: string | null
+          id?: string
+          key_points?: string[] | null
+          sentiment_score?: number | null
+          summary?: string | null
+          topics?: string[] | null
+          updated_at?: string | null
+          video_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_summaries_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "youtube_videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wallet_nonces: {
+        Row: {
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          nonce: string
+          public_key: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          nonce: string
+          public_key: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          nonce?: string
+          public_key?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      welcome_nft_mints: {
+        Row: {
+          created_at: string | null
+          error_message: string | null
+          id: string
+          metadata: Json | null
+          status: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      youtube_videos: {
+        Row: {
+          channel_id: string | null
+          created_at: string | null
+          description: string | null
+          duration: string | null
+          full_description: string | null
+          id: string
+          published_at: string | null
+          tags: string[] | null
+          thumbnailurl: string | null
+          title: string
+          updated_at: string | null
+          url: string
+          viewcount: number | null
+        }
+        Insert: {
+          channel_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          duration?: string | null
+          full_description?: string | null
+          id: string
+          published_at?: string | null
+          tags?: string[] | null
+          thumbnailurl?: string | null
+          title: string
+          updated_at?: string | null
+          url: string
+          viewcount?: number | null
+        }
+        Update: {
+          channel_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          duration?: string | null
+          full_description?: string | null
+          id?: string
+          published_at?: string | null
+          tags?: string[] | null
+          thumbnailurl?: string | null
+          title?: string
+          updated_at?: string | null
+          url?: string
+          viewcount?: number | null
+        }
+        Relationships: []
       }
     }
     Views: {

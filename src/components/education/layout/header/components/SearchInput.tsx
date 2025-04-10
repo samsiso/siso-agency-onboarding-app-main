@@ -6,10 +6,10 @@ import { Card } from '@/components/ui/card';
 import { SearchHistory } from './SearchHistory';
 import { SearchResults } from './SearchResults';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { safeSupabase } from '@/utils/supabaseHelpers';
 
 interface SearchInputProps {
   searchQuery: string;
@@ -39,7 +39,7 @@ export const SearchInput = ({
 
       try {
         const [videosResponse, educatorsResponse] = await Promise.all([
-          supabase
+          safeSupabase
             .from('youtube_videos')
             .select(`
               id,
@@ -50,7 +50,7 @@ export const SearchInput = ({
             .ilike('title', `%${searchQuery}%`)
             .limit(5),
 
-          supabase
+          safeSupabase
             .from('education_creators')
             .select(`
               id,
@@ -96,14 +96,14 @@ export const SearchInput = ({
   const { data: searchHistory, refetch: refetchHistory } = useQuery({
     queryKey: ['search-history'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await safeSupabase
         .from('user_search_history')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(5);
 
       if (error) throw error;
-      return data;
+      return data || [];
     },
     enabled: isExpanded
   });
@@ -128,11 +128,13 @@ export const SearchInput = ({
   const handleSearchResultClick = async (result: any) => {
     try {
       // Save to search history first
-      const { error: historyError } = await supabase.from('user_search_history').insert({
-        query: result.title,
-        result_type: result.type,
-        result_id: result.id
-      });
+      const { error: historyError } = await safeSupabase
+        .from('user_search_history')
+        .insert({
+          query: result.title,
+          result_type: result.type,
+          result_id: result.id
+        });
 
       if (historyError) {
         console.error('Error saving search history:', historyError);
@@ -149,7 +151,6 @@ export const SearchInput = ({
       // Close search panel and blur
       setIsExpanded(false);
       onBlur();
-
     } catch (error) {
       console.error('Navigation error:', error);
       toast.error('Failed to navigate. Please try again.');
@@ -242,4 +243,3 @@ export const SearchInput = ({
     </div>
   );
 };
-

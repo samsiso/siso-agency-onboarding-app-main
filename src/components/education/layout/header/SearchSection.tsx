@@ -2,7 +2,7 @@
 import { motion } from 'framer-motion';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { SearchInput } from './components/SearchInput';
-import { supabase } from '@/integrations/supabase/client';
+import { safeSupabase } from '@/utils/supabaseHelpers';
 
 interface SearchSectionProps {
   searchQuery: string;
@@ -39,10 +39,12 @@ export const SearchSection = ({
     if (!searchQuery.trim()) return;
 
     try {
-      await supabase.from('user_search_history').insert({
-        query: searchQuery,
-        result_type: 'path'
-      });
+      await safeSupabase
+        .from('user_search_history')
+        .insert({
+          query: searchQuery,
+          result_type: 'path'
+        });
       onBlur();
     } catch (error) {
       console.error('Error saving search:', error);

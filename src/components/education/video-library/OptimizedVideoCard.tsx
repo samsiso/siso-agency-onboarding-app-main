@@ -7,9 +7,9 @@ import { useAuthSession } from '@/hooks/useAuthSession';
 import { VideoThumbnail } from './VideoThumbnail';
 import { VideoActions } from './VideoActions';
 import { VideoMetadata } from './VideoMetadata';
-import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Clock, Calendar } from 'lucide-react';
+import { safeSupabase } from '@/utils/supabaseHelpers';
 
 interface OptimizedVideoCardProps {
   video: Video;
@@ -48,7 +48,7 @@ export const OptimizedVideoCard = ({ video, index, onClick, className }: Optimiz
     if (!user?.id) return;
     
     const checkBookmarkStatus = async () => {
-      const { data } = await supabase
+      const { data } = await safeSupabase
         .from('video_bookmarks')
         .select('id')
         .eq('user_id', user.id)

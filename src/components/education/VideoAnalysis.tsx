@@ -1,7 +1,8 @@
+
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { safeSupabase } from '@/utils/supabaseHelpers';
 
 interface VideoAnalysisProps {
   videoId: string;
@@ -11,7 +12,7 @@ export function VideoAnalysis({ videoId }: VideoAnalysisProps) {
   const { data: analysis, isLoading } = useQuery({
     queryKey: ['video-analysis', videoId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await safeSupabase
         .from('video_summaries')
         .select('*')
         .eq('video_id', videoId)

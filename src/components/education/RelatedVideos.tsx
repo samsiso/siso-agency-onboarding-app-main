@@ -1,7 +1,8 @@
+
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { ToolVideoCard } from '../tools/ToolVideoCard';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { safeSupabase } from '@/utils/supabaseHelpers';
 
 interface RelatedVideosProps {
   currentVideoId: string;
@@ -12,7 +13,7 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
   const { data: relatedVideos, isLoading } = useQuery({
     queryKey: ['related-videos', currentVideoId, topics],
     queryFn: async () => {
-      const { data: videos, error } = await supabase
+      const { data: videos, error } = await safeSupabase
         .from('youtube_videos')
         .select(`
           id,

@@ -1,6 +1,6 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { safeSupabase } from '@/utils/supabaseHelpers';
 import { Assistant } from '@/components/assistants/types';
 
 export function useAssistants() {
@@ -8,7 +8,7 @@ export function useAssistants() {
     queryKey: ['assistants'],
     queryFn: async () => {
       console.log('Fetching assistants...');
-      const { data, error } = await supabase
+      const { data, error } = await safeSupabase
         .from('tools')
         .select('*')
         .or('category.eq.assistant,category.eq.gpt builder');

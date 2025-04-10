@@ -1,7 +1,7 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { Video } from '@/components/education/types';
+import { safeSupabase } from '@/utils/supabaseHelpers';
 
 export const useEducatorVideos = (educatorId: string | null, page = 1) => {
   return useQuery({
@@ -11,7 +11,7 @@ export const useEducatorVideos = (educatorId: string | null, page = 1) => {
       
       console.log('Fetching videos for educator:', educatorId); // Debug log
       
-      const { data: educator } = await supabase
+      const { data: educator } = await safeSupabase
         .from('education_creators')
         .select('featured_videos')
         .eq('id', educatorId)
@@ -19,7 +19,7 @@ export const useEducatorVideos = (educatorId: string | null, page = 1) => {
 
       console.log('Educator data:', educator); // Debug log
 
-      const { data: videos, error } = await supabase
+      const { data: videos, error } = await safeSupabase
         .from('youtube_videos')
         .select(`
           id,

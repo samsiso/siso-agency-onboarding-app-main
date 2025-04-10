@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Bookmark, Share2, ThumbsUp, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
+import { safeSupabase } from '@/utils/supabaseHelpers';
 
 interface VideoActionsProps {
   videoId: string;
@@ -35,7 +35,7 @@ export const VideoActions = ({
 
     try {
       if (isBookmarked) {
-        await supabase
+        await safeSupabase
           .from('video_bookmarks')
           .delete()
           .eq('user_id', userId)
@@ -43,7 +43,7 @@ export const VideoActions = ({
         onBookmarkChange(false);
         toast.success('Video removed from bookmarks');
       } else {
-        await supabase
+        await safeSupabase
           .from('video_bookmarks')
           .insert([{ user_id: userId, video_id: videoId }]);
         onBookmarkChange(true);
@@ -64,7 +64,7 @@ export const VideoActions = ({
 
     try {
       if (isCompleted) {
-        await supabase
+        await safeSupabase
           .from('video_progress')
           .update({ completed: false, completed_at: null })
           .eq('user_id', userId)
@@ -72,7 +72,7 @@ export const VideoActions = ({
         onCompletionChange?.(false);
         toast.success('Video marked as not completed');
       } else {
-        await supabase
+        await safeSupabase
           .from('video_progress')
           .upsert({
             user_id: userId,

@@ -1,143 +1,112 @@
-import { Clock, X, Search, ChevronRight, History } from 'lucide-react';
-import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
-import { motion } from 'framer-motion';
-import { formatDistanceToNow } from 'date-fns';
+
+import { Trash2, Clock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { safeSupabase } from '@/utils/supabaseHelpers';
 
 interface SearchHistoryProps {
-  history: Array<{
+  history: {
     id: string;
     query: string;
     created_at: string;
     result_type: string;
-  }>;
+  }[];
   onHistoryCleared: () => Promise<void>;
-  onSearchSelect?: (query: string) => void;
+  onSearchSelect: (query: string) => void;
 }
 
-export const SearchHistory = ({ 
+export function SearchHistory({ 
   history, 
-  onHistoryCleared,
+  onHistoryCleared, 
   onSearchSelect 
-}: SearchHistoryProps) => {
-  // [Analysis] Early return with better empty state
-  if (!history || history.length === 0) {
+}: SearchHistoryProps) {
+  if (history.length === 0) {
     return (
-      <motion.div 
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="p-8 text-center space-y-3 bg-gradient-to-br from-white/5 to-transparent rounded-xl"
-      >
-        <History className="w-12 h-12 mx-auto text-siso-text/30" />
-        <div className="space-y-1">
-          <p className="text-lg font-medium text-siso-text/80">No recent searches</p>
-          <p className="text-sm text-siso-text/50">
-            Your search history will appear here
-          </p>
-        </div>
-      </motion.div>
+      <div className="flex flex-col items-center justify-center py-8 text-siso-text/50">
+        <Clock className="mb-2 h-8 w-8" />
+        <p className="text-sm">No recent searches</p>
+      </div>
     );
   }
 
-  const clearSearchHistory = async (id: string) => {
+  const handleClearHistory = async () => {
     try {
-      await supabase
+      const { data: { user } } = await safeSupabase.auth.getUser();
+      
+      if (!user) {
+        console.error('No authenticated user found');
+        return;
+      }
+      
+      const { error } = await safeSupabase
         .from('user_search_history')
         .delete()
-        .eq('id', id);
-      await onHistoryCleared();
-      toast.success('Search removed from history');
-    } catch (error) {
-      console.error('Error clearing search history:', error);
-      toast.error('Failed to clear search history');
-    }
-  };
-
-  // [Analysis] Group history items by date with better formatting
-  const groupedHistory = history.reduce((groups: any, item) => {
-    const date = new Date(item.created_at).toLocaleDateString();
-    if (!groups[date]) {
-      groups[date] = [];
-    }
-    groups[date].push(item);
-    return groups;
-  }, {});
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.05
+        .eq('user_id', user.id);
+      
+      if (error) {
+        console.error('Error clearing search history:', error);
+        return;
       }
+      
+      await onHistoryCleared();
+    } catch (error) {
+      console.error('Failed to clear search history:', error);
     }
   };
 
-  const itemVariants = {
-    hidden: { opacity: 0, x: -20 },
-    show: { opacity: 1, x: 0 }
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.round(diffMs / 60000);
+    const diffHours = Math.round(diffMins / 60);
+    const diffDays = Math.round(diffHours / 24);
+
+    if (diffMins < 1) return 'just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+
+    return date.toLocaleDateString(undefined, { 
+      month: 'short', 
+      day: 'numeric' 
+    });
   };
 
   return (
-    <motion.div 
-      variants={containerVariants}
-      initial="hidden"
-      animate="show"
-      className="space-y-6"
-    >
-      {Object.entries(groupedHistory).map(([date, items]: [string, any]) => (
-        <div key={date} className="space-y-2">
-          <h3 className="text-sm font-medium text-siso-text/60 px-3 flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-siso-orange/50" />
-            {date}
-          </h3>
-          <div className="space-y-1">
-            {items.map((item: any) => (
-              <motion.div
-                key={item.id}
-                variants={itemVariants}
-                className="flex items-center justify-between group px-3 py-2 rounded-lg 
-                  hover:bg-gradient-to-r hover:from-white/5 hover:to-transparent
-                  cursor-pointer backdrop-blur-sm"
-                onClick={() => onSearchSelect?.(item.query)}
-              >
-                <div className="flex items-center gap-3 flex-1">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-siso-red/10 to-siso-orange/10 
-                    flex items-center justify-center group-hover:from-siso-red/20 group-hover:to-siso-orange/20 
-                    transition-colors duration-300">
-                    <Clock className="w-4 h-4 text-siso-text/60 group-hover:text-siso-orange transition-colors" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <span className="text-sm text-siso-text/80 group-hover:text-white transition-colors block truncate">
-                      {item.query}
-                    </span>
-                    <span className="text-xs text-siso-text/40">
-                      {formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}
-                    </span>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      clearSearchHistory(item.id);
-                    }}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5
-                      hover:bg-white/5 rounded-full focus:opacity-100 focus:outline-none"
-                  >
-                    <X className="w-4 h-4 text-siso-text/60 hover:text-siso-red transition-colors" />
-                  </button>
-                  
-                  <ChevronRight className="w-4 h-4 text-siso-text/40 
-                    group-hover:text-siso-orange group-hover:translate-x-1
-                    transition-all duration-300" />
-                </div>
-              </motion.div>
-            ))}
-          </div>
+    <div className="space-y-4">
+      <ScrollArea className="h-[200px] overflow-y-auto pr-3">
+        <div className="space-y-2">
+          {history.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => onSearchSelect(item.query)}
+              className="flex items-center justify-between w-full p-2 rounded-md hover:bg-siso-text/10 
+                text-left transition-colors group"
+            >
+              <div className="flex items-center space-x-2">
+                <Clock className="h-4 w-4 text-siso-text/60" />
+                <span className="text-sm text-siso-text truncate max-w-[200px]">{item.query}</span>
+              </div>
+              <span className="text-xs text-siso-text/40 group-hover:opacity-100 opacity-50">
+                {formatDate(item.created_at)}
+              </span>
+            </button>
+          ))}
         </div>
-      ))}
-    </motion.div>
+      </ScrollArea>
+
+      <div className="flex justify-end">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleClearHistory}
+          className="text-xs text-siso-text/60 hover:text-siso-text hover:bg-transparent"
+        >
+          <Trash2 className="h-3.5 w-3.5 mr-1" />
+          Clear History
+        </Button>
+      </div>
+    </div>
   );
-};
+}

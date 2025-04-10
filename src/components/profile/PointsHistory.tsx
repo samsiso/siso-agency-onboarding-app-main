@@ -1,7 +1,8 @@
+
 import { useEffect, useState } from 'react';
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { History, Plus } from 'lucide-react';
+import { safeSupabase } from "@/utils/supabaseHelpers";
 
 interface PointsLogEntry {
   id: string;
@@ -17,7 +18,7 @@ export const PointsHistory = ({ userId }: { userId: string }) => {
   useEffect(() => {
     const fetchPointsHistory = async () => {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await safeSupabase
           .from('points_log')
           .select('*')
           .eq('user_id', userId)
@@ -103,4 +104,4 @@ export const PointsHistory = ({ userId }: { userId: string }) => {
       </CardContent>
     </Card>
   );
-};
+}

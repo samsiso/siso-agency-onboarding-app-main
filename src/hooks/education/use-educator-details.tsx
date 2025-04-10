@@ -1,6 +1,6 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { safeSupabase } from '@/utils/supabaseHelpers';
 
 export const useEducatorDetails = (slug: string) => {
   return useQuery({
@@ -9,7 +9,7 @@ export const useEducatorDetails = (slug: string) => {
       console.log('[useEducatorDetails] Fetching educator details for slug:', slug);
       
       // [Analysis] Try exact match first
-      const { data: educator, error: exactMatchError } = await supabase
+      const { data: educator, error: exactMatchError } = await safeSupabase
         .from('education_creators')
         .select(`
           id,
@@ -44,7 +44,7 @@ export const useEducatorDetails = (slug: string) => {
       const baseName = slug.split('-')[0]; // Get first part of the slug
       console.log('[useEducatorDetails] Trying to find by base name:', baseName);
       
-      const { data: fuzzyMatchEducator, error: fuzzyMatchError } = await supabase
+      const { data: fuzzyMatchEducator, error: fuzzyMatchError } = await safeSupabase
         .from('education_creators')
         .select()
         .ilike('slug', `${baseName}%`)

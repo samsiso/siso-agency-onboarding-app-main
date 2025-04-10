@@ -1,7 +1,8 @@
+
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { CheckCircle } from 'lucide-react';
+import { safeSupabase } from '@/utils/supabaseHelpers';
 
 interface VideoTakeawaysProps {
   videoId: string;
@@ -11,7 +12,7 @@ export function VideoTakeaways({ videoId }: VideoTakeawaysProps) {
   const { data: takeaways, isLoading } = useQuery({
     queryKey: ['video-takeaways', videoId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await safeSupabase
         .from('video_summaries')
         .select('*')
         .eq('video_id', videoId)
