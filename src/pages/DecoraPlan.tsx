@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useOnboardingAuth } from '@/hooks/useOnboardingAuth';
+import { ImplementationPlan } from '@/components/plan/ImplementationPlan';
 
 const DecoraPlan = () => {
   const navigate = useNavigate();
@@ -42,6 +43,14 @@ const DecoraPlan = () => {
       return () => clearTimeout(redirectTimer);
     }
   }, [typingComplete, navigate]);
+  
+  // Scroll to features section
+  const scrollToFeatures = () => {
+    document.getElementById('features-section')?.scrollIntoView({ 
+      behavior: 'smooth',
+      block: 'start'
+    });
+  };
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-siso-bg to-black flex flex-col items-center justify-center p-4">
@@ -112,6 +121,12 @@ const DecoraPlan = () => {
           </motion.div>
         </div>
       </motion.div>
+      
+      <div className="container max-w-5xl mx-auto mt-16 pb-12">
+        <ImplementationPlan onScrollToFeatures={scrollToFeatures} />
+        
+        {/* Add rest of the page content below */}
+      </div>
     </div>
   );
 };

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
 import { GradientHeading } from '@/components/ui/gradient-heading';
 import { featureCategories } from '@/data/plan/featureData';
