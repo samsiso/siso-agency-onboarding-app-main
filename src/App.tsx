@@ -18,6 +18,7 @@ import LeaderboardPage from './pages/LeaderboardPage';
 import SettingsPage from './pages/SettingsPage';
 import HelpPage from './pages/HelpPage';
 import { AuthGuard } from './components/auth/AuthGuard';
+import MyProjects from './pages/MyProjects';
 
 function App() {
   return (
@@ -43,7 +44,7 @@ function App() {
         
         {/* Protected Project Routes */}
         <Route path="/plan-builder" element={<AuthGuard><Home /></AuthGuard>} />
-        <Route path="/my-projects" element={<AuthGuard><Home /></AuthGuard>} />
+        <Route path="/my-projects" element={<AuthGuard><MyProjects /></AuthGuard>} />
         <Route path="/portfolio" element={<AuthGuard><Home /></AuthGuard>} />
         
         {/* Protected Financial Routes */}
