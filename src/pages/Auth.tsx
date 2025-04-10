@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { Waves } from '@/components/ui/waves-background';
-import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -45,34 +44,6 @@ export default function Auth() {
     checkSession();
   }, [navigate]);
 
-  const handleGoogleSignIn = async () => {
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: window.location.origin + '/api/auth/callback',
-        },
-      });
-      
-      if (error) throw error;
-      
-      toast({
-        title: "Signing in with Google...",
-        description: "You'll be redirected shortly",
-      });
-    } catch (error: any) {
-      console.error('Google sign in error:', error);
-      toast({
-        variant: "destructive",
-        title: "Error signing in",
-        description: error.message || "Please try again",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleEmailAuth = async (values: AuthFormValues) => {
     setIsLoading(true);
     try {
@@ -90,18 +61,11 @@ export default function Auth() {
         
         if (error) throw error;
         
-        if (data.user && !data.user.confirmed_at) {
-          toast({
-            title: "Check your email",
-            description: "We've sent you a confirmation link to verify your email address",
-          });
-        } else {
-          toast({
-            title: "Account created",
-            description: "Welcome to SISO Agency Platform",
-          });
-          navigate('/home');
-        }
+        toast({
+          title: "Account created",
+          description: "Welcome to SISO Agency Platform",
+        });
+        navigate('/home');
       } else {
         // Handle sign in
         const { data, error } = await supabase.auth.signInWithPassword({
@@ -228,19 +192,6 @@ export default function Auth() {
               </Button>
             </form>
           </Form>
-
-          <div className="flex items-center gap-2 my-6">
-            <div className="h-px flex-1 bg-siso-text/20"></div>
-            <span className="text-sm text-siso-text/60">OR</span>
-            <div className="h-px flex-1 bg-siso-text/20"></div>
-          </div>
-
-          <div className="flex justify-center">
-            <GoogleSignInButton
-              onClick={handleGoogleSignIn}
-              disabled={isLoading}
-            />
-          </div>
 
           <div className="text-center">
             <Button 
