@@ -6,12 +6,16 @@ import { Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useOnboardingAuth } from '@/hooks/useOnboardingAuth';
 import { ImplementationPlan } from '@/components/plan/ImplementationPlan';
+import { FeatureSection } from '@/components/plan/FeatureSection';
+import { EnhancedNextSteps } from '@/components/plan/EnhancedNextSteps';
 
 const DecoraPlan = () => {
   const navigate = useNavigate();
   const { userId } = useOnboardingAuth();
   const [typedText, setTypedText] = useState('');
   const [typingComplete, setTypingComplete] = useState(false);
+  const [showFeatureSelection, setShowFeatureSelection] = useState(false);
+  const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
   const agencyName = "Decora Agency";
   
   // Typewriter effect for the agency name
@@ -50,6 +54,11 @@ const DecoraPlan = () => {
       behavior: 'smooth',
       block: 'start'
     });
+    setShowFeatureSelection(true);
+  };
+
+  const handleFinalizeFeatures = (features: string[]) => {
+    setSelectedFeatures(features);
   };
   
   return (
@@ -123,9 +132,19 @@ const DecoraPlan = () => {
       </motion.div>
       
       <div className="container max-w-5xl mx-auto mt-16 pb-12">
+        {/* Implementation Plan Section */}
         <ImplementationPlan onScrollToFeatures={scrollToFeatures} />
         
-        {/* Add rest of the page content below */}
+        {/* Feature Selection Section - Only show when user clicks on "Explore Platform Features" */}
+        {showFeatureSelection && (
+          <FeatureSection onFinalizeFeatures={handleFinalizeFeatures} />
+        )}
+        
+        {/* Next Steps Section */}
+        <EnhancedNextSteps 
+          showFeatureSelection={showFeatureSelection} 
+          onShowFeatures={scrollToFeatures}
+        />
       </div>
     </div>
   );

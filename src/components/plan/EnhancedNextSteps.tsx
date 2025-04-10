@@ -1,11 +1,12 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, ExternalLink, Calendar, Sparkles, ChevronRight } from 'lucide-react';
+import { ArrowRight, Send, ChevronRight, Phone } from 'lucide-react';
 import { ButtonCta } from '@/components/ui/button-shiny';
 import { Button } from '@/components/ui/button';
 import { GradientHeading } from '@/components/ui/gradient-heading';
 import { RainbowButton } from '@/components/ui/rainbow-button';
+import { useNavigate } from 'react-router-dom';
 
 interface EnhancedNextStepsProps {
   showFeatureSelection: boolean;
@@ -17,6 +18,11 @@ export const EnhancedNextSteps: React.FC<EnhancedNextStepsProps> = ({
   onShowFeatures
 }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmitPlan = () => {
+    navigate('/onboarding/social');
+  };
 
   return (
     <motion.section 
@@ -39,17 +45,17 @@ export const EnhancedNextSteps: React.FC<EnhancedNextStepsProps> = ({
       >
         <div className="flex items-center gap-3 mb-4">
           <div className="bg-gradient-to-br from-siso-red to-siso-orange p-2.5 rounded-full">
-            <Sparkles className="h-5 w-5 text-white" />
+            <Send className="h-5 w-5 text-white" />
           </div>
           <h3 className="text-xl font-semibold text-white">
-            Ready to transform your OnlyFans agency?
+            Ready to get your custom OnlyFans platform?
           </h3>
         </div>
         
         <p className="text-siso-text mb-6 max-w-3xl">
           {!showFeatureSelection ? 
-            "Select your features to create a customized plan for your agency's needs. Our platform is designed specifically for OnlyFans agencies to help scale beyond $100k/month." :
-            "Book a call with our implementation team to discuss your specific needs and get started with your custom platform. We'll guide you through every step of the process."}
+            "Select your desired features to create a customized plan for your OnlyFans agency. After submitting, we'll collect your contact details to keep you updated on your MVP progress." :
+            "Submit your MVP plan to get started! We'll collect your WhatsApp number and social details, then you can create an account to monitor your app's progress through our client dashboard."}
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4">
@@ -72,9 +78,9 @@ export const EnhancedNextSteps: React.FC<EnhancedNextStepsProps> = ({
               whileTap={{ scale: 0.98 }}
             >
               <ButtonCta
-                label="Schedule Free Consultation"
+                label="Submit MVP Plan"
                 className="w-full sm:w-auto"
-                onClick={() => window.open('https://calendly.com/siso-team/onlyfans-platform', '_blank')}
+                onClick={handleSubmitPlan}
               />
             </motion.div>
           )}
@@ -88,11 +94,11 @@ export const EnhancedNextSteps: React.FC<EnhancedNextStepsProps> = ({
             <Button 
               variant="outline"
               className="w-full sm:w-auto relative overflow-hidden group border-siso-orange/30 text-siso-orange hover:bg-siso-orange/10"
-              onClick={() => window.open('https://calendly.com/siso-team/demo', '_blank')}
+              onClick={() => window.open('tel:+18889991234', '_blank')}
             >
               <span className="relative z-10 flex items-center">
-                Request Live Demo
-                <ExternalLink className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                Call For Assistance
+                <Phone className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </span>
               
               {/* Button shine effect */}
@@ -108,17 +114,9 @@ export const EnhancedNextSteps: React.FC<EnhancedNextStepsProps> = ({
         
         <div className="mt-6 pt-5 border-t border-siso-text/10 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-siso-orange" />
-            <span className="text-sm text-siso-text">Implementation begins within 48 hours</span>
+            <ArrowRight className="h-4 w-4 text-siso-orange" />
+            <span className="text-sm text-siso-text">Your MVP will be ready in under 5 days</span>
           </div>
-          
-          <motion.div 
-            className="text-xs text-siso-orange flex items-center gap-1 cursor-pointer"
-            whileHover={{ x: 3 }}
-          >
-            View case studies
-            <ArrowRight className="h-3 w-3" />
-          </motion.div>
         </div>
       </motion.div>
     </motion.section>
