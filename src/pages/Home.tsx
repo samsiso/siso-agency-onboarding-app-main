@@ -7,6 +7,7 @@ import { ArrowRight, Layout, Folder, Users, CreditCard, Bot, BookOpen } from 'lu
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { SetupChecklist } from '@/components/home/SetupChecklist';
 
 export default function Home() {
   const { user, loading } = useUser();
@@ -109,50 +110,8 @@ export default function Home() {
           />
         </div>
         
-        <div className="bg-black/30 border border-siso-text/10 rounded-lg p-6">
-          <h2 className="text-xl font-semibold text-white mb-4">Quick Start</h2>
-          <div className="space-y-4">
-            <div className="flex items-start gap-4 p-3 bg-black/20 rounded-lg">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-siso-red/20 to-siso-orange/20 text-white">
-                1
-              </div>
-              <div>
-                <h3 className="font-medium text-white">Create a Plan</h3>
-                <p className="text-sm text-siso-text mt-1">Start by creating a plan for your client's app using our AI-powered Plan Builder.</p>
-              </div>
-            </div>
-            
-            <div className="flex items-start gap-4 p-3 bg-black/20 rounded-lg">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-siso-red/20 to-siso-orange/20 text-white">
-                2
-              </div>
-              <div>
-                <h3 className="font-medium text-white">Set Up a Project</h3>
-                <p className="text-sm text-siso-text mt-1">Convert your plan into a project and start tracking progress.</p>
-              </div>
-            </div>
-            
-            <div className="flex items-start gap-4 p-3 bg-black/20 rounded-lg">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-siso-red/20 to-siso-orange/20 text-white">
-                3
-              </div>
-              <div>
-                <h3 className="font-medium text-white">Manage Client Communication</h3>
-                <p className="text-sm text-siso-text mt-1">Use our tools to streamline client onboarding and communication.</p>
-              </div>
-            </div>
-          </div>
-          
-          <Button 
-            asChild
-            className="mt-6 bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90"
-          >
-            <Link to="/plan-builder">
-              Start Building a Plan
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
+        {/* Replaced the QuickStart section with the SetupChecklist component */}
+        <SetupChecklist />
       </div>
     </MainLayout>
   );
