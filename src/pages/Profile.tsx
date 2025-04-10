@@ -47,6 +47,8 @@ const Profile = () => {
           rank={profile?.rank || 'Bronze'}
           avatarUrl={profile?.avatar_url}
           bannerUrl={profile?.banner_url}
+          user={user}
+          onUpdateProfile={() => window.location.reload()}
           onLogout={async () => {
             try {
               const { error } = await supabase.auth.signOut();

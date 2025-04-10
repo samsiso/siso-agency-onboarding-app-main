@@ -11,11 +11,11 @@ import FeatureFlags from "./featureFlags";
  * @param feature The feature flag to check (optional)
  * @returns A typed query builder for the specified table
  */
-export function safeQuery(tableName: string, feature?: keyof typeof FeatureFlags) {
+export function safeQuery<T = any>(tableName: string, feature?: keyof typeof FeatureFlags) {
   // If a feature is specified and disabled, use the mock client
   if (feature && !FeatureFlags[feature]) {
     console.log(`Feature ${feature} is disabled. Using mock data for ${tableName}`);
-    return safeSupabase.from(tableName);
+    return safeSupabase.from(tableName) as any;
   }
   
   // Otherwise use the real client with type assertion

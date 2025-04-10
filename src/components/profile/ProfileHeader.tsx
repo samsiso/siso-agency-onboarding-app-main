@@ -27,41 +27,52 @@ import { useToast } from '@/hooks/use-toast';
 import AchievementList from './AchievementList';
 
 interface ProfileHeaderProps {
-  user: User | null;
-  profile: {
-    avatar_url?: string;
-    bio?: string;
-    business_name?: string;
-    created_at?: string;
-    full_name?: string;
-    id?: string;
-    instagram_url?: string;
-    linkedin_url?: string;
-    onboarding_completed?: boolean;
-    professional_role?: string;
-    siso_tokens?: number;
-    solana_wallet_address?: string;
-    twitter_url?: string;
-    updated_at?: string;
-    website_url?: string;
-    youtube_url?: string;
-  };
+  fullName: string | null;
+  email: string | null;
+  points: number;
+  rank: string;
+  avatarUrl: string | null;
+  bannerUrl?: string | null;
+  onLogout: () => Promise<void>;
+  onBackToHome: () => void;
   achievements?: Array<{ name: string; icon?: string }>;
-  onUpdateProfile: () => void;
+  onUpdateProfile?: () => void;
   editable?: boolean;
+  user?: User | null;
 }
 
 export const ProfileHeader = ({ 
-  user,
-  profile,
+  fullName,
+  email,
+  points,
+  rank,
+  avatarUrl,
+  bannerUrl,
   achievements = [],
-  onUpdateProfile,
-  editable = false
+  onLogout,
+  onBackToHome,
+  onUpdateProfile = () => {},
+  editable = false,
+  user = null
 }: ProfileHeaderProps) => {
   const { toast } = useToast();
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
   const [deletingAvatar, setDeletingAvatar] = useState(false);
+
+  // Create a mock profile object for compatibility with existing code
+  const profile = {
+    full_name: fullName,
+    avatar_url: avatarUrl,
+    professional_role: null,
+    bio: null,
+    banner_url: bannerUrl,
+    linkedin_url: null,
+    website_url: null,
+    youtube_url: null,
+    instagram_url: null,
+    twitter_url: null
+  };
 
   if (!profile) {
     return <div>Loading profile...</div>;
@@ -95,8 +106,6 @@ export const ProfileHeader = ({
           })
           .eq('id', user?.id);
 
-        // Custom property for the header banner - note this would need to be properly typed in the database
-        // Normally we would add a banner_url column to the profiles table
         toast({
           title: "Avatar updated",
           description: "Your avatar has been updated successfully.",
@@ -175,7 +184,7 @@ export const ProfileHeader = ({
                 />
               ) : (
                 <div className="flex items-center justify-center h-full bg-siso-text/10 text-siso-text/60 font-medium text-lg">
-                  {(profile.full_name || user?.email || 'User').charAt(0).toUpperCase()}
+                  {(profile.full_name || email || 'User').charAt(0).toUpperCase()}
                 </div>
               )}
             </AspectRatio>
