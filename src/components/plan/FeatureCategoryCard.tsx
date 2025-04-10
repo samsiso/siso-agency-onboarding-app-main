@@ -39,8 +39,8 @@ export const FeatureCategoryCard: React.FC<FeatureCategoryCardProps> = ({
         
         <div className="flex-grow">
           <h3 className="font-medium text-white">{category.name}</h3>
-          {/* Access category info safely */}
-          <p className="text-sm text-siso-text/70 mb-2">{category.info || ''}</p>
+          {/* Use category.info or category.description or empty string */}
+          <p className="text-sm text-siso-text/70 mb-2">{category.info || category.description || ''}</p>
           
           <div className="flex flex-wrap gap-2 mt-2">
             {selectedFeatureCount > 0 && (

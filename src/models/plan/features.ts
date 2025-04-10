@@ -1,23 +1,13 @@
 
 import { ReactNode } from 'react';
 
-export interface Feature {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  included: boolean;
-  timeEstimate?: number;
-  category?: 'mvp' | 'advanced' | 'premium';
-  recommended?: boolean;
-  roi?: string;
-}
-
 export interface FeatureCategory {
   id: string;
   name: string;
   icon: ReactNode;
   features: FeatureItem[];
+  info?: string;  // Make info optional
+  description?: string; // Keep description for backward compatibility
 }
 
 export interface FeatureItem {
@@ -25,17 +15,9 @@ export interface FeatureItem {
   name: string;
   description: string;
   timeEstimate: number;
+  category: string;
+  tier: 'mvp' | 'advanced' | 'premium';
   recommended?: boolean;
+  included?: boolean;
   roi?: string;
-}
-
-export interface PlanTier {
-  id: string;
-  name: string;
-  price: number;
-  maxFeatures: string | number;
-  timeline: string;
-  supportLevel: string;
-  description: string;
-  recommended?: boolean;
 }

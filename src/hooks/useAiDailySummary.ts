@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { safeSupabase } from '@/utils/supabaseHelpers';
 import { useToast } from '@/hooks/use-toast';
@@ -211,13 +210,17 @@ export function useAiDailySummary(date: string, isAdmin: boolean = false) {
         }
         
         if (!data || !data.success) {
-          const errorMsg = data?.message || 'Failed to generate summary';
+          const errorMsg = data && typeof data === 'object' && 'message' in data 
+            ? data.message as string 
+            : 'Failed to generate summary';
           console.error("Generate summary error:", errorMsg);
           throw new Error(errorMsg);
         }
         
         // Check if error message exists in the data response
-        if (data.message && data.message.includes('API error')) {
+        if (data && typeof data === 'object' && 'message' in data && 
+            typeof data.message === 'string' && 
+            data.message.includes('API error')) {
           setError('AI service unavailable. Using basic summary instead.');
           toast({
             title: 'API Issue Detected',

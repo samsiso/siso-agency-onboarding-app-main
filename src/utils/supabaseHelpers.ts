@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 // List of tables that are used in the app but might not exist in the database yet

@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { safeSupabase } from "./supabaseHelpers";
 import FeatureFlags from "./featureFlags";
@@ -14,6 +15,26 @@ export function safeQuery<T = any>(tableName: string, feature?: keyof typeof Fea
   // If a feature is specified and disabled, use the mock client
   if (feature && !FeatureFlags[feature]) {
     console.log(`Feature ${feature} is disabled. Using mock data for ${tableName}`);
+    return safeSupabase.from(tableName) as any;
+  }
+  
+  // Types for the tables that may not exist in the Database type
+  const customTables = [
+    'ai_news', 
+    'ai_news_summaries', 
+    'ai_news_daily_summaries',
+    'ai_news_video_processing',
+    'ai_news_bookmarks', 
+    'news_sources',
+    'core_tools',
+    'automations',
+    'performance_metrics',
+    // Add other tables that cause type errors here
+  ];
+
+  // If the table is a custom table, use type assertion to bypass TypeScript's checks
+  if (customTables.includes(tableName)) {
+    console.log(`Using safeQuery for custom table: ${tableName}`);
     return safeSupabase.from(tableName) as any;
   }
   
