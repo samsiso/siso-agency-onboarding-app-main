@@ -10,7 +10,11 @@ import {
   Sparkles, 
   CheckCircle,
   Settings,
-  Star
+  Star,
+  Users,
+  FileText,
+  MessageSquare,
+  BarChart
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -578,6 +582,38 @@ export const TierFeatureSelection = ({ onFeaturesSelected }: TierFeatureSelectio
     }
   };
 
+  // Convert FeatureItem to Feature for FeatureSelection component
+  const mapFeatureItemsToFeatures = (items: FeatureItem[]) => {
+    return items.map(item => ({
+      id: item.id,
+      name: item.name,
+      description: item.description,
+      price: item.price,
+      included: item.included,
+      timeEstimate: item.timeEstimate,
+      category: item.tier as "mvp" | "advanced" | "premium", // Map category to tier for compatibility
+      recommended: item.recommended,
+      roi: item.roi
+    }));
+  };
+
+  // Handle features from FeatureSelection component
+  const handleFeaturesFromSelection = (features: any[]) => {
+    // Map the features back to FeatureItem format
+    const updatedFeatures = selectedFeatures.map(original => {
+      const updatedFeature = features.find(f => f.id === original.id);
+      if (updatedFeature) {
+        return {
+          ...original,
+          included: updatedFeature.included
+        };
+      }
+      return original;
+    });
+    
+    handleFeatureToggle(updatedFeatures);
+  };
+
   return (
     <TooltipProvider>
       <section className="space-y-6">
@@ -659,8 +695,8 @@ export const TierFeatureSelection = ({ onFeaturesSelected }: TierFeatureSelectio
             </div>
             
             <FeatureSelection
-              features={getFilteredFeatures()}
-              onChange={handleFeatureToggle}
+              features={mapFeatureItemsToFeatures(getFilteredFeatures())}
+              onChange={handleFeaturesFromSelection}
               filterCategory={activeCategory as any}
               showPricing={false}
             />
