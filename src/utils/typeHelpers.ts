@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { safeSupabase } from "./supabaseHelpers";
 import FeatureFlags from "./featureFlags";
@@ -19,6 +18,7 @@ export function safeQuery<T = any>(tableName: string, feature?: keyof typeof Fea
   }
   
   // Otherwise use the real client with type assertion
+  // Use the any type to bypass TypeScript's strict checking
   return supabase.from(tableName) as any;
 }
 
@@ -58,4 +58,37 @@ export function safeJsonAccess<T>(obj: any, key: string, defaultValue: T): T {
  */
 export function safeCast<T>(data: any): T {
   return data as unknown as T;
+}
+
+/**
+ * Safe property access for nested objects that might not exist
+ * Especially useful for response data from endpoints
+ * 
+ * @param obj The object to access properties from
+ * @param path The path to the desired property (e.g., "user.profile.name")
+ * @param defaultValue Default value to return if property doesn't exist
+ */
+export function safePropertyAccess<T>(obj: any, path: string, defaultValue: T): T {
+  try {
+    const keys = path.split('.');
+    let current = obj;
+    
+    for (const key of keys) {
+      if (current === null || current === undefined || typeof current !== 'object') {
+        return defaultValue;
+      }
+      current = current[key];
+    }
+    
+    return current !== undefined && current !== null ? current : defaultValue;
+  } catch (e) {
+    return defaultValue;
+  }
+}
+
+/**
+ * Type guard to check if an object is a Supabase error
+ */
+export function isSupabaseError(obj: any): boolean {
+  return obj && typeof obj === 'object' && 'code' in obj && 'message' in obj;
 }

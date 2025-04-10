@@ -2,8 +2,9 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { safePropertyAccess } from '@/utils/typeHelpers';
 
-// [Analysis] Separated profile data concerns from auth logic
+// Enhanced profile form data interface with all possible fields
 export interface ProfileFormData {
   fullName: string;
   businessName: string;
@@ -72,12 +73,16 @@ export const useProfileData = () => {
           if (profileData && isSubscribed) {
             console.log('[Profile] Profile data found:', profileData);
             setProfile(profileData);
+            
+            // Use safe property access for fields that might not exist in the DB schema
             setFormData({
               fullName: profileData.full_name || '',
               businessName: profileData.business_name || '',
-              businessType: profileData.business_type || '',
-              industry: profileData.industry || '',
-              interests: Array.isArray(profileData.interests) ? profileData.interests.join(', ') : '',
+              businessType: safePropertyAccess(profileData, 'business_type', ''),
+              industry: safePropertyAccess(profileData, 'industry', ''),
+              interests: Array.isArray(safePropertyAccess(profileData, 'interests', [])) 
+                ? safePropertyAccess(profileData, 'interests', []).join(', ') 
+                : '',
               bio: profileData.bio || '',
               linkedinUrl: profileData.linkedin_url || '',
               websiteUrl: profileData.website_url || '',

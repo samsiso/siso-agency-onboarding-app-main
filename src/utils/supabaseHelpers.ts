@@ -131,19 +131,34 @@ export const safeSupabase = {
     })
   },
 
-  // Mock channel for realtime subscriptions
-  channel: (channel: string) => ({
-    on: (event: string, config: any, callback: (payload: any) => void) => ({
-      subscribe: (callback?: (status: string) => void) => {
-        console.log(`Mock subscription to ${channel} for ${event}`);
-        if (callback) callback('SUBSCRIBED');
-        return {};
+  // Mock channel for realtime subscriptions with proper interface for unsubscribe
+  channel: (channelName: string) => {
+    const channelObj = {
+      on: (event: string, config: any, callback: (payload: any) => void) => {
+        return {
+          subscribe: (statusCallback?: (status: string) => void) => {
+            console.log(`Mock subscription to ${channelName} for ${event}`);
+            if (statusCallback) statusCallback('SUBSCRIBED');
+            return channelObj;
+          }
+        };
+      },
+      unsubscribe: () => {
+        console.log(`Mock unsubscribe from channel: ${channelName}`);
+        return Promise.resolve();
       }
-    })
-  }),
+    };
+    return channelObj;
+  },
   
   removeChannel: (channel: any) => {
-    console.log('Mock removal of channel', channel);
+    if (channel && typeof channel.unsubscribe === 'function') {
+      console.log('Removing channel with unsubscribe');
+      channel.unsubscribe();
+    } else {
+      console.log('Mock removal of channel (no unsubscribe method available)');
+    }
+    return Promise.resolve();
   }
 };
 

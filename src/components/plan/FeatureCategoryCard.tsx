@@ -1,9 +1,8 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ChevronRight, Clock } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { Clock } from 'lucide-react';
 import { FeatureCategory } from '@/models/plan/features';
 
 interface FeatureCategoryCardProps {
@@ -19,58 +18,50 @@ export const FeatureCategoryCard: React.FC<FeatureCategoryCardProps> = ({
   active,
   selectedFeatureCount,
   totalTimeEstimate,
-  onClick,
+  onClick
 }) => {
-  // Format time display
-  const formatTimeEstimate = (days: number) => {
-    if (days < 1) {
-      return `${Math.round(days * 24)} hrs`;
-    }
-    return days === 1 ? `${days} day` : `${days} days`;
-  };
-
   return (
     <motion.div
-      whileHover={{ scale: 1.02 }}
-      className={cn(
-        "p-4 rounded-lg border cursor-pointer transition-all",
-        active
-          ? "bg-siso-orange/10 border-siso-orange/30"
-          : "bg-black/30 border-siso-text/10 hover:bg-black/40"
-      )}
       onClick={onClick}
+      whileHover={{ scale: 1.01 }}
+      className={`
+        rounded-lg p-3 cursor-pointer transition-colors
+        ${active 
+          ? 'bg-siso-orange/10 border border-siso-orange/30' 
+          : 'bg-black/30 border border-siso-text/10 hover:bg-black/40'
+        }
+      `}
     >
-      <div className="flex justify-between items-center mb-2">
-        <div className="flex items-center gap-2">
-          <div className={cn(
-            "rounded-full p-1.5",
-            active ? "bg-siso-orange/20" : "bg-black/30"
-          )}>
-            {category.icon}
-          </div>
-          <h3 className="font-medium text-white">{category.name}</h3>
+      <div className="flex items-start gap-3">
+        <div className="rounded-full bg-siso-orange/10 p-1.5">
+          {category.icon}
         </div>
         
-        <ChevronRight className={cn(
-          "h-4 w-4 transition-transform",
-          active ? "text-siso-orange rotate-90" : "text-siso-text"
-        )} />
-      </div>
-      
-      <div className="flex justify-between items-center mt-4">
-        <Badge 
-          variant={selectedFeatureCount > 0 ? "success" : "outline"} 
-          className="text-xs"
-        >
-          {selectedFeatureCount} selected
-        </Badge>
-        
-        {totalTimeEstimate > 0 && (
-          <div className="flex items-center gap-1 text-xs text-siso-text">
-            <Clock className="h-3 w-3" />
-            {formatTimeEstimate(totalTimeEstimate)}
+        <div className="flex-grow">
+          <h3 className="font-medium text-white">{category.name}</h3>
+          <p className="text-sm text-siso-text/70 mb-2">{category.description}</p>
+          
+          <div className="flex flex-wrap gap-2 mt-2">
+            {selectedFeatureCount > 0 && (
+              <Badge 
+                variant={active ? "default" : "secondary"}
+                className="text-xs bg-black/40"
+              >
+                {selectedFeatureCount} selected
+              </Badge>
+            )}
+            
+            {totalTimeEstimate > 0 && (
+              <Badge 
+                variant={active ? "secondary" : "outline"}
+                className="flex items-center gap-1 text-xs bg-black/40"
+              >
+                <Clock className="w-3 h-3" />
+                +{totalTimeEstimate} days
+              </Badge>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </motion.div>
   );

@@ -55,7 +55,7 @@ export const EnhancedFeatureItem: React.FC<EnhancedFeatureItemProps> = ({
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Badge 
-                      variant={isSelected ? "warning" : "outline"} 
+                      variant={isSelected ? "success" : "outline"} 
                       className="flex items-center gap-1 bg-black/40"
                     >
                       <Clock className="h-3 w-3" />

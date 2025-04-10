@@ -90,6 +90,7 @@ export const WelcomeNFTStatus = () => {
 
     fetchStatus();
 
+    // Fix the channel subscription and unsubscription
     const channel = safeSupabase
       .channel('welcome-nft-status')
       .on(
@@ -127,8 +128,9 @@ export const WelcomeNFTStatus = () => {
       )
       .subscribe();
 
+    // Return proper cleanup function that actually unsubscribes
     return () => {
-      channel.unsubscribe();
+      safeSupabase.removeChannel(channel);
     };
   }, []);
 
