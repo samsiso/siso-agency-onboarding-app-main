@@ -44,6 +44,18 @@ export const usePerformanceMetrics = () => {
                 value: metricValue,
                 page: window.location.pathname
               });
+              
+              // In a real implementation, we would store this in a database
+              // But we're just mocking this here
+              /*
+              await safeSupabase.from('performance_metrics').insert([{
+                page_url: window.location.pathname,
+                metric_type: entry.entryType,
+                metric_value: metricValue,
+                user_agent: navigator.userAgent,
+                timestamp: new Date().toISOString()
+              }]);
+              */
             }
           });
         });
@@ -58,6 +70,15 @@ export const usePerformanceMetrics = () => {
             page: window.location.pathname,
             ttfb: navigationEntry.responseStart - navigationEntry.requestStart
           });
+          
+          // Mock storing TTFB in database
+          /*
+          await safeSupabase.from('performance_metrics').insert([{
+            page_url: window.location.pathname,
+            ttfb: navigationEntry.responseStart - navigationEntry.requestStart,
+            timestamp: new Date().toISOString()
+          }]);
+          */
         }
       } catch (error) {
         console.error('Error in performance monitoring:', error);

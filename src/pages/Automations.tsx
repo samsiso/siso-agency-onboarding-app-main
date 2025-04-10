@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useMemo } from 'react';
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Sidebar } from '@/components/Sidebar';
@@ -24,7 +23,9 @@ export default function Automations() {
       platform: 'zapier',
       complexity: 'medium',
       setup_guide: 'Connect your email provider to Zapier and setup triggers',
-      integration_time: '30 minutes'
+      integration_time: '30 minutes',
+      integration_url: 'https://zapier.com/apps/email',
+      profile_image_url: ''
     },
     {
       id: '2',
@@ -34,7 +35,9 @@ export default function Automations() {
       platform: 'buffer',
       complexity: 'simple',
       setup_guide: 'Connect your social accounts and create a posting schedule',
-      integration_time: '15 minutes'
+      integration_time: '15 minutes',
+      integration_url: 'https://buffer.com',
+      profile_image_url: ''
     },
     {
       id: '3',
@@ -44,7 +47,9 @@ export default function Automations() {
       platform: 'make',
       complexity: 'advanced',
       setup_guide: 'Create bidirectional sync between your CRM and other tools',
-      integration_time: '1 hour'
+      integration_time: '1 hour',
+      integration_url: 'https://make.com',
+      profile_image_url: ''
     }
   ], []);
 

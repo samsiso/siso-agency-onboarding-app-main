@@ -52,8 +52,11 @@ export const handleAuthCallback = async () => {
           .eq('id', session.user.id)
           .single();
 
-        // Using optional chaining to avoid errors
-        if (profile && !profile.onboarding_completed) {
+        // Using safer access pattern
+        const hasCompletedOnboarding = profile && 
+          (profile.onboarding_completed === true || profile.onboarding_step === 'completed');
+          
+        if (!hasCompletedOnboarding) {
           console.log('Redirecting to social onboarding...');
           window.location.replace('/onboarding/social');
         } else {

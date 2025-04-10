@@ -1,9 +1,9 @@
+
 import { useEffect, useState } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { PointsExchange } from '@/components/crypto/PointsExchange';
 import { NFTGallery } from '@/components/crypto/NFTGallery';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 
@@ -13,22 +13,20 @@ const Crypto = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    // Instead of database query, use mock data
     const fetchUserPoints = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
+        // Mock authentication/session check
+        const isAuthenticated = true;
+        
+        if (!isAuthenticated) {
           setLoading(false);
           return;
         }
 
-        const { data: profile, error } = await supabase
-          .from('profiles')
-          .select('points')
-          .eq('id', session.user.id)
-          .single();
-
-        if (error) throw error;
-        setUserPoints(profile?.points || 0);
+        // Set mock points
+        const mockPoints = 500;
+        setUserPoints(mockPoints);
       } catch (error: any) {
         console.error('Error fetching user points:', error);
         toast({

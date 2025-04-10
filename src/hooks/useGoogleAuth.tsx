@@ -20,15 +20,18 @@ export const useGoogleAuth = () => {
       
       // If already signed in, check profile and redirect
       if (currentSession) {
-        // Use profile, but don't access onboarding_step since it doesn't exist
+        // Use profile data with safer type handling
         const { data: profile } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', currentSession.user.id)
           .single();
 
-        // Check onboarding completed flag safely with optional chaining
-        if (!profile?.onboarding_completed) {
+        // Handle profile data safely
+        const hasCompletedOnboarding = profile && 
+          (profile.onboarding_completed === true || profile.onboarding_step === 'completed');
+
+        if (!hasCompletedOnboarding) {
           navigate('/onboarding/social');
         } else {
           navigate('/profile');

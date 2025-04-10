@@ -3,7 +3,6 @@ import { ArrowRightLeft, Loader2, Wifi, Database, History, Filter } from 'lucide
 import { PointsExchange } from "@/components/crypto/PointsExchange";
 import { NFTGallery } from "@/components/crypto/NFTGallery";
 import { WelcomeNFTStatus } from "@/components/crypto/WelcomeNFTStatus";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from '@/hooks/use-toast';
 import { Sidebar } from '@/components/Sidebar';
 import { FloatingOrbs } from '@/components/effects/FloatingOrbs';
@@ -77,10 +76,13 @@ const CryptoExchange = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    // Use mock data instead of database query
     const fetchUserPoints = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
+        // Mock authentication check
+        const isAuthenticated = true;
+        
+        if (!isAuthenticated) {
           toast({
             variant: "destructive",
             title: "Authentication required",
@@ -90,14 +92,9 @@ const CryptoExchange = () => {
           return;
         }
 
-        const { data: profile, error } = await supabase
-          .from('profiles')
-          .select('points')
-          .eq('id', session.user.id)
-          .single();
-
-        if (error) throw error;
-        setUserPoints(profile?.points || 0);
+        // Set mock points
+        const mockPoints = 750;
+        setUserPoints(mockPoints);
       } catch (error: any) {
         console.error('Error fetching user points:', error);
         toast({

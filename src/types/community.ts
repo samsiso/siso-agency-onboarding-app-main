@@ -17,5 +17,5 @@ export interface CommunityMember {
   rank?: string | null;
   contribution_count?: number;
   referral_count?: number;
-  slug?: string;
+  slug: string;
 }

@@ -1,7 +1,6 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { Sidebar } from '@/components/Sidebar';
 import { CommunitySearch } from '@/components/community/CommunitySearch';
 import { CommunityMemberCard } from '@/components/community/CommunityMemberCard';
@@ -12,42 +11,54 @@ export default function Community() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMember, setSelectedMember] = useState<CommunityMember | null>(null);
 
+  // Use mock data instead of querying database
   const { data: members, isLoading, error } = useQuery({
     queryKey: ['community-members'],
     queryFn: async () => {
-      console.log('Fetching community members...');
-      const { data, error } = await supabase
-        .from('tools')
-        .select('*')
-        .eq('category', 'community');
+      console.log('Fetching mock community members...');
       
-      if (error) {
-        console.error('Error fetching community members:', error);
-        throw error;
-      }
+      // Return mock data
+      const mockData: CommunityMember[] = [
+        {
+          id: '1',
+          name: 'Jane Smith',
+          description: 'AI researcher and developer',
+          member_type: 'Community Member',
+          youtube_url: 'https://youtube.com/@janesmith',
+          youtube_videos: [
+            { title: 'Introduction to AI', url: 'https://youtube.com/watch?v=123', thumbnailUrl: '' }
+          ],
+          website_url: 'https://janesmith.com',
+          specialization: ['Machine Learning', 'NLP'],
+          content_themes: ['Education', 'Research'],
+          profile_image_url: '',
+          platform: 'YouTube',
+          member_count: null,
+          join_url: null,
+          points: 250,
+          rank: 'Expert',
+          contribution_count: 12,
+          referral_count: 3,
+          slug: 'jane-smith'
+        },
+        {
+          id: '2',
+          name: 'AI Enthusiasts Group',
+          description: 'Community for AI enthusiasts',
+          member_type: 'Community',
+          website_url: 'https://ai-enthusiasts.com',
+          profile_image_url: '',
+          platform: 'Discord',
+          member_count: 1200,
+          join_url: 'https://discord.gg/ai-enthusiasts',
+          points: 0,
+          contribution_count: 0,
+          referral_count: 0,
+          slug: 'ai-enthusiasts'
+        }
+      ];
       
-      const transformedData = data.map(member => ({
-        id: member.id,
-        name: member.name,
-        description: member.description,
-        member_type: member.assistant_type || 'Community Member',
-        youtube_url: member.metadata?.youtube_url || '',
-        youtube_videos: member.metadata?.youtube_videos || [],
-        website_url: member.metadata?.website_url || '',
-        specialization: member.metadata?.specialization || [],
-        content_themes: member.metadata?.content_themes || [],
-        profile_image_url: member.icon || '',
-        platform: member.metadata?.platform || null,
-        member_count: null,
-        join_url: null,
-        points: 0,
-        rank: null,
-        contribution_count: 0,
-        referral_count: 0
-      })) as CommunityMember[];
-      
-      console.log('Fetched community members:', transformedData);
-      return transformedData;
+      return mockData;
     },
   });
 

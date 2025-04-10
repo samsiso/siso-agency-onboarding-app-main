@@ -93,8 +93,8 @@ export const safeSupabase = {
       };
     }
     
-    // Use type casting to bypass TypeScript's type checking constraints for real tables
-    return supabase.from(tableName) as any;
+    // Use any type to bypass TypeScript constraints
+    return supabase.from(tableName as any) as any;
   },
   
   // Add auth object to mock the Supabase auth methods
@@ -163,9 +163,6 @@ export const safeSupabase = {
 
 /**
  * Helper function for safely accessing JSON properties
- * @param obj The object to access properties from
- * @param key The key to access
- * @param defaultValue Default value if the property doesn't exist
  */
 export function safeJsonAccess<T>(obj: any, key: string, defaultValue: T): T {
   if (!obj || typeof obj !== 'object') return defaultValue;
