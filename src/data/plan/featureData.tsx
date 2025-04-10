@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { FeatureCategory, Feature, PlanTier } from '@/models/plan/features';
+import { FeatureCategory, FeatureItem, Feature, PlanTier } from '@/models/plan/features';
 import { 
   Users, 
   FileText, 
@@ -21,11 +21,46 @@ export const featureCategories: FeatureCategory[] = [
     name: 'Client Management',
     icon: <Users className="h-5 w-5" />,
     features: [
-      { id: 'client-profiles', name: 'Client Profiles', description: 'Detailed profiles for each creator with basic information.', timeEstimate: 0.5 },
-      { id: 'performance-dashboard', name: 'Basic Performance Dashboard', description: 'View key metrics like earnings and subscriber count.', timeEstimate: 1 },
-      { id: 'earnings-tracking', name: 'Earnings Tracking', description: 'Monitor creator revenue over time with basic charts.', timeEstimate: 1.5 },
-      { id: 'subscriber-tracking', name: 'Subscriber Count Tracking', description: 'Track subscriber growth or decline over time.', timeEstimate: 1 },
-      { id: 'advanced-analytics', name: 'Advanced Creator Analytics', description: 'In-depth performance insights with predictive trends.', timeEstimate: 3 },
+      { 
+        id: 'client-profiles', 
+        name: 'Client Profiles', 
+        description: 'Detailed profiles for each creator with basic information.', 
+        timeEstimate: 0.5,
+        category: 'client',
+        tier: 'mvp'
+      },
+      { 
+        id: 'performance-dashboard', 
+        name: 'Basic Performance Dashboard', 
+        description: 'View key metrics like earnings and subscriber count.', 
+        timeEstimate: 1,
+        category: 'client',
+        tier: 'mvp'
+      },
+      { 
+        id: 'earnings-tracking', 
+        name: 'Earnings Tracking', 
+        description: 'Monitor creator revenue over time with basic charts.', 
+        timeEstimate: 1.5,
+        category: 'client',
+        tier: 'mvp'
+      },
+      { 
+        id: 'subscriber-tracking', 
+        name: 'Subscriber Count Tracking', 
+        description: 'Track subscriber growth or decline over time.', 
+        timeEstimate: 1,
+        category: 'client',
+        tier: 'mvp'
+      },
+      { 
+        id: 'advanced-analytics', 
+        name: 'Advanced Creator Analytics', 
+        description: 'In-depth performance insights with predictive trends.', 
+        timeEstimate: 3,
+        category: 'client',
+        tier: 'advanced'
+      },
     ]
   },
   {
@@ -33,10 +68,38 @@ export const featureCategories: FeatureCategory[] = [
     name: 'Content Management',
     icon: <FileText className="h-5 w-5" />,
     features: [
-      { id: 'content-calendar', name: 'Simple Content Calendar', description: 'Plan posts with a basic scheduling tool.', timeEstimate: 1.5 },
-      { id: 'media-library', name: 'Media Library with Basic Tagging', description: 'Store and categorize assets with simple tags.', timeEstimate: 2 },
-      { id: 'content-approval', name: 'Content Approval Workflow', description: 'Approve or reject creator content before posting.', timeEstimate: 1.5 },
-      { id: 'ai-content-optimization', name: 'AI Content Optimization', description: 'Get suggestions to improve content based on trending topics.', timeEstimate: 4 },
+      { 
+        id: 'content-calendar', 
+        name: 'Simple Content Calendar', 
+        description: 'Plan posts with a basic scheduling tool.', 
+        timeEstimate: 1.5,
+        category: 'content',
+        tier: 'mvp'
+      },
+      { 
+        id: 'media-library', 
+        name: 'Media Library with Basic Tagging', 
+        description: 'Store and categorize assets with simple tags.', 
+        timeEstimate: 2,
+        category: 'content',
+        tier: 'mvp'
+      },
+      { 
+        id: 'content-approval', 
+        name: 'Content Approval Workflow', 
+        description: 'Approve or reject creator content before posting.', 
+        timeEstimate: 1.5,
+        category: 'content',
+        tier: 'mvp'
+      },
+      { 
+        id: 'ai-content-optimization', 
+        name: 'AI Content Optimization', 
+        description: 'Get suggestions to improve content based on trending topics.', 
+        timeEstimate: 4,
+        category: 'content',
+        tier: 'premium'
+      },
     ]
   },
   {
@@ -44,9 +107,30 @@ export const featureCategories: FeatureCategory[] = [
     name: 'Communication Tools',
     icon: <MessageSquare className="h-5 w-5" />,
     features: [
-      { id: 'in-app-messaging', name: 'In-App Messaging', description: 'Direct messaging between agency and creators.', timeEstimate: 3 },
-      { id: 'notification-system', name: 'Notification System', description: 'Alerts for deadlines, updates, and important events.', timeEstimate: 2 },
-      { id: 'fan-interaction', name: 'Fan Interaction Tools', description: 'Manage fan messages and interactions efficiently.', timeEstimate: 4 },
+      { 
+        id: 'in-app-messaging', 
+        name: 'In-App Messaging', 
+        description: 'Direct messaging between agency and creators.', 
+        timeEstimate: 3,
+        category: 'communication',
+        tier: 'advanced'
+      },
+      { 
+        id: 'notification-system', 
+        name: 'Notification System', 
+        description: 'Alerts for deadlines, updates, and important events.', 
+        timeEstimate: 2,
+        category: 'communication',
+        tier: 'mvp'
+      },
+      { 
+        id: 'fan-interaction', 
+        name: 'Fan Interaction Tools', 
+        description: 'Manage fan messages and interactions efficiently.', 
+        timeEstimate: 4,
+        category: 'communication',
+        tier: 'premium'
+      },
     ]
   },
   {
@@ -54,9 +138,30 @@ export const featureCategories: FeatureCategory[] = [
     name: 'Analytics',
     icon: <BarChart className="h-5 w-5" />,
     features: [
-      { id: 'basic-earnings', name: 'Basic Earnings Report', description: 'Simple revenue overview with basic filtering.', timeEstimate: 1 },
-      { id: 'subscriber-growth', name: 'Subscriber Growth Chart', description: 'Visualize subscriber trends over time.', timeEstimate: 1 },
-      { id: 'content-performance', name: 'Content Performance Metrics', description: 'Track likes, views, and engagement for each post.', timeEstimate: 2 },
+      { 
+        id: 'basic-earnings', 
+        name: 'Basic Earnings Report', 
+        description: 'Simple revenue overview with basic filtering.', 
+        timeEstimate: 1,
+        category: 'analytics',
+        tier: 'mvp'
+      },
+      { 
+        id: 'subscriber-growth', 
+        name: 'Subscriber Growth Chart', 
+        description: 'Visualize subscriber trends over time.', 
+        timeEstimate: 1,
+        category: 'analytics',
+        tier: 'mvp'
+      },
+      { 
+        id: 'content-performance', 
+        name: 'Content Performance Metrics', 
+        description: 'Track likes, views, and engagement for each post.', 
+        timeEstimate: 2,
+        category: 'analytics',
+        tier: 'advanced'
+      },
     ]
   },
   {
@@ -64,9 +169,30 @@ export const featureCategories: FeatureCategory[] = [
     name: 'Security',
     icon: <Shield className="h-5 w-5" />,
     features: [
-      { id: 'user-authentication', name: 'User Authentication', description: 'Secure login for agency staff and creators.', timeEstimate: 1 },
-      { id: 'role-based-access', name: 'Role-Based Access Control', description: 'Limit access based on user roles within the agency.', timeEstimate: 2 },
-      { id: 'two-factor', name: 'Two-Factor Authentication', description: 'Extra layer of security for account access.', timeEstimate: 1.5 },
+      { 
+        id: 'user-authentication', 
+        name: 'User Authentication', 
+        description: 'Secure login for agency staff and creators.', 
+        timeEstimate: 1,
+        category: 'security',
+        tier: 'mvp'
+      },
+      { 
+        id: 'role-based-access', 
+        name: 'Role-Based Access Control', 
+        description: 'Limit access based on user roles within the agency.', 
+        timeEstimate: 2,
+        category: 'security',
+        tier: 'advanced'
+      },
+      { 
+        id: 'two-factor', 
+        name: 'Two-Factor Authentication', 
+        description: 'Extra layer of security for account access.', 
+        timeEstimate: 1.5,
+        category: 'security',
+        tier: 'premium'
+      },
     ]
   },
   {
@@ -74,9 +200,30 @@ export const featureCategories: FeatureCategory[] = [
     name: 'Automation',
     icon: <Settings className="h-5 w-5" />,
     features: [
-      { id: 'automated-reminders', name: 'Automated Reminders', description: 'Notify creators of upcoming deadlines automatically.', timeEstimate: 1 },
-      { id: 'workflow-automation', name: 'Basic Workflow Automation', description: 'Automate repetitive steps like content approvals.', timeEstimate: 2.5 },
-      { id: 'fan-engagement', name: 'Automated Fan Engagement', description: 'Schedule and automate fan outreach campaigns.', timeEstimate: 4 },
+      { 
+        id: 'automated-reminders', 
+        name: 'Automated Reminders', 
+        description: 'Notify creators of upcoming deadlines automatically.', 
+        timeEstimate: 1,
+        category: 'automation',
+        tier: 'mvp'
+      },
+      { 
+        id: 'workflow-automation', 
+        name: 'Basic Workflow Automation', 
+        description: 'Automate repetitive steps like content approvals.', 
+        timeEstimate: 2.5,
+        category: 'automation',
+        tier: 'advanced'
+      },
+      { 
+        id: 'fan-engagement', 
+        name: 'Automated Fan Engagement', 
+        description: 'Schedule and automate fan outreach campaigns.', 
+        timeEstimate: 4,
+        category: 'automation',
+        tier: 'premium'
+      },
     ]
   }
 ];

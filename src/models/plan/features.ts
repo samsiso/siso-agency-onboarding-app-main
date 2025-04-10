@@ -21,3 +21,23 @@ export interface FeatureItem {
   included?: boolean;
   roi?: string;
 }
+
+// Add these interfaces to support src/data/plan/featureData.tsx
+export interface Feature {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  included: boolean;
+}
+
+export interface PlanTier {
+  id: string;
+  name: string;
+  price: number;
+  maxFeatures: number | string;
+  timeline: string;
+  supportLevel: string;
+  description: string;
+  recommended?: boolean;
+}
