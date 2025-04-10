@@ -45,13 +45,14 @@ export const handleAuthCallback = async () => {
       if (session) {
         console.log('Valid session found, checking onboarding status');
         
-        // Check onboarding status
+        // Check onboarding status using safePropertyAccess to avoid errors
         const { data: profile } = await supabase
           .from('profiles')
-          .select('onboarding_completed, onboarding_step')
+          .select('*')
           .eq('id', session.user.id)
           .single();
 
+        // Using optional chaining to avoid errors
         if (!profile?.onboarding_completed) {
           console.log('Redirecting to social onboarding...');
           window.location.replace('/onboarding/social');

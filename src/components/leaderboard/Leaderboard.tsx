@@ -1,110 +1,116 @@
+import React from 'react';
+import { Avatar } from "@/components/ui/avatar"
+import { AvatarImage, AvatarFallback } from "@radix-ui/react-avatar"
+import { CommunityMember } from '@/types/community';
+import { LeaderboardEntry } from './types';
+import { Badge } from '@/components/ui/badge';
+import { SparklesIcon } from '@heroicons/react/24/solid';
 
-import { useState, useEffect } from 'react';
-import { LeaderboardStats } from './LeaderboardStats';
-import { EarnMoreCard } from './components/EarnMoreCard';
-import { LeaderboardContent } from './components/LeaderboardContent';
-import { CommunityMemberDetails } from '../community/CommunityMemberDetails';
-import type { LeaderboardEntry } from './types';
-import { useLeaderboardData } from './hooks/useLeaderboardData';
+interface LeaderboardProps {
+  entries: LeaderboardEntry[];
+  loading: boolean;
+}
 
-export const Leaderboard = () => {
-  const {
-    leaderboardData,
-    filteredData,
-    setFilteredData,
-    totalUsersWithPoints,
-    totalPoints,
-    totalSisoTokens,
-  } = useLeaderboardData();
+const Leaderboard = ({ entries, loading }: LeaderboardProps) => {
+  if (loading) {
+    return <p>Loading leaderboard...</p>;
+  }
 
-  const [selectedUser, setSelectedUser] = useState<LeaderboardEntry | null>(null);
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [timePeriod, setTimePeriod] = useState<string>('all-time');
-  const [category, setCategory] = useState<string>('points');
+  if (!entries || entries.length === 0) {
+    return <p>No entries found.</p>;
+  }
 
-  // Filter data when search query, time period, or category changes
-  useEffect(() => {
-    let filtered = [...leaderboardData];
-
-    // Apply search filter
-    if (searchQuery) {
-      filtered = filtered.filter(entry => 
-        entry.profile?.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        entry.profile?.email?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    // Apply time period filter
-    if (timePeriod !== 'all-time') {
-      filtered = filtered.slice(0, timePeriod === 'daily' ? 10 : 
-                                 timePeriod === 'weekly' ? 20 : 
-                                 timePeriod === 'monthly' ? 50 : filtered.length);
-    }
-
-    // Apply category filter
-    if (category !== 'points') {
-      filtered.sort((a, b) => {
-        if (category === 'contributions') {
-          return (b.contribution_count || 0) - (a.contribution_count || 0);
-        } else if (category === 'referrals') {
-          return (b.referral_count || 0) - (a.referral_count || 0);
-        } else if (category === 'achievements') {
-          return (b.achievements?.length || 0) - (a.achievements?.length || 0);
-        }
-        return 0;
-      });
-    }
-
-    setFilteredData(filtered);
-  }, [searchQuery, timePeriod, category, leaderboardData]);
-
-  const handleUserClick = (user: LeaderboardEntry) => {
-    setSelectedUser(user);
+  const renderAsCommunityMember = (entry: LeaderboardEntry) => {
+  return {
+    id: entry.id,
+    name: entry.profile?.full_name || "Anonymous User",
+    description: entry.profile?.bio || "",
+    member_type: "Contributor",
+    youtube_url: entry.profile?.youtube_url || "",
+    website_url: entry.profile?.website_url || "",
+    profile_image_url: entry.profile?.avatar_url || "",
+    platform: "AI Enthusiast",
+    points: entry.points,
+    rank: entry.rank?.toString() || "", // Convert rank to string explicitly 
+    contribution_count: entry.contribution_count || 0,
+    referral_count: entry.referral_count || 0,
+    slug: entry.id
   };
-
-  // Map LeaderboardEntry to CommunityMember type
-  const mapToCommunityMember = (entry: LeaderboardEntry | null) => {
-    if (!entry) return null;
-    
-    return {
-      id: entry.id,
-      name: entry.profile?.full_name || 'Anonymous User',
-      description: entry.profile?.bio || undefined,
-      member_type: 'Community',
-      youtube_url: entry.profile?.youtube_url,
-      website_url: entry.profile?.website_url,
-      profile_image_url: entry.profile?.avatar_url,
-      platform: undefined,
-      points: entry.points || 0,
-      rank: entry.rank,
-      contribution_count: entry.contribution_count,
-      referral_count: entry.referral_count,
-      slug: entry.id, // Using id as slug since it's required
-    };
-  };
+};
 
   return (
-    <div className="space-y-6 animate-fadeIn">
-      <LeaderboardStats 
-        totalUsers={totalUsersWithPoints}
-        totalPoints={totalPoints}
-        totalSisoTokens={totalSisoTokens}
-      />
-      
-      <EarnMoreCard />
-      
-      <LeaderboardContent
-        filteredData={filteredData}
-        onUserClick={handleUserClick}
-        onSearchChange={setSearchQuery}
-        onPeriodChange={setTimePeriod}
-        onCategoryChange={setCategory}
-      />
+    <div className="overflow-x-auto">
+      <table className="min-w-full divide-y divide-gray-200">
+        <thead className="bg-gray-50">
+          <tr>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Rank
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              User
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Points
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Level
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Streak
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Contributions
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Referrals
+            </th>
+          </tr>
+        </thead>
+        <tbody className="bg-white divide-y divide-gray-200">
+          {entries.map((entry, index) => {
+            const communityMember: CommunityMember = renderAsCommunityMember(entry);
 
-      <CommunityMemberDetails
-        member={mapToCommunityMember(selectedUser)}
-        onClose={() => setSelectedUser(null)}
-      />
+            return (
+              <tr key={index}>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900">{communityMember.rank}</div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0 h-10 w-10">
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src={communityMember.profile_image_url} alt={communityMember.name} />
+                        <AvatarFallback>{communityMember.name?.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                    </div>
+                    <div className="ml-4">
+                      <div className="text-sm font-medium text-gray-900">{communityMember.name}</div>
+                      <div className="text-sm text-gray-500">{communityMember.description}</div>
+                    </div>
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900">{communityMember.points}</div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900">{entry.level}</div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900">{entry.streak_days}</div>
+                </td>
+                 <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900">{entry.contribution_count}</div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900">{entry.referral_count}</div>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 };
+
+export default Leaderboard;

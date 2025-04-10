@@ -20,6 +20,16 @@ export interface Tool {
     url: string;
     thumbnailUrl: string;
   }[];
+  
+  // Additional properties needed by components
+  assistant_type?: string;
+  youtube_url?: string;
+  profile_image_url?: string;
+  member_type?: string;
+  specialization?: string[];
+  content_themes?: string[];
+  use_cases?: string[];
+  likes_count?: number;
 }
 
 export interface Automation {
