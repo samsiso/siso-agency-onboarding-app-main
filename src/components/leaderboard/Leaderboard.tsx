@@ -1,10 +1,11 @@
+
 import React from 'react';
 import { Avatar } from "@/components/ui/avatar"
 import { AvatarImage, AvatarFallback } from "@radix-ui/react-avatar"
 import { CommunityMember } from '@/types/community';
 import { LeaderboardEntry } from './types';
 import { Badge } from '@/components/ui/badge';
-import { SparklesIcon } from '@heroicons/react/24/solid';
+import { SparklesIcon } from 'lucide-react';
 
 interface LeaderboardProps {
   entries: LeaderboardEntry[];
@@ -20,23 +21,23 @@ const Leaderboard = ({ entries, loading }: LeaderboardProps) => {
     return <p>No entries found.</p>;
   }
 
-  const renderAsCommunityMember = (entry: LeaderboardEntry) => {
-  return {
-    id: entry.id,
-    name: entry.profile?.full_name || "Anonymous User",
-    description: entry.profile?.bio || "",
-    member_type: "Contributor",
-    youtube_url: entry.profile?.youtube_url || "",
-    website_url: entry.profile?.website_url || "",
-    profile_image_url: entry.profile?.avatar_url || "",
-    platform: "AI Enthusiast",
-    points: entry.points,
-    rank: entry.rank?.toString() || "", // Convert rank to string explicitly 
-    contribution_count: entry.contribution_count || 0,
-    referral_count: entry.referral_count || 0,
-    slug: entry.id
+  const renderAsCommunityMember = (entry: LeaderboardEntry): CommunityMember => {
+    return {
+      id: entry.id,
+      name: entry.profile?.full_name || "Anonymous User",
+      description: entry.profile?.bio || "",
+      member_type: "Contributor",
+      youtube_url: entry.profile?.youtube_url || "",
+      website_url: entry.profile?.website_url || "",
+      profile_image_url: entry.profile?.avatar_url || "",
+      platform: "AI Enthusiast",
+      points: entry.points,
+      rank: entry.rank?.toString() || "", // Convert rank to string explicitly 
+      contribution_count: entry.contribution_count || 0,
+      referral_count: entry.referral_count || 0,
+      slug: entry.id
+    };
   };
-};
 
   return (
     <div className="overflow-x-auto">

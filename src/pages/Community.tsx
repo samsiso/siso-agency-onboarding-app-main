@@ -1,3 +1,4 @@
+
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
@@ -5,7 +6,7 @@ import { Sidebar } from '@/components/Sidebar';
 import { CommunitySearch } from '@/components/community/CommunitySearch';
 import { CommunityMemberCard } from '@/components/community/CommunityMemberCard';
 import { CommunityMemberDetails } from '@/components/community/CommunityMemberDetails';
-import { CommunityMember } from '@/components/community/types';
+import { CommunityMember } from '@/types/community';
 
 export default function Community() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -29,16 +30,16 @@ export default function Community() {
         id: member.id,
         name: member.name,
         description: member.description,
-        member_type: member.member_type,
-        youtube_url: member.youtube_url,
-        youtube_videos: member.youtube_videos as { title: string; url: string; }[] | null,
-        website_url: member.website_url,
-        specialization: member.specialization,
-        content_themes: member.content_themes,
-        profile_image_url: member.profile_image_url,
+        member_type: member.assistant_type || 'Community Member',
+        youtube_url: member.metadata?.youtube_url || '',
+        youtube_videos: member.metadata?.youtube_videos || [],
+        website_url: member.metadata?.website_url || '',
+        specialization: member.metadata?.specialization || [],
+        content_themes: member.metadata?.content_themes || [],
+        profile_image_url: member.icon || '',
+        platform: member.metadata?.platform || null,
         member_count: null,
         join_url: null,
-        platform: null,
         points: 0,
         rank: null,
         contribution_count: 0,

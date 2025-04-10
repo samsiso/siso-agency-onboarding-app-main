@@ -21,7 +21,8 @@ export const LeaderboardTable = ({ leaderboardData, onUserClick }: LeaderboardTa
     return 'Anonymous User';
   };
 
-  const formatLastActive = (date: string) => {
+  const formatLastActive = (date: string | undefined) => {
+    if (!date) return 'Unknown';
     try {
       return formatDistanceToNow(new Date(date), { addSuffix: true });
     } catch (error) {
@@ -123,7 +124,7 @@ export const LeaderboardTable = ({ leaderboardData, onUserClick }: LeaderboardTa
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-siso-red to-siso-orange flex items-center justify-center text-white font-bold">
                       {getDisplayName(entry).charAt(0)}
                     </div>
-                    {entry.achievements.length > 0 && (
+                    {entry.achievements && entry.achievements.length > 0 && (
                       <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-siso-orange rounded-full flex items-center justify-center text-[10px] text-white">
                         {entry.achievements.length}
                       </div>
@@ -175,4 +176,3 @@ export const LeaderboardTable = ({ leaderboardData, onUserClick }: LeaderboardTa
     </div>
   );
 };
-

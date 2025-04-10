@@ -1,8 +1,7 @@
 
 import { useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 
-// [Analysis] Define web vitals metric types for better type safety
+// Define web vitals metric types for better type safety
 interface WebVitalMetric {
   id: string;
   name: string;
@@ -13,7 +12,7 @@ interface WebVitalMetric {
 
 export const usePerformanceMetrics = () => {
   useEffect(() => {
-    // Only run in production and for authenticated users
+    // Only run in production
     if (process.env.NODE_ENV !== 'production') return;
 
     const recordMetrics = async () => {
@@ -39,19 +38,12 @@ export const usePerformanceMetrics = () => {
             }
 
             if (metricValue !== undefined) {
-              const metric = {
-                page_url: window.location.pathname,
-                [entry.entryType]: metricValue,
-              };
-
-              // Store metrics in Supabase
-              const { error } = await supabase
-                .from('performance_metrics')
-                .insert([metric]);
-
-              if (error) {
-                console.error('Error recording metrics:', error);
-              }
+              // Log metrics for debugging instead of storing in database
+              console.log('Performance metric:', {
+                type: entry.entryType,
+                value: metricValue,
+                page: window.location.pathname
+              });
             }
           });
         });
@@ -62,12 +54,10 @@ export const usePerformanceMetrics = () => {
         // Record TTFB
         const navigationEntry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
         if (navigationEntry) {
-          await supabase
-            .from('performance_metrics')
-            .insert([{
-              page_url: window.location.pathname,
-              ttfb: navigationEntry.responseStart - navigationEntry.requestStart,
-            }]);
+          console.log('TTFB:', {
+            page: window.location.pathname,
+            ttfb: navigationEntry.responseStart - navigationEntry.requestStart
+          });
         }
       } catch (error) {
         console.error('Error in performance monitoring:', error);

@@ -1,6 +1,6 @@
 
 import { MainLayout } from '@/components/assistants/layout/MainLayout';
-import { Leaderboard } from '@/components/leaderboard/Leaderboard';
+import Leaderboard from '@/components/leaderboard/Leaderboard';
 
 export default function LeaderboardPage() {
   return (

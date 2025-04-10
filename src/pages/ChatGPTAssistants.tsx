@@ -41,10 +41,17 @@ export default function ChatGPTAssistants() {
     if (!searchQuery.trim()) return;
 
     try {
-      await supabase.from('user_search_history').insert({
-        query: searchQuery,
-        result_type: 'assistant'
-      });
+      // Get current user
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        await supabase.from('user_search_history').insert({
+          query: searchQuery,
+          result_type: 'assistant',
+          user_id: session.user.id
+        });
+      } else {
+        console.log('User not logged in, search history not saved');
+      }
     } catch (error) {
       console.error('Error saving search:', error);
     }

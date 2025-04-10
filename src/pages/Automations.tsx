@@ -1,6 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
+
 import { useState, useCallback, useMemo } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Sidebar } from '@/components/Sidebar';
 import { AutomationDetails } from '@/components/automations/AutomationDetails';
@@ -13,18 +12,41 @@ export default function Automations() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedAutomation, setSelectedAutomation] = useState<Automation | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<AutomationCategory>('all');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { data: automations, isLoading } = useQuery({
-    queryKey: ['automations'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('automations')
-        .select('*');
-      
-      if (error) throw error;
-      return data as Automation[];
+  // Mock automation data
+  const automations: Automation[] = useMemo(() => [
+    {
+      id: '1',
+      name: 'Email Automation',
+      description: 'Automatically send personalized emails to customers',
+      category: 'marketing',
+      platform: 'zapier',
+      complexity: 'medium',
+      setup_guide: 'Connect your email provider to Zapier and setup triggers',
+      integration_time: '30 minutes'
     },
-  });
+    {
+      id: '2',
+      name: 'Social Media Scheduler',
+      description: 'Schedule posts across multiple platforms',
+      category: 'marketing',
+      platform: 'buffer',
+      complexity: 'simple',
+      setup_guide: 'Connect your social accounts and create a posting schedule',
+      integration_time: '15 minutes'
+    },
+    {
+      id: '3',
+      name: 'CRM Integration',
+      description: 'Sync customer data across platforms',
+      category: 'sales',
+      platform: 'make',
+      complexity: 'advanced',
+      setup_guide: 'Create bidirectional sync between your CRM and other tools',
+      integration_time: '1 hour'
+    }
+  ], []);
 
   const filteredAutomations = useMemo(() => {
     if (!automations) return [];
