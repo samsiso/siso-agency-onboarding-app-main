@@ -1,10 +1,10 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles, CheckCircle, ArrowRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import '@/components/ui/animations.css'; // Importing the animations
+import '@/components/ui/animations.css';
 
 interface WelcomeLoaderProps {
   progress: number;
@@ -36,7 +36,7 @@ export const WelcomeLoader = ({
     show: { opacity: 1, y: 0 }
   };
 
-  // Pulse animation for progress indicator
+  // Enhanced pulse animation for progress indicator
   const pulseAnimation = {
     scale: [1, 1.05, 1],
     opacity: [0.7, 1, 0.7],
