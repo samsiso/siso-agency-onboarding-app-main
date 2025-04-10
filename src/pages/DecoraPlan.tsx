@@ -5,6 +5,8 @@ import { motion } from 'framer-motion';
 import { WelcomeLoader } from '@/components/plan/WelcomeLoader';
 import { ClickThroughPrompt } from '@/components/plan/ClickThroughPrompt';
 import { useOnboardingAuth } from '@/hooks/useOnboardingAuth';
+// Import hide-scrollbar CSS for the feature selection
+import '@/components/ui/hide-scrollbar.css';
 
 const DecoraPlan = () => {
   const navigate = useNavigate();

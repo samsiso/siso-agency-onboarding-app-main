@@ -1,11 +1,9 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { GradientHeading } from '@/components/ui/gradient-heading';
 import { featureCategories } from '@/data/plan/featureData';
-import { EnhancedFeatureSelection } from './EnhancedFeatureSelection';
+import { ClickThroughFeatureSelection } from './ClickThroughFeatureSelection';
 
 interface FeatureSectionProps {
   onFinalizeFeatures: (selectedFeatures: string[]) => void;
@@ -35,7 +33,7 @@ export const FeatureSection: React.FC<FeatureSectionProps> = ({
         features with proven ROI for OnlyFans agencies.
       </p>
       
-      <EnhancedFeatureSelection 
+      <ClickThroughFeatureSelection 
         featureCategories={featureCategories}
         onFinalizeFeatures={onFinalizeFeatures}
       />
