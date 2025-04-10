@@ -10,14 +10,20 @@ import { WelcomeLoader } from '@/components/plan/WelcomeLoader';
 import { PriceSlider } from '@/components/plan/PriceSlider';
 import { GradientHeading } from '@/components/ui/gradient-heading';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useOnboardingAuth } from '@/hooks/useOnboardingAuth';
 
 const DecoraPlan = () => {
   const navigate = useNavigate();
+  const { userId } = useOnboardingAuth();
   const [showPrompts, setShowPrompts] = useState(true);
   const [currentStep, setCurrentStep] = useState(0);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [loadingComplete, setLoadingComplete] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
+  
+  // Auto-advance settings
+  const AUTO_ADVANCE = true;
+  const AUTO_ADVANCE_DELAY = 4000; // 4 seconds between steps
   
   // ROI Calculator States
   const [showRoiCalculator, setShowRoiCalculator] = useState(false);
@@ -45,17 +51,24 @@ const DecoraPlan = () => {
   }, []);
   
   useEffect(() => {
-    // Simulating loading progress
+    // Simulating loading progress with more natural, non-linear progression
     const progressInterval = setInterval(() => {
       setLoadingProgress(prev => {
+        // Make progress slower at the beginning and end
         if (prev >= 100) {
           clearInterval(progressInterval);
           setLoadingComplete(true);
           return 100;
         }
-        return prev + 5;
+        
+        // Slower progress between 70-95% to make it feel more realistic
+        if (prev > 70 && prev < 95) {
+          return prev + 1;
+        }
+        
+        return prev + (prev < 30 ? 4 : 3);
       });
-    }, 200);
+    }, 150);
     
     return () => clearInterval(progressInterval);
   }, []);
@@ -145,6 +158,8 @@ const DecoraPlan = () => {
             onComplete={handlePromptsComplete} 
             currentStep={currentStep}
             onNextStep={handleNextStep}
+            autoAdvance={AUTO_ADVANCE}
+            autoAdvanceDelay={AUTO_ADVANCE_DELAY}
           />
           
           <div className="mt-6 text-center">
@@ -159,62 +174,25 @@ const DecoraPlan = () => {
           </div>
         </motion.div>
       ) : (
-        <div className="max-w-md w-full bg-black/40 border border-siso-text/10 rounded-lg p-6 backdrop-blur-sm">
-          <div className="text-center mb-6">
-            <Sparkles className="h-12 w-12 text-siso-orange mx-auto mb-3" />
-            <h2 className="text-2xl font-bold text-white mb-1">
-              Preparing Your Custom Plan
-            </h2>
-            <p className="text-siso-text text-sm">
-              We're finalizing your custom OnlyFans Management Suite
-            </p>
-          </div>
-          
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-siso-text">Loading your custom plan</span>
-              <span className="text-sm text-siso-orange">
-                {loadingComplete ? 'Ready!' : `${loadingProgress}%`}
-              </span>
-            </div>
-            <Progress 
-              value={loadingProgress} 
-              className="h-2 bg-black/30" 
-              indicatorClassName="bg-gradient-to-r from-siso-red to-siso-orange" 
-            />
-          </div>
-          
-          <div className="space-y-3 mb-6">
-            {steps.map((step, index) => (
-              <div key={index} className="flex items-center gap-3">
-                <div className={`flex items-center justify-center w-8 h-8 rounded-full ${
-                  loadingProgress >= (index + 1) * 33 ? 'bg-siso-orange/20' : 'bg-siso-text/5'
-                }`}>
-                  {loadingProgress >= (index + 1) * 33 ? (
-                    <CheckCircle className="h-4 w-4 text-siso-orange" />
-                  ) : (
-                    <div className="h-4 w-4 rounded-full bg-siso-text/20" />
-                  )}
-                </div>
-                <p className={`text-sm ${
-                  loadingProgress >= (index + 1) * 33 ? 'text-siso-text' : 'text-siso-text/50'
-                }`}>
-                  {step}
-                </p>
-              </div>
-            ))}
-          </div>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="w-full"
+        >
+          <WelcomeLoader
+            progress={loadingProgress}
+            complete={loadingComplete}
+            steps={steps}
+            onContinue={handleSkipToFullPlan}
+          />
           
           {loadingComplete && (
-            <>
-              <Button 
-                onClick={handleSkipToFullPlan}
-                className="w-full bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-white mb-4"
-              >
-                View Your Personalized Plan
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-              
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="mt-6 max-w-md mx-auto"
+            >
               <Button
                 onClick={toggleRoiCalculator}
                 className="w-full bg-black/30 border border-siso-orange/30 text-siso-orange hover:bg-siso-orange/10"
@@ -354,9 +332,9 @@ const DecoraPlan = () => {
                   </Tabs>
                 </motion.div>
               )}
-            </>
+            </motion.div>
           )}
-        </div>
+        </motion.div>
       )}
     </div>
   );

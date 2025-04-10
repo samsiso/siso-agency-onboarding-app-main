@@ -17,7 +17,7 @@ export const FeatureSection: React.FC<FeatureSectionProps> = ({
   return (
     <motion.section 
       id="features-section" 
-      className="space-y-6 pt-6 pb-40" // Added bottom padding to accommodate fixed Next Steps
+      className="space-y-6 pt-6 pb-40" // Increased bottom padding to accommodate fixed Next Steps
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ 

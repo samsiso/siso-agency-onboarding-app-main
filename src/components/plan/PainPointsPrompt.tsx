@@ -84,6 +84,17 @@ export const PainPointsPrompt = ({
     }
   }, [currentStep, autoAdvance, autoAdvanceDelay, painPoints.length, onComplete, onNextStep]);
   
+  useEffect(() => {
+    // Auto transition from main card to benefits when in auto advance mode
+    if (autoAdvance && !animatingBenefits) {
+      const benefitsTimer = setTimeout(() => {
+        setAnimatingBenefits(true);
+      }, autoAdvanceDelay / 2);
+      
+      return () => clearTimeout(benefitsTimer);
+    }
+  }, [currentStep, autoAdvance, autoAdvanceDelay, animatingBenefits]);
+  
   const handleNext = () => {
     if (animatingBenefits) {
       setAnimatingBenefits(false);
