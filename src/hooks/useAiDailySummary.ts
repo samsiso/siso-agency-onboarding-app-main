@@ -211,13 +211,13 @@ export function useAiDailySummary(date: string, isAdmin: boolean = false) {
         }
         
         if (!data || !data.success) {
-          const errorMsg = data?.error || 'Failed to generate summary';
+          const errorMsg = data?.message || 'Failed to generate summary';
           console.error("Generate summary error:", errorMsg);
           throw new Error(errorMsg);
         }
         
-        // Check if this was a fallback/placeholder summary
-        if (data.error && data.error.includes('API error')) {
+        // Check if error message exists in the data response
+        if (data.message && data.message.includes('API error')) {
           setError('AI service unavailable. Using basic summary instead.');
           toast({
             title: 'API Issue Detected',

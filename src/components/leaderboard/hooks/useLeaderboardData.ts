@@ -1,16 +1,10 @@
 
 import { useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
-import type { LeaderboardEntry, Achievement } from '../types';
+import type { LeaderboardEntry, Achievement, TrendStats } from '../types';
 import { safeQuery } from '@/utils/typeHelpers';
 import FeatureFlags from '@/utils/featureFlags';
 import { safeSupabase } from '@/utils/supabaseHelpers';
-
-export interface TrendStats {
-  points: number;
-  users: number;
-  tokens: number;
-}
 
 export const useLeaderboardData = () => {
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
@@ -154,7 +148,7 @@ export const useLeaderboardData = () => {
         id: `mock-${index}`,
         user_id: `user-${index}`,
         points: 1000 - (index * 50),
-        rank: index + 1,
+        rank: (index + 1).toString(), // Convert to string for consistency
         achievements: [{ name: 'Early Adopter', icon: 'trophy' }],
         siso_tokens: 500 - (index * 25),
         updated_at: new Date().toISOString(),
@@ -227,7 +221,7 @@ export const useLeaderboardData = () => {
           id: profile.id,
           user_id: profile.id,
           points: profile.points || 0,
-          rank: profile.rank || 0,
+          rank: profile.rank || 0, // This will be cast to string|number due to the type definition
           achievements: achievements,
           siso_tokens: leaderboardEntry?.siso_tokens || 0,
           updated_at: profile.updated_at || new Date().toISOString(),
