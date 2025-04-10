@@ -20,7 +20,7 @@ export const EnhancedNextSteps: React.FC<EnhancedNextStepsProps> = ({
 
   return (
     <motion.section 
-      className="space-y-6 fixed bottom-0 left-0 right-0 z-30 mx-auto max-w-5xl px-4 pb-6 bg-gradient-to-t from-black via-black to-transparent pt-10"
+      className="space-y-6 mx-auto max-w-5xl px-4 pb-6 pt-10 mb-6"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -121,8 +121,6 @@ export const EnhancedNextSteps: React.FC<EnhancedNextStepsProps> = ({
           </motion.div>
         </div>
       </motion.div>
-      
-      {/* Progress pills - removed since it's now fixed at the bottom */}
     </motion.section>
   );
 };
