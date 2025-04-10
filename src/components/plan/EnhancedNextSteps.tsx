@@ -20,7 +20,7 @@ export const EnhancedNextSteps: React.FC<EnhancedNextStepsProps> = ({
 
   return (
     <motion.section 
-      className="space-y-6 sticky bottom-6 z-30 mt-8"
+      className="space-y-6 fixed bottom-6 left-0 right-0 z-30 mx-auto max-w-5xl px-4"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
