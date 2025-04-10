@@ -1,13 +1,11 @@
-
 import { GradientHeading } from '@/components/ui/gradient-heading';
 import { UserPlusIcon, ClipboardCheckIcon, RocketIcon, Heart, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
+import { EmailSignInButton } from '@/components/auth/EmailSignInButton';
 
 export const GettingStartedSection = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -31,16 +29,10 @@ export const GettingStartedSection = () => {
     }
   };
 
-  const handleGoogleSignIn = async () => {
+  const handleEmailSignIn = async () => {
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/onboarding/social`
-        }
-      });
-      if (error) throw error;
+      navigate('/auth');
     } catch (error: any) {
       console.error('Error:', error);
       toast({
@@ -189,8 +181,8 @@ export const GettingStartedSection = () => {
                           Create Your Account
                           <ArrowRight className="w-4 h-4" />
                         </Button>
-                        <GoogleSignInButton
-                          onClick={handleGoogleSignIn}
+                        <EmailSignInButton
+                          onClick={handleEmailSignIn}
                           disabled={isLoading}
                         />
                       </div>
