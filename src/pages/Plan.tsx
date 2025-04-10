@@ -11,8 +11,8 @@ import {
   Calendar, 
   DollarSign, 
   Users, 
-  FileText, 
   MessageSquare, 
+  FileText, 
   BarChart, 
   Shield, 
   Settings, 
@@ -813,7 +813,7 @@ const Plan = () => {
           />
         </div>
         
-        <div className="container mx-auto py-8 px-4">
+        <div className="container mx-auto py-8 px-4 max-w-5xl">
           <div className="flex flex-col space-y-8">
             <div className="mb-6">
               <WelcomeMessage 
