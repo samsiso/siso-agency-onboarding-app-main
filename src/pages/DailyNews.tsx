@@ -1,24 +1,10 @@
+
 import { useState } from 'react';
-import { useNewsItems } from '@/hooks/useNewsItems';
 import { Helmet } from 'react-helmet';
 import { Sidebar } from '@/components/Sidebar';
 
 const DailyNews = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-
-  const { 
-    newsItems, 
-    summaries, 
-    loadingSummaries, 
-    generateSummary, 
-    loading, 
-    hasMore, 
-    loadMore, 
-    error,
-    refresh
-  } = useNewsItems(selectedCategory, 'published');
-
-  const featuredArticle = newsItems.find(item => item.featured) || newsItems[0];
 
   return (
     <div className="flex min-h-screen bg-siso-bg">
@@ -30,7 +16,10 @@ const DailyNews = () => {
       <Sidebar />
       
       <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-20">
-        <h1>Daily News</h1>
+        <h1 className="text-3xl font-bold mb-6">Daily News</h1>
+        <div className="p-6 bg-white rounded-lg shadow-md">
+          <p className="text-gray-500">News content will be available soon.</p>
+        </div>
       </main>
     </div>
   );
