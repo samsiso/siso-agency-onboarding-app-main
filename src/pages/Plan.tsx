@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -34,6 +33,7 @@ import { AgencyPainPoints } from '@/components/plan/AgencyPainPoints';
 import { ROICalculator } from '@/components/plan/ROICalculator';
 import { FeatureSection } from '@/components/plan/FeatureSection';
 import { InteractiveCallout } from '@/components/plan/InteractiveCallout';
+import { EnhancedNextSteps } from '@/components/plan/EnhancedNextSteps';
 import { caseStudies } from '@/data/plan/featureData';
 
 interface PlanData {
@@ -205,7 +205,12 @@ const Plan = () => {
             scrollToFeatures={handleShowFeatures}
           />
           
-          <section className="space-y-4">
+          <motion.section 
+            className="space-y-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
             <GradientHeading 
               className="text-2xl font-bold" 
               variant="primary"
@@ -220,10 +225,16 @@ const Plan = () => {
             </p>
             
             <AgencyPainPoints onSolutionRequest={handleShowFeatures} />
-          </section>
+          </motion.section>
           
           {showSolutionsSection && (
-            <section id="solutions-section" className="space-y-4 pt-6">
+            <motion.section 
+              id="solutions-section" 
+              className="space-y-4 pt-6"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
               <GradientHeading 
                 className="text-2xl font-bold" 
                 variant="primary"
@@ -231,7 +242,7 @@ const Plan = () => {
                 Our Complete Solution
               </GradientHeading>
               
-              <div className="rounded-lg bg-black/20 backdrop-blur-sm border border-siso-text/10 p-6">
+              <div className="rounded-lg bg-black/20 backdrop-blur-sm border border-siso-text/10 p-6 shadow-md hover:shadow-lg transition-shadow duration-300">
                 <div className="mb-6 flex items-center gap-3">
                   <div className="rounded-full bg-siso-orange/10 p-3">
                     <Sparkles className="h-6 w-6 text-siso-orange" />
@@ -330,15 +341,27 @@ const Plan = () => {
                   </div>
                 </div>
               </div>
-            </section>
+            </motion.section>
           )}
           
           {showFeatureSelection && (
-            <FeatureSection onFinalizeFeatures={handleFinalizeFeatures} />
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              <FeatureSection onFinalizeFeatures={handleFinalizeFeatures} />
+            </motion.div>
           )}
           
           {selectedFeatures.length > 0 && (
-            <section id="review-section" className="space-y-4 pt-6">
+            <motion.section 
+              id="review-section" 
+              className="space-y-4 pt-6"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
               <GradientHeading 
                 className="text-2xl font-bold" 
                 variant="primary"
@@ -369,10 +392,15 @@ const Plan = () => {
                   basePrice={0}
                 />
               </div>
-            </section>
+            </motion.section>
           )}
           
-          <section className="space-y-4">
+          <motion.section 
+            className="space-y-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
             <GradientHeading 
               className="text-2xl font-bold" 
               variant="primary"
@@ -395,10 +423,15 @@ const Plan = () => {
                 />
               ))}
             </div>
-          </section>
+          </motion.section>
           
           {!selectedFeatures.length && (
-            <section className="space-y-4">
+            <motion.section 
+              className="space-y-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
               <GradientHeading 
                 className="text-2xl font-bold" 
                 variant="primary"
@@ -492,61 +525,13 @@ const Plan = () => {
                   </div>
                 </div>
               </div>
-            </section>
+            </motion.section>
           )}
           
-          <section className="space-y-4">
-            <GradientHeading 
-              className="text-2xl font-bold" 
-              variant="primary"
-            >
-              Next Steps
-            </GradientHeading>
-            
-            <div className="bg-gradient-to-r from-siso-red/20 to-siso-orange/20 rounded-lg p-6 border border-siso-orange/20">
-              <h3 className="text-xl font-semibold text-white mb-4">
-                Ready to transform your OnlyFans agency?
-              </h3>
-              
-              <p className="text-siso-text mb-6">
-                {!showFeatureSelection ? 
-                  "Select your features to create a customized plan for your agency's needs." :
-                  "Book a call with our implementation team to discuss your specific needs and get started with your custom platform."}
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4">
-                {!showFeatureSelection ? (
-                  <Button 
-                    className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-white" 
-                    size="lg"
-                    onClick={handleShowFeatures}
-                  >
-                    Customize Your Features
-                    <Settings className="ml-2 h-4 w-4" />
-                  </Button>
-                ) : (
-                  <Button 
-                    className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-white" 
-                    size="lg"
-                    onClick={() => window.open('https://calendly.com/siso-team/onlyfans-platform', '_blank')}
-                  >
-                    Schedule Your Free Consultation
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                )}
-                
-                <Button 
-                  variant="outline"
-                  className="border-siso-orange/30 text-siso-orange hover:bg-siso-orange/10"
-                  size="lg"
-                  onClick={() => window.open('https://calendly.com/siso-team/demo', '_blank')}
-                >
-                  Request Live Demo
-                  <ExternalLink className="ml-2 h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </section>
+          <EnhancedNextSteps 
+            showFeatureSelection={showFeatureSelection}
+            onShowFeatures={handleShowFeatures}
+          />
         </div>
       </div>
       
