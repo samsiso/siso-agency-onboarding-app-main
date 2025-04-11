@@ -3,7 +3,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, Check, TrendingUp } from 'lucide-react';
 
 interface UpsellFeatureCardProps {
   id: string;
@@ -39,6 +39,11 @@ export function UpsellFeatureCard({
           <p className="text-sm text-siso-text mb-3">
             {description}
           </p>
+          
+          <div className="flex items-center text-xs text-siso-orange gap-1 mb-3">
+            <TrendingUp className="h-3.5 w-3.5" />
+            <span>Premium Add-on</span>
+          </div>
         </div>
         
         <Button
@@ -51,7 +56,9 @@ export function UpsellFeatureCard({
           disabled={isAdded}
         >
           {isAdded ? (
-            "Added"
+            <>
+              <Check className="h-4 w-4 mr-1" /> Added
+            </>
           ) : (
             <>
               <Plus className="h-4 w-4 mr-1" /> Add

@@ -1,7 +1,9 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { CheckCircle } from 'lucide-react';
 import { GradientHeading } from '@/components/ui/gradient-heading';
+import { Button } from '@/components/ui/button';
 import { featureCategories } from '@/data/plan/featureData';
 import { ClickThroughFeatureSelection } from './ClickThroughFeatureSelection';
 import { RecommendedPackage } from './RecommendedPackage';
@@ -17,6 +19,7 @@ export const FeatureSection: React.FC<FeatureSectionProps> = ({
 }) => {
   const [showCustomization, setShowCustomization] = useState(false);
   const [selectedFeatureIds, setSelectedFeatureIds] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const recommendedPackage = useRecommendedPackage();
   
   const handleSelectRecommended = () => {
@@ -58,10 +61,29 @@ export const FeatureSection: React.FC<FeatureSectionProps> = ({
     }
   };
   
+  const handleSubmitFeatures = () => {
+    setIsSubmitting(true);
+    
+    setTimeout(() => {
+      setIsSubmitting(false);
+      // Auto-select recommended if no custom features were chosen
+      if (!recommendedPackage.isRecommendedSelected && !showCustomization) {
+        handleSelectRecommended();
+      }
+    }, 1000);
+  };
+  
+  // Auto-select recommended package on first load
+  React.useEffect(() => {
+    if (!recommendedPackage.isRecommendedSelected && selectedFeatureIds.length === 0) {
+      handleSelectRecommended();
+    }
+  }, []);
+  
   return (
     <motion.section 
       id="features-section" 
-      className="space-y-6 pt-6 pb-48" // Increased bottom padding to accommodate fixed Next Steps
+      className="space-y-6 pt-6 pb-48" 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ 
@@ -70,12 +92,12 @@ export const FeatureSection: React.FC<FeatureSectionProps> = ({
       }}
     >
       <GradientHeading className="text-2xl font-bold" variant="primary">
-        Customize Your Features
+        Your Agency Platform Features
       </GradientHeading>
       
       <p className="text-siso-text max-w-3xl">
-        Select the features that matter most to your agency. Each choice adds specific capabilities 
-        to your platform and influences your timeline.
+        We've pre-selected the essential features for your OnlyFans agency platform. You can stick with our
+        recommended package or customize your selection to match your specific needs.
       </p>
       
       {!showCustomization && (
@@ -95,6 +117,25 @@ export const FeatureSection: React.FC<FeatureSectionProps> = ({
           selectedFeatureIds={selectedFeatureIds}
           onAddFeature={handleAddUpsellFeature}
         />
+      )}
+      
+      {recommendedPackage.isRecommendedSelected && !showCustomization && (
+        <div className="flex justify-end mt-8">
+          <Button
+            onClick={handleSubmitFeatures}
+            disabled={isSubmitting}
+            className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90"
+          >
+            {isSubmitting ? (
+              <>Processing...</>
+            ) : (
+              <>
+                <CheckCircle className="mr-2 h-4 w-4" />
+                Confirm Features
+              </>
+            )}
+          </Button>
+        </div>
       )}
     </motion.section>
   );

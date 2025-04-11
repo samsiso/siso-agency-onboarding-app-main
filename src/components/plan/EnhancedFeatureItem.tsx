@@ -32,11 +32,15 @@ export function EnhancedFeatureItem({ feature, isSelected, onToggle }: EnhancedF
         {/* Selection circle */}
         <div className="flex-shrink-0 mt-1">
           <div className={cn(
-            "w-5 h-5 rounded-full transition-colors",
+            "w-5 h-5 rounded-full transition-colors flex items-center justify-center",
             isSelected 
-              ? "bg-siso-orange border-2 border-siso-orange" 
+              ? "bg-siso-orange/20 border-2 border-siso-orange" 
               : "border-2 border-siso-text/30"
-          )}/>
+          )}>
+            {isSelected && (
+              <div className="h-2.5 w-2.5 rounded-full bg-siso-orange"></div>
+            )}
+          </div>
         </div>
         
         {/* Content */}

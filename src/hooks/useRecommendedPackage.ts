@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { featureCategories } from '@/data/plan/featureData';
 
+// MVP Package - Free tier with essential features
 export const RECOMMENDED_FEATURE_IDS = [
   // Client Management Features
   'client-profiles',
@@ -31,6 +32,7 @@ export const RECOMMENDED_FEATURE_IDS = [
   'workflow-automation',
 ];
 
+// Premium add-on features (upsell opportunities)
 export const UPSELL_FEATURE_IDS = [
   'advanced-analytics',
   'ai-content-optimization',
