@@ -24,7 +24,7 @@ export const usePlanData = (username: string | undefined) => {
         setLoading(true);
         setError(null);
         
-        // Special handling for "decora" username
+        // Special handling for "decora" username - prioritize this check
         if (username.toLowerCase() === 'decora') {
           console.log("Using decora username - providing default plan data");
           
@@ -61,7 +61,7 @@ export const usePlanData = (username: string | undefined) => {
           return;
         }
         
-        // Fetch from Supabase instead of using mock data
+        // For non-decora usernames, fetch from Supabase
         const { data, error: supabaseError } = await supabase
           .from('plans')
           .select('*')

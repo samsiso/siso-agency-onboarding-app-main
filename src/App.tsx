@@ -32,8 +32,10 @@ function App() {
         <Route path="/onboarding-chat" element={<OnboardingChat />} />
         <Route path="/thankyou" element={<ThankYou />} />
         <Route path="/thankyou-plan" element={<ThankYouPlan />} />
+        
+        {/* Plan routes - /plan/:username is public, decora-plan is protected */}
         <Route path="/plan/:username" element={<Plan />} />
-        <Route path="/decora-plan" element={<DecoraPlan />} />
+        <Route path="/decora-plan" element={<AuthGuard><DecoraPlan /></AuthGuard>} />
         
         {/* Protected routes */}
         <Route path="/profile" element={<AuthGuard><Profile /></AuthGuard>} />
