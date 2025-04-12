@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '@/components/assistants/layout/MainLayout';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
@@ -8,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, ChevronDown, Download, UserCheck, CheckCircle, AlertCircle, Clock, Eye } from 'lucide-react';
+import { Search, ChevronDown, Download, UserCheck, CheckCircle, AlertCircle, Clock, Eye, ExternalLink } from 'lucide-react';
 
 interface Plan {
   id: string;
@@ -23,6 +24,7 @@ interface Plan {
 }
 
 const AdminPlans = () => {
+  const navigate = useNavigate();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [filteredPlans, setFilteredPlans] = useState<Plan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -117,6 +119,15 @@ const AdminPlans = () => {
   const handleViewDetails = (plan: Plan) => {
     setSelectedPlan(plan);
     setIsDetailOpen(true);
+  };
+  
+  const handleViewPlan = () => {
+    navigate('/decora-plan', { replace: true });
+  };
+  
+  const handleViewPlanFromDetails = () => {
+    setIsDetailOpen(false);
+    navigate('/decora-plan', { replace: true });
   };
   
   const exportToCSV = () => {
@@ -324,15 +335,26 @@ const AdminPlans = () => {
                         {new Date(plan.created_at).toLocaleDateString()}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handleViewDetails(plan)}
-                          className="h-8 px-2"
-                        >
-                          <Eye className="h-4 w-4 mr-1" />
-                          View
-                        </Button>
+                        <div className="flex items-center justify-end gap-2">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleViewDetails(plan)}
+                            className="h-8 px-2"
+                          >
+                            <Eye className="h-4 w-4 mr-1" />
+                            Details
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={handleViewPlan}
+                            className="h-8 px-2"
+                          >
+                            <ExternalLink className="h-4 w-4 mr-1" />
+                            View Plan
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))
@@ -480,9 +502,15 @@ const AdminPlans = () => {
                 <div className="text-sm text-muted-foreground">
                   Created: {new Date(selectedPlan.created_at).toLocaleString()}
                 </div>
-                <Button variant="outline" onClick={() => setIsDetailOpen(false)}>
-                  Close
-                </Button>
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => setIsDetailOpen(false)}>
+                    Close
+                  </Button>
+                  <Button onClick={handleViewPlanFromDetails} className="flex items-center gap-2">
+                    <ExternalLink className="h-4 w-4" />
+                    View Plan
+                  </Button>
+                </div>
               </div>
             </div>
           )}
