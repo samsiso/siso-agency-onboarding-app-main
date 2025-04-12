@@ -43,7 +43,6 @@ function App() {
         <Route path="/home" element={<AuthGuard><Home /></AuthGuard>} />
         
         {/* Protected Project Routes */}
-        <Route path="/plan-builder" element={<AuthGuard><DecoraPlan /></AuthGuard>} />
         <Route path="/my-projects" element={<AuthGuard><MyProjects /></AuthGuard>} />
         <Route path="/portfolio" element={<AuthGuard><Home /></AuthGuard>} />
         
