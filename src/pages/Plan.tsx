@@ -8,11 +8,12 @@ import { PainPointsModal } from '@/components/plan/PainPointsModal';
 import { Button } from '@/components/ui/button';
 import { usePlanContext } from '@/contexts/plan/PlanContext';
 import { useEffect } from 'react';
+import { AlertCircle } from 'lucide-react';
 
 // This is a wrapper component that provides the PlanContext
 const PlanWithContext = () => {
   const { username } = useParams<{ username: string }>();
-  const { loading, planData, setPlanData } = usePlanData(username);
+  const { loading, planData, error } = usePlanData(username);
   const navigate = useNavigate();
   
   // Log debugging information
@@ -23,7 +24,10 @@ const PlanWithContext = () => {
     if (planData) {
       console.log(`Company name: ${planData.company_name}`);
     }
-  }, [username, loading, planData]);
+    if (error) {
+      console.log(`Error loading plan: ${error}`);
+    }
+  }, [username, loading, planData, error]);
   
   if (loading) {
     return (
@@ -40,7 +44,10 @@ const PlanWithContext = () => {
   if (!planData) {
     return (
       <div className="flex min-h-screen w-full flex-col items-center justify-center bg-gradient-to-b from-black via-siso-bg to-black p-4 md:p-8">
-        <div className="text-center">
+        <div className="text-center max-w-md w-full bg-black/40 border border-red-500/20 rounded-lg p-6 backdrop-blur-sm">
+          <div className="mb-4">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto" />
+          </div>
           <h2 className="mb-2 text-2xl font-bold text-white">Plan Not Found</h2>
           <p className="mb-6 text-siso-text">
             We couldn't find a plan for username: "{username}".

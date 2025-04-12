@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import { useOnboardingAuth } from '@/hooks/useOnboardingAuth';
 import { WelcomeLoader } from '@/components/plan/WelcomeLoader';
+import { useToast } from '@/hooks/use-toast';
 
 export const useTypewriter = (text: string, speed: number = 80) => {
   const [displayText, setDisplayText] = useState('');
@@ -30,9 +31,11 @@ export const useTypewriter = (text: string, speed: number = 80) => {
 
 const DecoraPlan = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { userId } = useOnboardingAuth();
   const [progress, setProgress] = useState(0);
   const [loadingComplete, setLoadingComplete] = useState(false);
+  const [redirectAttempted, setRedirectAttempted] = useState(false);
   const agencyName = "Decora Agency";
   
   const { displayText, isComplete: typingComplete } = useTypewriter(agencyName);
@@ -55,18 +58,26 @@ const DecoraPlan = () => {
     }
   }, [typingComplete]);
   
-  // Auto-redirect after loading completes
+  // Auto-redirect after loading completes with error handling
   useEffect(() => {
-    if (loadingComplete) {
-      // Auto-redirect after a delay - ensure we're using lowercase username
+    if (loadingComplete && !redirectAttempted) {
+      // Auto-redirect after a delay - with fixed lowercase username
+      setRedirectAttempted(true);
       const redirectTimer = setTimeout(() => {
         console.log("DecoraPlan: Redirecting to /plan/decora");
+        
+        // Show toast when redirecting
+        toast({
+          title: "Your plan is ready!",
+          description: "Redirecting you to your personalized plan."
+        });
+        
         navigate('/plan/decora', { replace: true });
       }, 1000);
       
       return () => clearTimeout(redirectTimer);
     }
-  }, [loadingComplete, navigate]);
+  }, [loadingComplete, navigate, redirectAttempted, toast]);
   
   // Loading steps
   const loadingSteps = [
@@ -77,6 +88,10 @@ const DecoraPlan = () => {
   
   const handleContinue = () => {
     console.log("Manual continue clicked, redirecting to /plan/decora");
+    toast({
+      title: "Your plan is ready!",
+      description: "Redirecting you to your personalized plan."
+    });
     navigate('/plan/decora', { replace: true });
   };
   

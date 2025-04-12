@@ -25,7 +25,7 @@ export const menuSections: MenuSection[] = [
     icon: Briefcase,
     items: [
       {
-        href: '/plan-builder',
+        href: '/decora-plan',
         icon: Layout,
         label: 'Plan Builder',
       },
