@@ -87,86 +87,86 @@ export const UserFacingFeatures: React.FC<UserFacingFeaturesProps> = ({
                 Agency-Facing
               </TabsTrigger>
             </TabsList>
-          </Tabs>
           
-          <TabsContent value="both" className="mt-0">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Model Features Column */}
-              <div>
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="p-2 rounded-full bg-siso-orange/20">
-                    <Users className="h-5 w-5 text-siso-orange" />
+            <TabsContent value="both" className="mt-0">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Model Features Column */}
+                <div>
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="p-2 rounded-full bg-siso-orange/20">
+                      <Users className="h-5 w-5 text-siso-orange" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white">Model-Facing Features</h3>
                   </div>
-                  <h3 className="text-lg font-semibold text-white">Model-Facing Features</h3>
+                  
+                  <div className="space-y-4">
+                    {modelFacingCategories.map((category) => (
+                      <FeatureCategoryCard 
+                        key={category.id} 
+                        category={category} 
+                      />
+                    ))}
+                  </div>
                 </div>
                 
-                <div className="space-y-4">
-                  {modelFacingCategories.map((category) => (
-                    <FeatureCategoryCard 
-                      key={category.id} 
-                      category={category} 
-                    />
-                  ))}
+                {/* Agency Features Column */}
+                <div>
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="p-2 rounded-full bg-siso-orange/20">
+                      <Building className="h-5 w-5 text-siso-orange" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white">Agency-Facing Features</h3>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {agencyFacingCategories.map((category) => (
+                      <FeatureCategoryCard 
+                        key={category.id} 
+                        category={category} 
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
               
-              {/* Agency Features Column */}
-              <div>
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="p-2 rounded-full bg-siso-orange/20">
-                    <Building className="h-5 w-5 text-siso-orange" />
+              {/* Shared Features */}
+              {sharedFeatureCategories.length > 0 && (
+                <div className="mt-6">
+                  <h3 className="text-lg font-semibold text-white mb-4">Shared Features</h3>
+                  <div className="space-y-4">
+                    {sharedFeatureCategories.map((category) => (
+                      <FeatureCategoryCard 
+                        key={category.id} 
+                        category={category} 
+                      />
+                    ))}
                   </div>
-                  <h3 className="text-lg font-semibold text-white">Agency-Facing Features</h3>
                 </div>
-                
-                <div className="space-y-4">
-                  {agencyFacingCategories.map((category) => (
-                    <FeatureCategoryCard 
-                      key={category.id} 
-                      category={category} 
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
+              )}
+            </TabsContent>
             
-            {/* Shared Features */}
-            {sharedFeatureCategories.length > 0 && (
-              <div className="mt-6">
-                <h3 className="text-lg font-semibold text-white mb-4">Shared Features</h3>
-                <div className="space-y-4">
-                  {sharedFeatureCategories.map((category) => (
-                    <FeatureCategoryCard 
-                      key={category.id} 
-                      category={category} 
-                    />
-                  ))}
-                </div>
+            <TabsContent value="model" className="mt-0">
+              <div className="space-y-4">
+                {modelFacingCategories.map((category) => (
+                  <FeatureCategoryCard 
+                    key={category.id} 
+                    category={category} 
+                  />
+                ))}
               </div>
-            )}
-          </TabsContent>
-          
-          <TabsContent value="model" className="mt-0">
-            <div className="space-y-4">
-              {modelFacingCategories.map((category) => (
-                <FeatureCategoryCard 
-                  key={category.id} 
-                  category={category} 
-                />
-              ))}
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="agency" className="mt-0">
-            <div className="space-y-4">
-              {agencyFacingCategories.map((category) => (
-                <FeatureCategoryCard 
-                  key={category.id} 
-                  category={category} 
-                />
-              ))}
-            </div>
-          </TabsContent>
+            </TabsContent>
+            
+            <TabsContent value="agency" className="mt-0">
+              <div className="space-y-4">
+                {agencyFacingCategories.map((category) => (
+                  <FeatureCategoryCard 
+                    key={category.id} 
+                    category={category} 
+                  />
+                ))}
+              </div>
+            </TabsContent>
+          </Tabs>
           
           {/* Feature tier breakdown */}
           <div className="mt-8 p-4 bg-black/30 border border-siso-text/10 rounded-lg">
@@ -385,3 +385,4 @@ const FeatureItem: React.FC<{
     </div>
   );
 };
+
