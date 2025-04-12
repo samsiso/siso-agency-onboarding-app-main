@@ -86,8 +86,8 @@ const DecoraPlan = () => {
       description: "Redirecting you to your personalized plan."
     });
     
-    // Use React Router's navigate instead of direct window.location
-    navigate('/plan/decora');
+    // Use React Router's navigate with replace option to prevent going back to loading screen
+    navigate('/plan/decora', { replace: true });
   };
   
   // Show the welcome/loading screen

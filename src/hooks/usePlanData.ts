@@ -26,7 +26,39 @@ export const usePlanData = (username: string | undefined) => {
         
         // Special handling for "decora" username
         if (username.toLowerCase() === 'decora') {
-          console.log("Using decora username - fetching plan data");
+          console.log("Using decora username - providing default plan data");
+          
+          // Create default plan data for Decora
+          const decoraPlanData: PlanData = {
+            id: "decora-default-plan",
+            username: "decora",
+            company_name: "Decora Agency",
+            app_name: "OnlyFans Management Suite",
+            features: [
+              "Creator Profile Management",
+              "Content Scheduling",
+              "Analytics Dashboard",
+              "Unified Messaging",
+              "Payment Tracking",
+              "Automated Posting",
+              "Multi-Platform Support",
+              "Client Portal"
+            ],
+            branding: {
+              logo: "",
+              primary_color: "#f97316",
+              secondary_color: "#ef4444"
+            },
+            estimated_cost: 4997,
+            estimated_days: 21,
+            status: "approved",
+            created_at: new Date().toISOString()
+          };
+          
+          setPlanData(decoraPlanData);
+          setError(null);
+          setLoading(false);
+          return;
         }
         
         // Fetch from Supabase instead of using mock data
