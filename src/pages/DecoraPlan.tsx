@@ -6,6 +6,7 @@ import { useOnboardingAuth } from '@/hooks/useOnboardingAuth';
 import { WelcomeLoader } from '@/components/plan/WelcomeLoader';
 import { ClickThroughPrompt } from '@/components/plan/ClickThroughPrompt';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 export const useTypewriter = (text: string, speed: number = 80) => {
   const [displayText, setDisplayText] = useState('');
@@ -31,6 +32,7 @@ export const useTypewriter = (text: string, speed: number = 80) => {
 
 const DecoraPlan = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const { userId } = useOnboardingAuth();
   const [progress, setProgress] = useState(0);
   const [loadingComplete, setLoadingComplete] = useState(false);
@@ -82,8 +84,9 @@ const DecoraPlan = () => {
       title: "Your plan is ready!",
       description: "Redirecting you to your personalized plan."
     });
-    // Using direct window.location for consistent behavior
-    window.location.href = '/plan/decora';
+    
+    // Use React Router's navigate instead of direct window.location
+    navigate('/plan/decora');
   };
   
   // Show the welcome/loading screen

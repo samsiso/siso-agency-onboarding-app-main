@@ -24,6 +24,11 @@ export const usePlanData = (username: string | undefined) => {
         setLoading(true);
         setError(null);
         
+        // Special handling for "decora" username
+        if (username.toLowerCase() === 'decora') {
+          console.log("Using decora username - fetching plan data");
+        }
+        
         // Fetch from Supabase instead of using mock data
         const { data, error: supabaseError } = await supabase
           .from('plans')
@@ -37,7 +42,7 @@ export const usePlanData = (username: string | undefined) => {
         }
         
         if (data) {
-          console.log("Plan data successfully fetched:", data.company_name);
+          console.log("Plan data successfully fetched:", data);
           
           // Transform data to match PlanData interface
           const planData: PlanData = {
