@@ -19,7 +19,6 @@ import SettingsPage from './pages/SettingsPage';
 import HelpPage from './pages/HelpPage';
 import { AuthGuard } from './components/auth/AuthGuard';
 import MyProjects from './pages/MyProjects';
-import AdminPlanPanel from './pages/AdminPlanPanel';
 
 function App() {
   return (
@@ -32,8 +31,6 @@ function App() {
         <Route path="/onboarding-chat" element={<OnboardingChat />} />
         <Route path="/thankyou" element={<ThankYou />} />
         <Route path="/thankyou-plan" element={<ThankYouPlan />} />
-        
-        {/* Plan routes - both are public now */}
         <Route path="/plan/:username" element={<Plan />} />
         <Route path="/decora-plan" element={<DecoraPlan />} />
         
@@ -46,11 +43,9 @@ function App() {
         <Route path="/home" element={<AuthGuard><Home /></AuthGuard>} />
         
         {/* Protected Project Routes */}
+        <Route path="/plan-builder" element={<AuthGuard><Home /></AuthGuard>} />
         <Route path="/my-projects" element={<AuthGuard><MyProjects /></AuthGuard>} />
         <Route path="/portfolio" element={<AuthGuard><Home /></AuthGuard>} />
-        
-        {/* Admin Routes */}
-        <Route path="/admin/plans" element={<AuthGuard><AdminPlanPanel /></AuthGuard>} />
         
         {/* Protected Financial Routes */}
         <Route path="/payments" element={<AuthGuard><CryptoExchange /></AuthGuard>} />

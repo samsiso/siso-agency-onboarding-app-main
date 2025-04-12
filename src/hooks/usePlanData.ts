@@ -2,117 +2,47 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { PlanData } from '@/contexts/plan/PlanContext';
-import { supabase } from '@/integrations/supabase/client';
 
 export const usePlanData = (username: string | undefined) => {
   const [loading, setLoading] = useState(true);
   const [planData, setPlanData] = useState<PlanData | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
     const fetchPlanData = async () => {
       try {
-        if (!username) {
-          console.log("No username provided to usePlanData hook");
-          setLoading(false);
-          setError("No username provided");
-          return;
-        }
+        if (!username) return;
         
-        console.log(`Fetching plan data for username: ${username}`);
         setLoading(true);
-        setError(null);
         
-        // Special handling for "decora" username - prioritize this check
-        if (username.toLowerCase() === 'decora') {
-          console.log("Using decora username - providing default plan data");
-          
-          // Create default plan data for Decora
-          const decoraPlanData: PlanData = {
-            id: "decora-default-plan",
-            username: "decora",
-            company_name: "Decora Agency",
-            app_name: "OnlyFans Management Suite",
-            features: [
-              "Creator Profile Management",
-              "Content Scheduling",
-              "Analytics Dashboard",
-              "Unified Messaging",
-              "Payment Tracking",
-              "Automated Posting",
-              "Multi-Platform Support",
-              "Client Portal"
-            ],
+        // Mock data for now, could be replaced with API call
+        setTimeout(() => {
+          const mockData: PlanData = {
+            id: '123',
+            username: username,
+            company_name: username === 'decora' ? 'Decora Agency' : 'Siso Agency',
+            app_name: 'OnlyFans Management Suite',
+            features: ['Content Management', 'Analytics Dashboard', 'Client Portal', 'Messaging System'],
             branding: {
-              logo: "",
-              primary_color: "#f97316",
-              secondary_color: "#ef4444"
+              primary_color: '#3182CE',
+              secondary_color: '#805AD5'
             },
             estimated_cost: 4997,
-            estimated_days: 21,
-            status: "approved",
-            created_at: new Date().toISOString()
+            estimated_days: 14,
+            status: 'draft'
           };
           
-          setPlanData(decoraPlanData);
-          setError(null);
+          setPlanData(mockData);
           setLoading(false);
-          return;
-        }
+        }, 1500);
         
-        // For non-decora usernames, fetch from Supabase
-        const { data, error: supabaseError } = await supabase
-          .from('plans')
-          .select('*')
-          .ilike('username', username)
-          .maybeSingle();
-        
-        if (supabaseError) {
-          console.error('Error fetching plan data:', supabaseError);
-          throw supabaseError;
-        }
-        
-        if (data) {
-          console.log("Plan data successfully fetched:", data);
-          
-          // Transform data to match PlanData interface
-          const planData: PlanData = {
-            id: data.id,
-            username: data.username,
-            company_name: data.company_name,
-            app_name: data.app_name,
-            features: data.features,
-            branding: data.branding as PlanData['branding'],
-            estimated_cost: data.estimated_cost,
-            estimated_days: data.estimated_days,
-            status: data.status,
-            created_at: data.created_at
-          };
-          
-          setPlanData(planData);
-          setError(null);
-        } else {
-          console.log(`No plan data found for username: ${username}`);
-          setPlanData(null);
-          setError(`No plan found for "${username}"`);
-          
-          // Show toast when plan is not found, but don't redirect
-          toast({
-            title: "Plan not found",
-            description: `We couldn't find a plan for username "${username}".`,
-            variant: "destructive"
-          });
-        }
       } catch (error) {
         console.error('Error fetching plan data:', error);
-        setError("Failed to load plan data");
         toast({
           title: "Error loading plan",
           description: "Could not load the plan data. Please try again.",
           variant: "destructive"
         });
-      } finally {
         setLoading(false);
       }
     };
@@ -120,5 +50,5 @@ export const usePlanData = (username: string | undefined) => {
     fetchPlanData();
   }, [username, toast]);
 
-  return { loading, planData, setPlanData, setLoading, error };
+  return { loading, planData, setPlanData, setLoading };
 };
