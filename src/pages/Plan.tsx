@@ -1,5 +1,5 @@
 
-import { useParams, useLocation, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { usePlanData } from '@/hooks/usePlanData';
 import { PlanProvider } from '@/contexts/plan/PlanContext';
 import { MessageLoading } from '@/components/ui/message-loading';
@@ -13,19 +13,14 @@ import { AlertCircle } from 'lucide-react';
 // This is a wrapper component that provides the PlanContext
 const PlanWithContext = () => {
   const { username } = useParams<{ username: string }>();
-  const location = useLocation();
   const navigate = useNavigate();
   const { loading, planData, error } = usePlanData(username);
-  
-  // Check if we're coming from admin panel
-  const fromAdmin = location.state?.fromAdmin === true;
   
   // Log debugging information
   useEffect(() => {
     console.log(`Plan page loaded for username: ${username}`);
     console.log(`Loading state: ${loading}`);
     console.log(`Plan data exists: ${Boolean(planData)}`);
-    console.log(`Coming from admin panel: ${fromAdmin}`);
     
     if (planData) {
       console.log(`Company name: ${planData.company_name}`);
@@ -35,7 +30,7 @@ const PlanWithContext = () => {
     if (error) {
       console.log(`Error loading plan: ${error}`);
     }
-  }, [username, loading, planData, error, fromAdmin]);
+  }, [username, loading, planData, error]);
   
   if (loading) {
     return (

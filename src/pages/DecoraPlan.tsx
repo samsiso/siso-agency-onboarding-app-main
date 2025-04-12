@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
-import { useOnboardingAuth } from '@/hooks/useOnboardingAuth';
 import { WelcomeLoader } from '@/components/plan/WelcomeLoader';
 import { ClickThroughPrompt } from '@/components/plan/ClickThroughPrompt';
 import { useToast } from '@/hooks/use-toast';
@@ -33,7 +32,6 @@ export const useTypewriter = (text: string, speed: number = 80) => {
 const DecoraPlan = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { userId } = useOnboardingAuth();
   const [progress, setProgress] = useState(0);
   const [loadingComplete, setLoadingComplete] = useState(false);
   const [redirectAttempted, setRedirectAttempted] = useState(false);
