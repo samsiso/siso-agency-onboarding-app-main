@@ -46,7 +46,6 @@ export const PlanList = ({ plans, loading, onPlanUpdated }: PlanListProps) => {
 
   const viewPlan = (username: string) => {
     // Using direct URL navigation instead of react-router navigate
-    // This prevents any unwanted side effects and ensures we stay on the exact URL
     window.location.href = `/plan/${username.toLowerCase()}`;
   };
 

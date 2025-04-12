@@ -62,11 +62,11 @@ const PlanWithContext = () => {
             </Button>
             <div>
               <Button 
-                onClick={() => window.location.href = '/admin/plans'} 
+                onClick={() => window.location.href = '/decora-plan'} 
                 variant="outline" 
                 className="mt-2"
               >
-                View All Plans
+                Return to Plan Setup
               </Button>
             </div>
           </div>
