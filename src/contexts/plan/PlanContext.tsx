@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, useEffect } from 'react';
 
 export interface PlanData {
@@ -60,17 +61,36 @@ interface PlanContextType {
 const PlanContext = createContext<PlanContextType | undefined>(undefined);
 
 export const PlanProvider = ({ children }: { children: React.ReactNode }) => {
+  // Initialize state with sensible defaults
   const [loading, setLoading] = useState(true);
   const [planData, setPlanData] = useState<PlanData | null>(null);
   const [selectedColor, setSelectedColor] = useState('#3182CE');
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
-  const [showSolutionsSection, setShowSolutionsSection] = useState(false);
+  const [showSolutionsSection, setShowSolutionsSection] = useState(true); // Set to true by default
   const [showFeatureSelection, setShowFeatureSelection] = useState(true);
   const [totalTime, setTotalTime] = useState(14);
-  const [totalPrice, setTotalPrice] = useState(0);
+  const [totalPrice, setTotalPrice] = useState(4997); // Set a default starting price
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedPainPoint, setSelectedPainPoint] = useState<PainPointDetailProps | null>(null);
   const [showPainPointModal, setShowPainPointModal] = useState(false);
+
+  // Initialize selected features when plan data is loaded
+  useEffect(() => {
+    if (planData && planData.features) {
+      console.log("Setting initial selected features from plan data:", planData.features);
+      setSelectedFeatures(planData.features);
+      
+      // Update time based on the plan data
+      if (planData.estimated_days) {
+        setTotalTime(planData.estimated_days);
+      }
+      
+      // Update price based on the plan data
+      if (planData.estimated_cost) {
+        setTotalPrice(planData.estimated_cost);
+      }
+    }
+  }, [planData]);
 
   const value = {
     planData,

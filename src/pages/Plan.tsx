@@ -22,6 +22,8 @@ const PlanWithContext = () => {
     console.log(`Plan data exists: ${Boolean(planData)}`);
     if (planData) {
       console.log(`Company name: ${planData.company_name}`);
+      console.log(`Features: ${planData.features?.join(', ')}`);
+      console.log(`Status: ${planData.status}`);
     }
     if (error) {
       console.log(`Error loading plan: ${error}`);

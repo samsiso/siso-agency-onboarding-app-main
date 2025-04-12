@@ -64,6 +64,7 @@ const DecoraPlan = () => {
   useEffect(() => {
     if (loadingComplete && !redirectAttempted) {
       setRedirectAttempted(true);
+      console.log("Loading complete, showing click-through prompt");
       
       setTimeout(() => {
         setShowClickThroughPrompt(true);
