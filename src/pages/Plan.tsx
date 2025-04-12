@@ -206,23 +206,6 @@ const Plan = () => {
             scrollToFeatures={handleShowFeatures}
           />
           
-          {/* Implementation Plan Section - Added here from DecoraPlan */}
-          <motion.section 
-            className="space-y-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <GradientHeading 
-              className="text-2xl font-bold" 
-              variant="primary"
-            >
-              Your Implementation Plan
-            </GradientHeading>
-            
-            <ImplementationPlan onScrollToFeatures={handleShowFeatures} />
-          </motion.section>
-          
           <motion.section 
             className="space-y-4"
             initial={{ opacity: 0, y: 20 }}
@@ -441,6 +424,23 @@ const Plan = () => {
                 />
               ))}
             </div>
+          </motion.section>
+          
+          {/* Implementation Plan Section - Moved to just before Next Steps */}
+          <motion.section 
+            className="space-y-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <GradientHeading 
+              className="text-2xl font-bold" 
+              variant="primary"
+            >
+              Your Implementation Plan
+            </GradientHeading>
+            
+            <ImplementationPlan onScrollToFeatures={handleShowFeatures} />
           </motion.section>
           
           <EnhancedNextSteps 
