@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, useEffect } from 'react';
 
 export interface PlanData {
@@ -15,6 +14,7 @@ export interface PlanData {
   estimated_cost: number | null;
   estimated_days: number | null;
   status: string | null;
+  created_at?: string; // Added created_at property
 }
 
 export interface PainPointDetailProps {

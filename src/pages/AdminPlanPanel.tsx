@@ -32,7 +32,20 @@ export default function AdminPlanPanel() {
 
       if (data) {
         console.log('Fetched plans:', data);
-        setPlans(data);
+        // Transform data to match PlanData interface
+        const transformedData: PlanData[] = data.map(plan => ({
+          id: plan.id,
+          username: plan.username,
+          company_name: plan.company_name,
+          app_name: plan.app_name,
+          features: plan.features,
+          branding: plan.branding as PlanData['branding'],
+          estimated_cost: plan.estimated_cost,
+          estimated_days: plan.estimated_days,
+          status: plan.status,
+          created_at: plan.created_at
+        }));
+        setPlans(transformedData);
       }
     } catch (error) {
       console.error('Error fetching plans:', error);

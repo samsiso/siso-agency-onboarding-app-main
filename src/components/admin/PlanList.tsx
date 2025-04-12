@@ -50,7 +50,9 @@ export const PlanList = ({ plans, loading, onPlanUpdated }: PlanListProps) => {
     navigate(`/plan/${username.toLowerCase()}`);
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string | undefined) => {
+    if (!dateString) return 'Unknown date';
+    
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
@@ -103,7 +105,7 @@ export const PlanList = ({ plans, loading, onPlanUpdated }: PlanListProps) => {
                 {plan.app_name && <> • <strong>App:</strong> {plan.app_name}</>}
               </p>
               <div className="text-xs text-siso-text/60">
-                Created: {plan.created_at ? formatDate(plan.created_at) : 'Unknown'}
+                Created: {formatDate(plan.created_at)}
               </div>
               <div className="flex items-center space-x-2 mt-2">
                 <div className="bg-black/30 rounded px-2 py-1 text-sm">
