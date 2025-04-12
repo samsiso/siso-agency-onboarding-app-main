@@ -33,9 +33,9 @@ function App() {
         <Route path="/thankyou" element={<ThankYou />} />
         <Route path="/thankyou-plan" element={<ThankYouPlan />} />
         
-        {/* Plan routes - /plan/:username is public, decora-plan is protected */}
+        {/* Plan routes - both are public now */}
         <Route path="/plan/:username" element={<Plan />} />
-        <Route path="/decora-plan" element={<AuthGuard><DecoraPlan /></AuthGuard>} />
+        <Route path="/decora-plan" element={<DecoraPlan />} />
         
         {/* Protected routes */}
         <Route path="/profile" element={<AuthGuard><Profile /></AuthGuard>} />

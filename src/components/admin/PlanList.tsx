@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { PlanData } from '@/contexts/plan/PlanContext';
 import { Button } from '@/components/ui/button';
@@ -47,11 +46,9 @@ export const PlanList = ({ plans, loading, onPlanUpdated }: PlanListProps) => {
   };
 
   const viewPlan = (username: string) => {
-    // Navigate to plan page with the replace option to prevent going back to admin panel
-    navigate(`/plan/${username.toLowerCase()}`, { state: { fromAdmin: true } });
-    
-    // Log that we're navigating to the plan page
+    // Navigate directly to plan page - no state needed as we've fixed the AuthGuard
     console.log(`Navigating to plan page for username: ${username.toLowerCase()}`);
+    navigate(`/plan/${username.toLowerCase()}`);
   };
 
   const formatDate = (dateString: string | undefined) => {

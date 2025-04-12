@@ -31,14 +31,21 @@ export const AuthGuard = ({ children }: AuthGuardProps) => {
           navigate('/auth', { replace: true });
         } else {
           console.log('Session found:', session.user.id);
+          setIsLoading(false);
         }
       } catch (error) {
         console.error('Auth check error:', error);
         if (!location.pathname.startsWith('/plan/')) {
           navigate('/auth', { replace: true });
+        } else {
+          // Even if there's an error checking auth, we should still allow access to plan paths
+          setIsLoading(false);
         }
       } finally {
-        setIsLoading(false);
+        // Make sure we set loading to false for plan paths
+        if (location.pathname.startsWith('/plan/')) {
+          setIsLoading(false);
+        }
       }
     };
 
@@ -56,6 +63,11 @@ export const AuthGuard = ({ children }: AuthGuardProps) => {
       subscription.unsubscribe();
     };
   }, [navigate, location.pathname]);
+
+  // Always render children for plan paths immediately without loading state
+  if (location.pathname.startsWith('/plan/')) {
+    return <>{children}</>;
+  }
 
   if (isLoading) {
     return <div className="flex items-center justify-center min-h-screen">
