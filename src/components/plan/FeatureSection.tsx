@@ -4,11 +4,17 @@ import { motion } from 'framer-motion';
 import { CheckCircle } from 'lucide-react';
 import { GradientHeading } from '@/components/ui/gradient-heading';
 import { Button } from '@/components/ui/button';
-import { featureCategories } from '@/data/plan/featureData';
+import { 
+  featureCategories, 
+  modelFacingCategories, 
+  agencyFacingCategories, 
+  sharedFeatureCategories 
+} from '@/data/plan/featureData';
 import { ClickThroughFeatureSelection } from './ClickThroughFeatureSelection';
 import { RecommendedPackage } from './RecommendedPackage';
 import { UpsellSection } from './UpsellSection';
 import { useRecommendedPackage } from '@/hooks/useRecommendedPackage';
+import { UserFacingFeatures } from './UserFacingFeatures';
 
 interface FeatureSectionProps {
   onFinalizeFeatures: (selectedFeatures: string[]) => void;
@@ -18,6 +24,7 @@ export const FeatureSection: React.FC<FeatureSectionProps> = ({
   onFinalizeFeatures
 }) => {
   const [showCustomization, setShowCustomization] = useState(false);
+  const [showFeatureOverview, setShowFeatureOverview] = useState(true);
   const [selectedFeatureIds, setSelectedFeatureIds] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const recommendedPackage = useRecommendedPackage();
@@ -30,6 +37,7 @@ export const FeatureSection: React.FC<FeatureSectionProps> = ({
   
   const handleCustomize = () => {
     recommendedPackage.customizeFeatures();
+    setShowFeatureOverview(false);
     setShowCustomization(true);
   };
   
@@ -73,6 +81,13 @@ export const FeatureSection: React.FC<FeatureSectionProps> = ({
     }, 1000);
   };
   
+  const handleSelectFeaturesFromOverview = (selectedFeatures: string[]) => {
+    // Mark as recommended selected
+    recommendedPackage.selectRecommended();
+    // Finalize features
+    onFinalizeFeatures(selectedFeatures);
+  };
+  
   // Auto-select recommended package on first load
   React.useEffect(() => {
     if (!recommendedPackage.isRecommendedSelected && selectedFeatureIds.length === 0) {
@@ -96,11 +111,20 @@ export const FeatureSection: React.FC<FeatureSectionProps> = ({
       </GradientHeading>
       
       <p className="text-siso-text max-w-3xl">
-        We've pre-selected the essential features for your OnlyFans agency platform. You can stick with our
-        recommended package or customize your selection to match your specific needs.
+        Our OnlyFans agency platform includes separate interfaces for models and agency staff, ensuring everyone has exactly what they need. The MVP tier includes essential features to get you started immediately.
       </p>
       
-      {!showCustomization && (
+      {showFeatureOverview && (
+        <UserFacingFeatures
+          modelFacingCategories={modelFacingCategories}
+          agencyFacingCategories={agencyFacingCategories}
+          sharedFeatureCategories={sharedFeatureCategories}
+          onFeatureSelect={handleSelectFeaturesFromOverview}
+          onCustomize={handleCustomize}
+        />
+      )}
+      
+      {!showFeatureOverview && !showCustomization && (
         <RecommendedPackage 
           onSelectRecommended={handleSelectRecommended}
           onCustomize={handleCustomize}
@@ -112,14 +136,14 @@ export const FeatureSection: React.FC<FeatureSectionProps> = ({
           featureCategories={featureCategories}
           onFinalizeFeatures={handleFinalizeCustomFeatures}
         />
-      ) : recommendedPackage.isRecommendedSelected && (
+      ) : recommendedPackage.isRecommendedSelected && !showFeatureOverview && (
         <UpsellSection 
           selectedFeatureIds={selectedFeatureIds}
           onAddFeature={handleAddUpsellFeature}
         />
       )}
       
-      {recommendedPackage.isRecommendedSelected && !showCustomization && (
+      {recommendedPackage.isRecommendedSelected && !showCustomization && !showFeatureOverview && (
         <div className="flex justify-end mt-8">
           <Button
             onClick={handleSubmitFeatures}

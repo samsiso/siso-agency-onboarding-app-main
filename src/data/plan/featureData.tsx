@@ -12,220 +12,540 @@ import {
   Smartphone,
   Zap,
   Heart,
-  Target
+  Target,
+  Calendar,
+  BookOpen,
+  CheckSquare,
+  UserCog,
+  DollarSign,
+  FileContract,
+  UserPlus,
+  Share2,
+  Clipboard,
+  Lightbulb,
+  HelpCircle,
+  GraduationCap,
+  Plug
 } from 'lucide-react';
 
-export const featureCategories: FeatureCategory[] = [
+// Define model-facing feature categories
+export const modelFacingCategories: FeatureCategory[] = [
   {
-    id: 'client',
-    name: 'Client Management',
+    id: 'profile',
+    name: 'Profile Management',
     icon: <Users className="h-5 w-5" />,
+    userFacing: 'model',
+    description: 'Tools for models to manage their profiles and information',
     features: [
       { 
-        id: 'client-profiles', 
-        name: 'Client Profiles', 
-        description: 'Detailed profiles for each creator with basic information.', 
-        timeEstimate: 0.5,
-        category: 'client',
-        tier: 'mvp'
-      },
-      { 
-        id: 'performance-dashboard', 
-        name: 'Basic Performance Dashboard', 
-        description: 'View key metrics like earnings and subscriber count.', 
+        id: 'model-profile', 
+        name: 'Profile Management', 
+        description: 'View and update profiles with details like hobbies and communication style',
         timeEstimate: 1,
-        category: 'client',
-        tier: 'mvp'
+        category: 'profile',
+        tier: 'mvp',
+        userFacing: 'model',
+        recommended: true
       },
       { 
-        id: 'earnings-tracking', 
-        name: 'Earnings Tracking', 
-        description: 'Monitor creator revenue over time with basic charts.', 
+        id: 'profile-customization', 
+        name: 'Profile Customization', 
+        description: 'Personalize profile with photos, bio, and preferences',
+        timeEstimate: 0.5,
+        category: 'profile',
+        tier: 'mvp',
+        userFacing: 'model'
+      }
+    ]
+  },
+  {
+    id: 'tasks',
+    name: 'To-Do Lists',
+    icon: <CheckSquare className="h-5 w-5" />,
+    userFacing: 'model',
+    description: 'Task management tools for daily productivity',
+    features: [
+      { 
+        id: 'daily-tasks', 
+        name: 'Daily To-Do Lists', 
+        description: 'Manage daily tasks to stay focused and productive',
+        timeEstimate: 1,
+        category: 'tasks',
+        tier: 'mvp',
+        userFacing: 'model',
+        recommended: true
+      },
+      { 
+        id: 'weekly-monthly-tasks', 
+        name: 'Weekly & Monthly Tasks', 
+        description: 'Plan longer-term tasks and goals',
+        timeEstimate: 0.5,
+        category: 'tasks',
+        tier: 'advanced',
+        userFacing: 'model'
+      }
+    ]
+  },
+  {
+    id: 'performance',
+    name: 'Targets & Performance',
+    icon: <Target className="h-5 w-5" />,
+    userFacing: 'model',
+    description: 'Track goals and performance metrics',
+    features: [
+      { 
+        id: 'model-targets', 
+        name: 'Performance Targets', 
+        description: 'View goals like subscription chatting ratios and revenue targets',
         timeEstimate: 1.5,
-        category: 'client',
-        tier: 'mvp'
+        category: 'performance',
+        tier: 'mvp',
+        userFacing: 'model',
+        recommended: true,
+        roi: 'Increases model performance by 30% through clear goal setting'
       },
       { 
         id: 'subscriber-tracking', 
-        name: 'Subscriber Count Tracking', 
-        description: 'Track subscriber growth or decline over time.', 
+        name: 'Subscriber Tracking', 
+        description: 'Monitor subscriber numbers and growth over time',
         timeEstimate: 1,
-        category: 'client',
-        tier: 'mvp'
-      },
-      { 
-        id: 'advanced-analytics', 
-        name: 'Advanced Creator Analytics', 
-        description: 'In-depth performance insights with predictive trends.', 
-        timeEstimate: 3,
-        category: 'client',
-        tier: 'advanced'
-      },
+        category: 'performance',
+        tier: 'mvp',
+        userFacing: 'model'
+      }
     ]
   },
   {
-    id: 'content',
-    name: 'Content Management',
-    icon: <FileText className="h-5 w-5" />,
-    features: [
-      { 
-        id: 'content-calendar', 
-        name: 'Simple Content Calendar', 
-        description: 'Plan posts with a basic scheduling tool.', 
-        timeEstimate: 1.5,
-        category: 'content',
-        tier: 'mvp'
-      },
-      { 
-        id: 'media-library', 
-        name: 'Media Library with Basic Tagging', 
-        description: 'Store and categorize assets with simple tags.', 
-        timeEstimate: 2,
-        category: 'content',
-        tier: 'mvp'
-      },
-      { 
-        id: 'content-approval', 
-        name: 'Content Approval Workflow', 
-        description: 'Approve or reject creator content before posting.', 
-        timeEstimate: 1.5,
-        category: 'content',
-        tier: 'mvp'
-      },
-      { 
-        id: 'ai-content-optimization', 
-        name: 'AI Content Optimization', 
-        description: 'Get suggestions to improve content based on trending topics.', 
-        timeEstimate: 4,
-        category: 'content',
-        tier: 'premium'
-      },
-    ]
-  },
-  {
-    id: 'communication',
-    name: 'Communication Tools',
+    id: 'model-communication',
+    name: 'Communication',
     icon: <MessageSquare className="h-5 w-5" />,
+    userFacing: 'model',
+    description: 'Tools for staying in contact with the agency',
     features: [
       { 
-        id: 'in-app-messaging', 
-        name: 'In-App Messaging', 
-        description: 'Direct messaging between agency and creators.', 
-        timeEstimate: 3,
-        category: 'communication',
-        tier: 'advanced'
-      },
-      { 
-        id: 'notification-system', 
-        name: 'Notification System', 
-        description: 'Alerts for deadlines, updates, and important events.', 
+        id: 'model-chat', 
+        name: 'Agency Chat Channels', 
+        description: 'Dedicated chat channels including urgent ones for agency communication',
         timeEstimate: 2,
-        category: 'communication',
-        tier: 'mvp'
-      },
-      { 
-        id: 'fan-interaction', 
-        name: 'Fan Interaction Tools', 
-        description: 'Manage fan messages and interactions efficiently.', 
-        timeEstimate: 4,
-        category: 'communication',
-        tier: 'premium'
-      },
+        category: 'model-communication',
+        tier: 'mvp',
+        userFacing: 'model',
+        recommended: true
+      }
     ]
   },
   {
-    id: 'analytics',
-    name: 'Analytics',
-    icon: <BarChart className="h-5 w-5" />,
+    id: 'calendar',
+    name: 'Calendar & Reminders',
+    icon: <Calendar className="h-5 w-5" />,
+    userFacing: 'model',
+    description: 'Schedule management and reminder system',
     features: [
       { 
-        id: 'basic-earnings', 
-        name: 'Basic Earnings Report', 
-        description: 'Simple revenue overview with basic filtering.', 
-        timeEstimate: 1,
-        category: 'analytics',
-        tier: 'mvp'
-      },
-      { 
-        id: 'subscriber-growth', 
-        name: 'Subscriber Growth Chart', 
-        description: 'Visualize subscriber trends over time.', 
-        timeEstimate: 1,
-        category: 'analytics',
-        tier: 'mvp'
-      },
-      { 
-        id: 'content-performance', 
-        name: 'Content Performance Metrics', 
-        description: 'Track likes, views, and engagement for each post.', 
-        timeEstimate: 2,
-        category: 'analytics',
-        tier: 'advanced'
-      },
-    ]
-  },
-  {
-    id: 'security',
-    name: 'Security',
-    icon: <Shield className="h-5 w-5" />,
-    features: [
-      { 
-        id: 'user-authentication', 
-        name: 'User Authentication', 
-        description: 'Secure login for agency staff and creators.', 
-        timeEstimate: 1,
-        category: 'security',
-        tier: 'mvp'
-      },
-      { 
-        id: 'role-based-access', 
-        name: 'Role-Based Access Control', 
-        description: 'Limit access based on user roles within the agency.', 
-        timeEstimate: 2,
-        category: 'security',
-        tier: 'advanced'
-      },
-      { 
-        id: 'two-factor', 
-        name: 'Two-Factor Authentication', 
-        description: 'Extra layer of security for account access.', 
+        id: 'meeting-calendar', 
+        name: 'Meeting Calendar', 
+        description: 'View scheduled meetings and events',
         timeEstimate: 1.5,
-        category: 'security',
-        tier: 'premium'
+        category: 'calendar',
+        tier: 'mvp',
+        userFacing: 'model',
+        recommended: true
       },
+      { 
+        id: 'sms-reminders', 
+        name: 'SMS Reminders', 
+        description: 'Receive SMS notifications before scheduled meetings',
+        timeEstimate: 2,
+        category: 'calendar',
+        tier: 'advanced',
+        userFacing: 'model'
+      }
     ]
   },
   {
-    id: 'automation',
-    name: 'Automation',
-    icon: <Settings className="h-5 w-5" />,
+    id: 'learning',
+    name: 'Learning Resources',
+    icon: <BookOpen className="h-5 w-5" />,
+    userFacing: 'model',
+    description: 'Educational materials to improve skills',
     features: [
       { 
-        id: 'automated-reminders', 
-        name: 'Automated Reminders', 
-        description: 'Notify creators of upcoming deadlines automatically.', 
+        id: 'model-guides', 
+        name: 'Guides & SOPs', 
+        description: 'Access to guides and SOPs to improve skills',
         timeEstimate: 1,
-        category: 'automation',
-        tier: 'mvp'
+        category: 'learning',
+        tier: 'mvp',
+        userFacing: 'model'
       },
       { 
-        id: 'workflow-automation', 
-        name: 'Basic Workflow Automation', 
-        description: 'Automate repetitive steps like content approvals.', 
-        timeEstimate: 2.5,
-        category: 'automation',
-        tier: 'advanced'
-      },
-      { 
-        id: 'fan-engagement', 
-        name: 'Automated Fan Engagement', 
-        description: 'Schedule and automate fan outreach campaigns.', 
-        timeEstimate: 4,
-        category: 'automation',
-        tier: 'premium'
-      },
+        id: 'training-videos', 
+        name: 'Training Videos', 
+        description: 'Visual learning resources for skill development',
+        timeEstimate: 1.5,
+        category: 'learning',
+        tier: 'advanced',
+        userFacing: 'model'
+      }
     ]
   }
+];
+
+// Define agency-facing feature categories
+export const agencyFacingCategories: FeatureCategory[] = [
+  {
+    id: 'model-management',
+    name: 'Model Management',
+    icon: <UserCog className="h-5 w-5" />,
+    userFacing: 'agency',
+    description: 'Tools for managing models and their performance',
+    features: [
+      { 
+        id: 'manage-profiles', 
+        name: 'Model Profile Management', 
+        description: 'Manage model profiles, set targets, and monitor performance',
+        timeEstimate: 2,
+        category: 'model-management',
+        tier: 'mvp',
+        userFacing: 'agency',
+        recommended: true,
+        roi: 'Centralizes model management, saving 10+ hours per week'
+      },
+      { 
+        id: 'performance-analytics', 
+        name: 'Performance Analytics', 
+        description: 'Advanced analytics on model performance and earnings',
+        timeEstimate: 2.5,
+        category: 'model-management',
+        tier: 'advanced',
+        userFacing: 'agency'
+      }
+    ]
+  },
+  {
+    id: 'financial',
+    name: 'Financial Management',
+    icon: <DollarSign className="h-5 w-5" />,
+    userFacing: 'agency',
+    description: 'Tools for managing finances and payments',
+    features: [
+      { 
+        id: 'expense-tracking', 
+        name: 'Expense Tracking', 
+        description: 'Track expenses and financial transactions',
+        timeEstimate: 1.5,
+        category: 'financial',
+        tier: 'mvp',
+        userFacing: 'agency',
+        recommended: true
+      },
+      { 
+        id: 'invoicing', 
+        name: 'Invoice Generation', 
+        description: 'Create and manage invoices directly from the dashboard',
+        timeEstimate: 2,
+        category: 'financial',
+        tier: 'mvp',
+        userFacing: 'agency'
+      },
+      { 
+        id: 'payment-processing', 
+        name: 'Payment Processing', 
+        description: 'Process payments and track financial histories',
+        timeEstimate: 2.5,
+        category: 'financial',
+        tier: 'advanced',
+        userFacing: 'agency'
+      }
+    ]
+  },
+  {
+    id: 'employee',
+    name: 'Employee Management',
+    icon: <Users className="h-5 w-5" />,
+    userFacing: 'agency',
+    description: 'Tools for managing agency staff and chatters',
+    features: [
+      { 
+        id: 'hour-tracking', 
+        name: 'Staff Hour Tracking', 
+        description: 'Track hours for agency staff and chatters',
+        timeEstimate: 1.5,
+        category: 'employee',
+        tier: 'mvp',
+        userFacing: 'agency'
+      },
+      { 
+        id: 'staff-management', 
+        name: 'Staff Performance', 
+        description: 'Monitor and manage staff performance metrics',
+        timeEstimate: 2,
+        category: 'employee',
+        tier: 'advanced',
+        userFacing: 'agency'
+      }
+    ]
+  },
+  {
+    id: 'contracts',
+    name: 'Contract Templating',
+    icon: <FileContract className="h-5 w-5" />,
+    userFacing: 'agency',
+    description: 'Contract management and generation tools',
+    features: [
+      { 
+        id: 'contract-generation', 
+        name: 'Contract Generation', 
+        description: 'Generate contracts for models, staff, and chatters',
+        timeEstimate: 2,
+        category: 'contracts',
+        tier: 'mvp',
+        userFacing: 'agency',
+        recommended: true
+      },
+      { 
+        id: 'pdf-export', 
+        name: 'PDF Export', 
+        description: 'Download contracts as ready-to-sign PDFs',
+        timeEstimate: 1,
+        category: 'contracts',
+        tier: 'mvp',
+        userFacing: 'agency'
+      }
+    ]
+  },
+  {
+    id: 'onboarding',
+    name: 'Onboarding Process',
+    icon: <UserPlus className="h-5 w-5" />,
+    userFacing: 'agency',
+    description: 'Tools for onboarding new models',
+    features: [
+      { 
+        id: 'model-onboarding', 
+        name: 'Model Onboarding', 
+        description: 'Streamlined collection and organization of info for new models',
+        timeEstimate: 1.5,
+        category: 'onboarding',
+        tier: 'mvp',
+        userFacing: 'agency',
+        recommended: true,
+        roi: 'Reduces onboarding time by 65%, improving time-to-revenue'
+      },
+      { 
+        id: 'onboarding-automation', 
+        name: 'Onboarding Automation', 
+        description: 'Automate parts of the onboarding workflow',
+        timeEstimate: 2.5,
+        category: 'onboarding',
+        tier: 'advanced',
+        userFacing: 'agency'
+      }
+    ]
+  },
+  {
+    id: 'social-media',
+    name: 'Social Media Management',
+    icon: <Share2 className="h-5 w-5" />,
+    userFacing: 'agency',
+    description: 'Tools for managing social media accounts',
+    features: [
+      { 
+        id: 'login-storage', 
+        name: 'Secure Login Storage', 
+        description: 'Securely store login details for social media accounts',
+        timeEstimate: 1,
+        category: 'social-media',
+        tier: 'mvp',
+        userFacing: 'agency'
+      },
+      { 
+        id: 'outreach-planning', 
+        name: 'Outreach Strategy', 
+        description: 'Plan and manage social media outreach strategies',
+        timeEstimate: 2,
+        category: 'social-media',
+        tier: 'advanced',
+        userFacing: 'agency'
+      }
+    ]
+  },
+  {
+    id: 'sop',
+    name: 'SOP Section',
+    icon: <Clipboard className="h-5 w-5" />,
+    userFacing: 'agency',
+    description: 'Standard Operating Procedures library',
+    features: [
+      { 
+        id: 'sop-library', 
+        name: 'SOP Library', 
+        description: 'Library of standard operating procedures for staff alignment',
+        timeEstimate: 1,
+        category: 'sop',
+        tier: 'mvp',
+        userFacing: 'agency',
+        recommended: true
+      },
+      { 
+        id: 'training-materials', 
+        name: 'Training Videos', 
+        description: 'Training videos for staff development',
+        timeEstimate: 1.5,
+        category: 'sop',
+        tier: 'advanced',
+        userFacing: 'agency'
+      }
+    ]
+  },
+  {
+    id: 'tools',
+    name: 'Tool Section',
+    icon: <Lightbulb className="h-5 w-5" />,
+    userFacing: 'agency',
+    description: 'Automation tools and sales resources',
+    features: [
+      { 
+        id: 'automations', 
+        name: 'Automations', 
+        description: 'Time-saving automations for agency processes',
+        timeEstimate: 2.5,
+        category: 'tools',
+        tier: 'advanced',
+        userFacing: 'agency'
+      },
+      { 
+        id: 'sales-resources', 
+        name: 'Sales Resources', 
+        description: 'Resources to boost revenue and sales',
+        timeEstimate: 1.5,
+        category: 'tools',
+        tier: 'mvp',
+        userFacing: 'agency'
+      }
+    ]
+  },
+  {
+    id: 'agency-communication',
+    name: 'Communication',
+    icon: <MessageSquare className="h-5 w-5" />,
+    userFacing: 'agency',
+    description: 'Communication tools for agency staff',
+    features: [
+      { 
+        id: 'agency-chat', 
+        name: 'Team Chat Channels', 
+        description: 'Multiple chat channels for staff and model communication',
+        timeEstimate: 2,
+        category: 'agency-communication',
+        tier: 'mvp',
+        userFacing: 'agency',
+        recommended: true
+      },
+      { 
+        id: 'urgent-channel', 
+        name: 'Urgent Communication', 
+        description: 'Dedicated channels for urgent matters',
+        timeEstimate: 1,
+        category: 'agency-communication',
+        tier: 'mvp',
+        userFacing: 'agency'
+      }
+    ]
+  },
+  {
+    id: 'course',
+    name: 'Course Section',
+    icon: <GraduationCap className="h-5 w-5" />,
+    userFacing: 'agency',
+    description: 'Learning materials for agency growth',
+    features: [
+      { 
+        id: 'learning-materials', 
+        name: 'Learning Materials', 
+        description: 'Access to courses and videos for agency scaling',
+        timeEstimate: 1.5,
+        category: 'course',
+        tier: 'advanced',
+        userFacing: 'agency'
+      },
+      { 
+        id: 'growth-resources', 
+        name: 'Growth Resources', 
+        description: 'Resources to scale the agency to 100x',
+        timeEstimate: 1,
+        category: 'course',
+        tier: 'premium',
+        userFacing: 'agency'
+      }
+    ]
+  },
+  {
+    id: 'integrations',
+    name: 'Future Integrations',
+    icon: <Plug className="h-5 w-5" />,
+    userFacing: 'agency',
+    description: 'Planned API integrations for growth',
+    features: [
+      { 
+        id: 'dm-automation', 
+        name: 'DM Automation', 
+        description: 'Automate direct messages via API integrations',
+        timeEstimate: 3,
+        category: 'integrations',
+        tier: 'premium',
+        userFacing: 'agency'
+      },
+      { 
+        id: 'whatsapp-integration', 
+        name: 'WhatsApp Integration', 
+        description: 'Connect WhatsApp for streamlined communication',
+        timeEstimate: 3.5,
+        category: 'integrations',
+        tier: 'premium',
+        userFacing: 'agency'
+      }
+    ]
+  }
+];
+
+// Shared features category
+export const sharedFeatureCategories: FeatureCategory[] = [
+  {
+    id: 'help',
+    name: 'Help Center',
+    icon: <HelpCircle className="h-5 w-5" />,
+    userFacing: 'both',
+    description: 'Support hub for both models and agency staff',
+    features: [
+      { 
+        id: 'support-hub', 
+        name: 'Support Hub', 
+        description: 'Access to answers and tool links for troubleshooting',
+        timeEstimate: 1.5,
+        category: 'help',
+        tier: 'mvp',
+        userFacing: 'both',
+        recommended: true
+      },
+      { 
+        id: 'quick-guides', 
+        name: 'Quick Guides', 
+        description: 'Easy access to common questions and solutions',
+        timeEstimate: 1,
+        category: 'help',
+        tier: 'mvp',
+        userFacing: 'both'
+      }
+    ]
+  }
+];
+
+// Combine all categories for backward compatibility
+export const featureCategories: FeatureCategory[] = [
+  ...modelFacingCategories,
+  ...agencyFacingCategories,
+  ...sharedFeatureCategories
 ];
 
 export const additionalFeatures: Feature[] = [

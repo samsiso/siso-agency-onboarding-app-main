@@ -8,6 +8,7 @@ export interface FeatureCategory {
   features: FeatureItem[];
   info?: string;  // Make info optional
   description?: string; // Keep description for backward compatibility
+  userFacing?: 'model' | 'agency' | 'both'; // Add new property to indicate target user
 }
 
 export interface FeatureItem {
@@ -20,6 +21,7 @@ export interface FeatureItem {
   recommended?: boolean;
   included?: boolean;
   roi?: string;
+  userFacing?: 'model' | 'agency' | 'both'; // Add new property to indicate target user
 }
 
 // Add these interfaces to support src/data/plan/featureData.tsx
