@@ -4,12 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useOnboardingAuth } from '@/hooks/useOnboardingAuth';
 import { WelcomeLoader } from '@/components/plan/WelcomeLoader';
 
 const DecoraPlan = () => {
   const navigate = useNavigate();
-  const { userId } = useOnboardingAuth();
   const [typedText, setTypedText] = useState('');
   const [typingComplete, setTypingComplete] = useState(false);
   const [progress, setProgress] = useState(0);
