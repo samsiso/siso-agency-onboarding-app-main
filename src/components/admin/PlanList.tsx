@@ -47,8 +47,11 @@ export const PlanList = ({ plans, loading, onPlanUpdated }: PlanListProps) => {
   };
 
   const viewPlan = (username: string) => {
-    // Use React Router's navigate instead of direct window.location
-    navigate(`/plan/${username.toLowerCase()}`);
+    // Navigate to plan page with the replace option to prevent going back to admin panel
+    navigate(`/plan/${username.toLowerCase()}`, { state: { fromAdmin: true } });
+    
+    // Log that we're navigating to the plan page
+    console.log(`Navigating to plan page for username: ${username.toLowerCase()}`);
   };
 
   const formatDate = (dateString: string | undefined) => {
