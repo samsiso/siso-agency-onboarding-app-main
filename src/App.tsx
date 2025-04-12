@@ -19,6 +19,7 @@ import SettingsPage from './pages/SettingsPage';
 import HelpPage from './pages/HelpPage';
 import { AuthGuard } from './components/auth/AuthGuard';
 import MyProjects from './pages/MyProjects';
+import AdminPlanPanel from './pages/AdminPlanPanel';
 
 function App() {
   return (
@@ -45,6 +46,9 @@ function App() {
         {/* Protected Project Routes */}
         <Route path="/my-projects" element={<AuthGuard><MyProjects /></AuthGuard>} />
         <Route path="/portfolio" element={<AuthGuard><Home /></AuthGuard>} />
+        
+        {/* Admin Routes */}
+        <Route path="/admin/plans" element={<AuthGuard><AdminPlanPanel /></AuthGuard>} />
         
         {/* Protected Financial Routes */}
         <Route path="/payments" element={<AuthGuard><CryptoExchange /></AuthGuard>} />

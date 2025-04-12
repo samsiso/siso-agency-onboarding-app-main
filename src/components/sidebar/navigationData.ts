@@ -8,7 +8,8 @@ import {
   Trophy,
   Users,
   HelpCircle,
-  Settings
+  Settings,
+  FileText
 } from 'lucide-react';
 import { MenuSection } from './types';
 
@@ -28,6 +29,11 @@ export const menuSections: MenuSection[] = [
         href: '/decora-plan',
         icon: Layout,
         label: 'Plan Builder',
+      },
+      {
+        href: '/admin/plans',
+        icon: FileText,
+        label: 'Plan Admin',
       },
       {
         href: '/my-projects',
