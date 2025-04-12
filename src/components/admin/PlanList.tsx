@@ -6,7 +6,6 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Trash2, Edit, Eye, CheckCircle, XCircle } from 'lucide-react';
 import { Card } from '@/components/ui/card';
-import { useNavigate } from 'react-router-dom';
 
 interface PlanListProps {
   plans: PlanData[];
@@ -16,7 +15,6 @@ interface PlanListProps {
 
 export const PlanList = ({ plans, loading, onPlanUpdated }: PlanListProps) => {
   const { toast } = useToast();
-  const navigate = useNavigate();
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const handleDeletePlan = async (id: string) => {
@@ -47,7 +45,9 @@ export const PlanList = ({ plans, loading, onPlanUpdated }: PlanListProps) => {
   };
 
   const viewPlan = (username: string) => {
-    navigate(`/plan/${username.toLowerCase()}`);
+    // Using direct URL navigation instead of react-router navigate
+    // This prevents any unwanted side effects and ensures we stay on the exact URL
+    window.location.href = `/plan/${username.toLowerCase()}`;
   };
 
   const formatDate = (dateString: string | undefined) => {

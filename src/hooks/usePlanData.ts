@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { PlanData } from '@/contexts/plan/PlanContext';
+import { supabase } from '@/integrations/supabase/client';
 
 export const usePlanData = (username: string | undefined) => {
   const [loading, setLoading] = useState(true);
@@ -23,48 +24,49 @@ export const usePlanData = (username: string | undefined) => {
         setLoading(true);
         setError(null);
         
-        // Mock data for now, could be replaced with API call
-        setTimeout(() => {
-          // Case-insensitive match for usernames
-          const normalizedUsername = username.toLowerCase();
-          console.log(`Normalized username for lookup: ${normalizedUsername}`);
-          
-          // Check if this is a recognized username
-          if (normalizedUsername === 'decora') {
-            const mockData: PlanData = {
-              id: '123',
-              username: username,
-              company_name: 'Decora Agency',
-              app_name: 'OnlyFans Management Suite',
-              features: ['Content Management', 'Analytics Dashboard', 'Client Portal', 'Messaging System'],
-              branding: {
-                primary_color: '#3182CE',
-                secondary_color: '#805AD5'
-              },
-              estimated_cost: 4997,
-              estimated_days: 14,
-              status: 'draft'
-            };
-            
-            console.log("Plan data successfully fetched:", mockData.company_name);
-            setPlanData(mockData);
-            setError(null);
-          } else {
-            console.log(`No plan data found for username: ${username}`);
-            setPlanData(null);
-            setError(`No plan found for "${username}"`);
-            
-            // Show toast when plan is not found
-            toast({
-              title: "Plan not found",
-              description: `We couldn't find a plan for username "${username}".`,
-              variant: "destructive"
-            });
-          }
-          
-          setLoading(false);
-        }, 1500);
+        // Fetch from Supabase instead of using mock data
+        const { data, error: supabaseError } = await supabase
+          .from('plans')
+          .select('*')
+          .ilike('username', username)
+          .maybeSingle();
         
+        if (supabaseError) {
+          console.error('Error fetching plan data:', supabaseError);
+          throw supabaseError;
+        }
+        
+        if (data) {
+          console.log("Plan data successfully fetched:", data.company_name);
+          
+          // Transform data to match PlanData interface
+          const planData: PlanData = {
+            id: data.id,
+            username: data.username,
+            company_name: data.company_name,
+            app_name: data.app_name,
+            features: data.features,
+            branding: data.branding as PlanData['branding'],
+            estimated_cost: data.estimated_cost,
+            estimated_days: data.estimated_days,
+            status: data.status,
+            created_at: data.created_at
+          };
+          
+          setPlanData(planData);
+          setError(null);
+        } else {
+          console.log(`No plan data found for username: ${username}`);
+          setPlanData(null);
+          setError(`No plan found for "${username}"`);
+          
+          // Show toast when plan is not found, but don't redirect
+          toast({
+            title: "Plan not found",
+            description: `We couldn't find a plan for username "${username}".`,
+            variant: "destructive"
+          });
+        }
       } catch (error) {
         console.error('Error fetching plan data:', error);
         setError("Failed to load plan data");
@@ -73,6 +75,7 @@ export const usePlanData = (username: string | undefined) => {
           description: "Could not load the plan data. Please try again.",
           variant: "destructive"
         });
+      } finally {
         setLoading(false);
       }
     };

@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import { useOnboardingAuth } from '@/hooks/useOnboardingAuth';
@@ -30,7 +29,6 @@ export const useTypewriter = (text: string, speed: number = 80) => {
 };
 
 const DecoraPlan = () => {
-  const navigate = useNavigate();
   const { toast } = useToast();
   const { userId } = useOnboardingAuth();
   const [progress, setProgress] = useState(0);
@@ -72,12 +70,13 @@ const DecoraPlan = () => {
           description: "Redirecting you to your personalized plan."
         });
         
-        navigate('/plan/decora', { replace: true });
+        // Using direct window.location for consistent behavior
+        window.location.href = '/plan/decora';
       }, 1000);
       
       return () => clearTimeout(redirectTimer);
     }
-  }, [loadingComplete, navigate, redirectAttempted, toast]);
+  }, [loadingComplete, redirectAttempted, toast]);
   
   // Loading steps
   const loadingSteps = [
@@ -92,7 +91,8 @@ const DecoraPlan = () => {
       title: "Your plan is ready!",
       description: "Redirecting you to your personalized plan."
     });
-    navigate('/plan/decora', { replace: true });
+    // Using direct window.location for consistent behavior
+    window.location.href = '/plan/decora';
   };
   
   // Show the welcome/loading screen

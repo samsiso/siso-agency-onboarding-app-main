@@ -1,5 +1,5 @@
 
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { usePlanData } from '@/hooks/usePlanData';
 import { PlanProvider } from '@/contexts/plan/PlanContext';
 import { MessageLoading } from '@/components/ui/message-loading';
@@ -14,7 +14,6 @@ import { AlertCircle } from 'lucide-react';
 const PlanWithContext = () => {
   const { username } = useParams<{ username: string }>();
   const { loading, planData, error } = usePlanData(username);
-  const navigate = useNavigate();
   
   // Log debugging information
   useEffect(() => {
@@ -55,16 +54,19 @@ const PlanWithContext = () => {
             Please make sure you have the correct URL.
           </p>
           <div className="space-y-3">
-            <Button onClick={() => navigate('/')} variant="default">
-              Go Home
+            <Button 
+              onClick={() => window.history.back()} 
+              variant="default"
+            >
+              Go Back
             </Button>
             <div>
               <Button 
-                onClick={() => navigate('/decora-plan')} 
+                onClick={() => window.location.href = '/admin/plans'} 
                 variant="outline" 
                 className="mt-2"
               >
-                Restart Decora Plan
+                View All Plans
               </Button>
             </div>
           </div>
