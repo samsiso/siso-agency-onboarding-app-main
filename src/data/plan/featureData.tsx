@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { FeatureCategory, FeatureItem, Feature, PlanTier } from '@/models/plan/features';
 import { 
@@ -18,7 +17,7 @@ import {
   CheckSquare,
   UserCog,
   DollarSign,
-  FileContract,
+  File, // Replaced FileContract with File
   UserPlus,
   Share2,
   Clipboard,
@@ -289,7 +288,7 @@ export const agencyFacingCategories: FeatureCategory[] = [
   {
     id: 'contracts',
     name: 'Contract Templating',
-    icon: <FileContract className="h-5 w-5" />,
+    icon: <File className="h-5 w-5" />, // Changed from FileContract to File
     userFacing: 'agency',
     description: 'Contract management and generation tools',
     features: [
