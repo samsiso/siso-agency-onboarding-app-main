@@ -1,10 +1,11 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { AlertTriangle, Info, BarChart, ArrowRight, ExternalLink } from 'lucide-react';
+import { AlertTriangle, Info, BarChart, ArrowRight, ExternalLink, PieChart, Users, Clock, DollarSign } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AgencyPainPointModal } from './AgencyPainPointModal';
+import { Badge } from '@/components/ui/badge';
 
 export interface PainPoint {
   id: string;
@@ -24,6 +25,11 @@ export interface PainPoint {
     author: string;
     position: string;
   };
+  videoUrl?: string;
+  industryTrends?: {
+    year: string;
+    value: number;
+  }[];
 }
 
 interface AgencyPainPointsProps {
@@ -47,17 +53,23 @@ export const AgencyPainPoints = ({ onSolutionRequest }: AgencyPainPointsProps) =
         label: 'of agencies report high creator churn'
       },
       solutions: [
-        'Transparent performance reporting',
-        'Clear ROI demonstration',
-        'Revenue growth visualization',
-        'Client success tracking'
+        'Transparent performance reporting with real-time dashboards',
+        'Clear ROI demonstration through multi-platform analytics',
+        'Revenue growth visualization with predictive modeling',
+        'Client success tracking with actionable insights'
       ],
       impactAreas: ['Revenue stability', 'Team morale', 'Business growth', 'Market reputation'],
       testimonial: {
-        quote: "Before implementing proper retention systems, we were losing 1 in 3 creators monthly. Now our average client stays for over a year.",
+        quote: "Before implementing proper retention systems, we were losing 1 in 3 creators monthly. Now our average client stays for over a year and our revenue has stabilized completely.",
         author: "Maria Rodriguez",
         position: "CEO, Stellar OnlyFans Agency"
-      }
+      },
+      industryTrends: [
+        { year: '2021', value: 65 },
+        { year: '2022', value: 72 },
+        { year: '2023', value: 80 },
+        { year: '2024', value: 84 }
+      ]
     },
     {
       id: 'content-management',
@@ -71,17 +83,23 @@ export const AgencyPainPoints = ({ onSolutionRequest }: AgencyPainPointsProps) =
         label: 'miss at least one deadline per week'
       },
       solutions: [
-        'Centralized content calendar',
-        'Automated scheduling',
-        'Content inventory management',
-        'Performance tracking by content type'
+        'Centralized content calendar with role-based access control',
+        'Automated scheduling with time zone intelligence',
+        'Content inventory management with tagging and categorization',
+        'Performance tracking by content type with A/B testing capabilities'
       ],
       impactAreas: ['Creator satisfaction', 'Fan engagement', 'Team efficiency', 'Content quality'],
       testimonial: {
-        quote: "We were using spreadsheets and missing posts constantly. Now with a proper system, we never miss a deadline and our content engagement has improved dramatically.",
+        quote: "We were using spreadsheets and missing posts constantly. Now with a proper system, we never miss a deadline and our content engagement has improved by 45% in just two months.",
         author: "James Chen",
         position: "Operations Director, ContentMax Agency"
-      }
+      },
+      industryTrends: [
+        { year: '2021', value: 52 },
+        { year: '2022', value: 58 },
+        { year: '2023', value: 65 },
+        { year: '2024', value: 71 }
+      ]
     },
     {
       id: 'communication',
@@ -95,17 +113,23 @@ export const AgencyPainPoints = ({ onSolutionRequest }: AgencyPainPointsProps) =
         label: 'experience communication issues monthly'
       },
       solutions: [
-        'Unified messaging inbox',
-        'Priority message flagging',
-        'Automated response systems',
-        'Communication audit trails'
+        'Unified messaging inbox with platform integrations',
+        'Priority message flagging based on AI analysis',
+        'Automated response systems with personalization',
+        'Communication audit trails for accountability'
       ],
       impactAreas: ['Creator trust', 'Fan satisfaction', 'Team coordination', 'Crisis management'],
       testimonial: {
-        quote: "Our biggest creator almost left because important messages kept falling through the cracks. A unified communication system saved that relationship.",
+        quote: "Our biggest creator almost left because important messages kept falling through the cracks. A unified communication system saved that relationship and improved our response times by 80%.",
         author: "Alex Torres",
         position: "Client Success Manager, Elite Creator Management"
-      }
+      },
+      industryTrends: [
+        { year: '2021', value: 60 },
+        { year: '2022', value: 68 },
+        { year: '2023', value: 75 },
+        { year: '2024', value: 79 }
+      ]
     },
     {
       id: 'analytics',
@@ -119,17 +143,23 @@ export const AgencyPainPoints = ({ onSolutionRequest }: AgencyPainPointsProps) =
         label: 'struggle with performance reporting'
       },
       solutions: [
-        'Real-time performance dashboards',
-        'Revenue attribution tracking',
-        'Content effectiveness analysis',
-        'Growth trend visualization'
+        'Real-time performance dashboards with cross-platform data',
+        'Revenue attribution tracking to specific content and strategies',
+        'Content effectiveness analysis with engagement metrics',
+        'Growth trend visualization with predictive analytics'
       ],
       impactAreas: ['Strategic decision-making', 'Creator confidence', 'Revenue optimization', 'Market positioning'],
       testimonial: {
-        quote: "When we implemented proper analytics, we discovered which content types were 3x more profitable. This insight alone increased creator earnings by 40%.",
+        quote: "When we implemented proper analytics, we discovered which content types were 3x more profitable. This insight alone increased creator earnings by 40% and our agency commissions proportionally.",
         author: "Sarah Johnson",
         position: "Analytics Director, Creator Growth Partners"
-      }
+      },
+      industryTrends: [
+        { year: '2021', value: 55 },
+        { year: '2022', value: 62 },
+        { year: '2023', value: 70 },
+        { year: '2024', value: 76 }
+      ]
     }
   ];
   
@@ -141,12 +171,32 @@ export const AgencyPainPoints = ({ onSolutionRequest }: AgencyPainPointsProps) =
   return (
     <div className="space-y-6">
       <div className="bg-siso-orange/10 border border-siso-orange/30 rounded-lg p-4 mb-6">
-        <p className="text-siso-text text-sm flex items-start gap-2">
+        <div className="flex items-start gap-2">
           <Info className="h-4 w-4 text-siso-orange shrink-0 mt-0.5" />
-          <span>
-            <span className="font-semibold text-siso-text-bold">Based on our survey of 200+ OnlyFans agencies</span> - These are the most common pain points agencies face when trying to scale past $100k/month in revenue.
-          </span>
-        </p>
+          <div>
+            <p className="text-sm text-siso-text">
+              <span className="font-semibold text-siso-text-bold">Based on our survey of 200+ OnlyFans agencies</span> - These are the most common pain points agencies face when trying to scale past $100k/month in revenue.
+            </p>
+            <div className="flex flex-wrap gap-2 mt-2">
+              <Badge variant="outline" className="text-xs bg-black/30 border-siso-text/20">
+                <PieChart className="h-3 w-3 mr-1" />
+                2024 Data
+              </Badge>
+              <Badge variant="outline" className="text-xs bg-black/30 border-siso-text/20">
+                <Users className="h-3 w-3 mr-1" />
+                200+ Agencies
+              </Badge>
+              <Badge variant="outline" className="text-xs bg-black/30 border-siso-text/20">
+                <Clock className="h-3 w-3 mr-1" />
+                4-Year Trend
+              </Badge>
+              <Badge variant="outline" className="text-xs bg-black/30 border-siso-text/20">
+                <DollarSign className="h-3 w-3 mr-1" />
+                $100k+ MRR
+              </Badge>
+            </div>
+          </div>
+        </div>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -194,6 +244,27 @@ export const AgencyPainPoints = ({ onSolutionRequest }: AgencyPainPointsProps) =
                     />
                   </div>
                   <p className="text-xs text-siso-text/70 mt-1">{painPoint.surveyData.label}</p>
+                  
+                  {painPoint.industryTrends && (
+                    <div className="mt-3 pt-2 border-t border-siso-text/10">
+                      <p className="text-xs text-siso-text/70 mb-1">Trend (2021-2024)</p>
+                      <div className="flex items-end h-8 gap-1">
+                        {painPoint.industryTrends.map((trend, idx) => (
+                          <div key={idx} className="flex flex-col items-center flex-1">
+                            <div 
+                              className={`w-full ${
+                                trend.year === '2024' 
+                                  ? 'bg-siso-orange' 
+                                  : 'bg-siso-text/40'
+                              } rounded-sm`}
+                              style={{ height: `${(trend.value/100) * 100}%` }}
+                            ></div>
+                            <span className="text-[10px] text-siso-text/60 mt-1">{trend.year}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="flex justify-between items-center">
