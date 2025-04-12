@@ -18,10 +18,18 @@ export interface PlanData {
 }
 
 export interface PainPointDetailProps {
-  title: string;
-  description: string;
-  impact: string;
-  solutions: string[];
+  problem: string;
+  statistic: string;
+  solution: string;
+  detailedSolution: string;
+  benefits: string[];
+  metrics: { label: string; value: string; icon: JSX.Element }[];
+  images: { url: string; caption: string }[];
+  caseStudyLink: string;
+  title?: string; // Added for compatibility with existing code
+  description?: string; // Added for compatibility with existing code
+  impact?: string; // Added for compatibility with existing code
+  solutions?: string[]; // Added for compatibility with existing code
 }
 
 interface PlanContextType {

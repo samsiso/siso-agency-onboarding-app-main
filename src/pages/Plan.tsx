@@ -47,11 +47,26 @@ const PlanWithContext = () => {
 const PlanModalWrapper = () => {
   const { selectedPainPoint, showPainPointModal, setShowPainPointModal } = usePlanContext();
   
+  // Make sure we only render the modal if we have a valid pain point with all required properties
+  if (!selectedPainPoint) return null;
+  
+  // Create a properly formatted pain point object that matches the expected props
+  const painPointProps = {
+    problem: selectedPainPoint.problem || selectedPainPoint.title || "",
+    statistic: selectedPainPoint.statistic || "",
+    solution: selectedPainPoint.solution || "",
+    detailedSolution: selectedPainPoint.detailedSolution || "",
+    benefits: selectedPainPoint.benefits || [],
+    metrics: selectedPainPoint.metrics || [],
+    images: selectedPainPoint.images || [],
+    caseStudyLink: selectedPainPoint.caseStudyLink || "#"
+  };
+  
   return (
     <PainPointsModal 
       open={showPainPointModal}
       onOpenChange={setShowPainPointModal}
-      painPoint={selectedPainPoint}
+      painPoint={painPointProps}
     />
   );
 };
