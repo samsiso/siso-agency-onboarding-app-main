@@ -3,36 +3,39 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { useOnboardingAuth } from '@/hooks/useOnboardingAuth';
 import { WelcomeLoader } from '@/components/plan/WelcomeLoader';
+
+export const useTypewriter = (text: string, speed: number = 80) => {
+  const [displayText, setDisplayText] = useState('');
+  const [isComplete, setIsComplete] = useState(false);
+
+  useEffect(() => {
+    let i = 0;
+    const interval = setInterval(() => {
+      if (i <= text.length) {
+        setDisplayText(text.substring(0, i));
+        i++;
+      } else {
+        clearInterval(interval);
+        setIsComplete(true);
+      }
+    }, speed);
+    
+    return () => clearInterval(interval);
+  }, [text, speed]);
+
+  return { displayText, isComplete };
+};
 
 const DecoraPlan = () => {
   const navigate = useNavigate();
   const { userId } = useOnboardingAuth();
-  const [typedText, setTypedText] = useState('');
-  const [typingComplete, setTypingComplete] = useState(false);
   const [progress, setProgress] = useState(0);
   const [loadingComplete, setLoadingComplete] = useState(false);
   const agencyName = "Decora Agency";
   
-  // Typewriter effect for the agency name
-  useEffect(() => {
-    const text = agencyName;
-    let i = 0;
-    // Speed up the typewriter effect
-    const interval = setInterval(() => {
-      if (i <= text.length) {
-        setTypedText(text.substring(0, i));
-        i++;
-      } else {
-        clearInterval(interval);
-        setTypingComplete(true);
-      }
-    }, 80); // Slightly slower for better readability
-    
-    return () => clearInterval(interval);
-  }, []);
+  const { displayText, isComplete: typingComplete } = useTypewriter(agencyName);
   
   // Progress animation
   useEffect(() => {
@@ -96,7 +99,7 @@ const DecoraPlan = () => {
             </motion.div>
             
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-              Welcome, <span className="text-siso-orange">{typedText}</span>
+              Welcome, <span className="text-siso-orange">{displayText}</span>
               <span className="animate-pulse">|</span>
             </h1>
           </div>
