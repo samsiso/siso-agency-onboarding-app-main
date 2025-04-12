@@ -1,19 +1,29 @@
 
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { usePlanData } from '@/hooks/usePlanData';
 import { PlanProvider } from '@/contexts/plan/PlanContext';
 import { MessageLoading } from '@/components/ui/message-loading';
 import { PlanContent } from '@/components/plan/PlanContent';
 import { PainPointsModal } from '@/components/plan/PainPointsModal';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
 import { usePlanContext } from '@/contexts/plan/PlanContext';
+import { useEffect } from 'react';
 
 // This is a wrapper component that provides the PlanContext
 const PlanWithContext = () => {
   const { username } = useParams<{ username: string }>();
   const { loading, planData, setPlanData } = usePlanData(username);
   const navigate = useNavigate();
+  
+  // Log debugging information
+  useEffect(() => {
+    console.log(`Plan page loaded for username: ${username}`);
+    console.log(`Loading state: ${loading}`);
+    console.log(`Plan data exists: ${Boolean(planData)}`);
+    if (planData) {
+      console.log(`Company name: ${planData.company_name}`);
+    }
+  }, [username, loading, planData]);
   
   if (loading) {
     return (
@@ -32,10 +42,25 @@ const PlanWithContext = () => {
       <div className="flex min-h-screen w-full flex-col items-center justify-center bg-gradient-to-b from-black via-siso-bg to-black p-4 md:p-8">
         <div className="text-center">
           <h2 className="mb-2 text-2xl font-bold text-white">Plan Not Found</h2>
-          <p className="mb-6 text-siso-text">We couldn't find a plan for this username.</p>
-          <Button onClick={() => navigate('/')} variant="default">
-            Go Home
-          </Button>
+          <p className="mb-6 text-siso-text">
+            We couldn't find a plan for username: "{username}".
+            <br />
+            Please make sure you have the correct URL.
+          </p>
+          <div className="space-y-3">
+            <Button onClick={() => navigate('/')} variant="default">
+              Go Home
+            </Button>
+            <div>
+              <Button 
+                onClick={() => navigate('/decora-plan')} 
+                variant="outline" 
+                className="mt-2"
+              >
+                Restart Decora Plan
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     );

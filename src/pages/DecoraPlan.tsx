@@ -58,10 +58,11 @@ const DecoraPlan = () => {
   // Auto-redirect after loading completes
   useEffect(() => {
     if (loadingComplete) {
-      // Auto-redirect after a delay
+      // Auto-redirect after a delay - ensure we're using lowercase username
       const redirectTimer = setTimeout(() => {
+        console.log("DecoraPlan: Redirecting to /plan/decora");
         navigate('/plan/decora', { replace: true });
-      }, 1000); 
+      }, 1000);
       
       return () => clearTimeout(redirectTimer);
     }
@@ -75,6 +76,7 @@ const DecoraPlan = () => {
   ];
   
   const handleContinue = () => {
+    console.log("Manual continue clicked, redirecting to /plan/decora");
     navigate('/plan/decora', { replace: true });
   };
   
