@@ -37,6 +37,13 @@ import { EnhancedNextSteps } from '@/components/plan/EnhancedNextSteps';
 import { caseStudies } from '@/data/plan/featureData';
 import { ImplementationPlan } from '@/components/plan/ImplementationPlan';
 
+// Mapping of agency-specific URLs to industry types
+const AGENCY_TO_INDUSTRY_MAP: Record<string, string> = {
+  'decora': 'onlyfans-management',
+  'default': 'onlyfans-management',
+  // Add more mappings as needed
+};
+
 interface PlanData {
   id: string;
   username: string;
@@ -196,6 +203,9 @@ const Plan = () => {
     );
   }
   
+  // Get the industry type for the current agency
+  const industryType = username ? AGENCY_TO_INDUSTRY_MAP[username] || AGENCY_TO_INDUSTRY_MAP.default : 'onlyfans-management';
+  
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-black via-siso-bg to-black p-4 md:p-8">
       <div className="mx-auto max-w-5xl">
@@ -225,7 +235,10 @@ const Plan = () => {
               extensive research and surveys, we've identified these key pain points:
             </p>
             
-            <AgencyPainPoints onSolutionRequest={handleShowFeatures} />
+            <AgencyPainPoints 
+              onSolutionRequest={handleShowFeatures} 
+              agencyTypeSlug={industryType} 
+            />
           </motion.section>
           
           {showSolutionsSection && (
@@ -426,7 +439,6 @@ const Plan = () => {
             </div>
           </motion.section>
           
-          {/* Implementation Plan Section - Moved to just before Next Steps */}
           <motion.section 
             className="space-y-4"
             initial={{ opacity: 0, y: 20 }}

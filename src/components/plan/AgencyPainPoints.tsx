@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { AlertTriangle, Info, BarChart, ArrowRight, ExternalLink, PieChart, Users, Clock, DollarSign } from 'lucide-react';
@@ -39,7 +38,14 @@ interface AgencyPainPointsProps {
   agencyTypeSlug?: string;
 }
 
-export const AgencyPainPoints = ({ onSolutionRequest, agencyTypeSlug = 'onlyfans-management' }: AgencyPainPointsProps) => {
+// Mapping of agency-specific URLs to industry types
+const AGENCY_TO_INDUSTRY_MAP: Record<string, string> = {
+  'decora': 'onlyfans-management',
+  'default': 'onlyfans-management',
+  // Add more mappings as needed
+};
+
+export const AgencyPainPoints = ({ onSolutionRequest, agencyTypeSlug }: AgencyPainPointsProps) => {
   const [selectedPainPoint, setSelectedPainPoint] = useState<PainPoint | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [painPoints, setPainPoints] = useState<PainPoint[]>([]);
@@ -51,11 +57,22 @@ export const AgencyPainPoints = ({ onSolutionRequest, agencyTypeSlug = 'onlyfans
       try {
         setLoading(true);
         
+        // Get the username from URL params or use the provided agencyTypeSlug
+        const usernameParam = params.username || agencyTypeSlug;
+        
+        // Map the agency username to its industry type
+        // If the agency isn't in our mapping, use the default industry or the original username
+        const industryType = usernameParam 
+          ? AGENCY_TO_INDUSTRY_MAP[usernameParam] || AGENCY_TO_INDUSTRY_MAP.default || usernameParam
+          : 'onlyfans-management';
+        
+        console.log('Fetching pain points for industry type:', industryType);
+        
         // Get agency type ID first
         const { data: agencyTypes, error: agencyTypeError } = await safeSupabase
           .from('agency_types')
           .select('id')
-          .eq('slug', params.username || agencyTypeSlug)
+          .eq('slug', industryType)
           .single();
           
         if (agencyTypeError || !agencyTypes) {
