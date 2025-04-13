@@ -10,9 +10,10 @@ export interface CaseStudyProps {
   description: string;
   imageUrl: string;
   notionUrl?: string;
+  industry?: string; // Added industry field
 }
 
-export const CaseStudy = ({ title, description, imageUrl, notionUrl }: CaseStudyProps) => {
+export const CaseStudy = ({ title, description, imageUrl, notionUrl, industry }: CaseStudyProps) => {
   return (
     <motion.div 
       className="overflow-hidden rounded-lg bg-black/20 border border-siso-text/10 hover:border-siso-orange/30 transition-all duration-300 flex flex-col h-full"
@@ -29,6 +30,13 @@ export const CaseStudy = ({ title, description, imageUrl, notionUrl }: CaseStudy
       </div>
       
       <div className="p-4 flex flex-col flex-grow">
+        {industry && (
+          <div className="mb-2">
+            <span className="text-xs bg-siso-orange/20 text-siso-orange px-2 py-1 rounded-sm">
+              {industry}
+            </span>
+          </div>
+        )}
         <p className="text-sm text-siso-text mb-4 flex-grow">{description}</p>
         
         {notionUrl && (
