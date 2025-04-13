@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 
 export interface FeatureDetailState {
   id?: string;
@@ -14,29 +14,52 @@ export interface FeatureDetailState {
 }
 
 export function useFeatureDetail() {
+  const isMounted = useRef(true);
   const [featureDetail, setFeatureDetail] = useState<FeatureDetailState | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+  
+  const safeSetFeatureDetail = useCallback((value: FeatureDetailState | null) => {
+    if (isMounted.current) {
+      setFeatureDetail(value);
+    }
+  }, []);
+  
+  const safeSetIsDetailOpen = useCallback((value: boolean) => {
+    if (isMounted.current) {
+      setIsDetailOpen(value);
+    }
+  }, []);
+  
   const handleShowFeatureDetail = useCallback((feature: any, categoryName: string) => {
-    setFeatureDetail({
+    safeSetFeatureDetail({
       ...feature,
       categoryName
     });
-    setIsDetailOpen(true);
-  }, []);
+    safeSetIsDetailOpen(true);
+  }, [safeSetFeatureDetail, safeSetIsDetailOpen]);
   
   const handleCloseFeatureDetail = useCallback(() => {
-    setIsDetailOpen(false);
+    safeSetIsDetailOpen(false);
     // Optional: Add a delay before clearing the detail data
-    setTimeout(() => {
-      setFeatureDetail(null);
-    }, 200);
-  }, []);
+    if (isMounted.current) {
+      setTimeout(() => {
+        if (isMounted.current) {
+          safeSetFeatureDetail(null);
+        }
+      }, 200);
+    }
+  }, [safeSetIsDetailOpen, safeSetFeatureDetail]);
   
   return {
     featureDetail,
     isDetailOpen,
-    setIsDetailOpen,
+    setIsDetailOpen: safeSetIsDetailOpen,
     handleShowFeatureDetail,
     handleCloseFeatureDetail
   };

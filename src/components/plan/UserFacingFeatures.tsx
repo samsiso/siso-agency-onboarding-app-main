@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Users, Building, CheckCircle, ArrowRight, Plus, Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -30,6 +29,7 @@ export const UserFacingFeatures: React.FC<UserFacingFeaturesProps> = ({
   onCustomize
 }) => {
   const [activeTab, setActiveTab] = useState('both');
+  // Use a separate state variable for custom features to avoid conflicts
   const [customFeatures, setCustomFeatures] = useState<Array<{ name: string; description: string }>>([]);
   
   const { 
@@ -54,6 +54,14 @@ export const UserFacingFeatures: React.FC<UserFacingFeaturesProps> = ({
     handleCloseFeatureDetail
   } = useFeatureDetail();
   
+  // Notify parent when selected features change
+  useEffect(() => {
+    // Only notify if we have selected features
+    if (selectedFeatures.length > 0) {
+      onFeatureSelect(selectedFeatures);
+    }
+  }, [selectedFeatures, onFeatureSelect]);
+  
   const handleSelectRecommendedAndNotify = () => {
     const features = handleSelectRecommended();
     onFeatureSelect(features);
@@ -61,7 +69,6 @@ export const UserFacingFeatures: React.FC<UserFacingFeaturesProps> = ({
 
   const handleFeatureSelect = (featureName: string) => {
     toggleFeature(featureName);
-    // We don't notify parent yet as this is just selection
   };
   
   const handleAddCustomFeature = (name: string, description: string) => {
@@ -77,9 +84,12 @@ export const UserFacingFeatures: React.FC<UserFacingFeaturesProps> = ({
     removeCustomFeature(index);
   };
   
+  // The rest of the component remains unchanged
   return (
     <TooltipProvider>
       <div className="space-y-6">
+        
+
         <div className="bg-black/20 backdrop-blur-sm border border-siso-text/10 rounded-lg p-6">
           <h3 className="text-xl font-bold text-white mb-4">Comprehensive Agency Management System</h3>
           
@@ -117,6 +127,7 @@ export const UserFacingFeatures: React.FC<UserFacingFeaturesProps> = ({
               </TabsTrigger>
             </TabsList>
           
+            
             <TabsContent value="both" className="mt-4">
               {/* Modified layout: 2 columns instead of 4 */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto">

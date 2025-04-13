@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Clock, Gauge, DollarSign, CheckCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,14 @@ export const PlanReviewSummary: React.FC<PlanReviewSummaryProps> = ({
   onApprove,
   isSubmitting
 }) => {
+  const isMounted = useRef(true);
+  
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+  
   // Separate regular features from custom features
   const customFeatures = selectedFeatures.filter(feature => feature.startsWith('Custom:'));
   const standardFeatures = selectedFeatures.filter(feature => !feature.startsWith('Custom:'));
@@ -72,22 +80,24 @@ export const PlanReviewSummary: React.FC<PlanReviewSummaryProps> = ({
       </div>
       
       <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="bg-black/20 border border-siso-text/10 rounded-lg p-4"
-        >
-          <h4 className="text-lg font-semibold text-white mb-3">Standard Features</h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {standardFeatures.map((feature, index) => (
-              <div key={index} className="flex items-center gap-2 bg-black/20 rounded px-3 py-2">
-                <CheckCircle className="h-4 w-4 text-siso-orange flex-shrink-0" />
-                <span className="text-sm text-siso-text">{feature}</span>
-              </div>
-            ))}
-          </div>
-        </motion.div>
+        {standardFeatures.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="bg-black/20 border border-siso-text/10 rounded-lg p-4"
+          >
+            <h4 className="text-lg font-semibold text-white mb-3">Standard Features</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {standardFeatures.map((feature, index) => (
+                <div key={index} className="flex items-center gap-2 bg-black/20 rounded px-3 py-2">
+                  <CheckCircle className="h-4 w-4 text-siso-orange flex-shrink-0" />
+                  <span className="text-sm text-siso-text">{feature}</span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
 
         {customFeatures.length > 0 && (
           <motion.div
