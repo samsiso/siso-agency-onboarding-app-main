@@ -1,6 +1,5 @@
-
 import { Card } from "@/components/ui/card";
-import { ArrowUpRight, Users, CreditCard, ChartLineUp } from "lucide-react";
+import { ArrowUpRight, Users, CreditCard, ChartLine } from "lucide-react";
 
 interface StatCardProps {
   title: string;
@@ -54,7 +53,7 @@ export function DashboardStats() {
         value="64%" 
         change="5%" 
         isPositive={false}
-        icon={<ChartLineUp className="h-5 w-5 text-siso-orange" />}
+        icon={<ChartLine className="h-5 w-5 text-siso-orange" />}
       />
     </div>
   );
