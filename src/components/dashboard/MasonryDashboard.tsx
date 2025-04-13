@@ -24,9 +24,11 @@ import {
 export function MasonryDashboard() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-auto">
-      {/* Top Section - Full Width */}
-      <div className="col-span-1 md:col-span-3">
-        <SetupChecklist />
+      {/* Top Section - Checklist Now 1/3 Width and Centered */}
+      <div className="col-span-1 md:col-span-3 flex justify-center">
+        <div className="w-full md:w-1/3">
+          <SetupChecklist />
+        </div>
       </div>
       
       {/* Stats Row */}
@@ -108,3 +110,4 @@ export function MasonryDashboard() {
     </div>
   );
 }
+
