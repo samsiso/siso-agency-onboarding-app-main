@@ -9,6 +9,7 @@ import { FeatureCategoryCard } from './features/FeatureCategoryCard';
 import { FeatureDetailDialog } from './features/FeatureDetailDialog';
 import { FeatureTierBreakdown } from './features/FeatureTierBreakdown';
 import { FeatureInstructions } from './features/FeatureInstructions';
+import { QuickSummaryFeatures } from './features/QuickSummaryFeatures';
 import { useFeatureSelection } from '@/hooks/useFeatureSelection';
 import { useFeatureDetail } from '@/hooks/useFeatureDetail';
 
@@ -31,7 +32,9 @@ export const UserFacingFeatures: React.FC<UserFacingFeaturesProps> = ({
   
   const { 
     selectedFeatures,
-    handleSelectRecommended 
+    setSelectedFeatures,
+    handleSelectRecommended,
+    toggleFeature 
   } = useFeatureSelection(
     modelFacingCategories,
     agencyFacingCategories,
@@ -42,12 +45,18 @@ export const UserFacingFeatures: React.FC<UserFacingFeaturesProps> = ({
     featureDetail,
     isDetailOpen,
     setIsDetailOpen,
-    handleShowFeatureDetail
+    handleShowFeatureDetail,
+    handleCloseFeatureDetail
   } = useFeatureDetail();
   
   const handleSelectRecommendedAndNotify = () => {
     const features = handleSelectRecommended();
     onFeatureSelect(features);
+  };
+
+  const handleFeatureSelect = (featureName: string) => {
+    toggleFeature(featureName);
+    // We don't notify parent yet as this is just selection
   };
   
   return (
@@ -60,6 +69,15 @@ export const UserFacingFeatures: React.FC<UserFacingFeaturesProps> = ({
             Our platform is organized into model-facing and agency-facing features, ensuring each user gets exactly what they need. 
             The MVP tier includes essential features to get you started immediately.
           </p>
+
+          {/* Quick Summary Features - New Component */}
+          <QuickSummaryFeatures 
+            modelFacingCategories={modelFacingCategories}
+            agencyFacingCategories={agencyFacingCategories}
+            sharedFeatureCategories={sharedFeatureCategories}
+            onFeatureSelect={handleFeatureSelect}
+            onSelectAll={handleSelectRecommendedAndNotify}
+          />
           
           {/* Tab selection for user-facing perspective */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">

@@ -33,7 +33,7 @@ export function useFeatureSelection(
     return recommendedFeatures;
   }, [modelFacingCategories, agencyFacingCategories, sharedFeatureCategories]);
 
-  // Function to toggle a single feature
+  // Function to toggle a single feature by name
   const toggleFeature = useCallback((featureName: string) => {
     setSelectedFeatures(prev => 
       prev.includes(featureName)
@@ -42,10 +42,42 @@ export function useFeatureSelection(
     );
   }, []);
   
+  // Find a feature by name in all categories
+  const findFeatureById = useCallback((featureId: string) => {
+    const allCategories = [
+      ...modelFacingCategories, 
+      ...agencyFacingCategories, 
+      ...sharedFeatureCategories
+    ];
+    
+    for (const category of allCategories) {
+      const feature = category.features.find(f => f.id === featureId);
+      if (feature) return feature;
+    }
+    return null;
+  }, [modelFacingCategories, agencyFacingCategories, sharedFeatureCategories]);
+  
+  // Find a feature by name in all categories
+  const findFeatureByName = useCallback((featureName: string) => {
+    const allCategories = [
+      ...modelFacingCategories, 
+      ...agencyFacingCategories, 
+      ...sharedFeatureCategories
+    ];
+    
+    for (const category of allCategories) {
+      const feature = category.features.find(f => f.name === featureName);
+      if (feature) return feature;
+    }
+    return null;
+  }, [modelFacingCategories, agencyFacingCategories, sharedFeatureCategories]);
+  
   return {
     selectedFeatures,
     setSelectedFeatures,
     handleSelectRecommended,
-    toggleFeature
+    toggleFeature,
+    findFeatureById,
+    findFeatureByName
   };
 }
