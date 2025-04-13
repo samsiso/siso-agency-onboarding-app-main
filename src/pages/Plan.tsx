@@ -36,6 +36,7 @@ import { ImplementationPlan } from '@/components/plan/ImplementationPlan';
 import { usePlanData, PlanDataType } from '@/hooks/usePlanData';
 import { Button } from '@/components/ui/button';
 import { GradientHeading } from '@/components/ui/gradient-heading';
+import { supabase } from '@/integrations/supabase/client';
 
 // Mapping of agency-specific URLs to industry types
 const AGENCY_TO_INDUSTRY_MAP: Record<string, string> = {

@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface PlanDataType {
@@ -81,7 +81,15 @@ export function usePlanData(username: string | undefined) {
           }
         } else {
           if (isMounted.current) {
-            setPlanData(data);
+            // Convert the branding to the correct format if needed
+            const formattedData: PlanDataType = {
+              ...data,
+              branding: typeof data.branding === 'string' 
+                ? JSON.parse(data.branding) 
+                : data.branding
+            };
+            
+            setPlanData(formattedData);
             setLoading(false);
           }
         }

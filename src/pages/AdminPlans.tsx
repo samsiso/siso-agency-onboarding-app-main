@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '@/components/assistants/layout/MainLayout';
@@ -237,8 +238,16 @@ const AdminPlans = () => {
       }
       
       if (data) {
-        setPlans(data);
-        setFilteredPlans(data);
+        // Format the data to ensure branding is in the correct format
+        const formattedData: Plan[] = data.map(plan => ({
+          ...plan,
+          branding: typeof plan.branding === 'string' 
+            ? JSON.parse(plan.branding) 
+            : plan.branding
+        }));
+        
+        setPlans(formattedData);
+        setFilteredPlans(formattedData);
       }
       
       setIsLoading(false);
