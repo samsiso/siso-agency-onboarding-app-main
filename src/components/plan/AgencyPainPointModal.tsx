@@ -68,21 +68,35 @@ export const AgencyPainPointModal = ({
     }
   };
 
+  // Render the appropriate icon based on the icon string from database
+  const renderIcon = (iconName: string, className: string) => {
+    switch(iconName) {
+      case 'alert-triangle':
+        return <AlertTriangle className={className} />;
+      case 'bar-chart':
+        return <BarChart className={className} />;
+      case 'info':
+        return <Info className={className} />;
+      default:
+        return <Info className={className} />;
+    }
+  };
+
   // Industry data points (mock data based on real industry patterns)
   const industryData: DataPoint[] = [
     { 
-      label: painPoint.surveyData.label, 
-      value: painPoint.surveyData.percentage, 
+      label: painPoint.survey_data.label, 
+      value: painPoint.survey_data.percentage, 
       color: 'bg-gradient-to-r from-siso-red to-siso-orange' 
     },
     { 
       label: 'Report negative impact on revenue', 
-      value: Math.round(painPoint.surveyData.percentage * 0.8), 
+      value: Math.round(painPoint.survey_data.percentage * 0.8), 
       color: 'bg-amber-500' 
     },
     { 
       label: 'Cited as reason for creator churn', 
-      value: Math.round(painPoint.surveyData.percentage * 0.6), 
+      value: Math.round(painPoint.survey_data.percentage * 0.6), 
       color: 'bg-red-500' 
     },
     { 
@@ -123,7 +137,7 @@ export const AgencyPainPointModal = ({
           <DialogHeader>
             <div className="flex items-center gap-3 mb-2">
               <div className={`p-2.5 rounded-full ${getSeverityBgColor(painPoint.severity)}`}>
-                {painPoint.icon}
+                {renderIcon(painPoint.icon, "h-6 w-6 " + getSeverityColor(painPoint.severity))}
               </div>
               <div className="flex-1">
                 <DialogTitle className="text-xl font-bold text-white">
@@ -144,7 +158,7 @@ export const AgencyPainPointModal = ({
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-3">
             <div className="bg-black/30 text-siso-orange text-xs font-medium px-3 py-1.5 rounded inline-flex gap-1.5 items-center">
               <BarChart className="h-3.5 w-3.5" />
-              <span>Survey finding: {painPoint.surveyData.percentage}% {painPoint.surveyData.label}</span>
+              <span>Survey finding: {painPoint.survey_data.percentage}% {painPoint.survey_data.label}</span>
             </div>
             
             <motion.div 
@@ -228,7 +242,7 @@ export const AgencyPainPointModal = ({
                       Common Symptoms
                     </h4>
                     <ul className="space-y-2">
-                      {painPoint.impactAreas.map((area, idx) => (
+                      {painPoint.impact_areas.map((area, idx) => (
                         <li key={idx} className="flex items-center gap-2 text-sm text-siso-text">
                           <div className="h-1.5 w-1.5 rounded-full bg-siso-orange"></div>
                           {area}
@@ -246,19 +260,19 @@ export const AgencyPainPointModal = ({
                 </h4>
                 
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-siso-text">{painPoint.surveyData.label}</span>
-                  <span className="text-siso-orange font-semibold">{painPoint.surveyData.percentage}%</span>
+                  <span className="text-siso-text">{painPoint.survey_data.label}</span>
+                  <span className="text-siso-orange font-semibold">{painPoint.survey_data.percentage}%</span>
                 </div>
                 
                 <div className="w-full h-2.5 bg-siso-text/10 rounded-full overflow-hidden mb-4">
                   <div 
                     className="h-full bg-gradient-to-r from-siso-red to-siso-orange rounded-full"
-                    style={{ width: `${painPoint.surveyData.percentage}%` }}
+                    style={{ width: `${painPoint.survey_data.percentage}%` }}
                   />
                 </div>
                 
                 <div className="mt-4 grid grid-cols-2 gap-2">
-                  {painPoint.impactAreas.map((area, index) => (
+                  {painPoint.impact_areas.map((area, index) => (
                     <div key={index} className="flex items-center gap-2 text-xs text-siso-text bg-black/20 p-2 rounded border border-siso-text/5">
                       <div className="h-1.5 w-1.5 rounded-full bg-siso-orange/70"></div>
                       <span>{area}</span>

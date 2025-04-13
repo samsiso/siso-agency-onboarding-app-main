@@ -9,6 +9,98 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      agency_pain_points: {
+        Row: {
+          agency_type_id: string | null
+          created_at: string
+          description: string
+          icon: string
+          id: string
+          impact_areas: string[]
+          industry_trends: Json | null
+          severity: string
+          solutions: string[]
+          statistic: string
+          survey_data: Json
+          testimonial: Json | null
+          title: string
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          agency_type_id?: string | null
+          created_at?: string
+          description: string
+          icon: string
+          id?: string
+          impact_areas?: string[]
+          industry_trends?: Json | null
+          severity: string
+          solutions?: string[]
+          statistic: string
+          survey_data?: Json
+          testimonial?: Json | null
+          title: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          agency_type_id?: string | null
+          created_at?: string
+          description?: string
+          icon?: string
+          id?: string
+          impact_areas?: string[]
+          industry_trends?: Json | null
+          severity?: string
+          solutions?: string[]
+          statistic?: string
+          survey_data?: Json
+          testimonial?: Json | null
+          title?: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agency_pain_points_agency_type_id_fkey"
+            columns: ["agency_type_id"]
+            isOneToOne: false
+            referencedRelation: "agency_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agency_types: {
+        Row: {
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       banner_templates: {
         Row: {
           created_at: string
@@ -44,6 +136,44 @@ export type Database = {
           text_overlay?: Json | null
         }
         Relationships: []
+      }
+      case_studies: {
+        Row: {
+          agency_type_id: string | null
+          created_at: string
+          description: string
+          id: string
+          image_url: string | null
+          notion_url: string | null
+          title: string
+        }
+        Insert: {
+          agency_type_id?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          image_url?: string | null
+          notion_url?: string | null
+          title: string
+        }
+        Update: {
+          agency_type_id?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          image_url?: string | null
+          notion_url?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_studies_agency_type_id_fkey"
+            columns: ["agency_type_id"]
+            isOneToOne: false
+            referencedRelation: "agency_types"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       category_stats: {
         Row: {
