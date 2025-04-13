@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
 export interface FeatureDetailState {
   id?: string;
@@ -17,18 +17,27 @@ export function useFeatureDetail() {
   const [featureDetail, setFeatureDetail] = useState<FeatureDetailState | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   
-  const handleShowFeatureDetail = (feature: any, categoryName: string) => {
+  const handleShowFeatureDetail = useCallback((feature: any, categoryName: string) => {
     setFeatureDetail({
       ...feature,
       categoryName
     });
     setIsDetailOpen(true);
-  };
+  }, []);
+  
+  const handleCloseFeatureDetail = useCallback(() => {
+    setIsDetailOpen(false);
+    // Optional: Add a delay before clearing the detail data
+    setTimeout(() => {
+      setFeatureDetail(null);
+    }, 200);
+  }, []);
   
   return {
     featureDetail,
     isDetailOpen,
     setIsDetailOpen,
-    handleShowFeatureDetail
+    handleShowFeatureDetail,
+    handleCloseFeatureDetail
   };
 }

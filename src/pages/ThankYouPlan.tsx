@@ -1,7 +1,8 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { CheckCircle, ArrowRight, Clock, DollarSign } from 'lucide-react';
+import { CheckCircle, ArrowRight, Clock, DollarSign, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { GradientHeading } from '@/components/ui/gradient-heading';
@@ -17,6 +18,7 @@ const ThankYouPlan = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showLoginForm, setShowLoginForm] = useState(false);
   const [showVideoSection, setShowVideoSection] = useState(false);
+  const [showWhatsappForm, setShowWhatsappForm] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -33,6 +35,8 @@ const ThankYouPlan = () => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
+        // If user is already logged in, show video section first
+        setShowWhatsappForm(false);
         setShowVideoSection(true);
       }
     };
@@ -79,10 +83,14 @@ const ThankYouPlan = () => {
         description: "Your WhatsApp number has been saved",
       });
       
+      // After saving WhatsApp, always show video section next
+      setShowWhatsappForm(false);
+      setShowVideoSection(true);
+      
+      // If not logged in, after video we'll show auth form
       if (!userId) {
-        setShowLoginForm(true);
-      } else {
-        setShowVideoSection(true);
+        // We'll prompt to login when they click "Go to Dashboard"
+        // so we don't interrupt the CEO welcome video
       }
       
     } catch (error: any) {
@@ -165,7 +173,8 @@ const ThankYouPlan = () => {
           }
         }
         
-        setShowVideoSection(true);
+        // After successful signup, go to dashboard
+        navigate('/home');
       } else {
         const { data, error } = await supabase.auth.signInWithPassword({
           email,
@@ -191,7 +200,8 @@ const ThankYouPlan = () => {
           }
         }
         
-        setShowVideoSection(true);
+        // After successful login, go to dashboard
+        navigate('/home');
       }
     } catch (error: any) {
       console.error('Auth error:', error);
@@ -210,6 +220,16 @@ const ThankYouPlan = () => {
     setPassword('');
     setConfirmPassword('');
   };
+
+  const handleDashboardClick = () => {
+    // Check if user is logged in before going to dashboard
+    if (userId) {
+      navigate('/home');
+    } else {
+      setShowVideoSection(false);
+      setShowLoginForm(true);
+    }
+  };
   
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-black via-siso-bg to-black p-4">
@@ -220,7 +240,7 @@ const ThankYouPlan = () => {
         className="max-w-md w-full"
       >
         <div className="bg-black/40 backdrop-blur-md rounded-lg border border-siso-text/10 shadow-xl p-8">
-          {!showLoginForm && !showVideoSection && (
+          {showWhatsappForm && (
             <>
               <motion.div
                 initial={{ scale: 0 }}
@@ -287,7 +307,7 @@ const ThankYouPlan = () => {
             </>
           )}
           
-          {showLoginForm && !showVideoSection && (
+          {showLoginForm && (
             <>
               <GradientHeading className="text-3xl mb-4 text-center">
                 {isSignUp ? 'Create an Account' : 'Sign In'}
@@ -380,7 +400,7 @@ const ThankYouPlan = () => {
               
               <div className="space-y-4">
                 <Button 
-                  onClick={() => navigate('/home')}
+                  onClick={handleDashboardClick}
                   className="w-full bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90"
                 >
                   Go to Dashboard

@@ -10,19 +10,19 @@ export const FeatureInstructions: React.FC = () => {
         <li className="flex items-start gap-2">
           <CheckCircle className="h-5 w-5 text-siso-orange shrink-0 mt-0.5" />
           <span className="text-sm text-siso-text">
-            <strong className="text-white">Role-Based Access:</strong> When users log in, they see only the features relevant to their role—models get their dashboard, agency staff get theirs.
+            <strong className="text-white">Select Features:</strong> Choose the features you want in your OnlyFans Management Platform.
           </span>
         </li>
         <li className="flex items-start gap-2">
           <CheckCircle className="h-5 w-5 text-siso-orange shrink-0 mt-0.5" />
           <span className="text-sm text-siso-text">
-            <strong className="text-white">User-Friendly:</strong> The design is simple, so even non-tech-savvy users can navigate it easily.
+            <strong className="text-white">Review Plan:</strong> After selecting features, you'll see a summary of your custom plan.
           </span>
         </li>
         <li className="flex items-start gap-2">
           <CheckCircle className="h-5 w-5 text-siso-orange shrink-0 mt-0.5" />
           <span className="text-sm text-siso-text">
-            <strong className="text-white">Scalable:</strong> Built to grow with your agency, including future integrations like SMS and WhatsApp.
+            <strong className="text-white">Get Started:</strong> Approve your plan to begin the onboarding process and receive your MVP.
           </span>
         </li>
       </ul>

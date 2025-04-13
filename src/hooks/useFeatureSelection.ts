@@ -32,10 +32,20 @@ export function useFeatureSelection(
     setSelectedFeatures(recommendedFeatures);
     return recommendedFeatures;
   }, [modelFacingCategories, agencyFacingCategories, sharedFeatureCategories]);
+
+  // Function to toggle a single feature
+  const toggleFeature = useCallback((featureName: string) => {
+    setSelectedFeatures(prev => 
+      prev.includes(featureName)
+        ? prev.filter(f => f !== featureName)
+        : [...prev, featureName]
+    );
+  }, []);
   
   return {
     selectedFeatures,
     setSelectedFeatures,
-    handleSelectRecommended
+    handleSelectRecommended,
+    toggleFeature
   };
 }

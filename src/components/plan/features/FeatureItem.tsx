@@ -11,21 +11,26 @@ interface FeatureItemProps {
   description: string;
   tier: 'mvp' | 'advanced' | 'premium';
   recommended?: boolean;
+  isSelected?: boolean;
   onClick: () => void;
+  onInfoClick?: () => void;
 }
 
 export const FeatureItem: React.FC<FeatureItemProps> = ({ 
   name, 
   description, 
   tier, 
-  recommended, 
-  onClick 
+  recommended,
+  isSelected = false,
+  onClick,
+  onInfoClick
 }) => {
   return (
     <motion.div 
       className={cn(
         "flex items-start gap-3 p-3 rounded-md cursor-pointer hover:bg-black/30 transition-colors",
-        tier === 'mvp' ? "bg-black/20" : "bg-black/10"
+        isSelected ? "bg-black/40 border border-siso-orange/40" : "bg-black/10",
+        tier === 'mvp' ? "bg-opacity-20" : "bg-opacity-10"
       )}
       onClick={onClick}
       whileHover={{ scale: 1.02 }}
@@ -33,14 +38,14 @@ export const FeatureItem: React.FC<FeatureItemProps> = ({
     >
       <CheckCircle className={cn(
         "h-4 w-4 shrink-0 mt-0.5",
-        tier === 'mvp' ? "text-siso-orange" : "text-siso-text/50"
+        isSelected ? "text-siso-orange" : "text-siso-text/50"
       )} />
       
       <div>
         <div className="flex items-center gap-1">
           <span className={cn(
             "font-medium text-sm",
-            tier === 'mvp' ? "text-white" : "text-siso-text/80"
+            isSelected ? "text-white" : "text-siso-text/80"
           )}>
             {name}
           </span>
@@ -71,7 +76,7 @@ export const FeatureItem: React.FC<FeatureItemProps> = ({
         <div className="flex items-center mt-1">
           <Button variant="link" className="text-xs text-siso-orange p-0 h-auto" onClick={(e) => {
             e.stopPropagation();
-            onClick();
+            if (onInfoClick) onInfoClick();
           }}>
             <Info className="h-3 w-3 mr-1" />
             View Details
