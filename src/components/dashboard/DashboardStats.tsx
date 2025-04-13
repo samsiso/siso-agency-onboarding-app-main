@@ -42,7 +42,7 @@ function StatCard({ title, value, change, isPositive, icon, className = "" }: St
 
 export function DashboardStats() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+    <div className="flex flex-col space-y-4">
       <StatCard 
         title="Active Clients" 
         value="24" 

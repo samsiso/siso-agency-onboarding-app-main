@@ -24,36 +24,55 @@ import {
 export function MasonryDashboard() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-auto">
-      {/* Top Section - Checklist Now 1/3 Width and Centered */}
-      <div className="col-span-1 md:col-span-3 flex justify-center">
-        <div className="w-full md:w-1/3">
+      {/* Main Content - Two Column Layout */}
+      <div className="col-span-1">
+        {/* Left Column - Setup Checklist */}
+        <div className="mb-6">
           <SetupChecklist />
+        </div>
+        
+        {/* Clients Overview Card */}
+        <div className="mb-6">
+          <ClientsOverviewCard />
+        </div>
+        
+        {/* Projects Overview Card */}
+        <div className="mb-6">
+          <ProjectsOverviewCard />
         </div>
       </div>
       
-      {/* Stats Row */}
-      <div className="col-span-1 md:col-span-3">
-        <DashboardStats />
+      {/* Middle Column */}
+      <div className="col-span-1">
+        {/* Calendar Card */}
+        <div className="mb-6">
+          <CalendarCard />
+        </div>
+        
+        {/* Priority Tasks */}
+        <div className="mb-6">
+          <PriorityTasksCard />
+        </div>
       </div>
-
-      {/* Quick Actions */}
-      <div className="col-span-1 md:col-span-3">
-        <QuickActions />
+      
+      {/* Right Column - Stats and Revenue */}
+      <div className="col-span-1">
+        {/* Quick Actions */}
+        <div className="mb-6">
+          <QuickActions />
+        </div>
+        
+        {/* Stats Dashboard */}
+        <div className="mb-6">
+          <DashboardStats />
+        </div>
+        
+        {/* Revenue Card */}
+        <div className="mb-6">
+          <RevenueCard />
+        </div>
       </div>
-
-      {/* Left Column - Clients & Projects */}
-      <div className="col-span-1 md:col-span-2 space-y-6">
-        <ClientsOverviewCard />
-        <ProjectsOverviewCard />
-      </div>
-
-      {/* Right Column - Calendar, Activity */}
-      <div className="col-span-1 space-y-6">
-        <CalendarCard />
-        <RevenueCard />
-        <PriorityTasksCard />
-      </div>
-
+      
       {/* Recent Activity - Full Width */}
       <div className="col-span-1 md:col-span-3">
         <RecentActivityCard />
@@ -110,4 +129,3 @@ export function MasonryDashboard() {
     </div>
   );
 }
-
