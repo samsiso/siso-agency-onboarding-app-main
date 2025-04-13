@@ -23,12 +23,17 @@ import {
   Users,
   Filter,
   PlusCircle,
-  Briefcase
+  Briefcase,
+  Plus,
+  PencilLine,
+  Trash2
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { PlanForm } from '@/components/admin/PlanForm';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 interface Plan {
   id: string;
@@ -41,6 +46,10 @@ interface Plan {
   status: string;
   created_at: string;
   industry_type?: string;
+  branding?: {
+    primary_color?: string;
+    secondary_color?: string;
+  } | null;
 }
 
 interface IndustryTemplate {
@@ -159,6 +168,9 @@ const AdminPlans = () => {
   const [activeTab, setActiveTab] = useState<string>("all-plans");
   const [selectedIndustry, setSelectedIndustry] = useState<string | null>(null);
   const [industryFilteredPlans, setIndustryFilteredPlans] = useState<Plan[]>([]);
+  const [isCreatePlanOpen, setIsCreatePlanOpen] = useState(false);
+  const [isEditPlanOpen, setIsEditPlanOpen] = useState(false);
+  const [editingPlan, setEditingPlan] = useState<Plan | null>(null);
   
   const { toast } = useToast();
   const plansPerPage = 10;
@@ -215,76 +227,21 @@ const AdminPlans = () => {
     try {
       setIsLoading(true);
       
-      // In a real implementation, we'd fetch from the database
-      // For now, we'll mock the industry_type in our results
-      setTimeout(() => {
-        const mockData: Plan[] = [
-          {
-            id: '1',
-            app_name: 'Decora OnlyFans Suite',
-            company_name: 'Decora Agency',
-            username: 'decora',
-            estimated_cost: 4997,
-            estimated_days: 14,
-            features: ['Content Management', 'Analytics Dashboard', 'Client Portal'],
-            status: 'completed',
-            created_at: '2024-03-01T12:00:00Z',
-            industry_type: 'onlyfans-management'
-          },
-          {
-            id: '2',
-            app_name: 'SocialBoost Marketing Hub',
-            company_name: 'SocialBoost Media',
-            username: 'socialboost',
-            estimated_cost: 3997,
-            estimated_days: 21,
-            features: ['Campaign Management', 'Analytics', 'Client Reporting'],
-            status: 'in_progress',
-            created_at: '2024-03-15T12:00:00Z',
-            industry_type: 'digital-marketing'
-          },
-          {
-            id: '3',
-            app_name: 'ContentFlow Studio',
-            company_name: 'ContentFlow Agency',
-            username: 'contentflow',
-            estimated_cost: 2997,
-            estimated_days: 10,
-            features: ['Editorial Calendar', 'Asset Management', 'Publishing Tools'],
-            status: 'pending',
-            created_at: '2024-04-01T12:00:00Z',
-            industry_type: 'content-marketing'
-          },
-          {
-            id: '4',
-            app_name: 'CreatorPro Portal',
-            company_name: 'Stellar Creators',
-            username: 'stellarcreators',
-            estimated_cost: 4500,
-            estimated_days: 16,
-            features: ['Content Management', 'Collaboration Tools', 'Analytics'],
-            status: 'in_progress',
-            created_at: '2024-03-25T12:00:00Z',
-            industry_type: 'onlyfans-management'
-          },
-          {
-            id: '5',
-            app_name: 'LeadGen Pro',
-            company_name: 'LeadGen Solutions',
-            username: 'leadgen',
-            estimated_cost: 3750,
-            estimated_days: 14,
-            features: ['Lead Capture', 'CRM Integration', 'Analytics'],
-            status: 'pending',
-            created_at: '2024-04-10T12:00:00Z',
-            industry_type: 'lead-generation'
-          }
-        ];
+      const { data, error } = await supabase
+        .from('plans')
+        .select('*')
+        .order('created_at', { ascending: false });
         
-        setPlans(mockData);
-        setFilteredPlans(mockData);
-        setIsLoading(false);
-      }, 500);
+      if (error) {
+        throw error;
+      }
+      
+      if (data) {
+        setPlans(data);
+        setFilteredPlans(data);
+      }
+      
+      setIsLoading(false);
     } catch (error) {
       console.error('Error fetching plans:', error);
       toast({
@@ -293,6 +250,73 @@ const AdminPlans = () => {
         variant: 'destructive',
       });
       setIsLoading(false);
+      
+      // Fallback to mock data if fetch fails
+      const mockData: Plan[] = [
+        {
+          id: '1',
+          app_name: 'Decora OnlyFans Suite',
+          company_name: 'Decora Agency',
+          username: 'decora',
+          estimated_cost: 4997,
+          estimated_days: 14,
+          features: ['Content Management', 'Analytics Dashboard', 'Client Portal'],
+          status: 'completed',
+          created_at: '2024-03-01T12:00:00Z',
+          industry_type: 'onlyfans-management'
+        },
+        {
+          id: '2',
+          app_name: 'SocialBoost Marketing Hub',
+          company_name: 'SocialBoost Media',
+          username: 'socialboost',
+          estimated_cost: 3997,
+          estimated_days: 21,
+          features: ['Campaign Management', 'Analytics', 'Client Reporting'],
+          status: 'in_progress',
+          created_at: '2024-03-15T12:00:00Z',
+          industry_type: 'digital-marketing'
+        },
+        {
+          id: '3',
+          app_name: 'ContentFlow Studio',
+          company_name: 'ContentFlow Agency',
+          username: 'contentflow',
+          estimated_cost: 2997,
+          estimated_days: 10,
+          features: ['Editorial Calendar', 'Asset Management', 'Publishing Tools'],
+          status: 'pending',
+          created_at: '2024-04-01T12:00:00Z',
+          industry_type: 'content-marketing'
+        },
+        {
+          id: '4',
+          app_name: 'CreatorPro Portal',
+          company_name: 'Stellar Creators',
+          username: 'stellarcreators',
+          estimated_cost: 4500,
+          estimated_days: 16,
+          features: ['Content Management', 'Collaboration Tools', 'Analytics'],
+          status: 'in_progress',
+          created_at: '2024-03-25T12:00:00Z',
+          industry_type: 'onlyfans-management'
+        },
+        {
+          id: '5',
+          app_name: 'LeadGen Pro',
+          company_name: 'LeadGen Solutions',
+          username: 'leadgen',
+          estimated_cost: 3750,
+          estimated_days: 14,
+          features: ['Lead Capture', 'CRM Integration', 'Analytics'],
+          status: 'pending',
+          created_at: '2024-04-10T12:00:00Z',
+          industry_type: 'lead-generation'
+        }
+      ];
+      
+      setPlans(mockData);
+      setFilteredPlans(mockData);
     }
   };
   
@@ -308,15 +332,46 @@ const AdminPlans = () => {
     setIsDetailOpen(true);
   };
   
-  const handleViewPlan = () => {
-    navigate('/decora-plan', { replace: true });
+  const handleViewPlan = (username: string) => {
+    navigate(`/plan/${username}`, { replace: true });
   };
   
-  const handleViewPlanFromDetails = () => {
-    setIsDetailOpen(false);
-    navigate('/decora-plan', { replace: true });
+  const handleEditPlan = (plan: Plan) => {
+    setEditingPlan(plan);
+    setIsEditPlanOpen(true);
   };
-
+  
+  const handleDeletePlan = async (planId: string) => {
+    try {
+      const { error } = await supabase
+        .from('plans')
+        .delete()
+        .eq('id', planId);
+        
+      if (error) {
+        throw error;
+      }
+      
+      toast({
+        title: "Plan Deleted",
+        description: "The plan has been successfully deleted",
+      });
+      
+      fetchPlans();
+    } catch (error) {
+      console.error('Error deleting plan:', error);
+      toast({
+        title: "Error Deleting Plan",
+        description: "There was a problem deleting the plan",
+        variant: "destructive"
+      });
+    }
+  };
+  
+  const handleCreateNewPlan = () => {
+    setIsCreatePlanOpen(true);
+  };
+  
   const handleIndustrySelect = (industry: string | null) => {
     setSelectedIndustry(industry);
     setCurrentPage(1);
@@ -355,13 +410,6 @@ const AdminPlans = () => {
   
   const getIndustryClientCount = (industrySlug: string) => {
     return plans.filter(plan => plan.industry_type === industrySlug).length;
-  };
-
-  const handleCreateNewPlan = () => {
-    toast({
-      title: "Feature Coming Soon",
-      description: "The ability to create new plans will be available soon.",
-    });
   };
 
   const handleCreateNewIndustryTemplate = () => {
@@ -415,6 +463,14 @@ const AdminPlans = () => {
             >
               <Download className="h-4 w-4" />
               Export
+            </Button>
+            
+            <Button
+              onClick={handleCreateNewPlan}
+              variant="default"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              New Plan
             </Button>
           </div>
         </div>
@@ -611,7 +667,7 @@ const AdminPlans = () => {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={handleViewPlan}
+                                onClick={() => handleViewPlan(plan.username)}
                                 className="h-8 px-2"
                               >
                                 <ExternalLink className="h-4 w-4 mr-1" />
@@ -837,13 +893,106 @@ const AdminPlans = () => {
                   <Button variant="outline" onClick={() => setIsDetailOpen(false)}>
                     Close
                   </Button>
-                  <Button onClick={handleViewPlanFromDetails} className="flex items-center gap-2">
+                  
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setIsDetailOpen(false);
+                      handleEditPlan(selectedPlan);
+                    }}
+                  >
+                    <PencilLine className="h-4 w-4 mr-2" />
+                    Edit
+                  </Button>
+                  
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive">
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will permanently delete the plan
+                          for {selectedPlan.company_name || selectedPlan.username}.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={() => {
+                            handleDeletePlan(selectedPlan.id);
+                            setIsDetailOpen(false);
+                          }}
+                          className="bg-destructive text-destructive-foreground"
+                        >
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                  
+                  <Button onClick={() => handleViewPlan(selectedPlan.username)} className="flex items-center gap-2">
                     <ExternalLink className="h-4 w-4" />
                     View Plan
                   </Button>
                 </div>
               </div>
             </div>
+          )}
+        </DialogContent>
+      </Dialog>
+      
+      {/* Create Plan Dialog */}
+      <Dialog open={isCreatePlanOpen} onOpenChange={setIsCreatePlanOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Create New Plan</DialogTitle>
+            <DialogDescription>
+              Create a new plan for a company
+            </DialogDescription>
+          </DialogHeader>
+          <PlanForm 
+            mode="create"
+            onSuccess={() => {
+              setIsCreatePlanOpen(false);
+              fetchPlans();
+            }}
+          />
+        </DialogContent>
+      </Dialog>
+      
+      {/* Edit Plan Dialog */}
+      <Dialog open={isEditPlanOpen} onOpenChange={setIsEditPlanOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Plan</DialogTitle>
+            <DialogDescription>
+              Update the plan details
+            </DialogDescription>
+          </DialogHeader>
+          {editingPlan && (
+            <PlanForm 
+              mode="edit"
+              initialData={{
+                id: editingPlan.id,
+                username: editingPlan.username,
+                company_name: editingPlan.company_name || '',
+                app_name: editingPlan.app_name || '',
+                industry_type: editingPlan.industry_type || 'onlyfans-management',
+                estimated_cost: editingPlan.estimated_cost,
+                estimated_days: editingPlan.estimated_days,
+                primary_color: editingPlan.branding?.primary_color || '#3182CE',
+                secondary_color: editingPlan.branding?.secondary_color || '#805AD5',
+              }}
+              onSuccess={() => {
+                setIsEditPlanOpen(false);
+                fetchPlans();
+              }}
+            />
           )}
         </DialogContent>
       </Dialog>

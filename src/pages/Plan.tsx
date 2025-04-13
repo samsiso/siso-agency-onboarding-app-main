@@ -1,9 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { supabase } from '@/integrations/supabase/client';
-import { Button } from '@/components/ui/button';
-import { GradientHeading } from '@/components/ui/gradient-heading';
 import { 
   CheckCircle, 
   Loader2, 
@@ -36,6 +33,9 @@ import { InteractiveCallout } from '@/components/plan/InteractiveCallout';
 import { EnhancedNextSteps } from '@/components/plan/EnhancedNextSteps';
 import { caseStudies } from '@/data/plan/featureData';
 import { ImplementationPlan } from '@/components/plan/ImplementationPlan';
+import { usePlanData, PlanDataType } from '@/hooks/usePlanData';
+import { Button } from '@/components/ui/button';
+import { GradientHeading } from '@/components/ui/gradient-heading';
 
 // Mapping of agency-specific URLs to industry types
 const AGENCY_TO_INDUSTRY_MAP: Record<string, string> = {
@@ -44,28 +44,11 @@ const AGENCY_TO_INDUSTRY_MAP: Record<string, string> = {
   // Add more mappings as needed
 };
 
-interface PlanData {
-  id: string;
-  username: string;
-  company_name: string | null;
-  app_name: string | null;
-  features: string[] | null;
-  branding: {
-    logo?: string;
-    primary_color?: string;
-    secondary_color?: string;
-  } | null;
-  estimated_cost: number | null;
-  estimated_days: number | null;
-  status: string | null;
-}
-
 const Plan = () => {
   const { username } = useParams<{ username: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [loading, setLoading] = useState(true);
-  const [planData, setPlanData] = useState<PlanData | null>(null);
+  const { loading, planData, error } = usePlanData(username);
   const [selectedColor, setSelectedColor] = useState('#3182CE');
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
@@ -80,46 +63,16 @@ const Plan = () => {
   const mainContentRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
-    const fetchPlanData = async () => {
-      try {
-        if (!username) return;
-        
-        setLoading(true);
-        
-        setTimeout(() => {
-          const mockData: PlanData = {
-            id: '123',
-            username: username,
-            company_name: username === 'decora' ? 'Decora Agency' : 'Siso Agency',
-            app_name: 'OnlyFans Management Suite',
-            features: ['Content Management', 'Analytics Dashboard', 'Client Portal', 'Messaging System'],
-            branding: {
-              primary_color: '#3182CE',
-              secondary_color: '#805AD5'
-            },
-            estimated_cost: 4997,
-            estimated_days: 14,
-            status: 'draft'
-          };
-          
-          setPlanData(mockData);
-          setSelectedColor(mockData.branding?.primary_color || '#3182CE');
-          setLoading(false);
-        }, 1500);
-        
-      } catch (error) {
-        console.error('Error fetching plan data:', error);
-        toast({
-          title: "Error loading plan",
-          description: "Could not load the plan data. Please try again.",
-          variant: "destructive"
-        });
-        setLoading(false);
+    if (planData) {
+      setSelectedColor(planData.branding?.primary_color || '#3182CE');
+      if (planData.estimated_days) {
+        setTotalTime(planData.estimated_days);
       }
-    };
-    
-    fetchPlanData();
-  }, [username, toast]);
+      if (planData.estimated_cost) {
+        setTotalPrice(planData.estimated_cost);
+      }
+    }
+  }, [planData]);
   
   const handlePainPointClick = (painPoint: PainPointDetailProps) => {
     setSelectedPainPoint(painPoint);
@@ -163,18 +116,43 @@ const Plan = () => {
     }, 100);
   };
   
-  const handleApprovePlan = () => {
+  const handleApprovePlan = async () => {
     setIsSubmitting(true);
     
-    setTimeout(() => {
+    try {
+      if (username && planData) {
+        // Update the plan status in the database
+        const { error } = await supabase
+          .from('plans')
+          .update({ 
+            status: 'approved',
+            features: selectedFeatures
+          })
+          .eq('username', username);
+          
+        if (error) {
+          throw error;
+        }
+      }
+      
       toast({
         title: "Plan Approved!",
         description: "Your selections have been saved. We'll contact you shortly to begin implementation.",
       });
-      setIsSubmitting(false);
       
-      navigate('/dashboard');
-    }, 2000);
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 1000);
+    } catch (error) {
+      console.error('Error approving plan:', error);
+      toast({
+        title: "Error Approving Plan",
+        description: "There was a problem saving your plan. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   
   if (loading) {
@@ -189,7 +167,7 @@ const Plan = () => {
     );
   }
   
-  if (!planData) {
+  if (error || !planData) {
     return (
       <div className="flex min-h-screen w-full flex-col items-center justify-center bg-gradient-to-b from-black via-siso-bg to-black p-4 md:p-8">
         <div className="text-center">
@@ -204,7 +182,8 @@ const Plan = () => {
   }
   
   // Get the industry type for the current agency
-  const industryType = username ? AGENCY_TO_INDUSTRY_MAP[username] || AGENCY_TO_INDUSTRY_MAP.default : 'onlyfans-management';
+  const industryType = planData.industry_type || 
+    (username ? AGENCY_TO_INDUSTRY_MAP[username] || AGENCY_TO_INDUSTRY_MAP.default : 'onlyfans-management');
   
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-black via-siso-bg to-black p-4 md:p-8">

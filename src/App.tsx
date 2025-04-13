@@ -1,4 +1,3 @@
-
 import { Routes, Route } from 'react-router-dom';
 import Index from './pages/Index';
 import Auth from './pages/Auth';
@@ -6,8 +5,8 @@ import Profile from './pages/Profile';
 import OnboardingSocial from './pages/onboarding/social';
 import { Toaster } from '@/components/ui/toaster';
 import OnboardingChat from '@/pages/OnboardingChat';
-import ThankYou from '@/pages/ThankYou';
-import ThankYouPlan from '@/pages/ThankYouPlan';
+import ThankYou from './pages/ThankYou';
+import ThankYouPlan from './pages/ThankYouPlan';
 import Plan from './pages/Plan';
 import DecoraPlan from './pages/DecoraPlan';
 import Congratulations from './pages/onboarding/congratulations';
@@ -35,8 +34,10 @@ function App() {
         <Route path="/plan/:username" element={<Plan />} />
         <Route path="/decora-plan" element={<DecoraPlan />} />
         
-        {/* Admin routes */}
+        {/* Admin routes - we're keeping these unprotected for now */}
         <Route path="/admin/plans" element={<AdminPlans />} />
+        <Route path="/admin/plans/create" element={<AdminPlans />} />
+        <Route path="/admin/plans/:planId/edit" element={<AdminPlans />} />
         
         {/* Protected routes */}
         <Route path="/profile" element={<AuthGuard><Profile /></AuthGuard>} />
@@ -45,6 +46,7 @@ function App() {
         
         {/* Protected Dashboard Routes */}
         <Route path="/home" element={<AuthGuard><Home /></AuthGuard>} />
+        <Route path="/dashboard" element={<AuthGuard><Home /></AuthGuard>} />
         
         {/* Protected Project Routes */}
         <Route path="/plan-builder" element={<AuthGuard><Home /></AuthGuard>} />
