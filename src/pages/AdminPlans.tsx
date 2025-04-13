@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '@/components/assistants/layout/MainLayout';
@@ -447,12 +446,12 @@ const AdminPlans = () => {
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2">
                       <Filter className="h-4 w-4 text-muted-foreground" />
-                      <Select value={selectedIndustry || ''} onValueChange={(value) => handleIndustrySelect(value || null)}>
+                      <Select value={selectedIndustry || 'all'} onValueChange={(value) => handleIndustrySelect(value === 'all' ? null : value)}>
                         <SelectTrigger className="w-[180px]">
                           <SelectValue placeholder="All Industries" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">All Industries</SelectItem>
+                          <SelectItem value="all">All Industries</SelectItem>
                           {industryTemplates.map((industry) => (
                             <SelectItem key={industry.id} value={industry.slug}>{industry.name}</SelectItem>
                           ))}
