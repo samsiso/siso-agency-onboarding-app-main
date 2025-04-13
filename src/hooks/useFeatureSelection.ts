@@ -2,6 +2,11 @@
 import { useState, useCallback } from 'react';
 import { FeatureCategory } from '@/models/plan/features';
 
+export interface CustomFeature {
+  name: string;
+  description: string;
+}
+
 export function useFeatureSelection(
   modelFacingCategories: FeatureCategory[],
   agencyFacingCategories: FeatureCategory[],
@@ -9,6 +14,9 @@ export function useFeatureSelection(
 ) {
   // State for selected features
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
+  
+  // State for custom features
+  const [customFeaturesList, setCustomFeaturesList] = useState<CustomFeature[]>([]);
   
   // Function to select recommended features
   const handleSelectRecommended = useCallback(() => {
@@ -41,6 +49,19 @@ export function useFeatureSelection(
         : [...prev, featureName]
     );
   }, []);
+  
+  // Add a custom feature
+  const addCustomFeature = useCallback((name: string, description: string) => {
+    setCustomFeaturesList(prev => [...prev, { name, description }]);
+    setSelectedFeatures(prev => [...prev, `Custom: ${name}`]);
+  }, []);
+  
+  // Remove a custom feature
+  const removeCustomFeature = useCallback((index: number) => {
+    const featureToRemove = customFeaturesList[index];
+    setCustomFeaturesList(prev => prev.filter((_, i) => i !== index));
+    setSelectedFeatures(prev => prev.filter(f => f !== `Custom: ${featureToRemove.name}`));
+  }, [customFeaturesList]);
   
   // Find a feature by name in all categories
   const findFeatureById = useCallback((featureId: string) => {
@@ -78,6 +99,9 @@ export function useFeatureSelection(
     handleSelectRecommended,
     toggleFeature,
     findFeatureById,
-    findFeatureByName
+    findFeatureByName,
+    customFeaturesList,
+    addCustomFeature,
+    removeCustomFeature
   };
 }

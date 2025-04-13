@@ -1,16 +1,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { 
-  CheckCircle, 
-  Clock, 
-  DollarSign, 
-  Calendar, 
-  Users, 
-  MessageSquare,
-  FileText,
-  BarChart
-} from 'lucide-react';
+import { Clock, Gauge, DollarSign, CheckCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface PlanReviewSummaryProps {
@@ -21,93 +12,125 @@ interface PlanReviewSummaryProps {
   isSubmitting: boolean;
 }
 
-export const PlanReviewSummary = ({
+export const PlanReviewSummary: React.FC<PlanReviewSummaryProps> = ({
   selectedFeatures,
   timeline,
   totalCost,
   onApprove,
   isSubmitting
-}: PlanReviewSummaryProps) => {
-  const featureIcons: Record<string, React.ReactNode> = {
-    'Client Management': <Users className="h-5 w-5 text-siso-orange" />,
-    'Content Management': <FileText className="h-5 w-5 text-siso-orange" />,
-    'Communication Tools': <MessageSquare className="h-5 w-5 text-siso-orange" />,
-    'Analytics & Financials': <BarChart className="h-5 w-5 text-siso-orange" />
-  };
-  
+}) => {
+  // Separate regular features from custom features
+  const customFeatures = selectedFeatures.filter(feature => feature.startsWith('Custom:'));
+  const standardFeatures = selectedFeatures.filter(feature => !feature.startsWith('Custom:'));
+
   return (
-    <div className="bg-black/20 border border-siso-orange/20 rounded-lg p-6">
-      <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-        <CheckCircle className="h-5 w-5 text-siso-orange" />
-        Plan Summary
-      </h3>
+    <div className="bg-black/30 border border-siso-text/10 rounded-lg p-6 backdrop-blur-md">
+      <h3 className="text-xl font-bold text-white mb-4">Your Plan Summary</h3>
       
-      <div className="space-y-6 mb-6">
-        <div>
-          <h4 className="text-white font-medium mb-2">Selected Features</h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {selectedFeatures.map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="flex items-center gap-2 bg-black/30 p-3 rounded-lg border border-siso-text/10"
-              >
-                {featureIcons[feature] || <CheckCircle className="h-5 w-5 text-siso-orange" />}
-                <span className="text-siso-text">{feature}</span>
-              </motion.div>
-            ))}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-black/20 border border-siso-text/10 rounded-lg p-4 flex flex-col"
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <Gauge className="h-5 w-5 text-siso-orange" />
+            <h4 className="text-lg font-semibold text-white">Selected Features</h4>
           </div>
-        </div>
+          <p className="text-3xl font-bold text-siso-orange">{selectedFeatures.length}</p>
+          <p className="text-sm text-siso-text mt-1">Features included in your plan</p>
+        </motion.div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div className="bg-black/30 p-3 rounded-lg border border-siso-text/10">
-            <div className="flex items-center gap-2 mb-1">
-              <Clock className="h-5 w-5 text-siso-orange" />
-              <h4 className="text-white font-medium">Timeline</h4>
-            </div>
-            <p className="text-siso-text">{timeline} days to launch</p>
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="bg-black/20 border border-siso-text/10 rounded-lg p-4 flex flex-col"
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <Clock className="h-5 w-5 text-siso-orange" />
+            <h4 className="text-lg font-semibold text-white">Timeline</h4>
           </div>
-          
-          <div className="bg-black/30 p-3 rounded-lg border border-siso-text/10">
-            <div className="flex items-center gap-2 mb-1">
-              <DollarSign className="h-5 w-5 text-siso-orange" />
-              <h4 className="text-white font-medium">Investment</h4>
-            </div>
-            <p className="text-siso-text">£{totalCost}</p>
-          </div>
-        </div>
+          <p className="text-3xl font-bold text-siso-orange">{timeline} days</p>
+          <p className="text-sm text-siso-text mt-1">Time to launch your platform</p>
+        </motion.div>
         
-        <div className="bg-siso-orange/10 border border-siso-orange/20 rounded-lg p-4">
-          <h4 className="text-white font-medium flex items-center gap-2 mb-2">
-            <Calendar className="h-4 w-4 text-siso-orange" />
-            Next Steps After Approval
-          </h4>
-          <ol className="space-y-2 text-sm text-siso-text">
-            <li className="flex items-start gap-2">
-              <span className="bg-siso-orange/20 text-siso-orange rounded-full h-5 w-5 flex items-center justify-center shrink-0 mt-0.5">1</span>
-              <span>Kickoff meeting with your dedicated project manager</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="bg-siso-orange/20 text-siso-orange rounded-full h-5 w-5 flex items-center justify-center shrink-0 mt-0.5">2</span>
-              <span>Detailed requirements gathering and design approval</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="bg-siso-orange/20 text-siso-orange rounded-full h-5 w-5 flex items-center justify-center shrink-0 mt-0.5">3</span>
-              <span>Development begins with weekly progress updates</span>
-            </li>
-          </ol>
-        </div>
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="bg-black/20 border border-siso-text/10 rounded-lg p-4 flex flex-col"
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <DollarSign className="h-5 w-5 text-siso-orange" />
+            <h4 className="text-lg font-semibold text-white">Total Investment</h4>
+          </div>
+          <p className="text-3xl font-bold text-siso-orange">${totalCost.toLocaleString()}</p>
+          <p className="text-sm text-siso-text mt-1">Base price for selected features</p>
+        </motion.div>
       </div>
       
-      <Button
-        onClick={onApprove}
-        disabled={isSubmitting}
-        className="w-full bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-white"
-      >
-        {isSubmitting ? 'Processing...' : 'Approve Plan & Begin Onboarding'}
-      </Button>
+      <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="bg-black/20 border border-siso-text/10 rounded-lg p-4"
+        >
+          <h4 className="text-lg font-semibold text-white mb-3">Standard Features</h4>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {standardFeatures.map((feature, index) => (
+              <div key={index} className="flex items-center gap-2 bg-black/20 rounded px-3 py-2">
+                <CheckCircle className="h-4 w-4 text-siso-orange flex-shrink-0" />
+                <span className="text-sm text-siso-text">{feature}</span>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {customFeatures.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="bg-black/20 border border-siso-text/10 rounded-lg p-4"
+          >
+            <h4 className="text-lg font-semibold text-white mb-3">Custom Features</h4>
+            <div className="space-y-2">
+              {customFeatures.map((feature, index) => (
+                <div key={index} className="bg-gradient-to-r from-siso-orange/10 to-siso-red/10 border border-siso-orange/20 rounded px-3 py-2">
+                  <span className="text-sm text-white">{feature.replace('Custom: ', '')}</span>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-siso-text mt-3">
+              Custom features will be reviewed by our team and may affect final pricing and timeline.
+            </p>
+          </motion.div>
+        )}
+      </div>
+      
+      <div className="mt-6 flex justify-end">
+        <Button 
+          onClick={onApprove}
+          disabled={isSubmitting}
+          className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 px-6"
+          size="lg"
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Processing...
+            </>
+          ) : (
+            <>
+              <CheckCircle className="mr-2 h-4 w-4" />
+              Approve Plan
+            </>
+          )}
+        </Button>
+      </div>
     </div>
   );
 };

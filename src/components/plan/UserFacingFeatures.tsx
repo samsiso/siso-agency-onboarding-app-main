@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Users, Building, CheckCircle, ArrowRight } from 'lucide-react';
+import { Users, Building, CheckCircle, ArrowRight, Plus, Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -10,6 +10,7 @@ import { FeatureDetailDialog } from './features/FeatureDetailDialog';
 import { FeatureTierBreakdown } from './features/FeatureTierBreakdown';
 import { FeatureInstructions } from './features/FeatureInstructions';
 import { QuickSummaryFeatures } from './features/QuickSummaryFeatures';
+import { CustomFeatureInput } from './features/CustomFeatureInput';
 import { useFeatureSelection } from '@/hooks/useFeatureSelection';
 import { useFeatureDetail } from '@/hooks/useFeatureDetail';
 
@@ -29,12 +30,16 @@ export const UserFacingFeatures: React.FC<UserFacingFeaturesProps> = ({
   onCustomize
 }) => {
   const [activeTab, setActiveTab] = useState('both');
+  const [customFeatures, setCustomFeatures] = useState<Array<{ name: string; description: string }>>([]);
   
   const { 
     selectedFeatures,
     setSelectedFeatures,
     handleSelectRecommended,
-    toggleFeature 
+    toggleFeature,
+    addCustomFeature,
+    removeCustomFeature,
+    customFeaturesList
   } = useFeatureSelection(
     modelFacingCategories,
     agencyFacingCategories,
@@ -59,6 +64,19 @@ export const UserFacingFeatures: React.FC<UserFacingFeaturesProps> = ({
     // We don't notify parent yet as this is just selection
   };
   
+  const handleAddCustomFeature = (name: string, description: string) => {
+    const newCustomFeatures = [...customFeatures, { name, description }];
+    setCustomFeatures(newCustomFeatures);
+    addCustomFeature(name, description);
+  };
+  
+  const handleRemoveCustomFeature = (index: number) => {
+    const updatedCustomFeatures = [...customFeatures];
+    updatedCustomFeatures.splice(index, 1);
+    setCustomFeatures(updatedCustomFeatures);
+    removeCustomFeature(index);
+  };
+  
   return (
     <TooltipProvider>
       <div className="space-y-6">
@@ -70,7 +88,7 @@ export const UserFacingFeatures: React.FC<UserFacingFeaturesProps> = ({
             The MVP tier includes essential features to get you started immediately.
           </p>
 
-          {/* Quick Summary Features - New Component */}
+          {/* Quick Summary Features */}
           <QuickSummaryFeatures 
             modelFacingCategories={modelFacingCategories}
             agencyFacingCategories={agencyFacingCategories}
@@ -92,6 +110,10 @@ export const UserFacingFeatures: React.FC<UserFacingFeaturesProps> = ({
               <TabsTrigger value="agency" className="data-[state=active]:bg-siso-orange data-[state=active]:text-white">
                 <Building className="h-4 w-4 mr-2" />
                 Agency-Facing
+              </TabsTrigger>
+              <TabsTrigger value="custom" className="data-[state=active]:bg-siso-orange data-[state=active]:text-white">
+                <Edit className="h-4 w-4 mr-2" />
+                Custom Features
               </TabsTrigger>
             </TabsList>
           
@@ -177,6 +199,43 @@ export const UserFacingFeatures: React.FC<UserFacingFeaturesProps> = ({
                     onShowDetail={(feature) => handleShowFeatureDetail(feature, category.name)}
                   />
                 ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="custom" className="mt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto">
+                <div className="col-span-1 md:col-span-2 lg:col-span-1">
+                  <CustomFeatureInput 
+                    onAddFeature={handleAddCustomFeature}
+                    onRemoveFeature={handleRemoveCustomFeature}
+                    customFeatures={customFeatures}
+                  />
+                </div>
+                <div className="col-span-1 md:col-span-2 lg:col-span-1 bg-black/20 rounded-lg border border-siso-text/10 p-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="p-2 rounded-full bg-siso-orange/20">
+                      <Plus className="h-5 w-5 text-siso-orange" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white">Why Add Custom Features?</h3>
+                  </div>
+                  
+                  <div className="space-y-4 text-siso-text">
+                    <p>
+                      Need something specific for your business that isn't in our standard features? 
+                      Add it here and our team will evaluate if it can be included in your platform.
+                    </p>
+                    
+                    <div className="bg-black/30 rounded-lg p-3 border border-siso-text/10">
+                      <h4 className="text-white font-medium mb-2">What happens next?</h4>
+                      <ul className="list-disc list-inside space-y-1 text-sm">
+                        <li>We'll review each custom feature request</li>
+                        <li>Our team will reach out to discuss implementation details</li>
+                        <li>We'll provide a timeline and cost estimate if needed</li>
+                        <li>Approved features will be added to your implementation plan</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
               </div>
             </TabsContent>
           </Tabs>
