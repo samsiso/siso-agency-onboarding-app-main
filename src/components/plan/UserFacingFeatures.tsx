@@ -1,13 +1,14 @@
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Users, Building, CheckCircle, Info, ArrowRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Users, Building, CheckCircle, Info, ArrowRight, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { FeatureCategory } from '@/models/plan/features';
 import { cn } from '@/lib/utils';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface UserFacingFeaturesProps {
   modelFacingCategories: FeatureCategory[];
@@ -15,6 +16,18 @@ interface UserFacingFeaturesProps {
   sharedFeatureCategories: FeatureCategory[];
   onFeatureSelect: (selectedFeatures: string[]) => void;
   onCustomize: () => void;
+}
+
+interface FeatureDetailProps {
+  id: string;
+  name: string;
+  description: string;
+  tier: 'mvp' | 'advanced' | 'premium';
+  recommended?: boolean;
+  category: string;
+  categoryName?: string;
+  timeEstimate?: number;
+  roi?: string;
 }
 
 export const UserFacingFeatures: React.FC<UserFacingFeaturesProps> = ({
@@ -25,6 +38,8 @@ export const UserFacingFeatures: React.FC<UserFacingFeaturesProps> = ({
   onCustomize
 }) => {
   const [activeTab, setActiveTab] = useState('both');
+  const [featureDetail, setFeatureDetail] = useState<FeatureDetailProps | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
   
   const handleSelectRecommended = () => {
     const recommendedFeatures: string[] = [];
@@ -56,6 +71,14 @@ export const UserFacingFeatures: React.FC<UserFacingFeaturesProps> = ({
     });
     
     return count;
+  };
+
+  const handleShowFeatureDetail = (feature: any, categoryName: string) => {
+    setFeatureDetail({
+      ...feature,
+      categoryName
+    });
+    setIsDetailOpen(true);
   };
   
   const mvpFeatureCount = countFeaturesByTier('mvp');
@@ -99,11 +122,12 @@ export const UserFacingFeatures: React.FC<UserFacingFeaturesProps> = ({
                     <h3 className="text-lg font-semibold text-white">Model-Facing Features</h3>
                   </div>
                   
-                  <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {modelFacingCategories.map((category) => (
                       <FeatureCategoryCard 
                         key={category.id} 
-                        category={category} 
+                        category={category}
+                        onShowDetail={(feature) => handleShowFeatureDetail(feature, category.name)}
                       />
                     ))}
                   </div>
@@ -118,11 +142,12 @@ export const UserFacingFeatures: React.FC<UserFacingFeaturesProps> = ({
                     <h3 className="text-lg font-semibold text-white">Agency-Facing Features</h3>
                   </div>
                   
-                  <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {agencyFacingCategories.map((category) => (
                       <FeatureCategoryCard 
                         key={category.id} 
-                        category={category} 
+                        category={category}
+                        onShowDetail={(feature) => handleShowFeatureDetail(feature, category.name)}
                       />
                     ))}
                   </div>
@@ -133,11 +158,12 @@ export const UserFacingFeatures: React.FC<UserFacingFeaturesProps> = ({
               {sharedFeatureCategories.length > 0 && (
                 <div className="mt-6">
                   <h3 className="text-lg font-semibold text-white mb-4">Shared Features</h3>
-                  <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {sharedFeatureCategories.map((category) => (
                       <FeatureCategoryCard 
                         key={category.id} 
-                        category={category} 
+                        category={category}
+                        onShowDetail={(feature) => handleShowFeatureDetail(feature, category.name)}
                       />
                     ))}
                   </div>
@@ -146,22 +172,24 @@ export const UserFacingFeatures: React.FC<UserFacingFeaturesProps> = ({
             </TabsContent>
             
             <TabsContent value="model" className="mt-0">
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {modelFacingCategories.map((category) => (
                   <FeatureCategoryCard 
                     key={category.id} 
-                    category={category} 
+                    category={category}
+                    onShowDetail={(feature) => handleShowFeatureDetail(feature, category.name)}
                   />
                 ))}
               </div>
             </TabsContent>
             
             <TabsContent value="agency" className="mt-0">
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {agencyFacingCategories.map((category) => (
                   <FeatureCategoryCard 
                     key={category.id} 
-                    category={category} 
+                    category={category}
+                    onShowDetail={(feature) => handleShowFeatureDetail(feature, category.name)}
                   />
                 ))}
               </div>
@@ -249,13 +277,73 @@ export const UserFacingFeatures: React.FC<UserFacingFeaturesProps> = ({
             </Button>
           </div>
         </div>
+
+        {/* Feature Detail Modal */}
+        <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
+          <DialogContent className="sm:max-w-lg">
+            <DialogHeader>
+              <DialogTitle>
+                {featureDetail?.name}
+                {featureDetail?.recommended && (
+                  <Badge className="ml-2 bg-siso-orange text-white">Recommended</Badge>
+                )}
+              </DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              <div className="flex justify-between items-start">
+                <div>
+                  <Badge 
+                    variant="outline" 
+                    className={cn(
+                      "mt-1 mr-2",
+                      featureDetail?.tier === 'mvp' && "bg-siso-orange/10 text-siso-orange border-siso-orange/20",
+                      featureDetail?.tier === 'advanced' && "bg-blue-500/10 text-blue-400 border-blue-400/20",
+                      featureDetail?.tier === 'premium' && "bg-purple-500/10 text-purple-400 border-purple-400/20"
+                    )}
+                  >
+                    {featureDetail?.tier === 'mvp' && 'MVP Tier'}
+                    {featureDetail?.tier === 'advanced' && 'Advanced Tier'}
+                    {featureDetail?.tier === 'premium' && 'Premium Tier'}
+                  </Badge>
+                  
+                  <Badge variant="outline" className="mt-1">
+                    {featureDetail?.categoryName}
+                  </Badge>
+                </div>
+
+                {featureDetail?.timeEstimate && featureDetail.timeEstimate > 0 && (
+                  <div className="text-sm text-siso-text flex items-center">
+                    <Clock className="h-4 w-4 mr-1 opacity-70" />
+                    <span>+{featureDetail.timeEstimate} {featureDetail.timeEstimate === 1 ? 'day' : 'days'}</span>
+                  </div>
+                )}
+              </div>
+              
+              <p className="text-siso-text">{featureDetail?.description}</p>
+              
+              {featureDetail?.roi && (
+                <div className="bg-siso-orange/10 border border-siso-orange/20 rounded-md p-4 mt-4">
+                  <h4 className="text-white font-medium mb-1 flex items-center gap-2">
+                    <Target className="h-4 w-4 text-siso-orange" />
+                    Business Impact
+                  </h4>
+                  <p className="text-sm text-siso-text">{featureDetail.roi}</p>
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </TooltipProvider>
   );
 };
 
 // Sub-component for feature category card
-const FeatureCategoryCard: React.FC<{ category: FeatureCategory }> = ({ category }) => {
+const FeatureCategoryCard: React.FC<{ 
+  category: FeatureCategory;
+  onShowDetail: (feature: any) => void;
+}> = ({ category, onShowDetail }) => {
   const mvpFeatures = category.features.filter(f => f.tier === 'mvp');
   const advancedFeatures = category.features.filter(f => f.tier === 'advanced');
   const premiumFeatures = category.features.filter(f => f.tier === 'premium');
@@ -265,9 +353,9 @@ const FeatureCategoryCard: React.FC<{ category: FeatureCategory }> = ({ category
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="border border-siso-text/10 rounded-lg bg-black/30 overflow-hidden"
+      className="border border-siso-text/10 rounded-lg bg-black/30 overflow-hidden h-full flex flex-col"
     >
-      <div className="p-4">
+      <div className="p-4 flex-grow">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="p-1.5 rounded-full bg-black/40">
@@ -291,32 +379,45 @@ const FeatureCategoryCard: React.FC<{ category: FeatureCategory }> = ({ category
           {mvpFeatures.map(feature => (
             <FeatureItem 
               key={feature.id} 
-              name={feature.name} 
+              name={feature.name}
               description={feature.description}
               tier="mvp"
               recommended={feature.recommended}
+              onClick={() => onShowDetail({...feature, category: category.id})}
             />
           ))}
           
-          {advancedFeatures.map(feature => (
-            <FeatureItem 
-              key={feature.id} 
-              name={feature.name} 
-              description={feature.description}
-              tier="advanced"
-              recommended={feature.recommended}
-            />
-          ))}
+          {advancedFeatures.length > 0 && (
+            <div className="mt-4 pt-3 border-t border-siso-text/10">
+              <span className="text-xs text-siso-text/70">Advanced Features:</span>
+              {advancedFeatures.map(feature => (
+                <FeatureItem 
+                  key={feature.id} 
+                  name={feature.name}
+                  description={feature.description}
+                  tier="advanced"
+                  recommended={feature.recommended}
+                  onClick={() => onShowDetail({...feature, category: category.id})}
+                />
+              ))}
+            </div>
+          )}
           
-          {premiumFeatures.map(feature => (
-            <FeatureItem 
-              key={feature.id} 
-              name={feature.name} 
-              description={feature.description}
-              tier="premium"
-              recommended={feature.recommended}
-            />
-          ))}
+          {premiumFeatures.length > 0 && (
+            <div className="mt-4 pt-3 border-t border-siso-text/10">
+              <span className="text-xs text-siso-text/70">Premium Features:</span>
+              {premiumFeatures.map(feature => (
+                <FeatureItem 
+                  key={feature.id} 
+                  name={feature.name}
+                  description={feature.description}
+                  tier="premium"
+                  recommended={feature.recommended}
+                  onClick={() => onShowDetail({...feature, category: category.id})}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </motion.div>
@@ -329,12 +430,18 @@ const FeatureItem: React.FC<{
   description: string;
   tier: 'mvp' | 'advanced' | 'premium';
   recommended?: boolean;
-}> = ({ name, description, tier, recommended }) => {
+  onClick: () => void;
+}> = ({ name, description, tier, recommended, onClick }) => {
   return (
-    <div className={cn(
-      "flex items-start gap-2 p-2 rounded-md",
-      tier === 'mvp' ? "bg-black/20" : "bg-black/10"
-    )}>
+    <motion.div 
+      className={cn(
+        "flex items-start gap-2 p-2 rounded-md cursor-pointer hover:bg-black/30 transition-colors",
+        tier === 'mvp' ? "bg-black/20" : "bg-black/10"
+      )}
+      onClick={onClick}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+    >
       <CheckCircle className={cn(
         "h-4 w-4 shrink-0 mt-0.5",
         tier === 'mvp' ? "text-siso-orange" : "text-siso-text/50"
@@ -370,19 +477,16 @@ const FeatureItem: React.FC<{
           )}
         </div>
         
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button className="text-xs text-siso-text flex items-center gap-1 mt-0.5">
-              <Info className="h-3 w-3" />
-              Details
-            </button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom">
-            <p className="max-w-xs text-sm">{description}</p>
-          </TooltipContent>
-        </Tooltip>
+        <div className="flex items-center mt-0.5">
+          <Button variant="link" className="text-xs text-siso-orange p-0 h-auto" onClick={(e) => {
+            e.stopPropagation();
+            onClick();
+          }}>
+            <Info className="h-3 w-3 mr-1" />
+            View Details
+          </Button>
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
-
