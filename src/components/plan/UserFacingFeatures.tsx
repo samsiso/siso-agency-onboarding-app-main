@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Building, CheckCircle, Info, ArrowRight, X, Clock, Target } from 'lucide-react';
@@ -111,10 +110,11 @@ export const UserFacingFeatures: React.FC<UserFacingFeaturesProps> = ({
               </TabsTrigger>
             </TabsList>
           
-            <TabsContent value="both" className="mt-0">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <TabsContent value="both" className="mt-4">
+              {/* Modified layout: 2 columns instead of 4 */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto">
                 {/* Model Features Column */}
-                <div>
+                <div className="space-y-6">
                   <div className="flex items-center gap-2 mb-4">
                     <div className="p-2 rounded-full bg-siso-orange/20">
                       <Users className="h-5 w-5 text-siso-orange" />
@@ -122,7 +122,7 @@ export const UserFacingFeatures: React.FC<UserFacingFeaturesProps> = ({
                     <h3 className="text-lg font-semibold text-white">Model-Facing Features</h3>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-6">
                     {modelFacingCategories.map((category) => (
                       <FeatureCategoryCard 
                         key={category.id} 
@@ -134,7 +134,7 @@ export const UserFacingFeatures: React.FC<UserFacingFeaturesProps> = ({
                 </div>
                 
                 {/* Agency Features Column */}
-                <div>
+                <div className="space-y-6">
                   <div className="flex items-center gap-2 mb-4">
                     <div className="p-2 rounded-full bg-siso-orange/20">
                       <Building className="h-5 w-5 text-siso-orange" />
@@ -142,7 +142,7 @@ export const UserFacingFeatures: React.FC<UserFacingFeaturesProps> = ({
                     <h3 className="text-lg font-semibold text-white">Agency-Facing Features</h3>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-6">
                     {agencyFacingCategories.map((category) => (
                       <FeatureCategoryCard 
                         key={category.id} 
@@ -156,9 +156,9 @@ export const UserFacingFeatures: React.FC<UserFacingFeaturesProps> = ({
               
               {/* Shared Features */}
               {sharedFeatureCategories.length > 0 && (
-                <div className="mt-6">
+                <div className="mt-8">
                   <h3 className="text-lg font-semibold text-white mb-4">Shared Features</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto">
                     {sharedFeatureCategories.map((category) => (
                       <FeatureCategoryCard 
                         key={category.id} 
@@ -171,8 +171,8 @@ export const UserFacingFeatures: React.FC<UserFacingFeaturesProps> = ({
               )}
             </TabsContent>
             
-            <TabsContent value="model" className="mt-0">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <TabsContent value="model" className="mt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto">
                 {modelFacingCategories.map((category) => (
                   <FeatureCategoryCard 
                     key={category.id} 
@@ -183,8 +183,8 @@ export const UserFacingFeatures: React.FC<UserFacingFeaturesProps> = ({
               </div>
             </TabsContent>
             
-            <TabsContent value="agency" className="mt-0">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <TabsContent value="agency" className="mt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto">
                 {agencyFacingCategories.map((category) => (
                   <FeatureCategoryCard 
                     key={category.id} 
@@ -355,10 +355,10 @@ const FeatureCategoryCard: React.FC<{
       transition={{ duration: 0.3 }}
       className="border border-siso-text/10 rounded-lg bg-black/30 overflow-hidden h-full flex flex-col"
     >
-      <div className="p-4 flex-grow">
+      <div className="p-5 flex-grow">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-full bg-black/40">
+            <div className="p-2 rounded-full bg-black/40">
               {category.icon}
             </div>
             <h4 className="font-medium text-white">{category.name}</h4>
@@ -372,10 +372,10 @@ const FeatureCategoryCard: React.FC<{
         </div>
         
         {category.description && (
-          <p className="text-sm text-siso-text mt-2">{category.description}</p>
+          <p className="text-sm text-siso-text mt-2 mb-4">{category.description}</p>
         )}
         
-        <div className="mt-3 space-y-2">
+        <div className="space-y-3">
           {mvpFeatures.map(feature => (
             <FeatureItem 
               key={feature.id} 
@@ -435,7 +435,7 @@ const FeatureItem: React.FC<{
   return (
     <motion.div 
       className={cn(
-        "flex items-start gap-2 p-2 rounded-md cursor-pointer hover:bg-black/30 transition-colors",
+        "flex items-start gap-3 p-3 rounded-md cursor-pointer hover:bg-black/30 transition-colors",
         tier === 'mvp' ? "bg-black/20" : "bg-black/10"
       )}
       onClick={onClick}
@@ -477,7 +477,9 @@ const FeatureItem: React.FC<{
           )}
         </div>
         
-        <div className="flex items-center mt-0.5">
+        <p className="text-xs text-siso-text mt-1">{description}</p>
+        
+        <div className="flex items-center mt-1">
           <Button variant="link" className="text-xs text-siso-orange p-0 h-auto" onClick={(e) => {
             e.stopPropagation();
             onClick();
