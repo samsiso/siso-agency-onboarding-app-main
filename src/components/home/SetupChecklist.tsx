@@ -138,7 +138,7 @@ export const SetupChecklist = () => {
   };
 
   return (
-    <div className="bg-black/30 border border-siso-text/10 rounded-lg p-6">
+    <div className="bg-black/30 border border-siso-text/10 rounded-lg p-6 hover:border-siso-orange/30 transition-all duration-300">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold text-white">Setup Checklist</h2>
         <div className="flex items-center gap-2">
@@ -155,7 +155,7 @@ export const SetupChecklist = () => {
         {/* Vertical line connecting the steps */}
         <div className="absolute left-[23px] top-10 bottom-10 w-0.5 bg-gradient-to-b from-siso-red/70 to-siso-orange/70 z-0"></div>
         
-        <div className="space-y-6">
+        <div className="space-y-4">
           {items.map((item, index) => (
             <div key={item.id} className="flex items-start gap-4 relative z-10">
               {/* Icon with gradient background */}
@@ -184,7 +184,7 @@ export const SetupChecklist = () => {
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-siso-text mb-3">
+                <p className="text-sm text-siso-text mb-2">
                   {item.description}
                 </p>
                 <Button

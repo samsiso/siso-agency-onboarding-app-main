@@ -1,3 +1,4 @@
+
 'use client';
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { motion, useSpring, useTransform } from 'framer-motion';
@@ -5,7 +6,7 @@ import { cn } from '@/lib/utils';
 
 export function Spotlight({
   className,
-  size = 200,
+  size = 250,
 }: {
   className?: string;
   size?: number;
@@ -59,9 +60,9 @@ export function Spotlight({
     <motion.div
       ref={containerRef}
       className={cn(
-        'pointer-events-none absolute rounded-full bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops),transparent_80%)] blur-xl transition-opacity duration-200',
+        'pointer-events-none absolute rounded-full bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops),transparent_80%)] blur-xl transition-opacity duration-500',
         'from-siso-red via-siso-orange to-yellow-500',
-        isHovered ? 'opacity-100' : 'opacity-0',
+        isHovered ? 'opacity-20' : 'opacity-0',
         className
       )}
       style={{
