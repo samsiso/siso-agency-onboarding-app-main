@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -18,6 +17,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { Copy, EyeIcon, Pencil, Plus, Send, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { BulkPlanCreation } from './BulkPlanCreation';
 
 // Define the exact interface to match what comes from Supabase
 interface PlanData {
@@ -221,110 +221,114 @@ export const PlansList = () => {
   };
 
   return (
-    <Card className="border-siso-text/10 bg-black/30">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>App Plans</CardTitle>
-        <Button onClick={handleCreatePlan} className="bg-gradient-to-r from-siso-red to-siso-orange">
-          <Plus className="h-4 w-4 mr-2" /> Create New Plan
-        </Button>
-      </CardHeader>
-      <CardContent>
-        <div className="mb-4">
-          <Input 
-            placeholder="Search plans..." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="bg-black/20 border-siso-text/20"
-          />
-        </div>
-        
-        <div className="rounded-md border border-siso-text/10 overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-black/40 hover:bg-black/50">
-                <TableHead>Username</TableHead>
-                <TableHead>Company</TableHead>
-                <TableHead>App</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {loading ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-10 text-siso-text">
-                    Loading plans...
-                  </TableCell>
+    <div className="space-y-6">
+      <BulkPlanCreation />
+      
+      <Card className="border-siso-text/10 bg-black/30">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>App Plans</CardTitle>
+          <Button onClick={handleCreatePlan} className="bg-gradient-to-r from-siso-red to-siso-orange">
+            <Plus className="h-4 w-4 mr-2" /> Create New Plan
+          </Button>
+        </CardHeader>
+        <CardContent>
+          <div className="mb-4">
+            <Input 
+              placeholder="Search plans..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="bg-black/20 border-siso-text/20"
+            />
+          </div>
+          
+          <div className="rounded-md border border-siso-text/10 overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-black/40 hover:bg-black/50">
+                  <TableHead>Username</TableHead>
+                  <TableHead>Company</TableHead>
+                  <TableHead>App</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Created</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ) : filteredPlans.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-10 text-siso-text">
-                    No plans found. Create your first app plan.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredPlans.map((plan) => (
-                  <TableRow key={plan.id} className="hover:bg-black/20">
-                    <TableCell className="font-medium">{plan.username}</TableCell>
-                    <TableCell>{plan.company_name || '-'}</TableCell>
-                    <TableCell>{plan.app_name || '-'}</TableCell>
-                    <TableCell>{getStatusBadge(plan.status)}</TableCell>
-                    <TableCell>{new Date(plan.created_at).toLocaleDateString()}</TableCell>
-                    <TableCell className="text-right flex justify-end gap-2">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleViewPlan(plan.username)}
-                        className="h-8 w-8 p-0"
-                        title="View Plan"
-                      >
-                        <EyeIcon className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleEditPlan(plan.id)}
-                        className="h-8 w-8 p-0"
-                        title="Edit Plan"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleCopyLink(plan.username)}
-                        className="h-8 w-8 p-0"
-                        title="Copy Link"
-                      >
-                        <Copy className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleDuplicatePlan(plan.id)}
-                        className="h-8 w-8 p-0"
-                        title="Duplicate"
-                      >
-                        <Copy className="h-4 w-4 text-blue-400" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleDeletePlan(plan.id)}
-                        className="h-8 w-8 p-0 hover:text-red-500"
-                        title="Delete Plan"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+              </TableHeader>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-10 text-siso-text">
+                      Loading plans...
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
+                ) : filteredPlans.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-10 text-siso-text">
+                      No plans found. Create your first app plan.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredPlans.map((plan) => (
+                    <TableRow key={plan.id} className="hover:bg-black/20">
+                      <TableCell className="font-medium">{plan.username}</TableCell>
+                      <TableCell>{plan.company_name || '-'}</TableCell>
+                      <TableCell>{plan.app_name || '-'}</TableCell>
+                      <TableCell>{getStatusBadge(plan.status)}</TableCell>
+                      <TableCell>{new Date(plan.created_at).toLocaleDateString()}</TableCell>
+                      <TableCell className="text-right flex justify-end gap-2">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleViewPlan(plan.username)}
+                          className="h-8 w-8 p-0"
+                          title="View Plan"
+                        >
+                          <EyeIcon className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleEditPlan(plan.id)}
+                          className="h-8 w-8 p-0"
+                          title="Edit Plan"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleCopyLink(plan.username)}
+                          className="h-8 w-8 p-0"
+                          title="Copy Link"
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleDuplicatePlan(plan.id)}
+                          className="h-8 w-8 p-0"
+                          title="Duplicate"
+                        >
+                          <Copy className="h-4 w-4 text-blue-400" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleDeletePlan(plan.id)}
+                          className="h-8 w-8 p-0 hover:text-red-500"
+                          title="Delete Plan"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };

@@ -137,6 +137,50 @@ export type Database = {
         }
         Relationships: []
       }
+      bulk_plan_creations: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          created_plans: number
+          failed_plans: number
+          id: string
+          status: string
+          template_id: string | null
+          total_plans: number
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          created_plans?: number
+          failed_plans?: number
+          id?: string
+          status?: string
+          template_id?: string | null
+          total_plans?: number
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          created_plans?: number
+          failed_plans?: number
+          id?: string
+          status?: string
+          template_id?: string | null
+          total_plans?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bulk_plan_creations_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "plan_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       case_studies: {
         Row: {
           agency_type_id: string | null
@@ -530,6 +574,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      plan_templates: {
+        Row: {
+          app_name: string | null
+          branding: Json | null
+          created_at: string
+          description: string | null
+          estimated_cost: number | null
+          estimated_days: number | null
+          features: string[] | null
+          id: string
+          industry_type: string
+          is_default: boolean | null
+          name: string
+        }
+        Insert: {
+          app_name?: string | null
+          branding?: Json | null
+          created_at?: string
+          description?: string | null
+          estimated_cost?: number | null
+          estimated_days?: number | null
+          features?: string[] | null
+          id?: string
+          industry_type: string
+          is_default?: boolean | null
+          name: string
+        }
+        Update: {
+          app_name?: string | null
+          branding?: Json | null
+          created_at?: string
+          description?: string | null
+          estimated_cost?: number | null
+          estimated_days?: number | null
+          features?: string[] | null
+          id?: string
+          industry_type?: string
+          is_default?: boolean | null
+          name?: string
+        }
+        Relationships: []
       }
       plan_views: {
         Row: {
