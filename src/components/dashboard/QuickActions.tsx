@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Plus, FileText, Bell, Users, PlanIcon } from "lucide-react";
+import { Plus, FileText, Bell, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export function QuickActions() {

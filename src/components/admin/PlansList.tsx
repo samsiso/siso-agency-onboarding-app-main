@@ -26,6 +26,7 @@ interface Plan {
   app_name: string | null;
   status: string | null;
   created_at: string;
+  industry_type?: string; // Add this optional property to fix the error
 }
 
 export const PlansList = () => {
