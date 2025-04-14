@@ -72,8 +72,11 @@ export const PlansList = () => {
         throw error;
       }
 
+      // Explicitly cast the data to PlanData[] before mapping
+      const supabaseData = (data || []) as PlanData[];
+      
       // Map the data to ensure all fields match our Plan interface
-      const typedPlans: Plan[] = (data || []).map(plan => ({
+      const typedPlans: Plan[] = supabaseData.map(plan => ({
         ...plan,
         industry_type: plan.industry_type || null // Ensure industry_type is always present
       }));
