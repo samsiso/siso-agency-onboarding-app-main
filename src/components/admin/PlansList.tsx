@@ -58,10 +58,10 @@ export const PlansList = () => {
       }
 
       // Map the data to ensure all fields match our Plan interface
-      const typedPlans = (data || []).map(plan => ({
+      const typedPlans = data?.map(plan => ({
         ...plan,
         industry_type: plan.industry_type || null // Ensure industry_type is always present
-      })) as Plan[];
+      })) as Plan[] || [];
 
       setPlans(typedPlans);
     } catch (error: any) {
@@ -119,7 +119,7 @@ export const PlansList = () => {
           features: planData.features,
           estimated_cost: planData.estimated_cost,
           estimated_days: planData.estimated_days,
-          industry_type: planData.industry_type
+          industry_type: planData.industry_type || null  // Ensure it's never undefined
         })
         .select();
 
