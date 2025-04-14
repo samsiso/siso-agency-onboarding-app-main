@@ -57,7 +57,13 @@ export const PlansList = () => {
         throw error;
       }
 
-      setPlans(data || []);
+      // Map the data to ensure all fields match our Plan interface
+      const typedPlans = (data || []).map(plan => ({
+        ...plan,
+        industry_type: plan.industry_type || null // Ensure industry_type is always present
+      })) as Plan[];
+
+      setPlans(typedPlans);
     } catch (error: any) {
       console.error('Error fetching plans:', error.message);
       toast({
