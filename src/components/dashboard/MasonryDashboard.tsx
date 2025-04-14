@@ -18,11 +18,12 @@ import {
   Users, 
   CreditCard, 
   Bot, 
-  BookOpen 
+  BookOpen,
+  ArrowDownIcon, 
+  ArrowUpIcon 
 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '../ui/button';
-import { ArrowDownIcon, ArrowUpIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export function MasonryDashboard() {
@@ -30,37 +31,65 @@ export function MasonryDashboard() {
   const [expandedTools, setExpandedTools] = useState(true);
 
   return (
-    <div className="space-y-8">
-      {/* Top Cards Row - Most Important Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-        <ClientsOverviewCard />
-        <ProjectsOverviewCard />
-        <RevenueCard />
-        <motion.div
-          initial={{ opacity: 0, scale: 0.96 }}
-          animate={{ opacity: 1, scale: 1 }}
+    <div className="space-y-6">
+      {/* Stats Cards Row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4">
+        <motion.div 
+          className="lg:col-span-3"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+        >
+          <ClientsOverviewCard />
+        </motion.div>
+        
+        <motion.div 
+          className="lg:col-span-3"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
+        >
+          <ProjectsOverviewCard />
+        </motion.div>
+        
+        <motion.div 
+          className="lg:col-span-3"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.3 }}
-          className="lg:col-span-1"
+        >
+          <RevenueCard />
+        </motion.div>
+        
+        <motion.div 
+          className="lg:col-span-3"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.4 }}
         >
           <QuickActions />
         </motion.div>
       </div>
 
       {/* Setup Checklist - Important for new users */}
-      <div className="bg-black/20 border border-siso-text/10 rounded-xl p-5 hover:border-siso-orange/30 transition-all duration-300">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.5 }}
+        className="bg-black/20 border border-siso-text/10 rounded-xl p-5 hover:border-siso-orange/30 transition-all duration-300"
+      >
         <SetupChecklist />
-      </div>
+      </motion.div>
       
-      {/* Main Content Area - Two Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-7 gap-6">
-        {/* Left Column - Calendar and Tasks */}
-        <div className="lg:col-span-4 space-y-6">
+      {/* Main Content Area - Calendar and Tasks */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <div className="lg:col-span-8 space-y-4">
           <CalendarCard />
           <PriorityTasksCard />
         </div>
         
-        {/* Right Column - Stats Dashboard */}
-        <div className="lg:col-span-3 space-y-6">
+        {/* Stats Dashboard */}
+        <div className="lg:col-span-4">
           <div className="bg-black/30 border border-siso-text/10 rounded-xl overflow-hidden transition-all duration-300">
             <div 
               className="p-4 flex justify-between items-center cursor-pointer hover:bg-black/40" 
@@ -81,13 +110,13 @@ export function MasonryDashboard() {
         </div>
       </div>
       
-      {/* Recent Activity - Full Width */}
+      {/* Recent Activity */}
       <RecentActivityCard />
 
-      {/* Feature Cards */}
+      {/* Tools Section */}
       <div>
         <div 
-          className="flex justify-between items-center mb-5 cursor-pointer" 
+          className="flex justify-between items-center mb-4 cursor-pointer" 
           onClick={() => setExpandedTools(!expandedTools)}
         >
           <h2 className="text-xl font-semibold text-white">Agency Tools</h2>
@@ -97,7 +126,7 @@ export function MasonryDashboard() {
         </div>
 
         {expandedTools && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <DashboardCard
               title="Plan Builder" 
               description="Create app plans and cost estimates for your clients."
