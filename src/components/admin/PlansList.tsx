@@ -19,7 +19,22 @@ import { useToast } from '@/hooks/use-toast';
 import { Copy, EyeIcon, Pencil, Plus, Send, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-// Update the Plan interface to include industry_type
+// Define the exact interface to match what comes from Supabase
+interface PlanData {
+  id: string;
+  username: string;
+  company_name: string | null;
+  app_name: string | null;
+  status: string | null;
+  created_at: string;
+  branding: any;
+  estimated_cost: number | null;
+  estimated_days: number | null;
+  features: string[] | null;
+  industry_type?: string | null; // Make industry_type optional since it might not exist in all records
+}
+
+// Use this interface for our component state
 interface Plan {
   id: string;
   username: string;
@@ -27,11 +42,11 @@ interface Plan {
   app_name: string | null;
   status: string | null;
   created_at: string;
-  branding: any; // Explicitly add branding to match Supabase schema
+  branding: any;
   estimated_cost: number | null;
   estimated_days: number | null;
   features: string[] | null;
-  industry_type: string | null; // Add this line to resolve the TypeScript error
+  industry_type: string | null; // Required in our state
 }
 
 export const PlansList = () => {
@@ -58,10 +73,10 @@ export const PlansList = () => {
       }
 
       // Map the data to ensure all fields match our Plan interface
-      const typedPlans = data?.map(plan => ({
+      const typedPlans: Plan[] = (data || []).map(plan => ({
         ...plan,
         industry_type: plan.industry_type || null // Ensure industry_type is always present
-      })) as Plan[] || [];
+      }));
 
       setPlans(typedPlans);
     } catch (error: any) {
@@ -107,19 +122,22 @@ export const PlansList = () => {
       const timestamp = new Date().getTime();
       const newUsername = `${planData.username}_copy_${timestamp}`;
 
+      // Explicitly type the data with our PlanData interface
+      const planDataTyped = planData as PlanData;
+
       // Create a copy of the plan with the new username
       const { data, error } = await supabase
         .from('plans')
         .insert({
           username: newUsername,
-          company_name: planData.company_name,
-          app_name: planData.app_name,
+          company_name: planDataTyped.company_name,
+          app_name: planDataTyped.app_name,
           status: 'draft',
-          branding: planData.branding,
-          features: planData.features,
-          estimated_cost: planData.estimated_cost,
-          estimated_days: planData.estimated_days,
-          industry_type: planData.industry_type || null  // Ensure it's never undefined
+          branding: planDataTyped.branding,
+          features: planDataTyped.features,
+          estimated_cost: planDataTyped.estimated_cost,
+          estimated_days: planDataTyped.estimated_days,
+          industry_type: planDataTyped.industry_type || null  // Ensure it's never undefined
         })
         .select();
 
