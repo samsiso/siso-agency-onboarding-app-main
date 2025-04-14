@@ -496,6 +496,73 @@ export type Database = {
         }
         Relationships: []
       }
+      plan_comments: {
+        Row: {
+          author_email: string
+          content: string
+          created_at: string | null
+          id: string
+          plan_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          author_email: string
+          content: string
+          created_at?: string | null
+          id?: string
+          plan_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          author_email?: string
+          content?: string
+          created_at?: string | null
+          id?: string
+          plan_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_comments_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plan_views: {
+        Row: {
+          id: string
+          plan_id: string | null
+          user_agent: string | null
+          viewed_at: string | null
+          viewer_ip: string | null
+        }
+        Insert: {
+          id?: string
+          plan_id?: string | null
+          user_agent?: string | null
+          viewed_at?: string | null
+          viewer_ip?: string | null
+        }
+        Update: {
+          id?: string
+          plan_id?: string | null
+          user_agent?: string | null
+          viewed_at?: string | null
+          viewer_ip?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_views_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       plans: {
         Row: {
           app_name: string | null
