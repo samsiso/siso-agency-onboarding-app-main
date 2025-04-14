@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -19,6 +18,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Copy, EyeIcon, Pencil, Plus, Send, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+// Update the Plan interface to include industry_type
 interface Plan {
   id: string;
   username: string;
@@ -26,7 +26,11 @@ interface Plan {
   app_name: string | null;
   status: string | null;
   created_at: string;
-  industry_type?: string; // Add this optional property to fix the error
+  branding: any; // Explicitly add branding to match Supabase schema
+  estimated_cost: number | null;
+  estimated_days: number | null;
+  features: string[] | null;
+  industry_type?: string; // Add this optional property
 }
 
 export const PlansList = () => {
