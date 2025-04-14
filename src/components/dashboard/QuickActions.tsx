@@ -1,17 +1,25 @@
 
 import { Button } from "@/components/ui/button";
-import { Plus, FileText, Bell, Users } from "lucide-react";
+import { Plus, FileText, Bell, Users, PlanIcon } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export function QuickActions() {
+  const navigate = useNavigate();
+
+  const handleCreatePlan = () => {
+    navigate("/admin/plans/create");
+  };
+  
   return (
     <div className="flex flex-col space-y-3">
       <h3 className="text-lg font-semibold text-white mb-2">Quick Actions</h3>
       <Button 
         size="sm" 
         className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-white flex gap-2 w-full justify-center"
+        onClick={handleCreatePlan}
       >
         <Plus className="h-4 w-4" />
-        <span>New Project</span>
+        <span>New Plan</span>
       </Button>
       <div className="grid grid-cols-2 gap-3">
         <Button 

@@ -86,7 +86,7 @@ export function MasonryDashboard() {
             title="Plan Builder" 
             description="Create app plans and cost estimates for your clients."
             icon={Layout}
-            href="/plan-builder"
+            href="/admin/plans"
             delay={3}
           />
           <DashboardCard
