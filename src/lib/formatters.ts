@@ -40,3 +40,14 @@ export function formatTime(date: Date | string): string {
     minute: '2-digit'
   });
 }
+
+/**
+ * Format a number as a percentage
+ */
+export function formatPercentage(value: number): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'percent',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 1,
+  }).format(value / 100);
+}
