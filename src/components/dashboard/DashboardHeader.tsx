@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/useUser";
 import { Bell, Search } from "lucide-react";
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
 export function DashboardHeader() {
   const { user } = useUser();
@@ -16,8 +17,13 @@ export function DashboardHeader() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-6 mb-8">
-      <div className="flex items-center justify-between">
+    <motion.div 
+      className="flex flex-col gap-6 mb-8"
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent">
             {greeting}, {user?.email ? user.email.split('@')[0] : 'User'}
@@ -33,7 +39,7 @@ export function DashboardHeader() {
             <input 
               type="text" 
               placeholder="Search..."
-              className="pl-10 pr-4 py-2 bg-black/30 border border-siso-text/10 rounded-lg text-siso-text focus:outline-none focus:border-siso-orange/50 w-[180px] md:w-[220px]"
+              className="pl-10 pr-4 py-2 bg-black/30 border border-siso-text/10 rounded-lg text-siso-text focus:outline-none focus:border-siso-orange/50 w-full md:w-[220px]"
             />
           </div>
           
@@ -43,12 +49,19 @@ export function DashboardHeader() {
             className="relative bg-black/30 border-siso-text/10 hover:bg-siso-bg-alt hover:border-siso-border-hover"
           >
             <Bell className="h-5 w-5" />
-            <span className="absolute -top-1 -right-1 h-4 w-4 bg-siso-red rounded-full flex items-center justify-center text-[10px] text-white">
+            <span className="absolute -top-1 -right-1 h-5 w-5 bg-siso-red rounded-full flex items-center justify-center text-[10px] text-white">
               3
             </span>
           </Button>
         </div>
       </div>
-    </div>
+
+      {/* Breadcrumb Navigation */}
+      <div className="flex items-center">
+        <span className="text-siso-text/70">Dashboard</span>
+        <span className="mx-2 text-siso-text/40">/</span>
+        <span className="text-siso-text">Home</span>
+      </div>
+    </motion.div>
   );
 }

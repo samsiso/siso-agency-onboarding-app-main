@@ -22,6 +22,7 @@ export function DashboardCard({ title, description, icon: Icon, href, className 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: delay * 0.1 }}
+      whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
     >
       <Card className={`relative group bg-black/30 border border-siso-text/10 rounded-lg p-6 transition-all duration-300 hover:border-siso-orange/50 hover:shadow-lg overflow-hidden ${className}`}>
         <Spotlight />

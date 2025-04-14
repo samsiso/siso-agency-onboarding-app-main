@@ -9,17 +9,8 @@ import { DashboardStats } from '@/components/dashboard/DashboardStats';
 import { QuickActions } from '@/components/dashboard/QuickActions';
 import { DashboardCard } from '@/components/dashboard/DashboardCard';
 import { MasonryDashboard } from '@/components/dashboard/MasonryDashboard';
-import { 
-  Calendar,
-  MessageSquare,
-  LineChart,
-  Layout, 
-  Folder, 
-  Users, 
-  CreditCard, 
-  Bot, 
-  BookOpen
-} from 'lucide-react';
+import { motion } from 'framer-motion';
+import { FloatingOrbs } from '@/components/effects/FloatingOrbs';
 
 export default function Home() {
   const { user, loading } = useUser();
@@ -48,11 +39,19 @@ export default function Home() {
 
   return (
     <MainLayout>
-      <div className="container mx-auto px-4 py-6">
-        <DashboardHeader />
-        
-        {/* Main Dashboard Content - Masonry Layout */}
-        <MasonryDashboard />
+      <div className="relative">
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <FloatingOrbs />
+        </div>
+        <motion.div 
+          className="container mx-auto px-4 py-6 relative z-10"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <DashboardHeader />
+          <MasonryDashboard />
+        </motion.div>
       </div>
     </MainLayout>
   );
