@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -30,7 +31,7 @@ interface Plan {
   estimated_cost: number | null;
   estimated_days: number | null;
   features: string[] | null;
-  industry_type?: string; // Add this optional property
+  industry_type: string | null; // Add this line to resolve the TypeScript error
 }
 
 export const PlansList = () => {
