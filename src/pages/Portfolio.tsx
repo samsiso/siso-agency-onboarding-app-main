@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { MainLayout } from '@/components/assistants/layout/MainLayout';
 import { usePortfolioData } from '@/hooks/usePortfolioData';
@@ -26,7 +27,6 @@ export default function Portfolio() {
 
   const handleSelectItem = (item: PortfolioItem) => {
     setSelectedItem(item);
-    // Scroll to top when selecting a project
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -78,8 +78,12 @@ export default function Portfolio() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               key="grid"
+              className="space-y-8"
             >
-              <AddPortfolioButton />
+              <div className="flex items-center justify-between">
+                <AddPortfolioButton />
+              </div>
+
               <PortfolioFilters
                 categories={categories}
                 activeCategory={activeCategory}
