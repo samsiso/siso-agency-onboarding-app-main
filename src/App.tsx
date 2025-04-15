@@ -1,4 +1,3 @@
-
 import { Routes, Route } from 'react-router-dom';
 import Index from './pages/Index';
 import Auth from './pages/Auth';
@@ -22,6 +21,7 @@ import MyProjects from './pages/MyProjects';
 import AdminPlans from './pages/AdminPlans';
 import AdminTemplates from './pages/AdminTemplates';
 import Portfolio from './pages/Portfolio';
+import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
   return (
@@ -36,6 +36,9 @@ function App() {
         <Route path="/thankyou-plan" element={<ThankYouPlan />} />
         <Route path="/plan/:username" element={<Plan />} />
         <Route path="/decora-plan" element={<DecoraPlan />} />
+        
+        {/* Admin routes */}
+        <Route path="/admin" element={<AuthGuard><AdminDashboard /></AuthGuard>} />
         
         {/* Admin routes - we're keeping these unprotected for now */}
         <Route path="/admin/plans" element={<AdminPlans />} />
