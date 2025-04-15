@@ -2,6 +2,7 @@
 import { Trophy, Users, Coins, TrendingUp } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import CountUp from 'react-countup';
+import { formatCompactNumber } from '@/lib/formatters';
 
 interface LeaderboardStatsProps {
   totalUsers: number;
@@ -10,12 +11,6 @@ interface LeaderboardStatsProps {
 }
 
 export const LeaderboardStats = ({ totalUsers, totalPoints, totalSisoTokens }: LeaderboardStatsProps) => {
-  const formatNumber = (num: number) => {
-    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
-    if (num >= 1000) return `${(num / 1000).toFixed(1)}k`;
-    return num.toString();
-  };
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
       <Card className="bg-gradient-to-br from-siso-bg-alt to-siso-bg-alt/50 hover:border-siso-border-hover transition-all duration-300">

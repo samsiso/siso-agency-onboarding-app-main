@@ -1,5 +1,4 @@
-
-import { Trophy, Users, UserPlus, Clock, Award, Medal, TrendingUp, TrendingDown, CircleDollarSign } from 'lucide-react';
+import { Trophy, Users, UserPlus, Clock, Award, Medal, TrendingUp, TrendingDown, CircleDollarSign, CreditCard } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from '@/lib/utils';
@@ -79,6 +78,18 @@ export const LeaderboardTable = ({ leaderboardData, onUserClick }: LeaderboardTa
     );
   };
 
+  // Function to determine spending level badge
+  const getSpendingBadge = (spending: number) => {
+    if (spending >= 10000) {
+      return <span className="px-2 py-0.5 text-xs bg-purple-500/30 text-purple-200 rounded-full">Premium</span>;
+    } else if (spending >= 5000) {
+      return <span className="px-2 py-0.5 text-xs bg-yellow-500/30 text-yellow-200 rounded-full">Gold</span>;
+    } else if (spending >= 1000) {
+      return <span className="px-2 py-0.5 text-xs bg-gray-500/30 text-gray-200 rounded-full">Silver</span>;
+    }
+    return <span className="px-2 py-0.5 text-xs bg-orange-500/30 text-orange-200 rounded-full">Bronze</span>;
+  };
+
   return (
     <div className="relative overflow-x-auto rounded-lg border border-siso-border bg-black/20 backdrop-blur-sm">
       <Table>
@@ -88,6 +99,7 @@ export const LeaderboardTable = ({ leaderboardData, onUserClick }: LeaderboardTa
             <TableHead>Name</TableHead>
             <TableHead className="text-center">Points</TableHead>
             <TableHead className="text-center">Trend</TableHead>
+            <TableHead className="text-center">Spending</TableHead>
             <TableHead className="text-center">Contributions</TableHead>
             <TableHead className="text-center">Referrals</TableHead>
             <TableHead className="text-center">SISO Tokens</TableHead>
@@ -95,82 +107,96 @@ export const LeaderboardTable = ({ leaderboardData, onUserClick }: LeaderboardTa
           </TableRow>
         </TableHeader>
         <TableBody>
-          {leaderboardData.map((entry, index) => (
-            <motion.tr
-              key={entry.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.05 }}
-              className={cn(
-                "transition-all duration-200 cursor-pointer group",
-                getRowClassName(index)
-              )}
-              onClick={() => onUserClick(entry)}
-            >
-              <TableCell className="text-center font-medium">
-                <div className="flex items-center justify-center gap-2">
-                  {getRankBadge(index)}
-                  <span className={cn(
-                    "font-bold",
-                    index < 3 ? "text-siso-text-bold" : "text-siso-text"
-                  )}>
-                    {index + 1}
-                  </span>
-                </div>
-              </TableCell>
-              <TableCell className="font-medium">
-                <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-siso-red to-siso-orange flex items-center justify-center text-white font-bold">
-                      {getDisplayName(entry).charAt(0)}
-                    </div>
-                    {entry.achievements && entry.achievements.length > 0 && (
-                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-siso-orange rounded-full flex items-center justify-center text-[10px] text-white">
-                        {entry.achievements.length}
+          {leaderboardData.map((entry, index) => {
+            // Calculate mock spending amount based on siso_tokens (This is just for demo)
+            const spendingAmount = entry.siso_tokens * 10 + Math.floor(Math.random() * 500);
+            
+            return (
+              <motion.tr
+                key={entry.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.05 }}
+                className={cn(
+                  "transition-all duration-200 cursor-pointer group",
+                  getRowClassName(index)
+                )}
+                onClick={() => onUserClick(entry)}
+              >
+                <TableCell className="text-center font-medium">
+                  <div className="flex items-center justify-center gap-2">
+                    {getRankBadge(index)}
+                    <span className={cn(
+                      "font-bold",
+                      index < 3 ? "text-siso-text-bold" : "text-siso-text"
+                    )}>
+                      {index + 1}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell className="font-medium">
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-siso-red to-siso-orange flex items-center justify-center text-white font-bold">
+                        {getDisplayName(entry).charAt(0)}
                       </div>
-                    )}
+                      {entry.achievements && entry.achievements.length > 0 && (
+                        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-siso-orange rounded-full flex items-center justify-center text-[10px] text-white">
+                          {entry.achievements.length}
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-siso-text-bold font-semibold">{getDisplayName(entry)}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-xs text-siso-text/70">{entry.rank || 'Rookie'}</p>
+                        {getSpendingBadge(spendingAmount)}
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-siso-text-bold font-semibold">{getDisplayName(entry)}</p>
-                    <p className="text-xs text-siso-text/70">{entry.rank || 'Rookie'}</p>
+                </TableCell>
+                <TableCell className="text-center">
+                  <div className="flex items-center justify-center gap-2">
+                    <Trophy className="h-4 w-4 text-yellow-500" />
+                    <span className="font-medium">{entry.points || 0}</span>
                   </div>
-                </div>
-              </TableCell>
-              <TableCell className="text-center">
-                <div className="flex items-center justify-center gap-2">
-                  <Trophy className="h-4 w-4 text-yellow-500" />
-                  <span className="font-medium">{entry.points || 0}</span>
-                </div>
-              </TableCell>
-              <TableCell className="text-center">
-                {getTrendIndicator(index)}
-              </TableCell>
-              <TableCell className="text-center">
-                <div className="flex items-center justify-center gap-2">
-                  <Users className="h-4 w-4 text-siso-text/70" />
-                  <span>{entry.contribution_count || 0}</span>
-                </div>
-              </TableCell>
-              <TableCell className="text-center">
-                <div className="flex items-center justify-center gap-2">
-                  <UserPlus className="h-4 w-4 text-siso-text/70" />
-                  <span>{entry.referral_count || 0}</span>
-                </div>
-              </TableCell>
-              <TableCell className="text-center">
-                <div className="flex items-center justify-center gap-2">
-                  <CircleDollarSign className="h-4 w-4 text-siso-orange" />
-                  <span className="font-medium">{entry.siso_tokens || 0}</span>
-                </div>
-              </TableCell>
-              <TableCell className="text-center text-siso-text/70">
-                <div className="flex items-center justify-center gap-2">
-                  <Clock className="h-4 w-4" />
-                  <span>{formatLastActive(entry.updated_at)}</span>
-                </div>
-              </TableCell>
-            </motion.tr>
-          ))}
+                </TableCell>
+                <TableCell className="text-center">
+                  {getTrendIndicator(index)}
+                </TableCell>
+                <TableCell className="text-center">
+                  <div className="flex items-center justify-center gap-2">
+                    <CreditCard className="h-4 w-4 text-siso-text/70" />
+                    <span>${spendingAmount.toLocaleString()}</span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-center">
+                  <div className="flex items-center justify-center gap-2">
+                    <Users className="h-4 w-4 text-siso-text/70" />
+                    <span>{entry.contribution_count || 0}</span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-center">
+                  <div className="flex items-center justify-center gap-2">
+                    <UserPlus className="h-4 w-4 text-siso-text/70" />
+                    <span>{entry.referral_count || 0}</span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-center">
+                  <div className="flex items-center justify-center gap-2">
+                    <CircleDollarSign className="h-4 w-4 text-siso-orange" />
+                    <span className="font-medium">{entry.siso_tokens || 0}</span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-center text-siso-text/70">
+                  <div className="flex items-center justify-center gap-2">
+                    <Clock className="h-4 w-4" />
+                    <span>{formatLastActive(entry.updated_at)}</span>
+                  </div>
+                </TableCell>
+              </motion.tr>
+            );
+          })}
         </TableBody>
       </Table>
     </div>

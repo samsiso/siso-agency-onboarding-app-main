@@ -1,83 +1,81 @@
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, Filter, Search, Timer } from "lucide-react";
+import { Search, Filter, Calendar, Award } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 
 interface LeaderboardFiltersProps {
-  onPeriodChange: (period: string) => void;
   onSearchChange: (search: string) => void;
+  onPeriodChange: (period: string) => void;
   onCategoryChange: (category: string) => void;
 }
 
 export const LeaderboardFilters = ({
-  onPeriodChange,
   onSearchChange,
-  onCategoryChange
+  onPeriodChange,
+  onCategoryChange,
 }: LeaderboardFiltersProps) => {
   return (
-    <div className="mb-6 space-y-4">
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-siso-text/50" />
-          <Input
-            placeholder="Search players..."
-            className="pl-9 bg-black/20 border-siso-border"
-            onChange={(e) => onSearchChange(e.target.value)}
-          />
-        </div>
-        
-        <div className="flex gap-2">
-          <Select onValueChange={onPeriodChange} defaultValue="all-time">
-            <SelectTrigger className="w-[140px] bg-black/20 border-siso-border">
-              <Timer className="mr-2 h-4 w-4" />
+    <div className="flex flex-col md:flex-row gap-4 mb-6">
+      <div className="relative flex-grow">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Search users..."
+          className="pl-10 bg-background/50 border-siso-border"
+          onChange={(e) => onSearchChange(e.target.value)}
+        />
+      </div>
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex items-center gap-1.5">
+          <Calendar className="h-4 w-4 text-muted-foreground" />
+          <Select
+            defaultValue="week"
+            onValueChange={onPeriodChange}
+          >
+            <SelectTrigger className="w-[140px] bg-background/50 border-siso-border">
               <SelectValue placeholder="Time Period" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="daily">Daily</SelectItem>
-              <SelectItem value="weekly">Weekly</SelectItem>
-              <SelectItem value="monthly">Monthly</SelectItem>
-              <SelectItem value="all-time">All Time</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select onValueChange={onCategoryChange} defaultValue="points">
-            <SelectTrigger className="w-[140px] bg-black/20 border-siso-border">
-              <Filter className="mr-2 h-4 w-4" />
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="points">Points</SelectItem>
-              <SelectItem value="contributions">Contributions</SelectItem>
-              <SelectItem value="referrals">Referrals</SelectItem>
-              <SelectItem value="achievements">Achievements</SelectItem>
+              <SelectItem value="today">Today</SelectItem>
+              <SelectItem value="week">This Week</SelectItem>
+              <SelectItem value="month">This Month</SelectItem>
+              <SelectItem value="year">This Year</SelectItem>
+              <SelectItem value="all">All Time</SelectItem>
             </SelectContent>
           </Select>
         </div>
-      </div>
-
-      <div className="flex flex-wrap gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          className="bg-black/20 border-siso-border hover:bg-siso-bg-alt"
+        
+        <div className="flex items-center gap-1.5">
+          <Award className="h-4 w-4 text-muted-foreground" />
+          <Select
+            defaultValue="all"
+            onValueChange={onCategoryChange}
+          >
+            <SelectTrigger className="w-[140px] bg-background/50 border-siso-border">
+              <SelectValue placeholder="Category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Categories</SelectItem>
+              <SelectItem value="points">Points</SelectItem>
+              <SelectItem value="spending">Spending</SelectItem>
+              <SelectItem value="contributions">Contributions</SelectItem>
+              <SelectItem value="referrals">Referrals</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <Button 
+          variant="outline" 
+          size="icon"
+          className="bg-background/50 border-siso-border h-10 w-10"
         >
-          <Calendar className="mr-2 h-4 w-4" />
-          Season 1
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="bg-black/20 border-siso-border hover:bg-siso-bg-alt"
-        >
-          Jump to My Position
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="bg-black/20 border-siso-border hover:bg-siso-bg-alt"
-        >
-          Export Leaderboard
+          <Filter className="h-4 w-4" />
         </Button>
       </div>
     </div>
