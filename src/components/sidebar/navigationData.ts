@@ -1,14 +1,7 @@
-
 import { 
-  Home,
-  Layout,
-  Briefcase,
-  Folder,
-  CreditCard,
-  Trophy,
-  Users,
-  HelpCircle,
-  Settings
+  Home, Layout, Briefcase, Folder, CreditCard, 
+  Trophy, Users, HelpCircle, Settings,
+  LayoutDashboard, ClipboardList, UserCog
 } from 'lucide-react';
 import { MenuSection } from './types';
 
@@ -38,6 +31,28 @@ export const menuSections: MenuSection[] = [
         href: '/portfolio',
         icon: Users,
         label: 'Portfolio',
+      }
+    ]
+  },
+  {
+    type: 'section',
+    title: 'Admin',
+    icon: LayoutDashboard,
+    items: [
+      {
+        href: '/admin',
+        icon: LayoutDashboard,
+        label: 'Dashboard',
+      },
+      {
+        href: '/admin/plans',
+        icon: ClipboardList,
+        label: 'Plans',
+      },
+      {
+        href: '/admin/templates',
+        icon: UserCog,
+        label: 'Templates',
       }
     ]
   },
