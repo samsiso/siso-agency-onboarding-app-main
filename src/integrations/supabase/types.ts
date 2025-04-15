@@ -101,6 +101,86 @@ export type Database = {
         }
         Relationships: []
       }
+      api_requests: {
+        Row: {
+          created_at: string | null
+          endpoint: string
+          id: string
+          last_request_at: string | null
+          rate_limit_remaining: number | null
+          request_count: number | null
+          reset_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          endpoint: string
+          id?: string
+          last_request_at?: string | null
+          rate_limit_remaining?: number | null
+          request_count?: number | null
+          reset_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          endpoint?: string
+          id?: string
+          last_request_at?: string | null
+          rate_limit_remaining?: number | null
+          request_count?: number | null
+          reset_at?: string | null
+        }
+        Relationships: []
+      }
+      automated_plans: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          end_date: string | null
+          id: string
+          lead_id: string | null
+          plan_data: Json | null
+          plan_name: string
+          plan_status: string | null
+          start_date: string | null
+          success_metrics: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          end_date?: string | null
+          id?: string
+          lead_id?: string | null
+          plan_data?: Json | null
+          plan_name: string
+          plan_status?: string | null
+          start_date?: string | null
+          success_metrics?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          end_date?: string | null
+          id?: string
+          lead_id?: string | null
+          plan_data?: Json | null
+          plan_name?: string
+          plan_status?: string | null
+          start_date?: string | null
+          success_metrics?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automated_plans_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "instagram_leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       banner_templates: {
         Row: {
           created_at: string
@@ -342,6 +422,101 @@ export type Database = {
         }
         Relationships: []
       }
+      instagram_leads: {
+        Row: {
+          bio: string | null
+          created_at: string | null
+          followers_count: number | null
+          following_count: number | null
+          full_name: string | null
+          id: string
+          is_private: boolean | null
+          is_verified: boolean | null
+          last_updated: string | null
+          posts_count: number | null
+          profile_url: string | null
+          status: string | null
+          username: string
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string | null
+          followers_count?: number | null
+          following_count?: number | null
+          full_name?: string | null
+          id?: string
+          is_private?: boolean | null
+          is_verified?: boolean | null
+          last_updated?: string | null
+          posts_count?: number | null
+          profile_url?: string | null
+          status?: string | null
+          username: string
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string | null
+          followers_count?: number | null
+          following_count?: number | null
+          full_name?: string | null
+          id?: string
+          is_private?: boolean | null
+          is_verified?: boolean | null
+          last_updated?: string | null
+          posts_count?: number | null
+          profile_url?: string | null
+          status?: string | null
+          username?: string
+        }
+        Relationships: []
+      }
+      instagram_posts: {
+        Row: {
+          caption: string | null
+          comments_count: number | null
+          content_type: string | null
+          created_at: string | null
+          id: string
+          lead_id: string | null
+          likes_count: number | null
+          post_id: string | null
+          post_url: string
+          posted_at: string | null
+        }
+        Insert: {
+          caption?: string | null
+          comments_count?: number | null
+          content_type?: string | null
+          created_at?: string | null
+          id?: string
+          lead_id?: string | null
+          likes_count?: number | null
+          post_id?: string | null
+          post_url: string
+          posted_at?: string | null
+        }
+        Update: {
+          caption?: string | null
+          comments_count?: number | null
+          content_type?: string | null
+          created_at?: string | null
+          id?: string
+          lead_id?: string | null
+          likes_count?: number | null
+          post_id?: string | null
+          post_url?: string
+          posted_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "instagram_posts_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "instagram_leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leaderboard_entries: {
         Row: {
           id: string
@@ -539,6 +714,60 @@ export type Database = {
           whatsapp_number?: string | null
         }
         Relationships: []
+      }
+      outreach_activities: {
+        Row: {
+          activity_type: string
+          content: string | null
+          created_at: string | null
+          error_message: string | null
+          executed_at: string | null
+          id: string
+          lead_id: string | null
+          post_id: string | null
+          scheduled_at: string | null
+          status: string | null
+        }
+        Insert: {
+          activity_type: string
+          content?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          executed_at?: string | null
+          id?: string
+          lead_id?: string | null
+          post_id?: string | null
+          scheduled_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          activity_type?: string
+          content?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          executed_at?: string | null
+          id?: string
+          lead_id?: string | null
+          post_id?: string | null
+          scheduled_at?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "outreach_activities_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "instagram_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "outreach_activities_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "instagram_posts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       plan_comments: {
         Row: {
