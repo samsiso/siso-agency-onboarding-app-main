@@ -748,35 +748,84 @@ export type Database = {
         }
         Relationships: []
       }
-      portfolio_items: {
+      portfolio_categories: {
         Row: {
           created_at: string
           description: string | null
           id: string
-          image_url: string | null
-          project_id: string | null
-          title: string
-          user_id: string
+          name: string
+          slug: string
         }
         Insert: {
           created_at?: string
           description?: string | null
           id?: string
-          image_url?: string | null
-          project_id?: string | null
-          title: string
-          user_id: string
+          name: string
+          slug: string
         }
         Update: {
           created_at?: string
           description?: string | null
           id?: string
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
+      portfolio_items: {
+        Row: {
+          category_id: string | null
+          completion_date: string | null
+          created_at: string
+          description: string | null
+          github_url: string | null
+          highlights: string[] | null
+          id: string
+          image_url: string | null
+          live_url: string | null
+          project_id: string | null
+          technologies: string[] | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          category_id?: string | null
+          completion_date?: string | null
+          created_at?: string
+          description?: string | null
+          github_url?: string | null
+          highlights?: string[] | null
+          id?: string
           image_url?: string | null
+          live_url?: string | null
           project_id?: string | null
+          technologies?: string[] | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          category_id?: string | null
+          completion_date?: string | null
+          created_at?: string
+          description?: string | null
+          github_url?: string | null
+          highlights?: string[] | null
+          id?: string
+          image_url?: string | null
+          live_url?: string | null
+          project_id?: string | null
+          technologies?: string[] | null
           title?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "portfolio_items_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "portfolio_categories"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "portfolio_items_project_id_fkey"
             columns: ["project_id"]
