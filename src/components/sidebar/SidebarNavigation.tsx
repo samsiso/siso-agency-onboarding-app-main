@@ -1,15 +1,15 @@
-
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { SidebarSection } from './SidebarSection';
 import { NavigationProps } from './types';
-import { menuSections } from './navigationData';
+import { getMenuSections } from './navigationData';
 
 export const SidebarNavigation = ({ collapsed, onItemClick, visible }: NavigationProps) => {
   const location = useLocation();
   const [activeSection, setActiveSection] = useState<string | null>(null);
+  const menuSections = getMenuSections();
 
   // [Analysis] Only use IntersectionObserver for hash-based navigation
   useEffect(() => {

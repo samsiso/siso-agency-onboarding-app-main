@@ -1,17 +1,37 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { MainLayout } from '@/components/assistants/layout/MainLayout';
 import { PlansList } from '@/components/admin/PlansList';
 import { PlanForm } from '@/components/admin/PlanForm';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAdminCheck } from '@/hooks/useAdminCheck';
 
 export default function AdminPlans() {
+  const { isAdmin, isLoading } = useAdminCheck();
   const { planId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
+  
+  useEffect(() => {
+    if (!isLoading && !isAdmin) {
+      navigate('/');
+    }
+  }, [isAdmin, isLoading, navigate]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="w-8 h-8 animate-spin text-siso-orange" />
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return null;
+  }
+  
   const [loading, setLoading] = useState(false);
   
   // Check if we're in create mode
