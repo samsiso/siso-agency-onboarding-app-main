@@ -12,6 +12,12 @@ export interface PortfolioItem {
   description?: string;
   image_url?: string;
   category_id?: string;
+  client_name?: string;
+  client_source?: string;
+  development_status?: string;
+  project_status?: string;
+  invoice_status?: string;
+  notion_url?: string;
   technologies: string[];
   live_url?: string;
   github_url?: string;
