@@ -8,7 +8,9 @@ import { PointsHistory } from '@/components/profile/PointsHistory';
 import { ProfileLayout } from '@/components/profile/ProfileLayout';
 import { ProfileSkeleton } from '@/components/profile/ProfileSkeleton';
 import { ProfileMetrics } from '@/components/profile/ProfileMetrics';
+import { ProfileProgress } from '@/components/profile/ProfileProgress';
 import { useProfileData } from '@/hooks/useProfileData';
+import { SignOutButton } from '@/components/auth/SignOutButton';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -40,6 +42,11 @@ const Profile = () => {
   return (
     <ProfileLayout>
       <div className="bg-black/20 rounded-xl p-6 backdrop-blur-sm border border-siso-text/10">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-siso-text-bold">My Profile</h1>
+          <SignOutButton />
+        </div>
+        <ProfileProgress profile={profile} user={user} />
         <ProfileHeader
           fullName={profile?.full_name}
           email={user?.email}
