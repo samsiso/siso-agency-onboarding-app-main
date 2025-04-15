@@ -1,8 +1,13 @@
-
 import { 
+  LayoutDashboard, 
+  ClipboardList, 
+  UserCog,
+  Trophy,
+  Users,
+  Settings,
+  User,
   Home, Layout, Briefcase, Folder, CreditCard, 
-  Trophy, Users, HelpCircle, Settings,
-  LayoutDashboard, ClipboardList, UserCog
+  HelpCircle,
 } from 'lucide-react';
 import { MenuSection } from './types';
 import { useAdminCheck } from '@/hooks/useAdminCheck';
@@ -10,6 +15,69 @@ import { useAdminCheck } from '@/hooks/useAdminCheck';
 export const getMenuSections = (): MenuSection[] => {
   const { isAdmin } = useAdminCheck();
 
+  if (isAdmin) {
+    return [
+      {
+        type: 'main',
+        href: '/admin',
+        icon: LayoutDashboard,
+        label: 'Dashboard',
+      },
+      {
+        type: 'section',
+        title: 'Management',
+        icon: ClipboardList,
+        items: [
+          {
+            href: '/admin/plans',
+            icon: ClipboardList,
+            label: 'Plans',
+          },
+          {
+            href: '/admin/templates',
+            icon: UserCog,
+            label: 'Templates',
+          }
+        ]
+      },
+      {
+        type: 'section',
+        title: 'Analytics',
+        icon: Trophy,
+        items: [
+          {
+            href: '/economy/leaderboards',
+            icon: Trophy,
+            label: 'Leaderboards',
+          },
+          {
+            href: '/portfolio',
+            icon: Users,
+            label: 'Portfolio',
+          }
+        ]
+      },
+      {
+        type: 'section',
+        title: 'Settings',
+        icon: Settings,
+        items: [
+          {
+            href: '/profile',
+            icon: User,
+            label: 'Profile',
+          },
+          {
+            href: '/settings',
+            icon: Settings,
+            label: 'Settings',
+          }
+        ]
+      }
+    ];
+  }
+
+  // Return regular user navigation
   const sections: MenuSection[] = [
     {
       type: 'main',
@@ -45,16 +113,6 @@ export const getMenuSections = (): MenuSection[] => {
       icon: CreditCard,
       items: [
         {
-          href: '/payments',
-          icon: CreditCard,
-          label: 'Payments',
-        },
-        {
-          href: '/economy/earn',
-          icon: Trophy,
-          label: 'How to Earn',
-        },
-        {
           href: '/economy/leaderboards',
           icon: Trophy,
           label: 'Leaderboards',
@@ -67,11 +125,6 @@ export const getMenuSections = (): MenuSection[] => {
       icon: Settings,
       items: [
         {
-          href: '/help',
-          icon: HelpCircle,
-          label: 'Help & Support',
-        },
-        {
           href: '/profile',
           icon: Settings,
           label: 'Profile',
@@ -79,32 +132,6 @@ export const getMenuSections = (): MenuSection[] => {
       ]
     }
   ];
-
-  // Only add admin section if user is admin
-  if (isAdmin) {
-    sections.splice(2, 0, {
-      type: 'section',
-      title: 'Admin',
-      icon: LayoutDashboard,
-      items: [
-        {
-          href: '/admin',
-          icon: LayoutDashboard,
-          label: 'Dashboard',
-        },
-        {
-          href: '/admin/plans',
-          icon: ClipboardList,
-          label: 'Plans',
-        },
-        {
-          href: '/admin/templates',
-          icon: UserCog,
-          label: 'Templates',
-        }
-      ]
-    });
-  }
 
   return sections;
 };

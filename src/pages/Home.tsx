@@ -1,8 +1,6 @@
 
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MainLayout } from '@/components/assistants/layout/MainLayout';
-import { MasonryDashboard } from '@/components/dashboard/MasonryDashboard';
 import { useAdminCheck } from '@/hooks/useAdminCheck';
 import { Loader2 } from 'lucide-react';
 
@@ -11,8 +9,12 @@ export default function Home() {
   const { isAdmin, isLoading } = useAdminCheck();
   
   useEffect(() => {
-    if (!isLoading && isAdmin) {
-      navigate('/admin');
+    if (!isLoading) {
+      if (isAdmin) {
+        navigate('/admin');
+      } else {
+        navigate('/profile');
+      }
     }
   }, [isAdmin, isLoading, navigate]);
 
@@ -24,11 +26,5 @@ export default function Home() {
     );
   }
 
-  return (
-    <MainLayout>
-      <div className="container mx-auto px-4 py-8">
-        <MasonryDashboard />
-      </div>
-    </MainLayout>
-  );
+  return null;
 }
