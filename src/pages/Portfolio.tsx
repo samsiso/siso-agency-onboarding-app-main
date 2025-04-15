@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { MainLayout } from '@/components/assistants/layout/MainLayout';
 import { usePortfolioData } from '@/hooks/usePortfolioData';
@@ -11,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { PortfolioItem } from '@/types/portfolio';
 import { motion, AnimatePresence } from 'framer-motion';
+import { AddPortfolioButton } from '@/components/portfolio/AddPortfolioButton';
 
 export default function Portfolio() {
   const { items, categories, loading } = usePortfolioData();
@@ -79,12 +79,13 @@ export default function Portfolio() {
               exit={{ opacity: 0 }}
               key="grid"
             >
+              <AddPortfolioButton />
               <PortfolioFilters
                 categories={categories}
                 activeCategory={activeCategory}
                 onCategoryChange={setActiveCategory}
               />
-
+              
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredItems.map((item) => (
                   <PortfolioCard 

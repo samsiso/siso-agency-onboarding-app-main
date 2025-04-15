@@ -775,45 +775,63 @@ export type Database = {
       portfolio_items: {
         Row: {
           category_id: string | null
+          client_name: string | null
+          client_source: string | null
           completion_date: string | null
           created_at: string
           description: string | null
+          development_status: string | null
           github_url: string | null
           highlights: string[] | null
           id: string
           image_url: string | null
+          invoice_status: string | null
           live_url: string | null
+          notion_url: string | null
           project_id: string | null
+          project_status: string | null
           technologies: string[] | null
           title: string
           user_id: string
         }
         Insert: {
           category_id?: string | null
+          client_name?: string | null
+          client_source?: string | null
           completion_date?: string | null
           created_at?: string
           description?: string | null
+          development_status?: string | null
           github_url?: string | null
           highlights?: string[] | null
           id?: string
           image_url?: string | null
+          invoice_status?: string | null
           live_url?: string | null
+          notion_url?: string | null
           project_id?: string | null
+          project_status?: string | null
           technologies?: string[] | null
           title: string
           user_id: string
         }
         Update: {
           category_id?: string | null
+          client_name?: string | null
+          client_source?: string | null
           completion_date?: string | null
           created_at?: string
           description?: string | null
+          development_status?: string | null
           github_url?: string | null
           highlights?: string[] | null
           id?: string
           image_url?: string | null
+          invoice_status?: string | null
           live_url?: string | null
+          notion_url?: string | null
           project_id?: string | null
+          project_status?: string | null
           technologies?: string[] | null
           title?: string
           user_id?: string
