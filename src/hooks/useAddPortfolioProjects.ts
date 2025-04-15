@@ -6,10 +6,10 @@ import { useAuthSession } from '@/hooks/useAuthSession';
 
 export const useAddPortfolioProjects = () => {
   const { toast } = useToast();
-  const { session } = useAuthSession();
+  const { user } = useAuthSession();
 
   const addProjects = useCallback(async () => {
-    if (!session?.user?.id) {
+    if (!user?.id) {
       toast({
         title: "Authentication required",
         description: "Please login to add projects",
@@ -30,7 +30,7 @@ export const useAddPortfolioProjects = () => {
         notion_url: "https://sprout-draw-9ec.notion.site/Gym-Client-1b549797be6880a9a8bbdae7bd70e8d7?pvs=4",
         live_url: "https://gritnessgym.vercel.app/",
         invoice_status: "Not Invoiced",
-        user_id: session.user.id
+        user_id: user.id
       },
       {
         title: "NM Construction",
@@ -43,7 +43,7 @@ export const useAddPortfolioProjects = () => {
         notion_url: "https://sprout-draw-9ec.notion.site/APP-PLAN-1c149797be6880eb9ddcea624886102e?pvs=4",
         live_url: "https://nm-construction.vercel.app/",
         invoice_status: "Not Invoiced",
-        user_id: session.user.id
+        user_id: user.id
       },
       {
         title: "OPTIMAL CONSTRUCTION",
@@ -56,7 +56,7 @@ export const useAddPortfolioProjects = () => {
         notion_url: "https://sprout-draw-9ec.notion.site/Optimal-Construction-App-Plan-1c449797be688094a7f4caed01d5c992?pvs=4",
         live_url: "https://optimal-building-maintenance.vercel.app/",
         invoice_status: "Not Invoiced",
-        user_id: session.user.id
+        user_id: user.id
       },
       {
         title: "UbahCryp",
@@ -69,7 +69,7 @@ export const useAddPortfolioProjects = () => {
         notion_url: "https://sprout-draw-9ec.notion.site/APP-PLAN-1c349797be6880a18876de37e53f1c61?pvs=4",
         live_url: "https://ubahcrypcom.vercel.app/",
         invoice_status: "Not Invoiced",
-        user_id: session.user.id
+        user_id: user.id
       },
       {
         title: "Elementree",
@@ -82,7 +82,7 @@ export const useAddPortfolioProjects = () => {
         notion_url: "https://sprout-draw-9ec.notion.site/Elementree-Client-1be49797be688097a460d838c4db0178?pvs=4",
         live_url: "https://elementree.vercel.app/",
         invoice_status: "Not Invoiced",
-        user_id: session.user.id
+        user_id: user.id
       },
       {
         title: "Trojan MMA",
@@ -95,7 +95,7 @@ export const useAddPortfolioProjects = () => {
         notion_url: "https://sprout-draw-9ec.notion.site/Trojan-MMA-Client-1bd49797be688012965cf72cea1aa939?pvs=4",
         live_url: "https://trojan-mma.vercel.app/",
         invoice_status: "Not Invoiced",
-        user_id: session.user.id
+        user_id: user.id
       },
       {
         title: "Lets go",
@@ -108,7 +108,7 @@ export const useAddPortfolioProjects = () => {
         notion_url: "https://sprout-draw-9ec.notion.site/APP-PLAN-1c249797be6880619c93e589737f78ae?pvs=4",
         live_url: "https://lets-go-u7hh.vercel.app/",
         invoice_status: "Not Invoiced",
-        user_id: session.user.id
+        user_id: user.id
       },
       {
         title: "Mu Shin",
@@ -121,7 +121,7 @@ export const useAddPortfolioProjects = () => {
         notion_url: "https://sprout-draw-9ec.notion.site/Martial-Arts-Court-Client-1bd49797be68805d9002d52c394cebbb?pvs=4",
         live_url: "https://siso-mu-shin.vercel.app/",
         invoice_status: "Not Invoiced",
-        user_id: session.user.id
+        user_id: user.id
       },
       {
         title: "5 Star Hire",
@@ -134,7 +134,7 @@ export const useAddPortfolioProjects = () => {
         notion_url: "https://sprout-draw-9ec.notion.site/APP-PLAN-1c149797be688001b792ee95b65ce6fb?pvs=4",
         live_url: "https://5-star-hire.vercel.app/",
         invoice_status: "Not Invoiced",
-        user_id: session.user.id
+        user_id: user.id
       }
     ];
 
@@ -157,7 +157,7 @@ export const useAddPortfolioProjects = () => {
         variant: "destructive"
       });
     }
-  }, [session, toast]);
+  }, [user, toast]);
 
   return { addProjects };
 };
