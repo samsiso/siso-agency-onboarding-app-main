@@ -14,11 +14,10 @@ export const PortfolioHero = () => {
         className="relative z-10 max-w-4xl mx-auto text-center space-y-6"
       >
         <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent">
-          Featured Projects
+          Project Portfolio
         </h1>
         <p className="text-lg md:text-xl text-siso-text/80 max-w-2xl mx-auto">
-          A showcase of my recent web development projects and collaborations.
-          Each project represents a unique solution to real-world challenges.
+          Explore our diverse collection of web development projects, spanning across various industries from fitness and construction to web3 and hospitality.
         </p>
       </motion.div>
     </div>
