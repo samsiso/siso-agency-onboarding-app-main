@@ -14,6 +14,7 @@ export type InstagramLead = {
   is_private?: boolean;
   is_verified?: boolean;
   profile_url?: string;
+  created_at?: string; // Add this line to match the database schema
   status: 'new' | 'contacted' | 'responded' | 'qualified' | 'converted' | 'rejected';
 };
 
