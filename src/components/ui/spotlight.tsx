@@ -1,56 +1,56 @@
 
-import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
-import { cn } from '@/lib/utils';
+import { useRef, useEffect } from "react";
+import { cn } from "@/lib/utils";
+import { motion, useMotionValue, useSpring } from "framer-motion";
 
 interface SpotlightProps {
   className?: string;
-  size?: number;
+  children?: React.ReactNode;
 }
 
-export function Spotlight({ className, size = 700 }: SpotlightProps) {
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [opacity, setOpacity] = useState(0);
+export const Spotlight = ({ children, className = "" }: SpotlightProps) => {
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const handleMouseMove = (e: MouseEvent) => {
+    const { clientX, clientY } = e;
+    mouseX.set(clientX);
+    mouseY.set(clientY);
+  };
+
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setOpacity(1);
+    const currentRef = ref.current;
+    if (currentRef) {
+      currentRef.addEventListener("mousemove", handleMouseMove);
+    }
+    return () => {
+      if (currentRef) {
+        currentRef.removeEventListener("mousemove", handleMouseMove);
+      }
+    };
   }, []);
 
-  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setPosition({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
-  }
+  const springConfig = { stiffness: 100, damping: 30 };
+  const spotlightX = useSpring(mouseX, springConfig);
+  const spotlightY = useSpring(mouseY, springConfig);
 
   return (
     <div
-      className={cn("absolute inset-0 z-0 overflow-hidden", className)}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setOpacity(1)}
-      onMouseLeave={() => setOpacity(0.5)}
+      ref={ref}
+      className={cn(
+        "relative overflow-hidden",
+        className
+      )}
     >
       <motion.div
-        className="absolute -inset-px bg-[radial-gradient(var(--size)_circle_at_var(--x)_var(--y),rgba(255,87,34,0.15),transparent_80%)]"
+        className="pointer-events-none absolute inset-0 z-0 opacity-60 blur-[80px]"
         style={{
-          '--x': `${position.x}px`,
-          '--y': `${position.y}px`,
-          '--size': `${size}px`,
-          opacity: opacity,
-        } as any}
-        animate={{
-          '--x': `${position.x}px`,
-          '--y': `${position.y}px`,
-          opacity: opacity,
-        } as any}
-        transition={{
-          type: 'spring',
-          damping: 15,
-          stiffness: 300,
-          mass: 0.1,
+          background: `radial-gradient(600px circle at ${spotlightX}px ${spotlightY}px, rgba(237,129,65,0.15), transparent 80%)`,
         }}
       />
+      {children}
     </div>
   );
-}
+};

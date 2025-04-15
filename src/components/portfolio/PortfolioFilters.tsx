@@ -1,6 +1,7 @@
 
 import { PortfolioCategory } from '@/types/portfolio';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { motion } from 'framer-motion';
 
 interface PortfolioFiltersProps {
   categories: PortfolioCategory[];
@@ -14,8 +15,13 @@ export const PortfolioFilters = ({
   onCategoryChange,
 }: PortfolioFiltersProps) => {
   return (
-    <div className="w-full max-w-4xl mx-auto mb-8">
-      <Tabs defaultValue={activeCategory} onValueChange={onCategoryChange}>
+    <motion.div 
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="w-full max-w-4xl mx-auto mb-8"
+      id="portfolio-grid"
+    >
+      <Tabs defaultValue={activeCategory} value={activeCategory} onValueChange={onCategoryChange}>
         <TabsList className="w-full justify-start overflow-x-auto">
           <TabsTrigger value="all">All Projects</TabsTrigger>
           {categories.map((category) => (
@@ -25,6 +31,6 @@ export const PortfolioFilters = ({
           ))}
         </TabsList>
       </Tabs>
-    </div>
+    </motion.div>
   );
 };

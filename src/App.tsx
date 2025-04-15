@@ -1,3 +1,4 @@
+
 import { Routes, Route } from 'react-router-dom';
 import Index from './pages/Index';
 import Auth from './pages/Auth';
@@ -20,6 +21,7 @@ import { AuthGuard } from './components/auth/AuthGuard';
 import MyProjects from './pages/MyProjects';
 import AdminPlans from './pages/AdminPlans';
 import AdminTemplates from './pages/AdminTemplates';
+import Portfolio from './pages/Portfolio';
 
 function App() {
   return (
@@ -53,7 +55,7 @@ function App() {
         {/* Protected Project Routes */}
         <Route path="/plan-builder" element={<AuthGuard><Home /></AuthGuard>} />
         <Route path="/my-projects" element={<AuthGuard><MyProjects /></AuthGuard>} />
-        <Route path="/portfolio" element={<AuthGuard><Home /></AuthGuard>} />
+        <Route path="/portfolio" element={<AuthGuard><Portfolio /></AuthGuard>} />
         
         {/* Protected Financial Routes */}
         <Route path="/payments" element={<AuthGuard><CryptoExchange /></AuthGuard>} />
