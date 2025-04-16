@@ -55,97 +55,111 @@ export const useClientsList = ({
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['clients-list', page, pageSize, searchQuery, statusFilter, sortColumn, sortDirection],
     queryFn: async () => {
-      // Start with the main query
-      let query = supabase
-        .from('client_onboarding')
-        .select(`
-          id,
-          status,
-          current_step,
-          total_steps,
-          completed_steps,
-          created_at,
-          updated_at,
-          user_id,
-          project_name,
-          company_niche,
-          development_url,
-          mvp_build_status,
-          notion_plan_url,
-          payment_status,
-          estimated_price,
-          initial_contact_date,
-          start_date,
-          estimated_completion_date,
-          profiles:user_id (
-            full_name,
-            email,
-            business_name,
-            avatar_url,
-            phone
-          )
-        `)
-        .order(sortColumn, { ascending: sortDirection === 'asc' });
-      
-      // Apply status filter if not 'all'
-      if (statusFilter !== 'all') {
-        query = query.eq('status', statusFilter);
+      try {
+        // Start with the main query
+        let query = supabase
+          .from('client_onboarding')
+          .select(`
+            id,
+            status,
+            current_step,
+            total_steps,
+            completed_steps,
+            created_at,
+            updated_at,
+            user_id,
+            project_name,
+            company_niche,
+            development_url,
+            mvp_build_status,
+            notion_plan_url,
+            payment_status,
+            estimated_price,
+            initial_contact_date,
+            start_date,
+            estimated_completion_date,
+            profiles:user_id (
+              full_name,
+              email,
+              business_name,
+              avatar_url,
+              phone
+            )
+          `)
+          .order(sortColumn, { ascending: sortDirection === 'asc' });
+        
+        // Apply status filter if not 'all'
+        if (statusFilter !== 'all') {
+          query = query.eq('status', statusFilter);
+        }
+        
+        // Apply search filter
+        if (searchQuery) {
+          // Add filter conditions for both name and email
+          query = query.or(`profiles.full_name.ilike.%${searchQuery}%,profiles.email.ilike.%${searchQuery}%,project_name.ilike.%${searchQuery}%,company_niche.ilike.%${searchQuery}%`);
+        }
+        
+        // First get count of all matching records
+        const countResult = await query.count();
+        
+        if (countResult.error) {
+          console.error('Error fetching clients count:', countResult.error);
+          throw countResult.error;
+        }
+        
+        const count = countResult.count || 0;
+        
+        // Then fetch the page of data
+        const { data, error: dataError } = await query
+          .range(from, to);
+        
+        if (dataError) {
+          console.error('Error fetching clients data:', dataError);
+          throw dataError;
+        }
+        
+        if (!data) {
+          return {
+            clients: [],
+            totalCount: 0
+          };
+        }
+        
+        // Process and flatten the data structure
+        const processedData = data.map((item) => ({
+          id: item.id,
+          status: item.status,
+          current_step: item.current_step,
+          total_steps: item.total_steps,
+          completed_steps: item.completed_steps || [],
+          created_at: item.created_at,
+          updated_at: item.updated_at,
+          full_name: safePropertyAccess(item.profiles, 'full_name', 'Unknown'),
+          email: safePropertyAccess(item.profiles, 'email', null),
+          business_name: safePropertyAccess(item.profiles, 'business_name', null),
+          avatar_url: safePropertyAccess(item.profiles, 'avatar_url', null),
+          phone: safePropertyAccess(item.profiles, 'phone', null),
+          // New fields
+          project_name: item.project_name || null,
+          company_niche: item.company_niche || null,
+          development_url: item.development_url || null,
+          mvp_build_status: item.mvp_build_status || null,
+          notion_plan_url: item.notion_plan_url || null,
+          payment_status: item.payment_status || null,
+          estimated_price: item.estimated_price || null,
+          initial_contact_date: item.initial_contact_date || null,
+          start_date: item.start_date || null,
+          estimated_completion_date: item.estimated_completion_date || null,
+        }));
+        
+        return {
+          clients: processedData,
+          totalCount: count
+        };
+      } catch (error) {
+        console.error('Error in useClientsList:', error);
+        throw error;
       }
-      
-      // Apply search filter
-      if (searchQuery) {
-        // Add filter conditions for both name and email
-        query = query.or(`profiles.full_name.ilike.%${searchQuery}%,profiles.email.ilike.%${searchQuery}%,project_name.ilike.%${searchQuery}%,company_niche.ilike.%${searchQuery}%`);
-      }
-      
-      // First get count of all matching records
-      const { count, error: countError } = await query.count();
-      
-      if (countError) {
-        console.error('Error fetching clients count:', countError);
-        throw countError;
-      }
-      
-      // Then fetch the page of data
-      const { data, error: dataError } = await query
-        .range(from, to);
-      
-      if (dataError) {
-        console.error('Error fetching clients data:', dataError);
-        throw dataError;
-      }
-      
-      // Process and flatten the data structure
-      const processedData = data.map((item) => ({
-        id: item.id,
-        status: item.status,
-        current_step: item.current_step,
-        total_steps: item.total_steps,
-        completed_steps: item.completed_steps || [],
-        created_at: item.created_at,
-        updated_at: item.updated_at,
-        full_name: safePropertyAccess(item.profiles, 'full_name', 'Unknown'),
-        email: safePropertyAccess(item.profiles, 'email', null),
-        business_name: safePropertyAccess(item.profiles, 'business_name', null),
-        avatar_url: safePropertyAccess(item.profiles, 'avatar_url', null),
-        phone: safePropertyAccess(item.profiles, 'phone', null),
-        // New fields
-        project_name: item.project_name || null,
-        company_niche: item.company_niche || null,
-        development_url: item.development_url || null,
-        mvp_build_status: item.mvp_build_status || null,
-        notion_plan_url: item.notion_plan_url || null,
-        payment_status: item.payment_status || null,
-        estimated_price: item.estimated_price || null,
-        initial_contact_date: item.initial_contact_date || null,
-        start_date: item.start_date || null,
-        estimated_completion_date: item.estimated_completion_date || null,
-      }));
-      
-      return {
-        clients: processedData,
-        totalCount: count || 0
-      };
     },
   });
 

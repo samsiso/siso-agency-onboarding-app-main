@@ -44,7 +44,14 @@ export const useClientDetails = (clientId: string) => {
         .eq('id', clientId)
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching client details:', error);
+        throw error;
+      }
+      
+      if (!data) {
+        throw new Error('Client not found');
+      }
       
       // Process the data to get a flattened structure
       const clientData: ClientData = {
