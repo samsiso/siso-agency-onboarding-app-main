@@ -1,7 +1,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { ClientData } from './useClientsList';
+import { ClientData } from '@/types/client.types';
 import { safePropertyAccess } from '@/utils/errorSuppressions';
 
 export const useClientDetails = (clientId: string) => {
@@ -76,7 +76,7 @@ export const useClientDetails = (clientId: string) => {
             website_url: safePropertyAccess(profileData, 'website_url', null),
             professional_role: safePropertyAccess(profileData, 'professional_role', null),
             bio: safePropertyAccess(profileData, 'bio', null),
-            // New fields - safely access or provide defaults
+            // Project-related fields
             project_name: safePropertyAccess(data, 'project_name', null),
             company_niche: safePropertyAccess(data, 'company_niche', null),
             development_url: safePropertyAccess(data, 'development_url', null),
