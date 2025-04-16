@@ -1,7 +1,7 @@
 
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MainLayout } from '@/components/assistants/layout/MainLayout';
+import { AdminLayout } from '@/components/admin/layout/AdminLayout';
 import { Card } from '@/components/ui/card';
 import { BulkPlanCreation } from '@/components/admin/BulkPlanCreation';
 import { useAdminCheck } from '@/hooks/useAdminCheck';
@@ -30,13 +30,13 @@ export default function AdminTemplates() {
   }
 
   return (
-    <MainLayout>
+    <AdminLayout>
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold text-white mb-6">Plan Templates</h1>
         <div className="space-y-6">
           <BulkPlanCreation />
         </div>
       </div>
-    </MainLayout>
+    </AdminLayout>
   );
 }

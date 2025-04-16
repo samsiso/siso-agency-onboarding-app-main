@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import { MainLayout } from '@/components/assistants/layout/MainLayout';
+import { AdminLayout } from '@/components/admin/layout/AdminLayout';
 import { PlansList } from '@/components/admin/PlansList';
 import { PlanForm } from '@/components/admin/PlanForm';
 import { Button } from '@/components/ui/button';
@@ -47,7 +48,7 @@ export default function AdminPlans() {
   };
   
   return (
-    <MainLayout>
+    <AdminLayout>
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center mb-6">
           {(isCreateMode || isEditMode) && (
@@ -81,6 +82,6 @@ export default function AdminPlans() {
           <PlansList />
         )}
       </div>
-    </MainLayout>
+    </AdminLayout>
   );
 }

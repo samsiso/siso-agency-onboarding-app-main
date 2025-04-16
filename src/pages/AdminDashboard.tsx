@@ -1,7 +1,7 @@
 
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MainLayout } from '@/components/assistants/layout/MainLayout';
+import { AdminLayout } from '@/components/admin/layout/AdminLayout';
 import { AdminStats } from '@/components/admin/dashboard/AdminStats';
 import { ClientsList } from '@/components/admin/dashboard/ClientsList';
 import { LeadsOverview } from '@/components/admin/dashboard/LeadsOverview';
@@ -31,12 +31,12 @@ export default function AdminDashboard() {
   }
 
   return (
-    <MainLayout>
+    <AdminLayout>
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold">Admin Dashboard</h1>
           <div className="flex gap-2">
-            <span className="px-3 py-1 text-sm bg-siso-orange/10 text-siso-orange rounded-full">
+            <span className="px-3 py-1 text-sm bg-purple-500/10 text-purple-400 rounded-full">
               Admin Access
             </span>
           </div>
@@ -47,6 +47,6 @@ export default function AdminDashboard() {
           <ClientsList />
         </div>
       </div>
-    </MainLayout>
+    </AdminLayout>
   );
 }

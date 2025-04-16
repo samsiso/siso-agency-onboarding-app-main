@@ -1,15 +1,11 @@
 
 import { 
   Home, Layout, Briefcase, Folder, CreditCard, 
-  Trophy, Users, HelpCircle, Settings,
-  LayoutDashboard, ClipboardList, UserCog
+  Trophy, Users, HelpCircle, Settings
 } from 'lucide-react';
 import { MenuSection } from './types';
-import { useAdminCheck } from '@/hooks/useAdminCheck';
 
 export const getMenuSections = (): MenuSection[] => {
-  const { isAdmin } = useAdminCheck();
-
   const sections: MenuSection[] = [
     {
       type: 'main',
@@ -79,32 +75,6 @@ export const getMenuSections = (): MenuSection[] => {
       ]
     }
   ];
-
-  // Only add admin section if user is admin
-  if (isAdmin) {
-    sections.splice(2, 0, {
-      type: 'section',
-      title: 'Admin',
-      icon: LayoutDashboard,
-      items: [
-        {
-          href: '/admin',
-          icon: LayoutDashboard,
-          label: 'Dashboard',
-        },
-        {
-          href: '/admin/plans',
-          icon: ClipboardList,
-          label: 'Plans',
-        },
-        {
-          href: '/admin/templates',
-          icon: UserCog,
-          label: 'Templates',
-        }
-      ]
-    });
-  }
 
   return sections;
 };
