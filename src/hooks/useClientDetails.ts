@@ -45,13 +45,13 @@ export const useClientDetails = (clientId: string) => {
           .eq('id', clientId)
           .single();
         
+        // If there's an error, log it and return the default client data
         if (error) {
           console.error('Error fetching client details:', error);
-          // Return fallback object without attempting to access properties on error
           return createDefaultClientData(clientId);
         }
         
-        // Only process data if it exists and is not an error
+        // Only proceed if data exists and is not an error
         if (data) {
           // Safely extract profile data with a default empty object
           const profileData = data.profiles || {};
