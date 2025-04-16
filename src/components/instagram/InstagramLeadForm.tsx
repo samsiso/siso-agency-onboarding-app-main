@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useInstagramLeads } from '@/hooks/useInstagramLeads';
+import { toast } from 'sonner';
 
 export const InstagramLeadForm = () => {
   const [username, setUsername] = useState('');
@@ -13,8 +14,14 @@ export const InstagramLeadForm = () => {
     e.preventDefault();
     if (!username) return;
 
-    await addLead.mutateAsync({ username });
-    setUsername('');
+    try {
+      await addLead.mutateAsync({ username });
+      setUsername('');
+      toast.success('Lead added successfully');
+    } catch (error) {
+      toast.error('Failed to add lead');
+      console.error('Error adding lead:', error);
+    }
   };
 
   return (
@@ -26,8 +33,8 @@ export const InstagramLeadForm = () => {
           onChange={(e) => setUsername(e.target.value)}
         />
       </div>
-      <Button type="submit" variant="default">
-        Add Lead
+      <Button type="submit" variant="default" disabled={addLead.isPending}>
+        {addLead.isPending ? 'Adding...' : 'Add Lead'}
       </Button>
     </form>
   );

@@ -1,5 +1,5 @@
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 interface InstagramLead {
@@ -15,7 +15,13 @@ interface InstagramLead {
   bio: string | null;
 }
 
+interface AddLeadPayload {
+  username: string;
+}
+
 export const useInstagramLeads = (limit: number = 10) => {
+  const queryClient = useQueryClient();
+  
   const { data: leads = [], isLoading, error, refetch } = useQuery({
     queryKey: ['instagram-leads', limit],
     queryFn: async () => {
@@ -30,5 +36,22 @@ export const useInstagramLeads = (limit: number = 10) => {
     },
   });
 
-  return { leads, isLoading, error, refetch };
+  const addLead = useMutation({
+    mutationFn: async (payload: AddLeadPayload) => {
+      const { data, error } = await supabase
+        .from('instagram_leads')
+        .insert([{ username: payload.username, status: 'new' }])
+        .select('*')
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      // Invalidate the query to refetch the updated list
+      queryClient.invalidateQueries({ queryKey: ['instagram-leads'] });
+    },
+  });
+
+  return { leads, isLoading, error, refetch, addLead };
 };
