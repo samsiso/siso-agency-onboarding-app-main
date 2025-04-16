@@ -1,6 +1,8 @@
 
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { MainLayout } from '@/components/assistants/layout/MainLayout';
+import { MasonryDashboard } from '@/components/dashboard/MasonryDashboard';
 import { useAdminCheck } from '@/hooks/useAdminCheck';
 import { Loader2 } from 'lucide-react';
 
@@ -9,13 +11,8 @@ export default function Home() {
   const { isAdmin, isLoading } = useAdminCheck();
   
   useEffect(() => {
-    if (!isLoading) {
-      if (isAdmin) {
-        navigate('/admin');
-      } else {
-        // For regular users, stay on /home as it's their dashboard
-        return;
-      }
+    if (!isLoading && isAdmin) {
+      navigate('/admin');
     }
   }, [isAdmin, isLoading, navigate]);
 
@@ -27,12 +24,11 @@ export default function Home() {
     );
   }
 
-  // Return the actual home page content for regular users
-  // For admins, they will be redirected before this renders
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">Welcome to your Dashboard</h1>
-      {/* Add your dashboard content here */}
-    </div>
+    <MainLayout>
+      <div className="container mx-auto px-4 py-8">
+        <MasonryDashboard />
+      </div>
+    </MainLayout>
   );
 }
