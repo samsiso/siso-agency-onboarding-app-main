@@ -1,4 +1,3 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { useState, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
@@ -52,7 +51,7 @@ export default function Tools() {
     },
   });
 
-  const sortTools = (tools: Tool[]) => {
+  function sortTools(tools: Tool[]) {
     return [...tools].sort((a, b) => {
       switch (sortBy) {
         case 'rating':
@@ -67,7 +66,7 @@ export default function Tools() {
           return 0;
       }
     });
-  };
+  }
 
   const filteredTools = useMemo(() => {
     if (!tools) return [];

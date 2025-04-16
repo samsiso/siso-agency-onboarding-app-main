@@ -252,9 +252,9 @@ export function ClientsTable({ searchQuery = '', statusFilter = 'all' }: Clients
               <TableHead className="w-12">
                 <Checkbox 
                   checked={selectedClients.length === clients.length && clients.length > 0}
-                  indeterminate={selectedClients.length > 0 && selectedClients.length < clients.length}
                   onCheckedChange={handleSelectAll}
                   aria-label="Select all clients"
+                  className={selectedClients.length > 0 && selectedClients.length < clients.length ? "opacity-80" : ""}
                 />
               </TableHead>
               
@@ -381,8 +381,12 @@ export function ClientsTable({ searchQuery = '', statusFilter = 'all' }: Clients
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious 
-                  onClick={() => setPage(Math.max(1, page - 1))} 
-                  disabled={page <= 1}
+                  href="#" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (page > 1) setPage(page - 1);
+                  }}
+                  className={page <= 1 ? "pointer-events-none opacity-50" : ""}
                 />
               </PaginationItem>
               
@@ -402,7 +406,11 @@ export function ClientsTable({ searchQuery = '', statusFilter = 'all' }: Clients
                         </PaginationItem>
                         <PaginationItem>
                           <PaginationLink 
-                            onClick={() => setPage(pageNum)}
+                            href="#" 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setPage(pageNum);
+                            }}
                             isActive={page === pageNum}
                           >
                             {pageNum}
@@ -415,7 +423,11 @@ export function ClientsTable({ searchQuery = '', statusFilter = 'all' }: Clients
                   return (
                     <PaginationItem key={pageNum}>
                       <PaginationLink 
-                        onClick={() => setPage(pageNum)}
+                        href="#" 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setPage(pageNum);
+                        }}
                         isActive={page === pageNum}
                       >
                         {pageNum}
@@ -426,8 +438,12 @@ export function ClientsTable({ searchQuery = '', statusFilter = 'all' }: Clients
               
               <PaginationItem>
                 <PaginationNext 
-                  onClick={() => setPage(Math.min(totalPages, page + 1))} 
-                  disabled={page >= totalPages}
+                  href="#" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (page < totalPages) setPage(page + 1);
+                  }}
+                  className={page >= totalPages ? "pointer-events-none opacity-50" : ""}
                 />
               </PaginationItem>
             </PaginationContent>

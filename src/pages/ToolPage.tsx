@@ -170,4 +170,27 @@ export default function ToolPage() {
       </div>
     </div>
   );
+
+  function handleShare() {
+    if (navigator.share) {
+      navigator.share({
+        title: tool?.name,
+        text: tool?.description || `Check out ${tool?.name}`,
+        url: window.location.href,
+      }).catch((error) => console.log('Error sharing:', error));
+    }
+  }
+
+  function handleTwitterShare() {
+    const text = encodeURIComponent(`Check out ${tool?.name}${tool?.description ? `: ${tool.description}` : ''}`);
+    const url = encodeURIComponent(window.location.href);
+    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+  }
+
+  function getYoutubeEmbedUrl(url: string) {
+    const videoId = url.includes('watch?v=') 
+      ? url.split('watch?v=')[1].split('&')[0]
+      : url.split('/').pop();
+    return `https://www.youtube.com/embed/${videoId}`;
+  }
 }
