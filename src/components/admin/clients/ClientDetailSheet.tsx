@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ClientStatusBadge } from './ClientStatusBadge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useClientDetails } from '@/hooks/useClientDetails';
+import { useClientDetails } from '@/hooks/client/useClientDetails';
 import { formatRelativeTime } from '@/lib/formatters';
 import { Activity, AlignLeft, Clock, Edit2, Mail, Phone, User, Users } from 'lucide-react';
 

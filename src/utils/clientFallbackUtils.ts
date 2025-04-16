@@ -1,7 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { ClientData, ClientsListParams, ClientsListResponse } from '@/types/client.types';
-import { buildFallbackClientQuery, processClientData } from '@/utils/clientQueryBuilders';
+import { buildFallbackClientQuery } from '@/utils/clientQueryBuilders';
 
 /**
  * Fallback mechanism for when the main clients query fails
@@ -12,7 +12,7 @@ export const fetchClientsFallback = async (
   to: number
 ): Promise<ClientsListResponse> => {
   try {
-    const { page, pageSize, searchQuery, statusFilter } = params;
+    const { searchQuery, statusFilter } = params;
     
     // Build fallback query with only basic fields
     let fallbackQuery = buildFallbackClientQuery({ searchQuery, statusFilter });
