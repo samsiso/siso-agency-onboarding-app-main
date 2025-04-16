@@ -1,8 +1,7 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { buildClientListQuery, processClientData } from '@/utils/clientQueryBuilders';
 import { fetchClientsFallback } from '@/utils/clientFallbackUtils';
-import { ClientsListParams, ClientData } from '@/types/client.types';
+import { ClientsListParams, ClientsListResponse } from '@/types/client.types';
 
 export type { ClientData, ClientsListParams } from '@/types/client.types';
 
