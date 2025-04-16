@@ -1,3 +1,4 @@
+
 import { useQuery } from '@tanstack/react-query';
 import { useState, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
@@ -38,12 +39,14 @@ export default function Tools() {
         throw error;
       }
       
-      // Fix: Use castToMockTypeArray to cast the data to the right type
+      // Process the data - Ensure youtube_videos is properly formatted
       const toolsData = data.map(tool => ({
         ...tool,
         youtube_videos: tool.youtube_videos 
-          ? JSON.parse(JSON.stringify(tool.youtube_videos))
-          : null
+          ? (typeof tool.youtube_videos === 'string' 
+              ? JSON.parse(tool.youtube_videos) 
+              : tool.youtube_videos)
+          : []
       }));
       
       // Cast the data to Tool[] type
@@ -59,7 +62,7 @@ export default function Tools() {
         case 'name':
           return a.name.localeCompare(b.name);
         case 'newest':
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+          return new Date(b.created_at || '').getTime() - new Date(a.created_at || '').getTime();
         case 'popular':
           return (b.downloads_count || 0) - (a.downloads_count || 0);
         default:
@@ -79,7 +82,7 @@ export default function Tools() {
       const matchesCategory = 
         selectedCategory === 'all' || 
         (selectedCategory === 'featured' && tool.rating && tool.rating >= 4.5) ||
-        tool.category.toLowerCase() === selectedCategory.toLowerCase();
+        (tool.category && tool.category.toLowerCase() === selectedCategory.toLowerCase());
 
       return matchesSearch && matchesCategory;
     });
@@ -93,7 +96,7 @@ export default function Tools() {
       acc[category.label] = tools.filter(tool => 
         category.id === 'all' ? true : 
         category.id === 'featured' ? (tool.rating && tool.rating >= 4.5) :
-        tool.category.toLowerCase() === category.id.toLowerCase()
+        (tool.category && tool.category.toLowerCase() === category.id.toLowerCase())
       ).length;
       return acc;
     }, {} as { [key: string]: number });

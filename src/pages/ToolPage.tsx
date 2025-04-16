@@ -43,7 +43,11 @@ export default function ToolPage() {
       // Parse youtube_videos JSON if it exists
       const toolData = {
         ...data,
-        youtube_videos: data.youtube_videos ? JSON.parse(JSON.stringify(data.youtube_videos)) : null
+        youtube_videos: data.youtube_videos 
+          ? (typeof data.youtube_videos === 'string' 
+              ? JSON.parse(data.youtube_videos)
+              : data.youtube_videos)
+          : []
       };
       
       // Fix: Cast the data to Tool type
@@ -52,6 +56,7 @@ export default function ToolPage() {
     enabled: !!id && id !== ':id', // Only run query if we have a valid ID
   });
 
+  // Helper functions
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({
@@ -170,27 +175,4 @@ export default function ToolPage() {
       </div>
     </div>
   );
-
-  function handleShare() {
-    if (navigator.share) {
-      navigator.share({
-        title: tool?.name,
-        text: tool?.description || `Check out ${tool?.name}`,
-        url: window.location.href,
-      }).catch((error) => console.log('Error sharing:', error));
-    }
-  }
-
-  function handleTwitterShare() {
-    const text = encodeURIComponent(`Check out ${tool?.name}${tool?.description ? `: ${tool.description}` : ''}`);
-    const url = encodeURIComponent(window.location.href);
-    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
-  }
-
-  function getYoutubeEmbedUrl(url: string) {
-    const videoId = url.includes('watch?v=') 
-      ? url.split('watch?v=')[1].split('&')[0]
-      : url.split('/').pop();
-    return `https://www.youtube.com/embed/${videoId}`;
-  }
 }

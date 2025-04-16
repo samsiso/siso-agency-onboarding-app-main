@@ -51,15 +51,18 @@ export interface MockTypes {
     downloads_count?: number;
     created_at?: string;
     youtube_videos?: any[];
+    youtube_url?: string;
   };
 }
 
 /**
  * Enhanced query function for tables not in the Database type
  * This helps bypass TypeScript errors for tables that don't exist in the Database type
+ * @returns A query builder that bypasses TypeScript's type checking
  */
 export function enhancedTableQuery(tableName: string) {
-  return supabase.from(tableName);
+  // Use the any type to bypass TypeScript's type checking
+  return supabase.from(tableName as any);
 }
 
 /**
@@ -67,7 +70,8 @@ export function enhancedTableQuery(tableName: string) {
  * This helps with tables that are not in the Database type
  */
 export function safeTableQuery(tableName: string) {
-  return supabase.from(tableName);
+  // Use the any type to bypass TypeScript's type checking
+  return supabase.from(tableName as any);
 }
 
 /**
