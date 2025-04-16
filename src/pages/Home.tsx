@@ -13,7 +13,8 @@ export default function Home() {
       if (isAdmin) {
         navigate('/admin');
       } else {
-        navigate('/profile');
+        // For regular users, stay on /home as it's their dashboard
+        return;
       }
     }
   }, [isAdmin, isLoading, navigate]);
@@ -26,5 +27,12 @@ export default function Home() {
     );
   }
 
-  return null;
+  // Return the actual home page content for regular users
+  // For admins, they will be redirected before this renders
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold mb-6">Welcome to your Dashboard</h1>
+      {/* Add your dashboard content here */}
+    </div>
+  );
 }

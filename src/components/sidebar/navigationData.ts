@@ -1,3 +1,4 @@
+
 import { 
   LayoutDashboard, 
   ClipboardList, 
@@ -6,8 +7,7 @@ import {
   Users,
   Settings,
   User,
-  Home, Layout, Briefcase, Folder, CreditCard, 
-  HelpCircle,
+  Home, Layout, Briefcase, Folder
 } from 'lucide-react';
 import { MenuSection } from './types';
 import { useAdminCheck } from '@/hooks/useAdminCheck';
@@ -78,7 +78,7 @@ export const getMenuSections = (): MenuSection[] => {
   }
 
   // Return regular user navigation
-  const sections: MenuSection[] = [
+  return [
     {
       type: 'main',
       href: '/home',
@@ -109,8 +109,8 @@ export const getMenuSections = (): MenuSection[] => {
     },
     {
       type: 'section',
-      title: 'Financial',
-      icon: CreditCard,
+      title: 'Performance',
+      icon: Trophy,
       items: [
         {
           href: '/economy/leaderboards',
@@ -121,17 +121,20 @@ export const getMenuSections = (): MenuSection[] => {
     },
     {
       type: 'section',
-      title: 'Support & Settings',
+      title: 'Settings',
       icon: Settings,
       items: [
         {
           href: '/profile',
-          icon: Settings,
+          icon: User,
           label: 'Profile',
+        },
+        {
+          href: '/settings',
+          icon: Settings,
+          label: 'Settings',
         }
       ]
     }
   ];
-
-  return sections;
 };

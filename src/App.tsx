@@ -12,6 +12,10 @@ import Portfolio from './pages/Portfolio';
 import AdminPlans from './pages/AdminPlans';
 import AdminTemplates from './pages/AdminTemplates';
 import AdminDashboard from './pages/AdminDashboard';
+import OnboardingChat from './pages/OnboardingChat';
+import Plan from './pages/Plan';
+import ThankYouPlan from './pages/ThankYouPlan';
+import MyProjects from './pages/MyProjects';
 
 function App() {
   return (
@@ -21,19 +25,24 @@ function App() {
         {/* Public routes */}
         <Route path="/" element={<Index />} />
         <Route path="/auth" element={<Auth />} />
+        <Route path="/onboarding/chat" element={<AuthGuard><OnboardingChat /></AuthGuard>} />
+        <Route path="/thank-you-plan" element={<AuthGuard><ThankYouPlan /></AuthGuard>} />
         
-        {/* Admin routes - protected with AuthGuard */}
+        {/* Admin routes */}
         <Route path="/admin" element={<AuthGuard><AdminDashboard /></AuthGuard>} />
         <Route path="/admin/plans" element={<AuthGuard><AdminPlans /></AuthGuard>} />
         <Route path="/admin/templates" element={<AuthGuard><AdminTemplates /></AuthGuard>} />
         <Route path="/admin/plans/create" element={<AuthGuard><AdminPlans /></AuthGuard>} />
         <Route path="/admin/plans/:planId/edit" element={<AuthGuard><AdminPlans /></AuthGuard>} />
         
-        {/* Protected routes */}
+        {/* Protected routes - available to all authenticated users */}
+        <Route path="/home" element={<AuthGuard><Home /></AuthGuard>} />
         <Route path="/profile" element={<AuthGuard><Profile /></AuthGuard>} />
         <Route path="/settings" element={<AuthGuard><SettingsPage /></AuthGuard>} />
         <Route path="/portfolio" element={<AuthGuard><Portfolio /></AuthGuard>} />
         <Route path="/economy/leaderboards" element={<AuthGuard><LeaderboardPage /></AuthGuard>} />
+        <Route path="/plan-builder" element={<AuthGuard><Plan /></AuthGuard>} />
+        <Route path="/my-projects" element={<AuthGuard><MyProjects /></AuthGuard>} />
       </Routes>
     </>
   );
