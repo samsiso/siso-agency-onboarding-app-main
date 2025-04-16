@@ -1,3 +1,4 @@
+
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useClientsList } from '@/hooks/client';
 import { ClientData, ClientViewPreference } from '@/types/client.types';
@@ -20,6 +21,7 @@ import {
 import { ClientStatusBadge } from './ClientStatusBadge';
 import { ClientAnalyticsCards } from './ClientAnalyticsCards';
 import { ColumnManager } from './ColumnManager';
+import { ClientAddForm } from './ClientAddForm';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { formatRelativeTime } from '@/lib/formatters';

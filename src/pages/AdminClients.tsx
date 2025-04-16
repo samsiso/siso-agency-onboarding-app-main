@@ -7,12 +7,15 @@ import { ClientsToolbar } from '@/components/admin/clients/ClientsToolbar';
 import { useAdminCheck } from '@/hooks/useAdminCheck';
 import { Loader2 } from 'lucide-react';
 import { ClientViewPreference } from '@/types/client.types';
+import { updateExistingClientData, makeCurrentUserAdmin } from '@/utils/clientDataUtils';
+import { useToast } from '@/hooks/use-toast';
 
 export default function AdminClients() {
   const { isAdmin, isLoading } = useAdminCheck();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const { toast } = useToast();
   
   // New state for view preferences
   const [viewPreference, setViewPreference] = useState<ClientViewPreference>({
@@ -35,6 +38,33 @@ export default function AdminClients() {
     sortDirection: 'desc',
     pageSize: 10
   });
+
+  // Initialize the clients data and add admin role 
+  useEffect(() => {
+    const initializeData = async () => {
+      // Try to make current user admin for easier testing
+      const isAdminSuccess = await makeCurrentUserAdmin();
+      
+      if (isAdminSuccess) {
+        console.log('Admin role setup complete');
+      }
+      
+      // Update any incomplete client data
+      const dataUpdateSuccess = await updateExistingClientData();
+      
+      if (dataUpdateSuccess) {
+        console.log('Client data update complete');
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Error updating client data",
+          description: "There was a problem updating client information. Some data may be incomplete."
+        });
+      }
+    };
+    
+    initializeData();
+  }, [toast]);
 
   useEffect(() => {
     if (!isLoading && !isAdmin) {

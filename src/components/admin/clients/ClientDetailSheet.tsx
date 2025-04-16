@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/sheet';
 import { ClientStatusBadge } from './ClientStatusBadge';
 import { Button } from '@/components/ui/button';
-import { X, ExternalLink, Mail, Phone, Globe, MessageCircle } from 'lucide-react';
+import { X, ExternalLink, Mail, Phone, Globe, MessageCircle, Edit } from 'lucide-react';
 import { useClientDetails } from '@/hooks/client/useClientDetails';
 import { Loader2 } from 'lucide-react';
 import { formatRelativeTime } from '@/lib/formatters';
@@ -27,7 +27,7 @@ interface ClientDetailSheetProps {
 }
 
 export function ClientDetailSheet({ clientId, isOpen, onClose }: ClientDetailSheetProps) {
-  const { client, isLoading } = useClientDetails(clientId);
+  const { client, isLoading, error } = useClientDetails(clientId);
   
   // Close sheet when escape key is pressed
   useEffect(() => {
@@ -38,6 +38,10 @@ export function ClientDetailSheet({ clientId, isOpen, onClose }: ClientDetailShe
     window.addEventListener('keydown', handleEscape);
     return () => window.removeEventListener('keydown', handleEscape);
   }, [onClose]);
+
+  if (error) {
+    console.error("Error loading client details:", error);
+  }
   
   return (
     <Sheet open={isOpen} onOpenChange={open => !open && onClose()}>
@@ -222,7 +226,7 @@ export function ClientDetailSheet({ clientId, isOpen, onClose }: ClientDetailShe
               </TooltipProvider>
               
               <Button variant="default">
-                <Edit2 className="h-4 w-4 mr-2" />
+                <Edit className="h-4 w-4 mr-2" />
                 Edit Client
               </Button>
             </div>
@@ -230,25 +234,5 @@ export function ClientDetailSheet({ clientId, isOpen, onClose }: ClientDetailShe
         )}
       </SheetContent>
     </Sheet>
-  );
-}
-
-// Adding the Edit2 icon since it was used in the component but not imported
-function Edit2(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
-    </svg>
   );
 }

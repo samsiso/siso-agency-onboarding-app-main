@@ -32,10 +32,11 @@ export const useClientDetails = (clientId: string | null) => {
         
       } catch (error: any) {
         console.error('Error in useClientDetails:', error);
-        return null;
+        throw error; // Let the error propagate for better debugging
       }
     },
-    enabled: !!clientId
+    enabled: !!clientId,
+    retry: 1 // Only retry once to avoid excessive requests
   });
   
   return {
