@@ -32,7 +32,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { ClientDetailSheet } from './ClientDetailSheet';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
-import React from 'react'; // Add React import to fix UMD global issue
+import * as React from 'react'; // Fix UMD global issue
 
 interface ClientsTableProps {
   searchQuery?: string;
@@ -123,7 +123,6 @@ export function ClientsTable({ searchQuery = '', statusFilter = 'all' }: Clients
               <TableHead className="w-12">
                 <Checkbox 
                   checked={selectedClients.length === clients.length && clients.length > 0}
-                  // Remove indeterminate prop and use aria-checked instead
                   aria-checked={selectedClients.length > 0 && selectedClients.length < clients.length ? "mixed" : undefined}
                   onCheckedChange={handleSelectAll}
                   aria-label="Select all clients"
@@ -138,17 +137,33 @@ export function ClientsTable({ searchQuery = '', statusFilter = 'all' }: Clients
                 </Button>
               </TableHead>
               <TableHead>
-                <Button variant="ghost" onClick={() => handleSort('status')} className="flex items-center">
-                  Status
-                  {sortColumn === 'status' && (
+                <Button variant="ghost" onClick={() => handleSort('project_name')} className="flex items-center">
+                  Project Name
+                  {sortColumn === 'project_name' && (
                     <ArrowUpDown className={`ml-1 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
                   )}
                 </Button>
               </TableHead>
               <TableHead>
-                <Button variant="ghost" onClick={() => handleSort('current_step')} className="flex items-center">
-                  Onboarding
-                  {sortColumn === 'current_step' && (
+                <Button variant="ghost" onClick={() => handleSort('company_niche')} className="flex items-center">
+                  Company Niche
+                  {sortColumn === 'company_niche' && (
+                    <ArrowUpDown className={`ml-1 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                  )}
+                </Button>
+              </TableHead>
+              <TableHead>
+                <Button variant="ghost" onClick={() => handleSort('development_url')} className="flex items-center">
+                  Development URL
+                  {sortColumn === 'development_url' && (
+                    <ArrowUpDown className={`ml-1 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                  )}
+                </Button>
+              </TableHead>
+              <TableHead>
+                <Button variant="ghost" onClick={() => handleSort('status')} className="flex items-center">
+                  Status
+                  {sortColumn === 'status' && (
                     <ArrowUpDown className={`ml-1 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
                   )}
                 </Button>
@@ -167,7 +182,7 @@ export function ClientsTable({ searchQuery = '', statusFilter = 'all' }: Clients
           <TableBody>
             {clients.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center h-32 text-muted-foreground">
+                <TableCell colSpan={8} className="text-center h-32 text-muted-foreground">
                   No clients found matching your search criteria.
                 </TableCell>
               </TableRow>
@@ -188,20 +203,25 @@ export function ClientsTable({ searchQuery = '', statusFilter = 'all' }: Clients
                     </div>
                   </TableCell>
                   <TableCell>
-                    <ClientStatusBadge status={client.status} />
+                    {client.project_name || '-'}
                   </TableCell>
                   <TableCell>
-                    <div className="flex flex-col">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm">Step {client.current_step} of {client.total_steps}</span>
-                        <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-purple-500" 
-                            style={{ width: `${(client.current_step / client.total_steps) * 100}%` }} 
-                          />
-                        </div>
-                      </div>
-                    </div>
+                    {client.company_niche || '-'}
+                  </TableCell>
+                  <TableCell>
+                    {client.development_url ? (
+                      <a 
+                        href={client.development_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:underline flex items-center"
+                      >
+                        View <ExternalLink className="ml-1 h-3 w-3" />
+                      </a>
+                    ) : '-'}
+                  </TableCell>
+                  <TableCell>
+                    <ClientStatusBadge status={client.status} />
                   </TableCell>
                   <TableCell>
                     {formatRelativeTime(client.updated_at)}

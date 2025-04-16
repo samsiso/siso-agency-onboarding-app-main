@@ -28,6 +28,17 @@ export interface ClientData {
   website_url?: string | null;
   professional_role?: string | null;
   bio?: string | null;
+  // New fields
+  project_name?: string | null;
+  company_niche?: string | null;
+  development_url?: string | null;
+  mvp_build_status?: string | null;
+  notion_plan_url?: string | null;
+  payment_status?: string | null;
+  estimated_price?: number | null;
+  initial_contact_date?: string | null;
+  start_date?: string | null;
+  estimated_completion_date?: string | null;
 }
 
 export const useClientsList = ({
@@ -56,6 +67,16 @@ export const useClientsList = ({
           created_at,
           updated_at,
           user_id,
+          project_name,
+          company_niche,
+          development_url,
+          mvp_build_status,
+          notion_plan_url,
+          payment_status,
+          estimated_price,
+          initial_contact_date,
+          start_date,
+          estimated_completion_date,
           profiles:user_id (
             full_name,
             email,
@@ -74,16 +95,15 @@ export const useClientsList = ({
       // Apply search filter
       if (searchQuery) {
         // Add filter conditions for both name and email
-        query = query.or(`profiles.full_name.ilike.%${searchQuery}%,profiles.email.ilike.%${searchQuery}%`);
+        query = query.or(`profiles.full_name.ilike.%${searchQuery}%,profiles.email.ilike.%${searchQuery}%,project_name.ilike.%${searchQuery}%,company_niche.ilike.%${searchQuery}%`);
       }
       
       // First get count of all matching records
-      const countResult = await query.count();
-      const count = countResult.count || 0;
+      const { count, error: countError } = await query.count();
       
-      if (countResult.error) {
-        console.error('Error fetching clients count:', countResult.error);
-        throw countResult.error;
+      if (countError) {
+        console.error('Error fetching clients count:', countError);
+        throw countError;
       }
       
       // Then fetch the page of data
@@ -109,11 +129,22 @@ export const useClientsList = ({
         business_name: safePropertyAccess(item.profiles, 'business_name', null),
         avatar_url: safePropertyAccess(item.profiles, 'avatar_url', null),
         phone: safePropertyAccess(item.profiles, 'phone', null),
+        // New fields
+        project_name: item.project_name || null,
+        company_niche: item.company_niche || null,
+        development_url: item.development_url || null,
+        mvp_build_status: item.mvp_build_status || null,
+        notion_plan_url: item.notion_plan_url || null,
+        payment_status: item.payment_status || null,
+        estimated_price: item.estimated_price || null,
+        initial_contact_date: item.initial_contact_date || null,
+        start_date: item.start_date || null,
+        estimated_completion_date: item.estimated_completion_date || null,
       }));
       
       return {
         clients: processedData,
-        totalCount: count
+        totalCount: count || 0
       };
     },
   });

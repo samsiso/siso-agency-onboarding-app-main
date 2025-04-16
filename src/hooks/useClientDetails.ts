@@ -20,6 +20,16 @@ export const useClientDetails = (clientId: string) => {
           created_at,
           updated_at,
           user_id,
+          project_name,
+          company_niche,
+          development_url,
+          mvp_build_status,
+          notion_plan_url,
+          payment_status,
+          estimated_price,
+          initial_contact_date,
+          start_date,
+          estimated_completion_date,
           profiles:user_id (
             full_name,
             email,
@@ -54,6 +64,17 @@ export const useClientDetails = (clientId: string) => {
         website_url: safePropertyAccess(data.profiles, 'website_url', null),
         professional_role: safePropertyAccess(data.profiles, 'professional_role', null),
         bio: safePropertyAccess(data.profiles, 'bio', null),
+        // New fields
+        project_name: data.project_name || null,
+        company_niche: data.company_niche || null,
+        development_url: data.development_url || null,
+        mvp_build_status: data.mvp_build_status || null,
+        notion_plan_url: data.notion_plan_url || null,
+        payment_status: data.payment_status || null,
+        estimated_price: data.estimated_price || null,
+        initial_contact_date: data.initial_contact_date || null,
+        start_date: data.start_date || null,
+        estimated_completion_date: data.estimated_completion_date || null,
       };
       
       return clientData;
