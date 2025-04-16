@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { useClientsList } from '@/hooks/useClientsList';
+import { useClientsList } from '@/hooks/client'; // Updated import path
 import { 
   Table, 
   TableBody, 
