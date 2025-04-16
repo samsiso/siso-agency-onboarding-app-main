@@ -1,4 +1,3 @@
-
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useClientsList } from '@/hooks/client';
 import { ClientData, ClientViewPreference } from '@/types/client.types';
@@ -203,7 +202,20 @@ export function ClientsTable({
   };
 
   const handleColumnsChange = (newColumns: typeof viewPreference.columns) => {
-    onViewPreferenceChange({ columns: newColumns });
+    // Ensure the columns have label property
+    const columnsWithLabels = newColumns.map(col => {
+      if (!col.label) {
+        return {
+          ...col,
+          label: col.key.replace(/_/g, ' ').split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ')
+        };
+      }
+      return col;
+    });
+    
+    onViewPreferenceChange({ columns: columnsWithLabels });
   };
 
   // Scroll table to horizontally when editing cells

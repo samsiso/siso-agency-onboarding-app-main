@@ -10,26 +10,19 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Settings2 } from 'lucide-react';
-
-interface ColumnDef {
-  key: string;
-  label: string;
-  visible: boolean;
-  required?: boolean;
-  type?: 'text' | 'number' | 'select' | 'date' | 'url' | 'status';
-}
+import { ClientColumnPreference } from '@/types/client.types';
 
 interface ColumnManagerProps {
-  columns: ColumnDef[];
-  onColumnsChange: (columns: ColumnDef[]) => void;
+  columns: ClientColumnPreference[];
+  onColumnsChange: (columns: ClientColumnPreference[]) => void;
 }
 
 export function ColumnManager({ columns, onColumnsChange }: ColumnManagerProps) {
-  const [localColumns, setLocalColumns] = useState<ColumnDef[]>(columns);
+  const [localColumns, setLocalColumns] = useState<ClientColumnPreference[]>(columns);
 
   const handleColumnToggle = (columnKey: string) => {
     const newColumns = localColumns.map(col => {
-      if (col.key === columnKey && !col.required) {
+      if (col.key === columnKey) {
         return { ...col, visible: !col.visible };
       }
       return col;
@@ -54,11 +47,9 @@ export function ColumnManager({ columns, onColumnsChange }: ColumnManagerProps) 
           <DropdownMenuCheckboxItem
             key={column.key}
             checked={column.visible}
-            disabled={column.required}
             onCheckedChange={() => handleColumnToggle(column.key)}
           >
-            {column.label}
-            {column.required && <span className="ml-1 text-xs text-muted-foreground">(required)</span>}
+            {column.label || column.key.replace(/_/g, ' ')}
           </DropdownMenuCheckboxItem>
         ))}
       </DropdownMenuContent>

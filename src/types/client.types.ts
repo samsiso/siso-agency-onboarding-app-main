@@ -45,6 +45,7 @@ export interface ClientsListResponse {
 export interface ClientColumnPreference {
   key: string;
   visible: boolean;
+  label?: string; // Add label property to match ColumnDef interface
 }
 
 export interface ClientViewPreference {
