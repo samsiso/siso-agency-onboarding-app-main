@@ -32,6 +32,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { ClientDetailSheet } from './ClientDetailSheet';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import React from 'react'; // Add React import to fix UMD global issue
 
 interface ClientsTableProps {
   searchQuery?: string;
@@ -122,7 +123,8 @@ export function ClientsTable({ searchQuery = '', statusFilter = 'all' }: Clients
               <TableHead className="w-12">
                 <Checkbox 
                   checked={selectedClients.length === clients.length && clients.length > 0}
-                  indeterminate={selectedClients.length > 0 && selectedClients.length < clients.length}
+                  // Remove indeterminate prop and use aria-checked instead
+                  aria-checked={selectedClients.length > 0 && selectedClients.length < clients.length ? "mixed" : undefined}
                   onCheckedChange={handleSelectAll}
                   aria-label="Select all clients"
                 />

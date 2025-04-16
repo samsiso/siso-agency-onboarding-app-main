@@ -1,6 +1,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { safePropertyAccess } from '@/utils/errorSuppressions';
 
 interface ClientsListParams {
   page?: number;
@@ -14,7 +15,7 @@ interface ClientsListParams {
 export interface ClientData {
   id: string;
   full_name: string;
-  email: string;
+  email: string | null;
   business_name: string | null;
   phone: string | null;
   avatar_url: string | null;
@@ -24,6 +25,9 @@ export interface ClientData {
   completed_steps: string[];
   created_at: string;
   updated_at: string;
+  website_url?: string | null;
+  professional_role?: string | null;
+  bio?: string | null;
 }
 
 export const useClientsList = ({
@@ -74,11 +78,12 @@ export const useClientsList = ({
       }
       
       // First get count of all matching records
-      const { count, error: countError } = await query.count();
+      const countResult = await query.count();
+      const count = countResult.count || 0;
       
-      if (countError) {
-        console.error('Error fetching clients count:', countError);
-        throw countError;
+      if (countResult.error) {
+        console.error('Error fetching clients count:', countResult.error);
+        throw countResult.error;
       }
       
       // Then fetch the page of data
@@ -93,23 +98,22 @@ export const useClientsList = ({
       // Process and flatten the data structure
       const processedData = data.map((item) => ({
         id: item.id,
-        user_id: item.user_id,
         status: item.status,
         current_step: item.current_step,
         total_steps: item.total_steps,
         completed_steps: item.completed_steps || [],
         created_at: item.created_at,
         updated_at: item.updated_at,
-        full_name: item.profiles?.full_name || 'Unknown',
-        email: item.profiles?.email || null,
-        business_name: item.profiles?.business_name || null,
-        avatar_url: item.profiles?.avatar_url || null,
-        phone: item.profiles?.phone || null,
+        full_name: safePropertyAccess(item.profiles, 'full_name', 'Unknown'),
+        email: safePropertyAccess(item.profiles, 'email', null),
+        business_name: safePropertyAccess(item.profiles, 'business_name', null),
+        avatar_url: safePropertyAccess(item.profiles, 'avatar_url', null),
+        phone: safePropertyAccess(item.profiles, 'phone', null),
       }));
       
       return {
         clients: processedData,
-        totalCount: count || 0
+        totalCount: count
       };
     },
   });
