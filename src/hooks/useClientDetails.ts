@@ -47,13 +47,13 @@ export const useClientDetails = (clientId: string) => {
         
         if (error) {
           console.error('Error fetching client details:', error);
-          // Instead of trying to access properties on an error object,
-          // return a fallback object that matches the expected structure
+          // Return fallback object instead of trying to access properties on error
           return getFallbackClientData(clientId);
         }
         
         // Only process data if it exists and is not an error
-        if (data && !('code' in data)) {
+        if (data) {
+          // Safely extract profile data with a default empty object
           const profileData = data.profiles || {};
           
           // Safely process the data to get a flattened structure
@@ -108,74 +108,9 @@ export const useClientDetails = (clientId: string) => {
 
 // Helper function to create a fallback client data object
 function getFallbackClientData(clientId: string): ClientData {
-  try {
-    // For critical errors, try to get just the basic profile data
-    // This is a fallback query that might work even if the main one fails
-    return supabase
-      .from('client_onboarding')
-      .select(`
-        id,
-        status,
-        current_step,
-        total_steps,
-        completed_steps,
-        created_at,
-        updated_at,
-        user_id,
-        profiles:user_id (
-          full_name,
-          email,
-          business_name,
-          avatar_url,
-          phone
-        )
-      `)
-      .eq('id', clientId)
-      .single()
-      .then(({ data }) => {
-        if (data) {
-          const profileData = data.profiles || {};
-          
-          return {
-            id: data.id || clientId,
-            status: data.status || 'pending',
-            current_step: data.current_step || 1,
-            total_steps: data.total_steps || 5,
-            completed_steps: Array.isArray(data.completed_steps) ? data.completed_steps : [],
-            created_at: data.created_at || new Date().toISOString(),
-            updated_at: data.updated_at || new Date().toISOString(),
-            full_name: profileData?.full_name || 'Unknown',
-            email: profileData?.email || null,
-            business_name: profileData?.business_name || null,
-            avatar_url: profileData?.avatar_url || null,
-            phone: profileData?.phone || null,
-            website_url: null,
-            professional_role: null,
-            bio: null,
-            project_name: null,
-            company_niche: null,
-            development_url: null,
-            mvp_build_status: null,
-            notion_plan_url: null,
-            payment_status: null,
-            estimated_price: null,
-            initial_contact_date: null,
-            start_date: null,
-            estimated_completion_date: null,
-          };
-        }
-        
-        // Return a minimal fallback object if nothing else works
-        return createDefaultClientData(clientId);
-      })
-      .catch(() => {
-        // Return default client data if even the fallback query fails
-        return createDefaultClientData(clientId);
-      });
-  } catch {
-    // Return default client data if anything goes wrong
-    return createDefaultClientData(clientId);
-  }
+  // Create and return a basic default client object
+  // No longer trying to do a fallback query, which was causing type errors
+  return createDefaultClientData(clientId);
 }
 
 // Helper function to create a default client data object with minimal required fields
