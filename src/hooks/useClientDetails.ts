@@ -47,8 +47,8 @@ export const useClientDetails = (clientId: string) => {
         
         if (error) {
           console.error('Error fetching client details:', error);
-          // Return fallback object instead of trying to access properties on error
-          return getFallbackClientData(clientId);
+          // Return fallback object without attempting to access properties on error
+          return createDefaultClientData(clientId);
         }
         
         // Only process data if it exists and is not an error
@@ -93,11 +93,11 @@ export const useClientDetails = (clientId: string) => {
         }
         
         // If we get here, either there was an error or data is invalid
-        return getFallbackClientData(clientId);
+        return createDefaultClientData(clientId);
       } catch (error: any) {
         console.error('Error in useClientDetails:', error);
         // Return fallback object for any errors
-        return getFallbackClientData(clientId);
+        return createDefaultClientData(clientId);
       }
     },
     enabled: !!clientId,
@@ -105,13 +105,6 @@ export const useClientDetails = (clientId: string) => {
 
   return { client, isLoading, error };
 };
-
-// Helper function to create a fallback client data object
-function getFallbackClientData(clientId: string): ClientData {
-  // Create and return a basic default client object
-  // No longer trying to do a fallback query, which was causing type errors
-  return createDefaultClientData(clientId);
-}
 
 // Helper function to create a default client data object with minimal required fields
 function createDefaultClientData(clientId: string): ClientData {
