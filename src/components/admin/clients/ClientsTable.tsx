@@ -1,6 +1,7 @@
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { useClientsList } from '@/hooks/client';
+import { ClientData, ClientViewPreference } from '@/types/client.types';
 import { 
   Table, 
   TableBody, 
@@ -25,18 +26,26 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { formatRelativeTime } from '@/lib/formatters';
 import { 
   ArrowUpDown, 
+  Check,
   ChevronDown, 
   Download,
-  Edit2, 
+  Edit2,
   ExternalLink, 
   Filter,
   MoreHorizontal, 
   Plus,
   RefreshCw,
-  Trash2 
+  Save,
+  Trash2,
+  X
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ClientDetailSheet } from './ClientDetailSheet';
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
 import { 
   Pagination, 
   PaginationContent, 
@@ -45,59 +54,57 @@ import {
   PaginationNext, 
   PaginationPrevious 
 } from '@/components/ui/pagination';
+import { 
+  Tooltip, 
+  TooltipContent, 
+  TooltipProvider, 
+  TooltipTrigger 
+} from '@/components/ui/tooltip';
+import { Input } from '@/components/ui/input';
+import { toast } from 'react-hot-toast';
 import * as React from 'react';
-
-interface ColumnDef {
-  key: string;
-  label: string;
-  visible: boolean;
-  required?: boolean;
-  type?: 'text' | 'number' | 'select' | 'date' | 'url' | 'status';
-}
 
 interface ClientsTableProps {
   searchQuery?: string;
   statusFilter?: string;
+  viewPreference: ClientViewPreference;
+  onViewPreferenceChange: (preference: Partial<ClientViewPreference>) => void;
 }
 
-export function ClientsTable({ searchQuery = '', statusFilter = 'all' }: ClientsTableProps) {
+export function ClientsTable({ 
+  searchQuery = '', 
+  statusFilter = 'all',
+  viewPreference,
+  onViewPreferenceChange
+}: ClientsTableProps) {
   // Pagination state
   const [page, setPage] = useState(1);
-  const [pageSize] = useState(10);
   
   // Selection state
   const [selectedClients, setSelectedClients] = useState<string[]>([]);
   
-  // Sorting state
-  const [sortColumn, setSortColumn] = useState<string>('updated_at');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
-  
   // Active client state
   const [activeClient, setActiveClient] = useState<string | null>(null);
   
-  // Column visibility state
-  const [columns, setColumns] = useState<ColumnDef[]>([
-    { key: 'full_name', label: 'Client', visible: true, required: true },
-    { key: 'project_name', label: 'Project Name', visible: true },
-    { key: 'company_niche', label: 'Company Niche', visible: true },
-    { key: 'development_url', label: 'Development URL', visible: true },
-    { key: 'status', label: 'Status', visible: true },
-    { key: 'updated_at', label: 'Last Updated', visible: true },
-    { key: 'email', label: 'Email', visible: false },
-    { key: 'phone', label: 'Phone', visible: false },
-    { key: 'estimated_price', label: 'Project Value', visible: false },
-    { key: 'start_date', label: 'Start Date', visible: false },
-    { key: 'estimated_completion_date', label: 'Est. Completion', visible: false },
-  ]);
+  // Inline editing state
+  const [editingCell, setEditingCell] = useState<{id: string, field: string} | null>(null);
+  const [editValue, setEditValue] = useState<string>('');
+  const editInputRef = useRef<HTMLInputElement>(null);
+
+  // Get column definitions from view preferences
+  const visibleColumns = useMemo(() => 
+    viewPreference.columns.filter(col => col.visible),
+    [viewPreference.columns]
+  );
   
   // Fetch client data
   const { clients, isLoading, totalCount, refetch } = useClientsList({
     page,
-    pageSize,
+    pageSize: viewPreference.pageSize,
     searchQuery,
     statusFilter, 
-    sortColumn,
-    sortDirection
+    sortColumn: viewPreference.sortColumn,
+    sortDirection: viewPreference.sortDirection
   });
   
   // Calculate analytics data
@@ -117,15 +124,57 @@ export function ClientsTable({ searchQuery = '', statusFilter = 'all' }: Clients
     };
   }, [clients, totalCount]);
   
-  const totalPages = Math.ceil(totalCount / pageSize);
+  const totalPages = Math.ceil(totalCount / viewPreference.pageSize);
+
+  // Start editing a cell
+  const handleStartEdit = (client: ClientData, field: string) => {
+    setEditingCell({ id: client.id, field });
+    setEditValue(String(client[field as keyof ClientData] || ''));
+    
+    // Focus the input after it renders
+    setTimeout(() => {
+      if (editInputRef.current) {
+        editInputRef.current.focus();
+      }
+    }, 0);
+  };
+
+  // Save edited cell value
+  const handleSaveEdit = () => {
+    if (!editingCell) return;
+    
+    // In a real implementation, this would make an API call to update the data
+    toast.success(`Updated ${editingCell.field} for client ${editingCell.id}`);
+    console.log('Saving edit:', editingCell, editValue);
+    
+    setEditingCell(null);
+  };
+
+  // Cancel editing
+  const handleCancelEdit = () => {
+    setEditingCell(null);
+  };
+
+  // Handle keydown events in edit mode
+  const handleEditKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSaveEdit();
+    } else if (e.key === 'Escape') {
+      handleCancelEdit();
+    }
+  };
 
   // Table handlers
   const handleSort = (column: string) => {
-    if (sortColumn === column) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    if (viewPreference.sortColumn === column) {
+      onViewPreferenceChange({
+        sortDirection: viewPreference.sortDirection === 'asc' ? 'desc' : 'asc'
+      });
     } else {
-      setSortColumn(column);
-      setSortDirection('asc');
+      onViewPreferenceChange({
+        sortColumn: column,
+        sortDirection: 'asc'
+      });
     }
   };
 
@@ -153,10 +202,19 @@ export function ClientsTable({ searchQuery = '', statusFilter = 'all' }: Clients
     setActiveClient(null);
   };
 
-  const handleColumnsChange = (newColumns: ColumnDef[]) => {
-    setColumns(newColumns);
-    // Here we could save column preferences to user settings/local storage
+  const handleColumnsChange = (newColumns: typeof viewPreference.columns) => {
+    onViewPreferenceChange({ columns: newColumns });
   };
+
+  // Scroll table to horizontally when editing cells
+  useEffect(() => {
+    if (editingCell && editInputRef.current) {
+      const cell = editInputRef.current.parentElement;
+      if (cell) {
+        cell.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+      }
+    }
+  }, [editingCell]);
 
   // Render loading state
   if (isLoading) {
@@ -191,9 +249,6 @@ export function ClientsTable({ searchQuery = '', statusFilter = 'all' }: Clients
       </div>
     );
   }
-
-  // Get visible columns
-  const visibleColumns = columns.filter(col => col.visible);
 
   return (
     <div className="space-y-6">
@@ -238,89 +293,121 @@ export function ClientsTable({ searchQuery = '', statusFilter = 'all' }: Clients
             Filter
           </Button>
           <ColumnManager 
-            columns={columns} 
+            columns={viewPreference.columns} 
             onColumnsChange={handleColumnsChange}
           />
         </div>
       </div>
       
       {/* Clients Table */}
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-12">
-                <Checkbox 
-                  checked={selectedClients.length === clients.length && clients.length > 0}
-                  onCheckedChange={handleSelectAll}
-                  aria-label="Select all clients"
-                  className={selectedClients.length > 0 && selectedClients.length < clients.length ? "opacity-80" : ""}
-                />
-              </TableHead>
-              
-              {visibleColumns.map(column => (
-                <TableHead key={column.key}>
-                  <Button 
-                    variant="ghost" 
-                    onClick={() => handleSort(column.key)} 
-                    className="flex items-center font-semibold"
-                  >
-                    {column.label}
-                    {sortColumn === column.key && (
-                      <ArrowUpDown className={`ml-1 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                    )}
-                  </Button>
-                </TableHead>
-              ))}
-              
-              <TableHead className="w-12">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {clients.length === 0 ? (
+      <div className="rounded-md border overflow-hidden">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader className="sticky top-0 bg-background z-10">
               <TableRow>
-                <TableCell colSpan={visibleColumns.length + 2} className="text-center h-32 text-muted-foreground">
-                  No clients found matching your search criteria.
-                </TableCell>
+                <TableHead className="w-12">
+                  <Checkbox 
+                    checked={selectedClients.length === clients.length && clients.length > 0}
+                    onCheckedChange={handleSelectAll}
+                    aria-label="Select all clients"
+                    className={selectedClients.length > 0 && selectedClients.length < clients.length ? "opacity-80" : ""}
+                  />
+                </TableHead>
+                
+                {visibleColumns.map(column => (
+                  <TableHead 
+                    key={column.key} 
+                    className="min-w-[120px]"
+                  >
+                    <Button 
+                      variant="ghost" 
+                      onClick={() => handleSort(column.key)} 
+                      className="flex items-center font-semibold hover:bg-transparent"
+                    >
+                      <span className="capitalize">{column.key.replace(/_/g, ' ')}</span>
+                      {viewPreference.sortColumn === column.key && (
+                        <ArrowUpDown className={`ml-1 h-4 w-4 ${viewPreference.sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                      )}
+                    </Button>
+                  </TableHead>
+                ))}
+                
+                <TableHead className="w-12 sticky right-0 bg-background">Actions</TableHead>
               </TableRow>
-            ) : (
-              clients.map((client) => (
-                <TableRow key={client.id} className="group">
-                  <TableCell>
-                    <Checkbox 
-                      checked={selectedClients.includes(client.id)}
-                      onCheckedChange={() => handleSelectClient(client.id)}
-                      aria-label={`Select ${client.full_name}`}
-                    />
+            </TableHeader>
+            <TableBody>
+              {clients.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={visibleColumns.length + 2} className="text-center h-32 text-muted-foreground">
+                    No clients found matching your search criteria.
                   </TableCell>
-                  
-                  {visibleColumns.map(column => {
-                    switch (column.key) {
-                      case 'full_name':
-                        return (
-                          <TableCell key={column.key}>
-                            <div className="flex flex-col">
-                              <span className="font-medium">{client.full_name || 'Unknown'}</span>
-                              <span className="text-sm text-muted-foreground">{client.email || 'No email'}</span>
+                </TableRow>
+              ) : (
+                clients.map((client) => (
+                  <TableRow key={client.id} className="group">
+                    <TableCell>
+                      <Checkbox 
+                        checked={selectedClients.includes(client.id)}
+                        onCheckedChange={() => handleSelectClient(client.id)}
+                        aria-label={`Select ${client.full_name}`}
+                      />
+                    </TableCell>
+                    
+                    {visibleColumns.map(column => {
+                      // Check if this cell is being edited
+                      const isEditing = editingCell?.id === client.id && editingCell?.field === column.key;
+                      
+                      // Format cell based on column type
+                      const renderCell = () => {
+                        // If in edit mode, show input field
+                        if (isEditing) {
+                          return (
+                            <div className="flex items-center">
+                              <Input
+                                ref={editInputRef}
+                                value={editValue}
+                                onChange={(e) => setEditValue(e.target.value)}
+                                onKeyDown={handleEditKeyDown}
+                                className="h-8 min-w-[120px]"
+                                autoFocus
+                              />
+                              <div className="flex items-center ml-1">
+                                <Button 
+                                  size="icon" 
+                                  variant="ghost" 
+                                  className="h-6 w-6" 
+                                  onClick={handleSaveEdit}
+                                >
+                                  <Check className="h-3 w-3 text-green-500" />
+                                </Button>
+                                <Button 
+                                  size="icon" 
+                                  variant="ghost" 
+                                  className="h-6 w-6" 
+                                  onClick={handleCancelEdit}
+                                >
+                                  <X className="h-3 w-3 text-red-500" />
+                                </Button>
+                              </div>
                             </div>
-                          </TableCell>
-                        );
-                      case 'status':
-                        return (
-                          <TableCell key={column.key}>
-                            <ClientStatusBadge status={client.status} />
-                          </TableCell>
-                        );
-                      case 'updated_at':
-                        return (
-                          <TableCell key={column.key}>
-                            {formatRelativeTime(client.updated_at)}
-                          </TableCell>
-                        );
-                      case 'development_url':
-                        return (
-                          <TableCell key={column.key}>
-                            {client.development_url ? (
+                          );
+                        }
+
+                        // Custom rendering for specific column types
+                        switch (column.key) {
+                          case 'full_name':
+                            return (
+                              <div className="flex flex-col">
+                                <span className="font-medium">{client.full_name || 'Unknown'}</span>
+                                <span className="text-sm text-muted-foreground">{client.email || 'No email'}</span>
+                              </div>
+                            );
+                          case 'status':
+                            return <ClientStatusBadge status={client.status} />;
+                          case 'updated_at':
+                            return formatRelativeTime(client.updated_at);
+                          case 'development_url':
+                            return client.development_url ? (
                               <a 
                                 href={client.development_url} 
                                 target="_blank" 
@@ -329,49 +416,76 @@ export function ClientsTable({ searchQuery = '', statusFilter = 'all' }: Clients
                               >
                                 View <ExternalLink className="ml-1 h-3 w-3" />
                               </a>
-                            ) : '-'}
-                          </TableCell>
-                        );
-                      default:
-                        return (
-                          <TableCell key={column.key}>
-                            {client[column.key as keyof typeof client] || '-'}
-                          </TableCell>
-                        );
-                    }
-                  })}
-                  
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => handleOpenDetails(client.id)}>
-                          <ExternalLink className="h-4 w-4 mr-2" />
-                          View Details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Edit2 className="h-4 w-4 mr-2" />
-                          Edit Client
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-destructive">
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          Delete Client
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+                            ) : '-';
+                          case 'estimated_price':
+                            return client.estimated_price 
+                              ? `$${client.estimated_price.toLocaleString()}` 
+                              : '-';
+                          case 'start_date':
+                          case 'estimated_completion_date':
+                            return client[column.key as keyof typeof client] 
+                              ? new Date(client[column.key as keyof typeof client] as string).toLocaleDateString() 
+                              : '-';
+                          default:
+                            return client[column.key as keyof typeof client] || '-';
+                        }
+                      };
+
+                      return (
+                        <TableCell 
+                          key={column.key}
+                          className="relative group"
+                          onDoubleClick={() => handleStartEdit(client, column.key)}
+                        >
+                          {renderCell()}
+                          {!isEditing && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6 absolute right-2 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
+                              onClick={() => handleStartEdit(client, column.key)}
+                            >
+                              <Edit2 className="h-3 w-3" />
+                            </Button>
+                          )}
+                        </TableCell>
+                      );
+                    })}
+                    
+                    <TableCell className="sticky right-0 bg-background">
+                      <TooltipProvider>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={() => handleOpenDetails(client.id)}>
+                              <ExternalLink className="h-4 w-4 mr-2" />
+                              View Details
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <Edit2 className="h-4 w-4 mr-2" />
+                              Edit Client
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-destructive">
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Delete Client
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TooltipProvider>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
       {/* Pagination */}
