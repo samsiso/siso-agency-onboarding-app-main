@@ -1,61 +1,46 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { ClientData } from '@/types/client.types';
-import { createDefaultClientData, processClientDetail } from '@/utils/clientDataProcessors';
+import { processClientData } from '@/utils/clientQueryBuilders';
+import { safeSupabase } from '@/utils/supabaseHelpers';
 
-export const useClientDetails = (clientId: string) => {
-  const { data: client, isLoading, error } = useQuery({
+export const useClientDetails = (clientId: string | null) => {
+  const { data, isLoading, error } = useQuery({
     queryKey: ['client-details', clientId],
     queryFn: async () => {
+      if (!clientId) return null;
+      
       try {
-        // Fetch client data
-        const { data, error } = await supabase
+        const { data, error } = await safeSupabase
           .from('client_onboarding')
-          .select(`
-            id,
-            status,
-            current_step,
-            total_steps,
-            completed_steps,
-            created_at,
-            updated_at,
-            user_id,
-            profiles:user_id (
-              full_name,
-              email,
-              business_name,
-              avatar_url,
-              phone,
-              website_url,
-              professional_role,
-              bio
-            )
-          `)
+          .select('*')
           .eq('id', clientId)
           .single();
         
-        // If there's an error, log it and return the default client data
         if (error) {
           console.error('Error fetching client details:', error);
-          return createDefaultClientData(clientId);
+          throw error;
         }
         
-        // Only proceed if data exists and is not an error
-        if (data) {
-          return processClientDetail(data, clientId);
+        if (!data) {
+          return null;
         }
         
-        // If we get here, either there was an error or data is invalid
-        return createDefaultClientData(clientId);
+        // Process the client data
+        const [processedClient] = processClientData([data]);
+        return processedClient;
+        
       } catch (error: any) {
         console.error('Error in useClientDetails:', error);
-        // Return fallback object for any errors
-        return createDefaultClientData(clientId);
+        return null;
       }
     },
-    enabled: !!clientId,
+    enabled: !!clientId
   });
-
-  return { client, isLoading, error };
+  
+  return {
+    client: data as ClientData | null,
+    isLoading,
+    error
+  };
 };

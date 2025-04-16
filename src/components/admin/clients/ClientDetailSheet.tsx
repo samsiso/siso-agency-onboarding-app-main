@@ -1,257 +1,254 @@
 
-import { useState, useEffect } from 'react';
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
+import { useEffect } from 'react';
+import { 
+  Sheet, 
+  SheetContent, 
+  SheetHeader, 
   SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
+  SheetClose
+} from '@/components/ui/sheet';
 import { ClientStatusBadge } from './ClientStatusBadge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { X, ExternalLink, Mail, Phone, Globe, MessageCircle } from 'lucide-react';
 import { useClientDetails } from '@/hooks/client/useClientDetails';
+import { Loader2 } from 'lucide-react';
 import { formatRelativeTime } from '@/lib/formatters';
-import { Activity, AlignLeft, Clock, Edit2, Mail, Phone, User, Users } from 'lucide-react';
+import { 
+  Tooltip, 
+  TooltipContent, 
+  TooltipProvider, 
+  TooltipTrigger 
+} from '@/components/ui/tooltip';
 
 interface ClientDetailSheetProps {
-  clientId: string;
+  clientId: string | null;
   isOpen: boolean;
   onClose: () => void;
 }
 
-export function ClientDetailSheet({ 
-  clientId, 
-  isOpen, 
-  onClose 
-}: ClientDetailSheetProps) {
-  const [activeTab, setActiveTab] = useState('overview');
+export function ClientDetailSheet({ clientId, isOpen, onClose }: ClientDetailSheetProps) {
   const { client, isLoading } = useClientDetails(clientId);
-
-  // Reset active tab when client changes
+  
+  // Close sheet when escape key is pressed
   useEffect(() => {
-    setActiveTab('overview');
-  }, [clientId]);
-
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [onClose]);
+  
   return (
-    <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <SheetContent className="sm:max-w-xl overflow-y-auto">
-        <SheetHeader className="pb-4">
-          <SheetTitle className="flex items-center justify-between">
-            {isLoading ? (
-              <Skeleton className="h-8 w-48" />
-            ) : (
-              <div className="flex flex-col">
-                <div className="text-2xl font-bold">{client?.full_name || 'Client Details'}</div>
-                <div className="text-sm text-muted-foreground">{client?.email || 'No email'}</div>
-              </div>
-            )}
-            {!isLoading && client && (
-              <div className="flex items-center gap-2">
-                <ClientStatusBadge status={client.status} />
-                <Button size="icon" variant="ghost" className="h-8 w-8">
-                  <Edit2 className="h-4 w-4" />
-                </Button>
-              </div>
-            )}
-          </SheetTitle>
+    <Sheet open={isOpen} onOpenChange={open => !open && onClose()}>
+      <SheetContent className="w-[600px] sm:max-w-xl overflow-y-auto">
+        <SheetHeader className="flex flex-row items-center justify-between mb-6">
+          <SheetTitle>Client Details</SheetTitle>
+          <SheetClose asChild>
+            <Button variant="ghost" size="icon" onClick={onClose}>
+              <X className="h-4 w-4" />
+            </Button>
+          </SheetClose>
         </SheetHeader>
-
+        
         {isLoading ? (
-          <div className="space-y-4 mt-4">
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-32 w-full" />
-            <Skeleton className="h-32 w-full" />
+          <div className="flex items-center justify-center h-96">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
-        ) : client ? (
-          <>
-            <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="mt-2">
-              <TabsList className="grid grid-cols-4 mb-4">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="projects">Projects</TabsTrigger>
-                <TabsTrigger value="activity">Activity</TabsTrigger>
-                <TabsTrigger value="notes">Notes</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="overview" className="space-y-4">
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg">Client Information</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-start gap-2">
-                      <User className="h-4 w-4 mt-0.5 text-muted-foreground" />
-                      <div className="space-y-1">
-                        <p className="text-sm font-medium">Full Name</p>
-                        <p className="text-sm">{client.full_name || 'Not provided'}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start gap-2">
-                      <Mail className="h-4 w-4 mt-0.5 text-muted-foreground" />
-                      <div className="space-y-1">
-                        <p className="text-sm font-medium">Email</p>
-                        <p className="text-sm">{client.email || 'Not provided'}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-2">
-                      <Users className="h-4 w-4 mt-0.5 text-muted-foreground" />
-                      <div className="space-y-1">
-                        <p className="text-sm font-medium">Company</p>
-                        <p className="text-sm">{client.business_name || 'Not provided'}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start gap-2">
-                      <Phone className="h-4 w-4 mt-0.5 text-muted-foreground" />
-                      <div className="space-y-1">
-                        <p className="text-sm font-medium">Phone</p>
-                        <p className="text-sm">{client.phone || 'Not provided'}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg">Onboarding Progress</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium">Progress</span>
-                          <span className="text-sm">{Math.round((client.current_step / client.total_steps) * 100)}%</span>
-                        </div>
-                        <span className="text-sm text-muted-foreground">Step {client.current_step} of {client.total_steps}</span>
-                      </div>
-
-                      <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-purple-500" 
-                          style={{ width: `${(client.current_step / client.total_steps) * 100}%` }} 
-                        />
-                      </div>
-
-                      <div className="space-y-2 mt-2">
-                        {client.completed_steps && client.completed_steps.map((step, index) => (
-                          <div key={index} className="flex items-center gap-2">
-                            <div className="h-4 w-4 rounded-full bg-green-500 flex items-center justify-center">
-                              <svg className="h-2.5 w-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path>
-                              </svg>
-                            </div>
-                            <span className="text-sm">{step}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg">Timeline</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex gap-3">
-                        <div className="flex flex-col items-center">
-                          <div className="w-2 h-2 rounded-full bg-purple-500"></div>
-                          <div className="w-0.5 h-full bg-purple-200"></div>
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium">Account Created</div>
-                          <div className="text-xs text-muted-foreground">{formatRelativeTime(client.created_at)}</div>
-                        </div>
-                      </div>
-                      <div className="flex gap-3">
-                        <div className="flex flex-col items-center">
-                          <div className="w-2 h-2 rounded-full bg-purple-500"></div>
-                          <div className="w-0.5 h-full bg-purple-200"></div>
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium">Onboarding Started</div>
-                          <div className="text-xs text-muted-foreground">{formatRelativeTime(client.created_at)}</div>
-                        </div>
-                      </div>
-                      <div className="flex gap-3">
-                        <div className="flex flex-col items-center">
-                          <div className="w-2 h-2 rounded-full bg-purple-500"></div>
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium">Last Updated</div>
-                          <div className="text-xs text-muted-foreground">{formatRelativeTime(client.updated_at)}</div>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              
-              <TabsContent value="projects" className="space-y-4">
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg">Projects</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-center py-8 text-muted-foreground">
-                      <AlignLeft className="h-12 w-12 mx-auto mb-3 opacity-20" />
-                      <p>No projects found for this client.</p>
-                      <Button variant="outline" className="mt-4">
-                        Create New Project
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              
-              <TabsContent value="activity" className="space-y-4">
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg">Recent Activity</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-center py-8 text-muted-foreground">
-                      <Activity className="h-12 w-12 mx-auto mb-3 opacity-20" />
-                      <p>No recent activity recorded.</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              
-              <TabsContent value="notes" className="space-y-4">
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg">Notes</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-center py-8 text-muted-foreground">
-                      <AlignLeft className="h-12 w-12 mx-auto mb-3 opacity-20" />
-                      <p>No notes added for this client.</p>
-                      <Button variant="outline" className="mt-4">
-                        Add Note
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
-          </>
+        ) : !client ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Client details not available</p>
+          </div>
         ) : (
-          <div className="flex flex-col items-center justify-center h-64">
-            <p className="text-center text-muted-foreground">Client not found</p>
+          <div className="space-y-6">
+            {/* Header with Avatar and Status */}
+            <div className="flex items-center gap-4">
+              <div className="h-20 w-20 rounded-full overflow-hidden bg-muted">
+                {client.avatar_url ? (
+                  <img 
+                    src={client.avatar_url} 
+                    alt={client.full_name || 'Client avatar'} 
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="h-full w-full flex items-center justify-center bg-primary/10 text-primary font-bold text-xl">
+                    {(client.full_name || 'C').charAt(0)}
+                  </div>
+                )}
+              </div>
+              
+              <div>
+                <h2 className="text-xl font-bold">{client.full_name}</h2>
+                <p className="text-muted-foreground">{client.business_name || 'No company'}</p>
+                <div className="mt-2">
+                  <ClientStatusBadge status={client.status} />
+                </div>
+              </div>
+            </div>
+            
+            {/* Contact Information */}
+            <div className="border rounded-md p-4 space-y-3">
+              <h3 className="font-semibold mb-2">Contact Information</h3>
+              
+              <div className="grid grid-cols-1 gap-3">
+                {client.email && (
+                  <div className="flex items-center gap-2">
+                    <Mail className="h-4 w-4 text-muted-foreground" />
+                    <a 
+                      href={`mailto:${client.email}`} 
+                      className="text-blue-500 hover:underline"
+                    >
+                      {client.email}
+                    </a>
+                  </div>
+                )}
+                
+                {client.phone && (
+                  <div className="flex items-center gap-2">
+                    <Phone className="h-4 w-4 text-muted-foreground" />
+                    <a 
+                      href={`tel:${client.phone}`} 
+                      className="text-blue-500 hover:underline"
+                    >
+                      {client.phone}
+                    </a>
+                  </div>
+                )}
+                
+                {client.website_url && (
+                  <div className="flex items-center gap-2">
+                    <Globe className="h-4 w-4 text-muted-foreground" />
+                    <a 
+                      href={client.website_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:underline flex items-center"
+                    >
+                      {client.website_url}
+                      <ExternalLink className="ml-1 h-3 w-3" />
+                    </a>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            {/* Project Information */}
+            <div className="border rounded-md p-4">
+              <h3 className="font-semibold mb-4">Project Information</h3>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Project Name</p>
+                  <p>{client.project_name || 'Not specified'}</p>
+                </div>
+                
+                <div>
+                  <p className="text-sm text-muted-foreground">Industry</p>
+                  <p>{client.company_niche || 'Not specified'}</p>
+                </div>
+                
+                <div>
+                  <p className="text-sm text-muted-foreground">Development URL</p>
+                  {client.development_url ? (
+                    <a 
+                      href={client.development_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:underline flex items-center"
+                    >
+                      View Site <ExternalLink className="ml-1 h-3 w-3" />
+                    </a>
+                  ) : (
+                    <p>Not available</p>
+                  )}
+                </div>
+                
+                <div>
+                  <p className="text-sm text-muted-foreground">Initial Contact</p>
+                  <p>{client.initial_contact_date 
+                    ? formatRelativeTime(client.initial_contact_date) 
+                    : 'Unknown'}</p>
+                </div>
+              </div>
+              
+              {/* Onboarding Progress */}
+              <div className="mt-6">
+                <div className="flex justify-between items-center mb-2">
+                  <p className="text-sm font-medium">Onboarding Progress</p>
+                  <p className="text-sm text-muted-foreground">
+                    {client.current_step} of {client.total_steps} steps
+                  </p>
+                </div>
+                
+                <div className="h-2 w-full bg-secondary overflow-hidden rounded-full">
+                  <div 
+                    className="h-full bg-primary rounded-full" 
+                    style={{ 
+                      width: `${(client.current_step / client.total_steps) * 100}%`
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+            
+            {/* Quick Actions */}
+            <div className="flex flex-wrap gap-2">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Mail className="h-4 w-4 mr-2" />
+                      Email
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {client.email ? 'Send an email' : 'No email available'}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <MessageCircle className="h-4 w-4 mr-2" />
+                      Message
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    Send an internal message
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              
+              <Button variant="default">
+                <Edit2 className="h-4 w-4 mr-2" />
+                Edit Client
+              </Button>
+            </div>
           </div>
         )}
       </SheetContent>
     </Sheet>
+  );
+}
+
+// Adding the Edit2 icon since it was used in the component but not imported
+function Edit2(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+    </svg>
   );
 }

@@ -352,34 +352,49 @@ export type Database = {
       }
       client_onboarding: {
         Row: {
+          company_name: string | null
+          company_niche: string | null
           completed_steps: string[] | null
+          contact_name: string | null
           created_at: string | null
           current_step: number | null
           id: string
+          project_name: string | null
           status: string
           total_steps: number | null
           updated_at: string | null
           user_id: string | null
+          website_url: string | null
         }
         Insert: {
+          company_name?: string | null
+          company_niche?: string | null
           completed_steps?: string[] | null
+          contact_name?: string | null
           created_at?: string | null
           current_step?: number | null
           id?: string
+          project_name?: string | null
           status?: string
           total_steps?: number | null
           updated_at?: string | null
           user_id?: string | null
+          website_url?: string | null
         }
         Update: {
+          company_name?: string | null
+          company_niche?: string | null
           completed_steps?: string[] | null
+          contact_name?: string | null
           created_at?: string | null
           current_step?: number | null
           id?: string
+          project_name?: string | null
           status?: string
           total_steps?: number | null
           updated_at?: string | null
           user_id?: string | null
+          website_url?: string | null
         }
         Relationships: []
       }
