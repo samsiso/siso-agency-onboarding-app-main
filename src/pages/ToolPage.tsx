@@ -10,7 +10,7 @@ import { ToolActions } from '@/components/tools/ToolActions';
 import { ToolStats } from '@/components/tools/ToolStats';
 import { ToolVideos } from '@/components/tools/ToolVideos';
 import { ToolTags } from '@/components/tools/ToolTags';
-import { enhancedTableQuery, castToMockType } from '@/utils/errorSuppressions';
+import { enhancedTableQuery, castToMockType, MockTypes } from '@/utils/errorSuppressions';
 
 export default function ToolPage() {
   const { id } = useParams();
@@ -24,34 +24,72 @@ export default function ToolPage() {
       }
       
       console.log('Fetching tool with ID:', id);
-      // Fix: Use enhancedTableQuery to bypass TypeScript errors for tables not in the Database type
-      const { data, error } = await enhancedTableQuery('core_tools')
-        .select('*')
-        .eq('id', id)
-        .maybeSingle();
       
-      if (error) {
-        console.error('Error fetching tool:', error);
+      try {
+        // Query the core_tools table
+        const { data, error } = await enhancedTableQuery('core_tools')
+          .select('*')
+          .eq('id', id)
+          .maybeSingle();
+        
+        if (error) {
+          console.error('Error fetching tool:', error);
+          throw error;
+        }
+
+        if (!data) {
+          console.error('Tool not found with ID:', id);
+          throw new Error('Tool not found');
+        }
+        
+        // Ensure we're treating the data as an object we can work with
+        const toolRawData = data as any;
+        
+        // Process youtube_videos field if it exists
+        let youtubeVideos = [];
+        if (toolRawData.youtube_videos) {
+          try {
+            if (typeof toolRawData.youtube_videos === 'string') {
+              youtubeVideos = JSON.parse(toolRawData.youtube_videos);
+            } else {
+              youtubeVideos = toolRawData.youtube_videos;
+            }
+          } catch (e) {
+            console.error('Error parsing youtube_videos:', e);
+            youtubeVideos = [];
+          }
+        }
+        
+        // Construct our properly typed tool object
+        const toolData: Tool = {
+          id: toolRawData.id,
+          name: toolRawData.name,
+          description: toolRawData.description,
+          category: toolRawData.category || '',
+          rating: toolRawData.rating,
+          downloads_count: toolRawData.downloads_count,
+          created_at: toolRawData.created_at,
+          youtube_videos: youtubeVideos,
+          youtube_url: toolRawData.youtube_url,
+          likes_count: toolRawData.likes_count,
+          pricing_type: toolRawData.pricing_type,
+          website_url: toolRawData.website_url,
+          docs_url: toolRawData.docs_url,
+          github_url: toolRawData.github_url,
+          tags: toolRawData.tags,
+          assistant_type: toolRawData.assistant_type,
+          profile_image_url: toolRawData.profile_image_url,
+          member_type: toolRawData.member_type,
+          specialization: toolRawData.specialization,
+          content_themes: toolRawData.content_themes,
+          use_cases: toolRawData.use_cases
+        };
+        
+        return toolData;
+      } catch (error) {
+        console.error('Error in tool query:', error);
         throw error;
       }
-
-      if (!data) {
-        console.error('Tool not found with ID:', id);
-        throw new Error('Tool not found');
-      }
-      
-      // Parse youtube_videos JSON if it exists
-      const toolData = {
-        ...data,
-        youtube_videos: data.youtube_videos 
-          ? (typeof data.youtube_videos === 'string' 
-              ? JSON.parse(data.youtube_videos)
-              : data.youtube_videos)
-          : []
-      };
-      
-      // Fix: Cast the data to Tool type
-      return toolData as Tool;
     },
     enabled: !!id && id !== ':id', // Only run query if we have a valid ID
   });

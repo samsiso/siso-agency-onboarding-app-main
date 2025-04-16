@@ -29,28 +29,70 @@ export default function Tools() {
     queryKey: ['core_tools'],
     queryFn: async () => {
       console.log('Fetching tools from core_tools table...');
-      // Fix: Use enhancedTableQuery to bypass TypeScript errors for tables not in the Database type
-      const { data, error } = await enhancedTableQuery('core_tools')
-        .select('*');
-      
-      if (error) {
-        console.error('Error fetching tools:', error);
-        toast.error('Failed to load tools. Please try again later.');
+      try {
+        // Query the core_tools table
+        const { data, error } = await enhancedTableQuery('core_tools')
+          .select('*');
+        
+        if (error) {
+          console.error('Error fetching tools:', error);
+          toast.error('Failed to load tools. Please try again later.');
+          throw error;
+        }
+        
+        if (!data || !Array.isArray(data)) {
+          console.error('Invalid data format returned from core_tools');
+          return [];
+        }
+        
+        // Process the raw data and ensure proper typing
+        const toolsData: Tool[] = data.map((rawTool: any) => {
+          // Handle youtube_videos parsing
+          let youtubeVideos = [];
+          if (rawTool.youtube_videos) {
+            try {
+              if (typeof rawTool.youtube_videos === 'string') {
+                youtubeVideos = JSON.parse(rawTool.youtube_videos);
+              } else {
+                youtubeVideos = rawTool.youtube_videos;
+              }
+            } catch (e) {
+              console.error('Error parsing youtube_videos:', e);
+              youtubeVideos = [];
+            }
+          }
+          
+          // Construct a properly typed Tool object
+          return {
+            id: rawTool.id,
+            name: rawTool.name,
+            description: rawTool.description,
+            category: rawTool.category || '',
+            rating: rawTool.rating,
+            downloads_count: rawTool.downloads_count,
+            created_at: rawTool.created_at,
+            youtube_videos: youtubeVideos,
+            youtube_url: rawTool.youtube_url,
+            likes_count: rawTool.likes_count,
+            pricing_type: rawTool.pricing_type,
+            website_url: rawTool.website_url,
+            docs_url: rawTool.docs_url,
+            github_url: rawTool.github_url,
+            tags: rawTool.tags,
+            assistant_type: rawTool.assistant_type,
+            profile_image_url: rawTool.profile_image_url,
+            member_type: rawTool.member_type,
+            specialization: rawTool.specialization,
+            content_themes: rawTool.content_themes,
+            use_cases: rawTool.use_cases
+          };
+        });
+        
+        return toolsData;
+      } catch (error) {
+        console.error('Error in tools query:', error);
         throw error;
       }
-      
-      // Process the data - Ensure youtube_videos is properly formatted
-      const toolsData = data.map(tool => ({
-        ...tool,
-        youtube_videos: tool.youtube_videos 
-          ? (typeof tool.youtube_videos === 'string' 
-              ? JSON.parse(tool.youtube_videos) 
-              : tool.youtube_videos)
-          : []
-      }));
-      
-      // Cast the data to Tool[] type
-      return toolsData as Tool[];
     },
   });
 

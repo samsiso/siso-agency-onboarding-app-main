@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 /**
@@ -52,6 +51,18 @@ export interface MockTypes {
     created_at?: string;
     youtube_videos?: any[];
     youtube_url?: string;
+    likes_count?: number;
+    pricing_type?: string;
+    website_url?: string;
+    docs_url?: string;
+    github_url?: string;
+    tags?: string[];
+    assistant_type?: string;
+    profile_image_url?: string;
+    member_type?: string;
+    specialization?: string[];
+    content_themes?: string[];
+    use_cases?: string[];
   };
 }
 
