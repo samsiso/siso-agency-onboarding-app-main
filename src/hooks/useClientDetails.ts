@@ -58,32 +58,34 @@ export const useClientDetails = (clientId: string) => {
         // Using default values for all fields to handle missing columns
         const clientData: ClientData = {
           id: data.id || clientId,
-          status: data.status || 'pending',
-          current_step: data.current_step || 1,
-          total_steps: data.total_steps || 5,
-          completed_steps: Array.isArray(data.completed_steps) ? data.completed_steps : [],
-          created_at: data.created_at || new Date().toISOString(),
-          updated_at: data.updated_at || new Date().toISOString(),
-          full_name: data.profiles?.full_name || 'Unknown',
-          email: data.profiles?.email || null,
-          business_name: data.profiles?.business_name || null,
-          avatar_url: data.profiles?.avatar_url || null,
-          phone: data.profiles?.phone || null,
+          status: safePropertyAccess(data, 'status', 'pending'),
+          current_step: safePropertyAccess(data, 'current_step', 1),
+          total_steps: safePropertyAccess(data, 'total_steps', 5),
+          completed_steps: Array.isArray(safePropertyAccess(data, 'completed_steps', [])) 
+            ? safePropertyAccess(data, 'completed_steps', []) 
+            : [],
+          created_at: safePropertyAccess(data, 'created_at', new Date().toISOString()),
+          updated_at: safePropertyAccess(data, 'updated_at', new Date().toISOString()),
+          full_name: safePropertyAccess(data.profiles, 'full_name', 'Unknown'),
+          email: safePropertyAccess(data.profiles, 'email', null),
+          business_name: safePropertyAccess(data.profiles, 'business_name', null),
+          avatar_url: safePropertyAccess(data.profiles, 'avatar_url', null),
+          phone: safePropertyAccess(data.profiles, 'phone', null),
           // Additional fields for the detailed view
-          website_url: data.profiles?.website_url || null,
-          professional_role: data.profiles?.professional_role || null,
-          bio: data.profiles?.bio || null,
+          website_url: safePropertyAccess(data.profiles, 'website_url', null),
+          professional_role: safePropertyAccess(data.profiles, 'professional_role', null),
+          bio: safePropertyAccess(data.profiles, 'bio', null),
           // New fields - safely access or provide defaults
-          project_name: data.project_name || null,
-          company_niche: data.company_niche || null,
-          development_url: data.development_url || null,
-          mvp_build_status: data.mvp_build_status || null,
-          notion_plan_url: data.notion_plan_url || null,
-          payment_status: data.payment_status || null,
-          estimated_price: data.estimated_price || null,
-          initial_contact_date: data.initial_contact_date || null,
-          start_date: data.start_date || null,
-          estimated_completion_date: data.estimated_completion_date || null,
+          project_name: safePropertyAccess(data, 'project_name', null),
+          company_niche: safePropertyAccess(data, 'company_niche', null),
+          development_url: safePropertyAccess(data, 'development_url', null),
+          mvp_build_status: safePropertyAccess(data, 'mvp_build_status', null),
+          notion_plan_url: safePropertyAccess(data, 'notion_plan_url', null),
+          payment_status: safePropertyAccess(data, 'payment_status', null),
+          estimated_price: safePropertyAccess(data, 'estimated_price', null),
+          initial_contact_date: safePropertyAccess(data, 'initial_contact_date', null),
+          start_date: safePropertyAccess(data, 'start_date', null),
+          estimated_completion_date: safePropertyAccess(data, 'estimated_completion_date', null),
         };
         
         return clientData;
@@ -122,7 +124,7 @@ export const useClientDetails = (clientId: string) => {
         
         // Try to get basic data if possible
         try {
-          const { data: basicData } = await supabase
+          const { data: basicData, error: basicError } = await supabase
             .from('client_onboarding')
             .select(`
               id,
@@ -147,25 +149,32 @@ export const useClientDetails = (clientId: string) => {
             .eq('id', clientId)
             .single();
             
+          if (basicError) {
+            console.error('Error fetching fallback data:', basicError);
+            return fallbackClient;
+          }
+
           if (basicData) {
             // Return data with only the columns that exist
             return {
               ...fallbackClient,
-              id: basicData.id || clientId,
-              status: basicData.status || 'pending',
-              current_step: basicData.current_step || 1,
-              total_steps: basicData.total_steps || 5,
-              completed_steps: Array.isArray(basicData.completed_steps) ? basicData.completed_steps : [],
-              created_at: basicData.created_at || new Date().toISOString(),
-              updated_at: basicData.updated_at || new Date().toISOString(),
-              full_name: basicData.profiles?.full_name || 'Unknown',
-              email: basicData.profiles?.email || null,
-              business_name: basicData.profiles?.business_name || null,
-              avatar_url: basicData.profiles?.avatar_url || null,
-              phone: basicData.profiles?.phone || null,
-              website_url: basicData.profiles?.website_url || null,
-              professional_role: basicData.profiles?.professional_role || null,
-              bio: basicData.profiles?.bio || null,
+              id: safePropertyAccess(basicData, 'id', clientId),
+              status: safePropertyAccess(basicData, 'status', 'pending'),
+              current_step: safePropertyAccess(basicData, 'current_step', 1),
+              total_steps: safePropertyAccess(basicData, 'total_steps', 5),
+              completed_steps: Array.isArray(safePropertyAccess(basicData, 'completed_steps', [])) 
+                ? safePropertyAccess(basicData, 'completed_steps', []) 
+                : [],
+              created_at: safePropertyAccess(basicData, 'created_at', new Date().toISOString()),
+              updated_at: safePropertyAccess(basicData, 'updated_at', new Date().toISOString()),
+              full_name: safePropertyAccess(basicData, 'profiles.full_name', 'Unknown'),
+              email: safePropertyAccess(basicData, 'profiles.email', null),
+              business_name: safePropertyAccess(basicData, 'profiles.business_name', null),
+              avatar_url: safePropertyAccess(basicData, 'profiles.avatar_url', null),
+              phone: safePropertyAccess(basicData, 'profiles.phone', null),
+              website_url: safePropertyAccess(basicData, 'profiles.website_url', null),
+              professional_role: safePropertyAccess(basicData, 'profiles.professional_role', null),
+              bio: safePropertyAccess(basicData, 'profiles.bio', null),
             };
           }
         } catch (fallbackError) {

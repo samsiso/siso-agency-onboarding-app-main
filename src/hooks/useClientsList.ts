@@ -85,7 +85,7 @@ export const useClientsList = ({
               avatar_url,
               phone
             )
-          `)
+          `, { count: 'exact' })
           .order(sortColumn, { ascending: sortDirection === 'asc' });
         
         // Apply status filter if not 'all'
@@ -100,12 +100,13 @@ export const useClientsList = ({
         }
         
         // First get count of all matching records
-        const countResult = await query.count();
+        const countResult = await query;
         
-        // Safely get the count (handle case where countResult doesn't have count property)
-        const count = countResult && typeof countResult === 'object' && 'count' in countResult 
-          ? countResult.count as number || 0
-          : 0;
+        // Safely get the count - handle various response formats
+        let count = 0;
+        if (countResult && 'count' in countResult) {
+          count = countResult.count as number || 0;
+        }
         
         // Then fetch the page of data
         const { data, error: dataError } = await query
@@ -124,31 +125,37 @@ export const useClientsList = ({
         }
         
         // Process and flatten the data structure with safe access patterns
-        const processedData = data.map((item: any) => ({
-          id: item.id || '',
-          status: item.status || 'pending',
-          current_step: item.current_step || 1,
-          total_steps: item.total_steps || 5,
-          completed_steps: Array.isArray(item.completed_steps) ? item.completed_steps : [],
-          created_at: item.created_at || new Date().toISOString(),
-          updated_at: item.updated_at || new Date().toISOString(),
-          full_name: item.profiles?.full_name || 'Unknown',
-          email: item.profiles?.email || null,
-          business_name: item.profiles?.business_name || null,
-          avatar_url: item.profiles?.avatar_url || null,
-          phone: item.profiles?.phone || null,
-          // New fields with safe access
-          project_name: item.project_name || null,
-          company_niche: item.company_niche || null,
-          development_url: item.development_url || null,
-          mvp_build_status: item.mvp_build_status || null,
-          notion_plan_url: item.notion_plan_url || null,
-          payment_status: item.payment_status || null,
-          estimated_price: item.estimated_price || null,
-          initial_contact_date: item.initial_contact_date || null,
-          start_date: item.start_date || null,
-          estimated_completion_date: item.estimated_completion_date || null,
-        }));
+        const processedData = data.map((item: any) => {
+          const profiles = item.profiles || {};
+          
+          return {
+            id: safePropertyAccess(item, 'id', ''),
+            status: safePropertyAccess(item, 'status', 'pending'),
+            current_step: safePropertyAccess(item, 'current_step', 1),
+            total_steps: safePropertyAccess(item, 'total_steps', 5),
+            completed_steps: Array.isArray(safePropertyAccess(item, 'completed_steps', [])) 
+              ? safePropertyAccess(item, 'completed_steps', []) 
+              : [],
+            created_at: safePropertyAccess(item, 'created_at', new Date().toISOString()),
+            updated_at: safePropertyAccess(item, 'updated_at', new Date().toISOString()),
+            full_name: safePropertyAccess(profiles, 'full_name', 'Unknown'),
+            email: safePropertyAccess(profiles, 'email', null),
+            business_name: safePropertyAccess(profiles, 'business_name', null),
+            avatar_url: safePropertyAccess(profiles, 'avatar_url', null),
+            phone: safePropertyAccess(profiles, 'phone', null),
+            // New fields with safe access
+            project_name: safePropertyAccess(item, 'project_name', null),
+            company_niche: safePropertyAccess(item, 'company_niche', null),
+            development_url: safePropertyAccess(item, 'development_url', null),
+            mvp_build_status: safePropertyAccess(item, 'mvp_build_status', null),
+            notion_plan_url: safePropertyAccess(item, 'notion_plan_url', null),
+            payment_status: safePropertyAccess(item, 'payment_status', null),
+            estimated_price: safePropertyAccess(item, 'estimated_price', null),
+            initial_contact_date: safePropertyAccess(item, 'initial_contact_date', null),
+            start_date: safePropertyAccess(item, 'start_date', null),
+            estimated_completion_date: safePropertyAccess(item, 'estimated_completion_date', null),
+          };
+        });
         
         return {
           clients: processedData,
@@ -182,7 +189,7 @@ export const useClientsList = ({
                 avatar_url,
                 phone
               )
-            `)
+            `, { count: 'exact' })
             .order('updated_at', { ascending: false });
           
           if (statusFilter !== 'all') {
@@ -193,40 +200,46 @@ export const useClientsList = ({
             fallbackQuery = fallbackQuery.or(`profiles.full_name.ilike.%${searchQuery}%,profiles.email.ilike.%${searchQuery}%`);
           }
           
-          // Get count without trying to access .count property directly (to avoid TS errors)
-          const fallbackCountResult = await fallbackQuery.count();
-          fallbackCount = fallbackCountResult && typeof fallbackCountResult === 'object' 
-            ? (fallbackCountResult as any).count || 0
-            : 0;
+          // Get count without trying to access .count property directly
+          const fallbackCountResult = await fallbackQuery;
+          
+          // Safely get the count from the result
+          if (fallbackCountResult && 'count' in fallbackCountResult) {
+            fallbackCount = fallbackCountResult.count as number || 0;
+          }
           
           const { data: fallbackData } = await fallbackQuery.range(from, to);
           
           if (fallbackData && fallbackData.length > 0) {
-            fallbackClients = fallbackData.map((item: any) => ({
-              id: item.id || '',
-              status: item.status || 'pending',
-              current_step: item.current_step || 1,
-              total_steps: item.total_steps || 5,
-              completed_steps: Array.isArray(item.completed_steps) ? item.completed_steps : [],
-              created_at: item.created_at || new Date().toISOString(),
-              updated_at: item.updated_at || new Date().toISOString(),
-              full_name: item.profiles?.full_name || 'Unknown',
-              email: item.profiles?.email || null,
-              business_name: item.profiles?.business_name || null,
-              avatar_url: item.profiles?.avatar_url || null,
-              phone: item.profiles?.phone || null,
-              // Default values for new fields that don't exist yet
-              project_name: null,
-              company_niche: null,
-              development_url: null,
-              mvp_build_status: null,
-              notion_plan_url: null,
-              payment_status: null,
-              estimated_price: null,
-              initial_contact_date: null,
-              start_date: null,
-              estimated_completion_date: null,
-            }));
+            fallbackClients = fallbackData.map((item: any) => {
+              const profiles = item.profiles || {};
+              
+              return {
+                id: item.id || '',
+                status: item.status || 'pending',
+                current_step: item.current_step || 1,
+                total_steps: item.total_steps || 5,
+                completed_steps: Array.isArray(item.completed_steps) ? item.completed_steps : [],
+                created_at: item.created_at || new Date().toISOString(),
+                updated_at: item.updated_at || new Date().toISOString(),
+                full_name: profiles?.full_name || 'Unknown',
+                email: profiles?.email || null,
+                business_name: profiles?.business_name || null,
+                avatar_url: profiles?.avatar_url || null,
+                phone: profiles?.phone || null,
+                // Default values for new fields that don't exist yet
+                project_name: null,
+                company_niche: null,
+                development_url: null,
+                mvp_build_status: null,
+                notion_plan_url: null,
+                payment_status: null,
+                estimated_price: null,
+                initial_contact_date: null,
+                start_date: null,
+                estimated_completion_date: null,
+              };
+            });
           }
         } catch (fallbackError) {
           console.error('Error in fallback query:', fallbackError);
