@@ -102,12 +102,10 @@ export const useClientsList = ({
         // First get count of all matching records
         const countResult = await query.count();
         
-        if (countResult.error) {
-          console.error('Error fetching clients count:', countResult.error);
-          throw countResult.error;
-        }
-        
-        const count = countResult.count || 0;
+        // Safely get the count (handle case where countResult doesn't have count property)
+        const count = countResult && typeof countResult === 'object' && 'count' in countResult 
+          ? countResult.count as number || 0
+          : 0;
         
         // Then fetch the page of data
         const { data, error: dataError } = await query
@@ -125,21 +123,21 @@ export const useClientsList = ({
           };
         }
         
-        // Process and flatten the data structure
-        const processedData = data.map((item) => ({
-          id: item.id,
-          status: item.status,
-          current_step: item.current_step,
-          total_steps: item.total_steps,
-          completed_steps: item.completed_steps || [],
-          created_at: item.created_at,
-          updated_at: item.updated_at,
-          full_name: safePropertyAccess(item.profiles, 'full_name', 'Unknown'),
-          email: safePropertyAccess(item.profiles, 'email', null),
-          business_name: safePropertyAccess(item.profiles, 'business_name', null),
-          avatar_url: safePropertyAccess(item.profiles, 'avatar_url', null),
-          phone: safePropertyAccess(item.profiles, 'phone', null),
-          // New fields
+        // Process and flatten the data structure with safe access patterns
+        const processedData = data.map((item: any) => ({
+          id: item.id || '',
+          status: item.status || 'pending',
+          current_step: item.current_step || 1,
+          total_steps: item.total_steps || 5,
+          completed_steps: Array.isArray(item.completed_steps) ? item.completed_steps : [],
+          created_at: item.created_at || new Date().toISOString(),
+          updated_at: item.updated_at || new Date().toISOString(),
+          full_name: item.profiles?.full_name || 'Unknown',
+          email: item.profiles?.email || null,
+          business_name: item.profiles?.business_name || null,
+          avatar_url: item.profiles?.avatar_url || null,
+          phone: item.profiles?.phone || null,
+          // New fields with safe access
           project_name: item.project_name || null,
           company_niche: item.company_niche || null,
           development_url: item.development_url || null,
@@ -159,87 +157,84 @@ export const useClientsList = ({
       } catch (error: any) {
         console.error('Error in useClientsList:', error);
         
-        // If the error is about missing columns, we'll try a fallback query with only existing columns
-        if (error.message && error.message.includes("column") && error.message.includes("does not exist")) {
-          console.log("Missing columns detected, using fallback query");
+        // Fallback for any type of error
+        let fallbackClients: ClientData[] = [];
+        let fallbackCount = 0;
+        
+        // Try a fallback query with only existing columns
+        try {
+          // Fallback query with only standard columns
+          let fallbackQuery = supabase
+            .from('client_onboarding')
+            .select(`
+              id,
+              status,
+              current_step,
+              total_steps,
+              completed_steps,
+              created_at,
+              updated_at,
+              user_id,
+              profiles:user_id (
+                full_name,
+                email,
+                business_name,
+                avatar_url,
+                phone
+              )
+            `)
+            .order('updated_at', { ascending: false });
           
-          try {
-            // Fallback query with only standard columns
-            let fallbackQuery = supabase
-              .from('client_onboarding')
-              .select(`
-                id,
-                status,
-                current_step,
-                total_steps,
-                completed_steps,
-                created_at,
-                updated_at,
-                user_id,
-                profiles:user_id (
-                  full_name,
-                  email,
-                  business_name,
-                  avatar_url,
-                  phone
-                )
-              `)
-              .order('updated_at', { ascending: false });
-            
-            if (statusFilter !== 'all') {
-              fallbackQuery = fallbackQuery.eq('status', statusFilter);
-            }
-            
-            if (searchQuery) {
-              fallbackQuery = fallbackQuery.or(`profiles.full_name.ilike.%${searchQuery}%,profiles.email.ilike.%${searchQuery}%`);
-            }
-            
-            const fallbackCountResult = await fallbackQuery.count();
-            const fallbackCount = fallbackCountResult.count || 0;
-            
-            const { data: fallbackData } = await fallbackQuery.range(from, to);
-            
-            if (fallbackData && fallbackData.length > 0) {
-              const fallbackProcessedData = fallbackData.map((item) => ({
-                id: item.id,
-                status: item.status,
-                current_step: item.current_step,
-                total_steps: item.total_steps,
-                completed_steps: item.completed_steps || [],
-                created_at: item.created_at,
-                updated_at: item.updated_at,
-                full_name: safePropertyAccess(item.profiles, 'full_name', 'Unknown'),
-                email: safePropertyAccess(item.profiles, 'email', null),
-                business_name: safePropertyAccess(item.profiles, 'business_name', null),
-                avatar_url: safePropertyAccess(item.profiles, 'avatar_url', null),
-                phone: safePropertyAccess(item.profiles, 'phone', null),
-                // Default values for new fields that don't exist yet
-                project_name: null,
-                company_niche: null,
-                development_url: null,
-                mvp_build_status: null,
-                notion_plan_url: null,
-                payment_status: null,
-                estimated_price: null,
-                initial_contact_date: null,
-                start_date: null,
-                estimated_completion_date: null,
-              } as ClientData));
-              
-              return {
-                clients: fallbackProcessedData,
-                totalCount: fallbackCount
-              };
-            }
-          } catch (fallbackError) {
-            console.error('Error in fallback query:', fallbackError);
+          if (statusFilter !== 'all') {
+            fallbackQuery = fallbackQuery.eq('status', statusFilter);
           }
+          
+          if (searchQuery) {
+            fallbackQuery = fallbackQuery.or(`profiles.full_name.ilike.%${searchQuery}%,profiles.email.ilike.%${searchQuery}%`);
+          }
+          
+          // Get count without trying to access .count property directly (to avoid TS errors)
+          const fallbackCountResult = await fallbackQuery.count();
+          fallbackCount = fallbackCountResult && typeof fallbackCountResult === 'object' 
+            ? (fallbackCountResult as any).count || 0
+            : 0;
+          
+          const { data: fallbackData } = await fallbackQuery.range(from, to);
+          
+          if (fallbackData && fallbackData.length > 0) {
+            fallbackClients = fallbackData.map((item: any) => ({
+              id: item.id || '',
+              status: item.status || 'pending',
+              current_step: item.current_step || 1,
+              total_steps: item.total_steps || 5,
+              completed_steps: Array.isArray(item.completed_steps) ? item.completed_steps : [],
+              created_at: item.created_at || new Date().toISOString(),
+              updated_at: item.updated_at || new Date().toISOString(),
+              full_name: item.profiles?.full_name || 'Unknown',
+              email: item.profiles?.email || null,
+              business_name: item.profiles?.business_name || null,
+              avatar_url: item.profiles?.avatar_url || null,
+              phone: item.profiles?.phone || null,
+              // Default values for new fields that don't exist yet
+              project_name: null,
+              company_niche: null,
+              development_url: null,
+              mvp_build_status: null,
+              notion_plan_url: null,
+              payment_status: null,
+              estimated_price: null,
+              initial_contact_date: null,
+              start_date: null,
+              estimated_completion_date: null,
+            }));
+          }
+        } catch (fallbackError) {
+          console.error('Error in fallback query:', fallbackError);
         }
         
-        // If all else fails, return empty array
         return {
-          clients: [],
-          totalCount: 0
+          clients: fallbackClients,
+          totalCount: fallbackCount
         };
       }
     },
