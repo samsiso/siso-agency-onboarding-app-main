@@ -47,51 +47,50 @@ export const useClientDetails = (clientId: string) => {
         
         if (error) {
           console.error('Error fetching client details:', error);
-          throw error;
+          // Instead of throwing the error, we'll continue execution and provide fallback data
+          // We'll handle the error separately below
         }
         
-        if (!data) {
-          throw new Error('Client not found');
+        // If we have data, process it normally
+        if (data) {
+          // Safely process the data to get a flattened structure
+          // Using default values for all fields to handle missing columns
+          const clientData: ClientData = {
+            id: data.id || clientId,
+            status: safePropertyAccess(data, 'status', 'pending'),
+            current_step: safePropertyAccess(data, 'current_step', 1),
+            total_steps: safePropertyAccess(data, 'total_steps', 5),
+            completed_steps: Array.isArray(safePropertyAccess(data, 'completed_steps', [])) 
+              ? safePropertyAccess(data, 'completed_steps', []) 
+              : [],
+            created_at: safePropertyAccess(data, 'created_at', new Date().toISOString()),
+            updated_at: safePropertyAccess(data, 'updated_at', new Date().toISOString()),
+            full_name: safePropertyAccess(data.profiles, 'full_name', 'Unknown'),
+            email: safePropertyAccess(data.profiles, 'email', null),
+            business_name: safePropertyAccess(data.profiles, 'business_name', null),
+            avatar_url: safePropertyAccess(data.profiles, 'avatar_url', null),
+            phone: safePropertyAccess(data.profiles, 'phone', null),
+            // Additional fields for the detailed view
+            website_url: safePropertyAccess(data.profiles, 'website_url', null),
+            professional_role: safePropertyAccess(data.profiles, 'professional_role', null),
+            bio: safePropertyAccess(data.profiles, 'bio', null),
+            // New fields - safely access or provide defaults
+            project_name: safePropertyAccess(data, 'project_name', null),
+            company_niche: safePropertyAccess(data, 'company_niche', null),
+            development_url: safePropertyAccess(data, 'development_url', null),
+            mvp_build_status: safePropertyAccess(data, 'mvp_build_status', null),
+            notion_plan_url: safePropertyAccess(data, 'notion_plan_url', null),
+            payment_status: safePropertyAccess(data, 'payment_status', null),
+            estimated_price: safePropertyAccess(data, 'estimated_price', null),
+            initial_contact_date: safePropertyAccess(data, 'initial_contact_date', null),
+            start_date: safePropertyAccess(data, 'start_date', null),
+            estimated_completion_date: safePropertyAccess(data, 'estimated_completion_date', null),
+          };
+          
+          return clientData;
         }
         
-        // Safely process the data to get a flattened structure
-        // Using default values for all fields to handle missing columns
-        const clientData: ClientData = {
-          id: data.id || clientId,
-          status: safePropertyAccess(data, 'status', 'pending'),
-          current_step: safePropertyAccess(data, 'current_step', 1),
-          total_steps: safePropertyAccess(data, 'total_steps', 5),
-          completed_steps: Array.isArray(safePropertyAccess(data, 'completed_steps', [])) 
-            ? safePropertyAccess(data, 'completed_steps', []) 
-            : [],
-          created_at: safePropertyAccess(data, 'created_at', new Date().toISOString()),
-          updated_at: safePropertyAccess(data, 'updated_at', new Date().toISOString()),
-          full_name: safePropertyAccess(data.profiles, 'full_name', 'Unknown'),
-          email: safePropertyAccess(data.profiles, 'email', null),
-          business_name: safePropertyAccess(data.profiles, 'business_name', null),
-          avatar_url: safePropertyAccess(data.profiles, 'avatar_url', null),
-          phone: safePropertyAccess(data.profiles, 'phone', null),
-          // Additional fields for the detailed view
-          website_url: safePropertyAccess(data.profiles, 'website_url', null),
-          professional_role: safePropertyAccess(data.profiles, 'professional_role', null),
-          bio: safePropertyAccess(data.profiles, 'bio', null),
-          // New fields - safely access or provide defaults
-          project_name: safePropertyAccess(data, 'project_name', null),
-          company_niche: safePropertyAccess(data, 'company_niche', null),
-          development_url: safePropertyAccess(data, 'development_url', null),
-          mvp_build_status: safePropertyAccess(data, 'mvp_build_status', null),
-          notion_plan_url: safePropertyAccess(data, 'notion_plan_url', null),
-          payment_status: safePropertyAccess(data, 'payment_status', null),
-          estimated_price: safePropertyAccess(data, 'estimated_price', null),
-          initial_contact_date: safePropertyAccess(data, 'initial_contact_date', null),
-          start_date: safePropertyAccess(data, 'start_date', null),
-          estimated_completion_date: safePropertyAccess(data, 'estimated_completion_date', null),
-        };
-        
-        return clientData;
-      } catch (error: any) {
-        console.error('Error in useClientDetails:', error);
-        
+        // If we get here, either there was an error or no data was found
         // Provide a fallback object regardless of error type
         // This ensures the UI won't break even if the columns don't exist yet
         const fallbackClient: ClientData = {
@@ -155,10 +154,9 @@ export const useClientDetails = (clientId: string) => {
           }
 
           if (basicData) {
-            // Return data with only the columns that exist
             return {
               ...fallbackClient,
-              id: safePropertyAccess(basicData, 'id', clientId),
+              id: basicData.id || clientId,
               status: safePropertyAccess(basicData, 'status', 'pending'),
               current_step: safePropertyAccess(basicData, 'current_step', 1),
               total_steps: safePropertyAccess(basicData, 'total_steps', 5),
@@ -167,19 +165,52 @@ export const useClientDetails = (clientId: string) => {
                 : [],
               created_at: safePropertyAccess(basicData, 'created_at', new Date().toISOString()),
               updated_at: safePropertyAccess(basicData, 'updated_at', new Date().toISOString()),
-              full_name: safePropertyAccess(basicData, 'profiles.full_name', 'Unknown'),
-              email: safePropertyAccess(basicData, 'profiles.email', null),
-              business_name: safePropertyAccess(basicData, 'profiles.business_name', null),
-              avatar_url: safePropertyAccess(basicData, 'profiles.avatar_url', null),
-              phone: safePropertyAccess(basicData, 'profiles.phone', null),
-              website_url: safePropertyAccess(basicData, 'profiles.website_url', null),
-              professional_role: safePropertyAccess(basicData, 'profiles.professional_role', null),
-              bio: safePropertyAccess(basicData, 'profiles.bio', null),
+              full_name: basicData.profiles ? safePropertyAccess(basicData.profiles, 'full_name', 'Unknown') : 'Unknown',
+              email: basicData.profiles ? safePropertyAccess(basicData.profiles, 'email', null) : null,
+              business_name: basicData.profiles ? safePropertyAccess(basicData.profiles, 'business_name', null) : null,
+              avatar_url: basicData.profiles ? safePropertyAccess(basicData.profiles, 'avatar_url', null) : null,
+              phone: basicData.profiles ? safePropertyAccess(basicData.profiles, 'phone', null) : null,
+              website_url: basicData.profiles ? safePropertyAccess(basicData.profiles, 'website_url', null) : null,
+              professional_role: basicData.profiles ? safePropertyAccess(basicData.profiles, 'professional_role', null) : null,
+              bio: basicData.profiles ? safePropertyAccess(basicData.profiles, 'bio', null) : null,
             };
           }
         } catch (fallbackError) {
           console.error('Error fetching fallback data:', fallbackError);
         }
+        
+        return fallbackClient;
+      } catch (error: any) {
+        console.error('Error in useClientDetails:', error);
+        
+        // Always provide a fallback object
+        const fallbackClient: ClientData = {
+          id: clientId,
+          status: 'pending',
+          current_step: 1,
+          total_steps: 5,
+          completed_steps: [],
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          full_name: 'Unknown',
+          email: null,
+          business_name: null,
+          avatar_url: null,
+          phone: null,
+          website_url: null,
+          professional_role: null,
+          bio: null,
+          project_name: null,
+          company_niche: null,
+          development_url: null,
+          mvp_build_status: null,
+          notion_plan_url: null,
+          payment_status: null,
+          estimated_price: null,
+          initial_contact_date: null,
+          start_date: null,
+          estimated_completion_date: null,
+        };
         
         return fallbackClient;
       }

@@ -104,8 +104,8 @@ export const useClientsList = ({
         
         // Safely get the count - handle various response formats
         let count = 0;
-        if (countResult && 'count' in countResult) {
-          count = countResult.count as number || 0;
+        if (countResult && typeof countResult.count === 'number') {
+          count = countResult.count;
         }
         
         // Then fetch the page of data
@@ -117,7 +117,7 @@ export const useClientsList = ({
           throw dataError;
         }
         
-        if (!data) {
+        if (!data || data.length === 0) {
           return {
             clients: [],
             totalCount: 0
@@ -204,8 +204,8 @@ export const useClientsList = ({
           const fallbackCountResult = await fallbackQuery;
           
           // Safely get the count from the result
-          if (fallbackCountResult && 'count' in fallbackCountResult) {
-            fallbackCount = fallbackCountResult.count as number || 0;
+          if (fallbackCountResult && typeof fallbackCountResult.count === 'number') {
+            fallbackCount = fallbackCountResult.count;
           }
           
           const { data: fallbackData } = await fallbackQuery.range(from, to);
