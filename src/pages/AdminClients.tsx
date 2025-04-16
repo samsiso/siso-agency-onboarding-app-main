@@ -43,7 +43,7 @@ export default function AdminClients() {
           onStatusFilterChange={setStatusFilter}
         />
         
-        <div className="mt-4">
+        <div className="mt-6">
           <ClientsTable 
             searchQuery={searchQuery}
             statusFilter={statusFilter}

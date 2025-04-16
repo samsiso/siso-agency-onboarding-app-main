@@ -41,3 +41,15 @@ export interface ClientsListResponse {
   clients: ClientData[];
   totalCount: number;
 }
+
+export interface ClientColumnPreference {
+  key: string;
+  visible: boolean;
+}
+
+export interface ClientViewPreference {
+  columns: ClientColumnPreference[];
+  sortColumn: string;
+  sortDirection: 'asc' | 'desc';
+  pageSize: number;
+}
