@@ -99,13 +99,16 @@ export const useClientsList = ({
           query = query.or(`profiles.full_name.ilike.%${searchQuery}%,profiles.email.ilike.%${searchQuery}%,project_name.ilike.%${searchQuery}%,company_niche.ilike.%${searchQuery}%`);
         }
         
-        // First get count of all matching records
-        const countResult = await query;
-        
-        // Safely get the count - handle various response formats
+        // First get count - safely handle count property
         let count = 0;
-        if (countResult && typeof countResult.count === 'number') {
-          count = countResult.count;
+        try {
+          const countResult = await query;
+          // Check if countResult has count property
+          if (countResult && typeof countResult.count === 'number') {
+            count = countResult.count;
+          }
+        } catch (countError) {
+          console.error('Error getting count:', countError);
         }
         
         // Then fetch the page of data
@@ -200,12 +203,14 @@ export const useClientsList = ({
             fallbackQuery = fallbackQuery.or(`profiles.full_name.ilike.%${searchQuery}%,profiles.email.ilike.%${searchQuery}%`);
           }
           
-          // Get count without trying to access .count property directly
-          const fallbackCountResult = await fallbackQuery;
-          
-          // Safely get the count from the result
-          if (fallbackCountResult && typeof fallbackCountResult.count === 'number') {
-            fallbackCount = fallbackCountResult.count;
+          // Safely get the count
+          try {
+            const fallbackCountResult = await fallbackQuery;
+            if (fallbackCountResult && typeof fallbackCountResult.count === 'number') {
+              fallbackCount = fallbackCountResult.count;
+            }
+          } catch (countError) {
+            console.error('Error getting fallback count:', countError);
           }
           
           const { data: fallbackData } = await fallbackQuery.range(from, to);

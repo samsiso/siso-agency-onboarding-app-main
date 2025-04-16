@@ -47,14 +47,16 @@ export const useClientDetails = (clientId: string) => {
         
         if (error) {
           console.error('Error fetching client details:', error);
-          // Instead of throwing the error, we'll continue execution and provide fallback data
-          // We'll handle the error separately below
+          // Instead of trying to access properties on an error object,
+          // return a fallback object that matches the expected structure
+          return getFallbackClientData(clientId);
         }
         
-        // If we have data, process it normally
-        if (data) {
+        // Only process data if it exists and is not an error
+        if (data && !('code' in data)) {
+          const profileData = data.profiles || {};
+          
           // Safely process the data to get a flattened structure
-          // Using default values for all fields to handle missing columns
           const clientData: ClientData = {
             id: data.id || clientId,
             status: safePropertyAccess(data, 'status', 'pending'),
@@ -65,15 +67,15 @@ export const useClientDetails = (clientId: string) => {
               : [],
             created_at: safePropertyAccess(data, 'created_at', new Date().toISOString()),
             updated_at: safePropertyAccess(data, 'updated_at', new Date().toISOString()),
-            full_name: safePropertyAccess(data.profiles, 'full_name', 'Unknown'),
-            email: safePropertyAccess(data.profiles, 'email', null),
-            business_name: safePropertyAccess(data.profiles, 'business_name', null),
-            avatar_url: safePropertyAccess(data.profiles, 'avatar_url', null),
-            phone: safePropertyAccess(data.profiles, 'phone', null),
+            full_name: safePropertyAccess(profileData, 'full_name', 'Unknown'),
+            email: safePropertyAccess(profileData, 'email', null),
+            business_name: safePropertyAccess(profileData, 'business_name', null),
+            avatar_url: safePropertyAccess(profileData, 'avatar_url', null),
+            phone: safePropertyAccess(profileData, 'phone', null),
             // Additional fields for the detailed view
-            website_url: safePropertyAccess(data.profiles, 'website_url', null),
-            professional_role: safePropertyAccess(data.profiles, 'professional_role', null),
-            bio: safePropertyAccess(data.profiles, 'bio', null),
+            website_url: safePropertyAccess(profileData, 'website_url', null),
+            professional_role: safePropertyAccess(profileData, 'professional_role', null),
+            bio: safePropertyAccess(profileData, 'bio', null),
             // New fields - safely access or provide defaults
             project_name: safePropertyAccess(data, 'project_name', null),
             company_niche: safePropertyAccess(data, 'company_niche', null),
@@ -90,129 +92,12 @@ export const useClientDetails = (clientId: string) => {
           return clientData;
         }
         
-        // If we get here, either there was an error or no data was found
-        // Provide a fallback object regardless of error type
-        // This ensures the UI won't break even if the columns don't exist yet
-        const fallbackClient: ClientData = {
-          id: clientId,
-          status: 'pending',
-          current_step: 1,
-          total_steps: 5,
-          completed_steps: [],
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          full_name: 'Unknown',
-          email: null,
-          business_name: null,
-          avatar_url: null,
-          phone: null,
-          website_url: null,
-          professional_role: null,
-          bio: null,
-          project_name: null,
-          company_niche: null,
-          development_url: null,
-          mvp_build_status: null,
-          notion_plan_url: null,
-          payment_status: null,
-          estimated_price: null,
-          initial_contact_date: null,
-          start_date: null,
-          estimated_completion_date: null,
-        };
-        
-        // Try to get basic data if possible
-        try {
-          const { data: basicData, error: basicError } = await supabase
-            .from('client_onboarding')
-            .select(`
-              id,
-              status,
-              current_step,
-              total_steps,
-              completed_steps,
-              created_at,
-              updated_at,
-              user_id,
-              profiles:user_id (
-                full_name,
-                email,
-                business_name,
-                avatar_url,
-                phone,
-                website_url,
-                professional_role,
-                bio
-              )
-            `)
-            .eq('id', clientId)
-            .single();
-            
-          if (basicError) {
-            console.error('Error fetching fallback data:', basicError);
-            return fallbackClient;
-          }
-
-          if (basicData) {
-            return {
-              ...fallbackClient,
-              id: basicData.id || clientId,
-              status: safePropertyAccess(basicData, 'status', 'pending'),
-              current_step: safePropertyAccess(basicData, 'current_step', 1),
-              total_steps: safePropertyAccess(basicData, 'total_steps', 5),
-              completed_steps: Array.isArray(safePropertyAccess(basicData, 'completed_steps', [])) 
-                ? safePropertyAccess(basicData, 'completed_steps', []) 
-                : [],
-              created_at: safePropertyAccess(basicData, 'created_at', new Date().toISOString()),
-              updated_at: safePropertyAccess(basicData, 'updated_at', new Date().toISOString()),
-              full_name: basicData.profiles ? safePropertyAccess(basicData.profiles, 'full_name', 'Unknown') : 'Unknown',
-              email: basicData.profiles ? safePropertyAccess(basicData.profiles, 'email', null) : null,
-              business_name: basicData.profiles ? safePropertyAccess(basicData.profiles, 'business_name', null) : null,
-              avatar_url: basicData.profiles ? safePropertyAccess(basicData.profiles, 'avatar_url', null) : null,
-              phone: basicData.profiles ? safePropertyAccess(basicData.profiles, 'phone', null) : null,
-              website_url: basicData.profiles ? safePropertyAccess(basicData.profiles, 'website_url', null) : null,
-              professional_role: basicData.profiles ? safePropertyAccess(basicData.profiles, 'professional_role', null) : null,
-              bio: basicData.profiles ? safePropertyAccess(basicData.profiles, 'bio', null) : null,
-            };
-          }
-        } catch (fallbackError) {
-          console.error('Error fetching fallback data:', fallbackError);
-        }
-        
-        return fallbackClient;
+        // If we get here, either there was an error or data is invalid
+        return getFallbackClientData(clientId);
       } catch (error: any) {
         console.error('Error in useClientDetails:', error);
-        
-        // Always provide a fallback object
-        const fallbackClient: ClientData = {
-          id: clientId,
-          status: 'pending',
-          current_step: 1,
-          total_steps: 5,
-          completed_steps: [],
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          full_name: 'Unknown',
-          email: null,
-          business_name: null,
-          avatar_url: null,
-          phone: null,
-          website_url: null,
-          professional_role: null,
-          bio: null,
-          project_name: null,
-          company_niche: null,
-          development_url: null,
-          mvp_build_status: null,
-          notion_plan_url: null,
-          payment_status: null,
-          estimated_price: null,
-          initial_contact_date: null,
-          start_date: null,
-          estimated_completion_date: null,
-        };
-        
-        return fallbackClient;
+        // Return fallback object for any errors
+        return getFallbackClientData(clientId);
       }
     },
     enabled: !!clientId,
@@ -220,3 +105,106 @@ export const useClientDetails = (clientId: string) => {
 
   return { client, isLoading, error };
 };
+
+// Helper function to create a fallback client data object
+function getFallbackClientData(clientId: string): ClientData {
+  try {
+    // For critical errors, try to get just the basic profile data
+    // This is a fallback query that might work even if the main one fails
+    return supabase
+      .from('client_onboarding')
+      .select(`
+        id,
+        status,
+        current_step,
+        total_steps,
+        completed_steps,
+        created_at,
+        updated_at,
+        user_id,
+        profiles:user_id (
+          full_name,
+          email,
+          business_name,
+          avatar_url,
+          phone
+        )
+      `)
+      .eq('id', clientId)
+      .single()
+      .then(({ data }) => {
+        if (data) {
+          const profileData = data.profiles || {};
+          
+          return {
+            id: data.id || clientId,
+            status: data.status || 'pending',
+            current_step: data.current_step || 1,
+            total_steps: data.total_steps || 5,
+            completed_steps: Array.isArray(data.completed_steps) ? data.completed_steps : [],
+            created_at: data.created_at || new Date().toISOString(),
+            updated_at: data.updated_at || new Date().toISOString(),
+            full_name: profileData?.full_name || 'Unknown',
+            email: profileData?.email || null,
+            business_name: profileData?.business_name || null,
+            avatar_url: profileData?.avatar_url || null,
+            phone: profileData?.phone || null,
+            website_url: null,
+            professional_role: null,
+            bio: null,
+            project_name: null,
+            company_niche: null,
+            development_url: null,
+            mvp_build_status: null,
+            notion_plan_url: null,
+            payment_status: null,
+            estimated_price: null,
+            initial_contact_date: null,
+            start_date: null,
+            estimated_completion_date: null,
+          };
+        }
+        
+        // Return a minimal fallback object if nothing else works
+        return createDefaultClientData(clientId);
+      })
+      .catch(() => {
+        // Return default client data if even the fallback query fails
+        return createDefaultClientData(clientId);
+      });
+  } catch {
+    // Return default client data if anything goes wrong
+    return createDefaultClientData(clientId);
+  }
+}
+
+// Helper function to create a default client data object with minimal required fields
+function createDefaultClientData(clientId: string): ClientData {
+  return {
+    id: clientId,
+    status: 'pending',
+    current_step: 1,
+    total_steps: 5,
+    completed_steps: [],
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    full_name: 'Unknown',
+    email: null,
+    business_name: null,
+    avatar_url: null,
+    phone: null,
+    website_url: null,
+    professional_role: null,
+    bio: null,
+    project_name: null,
+    company_niche: null,
+    development_url: null,
+    mvp_build_status: null,
+    notion_plan_url: null,
+    payment_status: null,
+    estimated_price: null,
+    initial_contact_date: null,
+    start_date: null,
+    estimated_completion_date: null,
+  };
+}
