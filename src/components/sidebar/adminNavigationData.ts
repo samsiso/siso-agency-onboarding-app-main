@@ -19,9 +19,9 @@ export const getAdminMenuSections = (): MenuSection[] => {
       icon: Users,
       items: [
         {
-          href: '/admin/users',
+          href: '/admin/clients',
           icon: Users,
-          label: 'Users',
+          label: 'Clients',
         },
         {
           href: '/admin/plans',

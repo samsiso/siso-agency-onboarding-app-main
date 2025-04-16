@@ -22,6 +22,7 @@ import AdminPlans from './pages/AdminPlans';
 import AdminTemplates from './pages/AdminTemplates';
 import Portfolio from './pages/Portfolio';
 import AdminDashboard from './pages/AdminDashboard';
+import AdminClients from './pages/AdminClients';
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
         
         {/* Admin routes */}
         <Route path="/admin" element={<AuthGuard><AdminDashboard /></AuthGuard>} />
+        <Route path="/admin/clients" element={<AuthGuard><AdminClients /></AuthGuard>} />
         
         {/* Admin routes - we're keeping these unprotected for now */}
         <Route path="/admin/plans" element={<AdminPlans />} />
