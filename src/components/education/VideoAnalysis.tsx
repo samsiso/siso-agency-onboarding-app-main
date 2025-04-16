@@ -2,7 +2,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { safeSupabase } from '@/utils/supabaseHelpers';
+import { safeSupabase, safeCast } from '@/utils/supabaseHelpers';
 
 interface VideoAnalysisProps {
   videoId: string;
@@ -19,7 +19,7 @@ export function VideoAnalysis({ videoId }: VideoAnalysisProps) {
         .maybeSingle();
       
       if (error) throw error;
-      return data;
+      return safeCast(data);
     },
   });
 
@@ -37,6 +37,9 @@ export function VideoAnalysis({ videoId }: VideoAnalysisProps) {
     );
   }
 
+  // Safely access key_points with optional chaining
+  const keyPoints = analysis?.key_points || [];
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card className="p-6 space-y-4">
@@ -53,7 +56,7 @@ export function VideoAnalysis({ videoId }: VideoAnalysisProps) {
       <Card className="p-6 space-y-4">
         <h3 className="text-lg font-semibold text-siso-text-bold">Content Breakdown</h3>
         <div className="space-y-4">
-          {analysis?.key_points?.map((point: string, index: number) => (
+          {keyPoints.map((point: string, index: number) => (
             <div key={index} className="flex items-start gap-2">
               <span className="text-siso-orange">{index + 1}.</span>
               <p className="text-sm text-siso-text">{point}</p>

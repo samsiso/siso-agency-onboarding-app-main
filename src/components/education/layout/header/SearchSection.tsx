@@ -2,7 +2,7 @@
 import { motion } from 'framer-motion';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { SearchInput } from './components/SearchInput';
-import { safeSupabase } from '@/utils/supabaseHelpers';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SearchSectionProps {
   searchQuery: string;
@@ -39,7 +39,7 @@ export const SearchSection = ({
     if (!searchQuery.trim()) return;
 
     try {
-      await safeSupabase
+      await supabase
         .from('user_search_history')
         .insert({
           query: searchQuery,

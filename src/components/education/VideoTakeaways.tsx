@@ -2,7 +2,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Card } from '@/components/ui/card';
 import { CheckCircle } from 'lucide-react';
-import { safeSupabase } from '@/utils/supabaseHelpers';
+import { safeSupabase, safeCast } from '@/utils/supabaseHelpers';
 
 interface VideoTakeawaysProps {
   videoId: string;
@@ -19,7 +19,7 @@ export function VideoTakeaways({ videoId }: VideoTakeawaysProps) {
         .maybeSingle();
       
       if (error) throw error;
-      return data;
+      return safeCast(data);
     },
   });
 
@@ -38,12 +38,15 @@ export function VideoTakeaways({ videoId }: VideoTakeawaysProps) {
     );
   }
 
+  // Safely handle the key points array with optional chaining
+  const keyPoints = takeaways?.key_points || [];
+
   return (
     <Card className="p-6 space-y-6">
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-siso-text-bold">Key Takeaways</h3>
         <div className="space-y-3">
-          {takeaways?.key_points?.map((point: string, index: number) => (
+          {keyPoints.map((point: string, index: number) => (
             <div key={index} className="flex items-start gap-3">
               <CheckCircle className="w-5 h-5 text-siso-orange flex-shrink-0 mt-0.5" />
               <p className="text-siso-text">{point}</p>

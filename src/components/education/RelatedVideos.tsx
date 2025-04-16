@@ -2,7 +2,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { ToolVideoCard } from '../tools/ToolVideoCard';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import { safeSupabase } from '@/utils/supabaseHelpers';
+import { safeSupabase, safeCast } from '@/utils/supabaseHelpers';
 
 interface RelatedVideosProps {
   currentVideoId: string;
@@ -36,18 +36,21 @@ export function RelatedVideos({ currentVideoId, topics }: RelatedVideosProps) {
 
       console.log('Raw video data:', videos); // Debug log
 
-      return videos.map(video => ({
-        id: video.id,
-        title: video.title || '',
-        url: `https://youtube.com/watch?v=${video.id}`,
-        duration: video.duration || '0:00',
-        thumbnail_url: video.thumbnailUrl || '',
+      // Safely cast the returned data
+      const typedVideos = safeCast<any[]>(videos);
+
+      return typedVideos.map(video => ({
+        id: video?.id || '',
+        title: video?.title || '',
+        url: `https://youtube.com/watch?v=${video?.id || ''}`,
+        duration: video?.duration || '0:00',
+        thumbnail_url: video?.thumbnailUrl || '',
         educator: {
-          name: video.channel_id || 'Unknown Creator',
+          name: video?.channel_id || 'Unknown Creator',
           avatar_url: '' // Default empty string for avatar
         },
         metrics: {
-          views: video.viewCount || 0,
+          views: video?.viewCount || 0,
           likes: 0,
           sentiment_score: 0.8,
           difficulty: "Intermediate" as const,

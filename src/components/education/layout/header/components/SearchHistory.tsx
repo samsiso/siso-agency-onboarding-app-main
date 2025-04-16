@@ -2,7 +2,7 @@
 import { Trash2, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { safeSupabase } from '@/utils/supabaseHelpers';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SearchHistoryProps {
   history: {
@@ -31,14 +31,14 @@ export function SearchHistory({
 
   const handleClearHistory = async () => {
     try {
-      const { data: { user } } = await safeSupabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
         console.error('No authenticated user found');
         return;
       }
       
-      const { error } = await safeSupabase
+      const { error } = await supabase
         .from('user_search_history')
         .delete()
         .eq('user_id', user.id);

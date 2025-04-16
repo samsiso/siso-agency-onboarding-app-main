@@ -9,7 +9,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { safeSupabase } from '@/utils/supabaseHelpers';
+import { supabase } from '@/integrations/supabase/client';
+import { safeCast } from '@/utils/supabaseHelpers';
 
 interface SearchInputProps {
   searchQuery: string;
@@ -39,7 +40,7 @@ export const SearchInput = ({
 
       try {
         const [videosResponse, educatorsResponse] = await Promise.all([
-          safeSupabase
+          supabase
             .from('youtube_videos')
             .select(`
               id,
@@ -50,7 +51,7 @@ export const SearchInput = ({
             .ilike('title', `%${searchQuery}%`)
             .limit(5),
 
-          safeSupabase
+          supabase
             .from('education_creators')
             .select(`
               id,
@@ -66,21 +67,25 @@ export const SearchInput = ({
         if (videosResponse.error) throw videosResponse.error;
         if (educatorsResponse.error) throw educatorsResponse.error;
 
-        const videos = (videosResponse.data || []).map(video => ({
-          id: video.id,
+        // Safely cast data
+        const videosData = safeCast<any[]>(videosResponse.data || []);
+        const educatorsData = safeCast<any[]>(educatorsResponse.data || []);
+
+        const videos = videosData.map(video => ({
+          id: video?.id || '',
           type: 'video' as const,
-          title: video.title,
-          thumbnailUrl: video.thumbnailUrl,
-          description: video.full_description
+          title: video?.title || '',
+          thumbnailUrl: video?.thumbnailUrl || '',
+          description: video?.full_description || ''
         }));
 
-        const educators = (educatorsResponse.data || []).map(educator => ({
-          id: educator.id,
+        const educators = educatorsData.map(educator => ({
+          id: educator?.id || '',
           type: 'educator' as const,
-          title: educator.name,
-          channel_avatar_url: educator.channel_avatar_url,
-          description: educator.description,
-          slug: educator.slug
+          title: educator?.name || '',
+          channel_avatar_url: educator?.channel_avatar_url || '',
+          description: educator?.description || '',
+          slug: educator?.slug || ''
         }));
 
         return [...videos, ...educators];
@@ -96,14 +101,26 @@ export const SearchInput = ({
   const { data: searchHistory, refetch: refetchHistory } = useQuery({
     queryKey: ['search-history'],
     queryFn: async () => {
-      const { data, error } = await safeSupabase
-        .from('user_search_history')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(5);
+      try {
+        const { data, error } = await supabase
+          .from('user_search_history')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(5);
 
-      if (error) throw error;
-      return data || [];
+        if (error) throw error;
+        
+        // Safely cast data with default properties
+        return (data || []).map((item: any) => ({
+          id: item?.id || '',
+          query: item?.query || '',
+          created_at: item?.created_at || new Date().toISOString(),
+          result_type: item?.result_type || ''
+        }));
+      } catch (error) {
+        console.error('Error fetching search history:', error);
+        return [];
+      }
     },
     enabled: isExpanded
   });
@@ -128,17 +145,13 @@ export const SearchInput = ({
   const handleSearchResultClick = async (result: any) => {
     try {
       // Save to search history first
-      const { error: historyError } = await safeSupabase
+      await supabase
         .from('user_search_history')
         .insert({
           query: result.title,
           result_type: result.type,
           result_id: result.id
         });
-
-      if (historyError) {
-        console.error('Error saving search history:', historyError);
-      }
 
       // [Analysis] Direct navigation using full paths
       const path = result.type === 'video' 

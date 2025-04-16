@@ -5,7 +5,7 @@ import { Gift, Loader2, Share2, Twitter } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Confetti } from '@/components/ui/confetti';
-import { safeSupabase } from '@/utils/supabaseHelpers';
+import { safeSupabase, safeCast } from '@/utils/supabaseHelpers';
 import FeatureFlags from '@/utils/featureFlags';
 
 interface NFTMetadata {
@@ -50,10 +50,10 @@ export const WelcomeNFTStatus = () => {
 
     const fetchStatus = async () => {
       try {
-        const { data: { session } } = await safeSupabase.auth.getSession();
+        const { data: { session } } = await supabase.auth.getSession();
         if (!session) return;
 
-        const { data, error } = await safeSupabase
+        const { data, error } = await supabase
           .from('welcome_nft_mints')
           .select('*')
           .eq('user_id', session.user.id)
@@ -61,20 +61,21 @@ export const WelcomeNFTStatus = () => {
 
         if (error) throw error;
 
+        // Safely cast and parse the data
+        const nftData = safeCast<any>(data);
+        
         // Ensure status is one of our allowed types
-        const nftStatus: NFTStatusType = ['pending', 'completed', 'failed'].includes(data.status) 
-          ? data.status as NFTStatusType 
+        const nftStatus: NFTStatusType = ['pending', 'completed', 'failed'].includes(nftData?.status) 
+          ? nftData?.status as NFTStatusType 
           : 'pending';
 
-        const nftData: WelcomeNFTStatus = {
+        setStatus({
           status: nftStatus,
-          error_message: data.error_message,
-          metadata: isValidNFTMetadata(data.metadata) ? data.metadata : undefined
-        };
+          error_message: nftData?.error_message,
+          metadata: isValidNFTMetadata(nftData?.metadata) ? nftData.metadata : undefined
+        });
 
-        setStatus(nftData);
-
-        if (data?.status === 'completed' && isValidNFTMetadata(data.metadata)) {
+        if (nftData?.status === 'completed' && isValidNFTMetadata(nftData.metadata)) {
           confettiRef.current?.fire();
           toast({
             title: "Welcome NFT Minted!",
@@ -91,7 +92,7 @@ export const WelcomeNFTStatus = () => {
     fetchStatus();
 
     // Fix the channel subscription and unsubscription
-    const channel = safeSupabase
+    const channel = supabase
       .channel('welcome-nft-status')
       .on(
         'postgres_changes',
@@ -99,25 +100,23 @@ export const WelcomeNFTStatus = () => {
           event: 'UPDATE',
           schema: 'public',
           table: 'welcome_nft_mints',
-          filter: `user_id=eq.${safeSupabase.auth.getUser()}`
+          filter: `user_id=eq.${supabase.auth.getUser()}`
         },
         (payload) => {
-          const newData = payload.new;
+          const newData = safeCast<any>(payload.new);
           
           // Ensure status is one of our allowed types
-          const nftStatus: NFTStatusType = ['pending', 'completed', 'failed'].includes(newData.status) 
-            ? newData.status as NFTStatusType 
+          const nftStatus: NFTStatusType = ['pending', 'completed', 'failed'].includes(newData?.status) 
+            ? newData?.status as NFTStatusType 
             : 'pending';
             
-          const nftData: WelcomeNFTStatus = {
+          setStatus({
             status: nftStatus,
-            error_message: newData.error_message,
-            metadata: isValidNFTMetadata(newData.metadata) ? newData.metadata : undefined
-          };
+            error_message: newData?.error_message,
+            metadata: isValidNFTMetadata(newData?.metadata) ? newData.metadata : undefined
+          });
           
-          setStatus(nftData);
-          
-          if (newData.status === 'completed' && isValidNFTMetadata(newData.metadata)) {
+          if (newData?.status === 'completed' && isValidNFTMetadata(newData?.metadata)) {
             confettiRef.current?.fire();
             toast({
               title: "Welcome NFT Minted!",
@@ -130,7 +129,7 @@ export const WelcomeNFTStatus = () => {
 
     // Return proper cleanup function that actually unsubscribes
     return () => {
-      safeSupabase.removeChannel(channel);
+      supabase.removeChannel(channel);
     };
   }, []);
 
