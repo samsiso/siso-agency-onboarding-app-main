@@ -6,7 +6,7 @@ import { AdminStats } from '@/components/admin/dashboard/AdminStats';
 import { ClientsList } from '@/components/admin/dashboard/ClientsList';
 import { LeadsOverview } from '@/components/admin/dashboard/LeadsOverview';
 import { useAdminCheck } from '@/hooks/useAdminCheck';
-import { Loader2 } from 'lucide-react';
+import { Loader2, LayoutDashboard } from 'lucide-react';
 
 export default function AdminDashboard() {
   const { isAdmin, isLoading } = useAdminCheck();
@@ -34,14 +34,22 @@ export default function AdminDashboard() {
     <AdminLayout>
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
+            <p className="text-muted-foreground">
+              Welcome to your central control panel for managing the platform
+            </p>
+          </div>
           <div className="flex gap-2">
-            <span className="px-3 py-1 text-sm bg-purple-500/10 text-purple-400 rounded-full">
+            <span className="px-3 py-1 text-sm bg-purple-500/10 text-purple-400 rounded-full flex items-center">
+              <LayoutDashboard className="w-3.5 h-3.5 mr-1.5" />
               Admin Access
             </span>
           </div>
         </div>
+        
         <AdminStats />
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
           <LeadsOverview />
           <ClientsList />
