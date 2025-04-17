@@ -1,10 +1,10 @@
 
 import { supabase } from '@/integrations/supabase/client';
 
-// Helper function to generate random data for client onboarding
+// Helper function to check existing client data
 export const updateExistingClientData = async (): Promise<boolean> => {
   try {
-    // First check if there are any existing clients
+    // Check if there are any existing clients
     const { data: existingClients, error: fetchError } = await supabase
       .from('client_onboarding')
       .select('id, company_name')
@@ -15,135 +15,8 @@ export const updateExistingClientData = async (): Promise<boolean> => {
       return false;
     }
     
-    // Sample client data
-    const sampleClients = [
-      {
-        contact_name: 'John Smith',
-        company_name: 'Gritness Gym',
-        status: 'active',
-        company_niche: 'Fitness',
-        project_name: 'Gym Management Platform',
-        website_url: 'https://gritnessgym.vercel.app/',
-        current_step: 5,
-        total_steps: 5,
-        completed_steps: ['intro', 'details', 'scope', 'design', 'review']
-      },
-      {
-        contact_name: 'David Wilson',
-        company_name: 'NM Construction',
-        status: 'active',
-        company_niche: 'Construction',
-        project_name: 'Project Management Portal',
-        website_url: 'https://nm-construction.vercel.app/',
-        current_step: 5,
-        total_steps: 5,
-        completed_steps: ['intro', 'details', 'scope', 'design', 'review']
-      },
-      {
-        contact_name: 'Alex Johnson',
-        company_name: 'OPTIMAL CONSTRUCTION',
-        status: 'active',
-        company_niche: 'Construction',
-        project_name: 'Maintenance Management System',
-        website_url: 'https://optimal-building-maintenance.vercel.app/',
-        current_step: 5,
-        total_steps: 5,
-        completed_steps: ['intro', 'details', 'scope', 'design', 'review']
-      },
-      {
-        contact_name: 'Mark Taylor',
-        company_name: 'UbahCryp',
-        status: 'active',
-        company_niche: 'Web3',
-        project_name: 'Trading Platform',
-        website_url: 'https://ubahcrypcom.vercel.app/',
-        current_step: 5,
-        total_steps: 5,
-        completed_steps: ['intro', 'details', 'scope', 'design', 'review']
-      },
-      {
-        contact_name: 'Jennifer Lee',
-        company_name: 'Elementree',
-        status: 'active',
-        company_niche: 'Restaurant',
-        project_name: 'Management System',
-        website_url: 'https://elementree.vercel.app/',
-        current_step: 5,
-        total_steps: 5,
-        completed_steps: ['intro', 'details', 'scope', 'design', 'review']
-      },
-      {
-        contact_name: 'Ibrahim Khan',
-        company_name: 'Trojan MMA',
-        status: 'active',
-        company_niche: 'Martial Arts',
-        project_name: 'Gym Management Platform',
-        website_url: 'https://trojan-mma.vercel.app/',
-        current_step: 5,
-        total_steps: 5,
-        completed_steps: ['intro', 'details', 'scope', 'design', 'review']
-      },
-      {
-        contact_name: 'Steven Parker',
-        company_name: 'Lets Go',
-        status: 'active',
-        company_niche: 'Social',
-        project_name: 'Event Planning App',
-        website_url: 'https://lets-go-u7hh.vercel.app/',
-        current_step: 5,
-        total_steps: 5,
-        completed_steps: ['intro', 'details', 'scope', 'design', 'review']
-      },
-      {
-        contact_name: 'Michael Chen',
-        company_name: 'Mu Shin',
-        status: 'active',
-        company_niche: 'Martial Arts',
-        project_name: 'Self Defense Course Platform',
-        website_url: 'https://siso-mu-shin.vercel.app/',
-        current_step: 5,
-        total_steps: 5,
-        completed_steps: ['intro', 'details', 'scope', 'design', 'review']
-      },
-      {
-        contact_name: 'James Brown',
-        company_name: '5 Star Hire',
-        status: 'active',
-        company_niche: 'Automotive',
-        project_name: 'Car Hire Management System',
-        website_url: 'https://5-star-hire.vercel.app/',
-        current_step: 5,
-        total_steps: 5,
-        completed_steps: ['intro', 'details', 'scope', 'design', 'review']
-      }
-    ];
-    
-    // First, delete any existing data to ensure we don't create duplicates
-    if (existingClients && existingClients.length > 0) {
-      console.log('Deleting existing client data before reinserting...');
-      const { error: deleteError } = await supabase
-        .from('client_onboarding')
-        .delete()
-        .in('id', existingClients.map(client => client.id));
-        
-      if (deleteError) {
-        console.error('Error deleting existing clients:', deleteError);
-        return false;
-      }
-    }
-    
-    // Insert sample clients
-    const { error: insertError } = await supabase
-      .from('client_onboarding')
-      .insert(sampleClients);
-      
-    if (insertError) {
-      console.error('Error inserting sample clients:', insertError);
-      return false;
-    }
-    
-    console.log('Successfully created sample client data');
-    return true;
+    console.log('Found existing client data:', existingClients?.length || 0, 'clients');
+    return existingClients && existingClients.length > 0;
   } catch (error) {
     console.error('Error in updateExistingClientData:', error);
     return false;

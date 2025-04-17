@@ -49,20 +49,20 @@ export default function AdminClients() {
         console.log('Admin role setup complete');
       }
       
-      // Update any incomplete client data
-      const dataUpdateSuccess = await updateExistingClientData();
+      // Check client data
+      const hasClientData = await updateExistingClientData();
       
-      if (dataUpdateSuccess) {
-        console.log('Client data update complete');
+      if (hasClientData) {
+        console.log('Client data verified');
         toast({
           title: "Client data initialized",
-          description: "Sample client data has been loaded successfully."
+          description: "Sample client data is ready for use."
         });
       } else {
         toast({
           variant: "destructive",
-          title: "Error updating client data",
-          description: "There was a problem updating client information. Some data may be incomplete."
+          title: "No client data found",
+          description: "There appears to be an issue with the client data. Please check the database."
         });
       }
     };
