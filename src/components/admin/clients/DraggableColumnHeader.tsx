@@ -2,7 +2,7 @@
 import { useState, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { Button } from '@/components/ui/button';
-import { ArrowUpDown } from 'lucide-react';
+import { ArrowUpDown, GripVertical } from 'lucide-react';
 import { ClientColumnPreference } from '@/types/client.types';
 
 interface DraggableColumnHeaderProps {
@@ -29,6 +29,8 @@ export function DraggableColumnHeader({
   sortDirection,
 }: DraggableColumnHeaderProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const [isDraggingOver, setIsDraggingOver] = useState(false);
+  
   const [, drop] = useDrop({
     accept: 'column',
     hover(item: DragItem, monitor) {
@@ -51,7 +53,11 @@ export function DraggableColumnHeader({
       // but it's good here for the sake of performance
       // to avoid expensive index searches.
       item.index = hoverIndex;
+      setIsDraggingOver(true);
     },
+    drop() {
+      setIsDraggingOver(false);
+    }
   });
   
   const [{ isDragging }, drag] = useDrag({
@@ -69,8 +75,11 @@ export function DraggableColumnHeader({
   return (
     <div 
       ref={ref} 
-      className={`flex items-center font-semibold cursor-move ${isDragging ? 'opacity-50' : ''}`}
+      className={`flex items-center font-semibold ${isDragging ? 'opacity-50' : ''} ${isDraggingOver ? 'bg-primary/10' : ''}`}
     >
+      <div className="pr-2 cursor-move">
+        <GripVertical className="h-4 w-4 text-muted-foreground" />
+      </div>
       <Button 
         variant="ghost" 
         onClick={onSort} 
