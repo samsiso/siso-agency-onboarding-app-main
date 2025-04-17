@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 import { FinancialTransaction } from './types';
 
-export async function fetchTransactions(filters = {}): Promise<FinancialTransaction[]> {
+export async function fetchTransactions(filters: Record<string, any> = {}): Promise<FinancialTransaction[]> {
   try {
     const query = supabase
       .from('financial_transactions')

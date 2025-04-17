@@ -1,95 +1,116 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/components/ui/use-toast';
 import { FinancialSummary } from './types';
+import { fetchTransactions } from './transactionsApi';
 
-// Get financial summary data for dashboard
-export async function getFinancialSummary(period = 'month'): Promise<FinancialSummary> {
+// Calculate financial summary data
+export async function getFinancialSummary(period: 'month' | 'year' = 'month'): Promise<FinancialSummary> {
   try {
-    // Get current date and calculate date ranges
-    const now = new Date();
+    // Initialize the summary object with default values
+    const summary: FinancialSummary = {
+      totalRevenue: 0,
+      totalExpenses: 0,
+      profitMargin: 0,
+      outstandingAmount: 0,
+      revenueByMonth: []
+    };
+
+    // Get the start date based on the period
+    const today = new Date();
     let startDate: Date;
     
-    switch (period) {
-      case 'year':
-        startDate = new Date(now.getFullYear(), 0, 1);
-        break;
-      case 'quarter':
-        const quarter = Math.floor(now.getMonth() / 3);
-        startDate = new Date(now.getFullYear(), quarter * 3, 1);
-        break;
-      case 'month':
-      default:
-        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-        break;
+    if (period === 'year') {
+      startDate = new Date(today.getFullYear(), 0, 1); // Jan 1st of current year
+    } else {
+      startDate = new Date(today.getFullYear(), today.getMonth() - 5, 1); // 6 months ago
     }
     
-    // Format dates for queries
-    const formattedStartDate = startDate.toISOString().split('T')[0];
-    const formattedNowDate = now.toISOString().split('T')[0];
+    const startDateStr = startDate.toISOString().split('T')[0];
+
+    // Fetch all transactions for the period
+    const transactions = await fetchTransactions({});
     
-    // Fetch revenue transactions
-    const { data: revenueData, error: revenueError } = await supabase
-      .from('financial_transactions')
-      .select('amount')
-      .eq('type', 'revenue')
-      .gte('date', formattedStartDate)
-      .lte('date', formattedNowDate);
+    // Filter transactions by date
+    const filteredTransactions = transactions.filter(tx => 
+      new Date(tx.date) >= startDate
+    );
+
+    // Calculate total revenue and expenses
+    filteredTransactions.forEach(tx => {
+      if (tx.type === 'revenue') {
+        summary.totalRevenue += Number(tx.amount);
+      } else if (tx.type === 'expense') {
+        summary.totalExpenses += Number(tx.amount);
+      }
+    });
+
+    // Calculate profit margin if revenue is not zero
+    if (summary.totalRevenue > 0) {
+      const profit = summary.totalRevenue - summary.totalExpenses;
+      summary.profitMargin = Math.round((profit / summary.totalRevenue) * 100);
+    }
+
+    // Get revenue and expense by month for the chart
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    
+    // Initialize monthly data
+    let monthlyData: { [key: string]: { name: string; revenue: number; expense: number } } = {};
+    
+    // Current month and year
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    
+    // Initialize the last 6 months (or 12 months for year period)
+    const monthsToShow = period === 'year' ? 12 : 6;
+    
+    for (let i = 0; i < monthsToShow; i++) {
+      let monthIndex = currentMonth - i;
+      let year = currentYear;
       
-    if (revenueError) throw revenueError;
-    
-    // Fetch expense transactions
-    const { data: expenseData, error: expenseError } = await supabase
-      .from('financial_transactions')
-      .select('amount')
-      .eq('type', 'expense')
-      .gte('date', formattedStartDate)
-      .lte('date', formattedNowDate);
+      if (monthIndex < 0) {
+        monthIndex = 12 + monthIndex;
+        year = currentYear - 1;
+      }
       
-    if (expenseError) throw expenseError;
+      const monthKey = `${year}-${(monthIndex + 1).toString().padStart(2, '0')}`;
+      monthlyData[monthKey] = {
+        name: monthNames[monthIndex],
+        revenue: 0,
+        expense: 0
+      };
+    }
     
-    // Fetch outstanding invoices
-    const { data: outstandingData, error: outstandingError } = await supabase
+    // Aggregate transactions by month
+    filteredTransactions.forEach(tx => {
+      const txDate = new Date(tx.date);
+      const monthKey = `${txDate.getFullYear()}-${(txDate.getMonth() + 1).toString().padStart(2, '0')}`;
+      
+      // If we have this month in our data
+      if (monthlyData[monthKey]) {
+        if (tx.type === 'revenue') {
+          monthlyData[monthKey].revenue += Number(tx.amount);
+        } else if (tx.type === 'expense') {
+          monthlyData[monthKey].expense += Number(tx.amount);
+        }
+      }
+    });
+    
+    // Convert to array and sort by month
+    summary.revenueByMonth = Object.values(monthlyData).reverse();
+
+    // Get outstanding invoices amount
+    const { data: invoices, error } = await supabase
       .from('invoices')
       .select('amount')
       .in('status', ['pending', 'overdue']);
       
-    if (outstandingError) throw outstandingError;
-    
-    // Calculate totals - ensure we're parsing the values correctly
-    const totalRevenue = revenueData.reduce((sum, item) => sum + Number(item.amount), 0);
-    const totalExpenses = expenseData.reduce((sum, item) => sum + Number(item.amount), 0);
-    const profitMargin = totalRevenue > 0 ? ((totalRevenue - totalExpenses) / totalRevenue) * 100 : 0;
-    const outstandingAmount = outstandingData.reduce((sum, item) => sum + Number(item.amount), 0);
-    
-    // Get monthly data for charts (simplified mock data for now)
-    // In a real implementation, you would fetch this from the database grouped by month
-    const revenueByMonth = [
-      { name: 'Jan', revenue: 4000, expense: 2400 },
-      { name: 'Feb', revenue: 3000, expense: 1398 },
-      { name: 'Mar', revenue: 2000, expense: 9800 },
-      { name: 'Apr', revenue: 2780, expense: 3908 },
-      { name: 'May', revenue: 1890, expense: 4800 },
-      { name: 'Jun', revenue: 2390, expense: 3800 },
-      { name: 'Jul', revenue: 3490, expense: 4300 },
-    ];
-    
-    return {
-      totalRevenue,
-      totalExpenses,
-      profitMargin,
-      outstandingAmount,
-      revenueByMonth
-    };
+    if (!error && invoices) {
+      summary.outstandingAmount = invoices.reduce((sum, invoice) => sum + Number(invoice.amount), 0);
+    }
+
+    return summary;
   } catch (error) {
-    console.error('Error fetching financial summary:', error);
-    toast({
-      title: 'Error',
-      description: 'Failed to load financial summary',
-      variant: 'destructive',
-    });
-    
-    // Return default values in case of error
+    console.error('Error getting financial summary:', error);
     return {
       totalRevenue: 0,
       totalExpenses: 0,
