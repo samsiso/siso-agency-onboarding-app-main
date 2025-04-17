@@ -1,16 +1,21 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Filter, ChevronDown, X, Download, RefreshCw } from 'lucide-react';
+import { Search, Filter, ChevronDown, X, Download, RefreshCw, Upload } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { ColumnManager } from '../../clients/ColumnManager';
 import { LeadTableColumn } from '../types';
+import { BulkImportLeads } from './BulkImportLeads';
 
 interface LeadsToolbarProps {
   searchQuery: string;
@@ -45,6 +50,8 @@ export const LeadsToolbar = ({
   onRefresh,
   isAddingLead
 }: LeadsToolbarProps) => {
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
+
   return (
     <div className="px-4 py-2 border-b flex flex-wrap gap-2 items-center">
       <DropdownMenu>
@@ -58,7 +65,7 @@ export const LeadsToolbar = ({
         <DropdownMenuContent>
           <DropdownMenuItem onClick={() => onStatusFilterChange('all')}>
             All
-          </DropdownMenuItem>
+          DropdownMenuItem>
           <DropdownMenuItem onClick={() => onStatusFilterChange('new')}>
             New
           </DropdownMenuItem>
@@ -102,6 +109,18 @@ export const LeadsToolbar = ({
           </Button>
         </div>
       )}
+
+      <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
+        <DialogTrigger asChild>
+          <Button variant="outline" size="sm" className="h-8">
+            <Upload className="h-4 w-4 mr-1" />
+            Import
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="max-w-xl">
+          <BulkImportLeads />
+        </DialogContent>
+      </Dialog>
 
       <ColumnManager 
         columns={columns}
