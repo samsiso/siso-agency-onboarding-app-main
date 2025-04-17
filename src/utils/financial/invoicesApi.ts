@@ -26,10 +26,22 @@ export async function fetchInvoices(filters: Record<string, any> = {}): Promise<
     if (error) throw error;
     
     // Transform data to match the Invoice type
-    const transformedData = (data || []).map(item => ({
-      ...item,
-      status: item.status as 'draft' | 'pending' | 'paid' | 'overdue' | 'cancelled'
-    }));
+    const transformedData = (data || []).map(item => {
+      // Create client object with required properties
+      const clientData = item.client && typeof item.client === 'object' 
+        ? {
+            full_name: item.client.full_name || 'Unknown',
+            business_name: item.client.business_name
+          }
+        : { full_name: 'Unknown' };
+      
+      return {
+        ...item,
+        status: item.status as 'draft' | 'pending' | 'paid' | 'overdue' | 'cancelled',
+        client: clientData,
+        payment_method: item.payment_method
+      };
+    });
     
     return transformedData;
   } catch (error) {
@@ -59,9 +71,11 @@ export async function addInvoice(invoice: Omit<Invoice, 'id' | 'client' | 'payme
       description: 'Invoice added successfully',
     });
     
+    // Ensure the result conforms to the Invoice type
     return {
       ...data,
-      status: data.status as 'draft' | 'pending' | 'paid' | 'overdue' | 'cancelled'
+      status: data.status as 'draft' | 'pending' | 'paid' | 'overdue' | 'cancelled',
+      client: { full_name: 'Unknown' } // Default client info
     };
   } catch (error) {
     console.error('Error adding invoice:', error);
@@ -118,9 +132,11 @@ export async function updateInvoice(id: string, updates: Partial<Omit<Invoice, '
       description: 'Invoice updated successfully',
     });
     
+    // Ensure the result conforms to the Invoice type
     return {
       ...data,
-      status: data.status as 'draft' | 'pending' | 'paid' | 'overdue' | 'cancelled'
+      status: data.status as 'draft' | 'pending' | 'paid' | 'overdue' | 'cancelled',
+      client: { full_name: 'Unknown' } // Default client info
     };
   } catch (error) {
     console.error('Error updating invoice:', error);
