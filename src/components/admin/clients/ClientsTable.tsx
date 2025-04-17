@@ -67,6 +67,7 @@ import '../../../components/ui/hide-scrollbar.css';
 import { ClientSelectField } from './ClientSelectField';
 import { cn } from '@/lib/utils';
 import { tableStyles, tableCellStyles, tableRowStyles } from '@/components/ui/table-styles';
+import { EnhancedStatusBadge } from './EnhancedStatusBadge';
 
 const COMPANY_NICHE_OPTIONS = [
   { value: 'ecommerce', label: 'E-commerce' },
@@ -340,7 +341,7 @@ export function ClientsTable({
     switch (columnKey) {
       case 'full_name':
         return (
-          <div className="flex flex-col">
+          <div className="flex flex-col space-y-0.5">
             {isEditing ? (
               <Input
                 ref={editInputRef}
@@ -352,20 +353,15 @@ export function ClientsTable({
               />
             ) : (
               <div onDoubleClick={handleDoubleClick}>
-                <span className="font-medium">{client.full_name || 'Unknown'}</span>
-                <span className="text-sm text-muted-foreground">{client.email || 'No email'}</span>
+                <span className="font-medium text-foreground">{client.full_name || 'Unknown'}</span>
+                <span className="block text-xs text-muted-foreground">{client.email || 'No email'}</span>
               </div>
             )}
           </div>
         );
       case 'status':
         return (
-          <ClientSelectField
-            value={client.status}
-            onChange={(value) => handleSaveEdit({ id: client.id, field: 'status', value })}
-            options={STATUS_OPTIONS}
-            className="h-8 min-w-[120px]"
-          />
+          <EnhancedStatusBadge status={client.status} />
         );
       case 'company_niche':
         return (
@@ -600,11 +596,14 @@ export function ClientsTable({
         </div>
       )}
       
-      <div ref={tableContainerRef} className="relative rounded-lg overflow-hidden border border-border/50 bg-card shadow-sm">
+      <div ref={tableContainerRef} className="relative rounded-lg overflow-hidden border border-border/30 bg-card/30 shadow-sm backdrop-blur-sm">
         <ScrollableTable pinnedColumns={pinnedColumns}>
-          <Table ref={tableElementRef} className={tableStyles()}>
-            <TableHeader className="sticky top-0 bg-card/95 backdrop-blur-sm z-20">
-              <TableRow className="border-border/50 hover:bg-transparent">
+          <Table ref={tableElementRef} className={cn(
+            tableStyles(),
+            "backdrop-blur-sm [&_th]:bg-background/95 [&_td]:bg-transparent"
+          )}>
+            <TableHeader className="sticky top-0 z-20">
+              <TableRow className="hover:bg-transparent border-border/30">
                 <TableHead className="w-12 bg-card/95 backdrop-blur-sm sticky left-0 z-30">
                   <Checkbox 
                     checked={selectedClients.length === clients.length && clients.length > 0}
@@ -659,7 +658,7 @@ export function ClientsTable({
                 <TableRow>
                   <TableCell 
                     colSpan={visibleColumns.length + 1} 
-                    className="h-[300px] text-center"
+                    className="h-[300px] text-center bg-background/30"
                   >
                     <div className="flex flex-col items-center justify-center gap-3 text-muted-foreground">
                       <Users className="h-8 w-8 opacity-50" />

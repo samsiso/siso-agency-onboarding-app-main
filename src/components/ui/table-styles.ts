@@ -2,17 +2,17 @@
 import { cva } from "class-variance-authority";
 
 export const tableStyles = cva(
-  "w-full relative",
+  "w-full relative bg-white dark:bg-background border-collapse",
   {
     variants: {
       size: {
-        default: "",
-        sm: "text-sm",
-        lg: "text-lg"
+        default: "text-sm",
+        sm: "text-xs",
+        lg: "text-base"
       },
       variant: {
-        default: "bg-background border-border/50",
-        striped: "even:bg-muted/30"
+        default: "border-border/50 [&_tr:last-child]:border-0",
+        striped: "[&_tr:nth-child(even)]:bg-muted/30"
       }
     },
     defaultVariants: {
@@ -23,7 +23,12 @@ export const tableStyles = cva(
 );
 
 export const tableCellStyles = cva(
-  "relative p-3 align-middle [&:has([role=checkbox])]:pr-0",
+  [
+    "p-3 align-middle text-left",
+    "[&:has([role=checkbox])]:pr-0",
+    "[&>a]:text-primary [&>a]:hover:underline",
+    "whitespace-nowrap overflow-hidden text-ellipsis"
+  ].join(" "),
   {
     variants: {
       align: {
@@ -39,11 +44,15 @@ export const tableCellStyles = cva(
 );
 
 export const tableRowStyles = cva(
-  "border-b border-border/50 transition-colors",
+  [
+    "border-b border-border/40 transition-colors",
+    "hover:bg-muted/30",
+    "data-[state=selected]:bg-muted/20"
+  ].join(" "),
   {
     variants: {
       interactive: {
-        true: "hover:bg-muted/40 data-[state=selected]:bg-muted/20"
+        true: "cursor-pointer"
       }
     },
     defaultVariants: {
