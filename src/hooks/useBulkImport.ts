@@ -18,10 +18,10 @@ export const useBulkImport = () => {
       setValidationErrors([]);
       setImportProgress(0);
 
-      const { data: results, error } = await importLeads.mutateAsync({ leads: data, mode });
+      const results = await importLeads.mutateAsync({ leads: data, mode });
       
-      if (error) {
-        setValidationErrors([error.message]);
+      if (results.errors && results.errors.length > 0) {
+        setValidationErrors(results.errors);
         return false;
       }
 
