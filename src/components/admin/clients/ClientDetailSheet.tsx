@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { 
   Sheet, 
   SheetContent, 
@@ -19,6 +19,10 @@ import {
   TooltipProvider, 
   TooltipTrigger 
 } from '@/components/ui/tooltip';
+import { TodoList } from './TodoList';
+import { TodoItem } from '@/types/client.types';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface ClientDetailSheetProps {
   clientId: string | null;
@@ -27,7 +31,8 @@ interface ClientDetailSheetProps {
 }
 
 export function ClientDetailSheet({ clientId, isOpen, onClose }: ClientDetailSheetProps) {
-  const { client, isLoading, error } = useClientDetails(clientId);
+  const { client, isLoading, error, refetch } = useClientDetails(clientId);
+  const { toast } = useToast();
   
   // Close sheet when escape key is pressed
   useEffect(() => {
@@ -38,6 +43,37 @@ export function ClientDetailSheet({ clientId, isOpen, onClose }: ClientDetailShe
     window.addEventListener('keydown', handleEscape);
     return () => window.removeEventListener('keydown', handleEscape);
   }, [onClose]);
+
+  // Handle todo updates
+  const handleUpdateTodos = async (todos: TodoItem[]) => {
+    if (!client?.id) return;
+    
+    try {
+      const { error } = await supabase
+        .from('client_onboarding')
+        .update({ 
+          todos: todos,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', client.id);
+        
+      if (error) throw error;
+      
+      toast({
+        title: "Todo list updated",
+        description: "The todo list has been updated successfully."
+      });
+      
+      refetch();
+    } catch (error: any) {
+      console.error('Error updating todos:', error);
+      toast({
+        variant: "destructive",
+        title: "Failed to update todo list",
+        description: error.message || "An unexpected error occurred."
+      });
+    }
+  };
 
   if (error) {
     console.error("Error loading client details:", error);
@@ -193,6 +229,16 @@ export function ClientDetailSheet({ clientId, isOpen, onClose }: ClientDetailShe
                   />
                 </div>
               </div>
+            </div>
+            
+            {/* Todo List Section */}
+            <div className="border rounded-md p-4">
+              <h3 className="font-semibold mb-4">Todo List</h3>
+              <TodoList 
+                todos={client.todos || []} 
+                onUpdate={handleUpdateTodos} 
+                clientId={client.id} 
+              />
             </div>
             
             {/* Quick Actions */}
