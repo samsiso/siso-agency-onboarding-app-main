@@ -18,10 +18,21 @@
 
 .table-header-cell {
   transition: background-color 0.2s ease;
+  position: relative;
 }
 
 .table-header-cell:hover {
   background-color: rgba(255, 255, 255, 0.05);
+}
+
+.table-header-cell::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .table-row-hover {
@@ -53,20 +64,39 @@
 }
 
 /* Enhanced table styling */
+.enhanced-table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
 .enhanced-table th {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   padding: 12px 16px;
   font-weight: 500;
   text-align: left;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: rgba(30, 30, 30, 0.8);
+  backdrop-filter: blur(8px);
 }
 
 .enhanced-table td {
   padding: 12px 16px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  vertical-align: middle;
 }
 
 .enhanced-table tbody tr:last-child td {
   border-bottom: none;
+}
+
+.enhanced-table tbody tr {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.enhanced-table tbody tr:nth-child(odd) {
+  background-color: rgba(0, 0, 0, 0.04);
 }
 
 /* Card gradients */
@@ -84,4 +114,44 @@
 
 .card-gradient-4 {
   background: linear-gradient(135deg, rgba(255, 152, 0, 0.03) 0%, rgba(255, 152, 0, 0.08) 100%);
+}
+
+/* Enhanced card styling */
+.analytics-card {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  background-color: rgba(30, 30, 30, 0.5);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.analytics-card:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Button and control styles */
+.control-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.control-button::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.control-button:hover::after {
+  opacity: 1;
 }
