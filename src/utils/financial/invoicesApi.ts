@@ -31,8 +31,11 @@ export async function fetchInvoices(filters: InvoiceFilters = {}): Promise<Invoi
       
     if (error) throw error;
     
-    // Transform data using our utility functions
-    return transformEntityData<Invoice>(data as RawInvoiceData[], transformInvoiceData);
+    // Use type assertion to avoid deep instantiation errors
+    return transformEntityData<Invoice>(
+      (data || []) as RawInvoiceData[], 
+      transformInvoiceData
+    );
   } catch (error) {
     console.error('Error fetching invoices:', error);
     toast({

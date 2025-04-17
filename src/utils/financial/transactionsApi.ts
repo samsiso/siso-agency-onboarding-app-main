@@ -28,8 +28,11 @@ export async function fetchTransactions(filters: TransactionFilters = {}): Promi
       
     if (error) throw error;
     
-    // Transform data using our utility functions
-    return transformEntityData<FinancialTransaction>(data as RawTransactionData[], transformTransactionData);
+    // Use type assertion to avoid deep instantiation errors
+    return transformEntityData<FinancialTransaction>(
+      (data || []) as RawTransactionData[], 
+      transformTransactionData
+    );
   } catch (error) {
     console.error('Error fetching transactions:', error);
     toast({

@@ -1,19 +1,21 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { FinancialSummary } from './types';
+import { SummaryPeriod, SummaryFilters } from './types/summaryTypes';
 import { fetchTransactions } from './transactionsApi';
+import { 
+  createMonthlyRevenueData, 
+  calculateProfitMargin, 
+  createDefaultSummary 
+} from './utils/summaryTransformers';
 
-// Calculate financial summary data
-export async function getFinancialSummary(period: 'month' | 'year' = 'month'): Promise<FinancialSummary> {
+/**
+ * Calculate financial summary data
+ */
+export async function getFinancialSummary(period: SummaryPeriod = 'month'): Promise<FinancialSummary> {
   try {
     // Initialize the summary object with default values
-    const summary: FinancialSummary = {
-      totalRevenue: 0,
-      totalExpenses: 0,
-      profitMargin: 0,
-      outstandingAmount: 0,
-      revenueByMonth: []
-    };
+    const summary = createDefaultSummary();
 
     // Get the start date based on the period
     const today = new Date();
@@ -44,17 +46,14 @@ export async function getFinancialSummary(period: 'month' | 'year' = 'month'): P
       }
     });
 
-    // Calculate profit margin if revenue is not zero
-    if (summary.totalRevenue > 0) {
-      const profit = summary.totalRevenue - summary.totalExpenses;
-      summary.profitMargin = Math.round((profit / summary.totalRevenue) * 100);
-    }
+    // Calculate profit margin
+    summary.profitMargin = calculateProfitMargin(summary.totalRevenue, summary.totalExpenses);
 
     // Get revenue and expense by month for the chart
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     
     // Initialize monthly data
-    let monthlyData: { [key: string]: { name: string; revenue: number; expense: number } } = {};
+    let monthlyData: { [key: string]: { revenue: number; expense: number } } = {};
     
     // Current month and year
     const currentMonth = today.getMonth();
@@ -74,7 +73,6 @@ export async function getFinancialSummary(period: 'month' | 'year' = 'month'): P
       
       const monthKey = `${year}-${(monthIndex + 1).toString().padStart(2, '0')}`;
       monthlyData[monthKey] = {
-        name: monthNames[monthIndex],
         revenue: 0,
         expense: 0
       };
@@ -96,9 +94,23 @@ export async function getFinancialSummary(period: 'month' | 'year' = 'month'): P
     });
     
     // Convert to array and sort by month
-    summary.revenueByMonth = Object.values(monthlyData).reverse();
+    summary.revenueByMonth = createMonthlyRevenueData(monthlyData, monthNames);
 
     // Get outstanding invoices amount
+    await getOutstandingInvoicesAmount(summary);
+
+    return summary;
+  } catch (error) {
+    console.error('Error getting financial summary:', error);
+    return createDefaultSummary();
+  }
+}
+
+/**
+ * Fetch outstanding invoice amounts and add to summary
+ */
+async function getOutstandingInvoicesAmount(summary: FinancialSummary): Promise<void> {
+  try {
     const { data: invoices, error } = await supabase
       .from('invoices')
       .select('amount')
@@ -107,16 +119,8 @@ export async function getFinancialSummary(period: 'month' | 'year' = 'month'): P
     if (!error && invoices) {
       summary.outstandingAmount = invoices.reduce((sum, invoice) => sum + Number(invoice.amount), 0);
     }
-
-    return summary;
   } catch (error) {
-    console.error('Error getting financial summary:', error);
-    return {
-      totalRevenue: 0,
-      totalExpenses: 0,
-      profitMargin: 0,
-      outstandingAmount: 0,
-      revenueByMonth: []
-    };
+    console.error('Error fetching outstanding invoices:', error);
+    // If there's an error, we'll leave the outstandingAmount as 0
   }
 }
