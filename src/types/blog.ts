@@ -10,3 +10,13 @@ export type { ArticleSection } from './article-section';
 export type { NewsComment } from './comment';
 export type { NewsAnalysis, AIAnalysis } from './analysis';
 export type { Summary, Views } from './summary';
+
+// Define BlogPost interface for admin operations
+export interface BlogPost {
+  id: string;
+  title: string;
+  content: string;
+  author_id: string;
+  created_at?: string;
+  updated_at?: string;
+}
