@@ -11,6 +11,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useLeadImport, ImportLead } from '@/hooks/useLeadImport';
+import { DataPreview } from './DataPreview';
+import { downloadTemplate } from '@/utils/downloadUtils';
+import { FileText, Download, Upload, AlertCircle } from 'lucide-react';
 
 interface ColumnMapping {
   sourceColumn: string;
@@ -30,8 +33,9 @@ const AVAILABLE_FIELDS = [
 export function BulkImportLeads() {
   const [rawData, setRawData] = useState('');
   const [columnMappings, setColumnMappings] = useState<ColumnMapping[]>([]);
-  const [delimiter, setDelimiter] = useState('\t'); // Default to tab
+  const [delimiter, setDelimiter] = useState('\t');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [previewData, setPreviewData] = useState<string[][]>([]);
 
   const { importLeads, isImporting } = useLeadImport();
 
@@ -39,15 +43,22 @@ export function BulkImportLeads() {
     const pastedData = e.target.value;
     setRawData(pastedData);
     
-    // Auto-detect columns from first row
     if (pastedData) {
-      const firstRow = pastedData.split('\n')[0];
+      const rows = pastedData.split('\n').filter(row => row.trim());
+      const firstRow = rows[0];
       const columns = firstRow.split(delimiter);
       
       setColumnMappings(columns.map(col => ({
         sourceColumn: col.trim(),
         targetField: ''
       })));
+
+      // Set preview data
+      setPreviewData(
+        rows.slice(0, 6).map(row => row.split(delimiter))
+      );
+    } else {
+      setPreviewData([]);
     }
   };
 
@@ -113,29 +124,59 @@ export function BulkImportLeads() {
   return (
     <Card className="p-4">
       <div className="space-y-4">
-        <div className="flex items-center gap-4 mb-4">
+        <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">Bulk Import Leads</h3>
-          <Select
-            value={delimiter}
-            onValueChange={setDelimiter}
-          >
-            <SelectTrigger className="w-40">
-              <SelectValue placeholder="Select delimiter" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="\t">Tab</SelectItem>
-              <SelectItem value=",">Comma</SelectItem>
-              <SelectItem value=";">Semicolon</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={downloadTemplate}
+              className="flex items-center gap-2"
+            >
+              <Download className="h-4 w-4" />
+              Download Template
+            </Button>
+            <Select
+              value={delimiter}
+              onValueChange={setDelimiter}
+            >
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="Select delimiter" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="\t">Tab</SelectItem>
+                <SelectItem value=",">Comma</SelectItem>
+                <SelectItem value=";">Semicolon</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
-        <Textarea
-          placeholder="Paste your data here (tab or comma separated)..."
-          className="min-h-[200px] font-mono"
-          value={rawData}
-          onChange={handleDataPaste}
-        />
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <FileText className="h-4 w-4" />
+            <span>Paste your data below or use our template</span>
+          </div>
+          <Textarea
+            placeholder="Paste your data here (tab or comma separated)..."
+            className="min-h-[200px] font-mono"
+            value={rawData}
+            onChange={handleDataPaste}
+          />
+        </div>
+
+        {previewData.length > 0 && (
+          <div className="space-y-2">
+            <h4 className="font-medium flex items-center gap-2">
+              <AlertCircle className="h-4 w-4 text-blue-500" />
+              Preview (first 5 rows)
+            </h4>
+            <DataPreview 
+              data={previewData} 
+              columnMappings={columnMappings}
+            />
+          </div>
+        )}
 
         {columnMappings.length > 0 && (
           <div className="space-y-2">
@@ -177,6 +218,7 @@ export function BulkImportLeads() {
           disabled={isProcessing || !rawData.trim()}
           className="w-full"
         >
+          <Upload className="h-4 w-4 mr-2" />
           {isProcessing ? 'Importing...' : 'Import Leads'}
         </Button>
       </div>
