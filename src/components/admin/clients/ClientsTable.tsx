@@ -65,6 +65,8 @@ import { DraggableColumnHeader } from './DraggableColumnHeader';
 import { ScrollableTable } from './ScrollableTable';
 import '../../../components/ui/hide-scrollbar.css';
 import { ClientSelectField } from './ClientSelectField';
+import { cn } from '@/lib/utils';
+import { tableStyles, tableCellStyles, tableRowStyles } from '@/components/ui/table-styles';
 
 const COMPANY_NICHE_OPTIONS = [
   { value: 'ecommerce', label: 'E-commerce' },
