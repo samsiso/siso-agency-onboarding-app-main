@@ -1,62 +1,91 @@
 
 import React from 'react';
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { CheckCircle, Plus } from 'lucide-react';
 
 export function CheckInsView() {
   return (
-    <div className="bg-white rounded-md border p-6">
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold mb-2">Daily Business Check-In</h2>
-        <p className="text-sm text-muted-foreground">
-          Reflect on your day to identify successes, improvements, and action items
-        </p>
-      </div>
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CheckCircle className="h-5 w-5 text-purple-500" />
+            Daily Business Check-In
+          </CardTitle>
+          <CardDescription>
+            Reflect on your day, note achievements, and plan improvements
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="check-in-date">Date</Label>
+              <Input type="date" id="check-in-date" defaultValue={new Date().toISOString().split('T')[0]} />
+            </div>
+            <div>
+              <Label htmlFor="key-metrics">Key Metrics</Label>
+              <Input 
+                type="text" 
+                id="key-metrics" 
+                placeholder="e.g., Revenue: $1500, New Leads: 3"
+              />
+            </div>
+          </div>
+          
+          <div>
+            <Label htmlFor="went-well">What went well today?</Label>
+            <Textarea 
+              id="went-well" 
+              placeholder="List your achievements and successes..." 
+              className="min-h-[100px]"
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="improve">What could be improved?</Label>
+            <Textarea 
+              id="improve" 
+              placeholder="Note areas that need attention or improvement..." 
+              className="min-h-[100px]"
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="action-items">Action items for tomorrow</Label>
+            <Textarea 
+              id="action-items" 
+              placeholder="List concrete actions to take..." 
+              className="min-h-[100px]"
+            />
+          </div>
+          
+          <div className="flex justify-end">
+            <Button className="gap-2">
+              <Plus className="h-4 w-4" />
+              Save Check-In
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
       
-      <form className="space-y-4">
-        <div className="space-y-2">
-          <label className="text-sm font-medium">What went well today?</label>
-          <Textarea 
-            placeholder="List your wins, achievements, and positive outcomes..."
-            className="min-h-24"
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <label className="text-sm font-medium">What could be improved?</label>
-          <Textarea 
-            placeholder="Note any challenges, bottlenecks, or areas for growth..."
-            className="min-h-24"
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Action items for tomorrow</label>
-          <Textarea 
-            placeholder="List specific tasks or changes to implement..."
-            className="min-h-24"
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Key metrics & notes</label>
-          <Textarea 
-            placeholder="Record important numbers, client feedback, or other notes..."
-            className="min-h-12"
-          />
-        </div>
-        
-        <Button type="submit" className="w-full md:w-auto">
-          Save Check-In
-        </Button>
-      </form>
-      
-      <div className="mt-8 pt-6 border-t">
-        <h3 className="text-md font-medium mb-4">Previous Check-Ins</h3>
-        <p className="text-sm text-muted-foreground">
-          No previous check-ins found. Start by completing today's reflection.
-        </p>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Previous Check-Ins</CardTitle>
+          <CardDescription>
+            View your past business reflections and insights
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8 text-muted-foreground">
+            <p>No previous check-ins found</p>
+            <p className="text-sm mt-2">Complete your first check-in to start tracking your business reflections</p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

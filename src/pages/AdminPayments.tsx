@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { AdminLayout } from "@/components/admin/layout/AdminLayout";
 import { FinancialsHeader } from "@/components/admin/financials/FinancialsHeader";
@@ -27,37 +26,29 @@ export default function AdminPayments() {
     setIsLoading(true);
     
     try {
-      // Load expenses
-      const expenseData = await fetchTransactions({ 
-        type: 'expense',
-        ...filters
-      });
+      // Load all transactions
+      const transactionData = await fetchTransactions();
       
-      // Validate expenses data
-      if (Array.isArray(expenseData)) {
+      // Filter expenses and revenues separately
+      if (Array.isArray(transactionData)) {
+        const expenseData = transactionData.filter(transaction => 
+          transaction.type === 'expense'
+        );
         setExpenses(expenseData);
-      } else {
-        console.error("Invalid expense data format:", expenseData);
-        setExpenses([]);
-        toast({
-          title: "Error",
-          description: "Failed to load expenses data correctly",
-          variant: "destructive"
-        });
-      }
-      
-      // Load revenues
-      const revenueData = await fetchTransactions({ 
-        type: 'revenue',
-        ...filters 
-      });
-      
-      // Validate revenue data
-      if (Array.isArray(revenueData)) {
+        
+        const revenueData = transactionData.filter(transaction => 
+          transaction.type === 'revenue'
+        );
         setRevenues(revenueData);
       } else {
-        console.error("Invalid revenue data format:", revenueData);
+        console.error("Invalid transaction data format:", transactionData);
+        setExpenses([]);
         setRevenues([]);
+        toast({
+          title: "Error",
+          description: "Failed to load financial data correctly",
+          variant: "destructive"
+        });
       }
     } catch (error) {
       console.error("Error loading financial data:", error);

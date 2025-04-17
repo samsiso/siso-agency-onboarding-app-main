@@ -14,3 +14,4 @@ export * from './utils/relationshipUtils';
 export * from './utils/invoiceTransformers';
 export * from './utils/transactionTransformers';
 export * from './utils/summaryTransformers';
+export * from './transactionModifications';
