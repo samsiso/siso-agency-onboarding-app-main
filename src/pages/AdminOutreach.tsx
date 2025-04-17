@@ -888,8 +888,4 @@ const renderCellContent = (lead: any, key: string) => {
   );
 };
 
-// Helper function to render status badges
-const getStatusBadge = (status: string | null) => {
-  switch (status) {
-    case 'contacted':
-      return <Badge className="bg-blue-500/2
+export default AdminOutreach;
