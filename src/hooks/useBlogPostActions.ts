@@ -1,4 +1,3 @@
-
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { usePoints } from '@/hooks/usePoints';
 import { useToast } from '@/hooks/use-toast';
@@ -6,7 +5,6 @@ import { safeSupabase } from '@/utils/supabaseHelpers';
 import FeatureFlags from '@/utils/featureFlags';
 import { safeGet } from '@/utils/typeHelpers';
 
-// Enhanced hook with improved social sharing capabilities
 export const useBlogPostActions = () => {
   const { toast } = useToast();
   const { user } = useAuthSession();
@@ -122,9 +120,35 @@ export const useBlogPostActions = () => {
     }
   };
 
+  const safeFetchBlogPost = async (blogId: string) => {
+    try {
+      const { data, error } = await safeSupabase
+        .from('blog_posts')
+        .select('*')
+        .eq('id', blogId)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching blog post:', error);
+        return null;
+      }
+      
+      // Add non-null check before accessing data
+      if (data && typeof data === 'object' && 'id' in data) {
+        return data as { id: string; [key: string]: any };
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Error in safeFetchBlogPost:', error);
+      return null;
+    }
+  };
+
   return {
     handleShare,
-    handleBookmark
+    handleBookmark,
+    safeFetchBlogPost
   };
 };
 
@@ -141,7 +165,7 @@ export const safeFetchBlogPost = async (blogId: string) => {
       return null;
     }
     
-    // Safely access the post data with type assertion after validation
+    // Add non-null check before accessing data
     if (data && typeof data === 'object' && 'id' in data) {
       return data as { id: string; [key: string]: any };
     }
