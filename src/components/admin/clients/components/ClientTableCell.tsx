@@ -150,6 +150,7 @@ export function ClientTableCell({
       if (isEditing) {
         return renderEditableContent();
       } else if (Array.isArray(value)) {
+        // Handle arrays by showing their length instead of the raw array
         return <span>{value.length} items</span>;
       } else {
         return (

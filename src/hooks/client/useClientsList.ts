@@ -67,17 +67,18 @@ export const useClientsList = ({
         const processedData: ClientData[] = data.map(item => {
           // Create the avatar URL from the contact name
           const contactName = item.contact_name || 'Client';
-          const avatarUrl = `https://api.dicebear.com/7.x/initials/svg?seed=${contactName.substring(0, 2)}`;
+          const avatarUrl = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(contactName.substring(0, 2))}`;
           
           // Create an empty todos array as default
           const defaultTodos: TodoItem[] = [];
           
+          // Map the database item to our ClientData interface, providing default values for missing fields
           return {
             id: item.id,
             full_name: item.contact_name || 'Unknown Client',
-            email: item.email || null,
+            email: null, // These fields don't exist in the database, so we provide default values
             business_name: item.company_name || null,
-            phone: item.phone || null,
+            phone: null,
             avatar_url: avatarUrl,
             status: item.status || 'pending',
             current_step: item.current_step || 1,
@@ -86,28 +87,28 @@ export const useClientsList = ({
             created_at: item.created_at,
             updated_at: item.updated_at,
             website_url: item.website_url || null,
-            professional_role: item.professional_role || null,
-            bio: item.bio || null,
+            professional_role: null,
+            bio: null,
             project_name: item.project_name || null,
             company_niche: item.company_niche || null,
-            development_url: item.development_url || item.website_url || null,
-            mvp_build_status: item.mvp_build_status || null,
-            notion_plan_url: item.notion_plan_url || null,
-            payment_status: item.payment_status || null,
-            estimated_price: item.estimated_price || null,
-            initial_contact_date: item.initial_contact_date || item.created_at || null,
-            start_date: item.start_date || null,
-            estimated_completion_date: item.estimated_completion_date || null,
-            client_contact: item.client_contact || null,
-            purchase_history: item.purchase_history || null,
-            next_steps: item.next_steps || null,
-            key_research: item.key_research || null,
-            referral_source: item.referral_source || null,
-            industry: item.industry || null,
-            last_contacted_date: item.last_contacted_date || null,
-            assigned_to: item.assigned_to || null,
-            priority: (item.priority as 'low' | 'medium' | 'high' | null) || null,
-            todos: item.todos || defaultTodos
+            development_url: null,
+            mvp_build_status: null,
+            notion_plan_url: null,
+            payment_status: null,
+            estimated_price: null,
+            initial_contact_date: item.created_at || null,
+            start_date: null,
+            estimated_completion_date: null,
+            client_contact: null,
+            purchase_history: null,
+            next_steps: null,
+            key_research: null,
+            referral_source: null,
+            industry: null,
+            last_contacted_date: null,
+            assigned_to: null,
+            priority: null,
+            todos: defaultTodos
           };
         });
         
