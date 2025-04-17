@@ -1,36 +1,41 @@
 
-import { useCallback, useEffect } from 'react';
-import { debounce } from '@/lib/utils';
+import { useEffect } from 'react';
 
-interface UseSmoothScrollOptions {
+interface SmoothScrollOptions {
   onScroll?: (scrollLeft: number, scrollTop: number) => void;
   threshold?: number;
 }
 
-export function useSmoothScroll(ref: React.RefObject<HTMLElement>, options: UseSmoothScrollOptions = {}) {
-  const { onScroll, threshold = 10 } = options;
-
-  const handleScroll = useCallback(
-    debounce((event: Event) => {
-      const element = event.target as HTMLElement;
-      const { scrollLeft, scrollTop } = element;
-      onScroll?.(scrollLeft, scrollTop);
-    }, threshold),
-    [onScroll, threshold]
-  );
-
+export const useSmoothScroll = (
+  ref: React.RefObject<HTMLElement>,
+  options: SmoothScrollOptions = {}
+) => {
   useEffect(() => {
+    const { onScroll, threshold = 0 } = options;
     const element = ref.current;
+
     if (!element) return;
-
-    element.style.willChange = 'transform';
-    element.style.backfaceVisibility = 'hidden';
-    element.style.perspective = '1000px';
-    element.style.transform = 'translate3d(0,0,0)';
-
-    element.addEventListener('scroll', handleScroll, { passive: true });
-    return () => {
-      element.removeEventListener('scroll', handleScroll);
+    
+    // Add CSS for smooth scrolling
+    element.style.scrollBehavior = 'auto';
+    
+    const handleScroll = () => {
+      if (element && onScroll) {
+        onScroll(element.scrollLeft, element.scrollTop);
+      }
     };
-  }, [ref, handleScroll]);
-}
+
+    // Add scroll event listener
+    element.addEventListener('scroll', handleScroll);
+    
+    // Initial call
+    handleScroll();
+    
+    // Cleanup
+    return () => {
+      if (element) {
+        element.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, [ref, options]);
+};

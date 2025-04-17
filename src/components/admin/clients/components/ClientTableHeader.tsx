@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Table, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ClientColumnPreference } from '@/types/client.types';
 import { DraggableColumnHeader } from '../DraggableColumnHeader';
@@ -30,7 +30,7 @@ export function ClientTableHeader({
   return (
     <TableHeader className="sticky top-0 z-20">
       <TableRow className="hover:bg-transparent border-border/30">
-        <TableHead className="w-12 bg-background/95 backdrop-blur-sm sticky left-0 z-30">
+        <TableHead className="w-12 bg-background/95 backdrop-blur-sm sticky left-0 z-30 h-12 px-4">
           <Checkbox 
             checked={selectedClients.length === clients.length && clients.length > 0}
             onCheckedChange={onSelectAll}
@@ -41,7 +41,7 @@ export function ClientTableHeader({
         
         {visibleColumns.map((column, index) => {
           const isPinned = !!column.pinned;
-          let leftPosition = 40;
+          let leftPosition = 48; // Adjusted for checkbox column width
           if (isPinned) {
             for (let i = 0; i < index; i++) {
               if (visibleColumns[i].pinned) {
@@ -54,7 +54,7 @@ export function ClientTableHeader({
             <TableHead 
               key={column.key}
               className={cn(
-                "text-xs font-medium text-muted-foreground tracking-wider uppercase",
+                "text-xs font-medium text-muted-foreground tracking-wider uppercase h-12",
                 isPinned ? 'sticky z-20 bg-background/95 backdrop-blur-sm' : ''
               )}
               style={{ 

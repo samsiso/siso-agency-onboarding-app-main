@@ -63,13 +63,13 @@ export const useClientsList = ({
           };
         }
         
-        // Process the data to get the clientData format
+        // Process the data to get the clientData format with proper names
         const processedData: ClientData[] = data.map(item => ({
           id: item.id,
-          full_name: item.contact_name || 'Unknown',
-          email: null, // Not available in the current dataset
+          full_name: item.contact_name || 'Unknown Client',
+          email: item.email || null,
           business_name: item.company_name || null,
-          phone: null, // Not available in the current dataset
+          phone: item.phone || null,
           avatar_url: `https://api.dicebear.com/7.x/initials/svg?seed=${(item.contact_name || 'Client').substring(0, 2)}`,
           status: item.status || 'pending',
           current_step: item.current_step || 1,
@@ -78,18 +78,28 @@ export const useClientsList = ({
           created_at: item.created_at,
           updated_at: item.updated_at,
           website_url: item.website_url || null,
-          professional_role: null, // Not available in the current dataset
-          bio: null, // Not available in the current dataset
+          professional_role: item.professional_role || null,
+          bio: item.bio || null,
           project_name: item.project_name || null,
           company_niche: item.company_niche || null,
-          development_url: item.website_url || null,
-          mvp_build_status: null, // Not available in the current dataset
-          notion_plan_url: null, // Not available in the current dataset
-          payment_status: null, // Not available in the current dataset
-          estimated_price: null, // Not available in the current dataset
-          initial_contact_date: item.created_at || null,
-          start_date: null, // Not available in the current dataset
-          estimated_completion_date: null // Not available in the current dataset
+          development_url: item.development_url || item.website_url || null,
+          mvp_build_status: item.mvp_build_status || null,
+          notion_plan_url: item.notion_plan_url || null,
+          payment_status: item.payment_status || null,
+          estimated_price: item.estimated_price || null,
+          initial_contact_date: item.initial_contact_date || item.created_at || null,
+          start_date: item.start_date || null,
+          estimated_completion_date: item.estimated_completion_date || null,
+          client_contact: item.client_contact || null,
+          purchase_history: item.purchase_history || null,
+          next_steps: item.next_steps || null,
+          key_research: item.key_research || null,
+          referral_source: item.referral_source || null,
+          industry: item.industry || null,
+          last_contacted_date: item.last_contacted_date || null,
+          assigned_to: item.assigned_to || null,
+          priority: item.priority || null,
+          todos: item.todos || []
         }));
         
         console.log('Processed client data:', processedData);

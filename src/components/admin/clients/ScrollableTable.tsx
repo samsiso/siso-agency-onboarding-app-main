@@ -1,10 +1,7 @@
 
-import React, { useRef, useState } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import React, { useRef, useState, useEffect } from 'react';
 import { ClientColumnPreference } from '@/types/client.types';
 import { cn } from '@/lib/utils';
-import { useSmoothScroll } from '@/hooks/use-smooth-scroll';
 import '../../../components/ui/hide-scrollbar.css';
 
 interface ScrollableTableProps {
@@ -18,18 +15,43 @@ export function ScrollableTable({ children, pinnedColumns, className }: Scrollab
   const [leftShadowVisible, setLeftShadowVisible] = useState(false);
   const [rightShadowVisible, setRightShadowVisible] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [headerHeight, setHeaderHeight] = useState(0);
 
-  useSmoothScroll(scrollContainerRef, {
-    onScroll: (scrollLeft, scrollTop) => {
+  // Measure the header height to properly position the sticky header shadows
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      const headerElement = scrollContainerRef.current.querySelector('thead');
+      if (headerElement) {
+        setHeaderHeight(headerElement.offsetHeight);
+        document.documentElement.style.setProperty('--header-height', `${headerElement.offsetHeight}px`);
+      }
+    }
+  }, []);
+
+  // Handle scrolling without debounce for immediate feedback
+  useEffect(() => {
+    const handleScroll = () => {
       if (scrollContainerRef.current) {
-        const { scrollWidth, clientWidth } = scrollContainerRef.current;
+        const { scrollLeft, scrollTop, scrollWidth, clientWidth } = scrollContainerRef.current;
         setLeftShadowVisible(scrollLeft > 10);
         setRightShadowVisible(scrollLeft < scrollWidth - clientWidth - 10);
         setIsScrolled(scrollTop > 0);
       }
-    },
-    threshold: 5
-  });
+    };
+
+    const scrollContainer = scrollContainerRef.current;
+    if (scrollContainer) {
+      scrollContainer.addEventListener('scroll', handleScroll);
+      // Trigger initial check
+      handleScroll();
+    }
+
+    return () => {
+      if (scrollContainer) {
+        scrollContainer.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, []);
 
   const pinnedWidth = pinnedColumns.reduce((sum, col) => sum + (col.width || 150), 0);
 
@@ -52,7 +74,7 @@ export function ScrollableTable({ children, pinnedColumns, className }: Scrollab
       <div
         ref={scrollContainerRef}
         className={cn(
-          "overflow-auto hide-scrollbar relative scroll-smooth",
+          "overflow-auto hide-scrollbar relative",
           "transition-[background-color,border-color] duration-150",
           className
         )}
@@ -84,7 +106,7 @@ export function ScrollableTable({ children, pinnedColumns, className }: Scrollab
             <div
               className="sticky top-0 left-0 right-0 z-30 bg-background/95 border-b border-border/30 shadow-sm backdrop-blur-md"
               style={{
-                height: 'var(--header-height)',
+                height: `${headerHeight}px`,
                 transform: 'translate3d(0,0,0)'
               }}
             />

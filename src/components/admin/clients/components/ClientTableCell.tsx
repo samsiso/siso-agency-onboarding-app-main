@@ -55,11 +55,11 @@ export function ClientTableCell({
   switch (columnKey) {
     case 'full_name':
       return (
-        <div className="flex flex-col space-y-0.5">
+        <div className="flex flex-col space-y-0.5" title={client.full_name || ''}>
           {isEditing ? renderEditableContent() : (
             <div onDoubleClick={onDoubleClick}>
               <span className="font-medium text-foreground">{client.full_name || 'Unknown'}</span>
-              <span className="block text-xs text-muted-foreground">{client.email || 'No email'}</span>
+              {client.email && <span className="block text-xs text-muted-foreground">{client.email}</span>}
             </div>
           )}
         </div>
@@ -115,10 +115,10 @@ export function ClientTableCell({
     case 'next_steps':
     case 'key_research':
       return (
-        <div className="max-w-xs truncate" title={client[columnKey] || ''}>
+        <div className="max-w-xs truncate" title={client[columnKey as keyof ClientData]?.toString() || ''}>
           {isEditing ? renderEditableContent() : (
             <div onDoubleClick={onDoubleClick}>
-              {client[columnKey] || '-'}
+              {client[columnKey as keyof ClientData] || '-'}
             </div>
           )}
         </div>
@@ -146,7 +146,7 @@ export function ClientTableCell({
       );
 
     default:
-      const value = client[columnKey as keyof typeof client];
+      const value = client[columnKey as keyof ClientData];
       if (isEditing) {
         return renderEditableContent();
       } else if (Array.isArray(value)) {

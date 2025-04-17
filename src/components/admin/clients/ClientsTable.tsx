@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 import { tableStyles } from '@/components/ui/table-styles';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Download, Trash2 } from "lucide-react";
+import { Download, Trash2, Users } from "lucide-react";
 
 interface ClientsTableProps {
   searchQuery?: string;
