@@ -574,25 +574,36 @@ export function ClientsTable({
       />
       
       {selectedClients.length > 0 && (
-        <div className="flex items-center gap-2 mb-4 py-2 px-4 rounded-lg bg-muted/30 border border-border/50 shadow-sm">
-          <span className="text-sm font-medium">{selectedClients.length} clients selected</span>
-          <Button variant="outline" size="sm" onClick={handleDeleteSelected} className="border-border/50 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30">
-            <Trash2 className="h-4 w-4 mr-1" />
+        <div className="flex items-center gap-2 mb-4 py-2.5 px-4 rounded-lg bg-card/30 border border-border/50 shadow-sm backdrop-blur-sm">
+          <span className="text-sm font-medium text-muted-foreground">
+            {selectedClients.length} clients selected
+          </span>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleDeleteSelected} 
+            className="border-border/50 text-destructive hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
+          >
+            <Trash2 className="h-4 w-4 mr-1.5" />
             Delete
           </Button>
-          <Button variant="outline" size="sm" className="border-border/50 hover:bg-muted/50">
-            <Download className="h-4 w-4 mr-1" />
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="border-border/50 text-muted-foreground hover:bg-muted/50"
+          >
+            <Download className="h-4 w-4 mr-1.5" />
             Export
           </Button>
         </div>
       )}
       
-      <div ref={tableContainerRef} className="relative overflow-hidden">
+      <div ref={tableContainerRef} className="relative rounded-lg overflow-hidden border border-border/50 bg-card shadow-sm">
         <ScrollableTable pinnedColumns={pinnedColumns}>
-          <Table ref={tableElementRef} className="w-full border-collapse">
+          <Table ref={tableElementRef} className={tableStyles()}>
             <TableHeader className="sticky top-0 bg-card/95 backdrop-blur-sm z-20">
-              <TableRow className="border-border/50">
-                <TableHead className="w-12 bg-card/95 backdrop-blur-sm sticky left-0 z-30 table-header-cell">
+              <TableRow className="border-border/50 hover:bg-transparent">
+                <TableHead className="w-12 bg-card/95 backdrop-blur-sm sticky left-0 z-30">
                   <Checkbox 
                     checked={selectedClients.length === clients.length && clients.length > 0}
                     onCheckedChange={handleSelectAll}
@@ -615,7 +626,11 @@ export function ClientsTable({
                   return (
                     <TableHead 
                       key={column.key} 
-                      className={`${isPinned ? 'sticky z-20 bg-card/95 backdrop-blur-sm' : ''} table-header-cell`}
+                      className={cn(
+                        "text-xs font-medium text-muted-foreground tracking-wider uppercase",
+                        isPinned ? 'sticky z-20 bg-card/95 backdrop-blur-sm' : '',
+                        tableCellStyles()
+                      )}
                       style={{ 
                         minWidth: `${column.width || 150}px`,
                         width: `${column.width || 150}px`,
@@ -639,15 +654,18 @@ export function ClientsTable({
             
             <TableBody>
               {clients.length === 0 ? (
-                <TableRow className="border-border/50">
-                  <TableCell colSpan={visibleColumns.length + 2} className="text-center h-32 text-muted-foreground">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                      <Users className="h-8 w-8 text-muted-foreground/50" />
-                      <p>No clients found matching your search criteria</p>
+                <TableRow>
+                  <TableCell 
+                    colSpan={visibleColumns.length + 1} 
+                    className="h-[300px] text-center"
+                  >
+                    <div className="flex flex-col items-center justify-center gap-3 text-muted-foreground">
+                      <Users className="h-8 w-8 opacity-50" />
+                      <p className="text-sm">No clients found matching your search criteria</p>
                       <Button 
                         variant="outline" 
                         size="sm" 
-                        className="mt-2 border-border/50 hover:bg-muted/50"
+                        className="mt-2"
                         onClick={() => {
                           if (onSearchChange) onSearchChange('');
                           if (onStatusFilterChange) onStatusFilterChange('all');
@@ -660,7 +678,13 @@ export function ClientsTable({
                 </TableRow>
               ) : (
                 clients.map((client) => (
-                  <TableRow key={client.id} className="group border-border/50 table-row-hover">
+                  <TableRow 
+                    key={client.id} 
+                    className={cn(
+                      tableRowStyles(),
+                      "group transition-all duration-200"
+                    )}
+                  >
                     <TableCell className="sticky left-0 bg-background z-10">
                       <Checkbox 
                         checked={selectedClients.includes(client.id)}
@@ -683,7 +707,11 @@ export function ClientsTable({
                       return (
                         <TableCell 
                           key={column.key}
-                          className={`relative group ${isPinned ? 'sticky bg-background z-10' : ''}`}
+                          className={cn(
+                            "group-hover:bg-muted/40 transition-colors duration-200",
+                            isPinned ? 'sticky bg-background z-10' : '',
+                            tableCellStyles()
+                          )}
                           style={{ 
                             left: isPinned ? `${leftPosition}px` : undefined,
                             maxWidth: `${column.width || 150}px`,
