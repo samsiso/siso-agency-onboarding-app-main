@@ -1,4 +1,3 @@
-
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useClientsList } from '@/hooks/client';
 import { ClientData, ClientViewPreference, ClientColumnPreference, TodoItem } from '@/types/client.types';
@@ -65,6 +64,24 @@ import { TodoList } from './TodoList';
 import { DraggableColumnHeader } from './DraggableColumnHeader';
 import { ScrollableTable } from './ScrollableTable';
 import '../../../components/ui/hide-scrollbar.css';
+import { ClientSelectField } from './ClientSelectField';
+
+// Add these constants at the top level
+const COMPANY_NICHE_OPTIONS = [
+  { value: 'ecommerce', label: 'E-commerce' },
+  { value: 'saas', label: 'SaaS' },
+  { value: 'agency', label: 'Agency' },
+  { value: 'consulting', label: 'Consulting' },
+  { value: 'education', label: 'Education' },
+  { value: 'other', label: 'Other' }
+];
+
+const STATUS_OPTIONS = [
+  { value: 'pending', label: 'Pending' },
+  { value: 'active', label: 'Active' },
+  { value: 'completed', label: 'Completed' },
+  { value: 'on_hold', label: 'On Hold' }
+];
 
 interface ClientsTableProps {
   searchQuery?: string;
@@ -157,23 +174,21 @@ export function ClientsTable({
     }, 0);
   };
 
-  const handleSaveEdit = async () => {
-    if (!editingCell) return;
-    
+  const handleSaveEdit = async ({ id, field, value }: { id: string; field: string; value: string }) => {
     try {
       const { error } = await supabase
         .from('client_onboarding')
         .update({ 
-          [editingCell.field]: editValue,
+          [field]: value,
           updated_at: new Date().toISOString()
         })
-        .eq('id', editingCell.id);
+        .eq('id', id);
         
       if (error) throw error;
       
       toast({
         title: "Update successful",
-        description: `Updated ${editingCell.field} for this client.`
+        description: `Updated ${field} for this client.`
       });
       
       refetch();
@@ -311,21 +326,51 @@ export function ClientsTable({
   };
 
   function renderCellContent(client: ClientData, columnKey: string) {
+    const isEditing = editingCell?.id === client.id && editingCell?.field === columnKey;
+
+    const handleDoubleClick = () => {
+      handleStartEdit(client, columnKey);
+    };
+
     switch (columnKey) {
       case 'full_name':
         return (
           <div className="flex flex-col">
-            <span 
-              className="font-medium cursor-pointer hover:underline" 
-              onClick={() => handleOpenDetails(client.id)}
-            >
-              {client.full_name || 'Unknown'}
-            </span>
-            <span className="text-sm text-muted-foreground">{client.email || 'No email'}</span>
+            {isEditing ? (
+              <Input
+                ref={editInputRef}
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+                onKeyDown={handleEditKeyDown}
+                className="h-8 min-w-[120px] border-border/50"
+                autoFocus
+              />
+            ) : (
+              <div onDoubleClick={handleDoubleClick}>
+                <span className="font-medium">{client.full_name || 'Unknown'}</span>
+                <span className="text-sm text-muted-foreground">{client.email || 'No email'}</span>
+              </div>
+            )}
           </div>
         );
       case 'status':
-        return <ClientStatusBadge status={client.status} />;
+        return (
+          <ClientSelectField
+            value={client.status}
+            onChange={(value) => handleSaveEdit({ id: client.id, field: 'status', value })}
+            options={STATUS_OPTIONS}
+            className="h-8 min-w-[120px]"
+          />
+        );
+      case 'company_niche':
+        return (
+          <ClientSelectField
+            value={client.company_niche || 'other'}
+            onChange={(value) => handleSaveEdit({ id: client.id, field: 'company_niche', value })}
+            options={COMPANY_NICHE_OPTIONS}
+            className="h-8 min-w-[120px]"
+          />
+        );
       case 'updated_at':
         return formatRelativeTime(client.updated_at);
       case 'notion_plan_url':
@@ -544,10 +589,6 @@ export function ClientsTable({
                     </TableHead>
                   );
                 })}
-                
-                <TableHead className="w-12 sticky right-0 bg-card/95 backdrop-blur-sm z-20 table-header-cell">
-                  Actions
-                </TableHead>
               </TableRow>
             </TableHeader>
             
@@ -585,8 +626,6 @@ export function ClientsTable({
                     
                     {visibleColumns.map((column, colIndex) => {
                       const isPinned = !!column.pinned;
-                      const isEditing = editingCell?.id === client.id && editingCell?.field === column.key;
-                      
                       let leftPosition = 40;
                       if (isPinned) {
                         for (let i = 0; i < colIndex; i++) {
@@ -606,88 +645,10 @@ export function ClientsTable({
                           }}
                           onDoubleClick={() => handleStartEdit(client, column.key)}
                         >
-                          {isEditing ? (
-                            <div className="flex items-center">
-                              <Input
-                                ref={editInputRef}
-                                value={editValue}
-                                onChange={(e) => setEditValue(e.target.value)}
-                                onKeyDown={handleEditKeyDown}
-                                className="h-8 min-w-[120px] border-border/50"
-                                autoFocus
-                              />
-                              <div className="flex items-center ml-1">
-                                <Button 
-                                  size="icon" 
-                                  variant="ghost" 
-                                  className="h-6 w-6" 
-                                  onClick={handleSaveEdit}
-                                >
-                                  <Check className="h-3 w-3 text-green-500" />
-                                </Button>
-                                <Button 
-                                  size="icon" 
-                                  variant="ghost" 
-                                  className="h-6 w-6" 
-                                  onClick={handleCancelEdit}
-                                >
-                                  <X className="h-3 w-3 text-destructive" />
-                                </Button>
-                              </div>
-                            </div>
-                          ) : (
-                            renderCellContent(client, column.key)
-                          )}
-                          
-                          {!isEditing && (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-6 w-6 absolute right-2 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
-                              onClick={() => handleStartEdit(client, column.key)}
-                            >
-                              <Edit2 className="h-3 w-3" />
-                            </Button>
-                          )}
+                          {renderCellContent(client, column.key)}
                         </TableCell>
                       );
                     })}
-                    
-                    <TableCell className="sticky right-0 bg-background z-10">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48 border-border/70 bg-card/95 backdrop-blur-sm">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem 
-                            onClick={() => handleOpenDetails(client.id)}
-                            className="cursor-pointer hover:bg-muted/50"
-                          >
-                            <ExternalLink className="h-4 w-4 mr-2" />
-                            View Details
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => handleStartEdit(client, 'full_name')}
-                            className="cursor-pointer hover:bg-muted/50"
-                          >
-                            <Edit2 className="h-4 w-4 mr-2" />
-                            Edit Client
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem 
-                            className="text-destructive cursor-pointer hover:bg-destructive/10"
-                            onClick={() => handleDeleteClient(client.id)}
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Delete Client
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
                   </TableRow>
                 ))
               )}
