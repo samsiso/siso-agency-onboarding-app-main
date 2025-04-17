@@ -32,7 +32,7 @@ export async function fetchTransactions(filters: TransactionFilters = {}): Promi
       
     if (error) throw error;
     
-    // Break deep instantiation by typing as unknown first
+    // Use the improved transformEntityData function to avoid deep instantiation
     return transformEntityData(data || [], transformTransactionData);
   } catch (error) {
     console.error('Error fetching transactions:', error);
@@ -62,12 +62,8 @@ export async function addTransaction(
       description: `${transaction.type === 'expense' ? 'Expense' : 'Revenue'} recorded successfully`,
     });
     
-    // Use type assertion to avoid deep instantiation
-    return {
-      ...data,
-      type: data.type as 'expense' | 'revenue',
-      recurring_type: data.recurring_type as 'one-time' | 'monthly' | 'annual' | null
-    };
+    // Return a typed object to avoid deep instantiation
+    return transformTransactionData(data);
   } catch (error) {
     console.error('Error adding transaction:', error);
     toast({
@@ -124,11 +120,8 @@ export async function updateTransaction(
       description: 'Transaction updated successfully',
     });
     
-    return {
-      ...data,
-      type: data.type as 'expense' | 'revenue',
-      recurring_type: data.recurring_type as 'one-time' | 'monthly' | 'annual' | null
-    };
+    // Use the transformer to create proper type
+    return transformTransactionData(data);
   } catch (error) {
     console.error('Error updating transaction:', error);
     toast({

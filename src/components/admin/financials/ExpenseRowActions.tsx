@@ -12,12 +12,14 @@ interface ExpenseRowActionsProps {
   expenseId: string;
   onViewDetails: (id: string) => void;
   onDelete: (id: string) => void;
+  onEdit?: (id: string) => void;
 }
 
 export function ExpenseRowActions({ 
   expenseId, 
   onViewDetails, 
-  onDelete 
+  onDelete,
+  onEdit
 }: ExpenseRowActionsProps) {
   return (
     <DropdownMenu>
@@ -32,7 +34,7 @@ export function ExpenseRowActions({
           <Eye className="h-4 w-4 mr-2" />
           View Details
         </DropdownMenuItem>
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onEdit ? onEdit(expenseId) : null}>
           <Edit className="h-4 w-4 mr-2" />
           Edit
         </DropdownMenuItem>

@@ -21,15 +21,27 @@ export function useExpensesSort(expenses: FinancialTransaction[]) {
 
   // Sort expenses based on current sort state
   const sortedExpenses = useMemo(() => {
+    // Ensure we have a valid array to sort
+    if (!expenses || !Array.isArray(expenses)) {
+      console.warn("Invalid expenses data provided to useExpensesSort");
+      return [];
+    }
+
     return [...expenses].sort((a, b) => {
       if (sortField === "amount") {
+        // Ensure numeric comparison
+        const aAmount = typeof a.amount === 'number' ? a.amount : 0;
+        const bAmount = typeof b.amount === 'number' ? b.amount : 0;
         return sortDirection === "asc" 
-          ? a.amount - b.amount 
-          : b.amount - a.amount;
+          ? aAmount - bAmount 
+          : bAmount - aAmount;
       } else if (sortField === "date") {
+        // Handle potential invalid dates
+        const aDate = a.date ? new Date(a.date).getTime() : 0;
+        const bDate = b.date ? new Date(b.date).getTime() : 0;
         return sortDirection === "asc" 
-          ? new Date(a.date).getTime() - new Date(b.date).getTime() 
-          : new Date(b.date).getTime() - new Date(a.date).getTime();
+          ? aDate - bDate 
+          : bDate - aDate;
       } else if (sortField === "name") {
         const aVal = a.description || "";
         const bVal = b.description || "";

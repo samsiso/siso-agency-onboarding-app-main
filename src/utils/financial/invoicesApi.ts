@@ -31,7 +31,7 @@ export async function fetchInvoices(filters: InvoiceFilters = {}): Promise<Invoi
       
     if (error) throw error;
     
-    // Break deep instantiation by typing as unknown first
+    // Use the improved transformEntityData function
     return transformEntityData(data || [], transformInvoiceData);
   } catch (error) {
     console.error('Error fetching invoices:', error);
@@ -60,12 +60,8 @@ export async function addInvoice(invoice: Omit<Invoice, 'id' | 'client' | 'payme
       description: 'Invoice added successfully',
     });
     
-    // Ensure the result conforms to the Invoice type
-    return {
-      ...data,
-      status: data.status as 'draft' | 'pending' | 'paid' | 'overdue' | 'cancelled',
-      client: { full_name: 'Unknown' } // Default client info
-    };
+    // Use transformer to return proper type
+    return transformInvoiceData(data);
   } catch (error) {
     console.error('Error adding invoice:', error);
     toast({
@@ -121,12 +117,8 @@ export async function updateInvoice(id: string, updates: Partial<Omit<Invoice, '
       description: 'Invoice updated successfully',
     });
     
-    // Ensure the result conforms to the Invoice type
-    return {
-      ...data,
-      status: data.status as 'draft' | 'pending' | 'paid' | 'overdue' | 'cancelled',
-      client: { full_name: 'Unknown' } // Default client info
-    };
+    // Use transformer to return proper type
+    return transformInvoiceData(data);
   } catch (error) {
     console.error('Error updating invoice:', error);
     toast({

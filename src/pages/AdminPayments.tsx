@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { AdminLayout } from "@/components/admin/layout/AdminLayout";
 import { FinancialsHeader } from "@/components/admin/financials/FinancialsHeader";
@@ -8,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { fetchTransactions, FinancialTransaction } from "@/utils/financial";
 import { Button } from "@/components/ui/button";
 import { seedInitialExpenses } from "@/utils/financial/seedExpenses";
+import { toast } from "@/components/ui/use-toast";
 
 export default function AdminPayments() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -25,19 +27,45 @@ export default function AdminPayments() {
     setIsLoading(true);
     
     try {
+      // Load expenses
       const expenseData = await fetchTransactions({ 
         type: 'expense',
         ...filters
       });
-      setExpenses(expenseData || []);
       
+      // Validate expenses data
+      if (Array.isArray(expenseData)) {
+        setExpenses(expenseData);
+      } else {
+        console.error("Invalid expense data format:", expenseData);
+        setExpenses([]);
+        toast({
+          title: "Error",
+          description: "Failed to load expenses data correctly",
+          variant: "destructive"
+        });
+      }
+      
+      // Load revenues
       const revenueData = await fetchTransactions({ 
         type: 'revenue',
         ...filters 
       });
-      setRevenues(revenueData || []);
+      
+      // Validate revenue data
+      if (Array.isArray(revenueData)) {
+        setRevenues(revenueData);
+      } else {
+        console.error("Invalid revenue data format:", revenueData);
+        setRevenues([]);
+      }
     } catch (error) {
       console.error("Error loading financial data:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load financial data",
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
@@ -51,7 +79,18 @@ export default function AdminPayments() {
     setIsSeeding(true);
     try {
       await seedInitialExpenses();
-      loadData();
+      await loadData(); // Reload data after seeding
+      toast({
+        title: "Success",
+        description: "Sample expenses have been added successfully",
+      });
+    } catch (error) {
+      console.error("Error seeding expenses:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add sample expenses",
+        variant: "destructive"
+      });
     } finally {
       setIsSeeding(false);
     }
@@ -66,7 +105,7 @@ export default function AdminPayments() {
             <Button 
               variant="secondary" 
               onClick={handleSeedExpenses} 
-              disabled={isSeeding}
+              disabled={isLoading || isSeeding}
               className="mt-2 md:mt-0"
             >
               {isSeeding ? "Adding Expenses..." : "Add Sample Expenses"}

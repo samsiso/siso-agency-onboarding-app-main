@@ -6,9 +6,18 @@ import { Search, Filter, FileDown, FilePlus } from "lucide-react";
 interface ExpensesTableHeaderProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  onAddExpense?: () => void;
+  onExport?: () => void;
+  onFilter?: () => void;
 }
 
-export function ExpensesTableHeader({ searchQuery, onSearchChange }: ExpensesTableHeaderProps) {
+export function ExpensesTableHeader({ 
+  searchQuery, 
+  onSearchChange,
+  onAddExpense,
+  onExport,
+  onFilter
+}: ExpensesTableHeaderProps) {
   return (
     <div className="flex items-center justify-between">
       <h2 className="text-xl font-semibold">Expenses Tracking</h2>
@@ -23,15 +32,29 @@ export function ExpensesTableHeader({ searchQuery, onSearchChange }: ExpensesTab
             onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
-        <Button variant="outline" size="sm" className="h-9">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="h-9"
+          onClick={onFilter}
+        >
           <Filter className="h-4 w-4 mr-2" />
           Filter
         </Button>
-        <Button variant="outline" size="sm" className="h-9">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="h-9"
+          onClick={onExport}
+        >
           <FileDown className="h-4 w-4 mr-2" />
           Export
         </Button>
-        <Button size="sm" className="h-9">
+        <Button 
+          size="sm" 
+          className="h-9"
+          onClick={onAddExpense}
+        >
           <FilePlus className="h-4 w-4 mr-2" />
           Add Expense
         </Button>

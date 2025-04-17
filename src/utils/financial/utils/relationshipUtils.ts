@@ -30,15 +30,12 @@ export function createClientData(clientObj: any): { full_name: string; business_
 }
 
 /**
- * Transforms database response data to match expected types
- * Breaks deep type instantiation by using type assertion
+ * Transforms entity data to break deep type instantiation chains
+ * Uses explicit typing to prevent recursion
  */
-export function transformEntityData<T>(
-  data: unknown[], 
-  transformer: (item: any) => T
-): T[] {
+export function transformEntityData<T>(data: unknown[], transformer: (item: any) => T): T[] {
   if (!data || !Array.isArray(data)) return [];
   
-  // Type assertion to break infinite recursion
-  return (data as any[]).map(item => transformer(item));
+  // Use type assertion with unknown first to break recursive type chains
+  return (data as unknown[]).map(item => transformer(item));
 }
