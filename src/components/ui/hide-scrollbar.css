@@ -51,3 +51,37 @@
   transform: translateY(-2px);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
 }
+
+/* Enhanced table styling */
+.enhanced-table th {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px 16px;
+  font-weight: 500;
+  text-align: left;
+}
+
+.enhanced-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.enhanced-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Card gradients */
+.card-gradient-1 {
+  background: linear-gradient(135deg, rgba(255, 87, 34, 0.03) 0%, rgba(255, 87, 34, 0.08) 100%);
+}
+
+.card-gradient-2 {
+  background: linear-gradient(135deg, rgba(33, 150, 243, 0.03) 0%, rgba(33, 150, 243, 0.08) 100%);
+}
+
+.card-gradient-3 {
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.03) 0%, rgba(76, 175, 80, 0.08) 100%);
+}
+
+.card-gradient-4 {
+  background: linear-gradient(135deg, rgba(255, 152, 0, 0.03) 0%, rgba(255, 152, 0, 0.08) 100%);
+}

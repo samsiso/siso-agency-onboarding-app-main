@@ -82,16 +82,16 @@ export function ClientsHeader({
   return (
     <div className="space-y-6">
       {/* Title and main actions */}
-      <div className="flex justify-between items-center">
-        <div className="flex items-center space-x-3">
-          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-            <Users className="h-5 w-5 text-primary" />
+      <div className="flex justify-between items-center p-1">
+        <div className="flex items-center space-x-4">
+          <div className="h-11 w-11 rounded-full bg-primary/15 flex items-center justify-center shadow-sm">
+            <Users className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">
+            <h1 className="text-2xl font-bold tracking-tight">
               Clients
             </h1>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground mt-0.5">
               {totalClients} total clients in your database
             </p>
           </div>
@@ -100,7 +100,7 @@ export function ClientsHeader({
           <Button 
             variant="outline" 
             size="sm" 
-            className="h-9 hover:bg-muted/50" 
+            className="h-9 shadow-sm hover:bg-muted/50 border-border/50" 
             onClick={() => onRefetch()}
             title="Refresh data"
           >
@@ -110,7 +110,7 @@ export function ClientsHeader({
           <Button 
             variant="outline" 
             size="sm" 
-            className="h-9 hover:bg-muted/50" 
+            className="h-9 shadow-sm hover:bg-muted/50 border-border/50" 
             onClick={handleToggleShowAllColumns}
             title={viewPreference.showAllColumns ? "Show only selected columns" : "Show all columns"}
           >
@@ -132,7 +132,7 @@ export function ClientsHeader({
       </div>
 
       {/* Filters, search and views */}
-      <div className="flex flex-wrap gap-4 justify-between items-center bg-muted/30 p-4 rounded-lg border border-border/50">
+      <div className="flex flex-wrap gap-4 justify-between items-center bg-muted/30 p-4 rounded-md border border-border/50 shadow-sm">
         <div className="flex flex-1 gap-4 min-w-[280px]">
           <div className="relative w-full max-w-sm">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -148,7 +148,7 @@ export function ClientsHeader({
             <SelectTrigger className="w-[180px] border-border/50 bg-background shadow-sm h-10">
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="border-border/70 bg-card/95 backdrop-blur-sm shadow-lg">
               <SelectItem value="all">All Statuses</SelectItem>
               <SelectItem value="active">Active</SelectItem>
               <SelectItem value="pending">Pending</SelectItem>

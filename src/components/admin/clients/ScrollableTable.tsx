@@ -43,15 +43,15 @@ export function ScrollableTable({ children, pinnedColumns, className }: Scrollab
   const pinnedWidth = pinnedColumns.reduce((sum, col) => sum + (col.width || 150), 0);
   
   return (
-    <div className="relative rounded-md border overflow-hidden border-border/50 bg-card/30">
+    <div className="relative rounded-md border overflow-hidden border-border/50 bg-card/30 shadow-sm">
       {/* Left shadow when scrolled */}
       {leftShadowVisible && (
-        <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
+        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background/90 to-transparent z-10 pointer-events-none" />
       )}
       
       {/* Right shadow indicator for more content */}
       {rightShadowVisible && (
-        <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background/90 to-transparent z-10 pointer-events-none" />
       )}
       
       {/* Table with horizontal scrolling */}
@@ -64,7 +64,7 @@ export function ScrollableTable({ children, pinnedColumns, className }: Scrollab
           {/* Fixed/Pinned columns container */}
           {pinnedColumns.length > 0 && (
             <div 
-              className="absolute top-0 left-0 bottom-0 bg-background z-20 border-r border-border/50" 
+              className="absolute top-0 left-0 bottom-0 bg-background/90 backdrop-blur-sm z-20 border-r border-border/70 shadow-[4px_0_8px_rgba(0,0,0,0.05)]" 
               style={{ width: `${pinnedWidth}px` }}
             >
               {/* This will be filled by the children */}

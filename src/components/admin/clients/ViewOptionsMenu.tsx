@@ -27,7 +27,7 @@ export function ViewOptionsMenu({
           View Options
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56 border-border/70 bg-card/95 backdrop-blur-sm">
+      <DropdownMenuContent align="end" className="w-56 border-border/70 bg-card/95 backdrop-blur-sm shadow-lg">
         <DropdownMenuLabel>Customize View</DropdownMenuLabel>
         
         <DropdownMenuSeparator />
