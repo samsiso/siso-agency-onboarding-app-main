@@ -10,7 +10,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { 
   MessageCircle, Edit, Trash2, MoreVertical, Mail, AlertCircle,
-  CheckCircle, Clock, User, ShieldCheck, Palette, Code, LineChart 
+  CheckCircle, Clock, User, ShieldCheck, Palette, Code, LineChart,
+  Headphones, Star, Briefcase, CalendarPlus
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
@@ -26,14 +27,19 @@ export interface TeamMember {
   lastActive: string;
   department: string;
   joinDate: string;
+  tasks?: { total: number; completed: number };
+  whatsappStatus?: 'sent' | 'received' | 'pending' | null;
+  nextCall?: { title: string; date: string } | null;
+  skills?: string[];
 }
 
 interface TeamMemberListProps {
   searchQuery: string;
   roleFilter: string | null;
+  departmentFilter?: string | null;
 }
 
-export function TeamMemberList({ searchQuery, roleFilter }: TeamMemberListProps) {
+export function TeamMemberList({ searchQuery, roleFilter, departmentFilter }: TeamMemberListProps) {
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
   
   // Mock data - in a real app, this would come from your database
@@ -47,7 +53,11 @@ export function TeamMemberList({ searchQuery, roleFilter }: TeamMemberListProps)
       status: 'active',
       lastActive: 'Just now',
       department: 'Management',
-      joinDate: '2023-01-15'
+      joinDate: '2023-01-15',
+      tasks: { total: 12, completed: 8 },
+      whatsappStatus: 'received',
+      nextCall: { title: 'Team Sync', date: '2025-04-19' },
+      skills: ['Management', 'Leadership', 'Strategy']
     },
     {
       id: '2',
@@ -58,7 +68,11 @@ export function TeamMemberList({ searchQuery, roleFilter }: TeamMemberListProps)
       status: 'busy',
       lastActive: '5m ago',
       department: 'Engineering',
-      joinDate: '2023-03-22'
+      joinDate: '2023-03-22',
+      tasks: { total: 15, completed: 5 },
+      whatsappStatus: 'sent',
+      nextCall: { title: 'Code Review', date: '2025-04-18' },
+      skills: ['React', 'TypeScript', 'Node.js']
     },
     {
       id: '3',
@@ -69,7 +83,11 @@ export function TeamMemberList({ searchQuery, roleFilter }: TeamMemberListProps)
       status: 'offline',
       lastActive: '2h ago',
       department: 'Design',
-      joinDate: '2023-02-10'
+      joinDate: '2023-02-10',
+      tasks: { total: 8, completed: 7 },
+      whatsappStatus: 'pending',
+      nextCall: null,
+      skills: ['UI/UX', 'Figma', 'Sketch']
     },
     {
       id: '4',
@@ -80,7 +98,11 @@ export function TeamMemberList({ searchQuery, roleFilter }: TeamMemberListProps)
       status: 'away',
       lastActive: '15m ago',
       department: 'Marketing',
-      joinDate: '2023-04-05'
+      joinDate: '2023-04-05',
+      tasks: { total: 10, completed: 3 },
+      whatsappStatus: null,
+      nextCall: { title: 'Campaign Review', date: '2025-04-20' },
+      skills: ['Content', 'SEO', 'Social Media']
     },
     {
       id: '5',
@@ -91,7 +113,41 @@ export function TeamMemberList({ searchQuery, roleFilter }: TeamMemberListProps)
       status: 'active',
       lastActive: '1m ago',
       department: 'Management',
-      joinDate: '2022-11-18'
+      joinDate: '2022-11-18',
+      tasks: { total: 20, completed: 15 },
+      whatsappStatus: 'received',
+      nextCall: { title: 'Client Meeting', date: '2025-04-17' },
+      skills: ['Project Management', 'Agile', 'Client Relations']
+    },
+    {
+      id: '6',
+      name: 'Riley Smith',
+      email: 'riley@example.com',
+      role: 'Developer',
+      avatar: '',
+      status: 'active',
+      lastActive: '10m ago',
+      department: 'Engineering',
+      joinDate: '2023-06-10',
+      tasks: { total: 18, completed: 12 },
+      whatsappStatus: 'sent',
+      nextCall: { title: 'Sprint Planning', date: '2025-04-21' },
+      skills: ['Python', 'Django', 'AWS']
+    },
+    {
+      id: '7',
+      name: 'Taylor Williams',
+      email: 'taylor@example.com',
+      role: 'Support',
+      avatar: '',
+      status: 'busy',
+      lastActive: '30m ago',
+      department: 'Support',
+      joinDate: '2023-07-22',
+      tasks: { total: 25, completed: 20 },
+      whatsappStatus: 'received',
+      nextCall: null,
+      skills: ['Customer Service', 'Technical Support', 'Documentation']
     },
   ];
 
@@ -100,11 +156,14 @@ export function TeamMemberList({ searchQuery, roleFilter }: TeamMemberListProps)
     const matchesSearch = 
       member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       member.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      member.role.toLowerCase().includes(searchQuery.toLowerCase());
+      member.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (member.department && member.department.toLowerCase().includes(searchQuery.toLowerCase()));
     
     const matchesRole = roleFilter === null || member.role === roleFilter;
     
-    return matchesSearch && matchesRole;
+    const matchesDepartment = !departmentFilter || member.department === departmentFilter;
+    
+    return matchesSearch && matchesRole && matchesDepartment;
   });
 
   const getRoleIcon = (role: string) => {
@@ -112,13 +171,15 @@ export function TeamMemberList({ searchQuery, roleFilter }: TeamMemberListProps)
       case 'Admin':
         return <ShieldCheck className="h-4 w-4 text-purple-500" />;
       case 'Manager':
-        return <User className="h-4 w-4 text-blue-500" />;
+        return <Briefcase className="h-4 w-4 text-blue-500" />;
       case 'Developer':
         return <Code className="h-4 w-4 text-green-500" />;
       case 'Designer':
         return <Palette className="h-4 w-4 text-orange-500" />;
       case 'Marketing':
         return <LineChart className="h-4 w-4 text-pink-500" />;
+      case 'Support':
+        return <Headphones className="h-4 w-4 text-cyan-500" />;
       default:
         return <User className="h-4 w-4" />;
     }
@@ -135,6 +196,21 @@ export function TeamMemberList({ searchQuery, roleFilter }: TeamMemberListProps)
       case 'offline':
       default:
         return <div className="h-4 w-4 rounded-full bg-gray-400" />;
+    }
+  };
+
+  const getWhatsappStatusBadge = (status: string | null | undefined) => {
+    if (!status) return null;
+    
+    switch (status) {
+      case 'sent':
+        return <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20">Sent</Badge>;
+      case 'received':
+        return <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20">Received</Badge>;
+      case 'pending':
+        return <Badge variant="outline" className="bg-amber-500/10 text-amber-500 border-amber-500/20">Pending</Badge>;
+      default:
+        return null;
     }
   };
 
@@ -158,6 +234,10 @@ export function TeamMemberList({ searchQuery, roleFilter }: TeamMemberListProps)
     );
   };
 
+  const handleScheduleCall = (member: TeamMember) => {
+    toast.info(`Schedule call dialog would open for ${member.name}`);
+  };
+
   return (
     <>
       <div className="rounded-md border">
@@ -168,14 +248,16 @@ export function TeamMemberList({ searchQuery, roleFilter }: TeamMemberListProps)
               <TableHead>Role</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Department</TableHead>
-              <TableHead>Join Date</TableHead>
+              <TableHead>Tasks</TableHead>
+              <TableHead>WhatsApp</TableHead>
+              <TableHead>Next Call</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredMembers.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-10 text-muted-foreground">
+                <TableCell colSpan={8} className="text-center py-10 text-muted-foreground">
                   No team members found matching your criteria.
                 </TableCell>
               </TableRow>
@@ -211,7 +293,34 @@ export function TeamMemberList({ searchQuery, roleFilter }: TeamMemberListProps)
                     </div>
                   </TableCell>
                   <TableCell>{member.department}</TableCell>
-                  <TableCell>{new Date(member.joinDate).toLocaleDateString()}</TableCell>
+                  <TableCell>
+                    {member.tasks ? (
+                      <div className="flex items-center gap-1">
+                        <span className="font-medium">{member.tasks.completed}/{member.tasks.total}</span>
+                        <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-green-500" 
+                            style={{ width: `${(member.tasks.completed / member.tasks.total) * 100}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    ) : (
+                      <span>-</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {getWhatsappStatusBadge(member.whatsappStatus)}
+                  </TableCell>
+                  <TableCell>
+                    {member.nextCall ? (
+                      <div className="flex items-center gap-1 text-sm">
+                        <CalendarPlus className="h-3 w-3 text-muted-foreground" />
+                        <span>{new Date(member.nextCall.date).toLocaleDateString()}</span>
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground text-sm">-</span>
+                    )}
+                  </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
@@ -233,6 +342,13 @@ export function TeamMemberList({ searchQuery, roleFilter }: TeamMemberListProps)
                         }}>
                           <Mail className="h-4 w-4 mr-2" />
                           Send Email
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={(e) => {
+                          e.stopPropagation();
+                          handleScheduleCall(member);
+                        }}>
+                          <CalendarPlus className="h-4 w-4 mr-2" />
+                          Schedule Call
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={(e) => {
