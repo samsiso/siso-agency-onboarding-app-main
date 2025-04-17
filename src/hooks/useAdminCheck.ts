@@ -42,9 +42,9 @@ export const useAdminCheck = () => {
     staleTime: 5 * 60 * 1000,
     // Retry failed checks 
     retry: 2,
+    // Handle errors using meta for latest @tanstack/react-query version
     meta: {
-      // Better error handling
-      onError: (error: Error) => {
+      errorHandler: (error: Error) => {
         console.error('Admin check query error:', error);
       }
     }

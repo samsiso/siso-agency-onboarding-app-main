@@ -94,28 +94,61 @@ export const AgencyPainPoints = ({ onSolutionRequest, agencyTypeSlug }: AgencyPa
           return;
         }
         
-        if (data && data.length > 0) {
+        if (data && Array.isArray(data) && data.length > 0) {
           // Parse JSON fields and ensure proper typing
-          const formattedPainPoints: PainPoint[] = data.map((point: any) => ({
-            id: point.id || '',
-            title: point.title || '',
-            description: point.description || '',
-            severity: (point.severity || 'medium') as 'high' | 'medium' | 'low',
-            statistic: point.statistic || '',
-            icon: point.icon || 'info',
-            survey_data: typeof point.survey_data === 'string' 
-              ? JSON.parse(point.survey_data) 
-              : (point.survey_data || { percentage: 0, label: '' }),
-            solutions: Array.isArray(point.solutions) ? point.solutions : [],
-            impact_areas: Array.isArray(point.impact_areas) ? point.impact_areas : [],
-            testimonial: typeof point.testimonial === 'string' 
-              ? JSON.parse(point.testimonial) 
-              : point.testimonial,
-            video_url: point.video_url,
-            industry_trends: typeof point.industry_trends === 'string' 
-              ? JSON.parse(point.industry_trends) 
-              : point.industry_trends
-          }));
+          const formattedPainPoints: PainPoint[] = data.map((point: any) => {
+            // Ensure point is not null or undefined before accessing properties
+            if (!point) return {} as PainPoint;
+            
+            // Parse JSON fields with fallbacks
+            let surveyData = { percentage: 0, label: '' };
+            if (point.survey_data) {
+              try {
+                surveyData = typeof point.survey_data === 'string' 
+                  ? JSON.parse(point.survey_data) 
+                  : point.survey_data;
+              } catch (e) {
+                console.error('Error parsing survey_data:', e);
+              }
+            }
+            
+            let testimonial = undefined;
+            if (point.testimonial) {
+              try {
+                testimonial = typeof point.testimonial === 'string' 
+                  ? JSON.parse(point.testimonial) 
+                  : point.testimonial;
+              } catch (e) {
+                console.error('Error parsing testimonial:', e);
+              }
+            }
+            
+            let industryTrends = undefined;
+            if (point.industry_trends) {
+              try {
+                industryTrends = typeof point.industry_trends === 'string' 
+                  ? JSON.parse(point.industry_trends) 
+                  : point.industry_trends;
+              } catch (e) {
+                console.error('Error parsing industry_trends:', e);
+              }
+            }
+            
+            return {
+              id: String(point.id || ''),
+              title: String(point.title || ''),
+              description: String(point.description || ''),
+              severity: (String(point.severity || 'medium')) as 'high' | 'medium' | 'low',
+              statistic: String(point.statistic || ''),
+              icon: String(point.icon || 'info'),
+              survey_data: surveyData,
+              solutions: Array.isArray(point.solutions) ? point.solutions : [],
+              impact_areas: Array.isArray(point.impact_areas) ? point.impact_areas : [],
+              testimonial: testimonial,
+              video_url: point.video_url || undefined,
+              industry_trends: industryTrends
+            } as PainPoint;
+          });
           
           setPainPoints(formattedPainPoints);
         }

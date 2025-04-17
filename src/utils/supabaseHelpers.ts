@@ -76,3 +76,20 @@ export const addUserToAdminRole = async (userId: string): Promise<boolean> => {
     return false;
   }
 };
+
+// Helper function to safely access properties from potentially undefined objects
+export function safeGet<T>(obj: any, path: string, defaultValue: T): T {
+  if (!obj) return defaultValue;
+  
+  const keys = path.split('.');
+  let current = obj;
+  
+  for (const key of keys) {
+    if (current === undefined || current === null) {
+      return defaultValue;
+    }
+    current = current[key];
+  }
+  
+  return (current === undefined || current === null) ? defaultValue : current as T;
+}

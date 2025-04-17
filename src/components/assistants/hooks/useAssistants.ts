@@ -20,13 +20,18 @@ export function useAssistants() {
       
       console.log('Fetched assistants:', data);
       
-      // Cast data to Assistant[] safely with type assertions
-      return (data || []).map(item => {
+      // Make sure data is an array before mapping
+      const assistantsArray = Array.isArray(data) ? data : [];
+      
+      // Cast data to Assistant[] safely with explicit type checking
+      return assistantsArray.map(item => {
+        if (!item) return {} as Assistant;
+        
         return {
-          id: item.id,
-          name: item.name || '',
-          description: item.description,
-          category: item.category || '',
+          id: String(item.id || ''),
+          name: String(item.name || ''),
+          description: item.description || null,
+          category: String(item.category || ''),
           assistant_type: item.assistant_type || null,
           prompt_template: null,
           use_cases: null,

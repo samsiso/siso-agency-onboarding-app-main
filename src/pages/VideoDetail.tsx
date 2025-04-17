@@ -26,22 +26,23 @@ export default function VideoDetail() {
   return (
     <>
       <Helmet>
-        <title>{`${videoData.title || 'Video'} | ${videoData.educator.name} | SISO Education`}</title>
+        <title>{`${videoData.title || 'Video'} | ${videoData.educator?.name || 'SISO'} | SISO Education`}</title>
         <meta name="description" content={videoDescription} />
         <meta property="og:title" content={videoData.title || ''} />
         <meta property="og:description" content={videoDescription} />
-        <meta property="og:image" content={videoData.thumbnail_url} />
+        <meta property="og:image" content={videoData.thumbnail_url || ''} />
         <meta property="og:type" content="video.other" />
       </Helmet>
 
       <div className="min-h-screen bg-black">
         <div className="max-w-[1800px] mx-auto px-4 py-4">
-          <VideoBreadcrumbs title={videoData.title} />
+          <VideoBreadcrumbs title={videoData.title || ''} />
         </div>
 
+        {/* Pass videoId instead of video object to match the component's interface */}
         <VideoDetailLayout 
-          video={videoData}
-          activeTab="analysis"
+          videoId={videoData.id}
+          children={null}
         />
       </div>
     </>

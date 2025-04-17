@@ -1,4 +1,3 @@
-
 import { ClientData, ClientsListParams, ClientsListResponse } from '@/types/client.types';
 import { safeSupabase } from './supabaseHelpers';
 
@@ -33,7 +32,23 @@ export const fetchClientsFallback = async (
     
     // Map the data to the expected format with safe property access
     const clients: ClientData[] = data.map(item => {
-      // Ensure we're accessing properties safely
+      // Guard against item being undefined or null
+      if (!item) {
+        return {
+          id: '',
+          full_name: 'Unknown',
+          business_name: null,
+          status: 'pending',
+          current_step: 1,
+          total_steps: 5,
+          completed_steps: [],
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          // ... other fields with defaults
+        } as ClientData;
+      }
+      
+      // Ensure we're accessing properties safely using typeof checks
       const id = typeof item.id === 'string' ? item.id : '';
       const contactName = typeof item.contact_name === 'string' ? item.contact_name : 'Unknown';
       const companyName = typeof item.company_name === 'string' ? item.company_name : null;

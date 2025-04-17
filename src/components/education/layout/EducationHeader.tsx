@@ -1,13 +1,33 @@
 
 import React from 'react';
 
-// Temporary stub component until the actual component is implemented
-export const EducationHeader = () => {
+// Define proper interface for component props
+interface EducationHeaderProps {
+  title?: string;
+  description?: string;
+  stats?: any;
+  searchQuery?: string;
+  onSearchChange?: (value: string) => void;
+  isSearchFocused?: boolean;
+  onSearchFocus?: () => void;
+  onSearchBlur?: () => void;
+}
+
+export const EducationHeader: React.FC<EducationHeaderProps> = ({
+  title,
+  description,
+  stats,
+  searchQuery,
+  onSearchChange,
+  isSearchFocused,
+  onSearchFocus,
+  onSearchBlur
+}) => {
   return (
     <div className="pb-4 mb-6 border-b">
-      <h2 className="text-2xl font-bold">Education Hub</h2>
+      <h2 className="text-2xl font-bold">{title || "Education Hub"}</h2>
       <p className="text-muted-foreground">
-        Learn and grow with our educational resources.
+        {description || "Learn and grow with our educational resources."}
       </p>
     </div>
   );
