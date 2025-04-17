@@ -56,11 +56,18 @@ export function ClientTableCell({
     
     // Handle TodoItem[] specifically
     if (value[0] && typeof value[0] === 'object' && 'completed' in value[0]) {
-      return <span>{`${value.length} todos`}</span>;
+      const pendingCount = value.filter(item => !item.completed).length;
+      return (
+        <div className="flex items-center gap-2">
+          <span className="bg-blue-500/10 text-blue-500 rounded-full px-2 py-0.5 text-xs">
+            {pendingCount} pending tasks
+          </span>
+        </div>
+      );
     }
     
-    // Convert any array to a string representation
-    return <span>{`${value.length} items`}</span>;
+    // Convert any other array to a string representation
+    return <span>{value.map(item => String(item)).join(', ')}</span>;
   };
 
   const safeRender = (value: any): React.ReactNode => {

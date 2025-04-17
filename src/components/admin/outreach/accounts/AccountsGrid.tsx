@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { OutreachAccount } from '@/types/outreach';
 import { OutreachAccountCard } from './OutreachAccountCard';
@@ -45,7 +44,7 @@ export const AccountsGrid = ({
         <OutreachAccountCard
           key={account.id}
           account={account}
-          onEdit={() => onEditAccount(account)}
+          onEditClick={onEditAccount}
         />
       ))}
     </div>
