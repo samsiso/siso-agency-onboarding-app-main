@@ -7,18 +7,12 @@ export const updateExistingClientData = async (): Promise<boolean> => {
     // First check if there are any existing clients
     const { data: existingClients, error: fetchError } = await supabase
       .from('client_onboarding')
-      .select('id')
-      .limit(1);
+      .select('id, company_name')
+      .limit(9);
       
     if (fetchError) {
       console.error('Error checking existing clients:', fetchError);
       return false;
-    }
-    
-    // If we already have clients, no need to create sample data
-    if (existingClients && existingClients.length > 0) {
-      console.log('Client data already exists, skipping sample data creation');
-      return true;
     }
     
     // Sample client data
@@ -123,6 +117,20 @@ export const updateExistingClientData = async (): Promise<boolean> => {
         completed_steps: ['intro', 'details', 'scope', 'design', 'review']
       }
     ];
+    
+    // First, delete any existing data to ensure we don't create duplicates
+    if (existingClients && existingClients.length > 0) {
+      console.log('Deleting existing client data before reinserting...');
+      const { error: deleteError } = await supabase
+        .from('client_onboarding')
+        .delete()
+        .in('id', existingClients.map(client => client.id));
+        
+      if (deleteError) {
+        console.error('Error deleting existing clients:', deleteError);
+        return false;
+      }
+    }
     
     // Insert sample clients
     const { error: insertError } = await supabase
