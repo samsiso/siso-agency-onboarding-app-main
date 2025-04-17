@@ -8,23 +8,55 @@ import { useToast } from '@/hooks/use-toast';
 import { DashboardLayout } from '@/components/dashboard/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { LayoutDashboard, Users, Settings, FileSpreadsheet, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, Users, Settings, FileSpreadsheet, ChevronRight, Shield, Database } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { checkIsAdmin } from '@/utils/supabaseHelpers';
+import { useUser } from '@/hooks/useUser';
 
 export default function Home() {
   const { user } = useAuthSession();
+  const { user: currentUser } = useUser();
   const { toast } = useToast();
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
+  const [debugInfo, setDebugInfo] = useState<any>(null);
   
   useEffect(() => {
     const checkAdmin = async () => {
       if (user) {
         console.log('Home page - Checking admin status for user:', user.id);
-        const adminStatus = await checkIsAdmin();
-        console.log('Home page - Admin check result:', adminStatus);
-        setIsAdmin(adminStatus);
+        try {
+          // Check admin status directly
+          const adminStatus = await checkIsAdmin();
+          console.log('Home page - Admin check result:', adminStatus);
+          
+          // Also check roles directly from the database for debugging
+          const { data: roles, error } = await supabase
+            .from('user_roles')
+            .select('*')
+            .eq('user_id', user.id);
+          
+          if (error) {
+            console.error('Error fetching roles:', error);
+          } else {
+            console.log('User roles from database:', roles);
+            setDebugInfo({
+              userId: user.id,
+              email: user.email,
+              roles,
+              adminCheckResult: adminStatus
+            });
+          }
+          
+          setIsAdmin(adminStatus);
+        } catch (err) {
+          console.error('Error checking admin status:', err);
+          toast({
+            variant: "destructive",
+            title: "Admin check failed",
+            description: "There was a problem checking your admin status."
+          });
+        }
       } else {
         console.log('Home page - No user available for admin check');
       }
@@ -32,7 +64,53 @@ export default function Home() {
     };
     
     checkAdmin();
-  }, [user]);
+  }, [user, toast]);
+
+  // Helper function to set user as admin (for debugging purposes)
+  const makeUserAdmin = async () => {
+    if (!user) return;
+    
+    try {
+      setLoading(true);
+      // Add the current user to admin role
+      const { data, error } = await supabase
+        .from('user_roles')
+        .insert([{ user_id: user.id, role: 'admin' }]);
+      
+      if (error) {
+        if (error.code === '23505') { // Unique violation
+          toast({
+            title: "Already an admin",
+            description: "This user already has admin privileges."
+          });
+        } else {
+          console.error('Error making user admin:', error);
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Failed to set admin privileges: " + error.message
+          });
+        }
+      } else {
+        toast({
+          title: "Success!",
+          description: "Admin privileges have been granted. Please refresh the page."
+        });
+        // Re-check admin status
+        const adminStatus = await checkIsAdmin();
+        setIsAdmin(adminStatus);
+      }
+    } catch (err) {
+      console.error('Unexpected error:', err);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "An unexpected error occurred."
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -49,6 +127,65 @@ export default function Home() {
             </p>
           </div>
         </div>
+        
+        {/* Debug Information Card */}
+        <Card className="mb-8 bg-slate-800/50 border-slate-700">
+          <CardHeader className="bg-slate-800/80">
+            <CardTitle className="flex items-center gap-2">
+              <Database className="h-5 w-5" />
+              Authentication Debug Info
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm font-medium">User ID:</p>
+                <p className="text-xs font-mono bg-slate-900 p-2 rounded">{user?.id || 'Not authenticated'}</p>
+              </div>
+              
+              <div>
+                <p className="text-sm font-medium">Email:</p>
+                <p className="text-xs font-mono bg-slate-900 p-2 rounded">{user?.email || 'Not available'}</p>
+              </div>
+              
+              <div>
+                <p className="text-sm font-medium">Admin Status:</p>
+                {loading ? (
+                  <p>Checking...</p>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span className={`px-3 py-1 text-sm rounded-full flex items-center ${
+                      isAdmin ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+                    }`}>
+                      <Shield className="w-3.5 h-3.5 mr-1.5" />
+                      {isAdmin ? 'Admin' : 'Not Admin'}
+                    </span>
+                  </div>
+                )}
+              </div>
+              
+              {debugInfo?.roles && (
+                <div>
+                  <p className="text-sm font-medium">Roles in Database:</p>
+                  <pre className="text-xs font-mono bg-slate-900 p-2 rounded overflow-auto max-h-40">
+                    {JSON.stringify(debugInfo.roles, null, 2)}
+                  </pre>
+                </div>
+              )}
+              
+              <div>
+                <Button 
+                  onClick={makeUserAdmin} 
+                  disabled={loading} 
+                  variant="secondary"
+                  className="text-sm"
+                >
+                  {loading ? 'Working...' : 'Grant Admin Privileges'}
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
         
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
           {/* Quick Access Cards */}

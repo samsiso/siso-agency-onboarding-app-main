@@ -32,13 +32,31 @@ export const checkIsAdmin = async (): Promise<boolean> => {
   try {
     console.log('Checking admin status...');
     
-    const { data: { user } } = await supabase.auth.getUser();
+    // Get current user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError) {
+      console.error('Auth error during admin check:', userError);
+      return false;
+    }
+    
     if (!user) {
       console.log('No user found during admin check');
       return false;
     }
 
-    console.log('Checking admin status for user:', user.id);
+    console.log('Checking admin status for user:', user.id, user.email);
+    
+    // Add debug information - log all roles for this user
+    const { data: allRoles, error: rolesError } = await supabase
+      .from('user_roles')
+      .select('*')
+      .eq('user_id', user.id);
+      
+    if (rolesError) {
+      console.error('Error fetching all roles:', rolesError);
+    } else {
+      console.log('All user roles:', allRoles);
+    }
     
     // Query the user_roles table to check if the user is an admin
     const { data, error } = await supabase
@@ -66,11 +84,18 @@ export const checkIsAdmin = async (): Promise<boolean> => {
 // Helper function to add a user to the admin role
 export const addUserToAdminRole = async (userId: string): Promise<boolean> => {
   try {
+    console.log('Adding user to admin role:', userId);
     const { data, error } = await supabase
       .from('user_roles')
       .insert([{ user_id: userId, role: 'admin' }]);
       
-    return !error;
+    if (error) {
+      console.error('Error adding user to admin role:', error);
+      return false;
+    }
+      
+    console.log('Successfully added user to admin role');
+    return true;
   } catch (error) {
     console.error('Error adding user to admin role:', error);
     return false;
