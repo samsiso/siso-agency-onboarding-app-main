@@ -17,6 +17,7 @@ export const getAdminMenuSections = (): MenuSection[] => {
       type: 'section',
       title: 'Management',
       icon: Users,
+      label: 'Management',
       items: [
         {
           href: '/admin/clients',
@@ -39,6 +40,7 @@ export const getAdminMenuSections = (): MenuSection[] => {
       type: 'section',
       title: 'Analytics',
       icon: BarChart,
+      label: 'Analytics',
       items: [
         {
           href: '/admin/reports',
@@ -56,6 +58,7 @@ export const getAdminMenuSections = (): MenuSection[] => {
       type: 'section',
       title: 'System',
       icon: Settings,
+      label: 'System',
       items: [
         {
           href: '/admin/settings',

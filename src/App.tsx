@@ -1,3 +1,4 @@
+
 import { Routes, Route } from 'react-router-dom';
 import Index from './pages/Index';
 import Auth from './pages/Auth';
@@ -41,8 +42,6 @@ function App() {
         {/* Admin routes */}
         <Route path="/admin" element={<AuthGuard><AdminDashboard /></AuthGuard>} />
         <Route path="/admin/clients" element={<AuthGuard><AdminClients /></AuthGuard>} />
-        
-        {/* Admin routes - we're keeping these unprotected for now */}
         <Route path="/admin/plans" element={<AdminPlans />} />
         <Route path="/admin/templates" element={<AdminTemplates />} />
         <Route path="/admin/plans/create" element={<AdminPlans />} />
