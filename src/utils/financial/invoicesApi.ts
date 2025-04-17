@@ -31,7 +31,7 @@ export async function fetchInvoices(filters: Record<string, any> = {}): Promise<
       let clientData = { full_name: 'Unknown' };
       
       if (item.client && typeof item.client === 'object') {
-        const businessName = item.client.business_name;
+        const businessName = item.client.business_name || null;
         clientData = {
           full_name: item.client.full_name || 'Unknown',
           ...(businessName ? { business_name: businessName } : {})
