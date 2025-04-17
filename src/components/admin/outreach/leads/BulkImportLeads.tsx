@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -68,9 +69,9 @@ export function BulkImportLeads() {
 
       // Parse the data
       const rows = rawData.split('\n').filter(row => row.trim());
-      const parsedData = rows.slice(1).map(row => {
+      const parsedData: Record<string, any>[] = rows.slice(1).map(row => {
         const values = row.split(delimiter);
-        const lead: Record<string, any> = {};
+        const lead: Record<string, any> = { status: 'new' };
         
         columnMappings.forEach((mapping, index) => {
           if (mapping.targetField && values[index]) {
@@ -83,17 +84,24 @@ export function BulkImportLeads() {
           }
         });
 
-        // Set default values
-        lead.status = 'new';
+        // Ensure username is always present
+        if (!lead.username) {
+          return null;
+        }
+        
         return lead;
-      });
+      }).filter(Boolean) as Record<string, any>[];
 
       // Import the leads using the hook
-      await importLeads.mutateAsync(parsedData);
-      
-      // Clear the form on success
-      setRawData('');
-      setColumnMappings([]);
+      if (parsedData.length > 0) {
+        await importLeads.mutateAsync(parsedData);
+        
+        // Clear the form on success
+        setRawData('');
+        setColumnMappings([]);
+      } else {
+        toast.error('No valid leads found to import');
+      }
       
     } catch (error) {
       console.error('Import error:', error);

@@ -3,7 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-interface ImportLead {
+export interface ImportLead {
   username: string;
   full_name?: string | null;
   followers_count?: number | null;
@@ -16,7 +16,7 @@ interface ImportLead {
 
 export const useLeadImport = () => {
   const importLeads = useMutation({
-    mutationFn: async (leads: ImportLead[]) => {
+    mutationFn: async (leads: Record<string, any>[]) => {
       // Basic validation of required fields
       const validLeads = leads.filter(lead => lead.username);
       

@@ -18,6 +18,7 @@ interface ClientTableCellProps {
   onEditValueChange: (value: string) => void;
   onKeyDown: (e: React.KeyboardEvent) => void;
   onDoubleClick: () => void;
+  onSaveEdit: (params: { id: string; field: string; value: string }) => void;
 }
 
 export function ClientTableCell({
