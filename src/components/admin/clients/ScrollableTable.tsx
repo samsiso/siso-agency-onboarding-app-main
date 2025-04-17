@@ -61,11 +61,11 @@ export function ScrollableTable({ children, pinnedColumns, className }: Scrollab
         style={{ maxWidth: '100%', maxHeight: 'calc(100vh - 300px)' }}
       >
         <div style={{ position: 'relative', minWidth: '100%' }}>
-          {/* Fixed/Pinned columns container */}
+          {/* Fixed/Pinned columns container - removed opacity and background blur */}
           {pinnedColumns.length > 0 && (
             <div 
               className={cn(
-                "absolute top-0 left-0 bottom-0 bg-background/95 backdrop-blur-sm z-20 border-r border-border/70 shadow-[4px_0_8px_rgba(0,0,0,0.05)]",
+                "absolute top-0 left-0 bottom-0 border-r border-border/70 shadow-[4px_0_8px_rgba(0,0,0,0.05)]",
                 isScrolled && "top-[var(--header-height)]"
               )}
               style={{ width: `${pinnedWidth}px` }}
@@ -75,7 +75,7 @@ export function ScrollableTable({ children, pinnedColumns, className }: Scrollab
           {/* Sticky header container */}
           {isScrolled && (
             <div 
-              className="sticky top-0 left-0 right-0 z-30 bg-card/95 backdrop-blur-sm border-b border-border/50 shadow-sm"
+              className="sticky top-0 left-0 right-0 z-30 bg-card border-b border-border/50 shadow-sm"
               style={{ height: 'var(--header-height)' }}
             />
           )}
