@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { ClientData } from '@/types/client.types';
@@ -52,7 +51,21 @@ export function ClientTableCell({
     />
   );
 
+  // Helper function to safely render values
+  const safeRender = (value: any): React.ReactNode => {
+    if (value === null || value === undefined) {
+      return '-';
+    }
+    
+    if (Array.isArray(value)) {
+      return `${value.length} items`;
+    }
+    
+    return String(value);
+  };
+
   switch (columnKey) {
+    
     case 'full_name':
       return (
         <div className="flex flex-col space-y-0.5" title={client.full_name || ''}>
@@ -149,13 +162,11 @@ export function ClientTableCell({
       const value = client[columnKey as keyof ClientData];
       if (isEditing) {
         return renderEditableContent();
-      } else if (Array.isArray(value)) {
-        // Handle arrays by showing their length instead of the raw array
-        return <span>{value.length} items</span>;
       } else {
+        // Use the safeRender function to ensure proper rendering
         return (
           <div onDoubleClick={onDoubleClick}>
-            {value !== undefined && value !== null ? String(value) : '-'}
+            {safeRender(value)}
           </div>
         );
       }

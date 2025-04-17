@@ -58,7 +58,7 @@ const AdminPlans = () => {
                 <h2 className="text-xl font-semibold">Create New Plan</h2>
               </CardHeader>
               <CardContent>
-                <PlanForm onPlanCreated={handlePlanCreated} />
+                <PlanForm onSuccess={handlePlanCreated} />
               </CardContent>
             </Card>
           </TabsContent>
@@ -69,7 +69,7 @@ const AdminPlans = () => {
                 <h2 className="text-xl font-semibold">Bulk Plan Creation</h2>
               </CardHeader>
               <CardContent>
-                <BulkPlanCreation onPlansCreated={handlePlanCreated} />
+                <BulkPlanCreation />
               </CardContent>
             </Card>
           </TabsContent>
