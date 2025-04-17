@@ -16,7 +16,7 @@ export interface ImportLead {
 
 export const useLeadImport = () => {
   const importLeads = useMutation({
-    mutationFn: async (leads: Record<string, any>[]) => {
+    mutationFn: async (leads: ImportLead[]) => {
       // Basic validation of required fields
       const validLeads = leads.filter(lead => lead.username);
       
@@ -26,7 +26,7 @@ export const useLeadImport = () => {
 
       // Insert leads in batches of 50
       const BATCH_SIZE = 50;
-      const results: any[] = [];
+      const results: Array<any> = [];
 
       for (let i = 0; i < validLeads.length; i += BATCH_SIZE) {
         const batch = validLeads.slice(i, i + BATCH_SIZE);
@@ -43,7 +43,7 @@ export const useLeadImport = () => {
           .upsert(formattedBatch, { onConflict: 'username' });
 
         if (error) throw error;
-        if (data) results.push(...data);
+        if (data) results.push(...(data as Array<any>));
       }
 
       return results;

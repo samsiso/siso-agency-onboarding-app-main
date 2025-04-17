@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -69,7 +68,7 @@ export function BulkImportLeads() {
 
       // Parse the data
       const rows = rawData.split('\n').filter(row => row.trim());
-      const parsedData: Record<string, any>[] = rows.slice(1).map(row => {
+      const parsedData: ImportLead[] = rows.slice(1).map(row => {
         const values = row.split(delimiter);
         const lead: Record<string, any> = { status: 'new' };
         
@@ -89,8 +88,8 @@ export function BulkImportLeads() {
           return null;
         }
         
-        return lead;
-      }).filter(Boolean);
+        return lead as ImportLead;
+      }).filter(Boolean) as ImportLead[];
 
       // Import the leads using the hook
       if (parsedData.length > 0) {
