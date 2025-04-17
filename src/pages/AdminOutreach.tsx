@@ -54,6 +54,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { LeadsFunnelChart } from '@/components/admin/outreach/LeadsFunnelChart';
 import { OutreachAnalyticsCards } from '@/components/admin/outreach/OutreachAnalyticsCards';
 import { OutreachActivityLog } from '@/components/admin/outreach/OutreachActivityLog';
@@ -262,6 +269,11 @@ const AdminOutreach = () => {
     setIsAccountDialogOpen(true);
   };
 
+  const handleAddAccount = () => {
+    setActiveAccount(undefined);
+    setIsAccountDialogOpen(true);
+  };
+
   const handleSaveAccount = async (accountData: Partial<OutreachAccount>) => {
     try {
       if (activeAccount) {
@@ -270,7 +282,22 @@ const AdminOutreach = () => {
           ...accountData,
         });
       } else {
-        await addAccount.mutateAsync(accountData);
+        // Ensure required fields are present for new accounts
+        const newAccount = {
+          username: accountData.username || '',
+          platform: accountData.platform || 'instagram',
+          account_type: accountData.account_type || 'business',
+          status: accountData.status || 'active',
+          daily_dm_limit: accountData.daily_dm_limit || 30,
+          daily_follow_limit: accountData.daily_follow_limit || 50,
+          daily_comment_limit: accountData.daily_comment_limit || 40,
+          credentials: accountData.credentials || {},
+          proxy_settings: accountData.proxy_settings || {},
+          platform_specific_settings: accountData.platform_specific_settings || {},
+          ...accountData
+        };
+        
+        await addAccount.mutateAsync(newAccount as any);
       }
       setIsAccountDialogOpen(false);
       setActiveAccount(undefined);
@@ -278,6 +305,126 @@ const AdminOutreach = () => {
       console.error('Error saving account:', error);
     }
   };
+
+  // Helper function to render status badges
+const getStatusBadge = (status: string | null) => {
+  switch (status) {
+    case 'contacted':
+      return <Badge className="bg-blue-500/20 text-blue-400">Contacted</Badge>;
+    case 'converted':
+      return <Badge className="bg-green-500/20 text-green-400">Converted</Badge>;
+    case 'new':
+    default:
+      return <Badge className="bg-amber-500/20 text-amber-400">New</Badge>;
+  }
+};
+
+// Helper function to render cell content based on column key
+const renderCellContent = (lead: any, key: string) => {
+  switch (key) {
+    case 'username':
+      return (
+        <div className="flex items-center">
+          <div className="w-7 h-7 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white mr-2">
+            {lead.username.charAt(0).toUpperCase()}
+          </div>
+          <span>@{lead.username}</span>
+        </div>
+      );
+      
+    case 'followers_count':
+      return lead.followers_count 
+        ? formatCompactNumber(lead.followers_count) 
+        : 'N/A';
+        
+    case 'status':
+      return getStatusBadge(lead.status);
+      
+    case 'created_at':
+      return new Date(lead.created_at).toLocaleDateString();
+      
+    case 'source':
+      return <Badge variant="outline">Instagram</Badge>;
+      
+    case 'followed':
+      return lead.followed ? (
+        <div className="bg-green-500/10 text-green-500 w-5 h-5 rounded-full flex items-center justify-center">
+          <CheckCircle className="h-3 w-3" />
+        </div>
+      ) : (
+        <div className="bg-muted w-5 h-5 rounded-full flex items-center justify-center">
+          <XCircle className="h-3 w-3 text-muted-foreground/50" />
+        </div>
+      );
+      
+    case 'commented':
+      return lead.commented ? (
+        <div className="bg-green-500/10 text-green-500 w-5 h-5 rounded-full flex items-center justify-center">
+          <CheckCircle className="h-3 w-3" />
+        </div>
+      ) : (
+        <div className="bg-muted w-5 h-5 rounded-full flex items-center justify-center">
+          <XCircle className="h-3 w-3 text-muted-foreground/50" />
+        </div>
+      );
+      
+    case 'messaged':
+      return lead.messaged ? (
+        <div className="bg-green-500/10 text-green-500 w-5 h-5 rounded-full flex items-center justify-center">
+          <CheckCircle className="h-3 w-3" />
+        </div>
+      ) : (
+        <div className="bg-muted w-5 h-5 rounded-full flex items-center justify-center">
+          <XCircle className="h-3 w-3 text-muted-foreground/50" />
+        </div>
+      );
+      
+    case 'outreach_account':
+      return lead.outreach_account || (
+        <span className="text-muted-foreground">Not assigned</span>
+      );
+      
+    case 'app_plan_status':
+      if (lead.app_plan_status === 'completed') {
+        return <Badge className="bg-green-500/20 text-green-400">Completed</Badge>;
+      } else if (lead.app_plan_status === 'in_progress') {
+        return <Badge className="bg-blue-500/20 text-blue-400">In Progress</Badge>;
+      } else {
+        return <Badge variant="outline">Not Started</Badge>;
+      }
+      
+    case 'app_plan_url':
+      return lead.app_plan_url ? (
+        <a 
+          href={lead.app_plan_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-500 hover:underline flex items-center"
+          onClick={e => e.stopPropagation()}
+        >
+          <FileText className="h-4 w-4 mr-1" />
+          View Plan
+        </a>
+      ) : '-';
+      
+    case 'last_interaction':
+      return lead.last_interaction_at ? (
+        <div className="flex items-center">
+          <Calendar className="h-4 w-4 mr-1 text-muted-foreground" />
+          {new Date(lead.last_interaction_at).toLocaleDateString()}
+        </div>
+      ) : '-';
+      
+    case 'assigned_to':
+      return lead.assigned_to || '-';
+      
+    case 'notes':
+      return lead.notes || '-';
+      
+    default:
+      return lead[key] || '-';
+  }
+};
 
   return (
     <AdminLayout>
@@ -616,7 +763,7 @@ const AdminOutreach = () => {
                     <CardTitle>Social Media Accounts</CardTitle>
                     <CardDescription>Manage your outreach accounts</CardDescription>
                   </div>
-                  <Button onClick={() => setIsAccountDialogOpen(true)}>
+                  <Button onClick={handleAddAccount}>
                     <UserPlus className="h-4 w-4 mr-2" />
                     Add Account
                   </Button>
@@ -645,7 +792,10 @@ const AdminOutreach = () => {
                   </Button>
                 </div>
 
-                <Select value={selectedIndustry} onValueChange={setSelectedIndustry}>
+                <Select 
+                  value={selectedIndustry} 
+                  onValueChange={setSelectedIndustry}
+                >
                   <SelectTrigger className="w-[200px] mt-4">
                     <SelectValue placeholder="Filter by industry" />
                   </SelectTrigger>
@@ -742,120 +892,4 @@ const AdminOutreach = () => {
 const getStatusBadge = (status: string | null) => {
   switch (status) {
     case 'contacted':
-      return <Badge className="bg-blue-500/20 text-blue-400">Contacted</Badge>;
-    case 'converted':
-      return <Badge className="bg-green-500/20 text-green-400">Converted</Badge>;
-    case 'new':
-    default:
-      return <Badge className="bg-amber-500/20 text-amber-400">New</Badge>;
-  }
-};
-
-// Helper function to render cell content based on column key
-const renderCellContent = (lead: any, key: string) => {
-  switch (key) {
-    case 'username':
-      return (
-        <div className="flex items-center">
-          <div className="w-7 h-7 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white mr-2">
-            {lead.username.charAt(0).toUpperCase()}
-          </div>
-          <span>@{lead.username}</span>
-        </div>
-      );
-      
-    case 'followers_count':
-      return lead.followers_count 
-        ? formatCompactNumber(lead.followers_count) 
-        : 'N/A';
-        
-    case 'status':
-      return getStatusBadge(lead.status);
-      
-    case 'created_at':
-      return new Date(lead.created_at).toLocaleDateString();
-      
-    case 'source':
-      return <Badge variant="outline">Instagram</Badge>;
-      
-    case 'followed':
-      return lead.followed ? (
-        <div className="bg-green-500/10 text-green-500 w-5 h-5 rounded-full flex items-center justify-center">
-          <CheckCircle className="h-3 w-3" />
-        </div>
-      ) : (
-        <div className="bg-muted w-5 h-5 rounded-full flex items-center justify-center">
-          <XCircle className="h-3 w-3 text-muted-foreground/50" />
-        </div>
-      );
-      
-    case 'commented':
-      return lead.commented ? (
-        <div className="bg-green-500/10 text-green-500 w-5 h-5 rounded-full flex items-center justify-center">
-          <CheckCircle className="h-3 w-3" />
-        </div>
-      ) : (
-        <div className="bg-muted w-5 h-5 rounded-full flex items-center justify-center">
-          <XCircle className="h-3 w-3 text-muted-foreground/50" />
-        </div>
-      );
-      
-    case 'messaged':
-      return lead.messaged ? (
-        <div className="bg-green-500/10 text-green-500 w-5 h-5 rounded-full flex items-center justify-center">
-          <CheckCircle className="h-3 w-3" />
-        </div>
-      ) : (
-        <div className="bg-muted w-5 h-5 rounded-full flex items-center justify-center">
-          <XCircle className="h-3 w-3 text-muted-foreground/50" />
-        </div>
-      );
-      
-    case 'outreach_account':
-      return lead.outreach_account || (
-        <span className="text-muted-foreground">Not assigned</span>
-      );
-      
-    case 'app_plan_status':
-      if (lead.app_plan_status === 'completed') {
-        return <Badge className="bg-green-500/20 text-green-400">Completed</Badge>;
-      } else if (lead.app_plan_status === 'in_progress') {
-        return <Badge className="bg-blue-500/20 text-blue-400">In Progress</Badge>;
-      } else {
-        return <Badge variant="outline">Not Started</Badge>;
-      }
-      
-    case 'app_plan_url':
-      return lead.app_plan_url ? (
-        <a 
-          href={lead.app_plan_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-500 hover:underline flex items-center"
-          onClick={e => e.stopPropagation()}
-        >
-          <FileText className="h-4 w-4 mr-1" />
-          View Plan
-        </a>
-      ) : '-';
-      
-    case 'last_interaction':
-      return lead.last_interaction_at ? (
-        <div className="flex items-center">
-          <Calendar className="h-4 w-4 mr-1 text-muted-foreground" />
-          {new Date(lead.last_interaction_at).toLocaleDateString()}
-        </div>
-      ) : '-';
-      
-    case 'assigned_to':
-      return lead.assigned_to || '-';
-      
-    case 'notes':
-      return lead.notes || '-';
-      
-    default:
-      return lead[key] || '-';
-  }
-};
-
-export default AdminOutreach;
+      return <Badge className="bg-blue-500/2

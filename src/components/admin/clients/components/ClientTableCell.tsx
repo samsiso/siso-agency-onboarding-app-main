@@ -174,7 +174,6 @@ export function ClientTableCell({
       if (isEditing) {
         return renderEditableContent();
       } else {
-        // Use the safeRender function to ensure proper rendering
         return (
           <div onDoubleClick={onDoubleClick}>
             {safeRender(value)}
