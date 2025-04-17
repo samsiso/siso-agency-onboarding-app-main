@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -5,7 +6,8 @@ import { Gift, Loader2, Share2, Twitter } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Confetti } from '@/components/ui/confetti';
-import { safeSupabase, safeCast } from '@/utils/supabaseHelpers';
+import { safeSupabase } from '@/utils/supabaseHelpers';
+import { supabase } from '@/integrations/supabase/client';  // Add this import
 import FeatureFlags from '@/utils/featureFlags';
 
 interface NFTMetadata {

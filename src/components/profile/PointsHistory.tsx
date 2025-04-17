@@ -26,9 +26,17 @@ export const PointsHistory = ({ userId }: { userId: string }) => {
           .limit(10);
 
         if (error) throw error;
-        setPointsLog(data || []);
+        
+        // Safe type checking before setting state
+        if (data && Array.isArray(data)) {
+          setPointsLog(data as PointsLogEntry[]);
+        } else {
+          console.error('Received invalid data format:', data);
+          setPointsLog([]);
+        }
       } catch (error) {
         console.error('Error fetching points history:', error);
+        setPointsLog([]);
       } finally {
         setLoading(false);
       }

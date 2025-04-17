@@ -19,8 +19,8 @@ export function useAssistants() {
       }
       
       console.log('Fetched assistants:', data);
-      // Safely cast data to Assistant[]
-      return safeSupabase.safeCast<Assistant[]>(data || []);
+      // Cast data to Assistant[] safely
+      return (data || []) as Assistant[];
     },
   });
 }

@@ -25,10 +25,15 @@ export const fetchClientsFallback = async (
       console.error('Error in fallback client fetch:', error);
       return { clients: [], totalCount: 0 };
     }
+
+    if (!data || !Array.isArray(data)) {
+      console.error('No data returned or invalid data format');
+      return { clients: [], totalCount: 0 };
+    }
     
     // Map the data to the expected format
-    const clients: ClientData[] = (data || []).map(item => ({
-      id: item.id,
+    const clients: ClientData[] = data.map(item => ({
+      id: item.id || '',
       full_name: item.contact_name || 'Unknown',
       email: null,
       business_name: item.company_name || null,
@@ -38,8 +43,8 @@ export const fetchClientsFallback = async (
       current_step: item.current_step || 1,
       total_steps: item.total_steps || 5,
       completed_steps: item.completed_steps || [],
-      created_at: item.created_at,
-      updated_at: item.updated_at,
+      created_at: item.created_at || new Date().toISOString(),
+      updated_at: item.updated_at || new Date().toISOString(),
       website_url: item.website_url || null,
       professional_role: null,
       bio: null,

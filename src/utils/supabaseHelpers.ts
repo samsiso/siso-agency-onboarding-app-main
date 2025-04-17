@@ -1,6 +1,5 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { PostgrestFilterBuilder } from '@supabase/supabase-js';
 
 // Create a "safe" version of supabase that handles common errors
 export const safeSupabase = {
@@ -13,25 +12,7 @@ export const safeSupabase = {
   
   // Enhanced from method with additional typings
   from: (table: string) => {
-    const queryBuilder = supabase.from(table);
-    
-    return {
-      ...queryBuilder,
-      select: (query: string, options?: any) => {
-        const selectQuery = supabase.from(table).select(query, options);
-        return selectQuery;
-      },
-      insert: (values: any, options?: any) => {
-        return supabase.from(table).insert(values, options);
-      },
-      update: (values: any, options?: any) => {
-        return supabase.from(table).update(values, options);
-      },
-      delete: (options?: any) => {
-        return supabase.from(table).delete(options);
-      },
-      // Add any other methods you need here
-    };
+    return supabase.from(table);
   },
   
   // Pass through functions

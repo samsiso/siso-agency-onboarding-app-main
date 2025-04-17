@@ -1,4 +1,3 @@
-
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useClientsList } from '@/hooks/client';
 import { ClientData, ClientViewPreference } from '@/types/client.types';
@@ -64,6 +63,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import * as React from 'react';
+import { supabase } from '@/integrations/supabase/client';  // Add this import
 
 interface ClientsTableProps {
   searchQuery?: string;
