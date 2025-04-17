@@ -3,6 +3,28 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 import { Invoice } from './types';
 
+type SupabaseInvoiceResult = {
+  id: string;
+  invoice_number: string;
+  client_id: string;
+  amount: number;
+  currency: string;
+  issue_date: string;
+  due_date: string;
+  status: string;
+  payment_method_id?: string;
+  notes?: string;
+  client?: {
+    full_name?: string;
+    business_name?: string;
+  } | null;
+  payment_method?: {
+    id: string;
+    name: string;
+    is_active: boolean;
+  } | null;
+};
+
 export async function fetchInvoices(filters: Record<string, any> = {}): Promise<Invoice[]> {
   try {
     const query = supabase
@@ -26,7 +48,7 @@ export async function fetchInvoices(filters: Record<string, any> = {}): Promise<
     if (error) throw error;
     
     // Transform data to match the Invoice type
-    const transformedData = (data || []).map(item => {
+    const transformedData = (data || []).map((item: SupabaseInvoiceResult) => {
       // Create client object with required properties
       let clientData = { full_name: 'Unknown' };
       

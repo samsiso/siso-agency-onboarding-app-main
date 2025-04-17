@@ -3,6 +3,40 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 import { FinancialTransaction } from './types';
 
+type SupabaseTransactionResult = {
+  id: string;
+  type: string;
+  amount: number;
+  currency: string;
+  date: string;
+  description?: string;
+  category_id?: string;
+  vendor_id?: string;
+  payment_method_id?: string;
+  recurring_type?: string | null;
+  status: string;
+  receipt_url?: string;
+  notes?: string;
+  category?: {
+    id: string;
+    name: string;
+    description?: string;
+    is_active: boolean;
+  } | null;
+  vendor?: {
+    id: string;
+    name: string;
+    contact_email?: string;
+    payment_terms?: string;
+    is_active: boolean;
+  } | null;
+  payment_method?: {
+    id: string;
+    name: string;
+    is_active: boolean;
+  } | null;
+};
+
 export async function fetchTransactions(filters: Record<string, any> = {}): Promise<FinancialTransaction[]> {
   try {
     const query = supabase
@@ -27,14 +61,11 @@ export async function fetchTransactions(filters: Record<string, any> = {}): Prom
     if (error) throw error;
     
     // Transform types to ensure they conform to the expected types
-    const transformedData = (data || []).map(item => {
-      const transactionType = item.type as 'expense' | 'revenue';
-      const recurringType = item.recurring_type as 'one-time' | 'monthly' | 'annual' | null;
-      
+    const transformedData = (data || []).map((item: SupabaseTransactionResult) => {
       return {
         ...item,
-        type: transactionType,
-        recurring_type: recurringType,
+        type: item.type as 'expense' | 'revenue',
+        recurring_type: item.recurring_type as 'one-time' | 'monthly' | 'annual' | null,
         category: item.category || undefined,
         vendor: item.vendor || undefined,
         payment_method: item.payment_method || undefined
