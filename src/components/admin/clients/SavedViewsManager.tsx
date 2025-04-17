@@ -22,11 +22,11 @@ import { ClientViewPreference, SavedView } from '@/types/client.types';
 import { useToast } from '@/hooks/use-toast';
 
 interface SavedViewsManagerProps {
-  currentView: ClientViewPreference;
-  onViewChange: (preference: ClientViewPreference) => void;
+  currentPreference: ClientViewPreference;
+  onLoadView: (preference: ClientViewPreference) => void;
 }
 
-export function SavedViewsManager({ currentView, onViewChange }: SavedViewsManagerProps) {
+export function SavedViewsManager({ currentPreference, onLoadView }: SavedViewsManagerProps) {
   const [savedViews, setSavedViews] = useState<SavedView[]>([]);
   const [isCreating, setIsCreating] = useState(false);
   const [newViewName, setNewViewName] = useState('');
@@ -64,7 +64,7 @@ export function SavedViewsManager({ currentView, onViewChange }: SavedViewsManag
     const newView: SavedView = {
       id: uuidv4(),
       name: newViewName.trim(),
-      preference: { ...currentView }
+      preference: { ...currentPreference }
     };
 
     const updatedViews = [...savedViews, newView];
@@ -80,7 +80,7 @@ export function SavedViewsManager({ currentView, onViewChange }: SavedViewsManag
   };
 
   const handleLoadView = (view: SavedView) => {
-    onViewChange(view.preference);
+    onLoadView(view.preference);
     
     toast({
       title: "View loaded",

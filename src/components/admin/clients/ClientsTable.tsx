@@ -92,6 +92,7 @@ export function ClientsTable({
   const { toast } = useToast();
 
   const tableRef = useRef<HTMLDivElement>(null);
+  const tableElementRef = useRef<HTMLTableElement>(null);
   const tableContainerRef = useRef<HTMLDivElement>(null);
 
   const visibleColumns = useMemo(() => 
@@ -494,7 +495,7 @@ export function ClientsTable({
       
       <div ref={tableContainerRef} className="relative overflow-hidden">
         <div className="overflow-x-auto hide-scrollbar">
-          <Table ref={tableRef}>
+          <Table ref={tableElementRef}>
             <TableHeader className="sticky top-0 bg-background z-20">
               <TableRow>
                 <TableHead className="w-12 bg-background sticky left-0 z-30">

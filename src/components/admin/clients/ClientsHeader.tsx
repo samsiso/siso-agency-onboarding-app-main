@@ -119,7 +119,7 @@ export function ClientsHeader({
               <><PanelRightOpen className="h-4 w-4 mr-1" /> Expand</>
             )}
           </Button>
-          <ImportExportTools clients={clients} onImportSuccess={onRefetch} />
+          <ImportExportTools clients={clients} onImportComplete={onRefetch} />
           <Button className="bg-primary" onClick={onAddClient}>
             <Plus className="h-4 w-4 mr-1" />
             Add Client
