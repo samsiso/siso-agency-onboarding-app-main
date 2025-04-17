@@ -71,32 +71,21 @@ export function ClientsTable({
   viewPreference,
   onViewPreferenceChange
 }: ClientsTableProps) {
-  // Pagination state
   const [page, setPage] = useState(1);
-  
-  // Selection state
   const [selectedClients, setSelectedClients] = useState<string[]>([]);
-  
-  // Active client state
   const [activeClient, setActiveClient] = useState<string | null>(null);
-  
-  // Client add form state
   const [isAddClientOpen, setIsAddClientOpen] = useState(false);
-  
-  // Inline editing state
   const [editingCell, setEditingCell] = useState<{id: string, field: string} | null>(null);
   const [editValue, setEditValue] = useState<string>('');
   const editInputRef = useRef<HTMLInputElement>(null);
-  
+
   const { toast } = useToast();
 
-  // Get column definitions from view preferences
   const visibleColumns = useMemo(() => 
     viewPreference.columns.filter(col => col.visible),
     [viewPreference.columns]
   );
-  
-  // Fetch client data
+
   const { clients, isLoading, totalCount, refetch } = useClientsList({
     page,
     pageSize: viewPreference.pageSize,
@@ -105,8 +94,7 @@ export function ClientsTable({
     sortColumn: viewPreference.sortColumn,
     sortDirection: viewPreference.sortDirection
   });
-  
-  // Calculate analytics data
+
   const analyticsData = useMemo(() => {
     const activeClientsCount = clients.filter(c => c.status === 'active').length;
     const pipelineClientsCount = clients.filter(c => ['pending', 'proposal', 'negotiation'].includes(c.status)).length;
@@ -122,15 +110,13 @@ export function ClientsTable({
       conversionRate
     };
   }, [clients, totalCount]);
-  
+
   const totalPages = Math.ceil(totalCount / viewPreference.pageSize);
 
-  // Handle adding a new client
   const handleAddClient = () => {
     setIsAddClientOpen(true);
   };
-  
-  // Handle client add success
+
   const handleClientAddSuccess = () => {
     refetch();
     toast({
@@ -139,12 +125,10 @@ export function ClientsTable({
     });
   };
 
-  // Start editing a cell
   const handleStartEdit = (client: ClientData, field: string) => {
     setEditingCell({ id: client.id, field });
     setEditValue(String(client[field as keyof ClientData] || ''));
     
-    // Focus the input after it renders
     setTimeout(() => {
       if (editInputRef.current) {
         editInputRef.current.focus();
@@ -152,12 +136,10 @@ export function ClientsTable({
     }, 0);
   };
 
-  // Save edited cell value
   const handleSaveEdit = async () => {
     if (!editingCell) return;
     
     try {
-      // Update the value in the database
       const { error } = await supabase
         .from('client_onboarding')
         .update({ 
@@ -173,7 +155,6 @@ export function ClientsTable({
         description: `Updated ${editingCell.field} for this client.`
       });
       
-      // Refresh the data
       refetch();
     } catch (error: any) {
       console.error('Error saving edit:', error);
@@ -187,12 +168,10 @@ export function ClientsTable({
     }
   };
 
-  // Cancel editing
   const handleCancelEdit = () => {
     setEditingCell(null);
   };
 
-  // Handle keydown events in edit mode
   const handleEditKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleSaveEdit();
@@ -201,7 +180,6 @@ export function ClientsTable({
     }
   };
 
-  // Table handlers
   const handleSort = (column: string) => {
     if (viewPreference.sortColumn === column) {
       onViewPreferenceChange({
@@ -248,7 +226,6 @@ export function ClientsTable({
     onViewPreferenceChange({ columns: newColumns });
   };
 
-  // Scroll table to horizontally when editing cells
   useEffect(() => {
     if (editingCell && editInputRef.current) {
       const cell = editInputRef.current.parentElement;
@@ -258,7 +235,6 @@ export function ClientsTable({
     }
   }, [editingCell]);
 
-  // Handle deletion of selected clients
   const handleDeleteSelected = async () => {
     if (selectedClients.length === 0) return;
     
@@ -289,18 +265,15 @@ export function ClientsTable({
     }
   };
 
-  // Render loading state
   if (isLoading) {
     return (
       <div className="space-y-6">
-        {/* Analytics Cards Loading State */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {Array(4).fill(0).map((_, i) => (
             <Skeleton key={i} className="h-32 w-full" />
           ))}
         </div>
         
-        {/* Table Loading State */}
         <div className="rounded-md border bg-card">
           <div className="h-12 border-b flex items-center px-4 py-2">
             <Skeleton className="h-5 w-5" />
@@ -325,7 +298,6 @@ export function ClientsTable({
 
   return (
     <div className="space-y-6">
-      {/* Analytics Cards */}
       <ClientAnalyticsCards 
         activeClients={analyticsData.activeClients}
         pipelineClients={analyticsData.pipelineClients}
@@ -333,7 +305,6 @@ export function ClientsTable({
         conversionRate={analyticsData.conversionRate}
       />
       
-      {/* Table Header with Actions */}
       <ClientsHeader
         searchQuery={searchQuery}
         onSearchChange={(value) => {/* handle search change */}}
@@ -345,7 +316,6 @@ export function ClientsTable({
         totalClients={totalCount}
       />
       
-      {/* Table Actions for Selected Items */}
       {selectedClients.length > 0 && (
         <div className="flex items-center gap-2 mb-4 p-2 bg-muted rounded-md">
           <span className="text-sm font-medium">{selectedClients.length} selected</span>
@@ -360,7 +330,6 @@ export function ClientsTable({
         </div>
       )}
       
-      {/* Clients Table */}
       <div className="rounded-md border overflow-hidden">
         <div className="overflow-x-auto">
           <Table>
@@ -416,12 +385,9 @@ export function ClientsTable({
                     </TableCell>
                     
                     {visibleColumns.map(column => {
-                      // Check if this cell is being edited
                       const isEditing = editingCell?.id === client.id && editingCell?.field === column.key;
                       
-                      // Format cell based on column type
                       const renderCell = () => {
-                        // If in edit mode, show input field
                         if (isEditing) {
                           return (
                             <div className="flex items-center">
@@ -455,7 +421,6 @@ export function ClientsTable({
                           );
                         }
 
-                        // Custom rendering for specific column types
                         switch (column.key) {
                           case 'full_name':
                             return (
@@ -515,17 +480,17 @@ export function ClientsTable({
                               </div>
                             ) : '-';
                           case 'todos':
-                            // Properly render the todos array
-                            if (client.todos && client.todos.length > 0) {
+                            if (Array.isArray(client.todos) && client.todos.length > 0) {
+                              const pendingTodos = client.todos.filter(t => !t.completed).length;
                               return (
                                 <div className="flex items-center">
                                   <span className="bg-blue-500/10 text-blue-500 rounded-full px-2 py-0.5 text-xs">
-                                    {client.todos.filter(t => !t.completed).length} pending
+                                    {pendingTodos} pending
                                   </span>
                                 </div>
                               );
                             }
-                            return '-';
+                            return <span>-</span>;
                           case 'key_research':
                             return (
                               <div className="max-w-xs truncate" title={client.key_research || ''}>
@@ -533,7 +498,11 @@ export function ClientsTable({
                               </div>
                             );
                           default:
-                            return client[column.key as keyof typeof client] || '-';
+                            const value = client[column.key as keyof typeof client];
+                            if (Array.isArray(value)) {
+                              return <span>{value.length} items</span>;
+                            }
+                            return value !== undefined && value !== null ? String(value) : '-';
                         }
                       };
 
@@ -619,7 +588,6 @@ export function ClientsTable({
         </div>
       </div>
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div className="mt-4 flex justify-center">
           <Pagination>
@@ -642,7 +610,6 @@ export function ClientsTable({
                   (pageNum >= page - 1 && pageNum <= page + 1)
                 )
                 .map((pageNum, i, array) => {
-                  // Add ellipsis
                   if (i > 0 && array[i - 1] !== pageNum - 1) {
                     return (
                       <React.Fragment key={`ellipsis-${pageNum}`}>
@@ -696,7 +663,6 @@ export function ClientsTable({
         </div>
       )}
 
-      {/* Client Details Drawer */}
       {activeClient && (
         <ClientDetailSheet 
           clientId={activeClient} 
@@ -705,7 +671,6 @@ export function ClientsTable({
         />
       )}
       
-      {/* Client Add Form */}
       <ClientAddForm 
         open={isAddClientOpen} 
         onOpenChange={setIsAddClientOpen} 
