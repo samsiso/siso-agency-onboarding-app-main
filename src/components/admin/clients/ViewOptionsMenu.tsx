@@ -5,11 +5,8 @@ import {
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuCheckboxItem,
   DropdownMenuTrigger,
-  DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { ClientViewPreference } from '@/types/client.types';
 import { Settings2 } from 'lucide-react';
 
 interface ViewOptionsMenuProps {
@@ -25,12 +22,12 @@ export function ViewOptionsMenu({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="h-9">
+        <Button variant="outline" size="sm" className="h-9 shadow-sm border-border/50 hover:bg-muted/50">
           <Settings2 className="h-4 w-4 mr-2" />
           View Options
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
+      <DropdownMenuContent align="end" className="w-56 border-border/70 bg-card/95 backdrop-blur-sm">
         <DropdownMenuLabel>Customize View</DropdownMenuLabel>
         
         <DropdownMenuSeparator />
@@ -41,7 +38,7 @@ export function ViewOptionsMenu({
               key={size}
               variant={pageSize === size ? 'default' : 'outline'}
               size="sm"
-              className="h-8"
+              className={`h-8 ${pageSize === size ? 'bg-primary hover:bg-primary/90' : 'hover:bg-muted/50'}`}
               onClick={() => onPageSizeChange(size)}
             >
               {size}

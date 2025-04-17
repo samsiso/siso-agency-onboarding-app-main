@@ -16,10 +16,10 @@ export function ClientAnalyticsCards({
   conversionRate
 }: ClientAnalyticsCardsProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <Card>
-        <CardContent className="flex flex-row items-center justify-between py-6">
-          <div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <Card className="border-0 shadow-md bg-gradient-to-br from-background to-muted/30 card-hover">
+        <CardContent className="flex flex-row items-center justify-between p-6">
+          <div className="space-y-2">
             <p className="text-sm font-medium text-muted-foreground">Active Clients</p>
             <h3 className="text-2xl font-bold mt-1">{activeClients}</h3>
           </div>
@@ -29,9 +29,9 @@ export function ClientAnalyticsCards({
         </CardContent>
       </Card>
       
-      <Card>
-        <CardContent className="flex flex-row items-center justify-between py-6">
-          <div>
+      <Card className="border-0 shadow-md bg-gradient-to-br from-background to-muted/30 card-hover">
+        <CardContent className="flex flex-row items-center justify-between p-6">
+          <div className="space-y-2">
             <p className="text-sm font-medium text-muted-foreground">Pipeline Clients</p>
             <h3 className="text-2xl font-bold mt-1">{pipelineClients}</h3>
           </div>
@@ -41,9 +41,9 @@ export function ClientAnalyticsCards({
         </CardContent>
       </Card>
       
-      <Card>
-        <CardContent className="flex flex-row items-center justify-between py-6">
-          <div>
+      <Card className="border-0 shadow-md bg-gradient-to-br from-background to-muted/30 card-hover">
+        <CardContent className="flex flex-row items-center justify-between p-6">
+          <div className="space-y-2">
             <p className="text-sm font-medium text-muted-foreground">Pipeline Value</p>
             <h3 className="text-2xl font-bold mt-1">${pipelineValue.toLocaleString()}</h3>
           </div>
@@ -53,9 +53,9 @@ export function ClientAnalyticsCards({
         </CardContent>
       </Card>
       
-      <Card>
-        <CardContent className="flex flex-row items-center justify-between py-6">
-          <div>
+      <Card className="border-0 shadow-md bg-gradient-to-br from-background to-muted/30 card-hover">
+        <CardContent className="flex flex-row items-center justify-between p-6">
+          <div className="space-y-2">
             <p className="text-sm font-medium text-muted-foreground">Conversion Rate</p>
             <h3 className="text-2xl font-bold mt-1">{conversionRate}%</h3>
           </div>

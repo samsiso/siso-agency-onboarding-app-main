@@ -431,25 +431,27 @@ export function ClientsTable({
       <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {Array(4).fill(0).map((_, i) => (
-            <Skeleton key={i} className="h-32 w-full" />
+            <Skeleton key={i} className="h-32 w-full rounded-lg opacity-70" />
           ))}
         </div>
         
-        <div className="rounded-md border bg-card">
-          <div className="h-12 border-b flex items-center px-4 py-2">
-            <Skeleton className="h-5 w-5" />
-            <Skeleton className="h-5 w-32 ml-4" />
+        <Skeleton className="h-14 w-full mb-6 rounded-lg opacity-70" />
+        
+        <div className="rounded-md border bg-card/30 border-border/50">
+          <div className="h-12 border-b border-border/50 flex items-center px-4 py-2">
+            <Skeleton className="h-5 w-5 rounded-md opacity-70" />
+            <Skeleton className="h-5 w-32 ml-4 rounded-md opacity-70" />
           </div>
           {Array(5).fill(0).map((_, i) => (
-            <div key={i} className="border-b px-4 py-4 flex justify-between items-center">
+            <div key={i} className="border-b border-border/50 px-4 py-4 flex justify-between items-center">
               <div className="flex items-center gap-4">
-                <Skeleton className="h-5 w-5" />
+                <Skeleton className="h-5 w-5 rounded-md opacity-70" />
                 <div>
-                  <Skeleton className="h-5 w-32 mb-1" />
-                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-5 w-36 mb-2 rounded-md opacity-70" />
+                  <Skeleton className="h-4 w-24 rounded-md opacity-70" />
                 </div>
               </div>
-              <Skeleton className="h-6 w-20" />
+              <Skeleton className="h-6 w-20 rounded-full opacity-70" />
             </div>
           ))}
         </div>
@@ -480,13 +482,13 @@ export function ClientsTable({
       />
       
       {selectedClients.length > 0 && (
-        <div className="flex items-center gap-2 mb-4 p-2 bg-muted rounded-md">
-          <span className="text-sm font-medium">{selectedClients.length} selected</span>
-          <Button variant="outline" size="sm" onClick={handleDeleteSelected}>
+        <div className="flex items-center gap-2 mb-4 py-2 px-4 rounded-lg bg-muted/30 border border-border/50 shadow-sm">
+          <span className="text-sm font-medium">{selectedClients.length} clients selected</span>
+          <Button variant="outline" size="sm" onClick={handleDeleteSelected} className="border-border/50 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30">
             <Trash2 className="h-4 w-4 mr-1" />
             Delete
           </Button>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" className="border-border/50 hover:bg-muted/50">
             <Download className="h-4 w-4 mr-1" />
             Export
           </Button>
@@ -494,11 +496,11 @@ export function ClientsTable({
       )}
       
       <div ref={tableContainerRef} className="relative overflow-hidden">
-        <div className="overflow-x-auto hide-scrollbar">
-          <Table ref={tableElementRef}>
-            <TableHeader className="sticky top-0 bg-background z-20">
-              <TableRow>
-                <TableHead className="w-12 bg-background sticky left-0 z-30">
+        <ScrollableTable pinnedColumns={pinnedColumns}>
+          <Table ref={tableElementRef} className="w-full border-collapse">
+            <TableHeader className="sticky top-0 bg-card/95 backdrop-blur-sm z-20">
+              <TableRow className="border-border/50">
+                <TableHead className="w-12 bg-card/95 backdrop-blur-sm sticky left-0 z-30 table-header-cell">
                   <Checkbox 
                     checked={selectedClients.length === clients.length && clients.length > 0}
                     onCheckedChange={handleSelectAll}
@@ -521,7 +523,7 @@ export function ClientsTable({
                   return (
                     <TableHead 
                       key={column.key} 
-                      className={`${isPinned ? 'sticky z-20 bg-background' : ''}`}
+                      className={`${isPinned ? 'sticky z-20 bg-card/95 backdrop-blur-sm' : ''} table-header-cell`}
                       style={{ 
                         minWidth: `${column.width || 150}px`,
                         width: `${column.width || 150}px`,
@@ -541,7 +543,7 @@ export function ClientsTable({
                   );
                 })}
                 
-                <TableHead className="w-12 sticky right-0 bg-background z-20">
+                <TableHead className="w-12 sticky right-0 bg-card/95 backdrop-blur-sm z-20 table-header-cell">
                   Actions
                 </TableHead>
               </TableRow>
@@ -549,14 +551,28 @@ export function ClientsTable({
             
             <TableBody>
               {clients.length === 0 ? (
-                <TableRow>
+                <TableRow className="border-border/50">
                   <TableCell colSpan={visibleColumns.length + 2} className="text-center h-32 text-muted-foreground">
-                    No clients found matching your search criteria.
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <Users className="h-8 w-8 text-muted-foreground/50" />
+                      <p>No clients found matching your search criteria</p>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="mt-2 border-border/50 hover:bg-muted/50"
+                        onClick={() => {
+                          if (onSearchChange) onSearchChange('');
+                          if (onStatusFilterChange) onStatusFilterChange('all');
+                        }}
+                      >
+                        Clear filters
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ) : (
                 clients.map((client) => (
-                  <TableRow key={client.id} className="group">
+                  <TableRow key={client.id} className="group border-border/50 table-row-hover">
                     <TableCell className="sticky left-0 bg-background z-10">
                       <Checkbox 
                         checked={selectedClients.includes(client.id)}
@@ -595,7 +611,7 @@ export function ClientsTable({
                                 value={editValue}
                                 onChange={(e) => setEditValue(e.target.value)}
                                 onKeyDown={handleEditKeyDown}
-                                className="h-8 min-w-[120px]"
+                                className="h-8 min-w-[120px] border-border/50"
                                 autoFocus
                               />
                               <div className="flex items-center ml-1">
@@ -613,7 +629,7 @@ export function ClientsTable({
                                   className="h-6 w-6" 
                                   onClick={handleCancelEdit}
                                 >
-                                  <X className="h-3 w-3 text-red-500" />
+                                  <X className="h-3 w-3 text-destructive" />
                                 </Button>
                               </div>
                             </div>
@@ -642,20 +658,26 @@ export function ClientsTable({
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuContent align="end" className="w-48 border-border/70 bg-card/95 backdrop-blur-sm">
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={() => handleOpenDetails(client.id)}>
+                          <DropdownMenuItem 
+                            onClick={() => handleOpenDetails(client.id)}
+                            className="cursor-pointer hover:bg-muted/50"
+                          >
                             <ExternalLink className="h-4 w-4 mr-2" />
                             View Details
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleStartEdit(client, 'full_name')}>
+                          <DropdownMenuItem 
+                            onClick={() => handleStartEdit(client, 'full_name')}
+                            className="cursor-pointer hover:bg-muted/50"
+                          >
                             <Edit2 className="h-4 w-4 mr-2" />
                             Edit Client
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem 
-                            className="text-destructive"
+                            className="text-destructive cursor-pointer hover:bg-destructive/10"
                             onClick={() => handleDeleteClient(client.id)}
                           >
                             <Trash2 className="h-4 w-4 mr-2" />
@@ -669,11 +691,11 @@ export function ClientsTable({
               )}
             </TableBody>
           </Table>
-        </div>
+        </ScrollableTable>
       </div>
 
       {totalPages > 1 && (
-        <div className="mt-4 flex justify-center">
+        <div className="mt-6 flex justify-center">
           <Pagination>
             <PaginationContent>
               <PaginationItem>
@@ -708,6 +730,7 @@ export function ClientsTable({
                               setPage(pageNum);
                             }}
                             isActive={page === pageNum}
+                            className={page === pageNum ? "bg-primary hover:bg-primary/90" : "hover:bg-muted/50"}
                           >
                             {pageNum}
                           </PaginationLink>
@@ -725,6 +748,7 @@ export function ClientsTable({
                           setPage(pageNum);
                         }}
                         isActive={page === pageNum}
+                        className={page === pageNum ? "bg-primary hover:bg-primary/90" : "hover:bg-muted/50"}
                       >
                         {pageNum}
                       </PaginationLink>

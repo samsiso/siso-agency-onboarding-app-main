@@ -106,12 +106,12 @@ export function SavedViewsManager({ currentPreference, onLoadView }: SavedViewsM
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="h-9">
+        <Button variant="outline" size="sm" className="h-9 shadow-sm border-border/50 hover:bg-muted/50">
           <Bookmark className="h-4 w-4 mr-2" />
           Saved Views
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
+      <DropdownMenuContent align="end" className="w-60 border-border/70 bg-card/95 backdrop-blur-sm">
         <DropdownMenuLabel>Saved Views</DropdownMenuLabel>
         
         {savedViews.length > 0 ? (
@@ -120,16 +120,16 @@ export function SavedViewsManager({ currentPreference, onLoadView }: SavedViewsM
               <DropdownMenuItem 
                 key={view.id} 
                 onClick={() => handleLoadView(view)}
-                className="flex items-center justify-between cursor-pointer"
+                className="flex items-center justify-between cursor-pointer group py-2 px-3 hover:bg-muted/50"
               >
-                <span>{view.name}</span>
+                <span className="text-sm font-medium">{view.name}</span>
                 <Button
                   variant="ghost" 
                   size="icon" 
-                  className="h-6 w-6 opacity-70 hover:opacity-100"
+                  className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
                   onClick={(e) => handleDeleteView(view.id, e)}
                 >
-                  <Trash2 className="h-3.5 w-3.5" />
+                  <Trash2 className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
                 </Button>
               </DropdownMenuItem>
             ))}
@@ -147,7 +147,7 @@ export function SavedViewsManager({ currentPreference, onLoadView }: SavedViewsM
               placeholder="View name" 
               value={newViewName}
               onChange={(e) => setNewViewName(e.target.value)}
-              className="h-8 text-sm"
+              className="h-8 text-sm border-border/50"
               autoFocus
             />
             <div className="flex">
@@ -165,14 +165,14 @@ export function SavedViewsManager({ currentPreference, onLoadView }: SavedViewsM
                 className="h-8 w-8 p-0" 
                 onClick={() => setIsCreating(false)}
               >
-                <X className="h-4 w-4 text-red-500" />
+                <X className="h-4 w-4 text-destructive" />
               </Button>
             </div>
           </div>
         ) : (
           <DropdownMenuItem 
             onClick={() => setIsCreating(true)}
-            className="cursor-pointer"
+            className="cursor-pointer flex items-center py-2 hover:bg-muted/50"
           >
             <Save className="h-4 w-4 mr-2" />
             Save current view

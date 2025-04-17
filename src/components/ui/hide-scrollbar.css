@@ -1,10 +1,53 @@
 
-/* Hide scrollbar but keep functionality */
-.hide-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;  /* Chrome, Safari, Opera */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.table-shadow-left {
+  box-shadow: inset 10px 0 8px -8px rgba(0, 0, 0, 0.15);
+}
+
+.table-shadow-right {
+  box-shadow: inset -10px 0 8px -8px rgba(0, 0, 0, 0.15);
+}
+
+.table-header-cell {
+  transition: background-color 0.2s ease;
+}
+
+.table-header-cell:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.table-row-hover {
+  transition: all 0.2s ease;
+}
+
+.table-row-hover:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.pill {
+  transition: all 0.2s ease;
+}
+
+.pill:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card-hover {
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
 }
