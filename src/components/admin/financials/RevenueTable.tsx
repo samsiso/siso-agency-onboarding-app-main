@@ -33,7 +33,7 @@ import {
   Loader2
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { FinancialTransaction, deleteTransaction } from "@/utils/financialHelpers";
+import { FinancialTransaction, deleteTransaction } from "@/utils/financial";
 import {
   Dialog,
   DialogContent,

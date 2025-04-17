@@ -6,7 +6,7 @@ import { FinancialsDashboard } from "@/components/admin/financials/FinancialsDas
 import { ExpensesTable } from "@/components/admin/financials/ExpensesTable";
 import { RevenueTable } from "@/components/admin/financials/RevenueTable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { fetchTransactions, FinancialTransaction } from "@/utils/financialHelpers";
+import { fetchTransactions, FinancialTransaction } from "@/utils/financial";
 
 export default function AdminPayments() {
   const [activeTab, setActiveTab] = useState("dashboard");

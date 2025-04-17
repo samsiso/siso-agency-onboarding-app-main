@@ -11,7 +11,7 @@ import {
   Receipt, 
   CreditCard
 } from "lucide-react";
-import { getFinancialSummary } from "@/utils/financialHelpers";
+import { getFinancialSummary } from "@/utils/financial";
 import { Button } from "@/components/ui/button";
 import { 
   Select,

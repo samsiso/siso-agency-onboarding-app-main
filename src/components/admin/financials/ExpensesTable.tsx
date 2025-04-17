@@ -28,7 +28,7 @@ import {
   Eye,
   Loader2
 } from "lucide-react";
-import { FinancialTransaction, deleteTransaction } from "@/utils/financialHelpers";
+import { FinancialTransaction, deleteTransaction } from "@/utils/financial";
 import {
   Dialog,
   DialogContent,
@@ -69,7 +69,7 @@ export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }
     .filter(expense => 
       expense.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       expense.category?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      expense.vendor?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      expense.vendor?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       `${expense.amount}`.includes(searchQuery)
     )
     .sort((a, b) => {
