@@ -1,5 +1,5 @@
 
-import { useState, useRef } from 'react';
+import { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { Button } from '@/components/ui/button';
 import { ArrowUpDown, GripVertical } from 'lucide-react';
@@ -29,14 +29,25 @@ export function DraggableColumnHeader({
   sortDirection,
 }: DraggableColumnHeaderProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const [isDraggingOver, setIsDraggingOver] = useState(false);
   
-  const [, drop] = useDrop({
+  // Always initialize state variables at the top level, not conditionally
+  const [{ isDragging }, drag] = useDrag({
+    type: 'column',
+    item: () => {
+      return { id: column.key, index };
+    },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  });
+  
+  const [{ isDraggingOver }, drop] = useDrop({
     accept: 'column',
     hover(item: DragItem, monitor) {
       if (!ref.current) {
         return;
       }
+      
       const dragIndex = item.index;
       const hoverIndex = index;
       
@@ -53,20 +64,9 @@ export function DraggableColumnHeader({
       // but it's good here for the sake of performance
       // to avoid expensive index searches.
       item.index = hoverIndex;
-      setIsDraggingOver(true);
-    },
-    drop() {
-      setIsDraggingOver(false);
-    }
-  });
-  
-  const [{ isDragging }, drag] = useDrag({
-    type: 'column',
-    item: () => {
-      return { id: column.key, index };
     },
     collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
+      isDraggingOver: monitor.isOver(),
     }),
   });
   

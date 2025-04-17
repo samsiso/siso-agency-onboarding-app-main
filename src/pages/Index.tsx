@@ -12,15 +12,19 @@ const Index = () => {
   useEffect(() => {
     // Check if the user is already logged in and redirect accordingly
     const checkAuth = async () => {
-      const { data } = await supabase.auth.getSession();
-      
-      if (data.session) {
-        // If the user is an admin, redirect to the admin clients page
-        if (isAdmin && !isLoading) {
-          navigate('/admin/clients', { replace: true });
-        } else {
-          navigate('/home', { replace: true });
+      try {
+        const { data } = await supabase.auth.getSession();
+        
+        if (data.session) {
+          // If the user is an admin, redirect to the admin clients page
+          if (isAdmin) {
+            navigate('/admin/clients', { replace: true });
+          } else {
+            navigate('/home', { replace: true });
+          }
         }
+      } catch (error) {
+        console.error("Auth check error:", error);
       }
     };
     
