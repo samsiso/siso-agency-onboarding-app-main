@@ -2,7 +2,7 @@
 import { 
   LayoutDashboard, ClipboardList, UserCog, Users,
   CreditCard, Settings, FileSpreadsheet, BarChart, CalendarClock,
-  MessageSquare
+  MessageSquare, UsersIcon
 } from 'lucide-react';
 import { MenuSection } from './types';
 
@@ -24,6 +24,11 @@ export const getAdminMenuSections = (): MenuSection[] => {
           href: '/admin/clients',
           icon: Users,
           label: 'Clients',
+        },
+        {
+          href: '/admin/teams',
+          icon: UsersIcon,
+          label: 'Teams',
         },
         {
           href: '/admin/outreach',
