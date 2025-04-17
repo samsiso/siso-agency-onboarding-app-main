@@ -7,9 +7,9 @@ interface EnhancedStatusBadgeProps {
 }
 
 export function EnhancedStatusBadge({ status, className }: EnhancedStatusBadgeProps) {
+  const baseClasses = "inline-flex items-center justify-center px-2.5 py-0.5 text-xs font-medium rounded-full";
+  
   const getStatusStyle = (status: string) => {
-    const baseClasses = "inline-flex items-center justify-center px-2.5 py-0.5 text-xs font-medium rounded-full";
-    
     switch (status.toLowerCase()) {
       case 'active':
         return "bg-emerald-50/50 text-emerald-700 ring-1 ring-emerald-600/20";

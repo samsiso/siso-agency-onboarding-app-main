@@ -1,89 +1,24 @@
-import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
-import { useClientsList } from '@/hooks/client';
-import { ClientData, ClientViewPreference, ClientColumnPreference, TodoItem } from '@/types/client.types';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { 
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { useRef } from 'react';
+import { ClientViewPreference } from '@/types/client.types';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ClientStatusBadge } from './ClientStatusBadge';
+import { ClientAddForm } from './ClientAddForm';
 import { ClientAnalyticsCards } from './ClientAnalyticsCards';
 import { ClientsHeader } from './ClientsHeader';
-import { ClientAddForm } from './ClientAddForm';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { formatRelativeTime } from '@/lib/formatters';
-import { 
-  ArrowUpDown, 
-  Check,
-  ChevronDown, 
-  Download,
-  Edit2,
-  ExternalLink, 
-  MoreHorizontal, 
-  Plus,
-  RefreshCw,
-  Save,
-  Trash2,
-  X,
-  FileText,
-  Link,
-  CalendarClock,
-  DollarSign,
-  Pin,
-  PinOff,
-  Users
-} from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
 import { ClientDetailSheet } from './ClientDetailSheet';
-import { 
-  Pagination, 
-  PaginationContent, 
-  PaginationItem, 
-  PaginationLink, 
-  PaginationNext, 
-  PaginationPrevious 
-} from '@/components/ui/pagination';
-import { Input } from '@/components/ui/input';
-import { useToast } from '@/hooks/use-toast';
-import * as React from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { TodoList } from './TodoList';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import { Download, Trash2, Users } from 'lucide-react';
 import { DraggableColumnHeader } from './DraggableColumnHeader';
 import { ScrollableTable } from './ScrollableTable';
-import '../../../components/ui/hide-scrollbar.css';
-import { ClientSelectField } from './ClientSelectField';
-import { cn } from '@/lib/utils';
-import { tableStyles, tableCellStyles, tableRowStyles } from '@/components/ui/table-styles';
-import { EnhancedStatusBadge } from './EnhancedStatusBadge';
-
-const COMPANY_NICHE_OPTIONS = [
-  { value: 'ecommerce', label: 'E-commerce' },
-  { value: 'saas', label: 'SaaS' },
-  { value: 'agency', label: 'Agency' },
-  { value: 'consulting', label: 'Consulting' },
-  { value: 'education', label: 'Education' },
-  { value: 'other', label: 'Other' }
-];
-
-const STATUS_OPTIONS = [
-  { value: 'pending', label: 'Pending' },
-  { value: 'active', label: 'Active' },
-  { value: 'completed', label: 'Completed' },
-  { value: 'on_hold', label: 'On Hold' }
-];
+import { useClientTable } from './hooks/useClientTable';
+import { useClientAnalytics } from './components/ClientAnalytics';
+import { ClientTableCell, TableCell } from './components/ClientTableCell';
+import { cn } from "@/lib/utils";
+import { tableStyles, tableRowStyles } from '@/components/ui/table-styles';
+import * as React from 'react';
 
 interface ClientsTableProps {
   searchQuery?: string;
@@ -102,419 +37,50 @@ export function ClientsTable({
   onSearchChange,
   onStatusFilterChange
 }: ClientsTableProps) {
-  const [page, setPage] = useState(1);
-  const [selectedClients, setSelectedClients] = useState<string[]>([]);
-  const [activeClient, setActiveClient] = useState<string | null>(null);
-  const [isAddClientOpen, setIsAddClientOpen] = useState(false);
-  const [editingCell, setEditingCell] = useState<{id: string, field: string} | null>(null);
-  const [editValue, setEditValue] = useState<string>('');
-  const editInputRef = useRef<HTMLInputElement>(null);
-
-  const { toast } = useToast();
-
+  const [isAddClientOpen, setIsAddClientOpen] = React.useState(false);
   const tableRef = useRef<HTMLDivElement>(null);
   const tableElementRef = useRef<HTMLTableElement>(null);
   const tableContainerRef = useRef<HTMLDivElement>(null);
 
-  const visibleColumns = useMemo(() => 
+  const {
+    page,
+    setPage,
+    selectedClients,
+    activeClient,
+    setActiveClient,
+    editingCell,
+    editValue,
+    setEditValue,
+    editInputRef,
+    clients,
+    isLoading,
+    totalCount,
+    handleSort,
+    handleSelectAll,
+    handleSelectClient,
+    handleStartEdit,
+    handleSaveEdit,
+    handleDeleteSelected,
+    refetch
+  } = useClientTable(searchQuery, statusFilter, viewPreference, onViewPreferenceChange);
+
+  const analyticsData = useClientAnalytics({ clients, totalCount });
+  
+  const visibleColumns = React.useMemo(() => 
     viewPreference.columns.filter(col => col.visible),
     [viewPreference.columns]
   );
 
-  const pinnedColumns = useMemo(() => 
+  const pinnedColumns = React.useMemo(() => 
     visibleColumns.filter(col => col.pinned),
     [visibleColumns]
   );
 
-  const { clients, isLoading, totalCount, refetch } = useClientsList({
-    page,
-    pageSize: viewPreference.pageSize,
-    searchQuery,
-    statusFilter, 
-    sortColumn: viewPreference.sortColumn,
-    sortDirection: viewPreference.sortDirection
-  });
-
-  const analyticsData = useMemo(() => {
-    const activeClientsCount = clients.filter(c => c.status === 'active').length;
-    const pipelineClientsCount = clients.filter(c => ['pending', 'proposal', 'negotiation'].includes(c.status)).length;
-    const pipelineValue = clients
-      .filter(c => ['pending', 'proposal', 'negotiation'].includes(c.status))
-      .reduce((sum, client) => sum + (client.estimated_price || 0), 0);
-    const conversionRate = totalCount > 0 ? Math.round((activeClientsCount / totalCount) * 100) : 0;
-
-    return {
-      activeClients: activeClientsCount,
-      pipelineClients: pipelineClientsCount,
-      pipelineValue,
-      conversionRate
-    };
-  }, [clients, totalCount]);
-
   const totalPages = Math.ceil(totalCount / viewPreference.pageSize);
-
-  const handleAddClient = () => {
-    setIsAddClientOpen(true);
-  };
 
   const handleClientAddSuccess = () => {
     refetch();
-    toast({
-      title: "Client added successfully",
-      description: "The new client has been added to your list."
-    });
   };
-
-  const handleStartEdit = (client: ClientData, field: string) => {
-    setEditingCell({ id: client.id, field });
-    setEditValue(String(client[field as keyof ClientData] || ''));
-    
-    setTimeout(() => {
-      if (editInputRef.current) {
-        editInputRef.current.focus();
-      }
-    }, 0);
-  };
-
-  const handleSaveEdit = async ({ id, field, value }: { id: string; field: string; value: string }) => {
-    try {
-      const { error } = await supabase
-        .from('client_onboarding')
-        .update({ 
-          [field]: value,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', id);
-        
-      if (error) throw error;
-      
-      toast({
-        title: "Update successful",
-        description: `Updated ${field} for this client.`
-      });
-      
-      refetch();
-    } catch (error: any) {
-      console.error('Error saving edit:', error);
-      toast({
-        variant: "destructive",
-        title: "Error updating client",
-        description: error.message || "Failed to save changes. Please try again."
-      });
-    } finally {
-      setEditingCell(null);
-    }
-  };
-
-  const handleCancelEdit = () => {
-    setEditingCell(null);
-  };
-
-  const handleEditKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && editingCell) {
-      handleSaveEdit({
-        id: editingCell.id,
-        field: editingCell.field,
-        value: editValue
-      });
-    } else if (e.key === 'Escape') {
-      handleCancelEdit();
-    }
-  };
-
-  const handleSort = (column: string) => {
-    if (viewPreference.sortColumn === column) {
-      onViewPreferenceChange({
-        sortDirection: viewPreference.sortDirection === 'asc' ? 'desc' : 'asc'
-      });
-    } else {
-      onViewPreferenceChange({
-        sortColumn: column,
-        sortDirection: 'asc'
-      });
-    }
-  };
-
-  const handleSelectAll = () => {
-    if (selectedClients.length === clients.length) {
-      setSelectedClients([]);
-    } else {
-      setSelectedClients(clients.map(client => client.id));
-    }
-  };
-
-  const handleSelectClient = (clientId: string) => {
-    if (selectedClients.includes(clientId)) {
-      setSelectedClients(selectedClients.filter(id => id !== clientId));
-    } else {
-      setSelectedClients([...selectedClients, clientId]);
-    }
-  };
-
-  const handleOpenDetails = (clientId: string) => {
-    setActiveClient(clientId);
-  };
-
-  const handleCloseDetails = () => {
-    setActiveClient(null);
-  };
-
-  const handleToggleColumnPin = useCallback((index: number) => {
-    const newColumns = [...viewPreference.columns];
-    const columnKey = visibleColumns[index].key;
-    
-    const columnIndex = newColumns.findIndex(col => col.key === columnKey);
-    if (columnIndex !== -1) {
-      newColumns[columnIndex] = {
-        ...newColumns[columnIndex],
-        pinned: !newColumns[columnIndex].pinned
-      };
-      
-      onViewPreferenceChange({ columns: newColumns });
-    }
-  }, [viewPreference.columns, visibleColumns, onViewPreferenceChange]);
-
-  const handleColumnReorder = useCallback((dragIndex: number, hoverIndex: number) => {
-    const dragKey = visibleColumns[dragIndex].key;
-    const hoverKey = visibleColumns[hoverIndex].key;
-    
-    const newColumns = [...viewPreference.columns];
-    
-    const dragFullIndex = newColumns.findIndex(col => col.key === dragKey);
-    const hoverFullIndex = newColumns.findIndex(col => col.key === hoverKey);
-    
-    if (dragFullIndex !== -1 && hoverFullIndex !== -1) {
-      const dragItem = newColumns[dragFullIndex];
-      newColumns.splice(dragFullIndex, 1);
-      newColumns.splice(hoverFullIndex, 0, dragItem);
-      
-      onViewPreferenceChange({ columns: newColumns });
-    }
-  }, [visibleColumns, viewPreference.columns, onViewPreferenceChange]);
-
-  useEffect(() => {
-    if (editingCell && editInputRef.current) {
-      const cell = editInputRef.current.parentElement;
-      if (cell) {
-        cell.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
-      }
-    }
-  }, [editingCell]);
-
-  const handleDeleteSelected = async () => {
-    if (selectedClients.length === 0) return;
-    
-    if (window.confirm(`Are you sure you want to delete ${selectedClients.length} selected clients?`)) {
-      try {
-        const { error } = await supabase
-          .from('client_onboarding')
-          .delete()
-          .in('id', selectedClients);
-        
-        if (error) throw error;
-        
-        toast({
-          title: "Clients deleted",
-          description: `Successfully deleted ${selectedClients.length} clients.`
-        });
-        
-        setSelectedClients([]);
-        refetch();
-      } catch (error: any) {
-        console.error('Error deleting clients:', error);
-        toast({
-          variant: "destructive",
-          title: "Error deleting clients",
-          description: error.message || "Failed to delete selected clients."
-        });
-      }
-    }
-  };
-
-  function renderCellContent(client: ClientData, columnKey: string) {
-    const isEditing = editingCell?.id === client.id && editingCell?.field === columnKey;
-
-    const handleDoubleClick = () => {
-      handleStartEdit(client, columnKey);
-    };
-
-    switch (columnKey) {
-      case 'full_name':
-        return (
-          <div className="flex flex-col space-y-0.5">
-            {isEditing ? (
-              <Input
-                ref={editInputRef}
-                value={editValue}
-                onChange={(e) => setEditValue(e.target.value)}
-                onKeyDown={handleEditKeyDown}
-                className="h-8 min-w-[120px] border-border/50"
-                autoFocus
-              />
-            ) : (
-              <div onDoubleClick={handleDoubleClick}>
-                <span className="font-medium text-foreground">{client.full_name || 'Unknown'}</span>
-                <span className="block text-xs text-muted-foreground">{client.email || 'No email'}</span>
-              </div>
-            )}
-          </div>
-        );
-      case 'status':
-        return (
-          <EnhancedStatusBadge status={client.status} />
-        );
-      case 'company_niche':
-        return (
-          <ClientSelectField
-            value={client.company_niche || 'other'}
-            onChange={(value) => handleSaveEdit({ id: client.id, field: 'company_niche', value })}
-            options={COMPANY_NICHE_OPTIONS}
-            className="h-8 min-w-[120px]"
-          />
-        );
-      case 'updated_at':
-        return formatRelativeTime(client.updated_at);
-      case 'notion_plan_url':
-        return client.notion_plan_url ? (
-          <a 
-            href={client.notion_plan_url} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="text-blue-500 hover:underline flex items-center"
-          >
-            <FileText className="h-4 w-4 mr-1" />
-            Notion Plan
-          </a>
-        ) : '-';
-      case 'estimated_price':
-        return client.estimated_price 
-          ? <span className="flex items-center"><DollarSign className="h-4 w-4" />{client.estimated_price.toLocaleString()}</span> 
-          : '-';
-      case 'development_url':
-        return client.development_url ? (
-          <a 
-            href={client.development_url} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="text-blue-500 hover:underline flex items-center"
-          >
-            <Link className="h-4 w-4 mr-1" />
-            View Site
-          </a>
-        ) : '-';
-      case 'next_steps':
-        return (
-          <div className="max-w-xs truncate" title={client.next_steps || ''}>
-            {isEditing ? (
-              <Input
-                ref={editInputRef}
-                value={editValue}
-                onChange={(e) => setEditValue(e.target.value)}
-                onKeyDown={handleEditKeyDown}
-                className="h-8 min-w-[120px] border-border/50"
-                autoFocus
-              />
-            ) : (
-              <div onDoubleClick={handleDoubleClick}>
-                {client.next_steps || '-'}
-              </div>
-            )}
-          </div>
-        );
-      case 'estimated_completion_date':
-        return client.estimated_completion_date ? (
-          <div className="flex items-center">
-            <CalendarClock className="h-4 w-4 mr-1" />
-            {new Date(client.estimated_completion_date).toLocaleDateString()}
-          </div>
-        ) : '-';
-      case 'todos':
-        return renderTodoItems(client.todos);
-      case 'key_research':
-        return (
-          <div className="max-w-xs truncate" title={client.key_research || ''}>
-            {isEditing ? (
-              <Input
-                ref={editInputRef}
-                value={editValue}
-                onChange={(e) => setEditValue(e.target.value)}
-                onKeyDown={handleEditKeyDown}
-                className="h-8 min-w-[120px] border-border/50"
-                autoFocus
-              />
-            ) : (
-              <div onDoubleClick={handleDoubleClick}>
-                {client.key_research || '-'}
-              </div>
-            )}
-          </div>
-        );
-      default:
-        const value = client[columnKey as keyof typeof client];
-        if (isEditing) {
-          return (
-            <Input
-              ref={editInputRef}
-              value={editValue}
-              onChange={(e) => setEditValue(e.target.value)}
-              onKeyDown={handleEditKeyDown}
-              className="h-8 min-w-[120px] border-border/50"
-              autoFocus
-            />
-          );
-        } else if (Array.isArray(value)) {
-          return <span>{value.length} items</span>;
-        } else {
-          return (
-            <div onDoubleClick={handleDoubleClick}>
-              {value !== undefined && value !== null ? String(value) : '-'}
-            </div>
-          );
-        }
-    }
-  }
-
-  function handleDeleteClient(clientId: string) {
-    if (window.confirm('Are you sure you want to delete this client?')) {
-      try {
-        supabase
-          .from('client_onboarding')
-          .delete()
-          .eq('id', clientId)
-          .then(({ error }) => {
-            if (error) throw error;
-            
-            toast({
-              title: "Client deleted",
-              description: "The client has been permanently removed."
-            });
-            
-            refetch();
-          });
-      } catch (error: any) {
-        toast({
-          variant: "destructive",
-          title: "Error deleting client",
-          description: error.message || "Failed to delete client."
-        });
-      }
-    }
-  }
-
-  function renderTodoItems(todos?: TodoItem[]) {
-    if (!todos || todos.length === 0) {
-      return <span>-</span>;
-    }
-    
-    const pendingTodos = todos.filter(t => !t.completed).length;
-    return (
-      <div className="flex items-center">
-        <span className="bg-blue-500/10 text-blue-500 rounded-full px-2 py-0.5 text-xs">
-          {pendingTodos} pending
-        </span>
-      </div>
-    );
-  }
 
   if (isLoading) {
     return (
@@ -551,12 +117,7 @@ export function ClientsTable({
 
   return (
     <div className="space-y-6">
-      <ClientAnalyticsCards 
-        activeClients={analyticsData.activeClients}
-        pipelineClients={analyticsData.pipelineClients}
-        pipelineValue={analyticsData.pipelineValue}
-        conversionRate={analyticsData.conversionRate}
-      />
+      <ClientAnalyticsCards {...analyticsData} />
       
       <ClientsHeader
         searchQuery={searchQuery}
@@ -565,7 +126,7 @@ export function ClientsTable({
         onStatusFilterChange={onStatusFilterChange}
         viewPreference={viewPreference}
         onViewPreferenceChange={onViewPreferenceChange}
-        onAddClient={handleAddClient}
+        onAddClient={() => setIsAddClientOpen(true)}
         totalClients={totalCount}
         clients={clients}
         onRefetch={refetch}
@@ -626,11 +187,10 @@ export function ClientsTable({
                   
                   return (
                     <TableHead 
-                      key={column.key} 
+                      key={column.key}
                       className={cn(
                         "text-xs font-medium text-muted-foreground tracking-wider uppercase",
-                        isPinned ? 'sticky z-20 bg-card/95 backdrop-blur-sm' : '',
-                        tableCellStyles()
+                        isPinned ? 'sticky z-20 bg-card/95 backdrop-blur-sm' : ''
                       )}
                       style={{ 
                         minWidth: `${column.width || 150}px`,
@@ -641,9 +201,7 @@ export function ClientsTable({
                       <DraggableColumnHeader
                         column={column}
                         index={index}
-                        moveColumn={handleColumnReorder}
                         onSort={() => handleSort(column.key)}
-                        onTogglePin={() => handleToggleColumnPin(index)}
                         isSorted={viewPreference.sortColumn === column.key}
                         sortDirection={viewPreference.sortDirection}
                       />
@@ -705,21 +263,34 @@ export function ClientsTable({
                         }
                       }
                       
+                      const isEditing = editingCell?.id === client.id && editingCell?.field === column.key;
+                      
                       return (
                         <TableCell 
                           key={column.key}
-                          className={cn(
-                            "group-hover:bg-muted/40 transition-colors duration-200",
-                            isPinned ? 'sticky bg-background z-10' : '',
-                            tableCellStyles()
-                          )}
-                          style={{ 
-                            left: isPinned ? `${leftPosition}px` : undefined,
-                            maxWidth: `${column.width || 150}px`,
-                          }}
-                          onDoubleClick={() => handleStartEdit(client, column.key)}
+                          isPinned={isPinned}
+                          leftPosition={leftPosition}
+                          style={{ maxWidth: `${column.width || 150}px` }}
                         >
-                          {renderCellContent(client, column.key)}
+                          <ClientTableCell
+                            client={client}
+                            columnKey={column.key}
+                            isEditing={isEditing}
+                            editValue={editValue}
+                            editInputRef={editInputRef}
+                            onEditValueChange={setEditValue}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' && editingCell) {
+                                handleSaveEdit({
+                                  id: editingCell.id,
+                                  field: editingCell.field,
+                                  value: editValue
+                                });
+                              }
+                            }}
+                            onDoubleClick={() => handleStartEdit(client, column.key)}
+                            onSaveEdit={handleSaveEdit}
+                          />
                         </TableCell>
                       );
                     })}
@@ -812,7 +383,7 @@ export function ClientsTable({
         <ClientDetailSheet 
           clientId={activeClient} 
           isOpen={!!activeClient} 
-          onClose={handleCloseDetails} 
+          onClose={() => setActiveClient(null)} 
         />
       )}
       
