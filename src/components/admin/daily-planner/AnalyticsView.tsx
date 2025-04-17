@@ -1,10 +1,33 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart, LineChart, PieChart } from '@/components/ui/chart';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { BarChart, LineChart, PieChart } from 'recharts';
 
 export function AnalyticsView() {
+  // Sample data for charts
+  const completionData = [
+    { name: 'Mon', completed: 5, total: 8 },
+    { name: 'Tue', completed: 7, total: 9 },
+    { name: 'Wed', completed: 3, total: 7 },
+    { name: 'Thu', completed: 6, total: 8 },
+    { name: 'Fri', completed: 4, total: 6 },
+  ];
+
+  const categoryData = [
+    { name: 'Client Work', value: 12 },
+    { name: 'Admin', value: 8 },
+    { name: 'Marketing', value: 5 },
+    { name: 'Learning', value: 4 },
+  ];
+
+  const checkInData = [
+    { name: 'Week 1', consistency: 2 },
+    { name: 'Week 2', consistency: 4 },
+    { name: 'Week 3', consistency: 3 },
+    { name: 'Week 4', consistency: 5 },
+  ];
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -73,13 +96,42 @@ export function AnalyticsView() {
             
             <TabsContent value="tasks">
               <div className="h-[300px] w-full border rounded-md flex items-center justify-center text-muted-foreground">
-                Task completion chart will appear here
+                <ChartContainer 
+                  className="w-full h-full" 
+                  config={{
+                    completed: { label: "Completed" },
+                    total: { label: "Total" }
+                  }}
+                >
+                  <BarChart
+                    width={500}
+                    height={300}
+                    data={completionData}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    {/* Other chart elements would go here */}
+                  </BarChart>
+                </ChartContainer>
               </div>
             </TabsContent>
             
             <TabsContent value="categories">
               <div className="h-[300px] w-full border rounded-md flex items-center justify-center text-muted-foreground">
-                Task distribution by category chart
+                <ChartContainer 
+                  className="w-full h-full"
+                  config={{
+                    value: { label: "Tasks" }
+                  }}
+                >
+                  <PieChart
+                    width={500}
+                    height={300}
+                  >
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    {/* Pie chart elements would go here */}
+                  </PieChart>
+                </ChartContainer>
               </div>
             </TabsContent>
             
@@ -91,7 +143,22 @@ export function AnalyticsView() {
             
             <TabsContent value="checkins">
               <div className="h-[300px] w-full border rounded-md flex items-center justify-center text-muted-foreground">
-                Check-in consistency chart
+                <ChartContainer 
+                  className="w-full h-full"
+                  config={{
+                    consistency: { label: "Check-in Days" }
+                  }}
+                >
+                  <LineChart
+                    width={500}
+                    height={300}
+                    data={checkInData}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    {/* Line chart elements would go here */}
+                  </LineChart>
+                </ChartContainer>
               </div>
             </TabsContent>
           </Tabs>
