@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -62,28 +61,40 @@ export function BulkImportLeads() {
       return;
     }
 
-    const rows = rawData.split('\n').filter(row => row.trim());
-    const parsedData: ImportLead[] = rows.slice(1).map(row => {
-      const values = row.split(delimiter);
-      const lead: Record<string, any> = { status: 'new' };
-      
-      columnMappings.forEach((mapping, index) => {
-        if (mapping.targetField && values[index]) {
-          if (['followers_count', 'following_count', 'posts_count'].includes(mapping.targetField)) {
-            lead[mapping.targetField] = parseInt(values[index], 10) || null;
-          } else {
-            lead[mapping.targetField] = values[index].trim();
+    try {
+      const rows = rawData.split('\n').filter(row => row.trim());
+      const parsedData: ImportLead[] = rows.slice(1).map(row => {
+        const values = row.split(delimiter);
+        const lead: Record<string, any> = { status: 'new' };
+        
+        columnMappings.forEach((mapping, index) => {
+          if (mapping.targetField && values[index]) {
+            const value = values[index].trim();
+            if (['followers_count', 'following_count', 'posts_count'].includes(mapping.targetField)) {
+              lead[mapping.targetField] = parseInt(value, 10) || null;
+            } else {
+              lead[mapping.targetField] = value;
+            }
           }
-        }
-      });
-      
-      return lead.username ? lead as ImportLead : null;
-    }).filter(Boolean) as ImportLead[];
+        });
+        
+        return lead.username ? lead as ImportLead : null;
+      }).filter(Boolean) as ImportLead[];
 
-    const success = await processImport(parsedData);
-    if (success) {
-      setRawData('');
-      setColumnMappings([]);
+      if (parsedData.length === 0) {
+        toast.error('No valid leads found in the data');
+        return;
+      }
+
+      const success = await processImport(parsedData);
+      if (success) {
+        setRawData('');
+        setColumnMappings([]);
+        setPreviewData([]);
+      }
+    } catch (error) {
+      console.error('Error parsing data:', error);
+      toast.error('Failed to process data. Please check the format and try again.');
     }
   };
 
