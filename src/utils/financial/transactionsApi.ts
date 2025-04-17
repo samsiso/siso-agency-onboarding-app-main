@@ -1,134 +1,63 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/components/ui/use-toast';
 import { FinancialTransaction } from './types';
-import { TransactionFilters } from './types/transactionTypes';
-import { transformEntityData } from './utils/relationshipUtils';
 import { transformTransactionData } from './utils/transactionTransformers';
+import { transformEntityData } from './utils/relationshipUtils';
 
 /**
- * Fetches financial transactions with optional filters
+ * Fetches financial transactions with related entity data
+ * Uses explicit casting to break recursive type chains
  */
-export async function fetchTransactions(filters: TransactionFilters = {}): Promise<FinancialTransaction[]> {
+export async function fetchTransactions(): Promise<FinancialTransaction[]> {
   try {
-    const query = supabase
+    const { data, error } = await supabase
       .from('financial_transactions')
       .select(`
         *,
-        category:expense_categories(*),
-        vendor:vendors(*),
-        payment_method:payment_methods(*)
+        category:category_id (*),
+        vendor:vendor_id (*),
+        payment_method:payment_method_id (*)
       `)
       .order('date', { ascending: false });
-    
-    // Apply filters if provided
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        query.eq(key, value);
-      }
-    });
-    
-    const { data, error } = await query;
-      
-    if (error) throw error;
-    
-    // Use the improved transformEntityData function to avoid deep instantiation
-    return transformEntityData(data || [], transformTransactionData);
-  } catch (error) {
-    console.error('Error fetching transactions:', error);
-    toast({
-      title: 'Error',
-      description: 'Failed to load financial transactions',
-      variant: 'destructive',
-    });
+
+    if (error) {
+      console.error('Error fetching transactions:', error);
+      return [];
+    }
+
+    // Use transformEntityData to break deep type instantiation chains
+    return transformEntityData<FinancialTransaction>(data || [], transformTransactionData);
+  } catch (err) {
+    console.error('Unexpected error in fetchTransactions:', err);
     return [];
   }
 }
 
-export async function addTransaction(
-  transaction: Omit<FinancialTransaction, 'id' | 'category' | 'vendor' | 'payment_method'>
-): Promise<FinancialTransaction | null> {
+/**
+ * Fetches a single transaction by ID with related data
+ * Uses explicit type handling to prevent deep instantiation chains
+ */
+export async function fetchTransactionById(transactionId: string): Promise<FinancialTransaction | null> {
   try {
     const { data, error } = await supabase
       .from('financial_transactions')
-      .insert(transaction)
-      .select()
+      .select(`
+        *,
+        category:category_id (*),
+        vendor:vendor_id (*),
+        payment_method:payment_method_id (*)
+      `)
+      .eq('id', transactionId)
       .single();
-      
-    if (error) throw error;
-    
-    toast({
-      title: 'Success',
-      description: `${transaction.type === 'expense' ? 'Expense' : 'Revenue'} recorded successfully`,
-    });
-    
-    // Return a typed object to avoid deep instantiation
-    return transformTransactionData(data);
-  } catch (error) {
-    console.error('Error adding transaction:', error);
-    toast({
-      title: 'Error',
-      description: `Failed to record ${transaction.type === 'expense' ? 'expense' : 'revenue'}`,
-      variant: 'destructive',
-    });
-    return null;
-  }
-}
 
-export async function deleteTransaction(id: string): Promise<boolean> {
-  try {
-    const { error } = await supabase
-      .from('financial_transactions')
-      .delete()
-      .eq('id', id);
-      
-    if (error) throw error;
-    
-    toast({
-      title: 'Success',
-      description: 'Transaction deleted successfully',
-    });
-    
-    return true;
-  } catch (error) {
-    console.error('Error deleting transaction:', error);
-    toast({
-      title: 'Error',
-      description: 'Failed to delete transaction',
-      variant: 'destructive',
-    });
-    return false;
-  }
-}
+    if (error) {
+      console.error('Error fetching transaction by ID:', error);
+      return null;
+    }
 
-export async function updateTransaction(
-  id: string, 
-  updates: Partial<Omit<FinancialTransaction, 'id' | 'category' | 'vendor' | 'payment_method'>>
-): Promise<FinancialTransaction | null> {
-  try {
-    const { data, error } = await supabase
-      .from('financial_transactions')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single();
-      
-    if (error) throw error;
-    
-    toast({
-      title: 'Success',
-      description: 'Transaction updated successfully',
-    });
-    
-    // Use the transformer to create proper type
     return transformTransactionData(data);
-  } catch (error) {
-    console.error('Error updating transaction:', error);
-    toast({
-      title: 'Error',
-      description: 'Failed to update transaction',
-      variant: 'destructive',
-    });
+  } catch (err) {
+    console.error('Unexpected error in fetchTransactionById:', err);
     return null;
   }
 }

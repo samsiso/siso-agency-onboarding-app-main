@@ -1,7 +1,7 @@
 
 import { 
   LayoutDashboard, ClipboardList, UserCog, Users,
-  CreditCard, Settings, FileSpreadsheet, BarChart
+  CreditCard, Settings, FileSpreadsheet, BarChart, CalendarClock
 } from 'lucide-react';
 import { MenuSection } from './types';
 
@@ -33,6 +33,11 @@ export const getAdminMenuSections = (): MenuSection[] => {
           href: '/admin/templates',
           icon: UserCog,
           label: 'Templates',
+        },
+        {
+          href: '/admin/daily-planner',
+          icon: CalendarClock,
+          label: 'Daily Planner',
         }
       ]
     },
