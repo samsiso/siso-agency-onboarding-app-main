@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Sheet, SheetClose, SheetContent, SheetDescription, 
@@ -11,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Mail, Phone, MapPin, Calendar, Clock, MessageSquare,
-  FileText, BarChart2, User, Shield, Edit, WhatsappLogo,
+  FileText, BarChart2, User, Shield, Edit, 
   CalendarPlus, CheckCircle, AlertCircle, ArrowDownUp, 
   MessageCircle, Home, Briefcase
 } from 'lucide-react';
@@ -117,7 +116,7 @@ export function TeamMemberDetails({ member, open, onOpenChange }: TeamMemberDeta
                   <span>+1 (555) 123-4567</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
-                  <WhatsappLogo className="h-4 w-4 text-muted-foreground" />
+                  <MessageCircle className="h-4 w-4 text-muted-foreground" />
                   <span>+1 (555) 123-4567</span>
                   {member.whatsappStatus && (
                     <Badge 
