@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useMemo } from 'react';
 import { AdminLayout } from '@/components/admin/layout/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -33,7 +32,8 @@ import {
   RefreshCw,
   UserPlus,
   BarChart3,
-  Star
+  Star,
+  Linkedin
 } from 'lucide-react';
 import { 
   Table, 
@@ -59,6 +59,10 @@ import { OutreachAnalyticsCards } from '@/components/admin/outreach/OutreachAnal
 import { OutreachActivityLog } from '@/components/admin/outreach/OutreachActivityLog';
 import { useOutreachColumnPreferences } from '@/hooks/useOutreachColumnPreferences';
 import { LeadDetailSheet } from '@/components/admin/outreach/LeadDetailSheet';
+import { useOutreachAccounts } from '@/hooks/useOutreachAccounts';
+import { OutreachAccount } from '@/types/outreach';
+import { AccountsGrid } from '@/components/admin/outreach/accounts/AccountsGrid';
+import { AccountManagementDialog } from '@/components/admin/outreach/accounts/AccountManagementDialog';
 
 interface OutreachStats {
   total: number;
@@ -100,7 +104,8 @@ const AdminOutreach = () => {
   const [selectedLeads, setSelectedLeads] = useState<string[]>([]);
   const [activeLead, setActiveLead] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const { leads, isLoading, refetch, addLead } = useInstagramLeads(100);
+  const { leads, isLoading: isLeadsLoading, refetch, addLead } = useInstagramLeads(100);
+  const { accounts, isLoading: isAccountsLoading, addAccount, updateAccount } = useOutreachAccounts();
   
   const { 
     columns, 
@@ -123,6 +128,11 @@ const AdminOutreach = () => {
     visibleColumns.filter(col => col.pinned),
     [visibleColumns]
   );
+
+  const [activePlatform, setActivePlatform] = useState<'instagram' | 'linkedin' | undefined>();
+  const [selectedIndustry, setSelectedIndustry] = useState<string>();
+  const [activeAccount, setActiveAccount] = useState<OutreachAccount | undefined>();
+  const [isAccountDialogOpen, setIsAccountDialogOpen] = useState(false);
 
   const handleAddLead = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -247,6 +257,28 @@ const AdminOutreach = () => {
     toast.success(`Exported ${leadsToExport.length} leads to CSV`);
   };
 
+  const handleEditAccount = (account: OutreachAccount) => {
+    setActiveAccount(account);
+    setIsAccountDialogOpen(true);
+  };
+
+  const handleSaveAccount = async (accountData: Partial<OutreachAccount>) => {
+    try {
+      if (activeAccount) {
+        await updateAccount.mutateAsync({
+          id: activeAccount.id,
+          ...accountData,
+        });
+      } else {
+        await addAccount.mutateAsync(accountData);
+      }
+      setIsAccountDialogOpen(false);
+      setActiveAccount(undefined);
+    } catch (error) {
+      console.error('Error saving account:', error);
+    }
+  };
+
   return (
     <AdminLayout>
       <div className="container mx-auto p-4">
@@ -310,7 +342,7 @@ const AdminOutreach = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {isLoading ? (
+                    {isLeadsLoading ? (
                       <TableRow>
                         <TableCell colSpan={5} className="text-center py-10">
                           Loading leads...
@@ -503,7 +535,7 @@ const AdminOutreach = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {isLoading ? (
+                      {isLeadsLoading ? (
                         <TableRow>
                           <TableCell colSpan={visibleColumns.length + 1} className="text-center py-10">
                             Loading leads...
@@ -579,102 +611,73 @@ const AdminOutreach = () => {
           <TabsContent value="outreach-accounts">
             <Card>
               <CardHeader>
-                <CardTitle>Instagram Outreach Accounts</CardTitle>
-                <CardDescription>Manage accounts used for lead outreach</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex justify-between items-center">
                   <div>
-                    <h3 className="font-medium text-lg">Active Accounts</h3>
-                    <p className="text-sm text-muted-foreground">Manage your Instagram outreach accounts</p>
+                    <CardTitle>Social Media Accounts</CardTitle>
+                    <CardDescription>Manage your outreach accounts</CardDescription>
                   </div>
-                  <Button>
+                  <Button onClick={() => setIsAccountDialogOpen(true)}>
                     <UserPlus className="h-4 w-4 mr-2" />
                     Add Account
                   </Button>
                 </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {/* Example account cards */}
-                  {[1, 2, 3].map(idx => (
-                    <Card key={idx} className="overflow-hidden">
-                      <div className="bg-gradient-to-r from-purple-500 to-blue-500 h-3"></div>
-                      <CardContent className="pt-4">
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
-                            <Instagram className="h-5 w-5 text-purple-600" />
-                          </div>
-                          <div>
-                            <h4 className="font-semibold">@siso_agency{idx}</h4>
-                            <p className="text-xs text-muted-foreground">Business Account</p>
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-3 gap-2 text-center mb-3">
-                          <div>
-                            <p className="text-sm font-medium">15/{idx * 10}</p>
-                            <p className="text-xs text-muted-foreground">DMs Today</p>
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium">{idx * 5}/{idx * 20}</p>
-                            <p className="text-xs text-muted-foreground">Follows</p>
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium">{idx * 3}/{idx * 15}</p>
-                            <p className="text-xs text-muted-foreground">Comments</p>
-                          </div>
-                        </div>
-                        
-                        <div className="flex justify-between">
-                          <Badge variant={idx === 1 ? "outline" : "default"} className="text-xs">
-                            {idx === 1 ? "Paused" : "Active"}
-                          </Badge>
-                          <Button variant="ghost" size="sm">
-                            <Edit className="h-3 w-3 mr-1" />
-                            Manage
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+
+                <div className="flex gap-2 mt-4">
+                  <Button
+                    variant={!activePlatform ? "default" : "outline"}
+                    onClick={() => setActivePlatform(undefined)}
+                  >
+                    All Platforms
+                  </Button>
+                  <Button
+                    variant={activePlatform === 'instagram' ? "default" : "outline"}
+                    onClick={() => setActivePlatform('instagram')}
+                  >
+                    <Instagram className="h-4 w-4 mr-2" />
+                    Instagram
+                  </Button>
+                  <Button
+                    variant={activePlatform === 'linkedin' ? "default" : "outline"}
+                    onClick={() => setActivePlatform('linkedin')}
+                  >
+                    <Linkedin className="h-4 w-4 mr-2" />
+                    LinkedIn
+                  </Button>
                 </div>
 
-                <div className="mt-8">
-                  <h3 className="font-medium text-lg mb-4">Outreach Limits</h3>
-                  <div className="space-y-4">
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-sm font-medium">Daily DM Limit</span>
-                        <span className="text-sm text-muted-foreground">20 / 30</span>
-                      </div>
-                      <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="bg-blue-500 h-2 rounded-full" style={{ width: '66%' }}></div>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-sm font-medium">Daily Follow Limit</span>
-                        <span className="text-sm text-muted-foreground">15 / 50</span>
-                      </div>
-                      <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="bg-green-500 h-2 rounded-full" style={{ width: '30%' }}></div>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-sm font-medium">Daily Comment Limit</span>
-                        <span className="text-sm text-muted-foreground">12 / 40</span>
-                      </div>
-                      <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="bg-amber-500 h-2 rounded-full" style={{ width: '30%' }}></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <Select value={selectedIndustry} onValueChange={setSelectedIndustry}>
+                  <SelectTrigger className="w-[200px] mt-4">
+                    <SelectValue placeholder="Filter by industry" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All Industries</SelectItem>
+                    <SelectItem value="onlyfans">OnlyFans Management</SelectItem>
+                    <SelectItem value="ecommerce">E-commerce</SelectItem>
+                    <SelectItem value="saas">SaaS</SelectItem>
+                    <SelectItem value="agency">Agency</SelectItem>
+                  </SelectContent>
+                </Select>
+              </CardHeader>
+
+              <CardContent>
+                <AccountsGrid
+                  accounts={accounts}
+                  onEditAccount={handleEditAccount}
+                  platform={activePlatform}
+                  industryFilter={selectedIndustry}
+                />
               </CardContent>
             </Card>
+
+            <AccountManagementDialog
+              account={activeAccount}
+              isOpen={isAccountDialogOpen}
+              onClose={() => {
+                setIsAccountDialogOpen(false);
+                setActiveAccount(undefined);
+              }}
+              onSave={handleSaveAccount}
+            />
           </TabsContent>
           
           <TabsContent value="outreach-campaigns">
