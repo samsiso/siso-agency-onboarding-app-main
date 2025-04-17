@@ -2,6 +2,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { ImportMode } from './useBulkImport';
 
 export interface ImportLead {
   username: string;
@@ -22,9 +23,14 @@ interface ImportResults {
   updatedUsernames: string[];
 }
 
+interface ImportLeadsParams {
+  leads: ImportLead[];
+  mode: ImportMode;
+}
+
 export const useLeadImport = () => {
   const importLeads = useMutation({
-    mutationFn: async (leads: ImportLead[]): Promise<ImportResults> => {
+    mutationFn: async ({ leads, mode }: ImportLeadsParams): Promise<ImportResults> => {
       const validLeads = leads.filter(lead => lead.username);
       
       if (validLeads.length === 0) {
@@ -39,20 +45,43 @@ export const useLeadImport = () => {
         updatedUsernames: []
       };
 
-      const BATCH_SIZE = 50;
-      
-      // First, check which usernames already exist to determine inserts vs updates
+      // First, check which usernames already exist
       const allUsernames = validLeads.map(lead => lead.username.toLowerCase());
       const { data: existingLeads } = await supabase
         .from('instagram_leads')
         .select('username')
         .in('username', allUsernames);
       
-      // Create a set of existing usernames for quick lookups
       const existingUsernameSet = new Set(existingLeads?.map(lead => lead.username.toLowerCase()) || []);
 
-      for (let i = 0; i < validLeads.length; i += BATCH_SIZE) {
-        const batch = validLeads.slice(i, i + BATCH_SIZE);
+      // Filter leads based on import mode
+      const leadsToProcess = validLeads.filter(lead => {
+        const username = lead.username.toLowerCase();
+        const exists = existingUsernameSet.has(username);
+
+        if (exists) {
+          if (mode === 'skip') {
+            results.skipped++;
+            return false;
+          } else if (mode === 'fail') {
+            results.errors.push(`Username "${lead.username}" already exists`);
+            return false;
+          }
+        }
+        return true;
+      });
+
+      if (mode === 'fail' && results.errors.length > 0) {
+        throw new Error('Duplicate usernames found');
+      }
+
+      if (leadsToProcess.length === 0) {
+        return results;
+      }
+
+      const BATCH_SIZE = 50;
+      for (let i = 0; i < leadsToProcess.length; i += BATCH_SIZE) {
+        const batch = leadsToProcess.slice(i, i + BATCH_SIZE);
         const formattedBatch = batch.map(lead => ({
           ...lead,
           username: lead.username.toLowerCase(),
@@ -65,19 +94,18 @@ export const useLeadImport = () => {
           .from('instagram_leads')
           .upsert(formattedBatch, {
             onConflict: 'username',
-            ignoreDuplicates: false
+            ignoreDuplicates: mode === 'skip'
           })
           .select();
 
         if (error) {
           console.error('Batch import error:', error);
-          results.errors.push(`Error importing batch ${i / BATCH_SIZE + 1}: ${error.message}`);
+          results.errors.push(`Error importing batch: ${error.message}`);
           continue;
         }
 
         if (data) {
-          // Count inserted vs updated based on whether username existed before
-          for (const record of data) {
+          data.forEach(record => {
             const username = record.username.toLowerCase();
             if (existingUsernameSet.has(username)) {
               results.updated++;
@@ -85,22 +113,11 @@ export const useLeadImport = () => {
             } else {
               results.inserted++;
             }
-          }
+          });
         }
       }
 
       return results;
-    },
-    onSuccess: (results) => {
-      if (results.errors.length > 0) {
-        toast.error(`Import completed with ${results.errors.length} errors. Check console for details.`);
-        console.error('Import errors:', results.errors);
-      }
-      
-      const message = `Successfully imported:\n${results.inserted} new leads\n${results.updated} existing leads updated`;
-      if (results.errors.length === 0) {
-        toast.success(message);
-      }
     },
     onError: (error: Error) => {
       toast.error(`Import failed: ${error.message}`);
