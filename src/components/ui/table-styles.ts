@@ -2,7 +2,7 @@
 import { cva } from "class-variance-authority";
 
 export const tableStyles = cva(
-  "w-full relative bg-white dark:bg-background border-collapse",
+  "w-full relative bg-transparent border-collapse",
   {
     variants: {
       size: {
@@ -11,8 +11,8 @@ export const tableStyles = cva(
         lg: "text-base"
       },
       variant: {
-        default: "border-border/50 [&_tr:last-child]:border-0",
-        striped: "[&_tr:nth-child(even)]:bg-muted/30"
+        default: "border-border/20 [&_tr:last-child]:border-0",
+        striped: "[&_tr:nth-child(even)]:bg-muted/5"
       }
     },
     defaultVariants: {
@@ -24,10 +24,11 @@ export const tableStyles = cva(
 
 export const tableCellStyles = cva(
   [
-    "p-3 align-middle text-left",
+    "p-4 align-middle text-left",
     "[&:has([role=checkbox])]:pr-0",
     "[&>a]:text-primary [&>a]:hover:underline",
-    "whitespace-nowrap overflow-hidden text-ellipsis"
+    "whitespace-nowrap overflow-hidden text-ellipsis",
+    "transition-colors duration-200"
   ].join(" "),
   {
     variants: {
@@ -45,9 +46,9 @@ export const tableCellStyles = cva(
 
 export const tableRowStyles = cva(
   [
-    "border-b border-border/40 transition-colors",
-    "hover:bg-muted/30",
-    "data-[state=selected]:bg-muted/20"
+    "border-b border-border/20 transition-colors duration-200",
+    "hover:bg-muted/5",
+    "data-[state=selected]:bg-muted/10"
   ].join(" "),
   {
     variants: {

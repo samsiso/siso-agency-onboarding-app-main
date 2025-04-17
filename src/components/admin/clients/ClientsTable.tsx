@@ -1,4 +1,3 @@
-
 import { useRef } from 'react';
 import { ClientViewPreference } from '@/types/client.types';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -83,7 +82,6 @@ export function ClientsTable({
     refetch();
   };
 
-  // Implementation of moveColumn function that was missing
   const moveColumn = React.useCallback((dragIndex: number, hoverIndex: number) => {
     onViewPreferenceChange({
       columns: Array.from(viewPreference.columns, (col, idx) => {
@@ -173,7 +171,7 @@ export function ClientsTable({
         </div>
       )}
       
-      <div ref={tableContainerRef} className="relative rounded-lg overflow-hidden border border-border/30 bg-card/30 shadow-sm backdrop-blur-sm">
+      <div ref={tableContainerRef} className="relative rounded-lg overflow-hidden border border-border/30 bg-background/30 shadow-sm backdrop-blur-sm">
         <ScrollableTable pinnedColumns={pinnedColumns}>
           <Table ref={tableElementRef} className={cn(
             tableStyles(),
@@ -181,7 +179,7 @@ export function ClientsTable({
           )}>
             <TableHeader className="sticky top-0 z-20">
               <TableRow className="hover:bg-transparent border-border/30">
-                <TableHead className="w-12 bg-card/95 backdrop-blur-sm sticky left-0 z-30">
+                <TableHead className="w-12 bg-background/95 backdrop-blur-sm sticky left-0 z-30">
                   <Checkbox 
                     checked={selectedClients.length === clients.length && clients.length > 0}
                     onCheckedChange={handleSelectAll}
@@ -206,7 +204,7 @@ export function ClientsTable({
                       key={column.key}
                       className={cn(
                         "text-xs font-medium text-muted-foreground tracking-wider uppercase",
-                        isPinned ? 'sticky z-20 bg-card/95 backdrop-blur-sm' : ''
+                        isPinned ? 'sticky z-20 bg-background/95 backdrop-blur-sm' : ''
                       )}
                       style={{ 
                         minWidth: `${column.width || 150}px`,
@@ -258,7 +256,7 @@ export function ClientsTable({
                     key={client.id} 
                     className={cn(
                       tableRowStyles(),
-                      "group transition-all duration-200"
+                      "group transition-all duration-200 hover:bg-muted/10 border-border/20"
                     )}
                   >
                     <TableCell className="sticky left-0 bg-background z-10">
