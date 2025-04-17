@@ -39,10 +39,10 @@ export const ColumnMappings = ({ columnMappings, onMappingChange }: ColumnMappin
               {mapping.sourceColumn}
             </span>
             <Select
-              value={mapping.targetField}
+              value={mapping.targetField || "skip"}
               onValueChange={(value) => {
                 const newMappings = [...columnMappings];
-                newMappings[index].targetField = value;
+                newMappings[index].targetField = value === "skip" ? "" : value;
                 onMappingChange(newMappings);
               }}
             >
@@ -50,7 +50,7 @@ export const ColumnMappings = ({ columnMappings, onMappingChange }: ColumnMappin
                 <SelectValue placeholder="Map to field..." />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Skip this column</SelectItem>
+                <SelectItem value="skip">Skip this column</SelectItem>
                 {AVAILABLE_FIELDS.map(field => (
                   <SelectItem key={field.value} value={field.value}>
                     {field.label}
