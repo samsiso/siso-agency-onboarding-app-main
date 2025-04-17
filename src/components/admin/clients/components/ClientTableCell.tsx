@@ -65,6 +65,7 @@ export function ClientTableCell({
         return `${value.length} todos`;
       }
       
+      // Convert any array to a string representation
       return `${value.length} items`;
     }
     
