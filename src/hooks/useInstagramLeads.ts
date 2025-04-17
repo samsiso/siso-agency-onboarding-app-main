@@ -13,10 +13,25 @@ interface InstagramLead {
   created_at: string;
   profile_url: string | null;
   bio: string | null;
+  last_updated: string | null;
+  outreach_account?: string | null;
+  followed?: boolean;
+  commented?: boolean;
+  messaged?: boolean;
+  app_plan_status?: string | null;
+  app_plan_url?: string | null;
+  last_interaction_at?: string | null;
+  assigned_to?: string | null;
+  notes?: string | null;
 }
 
 interface AddLeadPayload {
   username: string;
+}
+
+interface UpdateLeadPayload {
+  id: string;
+  data: Partial<InstagramLead>;
 }
 
 export const useInstagramLeads = (limit: number = 10) => {
@@ -52,6 +67,27 @@ export const useInstagramLeads = (limit: number = 10) => {
       queryClient.invalidateQueries({ queryKey: ['instagram-leads'] });
     },
   });
+  
+  const updateLead = useMutation({
+    mutationFn: async (payload: UpdateLeadPayload) => {
+      const { data, error } = await supabase
+        .from('instagram_leads')
+        .update({ 
+          ...payload.data,
+          last_updated: new Date().toISOString()
+        })
+        .eq('id', payload.id)
+        .select('*')
+        .single();
 
-  return { leads, isLoading, error, refetch, addLead };
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      // Invalidate the query to refetch the updated list
+      queryClient.invalidateQueries({ queryKey: ['instagram-leads'] });
+    },
+  });
+
+  return { leads, isLoading, error, refetch, addLead, updateLead };
 };

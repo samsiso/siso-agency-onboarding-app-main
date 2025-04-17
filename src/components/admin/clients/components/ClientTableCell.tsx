@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { ClientData } from '@/types/client.types';
@@ -59,6 +58,13 @@ export function ClientTableCell({
     }
     
     if (Array.isArray(value)) {
+      if (value.length === 0) return '-';
+      
+      // Handle TodoItem[] specifically
+      if (value[0] && typeof value[0] === 'object' && 'completed' in value[0]) {
+        return `${value.length} todos`;
+      }
+      
       return `${value.length} items`;
     }
     
