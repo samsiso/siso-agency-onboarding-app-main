@@ -21,8 +21,12 @@ export default function Home() {
   useEffect(() => {
     const checkAdmin = async () => {
       if (user) {
+        console.log('Home page - Checking admin status for user:', user.id);
         const adminStatus = await checkIsAdmin();
+        console.log('Home page - Admin check result:', adminStatus);
         setIsAdmin(adminStatus);
+      } else {
+        console.log('Home page - No user available for admin check');
       }
       setLoading(false);
     };
@@ -115,8 +119,10 @@ export default function Home() {
           </Card>
         </div>
         
-        {/* Admin Access Section */}
-        {isAdmin && (
+        {/* Admin Access Section - with debugging information */}
+        {loading ? (
+          <div className="text-sm text-gray-500 mb-4">Checking admin status...</div>
+        ) : isAdmin ? (
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -153,6 +159,8 @@ export default function Home() {
               </CardFooter>
             </Card>
           </motion.div>
+        ) : (
+          <div className="text-sm text-gray-500 mb-4">Admin features not available for your account.</div>
         )}
       </div>
     </DashboardLayout>

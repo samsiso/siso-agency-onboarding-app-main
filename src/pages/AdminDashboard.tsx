@@ -8,11 +8,27 @@ import { LeadsOverview } from '@/components/admin/dashboard/LeadsOverview';
 import { useAdminCheck } from '@/hooks/useAdminCheck';
 import { Loader2, LayoutDashboard } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useUser } from '@/hooks/useUser';
 
 export default function AdminDashboard() {
-  const { isAdmin, isLoading } = useAdminCheck();
+  const { isAdmin, isLoading, refreshAdminStatus } = useAdminCheck();
+  const { user } = useUser();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Debug log the current state
+  useEffect(() => {
+    console.log('AdminDashboard - Admin check state:', { 
+      isAdmin, 
+      isLoading, 
+      userId: user?.id 
+    });
+  }, [isAdmin, isLoading, user]);
+
+  // Force refresh admin status when component mounts
+  useEffect(() => {
+    refreshAdminStatus();
+  }, [refreshAdminStatus]);
 
   useEffect(() => {
     // Only redirect if we're not loading and the admin check has completed

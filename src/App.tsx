@@ -39,13 +39,13 @@ function App() {
         <Route path="/plan/:username" element={<Plan />} />
         <Route path="/decora-plan" element={<DecoraPlan />} />
         
-        {/* Admin routes */}
-        <Route path="/admin" element={<AuthGuard><AdminDashboard /></AuthGuard>} />
-        <Route path="/admin/clients" element={<AuthGuard><AdminClients /></AuthGuard>} />
-        <Route path="/admin/plans" element={<AdminPlans />} />
-        <Route path="/admin/templates" element={<AdminTemplates />} />
-        <Route path="/admin/plans/create" element={<AdminPlans />} />
-        <Route path="/admin/plans/:planId/edit" element={<AdminPlans />} />
+        {/* Admin routes - using adminOnly prop to enforce admin access */}
+        <Route path="/admin" element={<AuthGuard adminOnly={true}><AdminDashboard /></AuthGuard>} />
+        <Route path="/admin/clients" element={<AuthGuard adminOnly={true}><AdminClients /></AuthGuard>} />
+        <Route path="/admin/plans" element={<AuthGuard adminOnly={true}><AdminPlans /></AuthGuard>} />
+        <Route path="/admin/templates" element={<AuthGuard adminOnly={true}><AdminTemplates /></AuthGuard>} />
+        <Route path="/admin/plans/create" element={<AuthGuard adminOnly={true}><AdminPlans /></AuthGuard>} />
+        <Route path="/admin/plans/:planId/edit" element={<AuthGuard adminOnly={true}><AdminPlans /></AuthGuard>} />
         
         {/* Protected routes */}
         <Route path="/profile" element={<AuthGuard><Profile /></AuthGuard>} />
