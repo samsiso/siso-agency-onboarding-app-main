@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { ClientData } from '@/types/client.types';
@@ -53,7 +52,7 @@ export function ClientTableCell({
   );
 
   const renderArray = (value: any[]): React.ReactNode => {
-    if (value.length === 0) return '-';
+    if (value.length === 0) return <span>-</span>;
     
     // Handle TodoItem[] specifically
     if (value[0] && typeof value[0] === 'object' && 'completed' in value[0]) {
@@ -66,7 +65,7 @@ export function ClientTableCell({
 
   const safeRender = (value: any): React.ReactNode => {
     if (value === null || value === undefined) {
-      return '-';
+      return <span>-</span>;
     }
     
     if (Array.isArray(value)) {
@@ -117,12 +116,12 @@ export function ClientTableCell({
           <FileText className="h-4 w-4 mr-1" />
           Notion Plan
         </a>
-      ) : '-';
+      ) : <span>-</span>;
 
     case 'estimated_price':
       return client.estimated_price 
         ? <span className="flex items-center"><DollarSign className="h-4 w-4" />{client.estimated_price.toLocaleString()}</span> 
-        : '-';
+        : <span>-</span>;
 
     case 'development_url':
       return client.development_url ? (
@@ -135,7 +134,7 @@ export function ClientTableCell({
           <Link className="h-4 w-4 mr-1" />
           View Site
         </a>
-      ) : '-';
+      ) : <span>-</span>;
 
     case 'next_steps':
     case 'key_research':
@@ -143,7 +142,7 @@ export function ClientTableCell({
         <div className="max-w-xs truncate" title={client[columnKey as keyof ClientData]?.toString() || ''}>
           {isEditing ? renderEditableContent() : (
             <div onDoubleClick={onDoubleClick}>
-              {client[columnKey as keyof ClientData] || '-'}
+              {client[columnKey as keyof ClientData] || <span>-</span>}
             </div>
           )}
         </div>
@@ -155,7 +154,7 @@ export function ClientTableCell({
           <CalendarClock className="h-4 w-4 mr-1" />
           {new Date(client.estimated_completion_date).toLocaleDateString()}
         </div>
-      ) : '-';
+      ) : <span>-</span>;
 
     case 'todos':
       if (!client.todos || client.todos.length === 0) {

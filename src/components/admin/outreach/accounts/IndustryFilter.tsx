@@ -23,7 +23,7 @@ export const IndustryFilter = ({ selectedIndustry, onIndustryChange }: IndustryF
         <SelectValue placeholder="Filter by industry" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="">All Industries</SelectItem>
+        <SelectItem value="all">All Industries</SelectItem>
         <SelectItem value="onlyfans">OnlyFans Management</SelectItem>
         <SelectItem value="ecommerce">E-commerce</SelectItem>
         <SelectItem value="saas">SaaS</SelectItem>

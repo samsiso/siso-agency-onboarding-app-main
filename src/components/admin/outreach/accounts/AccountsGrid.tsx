@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { OutreachAccountCard } from './OutreachAccountCard';
 import { OutreachAccount } from '@/types/outreach';
+import { OutreachAccountCard } from './OutreachAccountCard';
 
 interface AccountsGridProps {
   accounts: OutreachAccount[];
@@ -17,18 +17,35 @@ export const AccountsGrid = ({
   industryFilter 
 }: AccountsGridProps) => {
   const filteredAccounts = accounts.filter(account => {
-    if (platform && account.platform !== platform) return false;
-    if (industryFilter && account.industry_focus !== industryFilter) return false;
+    // Filter by platform if specified
+    if (platform && account.platform !== platform) {
+      return false;
+    }
+    
+    // Filter by industry if specified
+    if (industryFilter && industryFilter !== 'all' && account.industry_focus !== industryFilter) {
+      return false;
+    }
+    
     return true;
   });
 
+  if (filteredAccounts.length === 0) {
+    return (
+      <div className="text-center py-12 text-muted-foreground">
+        <p>No accounts found matching your criteria.</p>
+        <p className="text-sm">Try changing your filters or add a new account.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {filteredAccounts.map(account => (
+      {filteredAccounts.map((account) => (
         <OutreachAccountCard
           key={account.id}
           account={account}
-          onEditClick={onEditAccount}
+          onEdit={() => onEditAccount(account)}
         />
       ))}
     </div>
