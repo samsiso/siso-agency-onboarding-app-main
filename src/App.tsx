@@ -20,6 +20,7 @@ import HelpPage from './pages/HelpPage';
 import { AuthGuard } from './components/auth/AuthGuard';
 import MyProjects from './pages/MyProjects';
 import AdminPlans from './pages/AdminPlans';
+import AdminOutreach from './pages/AdminOutreach';
 import AdminTemplates from './pages/AdminTemplates';
 import Portfolio from './pages/Portfolio';
 import AdminDashboard from './pages/AdminDashboard';
@@ -45,6 +46,7 @@ function App() {
         <Route path="/admin" element={<AuthGuard adminOnly={true}><AdminDashboard /></AuthGuard>} />
         <Route path="/admin/clients" element={<AuthGuard adminOnly={true}><AdminClients /></AuthGuard>} />
         <Route path="/admin/plans" element={<AuthGuard adminOnly={true}><AdminPlans /></AuthGuard>} />
+        <Route path="/admin/outreach" element={<AuthGuard adminOnly={true}><AdminOutreach /></AuthGuard>} />
         <Route path="/admin/templates" element={<AuthGuard adminOnly={true}><AdminTemplates /></AuthGuard>} />
         <Route path="/admin/payments" element={<AuthGuard adminOnly={true}><AdminPayments /></AuthGuard>} />
         <Route path="/admin/daily-planner" element={<AuthGuard adminOnly={true}><AdminDailyPlanner /></AuthGuard>} />
