@@ -218,6 +218,7 @@ const AdminOutreach = () => {
           daily_dm_limit: accountData.daily_dm_limit || 30,
           daily_follow_limit: accountData.daily_follow_limit || 50,
           daily_comment_limit: accountData.daily_comment_limit || 40,
+          assigned_to: accountData.assigned_to || null,
           credentials: accountData.credentials || {},
           proxy_settings: accountData.proxy_settings || {},
           platform_specific_settings: accountData.platform_specific_settings || {},
