@@ -31,7 +31,7 @@ export function createClientData(clientObj: any): { full_name: string; business_
 
 /**
  * Transforms database response data to match expected types
- * Avoids recursive type instantiation with explicit any[] handling
+ * Uses explicit any[] typing to break deep type instantiation
  */
 export function transformEntityData<T>(
   data: any[], 
