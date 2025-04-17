@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { ClientData } from '@/types/client.types';
@@ -62,11 +63,11 @@ export function ClientTableCell({
       
       // Handle TodoItem[] specifically
       if (value[0] && typeof value[0] === 'object' && 'completed' in value[0]) {
-        return `${value.length} todos`;
+        return <span>{`${value.length} todos`}</span>;
       }
       
       // Convert any array to a string representation
-      return `${value.length} items`;
+      return <span>{`${value.length} items`}</span>;
     }
     
     return String(value);
