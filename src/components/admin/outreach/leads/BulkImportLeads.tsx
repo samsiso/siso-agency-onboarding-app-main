@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useLeadImport } from '@/hooks/useLeadImport';
+import { useLeadImport, ImportLead } from '@/hooks/useLeadImport';
 
 interface ColumnMapping {
   sourceColumn: string;
@@ -90,7 +90,7 @@ export function BulkImportLeads() {
         }
         
         return lead;
-      }).filter(Boolean) as Record<string, any>[];
+      }).filter(Boolean);
 
       // Import the leads using the hook
       if (parsedData.length > 0) {

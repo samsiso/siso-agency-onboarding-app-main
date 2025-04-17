@@ -26,21 +26,21 @@ export const useLeadImport = () => {
 
       // Insert leads in batches of 50
       const BATCH_SIZE = 50;
-      const results = [];
+      const results: any[] = [];
 
       for (let i = 0; i < validLeads.length; i += BATCH_SIZE) {
         const batch = validLeads.slice(i, i + BATCH_SIZE);
+        const formattedBatch = batch.map(lead => ({
+          ...lead,
+          username: lead.username,  // Ensure username is present
+          status: lead.status || 'new',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }));
+        
         const { data, error } = await supabase
           .from('instagram_leads')
-          .upsert(
-            batch.map(lead => ({
-              ...lead,
-              status: lead.status || 'new',
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            })),
-            { onConflict: 'username' }
-          );
+          .upsert(formattedBatch, { onConflict: 'username' });
 
         if (error) throw error;
         if (data) results.push(...data);
