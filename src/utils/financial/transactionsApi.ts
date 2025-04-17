@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 import { FinancialTransaction } from './types';
@@ -28,9 +27,9 @@ export async function fetchTransactions(filters: TransactionFilters = {}): Promi
       
     if (error) throw error;
     
-    // Use type assertion to avoid deep instantiation errors
-    return transformEntityData<FinancialTransaction>(
-      (data || []) as RawTransactionData[], 
+    // Use an explicit any[] type to avoid deep instantiation
+    return transformEntityData(
+      (data || []) as any[], 
       transformTransactionData
     );
   } catch (error) {

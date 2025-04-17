@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 import { Invoice } from './types';
@@ -31,9 +30,9 @@ export async function fetchInvoices(filters: InvoiceFilters = {}): Promise<Invoi
       
     if (error) throw error;
     
-    // Use type assertion to avoid deep instantiation errors
-    return transformEntityData<Invoice>(
-      (data || []) as RawInvoiceData[], 
+    // Use an explicit any[] type to avoid deep instantiation
+    return transformEntityData(
+      (data || []) as any[], 
       transformInvoiceData
     );
   } catch (error) {

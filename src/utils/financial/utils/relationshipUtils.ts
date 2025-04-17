@@ -31,6 +31,7 @@ export function createClientData(clientObj: any): { full_name: string; business_
 
 /**
  * Transforms database response data to match expected types
+ * Generic type parameter T represents the final transformed shape
  */
 export function transformEntityData<T>(
   data: any[], 
@@ -38,3 +39,4 @@ export function transformEntityData<T>(
 ): T[] {
   return (data || []).map(transformer);
 }
+
