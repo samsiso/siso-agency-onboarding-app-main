@@ -2,7 +2,7 @@
 import { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { Button } from '@/components/ui/button';
-import { ArrowUpDown, GripVertical } from 'lucide-react';
+import { ArrowUpDown, GripVertical, Pin, PinOff } from 'lucide-react';
 import { ClientColumnPreference } from '@/types/client.types';
 
 interface DraggableColumnHeaderProps {
@@ -10,6 +10,7 @@ interface DraggableColumnHeaderProps {
   index: number;
   moveColumn: (dragIndex: number, hoverIndex: number) => void;
   onSort: () => void;
+  onTogglePin?: () => void;
   isSorted: boolean;
   sortDirection?: 'asc' | 'desc';
 }
@@ -25,12 +26,12 @@ export function DraggableColumnHeader({
   index,
   moveColumn,
   onSort,
+  onTogglePin,
   isSorted,
   sortDirection,
 }: DraggableColumnHeaderProps) {
   const ref = useRef<HTMLDivElement>(null);
   
-  // Always initialize state variables at the top level, not conditionally
   const [{ isDragging }, drag] = useDrag({
     type: 'column',
     item: () => {
@@ -90,6 +91,22 @@ export function DraggableColumnHeader({
           <ArrowUpDown className={`ml-1 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
         )}
       </Button>
+      
+      {onTogglePin && (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onTogglePin}
+          className="ml-1 h-6 w-6 opacity-40 hover:opacity-100"
+          title={column.pinned ? "Unpin column" : "Pin column"}
+        >
+          {column.pinned ? (
+            <PinOff className="h-3 w-3" />
+          ) : (
+            <Pin className="h-3 w-3" />
+          )}
+        </Button>
+      )}
     </div>
   );
 }

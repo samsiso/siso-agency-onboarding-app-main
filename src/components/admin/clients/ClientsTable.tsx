@@ -1,6 +1,6 @@
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useClientsList } from '@/hooks/client';
-import { ClientData, ClientViewPreference, TodoItem } from '@/types/client.types';
+import { ClientData, ClientViewPreference, ClientColumnPreference, TodoItem } from '@/types/client.types';
 import { 
   Table, 
   TableBody, 
@@ -17,6 +17,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { ClientStatusBadge } from './ClientStatusBadge';
 import { ClientAnalyticsCards } from './ClientAnalyticsCards';
 import { ClientsHeader } from './ClientsHeader';
@@ -40,7 +41,9 @@ import {
   FileText,
   Link,
   CalendarClock,
-  DollarSign
+  DollarSign,
+  Pin,
+  PinOff
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ClientDetailSheet } from './ClientDetailSheet';
@@ -58,19 +61,25 @@ import * as React from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { TodoList } from './TodoList';
 import { DraggableColumnHeader } from './DraggableColumnHeader';
+import { ScrollableTable } from './ScrollableTable';
+import '../../../components/ui/hide-scrollbar.css';
 
 interface ClientsTableProps {
   searchQuery?: string;
   statusFilter?: string;
   viewPreference: ClientViewPreference;
   onViewPreferenceChange: (preference: Partial<ClientViewPreference>) => void;
+  onSearchChange?: (query: string) => void;
+  onStatusFilterChange?: (status: string) => void;
 }
 
 export function ClientsTable({ 
   searchQuery = '', 
   statusFilter = 'all',
   viewPreference,
-  onViewPreferenceChange
+  onViewPreferenceChange,
+  onSearchChange,
+  onStatusFilterChange
 }: ClientsTableProps) {
   const [page, setPage] = useState(1);
   const [selectedClients, setSelectedClients] = useState<string[]>([]);
@@ -82,9 +91,17 @@ export function ClientsTable({
 
   const { toast } = useToast();
 
+  const tableRef = useRef<HTMLDivElement>(null);
+  const tableContainerRef = useRef<HTMLDivElement>(null);
+
   const visibleColumns = useMemo(() => 
     viewPreference.columns.filter(col => col.visible),
     [viewPreference.columns]
+  );
+
+  const pinnedColumns = useMemo(() => 
+    visibleColumns.filter(col => col.pinned),
+    [visibleColumns]
   );
 
   const { clients, isLoading, totalCount, refetch } = useClientsList({
@@ -218,14 +235,38 @@ export function ClientsTable({
     setActiveClient(null);
   };
 
-  const handleColumnReorder = (dragIndex: number, hoverIndex: number) => {
+  const handleToggleColumnPin = useCallback((index: number) => {
     const newColumns = [...viewPreference.columns];
-    const dragItem = newColumns[dragIndex];
-    newColumns.splice(dragIndex, 1);
-    newColumns.splice(hoverIndex, 0, dragItem);
+    const columnKey = visibleColumns[index].key;
     
-    onViewPreferenceChange({ columns: newColumns });
-  };
+    const columnIndex = newColumns.findIndex(col => col.key === columnKey);
+    if (columnIndex !== -1) {
+      newColumns[columnIndex] = {
+        ...newColumns[columnIndex],
+        pinned: !newColumns[columnIndex].pinned
+      };
+      
+      onViewPreferenceChange({ columns: newColumns });
+    }
+  }, [viewPreference.columns, visibleColumns, onViewPreferenceChange]);
+
+  const handleColumnReorder = useCallback((dragIndex: number, hoverIndex: number) => {
+    const dragKey = visibleColumns[dragIndex].key;
+    const hoverKey = visibleColumns[hoverIndex].key;
+    
+    const newColumns = [...viewPreference.columns];
+    
+    const dragFullIndex = newColumns.findIndex(col => col.key === dragKey);
+    const hoverFullIndex = newColumns.findIndex(col => col.key === hoverKey);
+    
+    if (dragFullIndex !== -1 && hoverFullIndex !== -1) {
+      const dragItem = newColumns[dragFullIndex];
+      newColumns.splice(dragFullIndex, 1);
+      newColumns.splice(hoverFullIndex, 0, dragItem);
+      
+      onViewPreferenceChange({ columns: newColumns });
+    }
+  }, [visibleColumns, viewPreference.columns, onViewPreferenceChange]);
 
   useEffect(() => {
     if (editingCell && editInputRef.current) {
@@ -266,7 +307,110 @@ export function ClientsTable({
     }
   };
 
-  const renderTodoItems = (todos?: TodoItem[]) => {
+  function renderCellContent(client: ClientData, columnKey: string) {
+    switch (columnKey) {
+      case 'full_name':
+        return (
+          <div className="flex flex-col">
+            <span 
+              className="font-medium cursor-pointer hover:underline" 
+              onClick={() => handleOpenDetails(client.id)}
+            >
+              {client.full_name || 'Unknown'}
+            </span>
+            <span className="text-sm text-muted-foreground">{client.email || 'No email'}</span>
+          </div>
+        );
+      case 'status':
+        return <ClientStatusBadge status={client.status} />;
+      case 'updated_at':
+        return formatRelativeTime(client.updated_at);
+      case 'notion_plan_url':
+        return client.notion_plan_url ? (
+          <a 
+            href={client.notion_plan_url} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-blue-500 hover:underline flex items-center"
+          >
+            <FileText className="h-4 w-4 mr-1" />
+            Notion Plan
+          </a>
+        ) : '-';
+      case 'estimated_price':
+        return client.estimated_price 
+          ? <span className="flex items-center"><DollarSign className="h-4 w-4" />{client.estimated_price.toLocaleString()}</span> 
+          : '-';
+      case 'development_url':
+        return client.development_url ? (
+          <a 
+            href={client.development_url} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-blue-500 hover:underline flex items-center"
+          >
+            <Link className="h-4 w-4 mr-1" />
+            View Site
+          </a>
+        ) : '-';
+      case 'next_steps':
+        return (
+          <div className="max-w-xs truncate" title={client.next_steps || ''}>
+            {client.next_steps || '-'}
+          </div>
+        );
+      case 'estimated_completion_date':
+        return client.estimated_completion_date ? (
+          <div className="flex items-center">
+            <CalendarClock className="h-4 w-4 mr-1" />
+            {new Date(client.estimated_completion_date).toLocaleDateString()}
+          </div>
+        ) : '-';
+      case 'todos':
+        return renderTodoItems(client.todos);
+      case 'key_research':
+        return (
+          <div className="max-w-xs truncate" title={client.key_research || ''}>
+            {client.key_research || '-'}
+          </div>
+        );
+      default:
+        const value = client[columnKey as keyof typeof client];
+        if (Array.isArray(value)) {
+          return <span>{value.length} items</span>;
+        }
+        return value !== undefined && value !== null ? String(value) : '-';
+    }
+  }
+
+  function handleDeleteClient(clientId: string) {
+    if (window.confirm('Are you sure you want to delete this client?')) {
+      try {
+        supabase
+          .from('client_onboarding')
+          .delete()
+          .eq('id', clientId)
+          .then(({ error }) => {
+            if (error) throw error;
+            
+            toast({
+              title: "Client deleted",
+              description: "The client has been permanently removed."
+            });
+            
+            refetch();
+          });
+      } catch (error: any) {
+        toast({
+          variant: "destructive",
+          title: "Error deleting client",
+          description: error.message || "Failed to delete client."
+        });
+      }
+    }
+  }
+
+  function renderTodoItems(todos?: TodoItem[]) {
     if (!todos || todos.length === 0) {
       return <span>-</span>;
     }
@@ -279,7 +423,7 @@ export function ClientsTable({
         </span>
       </div>
     );
-  };
+  }
 
   if (isLoading) {
     return (
@@ -323,9 +467,9 @@ export function ClientsTable({
       
       <ClientsHeader
         searchQuery={searchQuery}
-        onSearchChange={(value) => {/* handle search change */}}
+        onSearchChange={onSearchChange}
         statusFilter={statusFilter}
-        onStatusFilterChange={(value) => {/* handle status filter change */}}
+        onStatusFilterChange={onStatusFilterChange}
         viewPreference={viewPreference}
         onViewPreferenceChange={onViewPreferenceChange}
         onAddClient={handleAddClient}
@@ -348,12 +492,12 @@ export function ClientsTable({
         </div>
       )}
       
-      <div className="rounded-md border overflow-hidden">
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader className="sticky top-0 bg-background z-10">
+      <div ref={tableContainerRef} className="relative overflow-hidden">
+        <div className="overflow-x-auto hide-scrollbar">
+          <Table ref={tableRef}>
+            <TableHeader className="sticky top-0 bg-background z-20">
               <TableRow>
-                <TableHead className="w-12">
+                <TableHead className="w-12 bg-background sticky left-0 z-30">
                   <Checkbox 
                     checked={selectedClients.length === clients.length && clients.length > 0}
                     onCheckedChange={handleSelectAll}
@@ -362,24 +506,43 @@ export function ClientsTable({
                   />
                 </TableHead>
                 
-                {visibleColumns.map((column, index) => (
-                  <TableHead 
-                    key={column.key} 
-                    className="min-w-[120px]"
-                    style={{ width: column.width ? `${column.width}px` : 'auto' }}
-                  >
-                    <DraggableColumnHeader
-                      column={column}
-                      index={index}
-                      moveColumn={handleColumnReorder}
-                      onSort={() => handleSort(column.key)}
-                      isSorted={viewPreference.sortColumn === column.key}
-                      sortDirection={viewPreference.sortDirection}
-                    />
-                  </TableHead>
-                ))}
+                {visibleColumns.map((column, index) => {
+                  const isPinned = !!column.pinned;
+                  let leftPosition = 40;
+                  if (isPinned) {
+                    for (let i = 0; i < index; i++) {
+                      if (visibleColumns[i].pinned) {
+                        leftPosition += visibleColumns[i].width || 150;
+                      }
+                    }
+                  }
+                  
+                  return (
+                    <TableHead 
+                      key={column.key} 
+                      className={`${isPinned ? 'sticky z-20 bg-background' : ''}`}
+                      style={{ 
+                        minWidth: `${column.width || 150}px`,
+                        width: `${column.width || 150}px`,
+                        left: isPinned ? `${leftPosition}px` : undefined
+                      }}
+                    >
+                      <DraggableColumnHeader
+                        column={column}
+                        index={index}
+                        moveColumn={handleColumnReorder}
+                        onSort={() => handleSort(column.key)}
+                        onTogglePin={() => handleToggleColumnPin(index)}
+                        isSorted={viewPreference.sortColumn === column.key}
+                        sortDirection={viewPreference.sortDirection}
+                      />
+                    </TableHead>
+                  );
+                })}
                 
-                <TableHead className="w-12 sticky right-0 bg-background">Actions</TableHead>
+                <TableHead className="w-12 sticky right-0 bg-background z-20">
+                  Actions
+                </TableHead>
               </TableRow>
             </TableHeader>
             
@@ -393,7 +556,7 @@ export function ClientsTable({
               ) : (
                 clients.map((client) => (
                   <TableRow key={client.id} className="group">
-                    <TableCell>
+                    <TableCell className="sticky left-0 bg-background z-10">
                       <Checkbox 
                         checked={selectedClients.includes(client.id)}
                         onCheckedChange={() => handleSelectClient(client.id)}
@@ -401,12 +564,30 @@ export function ClientsTable({
                       />
                     </TableCell>
                     
-                    {visibleColumns.map(column => {
+                    {visibleColumns.map((column, colIndex) => {
+                      const isPinned = !!column.pinned;
                       const isEditing = editingCell?.id === client.id && editingCell?.field === column.key;
                       
-                      const renderCell = () => {
-                        if (isEditing) {
-                          return (
+                      let leftPosition = 40;
+                      if (isPinned) {
+                        for (let i = 0; i < colIndex; i++) {
+                          if (visibleColumns[i].pinned) {
+                            leftPosition += visibleColumns[i].width || 150;
+                          }
+                        }
+                      }
+                      
+                      return (
+                        <TableCell 
+                          key={column.key}
+                          className={`relative group ${isPinned ? 'sticky bg-background z-10' : ''}`}
+                          style={{ 
+                            left: isPinned ? `${leftPosition}px` : undefined,
+                            maxWidth: `${column.width || 150}px`,
+                          }}
+                          onDoubleClick={() => handleStartEdit(client, column.key)}
+                        >
+                          {isEditing ? (
                             <div className="flex items-center">
                               <Input
                                 ref={editInputRef}
@@ -435,91 +616,10 @@ export function ClientsTable({
                                 </Button>
                               </div>
                             </div>
-                          );
-                        }
-
-                        switch (column.key) {
-                          case 'full_name':
-                            return (
-                              <div className="flex flex-col">
-                                <span 
-                                  className="font-medium cursor-pointer hover:underline" 
-                                  onClick={() => handleOpenDetails(client.id)}
-                                >
-                                  {client.full_name || 'Unknown'}
-                                </span>
-                                <span className="text-sm text-muted-foreground">{client.email || 'No email'}</span>
-                              </div>
-                            );
-                          case 'status':
-                            return <ClientStatusBadge status={client.status} />;
-                          case 'updated_at':
-                            return formatRelativeTime(client.updated_at);
-                          case 'notion_plan_url':
-                            return client.notion_plan_url ? (
-                              <a 
-                                href={client.notion_plan_url} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="text-blue-500 hover:underline flex items-center"
-                              >
-                                <FileText className="h-4 w-4 mr-1" />
-                                Notion Plan
-                              </a>
-                            ) : '-';
-                          case 'estimated_price':
-                            return client.estimated_price 
-                              ? <span className="flex items-center"><DollarSign className="h-4 w-4" />{client.estimated_price.toLocaleString()}</span> 
-                              : '-';
-                          case 'development_url':
-                            return client.development_url ? (
-                              <a 
-                                href={client.development_url} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="text-blue-500 hover:underline flex items-center"
-                              >
-                                <Link className="h-4 w-4 mr-1" />
-                                View Site
-                              </a>
-                            ) : '-';
-                          case 'next_steps':
-                            return (
-                              <div className="max-w-xs truncate" title={client.next_steps || ''}>
-                                {client.next_steps || '-'}
-                              </div>
-                            );
-                          case 'estimated_completion_date':
-                            return client.estimated_completion_date ? (
-                              <div className="flex items-center">
-                                <CalendarClock className="h-4 w-4 mr-1" />
-                                {new Date(client.estimated_completion_date).toLocaleDateString()}
-                              </div>
-                            ) : '-';
-                          case 'todos':
-                            return renderTodoItems(client.todos);
-                          case 'key_research':
-                            return (
-                              <div className="max-w-xs truncate" title={client.key_research || ''}>
-                                {client.key_research || '-'}
-                              </div>
-                            );
-                          default:
-                            const value = client[column.key as keyof typeof client];
-                            if (Array.isArray(value)) {
-                              return <span>{value.length} items</span>;
-                            }
-                            return value !== undefined && value !== null ? String(value) : '-';
-                        }
-                      };
-
-                      return (
-                        <TableCell 
-                          key={column.key}
-                          className="relative group"
-                          onDoubleClick={() => handleStartEdit(client, column.key)}
-                        >
-                          {renderCell()}
+                          ) : (
+                            renderCellContent(client, column.key)
+                          )}
+                          
                           {!isEditing && (
                             <Button
                               variant="ghost"
@@ -534,7 +634,7 @@ export function ClientsTable({
                       );
                     })}
                     
-                    <TableCell className="sticky right-0 bg-background">
+                    <TableCell className="sticky right-0 bg-background z-10">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100">
@@ -555,31 +655,7 @@ export function ClientsTable({
                           <DropdownMenuSeparator />
                           <DropdownMenuItem 
                             className="text-destructive"
-                            onClick={async () => {
-                              if (window.confirm('Are you sure you want to delete this client?')) {
-                                try {
-                                  const { error } = await supabase
-                                    .from('client_onboarding')
-                                    .delete()
-                                    .eq('id', client.id);
-                                  
-                                  if (error) throw error;
-                                  
-                                  toast({
-                                    title: "Client deleted",
-                                    description: "The client has been permanently removed."
-                                  });
-                                  
-                                  refetch();
-                                } catch (error: any) {
-                                  toast({
-                                    variant: "destructive",
-                                    title: "Error deleting client",
-                                    description: error.message || "Failed to delete client."
-                                  });
-                                }
-                              }
-                            }}
+                            onClick={() => handleDeleteClient(client.id)}
                           >
                             <Trash2 className="h-4 w-4 mr-2" />
                             Delete Client

@@ -18,36 +18,37 @@ export default function AdminClients() {
   const [statusFilter, setStatusFilter] = useState('all');
   const { toast } = useToast();
   
-  // Enhanced view preferences with more default columns
+  // Enhanced view preferences with all columns visible by default
   const [viewPreference, setViewPreference] = useState<ClientViewPreference>({
     columns: [
-      { key: 'full_name', visible: true, label: 'Client Name', width: 200 },
-      { key: 'business_name', visible: true, label: 'Business Name' },
-      { key: 'email', visible: true, label: 'Email' },
-      { key: 'phone', visible: false, label: 'Phone' },
-      { key: 'status', visible: true, label: 'Status' },
-      { key: 'project_name', visible: true, label: 'Project Name' },
-      { key: 'company_niche', visible: true, label: 'Company Niche' },
-      { key: 'notion_plan_url', visible: true, label: 'Notion Plan' },
-      { key: 'key_research', visible: false, label: 'Key Research' },
-      { key: 'development_url', visible: true, label: 'Development URL' },
+      { key: 'full_name', visible: true, label: 'Client Name', width: 200, pinned: true },
+      { key: 'business_name', visible: true, label: 'Business Name', width: 180 },
+      { key: 'email', visible: true, label: 'Email', width: 200 },
+      { key: 'phone', visible: true, label: 'Phone', width: 150 },
+      { key: 'status', visible: true, label: 'Status', width: 120, pinned: true },
+      { key: 'project_name', visible: true, label: 'Project Name', width: 180 },
+      { key: 'company_niche', visible: true, label: 'Company Niche', width: 160 },
+      { key: 'notion_plan_url', visible: true, label: 'Notion Plan', width: 150 },
+      { key: 'key_research', visible: true, label: 'Key Research', width: 200 },
+      { key: 'development_url', visible: true, label: 'Development URL', width: 180 },
       { key: 'next_steps', visible: true, label: 'Next Steps', width: 220 },
-      { key: 'payment_status', visible: false, label: 'Payment Status' },
-      { key: 'estimated_price', visible: true, label: 'Estimated Price' },
-      { key: 'initial_contact_date', visible: false, label: 'First Contact' },
-      { key: 'start_date', visible: false, label: 'Start Date' },
-      { key: 'estimated_completion_date', visible: true, label: 'Due Date' },
-      { key: 'updated_at', visible: true, label: 'Last Updated' },
-      { key: 'todos', visible: true, label: 'Todo Items' },
-      { key: 'purchase_history', visible: false, label: 'Purchase History' },
-      { key: 'client_contact', visible: false, label: 'Client Contact' },
-      { key: 'referral_source', visible: false, label: 'Referral Source' },
-      { key: 'assigned_to', visible: false, label: 'Assigned To' },
-      { key: 'priority', visible: false, label: 'Priority' },
+      { key: 'payment_status', visible: true, label: 'Payment Status', width: 150 },
+      { key: 'estimated_price', visible: true, label: 'Estimated Price', width: 150 },
+      { key: 'initial_contact_date', visible: true, label: 'First Contact', width: 150 },
+      { key: 'start_date', visible: true, label: 'Start Date', width: 150 },
+      { key: 'estimated_completion_date', visible: true, label: 'Due Date', width: 150 },
+      { key: 'updated_at', visible: true, label: 'Last Updated', width: 150 },
+      { key: 'todos', visible: true, label: 'Todo Items', width: 150 },
+      { key: 'purchase_history', visible: true, label: 'Purchase History', width: 180 },
+      { key: 'client_contact', visible: true, label: 'Client Contact', width: 160 },
+      { key: 'referral_source', visible: true, label: 'Referral Source', width: 160 },
+      { key: 'assigned_to', visible: true, label: 'Assigned To', width: 150 },
+      { key: 'priority', visible: true, label: 'Priority', width: 120 },
     ],
     sortColumn: 'updated_at',
     sortDirection: 'desc',
-    pageSize: 10
+    pageSize: 10,
+    showAllColumns: true
   });
 
   // Initialize the clients data and add admin role 
@@ -152,6 +153,8 @@ export default function AdminClients() {
             statusFilter={statusFilter}
             viewPreference={viewPreference}
             onViewPreferenceChange={handleViewPreferenceChange}
+            onSearchChange={handleSearchChange}
+            onStatusFilterChange={handleStatusFilterChange}
           />
         </DndProvider>
       </div>

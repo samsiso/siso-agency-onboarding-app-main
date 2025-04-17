@@ -68,6 +68,7 @@ export interface ClientColumnPreference {
   label?: string;
   width?: number;
   order?: number;
+  pinned?: boolean; // New field to mark a column as pinned
 }
 
 export interface ClientViewPreference {
@@ -76,6 +77,7 @@ export interface ClientViewPreference {
   sortDirection: 'asc' | 'desc';
   pageSize: number;
   filters?: ClientFilter[];
+  showAllColumns?: boolean; // New field to control visibility of all columns
 }
 
 export interface ClientFilter {

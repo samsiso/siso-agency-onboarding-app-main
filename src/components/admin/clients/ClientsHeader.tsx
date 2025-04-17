@@ -1,36 +1,38 @@
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ViewOptionsMenu } from './ViewOptionsMenu';
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 import { ColumnManager } from './ColumnManager';
-import { ClientData, ClientViewPreference } from '@/types/client.types';
-import { 
-  Filter, 
-  SlidersHorizontal, 
-  Search, 
-  UserPlus, 
-  Download, 
-  Upload,
-  Save,
-  Check
-} from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { ViewOptionsMenu } from './ViewOptionsMenu';
 import { SavedViewsManager } from './SavedViewsManager';
+import { ClientViewPreference, ClientData } from '@/types/client.types';
 import { ImportExportTools } from './ImportExportTools';
+import { 
+  Plus, 
+  Search, 
+  Filter, 
+  Download, 
+  RefreshCw, 
+  Users, 
+  PanelLeftOpen, 
+  PanelRightOpen, 
+  Eye, 
+  EyeOff 
+} from 'lucide-react';
 
 interface ClientsHeaderProps {
   searchQuery: string;
-  onSearchChange: (value: string) => void;
+  onSearchChange?: (value: string) => void;
   statusFilter: string;
-  onStatusFilterChange: (value: string) => void;
+  onStatusFilterChange?: (value: string) => void;
   viewPreference: ClientViewPreference;
   onViewPreferenceChange: (preference: Partial<ClientViewPreference>) => void;
   onAddClient: () => void;
@@ -51,80 +53,128 @@ export function ClientsHeader({
   clients,
   onRefetch
 }: ClientsHeaderProps) {
-  const [isAdvancedFiltersVisible, setIsAdvancedFiltersVisible] = useState(false);
-  const [currentViewName, setCurrentViewName] = useState('');
-  const [isSavingView, setIsSavingView] = useState(false);
+  const [localSearch, setLocalSearch] = useState(searchQuery);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onSearchChange(e.target.value);
+    setLocalSearch(e.target.value);
+    if (onSearchChange) {
+      onSearchChange(e.target.value);
+    }
+  };
+
+  const handleStatusChange = (value: string) => {
+    if (onStatusFilterChange) {
+      onStatusFilterChange(value);
+    }
+  };
+  
+  const handleToggleShowAllColumns = () => {
+    const newShowAllState = !viewPreference.showAllColumns;
+    
+    // Toggle visibility of all columns
+    const updatedColumns = viewPreference.columns.map(col => ({
+      ...col,
+      visible: newShowAllState || (col.key === 'full_name' || col.key === 'status')
+    }));
+    
+    onViewPreferenceChange({ 
+      columns: updatedColumns,
+      showAllColumns: newShowAllState
+    });
   };
 
   return (
-    <div className="space-y-4 mb-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+    <div className="space-y-4">
+      {/* Title and main actions */}
+      <div className="flex justify-between items-center">
+        <div className="flex items-center">
+          <Users className="h-6 w-6 mr-2" />
+          <h1 className="text-2xl font-bold">
+            Clients
+            <span className="ml-2 text-sm font-normal text-muted-foreground">
+              {totalClients} total
+            </span>
+          </h1>
+        </div>
         <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold">Client Management</h1>
-          <Badge variant="outline" className="ml-2">{totalClients} clients</Badge>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Button onClick={onAddClient} variant="default">
-            <UserPlus className="h-4 w-4 mr-2" />
-            Add Client
-          </Button>
-          
-          <SavedViewsManager 
-            currentView={viewPreference}
-            onViewChange={(preference) => onViewPreferenceChange(preference)}
-          />
-          
-          <ImportExportTools 
-            clients={clients}
-            onImportComplete={onRefetch}
-          />
-        </div>
-      </div>
-      
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search clients by name, email, project..."
-            value={searchQuery}
-            onChange={handleSearchChange}
-            className="pl-10"
-          />
-        </div>
-        
-        <div className="flex gap-2">
-          <ColumnManager 
-            columns={viewPreference.columns} 
-            onColumnsChange={(columns) => onViewPreferenceChange({ columns })}
-          />
-          
-          <ViewOptionsMenu
-            viewPreference={viewPreference}
-            onViewPreferenceChange={onViewPreferenceChange}
-          />
-          
           <Button 
             variant="outline" 
-            size="icon"
-            onClick={() => setIsAdvancedFiltersVisible(!isAdvancedFiltersVisible)}
+            size="sm" 
+            className="h-9" 
+            onClick={() => onRefetch()}
+            title="Refresh data"
           >
-            <Filter className="h-4 w-4" />
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="h-9" 
+            onClick={handleToggleShowAllColumns}
+            title={viewPreference.showAllColumns ? "Show only selected columns" : "Show all columns"}
+          >
+            {viewPreference.showAllColumns ? (
+              <><PanelLeftOpen className="h-4 w-4 mr-1" /> Focus</>
+            ) : (
+              <><PanelRightOpen className="h-4 w-4 mr-1" /> Expand</>
+            )}
+          </Button>
+          <ImportExportTools clients={clients} onImportSuccess={onRefetch} />
+          <Button className="bg-primary" onClick={onAddClient}>
+            <Plus className="h-4 w-4 mr-1" />
+            Add Client
           </Button>
         </div>
       </div>
-      
-      {isAdvancedFiltersVisible && (
-        <div className="p-4 border rounded-md bg-card">
-          <h3 className="font-medium mb-3">Advanced Filters</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Advanced filters go here */}
+
+      {/* Filters, search and views */}
+      <div className="flex flex-wrap gap-4 justify-between items-center">
+        <div className="flex flex-1 gap-4 min-w-[280px]">
+          <div className="relative w-full max-w-sm">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search clients..."
+              className="pl-8"
+              value={localSearch}
+              onChange={handleSearchChange}
+            />
           </div>
+          
+          <Select value={statusFilter} onValueChange={handleStatusChange}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Statuses</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="cancelled">Cancelled</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-      )}
+        
+        <div className="flex gap-2 items-center">
+          <ColumnManager 
+            columns={viewPreference.columns}
+            onColumnsChange={(columns) => onViewPreferenceChange({ columns })}
+            showAllColumns={viewPreference.showAllColumns}
+            onToggleShowAll={handleToggleShowAllColumns}
+          />
+          
+          <Separator orientation="vertical" className="h-8" />
+          
+          <ViewOptionsMenu 
+            pageSize={viewPreference.pageSize}
+            onPageSizeChange={(pageSize) => onViewPreferenceChange({ pageSize })}
+          />
+          
+          <SavedViewsManager
+            currentPreference={viewPreference}
+            onLoadView={(preference) => onViewPreferenceChange(preference)}
+          />
+        </div>
+      </div>
     </div>
   );
 }
