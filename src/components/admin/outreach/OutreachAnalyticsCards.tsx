@@ -1,91 +1,120 @@
 
-import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { 
-  User, 
-  Mail, 
-  CheckCircle, 
-  TrendingUp
-} from 'lucide-react';
+import { useLeadStats } from '@/hooks/useLeadStats';
+import { Users, MessageSquare, Send, FileText, Award } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-interface OutreachStatsProps {
-  stats: {
-    total: number;
-    contacted: number;
-    converted: number;
-    pending: number;
-    conversionRate: number;
-  };
+interface StatCardProps {
+  title: string;
+  value: number;
+  icon: React.ReactNode;
+  description: string;
+  percentage?: number;
+  loading?: boolean;
 }
 
-export function OutreachAnalyticsCards({ stats }: OutreachStatsProps) {
+const StatCard = ({ title, value, icon, description, percentage, loading }: StatCardProps) => {
+  if (loading) {
+    return (
+      <Card className="bg-gradient-to-br from-blue-900/10 to-blue-900/5">
+        <CardContent className="p-6">
+          <div className="flex justify-between items-start">
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-7 w-16" />
+            </div>
+            <Skeleton className="h-8 w-8 rounded-full" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <Card className="bg-gradient-to-br from-blue-900/10 to-blue-900/5 overflow-hidden relative">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-400/5 rounded-full -translate-y-1/3 translate-x-1/4" />
-        <CardContent className="p-6 flex flex-col relative z-10">
-          <div className="text-blue-400 mb-2">
-            <User className="h-6 w-6" />
-          </div>
-          <p className="text-muted-foreground text-sm">Total Leads</p>
-          <h3 className="text-2xl font-bold mt-1">{stats.total}</h3>
-          {stats.total > 0 && (
-            <div className="text-xs text-muted-foreground mt-2">
-              <span className="text-green-500">+{Math.round(stats.total * 0.1)}</span> from last week
-            </div>
-          )}
-        </CardContent>
-      </Card>
-      
-      <Card className="bg-gradient-to-br from-amber-900/10 to-amber-900/5 overflow-hidden relative">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-amber-400/5 rounded-full -translate-y-1/3 translate-x-1/4" />
-        <CardContent className="p-6 flex flex-col relative z-10">
-          <div className="text-amber-400 mb-2">
-            <Mail className="h-6 w-6" />
-          </div>
-          <p className="text-muted-foreground text-sm">Contacted</p>
-          <h3 className="text-2xl font-bold mt-1">{stats.contacted}</h3>
-          {stats.total > 0 && (
-            <div className="text-xs text-muted-foreground mt-2">
-              {Math.round((stats.contacted / stats.total) * 100)}% of total leads
-            </div>
-          )}
-        </CardContent>
-      </Card>
-      
-      <Card className="bg-gradient-to-br from-green-900/10 to-green-900/5 overflow-hidden relative">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-green-400/5 rounded-full -translate-y-1/3 translate-x-1/4" />
-        <CardContent className="p-6 flex flex-col relative z-10">
-          <div className="text-green-400 mb-2">
-            <CheckCircle className="h-6 w-6" />
-          </div>
-          <p className="text-muted-foreground text-sm">Converted</p>
-          <h3 className="text-2xl font-bold mt-1">{stats.converted}</h3>
-          {stats.contacted > 0 && (
-            <div className="text-xs text-muted-foreground mt-2">
-              {Math.round((stats.converted / stats.contacted) * 100)}% of contacted leads
-            </div>
-          )}
-        </CardContent>
-      </Card>
-      
-      <Card className="bg-gradient-to-br from-purple-900/10 to-purple-900/5 overflow-hidden relative">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-purple-400/5 rounded-full -translate-y-1/3 translate-x-1/4" />
-        <CardContent className="p-6 flex flex-col relative z-10">
-          <div className="text-purple-400 mb-2">
-            <TrendingUp className="h-6 w-6" />
-          </div>
-          <p className="text-muted-foreground text-sm">Conversion Rate</p>
-          <h3 className="text-2xl font-bold mt-1">{stats.conversionRate}%</h3>
-          {stats.conversionRate > 0 && stats.total > 0 && (
-            <div className="text-xs text-muted-foreground mt-2">
-              <span className={stats.conversionRate > 20 ? "text-green-500" : "text-amber-500"}>
-                {stats.conversionRate > 20 ? "Good" : "Needs improvement"}
-              </span>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Card className="bg-gradient-to-br from-blue-900/10 to-blue-900/5 overflow-hidden relative hover:border-blue-500/30 transition-colors">
+            <CardContent className="p-6">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-sm text-muted-foreground">{title}</p>
+                  <p className="text-2xl font-bold mt-2">{value}</p>
+                  {percentage && (
+                    <div className="flex items-center mt-2">
+                      <span className={`text-xs ${percentage > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                        {percentage > 0 ? '↑' : '↓'} {Math.abs(percentage)}%
+                      </span>
+                      <span className="text-xs text-muted-foreground ml-1">vs last month</span>
+                    </div>
+                  )}
+                </div>
+                <div className="h-8 w-8 flex items-center justify-center rounded-full bg-gradient-to-br from-blue-500/20 to-purple-500/20">
+                  {icon}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{description}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
+
+export function OutreachAnalyticsCards() {
+  const { data: stats, isLoading } = useLeadStats();
+
+  const cards = [
+    {
+      title: 'Total Leads',
+      value: stats?.total || 0,
+      icon: <Users className="h-4 w-4 text-blue-500" />,
+      description: 'Total number of leads in your database',
+      percentage: 12
+    },
+    {
+      title: 'Engaged Leads',
+      value: stats?.engaged || 0,
+      icon: <MessageSquare className="h-4 w-4 text-green-500" />,
+      description: 'Leads that have interacted with your outreach',
+      percentage: 8
+    },
+    {
+      title: 'Outreached',
+      value: stats?.outreached || 0,
+      icon: <Send className="h-4 w-4 text-purple-500" />,
+      description: 'Leads you have contacted',
+      percentage: 5
+    },
+    {
+      title: 'Plans Viewed',
+      value: stats?.plansViewed || 0,
+      icon: <FileText className="h-4 w-4 text-amber-500" />,
+      description: 'Leads who have viewed app plans',
+      percentage: 15
+    },
+    {
+      title: 'Clients',
+      value: stats?.converted || 0,
+      icon: <Award className="h-4 w-4 text-rose-500" />,
+      description: 'Leads converted to clients',
+      percentage: 3
+    }
+  ];
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+      {cards.map((card) => (
+        <StatCard
+          key={card.title}
+          loading={isLoading}
+          {...card}
+        />
+      ))}
     </div>
   );
 }
