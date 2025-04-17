@@ -50,7 +50,7 @@ export const getAdminMenuSections = (): MenuSection[] => {
         {
           href: '/admin/payments',
           icon: CreditCard,
-          label: 'Payments',
+          label: 'Financials',
         }
       ]
     },

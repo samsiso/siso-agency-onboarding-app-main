@@ -24,6 +24,7 @@ import AdminTemplates from './pages/AdminTemplates';
 import Portfolio from './pages/Portfolio';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminClients from './pages/AdminClients';
+import AdminPayments from './pages/AdminPayments';
 
 function App() {
   return (
@@ -44,6 +45,7 @@ function App() {
         <Route path="/admin/clients" element={<AuthGuard adminOnly={true}><AdminClients /></AuthGuard>} />
         <Route path="/admin/plans" element={<AuthGuard adminOnly={true}><AdminPlans /></AuthGuard>} />
         <Route path="/admin/templates" element={<AuthGuard adminOnly={true}><AdminTemplates /></AuthGuard>} />
+        <Route path="/admin/payments" element={<AuthGuard adminOnly={true}><AdminPayments /></AuthGuard>} />
         <Route path="/admin/plans/create" element={<AuthGuard adminOnly={true}><AdminPlans /></AuthGuard>} />
         <Route path="/admin/plans/:planId/edit" element={<AuthGuard adminOnly={true}><AdminPlans /></AuthGuard>} />
         
