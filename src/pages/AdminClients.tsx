@@ -54,6 +54,10 @@ export default function AdminClients() {
       
       if (dataUpdateSuccess) {
         console.log('Client data update complete');
+        toast({
+          title: "Client data initialized",
+          description: "Sample client data has been loaded successfully."
+        });
       } else {
         toast({
           variant: "destructive",

@@ -9,12 +9,12 @@ import { useNavigate } from "react-router-dom";
 export function ClientsOverviewCard() {
   const navigate = useNavigate();
   
-  // These would be replaced with actual data from your backend
+  // Updated client data to reflect our 9 active clients
   const clientData = {
-    activeClients: 24,
-    newClientsThisMonth: 3,
-    retentionRate: 92,
-    targetClients: 30,
+    activeClients: 9,
+    newClientsThisMonth: 2,
+    retentionRate: 95,
+    targetClients: 15,
   };
   
   const clientsProgress = (clientData.activeClients / clientData.targetClients) * 100;
@@ -26,7 +26,7 @@ export function ClientsOverviewCard() {
       transition={{ duration: 0.3, delay: 0.1 }}
     >
       <Card className="bg-black/30 border border-siso-text/10 p-5 hover:border-siso-orange/30 transition-all duration-300 cursor-pointer"
-        onClick={() => navigate('/portfolio')}
+        onClick={() => navigate('/admin/clients')}
       >
         <div className="flex justify-between items-center mb-5">
           <h3 className="text-lg font-semibold text-white">Client Overview</h3>
