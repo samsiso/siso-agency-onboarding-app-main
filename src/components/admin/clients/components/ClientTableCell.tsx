@@ -136,7 +136,7 @@ export function ClientTableCell({
       if (!client.todos || client.todos.length === 0) {
         return <span>-</span>;
       }
-      const pendingTodos = client.todos.filter(t => !t.completed).length;
+      const pendingTodos = Array.isArray(client.todos) ? client.todos.filter(t => !t.completed).length : 0;
       return (
         <div className="flex items-center">
           <span className="bg-blue-500/10 text-blue-500 rounded-full px-2 py-0.5 text-xs">

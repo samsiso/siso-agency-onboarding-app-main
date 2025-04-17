@@ -1,7 +1,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { ClientsListParams, ClientsListResponse, ClientData } from '@/types/client.types';
+import { ClientsListParams, ClientsListResponse, ClientData, TodoItem } from '@/types/client.types';
 
 export type { ClientData, ClientsListParams } from '@/types/client.types';
 
@@ -64,43 +64,52 @@ export const useClientsList = ({
         }
         
         // Process the data to get the clientData format with proper names
-        const processedData: ClientData[] = data.map(item => ({
-          id: item.id,
-          full_name: item.contact_name || 'Unknown Client',
-          email: item.email || null,
-          business_name: item.company_name || null,
-          phone: item.phone || null,
-          avatar_url: `https://api.dicebear.com/7.x/initials/svg?seed=${(item.contact_name || 'Client').substring(0, 2)}`,
-          status: item.status || 'pending',
-          current_step: item.current_step || 1,
-          total_steps: item.total_steps || 5,
-          completed_steps: item.completed_steps || [],
-          created_at: item.created_at,
-          updated_at: item.updated_at,
-          website_url: item.website_url || null,
-          professional_role: item.professional_role || null,
-          bio: item.bio || null,
-          project_name: item.project_name || null,
-          company_niche: item.company_niche || null,
-          development_url: item.development_url || item.website_url || null,
-          mvp_build_status: item.mvp_build_status || null,
-          notion_plan_url: item.notion_plan_url || null,
-          payment_status: item.payment_status || null,
-          estimated_price: item.estimated_price || null,
-          initial_contact_date: item.initial_contact_date || item.created_at || null,
-          start_date: item.start_date || null,
-          estimated_completion_date: item.estimated_completion_date || null,
-          client_contact: item.client_contact || null,
-          purchase_history: item.purchase_history || null,
-          next_steps: item.next_steps || null,
-          key_research: item.key_research || null,
-          referral_source: item.referral_source || null,
-          industry: item.industry || null,
-          last_contacted_date: item.last_contacted_date || null,
-          assigned_to: item.assigned_to || null,
-          priority: item.priority || null,
-          todos: item.todos || []
-        }));
+        const processedData: ClientData[] = data.map(item => {
+          // Create the avatar URL from the contact name
+          const contactName = item.contact_name || 'Client';
+          const avatarUrl = `https://api.dicebear.com/7.x/initials/svg?seed=${contactName.substring(0, 2)}`;
+          
+          // Create an empty todos array as default
+          const defaultTodos: TodoItem[] = [];
+          
+          return {
+            id: item.id,
+            full_name: item.contact_name || 'Unknown Client',
+            email: item.email || null,
+            business_name: item.company_name || null,
+            phone: item.phone || null,
+            avatar_url: avatarUrl,
+            status: item.status || 'pending',
+            current_step: item.current_step || 1,
+            total_steps: item.total_steps || 5,
+            completed_steps: item.completed_steps || [],
+            created_at: item.created_at,
+            updated_at: item.updated_at,
+            website_url: item.website_url || null,
+            professional_role: item.professional_role || null,
+            bio: item.bio || null,
+            project_name: item.project_name || null,
+            company_niche: item.company_niche || null,
+            development_url: item.development_url || item.website_url || null,
+            mvp_build_status: item.mvp_build_status || null,
+            notion_plan_url: item.notion_plan_url || null,
+            payment_status: item.payment_status || null,
+            estimated_price: item.estimated_price || null,
+            initial_contact_date: item.initial_contact_date || item.created_at || null,
+            start_date: item.start_date || null,
+            estimated_completion_date: item.estimated_completion_date || null,
+            client_contact: item.client_contact || null,
+            purchase_history: item.purchase_history || null,
+            next_steps: item.next_steps || null,
+            key_research: item.key_research || null,
+            referral_source: item.referral_source || null,
+            industry: item.industry || null,
+            last_contacted_date: item.last_contacted_date || null,
+            assigned_to: item.assigned_to || null,
+            priority: (item.priority as 'low' | 'medium' | 'high' | null) || null,
+            todos: item.todos || defaultTodos
+          };
+        });
         
         console.log('Processed client data:', processedData);
         
