@@ -1,4 +1,3 @@
-
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { usePoints } from '@/hooks/usePoints';
 import { useToast } from '@/hooks/use-toast';
@@ -122,4 +121,25 @@ export const useBlogPostActions = () => {
     handleShare,
     handleBookmark
   };
+};
+
+export const safeFetchBlogPost = async (blogId: string) => {
+  try {
+    const { data, error } = await safeSupabase
+      .from('blog_posts')
+      .select('*')
+      .eq('id', blogId)
+      .single();
+    
+    if (error) {
+      console.error('Error fetching blog post:', error);
+      return null;
+    }
+    
+    // Type assertion to avoid 'id does not exist' error
+    return data as { id: string; [key: string]: any };
+  } catch (error) {
+    console.error('Error in safeFetchBlogPost:', error);
+    return null;
+  }
 };

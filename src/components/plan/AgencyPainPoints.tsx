@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { AlertTriangle, Info, BarChart, ArrowRight, ExternalLink, PieChart, Users, Clock, DollarSign } from 'lucide-react';
@@ -69,13 +70,13 @@ export const AgencyPainPoints = ({ onSolutionRequest, agencyTypeSlug }: AgencyPa
         console.log('Fetching pain points for industry type:', industryType);
         
         // Get agency type ID first
-        const { data: agencyTypes, error: agencyTypeError } = await safeSupabase
+        const { data: agencyTypeData, error: agencyTypeError } = await safeSupabase
           .from('agency_types')
           .select('id')
           .eq('slug', industryType)
           .single();
           
-        if (agencyTypeError || !agencyTypes) {
+        if (agencyTypeError || !agencyTypeData) {
           console.error('Error fetching agency type:', agencyTypeError);
           setLoading(false);
           return;
@@ -85,7 +86,7 @@ export const AgencyPainPoints = ({ onSolutionRequest, agencyTypeSlug }: AgencyPa
         const { data, error } = await safeSupabase
           .from('agency_pain_points')
           .select('*')
-          .eq('agency_type_id', agencyTypes.id)
+          .eq('agency_type_id', agencyTypeData?.id)
           .order('created_at', { ascending: true });
           
         if (error) {

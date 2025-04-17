@@ -9,7 +9,7 @@ import { EarnHeader } from '@/components/earn/header/EarnHeader';
 import { SkillTreeContent } from '@/components/earn/content/SkillTreeContent';
 import { SkillPath, Skill, UserSkillProgress } from '@/types/skills';
 import { useAuthSession } from '@/hooks/useAuthSession';
-import { MainLayout } from '@/components/assistants/layout/MainLayout';
+import { MainLayout } from '@/components/layout/MainLayout';
 import { toast } from 'sonner';
 
 const HowToEarn = () => {

@@ -1,6 +1,5 @@
-
 import { useState } from 'react';
-import { MainLayout } from '@/components/assistants/layout/MainLayout';
+import { MainLayout } from '@/components/layout/MainLayout';
 import { 
   Card, 
   CardHeader, 

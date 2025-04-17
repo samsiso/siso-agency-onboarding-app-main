@@ -1,5 +1,4 @@
 
-import { MainLayout } from '@/components/assistants/layout/MainLayout';
 import { 
   Card, 
   CardHeader, 
@@ -14,6 +13,7 @@ import {
   AccordionItem,
   AccordionTrigger
 } from '@/components/ui/accordion';
+import { MainLayout } from '@/components/layout/MainLayout';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { SearchIcon, BookOpen, MessageCircle, Video, FileText } from 'lucide-react';

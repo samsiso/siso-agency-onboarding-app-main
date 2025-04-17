@@ -1,5 +1,6 @@
 import { ClientData, ClientsListParams, ClientsListResponse } from '@/types/client.types';
 import { safeSupabase } from './supabaseHelpers';
+import { typeHelpers } from './typeHelpers';
 
 /**
  * Fallback function to fetch clients data using an alternative approach
@@ -31,7 +32,7 @@ export const fetchClientsFallback = async (
     }
     
     // Map the data to the expected format with safe property access
-    const clients: ClientData[] = data.map(item => {
+    const clients: ClientData[] = data.map((item: any) => {
       // Guard against item being undefined or null
       if (!item) {
         return {
@@ -44,7 +45,6 @@ export const fetchClientsFallback = async (
           completed_steps: [],
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
-          // ... other fields with defaults
         } as ClientData;
       }
       
