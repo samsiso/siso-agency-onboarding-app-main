@@ -34,7 +34,7 @@ export const AdminSidebarNavigation = ({ collapsed, onItemClick, visible }: Navi
     }
   }, [location.hash]);
   
-  // Enhanced debugging for route matching
+  // Log current pathname for debugging
   useEffect(() => {
     console.log('Admin - Current pathname:', location.pathname);
   }, [location.pathname]);
