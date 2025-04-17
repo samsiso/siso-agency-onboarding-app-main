@@ -31,12 +31,12 @@ export function createClientData(clientObj: any): { full_name: string; business_
 
 /**
  * Transforms database response data to match expected types
- * Generic type parameter T represents the final transformed shape
+ * Avoids recursive type instantiation with explicit any[] handling
  */
 export function transformEntityData<T>(
   data: any[], 
   transformer: (item: any) => T
 ): T[] {
-  return (data || []).map(transformer);
+  if (!data || !Array.isArray(data)) return [];
+  return data.map(transformer);
 }
-

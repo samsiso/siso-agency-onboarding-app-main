@@ -30,11 +30,9 @@ export async function fetchInvoices(filters: InvoiceFilters = {}): Promise<Invoi
       
     if (error) throw error;
     
-    // Use an explicit any[] type to avoid deep instantiation
-    return transformEntityData(
-      (data || []) as any[], 
-      transformInvoiceData
-    );
+    // Handle data explicitly as any[] to avoid deep type instantiation
+    const safeData = (data || []) as any[];
+    return transformEntityData(safeData, transformInvoiceData);
   } catch (error) {
     console.error('Error fetching invoices:', error);
     toast({

@@ -2,125 +2,122 @@
 import { supabase } from '@/integrations/supabase/client';
 import { FinancialSummary } from './types';
 import { SummaryPeriod, SummaryFilters } from './types/summaryTypes';
-import { fetchTransactions } from './transactionsApi';
-import { 
-  createMonthlyRevenueData, 
-  calculateProfitMargin, 
-  createDefaultSummary 
-} from './utils/summaryTransformers';
+import { createMonthlyRevenueData, calculateProfitMargin, createDefaultSummary } from './utils/summaryTransformers';
 
 /**
- * Calculate financial summary data
+ * Fetches financial summary data
  */
-export async function getFinancialSummary(period: SummaryPeriod = 'month'): Promise<FinancialSummary> {
+export async function getFinancialSummary(period: SummaryPeriod = 'month', filters: SummaryFilters = {}): Promise<FinancialSummary> {
   try {
-    // Initialize the summary object with default values
-    const summary = createDefaultSummary();
-
-    // Get the start date based on the period
+    // Calculate date range based on period
     const today = new Date();
     let startDate: Date;
     
-    if (period === 'year') {
-      startDate = new Date(today.getFullYear(), 0, 1); // Jan 1st of current year
-    } else {
-      startDate = new Date(today.getFullYear(), today.getMonth() - 5, 1); // 6 months ago
+    if (period === 'month') {
+      startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+    } else { // year
+      startDate = new Date(today.getFullYear(), 0, 1);
     }
     
+    // Format dates for Supabase query
     const startDateStr = startDate.toISOString().split('T')[0];
-
-    // Fetch all transactions for the period
-    const transactions = await fetchTransactions({});
+    const endDateStr = today.toISOString().split('T')[0];
     
-    // Filter transactions by date
-    const filteredTransactions = transactions.filter(tx => 
-      new Date(tx.date) >= startDate
-    );
-
-    // Calculate total revenue and expenses
-    filteredTransactions.forEach(tx => {
-      if (tx.type === 'revenue') {
-        summary.totalRevenue += Number(tx.amount);
-      } else if (tx.type === 'expense') {
-        summary.totalExpenses += Number(tx.amount);
-      }
-    });
-
-    // Calculate profit margin
-    summary.profitMargin = calculateProfitMargin(summary.totalRevenue, summary.totalExpenses);
-
-    // Get revenue and expense by month for the chart
-    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    
-    // Initialize monthly data
-    let monthlyData: { [key: string]: { revenue: number; expense: number } } = {};
-    
-    // Current month and year
-    const currentMonth = today.getMonth();
-    const currentYear = today.getFullYear();
-    
-    // Initialize the last 6 months (or 12 months for year period)
-    const monthsToShow = period === 'year' ? 12 : 6;
-    
-    for (let i = 0; i < monthsToShow; i++) {
-      let monthIndex = currentMonth - i;
-      let year = currentYear;
+    // Fetch revenue transactions
+    const { data: revenueData, error: revenueError } = await supabase
+      .from('financial_transactions')
+      .select('amount, date')
+      .eq('type', 'revenue')
+      .gte('date', startDateStr)
+      .lte('date', endDateStr);
       
-      if (monthIndex < 0) {
-        monthIndex = 12 + monthIndex;
-        year = currentYear - 1;
-      }
-      
-      const monthKey = `${year}-${(monthIndex + 1).toString().padStart(2, '0')}`;
-      monthlyData[monthKey] = {
-        revenue: 0,
-        expense: 0
-      };
-    }
+    if (revenueError) throw revenueError;
     
-    // Aggregate transactions by month
-    filteredTransactions.forEach(tx => {
-      const txDate = new Date(tx.date);
-      const monthKey = `${txDate.getFullYear()}-${(txDate.getMonth() + 1).toString().padStart(2, '0')}`;
+    // Fetch expense transactions
+    const { data: expenseData, error: expenseError } = await supabase
+      .from('financial_transactions')
+      .select('amount, date')
+      .eq('type', 'expense')
+      .gte('date', startDateStr)
+      .lte('date', endDateStr);
       
-      // If we have this month in our data
-      if (monthlyData[monthKey]) {
-        if (tx.type === 'revenue') {
-          monthlyData[monthKey].revenue += Number(tx.amount);
-        } else if (tx.type === 'expense') {
-          monthlyData[monthKey].expense += Number(tx.amount);
-        }
-      }
-    });
+    if (expenseError) throw expenseError;
     
-    // Convert to array and sort by month
-    summary.revenueByMonth = createMonthlyRevenueData(monthlyData, monthNames);
-
-    // Get outstanding invoices amount
-    await getOutstandingInvoicesAmount(summary);
-
-    return summary;
-  } catch (error) {
-    console.error('Error getting financial summary:', error);
-    return createDefaultSummary();
-  }
-}
-
-/**
- * Fetch outstanding invoice amounts and add to summary
- */
-async function getOutstandingInvoicesAmount(summary: FinancialSummary): Promise<void> {
-  try {
-    const { data: invoices, error } = await supabase
+    // Fetch outstanding invoices
+    const { data: outstandingInvoices, error: invoicesError } = await supabase
       .from('invoices')
       .select('amount')
-      .in('status', ['pending', 'overdue']);
+      .eq('status', 'pending');
       
-    if (!error && invoices) {
-      summary.outstandingAmount = invoices.reduce((sum, invoice) => sum + Number(invoice.amount), 0);
+    if (invoicesError) throw invoicesError;
+    
+    // Calculate totals
+    const totalRevenue = (revenueData || []).reduce((sum, item) => sum + Number(item.amount), 0);
+    const totalExpenses = (expenseData || []).reduce((sum, item) => sum + Number(item.amount), 0);
+    const outstandingAmount = (outstandingInvoices || []).reduce((sum, item) => sum + Number(item.amount), 0);
+    const profitMargin = calculateProfitMargin(totalRevenue, totalExpenses);
+    
+    // Group transactions by month for chart data
+    const transactionsByMonth: { [key: string]: { revenue: number; expense: number } } = {};
+    
+    // Initialize with empty data for all months in range
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    
+    if (period === 'month') {
+      // For monthly view, initialize days
+      const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+      for (let i = 1; i <= daysInMonth; i++) {
+        const day = i < 10 ? `0${i}` : `${i}`;
+        transactionsByMonth[`${today.getFullYear()}-${today.getMonth() + 1}-${day}`] = { revenue: 0, expense: 0 };
+      }
+    } else {
+      // For yearly view, initialize months
+      for (let i = 0; i < 12; i++) {
+        const month = i + 1 < 10 ? `0${i + 1}` : `${i + 1}`;
+        transactionsByMonth[`${today.getFullYear()}-${month}`] = { revenue: 0, expense: 0 };
+      }
     }
+    
+    // Process revenue data
+    (revenueData || []).forEach(item => {
+      const date = new Date(item.date);
+      const key = period === 'month' 
+        ? `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
+        : `${date.getFullYear()}-${date.getMonth() + 1 < 10 ? '0' : ''}${date.getMonth() + 1}`;
+      
+      if (!transactionsByMonth[key]) {
+        transactionsByMonth[key] = { revenue: 0, expense: 0 };
+      }
+      
+      transactionsByMonth[key].revenue += Number(item.amount);
+    });
+    
+    // Process expense data
+    (expenseData || []).forEach(item => {
+      const date = new Date(item.date);
+      const key = period === 'month' 
+        ? `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
+        : `${date.getFullYear()}-${date.getMonth() + 1 < 10 ? '0' : ''}${date.getMonth() + 1}`;
+      
+      if (!transactionsByMonth[key]) {
+        transactionsByMonth[key] = { revenue: 0, expense: 0 };
+      }
+      
+      transactionsByMonth[key].expense += Number(item.amount);
+    });
+    
+    // Convert to array format for charts and sort by date
+    const revenueByMonth = createMonthlyRevenueData(transactionsByMonth, monthNames);
+    
+    return {
+      totalRevenue,
+      totalExpenses,
+      profitMargin,
+      outstandingAmount,
+      revenueByMonth
+    };
   } catch (error) {
-    console.error('Error fetching outstanding invoices:', error);
-    // If there's an error, we'll leave the outstandingAmount as 0
+    console.error('Error fetching financial summary:', error);
+    return createDefaultSummary();
   }
 }

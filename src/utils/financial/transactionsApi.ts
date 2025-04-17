@@ -27,11 +27,9 @@ export async function fetchTransactions(filters: TransactionFilters = {}): Promi
       
     if (error) throw error;
     
-    // Use an explicit any[] type to avoid deep instantiation
-    return transformEntityData(
-      (data || []) as any[], 
-      transformTransactionData
-    );
+    // Handle data explicitly as any[] to avoid deep type instantiation
+    const safeData = (data || []) as any[];
+    return transformEntityData(safeData, transformTransactionData);
   } catch (error) {
     console.error('Error fetching transactions:', error);
     toast({
