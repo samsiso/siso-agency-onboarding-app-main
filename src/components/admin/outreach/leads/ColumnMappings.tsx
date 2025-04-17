@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Select,
   SelectContent,
@@ -32,35 +33,37 @@ export const ColumnMappings = ({ columnMappings, onMappingChange }: ColumnMappin
   return (
     <div className="space-y-2">
       <h4 className="font-medium">Column Mappings</h4>
-      <div className="grid gap-2">
-        {columnMappings.map((mapping, index) => (
-          <div key={index} className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground w-1/3">
-              {mapping.sourceColumn}
-            </span>
-            <Select
-              value={mapping.targetField || "skip"}
-              onValueChange={(value) => {
-                const newMappings = [...columnMappings];
-                newMappings[index].targetField = value === "skip" ? "" : value;
-                onMappingChange(newMappings);
-              }}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Map to field..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="skip">Skip this column</SelectItem>
-                {AVAILABLE_FIELDS.map(field => (
-                  <SelectItem key={field.value} value={field.value}>
-                    {field.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        ))}
-      </div>
+      <ScrollArea className="max-h-[300px] pr-4">
+        <div className="grid gap-2">
+          {columnMappings.map((mapping, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground w-1/3">
+                {mapping.sourceColumn}
+              </span>
+              <Select
+                value={mapping.targetField || "skip"}
+                onValueChange={(value) => {
+                  const newMappings = [...columnMappings];
+                  newMappings[index].targetField = value === "skip" ? "" : value;
+                  onMappingChange(newMappings);
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Map to field..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="skip">Skip this column</SelectItem>
+                  {AVAILABLE_FIELDS.map(field => (
+                    <SelectItem key={field.value} value={field.value}>
+                      {field.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          ))}
+        </div>
+      </ScrollArea>
     </div>
   );
 };

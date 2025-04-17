@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
 import { Upload } from 'lucide-react';
 import { ImportLead } from '@/hooks/useLeadImport';
@@ -87,14 +88,16 @@ export function BulkImportLeads() {
   };
 
   return (
-    <Card className="p-4">
-      <div className="space-y-4">
+    <Card className="max-h-[80vh] overflow-hidden flex flex-col">
+      <div className="p-4 border-b">
         <ImportHeader 
           delimiter={delimiter}
           onDelimiterChange={setDelimiter}
         />
+      </div>
 
-        <div className="grid gap-6">
+      <ScrollArea className="flex-1 p-4">
+        <div className="space-y-6">
           <FileInputSection
             rawData={rawData}
             previewData={previewData}
@@ -134,7 +137,7 @@ export function BulkImportLeads() {
             )}
           </Button>
         </div>
-      </div>
+      </ScrollArea>
     </Card>
   );
 }
