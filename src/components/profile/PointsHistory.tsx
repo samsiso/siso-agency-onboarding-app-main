@@ -29,7 +29,14 @@ export const PointsHistory = ({ userId }: { userId: string }) => {
         
         // Safe type checking before setting state
         if (data && Array.isArray(data)) {
-          setPointsLog(data as PointsLogEntry[]);
+          // Explicitly map to ensure type safety
+          const typedData: PointsLogEntry[] = data.map((item: any) => ({
+            id: item.id || '',
+            action: item.action || '',
+            points_earned: Number(item.points_earned) || 0,
+            created_at: item.created_at || new Date().toISOString()
+          }));
+          setPointsLog(typedData);
         } else {
           console.error('Received invalid data format:', data);
           setPointsLog([]);

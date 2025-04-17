@@ -12,7 +12,7 @@ export const safeSupabase = {
   
   // Enhanced from method with additional typings
   from: (table: string) => {
-    return supabase.from(table);
+    return supabase.from(table as any);
   },
   
   // Pass through functions

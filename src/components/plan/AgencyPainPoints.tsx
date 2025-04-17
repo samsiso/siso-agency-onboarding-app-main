@@ -95,15 +95,23 @@ export const AgencyPainPoints = ({ onSolutionRequest, agencyTypeSlug }: AgencyPa
         }
         
         if (data && data.length > 0) {
-          // Parse JSON fields
-          const formattedPainPoints = data.map(point => ({
-            ...point,
+          // Parse JSON fields and ensure proper typing
+          const formattedPainPoints: PainPoint[] = data.map((point: any) => ({
+            id: point.id || '',
+            title: point.title || '',
+            description: point.description || '',
+            severity: (point.severity || 'medium') as 'high' | 'medium' | 'low',
+            statistic: point.statistic || '',
+            icon: point.icon || 'info',
             survey_data: typeof point.survey_data === 'string' 
               ? JSON.parse(point.survey_data) 
-              : point.survey_data,
+              : (point.survey_data || { percentage: 0, label: '' }),
+            solutions: Array.isArray(point.solutions) ? point.solutions : [],
+            impact_areas: Array.isArray(point.impact_areas) ? point.impact_areas : [],
             testimonial: typeof point.testimonial === 'string' 
               ? JSON.parse(point.testimonial) 
               : point.testimonial,
+            video_url: point.video_url,
             industry_trends: typeof point.industry_trends === 'string' 
               ? JSON.parse(point.industry_trends) 
               : point.industry_trends

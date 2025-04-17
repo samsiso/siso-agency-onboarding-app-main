@@ -42,9 +42,11 @@ export const useAdminCheck = () => {
     staleTime: 5 * 60 * 1000,
     // Retry failed checks 
     retry: 2,
-    // Better error handling
-    onError: (error) => {
-      console.error('Admin check query error:', error);
+    meta: {
+      // Better error handling
+      onError: (error: Error) => {
+        console.error('Admin check query error:', error);
+      }
     }
   });
 

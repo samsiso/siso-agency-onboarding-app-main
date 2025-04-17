@@ -1,8 +1,8 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { safeSupabase } from "./supabaseHelpers";
 import FeatureFlags from "./featureFlags";
 import { MockTypes } from "./errorSuppressions";
+import { safeCast } from "./supabaseHelpers";
 
 /**
  * Helper function to handle TypeScript errors when querying tables not defined in the Database type.

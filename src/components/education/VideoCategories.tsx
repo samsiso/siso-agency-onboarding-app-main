@@ -1,19 +1,18 @@
 
 import React from 'react';
 
+// Temporary stub component until the actual component is implemented
 export const VideoCategories = () => {
   return (
-    <div className="my-6">
-      <h2 className="text-xl font-semibold text-siso-text-bold mb-4">Categories</h2>
+    <div className="mb-8">
+      <h3 className="text-xl font-bold mb-4">Categories</h3>
       <div className="flex flex-wrap gap-2">
-        {['Beginner', 'Intermediate', 'Advanced', 'Tutorial', 'Case Study'].map((category) => (
-          <div key={category} className="px-3 py-1 bg-siso-text/5 rounded-full text-sm text-siso-text-bold">
+        {['Beginner', 'Advanced', 'Marketing', 'Development', 'Design'].map((category) => (
+          <button key={category} className="px-4 py-2 rounded-full bg-muted text-sm">
             {category}
-          </div>
+          </button>
         ))}
       </div>
     </div>
   );
 };
-
-export default VideoCategories;

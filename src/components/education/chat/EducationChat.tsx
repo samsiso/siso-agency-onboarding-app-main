@@ -1,23 +1,22 @@
 
 import React from 'react';
 
+// Temporary stub component until the actual component is implemented
 export const EducationChat = () => {
   return (
-    <div className="p-4 border border-siso-text/10 rounded-lg">
-      <h2 className="text-lg font-semibold text-siso-text-bold mb-4">Education Assistant</h2>
-      <div className="bg-black/20 p-4 rounded-lg mb-4 h-60 overflow-y-auto">
-        <div className="text-siso-text/70">Chat messages will appear here</div>
+    <div className="border rounded-md p-4">
+      <h3 className="text-lg font-medium mb-4">Education Assistant</h3>
+      <div className="bg-muted rounded-md p-3 mb-3">
+        <p className="text-sm">Hi! I'm your education assistant. How can I help you learn today?</p>
       </div>
       <div className="flex gap-2">
         <input 
           type="text" 
           placeholder="Ask a question..." 
-          className="flex-1 px-3 py-2 bg-black/20 border border-siso-text/10 rounded-md text-siso-text focus:outline-none focus:ring-1 focus:ring-siso-orange"
+          className="flex-1 px-3 py-2 rounded border bg-background"
         />
-        <button className="px-4 py-2 bg-siso-orange text-white rounded-md">Send</button>
+        <button className="px-4 py-2 rounded bg-primary text-primary-foreground">Send</button>
       </div>
     </div>
   );
 };
-
-export default EducationChat;

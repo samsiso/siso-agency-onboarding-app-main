@@ -52,32 +52,46 @@ export const processClientData = (data: any[]): ClientData[] => {
   return data.map(item => {
     if (!item) return {} as ClientData;
     
+    // Safely access properties
+    const id = typeof item.id === 'string' ? item.id : '';
+    const contactName = typeof item.contact_name === 'string' ? item.contact_name : 'Unknown';
+    const companyName = typeof item.company_name === 'string' ? item.company_name : null;
+    const status = typeof item.status === 'string' ? item.status : 'pending';
+    const currentStep = typeof item.current_step === 'number' ? item.current_step : 1;
+    const totalSteps = typeof item.total_steps === 'number' ? item.total_steps : 5;
+    const completedSteps = Array.isArray(item.completed_steps) ? item.completed_steps : [];
+    const createdAt = typeof item.created_at === 'string' ? item.created_at : new Date().toISOString();
+    const updatedAt = typeof item.updated_at === 'string' ? item.updated_at : new Date().toISOString();
+    const websiteUrl = typeof item.website_url === 'string' ? item.website_url : null;
+    const projectName = typeof item.project_name === 'string' ? item.project_name : null;
+    const companyNiche = typeof item.company_niche === 'string' ? item.company_niche : null;
+    
     return {
-      id: item.id || '',
-      full_name: item.contact_name || 'Unknown',
-      email: null, // Not available in the current dataset
-      business_name: item.company_name || null,
-      phone: null, // Not available in the current dataset
-      avatar_url: `https://api.dicebear.com/7.x/initials/svg?seed=${(item.contact_name || 'Client').substring(0, 2)}`,
-      status: item.status || 'pending',
-      current_step: item.current_step || 1,
-      total_steps: item.total_steps || 5,
-      completed_steps: item.completed_steps || [],
-      created_at: item.created_at || new Date().toISOString(),
-      updated_at: item.updated_at || new Date().toISOString(),
-      website_url: item.website_url || null,
-      professional_role: null, // Not available in the current dataset
-      bio: null, // Not available in the current dataset
-      project_name: item.project_name || null,
-      company_niche: item.company_niche || null,
-      development_url: item.website_url || null,
-      mvp_build_status: null, // Not available in the current dataset
-      notion_plan_url: null, // Not available in the current dataset
-      payment_status: null, // Not available in the current dataset
-      estimated_price: null, // Not available in the current dataset
-      initial_contact_date: item.created_at || null,
-      start_date: null, // Not available in the current dataset
-      estimated_completion_date: null // Not available in the current dataset
+      id,
+      full_name: contactName,
+      email: null,
+      business_name: companyName,
+      phone: null,
+      avatar_url: `https://api.dicebear.com/7.x/initials/svg?seed=${contactName.substring(0, 2)}`,
+      status,
+      current_step: currentStep,
+      total_steps: totalSteps,
+      completed_steps: completedSteps,
+      created_at: createdAt,
+      updated_at: updatedAt,
+      website_url: websiteUrl,
+      professional_role: null,
+      bio: null,
+      project_name: projectName,
+      company_niche: companyNiche,
+      development_url: websiteUrl,
+      mvp_build_status: null,
+      notion_plan_url: null,
+      payment_status: null,
+      estimated_price: null,
+      initial_contact_date: createdAt,
+      start_date: null,
+      estimated_completion_date: null
     };
   });
 };

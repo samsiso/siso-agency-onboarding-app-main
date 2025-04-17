@@ -7,8 +7,9 @@ import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Confetti } from '@/components/ui/confetti';
 import { safeSupabase } from '@/utils/supabaseHelpers';
-import { supabase } from '@/integrations/supabase/client';  // Add this import
+import { supabase } from '@/integrations/supabase/client';  
 import FeatureFlags from '@/utils/featureFlags';
+import { safeCast } from '@/utils/supabaseHelpers';
 
 interface NFTMetadata {
   name: string;
