@@ -1,6 +1,7 @@
+
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useClientsList } from '@/hooks/client';
-import { ClientData, ClientViewPreference } from '@/types/client.types';
+import { ClientData, ClientViewPreference, TodoItem } from '@/types/client.types';
 import { 
   Table, 
   TableBody, 
@@ -19,7 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ClientStatusBadge } from './ClientStatusBadge';
 import { ClientAnalyticsCards } from './ClientAnalyticsCards';
-import { ColumnManager } from './ColumnManager';
+import { ClientsHeader } from './ClientsHeader';
 import { ClientAddForm } from './ClientAddForm';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -31,21 +32,19 @@ import {
   Download,
   Edit2,
   ExternalLink, 
-  Filter,
   MoreHorizontal, 
   Plus,
   RefreshCw,
   Save,
   Trash2,
-  X
+  X,
+  FileText,
+  Link,
+  CalendarClock,
+  DollarSign
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ClientDetailSheet } from './ClientDetailSheet';
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable";
 import { 
   Pagination, 
   PaginationContent, 
@@ -54,16 +53,11 @@ import {
   PaginationNext, 
   PaginationPrevious 
 } from '@/components/ui/pagination';
-import { 
-  Tooltip, 
-  TooltipContent, 
-  TooltipProvider, 
-  TooltipTrigger 
-} from '@/components/ui/tooltip';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import * as React from 'react';
-import { supabase } from '@/integrations/supabase/client';  // Add this import
+import { supabase } from '@/integrations/supabase/client';
+import { TodoList } from './TodoList';
 
 interface ClientsTableProps {
   searchQuery?: string;
@@ -246,21 +240,13 @@ export function ClientsTable({
     setActiveClient(null);
   };
 
-  const handleColumnsChange = (newColumns: typeof viewPreference.columns) => {
-    // Ensure the columns have label property
-    const columnsWithLabels = newColumns.map(col => {
-      if (!col.label) {
-        return {
-          ...col,
-          label: col.key.replace(/_/g, ' ').split(' ')
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ')
-        };
-      }
-      return col;
-    });
+  const handleColumnReorder = (dragIndex: number, hoverIndex: number) => {
+    const newColumns = [...viewPreference.columns];
+    const dragItem = newColumns[dragIndex];
+    newColumns.splice(dragIndex, 1);
+    newColumns.splice(hoverIndex, 0, dragItem);
     
-    onViewPreferenceChange({ columns: columnsWithLabels });
+    onViewPreferenceChange({ columns: newColumns });
   };
 
   // Scroll table to horizontally when editing cells
@@ -348,44 +334,32 @@ export function ClientsTable({
         conversionRate={analyticsData.conversionRate}
       />
       
-      {/* Table Actions */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
-        <div className="flex items-center gap-2">
-          {selectedClients.length > 0 ? (
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">{selectedClients.length} selected</span>
-              <Button variant="outline" size="sm" onClick={handleDeleteSelected}>
-                <Trash2 className="h-4 w-4 mr-1" />
-                Delete
-              </Button>
-              <Button variant="outline" size="sm">
-                <Download className="h-4 w-4 mr-1" />
-                Export
-              </Button>
-            </div>
-          ) : (
-            <Button variant="default" size="sm" onClick={handleAddClient}>
-              <Plus className="h-4 w-4 mr-1" />
-              Add Client
-            </Button>
-          )}
-          
-          <Button variant="ghost" size="sm" onClick={() => refetch()}>
-            <RefreshCw className="h-4 w-4" />
+      {/* Table Header with Actions */}
+      <ClientsHeader
+        searchQuery={searchQuery}
+        onSearchChange={(value) => {/* handle search change */}}
+        statusFilter={statusFilter}
+        onStatusFilterChange={(value) => {/* handle status filter change */}}
+        viewPreference={viewPreference}
+        onViewPreferenceChange={onViewPreferenceChange}
+        onAddClient={handleAddClient}
+        totalClients={totalCount}
+      />
+      
+      {/* Table Actions for Selected Items */}
+      {selectedClients.length > 0 && (
+        <div className="flex items-center gap-2 mb-4 p-2 bg-muted rounded-md">
+          <span className="text-sm font-medium">{selectedClients.length} selected</span>
+          <Button variant="outline" size="sm" onClick={handleDeleteSelected}>
+            <Trash2 className="h-4 w-4 mr-1" />
+            Delete
           </Button>
-        </div>
-        
-        <div className="flex items-center gap-2">
           <Button variant="outline" size="sm">
-            <Filter className="h-4 w-4 mr-1" />
-            Filter
+            <Download className="h-4 w-4 mr-1" />
+            Export
           </Button>
-          <ColumnManager 
-            columns={viewPreference.columns} 
-            onColumnsChange={handleColumnsChange}
-          />
         </div>
-      </div>
+      )}
       
       {/* Clients Table */}
       <div className="rounded-md border overflow-hidden">
@@ -406,13 +380,14 @@ export function ClientsTable({
                   <TableHead 
                     key={column.key} 
                     className="min-w-[120px]"
+                    style={{ width: column.width ? `${column.width}px` : 'auto' }}
                   >
                     <Button 
                       variant="ghost" 
                       onClick={() => handleSort(column.key)} 
                       className="flex items-center font-semibold hover:bg-transparent"
                     >
-                      <span className="capitalize">{column.key.replace(/_/g, ' ')}</span>
+                      <span className="capitalize">{column.label || column.key.replace(/_/g, ' ')}</span>
                       {viewPreference.sortColumn === column.key && (
                         <ArrowUpDown className={`ml-1 h-4 w-4 ${viewPreference.sortDirection === 'asc' ? 'rotate-180' : ''}`} />
                       )}
@@ -486,7 +461,12 @@ export function ClientsTable({
                           case 'full_name':
                             return (
                               <div className="flex flex-col">
-                                <span className="font-medium">{client.full_name || 'Unknown'}</span>
+                                <span 
+                                  className="font-medium cursor-pointer hover:underline" 
+                                  onClick={() => handleOpenDetails(client.id)}
+                                >
+                                  {client.full_name || 'Unknown'}
+                                </span>
                                 <span className="text-sm text-muted-foreground">{client.email || 'No email'}</span>
                               </div>
                             );
@@ -494,6 +474,22 @@ export function ClientsTable({
                             return <ClientStatusBadge status={client.status} />;
                           case 'updated_at':
                             return formatRelativeTime(client.updated_at);
+                          case 'notion_plan_url':
+                            return client.notion_plan_url ? (
+                              <a 
+                                href={client.notion_plan_url} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-blue-500 hover:underline flex items-center"
+                              >
+                                <FileText className="h-4 w-4 mr-1" />
+                                Notion Plan
+                              </a>
+                            ) : '-';
+                          case 'estimated_price':
+                            return client.estimated_price 
+                              ? <span className="flex items-center"><DollarSign className="h-4 w-4" />{client.estimated_price.toLocaleString()}</span> 
+                              : '-';
                           case 'development_url':
                             return client.development_url ? (
                               <a 
@@ -502,18 +498,37 @@ export function ClientsTable({
                                 rel="noopener noreferrer"
                                 className="text-blue-500 hover:underline flex items-center"
                               >
-                                View <ExternalLink className="ml-1 h-3 w-3" />
+                                <Link className="h-4 w-4 mr-1" />
+                                View Site
                               </a>
                             ) : '-';
-                          case 'estimated_price':
-                            return client.estimated_price 
-                              ? `$${client.estimated_price.toLocaleString()}` 
-                              : '-';
-                          case 'start_date':
+                          case 'next_steps':
+                            return (
+                              <div className="max-w-xs truncate" title={client.next_steps || ''}>
+                                {client.next_steps || '-'}
+                              </div>
+                            );
                           case 'estimated_completion_date':
-                            return client[column.key as keyof typeof client] 
-                              ? new Date(client[column.key as keyof typeof client] as string).toLocaleDateString() 
-                              : '-';
+                            return client.estimated_completion_date ? (
+                              <div className="flex items-center">
+                                <CalendarClock className="h-4 w-4 mr-1" />
+                                {new Date(client.estimated_completion_date).toLocaleDateString()}
+                              </div>
+                            ) : '-';
+                          case 'todos':
+                            return client.todos && client.todos.length > 0 ? (
+                              <div className="flex items-center">
+                                <span className="bg-blue-500/10 text-blue-500 rounded-full px-2 py-0.5 text-xs">
+                                  {client.todos.filter(t => !t.completed).length} pending
+                                </span>
+                              </div>
+                            ) : '-';
+                          case 'key_research':
+                            return (
+                              <div className="max-w-xs truncate" title={client.key_research || ''}>
+                                {client.key_research || '-'}
+                              </div>
+                            );
                           default:
                             return client[column.key as keyof typeof client] || '-';
                         }
@@ -541,59 +556,57 @@ export function ClientsTable({
                     })}
                     
                     <TableCell className="sticky right-0 bg-background">
-                      <TooltipProvider>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-48">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => handleOpenDetails(client.id)}>
-                              <ExternalLink className="h-4 w-4 mr-2" />
-                              View Details
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleStartEdit(client, 'full_name')}>
-                              <Edit2 className="h-4 w-4 mr-2" />
-                              Edit Client
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem 
-                              className="text-destructive"
-                              onClick={async () => {
-                                if (window.confirm('Are you sure you want to delete this client?')) {
-                                  try {
-                                    const { error } = await supabase
-                                      .from('client_onboarding')
-                                      .delete()
-                                      .eq('id', client.id);
-                                    
-                                    if (error) throw error;
-                                    
-                                    toast({
-                                      title: "Client deleted",
-                                      description: "The client has been permanently removed."
-                                    });
-                                    
-                                    refetch();
-                                  } catch (error: any) {
-                                    toast({
-                                      variant: "destructive",
-                                      title: "Error deleting client",
-                                      description: error.message || "Failed to delete client."
-                                    });
-                                  }
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={() => handleOpenDetails(client.id)}>
+                            <ExternalLink className="h-4 w-4 mr-2" />
+                            View Details
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleStartEdit(client, 'full_name')}>
+                            <Edit2 className="h-4 w-4 mr-2" />
+                            Edit Client
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem 
+                            className="text-destructive"
+                            onClick={async () => {
+                              if (window.confirm('Are you sure you want to delete this client?')) {
+                                try {
+                                  const { error } = await supabase
+                                    .from('client_onboarding')
+                                    .delete()
+                                    .eq('id', client.id);
+                                  
+                                  if (error) throw error;
+                                  
+                                  toast({
+                                    title: "Client deleted",
+                                    description: "The client has been permanently removed."
+                                  });
+                                  
+                                  refetch();
+                                } catch (error: any) {
+                                  toast({
+                                    variant: "destructive",
+                                    title: "Error deleting client",
+                                    description: error.message || "Failed to delete client."
+                                  });
                                 }
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Delete Client
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TooltipProvider>
+                              }
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete Client
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 ))

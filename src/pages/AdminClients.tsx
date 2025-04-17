@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AdminLayout } from '@/components/admin/layout/AdminLayout';
 import { ClientsTable } from '@/components/admin/clients/ClientsTable';
-import { ClientsToolbar } from '@/components/admin/clients/ClientsToolbar';
 import { useAdminCheck } from '@/hooks/useAdminCheck';
 import { Loader2 } from 'lucide-react';
 import { ClientViewPreference } from '@/types/client.types';
@@ -17,21 +16,25 @@ export default function AdminClients() {
   const [statusFilter, setStatusFilter] = useState('all');
   const { toast } = useToast();
   
-  // New state for view preferences
+  // Enhanced view preferences with more default columns
   const [viewPreference, setViewPreference] = useState<ClientViewPreference>({
     columns: [
-      { key: 'full_name', visible: true, label: 'Full Name' },
+      { key: 'full_name', visible: true, label: 'Client Name', width: 200 },
       { key: 'business_name', visible: true, label: 'Business Name' },
       { key: 'email', visible: true, label: 'Email' },
       { key: 'phone', visible: false, label: 'Phone' },
       { key: 'status', visible: true, label: 'Status' },
       { key: 'project_name', visible: true, label: 'Project Name' },
       { key: 'company_niche', visible: true, label: 'Company Niche' },
+      { key: 'notion_plan_url', visible: true, label: 'Notion Plan' },
+      { key: 'key_research', visible: false, label: 'Key Research' },
       { key: 'development_url', visible: true, label: 'Development URL' },
+      { key: 'next_steps', visible: true, label: 'Next Steps', width: 220 },
       { key: 'payment_status', visible: false, label: 'Payment Status' },
-      { key: 'estimated_price', visible: false, label: 'Estimated Price' },
+      { key: 'estimated_price', visible: true, label: 'Estimated Price' },
+      { key: 'initial_contact_date', visible: false, label: 'First Contact' },
       { key: 'start_date', visible: false, label: 'Start Date' },
-      { key: 'estimated_completion_date', visible: false, label: 'Estimated Completion Date' },
+      { key: 'estimated_completion_date', visible: true, label: 'Due Date' },
       { key: 'updated_at', visible: true, label: 'Last Updated' },
     ],
     sortColumn: 'updated_at',
@@ -111,6 +114,14 @@ export default function AdminClients() {
     }));
   };
 
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+  };
+
+  const handleStatusFilterChange = (status: string) => {
+    setStatusFilter(status);
+  };
+
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
@@ -127,25 +138,12 @@ export default function AdminClients() {
   return (
     <AdminLayout>
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">Client Management</h1>
-        
-        <ClientsToolbar 
+        <ClientsTable 
           searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
           statusFilter={statusFilter}
-          onStatusFilterChange={setStatusFilter}
           viewPreference={viewPreference}
           onViewPreferenceChange={handleViewPreferenceChange}
         />
-        
-        <div className="mt-6">
-          <ClientsTable 
-            searchQuery={searchQuery}
-            statusFilter={statusFilter}
-            viewPreference={viewPreference}
-            onViewPreferenceChange={handleViewPreferenceChange}
-          />
-        </div>
       </div>
     </AdminLayout>
   );

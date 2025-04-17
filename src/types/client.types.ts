@@ -26,6 +26,26 @@ export interface ClientData {
   initial_contact_date?: string | null;
   start_date?: string | null;
   estimated_completion_date?: string | null;
+  // New fields for enhanced client management
+  client_contact?: string | null;
+  purchase_history?: string | null;
+  next_steps?: string | null;
+  key_research?: string | null;
+  referral_source?: string | null;
+  industry?: string | null;
+  last_contacted_date?: string | null;
+  assigned_to?: string | null;
+  priority?: 'low' | 'medium' | 'high' | null;
+  todos?: TodoItem[];
+}
+
+export interface TodoItem {
+  id: string;
+  text: string;
+  completed: boolean;
+  created_at: string;
+  due_date?: string | null;
+  assigned_to?: string | null;
 }
 
 export interface ClientsListParams {
@@ -45,7 +65,9 @@ export interface ClientsListResponse {
 export interface ClientColumnPreference {
   key: string;
   visible: boolean;
-  label?: string; // Add label property to match ColumnDef interface
+  label?: string;
+  width?: number;
+  order?: number;
 }
 
 export interface ClientViewPreference {
@@ -53,4 +75,18 @@ export interface ClientViewPreference {
   sortColumn: string;
   sortDirection: 'asc' | 'desc';
   pageSize: number;
+  filters?: ClientFilter[];
+}
+
+export interface ClientFilter {
+  column: string;
+  operator: 'equals' | 'contains' | 'greater_than' | 'less_than' | 'between' | 'in';
+  value: any;
+}
+
+export interface SavedView {
+  id: string;
+  name: string;
+  preference: ClientViewPreference;
+  isDefault?: boolean;
 }
