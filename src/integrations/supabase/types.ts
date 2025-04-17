@@ -602,45 +602,72 @@ export type Database = {
       }
       instagram_leads: {
         Row: {
+          app_plan_status: string | null
+          app_plan_url: string | null
+          assigned_to: string | null
           bio: string | null
+          commented: boolean | null
           created_at: string | null
+          followed: boolean | null
           followers_count: number | null
           following_count: number | null
           full_name: string | null
           id: string
           is_private: boolean | null
           is_verified: boolean | null
+          last_interaction_at: string | null
           last_updated: string | null
+          messaged: boolean | null
+          notes: string | null
+          outreach_account: string | null
           posts_count: number | null
           profile_url: string | null
           status: string | null
           username: string
         }
         Insert: {
+          app_plan_status?: string | null
+          app_plan_url?: string | null
+          assigned_to?: string | null
           bio?: string | null
+          commented?: boolean | null
           created_at?: string | null
+          followed?: boolean | null
           followers_count?: number | null
           following_count?: number | null
           full_name?: string | null
           id?: string
           is_private?: boolean | null
           is_verified?: boolean | null
+          last_interaction_at?: string | null
           last_updated?: string | null
+          messaged?: boolean | null
+          notes?: string | null
+          outreach_account?: string | null
           posts_count?: number | null
           profile_url?: string | null
           status?: string | null
           username: string
         }
         Update: {
+          app_plan_status?: string | null
+          app_plan_url?: string | null
+          assigned_to?: string | null
           bio?: string | null
+          commented?: boolean | null
           created_at?: string | null
+          followed?: boolean | null
           followers_count?: number | null
           following_count?: number | null
           full_name?: string | null
           id?: string
           is_private?: boolean | null
           is_verified?: boolean | null
+          last_interaction_at?: string | null
           last_updated?: string | null
+          messaged?: boolean | null
+          notes?: string | null
+          outreach_account?: string | null
           posts_count?: number | null
           profile_url?: string | null
           status?: string | null
@@ -953,9 +980,53 @@ export type Database = {
         }
         Relationships: []
       }
+      outreach_accounts: {
+        Row: {
+          account_type: string | null
+          assigned_to: string | null
+          created_at: string | null
+          daily_comment_limit: number | null
+          daily_dm_limit: number | null
+          daily_follow_limit: number | null
+          id: string
+          last_action_at: string | null
+          status: string | null
+          updated_at: string | null
+          username: string
+        }
+        Insert: {
+          account_type?: string | null
+          assigned_to?: string | null
+          created_at?: string | null
+          daily_comment_limit?: number | null
+          daily_dm_limit?: number | null
+          daily_follow_limit?: number | null
+          id?: string
+          last_action_at?: string | null
+          status?: string | null
+          updated_at?: string | null
+          username: string
+        }
+        Update: {
+          account_type?: string | null
+          assigned_to?: string | null
+          created_at?: string | null
+          daily_comment_limit?: number | null
+          daily_dm_limit?: number | null
+          daily_follow_limit?: number | null
+          id?: string
+          last_action_at?: string | null
+          status?: string | null
+          updated_at?: string | null
+          username?: string
+        }
+        Relationships: []
+      }
       outreach_activities: {
         Row: {
+          account_id: string | null
           activity_type: string
+          campaign_id: string | null
           content: string | null
           created_at: string | null
           error_message: string | null
@@ -967,7 +1038,9 @@ export type Database = {
           status: string | null
         }
         Insert: {
+          account_id?: string | null
           activity_type: string
+          campaign_id?: string | null
           content?: string | null
           created_at?: string | null
           error_message?: string | null
@@ -979,7 +1052,9 @@ export type Database = {
           status?: string | null
         }
         Update: {
+          account_id?: string | null
           activity_type?: string
+          campaign_id?: string | null
           content?: string | null
           created_at?: string | null
           error_message?: string | null
@@ -991,6 +1066,20 @@ export type Database = {
           status?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "outreach_activities_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "outreach_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "outreach_activities_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "outreach_campaigns"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "outreach_activities_lead_id_fkey"
             columns: ["lead_id"]
@@ -1006,6 +1095,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      outreach_campaigns: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          end_date: string | null
+          id: string
+          message_template: string | null
+          metrics: Json | null
+          name: string
+          start_date: string | null
+          status: string | null
+          target_audience: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          message_template?: string | null
+          metrics?: Json | null
+          name: string
+          start_date?: string | null
+          status?: string | null
+          target_audience?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          message_template?: string | null
+          metrics?: Json | null
+          name?: string
+          start_date?: string | null
+          status?: string | null
+          target_audience?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       payment_methods: {
         Row: {
