@@ -42,6 +42,8 @@ export default function AdminClients() {
   // Initialize the clients data and add admin role 
   useEffect(() => {
     const initializeData = async () => {
+      console.log('Initializing admin client data');
+      
       // Try to make current user admin for easier testing
       const isAdminSuccess = await makeCurrentUserAdmin();
       
@@ -71,10 +73,17 @@ export default function AdminClients() {
   }, [toast]);
 
   useEffect(() => {
+    // Only redirect if we're not loading and admin check is complete
     if (!isLoading && !isAdmin) {
-      navigate('/');
+      console.log('Not an admin, redirecting to home');
+      toast({
+        variant: "destructive",
+        title: "Access Denied",
+        description: "You don't have admin privileges to access this page.",
+      });
+      navigate('/home');
     }
-  }, [isAdmin, isLoading, navigate]);
+  }, [isAdmin, isLoading, navigate, toast]);
 
   // Save view preferences to localStorage
   useEffect(() => {
@@ -104,8 +113,9 @@ export default function AdminClients() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin text-siso-orange" />
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <Loader2 className="w-8 h-8 animate-spin text-siso-orange mb-4" />
+        <p className="text-siso-text">Verifying admin access...</p>
       </div>
     );
   }

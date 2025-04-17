@@ -34,6 +34,8 @@ export const makeCurrentUserAdmin = async (): Promise<boolean> => {
       return false;
     }
     
+    console.log('Attempting to make user an admin:', user.id);
+    
     // Check if user already has admin role
     const { data: existingRole, error: checkError } = await supabase
       .from('user_roles')
@@ -52,6 +54,8 @@ export const makeCurrentUserAdmin = async (): Promise<boolean> => {
       console.log('User is already an admin');
       return true;
     }
+    
+    console.log('Adding admin role to user');
     
     // Add admin role to user
     const { error: insertError } = await supabase

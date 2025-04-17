@@ -30,19 +30,35 @@ export function safeCast<T = any>(data: any): T {
 // Helper function to check if the current user is an admin
 export const checkIsAdmin = async (): Promise<boolean> => {
   try {
+    console.log('Checking admin status...');
+    
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return false;
+    if (!user) {
+      console.log('No user found during admin check');
+      return false;
+    }
 
+    console.log('Checking admin status for user:', user.id);
+    
+    // Query the user_roles table to check if the user is an admin
     const { data, error } = await supabase
       .from('user_roles')
       .select('role')
       .eq('user_id', user.id)
       .eq('role', 'admin')
-      .single();
+      .maybeSingle();
 
-    return !!data && !error;
+    if (error) {
+      console.error('Error checking admin role:', error.message);
+      return false;
+    }
+
+    const isAdmin = !!data;
+    console.log('Admin check result:', isAdmin, 'Role data:', data);
+    
+    return isAdmin;
   } catch (error) {
-    console.error('Error checking admin status:', error);
+    console.error('Unexpected error checking admin status:', error);
     return false;
   }
 };
