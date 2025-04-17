@@ -31,12 +31,14 @@ export function createClientData(clientObj: any): { full_name: string; business_
 
 /**
  * Transforms database response data to match expected types
- * Uses explicit any[] typing to break deep type instantiation
+ * Breaks deep type instantiation by using type assertion
  */
 export function transformEntityData<T>(
-  data: any[], 
+  data: unknown[], 
   transformer: (item: any) => T
 ): T[] {
   if (!data || !Array.isArray(data)) return [];
-  return data.map(transformer);
+  
+  // Type assertion to break infinite recursion
+  return (data as any[]).map(item => transformer(item));
 }

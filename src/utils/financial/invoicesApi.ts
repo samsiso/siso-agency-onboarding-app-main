@@ -1,7 +1,8 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 import { Invoice } from './types';
-import { InvoiceFilters, RawInvoiceData } from './types/invoiceTypes';
+import { InvoiceFilters } from './types/invoiceTypes';
 import { transformEntityData } from './utils/relationshipUtils';
 import { transformInvoiceData } from './utils/invoiceTransformers';
 
@@ -30,9 +31,8 @@ export async function fetchInvoices(filters: InvoiceFilters = {}): Promise<Invoi
       
     if (error) throw error;
     
-    // Handle data explicitly as any[] to avoid deep type instantiation
-    const safeData = (data || []) as any[];
-    return transformEntityData(safeData, transformInvoiceData);
+    // Break deep instantiation by typing as unknown first
+    return transformEntityData(data || [], transformInvoiceData);
   } catch (error) {
     console.error('Error fetching invoices:', error);
     toast({

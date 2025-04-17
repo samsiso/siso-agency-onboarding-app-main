@@ -1,12 +1,11 @@
 
 import { FinancialTransaction, ExpenseCategory, Vendor, PaymentMethod } from '../types';
-import { RawTransactionData } from '../types/transactionTypes';
 import { isValidRelationship } from './relationshipUtils';
 
 /**
  * Transforms raw transaction data from Supabase into the FinancialTransaction type
  */
-export function transformTransactionData(item: RawTransactionData): FinancialTransaction {
+export function transformTransactionData(item: any): FinancialTransaction {
   return {
     ...item,
     type: item.type as 'expense' | 'revenue',

@@ -7,6 +7,9 @@ import { ExpensesTable } from "@/components/admin/financials/ExpensesTable";
 import { RevenueTable } from "@/components/admin/financials/RevenueTable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { fetchTransactions, FinancialTransaction } from "@/utils/financial";
+import { Button } from "@/components/ui/button";
+import { seedInitialExpenses } from "@/utils/financial/seedExpenses";
+import { Database } from "@/components/ui/database";
 
 export default function AdminPayments() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -14,11 +17,16 @@ export default function AdminPayments() {
   const [expenses, setExpenses] = useState<FinancialTransaction[]>([]);
   const [revenues, setRevenues] = useState<FinancialTransaction[]>([]);
   const [filters, setFilters] = useState({});
+  const [isSeeding, setIsSeeding] = useState(false);
 
   useEffect(() => {
-    async function loadData() {
-      setIsLoading(true);
-      
+    loadData();
+  }, [filters]);
+
+  async function loadData() {
+    setIsLoading(true);
+    
+    try {
       // Load expenses
       const expenseData = await fetchTransactions({ 
         type: 'expense',
@@ -32,20 +40,44 @@ export default function AdminPayments() {
         ...filters 
       });
       setRevenues(revenueData || []);
-      
+    } catch (error) {
+      console.error("Error loading financial data:", error);
+    } finally {
       setIsLoading(false);
     }
-    
-    loadData();
-  }, [filters]);
+  }
 
   const handleFilterChange = (newFilters) => {
     setFilters(prev => ({ ...prev, ...newFilters }));
   };
 
+  const handleSeedExpenses = async () => {
+    setIsSeeding(true);
+    try {
+      await seedInitialExpenses();
+      loadData(); // Reload data after seeding
+    } finally {
+      setIsSeeding(false);
+    }
+  };
+
   return (
     <AdminLayout>
       <div className="container px-6 py-8 max-w-7xl">
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
+          <h1 className="text-3xl font-bold tracking-tight">Financial Management</h1>
+          {expenses.length === 0 && (
+            <Button 
+              variant="secondary" 
+              onClick={handleSeedExpenses} 
+              disabled={isSeeding}
+              className="mt-2 md:mt-0"
+            >
+              {isSeeding ? "Adding Expenses..." : "Add Sample Expenses"}
+            </Button>
+          )}
+        </div>
+        
         <FinancialsHeader onFilterChange={handleFilterChange} />
         
         <Tabs defaultValue="dashboard" className="mt-6" onValueChange={setActiveTab}>
@@ -64,11 +96,7 @@ export default function AdminPayments() {
             <ExpensesTable 
               expenses={expenses} 
               isLoading={isLoading} 
-              onDataChange={() => {
-                // Reload data when expenses change
-                fetchTransactions({ type: 'expense', ...filters })
-                  .then(data => setExpenses(data || []));
-              }}
+              onDataChange={loadData}
             />
           </TabsContent>
           
@@ -76,11 +104,7 @@ export default function AdminPayments() {
             <RevenueTable 
               revenues={revenues}
               isLoading={isLoading}
-              onDataChange={() => {
-                // Reload data when revenues change
-                fetchTransactions({ type: 'revenue', ...filters })
-                  .then(data => setRevenues(data || []));
-              }}
+              onDataChange={loadData}
             />
           </TabsContent>
           

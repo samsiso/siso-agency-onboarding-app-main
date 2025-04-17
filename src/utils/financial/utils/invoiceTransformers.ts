@@ -1,12 +1,11 @@
 
 import { PaymentMethod, Invoice } from '../types';
-import { RawInvoiceData } from '../types/invoiceTypes';
 import { createClientData, isValidRelationship } from './relationshipUtils';
 
 /**
  * Transforms raw invoice data from Supabase into the Invoice type
  */
-export function transformInvoiceData(item: RawInvoiceData): Invoice {
+export function transformInvoiceData(item: any): Invoice {
   return {
     ...item,
     status: item.status as 'draft' | 'pending' | 'paid' | 'overdue' | 'cancelled',

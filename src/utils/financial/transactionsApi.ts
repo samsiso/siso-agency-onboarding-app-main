@@ -1,10 +1,14 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 import { FinancialTransaction } from './types';
-import { RawTransactionData, TransactionFilters } from './types/transactionTypes';
+import { TransactionFilters } from './types/transactionTypes';
 import { transformEntityData } from './utils/relationshipUtils';
 import { transformTransactionData } from './utils/transactionTransformers';
 
+/**
+ * Fetches financial transactions with optional filters
+ */
 export async function fetchTransactions(filters: TransactionFilters = {}): Promise<FinancialTransaction[]> {
   try {
     const query = supabase
@@ -17,6 +21,7 @@ export async function fetchTransactions(filters: TransactionFilters = {}): Promi
       `)
       .order('date', { ascending: false });
     
+    // Apply filters if provided
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
         query.eq(key, value);
@@ -27,9 +32,8 @@ export async function fetchTransactions(filters: TransactionFilters = {}): Promi
       
     if (error) throw error;
     
-    // Handle data explicitly as any[] to avoid deep type instantiation
-    const safeData = (data || []) as any[];
-    return transformEntityData(safeData, transformTransactionData);
+    // Break deep instantiation by typing as unknown first
+    return transformEntityData(data || [], transformTransactionData);
   } catch (error) {
     console.error('Error fetching transactions:', error);
     toast({
@@ -58,6 +62,7 @@ export async function addTransaction(
       description: `${transaction.type === 'expense' ? 'Expense' : 'Revenue'} recorded successfully`,
     });
     
+    // Use type assertion to avoid deep instantiation
     return {
       ...data,
       type: data.type as 'expense' | 'revenue',
