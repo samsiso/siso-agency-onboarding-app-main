@@ -3,10 +3,10 @@ import React from 'react';
 import { Card, CardContent, CardHeader } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
-import AdminLayout from "../components/admin/layout/AdminLayout";
-import PlansList from "../components/admin/PlansList";
-import PlanForm from "../components/admin/PlanForm";
-import BulkPlanCreation from "../components/admin/BulkPlanCreation";
+import { AdminLayout } from "../components/admin/layout/AdminLayout";
+import { PlansList } from "../components/admin/PlansList";
+import { PlanForm } from "../components/admin/PlanForm";
+import { BulkPlanCreation } from "../components/admin/BulkPlanCreation";
 import { toast } from "sonner";
 
 const AdminPlans = () => {
