@@ -1,17 +1,7 @@
 
 import { ResponsiveContainer, AreaChart as RechartsAreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, BarChart as RechartsBarChart, Bar, PieChart as RechartsPieChart, Pie, Cell, Legend } from 'recharts';
 
-// Sample data - in a real app, this would come from your API
-const areaChartData = [
-  { name: 'Jan', revenue: 4000, expense: 2400 },
-  { name: 'Feb', revenue: 3000, expense: 1398 },
-  { name: 'Mar', revenue: 2000, expense: 9800 },
-  { name: 'Apr', revenue: 2780, expense: 3908 },
-  { name: 'May', revenue: 1890, expense: 4800 },
-  { name: 'Jun', revenue: 2390, expense: 3800 },
-  { name: 'Jul', revenue: 3490, expense: 4300 },
-];
-
+// Sample data for charts that don't have real data yet
 const barChartData = [
   { name: 'Jan', value: 4000 },
   { name: 'Feb', value: 3000 },
@@ -32,11 +22,22 @@ const pieChartData = [
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
-export function AreaChart() {
+export function AreaChart({ data = [] }) {
+  // Use provided data or fallback to empty array
+  const chartData = data.length > 0 ? data : [
+    { name: 'Jan', revenue: 4000, expense: 2400 },
+    { name: 'Feb', revenue: 3000, expense: 1398 },
+    { name: 'Mar', revenue: 2000, expense: 9800 },
+    { name: 'Apr', revenue: 2780, expense: 3908 },
+    { name: 'May', revenue: 1890, expense: 4800 },
+    { name: 'Jun', revenue: 2390, expense: 3800 },
+    { name: 'Jul', revenue: 3490, expense: 4300 },
+  ];
+
   return (
     <ResponsiveContainer width="100%" height={300}>
       <RechartsAreaChart
-        data={areaChartData}
+        data={chartData}
         margin={{
           top: 10,
           right: 30,
@@ -55,11 +56,14 @@ export function AreaChart() {
   );
 }
 
-export function BarChart() {
+export function BarChart({ data }) {
+  // Use provided data or fallback to sample data
+  const chartData = data || barChartData;
+  
   return (
     <ResponsiveContainer width="100%" height={300}>
       <RechartsBarChart
-        data={barChartData}
+        data={chartData}
         margin={{
           top: 5,
           right: 30,
@@ -77,12 +81,15 @@ export function BarChart() {
   );
 }
 
-export function PieChart() {
+export function PieChart({ data }) {
+  // Use provided data or fallback to sample data
+  const chartData = data || pieChartData;
+  
   return (
     <ResponsiveContainer width="100%" height={300}>
       <RechartsPieChart>
         <Pie
-          data={pieChartData}
+          data={chartData}
           cx="50%"
           cy="50%"
           labelLine={false}
@@ -91,7 +98,7 @@ export function PieChart() {
           dataKey="value"
           label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
         >
-          {pieChartData.map((entry, index) => (
+          {chartData.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
           ))}
         </Pie>

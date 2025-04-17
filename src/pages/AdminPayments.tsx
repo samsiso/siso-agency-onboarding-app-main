@@ -1,19 +1,52 @@
 
+import { useState, useEffect } from "react";
 import { AdminLayout } from "@/components/admin/layout/AdminLayout";
 import { FinancialsHeader } from "@/components/admin/financials/FinancialsHeader";
 import { FinancialsDashboard } from "@/components/admin/financials/FinancialsDashboard";
 import { ExpensesTable } from "@/components/admin/financials/ExpensesTable";
 import { RevenueTable } from "@/components/admin/financials/RevenueTable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState } from "react";
+import { fetchTransactions, FinancialTransaction } from "@/utils/financialHelpers";
 
 export default function AdminPayments() {
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [isLoading, setIsLoading] = useState(true);
+  const [expenses, setExpenses] = useState<FinancialTransaction[]>([]);
+  const [revenues, setRevenues] = useState<FinancialTransaction[]>([]);
+  const [filters, setFilters] = useState({});
+
+  useEffect(() => {
+    async function loadData() {
+      setIsLoading(true);
+      
+      // Load expenses
+      const expenseData = await fetchTransactions({ 
+        type: 'expense',
+        ...filters
+      });
+      setExpenses(expenseData || []);
+      
+      // Load revenues
+      const revenueData = await fetchTransactions({ 
+        type: 'revenue',
+        ...filters 
+      });
+      setRevenues(revenueData || []);
+      
+      setIsLoading(false);
+    }
+    
+    loadData();
+  }, [filters]);
+
+  const handleFilterChange = (newFilters) => {
+    setFilters(prev => ({ ...prev, ...newFilters }));
+  };
 
   return (
     <AdminLayout>
       <div className="container px-6 py-8 max-w-7xl">
-        <FinancialsHeader />
+        <FinancialsHeader onFilterChange={handleFilterChange} />
         
         <Tabs defaultValue="dashboard" className="mt-6" onValueChange={setActiveTab}>
           <TabsList className="grid grid-cols-4 w-full max-w-md">
@@ -28,11 +61,27 @@ export default function AdminPayments() {
           </TabsContent>
           
           <TabsContent value="expenses" className="mt-6">
-            <ExpensesTable />
+            <ExpensesTable 
+              expenses={expenses} 
+              isLoading={isLoading} 
+              onDataChange={() => {
+                // Reload data when expenses change
+                fetchTransactions({ type: 'expense', ...filters })
+                  .then(data => setExpenses(data || []));
+              }}
+            />
           </TabsContent>
           
           <TabsContent value="revenue" className="mt-6">
-            <RevenueTable />
+            <RevenueTable 
+              revenues={revenues}
+              isLoading={isLoading}
+              onDataChange={() => {
+                // Reload data when revenues change
+                fetchTransactions({ type: 'revenue', ...filters })
+                  .then(data => setRevenues(data || []));
+              }}
+            />
           </TabsContent>
           
           <TabsContent value="predictions" className="mt-6">

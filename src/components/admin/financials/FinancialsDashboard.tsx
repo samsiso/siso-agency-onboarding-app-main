@@ -1,4 +1,5 @@
 
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AreaChart, BarChart, PieChart } from "@/components/admin/financials/Charts";
 import { 
@@ -10,43 +11,91 @@ import {
   Receipt, 
   CreditCard
 } from "lucide-react";
+import { getFinancialSummary } from "@/utils/financialHelpers";
+import { Button } from "@/components/ui/button";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export function FinancialsDashboard() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [period, setPeriod] = useState("month");
+  const [summary, setSummary] = useState({
+    totalRevenue: 0,
+    totalExpenses: 0, 
+    profitMargin: 0,
+    outstandingAmount: 0,
+    revenueByMonth: []
+  });
+
+  useEffect(() => {
+    async function loadSummary() {
+      setIsLoading(true);
+      const data = await getFinancialSummary(period);
+      setSummary(data);
+      setIsLoading(false);
+    }
+    
+    loadSummary();
+  }, [period]);
+
   return (
     <div className="grid gap-6">
+      {/* Period selector */}
+      <div className="flex justify-end">
+        <Select value={period} onValueChange={setPeriod}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select period" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="month">This Month</SelectItem>
+            <SelectItem value="quarter">This Quarter</SelectItem>
+            <SelectItem value="year">This Year</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      
       {/* Summary Cards */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <SummaryCard 
           title="Total Revenue" 
-          value="£50,000" 
+          value={`£${summary.totalRevenue.toLocaleString()}`}
           trend="+12%" 
           trendType="up"
           description="vs last month"
           icon={<DollarSign className="h-4 w-4" />}
+          isLoading={isLoading}
         />
         <SummaryCard 
           title="Total Expenses" 
-          value="£20,000" 
+          value={`£${summary.totalExpenses.toLocaleString()}`}
           trend="+5%" 
           trendType="up"
           description="vs last month"
           icon={<CreditCard className="h-4 w-4" />}
+          isLoading={isLoading}
         />
         <SummaryCard 
           title="Profit Margin" 
-          value="60%" 
+          value={`${summary.profitMargin.toFixed(1)}%`}
           trend="+3%" 
           trendType="up"
           description="vs last month"
           icon={<TrendingUp className="h-4 w-4" />}
+          isLoading={isLoading}
         />
         <SummaryCard 
           title="Outstanding" 
-          value="£3,500" 
+          value={`£${summary.outstandingAmount.toLocaleString()}`}
           trend="-15%" 
           trendType="down"
           description="vs last month"
           icon={<Receipt className="h-4 w-4" />}
+          isLoading={isLoading}
         />
       </div>
 
@@ -57,7 +106,7 @@ export function FinancialsDashboard() {
             <CardTitle>Revenue vs Expenses</CardTitle>
           </CardHeader>
           <CardContent>
-            <AreaChart />
+            <AreaChart data={summary.revenueByMonth} />
           </CardContent>
         </Card>
         <Card className="col-span-3">
@@ -90,9 +139,10 @@ interface SummaryCardProps {
   trendType: 'up' | 'down';
   description: string;
   icon: React.ReactNode;
+  isLoading?: boolean;
 }
 
-function SummaryCard({ title, value, trend, trendType, description, icon }: SummaryCardProps) {
+function SummaryCard({ title, value, trend, trendType, description, icon, isLoading = false }: SummaryCardProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -102,7 +152,11 @@ function SummaryCard({ title, value, trend, trendType, description, icon }: Summ
         </div>
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
+        {isLoading ? (
+          <div className="h-8 w-24 bg-muted animate-pulse rounded"></div>
+        ) : (
+          <div className="text-2xl font-bold">{value}</div>
+        )}
         <div className="flex items-center mt-1">
           <span className={`flex items-center text-xs ${
             trendType === 'up' ? 'text-green-500' : 'text-red-500'

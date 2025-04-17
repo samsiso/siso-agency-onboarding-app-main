@@ -30,72 +30,80 @@ import {
   Clock,
   Check,
   AlertCircle,
+  Loader2
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { FinancialTransaction, deleteTransaction } from "@/utils/financialHelpers";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
-// Sample data - in a real app, this would come from your API
-const revenues = [
-  {
-    id: "1",
-    client: "Acme Corp",
-    project: "Website Redesign",
-    amount: 5000.00,
-    date: "2025-04-05",
-    status: "Paid",
-    invoiceNumber: "INV-001",
-    paymentMethod: "Bank Transfer"
-  },
-  {
-    id: "2",
-    client: "Tech Solutions",
-    project: "Mobile App Development",
-    amount: 15000.00,
-    date: "2025-04-10",
-    status: "Pending",
-    invoiceNumber: "INV-002",
-    paymentMethod: "Credit Card"
-  },
-  {
-    id: "3",
-    client: "Global Enterprises",
-    project: "E-commerce Platform",
-    amount: 12000.00,
-    date: "2025-04-15",
-    status: "Overdue",
-    invoiceNumber: "INV-003",
-    paymentMethod: "Bank Transfer"
-  },
-  {
-    id: "4",
-    client: "Modern Marketing",
-    project: "SEO Optimization",
-    amount: 3500.00,
-    date: "2025-04-20",
-    status: "Paid",
-    invoiceNumber: "INV-004",
-    paymentMethod: "PayPal"
-  },
-  {
-    id: "5",
-    client: "Startup Inc",
-    project: "Branding Package",
-    amount: 7500.00,
-    date: "2025-04-25",
-    status: "Draft",
-    invoiceNumber: "INV-005",
-    paymentMethod: "Pending"
-  }
-];
+interface RevenueTableProps {
+  revenues: FinancialTransaction[];
+  isLoading?: boolean;
+  onDataChange?: () => void;
+}
 
-export function RevenueTable() {
+export function RevenueTable({ revenues = [], isLoading = false, onDataChange }: RevenueTableProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [viewDetailsId, setViewDetailsId] = useState<string | null>(null);
+  const [sortField, setSortField] = useState<string>("date");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
-  // Simple client-side filtering - in a real app, you'd use a more sophisticated approach
-  const filteredRevenues = revenues.filter(revenue => 
-    revenue.client.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    revenue.project.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    revenue.invoiceNumber.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Get the revenue being viewed in the details dialog
+  const revenueDetails = viewDetailsId 
+    ? revenues.find(revenue => revenue.id === viewDetailsId) 
+    : null;
+
+  // Handle sort toggling
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
+
+  // Simple client-side filtering and sorting
+  const filteredRevenues = revenues
+    .filter(revenue => 
+      revenue.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      revenue.vendor?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      `${revenue.amount}`.includes(searchQuery)
+    )
+    .sort((a, b) => {
+      if (sortField === "amount") {
+        return sortDirection === "asc" 
+          ? a.amount - b.amount 
+          : b.amount - a.amount;
+      } else if (sortField === "date") {
+        return sortDirection === "asc" 
+          ? new Date(a.date).getTime() - new Date(b.date).getTime() 
+          : new Date(b.date).getTime() - new Date(a.date).getTime();
+      } else if (sortField === "name") {
+        const aVal = a.description || "";
+        const bVal = b.description || "";
+        return sortDirection === "asc" 
+          ? aVal.localeCompare(bVal) 
+          : bVal.localeCompare(aVal);
+      }
+      return 0;
+    });
+
+  // Handle revenue deletion
+  const handleDelete = async (id: string) => {
+    if (window.confirm("Are you sure you want to delete this revenue?")) {
+      const success = await deleteTransaction(id);
+      if (success && onDataChange) {
+        onDataChange();
+      }
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -122,7 +130,7 @@ export function RevenueTable() {
           </Button>
           <Button size="sm" className="h-9">
             <FilePlus className="h-4 w-4 mr-2" />
-            Add Invoice
+            Add Revenue
           </Button>
         </div>
       </div>
@@ -132,43 +140,51 @@ export function RevenueTable() {
           <TableHeader>
             <TableRow>
               <TableHead className="w-[200px]">
-                <div className="flex items-center">
-                  Client
+                <div className="flex items-center cursor-pointer" onClick={() => handleSort("name")}>
+                  Description
                   <ArrowUpDown className="ml-2 h-4 w-4" />
                 </div>
               </TableHead>
-              <TableHead>Project</TableHead>
+              <TableHead>Source/Client</TableHead>
               <TableHead>
-                <div className="flex items-center">
+                <div className="flex items-center cursor-pointer" onClick={() => handleSort("amount")}>
                   Amount
                   <ArrowUpDown className="ml-2 h-4 w-4" />
                 </div>
               </TableHead>
               <TableHead>
-                <div className="flex items-center">
+                <div className="flex items-center cursor-pointer" onClick={() => handleSort("date")}>
                   Date
                   <ArrowUpDown className="ml-2 h-4 w-4" />
                 </div>
               </TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Invoice #</TableHead>
+              <TableHead>Invoice</TableHead>
               <TableHead>Payment Method</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredRevenues.length > 0 ? (
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center py-8">
+                  <div className="flex justify-center">
+                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : filteredRevenues.length > 0 ? (
               filteredRevenues.map(revenue => (
                 <TableRow key={revenue.id}>
-                  <TableCell className="font-medium">{revenue.client}</TableCell>
-                  <TableCell>{revenue.project}</TableCell>
+                  <TableCell className="font-medium">{revenue.description}</TableCell>
+                  <TableCell>{revenue.vendor?.name || "—"}</TableCell>
                   <TableCell>£{revenue.amount.toFixed(2)}</TableCell>
-                  <TableCell>{revenue.date}</TableCell>
+                  <TableCell>{new Date(revenue.date).toLocaleDateString()}</TableCell>
                   <TableCell>
                     <StatusBadge status={revenue.status} />
                   </TableCell>
-                  <TableCell>{revenue.invoiceNumber}</TableCell>
-                  <TableCell>{revenue.paymentMethod}</TableCell>
+                  <TableCell>{revenue.notes || "—"}</TableCell>
+                  <TableCell>{revenue.payment_method?.name || "—"}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -178,19 +194,22 @@ export function RevenueTable() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setViewDetailsId(revenue.id)}>
                           <Eye className="h-4 w-4 mr-2" />
-                          View Invoice
+                          View Details
                         </DropdownMenuItem>
                         <DropdownMenuItem>
                           <Send className="h-4 w-4 mr-2" />
-                          Send Invoice
+                          Generate Invoice
                         </DropdownMenuItem>
                         <DropdownMenuItem>
                           <Edit className="h-4 w-4 mr-2" />
                           Edit
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600">
+                        <DropdownMenuItem 
+                          className="text-red-600" 
+                          onClick={() => handleDelete(revenue.id)}
+                        >
                           <Trash className="h-4 w-4 mr-2" />
                           Delete
                         </DropdownMenuItem>
@@ -202,13 +221,71 @@ export function RevenueTable() {
             ) : (
               <TableRow>
                 <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
-                  No revenue records found. Try adjusting your filters or add a new invoice.
+                  No revenue records found. Try adjusting your filters or add a new revenue record.
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </div>
+
+      {/* Revenue Details Dialog */}
+      {revenueDetails && (
+        <Dialog open={!!viewDetailsId} onOpenChange={(open) => !open && setViewDetailsId(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Revenue Details</DialogTitle>
+              <DialogDescription>
+                View detailed information about this revenue.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground">Description</h3>
+                  <p>{revenueDetails.description}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground">Amount</h3>
+                  <p className="font-semibold">£{revenueDetails.amount.toFixed(2)}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground">Date</h3>
+                  <p>{new Date(revenueDetails.date).toLocaleDateString()}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground">Source/Client</h3>
+                  <p>{revenueDetails.vendor?.name || "—"}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground">Payment Method</h3>
+                  <p>{revenueDetails.payment_method?.name || "—"}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground">Status</h3>
+                  <p>{revenueDetails.status}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground">Recurrence</h3>
+                  <p>
+                    {revenueDetails.recurring_type === 'monthly' 
+                      ? 'Monthly' 
+                      : revenueDetails.recurring_type === 'annual'
+                      ? 'Annual'
+                      : 'One-Time'}
+                  </p>
+                </div>
+              </div>
+              {revenueDetails.notes && (
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground">Notes</h3>
+                  <p className="text-sm">{revenueDetails.notes}</p>
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
@@ -218,19 +295,19 @@ function StatusBadge({ status }: { status: string }) {
   let icon = null;
 
   switch (status) {
-    case "Paid":
+    case "completed":
       color = "bg-green-100 text-green-800";
       icon = <Check className="h-3 w-3 mr-1" />;
       break;
-    case "Pending":
+    case "pending":
       color = "bg-amber-100 text-amber-800";
       icon = <Clock className="h-3 w-3 mr-1" />;
       break;
-    case "Overdue":
+    case "overdue":
       color = "bg-red-100 text-red-800";
       icon = <AlertCircle className="h-3 w-3 mr-1" />;
       break;
-    case "Draft":
+    case "draft":
       color = "bg-blue-100 text-blue-800";
       icon = <Edit className="h-3 w-3 mr-1" />;
       break;
