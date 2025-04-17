@@ -3,7 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 import { FinancialTransaction } from './types';
 
-type SupabaseTransactionResult = {
+// Define a more specific interface for what Supabase returns
+interface SupabaseTransactionResult {
   id: string;
   type: string;
   amount: number;
@@ -22,20 +23,20 @@ type SupabaseTransactionResult = {
     name: string;
     description?: string;
     is_active: boolean;
-  } | null;
+  } | null | unknown;
   vendor?: {
     id: string;
     name: string;
     contact_email?: string;
     payment_terms?: string;
     is_active: boolean;
-  } | null;
+  } | null | unknown;
   payment_method?: {
     id: string;
     name: string;
     is_active: boolean;
-  } | null;
-};
+  } | null | unknown;
+}
 
 export async function fetchTransactions(filters: Record<string, any> = {}): Promise<FinancialTransaction[]> {
   try {
@@ -61,14 +62,15 @@ export async function fetchTransactions(filters: Record<string, any> = {}): Prom
     if (error) throw error;
     
     // Transform types to ensure they conform to the expected types
-    const transformedData = (data || []).map((item: SupabaseTransactionResult) => {
+    const transformedData = (data || []).map((item: any) => {
       return {
         ...item,
         type: item.type as 'expense' | 'revenue',
         recurring_type: item.recurring_type as 'one-time' | 'monthly' | 'annual' | null,
-        category: item.category || undefined,
-        vendor: item.vendor || undefined,
-        payment_method: item.payment_method || undefined
+        // Safely handle potential relationship errors
+        category: item.category && typeof item.category === 'object' && !('code' in item.category) ? item.category : undefined,
+        vendor: item.vendor && typeof item.vendor === 'object' && !('code' in item.vendor) ? item.vendor : undefined,
+        payment_method: item.payment_method && typeof item.payment_method === 'object' && !('code' in item.payment_method) ? item.payment_method : undefined
       };
     });
     

@@ -3,7 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 import { Invoice } from './types';
 
-type SupabaseInvoiceResult = {
+// Define a more accurate interface for what Supabase returns
+interface SupabaseInvoiceResult {
   id: string;
   invoice_number: string;
   client_id: string;
@@ -14,16 +15,17 @@ type SupabaseInvoiceResult = {
   status: string;
   payment_method_id?: string;
   notes?: string;
+  // Handle potential relationship error by making client more flexible
   client?: {
     full_name?: string;
     business_name?: string;
-  } | null;
+  } | null | unknown;
   payment_method?: {
     id: string;
     name: string;
     is_active: boolean;
   } | null;
-};
+}
 
 export async function fetchInvoices(filters: Record<string, any> = {}): Promise<Invoice[]> {
   try {
@@ -48,11 +50,13 @@ export async function fetchInvoices(filters: Record<string, any> = {}): Promise<
     if (error) throw error;
     
     // Transform data to match the Invoice type
-    const transformedData = (data || []).map((item: SupabaseInvoiceResult) => {
+    const transformedData = (data || []).map((item: any) => {
       // Create client object with required properties
       let clientData = { full_name: 'Unknown' };
       
-      if (item.client && typeof item.client === 'object') {
+      if (item.client && typeof item.client === 'object' && 
+          // Check if it's not an error object from Supabase
+          !('code' in item.client) && !('message' in item.client) && !('details' in item.client)) {
         const businessName = item.client.business_name || null;
         clientData = {
           full_name: item.client.full_name || 'Unknown',
