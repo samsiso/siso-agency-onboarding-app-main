@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { AdminLayout } from "@/components/admin/layout/AdminLayout";
 import { FinancialsHeader } from "@/components/admin/financials/FinancialsHeader";
@@ -9,7 +8,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { fetchTransactions, FinancialTransaction } from "@/utils/financial";
 import { Button } from "@/components/ui/button";
 import { seedInitialExpenses } from "@/utils/financial/seedExpenses";
-import { Database } from "@/components/ui/database";
 
 export default function AdminPayments() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -27,14 +25,12 @@ export default function AdminPayments() {
     setIsLoading(true);
     
     try {
-      // Load expenses
       const expenseData = await fetchTransactions({ 
         type: 'expense',
         ...filters
       });
       setExpenses(expenseData || []);
       
-      // Load revenues
       const revenueData = await fetchTransactions({ 
         type: 'revenue',
         ...filters 
@@ -55,7 +51,7 @@ export default function AdminPayments() {
     setIsSeeding(true);
     try {
       await seedInitialExpenses();
-      loadData(); // Reload data after seeding
+      loadData();
     } finally {
       setIsSeeding(false);
     }
