@@ -23,7 +23,7 @@ import {
 
 export function FinancialsDashboard() {
   const [isLoading, setIsLoading] = useState(true);
-  const [period, setPeriod] = useState("month");
+  const [period, setPeriod] = useState<"month" | "year">("month");
   const [summary, setSummary] = useState({
     totalRevenue: 0,
     totalExpenses: 0, 
@@ -47,13 +47,12 @@ export function FinancialsDashboard() {
     <div className="grid gap-6">
       {/* Period selector */}
       <div className="flex justify-end">
-        <Select value={period} onValueChange={setPeriod}>
+        <Select value={period} onValueChange={(value: "month" | "year") => setPeriod(value)}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Select period" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="month">This Month</SelectItem>
-            <SelectItem value="quarter">This Quarter</SelectItem>
             <SelectItem value="year">This Year</SelectItem>
           </SelectContent>
         </Select>

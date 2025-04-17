@@ -25,7 +25,13 @@ export async function fetchInvoices(filters: Record<string, any> = {}): Promise<
       
     if (error) throw error;
     
-    return data || [];
+    // Transform data to match the Invoice type
+    const transformedData = (data || []).map(item => ({
+      ...item,
+      status: item.status as 'draft' | 'pending' | 'paid' | 'overdue' | 'cancelled'
+    }));
+    
+    return transformedData;
   } catch (error) {
     console.error('Error fetching invoices:', error);
     toast({
@@ -53,7 +59,10 @@ export async function addInvoice(invoice: Omit<Invoice, 'id' | 'client' | 'payme
       description: 'Invoice added successfully',
     });
     
-    return data;
+    return {
+      ...data,
+      status: data.status as 'draft' | 'pending' | 'paid' | 'overdue' | 'cancelled'
+    };
   } catch (error) {
     console.error('Error adding invoice:', error);
     toast({
@@ -109,7 +118,10 @@ export async function updateInvoice(id: string, updates: Partial<Omit<Invoice, '
       description: 'Invoice updated successfully',
     });
     
-    return data;
+    return {
+      ...data,
+      status: data.status as 'draft' | 'pending' | 'paid' | 'overdue' | 'cancelled'
+    };
   } catch (error) {
     console.error('Error updating invoice:', error);
     toast({
