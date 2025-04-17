@@ -18,21 +18,52 @@ export const useBulkImport = () => {
       return errors;
     }
 
-    const missingUsernames = data.some(lead => !lead.username);
-    if (missingUsernames) {
-      errors.push('All leads must have a username');
-    }
-
-    const numericFields = ['followers_count', 'following_count', 'posts_count'];
+    // Check for duplicate usernames
+    const usernames = new Set<string>();
     data.forEach((lead, index) => {
+      if (!lead.username) {
+        errors.push(`Row ${index + 1}: Username is required`);
+      } else {
+        const normalizedUsername = lead.username.toLowerCase().trim();
+        if (usernames.has(normalizedUsername)) {
+          errors.push(`Row ${index + 1}: Duplicate username "${lead.username}"`);
+        }
+        usernames.add(normalizedUsername);
+      }
+
+      // Validate numeric fields
+      const numericFields = ['followers_count', 'following_count', 'posts_count'];
       numericFields.forEach(field => {
-        if (lead[field as keyof ImportLead] && isNaN(Number(lead[field as keyof ImportLead]))) {
-          errors.push(`Row ${index + 1}: ${field} must be a number`);
+        const value = lead[field as keyof ImportLead];
+        if (value !== undefined && value !== null) {
+          const numValue = Number(value);
+          if (isNaN(numValue) || numValue < 0) {
+            errors.push(`Row ${index + 1}: ${field} must be a non-negative number`);
+          }
         }
       });
+
+      // Validate URL format
+      if (lead.profile_url && !lead.profile_url.startsWith('https://')) {
+        errors.push(`Row ${index + 1}: Profile URL must start with https://`);
+      }
     });
 
     return errors;
+  };
+
+  const cleanData = (data: ImportLead[]): ImportLead[] => {
+    return data.map(lead => ({
+      ...lead,
+      username: lead.username?.toLowerCase().trim(),
+      full_name: lead.full_name?.trim(),
+      bio: lead.bio?.trim(),
+      profile_url: lead.profile_url?.trim(),
+      followers_count: lead.followers_count ? Number(lead.followers_count) : null,
+      following_count: lead.following_count ? Number(lead.following_count) : null,
+      posts_count: lead.posts_count ? Number(lead.posts_count) : null,
+      status: 'new'
+    }));
   };
 
   const processImport = async (parsedData: ImportLead[]) => {
@@ -48,20 +79,21 @@ export const useBulkImport = () => {
         return false;
       }
 
+      const cleanedData = cleanData(parsedData);
       const BATCH_SIZE = 50;
-      const totalBatches = Math.ceil(parsedData.length / BATCH_SIZE);
+      const totalBatches = Math.ceil(cleanedData.length / BATCH_SIZE);
       
       let totalInserted = 0;
       let totalUpdated = 0;
       
-      for (let i = 0; i < parsedData.length; i += BATCH_SIZE) {
-        const batch = parsedData.slice(i, i + BATCH_SIZE);
+      for (let i = 0; i < cleanedData.length; i += BATCH_SIZE) {
+        const batch = cleanedData.slice(i, i + BATCH_SIZE);
         const results = await importLeads.mutateAsync(batch);
         
         totalInserted += results.inserted;
         totalUpdated += results.updated;
         
-        const progress = Math.min(((i + BATCH_SIZE) / parsedData.length) * 100, 100);
+        const progress = Math.min(((i + BATCH_SIZE) / cleanedData.length) * 100, 100);
         setImportProgress(progress);
       }
 
@@ -73,6 +105,7 @@ export const useBulkImport = () => {
       return false;
     } finally {
       setIsProcessing(false);
+      setImportProgress(0);
     }
   };
 

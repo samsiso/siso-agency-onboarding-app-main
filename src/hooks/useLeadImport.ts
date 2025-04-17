@@ -42,7 +42,7 @@ export const useLeadImport = () => {
       const BATCH_SIZE = 50;
       
       // First, check which usernames already exist to determine inserts vs updates
-      const allUsernames = validLeads.map(lead => lead.username.toLowerCase().trim());
+      const allUsernames = validLeads.map(lead => lead.username.toLowerCase());
       const { data: existingLeads } = await supabase
         .from('instagram_leads')
         .select('username')
@@ -55,7 +55,7 @@ export const useLeadImport = () => {
         const batch = validLeads.slice(i, i + BATCH_SIZE);
         const formattedBatch = batch.map(lead => ({
           ...lead,
-          username: lead.username.toLowerCase().trim(),
+          username: lead.username.toLowerCase(),
           status: lead.status || 'new',
           created_at: new Date().toISOString(),
           last_updated: new Date().toISOString()
@@ -93,15 +93,12 @@ export const useLeadImport = () => {
     },
     onSuccess: (results) => {
       if (results.errors.length > 0) {
-        toast.error(`Import completed with some errors. Check console for details.`);
+        toast.error(`Import completed with ${results.errors.length} errors. Check console for details.`);
         console.error('Import errors:', results.errors);
-      } else {
-        const message = `Successfully imported leads:\n${results.inserted} new leads added\n${results.updated} existing leads updated`;
-        
-        if (results.updatedUsernames.length > 0) {
-          console.info('Updated usernames:', results.updatedUsernames);
-        }
-        
+      }
+      
+      const message = `Successfully imported:\n${results.inserted} new leads\n${results.updated} existing leads updated`;
+      if (results.errors.length === 0) {
         toast.success(message);
       }
     },
