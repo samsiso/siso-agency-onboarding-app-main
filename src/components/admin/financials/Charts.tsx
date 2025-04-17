@@ -56,9 +56,9 @@ export function AreaChart({ data = [] }) {
   );
 }
 
-export function BarChart({ data }) {
+export function BarChart({ data = [] }) {
   // Use provided data or fallback to sample data
-  const chartData = data || barChartData;
+  const chartData = data?.length > 0 ? data : barChartData;
   
   return (
     <ResponsiveContainer width="100%" height={300}>
@@ -81,9 +81,9 @@ export function BarChart({ data }) {
   );
 }
 
-export function PieChart({ data }) {
+export function PieChart({ data = [] }) {
   // Use provided data or fallback to sample data
-  const chartData = data || pieChartData;
+  const chartData = data?.length > 0 ? data : pieChartData;
   
   return (
     <ResponsiveContainer width="100%" height={300}>

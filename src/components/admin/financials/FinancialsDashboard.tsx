@@ -114,7 +114,7 @@ export function FinancialsDashboard() {
             <CardTitle>Expense Breakdown</CardTitle>
           </CardHeader>
           <CardContent>
-            <PieChart />
+            <PieChart data={[]} />
           </CardContent>
         </Card>
       </div>
@@ -125,7 +125,7 @@ export function FinancialsDashboard() {
           <CardTitle>Monthly Revenue</CardTitle>
         </CardHeader>
         <CardContent>
-          <BarChart />
+          <BarChart data={[]} />
         </CardContent>
       </Card>
     </div>

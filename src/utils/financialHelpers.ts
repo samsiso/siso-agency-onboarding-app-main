@@ -148,7 +148,14 @@ export async function fetchTransactions(filters = {}): Promise<FinancialTransact
     const { data, error } = await query;
       
     if (error) throw error;
-    return data || [];
+    
+    // Transform type to ensure it conforms to 'expense' | 'revenue'
+    const transformedData = (data || []).map(item => ({
+      ...item,
+      type: item.type as 'expense' | 'revenue'
+    }));
+    
+    return transformedData;
   } catch (error) {
     console.error('Error fetching transactions:', error);
     toast({
@@ -181,7 +188,14 @@ export async function fetchInvoices(filters = {}): Promise<Invoice[]> {
     const { data, error } = await query;
       
     if (error) throw error;
-    return data || [];
+    
+    // Transform status to ensure it conforms to the union type
+    const transformedData = (data || []).map(item => ({
+      ...item,
+      status: item.status as 'draft' | 'pending' | 'paid' | 'overdue' | 'cancelled'
+    }));
+    
+    return transformedData;
   } catch (error) {
     console.error('Error fetching invoices:', error);
     toast({
@@ -250,7 +264,9 @@ export async function addVendor(vendor: Omit<Vendor, 'id'>): Promise<Vendor | nu
 }
 
 // Add a new transaction
-export async function addTransaction(transaction: Omit<FinancialTransaction, 'id' | 'category' | 'vendor' | 'payment_method'>): Promise<FinancialTransaction | null> {
+export async function addTransaction(
+  transaction: Omit<FinancialTransaction, 'id' | 'category' | 'vendor' | 'payment_method'>
+): Promise<FinancialTransaction | null> {
   try {
     const { data, error } = await supabase
       .from('financial_transactions')
@@ -265,7 +281,10 @@ export async function addTransaction(transaction: Omit<FinancialTransaction, 'id
       description: `${transaction.type === 'expense' ? 'Expense' : 'Revenue'} recorded successfully`,
     });
     
-    return data;
+    return {
+      ...data,
+      type: data.type as 'expense' | 'revenue' 
+    };
   } catch (error) {
     console.error('Error adding transaction:', error);
     toast({
@@ -278,7 +297,9 @@ export async function addTransaction(transaction: Omit<FinancialTransaction, 'id
 }
 
 // Add a new invoice
-export async function addInvoice(invoice: Omit<Invoice, 'id' | 'client' | 'payment_method'>): Promise<Invoice | null> {
+export async function addInvoice(
+  invoice: Omit<Invoice, 'id' | 'client' | 'payment_method'>
+): Promise<Invoice | null> {
   try {
     const { data, error } = await supabase
       .from('invoices')
@@ -293,7 +314,10 @@ export async function addInvoice(invoice: Omit<Invoice, 'id' | 'client' | 'payme
       description: 'Invoice created successfully',
     });
     
-    return data;
+    return {
+      ...data,
+      status: data.status as 'draft' | 'pending' | 'paid' | 'overdue' | 'cancelled'
+    };
   } catch (error) {
     console.error('Error adding invoice:', error);
     toast({
@@ -352,7 +376,10 @@ export async function updateTransaction(
       description: 'Transaction updated successfully',
     });
     
-    return data;
+    return {
+      ...data,
+      type: data.type as 'expense' | 'revenue'
+    };
   } catch (error) {
     console.error('Error updating transaction:', error);
     toast({
@@ -424,10 +451,10 @@ export async function getFinancialSummary(period = 'month'): Promise<{
     if (outstandingError) throw outstandingError;
     
     // Calculate totals
-    const totalRevenue = revenueData.reduce((sum, item) => sum + parseFloat(item.amount), 0);
-    const totalExpenses = expenseData.reduce((sum, item) => sum + parseFloat(item.amount), 0);
+    const totalRevenue = revenueData.reduce((sum, item) => sum + parseFloat(item.amount.toString()), 0);
+    const totalExpenses = expenseData.reduce((sum, item) => sum + parseFloat(item.amount.toString()), 0);
     const profitMargin = totalRevenue > 0 ? ((totalRevenue - totalExpenses) / totalRevenue) * 100 : 0;
-    const outstandingAmount = outstandingData.reduce((sum, item) => sum + parseFloat(item.amount), 0);
+    const outstandingAmount = outstandingData.reduce((sum, item) => sum + parseFloat(item.amount.toString()), 0);
     
     // Get monthly data for charts (simplified mock data for now)
     // In a real implementation, you would fetch this from the database grouped by month
