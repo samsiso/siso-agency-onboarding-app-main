@@ -1,6 +1,7 @@
+
 import { useRef } from 'react';
 import { ClientViewPreference } from '@/types/client.types';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ClientAddForm } from './ClientAddForm';
 import { ClientAnalyticsCards } from './ClientAnalyticsCards';
@@ -81,6 +82,21 @@ export function ClientsTable({
   const handleClientAddSuccess = () => {
     refetch();
   };
+
+  // Implementation of moveColumn function that was missing
+  const moveColumn = React.useCallback((dragIndex: number, hoverIndex: number) => {
+    onViewPreferenceChange({
+      columns: Array.from(viewPreference.columns, (col, idx) => {
+        if (idx === dragIndex) {
+          return viewPreference.columns[hoverIndex];
+        }
+        if (idx === hoverIndex) {
+          return viewPreference.columns[dragIndex];
+        }
+        return col;
+      }),
+    });
+  }, [viewPreference.columns, onViewPreferenceChange]);
 
   if (isLoading) {
     return (
@@ -201,6 +217,7 @@ export function ClientsTable({
                       <DraggableColumnHeader
                         column={column}
                         index={index}
+                        moveColumn={moveColumn}
                         onSort={() => handleSort(column.key)}
                         isSorted={viewPreference.sortColumn === column.key}
                         sortDirection={viewPreference.sortDirection}
@@ -268,9 +285,15 @@ export function ClientsTable({
                       return (
                         <TableCell 
                           key={column.key}
-                          isPinned={isPinned}
-                          leftPosition={leftPosition}
-                          style={{ maxWidth: `${column.width || 150}px` }}
+                          className={cn(
+                            "group-hover:bg-muted/40 transition-colors duration-200",
+                            isPinned ? 'sticky bg-background z-10' : '',
+                            "p-4 align-middle [&:has([role=checkbox])]:pr-0 whitespace-nowrap overflow-hidden text-ellipsis"
+                          )}
+                          style={{ 
+                            left: isPinned ? `${leftPosition}px` : undefined,
+                            maxWidth: `${column.width || 150}px`
+                          }}
                         >
                           <ClientTableCell
                             client={client}

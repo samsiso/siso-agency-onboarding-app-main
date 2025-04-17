@@ -161,28 +161,18 @@ export function ClientTableCell({
   }
 }
 
+// Regular TableCell component without the custom props needed only for the client table cell
 export function TableCell({ 
   children,
-  isPinned,
-  leftPosition,
   className,
   ...props
-}: React.TdHTMLAttributes<HTMLTableCellElement> & {
-  isPinned?: boolean;
-  leftPosition?: number;
-}) {
+}: React.TdHTMLAttributes<HTMLTableCellElement>) {
   return (
     <td
       className={cn(
-        "group-hover:bg-muted/40 transition-colors duration-200",
-        isPinned ? 'sticky bg-background z-10' : '',
         tableCellStyles(),
         className
       )}
-      style={{ 
-        left: isPinned ? `${leftPosition}px` : undefined,
-        maxWidth: props.style?.maxWidth
-      }}
       {...props}
     >
       {children}
