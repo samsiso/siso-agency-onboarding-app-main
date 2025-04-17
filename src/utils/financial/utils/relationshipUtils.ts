@@ -31,11 +31,11 @@ export function createClientData(clientObj: any): { full_name: string; business_
 
 /**
  * Transforms entity data to break deep type instantiation chains
- * Uses explicit typing to prevent recursion
+ * Uses explicit typing with unknown to prevent recursive type chains
  */
 export function transformEntityData<T>(data: unknown[], transformer: (item: any) => T): T[] {
   if (!data || !Array.isArray(data)) return [];
   
-  // Use type assertion with unknown first to break recursive type chains
-  return (data as unknown[]).map(item => transformer(item));
+  // Cast to unknown array first to break recursive type chains
+  return data.map(item => transformer(item));
 }
