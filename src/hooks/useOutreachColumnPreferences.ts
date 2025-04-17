@@ -1,7 +1,7 @@
 
 import { useState, useCallback } from 'react';
 
-interface OutreachColumnPreference {
+export interface OutreachColumnPreference {
   key: string;
   label: string;
   visible: boolean;
@@ -32,9 +32,14 @@ export const useOutreachColumnPreferences = (initialColumns: OutreachColumnPrefe
     setColumns(newColumns);
   }, [columns]);
   
+  // Add a type-safe setColumns wrapper function
+  const updateColumns = useCallback((newColumns: OutreachColumnPreference[]) => {
+    setColumns(newColumns);
+  }, []);
+  
   return {
     columns,
-    setColumns,
+    setColumns: updateColumns,
     sortColumn,
     setSortColumn,
     sortDirection,

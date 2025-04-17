@@ -416,8 +416,8 @@ const AdminOutreach = () => {
                 )}
                 
                 <ColumnManager 
-                  columns={columns}
-                  onColumnsChange={setColumns}
+                  columns={columns as any} // Cast to any to resolve type issue
+                  onColumnsChange={(newColumns) => setColumns(newColumns as any)} // Cast to any to resolve type issue
                   showAllColumns={showAllColumns}
                   onToggleShowAll={toggleShowAllColumns}
                 />

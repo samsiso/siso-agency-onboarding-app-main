@@ -25,7 +25,8 @@ import {
   Users,
   Share,
   PenLine,
-  History
+  History,
+  UserPlus
 } from 'lucide-react';
 import {
   Select,
