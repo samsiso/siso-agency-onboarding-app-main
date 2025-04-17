@@ -1,11 +1,12 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
-import { FinancialTransaction } from './types';
+import { FinancialTransaction, ExpenseCategory, Vendor, PaymentMethod } from './types';
 
-// Define a more specific interface for what Supabase returns
-interface SupabaseTransactionResult {
+interface BaseSupabaseEntity {
   id: string;
+}
+
+interface SupabaseTransactionResult extends BaseSupabaseEntity {
   type: string;
   amount: number;
   currency: string;
@@ -18,24 +19,17 @@ interface SupabaseTransactionResult {
   status: string;
   receipt_url?: string;
   notes?: string;
-  category?: {
-    id: string;
-    name: string;
-    description?: string;
-    is_active: boolean;
-  } | null | unknown;
-  vendor?: {
-    id: string;
-    name: string;
-    contact_email?: string;
-    payment_terms?: string;
-    is_active: boolean;
-  } | null | unknown;
-  payment_method?: {
-    id: string;
-    name: string;
-    is_active: boolean;
-  } | null | unknown;
+  category?: any;
+  vendor?: any;
+  payment_method?: any;
+}
+
+function isValidRelationship(obj: any): boolean {
+  return obj && 
+         typeof obj === 'object' && 
+         !('code' in obj) && 
+         !('message' in obj) && 
+         !('details' in obj);
 }
 
 export async function fetchTransactions(filters: Record<string, any> = {}): Promise<FinancialTransaction[]> {
@@ -50,7 +44,6 @@ export async function fetchTransactions(filters: Record<string, any> = {}): Prom
       `)
       .order('date', { ascending: false });
     
-    // Apply filters if provided
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
         query.eq(key, value);
@@ -61,16 +54,14 @@ export async function fetchTransactions(filters: Record<string, any> = {}): Prom
       
     if (error) throw error;
     
-    // Transform types to ensure they conform to the expected types
     const transformedData = (data || []).map((item: any) => {
       return {
         ...item,
         type: item.type as 'expense' | 'revenue',
         recurring_type: item.recurring_type as 'one-time' | 'monthly' | 'annual' | null,
-        // Safely handle potential relationship errors
-        category: item.category && typeof item.category === 'object' && !('code' in item.category) ? item.category : undefined,
-        vendor: item.vendor && typeof item.vendor === 'object' && !('code' in item.vendor) ? item.vendor : undefined,
-        payment_method: item.payment_method && typeof item.payment_method === 'object' && !('code' in item.payment_method) ? item.payment_method : undefined
+        category: isValidRelationship(item.category) ? item.category as ExpenseCategory : undefined,
+        vendor: isValidRelationship(item.vendor) ? item.vendor as Vendor : undefined,
+        payment_method: isValidRelationship(item.payment_method) ? item.payment_method as PaymentMethod : undefined
       };
     });
     
@@ -86,7 +77,6 @@ export async function fetchTransactions(filters: Record<string, any> = {}): Prom
   }
 }
 
-// Add a new transaction
 export async function addTransaction(
   transaction: Omit<FinancialTransaction, 'id' | 'category' | 'vendor' | 'payment_method'>
 ): Promise<FinancialTransaction | null> {
@@ -120,7 +110,6 @@ export async function addTransaction(
   }
 }
 
-// Delete a transaction
 export async function deleteTransaction(id: string): Promise<boolean> {
   try {
     const { error } = await supabase
@@ -147,7 +136,6 @@ export async function deleteTransaction(id: string): Promise<boolean> {
   }
 }
 
-// Update a transaction
 export async function updateTransaction(
   id: string, 
   updates: Partial<Omit<FinancialTransaction, 'id' | 'category' | 'vendor' | 'payment_method'>>

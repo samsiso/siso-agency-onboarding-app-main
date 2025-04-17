@@ -1,11 +1,21 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
-import { Invoice } from './types';
+import { Invoice, PaymentMethod } from './types';
+
+// Define simpler interfaces to break the nested type definition cycle
+interface BaseSupabaseEntity {
+  id: string;
+}
+
+// Interface for client data
+interface ClientData {
+  full_name?: string;
+  business_name?: string;
+}
 
 // Define a more accurate interface for what Supabase returns
-interface SupabaseInvoiceResult {
-  id: string;
+interface SupabaseInvoiceResult extends BaseSupabaseEntity {
   invoice_number: string;
   client_id: string;
   amount: number;
@@ -15,16 +25,18 @@ interface SupabaseInvoiceResult {
   status: string;
   payment_method_id?: string;
   notes?: string;
-  // Handle potential relationship error by making client more flexible
-  client?: {
-    full_name?: string;
-    business_name?: string;
-  } | null | unknown;
-  payment_method?: {
-    id: string;
-    name: string;
-    is_active: boolean;
-  } | null;
+  // Using any for these relationships to break the deep nesting
+  client?: any;
+  payment_method?: any;
+}
+
+// Helper function to check if an object is a valid client
+function isValidClient(obj: any): boolean {
+  return obj && 
+         typeof obj === 'object' && 
+         !('code' in obj) && 
+         !('message' in obj) && 
+         !('details' in obj);
 }
 
 export async function fetchInvoices(filters: Record<string, any> = {}): Promise<Invoice[]> {
@@ -52,11 +64,9 @@ export async function fetchInvoices(filters: Record<string, any> = {}): Promise<
     // Transform data to match the Invoice type
     const transformedData = (data || []).map((item: any) => {
       // Create client object with required properties
-      let clientData = { full_name: 'Unknown' };
+      let clientData: ClientData = { full_name: 'Unknown' };
       
-      if (item.client && typeof item.client === 'object' && 
-          // Check if it's not an error object from Supabase
-          !('code' in item.client) && !('message' in item.client) && !('details' in item.client)) {
+      if (isValidClient(item.client)) {
         const businessName = item.client.business_name || null;
         clientData = {
           full_name: item.client.full_name || 'Unknown',
@@ -68,7 +78,7 @@ export async function fetchInvoices(filters: Record<string, any> = {}): Promise<
         ...item,
         status: item.status as 'draft' | 'pending' | 'paid' | 'overdue' | 'cancelled',
         client: clientData,
-        payment_method: item.payment_method || undefined
+        payment_method: isValidClient(item.payment_method) ? item.payment_method as PaymentMethod : undefined
       };
     });
     
