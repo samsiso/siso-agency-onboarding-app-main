@@ -1,10 +1,12 @@
 
+import React from 'react';
 import { TableBody, TableRow } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ClientColumnPreference, ClientData } from '@/types/client.types';
 import { ClientTableCell, TableCell } from './ClientTableCell';
 import { cn } from '@/lib/utils';
 import { tableRowStyles } from '@/components/ui/table-styles';
+import { Users } from 'lucide-react';
 
 interface ClientTableBodyProps {
   clients: ClientData[];

@@ -1,5 +1,5 @@
 
-import * as React from 'react';
+import React from 'react';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 
 interface ClientTablePaginationProps {

@@ -1,4 +1,5 @@
-import { useRef } from 'react';
+
+import React, { useRef } from 'react';
 import { Table } from '@/components/ui/table';
 import { ClientViewPreference } from '@/types/client.types';
 import { ClientAddForm } from './ClientAddForm';
@@ -13,7 +14,9 @@ import { ClientTableBody } from './components/ClientTableBody';
 import { ClientTablePagination } from './components/ClientTablePagination';
 import { cn } from "@/lib/utils";
 import { tableStyles } from '@/components/ui/table-styles';
-import { Users } from 'lucide-react';
+import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { Download, Trash2 } from "lucide-react";
 
 interface ClientsTableProps {
   searchQuery?: string;

@@ -1,4 +1,5 @@
 
+import React from 'react';
 import { Table, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ClientColumnPreference } from '@/types/client.types';
