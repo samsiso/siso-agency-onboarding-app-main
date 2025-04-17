@@ -23,16 +23,17 @@ export function useAssistants() {
       // Make sure data is an array before mapping
       const assistantsArray = Array.isArray(data) ? data : [];
       
-      // Cast data to Assistant[] safely with explicit type checking
+      // Cast data to Assistant[] safely with type assertions
       return assistantsArray.map(item => {
         if (!item) return {} as Assistant;
         
+        // Use optional chaining and explicit type assertions for safety
         return {
-          id: String(item.id || ''),
-          name: String(item.name || ''),
-          description: item.description || null,
-          category: String(item.category || ''),
-          assistant_type: item.assistant_type || null,
+          id: String(item?.id || ''),
+          name: String(item?.name || ''),
+          description: item?.description || null,
+          category: String(item?.category || ''),
+          assistant_type: item?.assistant_type || null,
           prompt_template: null,
           use_cases: null,
           input_variables: null,
