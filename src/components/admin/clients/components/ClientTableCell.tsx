@@ -66,7 +66,7 @@ export function ClientTableCell({
       );
     }
     
-    // Convert any other array to a string representation
+    // Convert any other array to a comma-separated string
     return <span>{value.map(item => String(item)).join(', ')}</span>;
   };
 
