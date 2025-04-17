@@ -3,107 +3,35 @@ import { AdminLayout } from '@/components/admin/layout/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useInstagramLeads } from '@/hooks/useInstagramLeads';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { ScrollableTable } from '@/components/admin/clients/ScrollableTable';
-import { ClientColumnPreference } from '@/types/client.types';
-import { ColumnManager } from '@/components/admin/clients/ColumnManager';
+import { useOutreachColumnPreferences } from '@/hooks/useOutreachColumnPreferences';
+import { useOutreachAccounts } from '@/hooks/useOutreachAccounts';
 import { toast } from "sonner";
-import { formatCompactNumber } from '@/lib/formatters';
-import { 
-  User, 
-  Mail, 
-  MessageSquare, 
-  CheckCircle, 
-  XCircle, 
-  Phone, 
-  FileText, 
-  Edit, 
-  Search,
-  TrendingUp,
-  Calendar,
-  Plus,
-  Instagram,
-  Download,
-  Filter,
-  X,
-  ChevronDown,
-  RefreshCw,
-  UserPlus,
-  BarChart3,
-  Star,
-  Linkedin
-} from 'lucide-react';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-import { cn } from '@/lib/utils';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { UserPlus, BarChart3, Star, Edit, Plus } from 'lucide-react';
+import { INITIAL_COLUMNS } from '@/components/admin/outreach/types';
+import { LeadsTable } from '@/components/admin/outreach/leads/LeadsTable';
+import { LeadsToolbar } from '@/components/admin/outreach/leads/LeadsToolbar';
+import { LeadDetailSheet } from '@/components/admin/outreach/LeadDetailSheet';
 import { LeadsFunnelChart } from '@/components/admin/outreach/LeadsFunnelChart';
 import { OutreachAnalyticsCards } from '@/components/admin/outreach/OutreachAnalyticsCards';
 import { OutreachActivityLog } from '@/components/admin/outreach/OutreachActivityLog';
-import { useOutreachColumnPreferences } from '@/hooks/useOutreachColumnPreferences';
-import { LeadDetailSheet } from '@/components/admin/outreach/LeadDetailSheet';
-import { useOutreachAccounts } from '@/hooks/useOutreachAccounts';
-import { OutreachAccount } from '@/types/outreach';
 import { AccountsGrid } from '@/components/admin/outreach/accounts/AccountsGrid';
 import { AccountManagementDialog } from '@/components/admin/outreach/accounts/AccountManagementDialog';
-
-interface OutreachStats {
-  total: number;
-  contacted: number;
-  converted: number;
-  pending: number;
-  conversionRate: number;
-}
-
-interface LeadTableColumn {
-  key: string;
-  label: string;
-  visible: boolean;
-  width?: number;
-  pinned?: boolean;
-}
-
-const INITIAL_COLUMNS: LeadTableColumn[] = [
-  { key: 'username', label: 'Username', visible: true, width: 150, pinned: true },
-  { key: 'full_name', label: 'Name', visible: true, width: 180 },
-  { key: 'followers_count', label: 'Followers', visible: true, width: 120 },
-  { key: 'status', label: 'Status', visible: true, width: 120 },
-  { key: 'source', label: 'Source', visible: true, width: 120 },
-  { key: 'outreach_account', label: 'Outreach Account', visible: true, width: 150 },
-  { key: 'followed', label: 'Followed', visible: true, width: 100 },
-  { key: 'commented', label: 'Commented', visible: true, width: 120 },
-  { key: 'messaged', label: 'DMed', visible: true, width: 100 },
-  { key: 'app_plan_status', label: 'Plan Status', visible: true, width: 130 },
-  { key: 'app_plan_url', label: 'Plan URL', visible: false, width: 150 },
-  { key: 'last_interaction', label: 'Last Interaction', visible: false, width: 180 },
-  { key: 'created_at', label: 'Added Date', visible: true, width: 120 },
-  { key: 'assigned_to', label: 'Assigned To', visible: false, width: 150 },
-  { key: 'notes', label: 'Notes', visible: false, width: 200 },
-];
+import { PlatformFilters } from '@/components/admin/outreach/accounts/PlatformFilters';
+import { IndustryFilter } from '@/components/admin/outreach/accounts/IndustryFilter';
+import type { OutreachAccount } from '@/types/outreach';
+import type { OutreachStats } from '@/components/admin/outreach/types';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '@/components/ui/table';
+import { formatCompactNumber } from '@/lib/formatters';
+import { Badge } from '@/components/ui/badge';
+import { Calendar, CheckCircle, XCircle, FileText } from 'lucide-react';
 
 const AdminOutreach = () => {
   const [activeTab, setActiveTab] = useState('leads-overview');
@@ -125,34 +53,11 @@ const AdminOutreach = () => {
     toggleShowAllColumns,
     moveColumn
   } = useOutreachColumnPreferences(INITIAL_COLUMNS);
-  
-  const visibleColumns = useMemo(() => 
-    columns.filter(col => showAllColumns || col.visible),
-    [columns, showAllColumns]
-  );
-
-  const pinnedColumns = useMemo(() => 
-    visibleColumns.filter(col => col.pinned),
-    [visibleColumns]
-  );
 
   const [activePlatform, setActivePlatform] = useState<'instagram' | 'linkedin' | undefined>();
   const [selectedIndustry, setSelectedIndustry] = useState<string>();
   const [activeAccount, setActiveAccount] = useState<OutreachAccount | undefined>();
   const [isAccountDialogOpen, setIsAccountDialogOpen] = useState(false);
-
-  const handleAddLead = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!searchQuery.trim()) return;
-    
-    try {
-      await addLead.mutateAsync({ username: searchQuery });
-      setSearchQuery('');
-      toast.success('Lead added successfully');
-    } catch (error) {
-      toast.error('Failed to add lead');
-    }
-  };
 
   const stats: OutreachStats = useMemo(() => {
     const total = leads.length;
@@ -209,6 +114,29 @@ const AdminOutreach = () => {
     
     return filtered;
   }, [leads, searchQuery, statusFilter, sortColumn, sortDirection]);
+
+  const pinnedColumns = useMemo(() => 
+    columns.filter(col => col.pinned),
+    [columns]
+  );
+
+  const visibleColumns = useMemo(() => 
+    columns.filter(col => showAllColumns || col.visible),
+    [columns, showAllColumns]
+  );
+
+  const handleAddLead = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+    
+    try {
+      await addLead.mutateAsync({ username: searchQuery });
+      setSearchQuery('');
+      toast.success('Lead added successfully');
+    } catch (error) {
+      toast.error('Failed to add lead');
+    }
+  };
 
   const handleSort = useCallback((column: string) => {
     if (sortColumn === column) {
@@ -282,7 +210,6 @@ const AdminOutreach = () => {
           ...accountData,
         });
       } else {
-        // Ensure required fields are present for new accounts
         const newAccount = {
           username: accountData.username || '',
           platform: accountData.platform || 'instagram',
@@ -297,7 +224,7 @@ const AdminOutreach = () => {
           ...accountData
         };
         
-        await addAccount.mutateAsync(newAccount as any);
+        await addAccount.mutateAsync(newAccount);
       }
       setIsAccountDialogOpen(false);
       setActiveAccount(undefined);
@@ -306,132 +233,130 @@ const AdminOutreach = () => {
     }
   };
 
-  // Helper function to render status badges
-const getStatusBadge = (status: string | null) => {
-  switch (status) {
-    case 'contacted':
-      return <Badge className="bg-blue-500/20 text-blue-400">Contacted</Badge>;
-    case 'converted':
-      return <Badge className="bg-green-500/20 text-green-400">Converted</Badge>;
-    case 'new':
-    default:
-      return <Badge className="bg-amber-500/20 text-amber-400">New</Badge>;
-  }
-};
+  const getStatusBadge = (status: string | null) => {
+    switch (status) {
+      case 'contacted':
+        return <Badge className="bg-blue-500/20 text-blue-400">Contacted</Badge>;
+      case 'converted':
+        return <Badge className="bg-green-500/20 text-green-400">Converted</Badge>;
+      case 'new':
+      default:
+        return <Badge className="bg-amber-500/20 text-amber-400">New</Badge>;
+    }
+  };
 
-// Helper function to render cell content based on column key
-const renderCellContent = (lead: any, key: string) => {
-  switch (key) {
-    case 'username':
-      return (
-        <div className="flex items-center">
-          <div className="w-7 h-7 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white mr-2">
-            {lead.username.charAt(0).toUpperCase()}
+  const renderCellContent = (lead: any, key: string) => {
+    switch (key) {
+      case 'username':
+        return (
+          <div className="flex items-center">
+            <div className="w-7 h-7 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white mr-2">
+              {lead.username.charAt(0).toUpperCase()}
+            </div>
+            <span>@{lead.username}</span>
           </div>
-          <span>@{lead.username}</span>
-        </div>
-      );
-      
-    case 'followers_count':
-      return lead.followers_count 
-        ? formatCompactNumber(lead.followers_count) 
-        : 'N/A';
+        );
         
-    case 'status':
-      return getStatusBadge(lead.status);
-      
-    case 'created_at':
-      return new Date(lead.created_at).toLocaleDateString();
-      
-    case 'source':
-      return <Badge variant="outline">Instagram</Badge>;
-      
-    case 'followed':
-      return lead.followed ? (
-        <div className="bg-green-500/10 text-green-500 w-5 h-5 rounded-full flex items-center justify-center">
-          <CheckCircle className="h-3 w-3" />
-        </div>
-      ) : (
-        <div className="bg-muted w-5 h-5 rounded-full flex items-center justify-center">
-          <XCircle className="h-3 w-3 text-muted-foreground/50" />
-        </div>
-      );
-      
-    case 'commented':
-      return lead.commented ? (
-        <div className="bg-green-500/10 text-green-500 w-5 h-5 rounded-full flex items-center justify-center">
-          <CheckCircle className="h-3 w-3" />
-        </div>
-      ) : (
-        <div className="bg-muted w-5 h-5 rounded-full flex items-center justify-center">
-          <XCircle className="h-3 w-3 text-muted-foreground/50" />
-        </div>
-      );
-      
-    case 'messaged':
-      return lead.messaged ? (
-        <div className="bg-green-500/10 text-green-500 w-5 h-5 rounded-full flex items-center justify-center">
-          <CheckCircle className="h-3 w-3" />
-        </div>
-      ) : (
-        <div className="bg-muted w-5 h-5 rounded-full flex items-center justify-center">
-          <XCircle className="h-3 w-3 text-muted-foreground/50" />
-        </div>
-      );
-      
-    case 'outreach_account':
-      return lead.outreach_account || (
-        <span className="text-muted-foreground">Not assigned</span>
-      );
-      
-    case 'app_plan_status':
-      if (lead.app_plan_status === 'completed') {
-        return <Badge className="bg-green-500/20 text-green-400">Completed</Badge>;
-      } else if (lead.app_plan_status === 'in_progress') {
-        return <Badge className="bg-blue-500/20 text-blue-400">In Progress</Badge>;
-      } else {
-        return <Badge variant="outline">Not Started</Badge>;
-      }
-      
-    case 'app_plan_url':
-      return lead.app_plan_url ? (
-        <a 
-          href={lead.app_plan_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-500 hover:underline flex items-center"
-          onClick={e => e.stopPropagation()}
-        >
-          <FileText className="h-4 w-4 mr-1" />
-          View Plan
-        </a>
-      ) : '-';
-      
-    case 'last_interaction':
-      return lead.last_interaction_at ? (
-        <div className="flex items-center">
-          <Calendar className="h-4 w-4 mr-1 text-muted-foreground" />
-          {new Date(lead.last_interaction_at).toLocaleDateString()}
-        </div>
-      ) : '-';
-      
-    case 'assigned_to':
-      return lead.assigned_to || '-';
-      
-    case 'notes':
-      return lead.notes || '-';
-      
-    default:
-      return lead[key] || '-';
-  }
-};
+      case 'followers_count':
+        return lead.followers_count 
+          ? formatCompactNumber(lead.followers_count) 
+          : 'N/A';
+          
+      case 'status':
+        return getStatusBadge(lead.status);
+        
+      case 'created_at':
+        return new Date(lead.created_at).toLocaleDateString();
+        
+      case 'source':
+        return <Badge variant="outline">Instagram</Badge>;
+        
+      case 'followed':
+        return lead.followed ? (
+          <div className="bg-green-500/10 text-green-500 w-5 h-5 rounded-full flex items-center justify-center">
+            <CheckCircle className="h-3 w-3" />
+          </div>
+        ) : (
+          <div className="bg-muted w-5 h-5 rounded-full flex items-center justify-center">
+            <XCircle className="h-3 w-3 text-muted-foreground/50" />
+          </div>
+        );
+        
+      case 'commented':
+        return lead.commented ? (
+          <div className="bg-green-500/10 text-green-500 w-5 h-5 rounded-full flex items-center justify-center">
+            <CheckCircle className="h-3 w-3" />
+          </div>
+        ) : (
+          <div className="bg-muted w-5 h-5 rounded-full flex items-center justify-center">
+            <XCircle className="h-3 w-3 text-muted-foreground/50" />
+          </div>
+        );
+        
+      case 'messaged':
+        return lead.messaged ? (
+          <div className="bg-green-500/10 text-green-500 w-5 h-5 rounded-full flex items-center justify-center">
+            <CheckCircle className="h-3 w-3" />
+          </div>
+        ) : (
+          <div className="bg-muted w-5 h-5 rounded-full flex items-center justify-center">
+            <XCircle className="h-3 w-3 text-muted-foreground/50" />
+          </div>
+        );
+        
+      case 'outreach_account':
+        return lead.outreach_account || (
+          <span className="text-muted-foreground">Not assigned</span>
+        );
+        
+      case 'app_plan_status':
+        if (lead.app_plan_status === 'completed') {
+          return <Badge className="bg-green-500/20 text-green-400">Completed</Badge>;
+        } else if (lead.app_plan_status === 'in_progress') {
+          return <Badge className="bg-blue-500/20 text-blue-400">In Progress</Badge>;
+        } else {
+          return <Badge variant="outline">Not Started</Badge>;
+        }
+        
+      case 'app_plan_url':
+        return lead.app_plan_url ? (
+          <a 
+            href={lead.app_plan_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 hover:underline flex items-center"
+            onClick={e => e.stopPropagation()}
+          >
+            <FileText className="h-4 w-4 mr-1" />
+            View Plan
+          </a>
+        ) : '-';
+        
+      case 'last_interaction':
+        return lead.last_interaction_at ? (
+          <div className="flex items-center">
+            <Calendar className="h-4 w-4 mr-1 text-muted-foreground" />
+            {new Date(lead.last_interaction_at).toLocaleDateString()}
+          </div>
+        ) : '-';
+        
+      case 'assigned_to':
+        return lead.assigned_to || '-';
+        
+      case 'notes':
+        return lead.notes || '-';
+        
+      default:
+        return lead[key] || '-';
+    }
+  };
 
   return (
     <AdminLayout>
       <div className="container mx-auto p-4">
         <h1 className="text-2xl font-bold mb-6">Outreach Management</h1>
         
-        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value)}>
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="mb-6">
             <TabsTrigger value="leads-overview">Leads Overview</TabsTrigger>
             <TabsTrigger value="lead-management">Lead Management</TabsTrigger>
@@ -528,230 +453,41 @@ const renderCellContent = (lead: any, key: string) => {
           
           <TabsContent value="lead-management">
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle>Lead Database</CardTitle>
-                  <CardDescription>Manage and track your Instagram leads</CardDescription>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                  <form onSubmit={handleAddLead} className="flex gap-2">
-                    <div className="relative">
-                      <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        placeholder="Search leads or add new..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-8 w-[240px]"
-                      />
-                    </div>
-                    <Button type="submit" disabled={addLead.isPending || !searchQuery.trim()}>
-                      {addLead.isPending ? 'Adding...' : 'Add Lead'}
-                    </Button>
-                  </form>
-                </div>
+              <CardHeader>
+                <CardTitle>Lead Database</CardTitle>
+                <CardDescription>Manage and track your leads</CardDescription>
               </CardHeader>
               
-              <div className="px-4 py-2 border-b flex flex-wrap gap-2 items-center">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm" className="h-8">
-                      <Filter className="h-4 w-4 mr-1" />
-                      Status: {statusFilter === 'all' ? 'All' : statusFilter}
-                      <ChevronDown className="h-4 w-4 ml-1" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem onClick={() => handleStatusFilterChange('all')}>
-                      All
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleStatusFilterChange('new')}>
-                      New
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleStatusFilterChange('contacted')}>
-                      Contacted
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleStatusFilterChange('converted')}>
-                      Converted
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                
-                <div className="flex-grow"></div>
-                
-                {selectedLeads.length > 0 && (
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    <span>{selectedLeads.length} leads selected</span>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={() => setSelectedLeads([])}
-                      className="h-8 ml-2"
-                    >
-                      <X className="h-3 w-3 mr-1" />
-                      Clear
-                    </Button>
-                  </div>
-                )}
-                
-                <ColumnManager 
-                  columns={columns as any} // Cast to any to resolve type issue
-                  onColumnsChange={(newColumns) => setColumns(newColumns as any)} // Cast to any to resolve type issue
-                  showAllColumns={showAllColumns}
-                  onToggleShowAll={toggleShowAllColumns}
-                />
-                
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-8"
-                  onClick={handleExportLeads}
-                >
-                  <Download className="h-4 w-4 mr-1" />
-                  Export
-                </Button>
-                
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-8"
-                  onClick={() => refetch()}
-                >
-                  <RefreshCw className="h-4 w-4 mr-1" />
-                  Refresh
-                </Button>
-              </div>
+              <LeadsToolbar
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                onAddLead={handleAddLead}
+                statusFilter={statusFilter}
+                onStatusFilterChange={setStatusFilter}
+                selectedLeads={selectedLeads}
+                onClearSelection={() => setSelectedLeads([])}
+                columns={columns}
+                onColumnsChange={setColumns}
+                showAllColumns={showAllColumns}
+                onToggleShowAll={toggleShowAllColumns}
+                onExport={handleExportLeads}
+                onRefresh={() => refetch()}
+                isAddingLead={addLead.isPending}
+              />
               
-              <DndProvider backend={HTML5Backend}>
-                <ScrollableTable pinnedColumns={pinnedColumns} className="max-h-[calc(100vh-300px)]">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-12 sticky left-0 bg-background z-20">
-                          <div className="flex items-center justify-center">
-                            <input
-                              type="checkbox"
-                              checked={selectedLeads.length === filteredLeads.length && filteredLeads.length > 0}
-                              onChange={handleSelectAll}
-                              className="rounded border-muted"
-                            />
-                          </div>
-                        </TableHead>
-                        
-                        {visibleColumns.map((column, index) => {
-                          const isPinned = !!column.pinned;
-                          const isSorted = sortColumn === column.key;
-                          let leftPosition = 40; // width of checkbox column
-                          
-                          if (isPinned) {
-                            for (let i = 0; i < index; i++) {
-                              if (visibleColumns[i].pinned) {
-                                leftPosition += visibleColumns[i].width || 150;
-                              }
-                            }
-                          }
-                          
-                          return (
-                            <TableHead 
-                              key={column.key}
-                              className={cn(
-                                "font-medium",
-                                isPinned ? "sticky bg-background z-20" : ""
-                              )}
-                              style={{
-                                minWidth: `${column.width || 150}px`,
-                                width: `${column.width || 150}px`,
-                                left: isPinned ? `${leftPosition}px` : undefined
-                              }}
-                              onClick={() => handleSort(column.key)}
-                            >
-                              <div className="flex items-center cursor-pointer">
-                                {column.label}
-                                {isSorted && (
-                                  <ChevronDown 
-                                    className={cn(
-                                      "ml-1 h-4 w-4 transition-transform",
-                                      sortDirection === 'desc' ? "transform rotate-180" : ""
-                                    )}
-                                  />
-                                )}
-                              </div>
-                            </TableHead>
-                          );
-                        })}
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {isLeadsLoading ? (
-                        <TableRow>
-                          <TableCell colSpan={visibleColumns.length + 1} className="text-center py-10">
-                            Loading leads...
-                          </TableCell>
-                        </TableRow>
-                      ) : filteredLeads.length === 0 ? (
-                        <TableRow>
-                          <TableCell colSpan={visibleColumns.length + 1} className="text-center py-10">
-                            No leads found. Add your first lead.
-                          </TableCell>
-                        </TableRow>
-                      ) : (
-                        filteredLeads.map((lead) => (
-                          <TableRow 
-                            key={lead.id} 
-                            className="cursor-pointer hover:bg-muted/30"
-                            onClick={() => handleRowClick(lead.id)}
-                          >
-                            <TableCell 
-                              className="sticky left-0 bg-background z-10"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleSelectLead(lead.id);
-                              }}
-                            >
-                              <div className="flex items-center justify-center">
-                                <input
-                                  type="checkbox"
-                                  checked={selectedLeads.includes(lead.id)}
-                                  onChange={() => {}} // Handled by onClick
-                                  className="rounded border-muted"
-                                />
-                              </div>
-                            </TableCell>
-                            
-                            {visibleColumns.map((column, index) => {
-                              const isPinned = !!column.pinned;
-                              let leftPosition = 40; // width of checkbox column
-                              
-                              if (isPinned) {
-                                for (let i = 0; i < index; i++) {
-                                  if (visibleColumns[i].pinned) {
-                                    leftPosition += visibleColumns[i].width || 150;
-                                  }
-                                }
-                              }
-                              
-                              return (
-                                <TableCell 
-                                  key={`${lead.id}-${column.key}`}
-                                  className={cn(
-                                    isPinned ? "sticky bg-background z-10" : ""
-                                  )}
-                                  style={{
-                                    left: isPinned ? `${leftPosition}px` : undefined,
-                                    maxWidth: `${column.width || 150}px`
-                                  }}
-                                >
-                                  {renderCellContent(lead, column.key)}
-                                </TableCell>
-                              );
-                            })}
-                          </TableRow>
-                        ))
-                      )}
-                    </TableBody>
-                  </Table>
-                </ScrollableTable>
-              </DndProvider>
+              <LeadsTable
+                visibleColumns={visibleColumns}
+                pinnedColumns={pinnedColumns}
+                filteredLeads={filteredLeads}
+                selectedLeads={selectedLeads}
+                sortColumn={sortColumn}
+                sortDirection={sortDirection}
+                onSort={handleSort}
+                onSelectAll={handleSelectAll}
+                onSelectLead={handleSelectLead}
+                onRowClick={handleRowClick}
+                isLoading={isLeadsLoading}
+              />
             </Card>
           </TabsContent>
           
@@ -769,44 +505,15 @@ const renderCellContent = (lead: any, key: string) => {
                   </Button>
                 </div>
 
-                <div className="flex gap-2 mt-4">
-                  <Button
-                    variant={!activePlatform ? "default" : "outline"}
-                    onClick={() => setActivePlatform(undefined)}
-                  >
-                    All Platforms
-                  </Button>
-                  <Button
-                    variant={activePlatform === 'instagram' ? "default" : "outline"}
-                    onClick={() => setActivePlatform('instagram')}
-                  >
-                    <Instagram className="h-4 w-4 mr-2" />
-                    Instagram
-                  </Button>
-                  <Button
-                    variant={activePlatform === 'linkedin' ? "default" : "outline"}
-                    onClick={() => setActivePlatform('linkedin')}
-                  >
-                    <Linkedin className="h-4 w-4 mr-2" />
-                    LinkedIn
-                  </Button>
-                </div>
+                <PlatformFilters
+                  activePlatform={activePlatform}
+                  onPlatformChange={setActivePlatform}
+                />
 
-                <Select 
-                  value={selectedIndustry} 
-                  onValueChange={setSelectedIndustry}
-                >
-                  <SelectTrigger className="w-[200px] mt-4">
-                    <SelectValue placeholder="Filter by industry" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">All Industries</SelectItem>
-                    <SelectItem value="onlyfans">OnlyFans Management</SelectItem>
-                    <SelectItem value="ecommerce">E-commerce</SelectItem>
-                    <SelectItem value="saas">SaaS</SelectItem>
-                    <SelectItem value="agency">Agency</SelectItem>
-                  </SelectContent>
-                </Select>
+                <IndustryFilter
+                  selectedIndustry={selectedIndustry}
+                  onIndustryChange={setSelectedIndustry}
+                />
               </CardHeader>
 
               <CardContent>
