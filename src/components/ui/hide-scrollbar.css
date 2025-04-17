@@ -2,6 +2,7 @@
 .hide-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: rgba(0,0,0,0.2) transparent;
+  -webkit-overflow-scrolling: touch;
 }
 
 .hide-scrollbar::-webkit-scrollbar {
@@ -16,6 +17,7 @@
 .hide-scrollbar::-webkit-scrollbar-thumb {
   background-color: rgba(0,0,0,0.2);
   border-radius: 3px;
+  transition: background-color 0.2s ease;
 }
 
 .hide-scrollbar::-webkit-scrollbar-thumb:hover {
@@ -24,4 +26,18 @@
 
 :root {
   --header-height: 48px;
+}
+
+/* Add smooth scrolling behavior */
+.scroll-smooth {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Optimize performance */
+.scroll-optimize {
+  will-change: transform;
+  backface-visibility: hidden;
+  perspective: 1000px;
+  transform: translate3d(0,0,0);
 }
