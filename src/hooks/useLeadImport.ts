@@ -67,6 +67,8 @@ export const useLeadImport = () => {
             results.errors.push(`Username "${lead.username}" already exists`);
             return false;
           }
+          // For update and merge modes, we'll process the lead
+          return true;
         }
         return true;
       });
@@ -118,6 +120,15 @@ export const useLeadImport = () => {
       }
 
       return results;
+    },
+    onSuccess: (results) => {
+      const message = [
+        results.inserted > 0 ? `${results.inserted} leads added` : '',
+        results.updated > 0 ? `${results.updated} leads updated` : '',
+        results.skipped > 0 ? `${results.skipped} leads skipped` : ''
+      ].filter(Boolean).join(', ');
+
+      toast.success(`Import complete: ${message}`);
     },
     onError: (error: Error) => {
       toast.error(`Import failed: ${error.message}`);
