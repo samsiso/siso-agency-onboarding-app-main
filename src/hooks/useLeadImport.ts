@@ -19,6 +19,7 @@ interface ImportResults {
   updated: number;
   skipped: number;
   errors: string[];
+  updatedUsernames: string[];
 }
 
 export const useLeadImport = () => {
@@ -34,10 +35,21 @@ export const useLeadImport = () => {
         inserted: 0,
         updated: 0,
         skipped: 0,
-        errors: []
+        errors: [],
+        updatedUsernames: []
       };
 
       const BATCH_SIZE = 50;
+      
+      // First, check which usernames already exist to determine inserts vs updates
+      const allUsernames = validLeads.map(lead => lead.username.toLowerCase().trim());
+      const { data: existingLeads } = await supabase
+        .from('instagram_leads')
+        .select('username')
+        .in('username', allUsernames);
+      
+      // Create a set of existing usernames for quick lookups
+      const existingUsernameSet = new Set(existingLeads?.map(lead => lead.username.toLowerCase()) || []);
 
       for (let i = 0; i < validLeads.length; i += BATCH_SIZE) {
         const batch = validLeads.slice(i, i + BATCH_SIZE);
@@ -46,7 +58,7 @@ export const useLeadImport = () => {
           username: lead.username.toLowerCase().trim(),
           status: lead.status || 'new',
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          last_updated: new Date().toISOString()
         }));
         
         const { data, error } = await supabase
@@ -64,10 +76,16 @@ export const useLeadImport = () => {
         }
 
         if (data) {
-          // Count how many records were updated vs inserted
-          const newRecords = data.filter(d => d.created_at === d.updated_at).length;
-          results.inserted += newRecords;
-          results.updated += (data.length - newRecords);
+          // Count inserted vs updated based on whether username existed before
+          for (const record of data) {
+            const username = record.username.toLowerCase();
+            if (existingUsernameSet.has(username)) {
+              results.updated++;
+              results.updatedUsernames.push(username);
+            } else {
+              results.inserted++;
+            }
+          }
         }
       }
 
@@ -78,9 +96,13 @@ export const useLeadImport = () => {
         toast.error(`Import completed with some errors. Check console for details.`);
         console.error('Import errors:', results.errors);
       } else {
-        toast.success(
-          `Successfully imported leads:\n${results.inserted} new leads added\n${results.updated} existing leads updated`
-        );
+        const message = `Successfully imported leads:\n${results.inserted} new leads added\n${results.updated} existing leads updated`;
+        
+        if (results.updatedUsernames.length > 0) {
+          console.info('Updated usernames:', results.updatedUsernames);
+        }
+        
+        toast.success(message);
       }
     },
     onError: (error: Error) => {

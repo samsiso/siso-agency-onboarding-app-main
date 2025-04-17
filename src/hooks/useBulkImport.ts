@@ -45,21 +45,27 @@ export const useBulkImport = () => {
       if (errors.length > 0) {
         setValidationErrors(errors);
         toast.error('Please fix validation errors before importing');
-        return;
+        return false;
       }
 
       const BATCH_SIZE = 50;
       const totalBatches = Math.ceil(parsedData.length / BATCH_SIZE);
       
+      let totalInserted = 0;
+      let totalUpdated = 0;
+      
       for (let i = 0; i < parsedData.length; i += BATCH_SIZE) {
         const batch = parsedData.slice(i, i + BATCH_SIZE);
-        await importLeads.mutateAsync(batch);
+        const results = await importLeads.mutateAsync(batch);
+        
+        totalInserted += results.inserted;
+        totalUpdated += results.updated;
         
         const progress = Math.min(((i + BATCH_SIZE) / parsedData.length) * 100, 100);
         setImportProgress(progress);
       }
 
-      toast.success(`Successfully imported ${parsedData.length} leads`);
+      toast.success(`Import complete: ${totalInserted} leads added, ${totalUpdated} leads updated`);
       return true;
     } catch (error) {
       console.error('Import error:', error);
