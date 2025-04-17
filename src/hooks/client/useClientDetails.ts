@@ -5,7 +5,7 @@ import { processClientData } from '@/utils/clientQueryBuilders';
 import { safeSupabase } from '@/utils/supabaseHelpers';
 
 export const useClientDetails = (clientId: string | null) => {
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['client-details', clientId],
     queryFn: async () => {
       if (!clientId) return null;
@@ -42,6 +42,7 @@ export const useClientDetails = (clientId: string | null) => {
   return {
     client: data as ClientData | null,
     isLoading,
-    error
+    error,
+    refetch
   };
 };

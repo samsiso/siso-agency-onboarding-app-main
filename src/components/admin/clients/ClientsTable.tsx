@@ -515,14 +515,17 @@ export function ClientsTable({
                               </div>
                             ) : '-';
                           case 'todos':
-                            // Fix: Don't return the array directly, render it properly
-                            return client.todos && client.todos.length > 0 ? (
-                              <div className="flex items-center">
-                                <span className="bg-blue-500/10 text-blue-500 rounded-full px-2 py-0.5 text-xs">
-                                  {client.todos.filter(t => !t.completed).length} pending
-                                </span>
-                              </div>
-                            ) : '-';
+                            // Properly render the todos array
+                            if (client.todos && client.todos.length > 0) {
+                              return (
+                                <div className="flex items-center">
+                                  <span className="bg-blue-500/10 text-blue-500 rounded-full px-2 py-0.5 text-xs">
+                                    {client.todos.filter(t => !t.completed).length} pending
+                                  </span>
+                                </div>
+                              );
+                            }
+                            return '-';
                           case 'key_research':
                             return (
                               <div className="max-w-xs truncate" title={client.key_research || ''}>
