@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { checkIsAdmin } from '@/utils/supabaseHelpers';
 import { useToast } from '@/hooks/use-toast';
@@ -12,6 +12,7 @@ interface AuthGuardProps {
 
 export const AuthGuard = ({ children, adminOnly = false }: AuthGuardProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -38,27 +39,38 @@ export const AuthGuard = ({ children, adminOnly = false }: AuthGuardProps) => {
         console.log('AuthGuard - Session found:', session.user.id, session.user.email);
         setIsAuthenticated(true);
         
-        // If adminOnly is true, check if the user is an admin
-        if (adminOnly) {
-          console.log('AuthGuard - Checking admin status for protected route');
-          try {
-            const adminStatus = await checkIsAdmin();
-            console.log('AuthGuard - Admin check result:', adminStatus);
-            
-            setIsAdmin(adminStatus);
-            
-            if (!adminStatus) {
-              console.log('AuthGuard - Not an admin, redirecting to home');
-              toast({
-                variant: "destructive",
-                title: "Access Denied",
-                description: "You don't have admin privileges to access this page."
-              });
-              navigate('/home', { replace: true });
-              return;
-            }
-          } catch (error) {
-            console.error('Error in admin check:', error);
+        // Always check admin status for all authenticated users
+        try {
+          const adminStatus = await checkIsAdmin();
+          console.log('AuthGuard - Admin check result:', adminStatus);
+          
+          setIsAdmin(adminStatus);
+          
+          // Auto-redirect admin users to admin dashboard if they're on the home page
+          if (adminStatus && location.pathname === '/home') {
+            console.log('AuthGuard - Admin user detected on home page, redirecting to admin dashboard');
+            toast({
+              title: "Admin Access",
+              description: "Redirecting to admin dashboard."
+            });
+            navigate('/admin', { replace: true });
+            return;
+          }
+          
+          // If this is an admin-only route and user is not an admin, redirect
+          if (adminOnly && !adminStatus) {
+            console.log('AuthGuard - Not an admin, redirecting to home');
+            toast({
+              variant: "destructive",
+              title: "Access Denied",
+              description: "You don't have admin privileges to access this page."
+            });
+            navigate('/home', { replace: true });
+            return;
+          }
+        } catch (error) {
+          console.error('Error in admin check:', error);
+          if (adminOnly) {
             toast({
               variant: "destructive",
               title: "Access Check Failed",
@@ -82,11 +94,14 @@ export const AuthGuard = ({ children, adminOnly = false }: AuthGuardProps) => {
       console.log('AuthGuard - Auth state change:', event);
       if (event === 'SIGNED_OUT' || !session) {
         navigate('/auth', { replace: true });
-      } else if (event === 'SIGNED_IN' && adminOnly) {
+      } else if (event === 'SIGNED_IN') {
         // Re-check admin status when user signs in
         checkIsAdmin().then(status => {
           setIsAdmin(status);
-          if (!status && adminOnly) {
+          // Auto-redirect if admin and on home page
+          if (status && location.pathname === '/home') {
+            navigate('/admin', { replace: true });
+          } else if (adminOnly && !status) {
             navigate('/home', { replace: true });
           }
         });
@@ -96,7 +111,7 @@ export const AuthGuard = ({ children, adminOnly = false }: AuthGuardProps) => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate, adminOnly, toast]);
+  }, [navigate, adminOnly, toast, location.pathname]);
 
   if (isLoading) {
     return <div className="flex items-center justify-center min-h-screen">

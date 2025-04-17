@@ -3,10 +3,12 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { checkIsAdmin } from '@/utils/supabaseHelpers';
 
 export const useAuthSession = () => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   // Track initialization vs auth events separately
@@ -52,9 +54,14 @@ export const useAuthSession = () => {
         if (session?.user) {
           console.log('Found existing session for user:', session.user.id);
           setUser(session.user);
+          
+          // Check admin status
+          const adminStatus = await checkIsAdmin();
+          setIsAdmin(adminStatus);
         } else {
           console.log('No active session found');
           setUser(null);
+          setIsAdmin(false);
         }
         
         isInitialized.current = true;
@@ -79,14 +86,29 @@ export const useAuthSession = () => {
       if (event === 'SIGNED_IN') {
         if (session?.user) {
           setUser(session.user);
-          // Only navigate on explicit sign in, not session restore
-          toast({
-            title: "Successfully signed in",
-            description: "Welcome to SISO Resource Hub!",
-          });
+          
+          // Check admin status
+          const adminStatus = await checkIsAdmin();
+          setIsAdmin(adminStatus);
+          
+          // Redirect admin users to the admin dashboard
+          if (adminStatus) {
+            toast({
+              title: "Admin Access Detected",
+              description: "Redirecting to admin dashboard."
+            });
+            navigate('/admin', { replace: true });
+          } else {
+            toast({
+              title: "Successfully signed in",
+              description: "Welcome to SISO Resource Hub!",
+            });
+            navigate('/home', { replace: true });
+          }
         }
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
+        setIsAdmin(false);
         profileCache.current = null;
         navigate('/', { replace: true });
         toast({
@@ -97,6 +119,9 @@ export const useAuthSession = () => {
         // Just update the user without navigation
         if (session?.user) {
           setUser(session.user);
+          // Re-check admin status
+          const adminStatus = await checkIsAdmin();
+          setIsAdmin(adminStatus);
         }
       }
     });
@@ -111,6 +136,7 @@ export const useAuthSession = () => {
     try {
       await supabase.auth.signOut();
       setUser(null);
+      setIsAdmin(false);
       profileCache.current = null;
       toast({
         title: "Signed out",
@@ -130,6 +156,7 @@ export const useAuthSession = () => {
   return {
     user,
     loading,
+    isAdmin,
     handleSignOut,
   };
 };

@@ -46,35 +46,16 @@ export const checkIsAdmin = async (): Promise<boolean> => {
 
     console.log('Checking admin status for user:', user.id, user.email);
     
-    // Add debug information - log all roles for this user
-    const { data: allRoles, error: rolesError } = await supabase
-      .from('user_roles')
-      .select('*')
-      .eq('user_id', user.id);
-      
-    if (rolesError) {
-      console.error('Error fetching all roles:', rolesError);
-    } else {
-      console.log('All user roles:', allRoles);
-    }
+    // Use a direct query approach to avoid RLS recursion issues
+    const { data, error } = await supabase.rpc('is_admin', { user_id: user.id });
     
-    // Query the user_roles table to check if the user is an admin
-    const { data, error } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id)
-      .eq('role', 'admin')
-      .maybeSingle();
-
     if (error) {
-      console.error('Error checking admin role:', error.message);
+      console.error('Error checking admin role with RPC:', error.message);
       return false;
     }
 
-    const isAdmin = !!data;
-    console.log('Admin check result:', isAdmin, 'Role data:', data);
-    
-    return isAdmin;
+    console.log('Admin check result from RPC:', data);
+    return !!data;
   } catch (error) {
     console.error('Unexpected error checking admin status:', error);
     return false;
