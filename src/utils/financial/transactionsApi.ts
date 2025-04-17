@@ -27,14 +27,16 @@ export async function fetchTransactions(filters: Record<string, any> = {}): Prom
     if (error) throw error;
     
     // Transform types to ensure they conform to the expected types
-    const transformedData = (data || []).map(item => ({
-      ...item,
-      type: item.type as 'expense' | 'revenue',
-      recurring_type: item.recurring_type as 'one-time' | 'monthly' | 'annual' | null,
-      category: item.category || undefined,
-      vendor: item.vendor || undefined,
-      payment_method: item.payment_method || undefined
-    }));
+    const transformedData = (data || []).map(item => {
+      return {
+        ...item,
+        type: item.type as 'expense' | 'revenue',
+        recurring_type: item.recurring_type as 'one-time' | 'monthly' | 'annual' | null,
+        category: item.category || undefined,
+        vendor: item.vendor || undefined,
+        payment_method: item.payment_method || undefined
+      };
+    });
     
     return transformedData;
   } catch (error) {

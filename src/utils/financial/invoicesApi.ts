@@ -28,12 +28,13 @@ export async function fetchInvoices(filters: Record<string, any> = {}): Promise<
     // Transform data to match the Invoice type
     const transformedData = (data || []).map(item => {
       // Create client object with required properties
-      const clientData = item.client && typeof item.client === 'object' 
-        ? {
-            full_name: item.client.full_name || 'Unknown',
-            business_name: item.client.business_name
-          }
-        : { full_name: 'Unknown' };
+      let clientData = { full_name: 'Unknown' };
+      if (item.client && typeof item.client === 'object') {
+        clientData = {
+          full_name: item.client.full_name || 'Unknown',
+          business_name: item.client.business_name
+        };
+      }
       
       return {
         ...item,
