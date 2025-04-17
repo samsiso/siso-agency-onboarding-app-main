@@ -66,7 +66,6 @@ import { ScrollableTable } from './ScrollableTable';
 import '../../../components/ui/hide-scrollbar.css';
 import { ClientSelectField } from './ClientSelectField';
 
-// Add these constants at the top level
 const COMPANY_NICHE_OPTIONS = [
   { value: 'ecommerce', label: 'E-commerce' },
   { value: 'saas', label: 'SaaS' },
@@ -209,8 +208,12 @@ export function ClientsTable({
   };
 
   const handleEditKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSaveEdit();
+    if (e.key === 'Enter' && editingCell) {
+      handleSaveEdit({
+        id: editingCell.id,
+        field: editingCell.field,
+        value: editValue
+      });
     } else if (e.key === 'Escape') {
       handleCancelEdit();
     }
@@ -404,7 +407,20 @@ export function ClientsTable({
       case 'next_steps':
         return (
           <div className="max-w-xs truncate" title={client.next_steps || ''}>
-            {client.next_steps || '-'}
+            {isEditing ? (
+              <Input
+                ref={editInputRef}
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+                onKeyDown={handleEditKeyDown}
+                className="h-8 min-w-[120px] border-border/50"
+                autoFocus
+              />
+            ) : (
+              <div onDoubleClick={handleDoubleClick}>
+                {client.next_steps || '-'}
+              </div>
+            )}
           </div>
         );
       case 'estimated_completion_date':
@@ -419,15 +435,44 @@ export function ClientsTable({
       case 'key_research':
         return (
           <div className="max-w-xs truncate" title={client.key_research || ''}>
-            {client.key_research || '-'}
+            {isEditing ? (
+              <Input
+                ref={editInputRef}
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+                onKeyDown={handleEditKeyDown}
+                className="h-8 min-w-[120px] border-border/50"
+                autoFocus
+              />
+            ) : (
+              <div onDoubleClick={handleDoubleClick}>
+                {client.key_research || '-'}
+              </div>
+            )}
           </div>
         );
       default:
         const value = client[columnKey as keyof typeof client];
-        if (Array.isArray(value)) {
+        if (isEditing) {
+          return (
+            <Input
+              ref={editInputRef}
+              value={editValue}
+              onChange={(e) => setEditValue(e.target.value)}
+              onKeyDown={handleEditKeyDown}
+              className="h-8 min-w-[120px] border-border/50"
+              autoFocus
+            />
+          );
+        } else if (Array.isArray(value)) {
           return <span>{value.length} items</span>;
+        } else {
+          return (
+            <div onDoubleClick={handleDoubleClick}>
+              {value !== undefined && value !== null ? String(value) : '-'}
+            </div>
+          );
         }
-        return value !== undefined && value !== null ? String(value) : '-';
     }
   }
 
