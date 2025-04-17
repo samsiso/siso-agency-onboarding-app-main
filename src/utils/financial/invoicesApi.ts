@@ -29,10 +29,12 @@ export async function fetchInvoices(filters: Record<string, any> = {}): Promise<
     const transformedData = (data || []).map(item => {
       // Create client object with required properties
       let clientData = { full_name: 'Unknown' };
+      
       if (item.client && typeof item.client === 'object') {
+        const businessName = item.client.business_name;
         clientData = {
           full_name: item.client.full_name || 'Unknown',
-          business_name: item.client.business_name
+          ...(businessName ? { business_name: businessName } : {})
         };
       }
       
@@ -40,7 +42,7 @@ export async function fetchInvoices(filters: Record<string, any> = {}): Promise<
         ...item,
         status: item.status as 'draft' | 'pending' | 'paid' | 'overdue' | 'cancelled',
         client: clientData,
-        payment_method: item.payment_method
+        payment_method: item.payment_method || undefined
       };
     });
     

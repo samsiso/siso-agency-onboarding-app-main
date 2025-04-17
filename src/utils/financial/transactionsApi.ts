@@ -28,10 +28,13 @@ export async function fetchTransactions(filters: Record<string, any> = {}): Prom
     
     // Transform types to ensure they conform to the expected types
     const transformedData = (data || []).map(item => {
+      const transactionType = item.type as 'expense' | 'revenue';
+      const recurringType = item.recurring_type as 'one-time' | 'monthly' | 'annual' | null;
+      
       return {
         ...item,
-        type: item.type as 'expense' | 'revenue',
-        recurring_type: item.recurring_type as 'one-time' | 'monthly' | 'annual' | null,
+        type: transactionType,
+        recurring_type: recurringType,
         category: item.category || undefined,
         vendor: item.vendor || undefined,
         payment_method: item.payment_method || undefined
