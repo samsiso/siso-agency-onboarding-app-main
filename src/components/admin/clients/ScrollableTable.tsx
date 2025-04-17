@@ -16,13 +16,15 @@ export function ScrollableTable({ children, pinnedColumns, className }: Scrollab
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [leftShadowVisible, setLeftShadowVisible] = useState(false);
   const [rightShadowVisible, setRightShadowVisible] = useState(true);
+  const [isScrolled, setIsScrolled] = useState(false);
   
-  // Handle scroll shadow logic
+  // Handle scroll shadow and header logic
   const handleScroll = () => {
     if (scrollContainerRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+      const { scrollLeft, scrollTop, scrollWidth, clientWidth } = scrollContainerRef.current;
       setLeftShadowVisible(scrollLeft > 10);
       setRightShadowVisible(scrollLeft < scrollWidth - clientWidth - 10);
+      setIsScrolled(scrollTop > 0);
     }
   };
   
@@ -30,8 +32,6 @@ export function ScrollableTable({ children, pinnedColumns, className }: Scrollab
     const scrollContainer = scrollContainerRef.current;
     if (scrollContainer) {
       scrollContainer.addEventListener('scroll', handleScroll);
-      // Initialize shadow state
-      handleScroll();
       
       return () => {
         scrollContainer.removeEventListener('scroll', handleScroll);
@@ -43,7 +43,7 @@ export function ScrollableTable({ children, pinnedColumns, className }: Scrollab
   const pinnedWidth = pinnedColumns.reduce((sum, col) => sum + (col.width || 150), 0);
   
   return (
-    <div className="relative rounded-md border overflow-hidden border-border/50 bg-card/30 shadow-sm">
+    <div className="relative rounded-md border overflow-hidden border-border/50 bg-card shadow-sm">
       {/* Left shadow when scrolled */}
       {leftShadowVisible && (
         <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background/90 to-transparent z-10 pointer-events-none" />
@@ -57,18 +57,27 @@ export function ScrollableTable({ children, pinnedColumns, className }: Scrollab
       {/* Table with horizontal scrolling */}
       <div 
         ref={scrollContainerRef}
-        className={cn("overflow-x-auto hide-scrollbar", className)}
-        style={{ maxWidth: '100%' }}
+        className={cn("overflow-auto hide-scrollbar relative", className)}
+        style={{ maxWidth: '100%', maxHeight: 'calc(100vh - 300px)' }}
       >
         <div style={{ position: 'relative', minWidth: '100%' }}>
           {/* Fixed/Pinned columns container */}
           {pinnedColumns.length > 0 && (
             <div 
-              className="absolute top-0 left-0 bottom-0 bg-background/90 backdrop-blur-sm z-20 border-r border-border/70 shadow-[4px_0_8px_rgba(0,0,0,0.05)]" 
+              className={cn(
+                "absolute top-0 left-0 bottom-0 bg-background/95 backdrop-blur-sm z-20 border-r border-border/70 shadow-[4px_0_8px_rgba(0,0,0,0.05)]",
+                isScrolled && "top-[var(--header-height)]"
+              )}
               style={{ width: `${pinnedWidth}px` }}
-            >
-              {/* This will be filled by the children */}
-            </div>
+            />
+          )}
+          
+          {/* Sticky header container */}
+          {isScrolled && (
+            <div 
+              className="sticky top-0 left-0 right-0 z-30 bg-card/95 backdrop-blur-sm border-b border-border/50 shadow-sm"
+              style={{ height: 'var(--header-height)' }}
+            />
           )}
           
           {children}
