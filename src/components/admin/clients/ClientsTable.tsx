@@ -1,3 +1,4 @@
+
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useClientsList } from '@/hooks/client';
 import { ClientData, ClientViewPreference, TodoItem } from '@/types/client.types';
@@ -57,6 +58,9 @@ import { useToast } from '@/hooks/use-toast';
 import * as React from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { TodoList } from './TodoList';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import { DraggableColumnHeader } from './DraggableColumnHeader';
 
 interface ClientsTableProps {
   searchQuery?: string;
@@ -265,6 +269,21 @@ export function ClientsTable({
     }
   };
 
+  const renderTodoItems = (todos?: TodoItem[]) => {
+    if (!todos || todos.length === 0) {
+      return <span>-</span>;
+    }
+    
+    const pendingTodos = todos.filter(t => !t.completed).length;
+    return (
+      <div className="flex items-center">
+        <span className="bg-blue-500/10 text-blue-500 rounded-full px-2 py-0.5 text-xs">
+          {pendingTodos} pending
+        </span>
+      </div>
+    );
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -297,385 +316,377 @@ export function ClientsTable({
   }
 
   return (
-    <div className="space-y-6">
-      <ClientAnalyticsCards 
-        activeClients={analyticsData.activeClients}
-        pipelineClients={analyticsData.pipelineClients}
-        pipelineValue={analyticsData.pipelineValue}
-        conversionRate={analyticsData.conversionRate}
-      />
-      
-      <ClientsHeader
-        searchQuery={searchQuery}
-        onSearchChange={(value) => {/* handle search change */}}
-        statusFilter={statusFilter}
-        onStatusFilterChange={(value) => {/* handle status filter change */}}
-        viewPreference={viewPreference}
-        onViewPreferenceChange={onViewPreferenceChange}
-        onAddClient={handleAddClient}
-        totalClients={totalCount}
-      />
-      
-      {selectedClients.length > 0 && (
-        <div className="flex items-center gap-2 mb-4 p-2 bg-muted rounded-md">
-          <span className="text-sm font-medium">{selectedClients.length} selected</span>
-          <Button variant="outline" size="sm" onClick={handleDeleteSelected}>
-            <Trash2 className="h-4 w-4 mr-1" />
-            Delete
-          </Button>
-          <Button variant="outline" size="sm">
-            <Download className="h-4 w-4 mr-1" />
-            Export
-          </Button>
-        </div>
-      )}
-      
-      <div className="rounded-md border overflow-hidden">
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader className="sticky top-0 bg-background z-10">
-              <TableRow>
-                <TableHead className="w-12">
-                  <Checkbox 
-                    checked={selectedClients.length === clients.length && clients.length > 0}
-                    onCheckedChange={handleSelectAll}
-                    aria-label="Select all clients"
-                    className={selectedClients.length > 0 && selectedClients.length < clients.length ? "opacity-80" : ""}
-                  />
-                </TableHead>
-                
-                {visibleColumns.map(column => (
-                  <TableHead 
-                    key={column.key} 
-                    className="min-w-[120px]"
-                    style={{ width: column.width ? `${column.width}px` : 'auto' }}
-                  >
-                    <Button 
-                      variant="ghost" 
-                      onClick={() => handleSort(column.key)} 
-                      className="flex items-center font-semibold hover:bg-transparent"
-                    >
-                      <span className="capitalize">{column.label || column.key.replace(/_/g, ' ')}</span>
-                      {viewPreference.sortColumn === column.key && (
-                        <ArrowUpDown className={`ml-1 h-4 w-4 ${viewPreference.sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                      )}
-                    </Button>
-                  </TableHead>
-                ))}
-                
-                <TableHead className="w-12 sticky right-0 bg-background">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {clients.length === 0 ? (
+    <DndProvider backend={HTML5Backend}>
+      <div className="space-y-6">
+        <ClientAnalyticsCards 
+          activeClients={analyticsData.activeClients}
+          pipelineClients={analyticsData.pipelineClients}
+          pipelineValue={analyticsData.pipelineValue}
+          conversionRate={analyticsData.conversionRate}
+        />
+        
+        <ClientsHeader
+          searchQuery={searchQuery}
+          onSearchChange={(value) => {/* handle search change */}}
+          statusFilter={statusFilter}
+          onStatusFilterChange={(value) => {/* handle status filter change */}}
+          viewPreference={viewPreference}
+          onViewPreferenceChange={onViewPreferenceChange}
+          onAddClient={handleAddClient}
+          totalClients={totalCount}
+          clients={clients}
+          onRefetch={refetch}
+        />
+        
+        {selectedClients.length > 0 && (
+          <div className="flex items-center gap-2 mb-4 p-2 bg-muted rounded-md">
+            <span className="text-sm font-medium">{selectedClients.length} selected</span>
+            <Button variant="outline" size="sm" onClick={handleDeleteSelected}>
+              <Trash2 className="h-4 w-4 mr-1" />
+              Delete
+            </Button>
+            <Button variant="outline" size="sm">
+              <Download className="h-4 w-4 mr-1" />
+              Export
+            </Button>
+          </div>
+        )}
+        
+        <div className="rounded-md border overflow-hidden">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader className="sticky top-0 bg-background z-10">
                 <TableRow>
-                  <TableCell colSpan={visibleColumns.length + 2} className="text-center h-32 text-muted-foreground">
-                    No clients found matching your search criteria.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                clients.map((client) => (
-                  <TableRow key={client.id} className="group">
-                    <TableCell>
-                      <Checkbox 
-                        checked={selectedClients.includes(client.id)}
-                        onCheckedChange={() => handleSelectClient(client.id)}
-                        aria-label={`Select ${client.full_name}`}
+                  <TableHead className="w-12">
+                    <Checkbox 
+                      checked={selectedClients.length === clients.length && clients.length > 0}
+                      onCheckedChange={handleSelectAll}
+                      aria-label="Select all clients"
+                      className={selectedClients.length > 0 && selectedClients.length < clients.length ? "opacity-80" : ""}
+                    />
+                  </TableHead>
+                  
+                  {visibleColumns.map((column, index) => (
+                    <TableHead 
+                      key={column.key} 
+                      className="min-w-[120px]"
+                      style={{ width: column.width ? `${column.width}px` : 'auto' }}
+                    >
+                      <DraggableColumnHeader
+                        column={column}
+                        index={index}
+                        moveColumn={handleColumnReorder}
+                        onSort={() => handleSort(column.key)}
+                        isSorted={viewPreference.sortColumn === column.key}
+                        sortDirection={viewPreference.sortDirection}
                       />
-                    </TableCell>
-                    
-                    {visibleColumns.map(column => {
-                      const isEditing = editingCell?.id === client.id && editingCell?.field === column.key;
-                      
-                      const renderCell = () => {
-                        if (isEditing) {
-                          return (
-                            <div className="flex items-center">
-                              <Input
-                                ref={editInputRef}
-                                value={editValue}
-                                onChange={(e) => setEditValue(e.target.value)}
-                                onKeyDown={handleEditKeyDown}
-                                className="h-8 min-w-[120px]"
-                                autoFocus
-                              />
-                              <div className="flex items-center ml-1">
-                                <Button 
-                                  size="icon" 
-                                  variant="ghost" 
-                                  className="h-6 w-6" 
-                                  onClick={handleSaveEdit}
-                                >
-                                  <Check className="h-3 w-3 text-green-500" />
-                                </Button>
-                                <Button 
-                                  size="icon" 
-                                  variant="ghost" 
-                                  className="h-6 w-6" 
-                                  onClick={handleCancelEdit}
-                                >
-                                  <X className="h-3 w-3 text-red-500" />
-                                </Button>
-                              </div>
-                            </div>
-                          );
-                        }
-
-                        switch (column.key) {
-                          case 'full_name':
-                            return (
-                              <div className="flex flex-col">
-                                <span 
-                                  className="font-medium cursor-pointer hover:underline" 
-                                  onClick={() => handleOpenDetails(client.id)}
-                                >
-                                  {client.full_name || 'Unknown'}
-                                </span>
-                                <span className="text-sm text-muted-foreground">{client.email || 'No email'}</span>
-                              </div>
-                            );
-                          case 'status':
-                            return <ClientStatusBadge status={client.status} />;
-                          case 'updated_at':
-                            return formatRelativeTime(client.updated_at);
-                          case 'notion_plan_url':
-                            return client.notion_plan_url ? (
-                              <a 
-                                href={client.notion_plan_url} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="text-blue-500 hover:underline flex items-center"
-                              >
-                                <FileText className="h-4 w-4 mr-1" />
-                                Notion Plan
-                              </a>
-                            ) : '-';
-                          case 'estimated_price':
-                            return client.estimated_price 
-                              ? <span className="flex items-center"><DollarSign className="h-4 w-4" />{client.estimated_price.toLocaleString()}</span> 
-                              : '-';
-                          case 'development_url':
-                            return client.development_url ? (
-                              <a 
-                                href={client.development_url} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="text-blue-500 hover:underline flex items-center"
-                              >
-                                <Link className="h-4 w-4 mr-1" />
-                                View Site
-                              </a>
-                            ) : '-';
-                          case 'next_steps':
-                            return (
-                              <div className="max-w-xs truncate" title={client.next_steps || ''}>
-                                {client.next_steps || '-'}
-                              </div>
-                            );
-                          case 'estimated_completion_date':
-                            return client.estimated_completion_date ? (
-                              <div className="flex items-center">
-                                <CalendarClock className="h-4 w-4 mr-1" />
-                                {new Date(client.estimated_completion_date).toLocaleDateString()}
-                              </div>
-                            ) : '-';
-                          case 'todos':
-                            if (Array.isArray(client.todos) && client.todos.length > 0) {
-                              const pendingTodos = client.todos.filter(t => !t.completed).length;
-                              return (
-                                <div className="flex items-center">
-                                  <span className="bg-blue-500/10 text-blue-500 rounded-full px-2 py-0.5 text-xs">
-                                    {pendingTodos} pending
-                                  </span>
-                                </div>
-                              );
-                            }
-                            return <span>-</span>;
-                          case 'key_research':
-                            return (
-                              <div className="max-w-xs truncate" title={client.key_research || ''}>
-                                {client.key_research || '-'}
-                              </div>
-                            );
-                          default:
-                            const value = client[column.key as keyof typeof client];
-                            if (Array.isArray(value)) {
-                              return <span>{value.length} items</span>;
-                            }
-                            return value !== undefined && value !== null ? String(value) : '-';
-                        }
-                      };
-
-                      return (
-                        <TableCell 
-                          key={column.key}
-                          className="relative group"
-                          onDoubleClick={() => handleStartEdit(client, column.key)}
-                        >
-                          {renderCell()}
-                          {!isEditing && (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-6 w-6 absolute right-2 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
-                              onClick={() => handleStartEdit(client, column.key)}
-                            >
-                              <Edit2 className="h-3 w-3" />
-                            </Button>
-                          )}
-                        </TableCell>
-                      );
-                    })}
-                    
-                    <TableCell className="sticky right-0 bg-background">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={() => handleOpenDetails(client.id)}>
-                            <ExternalLink className="h-4 w-4 mr-2" />
-                            View Details
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleStartEdit(client, 'full_name')}>
-                            <Edit2 className="h-4 w-4 mr-2" />
-                            Edit Client
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem 
-                            className="text-destructive"
-                            onClick={async () => {
-                              if (window.confirm('Are you sure you want to delete this client?')) {
-                                try {
-                                  const { error } = await supabase
-                                    .from('client_onboarding')
-                                    .delete()
-                                    .eq('id', client.id);
-                                  
-                                  if (error) throw error;
-                                  
-                                  toast({
-                                    title: "Client deleted",
-                                    description: "The client has been permanently removed."
-                                  });
-                                  
-                                  refetch();
-                                } catch (error: any) {
-                                  toast({
-                                    variant: "destructive",
-                                    title: "Error deleting client",
-                                    description: error.message || "Failed to delete client."
-                                  });
-                                }
-                              }
-                            }}
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Delete Client
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                    </TableHead>
+                  ))}
+                  
+                  <TableHead className="w-12 sticky right-0 bg-background">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {clients.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={visibleColumns.length + 2} className="text-center h-32 text-muted-foreground">
+                      No clients found matching your search criteria.
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </div>
+                ) : (
+                  clients.map((client) => (
+                    <TableRow key={client.id} className="group">
+                      <TableCell>
+                        <Checkbox 
+                          checked={selectedClients.includes(client.id)}
+                          onCheckedChange={() => handleSelectClient(client.id)}
+                          aria-label={`Select ${client.full_name}`}
+                        />
+                      </TableCell>
+                      
+                      {visibleColumns.map(column => {
+                        const isEditing = editingCell?.id === client.id && editingCell?.field === column.key;
+                        
+                        const renderCell = () => {
+                          if (isEditing) {
+                            return (
+                              <div className="flex items-center">
+                                <Input
+                                  ref={editInputRef}
+                                  value={editValue}
+                                  onChange={(e) => setEditValue(e.target.value)}
+                                  onKeyDown={handleEditKeyDown}
+                                  className="h-8 min-w-[120px]"
+                                  autoFocus
+                                />
+                                <div className="flex items-center ml-1">
+                                  <Button 
+                                    size="icon" 
+                                    variant="ghost" 
+                                    className="h-6 w-6" 
+                                    onClick={handleSaveEdit}
+                                  >
+                                    <Check className="h-3 w-3 text-green-500" />
+                                  </Button>
+                                  <Button 
+                                    size="icon" 
+                                    variant="ghost" 
+                                    className="h-6 w-6" 
+                                    onClick={handleCancelEdit}
+                                  >
+                                    <X className="h-3 w-3 text-red-500" />
+                                  </Button>
+                                </div>
+                              </div>
+                            );
+                          }
 
-      {totalPages > 1 && (
-        <div className="mt-4 flex justify-center">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious 
-                  href="#" 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (page > 1) setPage(page - 1);
-                  }}
-                  className={page <= 1 ? "pointer-events-none opacity-50" : ""}
-                />
-              </PaginationItem>
-              
-              {Array.from({ length: totalPages }, (_, i) => i + 1)
-                .filter(pageNum => 
-                  pageNum === 1 || 
-                  pageNum === totalPages || 
-                  (pageNum >= page - 1 && pageNum <= page + 1)
-                )
-                .map((pageNum, i, array) => {
-                  if (i > 0 && array[i - 1] !== pageNum - 1) {
-                    return (
-                      <React.Fragment key={`ellipsis-${pageNum}`}>
-                        <PaginationItem>
-                          <span className="px-2">...</span>
-                        </PaginationItem>
-                        <PaginationItem>
-                          <PaginationLink 
-                            href="#" 
-                            onClick={(e) => {
-                              e.preventDefault();
-                              setPage(pageNum);
-                            }}
-                            isActive={page === pageNum}
+                          switch (column.key) {
+                            case 'full_name':
+                              return (
+                                <div className="flex flex-col">
+                                  <span 
+                                    className="font-medium cursor-pointer hover:underline" 
+                                    onClick={() => handleOpenDetails(client.id)}
+                                  >
+                                    {client.full_name || 'Unknown'}
+                                  </span>
+                                  <span className="text-sm text-muted-foreground">{client.email || 'No email'}</span>
+                                </div>
+                              );
+                            case 'status':
+                              return <ClientStatusBadge status={client.status} />;
+                            case 'updated_at':
+                              return formatRelativeTime(client.updated_at);
+                            case 'notion_plan_url':
+                              return client.notion_plan_url ? (
+                                <a 
+                                  href={client.notion_plan_url} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-blue-500 hover:underline flex items-center"
+                                >
+                                  <FileText className="h-4 w-4 mr-1" />
+                                  Notion Plan
+                                </a>
+                              ) : '-';
+                            case 'estimated_price':
+                              return client.estimated_price 
+                                ? <span className="flex items-center"><DollarSign className="h-4 w-4" />{client.estimated_price.toLocaleString()}</span> 
+                                : '-';
+                            case 'development_url':
+                              return client.development_url ? (
+                                <a 
+                                  href={client.development_url} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-blue-500 hover:underline flex items-center"
+                                >
+                                  <Link className="h-4 w-4 mr-1" />
+                                  View Site
+                                </a>
+                              ) : '-';
+                            case 'next_steps':
+                              return (
+                                <div className="max-w-xs truncate" title={client.next_steps || ''}>
+                                  {client.next_steps || '-'}
+                                </div>
+                              );
+                            case 'estimated_completion_date':
+                              return client.estimated_completion_date ? (
+                                <div className="flex items-center">
+                                  <CalendarClock className="h-4 w-4 mr-1" />
+                                  {new Date(client.estimated_completion_date).toLocaleDateString()}
+                                </div>
+                              ) : '-';
+                            case 'todos':
+                              return renderTodoItems(client.todos);
+                            case 'key_research':
+                              return (
+                                <div className="max-w-xs truncate" title={client.key_research || ''}>
+                                  {client.key_research || '-'}
+                                </div>
+                              );
+                            default:
+                              const value = client[column.key as keyof typeof client];
+                              if (Array.isArray(value)) {
+                                return <span>{value.length} items</span>;
+                              }
+                              return value !== undefined && value !== null ? String(value) : '-';
+                          }
+                        };
+
+                        return (
+                          <TableCell 
+                            key={column.key}
+                            className="relative group"
+                            onDoubleClick={() => handleStartEdit(client, column.key)}
                           >
-                            {pageNum}
-                          </PaginationLink>
-                        </PaginationItem>
-                      </React.Fragment>
-                    );
-                  }
-                  
-                  return (
-                    <PaginationItem key={pageNum}>
-                      <PaginationLink 
-                        href="#" 
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setPage(pageNum);
-                        }}
-                        isActive={page === pageNum}
-                      >
-                        {pageNum}
-                      </PaginationLink>
-                    </PaginationItem>
-                  );
-                })}
-              
-              <PaginationItem>
-                <PaginationNext 
-                  href="#" 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (page < totalPages) setPage(page + 1);
-                  }}
-                  className={page >= totalPages ? "pointer-events-none opacity-50" : ""}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
+                            {renderCell()}
+                            {!isEditing && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6 absolute right-2 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={() => handleStartEdit(client, column.key)}
+                              >
+                                <Edit2 className="h-3 w-3" />
+                              </Button>
+                            )}
+                          </TableCell>
+                        );
+                      })}
+                      
+                      <TableCell className="sticky right-0 bg-background">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={() => handleOpenDetails(client.id)}>
+                              <ExternalLink className="h-4 w-4 mr-2" />
+                              View Details
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleStartEdit(client, 'full_name')}>
+                              <Edit2 className="h-4 w-4 mr-2" />
+                              Edit Client
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem 
+                              className="text-destructive"
+                              onClick={async () => {
+                                if (window.confirm('Are you sure you want to delete this client?')) {
+                                  try {
+                                    const { error } = await supabase
+                                      .from('client_onboarding')
+                                      .delete()
+                                      .eq('id', client.id);
+                                    
+                                    if (error) throw error;
+                                    
+                                    toast({
+                                      title: "Client deleted",
+                                      description: "The client has been permanently removed."
+                                    });
+                                    
+                                    refetch();
+                                  } catch (error: any) {
+                                    toast({
+                                      variant: "destructive",
+                                      title: "Error deleting client",
+                                      description: error.message || "Failed to delete client."
+                                    });
+                                  }
+                                }
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Delete Client
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </div>
-      )}
 
-      {activeClient && (
-        <ClientDetailSheet 
-          clientId={activeClient} 
-          isOpen={!!activeClient} 
-          onClose={handleCloseDetails} 
+        {totalPages > 1 && (
+          <div className="mt-4 flex justify-center">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    href="#" 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (page > 1) setPage(page - 1);
+                    }}
+                    className={page <= 1 ? "pointer-events-none opacity-50" : ""}
+                  />
+                </PaginationItem>
+                
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter(pageNum => 
+                    pageNum === 1 || 
+                    pageNum === totalPages || 
+                    (pageNum >= page - 1 && pageNum <= page + 1)
+                  )
+                  .map((pageNum, i, array) => {
+                    if (i > 0 && array[i - 1] !== pageNum - 1) {
+                      return (
+                        <React.Fragment key={`ellipsis-${pageNum}`}>
+                          <PaginationItem>
+                            <span className="px-2">...</span>
+                          </PaginationItem>
+                          <PaginationItem>
+                            <PaginationLink 
+                              href="#" 
+                              onClick={(e) => {
+                                e.preventDefault();
+                                setPage(pageNum);
+                              }}
+                              isActive={page === pageNum}
+                            >
+                              {pageNum}
+                            </PaginationLink>
+                          </PaginationItem>
+                        </React.Fragment>
+                      );
+                    }
+                    
+                    return (
+                      <PaginationItem key={pageNum}>
+                        <PaginationLink 
+                          href="#" 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setPage(pageNum);
+                          }}
+                          isActive={page === pageNum}
+                        >
+                          {pageNum}
+                        </PaginationLink>
+                      </PaginationItem>
+                    );
+                  })}
+                
+                <PaginationItem>
+                  <PaginationNext 
+                    href="#" 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (page < totalPages) setPage(page + 1);
+                    }}
+                    className={page >= totalPages ? "pointer-events-none opacity-50" : ""}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
+
+        {activeClient && (
+          <ClientDetailSheet 
+            clientId={activeClient} 
+            isOpen={!!activeClient} 
+            onClose={handleCloseDetails} 
+          />
+        )}
+        
+        <ClientAddForm 
+          open={isAddClientOpen} 
+          onOpenChange={setIsAddClientOpen} 
+          onSuccess={handleClientAddSuccess}
         />
-      )}
-      
-      <ClientAddForm 
-        open={isAddClientOpen} 
-        onOpenChange={setIsAddClientOpen} 
-        onSuccess={handleClientAddSuccess}
-      />
-    </div>
+      </div>
+    </DndProvider>
   );
 }

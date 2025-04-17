@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ViewOptionsMenu } from './ViewOptionsMenu';
 import { ColumnManager } from './ColumnManager';
-import { ClientViewPreference } from '@/types/client.types';
+import { ClientData, ClientViewPreference } from '@/types/client.types';
 import { 
   Filter, 
   SlidersHorizontal, 
@@ -23,6 +23,8 @@ import {
   Check
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { SavedViewsManager } from './SavedViewsManager';
+import { ImportExportTools } from './ImportExportTools';
 
 interface ClientsHeaderProps {
   searchQuery: string;
@@ -33,6 +35,8 @@ interface ClientsHeaderProps {
   onViewPreferenceChange: (preference: Partial<ClientViewPreference>) => void;
   onAddClient: () => void;
   totalClients: number;
+  clients: ClientData[];
+  onRefetch: () => void;
 }
 
 export function ClientsHeader({
@@ -43,28 +47,16 @@ export function ClientsHeader({
   viewPreference,
   onViewPreferenceChange,
   onAddClient,
-  totalClients
+  totalClients,
+  clients,
+  onRefetch
 }: ClientsHeaderProps) {
   const [isAdvancedFiltersVisible, setIsAdvancedFiltersVisible] = useState(false);
-  const [savedViews, setSavedViews] = useState<{id: string, name: string}[]>([
-    { id: 'default', name: 'Default View' },
-    { id: 'financial', name: 'Financial Focus' },
-    { id: 'upcoming', name: 'Upcoming Deadlines' }
-  ]);
   const [currentViewName, setCurrentViewName] = useState('');
   const [isSavingView, setIsSavingView] = useState(false);
 
-  const handleSaveCurrentView = () => {
-    if (!currentViewName) return;
-    
-    const newView = { 
-      id: `view-${Date.now()}`, 
-      name: currentViewName 
-    };
-    
-    setSavedViews([...savedViews, newView]);
-    setCurrentViewName('');
-    setIsSavingView(false);
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onSearchChange(e.target.value);
   };
 
   return (
@@ -81,62 +73,15 @@ export function ClientsHeader({
             Add Client
           </Button>
           
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                <SlidersHorizontal className="h-4 w-4 mr-2" />
-                Views
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
-              {savedViews.map(view => (
-                <DropdownMenuItem key={view.id} className="cursor-pointer">
-                  {view.name}
-                  {view.id === 'default' && <Check className="ml-auto h-4 w-4 text-green-500" />}
-                </DropdownMenuItem>
-              ))}
-              
-              <DropdownMenuSeparator />
-              
-              {isSavingView ? (
-                <div className="p-2 flex items-center gap-2">
-                  <Input 
-                    placeholder="View name" 
-                    value={currentViewName}
-                    onChange={(e) => setCurrentViewName(e.target.value)}
-                    className="h-8 text-sm"
-                  />
-                  <Button 
-                    size="sm" 
-                    variant="ghost" 
-                    className="h-8 w-8 p-0" 
-                    onClick={handleSaveCurrentView}
-                  >
-                    <Save className="h-4 w-4" />
-                  </Button>
-                </div>
-              ) : (
-                <DropdownMenuItem 
-                  onSelect={(e) => {
-                    e.preventDefault();
-                    setIsSavingView(true);
-                  }}
-                >
-                  Save current view
-                </DropdownMenuItem>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <SavedViewsManager 
+            currentView={viewPreference}
+            onViewChange={(preference) => onViewPreferenceChange(preference)}
+          />
           
-          <Button variant="outline">
-            <Download className="h-4 w-4 mr-2" />
-            Export
-          </Button>
-          
-          <Button variant="outline">
-            <Upload className="h-4 w-4 mr-2" />
-            Import
-          </Button>
+          <ImportExportTools 
+            clients={clients}
+            onImportComplete={onRefetch}
+          />
         </div>
       </div>
       
@@ -146,7 +91,7 @@ export function ClientsHeader({
           <Input
             placeholder="Search clients by name, email, project..."
             value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
+            onChange={handleSearchChange}
             className="pl-10"
           />
         </div>

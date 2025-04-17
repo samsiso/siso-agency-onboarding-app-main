@@ -8,6 +8,8 @@ import { Loader2 } from 'lucide-react';
 import { ClientViewPreference } from '@/types/client.types';
 import { updateExistingClientData, makeCurrentUserAdmin } from '@/utils/clientDataUtils';
 import { useToast } from '@/hooks/use-toast';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 export default function AdminClients() {
   const { isAdmin, isLoading } = useAdminCheck();
@@ -36,6 +38,12 @@ export default function AdminClients() {
       { key: 'start_date', visible: false, label: 'Start Date' },
       { key: 'estimated_completion_date', visible: true, label: 'Due Date' },
       { key: 'updated_at', visible: true, label: 'Last Updated' },
+      { key: 'todos', visible: true, label: 'Todo Items' },
+      { key: 'purchase_history', visible: false, label: 'Purchase History' },
+      { key: 'client_contact', visible: false, label: 'Client Contact' },
+      { key: 'referral_source', visible: false, label: 'Referral Source' },
+      { key: 'assigned_to', visible: false, label: 'Assigned To' },
+      { key: 'priority', visible: false, label: 'Priority' },
     ],
     sortColumn: 'updated_at',
     sortDirection: 'desc',
@@ -138,12 +146,14 @@ export default function AdminClients() {
   return (
     <AdminLayout>
       <div className="container mx-auto px-4 py-8">
-        <ClientsTable 
-          searchQuery={searchQuery}
-          statusFilter={statusFilter}
-          viewPreference={viewPreference}
-          onViewPreferenceChange={handleViewPreferenceChange}
-        />
+        <DndProvider backend={HTML5Backend}>
+          <ClientsTable 
+            searchQuery={searchQuery}
+            statusFilter={statusFilter}
+            viewPreference={viewPreference}
+            onViewPreferenceChange={handleViewPreferenceChange}
+          />
+        </DndProvider>
       </div>
     </AdminLayout>
   );

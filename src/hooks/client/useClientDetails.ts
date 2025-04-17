@@ -1,6 +1,6 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { ClientData } from '@/types/client.types';
+import { ClientData, TodoItem } from '@/types/client.types';
 import { processClientData } from '@/utils/clientQueryBuilders';
 import { safeSupabase } from '@/utils/supabaseHelpers';
 

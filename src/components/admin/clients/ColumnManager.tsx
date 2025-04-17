@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { SlidersHorizontal, CheckCircle, Circle } from 'lucide-react';
+import { SlidersHorizontal, CheckCircle, Circle, Plus } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ClientColumnPreference } from '@/types/client.types';
+import { ColumnCustomizationModal } from './ColumnCustomizationModal';
 
 interface ColumnManagerProps {
   columns: ClientColumnPreference[];
@@ -19,6 +20,8 @@ interface ColumnManagerProps {
 }
 
 export function ColumnManager({ columns, onColumnsChange }: ColumnManagerProps) {
+  const [isCustomizationModalOpen, setIsCustomizationModalOpen] = useState(false);
+
   const handleToggleColumn = (key: string) => {
     const newColumns = columns.map(col => {
       if (col.key === key) {
@@ -48,47 +51,66 @@ export function ColumnManager({ columns, onColumnsChange }: ColumnManagerProps) 
   };
   
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm">
-          <SlidersHorizontal className="h-4 w-4 mr-1" />
-          Columns
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56">
-        <DropdownMenuLabel>Table Columns</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        
-        <DropdownMenuGroup className="max-h-[300px] overflow-y-auto">
-          {columns.map((column) => (
-            <DropdownMenuItem 
-              key={column.key}
-              onClick={(e) => {
-                e.preventDefault();
-                handleToggleColumn(column.key);
-              }}
-              className="flex items-center justify-between cursor-pointer"
-            >
-              <span>{column.label || column.key.replace(/_/g, ' ')}</span>
-              {column.visible ? 
-                <CheckCircle className="h-4 w-4 text-primary" /> : 
-                <Circle className="h-4 w-4 text-muted-foreground" />
-              }
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuGroup>
-        
-        <DropdownMenuSeparator />
-        <DropdownMenuItem 
-          onClick={(e) => {
-            e.preventDefault();
-            resetToDefault();
-          }}
-          className="text-center justify-center font-medium"
-        >
-          Reset to Default
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="sm" className="h-9">
+            <SlidersHorizontal className="h-4 w-4 mr-1" />
+            Columns
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-56">
+          <DropdownMenuLabel>Table Columns</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          
+          <DropdownMenuGroup className="max-h-[300px] overflow-y-auto">
+            {columns.map((column) => (
+              <DropdownMenuItem 
+                key={column.key}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleToggleColumn(column.key);
+                }}
+                className="flex items-center justify-between cursor-pointer"
+              >
+                <span>{column.label || column.key.replace(/_/g, ' ')}</span>
+                {column.visible ? 
+                  <CheckCircle className="h-4 w-4 text-primary" /> : 
+                  <Circle className="h-4 w-4 text-muted-foreground" />
+                }
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuGroup>
+          
+          <DropdownMenuSeparator />
+          <DropdownMenuItem 
+            onClick={(e) => {
+              e.preventDefault();
+              setIsCustomizationModalOpen(true);
+            }}
+            className="text-center justify-center font-medium"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Customize Columns
+          </DropdownMenuItem>
+          <DropdownMenuItem 
+            onClick={(e) => {
+              e.preventDefault();
+              resetToDefault();
+            }}
+            className="text-center justify-center font-medium"
+          >
+            Reset to Default
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      
+      <ColumnCustomizationModal
+        open={isCustomizationModalOpen}
+        onOpenChange={setIsCustomizationModalOpen}
+        columns={columns}
+        onColumnsChange={onColumnsChange}
+      />
+    </>
   );
 }
