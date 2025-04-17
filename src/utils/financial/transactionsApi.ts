@@ -1,38 +1,12 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
-import { FinancialTransaction, ExpenseCategory, Vendor, PaymentMethod } from './types';
+import { FinancialTransaction } from './types';
+import { RawTransactionData, TransactionFilters } from './types/transactionTypes';
+import { transformEntityData } from './utils/relationshipUtils';
+import { transformTransactionData } from './utils/transactionTransformers';
 
-interface BaseSupabaseEntity {
-  id: string;
-}
-
-interface SupabaseTransactionResult extends BaseSupabaseEntity {
-  type: string;
-  amount: number;
-  currency: string;
-  date: string;
-  description?: string;
-  category_id?: string;
-  vendor_id?: string;
-  payment_method_id?: string;
-  recurring_type?: string | null;
-  status: string;
-  receipt_url?: string;
-  notes?: string;
-  category?: any;
-  vendor?: any;
-  payment_method?: any;
-}
-
-function isValidRelationship(obj: any): boolean {
-  return obj && 
-         typeof obj === 'object' && 
-         !('code' in obj) && 
-         !('message' in obj) && 
-         !('details' in obj);
-}
-
-export async function fetchTransactions(filters: Record<string, any> = {}): Promise<FinancialTransaction[]> {
+export async function fetchTransactions(filters: TransactionFilters = {}): Promise<FinancialTransaction[]> {
   try {
     const query = supabase
       .from('financial_transactions')
@@ -54,18 +28,8 @@ export async function fetchTransactions(filters: Record<string, any> = {}): Prom
       
     if (error) throw error;
     
-    const transformedData = (data || []).map((item: any) => {
-      return {
-        ...item,
-        type: item.type as 'expense' | 'revenue',
-        recurring_type: item.recurring_type as 'one-time' | 'monthly' | 'annual' | null,
-        category: isValidRelationship(item.category) ? item.category as ExpenseCategory : undefined,
-        vendor: isValidRelationship(item.vendor) ? item.vendor as Vendor : undefined,
-        payment_method: isValidRelationship(item.payment_method) ? item.payment_method as PaymentMethod : undefined
-      };
-    });
-    
-    return transformedData;
+    // Transform data using our utility functions
+    return transformEntityData<FinancialTransaction>(data as RawTransactionData[], transformTransactionData);
   } catch (error) {
     console.error('Error fetching transactions:', error);
     toast({
