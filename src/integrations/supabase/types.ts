@@ -1701,6 +1701,104 @@ export type Database = {
           },
         ]
       }
+      task_rollover_history: {
+        Row: {
+          created_at: string | null
+          id: string
+          rolled_from_date: string
+          rolled_to_date: string
+          task_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          rolled_from_date: string
+          rolled_to_date: string
+          task_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          rolled_from_date?: string
+          rolled_to_date?: string
+          task_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_rollover_history_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tasks: {
+        Row: {
+          assigned_to: string | null
+          category: Database["public"]["Enums"]["task_category"]
+          completed_at: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          due_date: string | null
+          id: string
+          parent_task_id: string | null
+          priority: Database["public"]["Enums"]["task_priority"] | null
+          rolled_over_from: string | null
+          status: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          category: Database["public"]["Enums"]["task_category"]
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          parent_task_id?: string | null
+          priority?: Database["public"]["Enums"]["task_priority"] | null
+          rolled_over_from?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          category?: Database["public"]["Enums"]["task_category"]
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          parent_task_id?: string | null
+          priority?: Database["public"]["Enums"]["task_priority"] | null
+          rolled_over_from?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_parent_task_id_fkey"
+            columns: ["parent_task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_rolled_over_from_fkey"
+            columns: ["rolled_over_from"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tools: {
         Row: {
           assistant_type: string
@@ -2194,6 +2292,8 @@ export type Database = {
       }
     }
     Enums: {
+      task_category: "main" | "weekly" | "daily"
+      task_priority: "low" | "medium" | "high" | "urgent"
       user_role: "admin" | "client"
     }
     CompositeTypes: {
@@ -2310,6 +2410,8 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      task_category: ["main", "weekly", "daily"],
+      task_priority: ["low", "medium", "high", "urgent"],
       user_role: ["admin", "client"],
     },
   },

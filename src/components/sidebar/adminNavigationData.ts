@@ -1,4 +1,3 @@
-
 import { 
   LayoutDashboard, ClipboardList, UserCog, Users,
   CreditCard, Settings, FileSpreadsheet, BarChart, CalendarClock,
@@ -29,6 +28,11 @@ export const getAdminMenuSections = (): MenuSection[] => {
           href: '/admin/teams',
           icon: UsersIcon,
           label: 'Teams',
+        },
+        {
+          href: '/admin/tasks',
+          icon: ClipboardList,
+          label: 'Task Tracker',
         },
         {
           href: '/admin/outreach',
