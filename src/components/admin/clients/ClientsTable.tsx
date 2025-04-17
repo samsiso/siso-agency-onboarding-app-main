@@ -1,3 +1,4 @@
+
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useClientsList } from '@/hooks/client';
 import { ClientData, ClientViewPreference, ClientColumnPreference, TodoItem } from '@/types/client.types';
@@ -43,7 +44,8 @@ import {
   CalendarClock,
   DollarSign,
   Pin,
-  PinOff
+  PinOff,
+  Users
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ClientDetailSheet } from './ClientDetailSheet';
