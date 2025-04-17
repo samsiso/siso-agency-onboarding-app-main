@@ -51,22 +51,25 @@ export function ClientTableCell({
     />
   );
 
-  // Helper function to safely render values
+  const renderArray = (value: any[]): React.ReactNode => {
+    if (value.length === 0) return '-';
+    
+    // Handle TodoItem[] specifically
+    if (value[0] && typeof value[0] === 'object' && 'completed' in value[0]) {
+      return `${value.length} todos`;
+    }
+    
+    // Convert any array to a string representation
+    return <span>{`${value.length} items`}</span>;
+  };
+
   const safeRender = (value: any): React.ReactNode => {
     if (value === null || value === undefined) {
       return '-';
     }
     
     if (Array.isArray(value)) {
-      if (value.length === 0) return '-';
-      
-      // Handle TodoItem[] specifically
-      if (value[0] && typeof value[0] === 'object' && 'completed' in value[0]) {
-        return `${value.length} todos`;
-      }
-      
-      // Convert any array to a string representation
-      return <span>{`${value.length} items`}</span>;
+      return renderArray(value);
     }
     
     return <span>{String(value)}</span>;

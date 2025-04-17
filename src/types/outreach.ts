@@ -1,7 +1,8 @@
-
 export interface OutreachAccount {
   id: string;
   username: string;
+  platform: 'instagram' | 'linkedin';
+  industry_focus?: string;
   account_type: string;
   status: string;
   daily_dm_limit: number;
@@ -11,6 +12,9 @@ export interface OutreachAccount {
   updated_at: string;
   last_action_at: string | null;
   assigned_to: string | null;
+  credentials?: Record<string, any>;
+  proxy_settings?: Record<string, any>;
+  platform_specific_settings?: Record<string, any>;
 }
 
 export interface OutreachCampaign {

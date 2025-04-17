@@ -21,10 +21,10 @@ export const useOutreachAccounts = () => {
   });
 
   const addAccount = useMutation({
-    mutationFn: async (account: Partial<OutreachAccount>) => {
+    mutationFn: async (newAccount: Omit<OutreachAccount, 'id' | 'created_at' | 'updated_at'>) => {
       const { data, error } = await supabase
         .from('outreach_accounts')
-        .insert([account])
+        .insert([newAccount])
         .select()
         .single();
 

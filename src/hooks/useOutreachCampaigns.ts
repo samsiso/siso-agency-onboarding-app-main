@@ -21,10 +21,10 @@ export const useOutreachCampaigns = () => {
   });
 
   const addCampaign = useMutation({
-    mutationFn: async (campaign: Partial<OutreachCampaign>) => {
+    mutationFn: async (newCampaign: Omit<OutreachCampaign, 'id' | 'created_at' | 'updated_at'>) => {
       const { data, error } = await supabase
         .from('outreach_campaigns')
-        .insert([campaign])
+        .insert([newCampaign])
         .select()
         .single();
 

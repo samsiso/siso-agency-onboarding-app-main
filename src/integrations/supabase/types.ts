@@ -985,11 +985,16 @@ export type Database = {
           account_type: string | null
           assigned_to: string | null
           created_at: string | null
+          credentials: Json | null
           daily_comment_limit: number | null
           daily_dm_limit: number | null
           daily_follow_limit: number | null
           id: string
+          industry_focus: string | null
           last_action_at: string | null
+          platform: string
+          platform_specific_settings: Json | null
+          proxy_settings: Json | null
           status: string | null
           updated_at: string | null
           username: string
@@ -998,11 +1003,16 @@ export type Database = {
           account_type?: string | null
           assigned_to?: string | null
           created_at?: string | null
+          credentials?: Json | null
           daily_comment_limit?: number | null
           daily_dm_limit?: number | null
           daily_follow_limit?: number | null
           id?: string
+          industry_focus?: string | null
           last_action_at?: string | null
+          platform?: string
+          platform_specific_settings?: Json | null
+          proxy_settings?: Json | null
           status?: string | null
           updated_at?: string | null
           username: string
@@ -1011,11 +1021,16 @@ export type Database = {
           account_type?: string | null
           assigned_to?: string | null
           created_at?: string | null
+          credentials?: Json | null
           daily_comment_limit?: number | null
           daily_dm_limit?: number | null
           daily_follow_limit?: number | null
           id?: string
+          industry_focus?: string | null
           last_action_at?: string | null
+          platform?: string
+          platform_specific_settings?: Json | null
+          proxy_settings?: Json | null
           status?: string | null
           updated_at?: string | null
           username?: string
