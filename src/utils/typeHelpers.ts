@@ -10,6 +10,14 @@ export function safeGet<T>(obj: any, prop: string, defaultValue: T): T {
 }
 
 /**
+ * Safely access property from an object that might be null/undefined
+ * This is an alias for safeGet to maintain backward compatibility
+ */
+export function safePropertyAccess<T>(obj: any, prop: string, defaultValue: T): T {
+  return safeGet(obj, prop, defaultValue);
+}
+
+/**
  * Type utilities for working with database query results
  */
 export const typeHelpers = {
@@ -37,3 +45,4 @@ export const typeHelpers = {
     return !!queryResult && !!queryResult.data && !queryResult.error;
   }
 };
+

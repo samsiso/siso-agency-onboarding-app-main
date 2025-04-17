@@ -8,6 +8,7 @@ import { AgencyPainPointModal } from './AgencyPainPointModal';
 import { Badge } from '@/components/ui/badge';
 import { safeSupabase } from '@/utils/supabaseHelpers';
 import { useParams } from 'react-router-dom';
+import { safeGet } from '@/utils/typeHelpers';
 
 export interface PainPoint {
   id: string;
@@ -82,11 +83,20 @@ export const AgencyPainPoints = ({ onSolutionRequest, agencyTypeSlug }: AgencyPa
           return;
         }
         
+        // Using safe access to get the ID to avoid TypeScript errors
+        const agencyTypeId = safeGet(agencyTypeData, 'id', '');
+        
+        if (!agencyTypeId) {
+          console.error('Agency type ID not found');
+          setLoading(false);
+          return;
+        }
+        
         // Get pain points for this agency type
         const { data, error } = await safeSupabase
           .from('agency_pain_points')
           .select('*')
-          .eq('agency_type_id', agencyTypeData?.id)
+          .eq('agency_type_id', agencyTypeId)
           .order('created_at', { ascending: true });
           
         if (error) {

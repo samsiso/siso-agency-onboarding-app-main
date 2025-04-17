@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { safePropertyAccess } from '@/utils/typeHelpers';
+import { safeGet } from '@/utils/typeHelpers';
 
 // Enhanced profile form data interface with all possible fields
 export interface ProfileFormData {
@@ -76,20 +76,20 @@ export const useProfileData = () => {
             
             // Use safe property access for fields that might not exist in the DB schema
             setFormData({
-              fullName: profileData.full_name || '',
-              businessName: profileData.business_name || '',
-              businessType: safePropertyAccess(profileData, 'business_type', ''),
-              industry: safePropertyAccess(profileData, 'industry', ''),
-              interests: Array.isArray(safePropertyAccess(profileData, 'interests', [])) 
-                ? safePropertyAccess(profileData, 'interests', []).join(', ') 
+              fullName: safeGet(profileData, 'full_name', ''),
+              businessName: safeGet(profileData, 'business_name', ''),
+              businessType: safeGet(profileData, 'business_type', ''),
+              industry: safeGet(profileData, 'industry', ''),
+              interests: Array.isArray(safeGet(profileData, 'interests', [])) 
+                ? safeGet(profileData, 'interests', []).join(', ') 
                 : '',
-              bio: profileData.bio || '',
-              linkedinUrl: profileData.linkedin_url || '',
-              websiteUrl: profileData.website_url || '',
-              youtubeUrl: profileData.youtube_url || '',
-              instagramUrl: profileData.instagram_url || '',
-              twitterUrl: profileData.twitter_url || '',
-              professionalRole: profileData.professional_role || '',
+              bio: safeGet(profileData, 'bio', ''),
+              linkedinUrl: safeGet(profileData, 'linkedin_url', ''),
+              websiteUrl: safeGet(profileData, 'website_url', ''),
+              youtubeUrl: safeGet(profileData, 'youtube_url', ''),
+              instagramUrl: safeGet(profileData, 'instagram_url', ''),
+              twitterUrl: safeGet(profileData, 'twitter_url', ''),
+              professionalRole: safeGet(profileData, 'professional_role', ''),
             });
           }
         }

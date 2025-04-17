@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { LeaderboardEntry, LeaderboardFilter, LeaderboardStats, TrendStats } from '../types';
-import { safePropertyAccess } from '@/utils/typeHelpers'; 
+import { safeGet } from '@/utils/typeHelpers'; 
 
 export const useLeaderboardData = () => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -102,17 +102,17 @@ export const useLeaderboardData = () => {
           level: dbEntry.level || 1,
           streak_days: dbEntry.streak_days || 0,
           rank: dbEntry.rank?.toString() || '',
-          siso_tokens: safePropertyAccess(dbEntry.profile, 'siso_tokens', 0),
+          siso_tokens: safeGet(dbEntry.profile, 'siso_tokens', 0),
           updated_at: dbEntry.updated_at,
           contribution_count: 0, // Add this data when available
           referral_count: 0, // Add this data when available
           achievements: [], // Add this data when available
           profile: {
-            full_name: safePropertyAccess(dbEntry.profile, 'full_name', 'Anonymous'),
-            email: safePropertyAccess(dbEntry.profile, 'email', ''),
-            avatar_url: safePropertyAccess(dbEntry.profile, 'avatar_url', ''),
-            bio: safePropertyAccess(dbEntry.profile, 'bio', ''),
-            professional_role: safePropertyAccess(dbEntry.profile, 'professional_role', '')
+            full_name: safeGet(dbEntry.profile, 'full_name', 'Anonymous'),
+            email: safeGet(dbEntry.profile, 'email', ''),
+            avatar_url: safeGet(dbEntry.profile, 'avatar_url', ''),
+            bio: safeGet(dbEntry.profile, 'bio', ''),
+            professional_role: safeGet(dbEntry.profile, 'professional_role', '')
           }
         }));
         

@@ -1,8 +1,10 @@
+
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { usePoints } from '@/hooks/usePoints';
 import { useToast } from '@/hooks/use-toast';
 import { safeSupabase } from '@/utils/supabaseHelpers';
 import FeatureFlags from '@/utils/featureFlags';
+import { safeGet } from '@/utils/typeHelpers';
 
 // Enhanced hook with improved social sharing capabilities
 export const useBlogPostActions = () => {
@@ -74,12 +76,15 @@ export const useBlogPostActions = () => {
       
       if (checkError) throw checkError;
       
-      if (existingBookmark) {
+      // Safely access the bookmark ID to avoid TypeScript errors
+      const bookmarkId = existingBookmark ? safeGet(existingBookmark, 'id', '') : '';
+      
+      if (bookmarkId) {
         // Remove bookmark if it exists
         const { error: deleteError } = await safeSupabase
           .from('ai_news_bookmarks')
           .delete()
-          .eq('id', existingBookmark.id);
+          .eq('id', bookmarkId);
         
         if (deleteError) throw deleteError;
         
@@ -136,8 +141,12 @@ export const safeFetchBlogPost = async (blogId: string) => {
       return null;
     }
     
-    // Type assertion to avoid 'id does not exist' error
-    return data as { id: string; [key: string]: any };
+    // Safely access the post data with type assertion after validation
+    if (data && typeof data === 'object' && 'id' in data) {
+      return data as { id: string; [key: string]: any };
+    }
+    
+    return null;
   } catch (error) {
     console.error('Error in safeFetchBlogPost:', error);
     return null;
