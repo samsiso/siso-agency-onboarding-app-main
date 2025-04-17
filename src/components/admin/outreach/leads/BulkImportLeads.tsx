@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
+import { Progress } from '@/components/ui/progress';
 import {
   Select,
   SelectContent,
@@ -14,7 +15,7 @@ import { useLeadImport, ImportLead } from '@/hooks/useLeadImport';
 import { DataPreview } from './DataPreview';
 import { downloadTemplate } from '@/utils/downloadUtils';
 import { FileUpload } from './FileUpload';
-import { FileText, Download, Upload, AlertCircle } from 'lucide-react';
+import { FileText, Download, Upload, AlertCircle, CheckCircle } from 'lucide-react';
 
 interface ColumnMapping {
   sourceColumn: string;
@@ -37,6 +38,8 @@ export function BulkImportLeads() {
   const [delimiter, setDelimiter] = useState('\t');
   const [isProcessing, setIsProcessing] = useState(false);
   const [previewData, setPreviewData] = useState<string[][]>([]);
+  const [importProgress, setImportProgress] = useState(0);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   const { importLeads, isImporting } = useLeadImport();
 
@@ -83,11 +86,39 @@ export function BulkImportLeads() {
     }
   };
 
+  const validateData = (data: ImportLead[]): string[] => {
+    const errors: string[] = [];
+    
+    if (!data.length) {
+      errors.push('No valid data to import');
+      return errors;
+    }
+
+    // Check for required username field
+    const missingUsernames = data.some(lead => !lead.username);
+    if (missingUsernames) {
+      errors.push('All leads must have a username');
+    }
+
+    // Validate numeric fields
+    const numericFields = ['followers_count', 'following_count', 'posts_count'];
+    data.forEach((lead, index) => {
+      numericFields.forEach(field => {
+        if (lead[field as keyof ImportLead] && isNaN(Number(lead[field as keyof ImportLead]))) {
+          errors.push(`Row ${index + 1}: ${field} must be a number`);
+        }
+      });
+    });
+
+    return errors;
+  };
+
   const handleImport = async () => {
     try {
       setIsProcessing(true);
+      setValidationErrors([]);
+      setImportProgress(0);
       
-      // Basic validation
       if (!rawData.trim()) {
         toast.error('Please paste some data first');
         return;
@@ -98,7 +129,6 @@ export function BulkImportLeads() {
         return;
       }
 
-      // Parse the data
       const rows = rawData.split('\n').filter(row => row.trim());
       const parsedData: ImportLead[] = rows.slice(1).map(row => {
         const values = row.split(delimiter);
@@ -106,7 +136,6 @@ export function BulkImportLeads() {
         
         columnMappings.forEach((mapping, index) => {
           if (mapping.targetField && values[index]) {
-            // Convert numeric fields
             if (['followers_count', 'following_count', 'posts_count'].includes(mapping.targetField)) {
               lead[mapping.targetField] = parseInt(values[index], 10) || null;
             } else {
@@ -114,25 +143,32 @@ export function BulkImportLeads() {
             }
           }
         });
-
-        // Ensure username is always present
-        if (!lead.username) {
-          return null;
-        }
         
-        return lead as ImportLead;
+        return lead.username ? lead as ImportLead : null;
       }).filter(Boolean) as ImportLead[];
 
-      // Import the leads using the hook
-      if (parsedData.length > 0) {
-        await importLeads.mutateAsync(parsedData);
-        
-        // Clear the form on success
-        setRawData('');
-        setColumnMappings([]);
-      } else {
-        toast.error('No valid leads found to import');
+      const errors = validateData(parsedData);
+      if (errors.length > 0) {
+        setValidationErrors(errors);
+        toast.error('Please fix validation errors before importing');
+        return;
       }
+
+      const BATCH_SIZE = 50;
+      const totalBatches = Math.ceil(parsedData.length / BATCH_SIZE);
+      
+      for (let i = 0; i < parsedData.length; i += BATCH_SIZE) {
+        const batch = parsedData.slice(i, i + BATCH_SIZE);
+        await importLeads.mutateAsync(batch);
+        
+        const progress = Math.min(((i + BATCH_SIZE) / parsedData.length) * 100, 100);
+        setImportProgress(progress);
+      }
+
+      toast.success(`Successfully imported ${parsedData.length} leads`);
+      setRawData('');
+      setColumnMappings([]);
+      setImportProgress(0);
       
     } catch (error) {
       console.error('Import error:', error);
@@ -243,13 +279,48 @@ export function BulkImportLeads() {
             </div>
           )}
 
+        {validationErrors.length > 0 && (
+          <div className="bg-destructive/10 p-4 rounded-md space-y-2">
+            <div className="font-medium text-destructive flex items-center gap-2">
+              <AlertCircle className="h-4 w-4" />
+              Validation Errors
+            </div>
+            <ul className="list-disc pl-5 space-y-1">
+              {validationErrors.map((error, index) => (
+                <li key={index} className="text-sm text-destructive">
+                  {error}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {isProcessing && (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <span>Importing leads...</span>
+              <span>{Math.round(importProgress)}%</span>
+            </div>
+            <Progress value={importProgress} className="h-2" />
+          </div>
+        )}
+
           <Button 
             onClick={handleImport}
             disabled={isProcessing || !rawData.trim()}
             className="w-full"
           >
-            <Upload className="h-4 w-4 mr-2" />
-            {isProcessing ? 'Importing...' : 'Import Leads'}
+            {isProcessing ? (
+              <>
+                <Upload className="h-4 w-4 mr-2 animate-pulse" />
+                Importing...
+              </>
+            ) : (
+              <>
+                <Upload className="h-4 w-4 mr-2" />
+                Import Leads
+              </>
+            )}
           </Button>
         </div>
       </div>
