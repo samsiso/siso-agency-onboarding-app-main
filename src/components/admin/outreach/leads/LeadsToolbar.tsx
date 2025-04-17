@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -65,7 +66,7 @@ export const LeadsToolbar = ({
         <DropdownMenuContent>
           <DropdownMenuItem onClick={() => onStatusFilterChange('all')}>
             All
-          DropdownMenuItem>
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={() => onStatusFilterChange('new')}>
             New
           </DropdownMenuItem>
