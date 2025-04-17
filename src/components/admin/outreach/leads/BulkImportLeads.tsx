@@ -13,6 +13,7 @@ import {
 import { useLeadImport, ImportLead } from '@/hooks/useLeadImport';
 import { DataPreview } from './DataPreview';
 import { downloadTemplate } from '@/utils/downloadUtils';
+import { FileUpload } from './FileUpload';
 import { FileText, Download, Upload, AlertCircle } from 'lucide-react';
 
 interface ColumnMapping {
@@ -38,6 +39,26 @@ export function BulkImportLeads() {
   const [previewData, setPreviewData] = useState<string[][]>([]);
 
   const { importLeads, isImporting } = useLeadImport();
+
+  const handleFileSelect = (content: string) => {
+    setRawData(content);
+    if (content) {
+      const rows = content.split('\n').filter(row => row.trim());
+      const firstRow = rows[0];
+      const columns = firstRow.split(delimiter);
+      
+      setColumnMappings(columns.map(col => ({
+        sourceColumn: col.trim(),
+        targetField: ''
+      })));
+
+      setPreviewData(
+        rows.slice(0, 6).map(row => row.split(delimiter))
+      );
+    } else {
+      setPreviewData([]);
+    }
+  };
 
   const handleDataPaste = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const pastedData = e.target.value;
@@ -152,75 +173,85 @@ export function BulkImportLeads() {
           </div>
         </div>
 
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <FileText className="h-4 w-4" />
-            <span>Paste your data below or use our template</span>
-          </div>
-          <Textarea
-            placeholder="Paste your data here (tab or comma separated)..."
-            className="min-h-[200px] font-mono"
-            value={rawData}
-            onChange={handleDataPaste}
-          />
-        </div>
-
-        {previewData.length > 0 && (
+        <div className="grid gap-6">
           <div className="space-y-2">
-            <h4 className="font-medium flex items-center gap-2">
-              <AlertCircle className="h-4 w-4 text-blue-500" />
-              Preview (first 5 rows)
-            </h4>
-            <DataPreview 
-              data={previewData} 
-              columnMappings={columnMappings}
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <FileText className="h-4 w-4" />
+              <span>Upload a file or paste your data below</span>
+            </div>
+            <FileUpload onFileSelect={handleFileSelect} />
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <FileText className="h-4 w-4" />
+              <span>Or paste your data here</span>
+            </div>
+            <Textarea
+              placeholder="Paste your data here (tab or comma separated)..."
+              className="min-h-[200px] font-mono"
+              value={rawData}
+              onChange={handleDataPaste}
             />
           </div>
-        )}
 
-        {columnMappings.length > 0 && (
-          <div className="space-y-2">
-            <h4 className="font-medium">Column Mappings</h4>
-            <div className="grid gap-2">
-              {columnMappings.map((mapping, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground w-1/3">
-                    {mapping.sourceColumn}
-                  </span>
-                  <Select
-                    value={mapping.targetField}
-                    onValueChange={(value) => {
-                      const newMappings = [...columnMappings];
-                      newMappings[index].targetField = value;
-                      setColumnMappings(newMappings);
-                    }}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Map to field..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">Skip this column</SelectItem>
-                      {AVAILABLE_FIELDS.map(field => (
-                        <SelectItem key={field.value} value={field.value}>
-                          {field.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              ))}
+          {previewData.length > 0 && (
+            <div className="space-y-2">
+              <h4 className="font-medium flex items-center gap-2">
+                <AlertCircle className="h-4 w-4 text-blue-500" />
+                Preview (first 5 rows)
+              </h4>
+              <DataPreview 
+                data={previewData} 
+                columnMappings={columnMappings}
+              />
             </div>
-          </div>
-        )}
+          )}
 
-        <Button 
-          onClick={handleImport}
-          disabled={isProcessing || !rawData.trim()}
-          className="w-full"
-        >
-          <Upload className="h-4 w-4 mr-2" />
-          {isProcessing ? 'Importing...' : 'Import Leads'}
-        </Button>
+          {columnMappings.length > 0 && (
+            <div className="space-y-2">
+              <h4 className="font-medium">Column Mappings</h4>
+              <div className="grid gap-2">
+                {columnMappings.map((mapping, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground w-1/3">
+                      {mapping.sourceColumn}
+                    </span>
+                    <Select
+                      value={mapping.targetField}
+                      onValueChange={(value) => {
+                        const newMappings = [...columnMappings];
+                        newMappings[index].targetField = value;
+                        setColumnMappings(newMappings);
+                      }}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Map to field..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">Skip this column</SelectItem>
+                        {AVAILABLE_FIELDS.map(field => (
+                          <SelectItem key={field.value} value={field.value}>
+                            {field.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <Button 
+            onClick={handleImport}
+            disabled={isProcessing || !rawData.trim()}
+            className="w-full"
+          >
+            <Upload className="h-4 w-4 mr-2" />
+            {isProcessing ? 'Importing...' : 'Import Leads'}
+          </Button>
+        </div>
       </div>
     </Card>
   );
