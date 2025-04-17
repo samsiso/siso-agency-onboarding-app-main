@@ -62,7 +62,7 @@ import {
   TooltipTrigger 
 } from '@/components/ui/tooltip';
 import { Input } from '@/components/ui/input';
-import { toast } from 'react-hot-toast';
+import { useToast } from '@/hooks/use-toast';
 import * as React from 'react';
 
 interface ClientsTableProps {
@@ -87,10 +87,15 @@ export function ClientsTable({
   // Active client state
   const [activeClient, setActiveClient] = useState<string | null>(null);
   
+  // Client add form state
+  const [isAddClientOpen, setIsAddClientOpen] = useState(false);
+  
   // Inline editing state
   const [editingCell, setEditingCell] = useState<{id: string, field: string} | null>(null);
   const [editValue, setEditValue] = useState<string>('');
   const editInputRef = useRef<HTMLInputElement>(null);
+  
+  const { toast } = useToast();
 
   // Get column definitions from view preferences
   const visibleColumns = useMemo(() => 
@@ -127,6 +132,20 @@ export function ClientsTable({
   
   const totalPages = Math.ceil(totalCount / viewPreference.pageSize);
 
+  // Handle adding a new client
+  const handleAddClient = () => {
+    setIsAddClientOpen(true);
+  };
+  
+  // Handle client add success
+  const handleClientAddSuccess = () => {
+    refetch();
+    toast({
+      title: "Client added successfully",
+      description: "The new client has been added to your list."
+    });
+  };
+
   // Start editing a cell
   const handleStartEdit = (client: ClientData, field: string) => {
     setEditingCell({ id: client.id, field });
@@ -141,14 +160,38 @@ export function ClientsTable({
   };
 
   // Save edited cell value
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (!editingCell) return;
     
-    // In a real implementation, this would make an API call to update the data
-    toast.success(`Updated ${editingCell.field} for client ${editingCell.id}`);
-    console.log('Saving edit:', editingCell, editValue);
-    
-    setEditingCell(null);
+    try {
+      // Update the value in the database
+      const { error } = await supabase
+        .from('client_onboarding')
+        .update({ 
+          [editingCell.field]: editValue,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', editingCell.id);
+        
+      if (error) throw error;
+      
+      toast({
+        title: "Update successful",
+        description: `Updated ${editingCell.field} for this client.`
+      });
+      
+      // Refresh the data
+      refetch();
+    } catch (error: any) {
+      console.error('Error saving edit:', error);
+      toast({
+        variant: "destructive",
+        title: "Error updating client",
+        description: error.message || "Failed to save changes. Please try again."
+      });
+    } finally {
+      setEditingCell(null);
+    }
   };
 
   // Cancel editing
@@ -230,6 +273,37 @@ export function ClientsTable({
     }
   }, [editingCell]);
 
+  // Handle deletion of selected clients
+  const handleDeleteSelected = async () => {
+    if (selectedClients.length === 0) return;
+    
+    if (window.confirm(`Are you sure you want to delete ${selectedClients.length} selected clients?`)) {
+      try {
+        const { error } = await supabase
+          .from('client_onboarding')
+          .delete()
+          .in('id', selectedClients);
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Clients deleted",
+          description: `Successfully deleted ${selectedClients.length} clients.`
+        });
+        
+        setSelectedClients([]);
+        refetch();
+      } catch (error: any) {
+        console.error('Error deleting clients:', error);
+        toast({
+          variant: "destructive",
+          title: "Error deleting clients",
+          description: error.message || "Failed to delete selected clients."
+        });
+      }
+    }
+  };
+
   // Render loading state
   if (isLoading) {
     return (
@@ -280,7 +354,7 @@ export function ClientsTable({
           {selectedClients.length > 0 ? (
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium">{selectedClients.length} selected</span>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" onClick={handleDeleteSelected}>
                 <Trash2 className="h-4 w-4 mr-1" />
                 Delete
               </Button>
@@ -290,7 +364,7 @@ export function ClientsTable({
               </Button>
             </div>
           ) : (
-            <Button variant="default" size="sm">
+            <Button variant="default" size="sm" onClick={handleAddClient}>
               <Plus className="h-4 w-4 mr-1" />
               Add Client
             </Button>
@@ -481,12 +555,39 @@ export function ClientsTable({
                               <ExternalLink className="h-4 w-4 mr-2" />
                               View Details
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleStartEdit(client, 'full_name')}>
                               <Edit2 className="h-4 w-4 mr-2" />
                               Edit Client
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-destructive">
+                            <DropdownMenuItem 
+                              className="text-destructive"
+                              onClick={async () => {
+                                if (window.confirm('Are you sure you want to delete this client?')) {
+                                  try {
+                                    const { error } = await supabase
+                                      .from('client_onboarding')
+                                      .delete()
+                                      .eq('id', client.id);
+                                    
+                                    if (error) throw error;
+                                    
+                                    toast({
+                                      title: "Client deleted",
+                                      description: "The client has been permanently removed."
+                                    });
+                                    
+                                    refetch();
+                                  } catch (error: any) {
+                                    toast({
+                                      variant: "destructive",
+                                      title: "Error deleting client",
+                                      description: error.message || "Failed to delete client."
+                                    });
+                                  }
+                                }
+                              }}
+                            >
                               <Trash2 className="h-4 w-4 mr-2" />
                               Delete Client
                             </DropdownMenuItem>
@@ -587,6 +688,13 @@ export function ClientsTable({
           onClose={handleCloseDetails} 
         />
       )}
+      
+      {/* Client Add Form */}
+      <ClientAddForm 
+        open={isAddClientOpen} 
+        onOpenChange={setIsAddClientOpen} 
+        onSuccess={handleClientAddSuccess}
+      />
     </div>
   );
 }

@@ -1,8 +1,7 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { buildClientListQuery, processClientData } from '@/utils/clientQueryBuilders';
-import { fetchClientsFallback } from '@/utils/clientFallbackUtils';
-import { ClientsListParams, ClientsListResponse } from '@/types/client.types';
+import { supabase } from '@/integrations/supabase/client';
+import { ClientsListParams, ClientsListResponse, ClientData } from '@/types/client.types';
 
 export type { ClientData, ClientsListParams } from '@/types/client.types';
 
@@ -21,19 +20,33 @@ export const useClientsList = ({
     queryKey: ['clients-list', page, pageSize, searchQuery, statusFilter, sortColumn, sortDirection],
     queryFn: async () => {
       try {
-        // Build and execute the main query
-        const query = buildClientListQuery({ searchQuery, statusFilter, sortColumn, sortDirection });
+        // Build the query
+        let query = supabase
+          .from('client_onboarding')
+          .select('*', { count: 'exact' });
+        
+        // Apply text search
+        if (searchQuery) {
+          query = query.or(`
+            contact_name.ilike.%${searchQuery}%,
+            company_name.ilike.%${searchQuery}%,
+            website_url.ilike.%${searchQuery}%,
+            company_niche.ilike.%${searchQuery}%,
+            project_name.ilike.%${searchQuery}%
+          `);
+        }
+        
+        // Apply status filter
+        if (statusFilter && statusFilter !== 'all') {
+          query = query.eq('status', statusFilter);
+        }
+        
+        // Apply sorting
+        query = query.order(sortColumn, { ascending: sortDirection === 'asc' });
         
         // First get count
-        let count = 0;
-        try {
-          const countResult = await query;
-          if (countResult && typeof countResult.count === 'number') {
-            count = countResult.count;
-          }
-        } catch (countError) {
-          console.error('Error getting count:', countError);
-        }
+        const countResult = await query;
+        const count = countResult.count || 0;
         
         // Then fetch the page of data
         const { data, error: dataError } = await query.range(from, to);
@@ -50,8 +63,36 @@ export const useClientsList = ({
           };
         }
         
-        // Process the data to flatten the structure
-        const processedData = processClientData(data);
+        // Process the data to get the clientData format
+        const processedData: ClientData[] = data.map(item => ({
+          id: item.id,
+          full_name: item.contact_name || 'Unknown',
+          email: null, // Not available in the current dataset
+          business_name: item.company_name || null,
+          phone: null, // Not available in the current dataset
+          avatar_url: `https://api.dicebear.com/7.x/initials/svg?seed=${(item.contact_name || 'Client').substring(0, 2)}`,
+          status: item.status || 'pending',
+          current_step: item.current_step || 1,
+          total_steps: item.total_steps || 5,
+          completed_steps: item.completed_steps || [],
+          created_at: item.created_at,
+          updated_at: item.updated_at,
+          website_url: item.website_url || null,
+          professional_role: null, // Not available in the current dataset
+          bio: null, // Not available in the current dataset
+          project_name: item.project_name || null,
+          company_niche: item.company_niche || null,
+          development_url: item.website_url || null,
+          mvp_build_status: null, // Not available in the current dataset
+          notion_plan_url: null, // Not available in the current dataset
+          payment_status: null, // Not available in the current dataset
+          estimated_price: null, // Not available in the current dataset
+          initial_contact_date: item.created_at || null,
+          start_date: null, // Not available in the current dataset
+          estimated_completion_date: null // Not available in the current dataset
+        }));
+        
+        console.log('Processed client data:', processedData);
         
         return {
           clients: processedData,
@@ -60,8 +101,11 @@ export const useClientsList = ({
       } catch (error: any) {
         console.error('Error in useClientsList:', error);
         
-        // Use fallback mechanism if main query fails
-        return fetchClientsFallback({ page, pageSize, searchQuery, statusFilter, sortColumn, sortDirection }, from, to);
+        // Return empty data when there's an error
+        return {
+          clients: [],
+          totalCount: 0
+        };
       }
     },
   });

@@ -1,15 +1,16 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { SlidersHorizontal, CheckCircle, Circle } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuCheckboxItem,
+  DropdownMenuGroup,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Settings2 } from 'lucide-react';
+} from "@/components/ui/dropdown-menu";
 import { ClientColumnPreference } from '@/types/client.types';
 
 interface ColumnManagerProps {
@@ -18,40 +19,75 @@ interface ColumnManagerProps {
 }
 
 export function ColumnManager({ columns, onColumnsChange }: ColumnManagerProps) {
-  const [localColumns, setLocalColumns] = useState<ClientColumnPreference[]>(columns);
-
-  const handleColumnToggle = (columnKey: string) => {
-    const newColumns = localColumns.map(col => {
-      if (col.key === columnKey) {
+  const handleToggleColumn = (key: string) => {
+    const newColumns = columns.map(col => {
+      if (col.key === key) {
         return { ...col, visible: !col.visible };
       }
       return col;
     });
     
-    setLocalColumns(newColumns);
     onColumnsChange(newColumns);
   };
-
+  
+  const resetToDefault = () => {
+    const defaultColumns = columns.map(col => {
+      // Default visible columns
+      const defaultVisible = [
+        'full_name', 
+        'business_name', 
+        'status', 
+        'project_name', 
+        'updated_at'
+      ].includes(col.key);
+      
+      return { ...col, visible: defaultVisible };
+    });
+    
+    onColumnsChange(defaultColumns);
+  };
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="ml-auto flex items-center">
-          <Settings2 className="h-4 w-4 mr-2" />
+        <Button variant="outline" size="sm">
+          <SlidersHorizontal className="h-4 w-4 mr-1" />
           Columns
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel>Toggle Columns</DropdownMenuLabel>
+      <DropdownMenuContent className="w-56">
+        <DropdownMenuLabel>Table Columns</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {localColumns.map((column) => (
-          <DropdownMenuCheckboxItem
-            key={column.key}
-            checked={column.visible}
-            onCheckedChange={() => handleColumnToggle(column.key)}
-          >
-            {column.label || column.key.replace(/_/g, ' ')}
-          </DropdownMenuCheckboxItem>
-        ))}
+        
+        <DropdownMenuGroup className="max-h-[300px] overflow-y-auto">
+          {columns.map((column) => (
+            <DropdownMenuItem 
+              key={column.key}
+              onClick={(e) => {
+                e.preventDefault();
+                handleToggleColumn(column.key);
+              }}
+              className="flex items-center justify-between cursor-pointer"
+            >
+              <span>{column.label || column.key.replace(/_/g, ' ')}</span>
+              {column.visible ? 
+                <CheckCircle className="h-4 w-4 text-primary" /> : 
+                <Circle className="h-4 w-4 text-muted-foreground" />
+              }
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuGroup>
+        
+        <DropdownMenuSeparator />
+        <DropdownMenuItem 
+          onClick={(e) => {
+            e.preventDefault();
+            resetToDefault();
+          }}
+          className="text-center justify-center font-medium"
+        >
+          Reset to Default
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
