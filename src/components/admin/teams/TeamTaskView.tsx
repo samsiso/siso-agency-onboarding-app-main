@@ -1,12 +1,13 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { TaskList } from '@/components/admin/tasks/TaskList';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+import { TimelineTaskView } from './TimelineTaskView';
 
 interface TeamTaskViewProps {
   memberId?: string;
@@ -36,16 +37,18 @@ export function TeamTaskView({ memberId }: TeamTaskViewProps) {
         transition={{ duration: 0.3 }}
       >
         <Card className="bg-gradient-to-r from-purple-900/40 via-purple-800/30 to-indigo-900/40 border-purple-500/20">
-          <CardHeader>
-            <CardTitle className="text-2xl">{memberName}'s Tasks</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="daily" className="space-y-6">
+          <div className="p-6">
+            <Tabs defaultValue="timeline" className="space-y-6">
               <TabsList>
+                <TabsTrigger value="timeline">Timeline</TabsTrigger>
                 <TabsTrigger value="daily">Daily Tasks</TabsTrigger>
                 <TabsTrigger value="overall">Overall Tasks</TabsTrigger>
                 <TabsTrigger value="goals">Goals</TabsTrigger>
               </TabsList>
+
+              <TabsContent value="timeline" className="space-y-4">
+                <TimelineTaskView memberId={memberId} />
+              </TabsContent>
 
               <TabsContent value="daily" className="space-y-4">
                 <TaskList category="daily" userId={memberId} />
@@ -59,7 +62,7 @@ export function TeamTaskView({ memberId }: TeamTaskViewProps) {
                 <TaskList category="weekly" userId={memberId} />
               </TabsContent>
             </Tabs>
-          </CardContent>
+          </div>
         </Card>
       </motion.div>
     </div>

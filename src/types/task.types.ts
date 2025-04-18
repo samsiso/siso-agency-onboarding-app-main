@@ -1,4 +1,3 @@
-
 export type TaskCategory = 'main' | 'weekly' | 'daily' | 'siso_app_dev' | 'onboarding_app' | 'instagram';
 export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent';
 export type TaskStatus = 'pending' | 'in_progress' | 'completed';
@@ -18,6 +17,8 @@ export interface Task {
   created_by?: string;
   parent_task_id?: string;
   rolled_over_from?: string;
+  start_time?: string; // Added for timeline view
+  duration?: number; // Duration in minutes
 }
 
 export interface TaskStats {
