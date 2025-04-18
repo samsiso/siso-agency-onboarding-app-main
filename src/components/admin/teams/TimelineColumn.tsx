@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Task } from '@/types/task.types';
 import { format } from 'date-fns';
 import { TaskCard } from './TaskCard';
@@ -8,8 +8,20 @@ import { cn } from '@/lib/utils';
 
 export function TimelineColumn({ tasks }: { tasks: Task[] }) {
   const timeSlots = Array.from({ length: 24 }, (_, i) => i);
-  const currentHour = new Date().getHours();
+  const [currentTime, setCurrentTime] = useState(new Date());
   const { handleDrop, handleDragOver, isDragging } = useTaskDragDrop();
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000); // Update every minute
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const currentHour = currentTime.getHours();
+  const currentMinute = currentTime.getMinutes();
+  const currentTimePercentage = (currentHour * 60 + currentMinute) / (24 * 60) * 100;
 
   return (
     <div className="relative min-h-[600px]">
@@ -35,11 +47,13 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
       <div className="ml-16 relative">
         {/* Current time indicator */}
         <div 
-          className="absolute left-0 right-0 border-t-2 border-red-500 z-10"
+          className="absolute left-0 right-0 border-t-2 border-red-500 z-10 transition-transform duration-1000"
           style={{
-            top: `${(new Date().getHours() * 60 + new Date().getMinutes()) / 1440 * 100}%`
+            top: `${currentTimePercentage}%`,
           }}
-        />
+        >
+          <div className="absolute -left-1 -top-1.5 w-3 h-3 rounded-full bg-red-500" />
+        </div>
 
         {tasks.map((task) => (
           <TaskCard 

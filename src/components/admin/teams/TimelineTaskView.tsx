@@ -7,11 +7,13 @@ import { useTasks } from '@/hooks/useTasks';
 import { format } from 'date-fns';
 import { TaskCard } from './TaskCard';
 import { motion } from 'framer-motion';
-import { Clock, ListTodo, RefreshCcw } from 'lucide-react';
+import { Clock, ListTodo, RefreshCcw, Calendar } from 'lucide-react';
+import { useDayPeriod } from '@/hooks/useDayPeriod';
 
 export function TimelineTaskView({ memberId }: { memberId?: string }) {
   const { useTaskQuery } = useTasks();
   const { data: tasks = [] } = useTaskQuery('daily', memberId);
+  const { greeting, icon: DayPeriodIcon, gradientClass } = useDayPeriod();
 
   const todaysTasks = tasks.filter(task => {
     if (!task.start_time) return false;
@@ -27,6 +29,8 @@ export function TimelineTaskView({ memberId }: { memberId?: string }) {
   });
 
   const recurringTasks = tasks.filter(task => task.recurring_type && task.recurring_type !== 'none');
+  const today = new Date();
+  const formattedDate = format(today, 'EEEE, MMMM d, yyyy');
 
   return (
     <div className="space-y-6">
@@ -34,12 +38,13 @@ export function TimelineTaskView({ memberId }: { memberId?: string }) {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="bg-gradient-to-r from-purple-900/40 via-purple-800/30 to-indigo-900/40 p-6 rounded-lg border border-purple-500/20"
+        className={`bg-gradient-to-r ${gradientClass} p-6 rounded-lg border border-purple-500/20`}
       >
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white mb-2">
-              Welcome, SISO
+            <h1 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
+              <DayPeriodIcon className="h-6 w-6" />
+              {greeting}, SISO
             </h1>
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1 rounded-lg bg-green-100 px-2 py-1 text-xs font-medium text-green-700 dark:bg-green-900 dark:text-green-300">
@@ -58,7 +63,10 @@ export function TimelineTaskView({ memberId }: { memberId?: string }) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="p-4 overflow-hidden">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">Today's Schedule</h2>
+            <div className="flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-purple-500" />
+              <h2 className="text-lg font-semibold">Schedule for {formattedDate}</h2>
+            </div>
             {recurringTasks.length > 0 && (
               <div className="flex items-center gap-1 text-sm text-muted-foreground">
                 <RefreshCcw className="h-4 w-4" />
@@ -66,7 +74,7 @@ export function TimelineTaskView({ memberId }: { memberId?: string }) {
               </div>
             )}
           </div>
-          <div className="max-h-[600px] overflow-y-auto hide-scrollbar">
+          <div className="max-h-[600px] overflow-y-auto hide-scrollbar relative">
             <TimelineColumn tasks={todaysTasks} />
           </div>
         </Card>
