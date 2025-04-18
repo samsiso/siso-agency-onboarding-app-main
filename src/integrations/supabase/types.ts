@@ -2345,7 +2345,13 @@ export type Database = {
       }
     }
     Enums: {
-      task_category: "main" | "weekly" | "daily"
+      task_category:
+        | "main"
+        | "weekly"
+        | "daily"
+        | "siso_app_dev"
+        | "onboarding_app"
+        | "instagram"
       task_priority: "low" | "medium" | "high" | "urgent"
       user_role: "admin" | "client"
     }
@@ -2463,7 +2469,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      task_category: ["main", "weekly", "daily"],
+      task_category: [
+        "main",
+        "weekly",
+        "daily",
+        "siso_app_dev",
+        "onboarding_app",
+        "instagram",
+      ],
       task_priority: ["low", "medium", "high", "urgent"],
       user_role: ["admin", "client"],
     },
