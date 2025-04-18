@@ -31,7 +31,7 @@ export default function AdminTasks() {
                 <CardTitle>Active Tasks</CardTitle>
               </CardHeader>
               <CardContent>
-                <TaskList />
+                <TaskList category="main" />
               </CardContent>
             </Card>
           </TabsContent>
