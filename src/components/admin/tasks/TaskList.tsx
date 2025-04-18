@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useTasks, TaskCategory } from '@/hooks/useTasks';
+import { useTasks, TaskCategory, Task } from '@/hooks/useTasks';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { TaskItem } from './TaskItem';

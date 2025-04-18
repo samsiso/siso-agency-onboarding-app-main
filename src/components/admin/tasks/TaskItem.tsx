@@ -6,16 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Calendar, Clock, User } from 'lucide-react';
 import { format } from 'date-fns';
-
-interface Task {
-  id: string;
-  title: string;
-  description: string | null;
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  due_date: string | null;
-  assigned_to: string | null;
-  status: string;
-}
+import { Task } from '@/hooks/useTasks';
 
 interface TaskItemProps {
   task: Task;
