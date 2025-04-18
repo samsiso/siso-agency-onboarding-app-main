@@ -25,7 +25,8 @@ export function TodoList({ todos = [], onUpdate, clientId, disabled = false }: T
       id: `todo-${Date.now()}`,
       text: newTodoText,
       completed: false,
-      created_at: new Date().toISOString()
+      priority: 'medium', // Set a default priority
+      // Don't include created_at as it doesn't exist in the TodoItem type
     };
 
     onUpdate([...todos, newTodo]);

@@ -64,7 +64,8 @@ export function SavedViewsManager({ currentPreference, onLoadView }: SavedViewsM
     const newView: SavedView = {
       id: uuidv4(),
       name: newViewName.trim(),
-      preference: { ...currentPreference }
+      preference: { ...currentPreference },
+      createdAt: new Date().toISOString() // Add the required createdAt property
     };
 
     const updatedViews = [...savedViews, newView];

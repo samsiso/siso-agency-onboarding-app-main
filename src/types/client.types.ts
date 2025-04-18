@@ -1,4 +1,3 @@
-
 export interface ClientDocument {
   id: string;
   client_id: string;
@@ -39,6 +38,9 @@ export interface ClientData {
   initial_contact_date?: string | null;
   start_date?: string | null;
   estimated_completion_date?: string | null;
+  todos?: TodoItem[];
+  next_steps?: string | null;
+  key_research?: string | null;
 }
 
 export interface TodoItem {
@@ -48,6 +50,7 @@ export interface TodoItem {
   due_date?: string;
   priority: 'low' | 'medium' | 'high';
   related_to?: string;
+  assigned_to?: string;
 }
 
 export interface ClientsListParams {
