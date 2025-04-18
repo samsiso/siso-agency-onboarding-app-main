@@ -16,7 +16,7 @@ export function TimelineTaskView({ memberId }: { memberId?: string }) {
   const todaysTasks = tasks.filter(task => {
     if (!task.start_time) return false;
     return format(new Date(task.start_time), 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd') ||
-           task.recurring_type !== 'none';
+           (task.recurring_type && task.recurring_type !== 'none');
   });
 
   const upcomingTasks = tasks.filter(task => {
@@ -26,7 +26,7 @@ export function TimelineTaskView({ memberId }: { memberId?: string }) {
     return dueDate > today && format(dueDate, 'yyyy-MM-dd') !== format(today, 'yyyy-MM-dd');
   });
 
-  const recurringTasks = tasks.filter(task => task.recurring_type !== 'none');
+  const recurringTasks = tasks.filter(task => task.recurring_type && task.recurring_type !== 'none');
 
   return (
     <div className="space-y-6">

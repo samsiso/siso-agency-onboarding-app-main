@@ -1,3 +1,4 @@
+
 export type TaskCategory = 'main' | 'weekly' | 'daily' | 'siso_app_dev' | 'onboarding_app' | 'instagram';
 export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent';
 export type TaskStatus = 'pending' | 'in_progress' | 'completed';
@@ -19,6 +20,8 @@ export interface Task {
   rolled_over_from?: string;
   start_time?: string; // Added for timeline view
   duration?: number; // Duration in minutes
+  recurring_type?: 'none' | 'daily' | 'weekly' | 'monthly'; // Type of recurrence
+  recurring_days?: string[]; // Days of week for weekly recurrence
 }
 
 export interface TaskStats {

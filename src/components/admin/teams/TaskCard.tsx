@@ -55,7 +55,7 @@ export function TaskCard({ task, currentHour }: TaskCardProps) {
                 {task.duration && ` · ${task.duration}m`}
               </div>
             )}
-            {task.recurring_type !== 'none' && (
+            {task.recurring_type && task.recurring_type !== 'none' && (
               <Badge variant="outline" className="flex items-center gap-1">
                 <RefreshCcw className="h-3 w-3" />
                 {task.recurring_type}
