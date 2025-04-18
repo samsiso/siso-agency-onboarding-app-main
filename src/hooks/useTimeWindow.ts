@@ -13,25 +13,27 @@ export const useTimeWindow = () => {
     return { windowStart, windowEnd };
   };
 
+  const scrollToCurrentTime = () => {
+    if (timelineRef.current) {
+      const now = new Date();
+      const currentHour = now.getHours();
+      const currentMinute = now.getMinutes();
+      const totalMinutes = currentHour * 60 + currentMinute;
+      const scrollPosition = (totalMinutes / (24 * 60)) * (24 * 80); // 24 hours * 80px per hour
+      timelineRef.current.scrollTo({
+        top: scrollPosition - (timelineRef.current.clientHeight / 2),
+        behavior: 'smooth'
+      });
+    }
+  };
+
   useEffect(() => {
     // Initial scroll position
-    if (timelineRef.current) {
-      const { windowStart } = getCurrentWindow();
-      const currentHour = new Date().getHours();
-      const scrollPosition = (currentHour - windowStart) * 80; // 80px per hour
-      timelineRef.current.scrollTop = scrollPosition - 160; // Center in viewport
-    }
+    scrollToCurrentTime();
 
     const timer = setInterval(() => {
       setCurrentTime(new Date());
-      
-      // Update scroll position
-      if (timelineRef.current) {
-        const { windowStart } = getCurrentWindow();
-        const currentHour = new Date().getHours();
-        const scrollPosition = (currentHour - windowStart) * 80; // 80px per hour
-        timelineRef.current.scrollTop = scrollPosition - 160; // Center in viewport
-      }
+      scrollToCurrentTime();
     }, 10000); // Update every 10 seconds
 
     return () => clearInterval(timer);
