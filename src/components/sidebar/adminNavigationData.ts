@@ -1,8 +1,8 @@
 
 import { 
-  LayoutDashboard, ClipboardList, UserCog, Users,
-  CreditCard, Settings, FileSpreadsheet, BarChart, CalendarClock,
-  MessageSquare, UsersIcon, CheckSquare
+  LayoutDashboard, Users, MessageSquare, UserCheck,
+  CheckSquare, CalendarClock, CreditCard, Settings,
+  ClipboardCheck, UsersIcon
 } from 'lucide-react';
 import { MenuSection } from './types';
 
@@ -16,15 +16,28 @@ export const getAdminMenuSections = (): MenuSection[] => {
     },
     {
       type: 'section',
-      title: 'Management',
+      title: 'Client Management',
       icon: Users,
-      label: 'Management',
+      label: 'Client Management',
       items: [
         {
           href: '/admin/clients',
           icon: Users,
           label: 'Clients',
         },
+        {
+          href: '/admin/outreach',
+          icon: MessageSquare,
+          label: 'Outreach',
+        }
+      ]
+    },
+    {
+      type: 'section',
+      title: 'Team Operations',
+      icon: UsersIcon,
+      label: 'Team Operations',
+      items: [
         {
           href: '/admin/teams',
           icon: UsersIcon,
@@ -34,39 +47,29 @@ export const getAdminMenuSections = (): MenuSection[] => {
           href: '/admin/tasks',
           icon: CheckSquare,
           label: 'Tasks',
-        },
-        {
-          href: '/admin/outreach',
-          icon: MessageSquare,
-          label: 'Outreach',
-        },
-        {
-          href: '/admin/templates',
-          icon: UserCog,
-          label: 'Templates',
-        },
-        {
-          href: '/admin/daily-planner',
-          icon: CalendarClock,
-          label: 'Daily Planner',
         }
       ]
     },
     {
       type: 'section',
-      title: 'Analytics',
-      icon: BarChart,
-      label: 'Analytics',
+      title: 'Business Tools',
+      icon: ClipboardCheck,
+      label: 'Business Tools',
       items: [
         {
-          href: '/admin/reports',
-          icon: FileSpreadsheet,
-          label: 'Reports',
+          href: '/admin/daily-planner',
+          icon: CalendarClock,
+          label: 'Daily Planner',
         },
         {
           href: '/admin/payments',
           icon: CreditCard,
           label: 'Financials',
+        },
+        {
+          href: '/admin/templates',
+          icon: UserCheck,
+          label: 'Templates',
         }
       ]
     },
@@ -87,3 +90,4 @@ export const getAdminMenuSections = (): MenuSection[] => {
 
   return sections;
 };
+

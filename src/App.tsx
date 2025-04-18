@@ -1,11 +1,10 @@
-
 import { Routes, Route } from 'react-router-dom';
 import Index from './pages/Index';
 import Auth from './pages/Auth';
 import Profile from './pages/Profile';
 import OnboardingSocial from './pages/onboarding/social';
 import { Toaster } from '@/components/ui/toaster';
-import OnboardingChat from '@/pages/OnboardingChat';
+import OnboardingChat from './pages/OnboardingChat';
 import ThankYou from './pages/ThankYou';
 import ThankYouPlan from './pages/ThankYouPlan';
 import Plan from './pages/Plan';
@@ -29,6 +28,8 @@ import AdminClients from './pages/AdminClients';
 import AdminPayments from './pages/AdminPayments';
 import AdminDailyPlanner from './pages/AdminDailyPlanner';
 import ClientDetailPage from './pages/ClientDetailPage';
+import AdminTasks from './pages/AdminTasks';
+import AdminSettings from './pages/AdminSettings';
 
 function App() {
   return (
@@ -53,6 +54,8 @@ function App() {
         <Route path="/admin/teams" element={<AuthGuard adminOnly={true}><AdminTeams /></AuthGuard>} />
         <Route path="/admin/payments" element={<AuthGuard adminOnly={true}><AdminPayments /></AuthGuard>} />
         <Route path="/admin/daily-planner" element={<AuthGuard adminOnly={true}><AdminDailyPlanner /></AuthGuard>} />
+        <Route path="/admin/tasks" element={<AuthGuard adminOnly={true}><AdminTasks /></AuthGuard>} />
+        <Route path="/admin/settings" element={<AuthGuard adminOnly={true}><AdminSettings /></AuthGuard>} />
         <Route path="/admin/plans/create" element={<AuthGuard adminOnly={true}><AdminPlans /></AuthGuard>} />
         <Route path="/admin/plans/:planId/edit" element={<AuthGuard adminOnly={true}><AdminPlans /></AuthGuard>} />
         
