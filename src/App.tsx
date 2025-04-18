@@ -31,6 +31,7 @@ import ClientDetailPage from './pages/ClientDetailPage';
 import AdminTasks from './pages/AdminTasks';
 import AdminSettings from './pages/AdminSettings';
 import { TeamMemberTasksView } from './components/admin/tasks/TeamMemberTasksView';
+import TeamMemberTasksPage from './pages/TeamMemberTasksPage';
 
 function App() {
   return (
@@ -56,7 +57,7 @@ function App() {
         <Route path="/admin/payments" element={<AuthGuard adminOnly={true}><AdminPayments /></AuthGuard>} />
         <Route path="/admin/daily-planner" element={<AuthGuard adminOnly={true}><AdminDailyPlanner /></AuthGuard>} />
         <Route path="/admin/tasks" element={<AuthGuard adminOnly={true}><AdminTasks /></AuthGuard>} />
-        <Route path="/admin/tasks/:memberId" element={<AuthGuard adminOnly={true}><TeamMemberTasksView /></AuthGuard>} />
+        <Route path="/admin/tasks/:memberId" element={<AuthGuard adminOnly={true}><TeamMemberTasksPage /></AuthGuard>} />
         <Route path="/admin/settings" element={<AuthGuard adminOnly={true}><AdminSettings /></AuthGuard>} />
         <Route path="/admin/plans/create" element={<AuthGuard adminOnly={true}><AdminPlans /></AuthGuard>} />
         <Route path="/admin/plans/:planId/edit" element={<AuthGuard adminOnly={true}><AdminPlans /></AuthGuard>} />

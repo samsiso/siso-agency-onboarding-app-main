@@ -18,7 +18,9 @@ export function TimelineTaskView({ memberId }: { memberId?: string }) {
 
   const upcomingTasks = tasks.filter(task => {
     if (!task.due_date) return false;
-    return new Date(task.due_date) > new Date();
+    const dueDate = new Date(task.due_date);
+    const today = new Date();
+    return dueDate > today && format(dueDate, 'yyyy-MM-dd') !== format(today, 'yyyy-MM-dd');
   });
 
   return (

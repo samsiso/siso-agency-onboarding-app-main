@@ -1845,10 +1845,12 @@ export type Database = {
           created_by: string | null
           description: string | null
           due_date: string | null
+          duration: number | null
           id: string
           parent_task_id: string | null
           priority: Database["public"]["Enums"]["task_priority"] | null
           rolled_over_from: string | null
+          start_time: string | null
           status: string | null
           title: string
           updated_at: string | null
@@ -1861,10 +1863,12 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           due_date?: string | null
+          duration?: number | null
           id?: string
           parent_task_id?: string | null
           priority?: Database["public"]["Enums"]["task_priority"] | null
           rolled_over_from?: string | null
+          start_time?: string | null
           status?: string | null
           title: string
           updated_at?: string | null
@@ -1877,10 +1881,12 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           due_date?: string | null
+          duration?: number | null
           id?: string
           parent_task_id?: string | null
           priority?: Database["public"]["Enums"]["task_priority"] | null
           rolled_over_from?: string | null
+          start_time?: string | null
           status?: string | null
           title?: string
           updated_at?: string | null
