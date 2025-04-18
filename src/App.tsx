@@ -28,6 +28,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminClients from './pages/AdminClients';
 import AdminPayments from './pages/AdminPayments';
 import AdminDailyPlanner from './pages/AdminDailyPlanner';
+import ClientDetailPage from './pages/ClientDetailPage';
 
 function App() {
   return (
@@ -46,6 +47,7 @@ function App() {
         {/* Admin routes - using adminOnly prop to enforce admin access */}
         <Route path="/admin" element={<AuthGuard adminOnly={true}><AdminDashboard /></AuthGuard>} />
         <Route path="/admin/clients" element={<AuthGuard adminOnly={true}><AdminClients /></AuthGuard>} />
+        <Route path="/admin/clients/:clientId" element={<AuthGuard adminOnly={true}><ClientDetailPage /></AuthGuard>} />
         <Route path="/admin/outreach" element={<AuthGuard adminOnly={true}><AdminOutreach /></AuthGuard>} />
         <Route path="/admin/templates" element={<AuthGuard adminOnly={true}><AdminTemplates /></AuthGuard>} />
         <Route path="/admin/teams" element={<AuthGuard adminOnly={true}><AdminTeams /></AuthGuard>} />

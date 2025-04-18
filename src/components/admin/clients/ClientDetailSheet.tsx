@@ -1,28 +1,17 @@
 
-import { useEffect, useState } from 'react';
-import { 
-  Sheet, 
-  SheetContent, 
-  SheetHeader, 
-  SheetTitle,
-  SheetClose
-} from '@/components/ui/sheet';
-import { ClientStatusBadge } from './ClientStatusBadge';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useClientDetails } from '@/hooks/client';
 import { Button } from '@/components/ui/button';
-import { X, ExternalLink, Mail, Phone, Globe, MessageCircle, Edit } from 'lucide-react';
-import { useClientDetails } from '@/hooks/client/useClientDetails';
-import { Loader2 } from 'lucide-react';
-import { formatRelativeTime } from '@/lib/formatters';
-import { 
-  Tooltip, 
-  TooltipContent, 
-  TooltipProvider, 
-  TooltipTrigger 
-} from '@/components/ui/tooltip';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ClientStatusBadge } from './ClientStatusBadge';
 import { TodoList } from './TodoList';
-import { TodoItem } from '@/types/client.types';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { Calendar, ArrowUpRightSquare, ClipboardList, Mail, MessageSquare } from 'lucide-react';
 
 interface ClientDetailSheetProps {
   clientId: string | null;
@@ -31,254 +20,285 @@ interface ClientDetailSheetProps {
 }
 
 export function ClientDetailSheet({ clientId, isOpen, onClose }: ClientDetailSheetProps) {
-  const { client, isLoading, error, refetch } = useClientDetails(clientId);
-  const { toast } = useToast();
+  const { client, isLoading, updateClient, updateTodos, isUpdating } = useClientDetails(clientId);
+  const navigate = useNavigate();
   
-  // Close sheet when escape key is pressed
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
-  }, [onClose]);
-
-  // Handle todo updates
-  const handleUpdateTodos = async (todos: TodoItem[]) => {
-    if (!client?.id) return;
-    
-    try {
-      const { error } = await supabase
-        .from('client_onboarding')
-        .update({ 
-          todos: todos,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', client.id);
-        
-      if (error) throw error;
-      
-      toast({
-        title: "Todo list updated",
-        description: "The todo list has been updated successfully."
-      });
-      
-      refetch();
-    } catch (error: any) {
-      console.error('Error updating todos:', error);
-      toast({
-        variant: "destructive",
-        title: "Failed to update todo list",
-        description: error.message || "An unexpected error occurred."
-      });
+  const viewFullDetails = () => {
+    if (client) {
+      navigate(`/admin/clients/${client.id}`);
+      onClose();
     }
   };
 
-  if (error) {
-    console.error("Error loading client details:", error);
-  }
-  
   return (
-    <Sheet open={isOpen} onOpenChange={open => !open && onClose()}>
-      <SheetContent className="w-[600px] sm:max-w-xl overflow-y-auto">
-        <SheetHeader className="flex flex-row items-center justify-between mb-6">
-          <SheetTitle>Client Details</SheetTitle>
-          <SheetClose asChild>
-            <Button variant="ghost" size="icon" onClick={onClose}>
-              <X className="h-4 w-4" />
-            </Button>
-          </SheetClose>
-        </SheetHeader>
-        
-        {isLoading ? (
-          <div className="flex items-center justify-center h-96">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        ) : !client ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">Client details not available</p>
+    <Sheet open={isOpen} onOpenChange={onClose}>
+      <SheetContent className="sm:max-w-xl overflow-y-auto">
+        {isLoading || !client ? (
+          <div className="space-y-6 pt-6">
+            <div className="flex items-center space-x-4">
+              <Skeleton className="h-12 w-12 rounded-full" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-[200px]" />
+                <Skeleton className="h-3 w-[150px]" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-2/3" />
+            </div>
           </div>
         ) : (
-          <div className="space-y-6">
-            {/* Header with Avatar and Status */}
-            <div className="flex items-center gap-4">
-              <div className="h-20 w-20 rounded-full overflow-hidden bg-muted">
-                {client.avatar_url ? (
-                  <img 
-                    src={client.avatar_url} 
-                    alt={client.full_name || 'Client avatar'} 
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="h-full w-full flex items-center justify-center bg-primary/10 text-primary font-bold text-xl">
-                    {(client.full_name || 'C').charAt(0)}
-                  </div>
-                )}
+          <>
+            <SheetHeader className="pb-4">
+              <div className="flex justify-between items-start">
+                <SheetTitle className="text-2xl">{client.full_name || 'Unnamed Client'}</SheetTitle>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="flex items-center gap-2"
+                  onClick={viewFullDetails}
+                >
+                  <ArrowUpRightSquare className="h-4 w-4" />
+                  View Full Details
+                </Button>
               </div>
+              <SheetDescription>
+                {client.business_name || 'No business name provided'}
+              </SheetDescription>
+            </SheetHeader>
+            
+            <div className="flex items-center gap-4 mb-6">
+              <Avatar className="h-16 w-16 border-2 border-muted">
+                <AvatarImage src={client.avatar_url || undefined} alt={client.full_name || 'Client'} />
+                <AvatarFallback className="text-lg bg-primary/10">
+                  {client.full_name?.substring(0, 2).toUpperCase() || 'CL'}
+                </AvatarFallback>
+              </Avatar>
               
-              <div>
-                <h2 className="text-xl font-bold">{client.full_name}</h2>
-                <p className="text-muted-foreground">{client.business_name || 'No company'}</p>
-                <div className="mt-2">
-                  <ClientStatusBadge status={client.status} />
+              <div className="flex flex-col gap-1">
+                <ClientStatusBadge status={client.status} />
+                
+                <div className="flex items-center gap-2">
+                  {client.email && (
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                      <Mail className="h-4 w-4" />
+                    </Button>
+                  )}
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                    <MessageSquare className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                    <Calendar className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                    <ClipboardList className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             </div>
             
-            {/* Contact Information */}
-            <div className="border rounded-md p-4 space-y-3">
-              <h3 className="font-semibold mb-2">Contact Information</h3>
+            <div className="space-y-2 mb-6">
+              {client.project_name && (
+                <div>
+                  <span className="text-sm font-medium">Project:</span>{' '}
+                  <span className="text-sm">{client.project_name}</span>
+                </div>
+              )}
+              {client.company_niche && (
+                <div>
+                  <span className="text-sm font-medium">Industry:</span>{' '}
+                  <span className="text-sm">{client.company_niche}</span>
+                </div>
+              )}
+              {client.website_url && (
+                <div>
+                  <span className="text-sm font-medium">Website:</span>{' '}
+                  <a 
+                    href={client.website_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-600 hover:underline"
+                  >
+                    {client.website_url}
+                  </a>
+                </div>
+              )}
+              <div>
+                <span className="text-sm font-medium">Client Since:</span>{' '}
+                <span className="text-sm">{new Date(client.created_at).toLocaleDateString()}</span>
+              </div>
+            </div>
+            
+            <Separator className="my-4" />
+            
+            <Tabs defaultValue="overview">
+              <TabsList className="mb-4 grid w-full grid-cols-3">
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="tasks">Tasks</TabsTrigger>
+                <TabsTrigger value="documents">Documents</TabsTrigger>
+              </TabsList>
               
-              <div className="grid grid-cols-1 gap-3">
-                {client.email && (
-                  <div className="flex items-center gap-2">
-                    <Mail className="h-4 w-4 text-muted-foreground" />
+              <TabsContent value="overview" className="space-y-4">
+                <div className="space-y-2">
+                  <h3 className="text-lg font-medium">Project Status</h3>
+                  
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="border rounded p-3">
+                      <div className="text-sm text-muted-foreground">Onboarding</div>
+                      <div className="text-2xl font-semibold mt-1">
+                        {client.current_step || 0}/{client.total_steps || 5}
+                      </div>
+                    </div>
+                    
+                    <div className="border rounded p-3">
+                      <div className="text-sm text-muted-foreground">Completion</div>
+                      <div className="text-2xl font-semibold mt-1">
+                        {Math.round((client.current_step / (client.total_steps || 5)) * 100)}%
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {client.notion_plan_url && (
+                  <div>
+                    <h3 className="text-lg font-medium mb-2">Project Plan</h3>
                     <a 
-                      href={`mailto:${client.email}`} 
-                      className="text-blue-500 hover:underline"
+                      href={client.notion_plan_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 p-3 border rounded hover:bg-muted/50"
                     >
-                      {client.email}
+                      <svg width="24" height="24" viewBox="0 0 120 126" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20.6927 21.9927C24.5927 25.4927 25.7927 24.9927 35.4927 23.9927L96.1927 17.3927C97.3927 17.3927 96.4927 16.2927 95.9927 16.0927L85.4927 8.59271C83.3927 6.89271 80.5927 4.79271 74.7927 5.49271L17.6927 12.8927C15.9927 13.1927 15.4927 14.2927 16.1927 14.9927L20.6927 21.9927Z" fill="black"/>
+                        <path d="M22.1927 37.1927V105.793C22.1927 109.793 24.1927 111.093 28.9927 110.793L96.6927 103.593C101.493 103.293 102.993 100.793 102.993 97.1927V29.2927C102.993 25.6927 101.193 23.7927 97.1927 24.0927L27.9927 31.4927C23.8927 31.9927 22.1927 33.5927 22.1927 37.1927Z" fill="white"/>
+                        <path d="M60.1927 40.4928C60.1927 41.9928 58.8927 43.4928 56.7927 43.5928L32.5927 45.8928V81.3928C32.5927 83.7928 31.1927 85.1928 28.9927 85.3928C26.7927 85.5928 25.0927 84.4928 25.0927 81.9928V33.8928C25.0927 31.3928 26.3927 29.7928 28.9927 29.3928L56.9927 26.2928C58.8927 25.9928 60.1927 27.7928 60.1927 29.6928V40.4928Z" fill="black"/>
+                        <path d="M63.1927 56.9928V97.1928C63.1927 99.9928 64.9928 100.893 67.3928 98.6928L99.7928 69.6928C101.393 68.1928 101.093 66.7928 99.0928 66.4928L67.9928 62.0928C64.9928 61.4928 63.1927 62.9928 63.1927 65.7928V80.9928L63.1927 56.9928Z" fill="#F2F2F2"/>
+                      </svg>
+                      <div>
+                        <div className="font-medium">Notion Project Plan</div>
+                        <div className="text-sm text-muted-foreground">View detailed project plan in Notion</div>
+                      </div>
                     </a>
                   </div>
                 )}
                 
-                {client.phone && (
-                  <div className="flex items-center gap-2">
-                    <Phone className="h-4 w-4 text-muted-foreground" />
-                    <a 
-                      href={`tel:${client.phone}`} 
-                      className="text-blue-500 hover:underline"
-                    >
-                      {client.phone}
-                    </a>
-                  </div>
-                )}
+                {/* Recent interactions would go here */}
                 
-                {client.website_url && (
-                  <div className="flex items-center gap-2">
-                    <Globe className="h-4 w-4 text-muted-foreground" />
+                <div className="mt-4">
+                  <Button onClick={viewFullDetails} className="w-full">
+                    View Complete Project Details
+                  </Button>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="tasks">
+                <h3 className="text-lg font-medium mb-4">Tasks & To-Do Items</h3>
+                <TodoList 
+                  initialTodos={client.todos || []} 
+                  clientId={client.id}
+                  onUpdate={(todos) => updateTodos(todos)}
+                  disabled={isUpdating}
+                />
+              </TabsContent>
+              
+              <TabsContent value="documents">
+                <h3 className="text-lg font-medium mb-4">Documents & Links</h3>
+                <div className="space-y-2">
+                  {client.notion_plan_url && (
+                    <a 
+                      href={client.notion_plan_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 p-3 border rounded hover:bg-muted/50"
+                    >
+                      <svg width="20" height="20" viewBox="0 0 120 126" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20.6927 21.9927C24.5927 25.4927 25.7927 24.9927 35.4927 23.9927L96.1927 17.3927C97.3927 17.3927 96.4927 16.2927 95.9927 16.0927L85.4927 8.59271C83.3927 6.89271 80.5927 4.79271 74.7927 5.49271L17.6927 12.8927C15.9927 13.1927 15.4927 14.2927 16.1927 14.9927L20.6927 21.9927Z" fill="black"/>
+                        <path d="M22.1927 37.1927V105.793C22.1927 109.793 24.1927 111.093 28.9927 110.793L96.6927 103.593C101.493 103.293 102.993 100.793 102.993 97.1927V29.2927C102.993 25.6927 101.193 23.7927 97.1927 24.0927L27.9927 31.4927C23.8927 31.9927 22.1927 33.5927 22.1927 37.1927Z" fill="white"/>
+                        <path d="M60.1927 40.4928C60.1927 41.9928 58.8927 43.4928 56.7927 43.5928L32.5927 45.8928V81.3928C32.5927 83.7928 31.1927 85.1928 28.9927 85.3928C26.7927 85.5928 25.0927 84.4928 25.0927 81.9928V33.8928C25.0927 31.3928 26.3927 29.7928 28.9927 29.3928L56.9927 26.2928C58.8927 25.9928 60.1927 27.7928 60.1927 29.6928V40.4928Z" fill="black"/>
+                        <path d="M63.1927 56.9928V97.1928C63.1927 99.9928 64.9928 100.893 67.3928 98.6928L99.7928 69.6928C101.393 68.1928 101.093 66.7928 99.0928 66.4928L67.9928 62.0928C64.9928 61.4928 63.1927 62.9928 63.1927 65.7928V80.9928L63.1927 56.9928Z" fill="#F2F2F2"/>
+                      </svg>
+                      <span>Notion Project Plan</span>
+                    </a>
+                  )}
+                  
+                  {client.website_url && (
                     <a 
                       href={client.website_url} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline flex items-center"
+                      className="flex items-center gap-3 p-3 border rounded hover:bg-muted/50"
                     >
-                      {client.website_url}
-                      <ExternalLink className="ml-1 h-3 w-3" />
+                      <Globe className="h-5 w-5" />
+                      <span>Client Website</span>
                     </a>
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            {/* Project Information */}
-            <div className="border rounded-md p-4">
-              <h3 className="font-semibold mb-4">Project Information</h3>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">Project Name</p>
-                  <p>{client.project_name || 'Not specified'}</p>
-                </div>
-                
-                <div>
-                  <p className="text-sm text-muted-foreground">Industry</p>
-                  <p>{client.company_niche || 'Not specified'}</p>
-                </div>
-                
-                <div>
-                  <p className="text-sm text-muted-foreground">Development URL</p>
-                  {client.development_url ? (
-                    <a 
-                      href={client.development_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline flex items-center"
-                    >
-                      View Site <ExternalLink className="ml-1 h-3 w-3" />
-                    </a>
-                  ) : (
-                    <p>Not available</p>
                   )}
-                </div>
-                
-                <div>
-                  <p className="text-sm text-muted-foreground">Initial Contact</p>
-                  <p>{client.initial_contact_date 
-                    ? formatRelativeTime(client.initial_contact_date) 
-                    : 'Unknown'}</p>
-                </div>
-              </div>
-              
-              {/* Onboarding Progress */}
-              <div className="mt-6">
-                <div className="flex justify-between items-center mb-2">
-                  <p className="text-sm font-medium">Onboarding Progress</p>
-                  <p className="text-sm text-muted-foreground">
-                    {client.current_step} of {client.total_steps} steps
-                  </p>
-                </div>
-                
-                <div className="h-2 w-full bg-secondary overflow-hidden rounded-full">
-                  <div 
-                    className="h-full bg-primary rounded-full" 
-                    style={{ 
-                      width: `${(client.current_step / client.total_steps) * 100}%`
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-            
-            {/* Todo List Section */}
-            <div className="border rounded-md p-4">
-              <h3 className="font-semibold mb-4">Todo List</h3>
-              <TodoList 
-                todos={client.todos || []} 
-                onUpdate={handleUpdateTodos} 
-                clientId={client.id} 
-              />
-            </div>
-            
-            {/* Quick Actions */}
-            <div className="flex flex-wrap gap-2">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      <Mail className="h-4 w-4 mr-2" />
-                      Email
+                  
+                  {client.development_url && (
+                    <a 
+                      href={client.development_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 p-3 border rounded hover:bg-muted/50"
+                    >
+                      <Code className="h-5 w-5" />
+                      <span>Development Site</span>
+                    </a>
+                  )}
+                  
+                  <div className="mt-4">
+                    <Button onClick={viewFullDetails} className="w-full">
+                      View All Documents
                     </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    {client.email ? 'Send an email' : 'No email available'}
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      <MessageCircle className="h-4 w-4 mr-2" />
-                      Message
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    Send an internal message
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              
-              <Button variant="default">
-                <Edit className="h-4 w-4 mr-2" />
-                Edit Client
-              </Button>
-            </div>
-          </div>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </>
         )}
       </SheetContent>
     </Sheet>
+  );
+}
+
+// Import these icons for the ClientDetailSheet
+function Globe(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="12" r="10" />
+      <line x1="2" x2="22" y1="12" y2="12" />
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+    </svg>
+  );
+}
+
+function Code(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <polyline points="16 18 22 12 16 6" />
+      <polyline points="8 6 2 12 8 18" />
+    </svg>
   );
 }
