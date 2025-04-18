@@ -138,7 +138,7 @@ export function ClientProjectOverview({ client }: ClientProjectOverviewProps) {
         </TabsList>
         <TabsContent value="description" className="p-4 border rounded-md mt-2">
           <p className="text-sm text-muted-foreground">
-            {client.bio || client.description || 'No project description available. Add details about the project scope, objectives, and key deliverables here.'}
+            {client.bio || 'No project description available. Add details about the project scope, objectives, and key deliverables here.'}
           </p>
         </TabsContent>
         <TabsContent value="notes" className="p-4 border rounded-md mt-2">

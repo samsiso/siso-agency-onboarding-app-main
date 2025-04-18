@@ -195,7 +195,7 @@ export function ClientDetailSheet({ clientId, isOpen, onClose }: ClientDetailShe
               <TabsContent value="tasks">
                 <h3 className="text-lg font-medium mb-4">Tasks & To-Do Items</h3>
                 <TodoList 
-                  initialTodos={client.todos || []} 
+                  todos={client.todos || []} 
                   clientId={client.id}
                   onUpdate={(todos) => updateTodos(todos)}
                   disabled={isUpdating}
