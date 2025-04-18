@@ -46,7 +46,7 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
               isDragging && "hover:bg-purple-100/5"
             )}
           >
-            {format(new Date().setHours(hour), 'HH:mm')}
+            {`${hour.toString().padStart(2, '0')}:00`}
           </div>
         ))}
       </div>
