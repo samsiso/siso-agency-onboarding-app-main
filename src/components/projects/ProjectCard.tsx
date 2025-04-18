@@ -85,7 +85,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
           
           <div className="space-y-2">
             <p className="text-xs text-siso-text">
-              Created: {formatDate(new Date(project.created_at))}
+              Created: {formatDate(project.created_at)}
             </p>
             <p className="text-xs text-siso-text">
               Estimated Cost: ${project.estimated_cost} • Timeline: {project.estimated_days} days

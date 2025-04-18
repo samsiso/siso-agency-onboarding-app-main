@@ -10,6 +10,15 @@ export function formatCompactNumber(num: number): string {
 }
 
 /**
+ * Formats a number with commas as thousand separators
+ */
+export function formatNumber(num: number): string {
+  if (num === null || num === undefined) return '0';
+  
+  return new Intl.NumberFormat('en-US').format(num);
+}
+
+/**
  * Formats a date string as relative time (e.g., "2 hours ago", "3 days ago")
  */
 export function formatRelativeTime(dateString: string): string {
