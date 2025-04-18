@@ -1,6 +1,6 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { Task, TaskCategory, TaskStats } from '@/types/task.types';
+import { Task, TaskCategory, TaskStats, TaskPriority } from '@/types/task.types';
 import { fetchTasks, fetchTaskStats } from '@/api/taskApi';
 import { useTaskOperations } from './useTaskOperations';
 
@@ -35,4 +35,4 @@ export function useTasks() {
 }
 
 // Export types for backward compatibility
-export type { Task, TaskCategory, TaskStats };
+export type { Task, TaskCategory, TaskStats, TaskPriority };
