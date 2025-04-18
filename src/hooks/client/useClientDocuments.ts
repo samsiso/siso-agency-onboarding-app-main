@@ -24,7 +24,7 @@ export const useClientDocuments = (clientId: string) => {
 
   // Create a new document
   const createDocumentMutation = useMutation({
-    mutationFn: async (newDocument: Partial<ClientDocument>) => {
+    mutationFn: async (newDocument: Partial<ClientDocument> & { document_type: 'app_plan' | 'functionalities' | 'wireframes' | 'inspiration', title: string }) => {
       const { data, error } = await supabase
         .from('client_documents')
         .insert({

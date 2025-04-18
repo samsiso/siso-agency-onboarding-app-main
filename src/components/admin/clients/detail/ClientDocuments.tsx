@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { ClientData } from '@/types/client.types';
+import { ClientData, ClientDocument } from '@/types/client.types';
 import { useClientDocuments } from '@/hooks/client/useClientDocuments';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -26,8 +26,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 export function ClientDocuments({ client }: { client: ClientData }) {
   const { documents, createDocument, updateDocument, deleteDocument } = useClientDocuments(client.id);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [selectedDocument, setSelectedDocument] = useState<any>(null);
-  const [newDocument, setNewDocument] = useState({
+  const [selectedDocument, setSelectedDocument] = useState<ClientDocument | null>(null);
+  const [newDocument, setNewDocument] = useState<{
+    title: string;
+    content: string;
+    document_type: 'app_plan' | 'functionalities' | 'wireframes' | 'inspiration';
+  }>({
     title: '',
     content: '',
     document_type: 'app_plan'
@@ -120,7 +124,7 @@ export function ClientDocuments({ client }: { client: ClientData }) {
               <label className="block text-sm font-medium mb-2">Document Type</label>
               <Select 
                 value={newDocument.document_type} 
-                onValueChange={(value) => setNewDocument(prev => ({ ...prev, document_type: value }))}
+                onValueChange={(value: 'app_plan' | 'functionalities' | 'wireframes' | 'inspiration') => setNewDocument(prev => ({ ...prev, document_type: value }))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select document type" />
@@ -179,7 +183,7 @@ export function ClientDocuments({ client }: { client: ClientData }) {
                 <label className="block text-sm font-medium mb-2">Title</label>
                 <Input 
                   value={selectedDocument.title}
-                  onChange={(e) => setSelectedDocument(prev => ({ ...prev, title: e.target.value }))}
+                  onChange={(e) => setSelectedDocument(prev => prev ? { ...prev, title: e.target.value } : null)}
                   placeholder="Enter document title"
                 />
               </div>
@@ -187,7 +191,7 @@ export function ClientDocuments({ client }: { client: ClientData }) {
                 <label className="block text-sm font-medium mb-2">Content</label>
                 <Textarea 
                   value={selectedDocument.content}
-                  onChange={(e) => setSelectedDocument(prev => ({ ...prev, content: e.target.value }))}
+                  onChange={(e) => setSelectedDocument(prev => prev ? { ...prev, content: e.target.value } : null)}
                   placeholder="Write your document content here"
                   rows={10}
                 />
