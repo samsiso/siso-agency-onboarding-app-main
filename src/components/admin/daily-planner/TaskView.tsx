@@ -1,17 +1,17 @@
-
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { CheckCircle, Circle, Clock, PlusCircle, Filter, MoreHorizontal, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useTasks } from '@/hooks/useTasks';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/use-toast';
+import { Button } from '@/components/ui/button';
+import { Filter, PlusCircle, Search } from 'lucide-react';
+import { DailyTasksSection } from './DailyTasksSection';
+import { TaskBank } from './TaskBank';
 
 export function TaskView() {
-  const { useTaskQuery, useCreateTask } = useTasks();
+  const { useTaskQuery, useCreateTask, useUpdateTask } = useTasks();
   const [category, setCategory] = useState<'main' | 'weekly' | 'daily'>('main');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -19,12 +19,32 @@ export function TaskView() {
 
   const { data: tasks = [], isLoading } = useTaskQuery(category);
   const createTaskMutation = useCreateTask();
+  const updateTaskMutation = useUpdateTask();
+
+  const handleStatusChange = (taskId: string, newStatus: 'pending' | 'in_progress' | 'completed') => {
+    updateTaskMutation.mutate(
+      { id: taskId, status: newStatus },
+      {
+        onSuccess: () => {
+          toast({ 
+            title: 'Task Updated', 
+            description: 'Task status has been updated successfully' 
+          });
+        },
+        onError: () => {
+          toast({ 
+            title: 'Error', 
+            description: 'Failed to update task status', 
+            variant: 'destructive' 
+          });
+        }
+      }
+    );
+  };
 
   const filteredTasks = tasks.filter(task => {
     const matchesSearch = task.title.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || 
-                          (statusFilter === 'completed' && task.status === 'completed') ||
-                          (statusFilter === 'pending' && task.status === 'pending');
+    const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
@@ -131,38 +151,16 @@ export function TaskView() {
             </div>
           </div>
 
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[50px]">Status</TableHead>
-                <TableHead>Task Name</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Priority</TableHead>
-                <TableHead>Due Date</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredTasks.map((task) => (
-                <TableRow key={task.id}>
-                  <TableCell>
-                    {task.status === 'completed' ? (
-                      <CheckCircle className="h-5 w-5 text-green-500" />
-                    ) : task.status === 'in_progress' ? (
-                      <Clock className="h-5 w-5 text-amber-500" />
-                    ) : (
-                      <Circle className="h-5 w-5 text-slate-300" />
-                    )}
-                  </TableCell>
-                  <TableCell>{task.title}</TableCell>
-                  <TableCell>{task.category}</TableCell>
-                  <TableCell>{task.priority}</TableCell>
-                  <TableCell>
-                    {task.due_date ? new Date(task.due_date).toLocaleDateString() : 'No due date'}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <div className="space-y-6">
+            <DailyTasksSection 
+              tasks={filteredTasks.filter(t => t.category === 'daily')} 
+              onStatusChange={handleStatusChange}
+            />
+            <TaskBank 
+              tasks={filteredTasks.filter(t => t.category !== 'daily')} 
+              onStatusChange={handleStatusChange}
+            />
+          </div>
         </CardContent>
       </Card>
     </div>
