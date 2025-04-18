@@ -1,5 +1,6 @@
 
 import { UserCircle, Clock } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { useState, useEffect } from 'react';
 
@@ -39,28 +40,42 @@ export function WelcomeBanner({ user }: WelcomeBannerProps) {
   const userName = user?.email ? user.email.split('@')[0] : 'Admin';
 
   return (
-    <Card className="border-0 bg-gradient-to-r from-purple-900/40 to-indigo-900/40 backdrop-blur-sm shadow-lg">
-      <CardContent className="p-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between">
-          <div className="flex items-center space-x-4 mb-4 md:mb-0">
-            <div className="h-12 w-12 rounded-full bg-purple-600/20 flex items-center justify-center text-purple-200">
-              <UserCircle className="h-8 w-8" />
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      <Card className="border-0 bg-gradient-to-r from-purple-900/40 via-purple-800/30 to-indigo-900/40 backdrop-blur-sm shadow-lg">
+        <CardContent className="p-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between">
+            <div className="flex items-center space-x-4 mb-4 md:mb-0">
+              <motion.div 
+                whileHover={{ scale: 1.05 }}
+                className="h-12 w-12 rounded-full bg-purple-600/20 flex items-center justify-center text-purple-200"
+              >
+                <UserCircle className="h-8 w-8" />
+              </motion.div>
+              <div>
+                <motion.h1 
+                  className="text-2xl font-bold text-white bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent"
+                >
+                  {greeting}, {userName}
+                </motion.h1>
+                <p className="text-purple-200/80">
+                  Welcome to your admin dashboard
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-white">
-                {greeting}, {userName}
-              </h1>
-              <p className="text-purple-200/80">
-                Welcome to your admin dashboard
-              </p>
-            </div>
+            <motion.div 
+              whileHover={{ scale: 1.02 }}
+              className="flex items-center space-x-2 bg-white/5 rounded-full px-4 py-2 text-purple-200/80"
+            >
+              <Clock className="h-5 w-5" />
+              <span>{currentTime}</span>
+            </motion.div>
           </div>
-          <div className="flex items-center text-purple-200/80">
-            <Clock className="h-5 w-5 mr-2" />
-            <span>{currentTime}</span>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }

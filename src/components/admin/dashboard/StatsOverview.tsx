@@ -1,8 +1,7 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Users, CreditCard, BarChart3, TrendingUp } from "lucide-react";
 import { motion } from "framer-motion";
-import { formatCompactNumber, formatCurrency } from "@/lib/formatters";
+import { formatCompactNumber } from "@/lib/formatters";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -13,14 +12,17 @@ interface StatCardProps {
   change?: string;
   trend?: "up" | "down";
   loading?: boolean;
+  delay?: number;
 }
 
-const StatCard = ({ title, value, icon, change, trend, loading }: StatCardProps) => {
+const StatCard = ({ title, value, icon, change, trend, loading, delay = 0 }: StatCardProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 0.3, delay: delay * 0.1 }}
+      whileHover={{ y: -5 }}
+      className="will-change-transform"
     >
       <Card className="bg-black/30 border-gray-800 hover:border-purple-500/30 transition-all duration-300">
         <CardContent className="p-6">
@@ -88,6 +90,7 @@ export function StatsOverview() {
         change="12%"
         trend="up"
         loading={isLoading}
+        delay={0}
       />
       <StatCard
         title="Active Leads"
@@ -96,6 +99,7 @@ export function StatsOverview() {
         change="8%"
         trend="up"
         loading={isLoading}
+        delay={1}
       />
       <StatCard
         title="Pending Tasks"
@@ -104,14 +108,16 @@ export function StatsOverview() {
         change="5%"
         trend="down"
         loading={isLoading}
+        delay={2}
       />
       <StatCard
         title="Monthly Revenue"
-        value={isLoading ? "" : formatCurrency(stats?.revenue || 0)}
+        value={isLoading ? "" : formatCompactNumber(stats?.revenue || 0)}
         icon={<CreditCard className="h-6 w-6" />}
         change="15%"
         trend="up"
         loading={isLoading}
+        delay={3}
       />
     </div>
   );
