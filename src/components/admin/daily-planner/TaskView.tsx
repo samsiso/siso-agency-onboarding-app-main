@@ -2,19 +2,21 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useTasks } from '@/hooks/useTasks';
+import { useTasks, TaskCategory, TaskPriority, TaskStatus } from '@/hooks/useTasks';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
 import { Filter, PlusCircle, Search } from 'lucide-react';
 import { DailyTasksSection } from './DailyTasksSection';
 import { TaskBank } from './TaskBank';
+import { TaskCreationDialog } from './TaskCreationDialog';
 
 export function TaskView() {
   const { useTaskQuery, useCreateTask, useUpdateTask } = useTasks();
-  const [category, setCategory] = useState<'main' | 'weekly' | 'daily'>('main');
+  const [category, setCategory] = useState<TaskCategory>('main');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
   const { toast } = useToast();
 
   const { data: tasks = [], isLoading } = useTaskQuery(category);
@@ -42,41 +44,39 @@ export function TaskView() {
     );
   };
 
+  const handleCreateTask = async (formData: FormData) => {
+    const newTask = {
+      title: formData.get('title') as string,
+      description: formData.get('description') as string,
+      category: formData.get('category') as TaskCategory,
+      priority: formData.get('priority') as TaskPriority,
+      due_date: formData.get('due_date') as string,
+      status: 'pending' as const
+    };
+
+    createTaskMutation.mutate(newTask, {
+      onSuccess: () => {
+        toast({ 
+          title: 'Task Created', 
+          description: 'Your task has been added successfully' 
+        });
+        setShowCreateDialog(false);
+      },
+      onError: () => {
+        toast({ 
+          title: 'Error', 
+          description: 'Failed to create task', 
+          variant: 'destructive' 
+        });
+      }
+    });
+  };
+
   const filteredTasks = tasks.filter(task => {
     const matchesSearch = task.title.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
-
-  const handleCreateTask = (formData: React.FormEvent<HTMLFormElement>) => {
-    formData.preventDefault();
-    const form = formData.target as HTMLFormElement;
-    const titleInput = form.elements.namedItem('title') as HTMLInputElement;
-    const descriptionInput = form.elements.namedItem('description') as HTMLInputElement;
-
-    createTaskMutation.mutate(
-      {
-        title: titleInput.value,
-        description: descriptionInput.value,
-        category,
-        status: 'pending',
-        priority: 'medium'
-      },
-      {
-        onSuccess: () => {
-          toast({ title: 'Task Created', description: 'Your task has been added successfully' });
-          form.reset();
-        },
-        onError: (error) => {
-          toast({ 
-            title: 'Error', 
-            description: 'Failed to create task', 
-            variant: 'destructive' 
-          });
-        }
-      }
-    );
-  };
 
   return (
     <div className="space-y-4">
@@ -85,11 +85,11 @@ export function TaskView() {
           <div>
             <CardTitle>Task Manager</CardTitle>
             <CardDescription>
-              Manage your {category} tasks across the team
+              Manage your {category.split('_').join(' ')} tasks
             </CardDescription>
           </div>
           <div className="flex gap-2">
-            <Select value={category} onValueChange={(val: 'main' | 'weekly' | 'daily') => setCategory(val)}>
+            <Select value={category} onValueChange={(val: TaskCategory) => setCategory(val)}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Select Category" />
               </SelectTrigger>
@@ -97,26 +97,19 @@ export function TaskView() {
                 <SelectItem value="main">Main Tasks</SelectItem>
                 <SelectItem value="weekly">Weekly Tasks</SelectItem>
                 <SelectItem value="daily">Daily Tasks</SelectItem>
+                <SelectItem value="siso_app_dev">SISO App Dev</SelectItem>
+                <SelectItem value="onboarding_app">Onboarding App</SelectItem>
+                <SelectItem value="instagram">Instagram</SelectItem>
               </SelectContent>
             </Select>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button size="sm" className="gap-1">
-                  <PlusCircle className="h-4 w-4" />
-                  Add Task
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Create New Task</DialogTitle>
-                </DialogHeader>
-                <form onSubmit={handleCreateTask} className="space-y-4">
-                  <Input name="title" placeholder="Task Title" required />
-                  <Input name="description" placeholder="Description (optional)" />
-                  <Button type="submit">Create Task</Button>
-                </form>
-              </DialogContent>
-            </Dialog>
+            <Button 
+              size="sm" 
+              className="gap-1"
+              onClick={() => setShowCreateDialog(true)}
+            >
+              <PlusCircle className="h-4 w-4" />
+              Add Task
+            </Button>
           </div>
         </CardHeader>
         <CardContent>
@@ -145,24 +138,23 @@ export function TaskView() {
                   <SelectItem value="completed">Completed</SelectItem>
                 </SelectContent>
               </Select>
-              <Button variant="outline" size="icon">
-                <Filter className="h-4 w-4" />
-              </Button>
             </div>
           </div>
 
           <div className="space-y-6">
-            <DailyTasksSection 
-              tasks={filteredTasks.filter(t => t.category === 'daily')} 
-              onStatusChange={handleStatusChange}
-            />
             <TaskBank 
-              tasks={filteredTasks.filter(t => t.category !== 'daily')} 
+              tasks={filteredTasks} 
               onStatusChange={handleStatusChange}
             />
           </div>
         </CardContent>
       </Card>
+
+      <TaskCreationDialog
+        open={showCreateDialog}
+        onOpenChange={setShowCreateDialog}
+        onSubmit={handleCreateTask}
+      />
     </div>
   );
 }

@@ -3,18 +3,23 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
+export type TaskCategory = 'main' | 'weekly' | 'daily' | 'siso_app_dev' | 'onboarding_app' | 'instagram';
+export type TaskPriority = 'low' | 'medium' | 'high';
+export type TaskStatus = 'pending' | 'in_progress' | 'completed';
+
 export interface Task {
   id: string;
   title: string;
   description?: string;
-  status: 'pending' | 'in_progress' | 'completed';
-  priority: 'low' | 'medium' | 'high';
+  status: TaskStatus;
+  priority: TaskPriority;
   due_date?: string;
-  category: 'main' | 'weekly' | 'daily';
+  category: TaskCategory;
   labels?: string[];
   estimated_time?: number;
   assigned_to?: string;
   created_at: string;
+  created_by?: string;
   parent_task_id?: string;
   rolled_over_from?: string;
 }
@@ -23,10 +28,13 @@ export const useTasks = () => {
   const queryClient = useQueryClient();
 
   // Fetch tasks with category filtering
-  const fetchTasks = async (category?: Task['category']) => {
+  const fetchTasks = async (category?: TaskCategory) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    
     let query = supabase
       .from('tasks')
       .select('*')
+      .or(`assigned_to.eq.${user?.id},created_by.eq.${user?.id}`)
       .order('created_at', { ascending: false });
 
     if (category) {
@@ -36,31 +44,23 @@ export const useTasks = () => {
     const { data, error } = await query;
     
     if (error) throw error;
-    
-    // Transform data to ensure it conforms to our Task interface
-    return (data || []).map(task => ({
-      ...task,
-      status: (task.status as string || 'pending') as 'pending' | 'in_progress' | 'completed',
-      priority: (task.priority as string || 'medium') as 'low' | 'medium' | 'high',
-      category: task.category as 'main' | 'weekly' | 'daily'
-    })) as Task[];
+    return data as Task[];
   };
 
-  // Query hook for tasks
-  const useTaskQuery = (category?: Task['category']) => {
+  const useTaskQuery = (category?: TaskCategory) => {
     return useQuery({
       queryKey: ['tasks', category],
       queryFn: () => fetchTasks(category)
     });
   };
 
-  // Create task mutation
   const useCreateTask = () => {
     return useMutation({
       mutationFn: async (newTask: Omit<Task, 'id' | 'created_at'>) => {
+        const { data: { user } } = await supabase.auth.getUser();
         const { data, error } = await supabase
           .from('tasks')
-          .insert(newTask)
+          .insert({ ...newTask, created_by: user?.id })
           .select()
           .single();
         
@@ -73,7 +73,6 @@ export const useTasks = () => {
     });
   };
 
-  // Update task mutation
   const useUpdateTask = () => {
     return useMutation({
       mutationFn: async (updatedTask: Partial<Task> & { id: string }) => {
@@ -93,48 +92,9 @@ export const useTasks = () => {
     });
   };
 
-  // Rollover incomplete tasks
-  const useRolloverTasks = () => {
-    return useMutation({
-      mutationFn: async () => {
-        const today = new Date().toISOString().split('T')[0];
-        const { data: incompleteTasks, error: fetchError } = await supabase
-          .from('tasks')
-          .select('*')
-          .eq('category', 'daily')
-          .neq('status', 'completed')
-          .lt('due_date', today);
-
-        if (fetchError) throw fetchError;
-
-        if (!incompleteTasks?.length) return [];
-
-        const rolledOverTasks = incompleteTasks.map(task => ({
-          ...task,
-          due_date: today,
-          rolled_over_from: task.id,
-          id: undefined,
-          created_at: undefined
-        }));
-
-        const { data, error } = await supabase
-          .from('tasks')
-          .insert(rolledOverTasks)
-          .select();
-
-        if (error) throw error;
-        return data;
-      },
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      }
-    });
-  };
-
   return {
     useTaskQuery,
     useCreateTask,
-    useUpdateTask,
-    useRolloverTasks
+    useUpdateTask
   };
 };
