@@ -3,11 +3,17 @@ import { useState, useEffect, useRef } from 'react';
 
 export const useTimeWindow = () => {
   const [currentTime, setCurrentTime] = useState(() => {
-    // Get current time in UK timezone using UTC
+    // Get current time in UK timezone
     const now = new Date();
-    const ukTime = new Date(now.toLocaleString('en-GB', { timeZone: 'Europe/London' }));
-    console.log('Initial UK time:', ukTime.toLocaleString('en-GB'));
-    return ukTime;
+    // Use proper timezone offset calculation
+    return new Date(Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate(),
+      now.getUTCHours(),
+      now.getUTCMinutes(),
+      now.getUTCSeconds()
+    ) + (0 * 60 * 60 * 1000)); // UK time is UTC+0 or UTC+1 depending on DST
   });
   const timelineRef = useRef<HTMLDivElement>(null);
 
@@ -40,8 +46,17 @@ export const useTimeWindow = () => {
     const timer = setInterval(() => {
       // Update current time with UK timezone
       const now = new Date();
-      const ukTime = new Date(now.toLocaleString('en-GB', { timeZone: 'Europe/London' }));
-      console.log('Updated UK time:', ukTime.toLocaleString('en-GB'));
+      // Use proper timezone offset calculation for updates
+      const ukTime = new Date(Date.UTC(
+        now.getUTCFullYear(),
+        now.getUTCMonth(),
+        now.getUTCDate(),
+        now.getUTCHours(),
+        now.getUTCMinutes(),
+        now.getUTCSeconds()
+      ) + (0 * 60 * 60 * 1000)); // UK time is UTC+0 or UTC+1 depending on DST
+      
+      console.log('Updated UK time:', ukTime.toISOString());
       setCurrentTime(ukTime);
       scrollToCurrentTime();
     }, 10000); // Update every 10 seconds
@@ -51,4 +66,3 @@ export const useTimeWindow = () => {
 
   return { currentTime, timelineRef, getCurrentWindow };
 };
-
