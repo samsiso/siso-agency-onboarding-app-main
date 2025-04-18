@@ -403,6 +403,56 @@ export type Database = {
         }
         Relationships: []
       }
+      client_documents: {
+        Row: {
+          client_id: string
+          content: string | null
+          created_at: string
+          created_by: string | null
+          document_type: string
+          id: string
+          is_pinned: boolean | null
+          last_edited_by: string | null
+          position: number | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          content?: string | null
+          created_at?: string
+          created_by?: string | null
+          document_type: string
+          id?: string
+          is_pinned?: boolean | null
+          last_edited_by?: string | null
+          position?: number | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          content?: string | null
+          created_at?: string
+          created_by?: string | null
+          document_type?: string
+          id?: string
+          is_pinned?: boolean | null
+          last_edited_by?: string | null
+          position?: number | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_documents_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "client_onboarding"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_onboarding: {
         Row: {
           company_name: string | null

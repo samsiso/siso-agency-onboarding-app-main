@@ -1,94 +1,14 @@
 
-export interface ClientData {
+export interface ClientDocument {
   id: string;
-  full_name: string;
-  email: string | null;
-  business_name: string | null;
-  phone: string | null;
-  avatar_url: string | null;
-  status: string;
-  current_step: number;
-  total_steps: number;
-  completed_steps: string[];
+  client_id: string;
+  title: string;
+  content: string;
+  document_type: 'app_plan' | 'functionalities' | 'wireframes' | 'inspiration';
   created_at: string;
   updated_at: string;
-  website_url?: string | null;
-  professional_role?: string | null;
-  bio?: string | null;
-  // Project-related fields
-  project_name?: string | null;
-  company_niche?: string | null;
-  development_url?: string | null;
-  mvp_build_status?: string | null;
-  notion_plan_url?: string | null;
-  payment_status?: string | null;
-  estimated_price?: number | null;
-  initial_contact_date?: string | null;
-  start_date?: string | null;
-  estimated_completion_date?: string | null;
-  // New fields for enhanced client management
-  client_contact?: string | null;
-  purchase_history?: string | null;
-  next_steps?: string | null;
-  key_research?: string | null;
-  referral_source?: string | null;
-  industry?: string | null;
-  last_contacted_date?: string | null;
-  assigned_to?: string | null;
-  priority?: 'low' | 'medium' | 'high' | null;
-  todos?: TodoItem[];
-}
-
-export interface TodoItem {
-  id: string;
-  text: string;
-  completed: boolean;
-  created_at: string;
-  due_date?: string | null;
-  assigned_to?: string | null;
-}
-
-export interface ClientsListParams {
-  page?: number;
-  pageSize?: number;
-  searchQuery?: string;
-  statusFilter?: string;
-  sortColumn?: string;
-  sortDirection?: 'asc' | 'desc';
-}
-
-export interface ClientsListResponse {
-  clients: ClientData[];
-  totalCount: number;
-}
-
-export interface ClientColumnPreference {
-  key: string;
-  visible: boolean;
-  label?: string;
-  width?: number;
-  order?: number;
-  pinned?: boolean; // New field to mark a column as pinned
-}
-
-export interface ClientViewPreference {
-  columns: ClientColumnPreference[];
-  sortColumn: string;
-  sortDirection: 'asc' | 'desc';
-  pageSize: number;
-  filters?: ClientFilter[];
-  showAllColumns?: boolean; // New field to control visibility of all columns
-}
-
-export interface ClientFilter {
-  column: string;
-  operator: 'equals' | 'contains' | 'greater_than' | 'less_than' | 'between' | 'in';
-  value: any;
-}
-
-export interface SavedView {
-  id: string;
-  name: string;
-  preference: ClientViewPreference;
-  isDefault?: boolean;
+  created_by?: string;
+  last_edited_by?: string;
+  is_pinned?: boolean;
+  position?: number;
 }

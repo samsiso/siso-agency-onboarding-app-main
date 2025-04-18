@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useClientDetails } from '@/hooks/client';
@@ -23,6 +22,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { ClientDocuments } from '@/components/admin/clients/detail/ClientDocuments';
 
 export default function ClientDetailPage() {
   const { clientId } = useParams<{ clientId: string }>();
@@ -122,7 +122,7 @@ export default function ClientDetailPage() {
         <ClientDetailHeader client={client} />
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
-          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 mb-6">
+          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 mb-6">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="timeline">Timeline</TabsTrigger>
             <TabsTrigger value="interactions">Interactions</TabsTrigger>
@@ -157,7 +157,7 @@ export default function ClientDetailPage() {
           </TabsContent>
           
           <TabsContent value="documents" className="space-y-4">
-            <ClientRelatedDocuments client={client} />
+            <ClientDocuments client={client} />
           </TabsContent>
         </Tabs>
       </div>
