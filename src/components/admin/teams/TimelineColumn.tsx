@@ -2,6 +2,7 @@
 import React from 'react';
 import { Task } from '@/types/task.types';
 import { format } from 'date-fns';
+import { TaskCard } from './TaskCard';
 
 export function TimelineColumn({ tasks }: { tasks: Task[] }) {
   // Generate time slots for 24 hours

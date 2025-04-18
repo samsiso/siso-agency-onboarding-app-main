@@ -5,6 +5,7 @@ import { TimelineColumn } from './TimelineColumn';
 import { Task } from '@/types/task.types';
 import { useTasks } from '@/hooks/useTasks';
 import { format } from 'date-fns';
+import { TaskCard } from './TaskCard';
 
 export function TimelineTaskView({ memberId }: { memberId?: string }) {
   const { useTaskQuery } = useTasks();
