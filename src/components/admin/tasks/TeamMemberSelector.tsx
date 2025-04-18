@@ -33,7 +33,7 @@ export function TeamMemberSelector() {
   ];
   
   const handleSelectMember = (member: TeamMember) => {
-    navigate(`?member=${member.id}`);
+    navigate(`/admin/tasks/${member.id}`);
   };
   
   // Get currently selected member from URL

@@ -41,14 +41,19 @@ export function TaskBank({ userId, showAllTasks = true }: TaskBankProps) {
   return (
     <div className="space-y-6">
       {displayName && (
-        <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
-          <h1 className="text-xl font-bold text-purple-800">
-            {displayName}'s Tasks
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="bg-gradient-to-r from-purple-900/40 via-purple-800/30 to-indigo-900/40 p-6 rounded-lg border border-purple-500/20"
+        >
+          <h1 className="text-2xl font-bold text-white mb-2">
+            {displayName}'s Task Dashboard
           </h1>
-          <p className="text-sm text-purple-600">
-            Viewing tasks assigned to {displayName}
+          <p className="text-purple-200/80">
+            Manage and track tasks assigned to {displayName}
           </p>
-        </div>
+        </motion.div>
       )}
 
       <Tabs value={activeView} onValueChange={(value) => setActiveView(value as 'byCategory' | 'analytics')}>
