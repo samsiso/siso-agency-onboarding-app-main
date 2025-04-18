@@ -6,6 +6,7 @@ import { Chip } from '@/components/ui/chip';
 import { TaskCategory } from '@/hooks/useTasks';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useSearchParams } from 'react-router-dom';
+import { TaskAnalytics } from './TaskAnalytics';
 
 const categories: TaskCategory[] = [
   'siso_app_dev',
