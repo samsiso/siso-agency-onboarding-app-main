@@ -31,6 +31,9 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
     }
   };
 
+  // Calculate the exact position for the current time indicator
+  const timePosition = ((currentHour * 60 + currentMinute) / (24 * 60)) * (24 * 80);
+
   return (
     <div className="relative min-h-[600px] flex">
       {/* Time ruler */}
@@ -82,7 +85,7 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
         <div 
           className="absolute left-0 right-0 flex items-center gap-2 z-10 transition-all duration-1000"
           style={{
-            top: `${((currentHour * 60 + currentMinute) / (24 * 60)) * (24 * 80)}px`,
+            top: `${timePosition}px`,
           }}
         >
           <div className="border-t-2 border-red-500 flex-1" />
