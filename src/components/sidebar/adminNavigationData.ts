@@ -30,11 +30,6 @@ export const getAdminMenuSections = (): MenuSection[] => {
           label: 'Teams',
         },
         {
-          href: '/admin/tasks',
-          icon: ClipboardList,
-          label: 'Task Tracker',
-        },
-        {
           href: '/admin/outreach',
           icon: MessageSquare,
           label: 'Outreach',
