@@ -7,23 +7,26 @@ import { useTasks } from '@/hooks/useTasks';
 import { format } from 'date-fns';
 import { TaskCard } from './TaskCard';
 import { motion } from 'framer-motion';
-import { Clock, ListTodo } from 'lucide-react';
+import { Clock, ListTodo, RefreshCcw } from 'lucide-react';
 
 export function TimelineTaskView({ memberId }: { memberId?: string }) {
   const { useTaskQuery } = useTasks();
   const { data: tasks = [] } = useTaskQuery('daily', memberId);
 
   const todaysTasks = tasks.filter(task => {
-    if (!task.due_date) return false;
-    return format(new Date(task.due_date), 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
+    if (!task.start_time) return false;
+    return format(new Date(task.start_time), 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd') ||
+           task.recurring_type !== 'none';
   });
 
   const upcomingTasks = tasks.filter(task => {
-    if (!task.due_date) return false;
+    if (!task.due_date || task.start_time) return false;
     const dueDate = new Date(task.due_date);
     const today = new Date();
     return dueDate > today && format(dueDate, 'yyyy-MM-dd') !== format(today, 'yyyy-MM-dd');
   });
+
+  const recurringTasks = tasks.filter(task => task.recurring_type !== 'none');
 
   return (
     <div className="space-y-6">
@@ -54,7 +57,15 @@ export function TimelineTaskView({ memberId }: { memberId?: string }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="p-4 overflow-hidden">
-          <h2 className="text-lg font-semibold mb-4">Today's Schedule</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">Today's Schedule</h2>
+            {recurringTasks.length > 0 && (
+              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                <RefreshCcw className="h-4 w-4" />
+                <span>{recurringTasks.length} recurring</span>
+              </div>
+            )}
+          </div>
           <div className="max-h-[600px] overflow-y-auto hide-scrollbar">
             <TimelineColumn tasks={todaysTasks} />
           </div>
@@ -62,6 +73,9 @@ export function TimelineTaskView({ memberId }: { memberId?: string }) {
         
         <Card className="p-4">
           <h2 className="text-lg font-semibold mb-4">Upcoming Tasks</h2>
+          <p className="text-sm text-muted-foreground mb-4">
+            Drag tasks to the timeline to schedule them
+          </p>
           <div className="max-h-[600px] overflow-y-auto hide-scrollbar space-y-4">
             {upcomingTasks.map(task => (
               <TaskCard key={task.id} task={task} />

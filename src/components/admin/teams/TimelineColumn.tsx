@@ -3,11 +3,13 @@ import React from 'react';
 import { Task } from '@/types/task.types';
 import { format } from 'date-fns';
 import { TaskCard } from './TaskCard';
+import { useTaskDragDrop } from '@/hooks/useTaskDragDrop';
+import { cn } from '@/lib/utils';
 
 export function TimelineColumn({ tasks }: { tasks: Task[] }) {
-  // Generate time slots for 24 hours
   const timeSlots = Array.from({ length: 24 }, (_, i) => i);
   const currentHour = new Date().getHours();
+  const { handleDrop, handleDragOver, isDragging } = useTaskDragDrop();
 
   return (
     <div className="relative min-h-[600px]">
@@ -16,9 +18,13 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
         {timeSlots.map((hour) => (
           <div
             key={hour}
-            className={`h-20 flex items-center justify-center text-sm ${
-              hour === currentHour ? 'bg-purple-100/10 font-bold' : ''
-            }`}
+            onDragOver={handleDragOver}
+            onDrop={(e) => handleDrop(e, hour)}
+            className={cn(
+              "h-20 flex items-center justify-center text-sm transition-colors",
+              hour === currentHour && "bg-purple-100/10 font-bold",
+              isDragging && "hover:bg-purple-100/5"
+            )}
           >
             {format(new Date().setHours(hour), 'ha')}
           </div>
