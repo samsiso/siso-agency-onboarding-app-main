@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { TimelineColumn } from './TimelineColumn';
 import { Task } from '@/types/task.types';
@@ -7,13 +7,17 @@ import { useTasks } from '@/hooks/useTasks';
 import { format } from 'date-fns';
 import { TaskCard } from './TaskCard';
 import { motion } from 'framer-motion';
-import { Clock, ListTodo, RefreshCcw, Calendar } from 'lucide-react';
+import { Clock, ListTodo, RefreshCcw, Calendar, ArrowUpRight } from 'lucide-react';
 import { useDayPeriod } from '@/hooks/useDayPeriod';
+import { Badge } from '@/components/ui/badge';
+import { useCheckInOut } from '@/hooks/useCheckInOut';
 
 export function TimelineTaskView({ memberId }: { memberId?: string }) {
   const { useTaskQuery } = useTasks();
   const { data: tasks = [] } = useTaskQuery('daily', memberId);
   const { greeting, icon: DayPeriodIcon, gradientClass } = useDayPeriod();
+  const { morningCheckInTime, eveningCheckOutTime } = useCheckInOut();
+  const [rolledOverTasks, setRolledOverTasks] = useState<Task[]>([]);
 
   const todaysTasks = tasks.filter(task => {
     if (!task.start_time) return false;
@@ -28,9 +32,19 @@ export function TimelineTaskView({ memberId }: { memberId?: string }) {
     return dueDate > today && format(dueDate, 'yyyy-MM-dd') !== format(today, 'yyyy-MM-dd');
   });
 
+  // Determine rolled-over tasks
+  useEffect(() => {
+    const rolledOver = tasks.filter(task => !!task.rolled_over_from);
+    setRolledOverTasks(rolledOver);
+  }, [tasks]);
+
   const recurringTasks = tasks.filter(task => task.recurring_type && task.recurring_type !== 'none');
   const today = new Date();
   const formattedDate = format(today, 'EEEE, MMMM d, yyyy');
+
+  // Format times
+  const morningCheckInTimeStr = format(morningCheckInTime, 'h:mm a');
+  const eveningCheckOutTimeStr = format(eveningCheckOutTime, 'h:mm a');
 
   return (
     <div className="space-y-6">
@@ -55,6 +69,12 @@ export function TimelineTaskView({ memberId }: { memberId?: string }) {
                 <Clock className="h-3 w-3" />
                 <span>Upcoming Tasks: {upcomingTasks.length}</span>
               </div>
+              {rolledOverTasks.length > 0 && (
+                <div className="flex items-center gap-1 rounded-lg bg-amber-100 px-2 py-1 text-xs font-medium text-amber-700 dark:bg-amber-900 dark:text-amber-300">
+                  <ArrowUpRight className="h-3 w-3" />
+                  <span>Rolled Over: {rolledOverTasks.length}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -67,12 +87,25 @@ export function TimelineTaskView({ memberId }: { memberId?: string }) {
               <Calendar className="h-5 w-5 text-purple-500" />
               <h2 className="text-lg font-semibold">Schedule for {formattedDate}</h2>
             </div>
-            {recurringTasks.length > 0 && (
-              <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                <RefreshCcw className="h-4 w-4" />
-                <span>{recurringTasks.length} recurring</span>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+              {recurringTasks.length > 0 && (
+                <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                  <RefreshCcw className="h-4 w-4" />
+                  <span>{recurringTasks.length} recurring</span>
+                </div>
+              )}
+              <div className="text-xs text-muted-foreground">
+                <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200 mr-1">
+                  Check-in
+                </Badge>
+                {morningCheckInTimeStr}
+                <span className="mx-1">•</span>
+                <Badge variant="outline" className="bg-purple-50 text-purple-600 border-purple-200 mr-1">
+                  Check-out
+                </Badge>
+                {eveningCheckOutTimeStr}
               </div>
-            )}
+            </div>
           </div>
           <div className="max-h-[600px] overflow-y-auto hide-scrollbar relative">
             <TimelineColumn tasks={todaysTasks} />

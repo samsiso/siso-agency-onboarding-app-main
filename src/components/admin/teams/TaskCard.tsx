@@ -3,7 +3,7 @@ import React from 'react';
 import { Task } from '@/types/task.types';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Clock, RefreshCcw } from 'lucide-react';
+import { Clock, RefreshCcw, ArrowUpRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { useTaskDragDrop } from '@/hooks/useTaskDragDrop';
 import { cn } from '@/lib/utils';
@@ -32,6 +32,7 @@ export function TaskCard({ task, currentHour }: TaskCardProps) {
   };
 
   const isCurrentTask = startTime && currentHour === startTime.getHours();
+  const isRolledOver = !!task.rolled_over_from;
 
   return (
     <Card 
@@ -40,7 +41,8 @@ export function TaskCard({ task, currentHour }: TaskCardProps) {
       onDragEnd={handleDragEnd}
       className={cn(
         "absolute left-0 right-2 p-2 transition-all duration-200 cursor-move hover:ring-2 hover:ring-purple-500/50",
-        isCurrentTask ? 'bg-purple-500/20 border-purple-500/50' : 'bg-gray-800/50 hover:bg-gray-800/70'
+        isCurrentTask ? 'bg-purple-500/20 border-purple-500/50' : 'bg-gray-800/50 hover:bg-gray-800/70',
+        isRolledOver && 'border-l-4 border-l-amber-500'
       )}
       style={getTaskPosition()}
     >
@@ -59,6 +61,12 @@ export function TaskCard({ task, currentHour }: TaskCardProps) {
               <Badge variant="outline" className="flex items-center gap-1">
                 <RefreshCcw className="h-3 w-3" />
                 {task.recurring_type}
+              </Badge>
+            )}
+            {isRolledOver && (
+              <Badge variant="outline" className="flex items-center gap-1 bg-amber-500/10 text-amber-500 border-amber-500/30">
+                <ArrowUpRight className="h-3 w-3" />
+                Rolled over
               </Badge>
             )}
           </div>

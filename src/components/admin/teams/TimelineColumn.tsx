@@ -6,13 +6,28 @@ import { TaskCard } from './TaskCard';
 import { useTaskDragDrop } from '@/hooks/useTaskDragDrop';
 import { cn } from '@/lib/utils';
 import { useTimeWindow } from '@/hooks/useTimeWindow';
-import { ChevronUp, ChevronDown, Clock } from 'lucide-react';
+import { ChevronUp, ChevronDown, Clock, Coffee, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useCheckInOut } from '@/hooks/useCheckInOut';
+import { CheckInOutDialog } from './CheckInOutDialog';
 
 export function TimelineColumn({ tasks }: { tasks: Task[] }) {
   const timeSlots = Array.from({ length: 24 }, (_, i) => i);
   const { currentTime, timelineRef, getCurrentWindow } = useTimeWindow();
   const { handleDrop, handleDragOver, isDragging } = useTaskDragDrop();
+  const { 
+    morningCheckInTime, 
+    eveningCheckOutTime,
+    shouldShowMorningCheckIn,
+    shouldShowEveningCheckOut,
+    handleMorningCheckIn,
+    handleEveningCheckOut,
+    checkInStatus,
+    checkOutStatus
+  } = useCheckInOut();
+  
+  const [checkInDialogOpen, setCheckInDialogOpen] = React.useState(false);
+  const [checkOutDialogOpen, setCheckOutDialogOpen] = React.useState(false);
 
   const { windowStart, windowEnd } = getCurrentWindow();
   const currentHour = currentTime.getHours();
@@ -53,6 +68,11 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
     pixelsPerHour: HOUR_HEIGHT,
     pixelsPerMinute: PIXELS_PER_MINUTE
   });
+
+  // Calculate positions for check-in and check-out indicators
+  const checkInPosition = morningCheckInTime.getHours() * HOUR_HEIGHT;
+  const checkOutPosition = eveningCheckOutTime.getHours() * HOUR_HEIGHT + 
+                          (eveningCheckOutTime.getMinutes() * PIXELS_PER_MINUTE);
 
   return (
     <div className="relative min-h-[600px] flex">
@@ -116,6 +136,56 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
           </div>
         </div>
 
+        {/* Morning Check-In indicator */}
+        <div 
+          className={cn(
+            "absolute left-0 right-0 flex items-center gap-2 z-10",
+            checkInStatus === 'completed' ? "opacity-30" : "opacity-100"
+          )}
+          style={{
+            top: `${checkInPosition}px`,
+          }}
+        >
+          <div className="border-t-2 border-dashed border-green-500 flex-1" />
+          <Button 
+            variant="outline" 
+            size="sm"
+            className={cn(
+              "absolute right-2 -top-3 bg-green-50 text-green-700 border-green-300 hover:bg-green-100",
+              shouldShowMorningCheckIn() ? "animate-pulse" : ""
+            )}
+            onClick={() => setCheckInDialogOpen(true)}
+          >
+            <Coffee className="h-4 w-4 mr-1" />
+            {checkInStatus === 'completed' ? "Checked In" : "Check In"}
+          </Button>
+        </div>
+        
+        {/* Evening Check-Out indicator */}
+        <div 
+          className={cn(
+            "absolute left-0 right-0 flex items-center gap-2 z-10",
+            checkOutStatus === 'completed' ? "opacity-30" : "opacity-100"
+          )}
+          style={{
+            top: `${checkOutPosition}px`,
+          }}
+        >
+          <div className="border-t-2 border-dashed border-purple-500 flex-1" />
+          <Button 
+            variant="outline" 
+            size="sm"
+            className={cn(
+              "absolute right-2 -top-3 bg-purple-50 text-purple-700 border-purple-300 hover:bg-purple-100",
+              shouldShowEveningCheckOut() ? "animate-pulse" : ""
+            )}
+            onClick={() => setCheckOutDialogOpen(true)}
+          >
+            <Sparkles className="h-4 w-4 mr-1" />
+            {checkOutStatus === 'completed' ? "Checked Out" : "Check Out"}
+          </Button>
+        </div>
+
         {/* Visible window indicator */}
         <div 
           className="absolute left-0 right-0 bg-purple-50/5 border-y border-purple-500/20"
@@ -133,6 +203,23 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
           />
         ))}
       </div>
+
+      {/* Check-in/Check-out Dialogs */}
+      <CheckInOutDialog
+        type="check-in"
+        open={checkInDialogOpen}
+        onOpenChange={setCheckInDialogOpen}
+        onComplete={handleMorningCheckIn}
+        time={morningCheckInTime}
+      />
+      
+      <CheckInOutDialog
+        type="check-out"
+        open={checkOutDialogOpen}
+        onOpenChange={setCheckOutDialogOpen}
+        onComplete={handleEveningCheckOut}
+        time={eveningCheckOutTime}
+      />
     </div>
   );
 }
