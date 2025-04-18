@@ -1,12 +1,12 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { formatCompactNumber, formatRelativeTime } from '@/lib/formatters';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ArrowUpRight, Instagram, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface InstagramLead {
@@ -34,72 +34,98 @@ export const LeadsOverview = () => {
   });
 
   const viewAllLeads = () => {
-    // In the future, we'll implement a dedicated leads management page
-    // navigate('/admin/leads');
-    console.log('View all leads clicked');
+    // Future implementation for leads management page
+    navigate('/admin/outreach');
   };
-
-  if (isLoading) {
-    return (
-      <Card className="p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">Recent Leads</h2>
-          <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-        </div>
-        <div className="space-y-4">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="flex items-center justify-between">
-              <div>
-                <Skeleton className="h-5 w-32 mb-1" />
-                <Skeleton className="h-4 w-24" />
-              </div>
-              <Skeleton className="h-4 w-20" />
-            </div>
-          ))}
-        </div>
-      </Card>
-    );
-  }
 
   const getStatusBadge = (status: string | null) => {
     switch (status) {
       case 'contacted':
-        return <Badge className="bg-blue-500/20 text-blue-400">Contacted</Badge>;
+        return <Badge variant="info">Contacted</Badge>;
       case 'converted':
-        return <Badge className="bg-green-500/20 text-green-400">Converted</Badge>;
+        return <Badge variant="success">Converted</Badge>;
       case 'new':
       default:
-        return <Badge className="bg-amber-500/20 text-amber-400">New</Badge>;
+        return <Badge variant="warning">New</Badge>;
     }
   };
 
   return (
-    <Card className="p-6">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Recent Leads</h2>
-        <Button variant="ghost" size="sm" onClick={viewAllLeads}>
-          View all
+    <Card className="border border-gray-800">
+      <CardHeader className="flex flex-row items-center justify-between pb-2 pt-6">
+        <CardTitle className="flex items-center">
+          <Instagram className="mr-2 h-5 w-5 text-pink-400" />
+          Instagram Leads
+        </CardTitle>
+        <Button 
+          variant="ghost" 
+          size="sm"
+          className="text-gray-400 hover:text-white"
+          onClick={viewAllLeads}
+        >
+          View All
+          <ChevronRight className="ml-1 h-4 w-4" />
         </Button>
-      </div>
-      <div className="space-y-4">
-        {leads.length === 0 ? (
-          <p className="text-muted-foreground">No leads found.</p>
-        ) : (
-          leads.map((lead: InstagramLead) => (
-            <div key={lead.id} className="flex items-center justify-between">
-              <div>
-                <p className="font-medium">@{lead.username}</p>
-                <p className="text-sm text-muted-foreground">
-                  {getStatusBadge(lead.status)} • {formatRelativeTime(lead.created_at)}
-                </p>
+      </CardHeader>
+      
+      <CardContent>
+        {isLoading ? (
+          <div className="space-y-4">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="flex items-center justify-between">
+                <div>
+                  <Skeleton className="h-5 w-32 mb-1" />
+                  <Skeleton className="h-4 w-24" />
+                </div>
+                <Skeleton className="h-4 w-20" />
               </div>
-              <span className="text-sm">
-                {lead.followers_count ? `${formatCompactNumber(lead.followers_count)} followers` : 'N/A'}
-              </span>
-            </div>
-          ))
+            ))}
+          </div>
+        ) : leads.length === 0 ? (
+          <div className="text-center py-6">
+            <p className="text-gray-500">No leads found.</p>
+            <Button variant="outline" size="sm" className="mt-2">
+              Find New Leads
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {leads.map((lead: InstagramLead) => (
+              <div key={lead.id} className="flex items-center justify-between p-3 rounded-md bg-gray-900/50 hover:bg-gray-900/70 transition-colors">
+                <div>
+                  <div className="flex items-center">
+                    <p className="font-medium text-gray-200">@{lead.username}</p>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-6 w-6 p-0 ml-1 text-pink-400 hover:text-pink-300"
+                      onClick={() => window.open(`https://instagram.com/${lead.username}`, '_blank')}
+                    >
+                      <ArrowUpRight className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                  <div className="flex items-center mt-1 space-x-2 text-xs">
+                    {getStatusBadge(lead.status)}
+                    <span className="text-gray-400">
+                      {formatRelativeTime(lead.created_at)}
+                    </span>
+                  </div>
+                </div>
+                <div className="text-sm text-gray-300 font-medium">
+                  {lead.followers_count ? (
+                    <span className="flex items-center">
+                      {formatCompactNumber(lead.followers_count)} 
+                      <span className="text-gray-500 text-xs ml-1">followers</span>
+                    </span>
+                  ) : (
+                    <span className="text-gray-500">N/A</span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         )}
-      </div>
+      </CardContent>
     </Card>
   );
 };

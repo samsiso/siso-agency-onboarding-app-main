@@ -9,6 +9,9 @@ import { useAdminCheck } from '@/hooks/useAdminCheck';
 import { Loader2, LayoutDashboard } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useUser } from '@/hooks/useUser';
+import { DashboardKPI } from '@/components/admin/dashboard/DashboardKPI';
+import { AdminTasks } from '@/components/admin/dashboard/AdminTasks';
+import { WelcomeBanner } from '@/components/admin/dashboard/WelcomeBanner';
 
 export default function AdminDashboard() {
   const { isAdmin, isLoading, refreshAdminStatus } = useAdminCheck();
@@ -49,8 +52,8 @@ export default function AdminDashboard() {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin text-siso-orange mb-4" />
-        <p className="text-siso-text">Verifying admin access...</p>
+        <Loader2 className="w-8 h-8 animate-spin text-purple-500 mb-4" />
+        <p className="text-gray-200">Verifying admin access...</p>
       </div>
     );
   }
@@ -62,27 +65,20 @@ export default function AdminDashboard() {
 
   return (
     <AdminLayout>
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
-            <p className="text-muted-foreground">
-              Welcome to your central control panel for managing the platform
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <span className="px-3 py-1 text-sm bg-purple-500/10 text-purple-400 rounded-full flex items-center">
-              <LayoutDashboard className="w-3.5 h-3.5 mr-1.5" />
-              Admin Access
-            </span>
-          </div>
-        </div>
+      <div className="container mx-auto px-4 py-6 space-y-6">
+        <WelcomeBanner user={user} />
         
-        <AdminStats />
+        <DashboardKPI />
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
-          <LeadsOverview />
-          <ClientsList />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-6">
+            <AdminTasks />
+            <LeadsOverview />
+          </div>
+          <div className="space-y-6">
+            <ClientsList />
+            <AdminStats />
+          </div>
         </div>
       </div>
     </AdminLayout>

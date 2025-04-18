@@ -1,112 +1,106 @@
 
 /**
- * Format a number as a currency string
- */
-export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
-
-/**
- * Format a number with commas
- */
-export function formatNumber(num: number): string {
-  return new Intl.NumberFormat('en-US').format(num);
-}
-
-/**
- * Format a date to local string
- */
-export function formatDate(date: Date | string): string {
-  const d = typeof date === 'string' ? new Date(date) : date;
-  return d.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  });
-}
-
-/**
- * Format a time to local string
- */
-export function formatTime(date: Date | string): string {
-  const d = typeof date === 'string' ? new Date(date) : date;
-  return d.toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-}
-
-/**
- * Format a number as a percentage
- */
-export function formatPercentage(value: number): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'percent',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 1,
-  }).format(value / 100);
-}
-
-/**
- * Format a number as a compact number (e.g. 1.2k, 1.2M)
+ * Formats numbers in a compact form (e.g., 1.2k, 3.5M)
  */
 export function formatCompactNumber(num: number): string {
-  return new Intl.NumberFormat('en-US', {
-    notation: 'compact',
-    compactDisplay: 'short',
-  }).format(num);
+  if (num === null || num === undefined) return '0';
+  
+  const formatter = Intl.NumberFormat('en', { notation: 'compact' });
+  return formatter.format(num);
 }
 
 /**
- * Format a monetary value to show spending tier
+ * Formats a date string as relative time (e.g., "2 hours ago", "3 days ago")
  */
-export function formatSpendingTier(amount: number): string {
-  if (amount >= 10000) return 'Premium';
-  if (amount >= 5000) return 'Gold';
-  if (amount >= 1000) return 'Silver';
-  return 'Bronze';
-}
+export function formatRelativeTime(dateString: string): string {
+  if (!dateString) return 'N/A';
 
-/**
- * Apply color class based on trend direction
- */
-export function getTrendColorClass(trend: 'up' | 'down' | 'stable'): string {
-  switch (trend) {
-    case 'up':
-      return 'text-green-500';
-    case 'down':
-      return 'text-red-500';
-    default:
-      return 'text-yellow-500';
-  }
-}
-
-/**
- * Format a relative time (e.g. 2 hours ago)
- */
-export function formatRelativeTime(date: Date | string): string {
-  const d = typeof date === 'string' ? new Date(date) : date;
+  const date = new Date(dateString);
   const now = new Date();
-  const diffMs = now.getTime() - d.getTime();
-  const diffSecs = Math.floor(diffMs / 1000);
-  const diffMins = Math.floor(diffSecs / 60);
-  const diffHours = Math.floor(diffMins / 60);
-  const diffDays = Math.floor(diffHours / 24);
+  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-  if (diffDays > 30) {
-    return formatDate(d);
-  } else if (diffDays > 0) {
-    return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-  } else if (diffHours > 0) {
-    return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-  } else if (diffMins > 0) {
-    return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
-  } else {
+  // Handle invalid dates
+  if (isNaN(date.getTime())) return 'Invalid date';
+
+  const intervals = [
+    { label: 'year', seconds: 31536000 },
+    { label: 'month', seconds: 2592000 },
+    { label: 'week', seconds: 604800 },
+    { label: 'day', seconds: 86400 },
+    { label: 'hour', seconds: 3600 },
+    { label: 'minute', seconds: 60 },
+    { label: 'second', seconds: 1 }
+  ];
+
+  // Handle future dates
+  if (seconds < 0) {
+    const absSeconds = Math.abs(seconds);
+    for (let i = 0; i < intervals.length; i++) {
+      const interval = intervals[i];
+      const count = Math.floor(absSeconds / interval.seconds);
+      if (count > 0) {
+        return `in ${count} ${interval.label}${count !== 1 ? 's' : ''}`;
+      }
+    }
     return 'just now';
   }
+
+  // Handle past dates
+  for (let i = 0; i < intervals.length; i++) {
+    const interval = intervals[i];
+    const count = Math.floor(seconds / interval.seconds);
+    if (count > 0) {
+      return `${count} ${interval.label}${count !== 1 ? 's' : ''} ago`;
+    }
+  }
+  
+  return 'just now';
+}
+
+/**
+ * Formats a date for display
+ */
+export function formatDate(dateString: string, format: 'short' | 'medium' | 'long' = 'medium'): string {
+  if (!dateString) return 'N/A';
+  
+  const date = new Date(dateString);
+  
+  // Handle invalid dates
+  if (isNaN(date.getTime())) return 'Invalid date';
+  
+  let options: Intl.DateTimeFormatOptions;
+  
+  switch (format) {
+    case 'short':
+      options = { month: 'numeric', day: 'numeric' };
+      break;
+    case 'long':
+      options = { 
+        weekday: 'long',
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+      };
+      break;
+    case 'medium':
+    default:
+      options = { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric',
+      };
+      break;
+  }
+  
+  return new Intl.DateTimeFormat('en-US', options).format(date);
+}
+
+/**
+ * Formats currency values
+ */
+export function formatCurrency(value: number, currency = 'USD'): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency,
+  }).format(value);
 }
