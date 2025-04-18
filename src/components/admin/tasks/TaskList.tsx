@@ -1,29 +1,30 @@
 
 import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { useTasks, TaskCategory } from '@/hooks/useTasks';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { TaskItem } from './TaskItem';
+import { useToast } from '@/components/ui/use-toast';
 
 interface TaskListProps {
-  category: 'main' | 'weekly' | 'daily';
+  category: TaskCategory;
 }
 
 export function TaskList({ category }: TaskListProps) {
-  const { data: tasks, isLoading, error } = useQuery({
-    queryKey: ['tasks', category],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('tasks')
-        .select('*')
-        .eq('category', category)
-        .order('created_at', { ascending: false });
-        
-      if (error) throw error;
-      return data;
+  const { useTaskQuery } = useTasks();
+  const { toast } = useToast();
+  const { data: tasks, isLoading, error } = useTaskQuery(category);
+
+  React.useEffect(() => {
+    if (error) {
+      console.error('Task fetching error:', error);
+      toast({
+        variant: "destructive",
+        title: "Error loading tasks",
+        description: error instanceof Error ? error.message : "Failed to load tasks"
+      });
     }
-  });
+  }, [error, toast]);
 
   if (isLoading) {
     return (
@@ -32,14 +33,6 @@ export function TaskList({ category }: TaskListProps) {
         <Skeleton className="h-16 w-full" />
         <Skeleton className="h-16 w-full" />
       </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <Alert variant="destructive">
-        <AlertDescription>Failed to load tasks</AlertDescription>
-      </Alert>
     );
   }
 

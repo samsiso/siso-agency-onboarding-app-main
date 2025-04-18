@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -78,6 +77,12 @@ export function TaskView() {
     const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+  // Add debug logging for filteredTasks
+  console.log('Current category:', category);
+  console.log('Search query:', searchQuery);
+  console.log('Status filter:', statusFilter);
+  console.log('Filtered tasks:', filteredTasks);
 
   return (
     <div className="space-y-4">

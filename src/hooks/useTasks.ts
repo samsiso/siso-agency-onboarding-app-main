@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -35,29 +34,40 @@ export const useTasks = () => {
 
   // Fetch tasks with category filtering
   const fetchTasks = async (category?: TaskCategory) => {
+    console.log('Fetching tasks with category:', category);
+    
     const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      console.log('No authenticated user found');
+      throw new Error('Not authenticated');
+    }
     
     let query = supabase
       .from('tasks')
-      .select('*')
-      .or(`assigned_to.eq.${user?.id},created_by.eq.${user?.id}`)
-      .order('created_at', { ascending: false });
+      .select('*');
 
     if (category) {
-      // Using type assertion to resolve the mismatch
-      query = query.eq('category', category as any);
+      console.log('Applying category filter:', category);
+      query = query.eq('category', category);
     }
 
     const { data, error } = await query;
     
-    if (error) throw error;
+    if (error) {
+      console.error('Error fetching tasks:', error);
+      throw error;
+    }
+
+    console.log('Tasks fetched successfully:', data);
     return data as Task[];
   };
 
   const useTaskQuery = (category?: TaskCategory) => {
     return useQuery({
       queryKey: ['tasks', category],
-      queryFn: () => fetchTasks(category)
+      queryFn: () => fetchTasks(category),
+      retry: 1,
+      refetchOnWindowFocus: true
     });
   };
 
