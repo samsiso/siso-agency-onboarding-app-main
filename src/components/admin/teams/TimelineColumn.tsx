@@ -19,6 +19,13 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
   const currentMinute = currentTime.getMinutes();
   const currentTimeString = format(currentTime, 'HH:mm');
 
+  // Debug logging
+  console.log('Timeline rendering with:', {
+    currentTime: currentTime.toLocaleTimeString(),
+    currentHour,
+    currentMinute
+  });
+
   const scrollUp = () => {
     if (timelineRef.current) {
       timelineRef.current.scrollBy({ top: -80, behavior: 'smooth' });
@@ -31,8 +38,21 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
     }
   };
 
+  // Calculate pixels per hour and minute
+  const HOUR_HEIGHT = 80; // 80px per hour
+  const TOTAL_HOURS = 24;
+  const PIXELS_PER_MINUTE = HOUR_HEIGHT / 60;
+  
   // Calculate the exact position for the current time indicator
-  const timePosition = ((currentHour * 60 + currentMinute) / (24 * 60)) * (24 * 80);
+  const timePosition = (currentHour * HOUR_HEIGHT) + (currentMinute * PIXELS_PER_MINUTE);
+  
+  console.log('Time position calculation:', {
+    timePosition,
+    currentHour,
+    currentMinute,
+    pixelsPerHour: HOUR_HEIGHT,
+    pixelsPerMinute: PIXELS_PER_MINUTE
+  });
 
   return (
     <div className="relative min-h-[600px] flex">
@@ -100,8 +120,8 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
         <div 
           className="absolute left-0 right-0 bg-purple-50/5 border-y border-purple-500/20"
           style={{
-            top: `${(windowStart / 24) * (24 * 80)}px`,
-            height: `${((windowEnd - windowStart) / 24) * (24 * 80)}px`,
+            top: `${windowStart * HOUR_HEIGHT}px`,
+            height: `${(windowEnd - windowStart) * HOUR_HEIGHT}px`,
           }}
         />
 
