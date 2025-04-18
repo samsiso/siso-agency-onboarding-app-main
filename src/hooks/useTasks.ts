@@ -25,6 +25,31 @@ export interface Task {
   rolled_over_from?: string;
 }
 
+export interface TaskStats {
+  byStatus: {
+    pending: number;
+    in_progress: number;
+    completed: number;
+  };
+  byPriority: {
+    low: number;
+    medium: number;
+    high: number;
+    urgent: number;
+  };
+  byDay: Array<{
+    day: string;
+    created: number;
+    completed: number;
+  }>;
+  totals: {
+    pending: number;
+    in_progress: number;
+    completed: number;
+    total: number;
+  };
+}
+
 // Type definition for database operations to handle the type mismatch
 type DatabaseTask = Omit<Task, 'category'> & {
   category: string;
@@ -33,9 +58,9 @@ type DatabaseTask = Omit<Task, 'category'> & {
 export const useTasks = () => {
   const queryClient = useQueryClient();
 
-  // Fetch tasks with category filtering
-  const fetchTasks = async (category?: TaskCategory) => {
-    console.log('Fetching tasks with category:', category);
+  // Fetch tasks with category and user filtering
+  const fetchTasks = async (category?: TaskCategory, userId?: string) => {
+    console.log('Fetching tasks with category:', category, 'and userId:', userId);
     
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -51,6 +76,11 @@ export const useTasks = () => {
       console.log('Applying category filter:', category);
       query = query.eq('category', category);
     }
+    
+    if (userId) {
+      console.log('Filtering tasks by assigned user:', userId);
+      query = query.eq('assigned_to', userId);
+    }
 
     const { data, error } = await query;
     
@@ -63,10 +93,120 @@ export const useTasks = () => {
     return data as Task[];
   };
 
-  const useTaskQuery = (category?: TaskCategory) => {
+  // Fetch task statistics for analytics
+  const fetchTaskStats = async (userId?: string): Promise<TaskStats> => {
+    console.log('Fetching task statistics for userId:', userId);
+    
+    // In a real implementation, this would query aggregated data from the database
+    // For this demo, we'll simulate it with mock data
+    
+    // Base mock data
+    const mockStats: TaskStats = {
+      byStatus: {
+        pending: 12,
+        in_progress: 8,
+        completed: 24
+      },
+      byPriority: {
+        low: 15,
+        medium: 18,
+        high: 8,
+        urgent: 3
+      },
+      byDay: [
+        { day: 'Mon', created: 5, completed: 4 },
+        { day: 'Tue', created: 7, completed: 6 },
+        { day: 'Wed', created: 6, completed: 8 },
+        { day: 'Thu', created: 8, completed: 5 },
+        { day: 'Fri', created: 4, completed: 9 },
+        { day: 'Sat', created: 2, completed: 2 },
+        { day: 'Sun', created: 1, completed: 0 },
+      ],
+      totals: {
+        pending: 12,
+        in_progress: 8,
+        completed: 24,
+        total: 44
+      }
+    };
+
+    // Different stats for different users
+    if (userId === 'siso') {
+      return {
+        byStatus: {
+          pending: 5,
+          in_progress: 4,
+          completed: 15
+        },
+        byPriority: {
+          low: 8,
+          medium: 9,
+          high: 5,
+          urgent: 2
+        },
+        byDay: [
+          { day: 'Mon', created: 3, completed: 2 },
+          { day: 'Tue', created: 4, completed: 3 },
+          { day: 'Wed', created: 3, completed: 4 },
+          { day: 'Thu', created: 5, completed: 3 },
+          { day: 'Fri', created: 2, completed: 5 },
+          { day: 'Sat', created: 1, completed: 1 },
+          { day: 'Sun', created: 0, completed: 0 },
+        ],
+        totals: {
+          pending: 5,
+          in_progress: 4,
+          completed: 15,
+          total: 24
+        }
+      };
+    } else if (userId === 'sam') {
+      return {
+        byStatus: {
+          pending: 7,
+          in_progress: 4,
+          completed: 9
+        },
+        byPriority: {
+          low: 7,
+          medium: 9,
+          high: 3,
+          urgent: 1
+        },
+        byDay: [
+          { day: 'Mon', created: 2, completed: 2 },
+          { day: 'Tue', created: 3, completed: 3 },
+          { day: 'Wed', created: 3, completed: 4 },
+          { day: 'Thu', created: 3, completed: 2 },
+          { day: 'Fri', created: 2, completed: 4 },
+          { day: 'Sat', created: 1, completed: 1 },
+          { day: 'Sun', created: 1, completed: 0 },
+        ],
+        totals: {
+          pending: 7,
+          in_progress: 4,
+          completed: 9,
+          total: 20
+        }
+      };
+    }
+    
+    return mockStats;
+  };
+
+  const useTaskQuery = (category?: TaskCategory, userId?: string) => {
     return useQuery({
-      queryKey: ['tasks', category],
-      queryFn: () => fetchTasks(category),
+      queryKey: ['tasks', category, userId],
+      queryFn: () => fetchTasks(category, userId),
+      retry: 1,
+      refetchOnWindowFocus: true
+    });
+  };
+
+  const useTaskStatsQuery = (userId?: string) => {
+    return useQuery({
+      queryKey: ['taskStats', userId],
+      queryFn: () => fetchTaskStats(userId),
       retry: 1,
       refetchOnWindowFocus: true
     });
@@ -92,6 +232,7 @@ export const useTasks = () => {
       },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['tasks'] });
+        queryClient.invalidateQueries({ queryKey: ['taskStats'] });
       }
     });
   };
@@ -112,12 +253,14 @@ export const useTasks = () => {
       },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['tasks'] });
+        queryClient.invalidateQueries({ queryKey: ['taskStats'] });
       }
     });
   };
 
   return {
     useTaskQuery,
+    useTaskStatsQuery,
     useCreateTask,
     useUpdateTask
   };

@@ -8,12 +8,13 @@ import { useToast } from '@/components/ui/use-toast';
 
 interface TaskListProps {
   category: TaskCategory;
+  userId?: string;
 }
 
-export function TaskList({ category }: TaskListProps) {
+export function TaskList({ category, userId }: TaskListProps) {
   const { useTaskQuery } = useTasks();
   const { toast } = useToast();
-  const { data: tasks, isLoading, error } = useTaskQuery(category);
+  const { data: tasks, isLoading, error } = useTaskQuery(category, userId);
 
   React.useEffect(() => {
     if (error) {
@@ -39,7 +40,7 @@ export function TaskList({ category }: TaskListProps) {
   if (!tasks?.length) {
     return (
       <div className="text-center py-8 text-muted-foreground">
-        No {category} tasks found
+        {userId ? `No ${category} tasks assigned to this user` : `No ${category} tasks found`}
       </div>
     );
   }
