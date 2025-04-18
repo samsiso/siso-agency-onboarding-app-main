@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 
 export const useTimeWindow = () => {
@@ -13,17 +14,25 @@ export const useTimeWindow = () => {
   };
 
   useEffect(() => {
+    // Initial scroll position
+    if (timelineRef.current) {
+      const { windowStart } = getCurrentWindow();
+      const currentHour = new Date().getHours();
+      const scrollPosition = (currentHour - windowStart) * 80; // 80px per hour
+      timelineRef.current.scrollTop = scrollPosition - 160; // Center in viewport
+    }
+
     const timer = setInterval(() => {
       setCurrentTime(new Date());
       
-      // Scroll to keep current time in view
+      // Update scroll position
       if (timelineRef.current) {
         const { windowStart } = getCurrentWindow();
         const currentHour = new Date().getHours();
         const scrollPosition = (currentHour - windowStart) * 80; // 80px per hour
         timelineRef.current.scrollTop = scrollPosition - 160; // Center in viewport
       }
-    }, 60000); // Update every minute
+    }, 10000); // Update every 10 seconds
 
     return () => clearInterval(timer);
   }, []);

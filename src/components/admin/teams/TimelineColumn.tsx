@@ -17,7 +17,7 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
   const { windowStart, windowEnd } = getCurrentWindow();
   const currentHour = currentTime.getHours();
   const currentMinute = currentTime.getMinutes();
-  const currentTimeString = format(currentTime, 'h:mm a');
+  const currentTimeString = format(currentTime, 'HH:mm');
 
   const scrollUp = () => {
     if (timelineRef.current) {
@@ -46,7 +46,7 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
               isDragging && "hover:bg-purple-100/5"
             )}
           >
-            {format(new Date().setHours(hour), 'ha')}
+            {format(new Date().setHours(hour), 'HH:mm')}
           </div>
         ))}
       </div>
@@ -82,7 +82,7 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
         <div 
           className="absolute left-0 right-0 flex items-center gap-2 z-10 transition-all duration-1000"
           style={{
-            top: `${((currentHour * 60 + currentMinute) / (24 * 60)) * 100}%`,
+            top: `${((currentHour * 60 + currentMinute) / (24 * 60)) * (24 * 80)}px`,
           }}
         >
           <div className="border-t-2 border-red-500 flex-1" />
@@ -97,8 +97,8 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
         <div 
           className="absolute left-0 right-0 bg-purple-50/5 border-y border-purple-500/20"
           style={{
-            top: `${(windowStart / 24) * 100}%`,
-            height: `${((windowEnd - windowStart) / 24) * 100}%`,
+            top: `${(windowStart / 24) * (24 * 80)}px`,
+            height: `${((windowEnd - windowStart) / 24) * (24 * 80)}px`,
           }}
         />
 
