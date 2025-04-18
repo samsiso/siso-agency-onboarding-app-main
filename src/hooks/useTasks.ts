@@ -35,7 +35,14 @@ export const useTasks = () => {
     const { data, error } = await query;
     
     if (error) throw error;
-    return data;
+    
+    // Transform data to ensure it conforms to our Task interface
+    return (data || []).map(task => ({
+      ...task,
+      status: (task.status as string || 'pending') as 'pending' | 'in_progress' | 'completed',
+      priority: (task.priority as string || 'medium') as 'low' | 'medium' | 'high',
+      category: task.category as 'main' | 'weekly' | 'daily'
+    })) as Task[];
   };
 
   // Query hook for tasks
