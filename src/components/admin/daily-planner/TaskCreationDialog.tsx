@@ -24,13 +24,19 @@ export function TaskCreationDialog({ open, onOpenChange, onSubmit }: TaskCreatio
 
   const priorities: TaskPriority[] = ['low', 'medium', 'high'];
 
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    onSubmit(formData);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create New Task</DialogTitle>
         </DialogHeader>
-        <form action={onSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <Input name="title" placeholder="Task Title" required />
           <Input name="description" placeholder="Description (optional)" />
           

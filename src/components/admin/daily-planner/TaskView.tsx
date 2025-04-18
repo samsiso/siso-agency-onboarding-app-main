@@ -1,9 +1,9 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useTasks, TaskCategory, TaskPriority, TaskStatus } from '@/hooks/useTasks';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
 import { Filter, PlusCircle, Search } from 'lucide-react';
@@ -23,7 +23,7 @@ export function TaskView() {
   const createTaskMutation = useCreateTask();
   const updateTaskMutation = useUpdateTask();
 
-  const handleStatusChange = (taskId: string, newStatus: 'pending' | 'in_progress' | 'completed') => {
+  const handleStatusChange = (taskId: string, newStatus: TaskStatus) => {
     updateTaskMutation.mutate(
       { id: taskId, status: newStatus },
       {
@@ -44,7 +44,7 @@ export function TaskView() {
     );
   };
 
-  const handleCreateTask = async (formData: FormData) => {
+  const handleCreateTask = (formData: FormData) => {
     const newTask = {
       title: formData.get('title') as string,
       description: formData.get('description') as string,
@@ -62,7 +62,8 @@ export function TaskView() {
         });
         setShowCreateDialog(false);
       },
-      onError: () => {
+      onError: (error) => {
+        console.error('Error creating task:', error);
         toast({ 
           title: 'Error', 
           description: 'Failed to create task', 

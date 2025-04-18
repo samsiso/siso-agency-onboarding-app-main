@@ -38,7 +38,7 @@ export const useTasks = () => {
       .order('created_at', { ascending: false });
 
     if (category) {
-      query = query.eq('category', category);
+      query = query.eq('category', category as string); // Cast to string to avoid type issues
     }
 
     const { data, error } = await query;
@@ -60,7 +60,11 @@ export const useTasks = () => {
         const { data: { user } } = await supabase.auth.getUser();
         const { data, error } = await supabase
           .from('tasks')
-          .insert({ ...newTask, created_by: user?.id })
+          .insert({ 
+            ...newTask, 
+            created_by: user?.id,
+            category: newTask.category as string // Cast to string to avoid type issues
+          } as any)
           .select()
           .single();
         
@@ -76,9 +80,14 @@ export const useTasks = () => {
   const useUpdateTask = () => {
     return useMutation({
       mutationFn: async (updatedTask: Partial<Task> & { id: string }) => {
+        const taskUpdate = { ...updatedTask };
+        if (taskUpdate.category) {
+          taskUpdate.category = taskUpdate.category as string; // Cast to string to avoid type issues
+        }
+        
         const { data, error } = await supabase
           .from('tasks')
-          .update(updatedTask)
+          .update(taskUpdate as any)
           .eq('id', updatedTask.id)
           .select()
           .single();
