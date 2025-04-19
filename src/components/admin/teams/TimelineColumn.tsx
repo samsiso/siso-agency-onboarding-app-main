@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Task } from '@/types/task.types';
 import { TaskCard } from './TaskCard';
@@ -13,7 +14,6 @@ import { TimelineGrid } from './timeline/TimelineGrid';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { cn } from '@/lib/utils';
 
 export function TimelineColumn({ tasks }: { tasks: Task[] }) {
   const { currentTime, timelineRef, getCurrentWindow, scrollToCurrentTime } = useTimeWindow();
@@ -65,7 +65,10 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
           currentDate={currentTime}
         />
         
-        <ScrollArea className="flex-1">
+        <ScrollArea 
+          ref={timelineRef}
+          className="flex-1"
+        >
           <div className="relative px-1 sm:px-2 min-h-[2400px]">
             <TimelineGrid hourHeight={100} />
             <TimeIndicator 
