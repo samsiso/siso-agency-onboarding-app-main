@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -33,6 +34,7 @@ export function CheckInOutDialog({ type, open, onOpenChange, onComplete, time }:
   const [completedTasks, setCompletedTasks] = useState('');
   const [blockers, setBlockers] = useState('');
   const [tomorrowPlan, setTomorrowPlan] = useState('');
+  const [morningTasks, setMorningTasks] = useState(morningRoutineTasks);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,6 +67,20 @@ export function CheckInOutDialog({ type, open, onOpenChange, onComplete, time }:
     }
   };
 
+  const handleToggleTask = (id: string) => {
+    setMorningTasks(prevTasks => 
+      prevTasks.map(task => 
+        task.id === id ? { ...task, completed: !task.completed } : task
+      )
+    );
+  };
+
+  const handleDeleteTask = (id: string) => {
+    // In this context, we don't actually want to delete morning routine tasks
+    // But we need to provide the prop to satisfy TypeScript
+    console.log('Delete task is not implemented for morning routine tasks');
+  };
+
   const renderCheckInContent = () => (
     <>
       <DialogDescription className="flex items-center gap-2 text-green-600 font-medium mb-6">
@@ -82,11 +98,9 @@ export function CheckInOutDialog({ type, open, onOpenChange, onComplete, time }:
         
         <div className="space-y-4">
           <SubtaskList 
-            subtasks={morningRoutineTasks}
-            onToggle={(id) => {
-              console.log('Toggle morning routine task:', id);
-              // In a real app, update the task status
-            }}
+            subtasks={morningTasks}
+            onToggle={handleToggleTask}
+            onDelete={handleDeleteTask}
           />
           
           <div>
