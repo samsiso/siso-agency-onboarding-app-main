@@ -31,9 +31,9 @@ export function TimelineTaskView({ memberId }: TimelineTaskViewProps) {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="h-[calc(100vh-6rem)]"
+      className="h-full"
     >
-      <Card className="h-full overflow-hidden">
+      <Card className="h-full">
         {isDailyTasksLoading ? (
           <div className="flex items-center justify-center h-40">
             <div className="animate-pulse text-muted-foreground">Loading tasks...</div>
