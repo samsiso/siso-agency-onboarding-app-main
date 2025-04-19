@@ -1,5 +1,6 @@
 
 import { useState, useEffect, useRef } from 'react';
+import { ScrollArea } from '@radix-ui/react-scroll-area';
 
 export const useTimeWindow = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -7,7 +8,6 @@ export const useTimeWindow = () => {
 
   const getCurrentWindow = () => {
     const currentHour = currentTime.getHours();
-    console.log('Current hour from useTimeWindow:', currentHour);
     const windowStart = Math.max(0, currentHour - 4);
     const windowEnd = Math.min(24, windowStart + 8);
     return { windowStart, windowEnd };
@@ -17,24 +17,27 @@ export const useTimeWindow = () => {
     if (timelineRef.current) {
       const currentHour = currentTime.getHours();
       const currentMinute = currentTime.getMinutes();
-      console.log('Time components:', { currentHour, currentMinute });
       const totalMinutes = currentHour * 60 + currentMinute;
       const scrollPosition = (totalMinutes / (24 * 60)) * (24 * 80); // 24 hours * 80px per hour
+      
+      const containerHeight = timelineRef.current.clientHeight;
+      const targetPosition = scrollPosition - (containerHeight / 2);
+      
       timelineRef.current.scrollTo({
-        top: scrollPosition - (timelineRef.current.clientHeight / 2),
+        top: Math.max(0, targetPosition),
         behavior: 'smooth'
       });
     }
   };
 
   useEffect(() => {
-    scrollToCurrentTime();
+    // Initial scroll to current time
+    setTimeout(scrollToCurrentTime, 100);
+
     const timer = setInterval(() => {
       const newTime = new Date();
-      console.log('Updating time to:', newTime.toLocaleTimeString());
       setCurrentTime(newTime);
-      scrollToCurrentTime();
-    }, 10000); // Update every 10 seconds
+    }, 60000); // Update every minute
 
     return () => clearInterval(timer);
   }, []);

@@ -18,24 +18,26 @@ export function TimelineRuler({ currentHour }: TimelineRulerProps) {
   };
 
   return (
-    <div className="absolute left-0 top-0 bottom-0 w-16 border-r border-gray-200 bg-background z-10">
-      {timeSlots.map((hour) => (
-        <div
-          key={hour}
-          onDragOver={handleDragOver}
-          onDrop={(e) => handleTimeSlotDrop(e, hour)}
-          className={cn(
-            "h-20 flex items-center justify-center text-sm transition-colors relative",
-            hour === currentHour && "bg-purple-100/10 font-bold",
-            isDragging && "hover:bg-purple-100/5"
-          )}
-        >
-          {`${hour.toString().padStart(2, '0')}:00`}
-          {isDragging && (
-            <div className="absolute inset-0 border-2 border-purple-500/20 border-dashed pointer-events-none" />
-          )}
-        </div>
-      ))}
+    <div className="absolute left-0 top-0 bottom-0 w-16 border-r border-gray-200 bg-background/80 backdrop-blur z-10">
+      <div className="h-[1920px]">
+        {timeSlots.map((hour) => (
+          <div
+            key={hour}
+            onDragOver={handleDragOver}
+            onDrop={(e) => handleTimeSlotDrop(e, hour)}
+            className={cn(
+              "h-20 flex items-center justify-center text-sm transition-colors relative",
+              hour === currentHour && "bg-purple-100/10 font-bold",
+              isDragging && "hover:bg-purple-100/5"
+            )}
+          >
+            {`${hour.toString().padStart(2, '0')}:00`}
+            {isDragging && (
+              <div className="absolute inset-0 border-2 border-purple-500/20 border-dashed pointer-events-none" />
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

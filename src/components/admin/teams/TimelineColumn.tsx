@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from 'react';
+
+import React from 'react';
 import { Task } from '@/types/task.types';
 import { TaskCard } from './TaskCard';
 import { useTimeWindow } from '@/hooks/useTimeWindow';
@@ -8,6 +9,7 @@ import { TimelineRuler } from './timeline/TimelineRuler';
 import { ScrollButtons } from './timeline/ScrollButtons';
 import { TimeIndicator } from './timeline/TimeIndicator';
 import { RoutineCard } from './timeline/RoutineCard';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 export function TimelineColumn({ tasks }: { tasks: Task[] }) {
   const { currentTime, timelineRef, getCurrentWindow } = useTimeWindow();
@@ -24,7 +26,6 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
   
   const [checkInDialogOpen, setCheckInDialogOpen] = React.useState(false);
   const [checkOutDialogOpen, setCheckOutDialogOpen] = React.useState(false);
-  const touchStartY = useRef<number | null>(null);
 
   const { windowStart, windowEnd } = getCurrentWindow();
   const currentHour = currentTime.getHours();
@@ -56,83 +57,56 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
   const checkOutPosition = eveningCheckOutTime.getHours() * HOUR_HEIGHT + 
                           (eveningCheckOutTime.getMinutes() * PIXELS_PER_MINUTE);
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartY.current = e.touches[0].clientY;
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!touchStartY.current || !timelineRef.current) return;
-    
-    const deltaY = touchStartY.current - e.touches[0].clientY;
-    timelineRef.current.scrollBy({ top: deltaY });
-    touchStartY.current = e.touches[0].clientY;
-  };
-
-  const scrollUp = () => {
-    if (timelineRef.current) {
-      timelineRef.current.scrollBy({ top: -80, behavior: 'smooth' });
-    }
-  };
-
-  const scrollDown = () => {
-    if (timelineRef.current) {
-      timelineRef.current.scrollBy({ top: 80, behavior: 'smooth' });
-    }
-  };
-
   return (
     <div className="relative min-h-[600px] flex">
       <TimelineRuler currentHour={currentHour} />
-      <ScrollButtons onScrollUp={scrollUp} onScrollDown={scrollDown} />
+      <ScrollButtons onScrollUp={() => timelineRef.current?.scrollBy({ top: -80, behavior: 'smooth' })} 
+                    onScrollDown={() => timelineRef.current?.scrollBy({ top: 80, behavior: 'smooth' })} />
 
-      <div 
-        ref={timelineRef}
-        className="ml-16 relative flex-1 overflow-y-auto hide-scrollbar touch-pan-y"
-        style={{
-          height: '600px',
-          scrollBehavior: 'smooth',
-          overscrollBehavior: 'contain',
-          WebkitOverflowScrolling: 'touch',
-          padding: '0 1rem'
-        }}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-      >
-        <TimeIndicator currentTime={currentTime} position={currentHour * 80 + (currentMinute / 60) * 80} />
-        
-        {shouldShowMorningCheckIn() && (
-          <RoutineCard
-            type="morning"
-            time={morningCheckInTime}
-            status={checkInStatus}
-            onClick={() => setCheckInDialogOpen(true)}
-          />
-        )}
-        
-        {shouldShowEveningCheckOut() && (
-          <RoutineCard
-            type="evening"
-            time={eveningCheckOutTime}
-            status={checkOutStatus}
-            onClick={() => setCheckOutDialogOpen(true)}
-          />
-        )}
+      <div className="ml-16 relative flex-1">
+        <ScrollArea 
+          ref={timelineRef}
+          className="h-[600px] relative"
+          scrollHideDelay={0}
+        >
+          <div className="relative min-h-[1920px] px-4">
+            <TimeIndicator currentTime={currentTime} position={currentHour * 80 + (currentMinute / 60) * 80} />
+            
+            {shouldShowMorningCheckIn() && (
+              <RoutineCard
+                type="morning"
+                time={morningCheckInTime}
+                status={checkInStatus}
+                onClick={() => setCheckInDialogOpen(true)}
+              />
+            )}
+            
+            {shouldShowEveningCheckOut() && (
+              <RoutineCard
+                type="evening"
+                time={eveningCheckOutTime}
+                status={checkOutStatus}
+                onClick={() => setCheckOutDialogOpen(true)}
+              />
+            )}
 
-        <div 
-          className="absolute left-0 right-0 bg-purple-50/5 border-y border-purple-500/20"
-          style={{
-            top: `${windowStart * 80}px`,
-            height: `${(windowEnd - windowStart) * 80}px`,
-          }}
-        />
+            <div 
+              className="absolute left-0 right-0 bg-purple-50/5 border-y border-purple-500/20"
+              style={{
+                top: `${windowStart * 80}px`,
+                height: `${(windowEnd - windowStart) * 80}px`,
+              }}
+            />
 
-        {allTasks.map((task) => (
-          <TaskCard 
-            key={task.id} 
-            task={task}
-            currentHour={currentHour}
-          />
-        ))}
+            {allTasks.map((task) => (
+              <TaskCard 
+                key={task.id} 
+                task={task}
+                currentHour={currentHour}
+              />
+            ))}
+          </div>
+        </ScrollArea>
       </div>
 
       <CheckInOutDialog
