@@ -20,7 +20,6 @@ export function TaskCard({ task, currentHour }: TaskCardProps) {
   const startTime = task.start_time ? new Date(task.start_time) : null;
   const duration = task.duration || 60;
 
-  // Mock subtasks - in a real app, these would come from the task data
   const subtasks = [
     { id: '1', title: 'Review agenda', completed: true },
     { id: '2', title: 'Check emails', completed: false },
@@ -31,10 +30,10 @@ export function TaskCard({ task, currentHour }: TaskCardProps) {
   const getTaskPosition = () => {
     if (!startTime) return {};
     const minutes = startTime.getHours() * 60 + startTime.getMinutes();
+    const heightInPixels = Math.max((duration / 60) * 80, 80); // 80px per hour minimum
     return {
       top: `${(minutes / 1440) * 100}%`,
-      height: `${Math.max((duration / 1440) * 100, 3)}%`,
-      minHeight: '80px'
+      height: `${heightInPixels}px`,
     };
   };
 
@@ -42,7 +41,6 @@ export function TaskCard({ task, currentHour }: TaskCardProps) {
   const isRolledOver = !!task.rolled_over_from;
 
   const handleToggleSubtask = (id: string) => {
-    // In a real app, this would update the subtask status in the database
     console.log('Toggle subtask:', id);
   };
 
@@ -52,8 +50,12 @@ export function TaskCard({ task, currentHour }: TaskCardProps) {
       onDragStart={(e) => handleDragStart(e, task)}
       onDragEnd={handleDragEnd}
       className={cn(
-        "absolute left-0 right-2 p-4 transition-all duration-200 cursor-move hover:ring-2 hover:ring-purple-500/50",
-        isCurrentTask ? 'bg-purple-500/20 border-purple-500/50' : 'bg-gray-800/50 hover:bg-gray-800/70',
+        "absolute left-0 right-2 p-4 transition-all duration-200 cursor-move",
+        "hover:ring-2 hover:ring-purple-500/50 backdrop-blur-sm",
+        "rounded-lg border shadow-lg",
+        isCurrentTask 
+          ? 'bg-purple-500/20 border-purple-500/50' 
+          : 'bg-gray-800/50 hover:bg-gray-800/70',
         isRolledOver && 'border-l-4 border-l-amber-500'
       )}
       style={getTaskPosition()}

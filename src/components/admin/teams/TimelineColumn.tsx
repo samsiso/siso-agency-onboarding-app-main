@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Task } from '@/types/task.types';
 import { TaskCard } from './TaskCard';
 import { useTimeWindow } from '@/hooks/useTimeWindow';
@@ -25,18 +25,30 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
   
   const [checkInDialogOpen, setCheckInDialogOpen] = React.useState(false);
   const [checkOutDialogOpen, setCheckOutDialogOpen] = React.useState(false);
+  const touchStartY = useRef<number | null>(null);
 
   const { windowStart, windowEnd } = getCurrentWindow();
   const currentHour = currentTime.getHours();
   const currentMinute = currentTime.getMinutes();
 
-  // Calculate positions
   const HOUR_HEIGHT = 80;
   const PIXELS_PER_MINUTE = HOUR_HEIGHT / 60;
   const timePosition = (currentHour * HOUR_HEIGHT) + (currentMinute * PIXELS_PER_MINUTE);
   const checkInPosition = morningCheckInTime.getHours() * HOUR_HEIGHT;
   const checkOutPosition = eveningCheckOutTime.getHours() * HOUR_HEIGHT + 
                           (eveningCheckOutTime.getMinutes() * PIXELS_PER_MINUTE);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!touchStartY.current || !timelineRef.current) return;
+    
+    const deltaY = touchStartY.current - e.touches[0].clientY;
+    timelineRef.current.scrollBy({ top: deltaY });
+    touchStartY.current = e.touches[0].clientY;
+  };
 
   const scrollUp = () => {
     if (timelineRef.current) {
@@ -57,11 +69,13 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
 
       <div 
         ref={timelineRef}
-        className="ml-16 relative flex-1 overflow-y-auto hide-scrollbar"
+        className="ml-16 relative flex-1 overflow-y-auto hide-scrollbar touch-pan-y"
         style={{
           height: '600px',
           scrollBehavior: 'smooth',
         }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
       >
         <TimeIndicator currentTime={currentTime} position={timePosition} />
         
