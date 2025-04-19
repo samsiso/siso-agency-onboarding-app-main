@@ -16,13 +16,7 @@ export function TimelineRuler({ currentHour, hourHeight: propHourHeight, onTimeS
   const isMobile = useIsMobile();
   const hourHeight = propHourHeight || (isMobile ? 60 : 80);
 
-  const handleTimeSlotDrop = (e: React.DragEvent, hour: number) => {
-    // Fix: Instead of passing the hour number to handleDrop, we pass the event and let
-    // handleDrop extract position from the event itself
-    handleDrop(e, e.currentTarget as HTMLElement);
-  };
-
-  const handleTimeSlotClickInternal = (hour: number) => {
+  const handleTimeSlotClick = (hour: number) => {
     if (onTimeSlotClick) {
       onTimeSlotClick(hour);
     }
@@ -34,10 +28,10 @@ export function TimelineRuler({ currentHour, hourHeight: propHourHeight, onTimeS
         <div
           key={hour}
           onDragOver={handleDragOver}
-          onDrop={(e) => handleTimeSlotDrop(e, hour)}
-          onClick={() => handleTimeSlotClickInternal(hour)}
+          onDrop={(e) => handleDrop(e, e.currentTarget)}
+          onClick={() => handleTimeSlotClick(hour)}
           className={cn(
-            "flex items-center justify-center text-xs sm:text-sm transition-colors relative cursor-pointer",
+            "flex items-center justify-center text-xs sm:text-sm relative cursor-pointer",
             hour === currentHour && "bg-purple-100/10 font-bold",
             isDragging && "hover:bg-purple-100/5",
             "hover:bg-purple-100/5"

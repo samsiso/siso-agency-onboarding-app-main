@@ -12,13 +12,13 @@ export function useTaskDragDrop() {
   const { toast } = useToast();
   const isMobile = useIsMobile();
   
-  const HOUR_HEIGHT = 100;
+  const HOUR_HEIGHT = isMobile ? 60 : 100;
   const MINUTES_IN_HOUR = 60;
 
   const calculateTimeFromPosition = (y: number) => {
     const totalMinutes = Math.round((y / HOUR_HEIGHT) * MINUTES_IN_HOUR);
     const hours = Math.floor(totalMinutes / MINUTES_IN_HOUR);
-    const minutes = Math.round((totalMinutes % MINUTES_IN_HOUR) / 15) * 15; // Snap to 15-minute intervals
+    const minutes = Math.round((totalMinutes % MINUTES_IN_HOUR) / 15) * 15;
     
     const time = new Date();
     time.setHours(hours, minutes, 0, 0);
@@ -30,7 +30,7 @@ export function useTaskDragDrop() {
     e.dataTransfer.setData('taskId', task.id);
     e.dataTransfer.effectAllowed = 'move';
     
-    // Create and setup ghost element
+    // Create ghost element for better drag visualization
     const ghost = taskElement.cloneNode(true) as HTMLElement;
     ghost.style.opacity = '0.7';
     ghost.style.position = 'absolute';
@@ -42,31 +42,38 @@ export function useTaskDragDrop() {
     document.body.appendChild(ghost);
     e.dataTransfer.setDragImage(ghost, 10, 10);
     
-    // Remove ghost after drag starts
     requestAnimationFrame(() => {
       document.body.removeChild(ghost);
     });
     
     setIsDragging(true);
+
+    // Create or show guide line
+    let guideLine = document.getElementById('dragGuideLine');
+    if (!guideLine) {
+      guideLine = document.createElement('div');
+      guideLine.id = 'dragGuideLine';
+      guideLine.className = 'fixed left-0 right-0 h-0.5 bg-purple-500 pointer-events-none z-50';
+      document.body.appendChild(guideLine);
+    }
   };
 
   const handleDragEnd = () => {
     setIsDragging(false);
     const guideLine = document.getElementById('dragGuideLine');
     if (guideLine) {
-      guideLine.style.display = 'none';
+      guideLine.remove();
     }
   };
 
-  // Updated to accept an HTMLElement as the second parameter
-  const handleDrop = async (e: React.DragEvent, scrollContainer: HTMLElement) => {
+  const handleDrop = async (e: React.DragEvent, dropZone: HTMLElement) => {
     e.preventDefault();
     const taskId = e.dataTransfer.getData('taskId');
     if (!taskId) return;
     
     try {
-      const rect = scrollContainer.getBoundingClientRect();
-      const scrollOffset = scrollContainer.scrollTop || 0;
+      const rect = dropZone.getBoundingClientRect();
+      const scrollOffset = dropZone.scrollTop || 0;
       const y = e.clientY - rect.top + scrollOffset;
       
       const newStartTime = calculateTimeFromPosition(y);
@@ -90,27 +97,24 @@ export function useTaskDragDrop() {
         description: error instanceof Error ? error.message : "Unknown error occurred"
       });
     }
+    handleDragEnd();
   };
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
     
-    const timelineEl = e.currentTarget;
-    if (timelineEl instanceof HTMLElement) {
-      // Update guide line position
-      const guideLine = document.getElementById('dragGuideLine');
-      if (guideLine) {
-        const rect = timelineEl.getBoundingClientRect();
-        const scrollOffset = timelineEl.scrollTop || 0;
-        const y = e.clientY - rect.top + scrollOffset;
-        
-        // Snap to 15-minute intervals
-        const snappedY = Math.round(y / (HOUR_HEIGHT / 4)) * (HOUR_HEIGHT / 4);
-        
-        guideLine.style.top = `${snappedY}px`;
-        guideLine.style.display = 'block';
-      }
+    const guideLine = document.getElementById('dragGuideLine');
+    if (guideLine && e.currentTarget instanceof HTMLElement) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const scrollOffset = e.currentTarget.scrollTop || 0;
+      const y = e.clientY - rect.top + scrollOffset;
+      
+      // Snap to 15-minute intervals
+      const snappedY = Math.round(y / (HOUR_HEIGHT / 4)) * (HOUR_HEIGHT / 4);
+      
+      guideLine.style.top = `${e.clientY}px`;
+      guideLine.style.display = 'block';
     }
   };
 
