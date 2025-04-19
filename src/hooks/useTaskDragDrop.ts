@@ -58,6 +58,7 @@ export function useTaskDragDrop() {
     }
   };
 
+  // Updated to accept an HTMLElement as the second parameter
   const handleDrop = async (e: React.DragEvent, scrollContainer: HTMLElement) => {
     e.preventDefault();
     const taskId = e.dataTransfer.getData('taskId');
@@ -65,7 +66,7 @@ export function useTaskDragDrop() {
     
     try {
       const rect = scrollContainer.getBoundingClientRect();
-      const scrollOffset = scrollContainer.scrollTop;
+      const scrollOffset = scrollContainer.scrollTop || 0;
       const y = e.clientY - rect.top + scrollOffset;
       
       const newStartTime = calculateTimeFromPosition(y);
@@ -101,7 +102,7 @@ export function useTaskDragDrop() {
       const guideLine = document.getElementById('dragGuideLine');
       if (guideLine) {
         const rect = timelineEl.getBoundingClientRect();
-        const scrollOffset = timelineEl.scrollTop;
+        const scrollOffset = timelineEl.scrollTop || 0;
         const y = e.clientY - rect.top + scrollOffset;
         
         // Snap to 15-minute intervals

@@ -17,9 +17,9 @@ export function TimelineRuler({ currentHour, hourHeight: propHourHeight, onTimeS
   const hourHeight = propHourHeight || (isMobile ? 60 : 80);
 
   const handleTimeSlotDrop = (e: React.DragEvent, hour: number) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const offsetY = e.clientY - rect.top + (hour * hourHeight);
-    handleDrop(e, offsetY);
+    // Fix: Instead of passing the hour number to handleDrop, we pass the event and let
+    // handleDrop extract position from the event itself
+    handleDrop(e, e.currentTarget as HTMLElement);
   };
 
   const handleTimeSlotClickInternal = (hour: number) => {
