@@ -58,67 +58,79 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
         className="p-4"
       />
       
-      <div className="flex-1 relative flex">
-        <TimelineRuler 
-          currentHour={currentHour} 
-          hourHeight={100}
-          onTimeSlotClick={handleTimeSlotClick}
-        />
-
-        <ScrollArea className="flex-1 h-[calc(100vh-13rem)]">
-          <div className="relative pl-12 sm:pl-16 pr-4" style={{ height: '2400px' }}>
-            <TimelineGrid hourHeight={100} />
-            
-            <TimeIndicator 
-              currentTime={currentTime} 
-              position={currentHour * 100 + (currentMinute / 60) * 100} 
-            />
-            
-            {shouldShowMorningCheckIn() && (
-              <RoutineCard
-                type="morning"
-                time={morningCheckInTime}
-                status={checkInStatus}
-                onClick={() => setCheckInDialogOpen(true)}
+      <div className="flex-1 relative">
+        <ScrollArea 
+          ref={timelineRef}
+          className="h-[calc(100vh-13rem)]"
+        >
+          <div 
+            className="relative min-h-[2400px]"
+            style={{ paddingLeft: '4rem' }} // Space for the ruler
+          >
+            {/* Sticky ruler container */}
+            <div className="absolute left-0 top-0 bottom-0 w-16 bg-background/80 backdrop-blur z-10">
+              <TimelineRuler 
+                currentHour={currentHour} 
+                hourHeight={100}
+                onTimeSlotClick={handleTimeSlotClick}
               />
-            )}
-            
-            {shouldShowEveningCheckOut() && (
-              <RoutineCard
-                type="evening"
-                time={eveningCheckOutTime}
-                status={checkOutStatus}
-                onClick={() => setCheckOutDialogOpen(true)}
-              />
-            )}
-
-            <div className="absolute inset-0 grid grid-rows-[repeat(24,100px)] gap-0 pointer-events-none">
-              {allTasks.map((task) => (
-                <TaskCard 
-                  key={task.id} 
-                  task={task}
-                  currentHour={currentHour}
-                  allTasks={allTasks}
-                />
-              ))}
             </div>
 
-            {allTasks.length === 0 && (
-              <div className="absolute inset-0 flex items-center justify-center h-[600px]">
-                <div className="text-center p-6 max-w-xs mx-auto">
-                  <div className="rounded-full bg-gray-100 w-12 h-12 mx-auto mb-4 flex items-center justify-center">
-                    <Plus className="h-6 w-6 text-gray-500" />
-                  </div>
-                  <h3 className="text-lg font-medium mb-2">No tasks scheduled</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Click on a time slot or use the create button to add tasks to your schedule
-                  </p>
-                  <Button onClick={() => handleCreateTask()}>
-                    Create Task
-                  </Button>
-                </div>
+            {/* Main content area */}
+            <div className="relative pl-4 pr-4">
+              <TimelineGrid hourHeight={100} />
+              
+              <TimeIndicator 
+                currentTime={currentTime} 
+                position={currentHour * 100 + (currentMinute / 60) * 100} 
+              />
+              
+              {shouldShowMorningCheckIn() && (
+                <RoutineCard
+                  type="morning"
+                  time={morningCheckInTime}
+                  status={checkInStatus}
+                  onClick={() => setCheckInDialogOpen(true)}
+                />
+              )}
+              
+              {shouldShowEveningCheckOut() && (
+                <RoutineCard
+                  type="evening"
+                  time={eveningCheckOutTime}
+                  status={checkOutStatus}
+                  onClick={() => setCheckOutDialogOpen(true)}
+                />
+              )}
+
+              <div className="absolute inset-0 grid grid-rows-[repeat(24,100px)] gap-0 pointer-events-none">
+                {allTasks.map((task) => (
+                  <TaskCard 
+                    key={task.id} 
+                    task={task}
+                    currentHour={currentHour}
+                    allTasks={allTasks}
+                  />
+                ))}
               </div>
-            )}
+
+              {allTasks.length === 0 && (
+                <div className="absolute inset-0 flex items-center justify-center h-[600px]">
+                  <div className="text-center p-6 max-w-xs mx-auto">
+                    <div className="rounded-full bg-gray-100 w-12 h-12 mx-auto mb-4 flex items-center justify-center">
+                      <Plus className="h-6 w-6 text-gray-500" />
+                    </div>
+                    <h3 className="text-lg font-medium mb-2">No tasks scheduled</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Click on a time slot or use the create button to add tasks to your schedule
+                    </p>
+                    <Button onClick={() => handleCreateTask()}>
+                      Create Task
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </ScrollArea>
       </div>
