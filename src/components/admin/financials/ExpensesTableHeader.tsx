@@ -2,6 +2,8 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Filter, FileDown, FilePlus } from "lucide-react";
+import { ColumnCustomization } from "./table/ColumnCustomization";
+import { SavedViewsManager } from "./table/SavedViewsManager";
 
 interface ExpensesTableHeaderProps {
   searchQuery: string;
@@ -9,6 +11,11 @@ interface ExpensesTableHeaderProps {
   onAddExpense?: () => void;
   onExport?: () => void;
   onFilter?: () => void;
+  columns: { key: string; label: string; visible: boolean; }[];
+  onColumnVisibilityChange: (columns: any[]) => void;
+  savedViews: any[];
+  onViewSelect: (view: any) => void;
+  onViewSave: (name: string, currentState: any) => void;
 }
 
 export function ExpensesTableHeader({ 
@@ -16,7 +23,12 @@ export function ExpensesTableHeader({
   onSearchChange,
   onAddExpense,
   onExport,
-  onFilter
+  onFilter,
+  columns,
+  onColumnVisibilityChange,
+  savedViews,
+  onViewSelect,
+  onViewSave
 }: ExpensesTableHeaderProps) {
   return (
     <div className="flex items-center justify-between">
@@ -32,6 +44,18 @@ export function ExpensesTableHeader({
             onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
+        
+        <ColumnCustomization 
+          columns={columns} 
+          onColumnVisibilityChange={onColumnVisibilityChange}
+        />
+        
+        <SavedViewsManager
+          views={savedViews}
+          onViewSelect={onViewSelect}
+          onViewSave={onViewSave}
+        />
+        
         <Button 
           variant="outline" 
           size="sm" 
@@ -41,6 +65,7 @@ export function ExpensesTableHeader({
           <Filter className="h-4 w-4 mr-2" />
           Filter
         </Button>
+        
         <Button 
           variant="outline" 
           size="sm" 
@@ -50,6 +75,7 @@ export function ExpensesTableHeader({
           <FileDown className="h-4 w-4 mr-2" />
           Export
         </Button>
+        
         <Button 
           size="sm" 
           className="h-9"
