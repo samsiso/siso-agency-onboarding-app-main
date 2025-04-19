@@ -21,35 +21,20 @@ export function TaskCard({ task, currentHour, allTasks = [], onDragSuccess }: Ta
   const [showDetailDrawer, setShowDetailDrawer] = useState(false);
   const startTime = task.start_time ? new Date(task.start_time) : null;
   const { calculateTaskPosition, findOverlappingTasks } = useTaskPositioning();
+  const [isExpanded, setIsExpanded] = useState(false);
   
   const overlappingTasks = findOverlappingTasks(allTasks, task);
   const position = calculateTaskPosition(task, overlappingTasks);
-
-  const subtasks = [
-    { id: '1', title: 'Review agenda', completed: true },
-    { id: '2', title: 'Check emails', completed: false },
-    { id: '3', title: 'Update task status', completed: false },
-    { id: '4', title: 'Prepare for standup', completed: false },
-  ];
-
-  const completedSubtasks = subtasks.filter(st => st.completed).length;
-  const progress = (completedSubtasks / subtasks.length) * 100;
-  const isCurrentTask = startTime && currentHour === startTime.getHours();
-  const isRolledOver = !!task.rolled_over_from;
 
   const handleTaskClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setShowDetailDrawer(true);
   };
 
-  // Add a function to handle drag end with callback
-  const handleDragEndWithCallback = () => {
-    handleDragEnd();
-    // If onDragSuccess prop exists, call it when drag ends
-    if (onDragSuccess) {
-      onDragSuccess(task);
-    }
-  };
+  // Mock progress calculation - replace with real progress tracking
+  const progress = task.status === 'completed' ? 100 : 
+                  task.status === 'in_progress' ? 60 : 
+                  0;
 
   // Get priority-based background color
   const getPriorityBackground = () => {
@@ -66,39 +51,52 @@ export function TaskCard({ task, currentHour, allTasks = [], onDragSuccess }: Ta
       <Card 
         draggable
         onDragStart={(e) => handleDragStart(e, task)}
-        onDragEnd={handleDragEndWithCallback}
+        onDragEnd={handleDragEnd}
         onClick={handleTaskClick}
+        onMouseEnter={() => setIsExpanded(true)}
+        onMouseLeave={() => setIsExpanded(false)}
         className={cn(
           "absolute p-2 sm:p-3 transition-all duration-200",
           "hover:ring-2 hover:ring-purple-500/50 backdrop-blur-sm",
           "rounded-lg border shadow-lg touch-manipulation cursor-pointer",
           "flex flex-col justify-between gap-2",
-          isCurrentTask 
-            ? 'bg-purple-500/20 border-purple-500/50' 
-            : getPriorityBackground(),
-          isRolledOver && 'border-l-4 border-l-amber-500',
+          isCurrentTask ? 'bg-purple-500/20 border-purple-500/50' : getPriorityBackground(),
+          isExpanded && 'z-50',
           !startTime && 'static'
         )}
         style={startTime ? {
           top: `${position.top}px`,
           left: `${position.left}%`,
-          height: `${position.height}px`,
+          height: isExpanded ? 'auto' : `${position.height}px`,
+          minHeight: `${position.height}px`,
           width: position.width,
+          transform: isExpanded ? 'scale(1.02)' : undefined,
         } : {}}
       >
         <div className="space-y-2">
-          <h3 className="font-medium text-sm sm:text-base truncate">
-            {task.title}
-          </h3>
-          
-          <div className="flex flex-wrap items-center gap-1 sm:gap-2">
+          <div className="flex items-start justify-between gap-2">
+            <h3 className={cn(
+              "font-medium text-sm sm:text-base",
+              isExpanded ? "" : "line-clamp-2"
+            )}>
+              {task.title}
+            </h3>
             <PriorityBadge priority={task.priority} />
           </div>
+          
+          {task.description && (
+            <p className={cn(
+              "text-xs text-muted-foreground",
+              isExpanded ? "" : "line-clamp-2"
+            )}>
+              {task.description}
+            </p>
+          )}
 
           <div className="space-y-1">
             <div className="flex items-center justify-between text-xs text-muted-foreground">
               <span>Progress</span>
-              <span>{Math.round(progress)}%</span>
+              <span>{progress}%</span>
             </div>
             <Progress value={progress} className="h-1" />
           </div>
@@ -113,3 +111,4 @@ export function TaskCard({ task, currentHour, allTasks = [], onDragSuccess }: Ta
     </>
   );
 }
+

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Task } from '@/types/task.types';
 import { TaskCard } from './TaskCard';
@@ -11,6 +10,7 @@ import { TimeIndicator } from './timeline/TimeIndicator';
 import { RoutineCard } from './timeline/RoutineCard';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
 
 export function TimelineColumn({ tasks }: { tasks: Task[] }) {
   const { currentTime, timelineRef, getCurrentWindow } = useTimeWindow();
@@ -27,7 +27,6 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
   
   const [checkInDialogOpen, setCheckInDialogOpen] = React.useState(false);
   const [checkOutDialogOpen, setCheckOutDialogOpen] = React.useState(false);
-  const isMobile = useIsMobile();
 
   const { windowStart, windowEnd } = getCurrentWindow();
   const currentHour = currentTime.getHours();
@@ -38,8 +37,10 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
     return new Date(a.start_time).getTime() - new Date(b.start_time).getTime();
   });
 
-  const HOUR_HEIGHT = isMobile ? 60 : 80;
+  const isMobile = useIsMobile();
+  const HOUR_HEIGHT = isMobile ? 80 : 100; // Increased height to match TaskCard
   const PIXELS_PER_MINUTE = HOUR_HEIGHT / 60;
+  
   const timePosition = (currentHour * HOUR_HEIGHT) + (currentMinute * PIXELS_PER_MINUTE);
   const checkInPosition = morningCheckInTime.getHours() * HOUR_HEIGHT;
   const checkOutPosition = eveningCheckOutTime.getHours() * HOUR_HEIGHT + 
@@ -47,10 +48,10 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
 
   return (
     <div className="relative min-h-[400px] sm:min-h-[600px] flex">
-      <TimelineRuler currentHour={currentHour} />
+      <TimelineRuler currentHour={currentHour} hourHeight={HOUR_HEIGHT} />
       <ScrollButtons 
-        onScrollUp={() => timelineRef.current?.scrollBy({ top: -80, behavior: 'smooth' })} 
-        onScrollDown={() => timelineRef.current?.scrollBy({ top: 80, behavior: 'smooth' })} 
+        onScrollUp={() => timelineRef.current?.scrollBy({ top: -HOUR_HEIGHT, behavior: 'smooth' })} 
+        onScrollDown={() => timelineRef.current?.scrollBy({ top: HOUR_HEIGHT, behavior: 'smooth' })} 
       />
 
       <div className="ml-12 sm:ml-14 relative flex-1">
@@ -59,7 +60,10 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
           className="h-[400px] sm:h-[600px] relative"
           scrollHideDelay={0}
         >
-          <div className="relative min-h-[1440px] sm:min-h-[1920px] px-1 sm:px-2">
+          <div className={cn(
+            "relative px-1 sm:px-2",
+            "min-h-[1920px] sm:min-h-[2400px]"
+          )}>
             <TimeIndicator currentTime={currentTime} position={timePosition} />
             
             {shouldShowMorningCheckIn() && (
