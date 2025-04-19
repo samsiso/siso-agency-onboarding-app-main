@@ -13,18 +13,15 @@ interface TaskCardProps {
   task: Task;
   currentHour?: number;
   allTasks?: Task[];
-  onDragSuccess?: (task: Task) => void;
 }
 
-export function TaskCard({ task, currentHour, allTasks = [], onDragSuccess }: TaskCardProps) {
+export function TaskCard({ task, currentHour, allTasks = [] }: TaskCardProps) {
   const { handleDragStart, handleDragEnd } = useTaskDragDrop();
   const [showDetailDrawer, setShowDetailDrawer] = useState(false);
   const startTime = task.start_time ? new Date(task.start_time) : null;
-  const { calculateTaskPosition, findOverlappingTasks } = useTaskPositioning();
-  const [isExpanded, setIsExpanded] = useState(false);
-  
-  const overlappingTasks = findOverlappingTasks(allTasks, task);
-  const position = calculateTaskPosition(task, overlappingTasks);
+  const duration = task.duration || 60; // Default to 1 hour if no duration specified
+  const rowStart = startTime ? startTime.getHours() + 1 : 1; // Grid rows start at 1
+  const rowSpan = Math.ceil(duration / 60); // Convert minutes to hours, rounded up
 
   // Check if this is the current task based on start time and current hour
   const isCurrentTask = currentHour !== undefined && startTime && 
@@ -57,42 +54,31 @@ export function TaskCard({ task, currentHour, allTasks = [], onDragSuccess }: Ta
         onDragStart={(e) => handleDragStart(e, task)}
         onDragEnd={handleDragEnd}
         onClick={handleTaskClick}
-        onMouseEnter={() => setIsExpanded(true)}
-        onMouseLeave={() => setIsExpanded(false)}
         className={cn(
           "absolute p-2 sm:p-3 transition-all duration-200",
           "hover:ring-2 hover:ring-purple-500/50 backdrop-blur-sm",
           "rounded-lg border shadow-lg touch-manipulation cursor-pointer",
-          "flex flex-col justify-between gap-2",
+          "flex flex-col justify-between gap-2 pointer-events-auto",
           isCurrentTask ? 'bg-purple-500/20 border-purple-500/50' : getPriorityBackground(),
-          isExpanded && 'z-50',
-          !startTime && 'static'
+          "z-10"
         )}
-        style={startTime ? {
-          top: `${position.top}px`,
-          left: `${position.left}%`,
-          height: isExpanded ? 'auto' : `${position.height}px`,
-          minHeight: `${position.height}px`,
-          width: position.width,
-          transform: isExpanded ? 'scale(1.02)' : undefined,
-        } : {}}
+        style={{
+          gridRow: `${rowStart} / span ${rowSpan}`,
+          left: '8px',
+          right: '8px',
+          minHeight: 0
+        }}
       >
         <div className="space-y-2">
           <div className="flex items-start justify-between gap-2">
-            <h3 className={cn(
-              "font-medium text-sm sm:text-base",
-              isExpanded ? "" : "line-clamp-2"
-            )}>
+            <h3 className="font-medium text-sm sm:text-base line-clamp-2">
               {task.title}
             </h3>
             <PriorityBadge priority={task.priority} />
           </div>
           
           {task.description && (
-            <p className={cn(
-              "text-xs text-muted-foreground",
-              isExpanded ? "" : "line-clamp-2"
-            )}>
+            <p className="text-xs text-muted-foreground line-clamp-2">
               {task.description}
             </p>
           )}

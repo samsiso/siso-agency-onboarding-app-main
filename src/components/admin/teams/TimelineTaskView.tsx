@@ -2,7 +2,6 @@
 import React from 'react';
 import { useTasks } from '@/hooks/useTasks';
 import { TimelineColumn } from './TimelineColumn';
-import { motion } from 'framer-motion';
 
 interface TimelineTaskViewProps {
   memberId?: string;
@@ -25,12 +24,7 @@ export function TimelineTaskView({ memberId }: TimelineTaskViewProps) {
   });
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="h-full flex flex-col bg-background rounded-lg border"
-    >
+    <div className="h-full flex flex-col">
       {isDailyTasksLoading ? (
         <div className="flex items-center justify-center h-40">
           <div className="animate-pulse text-muted-foreground">Loading tasks...</div>
@@ -38,6 +32,6 @@ export function TimelineTaskView({ memberId }: TimelineTaskViewProps) {
       ) : (
         <TimelineColumn tasks={todaysTasks} />
       )}
-    </motion.div>
+    </div>
   );
 }
