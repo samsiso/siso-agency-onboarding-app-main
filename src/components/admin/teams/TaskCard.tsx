@@ -7,8 +7,7 @@ import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 import { PriorityBadge } from './PriorityBadge';
 import { useTaskPositioning } from '@/hooks/useTaskPositioning';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { TaskDetailDrawer } from './TaskDetailDrawer';
+import { TaskDetailDrawer } from './task-detail/TaskDetailDrawer';
 
 interface TaskCardProps {
   task: Task;
@@ -21,7 +20,6 @@ export function TaskCard({ task, currentHour, allTasks }: TaskCardProps) {
   const [showDetailDrawer, setShowDetailDrawer] = useState(false);
   const startTime = task.start_time ? new Date(task.start_time) : null;
   const { calculateTaskPosition, findOverlappingTasks } = useTaskPositioning();
-  const isMobile = useIsMobile();
   
   const overlappingTasks = findOverlappingTasks(allTasks, task);
   const position = calculateTaskPosition(task, overlappingTasks);
@@ -39,10 +37,8 @@ export function TaskCard({ task, currentHour, allTasks }: TaskCardProps) {
   const isRolledOver = !!task.rolled_over_from;
 
   const handleTaskClick = (e: React.MouseEvent) => {
-    if (isMobile) {
-      e.stopPropagation();
-      setShowDetailDrawer(true);
-    }
+    e.stopPropagation();
+    setShowDetailDrawer(true);
   };
 
   return (
@@ -55,7 +51,7 @@ export function TaskCard({ task, currentHour, allTasks }: TaskCardProps) {
         className={cn(
           "absolute p-2 sm:p-3 transition-all duration-200",
           "hover:ring-2 hover:ring-purple-500/50 backdrop-blur-sm",
-          "rounded-lg border shadow-lg touch-manipulation",
+          "rounded-lg border shadow-lg touch-manipulation cursor-pointer",
           "flex flex-col justify-between gap-2",
           isCurrentTask 
             ? 'bg-purple-500/20 border-purple-500/50' 
