@@ -2,6 +2,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import { FinancialTransaction } from "./types";
+import { transformTransactionData } from "./utils/transactionTransformers";
 
 // Fetch all transactions
 export async function fetchTransactions(): Promise<FinancialTransaction[]> {
@@ -20,7 +21,8 @@ export async function fetchTransactions(): Promise<FinancialTransaction[]> {
     return [];
   }
 
-  return data as FinancialTransaction[];
+  // Use the transformer to convert the raw data to the expected type
+  return Array.isArray(data) ? data.map(transformTransactionData) : [];
 }
 
 // Delete a transaction by ID

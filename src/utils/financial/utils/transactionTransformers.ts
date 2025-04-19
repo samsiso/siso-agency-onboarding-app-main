@@ -9,15 +9,28 @@ import { isValidRelationship } from './relationshipUtils';
 export function transformTransactionData(item: any): FinancialTransaction {
   // Extract related entities with proper type checking
   const category = isValidRelationship(item.category) 
-    ? item.category as ExpenseCategory
+    ? {
+        id: item.category.id,
+        name: item.category.name,
+        description: '',  // Provide default values for required fields
+        is_active: true   // Provide default values for required fields
+      } as ExpenseCategory
     : undefined;
     
   const vendor = isValidRelationship(item.vendor)
-    ? item.vendor as Vendor
+    ? {
+        id: item.vendor.id,
+        name: item.vendor.name,
+        is_active: true,  // Provide default values for required fields
+      } as Vendor
     : undefined;
     
   const paymentMethod = isValidRelationship(item.payment_method)
-    ? item.payment_method as PaymentMethod
+    ? {
+        id: item.payment_method.id,
+        name: item.payment_method.name,
+        is_active: true   // Provide default values for required fields
+      } as PaymentMethod
     : undefined;
 
   // Return a properly typed object
