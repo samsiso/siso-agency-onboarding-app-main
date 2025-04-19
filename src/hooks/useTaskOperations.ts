@@ -18,9 +18,10 @@ export function useTaskOperations() {
             created_by: user?.id
           } as any)
           .select()
-          .single();
+          .maybeSingle();
         
         if (error) throw error;
+        if (!data) throw new Error('Failed to create task');
         return data;
       },
       onSuccess: () => {
@@ -38,9 +39,10 @@ export function useTaskOperations() {
           .update(updatedTask as any)
           .eq('id', updatedTask.id)
           .select()
-          .single();
+          .maybeSingle();
         
         if (error) throw error;
+        if (!data) throw new Error(`Task with id ${updatedTask.id} not found`);
         return data;
       },
       onSuccess: () => {
@@ -55,3 +57,5 @@ export function useTaskOperations() {
     useUpdateTask
   };
 }
+
+export type { Task };

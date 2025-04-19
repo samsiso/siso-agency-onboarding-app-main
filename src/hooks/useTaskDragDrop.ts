@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useTasks } from '@/hooks/useTasks';
 import { Task } from '@/types/task.types';
@@ -69,7 +70,14 @@ export function useTaskDragDrop() {
   const handleDrop = async (e: React.DragEvent, dropZone: HTMLElement) => {
     e.preventDefault();
     const taskId = e.dataTransfer.getData('taskId');
-    if (!taskId) return;
+    if (!taskId) {
+      toast({
+        variant: "destructive",
+        title: "Error rescheduling task",
+        description: "Could not identify the task being moved"
+      });
+      return;
+    }
     
     try {
       const rect = dropZone.getBoundingClientRect();
@@ -91,13 +99,15 @@ export function useTaskDragDrop() {
         })}`,
       });
     } catch (error) {
+      console.error('Error rescheduling task:', error);
       toast({
         variant: "destructive",
         title: "Error rescheduling task",
-        description: error instanceof Error ? error.message : "Unknown error occurred"
+        description: error instanceof Error ? error.message : "Failed to update task"
       });
+    } finally {
+      handleDragEnd();
     }
-    handleDragEnd();
   };
 
   const handleDragOver = (e: React.DragEvent) => {
