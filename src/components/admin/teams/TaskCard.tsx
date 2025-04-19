@@ -9,6 +9,7 @@ import { useTaskDragDrop } from '@/hooks/useTaskDragDrop';
 import { cn } from '@/lib/utils';
 import { SubtaskList } from './SubtaskList';
 import { Progress } from '@/components/ui/progress';
+import { PriorityBadge } from './PriorityBadge';
 
 interface TaskCardProps {
   task: Task;
@@ -32,13 +33,13 @@ export function TaskCard({ task, currentHour }: TaskCardProps) {
     if (!startTime) return {};
     const minutes = startTime.getHours() * 60 + startTime.getMinutes();
     const baseHeight = (duration / 60) * 80; // 80px per hour
-    const minHeight = 100; // Minimum height for content
+    const minHeight = 120; // Increased minimum height for content
     const heightInPixels = Math.max(baseHeight, minHeight);
     
     return {
       top: `${(minutes / 1440) * 100}%`,
       height: `${heightInPixels}px`,
-      width: 'calc(100% - 1rem)' // Leave space for scrollbar
+      width: 'calc(100% - 2rem)' // Increased margin for better spacing
     };
   };
 
@@ -57,10 +58,10 @@ export function TaskCard({ task, currentHour }: TaskCardProps) {
       onDragStart={(e) => handleDragStart(e, task)}
       onDragEnd={handleDragEnd}
       className={cn(
-        "absolute p-3 transition-all duration-200 cursor-move",
+        "absolute p-4 transition-all duration-200 cursor-move",
         "hover:ring-2 hover:ring-purple-500/50 backdrop-blur-sm",
         "rounded-lg border shadow-lg",
-        "flex flex-col justify-between",
+        "flex flex-col justify-between gap-3",
         isCurrentTask 
           ? 'bg-purple-500/20 border-purple-500/50' 
           : 'bg-gray-800/50 hover:bg-gray-800/70',
@@ -68,38 +69,49 @@ export function TaskCard({ task, currentHour }: TaskCardProps) {
       )}
       style={getTaskPosition()}
     >
-      <div className="space-y-2">
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
+      <div className="space-y-3">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1 min-w-0 space-y-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <h3 className="font-medium text-base truncate">{task.title}</h3>
-              {isRolledOver && (
-                <Badge variant="outline" className="flex items-center gap-1 bg-amber-500/10 text-amber-500 border-amber-500/30">
-                  <RefreshCcw className="h-3 w-3" />
-                  Rolled
-                </Badge>
-              )}
+              <div className="flex items-center gap-2">
+                <PriorityBadge priority={task.priority} />
+                {isRolledOver && (
+                  <Badge variant="outline" className="flex items-center gap-1 bg-amber-500/10 text-amber-500 border-amber-500/30">
+                    <RefreshCcw className="h-3 w-3" />
+                    Rolled
+                  </Badge>
+                )}
+              </div>
             </div>
             
-            <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground mt-1">
+            <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
               {startTime && (
                 <div className="flex items-center gap-1">
-                  <Clock className="h-3.5 w-3.5" />
+                  <Clock className="h-4 w-4" />
                   {format(startTime, 'h:mm a')}
-                  {duration && <span className="text-xs">· {duration}m</span>}
+                  {duration && <span className="text-xs ml-1">· {duration}m</span>}
                 </div>
               )}
               
               <div className="flex items-center gap-1">
-                <Users className="h-3.5 w-3.5" />
+                <Users className="h-4 w-4" />
                 <span className="text-xs">3</span>
               </div>
+            </div>
+
+            <div className="space-y-1">
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>Progress</span>
+                <span>{Math.round(progress)}%</span>
+              </div>
+              <Progress value={progress} className="h-1.5" />
             </div>
           </div>
           
           <button 
             onClick={() => setIsExpanded(!isExpanded)}
-            className="p-1 hover:bg-gray-800/50 rounded-full transition-colors shrink-0"
+            className="p-1.5 hover:bg-gray-800/50 rounded-full transition-colors shrink-0"
           >
             {isExpanded ? (
               <ChevronUp className="h-4 w-4" />
@@ -108,8 +120,6 @@ export function TaskCard({ task, currentHour }: TaskCardProps) {
             )}
           </button>
         </div>
-
-        <Progress value={progress} className="h-1" />
 
         {isExpanded && (
           <SubtaskList 
