@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import { Task } from '@/types/task.types';
 import { TaskCard } from './TaskCard';
@@ -8,7 +7,7 @@ import { CheckInOutDialog } from './CheckInOutDialog';
 import { TimelineRuler } from './timeline/TimelineRuler';
 import { ScrollButtons } from './timeline/ScrollButtons';
 import { TimeIndicator } from './timeline/TimeIndicator';
-import { RoutineIndicator } from './timeline/RoutineIndicator';
+import { RoutineCard } from './timeline/RoutineCard';
 
 export function TimelineColumn({ tasks }: { tasks: Task[] }) {
   const { currentTime, timelineRef, getCurrentWindow } = useTimeWindow();
@@ -30,6 +29,25 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
   const { windowStart, windowEnd } = getCurrentWindow();
   const currentHour = currentTime.getHours();
   const currentMinute = currentTime.getMinutes();
+
+  // Test task for SISO Agency App Dev
+  const testTask: Task = {
+    id: 'test-task',
+    title: 'SISO Agency App Development',
+    description: 'Work on core features and improvements',
+    status: 'in_progress',
+    priority: 'high',
+    category: 'siso_app_dev',
+    created_at: new Date().toISOString(),
+    start_time: (() => {
+      const time = new Date(morningCheckInTime);
+      time.setHours(time.getHours() + 1); // Set 1 hour after morning check-in
+      return time.toISOString();
+    })(),
+    duration: 60 // 1 hour duration
+  };
+
+  const allTasks = [...tasks, testTask];
 
   const HOUR_HEIGHT = 80;
   const PIXELS_PER_MINUTE = HOUR_HEIGHT / 60;
@@ -80,33 +98,35 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
       >
-        <TimeIndicator currentTime={currentTime} position={timePosition} />
+        <TimeIndicator currentTime={currentTime} position={currentHour * 80 + (currentMinute / 60) * 80} />
         
-        <RoutineIndicator
-          type="morning"
-          position={checkInPosition}
-          status={checkInStatus}
-          shouldShow={shouldShowMorningCheckIn()}
-          onClick={() => setCheckInDialogOpen(true)}
-        />
+        {shouldShowMorningCheckIn() && (
+          <RoutineCard
+            type="morning"
+            time={morningCheckInTime}
+            status={checkInStatus}
+            onClick={() => setCheckInDialogOpen(true)}
+          />
+        )}
         
-        <RoutineIndicator
-          type="evening"
-          position={checkOutPosition}
-          status={checkOutStatus}
-          shouldShow={shouldShowEveningCheckOut()}
-          onClick={() => setCheckOutDialogOpen(true)}
-        />
+        {shouldShowEveningCheckOut() && (
+          <RoutineCard
+            type="evening"
+            time={eveningCheckOutTime}
+            status={checkOutStatus}
+            onClick={() => setCheckOutDialogOpen(true)}
+          />
+        )}
 
         <div 
           className="absolute left-0 right-0 bg-purple-50/5 border-y border-purple-500/20"
           style={{
-            top: `${windowStart * HOUR_HEIGHT}px`,
-            height: `${(windowEnd - windowStart) * HOUR_HEIGHT}px`,
+            top: `${windowStart * 80}px`,
+            height: `${(windowEnd - windowStart) * 80}px`,
           }}
         />
 
-        {tasks.map((task) => (
+        {allTasks.map((task) => (
           <TaskCard 
             key={task.id} 
             task={task}
