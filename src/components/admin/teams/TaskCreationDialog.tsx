@@ -126,7 +126,7 @@ export function TaskCreationDialog({ isOpen, onClose, initialDate, initialHour }
       status: 'pending',
       start_time: taskStartTime?.toISOString(),
       duration: data.duration ? parseInt(data.duration) : 60,
-      created_at: new Date().toISOString()
+      // Removed created_at as it's automatically handled by the API
     }, {
       onSuccess: () => {
         toast({
