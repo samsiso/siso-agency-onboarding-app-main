@@ -73,6 +73,8 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
         style={{
           height: '600px',
           scrollBehavior: 'smooth',
+          overscrollBehavior: 'contain',
+          WebkitOverflowScrolling: 'touch'
         }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
