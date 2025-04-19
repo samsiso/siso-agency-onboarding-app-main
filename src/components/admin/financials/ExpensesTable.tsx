@@ -74,16 +74,7 @@ export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }
     }
   };
 
-  // Handle saving the current view
-  const handleSaveView = (name: string) => {
-    const currentState = {
-      filters: { searchQuery },
-      columns: columns
-    };
-    saveView(name, currentState);
-  };
-
-  // Apply a saved view
+  // Handle applying a saved view
   const handleApplyView = (view: SavedView) => {
     selectView(view);
     if (view.filters) {
@@ -102,7 +93,7 @@ export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }
         columns={columns}
         onColumnVisibilityChange={updateColumnVisibility}
         savedViews={views}
-        onViewSelect={selectView}
+        onViewSelect={handleApplyView}
         onViewSave={(name) => saveView(name, {
           filters: { searchQuery },
           columns

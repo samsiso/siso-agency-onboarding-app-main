@@ -30,7 +30,17 @@ export function useTableViews(tableName: string) {
       .eq('user_id', user.id);
 
     if (!error && data) {
-      setViews(data as SavedView[]);
+      // Convert data from database format to our SavedView format
+      const formattedViews: SavedView[] = data.map(item => ({
+        id: item.id,
+        name: item.name,
+        filters: item.filters as SavedView['filters'],
+        columns: item.columns as unknown as TableColumn[],
+        user_id: item.user_id,
+        table_name: item.table_name
+      }));
+      
+      setViews(formattedViews);
     } else {
       console.error("Error loading views:", error);
     }
@@ -41,20 +51,31 @@ export function useTableViews(tableName: string) {
     if (!user) return false;
 
     try {
+      // Convert TableColumn[] to JSON compatible format for database storage
       const { data, error } = await supabase
         .from('table_views')
-        .insert([{
+        .insert({
           name,
           table_name: tableName,
           user_id: user.id,
           filters: state.filters,
-          columns: state.columns
-        }])
+          columns: state.columns as unknown as any
+        })
         .select()
         .single();
 
       if (!error && data) {
-        setViews([...views, data as SavedView]);
+        // Convert the returned data back to our SavedView format
+        const newView: SavedView = {
+          id: data.id,
+          name: data.name,
+          filters: data.filters as SavedView['filters'],
+          columns: data.columns as unknown as TableColumn[],
+          user_id: data.user_id,
+          table_name: data.table_name
+        };
+        
+        setViews([...views, newView]);
         return true;
       } else {
         console.error("Error saving view:", error);
