@@ -12,7 +12,7 @@ const sampleExpenses = [
     date: "2024-01-05",
     category: "Utilities",
     vendor: "Virgin Media",
-    type: "expense"
+    type: "expense" as const
   },
   {
     description: "Notion Subscription",
@@ -20,7 +20,7 @@ const sampleExpenses = [
     date: "2024-01-11",
     category: "Services",
     vendor: "Notion",
-    type: "expense"
+    type: "expense" as const
   },
   {
     description: "Google Play Store",
@@ -28,7 +28,7 @@ const sampleExpenses = [
     date: "2024-01-12",
     category: "Services",
     vendor: "Google",
-    type: "expense"
+    type: "expense" as const
   },
   {
     description: "OpenAI Subscription",
@@ -36,7 +36,7 @@ const sampleExpenses = [
     date: "2024-01-12",
     category: "Services",
     vendor: "OpenAI",
-    type: "expense"
+    type: "expense" as const
   },
   {
     description: "Airtable Subscription",
@@ -44,7 +44,7 @@ const sampleExpenses = [
     date: "2024-01-13",
     category: "Services",
     vendor: "Airtable",
-    type: "expense"
+    type: "expense" as const
   },
   {
     description: "Midjourney Subscription",
@@ -52,7 +52,7 @@ const sampleExpenses = [
     date: "2024-01-27",
     category: "Services",
     vendor: "Midjourney",
-    type: "expense"
+    type: "expense" as const
   },
   {
     description: "FlutterFlow Subscription",
@@ -60,7 +60,7 @@ const sampleExpenses = [
     date: "2024-01-31",
     category: "Services",
     vendor: "FlutterFlow",
-    type: "expense"
+    type: "expense" as const
   },
   {
     description: "Google Services",
@@ -68,7 +68,7 @@ const sampleExpenses = [
     date: "2024-02-13",
     category: "Services",
     vendor: "Google",
-    type: "expense"
+    type: "expense" as const
   },
   {
     description: "Notion Additional Services",
@@ -76,7 +76,7 @@ const sampleExpenses = [
     date: "2024-02-24",
     category: "Services",
     vendor: "Notion",
-    type: "expense"
+    type: "expense" as const
   },
   {
     description: "TradingView Subscription",
@@ -84,7 +84,7 @@ const sampleExpenses = [
     date: "2024-02-28",
     category: "Services",
     vendor: "TradingView",
-    type: "expense"
+    type: "expense" as const
   }
 ];
 
