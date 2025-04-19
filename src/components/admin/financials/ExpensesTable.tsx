@@ -1,6 +1,6 @@
 
 import { Table, TableBody, TableHeader } from "@/components/ui/table";
-import { FinancialTransaction, deleteTransaction } from "@/utils/financial";
+import { deleteTransaction } from "@/utils/financial";
 import { ExpenseDetailsDialog } from "./ExpenseDetailsDialog";
 import { useExpensesSort } from "@/hooks/useExpensesSort";
 import { useTableColumns } from "@/hooks/useTableColumns";
@@ -11,13 +11,7 @@ import { ExpensesTableBody } from "./expense/ExpensesTableBody";
 import { ExpensesTableLoading } from "./expense/ExpensesTableLoading";
 import { ExpensesToolbar } from "./table/ExpensesToolbar";
 
-interface ExpensesTableProps {
-  expenses: FinancialTransaction[];
-  isLoading?: boolean;
-  onDataChange?: () => void;
-}
-
-export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }: ExpensesTableProps) {
+export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }) {
   // Define the initial columns configuration
   const initialColumns = [
     { key: "description", label: "Expense Name", visible: true },
@@ -39,6 +33,13 @@ export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }
     setViewDetailsId, 
     filteredExpenses 
   } = useExpensesTableData(sortedExpenses);
+
+  // Added handleApplyView function to resolve the undefined error
+  const handleApplyView = (view) => {
+    // Set search query and column visibility based on the selected view
+    setSearchQuery(view.filters?.searchQuery || '');
+    selectView(view);
+  };
 
   // Get the expense being viewed in the details dialog
   const expenseDetails = viewDetailsId 
