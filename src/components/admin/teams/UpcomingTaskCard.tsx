@@ -9,6 +9,7 @@ import { useTaskDragDrop } from '@/hooks/useTaskDragDrop';
 import { TaskDetailDrawer } from './TaskDetailDrawer';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
+import { Progress } from '@/components/ui/progress';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,6 +25,12 @@ interface UpcomingTaskCardProps {
 export function UpcomingTaskCard({ task, onDragSuccess }: UpcomingTaskCardProps) {
   const { handleDragStart, handleDragEnd } = useTaskDragDrop();
   const [showDetailDrawer, setShowDetailDrawer] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  
+  // Calculate progress (this is a mock calculation - you might want to implement real progress tracking)
+  const progress = task.status === 'completed' ? 100 : 
+                  task.status === 'in_progress' ? 60 : 
+                  0;
   
   // Generate a lighter background color based on priority
   const getPriorityBackground = () => {
@@ -36,6 +43,7 @@ export function UpcomingTaskCard({ task, onDragSuccess }: UpcomingTaskCardProps)
   };
 
   const handleDragStartWithCallback = (e: React.DragEvent) => {
+    e.stopPropagation(); // Prevent card click when starting drag
     handleDragStart(e, task);
   };
 
@@ -45,6 +53,10 @@ export function UpcomingTaskCard({ task, onDragSuccess }: UpcomingTaskCardProps)
       onDragSuccess(task);
     }
   };
+
+  const handleCardClick = () => {
+    setShowDetailDrawer(true);
+  };
   
   return (
     <>
@@ -52,10 +64,14 @@ export function UpcomingTaskCard({ task, onDragSuccess }: UpcomingTaskCardProps)
         draggable
         onDragStart={handleDragStartWithCallback}
         onDragEnd={handleDragEndWithCallback}
+        onClick={handleCardClick}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
         className={cn(
-          "p-4 cursor-grab active:cursor-grabbing transition-all duration-200",
+          "p-4 cursor-pointer transition-all duration-200",
           "border shadow-sm hover:shadow-md w-full",
           "hover:border-purple-300 dark:hover:border-purple-700",
+          "active:scale-[0.98]",
           getPriorityBackground()
         )}
       >
@@ -81,11 +97,32 @@ export function UpcomingTaskCard({ task, onDragSuccess }: UpcomingTaskCardProps)
                   {task.description}
                 </p>
               )}
+
+              <div className="mt-2 space-y-2">
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>Progress</span>
+                  <span>{progress}%</span>
+                </div>
+                <Progress 
+                  value={progress} 
+                  className="h-1.5"
+                  indicatorClassName={cn(
+                    task.status === 'completed' ? 'bg-green-500' :
+                    task.status === 'in_progress' ? 'bg-purple-500' :
+                    'bg-slate-500'
+                  )}
+                />
+              </div>
             </div>
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 flex-shrink-0">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-7 w-7 p-0 flex-shrink-0"
+                  onClick={(e) => e.stopPropagation()} // Prevent card click when opening menu
+                >
                   <span className="sr-only">Open menu</span>
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
@@ -95,7 +132,8 @@ export function UpcomingTaskCard({ task, onDragSuccess }: UpcomingTaskCardProps)
                   View Details
                 </DropdownMenuItem>
                 <DropdownMenuItem 
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     if (onDragSuccess) onDragSuccess(task);
                   }}
                 >
@@ -105,12 +143,19 @@ export function UpcomingTaskCard({ task, onDragSuccess }: UpcomingTaskCardProps)
             </DropdownMenu>
           </div>
           
-          <div className="flex items-center justify-between border-t pt-2">
+          <div className={cn(
+            "flex items-center justify-between border-t pt-2",
+            "opacity-0 transition-opacity duration-200",
+            isHovered && "opacity-100"
+          )}>
             <Button 
               size="sm" 
               variant="outline"
               className="h-7 text-xs"
-              onClick={() => setShowDetailDrawer(true)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowDetailDrawer(true);
+              }}
             >
               View Details
             </Button>
