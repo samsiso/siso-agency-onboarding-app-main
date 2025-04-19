@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { Task } from '@/types/task.types';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter } from '@/components/ui/drawer';
-import { Separator } from '@/components/ui/separator';
+import { Drawer, DrawerContent, DrawerFooter } from '@/components/ui/drawer';
 import { useTaskOperations } from '@/hooks/useTaskOperations';
 import { useToast } from '@/hooks/use-toast';
-import { SubtaskList } from '../subtasks/SubtaskList';
-import { Plus } from 'lucide-react';
 import { TaskContent } from './TaskContent';
 import { TaskMetadata } from './TaskMetadata';
 import { TaskActions } from './TaskActions';
+import { TaskDetailHeader } from './TaskDetailHeader';
+import { SubtasksSection } from './SubtasksSection';
+import { useSubtasks } from '@/hooks/useSubtasks';
 import { format } from 'date-fns';
 
 interface TaskDetailDrawerProps {
@@ -25,13 +25,20 @@ export function TaskDetailDrawer({ task, isOpen, onClose }: TaskDetailDrawerProp
   const { useUpdateTask } = useTaskOperations();
   const { mutate: updateTask } = useUpdateTask();
   const { toast } = useToast();
-  
-  const [subtasks, setSubtasks([
+
+  const initialSubtasks = [
     { id: '1', title: 'Research requirements', completed: true },
     { id: '2', title: 'Create mockups', completed: false },
     { id: '3', title: 'Implementation', completed: false },
     { id: '4', title: 'Testing', completed: false },
-  ]);
+  ];
+
+  const { 
+    subtasks, 
+    handleSubtaskToggle, 
+    handleAddSubtask, 
+    handleDeleteSubtask 
+  } = useSubtasks(initialSubtasks);
 
   const handleSaveChanges = () => {
     if (!task) return;
@@ -121,36 +128,15 @@ export function TaskDetailDrawer({ task, isOpen, onClose }: TaskDetailDrawerProp
     );
   };
 
-  const handleSubtaskToggle = (id: string) => {
-    setSubtasks(subtasks.map(st => 
-      st.id === id ? { ...st, completed: !st.completed } : st
-    ));
-  };
-
-  const handleAddSubtask = () => {
-    const newId = String(subtasks.length + 1);
-    setSubtasks([...subtasks, { id: newId, title: 'New subtask', completed: false }]);
-  };
-
-  const handleDeleteSubtask = (id: string) => {
-    setSubtasks(subtasks.filter(st => st.id !== id));
-  };
-
   if (!task) return null;
 
-  const completedSubtasks = subtasks.filter(st => st.completed).length;
-  const progress = subtasks.length > 0 ? (completedSubtasks / subtasks.length) * 100 : 0;
-  
   return (
     <Drawer open={isOpen} onOpenChange={onClose}>
       <DrawerContent className="max-h-[90vh]">
         <div className="max-w-md mx-auto w-full">
-          <DrawerHeader>
-            <DrawerTitle className="text-center text-xl">Task Details</DrawerTitle>
-          </DrawerHeader>
+          <TaskDetailHeader />
           
           <div className="px-4 py-2 space-y-5 overflow-y-auto max-h-[calc(90vh-140px)]">
-            {/* Title and description section */}
             <TaskContent
               task={task}
               isEditing={isEditing}
@@ -161,31 +147,14 @@ export function TaskDetailDrawer({ task, isOpen, onClose }: TaskDetailDrawerProp
               onDescriptionChange={setEditedDescription}
             />
                 
-            <Separator />
-            
-            {/* Status and metadata section */}
             <TaskMetadata task={task} />
             
-            <Separator />
-            
-            {/* Subtasks section */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium">Subtasks ({completedSubtasks}/{subtasks.length})</h3>
-                <button
-                  onClick={handleAddSubtask}
-                  className="p-1 hover:bg-accent rounded-full"
-                >
-                  <Plus className="h-4 w-4 text-muted-foreground" />
-                </button>
-              </div>
-              
-              <SubtaskList 
-                subtasks={subtasks}
-                onToggle={handleSubtaskToggle}
-                onDelete={handleDeleteSubtask}
-              />
-            </div>
+            <SubtasksSection 
+              subtasks={subtasks}
+              onToggle={handleSubtaskToggle}
+              onDelete={handleDeleteSubtask}
+              onAdd={handleAddSubtask}
+            />
           </div>
           
           <DrawerFooter className="pt-2">
