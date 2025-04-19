@@ -5,7 +5,6 @@ import { TimelineColumn } from './TimelineColumn';
 import { Task } from '@/types/task.types';
 import { useTasks } from '@/hooks/useTasks';
 import { format } from 'date-fns';
-import { TaskCard } from './TaskCard';
 import { motion } from 'framer-motion';
 import { Clock, ListTodo, RefreshCcw, Calendar, ArrowUpRight } from 'lucide-react';
 import { useDayPeriod } from '@/hooks/useDayPeriod';
@@ -45,6 +44,28 @@ export function TimelineTaskView({ memberId }: { memberId?: string }) {
   // Format times
   const morningCheckInTimeStr = format(morningCheckInTime, 'h:mm a');
   const eveningCheckOutTimeStr = format(eveningCheckOutTime, 'h:mm a');
+
+  // Test task for SISO Agency App Dev
+  const testTask: Task = {
+    id: 'test-task',
+    title: 'SISO Agency App Development',
+    description: 'Work on core features and improvements',
+    status: 'in_progress',
+    priority: 'high',
+    category: 'siso_app_dev',
+    created_at: new Date().toISOString(),
+    start_time: (() => {
+      const time = new Date();
+      time.setHours(10, 0, 0, 0);
+      return time.toISOString();
+    })(),
+    duration: 60
+  };
+
+  const allTasks = [...tasks, testTask].sort((a, b) => {
+    if (!a.start_time || !b.start_time) return 0;
+    return new Date(a.start_time).getTime() - new Date(b.start_time).getTime();
+  });
 
   return (
     <div className="space-y-6">
@@ -119,7 +140,11 @@ export function TimelineTaskView({ memberId }: { memberId?: string }) {
           </p>
           <div className="max-h-[600px] overflow-y-auto hide-scrollbar space-y-4">
             {upcomingTasks.map(task => (
-              <TaskCard key={task.id} task={task} />
+              <TaskCard 
+                key={task.id} 
+                task={task}
+                allTasks={upcomingTasks}
+              />
             ))}
           </div>
         </Card>

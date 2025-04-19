@@ -1,8 +1,9 @@
+
 import React, { useState } from 'react';
 import { Task } from '@/types/task.types';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Users, ChevronDown, ChevronUp, RefreshCcw } from 'lucide-react';
+import { Clock, Users, ChevronDown, ChevronUp, RefreshCcw, GripVertical } from 'lucide-react';
 import { format } from 'date-fns';
 import { useTaskDragDrop } from '@/hooks/useTaskDragDrop';
 import { cn } from '@/lib/utils';
@@ -37,6 +38,7 @@ export function TaskCard({ task, currentHour, allTasks }: TaskCardProps) {
   const isRolledOver = !!task.rolled_over_from;
   const completedSubtasks = subtasks.filter(st => st.completed).length;
   const progress = (completedSubtasks / subtasks.length) * 100;
+  const taskDuration = task.duration || 60; // Use task.duration with a fallback to 60
 
   return (
     <Card 
@@ -82,7 +84,7 @@ export function TaskCard({ task, currentHour, allTasks }: TaskCardProps) {
                 <div className="flex items-center gap-1">
                   <Clock className="h-4 w-4" />
                   {format(startTime, 'h:mm a')}
-                  {duration && <span className="text-xs ml-1">· {duration}m</span>}
+                  {taskDuration && <span className="text-xs ml-1">· {taskDuration}m</span>}
                 </div>
               )}
               
