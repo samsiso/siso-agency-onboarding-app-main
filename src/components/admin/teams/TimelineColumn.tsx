@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Task } from '@/types/task.types';
 import { TaskCard } from './TaskCard';
@@ -14,9 +13,11 @@ import { TimelineGrid } from './timeline/TimelineGrid';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useTaskDragDrop } from '@/hooks/useTaskDragDrop';
 
 export function TimelineColumn({ tasks }: { tasks: Task[] }) {
   const { currentTime, timelineRef, getCurrentWindow, scrollToCurrentTime } = useTimeWindow();
+  const { isDragging } = useTaskDragDrop();
   const { 
     morningCheckInTime, 
     eveningCheckOutTime,
@@ -65,25 +66,32 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
         >
           <div 
             className="relative min-h-[2400px]"
-            style={{ paddingLeft: '4rem' }} // Space for the ruler
+            style={{ paddingLeft: '4rem' }}
           >
-            {/* Sticky ruler container */}
             <div className="absolute left-0 top-0 bottom-0 w-16 bg-background/80 backdrop-blur z-10">
               <TimelineRuler 
-                currentHour={currentHour} 
+                currentHour={currentTime.getHours()} 
                 hourHeight={100}
                 onTimeSlotClick={handleTimeSlotClick}
               />
             </div>
 
-            {/* Main content area */}
             <div className="relative pl-4 pr-4">
               <TimelineGrid hourHeight={100} />
               
               <TimeIndicator 
                 currentTime={currentTime} 
-                position={currentHour * 100 + (currentMinute / 60) * 100} 
+                position={currentTime.getHours() * 100 + (currentTime.getMinutes() / 60) * 100} 
               />
+              
+              {/* Add drag guide line */}
+              {isDragging && (
+                <div
+                  id="dragGuideLine"
+                  className="absolute left-0 right-0 h-0.5 bg-purple-500/50 pointer-events-none hidden"
+                  style={{ zIndex: 20 }}
+                />
+              )}
               
               {shouldShowMorningCheckIn() && (
                 <RoutineCard

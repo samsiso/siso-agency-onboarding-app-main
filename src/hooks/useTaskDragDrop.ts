@@ -30,8 +30,11 @@ export function useTaskDragDrop() {
     e.dataTransfer.effectAllowed = 'move';
     setIsDragging(true);
     
-    // Add visual feedback
+    // Store the original horizontal position
     if (e.currentTarget instanceof HTMLElement) {
+      e.dataTransfer.setData('originalLeft', e.currentTarget.style.left);
+      
+      // Create a drag ghost that matches the card's appearance
       const dragImage = e.currentTarget.cloneNode(true) as HTMLElement;
       dragImage.style.opacity = '0.7';
       dragImage.style.position = 'absolute';
@@ -50,10 +53,11 @@ export function useTaskDragDrop() {
   const handleDrop = async (e: React.DragEvent, offsetY: number) => {
     e.preventDefault();
     const taskId = e.dataTransfer.getData('taskId');
+    const originalLeft = e.dataTransfer.getData('originalLeft');
+    
     if (!taskId) return;
     
     try {
-      // Snap to 5-minute intervals for more precise positioning
       const newStartTime = calculateTimeFromPosition(offsetY);
       
       await updateTaskMutation.mutateAsync({
@@ -62,13 +66,13 @@ export function useTaskDragDrop() {
       });
 
       toast({
-        title: "Task scheduled",
-        description: `Task has been scheduled for ${newStartTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}.`
+        title: "Task rescheduled",
+        description: `Task moved to ${newStartTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
       });
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Error scheduling task",
+        title: "Error rescheduling task",
         description: error instanceof Error ? error.message : "Unknown error occurred"
       });
     }
@@ -77,6 +81,18 @@ export function useTaskDragDrop() {
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
+    
+    // Add vertical guide line at drag position
+    const timelineEl = e.currentTarget;
+    if (timelineEl instanceof HTMLElement) {
+      const guideLineEl = document.getElementById('dragGuideLine');
+      if (guideLineEl) {
+        const rect = timelineEl.getBoundingClientRect();
+        const y = e.clientY - rect.top;
+        guideLineEl.style.top = `${y}px`;
+        guideLineEl.style.display = 'block';
+      }
+    }
   };
 
   return {
@@ -84,6 +100,7 @@ export function useTaskDragDrop() {
     handleDragStart,
     handleDragEnd,
     handleDrop,
-    handleDragOver
+    handleDragOver,
+    HOUR_HEIGHT
   };
 }
