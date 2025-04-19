@@ -53,7 +53,7 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
   };
 
   return (
-    <div className="relative min-h-[600px] flex">
+    <div className="relative min-h-[calc(100vh-300px)] flex">
       <TimelineRuler 
         currentHour={currentHour} 
         hourHeight={100}
@@ -68,11 +68,14 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
         
         <ScrollArea 
           ref={timelineRef}
-          className="h-[calc(100vh-220px)]"
+          className="h-[calc(100vh-300px)]"
         >
           <div className="relative px-1 sm:px-2 min-h-[2400px]">
             <TimelineGrid hourHeight={100} />
-            <TimeIndicator currentTime={currentTime} position={currentHour * 100 + (currentMinute / 60) * 100} />
+            <TimeIndicator 
+              currentTime={currentTime} 
+              position={currentHour * 100 + (currentMinute / 60) * 100} 
+            />
             
             {shouldShowMorningCheckIn() && (
               <RoutineCard
