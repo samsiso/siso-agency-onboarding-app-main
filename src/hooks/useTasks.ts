@@ -1,6 +1,7 @@
+
 import { useQuery } from '@tanstack/react-query';
-import { Task, TaskCategory, TaskStats, TaskPriority } from '@/types/task.types';
-import { fetchTasks, fetchTaskStats } from '@/api/taskApi';
+import { Task, TaskCategory, TaskStats, TaskPriority, TaskStatus } from '@/types/task.types';
+import { fetchTaskStats } from '@/api/taskApi';
 import { useTaskOperations } from './useTaskOperations';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -13,7 +14,10 @@ export function useTasks() {
         const query = supabase
           .from('tasks')
           .select('*')
-          .eq('category', category);
+          
+        if (category) {
+          query.eq('category', category);
+        }
 
         if (userId) {
           query.eq('assigned_to', userId);
@@ -26,8 +30,17 @@ export function useTasks() {
           throw error;
         }
 
+        // Map the data to ensure types are correct
+        const mappedData = (data || []).map(item => ({
+          ...item,
+          // Ensure status is a valid TaskStatus
+          status: validateTaskStatus(item.status),
+          // Ensure priority is a valid TaskPriority
+          priority: validateTaskPriority(item.priority)
+        } as Task));
+
         // Sort tasks by priority
-        return (data || []).sort((a, b) => {
+        return mappedData.sort((a, b) => {
           const priorityOrder = { urgent: 0, high: 1, medium: 2, low: 3 };
           return (priorityOrder[a.priority] || 99) - (priorityOrder[b.priority] || 99);
         });
@@ -38,6 +51,18 @@ export function useTasks() {
         }
       }
     });
+  };
+
+  // Helper function to validate task status
+  const validateTaskStatus = (status: any): TaskStatus => {
+    const validStatuses: TaskStatus[] = ['pending', 'in_progress', 'completed'];
+    return validStatuses.includes(status) ? status : 'pending';
+  };
+
+  // Helper function to validate task priority
+  const validateTaskPriority = (priority: any): TaskPriority => {
+    const validPriorities: TaskPriority[] = ['low', 'medium', 'high', 'urgent'];
+    return validPriorities.includes(priority) ? priority : 'medium';
   };
 
   const useTaskStatsQuery = (userId?: string) => {
