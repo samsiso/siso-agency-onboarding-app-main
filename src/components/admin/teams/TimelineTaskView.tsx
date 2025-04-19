@@ -145,8 +145,8 @@ export function TimelineTaskView({ memberId }: { memberId?: string }) {
               <div className="animate-pulse text-muted-foreground">Loading tasks...</div>
             </div>
           ) : (
-            <ScrollArea className="h-[300px] sm:h-[520px]">
-              <div className="space-y-3 pr-4 pb-2">
+            <ScrollArea className="h-[300px] sm:h-[520px] w-full">
+              <div className="space-y-3 pr-4 pb-2 pl-1">
                 {upcomingTasks.length > 0 ? (
                   upcomingTasks.map(task => (
                     <UpcomingTaskCard 

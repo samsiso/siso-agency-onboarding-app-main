@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Task } from '@/types/task.types';
@@ -53,15 +54,15 @@ export function UpcomingTaskCard({ task, onDragSuccess }: UpcomingTaskCardProps)
         onDragEnd={handleDragEndWithCallback}
         className={cn(
           "p-3 cursor-grab active:cursor-grabbing transition-all duration-200",
-          "border shadow-sm hover:shadow-md",
+          "border shadow-sm hover:shadow-md w-full",
           "hover:border-purple-300 dark:hover:border-purple-700",
           getPriorityBackground()
         )}
       >
-        <div className="flex flex-col gap-3">
-          <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col gap-2">
+          <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
-              <div className="flex flex-wrap items-center gap-2 mb-2">
+              <div className="flex flex-wrap items-center gap-2 mb-1.5">
                 <PriorityBadge priority={task.priority} />
                 {task.due_date && (
                   <div className="flex items-center text-xs text-muted-foreground gap-1">
@@ -71,12 +72,12 @@ export function UpcomingTaskCard({ task, onDragSuccess }: UpcomingTaskCardProps)
                 )}
               </div>
               
-              <h3 className="font-medium text-sm sm:text-base mb-2 line-clamp-2">
+              <h3 className="font-medium text-sm sm:text-base mb-1.5 line-clamp-2">
                 {task.title}
               </h3>
               
               {task.description && (
-                <p className="text-xs text-muted-foreground line-clamp-2 mb-3">
+                <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
                   {task.description}
                 </p>
               )}
@@ -84,7 +85,7 @@ export function UpcomingTaskCard({ task, onDragSuccess }: UpcomingTaskCardProps)
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 -mt-1">
                   <span className="sr-only">Open menu</span>
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
@@ -104,7 +105,7 @@ export function UpcomingTaskCard({ task, onDragSuccess }: UpcomingTaskCardProps)
             </DropdownMenu>
           </div>
           
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between pt-1">
             <Button 
               size="sm" 
               variant="outline"
