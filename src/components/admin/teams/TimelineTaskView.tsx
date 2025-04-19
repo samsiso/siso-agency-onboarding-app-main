@@ -12,15 +12,19 @@ import { Badge } from '@/components/ui/badge';
 import { useCheckInOut } from '@/hooks/useCheckInOut';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { TaskCard } from './TaskCard';
+import { UpcomingTaskCard } from './UpcomingTaskCard';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { useToast } from '@/hooks/use-toast';
 
 export function TimelineTaskView({ memberId }: { memberId?: string }) {
   const { useTaskQuery } = useTasks();
-  const { data: dailyTasks = [] } = useTaskQuery('daily');
-  const { data: sisoTasks = [] } = useTaskQuery('siso_app_dev');
+  const { data: dailyTasks = [], isLoading: isDailyTasksLoading } = useTaskQuery('daily');
+  const { data: sisoTasks = [], isLoading: isSisoTasksLoading } = useTaskQuery('siso_app_dev');
   const { greeting, icon: DayPeriodIcon, gradientClass } = useDayPeriod();
   const { morningCheckInTime, eveningCheckOutTime } = useCheckInOut();
   const [rolledOverTasks, setRolledOverTasks] = useState<Task[]>([]);
   const isMobile = useIsMobile();
+  const { toast } = useToast();
 
   const todaysTasks = dailyTasks.filter(task => {
     if (!task.start_time) return false;
@@ -29,12 +33,13 @@ export function TimelineTaskView({ memberId }: { memberId?: string }) {
   });
 
   // Filter tasks that are not completed and don't have a start time
+  // Apply proper sorting by priority (high -> medium -> low)
   const upcomingTasks = sisoTasks.filter(task => 
     task.status !== 'completed' && !task.start_time
   ).sort((a, b) => {
     // Sort by priority (high -> medium -> low)
-    const priorityOrder = { high: 0, medium: 1, low: 2 };
-    return (priorityOrder[a.priority] || 0) - (priorityOrder[b.priority] || 0);
+    const priorityOrder = { urgent: 0, high: 1, medium: 2, low: 3 };
+    return (priorityOrder[a.priority] || 99) - (priorityOrder[b.priority] || 99);
   });
 
   // Determine rolled-over tasks
@@ -42,6 +47,13 @@ export function TimelineTaskView({ memberId }: { memberId?: string }) {
     const rolledOver = dailyTasks.filter(task => !!task.rolled_over_from);
     setRolledOverTasks(rolledOver);
   }, [dailyTasks]);
+
+  const handleDragTask = (task: Task) => {
+    toast({
+      title: "Task scheduled",
+      description: `"${task.title}" has been added to your schedule.`,
+    });
+  };
 
   const recurringTasks = dailyTasks.filter(task => task.recurring_type && task.recurring_type !== 'none');
   const today = new Date();
@@ -120,25 +132,37 @@ export function TimelineTaskView({ memberId }: { memberId?: string }) {
         </Card>
         
         <Card className="p-3 sm:p-4">
-          <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-4">Upcoming Tasks</h2>
+          <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-4 flex items-center gap-2">
+            <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-purple-500" />
+            Upcoming Tasks
+          </h2>
           <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">
             SISO App Development Tasks - Drag tasks to the timeline to schedule them
           </p>
-          <div className="max-h-[300px] sm:max-h-[600px] overflow-y-auto hide-scrollbar space-y-3 sm:space-y-4">
-            {upcomingTasks.length > 0 ? (
-              upcomingTasks.map(task => (
-                <TaskCard 
-                  key={task.id} 
-                  task={task}
-                  allTasks={upcomingTasks}
-                />
-              ))
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                No upcoming SISO App tasks
+          
+          {isSisoTasksLoading ? (
+            <div className="flex items-center justify-center h-40">
+              <div className="animate-pulse text-muted-foreground">Loading tasks...</div>
+            </div>
+          ) : (
+            <ScrollArea className="h-[300px] sm:h-[520px] pr-4">
+              <div className="space-y-3 pb-2">
+                {upcomingTasks.length > 0 ? (
+                  upcomingTasks.map(task => (
+                    <UpcomingTaskCard 
+                      key={task.id} 
+                      task={task}
+                      onDragSuccess={handleDragTask}
+                    />
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No upcoming SISO App tasks
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </ScrollArea>
+          )}
         </Card>
       </div>
     </div>
