@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Task } from '@/types/task.types';
 import { TaskCard } from './TaskCard';
@@ -15,6 +14,8 @@ import { TimelineHeader } from './timeline/TimelineHeader';
 import { TimelineGrid } from './timeline/TimelineGrid';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+
+const HOUR_HEIGHT = 100; // Standardized height
 
 export function TimelineColumn({ tasks }: { tasks: Task[] }) {
   const { currentTime, timelineRef, getCurrentWindow } = useTimeWindow();
@@ -43,9 +44,7 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
     return new Date(a.start_time).getTime() - new Date(b.start_time).getTime();
   });
 
-  const HOUR_HEIGHT = 100; // Fixed height for consistency
-  const PIXELS_PER_MINUTE = HOUR_HEIGHT / 60;
-  const timePosition = (currentHour * HOUR_HEIGHT) + (currentMinute * PIXELS_PER_MINUTE);
+  const timePosition = (currentHour * HOUR_HEIGHT) + (currentMinute * (HOUR_HEIGHT / 60));
 
   const handleCreateTask = (hour?: number) => {
     setSelectedHour(hour);
@@ -63,23 +62,20 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
         currentDate={currentTime}
       />
       
-      <div className="relative flex-1 overflow-hidden">
+      <div className="relative flex-1 h-full overflow-hidden">
         <div 
           ref={timelineRef}
-          className="absolute inset-0 overflow-y-auto overflow-x-hidden"
-          style={{ height: '100%' }}
+          className="absolute inset-0 overflow-y-auto hide-scrollbar"
         >
           <div className="relative ml-12 sm:ml-16">
-            <div 
-              className="relative"
-              style={{ height: `${24 * HOUR_HEIGHT}px` }}
-            >
+            <div className="relative" style={{ height: `${24 * HOUR_HEIGHT}px` }}>
               <TimelineGrid hourHeight={HOUR_HEIGHT} />
               <TimelineRuler 
                 currentHour={currentHour} 
                 hourHeight={HOUR_HEIGHT}
                 onTimeSlotClick={handleTimeSlotClick}
               />
+              
               <TimeIndicator currentTime={currentTime} position={timePosition} />
 
               {shouldShowMorningCheckIn() && (
