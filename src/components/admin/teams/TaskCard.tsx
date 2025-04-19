@@ -1,17 +1,13 @@
+
 import React, { useState } from 'react';
 import { Task } from '@/types/task.types';
 import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Clock, Users, ChevronDown, ChevronUp, RefreshCcw, GripVertical } from 'lucide-react';
-import { format } from 'date-fns';
 import { useTaskDragDrop } from '@/hooks/useTaskDragDrop';
 import { cn } from '@/lib/utils';
-import { SubtaskList } from './SubtaskList';
 import { Progress } from '@/components/ui/progress';
 import { PriorityBadge } from './PriorityBadge';
 import { useTaskPositioning } from '@/hooks/useTaskPositioning';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { TaskDetailDrawer } from './TaskDetailDrawer';
 
 interface TaskCardProps {
@@ -41,7 +37,6 @@ export function TaskCard({ task, currentHour, allTasks }: TaskCardProps) {
   const progress = (completedSubtasks / subtasks.length) * 100;
   const isCurrentTask = startTime && currentHour === startTime.getHours();
   const isRolledOver = !!task.rolled_over_from;
-  const taskDuration = task.duration || 60; // Use task.duration with a fallback to 60
 
   const handleTaskClick = (e: React.MouseEvent) => {
     if (isMobile) {
@@ -58,7 +53,7 @@ export function TaskCard({ task, currentHour, allTasks }: TaskCardProps) {
         onDragEnd={handleDragEnd}
         onClick={handleTaskClick}
         className={cn(
-          "absolute p-2 sm:p-4 transition-all duration-200",
+          "absolute p-2 sm:p-3 transition-all duration-200",
           "hover:ring-2 hover:ring-purple-500/50 backdrop-blur-sm",
           "rounded-lg border shadow-lg touch-manipulation",
           "flex flex-col justify-between gap-2",

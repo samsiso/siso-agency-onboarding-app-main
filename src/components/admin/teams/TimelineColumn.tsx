@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Task } from '@/types/task.types';
 import { TaskCard } from './TaskCard';
@@ -70,13 +69,13 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
         onScrollDown={() => timelineRef.current?.scrollBy({ top: 80, behavior: 'smooth' })} 
       />
 
-      <div className="ml-12 sm:ml-16 relative flex-1">
+      <div className="ml-12 sm:ml-14 relative flex-1">
         <ScrollArea 
           ref={timelineRef}
           className="h-[400px] sm:h-[600px] relative"
           scrollHideDelay={0}
         >
-          <div className="relative min-h-[1440px] sm:min-h-[1920px] px-2 sm:px-4">
+          <div className="relative min-h-[1440px] sm:min-h-[1920px] px-1 sm:px-2">
             <TimeIndicator currentTime={currentTime} position={timePosition} />
             
             {shouldShowMorningCheckIn() && (

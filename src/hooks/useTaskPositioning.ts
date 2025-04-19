@@ -1,4 +1,3 @@
-
 import { Task } from '@/types/task.types';
 import { useIsMobile } from './use-mobile';
 
