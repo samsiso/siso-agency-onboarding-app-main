@@ -27,22 +27,21 @@ export function TimelineTaskView({ memberId }: TimelineTaskViewProps) {
   });
 
   return (
-    <div className="space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-      >
-        <Card className="p-3 sm:p-4">
-          {isDailyTasksLoading ? (
-            <div className="flex items-center justify-center h-40">
-              <div className="animate-pulse text-muted-foreground">Loading tasks...</div>
-            </div>
-          ) : (
-            <TimelineColumn tasks={todaysTasks} />
-          )}
-        </Card>
-      </motion.div>
-    </div>
+    <motion.div
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="h-[calc(100vh-220px)]"
+    >
+      <Card className="h-full">
+        {isDailyTasksLoading ? (
+          <div className="flex items-center justify-center h-40">
+            <div className="animate-pulse text-muted-foreground">Loading tasks...</div>
+          </div>
+        ) : (
+          <TimelineColumn tasks={todaysTasks} />
+        )}
+      </Card>
+    </motion.div>
   );
 }

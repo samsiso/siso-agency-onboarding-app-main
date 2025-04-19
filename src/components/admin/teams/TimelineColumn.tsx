@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Task } from '@/types/task.types';
 import { TaskCard } from './TaskCard';
@@ -8,13 +7,13 @@ import { CheckInOutDialog } from './CheckInOutDialog';
 import { TimelineRuler } from './timeline/TimelineRuler';
 import { TimeIndicator } from './timeline/TimeIndicator';
 import { RoutineCard } from './timeline/RoutineCard';
-import { cn } from '@/lib/utils';
 import { TaskCreationDialog } from './TaskCreationDialog';
 import { TimelineHeader } from './timeline/TimelineHeader';
 import { TimelineGrid } from './timeline/TimelineGrid';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { cn } from '@/lib/utils';
 
 export function TimelineColumn({ tasks }: { tasks: Task[] }) {
   const { currentTime, timelineRef, getCurrentWindow, scrollToCurrentTime } = useTimeWindow();
@@ -53,23 +52,20 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
   };
 
   return (
-    <div className="relative min-h-[calc(100vh-300px)] flex">
+    <div className="relative h-full flex">
       <TimelineRuler 
         currentHour={currentHour} 
         hourHeight={100}
         onTimeSlotClick={handleTimeSlotClick}
       />
       
-      <div className="ml-12 sm:ml-16 relative flex-1">
+      <div className="ml-12 sm:ml-16 relative flex-1 flex flex-col">
         <TimelineHeader 
           onCreateTask={() => handleCreateTask()}
           currentDate={currentTime}
         />
         
-        <ScrollArea 
-          ref={timelineRef}
-          className="h-[calc(100vh-300px)]"
-        >
+        <ScrollArea className="flex-1">
           <div className="relative px-1 sm:px-2 min-h-[2400px]">
             <TimelineGrid hourHeight={100} />
             <TimeIndicator 
