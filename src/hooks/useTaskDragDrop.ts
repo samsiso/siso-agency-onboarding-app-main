@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useTasks } from '@/hooks/useTasks';
 import { Task } from '@/types/task.types';
@@ -48,7 +47,7 @@ export function useTaskDragDrop() {
     
     setIsDragging(true);
 
-    // Create or show guide line
+    // Show guide line
     let guideLine = document.getElementById('dragGuideLine');
     if (!guideLine) {
       guideLine = document.createElement('div');
@@ -56,6 +55,7 @@ export function useTaskDragDrop() {
       guideLine.className = 'fixed left-0 right-0 h-0.5 bg-purple-500 pointer-events-none z-50';
       document.body.appendChild(guideLine);
     }
+    guideLine.style.display = 'block';
   };
 
   const handleDragEnd = () => {

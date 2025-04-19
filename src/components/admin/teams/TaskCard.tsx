@@ -55,9 +55,9 @@ export function TaskCard({ task, currentHour, allTasks = [] }: TaskCardProps) {
         onClick={handleTaskClick}
         data-task-id={task.id}
         className={cn(
-          "absolute p-2 sm:p-3 select-none",
+          "absolute p-2 sm:p-3 select-none pointer-events-auto",
           "hover:ring-2 hover:ring-purple-500/50 backdrop-blur-sm",
-          "rounded-lg border shadow-lg",
+          "rounded-lg border shadow-lg cursor-pointer",
           "flex flex-col justify-between gap-2",
           isCurrentTask ? 'bg-purple-500/20 border-purple-500/50' : getPriorityBackground(),
           isDragging ? 'opacity-50 ring-2 ring-purple-500' : 'opacity-100',
@@ -74,6 +74,7 @@ export function TaskCard({ task, currentHour, allTasks = [] }: TaskCardProps) {
             <div 
               data-drag-handle 
               className="cursor-grab active:cursor-grabbing p-1 -ml-1 touch-none"
+              onMouseDown={(e) => e.stopPropagation()}
             >
               <GripVertical className="h-4 w-4 text-muted-foreground/50" />
             </div>

@@ -110,7 +110,7 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
                 />
               )}
 
-              <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute inset-0">
                 {allTasks.map((task) => (
                   <TaskCard 
                     key={task.id} 
