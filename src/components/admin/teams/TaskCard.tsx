@@ -6,6 +6,7 @@ import { useTaskDragDrop } from '@/hooks/useTaskDragDrop';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 import { PriorityBadge } from './PriorityBadge';
+import { useTaskPositioning } from '@/hooks/useTaskPositioning';
 import { TaskDetailDrawer } from './task-detail/TaskDetailDrawer';
 
 interface TaskCardProps {
@@ -54,7 +55,7 @@ export function TaskCard({ task, currentHour, allTasks = [] }: TaskCardProps) {
         onDragEnd={handleDragEnd}
         onClick={handleTaskClick}
         className={cn(
-          "absolute left-4 right-4 p-2 sm:p-3 transition-all duration-200",
+          "absolute p-2 sm:p-3 transition-all duration-200",
           "hover:ring-2 hover:ring-purple-500/50 backdrop-blur-sm",
           "rounded-lg border shadow-lg touch-manipulation cursor-pointer",
           "flex flex-col justify-between gap-2 pointer-events-auto",
@@ -62,8 +63,10 @@ export function TaskCard({ task, currentHour, allTasks = [] }: TaskCardProps) {
           "z-10"
         )}
         style={{
-          top: `${rowStart * 96}px`,
-          minHeight: `${rowSpan * 96}px`
+          gridRow: `${rowStart} / span ${rowSpan}`,
+          left: '8px',
+          right: '8px',
+          minHeight: 0
         }}
       >
         <div className="space-y-2">
