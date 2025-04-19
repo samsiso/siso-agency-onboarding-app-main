@@ -6,18 +6,13 @@ import { ClientsListParams, ClientsListResponse, ClientData, TodoItem } from '@/
 export type { ClientData, ClientsListParams } from '@/types/client.types';
 
 export const useClientsList = ({
-  page = 1,
-  pageSize = 10,
   searchQuery = '',
   statusFilter = 'all',
   sortColumn = 'updated_at',
   sortDirection = 'desc'
-}: ClientsListParams = {}) => {
-  const from = (page - 1) * pageSize;
-  const to = from + pageSize - 1;
-
+}: Partial<ClientsListParams> = {}) => {
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['clients-list', page, pageSize, searchQuery, statusFilter, sortColumn, sortDirection],
+    queryKey: ['clients-list', searchQuery, statusFilter, sortColumn, sortDirection],
     queryFn: async () => {
       try {
         // Build the query
@@ -44,39 +39,32 @@ export const useClientsList = ({
         // Apply sorting
         query = query.order(sortColumn, { ascending: sortDirection === 'asc' });
         
-        // First get count
-        const countResult = await query;
-        const count = countResult.count || 0;
-        
-        // Then fetch the page of data
-        const { data, error: dataError } = await query.range(from, to);
+        // Get all data at once
+        const { data: allData, error: dataError, count } = await query;
         
         if (dataError) {
           console.error('Error fetching clients data:', dataError);
           throw dataError;
         }
         
-        if (!data || data.length === 0) {
+        if (!allData || allData.length === 0) {
           return {
             clients: [],
             totalCount: 0
           };
         }
         
-        // Process the data to get the clientData format with proper names
-        const processedData: ClientData[] = data.map(item => {
-          // Create the avatar URL from the contact name
+        // Process all data
+        const processedData: ClientData[] = allData.map(item => {
           const contactName = item.contact_name || 'Client';
           const avatarUrl = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(contactName.substring(0, 2))}`;
           
-          // Create an empty todos array as default
           const defaultTodos: TodoItem[] = [];
           
-          // Map the database item to our ClientData interface, providing default values for missing fields
           return {
             id: item.id,
             full_name: item.contact_name || 'Unknown Client',
-            email: null, // These fields don't exist in the database, so we provide default values
+            email: null,
             business_name: item.company_name || null,
             phone: null,
             avatar_url: avatarUrl,
@@ -112,16 +100,12 @@ export const useClientsList = ({
           };
         });
         
-        console.log('Processed client data:', processedData);
-        
         return {
           clients: processedData,
-          totalCount: count
+          totalCount: count || processedData.length
         };
       } catch (error: any) {
         console.error('Error in useClientsList:', error);
-        
-        // Return empty data when there's an error
         return {
           clients: [],
           totalCount: 0

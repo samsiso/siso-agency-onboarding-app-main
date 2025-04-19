@@ -17,7 +17,6 @@ export function ScrollableTable({ children, pinnedColumns, className }: Scrollab
   const [isScrolled, setIsScrolled] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(0);
 
-  // Measure the header height to properly position the sticky header shadows
   useEffect(() => {
     if (scrollContainerRef.current) {
       const headerElement = scrollContainerRef.current.querySelector('thead');
@@ -28,7 +27,6 @@ export function ScrollableTable({ children, pinnedColumns, className }: Scrollab
     }
   }, []);
 
-  // Handle scrolling without debounce for immediate feedback
   useEffect(() => {
     const handleScroll = () => {
       if (scrollContainerRef.current) {
@@ -42,7 +40,6 @@ export function ScrollableTable({ children, pinnedColumns, className }: Scrollab
     const scrollContainer = scrollContainerRef.current;
     if (scrollContainer) {
       scrollContainer.addEventListener('scroll', handleScroll);
-      // Trigger initial check
       handleScroll();
     }
 
@@ -60,14 +57,14 @@ export function ScrollableTable({ children, pinnedColumns, className }: Scrollab
       {leftShadowVisible && (
         <div 
           className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background/90 to-transparent z-10 pointer-events-none"
-          style={{ transform: 'translate3d(0,0,0)' }}
+          style={{ transform: 'translate3d(0,0,0)', willChange: 'opacity' }}
         />
       )}
 
       {rightShadowVisible && (
         <div 
           className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background/90 to-transparent z-10 pointer-events-none"
-          style={{ transform: 'translate3d(0,0,0)' }}
+          style={{ transform: 'translate3d(0,0,0)', willChange: 'opacity' }}
         />
       )}
 
@@ -76,18 +73,25 @@ export function ScrollableTable({ children, pinnedColumns, className }: Scrollab
         className={cn(
           "overflow-auto hide-scrollbar relative",
           "transition-[background-color,border-color] duration-150",
+          "overscroll-x-none scroll-smooth",
           className
         )}
         style={{
           maxWidth: '100%',
           maxHeight: 'calc(100vh - 300px)',
-          willChange: 'transform',
+          willChange: 'transform, scroll-position',
           backfaceVisibility: 'hidden',
           perspective: '1000px',
-          transform: 'translate3d(0,0,0)'
+          transform: 'translate3d(0,0,0)',
+          contain: 'content',
+          WebkitOverflowScrolling: 'touch'
         }}
       >
-        <div style={{ position: 'relative', minWidth: '100%' }}>
+        <div style={{ 
+          position: 'relative', 
+          minWidth: '100%',
+          contain: 'layout style paint'
+        }}>
           {pinnedColumns.length > 0 && (
             <div
               className={cn(
@@ -97,7 +101,8 @@ export function ScrollableTable({ children, pinnedColumns, className }: Scrollab
               )}
               style={{ 
                 width: `${pinnedWidth}px`,
-                transform: 'translate3d(0,0,0)'
+                transform: 'translate3d(0,0,0)',
+                willChange: 'transform'
               }}
             />
           )}
@@ -107,7 +112,8 @@ export function ScrollableTable({ children, pinnedColumns, className }: Scrollab
               className="sticky top-0 left-0 right-0 z-30 bg-background/95 border-b border-border/30 shadow-sm backdrop-blur-md"
               style={{
                 height: `${headerHeight}px`,
-                transform: 'translate3d(0,0,0)'
+                transform: 'translate3d(0,0,0)',
+                willChange: 'transform'
               }}
             />
           )}
