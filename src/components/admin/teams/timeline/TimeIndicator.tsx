@@ -1,7 +1,8 @@
 
 import React from 'react';
-import { Clock } from 'lucide-react';
 import { format } from 'date-fns';
+import { Clock } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface TimeIndicatorProps {
   currentTime: Date;
@@ -9,18 +10,19 @@ interface TimeIndicatorProps {
 }
 
 export function TimeIndicator({ currentTime, position }: TimeIndicatorProps) {
-  const currentTimeString = format(currentTime, 'HH:mm');
-
+  const isMobile = useIsMobile();
+  
   return (
-    <div 
-      className="absolute left-0 right-0 flex items-center gap-2 z-10 transition-all duration-1000"
+    <div
+      className="absolute left-0 right-2 sm:right-4 pointer-events-none z-10"
       style={{ top: `${position}px` }}
     >
-      <div className="border-t-2 border-red-500 flex-1" />
-      <div className="absolute -left-1 -top-1.5 w-3 h-3 rounded-full bg-red-500" />
-      <div className="absolute -left-20 -top-3 flex items-center gap-1 text-xs font-medium text-red-500">
-        <Clock className="h-3 w-3" />
-        {currentTimeString}
+      <div className="flex items-center">
+        <div className="w-full h-px bg-red-400 opacity-70" />
+        <div className="flex-shrink-0 bg-red-500/90 text-white rounded-md px-1.5 py-1 shadow-md text-xs flex items-center gap-1">
+          <Clock className={`h-${isMobile ? 3 : 4} w-${isMobile ? 3 : 4}`} />
+          <span>{format(currentTime, isMobile ? 'H:mm' : 'h:mm a')}</span>
+        </div>
       </div>
     </div>
   );

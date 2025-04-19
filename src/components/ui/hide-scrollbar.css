@@ -41,3 +41,33 @@
   perspective: 1000px;
   transform: translate3d(0,0,0);
 }
+
+/* Touch optimization styles */
+[data-touch-action="none"] {
+  touch-action: none;
+}
+
+.touch-manipulation {
+  touch-action: manipulation;
+}
+
+/* Larger touch targets for mobile */
+@media (max-width: 640px) {
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  button, 
+  [role="button"],
+  a {
+    min-height: 36px;
+    min-width: 36px;
+  }
+}
+
+/* Prevent text selection during drag operations */
+.no-select {
+  user-select: none;
+  -webkit-user-select: none;
+}

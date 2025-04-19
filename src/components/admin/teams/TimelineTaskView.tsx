@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { TimelineColumn } from './TimelineColumn';
@@ -10,6 +11,7 @@ import { Clock, ListTodo, RefreshCcw, Calendar, ArrowUpRight } from 'lucide-reac
 import { useDayPeriod } from '@/hooks/useDayPeriod';
 import { Badge } from '@/components/ui/badge';
 import { useCheckInOut } from '@/hooks/useCheckInOut';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export function TimelineTaskView({ memberId }: { memberId?: string }) {
   const { useTaskQuery } = useTasks();
@@ -17,6 +19,7 @@ export function TimelineTaskView({ memberId }: { memberId?: string }) {
   const { greeting, icon: DayPeriodIcon, gradientClass } = useDayPeriod();
   const { morningCheckInTime, eveningCheckOutTime } = useCheckInOut();
   const [rolledOverTasks, setRolledOverTasks] = useState<Task[]>([]);
+  const isMobile = useIsMobile();
 
   const todaysTasks = tasks.filter(task => {
     if (!task.start_time) return false;
@@ -73,15 +76,15 @@ export function TimelineTaskView({ memberId }: { memberId?: string }) {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className={`bg-gradient-to-r ${gradientClass} p-6 rounded-lg border border-purple-500/20`}
+        className={`bg-gradient-to-r ${gradientClass} p-4 sm:p-6 rounded-lg border border-purple-500/20`}
       >
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
-              <DayPeriodIcon className="h-6 w-6" />
+            <h1 className="text-xl sm:text-2xl font-bold text-white mb-2 flex items-center gap-2">
+              <DayPeriodIcon className="h-5 w-5 sm:h-6 sm:w-6" />
               {greeting}, SISO
             </h1>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <div className="flex items-center gap-1 rounded-lg bg-green-100 px-2 py-1 text-xs font-medium text-green-700 dark:bg-green-900 dark:text-green-300">
                 <ListTodo className="h-3 w-3" />
                 <span>Today's Tasks: {todaysTasks.length}</span>
@@ -101,21 +104,23 @@ export function TimelineTaskView({ memberId }: { memberId?: string }) {
         </div>
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="p-4 overflow-hidden">
-          <div className="flex items-center justify-between mb-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        <Card className="p-3 sm:p-4 overflow-hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 sm:mb-4 gap-2">
             <div className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-purple-500" />
-              <h2 className="text-lg font-semibold">Schedule for {formattedDate}</h2>
+              <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-purple-500" />
+              <h2 className="text-base sm:text-lg font-semibold truncate">
+                Schedule for {isMobile ? format(today, 'MMM d') : formattedDate}
+              </h2>
             </div>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <div className="flex flex-wrap items-center gap-x-3 sm:gap-x-4 gap-y-1 sm:gap-y-2 text-xs">
               {recurringTasks.length > 0 && (
-                <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                  <RefreshCcw className="h-4 w-4" />
+                <div className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground">
+                  <RefreshCcw className="h-3 w-3 sm:h-4 sm:w-4" />
                   <span>{recurringTasks.length} recurring</span>
                 </div>
               )}
-              <div className="text-xs text-muted-foreground">
+              <div className="text-xs text-muted-foreground hidden sm:block">
                 <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200 mr-1">
                   Check-in
                 </Badge>
@@ -128,17 +133,17 @@ export function TimelineTaskView({ memberId }: { memberId?: string }) {
               </div>
             </div>
           </div>
-          <div className="max-h-[600px] overflow-y-auto hide-scrollbar relative">
+          <div className="max-h-[400px] sm:max-h-[600px] overflow-y-auto hide-scrollbar relative">
             <TimelineColumn tasks={todaysTasks} />
           </div>
         </Card>
         
-        <Card className="p-4">
-          <h2 className="text-lg font-semibold mb-4">Upcoming Tasks</h2>
-          <p className="text-sm text-muted-foreground mb-4">
+        <Card className="p-3 sm:p-4">
+          <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-4">Upcoming Tasks</h2>
+          <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">
             Drag tasks to the timeline to schedule them
           </p>
-          <div className="max-h-[600px] overflow-y-auto hide-scrollbar space-y-4">
+          <div className="max-h-[300px] sm:max-h-[600px] overflow-y-auto hide-scrollbar space-y-3 sm:space-y-4">
             {upcomingTasks.map(task => (
               <TaskCard 
                 key={task.id} 

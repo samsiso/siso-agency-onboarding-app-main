@@ -1,5 +1,6 @@
 
 import { Task } from '@/types/task.types';
+import { useIsMobile } from './use-mobile';
 
 interface TaskPosition {
   top: number;
@@ -9,9 +10,10 @@ interface TaskPosition {
 }
 
 export function useTaskPositioning() {
-  const HOUR_HEIGHT = 80;
+  const isMobile = useIsMobile();
+  const HOUR_HEIGHT = isMobile ? 60 : 80;
   const MINUTES_IN_HOUR = 60;
-  const CARD_MIN_HEIGHT = 80;
+  const CARD_MIN_HEIGHT = isMobile ? 60 : 80;
 
   const calculateTaskPosition = (task: Task, overlappingTasks: Task[] = []): TaskPosition => {
     if (!task.start_time) {
@@ -28,13 +30,13 @@ export function useTaskPositioning() {
     const heightInPixels = Math.max(duration * pixelsPerMinute, CARD_MIN_HEIGHT);
 
     // Handle overlapping tasks by offsetting horizontally
-    const offsetWidth = 90; // Base width percentage
+    const offsetWidth = isMobile ? 95 : 90; // Base width percentage - wider on mobile for better touch targets
     let leftOffset = 0;
     
     if (overlappingTasks.length > 0) {
       const taskIndex = overlappingTasks.findIndex(t => t.id === task.id);
-      leftOffset = (taskIndex * 8); // 8% offset for each overlapping task
-      const width = `${offsetWidth - (overlappingTasks.length - 1) * 8}%`;
+      leftOffset = (taskIndex * (isMobile ? 4 : 8)); // Less offset on mobile to use space efficiently
+      const width = `${offsetWidth - (overlappingTasks.length - 1) * (isMobile ? 4 : 8)}%`;
       return {
         top: topPosition,
         left: leftOffset,
@@ -47,7 +49,7 @@ export function useTaskPositioning() {
       top: topPosition,
       left: 0,
       height: heightInPixels,
-      width: '90%'
+      width: `${offsetWidth}%`
     };
   };
 
