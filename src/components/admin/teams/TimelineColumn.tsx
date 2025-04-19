@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Task } from '@/types/task.types';
 import { TaskCard } from './TaskCard';
 import { useTimeWindow } from '@/hooks/useTimeWindow';
@@ -12,6 +12,11 @@ import { RoutineCard } from './timeline/RoutineCard';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
+import { TaskCreationDialog } from './TaskCreationDialog';
+import { TimelineHeader } from './timeline/TimelineHeader';
+import { TimelineGrid } from './timeline/TimelineGrid';
+import { Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export function TimelineColumn({ tasks }: { tasks: Task[] }) {
   const { currentTime, timelineRef, getCurrentWindow } = useTimeWindow();
@@ -26,8 +31,10 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
     checkOutStatus
   } = useCheckInOut();
   
-  const [checkInDialogOpen, setCheckInDialogOpen] = React.useState(false);
-  const [checkOutDialogOpen, setCheckOutDialogOpen] = React.useState(false);
+  const [checkInDialogOpen, setCheckInDialogOpen] = useState(false);
+  const [checkOutDialogOpen, setCheckOutDialogOpen] = useState(false);
+  const [taskCreationOpen, setTaskCreationOpen] = useState(false);
+  const [selectedHour, setSelectedHour] = useState<number | undefined>(undefined);
 
   const { windowStart, windowEnd } = getCurrentWindow();
   const currentHour = currentTime.getHours();
@@ -43,19 +50,35 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
   const PIXELS_PER_MINUTE = HOUR_HEIGHT / 60;
   
   const timePosition = (currentHour * HOUR_HEIGHT) + (currentMinute * PIXELS_PER_MINUTE);
-  const checkInPosition = morningCheckInTime.getHours() * HOUR_HEIGHT;
-  const checkOutPosition = eveningCheckOutTime.getHours() * HOUR_HEIGHT + 
-                          (eveningCheckOutTime.getMinutes() * PIXELS_PER_MINUTE);
+
+  const handleCreateTask = (hour?: number) => {
+    setSelectedHour(hour);
+    setTaskCreationOpen(true);
+  };
+  
+  const handleTimeSlotClick = (hour: number) => {
+    handleCreateTask(hour);
+  };
 
   return (
     <div className="relative min-h-[400px] sm:min-h-[600px] flex">
-      <TimelineRuler currentHour={currentHour} hourHeight={HOUR_HEIGHT} />
+      <TimelineRuler 
+        currentHour={currentHour} 
+        hourHeight={HOUR_HEIGHT}
+        onTimeSlotClick={handleTimeSlotClick}
+      />
+      
       <ScrollButtons 
         onScrollUp={() => timelineRef.current?.scrollBy({ top: -HOUR_HEIGHT, behavior: 'smooth' })} 
         onScrollDown={() => timelineRef.current?.scrollBy({ top: HOUR_HEIGHT, behavior: 'smooth' })} 
       />
 
-      <div className="ml-12 sm:ml-14 relative flex-1">
+      <div className="ml-12 sm:ml-16 relative flex-1">
+        <TimelineHeader 
+          onCreateTask={() => handleCreateTask()}
+          currentDate={currentTime}
+        />
+        
         <ScrollArea 
           ref={timelineRef}
           className="h-[400px] sm:h-[600px] relative"
@@ -65,6 +88,7 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
             "relative px-1 sm:px-2",
             "min-h-[1920px] sm:min-h-[2400px]"
           )}>
+            <TimelineGrid hourHeight={HOUR_HEIGHT} />
             <TimeIndicator currentTime={currentTime} position={timePosition} />
             
             {shouldShowMorningCheckIn() && (
@@ -93,6 +117,24 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
               }}
             />
 
+            {/* Empty state when no tasks */}
+            {allTasks.length === 0 && (
+              <div className="absolute inset-0 flex items-center justify-center h-[600px]">
+                <div className="text-center p-6 max-w-xs mx-auto">
+                  <div className="rounded-full bg-gray-100 w-12 h-12 mx-auto mb-4 flex items-center justify-center">
+                    <Plus className="h-6 w-6 text-gray-500" />
+                  </div>
+                  <h3 className="text-lg font-medium mb-2">No tasks scheduled</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Click on a time slot or use the create button to add tasks to your schedule
+                  </p>
+                  <Button onClick={() => handleCreateTask()}>
+                    Create Task
+                  </Button>
+                </div>
+              </div>
+            )}
+
             {allTasks.map((task) => (
               <TaskCard 
                 key={task.id} 
@@ -119,6 +161,12 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
         onOpenChange={setCheckOutDialogOpen}
         onComplete={handleEveningCheckOut}
         time={eveningCheckOutTime}
+      />
+      
+      <TaskCreationDialog
+        isOpen={taskCreationOpen}
+        onClose={() => setTaskCreationOpen(false)}
+        initialHour={selectedHour}
       />
     </div>
   );
