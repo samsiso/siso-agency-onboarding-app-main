@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { addMultipleTransactions } from '@/utils/financial/transactionModifications';
 
+// Define a schema for the expense form with non-optional fields to match the expected type
 const expenseFormSchema = z.object({
   description: z.string().min(1, "Description is required"),
   amount: z.string().min(1, "Amount is required").transform(Number),
@@ -32,7 +33,11 @@ const expenseFormSchema = z.object({
   recurring_type: z.enum(['one-time', 'monthly', 'annual']).default('one-time'),
 });
 
-export function ExpenseForm() {
+interface ExpenseFormProps {
+  onExpenseAdded?: () => void;
+}
+
+export function ExpenseForm({ onExpenseAdded }: ExpenseFormProps) {
   const form = useForm<z.infer<typeof expenseFormSchema>>({
     resolver: zodResolver(expenseFormSchema),
     defaultValues: {
@@ -41,9 +46,15 @@ export function ExpenseForm() {
   });
 
   const onSubmit = async (values: z.infer<typeof expenseFormSchema>) => {
+    // Explicitly cast the transaction object to ensure all required properties are present
     const success = await addMultipleTransactions([{
-      ...values,
-      type: 'expense'
+      description: values.description,
+      amount: Number(values.amount),
+      date: values.date,
+      category: values.category,
+      vendor: values.vendor,
+      type: 'expense',
+      recurring_type: values.recurring_type
     }]);
 
     if (success) {
@@ -52,6 +63,9 @@ export function ExpenseForm() {
         description: "Expense added successfully",
       });
       form.reset();
+      if (onExpenseAdded) {
+        onExpenseAdded();
+      }
     }
   };
 

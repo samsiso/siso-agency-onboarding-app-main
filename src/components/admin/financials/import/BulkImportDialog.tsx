@@ -15,9 +15,14 @@ import { FileInput } from "./FileInput";
 import { toast } from "@/components/ui/use-toast";
 import { addMultipleTransactions } from "@/utils/financial/transactionModifications";
 
-export function BulkImportDialog() {
+interface BulkImportDialogProps {
+  onImportComplete?: () => void;
+}
+
+export function BulkImportDialog({ onImportComplete }: BulkImportDialogProps) {
   const [importProgress, setImportProgress] = useState(0);
   const [isImporting, setIsImporting] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const handleImport = async (expenses: any[]) => {
     setIsImporting(true);
@@ -30,6 +35,11 @@ export function BulkImportDialog() {
           title: "Success",
           description: `Successfully imported ${expenses.length} expenses`,
         });
+        // Close dialog and trigger data reload
+        setOpen(false);
+        if (onImportComplete) {
+          onImportComplete();
+        }
       }
     } catch (error) {
       console.error('Import error:', error);
@@ -45,7 +55,7 @@ export function BulkImportDialog() {
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline">
           <Import className="mr-2 h-4 w-4" />

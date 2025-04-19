@@ -6,9 +6,10 @@ import { AddExpenseDialog } from "./expense/AddExpenseDialog";
 
 interface FinancialsHeaderProps {
   onFilterChange?: (filters: any) => void;
+  onDataChange?: () => void;
 }
 
-export function FinancialsHeader({ onFilterChange }: FinancialsHeaderProps) {
+export function FinancialsHeader({ onFilterChange, onDataChange }: FinancialsHeaderProps) {
   return (
     <div className="flex items-center justify-between mb-6">
       <div className="space-y-1">
@@ -22,8 +23,8 @@ export function FinancialsHeader({ onFilterChange }: FinancialsHeaderProps) {
           <Filter className="mr-2 h-4 w-4" />
           Filter
         </Button>
-        <BulkImportDialog />
-        <AddExpenseDialog />
+        <BulkImportDialog onImportComplete={onDataChange} />
+        <AddExpenseDialog onExpenseAdded={onDataChange} />
       </div>
     </div>
   );

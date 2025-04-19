@@ -3,15 +3,19 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 import { v4 as uuidv4 } from 'uuid';
 
-// Bulk insert method for multiple transactions
-export async function addMultipleTransactions(transactions: Array<{
+// Define the expected transaction input type
+export type ExpenseTransactionInput = {
   description: string; 
   amount: number; 
   date: string; 
   category: string;
   vendor: string;
-  type: 'expense'
-}>): Promise<boolean> {
+  type: 'expense';
+  recurring_type?: 'one-time' | 'monthly' | 'annual';
+};
+
+// Bulk insert method for multiple transactions
+export async function addMultipleTransactions(transactions: ExpenseTransactionInput[]): Promise<boolean> {
   try {
     // First, find the category and vendor IDs
     const categoryPromises = transactions.map(async (transaction) => {
@@ -56,7 +60,8 @@ export async function addMultipleTransactions(transactions: Array<{
         category_id: t.category_id,
         vendor_id: t.vendor_id,
         status: 'completed',
-        currency: 'GBP'
+        currency: 'GBP',
+        recurring_type: t.recurring_type || 'one-time'
       })));
 
     if (error) {
