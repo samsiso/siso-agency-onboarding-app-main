@@ -1,19 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
-import { TimelineColumn } from './TimelineColumn';
-import { Task } from '@/types/task.types';
 import { useTasks } from '@/hooks/useTasks';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Task } from '@/types/task.types';
+import { TimelineColumn } from './TimelineColumn';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useTaskOperations } from '@/hooks/useTaskOperations';
+import { useToast } from '@/hooks/use-toast';
+import { Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 import { Clock, ListTodo, RefreshCcw, Calendar, ArrowUpRight } from 'lucide-react';
 import { useDayPeriod } from '@/hooks/useDayPeriod';
 import { Badge } from '@/components/ui/badge';
 import { useCheckInOut } from '@/hooks/useCheckInOut';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { TaskCard } from './TaskCard';
 import { UpcomingTaskCard } from './UpcomingTaskCard';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { useToast } from '@/hooks/use-toast';
 
 interface TimelineTaskViewProps {
   memberId?: string;
@@ -21,8 +24,8 @@ interface TimelineTaskViewProps {
 
 export function TimelineTaskView({ memberId }: TimelineTaskViewProps) {
   const { useTaskQuery } = useTasks();
-  const { data: dailyTasks = [], isLoading: isDailyTasksLoading } = useTaskQuery('daily');
-  const { data: sisoTasks = [], isLoading: isSisoTasksLoading } = useTaskQuery('siso_app_dev');
+  const { data: dailyTasks = [], isLoading: isDailyTasksLoading } = useTaskQuery('daily', memberId);
+  const { data: sisoTasks = [], isLoading: isSisoTasksLoading } = useTaskQuery('siso_app_dev', memberId);
   const { greeting, icon: DayPeriodIcon, gradientClass } = useDayPeriod();
   const { morningCheckInTime, eveningCheckOutTime } = useCheckInOut();
   const [rolledOverTasks, setRolledOverTasks] = useState<Task[]>([]);
@@ -72,12 +75,12 @@ export function TimelineTaskView({ memberId }: TimelineTaskViewProps) {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className={`bg-gradient-to-r ${gradientClass} p-4 sm:p-6 rounded-lg border border-purple-500/20`}
+        className={`bg-gradient-to-r ${greeting === 'Good Morning' ? 'from-purple-500 to-blue-500' : greeting === 'Good Afternoon' ? 'from-yellow-500 to-orange-500' : 'from-purple-800 to-indigo-800'} p-4 sm:p-6 rounded-lg border border-purple-500/20`}
       >
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-white mb-2 flex items-center gap-2">
-              <DayPeriodIcon className="h-5 w-5 sm:h-6 sm:w-6" />
+              {greeting === 'Good Morning' ? <Clock className="h-5 w-5 sm:h-6 sm:w-6" /> : greeting === 'Good Afternoon' ? <Clock className="h-5 w-5 sm:h-6 sm:w-6" /> : <Clock className="h-5 w-5 sm:h-6 sm:w-6" />}
               {greeting}, SISO
             </h1>
             <div className="flex flex-wrap items-center gap-2">
@@ -130,7 +133,13 @@ export function TimelineTaskView({ memberId }: TimelineTaskViewProps) {
             </div>
           </div>
           <div className="max-h-[400px] sm:max-h-[600px] overflow-y-auto hide-scrollbar relative">
-            <TimelineColumn tasks={todaysTasks} />
+            {isDailyTasksLoading ? (
+              <div className="flex items-center justify-center h-40">
+                <div className="animate-pulse text-muted-foreground">Loading tasks...</div>
+              </div>
+            ) : (
+              <TimelineColumn tasks={dailyTasks} />
+            )}
           </div>
         </Card>
         
@@ -150,9 +159,9 @@ export function TimelineTaskView({ memberId }: TimelineTaskViewProps) {
           ) : (
             <ScrollArea className="h-[300px] sm:h-[520px] w-full relative">
               <div className="space-y-3 pr-6">
-                {upcomingTasks.length > 0 ? (
-                  upcomingTasks.map(task => (
-                    <UpcomingTaskCard 
+                {sisoTasks.length > 0 ? (
+                  sisoTasks.map(task => (
+                    <TaskCard 
                       key={task.id} 
                       task={task}
                       onDragSuccess={handleDragTask}
