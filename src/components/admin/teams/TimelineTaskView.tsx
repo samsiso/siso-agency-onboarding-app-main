@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { TimelineColumn } from './TimelineColumn';
@@ -16,7 +15,11 @@ import { UpcomingTaskCard } from './UpcomingTaskCard';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 
-export function TimelineTaskView({ memberId }: { memberId?: string }) {
+interface TimelineTaskViewProps {
+  memberId?: string;
+}
+
+export function TimelineTaskView({ memberId }: TimelineTaskViewProps) {
   const { useTaskQuery } = useTasks();
   const { data: dailyTasks = [], isLoading: isDailyTasksLoading } = useTaskQuery('daily');
   const { data: sisoTasks = [], isLoading: isSisoTasksLoading } = useTaskQuery('siso_app_dev');
@@ -145,8 +148,8 @@ export function TimelineTaskView({ memberId }: { memberId?: string }) {
               <div className="animate-pulse text-muted-foreground">Loading tasks...</div>
             </div>
           ) : (
-            <ScrollArea className="h-[300px] sm:h-[520px] w-full pr-4">
-              <div className="space-y-3 pl-1 pr-1">
+            <ScrollArea className="h-[300px] sm:h-[520px] w-full">
+              <div className="space-y-3 px-4">
                 {upcomingTasks.length > 0 ? (
                   upcomingTasks.map(task => (
                     <UpcomingTaskCard 

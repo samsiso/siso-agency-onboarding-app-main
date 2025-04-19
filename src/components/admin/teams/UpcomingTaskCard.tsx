@@ -54,14 +54,14 @@ export function UpcomingTaskCard({ task, onDragSuccess }: UpcomingTaskCardProps)
         onDragEnd={handleDragEndWithCallback}
         className={cn(
           "p-4 cursor-grab active:cursor-grabbing transition-all duration-200",
-          "border shadow-sm hover:shadow-md w-full",
+          "border shadow-sm hover:shadow-md",
           "hover:border-purple-300 dark:hover:border-purple-700",
           getPriorityBackground()
         )}
       >
-        <div className="flex flex-col gap-3 max-w-full">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex-1 min-w-0 overflow-hidden">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2 mb-2">
                 <PriorityBadge priority={task.priority} />
                 {task.due_date && (
@@ -77,7 +77,7 @@ export function UpcomingTaskCard({ task, onDragSuccess }: UpcomingTaskCardProps)
               </h3>
               
               {task.description && (
-                <p className="text-xs text-muted-foreground mb-2 break-words">
+                <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
                   {task.description}
                 </p>
               )}
@@ -105,7 +105,7 @@ export function UpcomingTaskCard({ task, onDragSuccess }: UpcomingTaskCardProps)
             </DropdownMenu>
           </div>
           
-          <div className="flex items-center justify-between border-t pt-2 mt-1">
+          <div className="flex items-center justify-between border-t pt-2">
             <Button 
               size="sm" 
               variant="outline"
