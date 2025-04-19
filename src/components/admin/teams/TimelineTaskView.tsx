@@ -1,7 +1,7 @@
-
 import React, { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { TimelineColumn } from './TimelineColumn';
+import { TaskCard } from './TaskCard';
 import { Task } from '@/types/task.types';
 import { useTasks } from '@/hooks/useTasks';
 import { format } from 'date-fns';
