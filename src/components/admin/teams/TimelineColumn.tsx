@@ -17,7 +17,7 @@ import { useTaskDragDrop } from '@/hooks/useTaskDragDrop';
 
 export function TimelineColumn({ tasks }: { tasks: Task[] }) {
   const { currentTime, timelineRef, getCurrentWindow, scrollToCurrentTime } = useTimeWindow();
-  const { isDragging } = useTaskDragDrop();
+  const { handleDrop, handleDragOver, isDragging } = useTaskDragDrop();
   const { 
     morningCheckInTime, 
     eveningCheckOutTime,
@@ -28,19 +28,11 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
     checkInStatus,
     checkOutStatus
   } = useCheckInOut();
-  
+
   const [checkInDialogOpen, setCheckInDialogOpen] = useState(false);
   const [checkOutDialogOpen, setCheckOutDialogOpen] = useState(false);
   const [taskCreationOpen, setTaskCreationOpen] = useState(false);
   const [selectedHour, setSelectedHour] = useState<number | undefined>(undefined);
-
-  const currentHour = currentTime.getHours();
-  const currentMinute = currentTime.getMinutes();
-
-  const allTasks = [...tasks].sort((a, b) => {
-    if (!a.start_time || !b.start_time) return 0;
-    return new Date(a.start_time).getTime() - new Date(b.start_time).getTime();
-  });
 
   const handleCreateTask = (hour?: number) => {
     setSelectedHour(hour);
@@ -50,6 +42,11 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
   const handleTimeSlotClick = (hour: number) => {
     handleCreateTask(hour);
   };
+
+  const allTasks = [...tasks].sort((a, b) => {
+    if (!a.start_time || !b.start_time) return 0;
+    return new Date(a.start_time).getTime() - new Date(b.start_time).getTime();
+  });
 
   return (
     <div className="flex flex-col h-full">
@@ -63,11 +60,14 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
         <ScrollArea 
           ref={timelineRef}
           className="h-[calc(100vh-13rem)]"
+          onDragOver={handleDragOver}
+          onDrop={(e) => {
+            if (timelineRef.current) {
+              handleDrop(e, timelineRef.current);
+            }
+          }}
         >
-          <div 
-            className="relative min-h-[2400px]"
-            style={{ paddingLeft: '4rem' }}
-          >
+          <div className="relative min-h-[2400px]" style={{ paddingLeft: '4rem' }}>
             <div className="absolute left-0 top-0 bottom-0 w-16 bg-background/80 backdrop-blur z-10">
               <TimelineRuler 
                 currentHour={currentTime.getHours()} 
@@ -84,7 +84,6 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
                 position={currentTime.getHours() * 100 + (currentTime.getMinutes() / 60) * 100} 
               />
               
-              {/* Add drag guide line */}
               {isDragging && (
                 <div
                   id="dragGuideLine"
@@ -111,12 +110,12 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
                 />
               )}
 
-              <div className="absolute inset-0 grid grid-rows-[repeat(24,100px)] gap-0 pointer-events-none">
+              <div className="absolute inset-0 pointer-events-none">
                 {allTasks.map((task) => (
                   <TaskCard 
                     key={task.id} 
                     task={task}
-                    currentHour={currentHour}
+                    currentHour={currentTime.getHours()}
                     allTasks={allTasks}
                   />
                 ))}

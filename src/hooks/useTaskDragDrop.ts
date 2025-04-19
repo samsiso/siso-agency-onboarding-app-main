@@ -12,13 +12,13 @@ export function useTaskDragDrop() {
   const { toast } = useToast();
   const isMobile = useIsMobile();
   
-  const HOUR_HEIGHT = isMobile ? 60 : 80;
+  const HOUR_HEIGHT = 100;
   const MINUTES_IN_HOUR = 60;
 
   const calculateTimeFromPosition = (y: number) => {
     const totalMinutes = Math.round((y / HOUR_HEIGHT) * MINUTES_IN_HOUR);
     const hours = Math.floor(totalMinutes / MINUTES_IN_HOUR);
-    const minutes = Math.round((totalMinutes % MINUTES_IN_HOUR) / 5) * 5; // Round to nearest 5 minutes
+    const minutes = Math.round((totalMinutes % MINUTES_IN_HOUR) / 15) * 15; // Snap to 15-minute intervals
     
     const time = new Date();
     time.setHours(hours, minutes, 0, 0);
@@ -26,39 +26,49 @@ export function useTaskDragDrop() {
   };
 
   const handleDragStart = (e: React.DragEvent, task: Task) => {
+    const taskElement = e.currentTarget as HTMLElement;
     e.dataTransfer.setData('taskId', task.id);
     e.dataTransfer.effectAllowed = 'move';
-    setIsDragging(true);
     
-    // Store the original horizontal position
-    if (e.currentTarget instanceof HTMLElement) {
-      e.dataTransfer.setData('originalLeft', e.currentTarget.style.left);
-      
-      // Create a drag ghost that matches the card's appearance
-      const dragImage = e.currentTarget.cloneNode(true) as HTMLElement;
-      dragImage.style.opacity = '0.7';
-      dragImage.style.position = 'absolute';
-      dragImage.style.left = '-1000px';
-      dragImage.style.top = '-1000px';
-      document.body.appendChild(dragImage);
-      e.dataTransfer.setDragImage(dragImage, 0, 0);
-      setTimeout(() => document.body.removeChild(dragImage), 0);
-    }
+    // Create and setup ghost element
+    const ghost = taskElement.cloneNode(true) as HTMLElement;
+    ghost.style.opacity = '0.7';
+    ghost.style.position = 'absolute';
+    ghost.style.left = '-9999px';
+    ghost.style.top = '-9999px';
+    ghost.style.width = `${taskElement.offsetWidth}px`;
+    ghost.style.pointerEvents = 'none';
+    
+    document.body.appendChild(ghost);
+    e.dataTransfer.setDragImage(ghost, 10, 10);
+    
+    // Remove ghost after drag starts
+    requestAnimationFrame(() => {
+      document.body.removeChild(ghost);
+    });
+    
+    setIsDragging(true);
   };
 
   const handleDragEnd = () => {
     setIsDragging(false);
+    const guideLine = document.getElementById('dragGuideLine');
+    if (guideLine) {
+      guideLine.style.display = 'none';
+    }
   };
 
-  const handleDrop = async (e: React.DragEvent, offsetY: number) => {
+  const handleDrop = async (e: React.DragEvent, scrollContainer: HTMLElement) => {
     e.preventDefault();
     const taskId = e.dataTransfer.getData('taskId');
-    const originalLeft = e.dataTransfer.getData('originalLeft');
-    
     if (!taskId) return;
     
     try {
-      const newStartTime = calculateTimeFromPosition(offsetY);
+      const rect = scrollContainer.getBoundingClientRect();
+      const scrollOffset = scrollContainer.scrollTop;
+      const y = e.clientY - rect.top + scrollOffset;
+      
+      const newStartTime = calculateTimeFromPosition(y);
       
       await updateTaskMutation.mutateAsync({
         id: taskId,
@@ -67,7 +77,10 @@ export function useTaskDragDrop() {
 
       toast({
         title: "Task rescheduled",
-        description: `Task moved to ${newStartTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
+        description: `Task moved to ${newStartTime.toLocaleTimeString([], { 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        })}`,
       });
     } catch (error) {
       toast({
@@ -82,15 +95,20 @@ export function useTaskDragDrop() {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
     
-    // Add vertical guide line at drag position
     const timelineEl = e.currentTarget;
     if (timelineEl instanceof HTMLElement) {
-      const guideLineEl = document.getElementById('dragGuideLine');
-      if (guideLineEl) {
+      // Update guide line position
+      const guideLine = document.getElementById('dragGuideLine');
+      if (guideLine) {
         const rect = timelineEl.getBoundingClientRect();
-        const y = e.clientY - rect.top;
-        guideLineEl.style.top = `${y}px`;
-        guideLineEl.style.display = 'block';
+        const scrollOffset = timelineEl.scrollTop;
+        const y = e.clientY - rect.top + scrollOffset;
+        
+        // Snap to 15-minute intervals
+        const snappedY = Math.round(y / (HOUR_HEIGHT / 4)) * (HOUR_HEIGHT / 4);
+        
+        guideLine.style.top = `${snappedY}px`;
+        guideLine.style.display = 'block';
       }
     }
   };
