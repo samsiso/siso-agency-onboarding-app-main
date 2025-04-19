@@ -6,13 +6,14 @@ import { useIsMobile } from '@/hooks/use-mobile';
 
 interface TimelineRulerProps {
   currentHour: number;
+  hourHeight?: number; // Added hourHeight as an optional prop
 }
 
-export function TimelineRuler({ currentHour }: TimelineRulerProps) {
+export function TimelineRuler({ currentHour, hourHeight: propHourHeight }: TimelineRulerProps) {
   const { handleDrop, handleDragOver, isDragging } = useTaskDragDrop();
   const timeSlots = Array.from({ length: 24 }, (_, i) => i);
   const isMobile = useIsMobile();
-  const hourHeight = isMobile ? 60 : 80;
+  const hourHeight = propHourHeight || (isMobile ? 60 : 80); // Use provided hourHeight or default
 
   const handleTimeSlotDrop = (e: React.DragEvent, hour: number) => {
     const rect = e.currentTarget.getBoundingClientRect();

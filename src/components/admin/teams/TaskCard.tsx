@@ -26,6 +26,10 @@ export function TaskCard({ task, currentHour, allTasks = [], onDragSuccess }: Ta
   const overlappingTasks = findOverlappingTasks(allTasks, task);
   const position = calculateTaskPosition(task, overlappingTasks);
 
+  // Check if this is the current task based on start time and current hour
+  const isCurrentTask = currentHour !== undefined && startTime && 
+                       startTime.getHours() === currentHour;
+
   const handleTaskClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setShowDetailDrawer(true);
@@ -111,4 +115,3 @@ export function TaskCard({ task, currentHour, allTasks = [], onDragSuccess }: Ta
     </>
   );
 }
-
