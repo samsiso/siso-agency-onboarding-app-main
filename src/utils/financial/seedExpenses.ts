@@ -1,59 +1,90 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { v4 as uuidv4 } from 'uuid';
-import { addTransaction } from './transactionModifications';
+import { addMultipleTransactions } from './transactionModifications';
 import { toast } from '@/components/ui/use-toast';
 
-// Sample expense data
+// Updated sample expenses to include the specific expenses you mentioned
 const sampleExpenses = [
   {
-    description: "Office Rent",
-    amount: 1250,
-    date: new Date(new Date().setDate(new Date().getDate() - 5)).toISOString(),
-    category_id: null,
-    vendor_id: null,
-    payment_method_id: null,
-    type: "expense",
-    recurring_type: "monthly"
+    description: "Virgin Media Internet",
+    amount: 132.50,
+    date: "2024-01-05",
+    category: "Utilities",
+    vendor: "Virgin Media",
+    type: "expense"
   },
   {
-    description: "Marketing Expenses",
-    amount: 800,
-    date: new Date(new Date().setDate(new Date().getDate() - 10)).toISOString(),
-    category_id: null,
-    vendor_id: null,
-    payment_method_id: null,
-    type: "expense",
-    recurring_type: "one-time"
+    description: "Notion Subscription",
+    amount: 50.90,
+    date: "2024-01-11",
+    category: "Services",
+    vendor: "Notion",
+    type: "expense"
   },
   {
-    description: "Salaries",
-    amount: 5000,
-    date: new Date(new Date().setDate(new Date().getDate() - 15)).toISOString(),
-    category_id: null,
-    vendor_id: null,
-    payment_method_id: null,
-    type: "expense",
-    recurring_type: "monthly"
+    description: "Google Play Store",
+    amount: 19.60,
+    date: "2024-01-12",
+    category: "Services",
+    vendor: "Google",
+    type: "expense"
   },
   {
-    description: "Software Subscriptions",
-    amount: 300,
-    date: new Date(new Date().setDate(new Date().getDate() - 20)).toISOString(),
-    category_id: null,
-    vendor_id: null,
-    payment_method_id: null,
-    type: "expense",
-    recurring_type: "monthly"
+    description: "OpenAI Subscription",
+    amount: 56.45,
+    date: "2024-01-12",
+    category: "Services",
+    vendor: "OpenAI",
+    type: "expense"
   },
   {
-    description: "Client Entertainment",
-    amount: 400,
-    date: new Date(new Date().setDate(new Date().getDate() - 25)).toISOString(),
-    category_id: null,
-    vendor_id: null,
-    payment_method_id: null,
-    type: "expense",
-    recurring_type: "one-time"
+    description: "Airtable Subscription",
+    amount: 19.07,
+    date: "2024-01-13",
+    category: "Services",
+    vendor: "Airtable",
+    type: "expense"
+  },
+  {
+    description: "Midjourney Subscription",
+    amount: 9.57,
+    date: "2024-01-27",
+    category: "Services",
+    vendor: "Midjourney",
+    type: "expense"
+  },
+  {
+    description: "FlutterFlow Subscription",
+    amount: 55.04,
+    date: "2024-01-31",
+    category: "Services",
+    vendor: "FlutterFlow",
+    type: "expense"
+  },
+  {
+    description: "Google Services",
+    amount: 10.00,
+    date: "2024-02-13",
+    category: "Services",
+    vendor: "Google",
+    type: "expense"
+  },
+  {
+    description: "Notion Additional Services",
+    amount: 5.59,
+    date: "2024-02-24",
+    category: "Services",
+    vendor: "Notion",
+    type: "expense"
+  },
+  {
+    description: "TradingView Subscription",
+    amount: 35.94,
+    date: "2024-02-28",
+    category: "Services",
+    vendor: "TradingView",
+    type: "expense"
   }
 ];
 
@@ -62,45 +93,8 @@ const sampleExpenses = [
  */
 export async function seedInitialExpenses(): Promise<boolean> {
   try {
-    // Fetch existing categories or create default ones
-    let categoryId = null;
-    const { data: categories } = await supabase
-      .from('expense_categories')
-      .select('id, name')
-      .eq('name', 'Office Expenses')
-      .limit(1);
-      
-    if (!categories || categories.length === 0) {
-      const { data: newCategory, error: categoryError } = await supabase
-        .from('expense_categories')
-        .insert({ id: uuidv4(), name: 'Office Expenses' })
-        .select('id')
-        .single();
-        
-      if (categoryError) {
-        console.error("Error creating default category:", categoryError);
-      } else if (newCategory) {
-        categoryId = newCategory.id;
-      }
-    } else {
-      categoryId = categories[0].id;
-    }
-    
-    // Add sample expenses with the category
-    for (const expense of sampleExpenses) {
-      const expenseWithCategory = {
-        ...expense,
-        id: uuidv4(),
-        category_id: categoryId
-      };
-      
-      const success = await addTransaction(expenseWithCategory);
-      if (!success) {
-        throw new Error("Failed to add sample expense");
-      }
-    }
-    
-    return true;
+    // Use the new bulk insert method
+    return await addMultipleTransactions(sampleExpenses);
   } catch (error) {
     console.error("Error seeding expenses:", error);
     toast({
