@@ -54,7 +54,7 @@ export function UpcomingTaskCard({ task, onDragSuccess }: UpcomingTaskCardProps)
         onDragEnd={handleDragEndWithCallback}
         className={cn(
           "p-4 cursor-grab active:cursor-grabbing transition-all duration-200",
-          "border shadow-sm hover:shadow-md",
+          "border shadow-sm hover:shadow-md w-full",
           "hover:border-purple-300 dark:hover:border-purple-700",
           getPriorityBackground()
         )}
@@ -72,7 +72,7 @@ export function UpcomingTaskCard({ task, onDragSuccess }: UpcomingTaskCardProps)
                 )}
               </div>
               
-              <h3 className="font-medium text-sm sm:text-base mb-2 break-words">
+              <h3 className="font-medium text-sm sm:text-base mb-2 break-words line-clamp-2">
                 {task.title}
               </h3>
               
