@@ -18,14 +18,33 @@ export function useTableViews(tableName: string) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    const { data, error } = await supabase
-      .from('table_views')
-      .select('*')
-      .eq('table_name', tableName)
-      .eq('user_id', user.id);
+    try {
+      // Check if the table exists first by using the system catalog
+      const { data: tableExists } = await supabase
+        .from('table_views')
+        .select('id')
+        .limit(1)
+        .throwOnError();
 
-    if (!error && data) {
-      setViews(data);
+      if (tableExists) {
+        const { data, error } = await supabase
+          .from('table_views')
+          .select('*')
+          .eq('table_name', tableName)
+          .eq('user_id', user.id);
+
+        if (!error && data) {
+          setViews(data as unknown as SavedView[]);
+        } else {
+          console.error("Error loading views:", error);
+        }
+      } else {
+        console.log("Table 'table_views' does not exist yet");
+        setViews([]);
+      }
+    } catch (error) {
+      console.log("Table 'table_views' might not exist yet:", error);
+      setViews([]);
     }
   };
 
@@ -33,22 +52,31 @@ export function useTableViews(tableName: string) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    const { data, error } = await supabase
-      .from('table_views')
-      .insert([
-        {
-          name,
-          table_name: tableName,
-          user_id: user.id,
-          filters: state.filters,
-          columns: state.columns
-        }
-      ])
-      .select()
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('table_views')
+        .insert([
+          {
+            name,
+            table_name: tableName,
+            user_id: user.id,
+            filters: state.filters,
+            columns: state.columns
+          }
+        ])
+        .select()
+        .single();
 
-    if (!error && data) {
-      setViews([...views, data]);
+      if (!error && data) {
+        setViews([...views, data as unknown as SavedView]);
+        return true;
+      } else {
+        console.error("Error saving view:", error);
+        return false;
+      }
+    } catch (error) {
+      console.error("Error saving view:", error);
+      return false;
     }
   };
 

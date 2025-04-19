@@ -4,6 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Search, Filter, FileDown, FilePlus } from "lucide-react";
 import { ColumnCustomization } from "./table/ColumnCustomization";
 import { SavedViewsManager } from "./table/SavedViewsManager";
+import { TableColumn } from "@/hooks/useTableColumns";
+import { SavedView } from "@/hooks/useTableViews";
 
 interface ExpensesTableHeaderProps {
   searchQuery: string;
@@ -11,11 +13,11 @@ interface ExpensesTableHeaderProps {
   onAddExpense?: () => void;
   onExport?: () => void;
   onFilter?: () => void;
-  columns: { key: string; label: string; visible: boolean; }[];
-  onColumnVisibilityChange: (columns: any[]) => void;
-  savedViews: any[];
-  onViewSelect: (view: any) => void;
-  onViewSave: (name: string, currentState: any) => void;
+  columns: TableColumn[];
+  onColumnVisibilityChange: (columns: TableColumn[]) => void;
+  savedViews: SavedView[];
+  onViewSelect: (view: SavedView) => void;
+  onViewSave: (name: string) => void;
 }
 
 export function ExpensesTableHeader({ 
