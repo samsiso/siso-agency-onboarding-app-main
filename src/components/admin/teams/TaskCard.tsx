@@ -12,10 +12,11 @@ import { TaskDetailDrawer } from './task-detail/TaskDetailDrawer';
 interface TaskCardProps {
   task: Task;
   currentHour?: number;
-  allTasks: Task[];
+  allTasks?: Task[];
+  onDragSuccess?: (task: Task) => void;
 }
 
-export function TaskCard({ task, currentHour, allTasks }: TaskCardProps) {
+export function TaskCard({ task, currentHour, allTasks = [], onDragSuccess }: TaskCardProps) {
   const { handleDragStart, handleDragEnd } = useTaskDragDrop();
   const [showDetailDrawer, setShowDetailDrawer] = useState(false);
   const startTime = task.start_time ? new Date(task.start_time) : null;
@@ -41,12 +42,31 @@ export function TaskCard({ task, currentHour, allTasks }: TaskCardProps) {
     setShowDetailDrawer(true);
   };
 
+  // Add a function to handle drag end with callback
+  const handleDragEndWithCallback = () => {
+    handleDragEnd();
+    // If onDragSuccess prop exists, call it when drag ends
+    if (onDragSuccess) {
+      onDragSuccess(task);
+    }
+  };
+
+  // Get priority-based background color
+  const getPriorityBackground = () => {
+    switch (task.priority) {
+      case 'urgent': return 'bg-red-500/20 border-red-500/50 hover:bg-red-500/30';
+      case 'high': return 'bg-amber-500/20 border-amber-500/50 hover:bg-amber-500/30';
+      case 'medium': return 'bg-purple-500/20 border-purple-500/50 hover:bg-purple-500/30';
+      default: return 'bg-gray-800/50 hover:bg-gray-800/70';
+    }
+  };
+
   return (
     <>
       <Card 
         draggable
         onDragStart={(e) => handleDragStart(e, task)}
-        onDragEnd={handleDragEnd}
+        onDragEnd={handleDragEndWithCallback}
         onClick={handleTaskClick}
         className={cn(
           "absolute p-2 sm:p-3 transition-all duration-200",
@@ -55,7 +75,7 @@ export function TaskCard({ task, currentHour, allTasks }: TaskCardProps) {
           "flex flex-col justify-between gap-2",
           isCurrentTask 
             ? 'bg-purple-500/20 border-purple-500/50' 
-            : 'bg-gray-800/50 hover:bg-gray-800/70',
+            : getPriorityBackground(),
           isRolledOver && 'border-l-4 border-l-amber-500',
           !startTime && 'static'
         )}
