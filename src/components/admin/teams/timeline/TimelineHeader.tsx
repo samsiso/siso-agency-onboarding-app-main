@@ -8,16 +8,17 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from "@/components/ui/dropdown-menu";
 
 interface TimelineHeaderProps {
   onCreateTask: () => void;
   currentDate?: Date;
+  className?: string; // Added className prop
 }
 
-export function TimelineHeader({ onCreateTask, currentDate = new Date() }: TimelineHeaderProps) {
+export function TimelineHeader({ onCreateTask, currentDate = new Date(), className }: TimelineHeaderProps) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 sm:mb-4 gap-2">
+    <div className={`flex flex-col sm:flex-row sm:items-center justify-between mb-3 sm:mb-4 gap-2 ${className || ''}`}>
       <div className="flex items-center gap-2">
         <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-purple-500" />
         <h2 className="text-base sm:text-lg font-semibold truncate">
