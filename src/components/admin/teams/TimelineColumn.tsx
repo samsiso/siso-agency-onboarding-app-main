@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Task } from '@/types/task.types';
 import { TaskCard } from './TaskCard';
@@ -8,14 +9,14 @@ import { TimelineRuler } from './timeline/TimelineRuler';
 import { ScrollButtons } from './timeline/ScrollButtons';
 import { TimeIndicator } from './timeline/TimeIndicator';
 import { RoutineCard } from './timeline/RoutineCard';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { TaskCreationDialog } from './TaskCreationDialog';
 import { TimelineHeader } from './timeline/TimelineHeader';
 import { TimelineGrid } from './timeline/TimelineGrid';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
-const HOUR_HEIGHT = 100; // Standardized height
 
 export function TimelineColumn({ tasks }: { tasks: Task[] }) {
   const { currentTime, timelineRef, getCurrentWindow } = useTimeWindow();
@@ -44,7 +45,11 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
     return new Date(a.start_time).getTime() - new Date(b.start_time).getTime();
   });
 
-  const timePosition = (currentHour * HOUR_HEIGHT) + (currentMinute * (HOUR_HEIGHT / 60));
+  const isMobile = useIsMobile();
+  const HOUR_HEIGHT = isMobile ? 80 : 100; // Increased height to match TaskCard
+  const PIXELS_PER_MINUTE = HOUR_HEIGHT / 60;
+  
+  const timePosition = (currentHour * HOUR_HEIGHT) + (currentMinute * PIXELS_PER_MINUTE);
 
   const handleCreateTask = (hour?: number) => {
     setSelectedHour(hour);
@@ -56,87 +61,90 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <TimelineHeader 
-        onCreateTask={() => handleCreateTask()}
-        currentDate={currentTime}
+    <div className="relative min-h-[400px] sm:min-h-[600px] flex">
+      <TimelineRuler 
+        currentHour={currentHour} 
+        hourHeight={HOUR_HEIGHT}
+        onTimeSlotClick={handleTimeSlotClick}
       />
       
-      <div className="relative flex-1 h-full overflow-hidden">
-        <div 
-          ref={timelineRef}
-          className="absolute inset-0 overflow-y-auto hide-scrollbar"
-        >
-          <div className="relative ml-12 sm:ml-16">
-            <div className="relative" style={{ height: `${24 * HOUR_HEIGHT}px` }}>
-              <TimelineGrid hourHeight={HOUR_HEIGHT} />
-              <TimelineRuler 
-                currentHour={currentHour} 
-                hourHeight={HOUR_HEIGHT}
-                onTimeSlotClick={handleTimeSlotClick}
-              />
-              
-              <TimeIndicator currentTime={currentTime} position={timePosition} />
+      <ScrollButtons 
+        onScrollUp={() => timelineRef.current?.scrollBy({ top: -HOUR_HEIGHT, behavior: 'smooth' })} 
+        onScrollDown={() => timelineRef.current?.scrollBy({ top: HOUR_HEIGHT, behavior: 'smooth' })} 
+      />
 
-              {shouldShowMorningCheckIn() && (
-                <RoutineCard
-                  type="morning"
-                  time={morningCheckInTime}
-                  status={checkInStatus}
-                  onClick={() => setCheckInDialogOpen(true)}
-                />
-              )}
-              
-              {shouldShowEveningCheckOut() && (
-                <RoutineCard
-                  type="evening"
-                  time={eveningCheckOutTime}
-                  status={checkOutStatus}
-                  onClick={() => setCheckOutDialogOpen(true)}
-                />
-              )}
-
-              <div 
-                className="absolute left-0 right-2 sm:right-4 bg-purple-50/5 border-y border-purple-500/20"
-                style={{
-                  top: `${windowStart * HOUR_HEIGHT}px`,
-                  height: `${(windowEnd - windowStart) * HOUR_HEIGHT}px`,
-                }}
-              />
-
-              {allTasks.length === 0 && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center p-6 max-w-xs mx-auto">
-                    <div className="rounded-full bg-gray-100 w-12 h-12 mx-auto mb-4 flex items-center justify-center">
-                      <Plus className="h-6 w-6 text-gray-500" />
-                    </div>
-                    <h3 className="text-lg font-medium mb-2">No tasks scheduled</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Click on a time slot or use the create button to add tasks to your schedule
-                    </p>
-                    <Button onClick={() => handleCreateTask()}>
-                      Create Task
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              {allTasks.map((task) => (
-                <TaskCard 
-                  key={task.id} 
-                  task={task}
-                  currentHour={currentHour}
-                  allTasks={allTasks}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <ScrollButtons 
-          onScrollUp={() => timelineRef.current?.scrollBy({ top: -HOUR_HEIGHT, behavior: 'smooth' })} 
-          onScrollDown={() => timelineRef.current?.scrollBy({ top: HOUR_HEIGHT, behavior: 'smooth' })} 
+      <div className="ml-12 sm:ml-16 relative flex-1">
+        <TimelineHeader 
+          onCreateTask={() => handleCreateTask()}
+          currentDate={currentTime}
         />
+        
+        <ScrollArea 
+          ref={timelineRef}
+          className="h-[400px] sm:h-[600px] relative"
+          scrollHideDelay={0}
+        >
+          <div className={cn(
+            "relative px-1 sm:px-2",
+            "min-h-[1920px] sm:min-h-[2400px]"
+          )}>
+            <TimelineGrid hourHeight={HOUR_HEIGHT} />
+            <TimeIndicator currentTime={currentTime} position={timePosition} />
+            
+            {shouldShowMorningCheckIn() && (
+              <RoutineCard
+                type="morning"
+                time={morningCheckInTime}
+                status={checkInStatus}
+                onClick={() => setCheckInDialogOpen(true)}
+              />
+            )}
+            
+            {shouldShowEveningCheckOut() && (
+              <RoutineCard
+                type="evening"
+                time={eveningCheckOutTime}
+                status={checkOutStatus}
+                onClick={() => setCheckOutDialogOpen(true)}
+              />
+            )}
+
+            <div 
+              className="absolute left-0 right-0 bg-purple-50/5 border-y border-purple-500/20"
+              style={{
+                top: `${windowStart * HOUR_HEIGHT}px`,
+                height: `${(windowEnd - windowStart) * HOUR_HEIGHT}px`,
+              }}
+            />
+
+            {/* Empty state when no tasks */}
+            {allTasks.length === 0 && (
+              <div className="absolute inset-0 flex items-center justify-center h-[600px]">
+                <div className="text-center p-6 max-w-xs mx-auto">
+                  <div className="rounded-full bg-gray-100 w-12 h-12 mx-auto mb-4 flex items-center justify-center">
+                    <Plus className="h-6 w-6 text-gray-500" />
+                  </div>
+                  <h3 className="text-lg font-medium mb-2">No tasks scheduled</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Click on a time slot or use the create button to add tasks to your schedule
+                  </p>
+                  <Button onClick={() => handleCreateTask()}>
+                    Create Task
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {allTasks.map((task) => (
+              <TaskCard 
+                key={task.id} 
+                task={task}
+                currentHour={currentHour}
+                allTasks={allTasks}
+              />
+            ))}
+          </div>
+        </ScrollArea>
       </div>
 
       <CheckInOutDialog
