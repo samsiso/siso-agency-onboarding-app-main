@@ -1,18 +1,20 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { Task, TaskCategory, TaskStats, TaskPriority } from '@/types/task.types';
 import { fetchTasks, fetchTaskStats } from '@/api/taskApi';
 import { useTaskOperations } from './useTaskOperations';
 
-/**
- * Hook for task-related operations and queries
- */
 export function useTasks() {
-  // Re-export task types for backward compatibility
   const useTaskQuery = (category?: TaskCategory, userId?: string) => {
+    console.log('Fetching tasks with category:', category, 'userId:', userId);
     return useQuery({
       queryKey: ['tasks', category, userId],
-      queryFn: () => fetchTasks(category, userId)
+      queryFn: () => fetchTasks(category, userId),
+      onSuccess: (data) => {
+        console.log('Tasks fetched successfully:', data);
+      },
+      onError: (error) => {
+        console.error('Error fetching tasks:', error);
+      }
     });
   };
 

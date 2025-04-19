@@ -15,8 +15,8 @@ import { TaskCard } from './TaskCard';
 
 export function TimelineTaskView({ memberId }: { memberId?: string }) {
   const { useTaskQuery } = useTasks();
-  const { data: dailyTasks = [] } = useTaskQuery('daily', memberId);
-  const { data: sisoTasks = [] } = useTaskQuery('siso_app_dev', memberId);
+  const { data: dailyTasks = [] } = useTaskQuery('daily');
+  const { data: sisoTasks = [] } = useTaskQuery('siso_app_dev');
   const { greeting, icon: DayPeriodIcon, gradientClass } = useDayPeriod();
   const { morningCheckInTime, eveningCheckOutTime } = useCheckInOut();
   const [rolledOverTasks, setRolledOverTasks] = useState<Task[]>([]);
@@ -28,12 +28,13 @@ export function TimelineTaskView({ memberId }: { memberId?: string }) {
            (task.recurring_type && task.recurring_type !== 'none');
   });
 
+  // Filter tasks that are not completed and don't have a start time
   const upcomingTasks = sisoTasks.filter(task => 
     task.status !== 'completed' && !task.start_time
   ).sort((a, b) => {
     // Sort by priority (high -> medium -> low)
     const priorityOrder = { high: 0, medium: 1, low: 2 };
-    return priorityOrder[a.priority] - priorityOrder[b.priority];
+    return (priorityOrder[a.priority] || 0) - (priorityOrder[b.priority] || 0);
   });
 
   // Determine rolled-over tasks
