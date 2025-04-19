@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useTasks } from '@/hooks/useTasks';
 import { Task } from '@/types/task.types';
@@ -14,7 +13,7 @@ export function useTaskDragDrop() {
   
   const HOUR_HEIGHT = isMobile ? 60 : 100;
   const MINUTES_IN_HOUR = 60;
-
+  
   const calculateTimeFromPosition = (y: number) => {
     const totalMinutes = Math.round((y / HOUR_HEIGHT) * MINUTES_IN_HOUR);
     const hours = Math.floor(totalMinutes / MINUTES_IN_HOUR);
@@ -26,6 +25,11 @@ export function useTaskDragDrop() {
   };
 
   const handleDragStart = (e: React.DragEvent, task: Task) => {
+    if (!task.id) {
+      console.error('Invalid task dragged:', task);
+      return;
+    }
+
     const taskElement = e.currentTarget as HTMLElement;
     e.dataTransfer.setData('taskId', task.id);
     e.dataTransfer.effectAllowed = 'move';
@@ -48,7 +52,6 @@ export function useTaskDragDrop() {
     
     setIsDragging(true);
 
-    // Show guide line
     let guideLine = document.getElementById('dragGuideLine');
     if (!guideLine) {
       guideLine = document.createElement('div');
@@ -70,21 +73,26 @@ export function useTaskDragDrop() {
   const handleDrop = async (e: React.DragEvent, dropZone: HTMLElement) => {
     e.preventDefault();
     const taskId = e.dataTransfer.getData('taskId');
+    
     if (!taskId) {
+      console.error('No task ID found in drop event');
       toast({
         variant: "destructive",
         title: "Error rescheduling task",
         description: "Could not identify the task being moved"
       });
+      handleDragEnd();
       return;
     }
-    
+
     try {
+      console.log('Attempting to reschedule task:', taskId);
       const rect = dropZone.getBoundingClientRect();
       const scrollOffset = dropZone.scrollTop || 0;
       const y = e.clientY - rect.top + scrollOffset;
       
       const newStartTime = calculateTimeFromPosition(y);
+      console.log('New start time calculated:', newStartTime.toISOString());
       
       await updateTaskMutation.mutateAsync({
         id: taskId,
