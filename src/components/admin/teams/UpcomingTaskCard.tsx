@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Task } from '@/types/task.types';
@@ -59,62 +58,61 @@ export function UpcomingTaskCard({ task, onDragSuccess }: UpcomingTaskCardProps)
           getPriorityBackground()
         )}
       >
-        <div className="flex justify-between items-start">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1.5">
-              <PriorityBadge priority={task.priority} />
-              {task.due_date && (
-                <div className="flex items-center text-xs text-muted-foreground gap-1">
-                  <Calendar className="h-3 w-3" />
-                  <span>Due: {format(new Date(task.due_date), 'MMM d')}</span>
-                </div>
+        <div className="flex flex-col gap-3">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-2 mb-2">
+                <PriorityBadge priority={task.priority} />
+                {task.due_date && (
+                  <div className="flex items-center text-xs text-muted-foreground gap-1">
+                    <Calendar className="h-3 w-3" />
+                    <span>Due: {format(new Date(task.due_date), 'MMM d')}</span>
+                  </div>
+                )}
+              </div>
+              
+              <h3 className="font-medium text-sm sm:text-base mb-2 line-clamp-2">
+                {task.title}
+              </h3>
+              
+              {task.description && (
+                <p className="text-xs text-muted-foreground line-clamp-2 mb-3">
+                  {task.description}
+                </p>
               )}
             </div>
             
-            <h3 className="font-medium text-sm sm:text-base mb-1.5 line-clamp-2">
-              {task.title}
-            </h3>
-            
-            {task.description && (
-              <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
-                {task.description}
-              </p>
-            )}
-            
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <Button 
-                  size="sm" 
-                  variant="outline"
-                  className="h-7 text-xs"
-                  onClick={() => setShowDetailDrawer(true)}
-                >
-                  View Details
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal className="h-4 w-4" />
                 </Button>
-              </div>
-              
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                    <span className="sr-only">Open menu</span>
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => setShowDetailDrawer(true)}>
-                    View Details
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => {
-                      // This would be implemented to actually schedule the task
-                      if (onDragSuccess) onDragSuccess(task);
-                    }}
-                  >
-                    Schedule Task
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-[160px]">
+                <DropdownMenuItem onClick={() => setShowDetailDrawer(true)}>
+                  View Details
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => {
+                    if (onDragSuccess) onDragSuccess(task);
+                  }}
+                >
+                  Schedule Task
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <Button 
+              size="sm" 
+              variant="outline"
+              className="h-7 text-xs"
+              onClick={() => setShowDetailDrawer(true)}
+            >
+              View Details
+            </Button>
           </div>
         </div>
       </Card>
