@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Task } from '@/types/task.types';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter } from '@/components/ui/drawer';
@@ -10,6 +9,7 @@ import { Plus } from 'lucide-react';
 import { TaskContent } from './task-detail/TaskContent';
 import { TaskMetadata } from './task-detail/TaskMetadata';
 import { TaskActions } from './task-detail/TaskActions';
+import { format } from 'date-fns';
 
 interface TaskDetailDrawerProps {
   task: Task | null;
