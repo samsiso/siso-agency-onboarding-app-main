@@ -1,8 +1,6 @@
-
 import React, { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { TimelineColumn } from './TimelineColumn';
-import { TaskCard } from './TaskCard';
 import { Task } from '@/types/task.types';
 import { useTasks } from '@/hooks/useTasks';
 import { format } from 'date-fns';
@@ -15,60 +13,40 @@ import { useIsMobile } from '@/hooks/use-mobile';
 
 export function TimelineTaskView({ memberId }: { memberId?: string }) {
   const { useTaskQuery } = useTasks();
-  const { data: tasks = [] } = useTaskQuery('daily', memberId);
+  const { data: dailyTasks = [] } = useTaskQuery('daily', memberId);
+  const { data: sisoTasks = [] } = useTaskQuery('siso_app_dev', memberId);
   const { greeting, icon: DayPeriodIcon, gradientClass } = useDayPeriod();
   const { morningCheckInTime, eveningCheckOutTime } = useCheckInOut();
   const [rolledOverTasks, setRolledOverTasks] = useState<Task[]>([]);
   const isMobile = useIsMobile();
 
-  const todaysTasks = tasks.filter(task => {
+  const todaysTasks = dailyTasks.filter(task => {
     if (!task.start_time) return false;
     return format(new Date(task.start_time), 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd') ||
            (task.recurring_type && task.recurring_type !== 'none');
   });
 
-  const upcomingTasks = tasks.filter(task => {
-    if (!task.due_date || task.start_time) return false;
-    const dueDate = new Date(task.due_date);
-    const today = new Date();
-    return dueDate > today && format(dueDate, 'yyyy-MM-dd') !== format(today, 'yyyy-MM-dd');
+  const upcomingTasks = sisoTasks.filter(task => 
+    task.status !== 'completed' && !task.start_time
+  ).sort((a, b) => {
+    // Sort by priority (high -> medium -> low)
+    const priorityOrder = { high: 0, medium: 1, low: 2 };
+    return priorityOrder[a.priority] - priorityOrder[b.priority];
   });
 
   // Determine rolled-over tasks
   useEffect(() => {
-    const rolledOver = tasks.filter(task => !!task.rolled_over_from);
+    const rolledOver = dailyTasks.filter(task => !!task.rolled_over_from);
     setRolledOverTasks(rolledOver);
-  }, [tasks]);
+  }, [dailyTasks]);
 
-  const recurringTasks = tasks.filter(task => task.recurring_type && task.recurring_type !== 'none');
+  const recurringTasks = dailyTasks.filter(task => task.recurring_type && task.recurring_type !== 'none');
   const today = new Date();
   const formattedDate = format(today, 'EEEE, MMMM d, yyyy');
 
   // Format times
   const morningCheckInTimeStr = format(morningCheckInTime, 'h:mm a');
   const eveningCheckOutTimeStr = format(eveningCheckOutTime, 'h:mm a');
-
-  // Test task for SISO Agency App Dev
-  const testTask: Task = {
-    id: 'test-task',
-    title: 'SISO Agency App Development',
-    description: 'Work on core features and improvements',
-    status: 'in_progress',
-    priority: 'high',
-    category: 'siso_app_dev',
-    created_at: new Date().toISOString(),
-    start_time: (() => {
-      const time = new Date();
-      time.setHours(10, 0, 0, 0);
-      return time.toISOString();
-    })(),
-    duration: 60
-  };
-
-  const allTasks = [...tasks, testTask].sort((a, b) => {
-    if (!a.start_time || !b.start_time) return 0;
-    return new Date(a.start_time).getTime() - new Date(b.start_time).getTime();
-  });
 
   return (
     <div className="space-y-6">
@@ -141,16 +119,22 @@ export function TimelineTaskView({ memberId }: { memberId?: string }) {
         <Card className="p-3 sm:p-4">
           <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-4">Upcoming Tasks</h2>
           <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">
-            Drag tasks to the timeline to schedule them
+            SISO App Development Tasks - Drag tasks to the timeline to schedule them
           </p>
           <div className="max-h-[300px] sm:max-h-[600px] overflow-y-auto hide-scrollbar space-y-3 sm:space-y-4">
-            {upcomingTasks.map(task => (
-              <TaskCard 
-                key={task.id} 
-                task={task}
-                allTasks={upcomingTasks}
-              />
-            ))}
+            {upcomingTasks.length > 0 ? (
+              upcomingTasks.map(task => (
+                <TaskCard 
+                  key={task.id} 
+                  task={task}
+                  allTasks={upcomingTasks}
+                />
+              ))
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                No upcoming SISO App tasks
+              </div>
+            )}
           </div>
         </Card>
       </div>
