@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { useTasks } from '@/hooks/useTasks';
@@ -25,8 +24,8 @@ interface TimelineTaskViewProps {
 
 export function TimelineTaskView({ memberId }: TimelineTaskViewProps) {
   const { useTaskQuery } = useTasks();
-  const { data: dailyTasks = [], isLoading: isDailyTasksLoading } = useTaskQuery('daily', memberId);
-  const { data: sisoTasks = [], isLoading: isSisoTasksLoading } = useTaskQuery('siso_app_dev', memberId);
+  const { data: dailyTasks = [], isLoading: isDailyTasksLoading } = useTaskQuery('daily');
+  const { data: sisoTasks = [], isLoading: isSisoTasksLoading } = useTaskQuery('siso_app_dev');
   const { greeting, icon: DayPeriodIcon, gradientClass } = useDayPeriod();
   const { morningCheckInTime, eveningCheckOutTime } = useCheckInOut();
   const [rolledOverTasks, setRolledOverTasks] = useState<Task[]>([]);
@@ -35,21 +34,23 @@ export function TimelineTaskView({ memberId }: TimelineTaskViewProps) {
 
   const todaysTasks = dailyTasks.filter(task => {
     if (!task.start_time) return false;
-    return format(new Date(task.start_time), 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd') ||
-           (task.recurring_type && task.recurring_type !== 'none');
+    const taskDate = new Date(task.start_time);
+    const today = new Date();
+    return (
+      taskDate.getDate() === today.getDate() &&
+      taskDate.getMonth() === today.getMonth() &&
+      taskDate.getFullYear() === today.getFullYear()
+    ) || (task.recurring_type && task.recurring_type !== 'none');
   });
 
-  // Filter tasks that are not completed and don't have a start time
-  // Apply proper sorting by priority (high -> medium -> low)
-  const upcomingTasks = sisoTasks.filter(task => 
-    task.status !== 'completed' && !task.start_time
-  ).sort((a, b) => {
-    // Sort by priority (high -> medium -> low)
-    const priorityOrder = { urgent: 0, high: 1, medium: 2, low: 3 };
-    return (priorityOrder[a.priority] || 99) - (priorityOrder[b.priority] || 99);
-  });
+  // Sort upcoming tasks by priority
+  const upcomingTasks = sisoTasks
+    .filter(task => !task.start_time && task.status !== 'completed')
+    .sort((a, b) => {
+      const priorityOrder = { urgent: 0, high: 1, medium: 2, low: 3 };
+      return (priorityOrder[a.priority] || 99) - (priorityOrder[b.priority] || 99);
+    });
 
-  // Determine rolled-over tasks
   useEffect(() => {
     const rolledOver = dailyTasks.filter(task => !!task.rolled_over_from);
     setRolledOverTasks(rolledOver);
@@ -105,7 +106,9 @@ export function TimelineTaskView({ memberId }: TimelineTaskViewProps) {
       </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        
         <Card className="p-3 sm:p-4 overflow-hidden">
+          
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 sm:mb-4 gap-2">
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-purple-500" />
@@ -133,16 +136,18 @@ export function TimelineTaskView({ memberId }: TimelineTaskViewProps) {
               </div>
             </div>
           </div>
+
           <div className="max-h-[400px] sm:max-h-[600px] overflow-y-auto hide-scrollbar relative">
             {isDailyTasksLoading ? (
               <div className="flex items-center justify-center h-40">
                 <div className="animate-pulse text-muted-foreground">Loading tasks...</div>
               </div>
             ) : (
-              <TimelineColumn tasks={dailyTasks} />
+              <TimelineColumn tasks={todaysTasks} />
             )}
           </div>
         </Card>
+        
         
         <Card className="p-3 sm:p-4">
           <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-4 flex items-center gap-2">
@@ -160,8 +165,8 @@ export function TimelineTaskView({ memberId }: TimelineTaskViewProps) {
           ) : (
             <ScrollArea className="h-[300px] sm:h-[520px] w-full relative">
               <div className="space-y-3 pr-6">
-                {sisoTasks.length > 0 ? (
-                  sisoTasks.map(task => (
+                {upcomingTasks.length > 0 ? (
+                  upcomingTasks.map(task => (
                     <TaskCard 
                       key={task.id} 
                       task={task}
