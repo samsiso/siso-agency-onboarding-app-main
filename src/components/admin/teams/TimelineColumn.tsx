@@ -14,6 +14,7 @@ import { TimelineHeader } from './timeline/TimelineHeader';
 import { TimelineGrid } from './timeline/TimelineGrid';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 export function TimelineColumn({ tasks }: { tasks: Task[] }) {
   const { currentTime, timelineRef, getCurrentWindow, scrollToCurrentTime } = useTimeWindow();
@@ -59,25 +60,15 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
         onTimeSlotClick={handleTimeSlotClick}
       />
       
-      <div className="ml-12 sm:ml-16 relative flex-1 overflow-hidden">
+      <div className="ml-12 sm:ml-16 relative flex-1">
         <TimelineHeader 
           onCreateTask={() => handleCreateTask()}
           currentDate={currentTime}
         />
         
-        <div 
+        <ScrollArea 
           ref={timelineRef}
-          className={cn(
-            "overflow-y-auto relative",
-            "h-[calc(100vh-220px)]",
-            "will-change-scroll",
-            "scrollbar-gutter-stable",
-            "scroll-smooth"
-          )}
-          style={{
-            contain: 'strict',
-            WebkitOverflowScrolling: 'touch'
-          }}
+          className="h-[calc(100vh-220px)]"
         >
           <div className="relative px-1 sm:px-2 min-h-[2400px]">
             <TimelineGrid hourHeight={100} />
@@ -101,7 +92,6 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
               />
             )}
 
-            {/* Empty state when no tasks */}
             {allTasks.length === 0 && (
               <div className="absolute inset-0 flex items-center justify-center h-[600px]">
                 <div className="text-center p-6 max-w-xs mx-auto">
@@ -128,7 +118,7 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
               />
             ))}
           </div>
-        </div>
+        </ScrollArea>
       </div>
 
       <CheckInOutDialog
