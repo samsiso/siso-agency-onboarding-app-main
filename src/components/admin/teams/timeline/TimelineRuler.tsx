@@ -14,7 +14,7 @@ export function TimelineRuler({ currentHour, hourHeight: propHourHeight, onTimeS
   const { handleDrop, handleDragOver, isDragging } = useTaskDragDrop();
   const timeSlots = Array.from({ length: 24 }, (_, i) => i);
   const isMobile = useIsMobile();
-  const hourHeight = propHourHeight || (isMobile ? 60 : 80);
+  const hourHeight = propHourHeight || 100;
 
   const handleTimeSlotDrop = (e: React.DragEvent, hour: number) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -39,8 +39,8 @@ export function TimelineRuler({ currentHour, hourHeight: propHourHeight, onTimeS
           className={cn(
             "flex items-center justify-center text-xs sm:text-sm transition-colors relative cursor-pointer",
             hour === currentHour && "bg-purple-100/10 font-bold",
-            isDragging && "hover:bg-purple-100/5",
-            "hover:bg-purple-100/5"
+            isDragging && "hover:bg-purple-100/30",
+            "hover:bg-purple-100/10"
           )}
           style={{
             height: `${hourHeight}px`,
@@ -49,7 +49,7 @@ export function TimelineRuler({ currentHour, hourHeight: propHourHeight, onTimeS
         >
           {`${hour.toString().padStart(2, '0')}:00`}
           {isDragging && (
-            <div className="absolute inset-0 border-2 border-purple-500/20 border-dashed pointer-events-none" />
+            <div className="absolute inset-0 border-2 border-purple-500/40 border-dashed pointer-events-none" />
           )}
         </div>
       ))}
