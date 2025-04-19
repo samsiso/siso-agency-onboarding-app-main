@@ -1,26 +1,30 @@
-
 import React, { useState } from 'react';
 import { Task } from '@/types/task.types';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Users, ChevronDown, ChevronUp, RefreshCcw, GripVertical } from 'lucide-react';
+import { Clock, Users, ChevronDown, ChevronUp, RefreshCcw } from 'lucide-react';
 import { format } from 'date-fns';
 import { useTaskDragDrop } from '@/hooks/useTaskDragDrop';
 import { cn } from '@/lib/utils';
 import { SubtaskList } from './SubtaskList';
 import { Progress } from '@/components/ui/progress';
 import { PriorityBadge } from './PriorityBadge';
+import { useTaskPositioning } from '@/hooks/useTaskPositioning';
 
 interface TaskCardProps {
   task: Task;
   currentHour?: number;
+  allTasks: Task[];
 }
 
-export function TaskCard({ task, currentHour }: TaskCardProps) {
+export function TaskCard({ task, currentHour, allTasks }: TaskCardProps) {
   const { handleDragStart, handleDragEnd } = useTaskDragDrop();
   const [isExpanded, setIsExpanded] = useState(false);
   const startTime = task.start_time ? new Date(task.start_time) : null;
-  const duration = task.duration || 60;
+  const { calculateTaskPosition, findOverlappingTasks } = useTaskPositioning();
+  
+  const overlappingTasks = findOverlappingTasks(allTasks, task);
+  const position = calculateTaskPosition(task, overlappingTasks);
 
   const subtasks = [
     { id: '1', title: 'Review agenda', completed: true },
@@ -28,22 +32,6 @@ export function TaskCard({ task, currentHour }: TaskCardProps) {
     { id: '3', title: 'Update task status', completed: false },
     { id: '4', title: 'Prepare for standup', completed: false },
   ];
-
-  const getTaskPosition = () => {
-    if (!startTime) return {};
-    const minutes = startTime.getHours() * 60 + startTime.getMinutes();
-    const pixelsPerMinute = 80 / 60; // 80px per hour
-    const topPosition = minutes * pixelsPerMinute;
-    const baseHeight = duration * pixelsPerMinute;
-    const minHeight = 120;
-    const heightInPixels = Math.max(baseHeight, minHeight);
-    
-    return {
-      top: `${topPosition}px`,
-      height: `${heightInPixels}px`,
-      width: 'calc(100% - 2rem)'
-    };
-  };
 
   const isCurrentTask = startTime && currentHour === startTime.getHours();
   const isRolledOver = !!task.rolled_over_from;
@@ -65,7 +53,12 @@ export function TaskCard({ task, currentHour }: TaskCardProps) {
           : 'bg-gray-800/50 hover:bg-gray-800/70',
         isRolledOver && 'border-l-4 border-l-amber-500'
       )}
-      style={getTaskPosition()}
+      style={{
+        top: `${position.top}px`,
+        left: `${position.left}%`,
+        height: `${position.height}px`,
+        width: position.width,
+      }}
     >
       <div className="space-y-3">
         <div className="flex items-start justify-between gap-3">

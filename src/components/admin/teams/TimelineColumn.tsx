@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Task } from '@/types/task.types';
 import { TaskCard } from './TaskCard';
@@ -31,7 +30,7 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
   const currentHour = currentTime.getHours();
   const currentMinute = currentTime.getMinutes();
 
-  // Test task for SISO Agency App Dev at 10am
+  // Test task for SISO Agency App Dev
   const testTask: Task = {
     id: 'test-task',
     title: 'SISO Agency App Development',
@@ -42,13 +41,16 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
     created_at: new Date().toISOString(),
     start_time: (() => {
       const time = new Date();
-      time.setHours(10, 0, 0, 0); // Set to 10:00 AM
+      time.setHours(10, 0, 0, 0);
       return time.toISOString();
     })(),
-    duration: 60 // 1 hour duration
+    duration: 60
   };
 
-  const allTasks = [...tasks, testTask];
+  const allTasks = [...tasks, testTask].sort((a, b) => {
+    if (!a.start_time || !b.start_time) return 0;
+    return new Date(a.start_time).getTime() - new Date(b.start_time).getTime();
+  });
 
   const HOUR_HEIGHT = 80;
   const PIXELS_PER_MINUTE = HOUR_HEIGHT / 60;
@@ -60,8 +62,10 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
   return (
     <div className="relative min-h-[600px] flex">
       <TimelineRuler currentHour={currentHour} />
-      <ScrollButtons onScrollUp={() => timelineRef.current?.scrollBy({ top: -80, behavior: 'smooth' })} 
-                    onScrollDown={() => timelineRef.current?.scrollBy({ top: 80, behavior: 'smooth' })} />
+      <ScrollButtons 
+        onScrollUp={() => timelineRef.current?.scrollBy({ top: -80, behavior: 'smooth' })} 
+        onScrollDown={() => timelineRef.current?.scrollBy({ top: 80, behavior: 'smooth' })} 
+      />
 
       <div className="ml-16 relative flex-1">
         <ScrollArea 
@@ -70,7 +74,7 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
           scrollHideDelay={0}
         >
           <div className="relative min-h-[1920px] px-4">
-            <TimeIndicator currentTime={currentTime} position={currentHour * 80 + (currentMinute / 60) * 80} />
+            <TimeIndicator currentTime={currentTime} position={timePosition} />
             
             {shouldShowMorningCheckIn() && (
               <RoutineCard
@@ -103,6 +107,7 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
                 key={task.id} 
                 task={task}
                 currentHour={currentHour}
+                allTasks={allTasks}
               />
             ))}
           </div>
