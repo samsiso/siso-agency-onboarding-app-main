@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { TimelineTaskView } from './TimelineTaskView';
+import { TaskBank } from '../tasks/TaskBank';
 
 interface TeamTaskViewProps {
   memberId?: string;
@@ -41,13 +42,17 @@ export function TeamTaskView({ memberId }: TeamTaskViewProps) {
             <Tabs defaultValue="timeline" className="space-y-6">
               <TabsList>
                 <TabsTrigger value="timeline">Timeline</TabsTrigger>
+                <TabsTrigger value="tasks">Tasks</TabsTrigger>
                 <TabsTrigger value="daily">Daily Tasks</TabsTrigger>
                 <TabsTrigger value="overall">Overall Tasks</TabsTrigger>
-                <TabsTrigger value="goals">Goals</TabsTrigger>
               </TabsList>
 
               <TabsContent value="timeline" className="space-y-4">
                 <TimelineTaskView memberId={memberId} />
+              </TabsContent>
+
+              <TabsContent value="tasks" className="space-y-4">
+                <TaskBank userId={memberId} />
               </TabsContent>
 
               <TabsContent value="daily" className="space-y-4">
@@ -56,10 +61,6 @@ export function TeamTaskView({ memberId }: TeamTaskViewProps) {
 
               <TabsContent value="overall" className="space-y-4">
                 <TaskList category="main" userId={memberId} />
-              </TabsContent>
-
-              <TabsContent value="goals" className="space-y-4">
-                <TaskList category="weekly" userId={memberId} />
               </TabsContent>
             </Tabs>
           </div>
