@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Task } from '@/types/task.types';
 import { Card } from '@/components/ui/card';
@@ -7,7 +8,6 @@ import { Progress } from '@/components/ui/progress';
 import { PriorityBadge } from './PriorityBadge';
 import { useTaskPositioning } from '@/hooks/useTaskPositioning';
 import { TaskDetailDrawer } from './task-detail/TaskDetailDrawer';
-import { GripVertical } from 'lucide-react';
 
 interface TaskCardProps {
   task: Task;
@@ -18,21 +18,10 @@ interface TaskCardProps {
 export function TaskCard({ task, currentHour, allTasks = [] }: TaskCardProps) {
   const { handleDragStart, handleDragEnd } = useTaskDragDrop();
   const [showDetailDrawer, setShowDetailDrawer] = useState(false);
-  const { calculateTaskPosition, findOverlappingTasks } = useTaskPositioning();
-  const [isHovered, setIsHovered] = useState(false);
-  
-  // Find overlapping tasks
-  const overlappingTasks = findOverlappingTasks(allTasks, task);
-  
-  // Calculate position based on start time and overlapping tasks
-  const { top, left, height, width } = calculateTaskPosition(task, overlappingTasks);
-  
   const startTime = task.start_time ? new Date(task.start_time) : null;
-  
-  // Format time display
-  const timeDisplay = startTime 
-    ? startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    : '';
+  const duration = task.duration || 60; // Default to 1 hour if no duration specified
+  const rowStart = startTime ? startTime.getHours() + 1 : 1; // Grid rows start at 1
+  const rowSpan = Math.ceil(duration / 60); // Convert minutes to hours, rounded up
 
   // Check if this is the current task based on start time and current hour
   const isCurrentTask = currentHour !== undefined && startTime && 
@@ -65,58 +54,35 @@ export function TaskCard({ task, currentHour, allTasks = [] }: TaskCardProps) {
         onDragStart={(e) => handleDragStart(e, task)}
         onDragEnd={handleDragEnd}
         onClick={handleTaskClick}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
         className={cn(
           "absolute p-2 sm:p-3 transition-all duration-200",
           "hover:ring-2 hover:ring-purple-500/50 backdrop-blur-sm",
-          "rounded-lg border shadow-md touch-manipulation cursor-pointer",
+          "rounded-lg border shadow-lg touch-manipulation cursor-pointer",
           "flex flex-col justify-between gap-2 pointer-events-auto",
           isCurrentTask ? 'bg-purple-500/20 border-purple-500/50' : getPriorityBackground(),
-          "z-10 animate-fade-in"
+          "z-10"
         )}
         style={{
-          top: `${top}px`,
-          left: `${left}%`,
-          height: `${height}px`,
-          width,
+          gridRow: `${rowStart} / span ${rowSpan}`,
+          left: '8px',
+          right: '8px',
+          minHeight: 0
         }}
       >
-        <div className="flex items-start justify-between">
-          <div className="flex-1 space-y-2">
-            <div className="flex items-start justify-between gap-2">
-              <h3 className="font-medium text-sm sm:text-base line-clamp-2">
-                {task.title}
-              </h3>
-              <PriorityBadge priority={task.priority} />
-            </div>
-            
-            {task.description && (
-              <p className="text-xs text-muted-foreground line-clamp-2">
-                {task.description}
-              </p>
-            )}
+        <div className="space-y-2">
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="font-medium text-sm sm:text-base line-clamp-2">
+              {task.title}
+            </h3>
+            <PriorityBadge priority={task.priority} />
           </div>
           
-          <div 
-            className={cn(
-              "h-full cursor-grab active:cursor-grabbing",
-              "px-1 -my-2 -mr-2 flex items-center opacity-0 transition-opacity",
-              isHovered && "opacity-100"
-            )}
-            onMouseDown={(e) => e.stopPropagation()}
-          >
-            <GripVertical className="h-4 w-4 text-muted-foreground" />
-          </div>
-        </div>
-        
-        <div className="mt-auto space-y-2">
-          {timeDisplay && (
-            <div className="text-xs font-medium text-muted-foreground">
-              {timeDisplay}
-            </div>
+          {task.description && (
+            <p className="text-xs text-muted-foreground line-clamp-2">
+              {task.description}
+            </p>
           )}
-          
+
           <div className="space-y-1">
             <div className="flex items-center justify-between text-xs text-muted-foreground">
               <span>Progress</span>

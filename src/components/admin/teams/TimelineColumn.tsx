@@ -14,7 +14,6 @@ import { TimelineGrid } from './timeline/TimelineGrid';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useTaskDragDrop } from '@/hooks/useTaskDragDrop';
 
 export function TimelineColumn({ tasks }: { tasks: Task[] }) {
   const { currentTime, timelineRef, getCurrentWindow, scrollToCurrentTime } = useTimeWindow();
@@ -28,8 +27,6 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
     checkInStatus,
     checkOutStatus
   } = useCheckInOut();
-
-  const { isDragging } = useTaskDragDrop();
   
   const [checkInDialogOpen, setCheckInDialogOpen] = useState(false);
   const [checkOutDialogOpen, setCheckOutDialogOpen] = useState(false);
@@ -38,8 +35,6 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
 
   const currentHour = currentTime.getHours();
   const currentMinute = currentTime.getMinutes();
-
-  const hourHeight = 100; // Consistent height for grid cells and ruler
 
   const allTasks = [...tasks].sort((a, b) => {
     if (!a.start_time || !b.start_time) return 0;
@@ -68,29 +63,28 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
           ref={timelineRef}
           className="h-[calc(100vh-13rem)]"
         >
-          <div className="relative min-h-[2400px]">
-            <div 
-              className="absolute top-0 left-0 bottom-0 w-16 bg-background/80 backdrop-blur z-10"
-              style={{ height: `${24 * hourHeight}px` }}
-            >
+          <div 
+            className="relative min-h-[2400px]"
+            style={{ paddingLeft: '4rem' }} // Space for the ruler
+          >
+            {/* Sticky ruler container */}
+            <div className="absolute left-0 top-0 bottom-0 w-16 bg-background/80 backdrop-blur z-10">
               <TimelineRuler 
                 currentHour={currentHour} 
-                hourHeight={hourHeight}
+                hourHeight={100}
                 onTimeSlotClick={handleTimeSlotClick}
               />
             </div>
 
-            <div className="relative ml-16 px-4">
-              {/* Background grid */}
-              <TimelineGrid hourHeight={hourHeight} />
+            {/* Main content area */}
+            <div className="relative pl-4 pr-4">
+              <TimelineGrid hourHeight={100} />
               
-              {/* Current time indicator */}
               <TimeIndicator 
                 currentTime={currentTime} 
-                position={currentHour * hourHeight + (currentMinute / 60) * hourHeight} 
+                position={currentHour * 100 + (currentMinute / 60) * 100} 
               />
               
-              {/* Morning routine card */}
               {shouldShowMorningCheckIn() && (
                 <RoutineCard
                   type="morning"
@@ -100,7 +94,6 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
                 />
               )}
               
-              {/* Evening routine card */}
               {shouldShowEveningCheckOut() && (
                 <RoutineCard
                   type="evening"
@@ -110,13 +103,7 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
                 />
               )}
 
-              {/* Task cards */}
-              <div 
-                className={cn(
-                  "absolute inset-0", 
-                  isDragging && "bg-purple-500/5 transition-colors"
-                )}
-              >
+              <div className="absolute inset-0 grid grid-rows-[repeat(24,100px)] gap-0 pointer-events-none">
                 {allTasks.map((task) => (
                   <TaskCard 
                     key={task.id} 
@@ -127,7 +114,6 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
                 ))}
               </div>
 
-              {/* Empty state */}
               {allTasks.length === 0 && (
                 <div className="absolute inset-0 flex items-center justify-center h-[600px]">
                   <div className="text-center p-6 max-w-xs mx-auto">
@@ -172,9 +158,4 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
       />
     </div>
   );
-}
-
-// Helper for className conditionals
-function cn(...classes: (string | boolean | undefined)[]) {
-  return classes.filter(Boolean).join(' ');
 }

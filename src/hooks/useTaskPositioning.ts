@@ -11,15 +11,13 @@ interface TaskPosition {
 
 export function useTaskPositioning() {
   const isMobile = useIsMobile();
-  const HOUR_HEIGHT = 100; // Consistent height with TimelineRuler
+  const HOUR_HEIGHT = isMobile ? 80 : 100; // Increased height
   const MINUTES_IN_HOUR = 60;
-  const CARD_MIN_HEIGHT = 60; // Minimum card height
-  const HORIZONTAL_OFFSET = 4; // Percentage offset for overlapping tasks
-  const BASE_LEFT_OFFSET = 16; // Base left offset to align with ruler
+  const CARD_MIN_HEIGHT = isMobile ? 80 : 100; // Increased minimum height
 
   const calculateTaskPosition = (task: Task, overlappingTasks: Task[] = []): TaskPosition => {
     if (!task.start_time) {
-      return { top: 0, left: BASE_LEFT_OFFSET, height: CARD_MIN_HEIGHT, width: '95%' };
+      return { top: 0, left: 0, height: CARD_MIN_HEIGHT, width: '100%' };
     }
 
     const startTime = new Date(task.start_time);
@@ -32,33 +30,26 @@ export function useTaskPositioning() {
     const heightInPixels = Math.max(duration * pixelsPerMinute, CARD_MIN_HEIGHT);
 
     // Handle overlapping tasks
-    const baseWidth = isMobile ? 90 : 95; // Base width percentage
-    let leftOffset = BASE_LEFT_OFFSET; // Start with base offset
+    const offsetWidth = isMobile ? 92 : 85; // Adjusted width percentages
+    let leftOffset = 0;
     
     if (overlappingTasks.length > 0) {
-      // Find this task's index among overlapping tasks (sorted by ID to keep consistent)
-      const sortedTasks = [...overlappingTasks, task].sort((a, b) => a.id.localeCompare(b.id));
-      const taskIndex = sortedTasks.findIndex(t => t.id === task.id);
-      
-      // Calculate offset based on task's position in the sorted overlapping tasks
-      leftOffset = BASE_LEFT_OFFSET + (taskIndex * HORIZONTAL_OFFSET);
-      
-      // Adjust width based on number of overlapping tasks
-      const adjustedWidth = baseWidth - ((sortedTasks.length - 1) * HORIZONTAL_OFFSET);
-      
+      const taskIndex = overlappingTasks.findIndex(t => t.id === task.id);
+      leftOffset = (taskIndex * (isMobile ? 6 : 12)); // Adjusted offset
+      const width = `${offsetWidth - (overlappingTasks.length - 1) * (isMobile ? 6 : 12)}%`;
       return {
         top: topPosition,
         left: leftOffset,
         height: heightInPixels,
-        width: `${Math.max(adjustedWidth, 60)}%` // Ensure minimum width
+        width
       };
     }
 
     return {
       top: topPosition,
-      left: leftOffset,
+      left: 0,
       height: heightInPixels,
-      width: `${baseWidth}%`
+      width: `${offsetWidth}%`
     };
   };
 
@@ -66,16 +57,13 @@ export function useTaskPositioning() {
     if (!currentTask.start_time) return [];
     
     const currentStart = new Date(currentTask.start_time).getTime();
-    const currentDuration = currentTask.duration || 60; // Default to 1 hour
-    const currentEnd = currentStart + (currentDuration * 60000); // Convert minutes to milliseconds
+    const currentEnd = new Date(currentStart + (currentTask.duration || 60) * 60000).getTime();
 
-    // Find tasks that overlap in time
     return tasks.filter(task => {
       if (!task.start_time || task.id === currentTask.id) return false;
       
       const taskStart = new Date(task.start_time).getTime();
-      const taskDuration = task.duration || 60;
-      const taskEnd = taskStart + (taskDuration * 60000);
+      const taskEnd = new Date(taskStart + (task.duration || 60) * 60000).getTime();
 
       return (currentStart < taskEnd && currentEnd > taskStart);
     });

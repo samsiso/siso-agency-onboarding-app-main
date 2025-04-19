@@ -48,7 +48,7 @@ export function UpcomingTaskCard({ task, onDragSuccess }: UpcomingTaskCardProps)
   };
 
   const handleDragEndWithCallback = (e: React.DragEvent) => {
-    handleDragEnd(e); // Pass the event parameter to handleDragEnd
+    handleDragEnd();
     if (e.dataTransfer.dropEffect === 'move' && onDragSuccess) {
       onDragSuccess(task);
     }
