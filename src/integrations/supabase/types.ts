@@ -1804,6 +1804,39 @@ export type Database = {
           },
         ]
       }
+      table_views: {
+        Row: {
+          columns: Json | null
+          created_at: string
+          filters: Json | null
+          id: string
+          name: string
+          table_name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          columns?: Json | null
+          created_at?: string
+          filters?: Json | null
+          id?: string
+          name: string
+          table_name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          columns?: Json | null
+          created_at?: string
+          filters?: Json | null
+          id?: string
+          name?: string
+          table_name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       task_rollover_history: {
         Row: {
           created_at: string | null

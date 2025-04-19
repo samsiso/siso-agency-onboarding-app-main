@@ -1,4 +1,3 @@
-
 import { useState, useMemo, useEffect } from "react";
 import { 
   Table, 
@@ -103,8 +102,11 @@ export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }
         columns={columns}
         onColumnVisibilityChange={updateColumnVisibility}
         savedViews={views}
-        onViewSelect={handleApplyView}
-        onViewSave={handleSaveView}
+        onViewSelect={selectView}
+        onViewSave={(name) => saveView(name, {
+          filters: { searchQuery },
+          columns
+        })}
       />
 
       <div className="rounded-md border">
