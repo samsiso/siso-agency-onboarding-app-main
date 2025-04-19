@@ -1,3 +1,4 @@
+
 import { Task } from '@/types/task.types';
 import { useIsMobile } from './use-mobile';
 
@@ -14,10 +15,11 @@ export function useTaskPositioning() {
   const MINUTES_IN_HOUR = 60;
   const CARD_MIN_HEIGHT = 60; // Minimum card height
   const HORIZONTAL_OFFSET = 4; // Percentage offset for overlapping tasks
+  const BASE_LEFT_OFFSET = 16; // Base left offset to align with ruler
 
   const calculateTaskPosition = (task: Task, overlappingTasks: Task[] = []): TaskPosition => {
     if (!task.start_time) {
-      return { top: 0, left: 0, height: CARD_MIN_HEIGHT, width: '95%' };
+      return { top: 0, left: BASE_LEFT_OFFSET, height: CARD_MIN_HEIGHT, width: '95%' };
     }
 
     const startTime = new Date(task.start_time);
@@ -31,7 +33,7 @@ export function useTaskPositioning() {
 
     // Handle overlapping tasks
     const baseWidth = isMobile ? 90 : 95; // Base width percentage
-    let leftOffset = 0;
+    let leftOffset = BASE_LEFT_OFFSET; // Start with base offset
     
     if (overlappingTasks.length > 0) {
       // Find this task's index among overlapping tasks (sorted by ID to keep consistent)
@@ -39,7 +41,7 @@ export function useTaskPositioning() {
       const taskIndex = sortedTasks.findIndex(t => t.id === task.id);
       
       // Calculate offset based on task's position in the sorted overlapping tasks
-      leftOffset = taskIndex * HORIZONTAL_OFFSET;
+      leftOffset = BASE_LEFT_OFFSET + (taskIndex * HORIZONTAL_OFFSET);
       
       // Adjust width based on number of overlapping tasks
       const adjustedWidth = baseWidth - ((sortedTasks.length - 1) * HORIZONTAL_OFFSET);
