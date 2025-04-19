@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Task } from '@/types/task.types';
 import { TaskCard } from './TaskCard';
@@ -32,24 +33,7 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
   const currentHour = currentTime.getHours();
   const currentMinute = currentTime.getMinutes();
 
-  // Test task for SISO Agency App Dev
-  const testTask: Task = {
-    id: 'test-task',
-    title: 'SISO Agency App Development',
-    description: 'Work on core features and improvements',
-    status: 'in_progress',
-    priority: 'high',
-    category: 'siso_app_dev',
-    created_at: new Date().toISOString(),
-    start_time: (() => {
-      const time = new Date();
-      time.setHours(10, 0, 0, 0);
-      return time.toISOString();
-    })(),
-    duration: 60
-  };
-
-  const allTasks = [...tasks, testTask].sort((a, b) => {
+  const allTasks = [...tasks].sort((a, b) => {
     if (!a.start_time || !b.start_time) return 0;
     return new Date(a.start_time).getTime() - new Date(b.start_time).getTime();
   });

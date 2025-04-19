@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { TimelineColumn } from './TimelineColumn';
@@ -10,6 +11,7 @@ import { useDayPeriod } from '@/hooks/useDayPeriod';
 import { Badge } from '@/components/ui/badge';
 import { useCheckInOut } from '@/hooks/useCheckInOut';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { TaskCard } from './TaskCard';
 
 export function TimelineTaskView({ memberId }: { memberId?: string }) {
   const { useTaskQuery } = useTasks();
