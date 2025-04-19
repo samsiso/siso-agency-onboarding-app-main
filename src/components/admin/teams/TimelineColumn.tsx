@@ -6,11 +6,8 @@ import { useTimeWindow } from '@/hooks/useTimeWindow';
 import { useCheckInOut } from '@/hooks/useCheckInOut';
 import { CheckInOutDialog } from './CheckInOutDialog';
 import { TimelineRuler } from './timeline/TimelineRuler';
-import { ScrollButtons } from './timeline/ScrollButtons';
 import { TimeIndicator } from './timeline/TimeIndicator';
 import { RoutineCard } from './timeline/RoutineCard';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { TaskCreationDialog } from './TaskCreationDialog';
 import { TimelineHeader } from './timeline/TimelineHeader';
@@ -19,7 +16,7 @@ import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export function TimelineColumn({ tasks }: { tasks: Task[] }) {
-  const { currentTime, timelineRef, getCurrentWindow } = useTimeWindow();
+  const { currentTime, timelineRef, getCurrentWindow, scrollToCurrentTime } = useTimeWindow();
   const { 
     morningCheckInTime, 
     eveningCheckOutTime,
@@ -45,12 +42,6 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
     return new Date(a.start_time).getTime() - new Date(b.start_time).getTime();
   });
 
-  const isMobile = useIsMobile();
-  const HOUR_HEIGHT = isMobile ? 80 : 100; // Increased height to match TaskCard
-  const PIXELS_PER_MINUTE = HOUR_HEIGHT / 60;
-  
-  const timePosition = (currentHour * HOUR_HEIGHT) + (currentMinute * PIXELS_PER_MINUTE);
-
   const handleCreateTask = (hour?: number) => {
     setSelectedHour(hour);
     setTaskCreationOpen(true);
@@ -61,35 +52,36 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
   };
 
   return (
-    <div className="relative min-h-[400px] sm:min-h-[600px] flex">
+    <div className="relative min-h-[600px] flex">
       <TimelineRuler 
         currentHour={currentHour} 
-        hourHeight={HOUR_HEIGHT}
+        hourHeight={100}
         onTimeSlotClick={handleTimeSlotClick}
       />
       
-      <ScrollButtons 
-        onScrollUp={() => timelineRef.current?.scrollBy({ top: -HOUR_HEIGHT, behavior: 'smooth' })} 
-        onScrollDown={() => timelineRef.current?.scrollBy({ top: HOUR_HEIGHT, behavior: 'smooth' })} 
-      />
-
-      <div className="ml-12 sm:ml-16 relative flex-1">
+      <div className="ml-12 sm:ml-16 relative flex-1 overflow-hidden">
         <TimelineHeader 
           onCreateTask={() => handleCreateTask()}
           currentDate={currentTime}
         />
         
-        <ScrollArea 
+        <div 
           ref={timelineRef}
-          className="h-[400px] sm:h-[600px] relative"
-          scrollHideDelay={0}
+          className={cn(
+            "overflow-y-auto relative",
+            "h-[calc(100vh-220px)]",
+            "will-change-scroll",
+            "scrollbar-gutter-stable",
+            "scroll-smooth"
+          )}
+          style={{
+            contain: 'strict',
+            WebkitOverflowScrolling: 'touch'
+          }}
         >
-          <div className={cn(
-            "relative px-1 sm:px-2",
-            "min-h-[1920px] sm:min-h-[2400px]"
-          )}>
-            <TimelineGrid hourHeight={HOUR_HEIGHT} />
-            <TimeIndicator currentTime={currentTime} position={timePosition} />
+          <div className="relative px-1 sm:px-2 min-h-[2400px]">
+            <TimelineGrid hourHeight={100} />
+            <TimeIndicator currentTime={currentTime} position={currentHour * 100 + (currentMinute / 60) * 100} />
             
             {shouldShowMorningCheckIn() && (
               <RoutineCard
@@ -108,14 +100,6 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
                 onClick={() => setCheckOutDialogOpen(true)}
               />
             )}
-
-            <div 
-              className="absolute left-0 right-0 bg-purple-50/5 border-y border-purple-500/20"
-              style={{
-                top: `${windowStart * HOUR_HEIGHT}px`,
-                height: `${(windowEnd - windowStart) * HOUR_HEIGHT}px`,
-              }}
-            />
 
             {/* Empty state when no tasks */}
             {allTasks.length === 0 && (
@@ -144,7 +128,7 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
               />
             ))}
           </div>
-        </ScrollArea>
+        </div>
       </div>
 
       <CheckInOutDialog

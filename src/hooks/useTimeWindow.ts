@@ -1,6 +1,5 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { ScrollArea } from '@radix-ui/react-scroll-area';
 
 export const useTimeWindow = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -8,9 +7,8 @@ export const useTimeWindow = () => {
 
   const getCurrentWindow = () => {
     const currentHour = currentTime.getHours();
-    const windowStart = Math.max(0, currentHour - 4);
-    const windowEnd = Math.min(24, windowStart + 8);
-    return { windowStart, windowEnd };
+    // Show full day instead of just 8 hours
+    return { windowStart: 0, windowEnd: 24 };
   };
 
   const scrollToCurrentTime = () => {
@@ -18,7 +16,7 @@ export const useTimeWindow = () => {
       const currentHour = currentTime.getHours();
       const currentMinute = currentTime.getMinutes();
       const totalMinutes = currentHour * 60 + currentMinute;
-      const scrollPosition = (totalMinutes / (24 * 60)) * (24 * 80); // 24 hours * 80px per hour
+      const scrollPosition = (totalMinutes / (24 * 60)) * timelineRef.current.scrollHeight;
       
       const containerHeight = timelineRef.current.clientHeight;
       const targetPosition = scrollPosition - (containerHeight / 2);
@@ -31,16 +29,18 @@ export const useTimeWindow = () => {
   };
 
   useEffect(() => {
-    // Initial scroll to current time
-    setTimeout(scrollToCurrentTime, 100);
+    // Initial scroll to current time with a slight delay to ensure DOM is ready
+    const timer = setTimeout(scrollToCurrentTime, 100);
 
-    const timer = setInterval(() => {
-      const newTime = new Date();
-      setCurrentTime(newTime);
+    const timeUpdateInterval = setInterval(() => {
+      setCurrentTime(new Date());
     }, 60000); // Update every minute
 
-    return () => clearInterval(timer);
+    return () => {
+      clearTimeout(timer);
+      clearInterval(timeUpdateInterval);
+    };
   }, []);
 
-  return { currentTime, timelineRef, getCurrentWindow };
+  return { currentTime, timelineRef, getCurrentWindow, scrollToCurrentTime };
 };
