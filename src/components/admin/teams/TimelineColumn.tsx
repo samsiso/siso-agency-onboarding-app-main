@@ -135,7 +135,7 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
           </div>
         </div>
 
-        {/* Morning Check-In indicator */}
+        {/* Morning Routine indicator */}
         <div 
           className={cn(
             "absolute left-0 right-0 flex items-center gap-2 z-10",
@@ -156,7 +156,7 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
             onClick={() => setCheckInDialogOpen(true)}
           >
             <Coffee className="h-4 w-4 mr-1" />
-            {checkInStatus === 'completed' ? "Checked In" : "Check In"}
+            {checkInStatus === 'completed' ? "Morning Routine Done" : "Start Morning Routine"}
           </Button>
         </div>
         
@@ -203,7 +203,7 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
         ))}
       </div>
 
-      {/* Check-in/Check-out Dialogs */}
+      {/* Dialogs */}
       <CheckInOutDialog
         type="check-in"
         open={checkInDialogOpen}

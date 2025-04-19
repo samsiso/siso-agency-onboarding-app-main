@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -10,6 +9,7 @@ import {
   CalendarCheck, ListTodo, BrainCircuit 
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { SubtaskList } from './SubtaskList';
 
 interface CheckInOutDialogProps {
   type: 'check-in' | 'check-out';
@@ -18,6 +18,14 @@ interface CheckInOutDialogProps {
   onComplete: (data: any) => Promise<boolean>;
   time: Date;
 }
+
+const morningRoutineTasks = [
+  { id: 'mr1', title: 'Review today\'s agenda', completed: false },
+  { id: 'mr2', title: 'Check and respond to important emails', completed: false },
+  { id: 'mr3', title: 'Update task statuses', completed: false },
+  { id: 'mr4', title: 'Prepare for daily standup', completed: false },
+  { id: 'mr5', title: 'Set priorities for the day', completed: false }
+];
 
 export function CheckInOutDialog({ type, open, onOpenChange, onComplete, time }: CheckInOutDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -61,26 +69,36 @@ export function CheckInOutDialog({ type, open, onOpenChange, onComplete, time }:
     <>
       <DialogDescription className="flex items-center gap-2 text-green-600 font-medium mb-6">
         <Coffee className="h-5 w-5" />
-        <span>Good morning! Let's start your day right.</span>
+        <span>Let's start your day with a productive morning routine!</span>
       </DialogDescription>
       
       <div className="space-y-4">
         <div className="bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
           <h4 className="font-medium flex items-center gap-2 text-amber-800 dark:text-amber-400">
             <ListTodo className="h-4 w-4" />
-            Incomplete tasks will be automatically rolled over to today
+            Complete your morning routine tasks
           </h4>
         </div>
         
-        <div>
-          <Label htmlFor="check-in-notes">Anything to note for today?</Label>
-          <Textarea
-            id="check-in-notes"
-            placeholder="What are your main goals today?"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            className="min-h-[100px]"
+        <div className="space-y-4">
+          <SubtaskList 
+            subtasks={morningRoutineTasks}
+            onToggle={(id) => {
+              console.log('Toggle morning routine task:', id);
+              // In a real app, update the task status
+            }}
           />
+          
+          <div>
+            <Label htmlFor="check-in-notes">Additional notes</Label>
+            <Textarea
+              id="check-in-notes"
+              placeholder="Any blockers or important notes for today?"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              className="min-h-[100px]"
+            />
+          </div>
         </div>
       </div>
     </>
