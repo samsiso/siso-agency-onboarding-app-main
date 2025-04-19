@@ -1,13 +1,16 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Task } from '@/types/task.types';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
+import { Drawer, DrawerContent } from '@/components/ui/drawer';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Calendar, Users, RefreshCcw } from 'lucide-react';
+import { Clock, Calendar, Users, RefreshCcw, Edit2, Plus, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { SubtaskList } from './SubtaskList';
 import { PriorityBadge } from './PriorityBadge';
 import { cn } from '@/lib/utils';
+import { Input } from '@/components/ui/input';
+import { useTaskOperations } from '@/hooks/useTaskOperations';
+import { useToast } from '@/hooks/use-toast';
 
 interface TaskDetailDrawerProps {
   task: Task | null;
@@ -16,32 +19,96 @@ interface TaskDetailDrawerProps {
 }
 
 export function TaskDetailDrawer({ task, isOpen, onClose }: TaskDetailDrawerProps) {
-  if (!task) return null;
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedTitle, setEditedTitle] = useState(task?.title || '');
+  const { useUpdateTask } = useTaskOperations();
+  const { mutate: updateTask } = useUpdateTask();
+  const { toast } = useToast();
+  const startTime = task?.start_time ? new Date(task.start_time) : null;
+  const isRolledOver = !!task?.rolled_over_from;
 
-  const startTime = task.start_time ? new Date(task.start_time) : null;
-  const isRolledOver = !!task.rolled_over_from;
-
-  // Test subtasks data (you should replace this with real data from your task)
-  const subtasks = [
+  const [subtasks, setSubtasks] = useState([
     { id: '1', title: 'Review agenda', completed: false },
     { id: '2', title: 'Check emails', completed: false },
     { id: '3', title: 'Update task status', completed: false },
     { id: '4', title: 'Prepare for standup', completed: false },
-  ];
+  ]);
+
+  const handleTitleSave = () => {
+    if (!task) return;
+    
+    updateTask(
+      { id: task.id, title: editedTitle },
+      {
+        onSuccess: () => {
+          setIsEditing(false);
+          toast({
+            title: "Task updated",
+            description: "The task title has been updated successfully.",
+          });
+        },
+        onError: () => {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Failed to update task title.",
+          });
+        },
+      }
+    );
+  };
 
   const handleSubtaskToggle = (id: string) => {
-    // Implement subtask toggle functionality
-    console.log('Toggle subtask:', id);
+    setSubtasks(subtasks.map(st => 
+      st.id === id ? { ...st, completed: !st.completed } : st
+    ));
   };
+
+  const handleAddSubtask = () => {
+    const newId = String(subtasks.length + 1);
+    setSubtasks([...subtasks, { id: newId, title: 'New subtask', completed: false }]);
+  };
+
+  const handleDeleteSubtask = (id: string) => {
+    setSubtasks(subtasks.filter(st => st.id !== id));
+  };
+
+  if (!task) return null;
 
   return (
     <Drawer open={isOpen} onOpenChange={onClose}>
       <DrawerContent className="h-[85vh]">
         <div className="mx-auto w-full max-w-sm">
-          <DrawerHeader>
-            <DrawerTitle className="text-lg font-semibold">{task.title}</DrawerTitle>
-          </DrawerHeader>
           <div className="p-4 space-y-4">
+            <div className="flex items-center justify-between gap-2">
+              {isEditing ? (
+                <div className="flex-1 flex items-center gap-2">
+                  <Input
+                    value={editedTitle}
+                    onChange={(e) => setEditedTitle(e.target.value)}
+                    className="flex-1"
+                    autoFocus
+                  />
+                  <button 
+                    onClick={handleTitleSave}
+                    className="px-3 py-1 bg-green-500/10 text-green-500 rounded-md hover:bg-green-500/20"
+                  >
+                    Save
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between w-full">
+                  <h2 className="text-lg font-semibold">{task.title}</h2>
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="p-1 hover:bg-accent rounded-full"
+                  >
+                    <Edit2 className="h-4 w-4 text-muted-foreground" />
+                  </button>
+                </div>
+              )}
+            </div>
+
             <div className="flex flex-wrap gap-2">
               <PriorityBadge priority={task.priority} />
               {isRolledOver && (
@@ -52,40 +119,20 @@ export function TaskDetailDrawer({ task, isOpen, onClose }: TaskDetailDrawerProp
               )}
             </div>
 
-            <div className="space-y-2">
-              {startTime && (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Clock className="h-4 w-4" />
-                  <span>{format(startTime, 'h:mm a')}</span>
-                  {task.duration && (
-                    <span className="text-sm">· {task.duration}m</span>
-                  )}
-                </div>
-              )}
-              
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Calendar className="h-4 w-4" />
-                <span>{format(new Date(task.created_at), 'MMM d, yyyy')}</span>
-              </div>
-
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Users className="h-4 w-4" />
-                <span>3 members assigned</span>
-              </div>
-            </div>
-
-            {task.description && (
-              <div className="space-y-1">
-                <h3 className="text-sm font-medium">Description</h3>
-                <p className="text-sm text-muted-foreground">{task.description}</p>
-              </div>
-            )}
-
             <div className="pt-4">
-              <h3 className="text-sm font-medium mb-2">Subtasks</h3>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-medium">Subtasks</h3>
+                <button
+                  onClick={handleAddSubtask}
+                  className="p-1 hover:bg-accent rounded-full"
+                >
+                  <Plus className="h-4 w-4 text-muted-foreground" />
+                </button>
+              </div>
               <SubtaskList 
                 subtasks={subtasks}
                 onToggle={handleSubtaskToggle}
+                onDelete={handleDeleteSubtask}
                 className="bg-background/95 backdrop-blur"
               />
             </div>

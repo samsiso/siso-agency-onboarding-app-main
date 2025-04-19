@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Check, Circle } from 'lucide-react';
+import { Check, Circle, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 
@@ -13,10 +13,11 @@ interface Subtask {
 interface SubtaskListProps {
   subtasks: Subtask[];
   onToggle?: (id: string) => void;
+  onDelete?: (id: string) => void;
   className?: string;
 }
 
-export function SubtaskList({ subtasks, onToggle, className }: SubtaskListProps) {
+export function SubtaskList({ subtasks, onToggle, onDelete, className }: SubtaskListProps) {
   const completedCount = subtasks.filter(task => task.completed).length;
   const progress = (completedCount / subtasks.length) * 100;
 
@@ -31,15 +32,11 @@ export function SubtaskList({ subtasks, onToggle, className }: SubtaskListProps)
         {subtasks.map(subtask => (
           <li
             key={subtask.id}
-            className="flex items-center gap-2 text-sm"
-            onClick={() => onToggle?.(subtask.id)}
+            className="flex items-center gap-2 text-sm bg-background/50 p-2 rounded-lg"
           >
             <button 
               className="p-2 -m-2 rounded-full hover:bg-accent" 
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggle?.(subtask.id);
-              }}
+              onClick={() => onToggle?.(subtask.id)}
               aria-label={subtask.completed ? "Mark as incomplete" : "Mark as complete"}
             >
               {subtask.completed ? (
@@ -54,6 +51,15 @@ export function SubtaskList({ subtasks, onToggle, className }: SubtaskListProps)
             )}>
               {subtask.title}
             </span>
+            {onDelete && (
+              <button
+                onClick={() => onDelete(subtask.id)}
+                className="p-2 -m-2 rounded-full hover:bg-accent text-destructive hover:text-destructive"
+                aria-label="Delete subtask"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            )}
           </li>
         ))}
       </ul>
