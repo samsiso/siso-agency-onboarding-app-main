@@ -30,7 +30,7 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
   const currentHour = currentTime.getHours();
   const currentMinute = currentTime.getMinutes();
 
-  // Test task for SISO Agency App Dev
+  // Test task for SISO Agency App Dev at 10am
   const testTask: Task = {
     id: 'test-task',
     title: 'SISO Agency App Development',
@@ -40,8 +40,8 @@ export function TimelineColumn({ tasks }: { tasks: Task[] }) {
     category: 'siso_app_dev',
     created_at: new Date().toISOString(),
     start_time: (() => {
-      const time = new Date(morningCheckInTime);
-      time.setHours(time.getHours() + 1); // Set 1 hour after morning check-in
+      const time = new Date();
+      time.setHours(10, 0, 0, 0); // Set to 10:00 AM
       return time.toISOString();
     })(),
     duration: 60 // 1 hour duration

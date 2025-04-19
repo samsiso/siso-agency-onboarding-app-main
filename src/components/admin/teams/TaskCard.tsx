@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Task } from '@/types/task.types';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Users, ChevronDown, ChevronUp, RefreshCcw } from 'lucide-react';
+import { Clock, Users, ChevronDown, ChevronUp, RefreshCcw, GripVertical } from 'lucide-react';
 import { format } from 'date-fns';
 import { useTaskDragDrop } from '@/hooks/useTaskDragDrop';
 import { cn } from '@/lib/utils';
@@ -32,14 +32,16 @@ export function TaskCard({ task, currentHour }: TaskCardProps) {
   const getTaskPosition = () => {
     if (!startTime) return {};
     const minutes = startTime.getHours() * 60 + startTime.getMinutes();
-    const baseHeight = (duration / 60) * 80; // 80px per hour
-    const minHeight = 120; // Increased minimum height for content
+    const pixelsPerMinute = 80 / 60; // 80px per hour
+    const topPosition = minutes * pixelsPerMinute;
+    const baseHeight = duration * pixelsPerMinute;
+    const minHeight = 120;
     const heightInPixels = Math.max(baseHeight, minHeight);
     
     return {
-      top: `${(minutes / 1440) * 100}%`,
+      top: `${topPosition}px`,
       height: `${heightInPixels}px`,
-      width: 'calc(100% - 2rem)' // Increased margin for better spacing
+      width: 'calc(100% - 2rem)'
     };
   };
 
@@ -47,10 +49,6 @@ export function TaskCard({ task, currentHour }: TaskCardProps) {
   const isRolledOver = !!task.rolled_over_from;
   const completedSubtasks = subtasks.filter(st => st.completed).length;
   const progress = (completedSubtasks / subtasks.length) * 100;
-
-  const handleToggleSubtask = (id: string) => {
-    console.log('Toggle subtask:', id);
-  };
 
   return (
     <Card 
@@ -71,6 +69,7 @@ export function TaskCard({ task, currentHour }: TaskCardProps) {
     >
       <div className="space-y-3">
         <div className="flex items-start justify-between gap-3">
+          <GripVertical className="h-5 w-5 text-gray-400 cursor-move" />
           <div className="flex-1 min-w-0 space-y-2">
             <div className="flex items-center gap-2 flex-wrap">
               <h3 className="font-medium text-base truncate">{task.title}</h3>
@@ -124,7 +123,7 @@ export function TaskCard({ task, currentHour }: TaskCardProps) {
         {isExpanded && (
           <SubtaskList 
             subtasks={subtasks}
-            onToggle={handleToggleSubtask}
+            onToggle={() => {}}
           />
         )}
       </div>
