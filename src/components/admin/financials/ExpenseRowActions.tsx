@@ -1,49 +1,43 @@
 
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Edit, Trash, Eye } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Eye, Edit, Trash, MoreHorizontal } from "lucide-react";
 
 interface ExpenseRowActionsProps {
   expenseId: string;
   onViewDetails: (id: string) => void;
   onDelete: (id: string) => void;
-  onEdit?: (id: string) => void;
 }
 
-export function ExpenseRowActions({ 
-  expenseId, 
-  onViewDetails, 
-  onDelete,
-  onEdit
-}: ExpenseRowActionsProps) {
+export function ExpenseRowActions({ expenseId, onViewDetails, onDelete }: ExpenseRowActionsProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm">
+        <Button variant="ghost" size="icon" className="h-8 w-8">
           <MoreHorizontal className="h-4 w-4" />
           <span className="sr-only">Open menu</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="w-[160px]">
         <DropdownMenuItem onClick={() => onViewDetails(expenseId)}>
-          <Eye className="h-4 w-4 mr-2" />
-          View Details
+          <Eye className="mr-2 h-4 w-4" />
+          <span>View Details</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => onEdit ? onEdit(expenseId) : null}>
-          <Edit className="h-4 w-4 mr-2" />
-          Edit
+        <DropdownMenuItem>
+          <Edit className="mr-2 h-4 w-4" />
+          <span>Edit</span>
         </DropdownMenuItem>
         <DropdownMenuItem 
-          className="text-red-600" 
           onClick={() => onDelete(expenseId)}
+          className="text-destructive focus:text-destructive"
         >
-          <Trash className="h-4 w-4 mr-2" />
-          Delete
+          <Trash className="mr-2 h-4 w-4" />
+          <span>Delete</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

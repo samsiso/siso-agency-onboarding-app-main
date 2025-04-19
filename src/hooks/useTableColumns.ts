@@ -5,6 +5,8 @@ export interface TableColumn {
   key: string;
   label: string;
   visible: boolean;
+  pinned?: boolean;
+  width?: number;
 }
 
 export function useTableColumns(initialColumns: TableColumn[]) {

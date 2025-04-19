@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { Table, TableBody, TableHeader } from "@/components/ui/table";
 import { deleteTransaction } from "@/utils/financial";
 import { ExpenseDetailsDialog } from "./ExpenseDetailsDialog";
@@ -9,12 +10,17 @@ import { useExpensesTableData } from "@/hooks/useExpensesTableData";
 import { ExpensesTableHeader } from "./expense/ExpensesTableHeader";
 import { ExpensesTableBody } from "./expense/ExpensesTableBody";
 import { ExpensesTableLoading } from "./expense/ExpensesTableLoading";
-import { ExpensesToolbar } from "./table/ExpensesToolbar";
+import { ScrollableTable } from "../clients/ScrollableTable";
+import { ExpensesFinanceToolbar } from "./table/ExpensesFinanceToolbar";
+import { Button } from "@/components/ui/button";
+import { ArrowUpDown, Download, Filter, Plus, Trash2 } from "lucide-react";
 
 export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }) {
-  // Define the initial columns configuration
+  const [selectedExpenses, setSelectedExpenses] = useState<string[]>([]);
+  
+  // Define the initial columns configuration with pinning capability
   const initialColumns = [
-    { key: "description", label: "Expense Name", visible: true },
+    { key: "description", label: "Expense Name", visible: true, pinned: true },
     { key: "category", label: "Category", visible: true },
     { key: "amount", label: "Amount", visible: true },
     { key: "date", label: "Date", visible: true },
@@ -34,9 +40,8 @@ export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }
     filteredExpenses 
   } = useExpensesTableData(sortedExpenses);
 
-  // Added handleApplyView function to resolve the undefined error
+  // Function to handle view selection
   const handleApplyView = (view) => {
-    // Set search query and column visibility based on the selected view
     setSearchQuery(view.filters?.searchQuery || '');
     selectView(view);
   };
@@ -55,10 +60,49 @@ export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }
       }
     }
   };
+  
+  // Handle selecting all expenses
+  const handleSelectAll = () => {
+    if (selectedExpenses.length === filteredExpenses.length) {
+      setSelectedExpenses([]);
+    } else {
+      setSelectedExpenses(filteredExpenses.map(expense => expense.id));
+    }
+  };
+  
+  // Handle selecting individual expense
+  const handleSelectExpense = (expenseId: string) => {
+    setSelectedExpenses(prev => 
+      prev.includes(expenseId)
+        ? prev.filter(id => id !== expenseId)
+        : [...prev, expenseId]
+    );
+  };
+  
+  // Handle multiple expenses deletion
+  const handleDeleteSelected = async () => {
+    if (selectedExpenses.length === 0) return;
+    
+    if (window.confirm(`Are you sure you want to delete ${selectedExpenses.length} selected expenses?`)) {
+      let success = true;
+      for (const id of selectedExpenses) {
+        const result = await deleteTransaction(id);
+        if (!result) success = false;
+      }
+      
+      if (success && onDataChange) {
+        onDataChange();
+        setSelectedExpenses([]);
+      }
+    }
+  };
+
+  // Get pinned columns for the ScrollableTable
+  const pinnedColumns = visibleColumns.filter(col => col.pinned) || [];
 
   return (
-    <div className="space-y-4">
-      <ExpensesToolbar
+    <div className="space-y-6">
+      <ExpensesFinanceToolbar
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         columns={columns}
@@ -69,16 +113,26 @@ export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }
           filters: { searchQuery },
           columns
         })}
+        selectedCount={selectedExpenses.length}
+        onDeleteSelected={handleDeleteSelected}
+        onAddExpense={() => alert("Add expense feature coming soon")}
+        onExport={() => alert("Export feature coming soon")}
       />
 
-      <div className="rounded-md border">
+      <ScrollableTable pinnedColumns={pinnedColumns}>
         <Table>
           <TableHeader>
             <ExpensesTableHeader 
               visibleColumns={visibleColumns} 
-              onSort={handleSort} 
+              onSort={handleSort}
+              selectedExpenses={selectedExpenses}
+              expenses={filteredExpenses}
+              onSelectAll={handleSelectAll}
+              sortColumn={sortField}
+              sortDirection={sortDirection} 
             />
           </TableHeader>
+          
           <TableBody>
             {isLoading ? (
               <ExpensesTableLoading colSpan={visibleColumns.length + 1} />
@@ -88,11 +142,13 @@ export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }
                 visibleColumns={visibleColumns}
                 onViewDetails={setViewDetailsId}
                 onDelete={handleDelete}
+                selectedExpenses={selectedExpenses}
+                onSelectExpense={handleSelectExpense}
               />
             )}
           </TableBody>
         </Table>
-      </div>
+      </ScrollableTable>
 
       <ExpenseDetailsDialog 
         expense={expenseDetails}
