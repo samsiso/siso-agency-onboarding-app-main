@@ -1,8 +1,6 @@
 
 import React from 'react';
-import { Card } from '@/components/ui/card';
 import { useTasks } from '@/hooks/useTasks';
-import { Task } from '@/types/task.types';
 import { TimelineColumn } from './TimelineColumn';
 import { motion } from 'framer-motion';
 
@@ -31,17 +29,15 @@ export function TimelineTaskView({ memberId }: TimelineTaskViewProps) {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="h-full"
+      className="h-full flex flex-col bg-background rounded-lg border"
     >
-      <Card className="h-full">
-        {isDailyTasksLoading ? (
-          <div className="flex items-center justify-center h-40">
-            <div className="animate-pulse text-muted-foreground">Loading tasks...</div>
-          </div>
-        ) : (
-          <TimelineColumn tasks={todaysTasks} />
-        )}
-      </Card>
+      {isDailyTasksLoading ? (
+        <div className="flex items-center justify-center h-40">
+          <div className="animate-pulse text-muted-foreground">Loading tasks...</div>
+        </div>
+      ) : (
+        <TimelineColumn tasks={todaysTasks} />
+      )}
     </motion.div>
   );
 }
