@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Table, TableBody, TableHeader } from "@/components/ui/table";
 import { deleteTransaction } from "@/utils/financial";
@@ -13,6 +12,7 @@ import { SpreadsheetTable } from "./table/SpreadsheetTable";
 import { ExpensesFinanceToolbar } from "./table/ExpensesFinanceToolbar";
 import { ArrowUpDown, Download, Filter, Plus, Trash2 } from "lucide-react";
 import { SpreadsheetExpensesBody } from "./expense/SpreadsheetExpensesBody";
+import { AddExpenseRow } from "./expense/AddExpenseRow";
 
 export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }) {
   const [selectedExpenses, setSelectedExpenses] = useState<string[]>([]);
@@ -147,8 +147,12 @@ export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }
                 sortDirection={sortDirection} 
               />
             </TableHeader>
-            
             <TableBody>
+              {/* Inline add-expense row (shown always at top) */}
+              <AddExpenseRow 
+                onExpenseAdded={onDataChange}
+                visibleColumns={visibleColumns}
+              />
               {isLoading ? (
                 <ExpensesTableLoading colSpan={visibleColumns.length + 1} />
               ) : (

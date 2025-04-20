@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { TableColumn } from "@/hooks/useTableColumns";
 import { cn } from "@/lib/utils";
@@ -59,6 +58,11 @@ export function SpreadsheetTable({
       <style dangerouslySetInnerHTML={{ __html: `
         .spreadsheet-grid table {
           border-collapse: collapse;
+        }
+        .spreadsheet-grid select {
+          background: white !important;
+          border: 1px solid #E5E7EB !important;
+          z-index: 40 !important;
         }
         .spreadsheet-grid tbody tr:hover {
           background-color: rgba(0, 0, 0, 0.025);
