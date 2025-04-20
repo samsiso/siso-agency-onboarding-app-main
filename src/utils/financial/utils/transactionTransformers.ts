@@ -2,50 +2,49 @@
 import { FinancialTransaction, ExpenseCategory, Vendor, PaymentMethod } from '../types';
 import { isValidRelationship } from './relationshipUtils';
 
-/**
- * Transforms raw transaction data from Supabase into the FinancialTransaction type
- */
 export function transformTransactionData(item: any): FinancialTransaction {
-  // Handle null or undefined item
   if (!item) {
     console.error("Received null or undefined transaction data");
     return {} as FinancialTransaction;
   }
 
-  // Log for debugging
-  console.log("Transforming transaction:", item.id, item.description);
+  // Log the raw data for debugging
+  console.log("Raw transaction data:", item);
 
-  // Extract related entities with proper type checking
-  const category = isValidRelationship(item.category) 
-    ? {
-        id: item.category.id,
-        name: item.category.name,
-        description: '',  // Provide default values for required fields
-        is_active: true   // Provide default values for required fields
-      } as ExpenseCategory
-    : undefined;
+  const category = item.category ? {
+    id: item.category.id,
+    name: item.category.name,
+    description: item.category.description || '',
+    is_active: item.category.is_active || true
+  } : undefined;
     
-  const vendor = isValidRelationship(item.vendor)
-    ? {
-        id: item.vendor.id,
-        name: item.vendor.name,
-        is_active: true,  // Provide default values for required fields
-      } as Vendor
-    : undefined;
+  const vendor = item.vendor ? {
+    id: item.vendor.id,
+    name: item.vendor.name,
+    is_active: item.vendor.is_active || true
+  } : undefined;
     
-  const paymentMethod = isValidRelationship(item.payment_method)
-    ? {
-        id: item.payment_method.id,
-        name: item.payment_method.name,
-        is_active: true   // Provide default values for required fields
-      } as PaymentMethod
-    : undefined;
+  const paymentMethod = item.payment_method ? {
+    id: item.payment_method.id,
+    name: item.payment_method.name,
+    is_active: item.payment_method.is_active || true
+  } : undefined;
 
-  // Return a properly typed object
+  // Return transformed data with all required fields
   return {
-    ...item,
-    type: item.type as 'expense' | 'revenue',
-    recurring_type: item.recurring_type as 'one-time' | 'monthly' | 'annual' | null,
+    id: item.id,
+    type: item.type || 'expense',
+    amount: item.amount || 0,
+    currency: item.currency || 'GBP',
+    date: item.date,
+    description: item.description || '',
+    status: item.status || 'completed',
+    recurring_type: item.recurring_type || null,
+    notes: item.notes || '',
+    receipt_url: item.receipt_url || '',
+    category_id: item.category_id,
+    vendor_id: item.vendor_id,
+    payment_method_id: item.payment_method_id,
     category,
     vendor,
     payment_method: paymentMethod

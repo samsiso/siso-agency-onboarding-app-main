@@ -4,18 +4,17 @@ import { toast } from "@/components/ui/use-toast";
 import { FinancialTransaction } from "./types";
 import { transformTransactionData } from "./utils/transactionTransformers";
 
-// Fetch all transactions with better error handling
 export async function fetchTransactions(): Promise<FinancialTransaction[]> {
   try {
-    console.log("Fetching transactions");
+    console.log("Starting to fetch transactions");
     
     const { data, error } = await supabase
       .from("financial_transactions")
       .select(`
         *,
-        category:expense_categories(id, name),
-        vendor:vendors(id, name),
-        payment_method:payment_methods(id, name)
+        category:expense_categories(id, name, description, is_active),
+        vendor:vendors(id, name, is_active),
+        payment_method:payment_methods(id, name, is_active)
       `)
       .order("date", { ascending: false });
 
@@ -23,17 +22,18 @@ export async function fetchTransactions(): Promise<FinancialTransaction[]> {
       console.error("Error fetching transactions:", error);
       toast({
         title: "Error",
-        description: "Failed to fetch transactions: " + error.message,
+        description: "Failed to fetch transactions",
         variant: "destructive"
       });
       return [];
     }
 
-    // Check if data is available and log for debugging
-    console.log(`Fetched ${data?.length || 0} transactions`);
+    console.log("Raw transactions data:", data);
     
-    // Transform the data correctly
-    return Array.isArray(data) ? data.map(transformTransactionData) : [];
+    const transformedData = data.map(transformTransactionData);
+    console.log("Transformed transactions:", transformedData);
+    
+    return transformedData;
   } catch (err) {
     console.error("Unexpected error fetching transactions:", err);
     toast({
