@@ -9,6 +9,8 @@ export async function fetchTransactions(): Promise<FinancialTransaction[]> {
     console.log("Starting to fetch transactions");
     
     const { data: { user } } = await supabase.auth.getUser();
+    console.log("Current user:", user?.id);
+
     if (!user) {
       console.error("No authenticated user found");
       toast({
