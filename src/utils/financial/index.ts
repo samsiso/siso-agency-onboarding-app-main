@@ -11,7 +11,12 @@ export * from './transactionsApi';
 export * from './invoicesApi';
 export * from './summaryApi';
 export * from './utils/relationshipUtils';
-export * from './utils/invoiceTransformers';
-export * from './utils/transactionTransformers';
+// We're not exporting these directly to avoid duplicate exports
+// export * from './utils/invoiceTransformers';
+// export * from './utils/transactionTransformers';
 export * from './utils/summaryTransformers';
 export * from './transactionModifications';
+
+// Re-export specific transforms to avoid naming conflicts
+export { transformInvoiceData } from './utils/invoiceTransformers';
+export { transformTransactionData } from './utils/transactionTransformers';

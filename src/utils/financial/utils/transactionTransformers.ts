@@ -1,12 +1,6 @@
 
 import { FinancialTransaction, ExpenseCategory, Vendor, PaymentMethod } from '../types';
-
-/**
- * Helper function to check if a relationship object is valid
- */
-export function isValidRelationship(relation: any): boolean {
-  return relation && typeof relation === 'object' && relation.id;
-}
+import { isValidRelationship } from './relationshipUtils';
 
 /**
  * Transforms raw transaction data from Supabase into the FinancialTransaction type

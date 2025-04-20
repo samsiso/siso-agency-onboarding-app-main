@@ -1,6 +1,6 @@
 
 import { PaymentMethod, Invoice } from '../types';
-import { createClientData, isValidRelationship } from './relationshipUtils';
+import { isValidRelationship, createClientData } from './relationshipUtils';
 
 /**
  * Transforms raw invoice data from Supabase into the Invoice type
