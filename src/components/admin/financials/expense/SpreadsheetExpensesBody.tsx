@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { TableRow } from "@/components/ui/table";
 import { FinancialTransaction } from "@/utils/financial";
@@ -86,8 +85,6 @@ export function SpreadsheetExpensesBody({
             </td>
             
             {visibleColumns.map((column) => {
-              const isEditing = editingCell?.id === expense.id && editingCell?.field === column.key;
-              
               switch (column.key) {
                 case "description":
                   return (
@@ -108,10 +105,11 @@ export function SpreadsheetExpensesBody({
                       type="select"
                       options={[
                         { value: "", label: "Uncategorized" },
-                        // This would normally come from your categories list
-                        { value: "cat1", label: "Office Supplies" },
-                        { value: "cat2", label: "Marketing" },
-                        { value: "cat3", label: "Travel" }
+                        { value: "office", label: "Office Supplies" },
+                        { value: "software", label: "Software" },
+                        { value: "marketing", label: "Marketing" },
+                        { value: "travel", label: "Travel" },
+                        { value: "utilities", label: "Utilities" }
                       ]}
                       formatter={(value) => (
                         <Badge variant="outline" className="bg-blue-100/50 text-blue-800 border-blue-200">
@@ -137,7 +135,7 @@ export function SpreadsheetExpensesBody({
                   return (
                     <EditableCell
                       key={`${expense.id}-${column.key}`}
-                      value={expense.date || ""}
+                      value={expense.date}
                       onChange={(value) => handleCellUpdate(expense.id, "date", value)}
                       type="date"
                     />
@@ -150,11 +148,15 @@ export function SpreadsheetExpensesBody({
                       value={expense.recurring_type || "one-time"}
                       onChange={(value) => handleCellUpdate(expense.id, "recurring_type", value)}
                       type="select"
-                      options={recurringOptions}
+                      options={[
+                        { value: "one-time", label: "One-Time" },
+                        { value: "monthly", label: "Monthly" },
+                        { value: "annual", label: "Annual" }
+                      ]}
                       formatter={(value) => (
                         <Badge className={cn("font-medium", getBadgeColor(value))}>
                           {value === 'monthly' ? 'Monthly' : 
-                          value === 'annual' ? 'Annual' : 'One-Time'}
+                           value === 'annual' ? 'Annual' : 'One-Time'}
                         </Badge>
                       )}
                     />
@@ -164,7 +166,7 @@ export function SpreadsheetExpensesBody({
                   return (
                     <EditableCell
                       key={`${expense.id}-${column.key}`}
-                      value={expense.vendor?.name || ""}
+                      value={expense.vendor?.name || "—"}
                       onChange={(value) => handleCellUpdate(expense.id, "vendor_id", value)}
                     />
                   );
@@ -173,17 +175,8 @@ export function SpreadsheetExpensesBody({
                   return (
                     <EditableCell
                       key={`${expense.id}-${column.key}`}
-                      value={expense.payment_method?.name || ""}
+                      value={expense.payment_method?.name || "—"}
                       onChange={(value) => handleCellUpdate(expense.id, "payment_method_id", value)}
-                    />
-                  );
-                  
-                case "notes":
-                  return (
-                    <EditableCell
-                      key={`${expense.id}-${column.key}`}
-                      value={expense.notes || ""}
-                      onChange={(value) => handleCellUpdate(expense.id, "notes", value)}
                     />
                   );
 
