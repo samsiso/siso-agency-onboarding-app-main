@@ -13,7 +13,7 @@ interface EditableCellProps {
   options?: Array<{ value: string; label: string }>;
   className?: string;
   align?: "left" | "center" | "right";
-  formatter?: (value: any) => string;
+  formatter?: (value: any) => React.ReactNode;
   inputClassName?: string;
 }
 

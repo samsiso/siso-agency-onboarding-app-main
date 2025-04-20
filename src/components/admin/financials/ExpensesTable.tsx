@@ -173,7 +173,7 @@ export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }
         onOpenChange={(open) => !open && setViewDetailsId(null)}
       />
       
-      <style jsx global>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         .spreadsheet-container {
           overflow: hidden;
           border-radius: 0.5rem;
@@ -202,7 +202,7 @@ export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }
         .spreadsheet-container ::-webkit-scrollbar-corner {
           background: #f1f1f1;
         }
-      `}</style>
+      `}} />
     </div>
   );
 }

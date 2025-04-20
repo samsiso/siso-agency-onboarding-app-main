@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { useElementSize } from "@/hooks/useElementSize";
+import "@/components/ui/hide-scrollbar.css";
 
 interface SpreadsheetTableProps {
   children: React.ReactNode;
@@ -55,7 +56,7 @@ export function SpreadsheetTable({
         </div>
       </ScrollArea>
       
-      <style jsx global>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         .spreadsheet-grid table {
           border-collapse: collapse;
         }
@@ -92,7 +93,7 @@ export function SpreadsheetTable({
         .spreadsheet-grid th:hover .resize-handle {
           background: rgba(99, 102, 241, 0.3);
         }
-      `}</style>
+      `}} />
     </div>
   );
 }
