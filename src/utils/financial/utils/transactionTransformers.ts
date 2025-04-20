@@ -9,8 +9,9 @@ export function transformTransactionData(item: any): FinancialTransaction {
   }
 
   // Log the raw data for debugging
-  console.log("Raw transaction data:", item);
+  console.log("Processing transaction data:", item.id);
 
+  // Safely extract relations - these might be null for new design
   const category = item.category ? {
     id: item.category.id,
     name: item.category.name,

@@ -23,14 +23,10 @@ export async function fetchTransactions(): Promise<FinancialTransaction[]> {
 
     console.log("Fetching transactions for user:", user.id);
 
-    const { data, error } = await supabase
+    // Simple query first - we'll join relationships separately to avoid potential RLS recursion issues
+    const { data: transactionData, error } = await supabase
       .from("financial_transactions")
-      .select(`
-        *,
-        category:expense_categories(id, name, description, is_active),
-        vendor:vendors(id, name, is_active),
-        payment_method:payment_methods(id, name, is_active)
-      `)
+      .select("*")
       .order("date", { ascending: false });
 
     if (error) {
@@ -43,12 +39,61 @@ export async function fetchTransactions(): Promise<FinancialTransaction[]> {
       return [];
     }
 
-    console.log("Raw transactions data:", data);
+    console.log("Found transactions:", transactionData?.length || 0);
     
-    const transformedData = data.map(transformTransactionData);
-    console.log("Transformed transactions:", transformedData);
+    if (!transactionData || transactionData.length === 0) {
+      return [];
+    }
+
+    // Now fetch related data separately
+    const transactions = await Promise.all(transactionData.map(async (transaction) => {
+      // Get category if exists
+      let category = null;
+      if (transaction.category_id) {
+        const { data } = await supabase
+          .from("expense_categories")
+          .select("*")
+          .eq("id", transaction.category_id)
+          .single();
+        category = data;
+      }
+      
+      // Get vendor if exists
+      let vendor = null;
+      if (transaction.vendor_id) {
+        const { data } = await supabase
+          .from("vendors")
+          .select("*")
+          .eq("id", transaction.vendor_id)
+          .single();
+        vendor = data;
+      }
+      
+      // Get payment method if exists
+      let paymentMethod = null;
+      if (transaction.payment_method_id) {
+        const { data } = await supabase
+          .from("payment_methods")
+          .select("*")
+          .eq("id", transaction.payment_method_id)
+          .single();
+        paymentMethod = data;
+      }
+      
+      // Combine transaction with its relationships
+      const enrichedTransaction = {
+        ...transaction,
+        category,
+        vendor,
+        payment_method: paymentMethod
+      };
+      
+      return transformTransactionData(enrichedTransaction);
+    }));
     
-    return transformedData;
+    console.log("Transformed transactions:", transactions);
+    
+    return transactions;
   } catch (err) {
     console.error("Unexpected error fetching transactions:", err);
     toast({
