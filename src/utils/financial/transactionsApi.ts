@@ -8,6 +8,17 @@ export async function fetchTransactions(): Promise<FinancialTransaction[]> {
   try {
     console.log("Starting to fetch transactions");
     
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      console.error("No authenticated user found");
+      toast({
+        title: "Error",
+        description: "You must be logged in to view transactions",
+        variant: "destructive"
+      });
+      return [];
+    }
+
     const { data, error } = await supabase
       .from("financial_transactions")
       .select(`
@@ -45,7 +56,6 @@ export async function fetchTransactions(): Promise<FinancialTransaction[]> {
   }
 }
 
-// Delete a transaction by ID
 export async function deleteTransaction(id: string): Promise<boolean> {
   try {
     const { error } = await supabase
@@ -70,6 +80,51 @@ export async function deleteTransaction(id: string): Promise<boolean> {
     return true;
   } catch (err) {
     console.error("Unexpected error deleting transaction:", err);
+    toast({
+      title: "Error",
+      description: "An unexpected error occurred",
+      variant: "destructive"
+    });
+    return false;
+  }
+}
+
+export async function createTransaction(transaction: Omit<FinancialTransaction, 'id'>): Promise<boolean> {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to create transactions",
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    const { error } = await supabase
+      .from("financial_transactions")
+      .insert({
+        ...transaction,
+        user_id: user.id
+      });
+
+    if (error) {
+      console.error("Error creating transaction:", error);
+      toast({
+        title: "Error",
+        description: "Failed to create the transaction",
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    toast({
+      title: "Success",
+      description: "Transaction created successfully",
+    });
+    return true;
+  } catch (err) {
+    console.error("Unexpected error creating transaction:", err);
     toast({
       title: "Error",
       description: "An unexpected error occurred",
