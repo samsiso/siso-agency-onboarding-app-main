@@ -7,13 +7,27 @@ import { toast } from "@/hooks/use-toast";
 import { TableRow, TableCell } from "@/components/ui/table";
 import { FinancialTransaction } from "@/utils/financial/types";
 
+type RecurringType = "one-time" | "monthly" | "annual";
+
 export interface AddExpenseRowProps {
   onExpenseAdded: () => void;
   visibleColumns: any[];
 }
 
 export function AddExpenseRow({ onExpenseAdded, visibleColumns }: AddExpenseRowProps) {
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<{
+    description: string;
+    amount: string;
+    date: string;
+    category_id: string;
+    vendor_id: string;
+    payment_method_id: string;
+    recurring_type: RecurringType;
+    notes: string;
+    type: "expense";
+    currency: string;
+    status: string;
+  }>({
     description: "",
     amount: "",
     date: "",
@@ -22,17 +36,24 @@ export function AddExpenseRow({ onExpenseAdded, visibleColumns }: AddExpenseRowP
     payment_method_id: "",
     recurring_type: "one-time",
     notes: "",
-    type: "expense" as const, // Explicitly type this as a literal 'expense' type
+    type: "expense",
     currency: "GBP",
     status: "completed"
   });
   const [isSaving, setIsSaving] = useState(false);
 
   const handleInput = (field: string, value: string) => {
-    setForm({ ...form, [field]: value });
+    // For recurring_type, ensure value is of RecurringType type
+    if (field === "recurring_type") {
+      // Validate value before setting
+      if (value === "one-time" || value === "monthly" || value === "annual") {
+        setForm(prev => ({ ...prev, [field]: value as RecurringType }));
+      }
+    } else {
+      setForm(prev => ({ ...prev, [field]: value }));
+    }
   };
 
-  // Very minimal: category, vendor, payment, recurrence can be extended to autocomplete later.
   const handleAdd = async () => {
     if (!form.description || !form.amount || !form.date) {
       toast({
@@ -50,13 +71,13 @@ export function AddExpenseRow({ onExpenseAdded, visibleColumns }: AddExpenseRowP
     setIsSaving(false);
     if (success) {
       toast({ title: "Expense Added" });
-      setForm({
-        ...form,
+      setForm(prev => ({
+        ...prev,
         description: "",
         amount: "",
         date: "",
         notes: "",
-      });
+      }));
       onExpenseAdded();
     }
   };
@@ -80,7 +101,6 @@ export function AddExpenseRow({ onExpenseAdded, visibleColumns }: AddExpenseRowP
           case "category":
             return (
               <TableCell key={col.key}>
-                {/* Replace with fetch to categories dropdown later */}
                 <Input
                   value={form.category_id}
                   onChange={e => handleInput("category_id", e.target.value)}
@@ -169,3 +189,4 @@ export function AddExpenseRow({ onExpenseAdded, visibleColumns }: AddExpenseRowP
     </TableRow>
   );
 }
+
