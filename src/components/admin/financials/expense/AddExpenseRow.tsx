@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { createTransaction } from "@/utils/financial";
 import { toast } from "@/hooks/use-toast";
 import { TableRow, TableCell } from "@/components/ui/table";
+import { FinancialTransaction } from "@/utils/financial/types";
 
 export interface AddExpenseRowProps {
   onExpenseAdded: () => void;
@@ -21,7 +22,7 @@ export function AddExpenseRow({ onExpenseAdded, visibleColumns }: AddExpenseRowP
     payment_method_id: "",
     recurring_type: "one-time",
     notes: "",
-    type: "expense",
+    type: "expense" as const, // Explicitly type this as a literal 'expense' type
     currency: "GBP",
     status: "completed"
   });
@@ -168,4 +169,3 @@ export function AddExpenseRow({ onExpenseAdded, visibleColumns }: AddExpenseRowP
     </TableRow>
   );
 }
-
