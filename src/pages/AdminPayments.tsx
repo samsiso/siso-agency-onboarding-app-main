@@ -9,6 +9,7 @@ import { fetchTransactions, FinancialTransaction } from "@/utils/financial";
 import { Button } from "@/components/ui/button";
 import { seedInitialExpenses } from "@/utils/financial/seedExpenses";
 import { toast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function AdminPayments() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -17,6 +18,30 @@ export default function AdminPayments() {
   const [revenues, setRevenues] = useState<FinancialTransaction[]>([]);
   const [filters, setFilters] = useState({});
   const [isSeeding, setIsSeeding] = useState(false);
+  const [expensesExist, setExpensesExist] = useState(false);
+
+  // Check if expenses exist when component mounts
+  useEffect(() => {
+    const checkExpensesExistence = async () => {
+      try {
+        const { count, error } = await supabase
+          .from('financial_transactions')
+          .select('*', { count: 'exact' })
+          .eq('type', 'expense');
+
+        if (error) {
+          console.error("Error checking expenses:", error);
+          return;
+        }
+
+        setExpensesExist(count !== 0);
+      } catch (error) {
+        console.error("Error checking expenses:", error);
+      }
+    };
+
+    checkExpensesExistence();
+  }, []);
 
   useEffect(() => {
     loadData();
@@ -69,12 +94,11 @@ export default function AdminPayments() {
   const handleSeedExpenses = async () => {
     setIsSeeding(true);
     try {
-      await seedInitialExpenses();
-      await loadData(); // Reload data after seeding
-      toast({
-        title: "Success",
-        description: "Sample expenses have been added successfully",
-      });
+      const success = await seedInitialExpenses();
+      if (success) {
+        await loadData(); // Reload data after seeding
+        setExpensesExist(true);
+      }
     } catch (error) {
       console.error("Error seeding expenses:", error);
       toast({
@@ -92,7 +116,7 @@ export default function AdminPayments() {
       <div className="container px-6 py-8 max-w-7xl">
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
           <h1 className="text-3xl font-bold tracking-tight">Financial Management</h1>
-          {expenses.length === 0 && (
+          {!expensesExist && (
             <Button 
               variant="secondary" 
               onClick={handleSeedExpenses} 

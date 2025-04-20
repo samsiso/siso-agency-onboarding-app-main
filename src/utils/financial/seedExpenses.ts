@@ -864,14 +864,45 @@ const sampleExpenses = [
 ];
 
 /**
- * Seeds initial sample expenses for demonstration
+ * Seeds initial sample expenses with improved error handling
  */
 export async function seedInitialExpenses(): Promise<boolean> {
   try {
-    // Use the new bulk insert method
-    return await addMultipleTransactions(sampleExpenses);
+    // Check if expenses already exist to prevent duplicates
+    const { count, error: countError } = await supabase
+      .from('financial_transactions')
+      .select('*', { count: 'exact' });
+
+    if (countError) {
+      console.error("Error checking existing expenses:", countError);
+      toast({
+        title: "Error",
+        description: "Failed to check existing expenses",
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    // Only seed if no existing expenses
+    if (count === 0) {
+      const result = await addMultipleTransactions(sampleExpenses);
+      
+      if (result) {
+        toast({
+          title: "Success",
+          description: `${sampleExpenses.length} expenses added successfully`,
+        });
+        return true;
+      }
+    } else {
+      toast({
+        title: "Info",
+        description: `${count} expenses already exist. Skipping seeding.`,
+      });
+      return false;
+    }
   } catch (error) {
-    console.error("Error seeding expenses:", error);
+    console.error("Comprehensive error seeding expenses:", error);
     toast({
       title: "Error",
       description: "Failed to seed sample expenses",
