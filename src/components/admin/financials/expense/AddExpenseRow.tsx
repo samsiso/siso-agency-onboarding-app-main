@@ -1,11 +1,10 @@
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { createTransaction } from "@/utils/financial";
 import { toast } from "@/hooks/use-toast";
 import { TableRow, TableCell } from "@/components/ui/table";
-import { FinancialTransaction } from "@/utils/financial/types";
 import { Plus, Check, X } from "lucide-react";
 
 type RecurringType = "one-time" | "monthly" | "annual";
@@ -15,28 +14,27 @@ export interface AddExpenseRowProps {
   visibleColumns: any[];
 }
 
+// Helper to auto-focus first input
+function useAutoFocus(ref, active) {
+  useEffect(() => {
+    if (active && ref.current) {
+      ref.current.focus();
+    }
+  }, [active]);
+}
+
 export function AddExpenseRow({ onExpenseAdded, visibleColumns }: AddExpenseRowProps) {
-  const [isAdding, setIsAdding] = useState(false);
-  const [form, setForm] = useState<{
-    description: string;
-    amount: string;
-    date: string;
-    category_id: string;
-    vendor_id: string;
-    payment_method_id: string;
-    recurring_type: RecurringType;
-    notes: string;
-    type: "expense";
-    currency: string;
-    status: string;
-  }>({
+  const [isEditing, setIsEditing] = useState(false);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const [form, setForm] = useState({
     description: "",
     amount: "",
     date: "",
     category_id: "",
     vendor_id: "",
     payment_method_id: "",
-    recurring_type: "one-time",
+    recurring_type: "one-time" as RecurringType,
     notes: "",
     type: "expense",
     currency: "GBP",
@@ -44,18 +42,37 @@ export function AddExpenseRow({ onExpenseAdded, visibleColumns }: AddExpenseRowP
   });
   const [isSaving, setIsSaving] = useState(false);
 
-  const handleInput = (field: string, value: string) => {
-    // For recurring_type, ensure value is of RecurringType type
-    if (field === "recurring_type") {
-      // Validate value before setting
-      if (value === "one-time" || value === "monthly" || value === "annual") {
-        setForm(prev => ({ ...prev, [field]: value as RecurringType }));
-      }
-    } else {
-      setForm(prev => ({ ...prev, [field]: value }));
-    }
+  useAutoFocus(inputRef, isEditing);
+
+  // Reset form and switch back to add button state
+  const resetForm = () => {
+    setForm({
+      description: "",
+      amount: "",
+      date: "",
+      category_id: "",
+      vendor_id: "",
+      payment_method_id: "",
+      recurring_type: "one-time",
+      notes: "",
+      type: "expense",
+      currency: "GBP",
+      status: "completed"
+    });
+    setIsEditing(false);
   };
 
+  // Populate field values
+  const handleInput = (field: string, value: string) => {
+    setForm(prev => ({
+      ...prev,
+      [field]: field === "recurring_type"
+        ? (["one-time", "monthly", "annual"].includes(value) ? value : "one-time")
+        : value
+    }));
+  };
+
+  // Save logic
   const handleAdd = async () => {
     if (!form.description || !form.amount || !form.date) {
       toast({
@@ -73,39 +90,26 @@ export function AddExpenseRow({ onExpenseAdded, visibleColumns }: AddExpenseRowP
     setIsSaving(false);
     if (success) {
       toast({ title: "Expense Added" });
-      setForm(prev => ({
-        ...prev,
-        description: "",
-        amount: "",
-        date: "",
-        notes: "",
-      }));
-      setIsAdding(false);
+      resetForm();
       onExpenseAdded();
     }
   };
 
-  const handleCancel = () => {
-    setIsAdding(false);
-    setForm(prev => ({
-      ...prev,
-      description: "",
-      amount: "",
-      date: "",
-      notes: "",
-    }));
-  };
-
-  if (!isAdding) {
+  if (!isEditing) {
     return (
-      <TableRow 
-        className="add-expense-row-trigger cursor-pointer" 
-        onClick={() => setIsAdding(true)}
-      >
+      <TableRow className="add-expense-row-trigger cursor-pointer group" onClick={() => setIsEditing(true)}>
         <TableCell colSpan={visibleColumns.length + 2} className="text-center py-3">
-          <div className="flex items-center justify-center text-muted-foreground">
-            <Plus className="h-4 w-4 mr-2" />
-            <span>Add New Expense</span>
+          <div className="flex items-center justify-center gap-2 text-muted-foreground opacity-90 group-hover:opacity-100 transition">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className="rounded-full p-1 border border-amber-700/60 bg-[#18181b] hover:bg-primary/80"
+              aria-label="Add Expense"
+              tabIndex={0}
+            >
+              <Plus className="h-5 w-5 text-primary" />
+            </Button>
+            <span className="tracking-wide text-amber-200">Add Expense</span>
           </div>
         </TableCell>
       </TableRow>
@@ -113,18 +117,19 @@ export function AddExpenseRow({ onExpenseAdded, visibleColumns }: AddExpenseRowP
   }
 
   return (
-    <TableRow className="bg-background/60 hover:bg-muted/10">
-      <TableCell />
+    <TableRow className="bg-gray-950/95 hover:bg-gray-800/40 border-b border-amber-800/40 focus-within:ring-1 focus-within:ring-primary">
+      <TableCell /> {/* For checkbox col alignment */}
       {visibleColumns.map(col => {
         switch (col.key) {
           case "description":
             return (
               <TableCell key={col.key}>
                 <Input
+                  ref={inputRef}
                   value={form.description}
                   onChange={e => handleInput("description", e.target.value)}
                   placeholder="Description"
-                  className="min-w-[140px]"
+                  className="min-w-[140px] bg-[#18181b] border border-gray-800 text-amber-100"
                   autoFocus
                 />
               </TableCell>
@@ -136,6 +141,7 @@ export function AddExpenseRow({ onExpenseAdded, visibleColumns }: AddExpenseRowP
                   value={form.category_id}
                   onChange={e => handleInput("category_id", e.target.value)}
                   placeholder="Category ID"
+                  className="bg-[#18181b] border border-gray-800 text-amber-100"
                 />
               </TableCell>
             );
@@ -149,7 +155,7 @@ export function AddExpenseRow({ onExpenseAdded, visibleColumns }: AddExpenseRowP
                   step="0.01"
                   min="0"
                   placeholder="0.00"
-                  className="w-20"
+                  className="w-24 bg-[#18181b] border border-gray-800 text-amber-100"
                 />
               </TableCell>
             );
@@ -160,6 +166,7 @@ export function AddExpenseRow({ onExpenseAdded, visibleColumns }: AddExpenseRowP
                   value={form.date}
                   onChange={e => handleInput("date", e.target.value)}
                   type="date"
+                  className="bg-[#18181b] border border-gray-800 text-amber-100"
                 />
               </TableCell>
             );
@@ -169,8 +176,8 @@ export function AddExpenseRow({ onExpenseAdded, visibleColumns }: AddExpenseRowP
                 <select
                   value={form.recurring_type}
                   onChange={e => handleInput("recurring_type", e.target.value)}
-                  className="bg-muted border px-2 py-1 rounded"
-                  style={{ zIndex: 40, minWidth: 80 }}
+                  className="bg-[#18181b] border border-gray-800 text-amber-100 px-2 py-1 rounded"
+                  style={{ minWidth: 90 }}
                 >
                   <option value="one-time">One-Time</option>
                   <option value="monthly">Monthly</option>
@@ -185,6 +192,7 @@ export function AddExpenseRow({ onExpenseAdded, visibleColumns }: AddExpenseRowP
                   value={form.vendor_id}
                   onChange={e => handleInput("vendor_id", e.target.value)}
                   placeholder="Vendor ID"
+                  className="bg-[#18181b] border border-gray-800 text-amber-100"
                 />
               </TableCell>
             );
@@ -195,6 +203,7 @@ export function AddExpenseRow({ onExpenseAdded, visibleColumns }: AddExpenseRowP
                   value={form.payment_method_id}
                   onChange={e => handleInput("payment_method_id", e.target.value)}
                   placeholder="Payment Method ID"
+                  className="bg-[#18181b] border border-gray-800 text-amber-100"
                 />
               </TableCell>
             );
@@ -205,6 +214,7 @@ export function AddExpenseRow({ onExpenseAdded, visibleColumns }: AddExpenseRowP
                   value={form.notes}
                   onChange={e => handleInput("notes", e.target.value)}
                   placeholder="Notes"
+                  className="bg-[#18181b] border border-gray-800 text-amber-100"
                 />
               </TableCell>
             );
@@ -214,7 +224,7 @@ export function AddExpenseRow({ onExpenseAdded, visibleColumns }: AddExpenseRowP
       })}
       <TableCell>
         <div className="flex items-center gap-2 justify-end">
-          <Button variant="ghost" size="sm" onClick={handleCancel} disabled={isSaving}>
+          <Button variant="ghost" size="sm" onClick={resetForm} disabled={isSaving}>
             <X className="h-4 w-4" />
           </Button>
           <Button variant="default" size="sm" onClick={handleAdd} disabled={isSaving}>

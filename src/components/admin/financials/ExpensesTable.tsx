@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Table, TableBody, TableHeader } from "@/components/ui/table";
 import { deleteTransaction } from "@/utils/financial";
@@ -121,6 +120,7 @@ export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }
     console.log("Add new expense");
   };
 
+  // Explicitly move AddExpenseRow to render as the very first body row only
   return (
     <div className="space-y-6">
       <ExpensesFinanceToolbar
@@ -145,22 +145,22 @@ export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }
           <Table variant="striped" size="sm">
             <TableHeader>
               <ExpensesTableHeader 
-                visibleColumns={visibleColumns} 
+                visibleColumns={visibleColumns}
                 onSort={handleSort}
                 selectedExpenses={selectedExpenses}
                 expenses={filteredExpenses}
                 onSelectAll={handleSelectAll}
                 sortColumn={sortField}
-                sortDirection={sortDirection} 
+                sortDirection={sortDirection}
               />
             </TableHeader>
             <TableBody>
-              {/* Interactive Add Expense Row - always at the top */}
+              {/* Always show "Add Expense" row at the top */}
               <AddExpenseRow 
                 onExpenseAdded={onDataChange}
                 visibleColumns={visibleColumns}
               />
-              
+              {/* ... keep existing conditional rendering for loading/records ... */}
               {isLoading ? (
                 <ExpensesTableLoading colSpan={visibleColumns.length + 1} />
               ) : (
