@@ -11,8 +11,8 @@ export const tableStyles = cva(
         lg: "text-base"
       },
       variant: {
-        default: "border-border/20 [&_tr:last-child]:border-0",
-        striped: "[&_tr:nth-child(even)]:bg-muted/5"
+        default: "border border-border/20 rounded-md overflow-hidden",
+        striped: "[&_tr:nth-child(even)]:bg-muted/5 border border-border/20 rounded-md overflow-hidden"
       }
     },
     defaultVariants: {
@@ -24,7 +24,7 @@ export const tableStyles = cva(
 
 export const tableCellStyles = cva(
   [
-    "p-4 align-middle text-left",
+    "align-middle text-left box-border",
     "[&:has([role=checkbox])]:pr-0",
     "[&>a]:text-primary [&>a]:hover:underline",
     "whitespace-nowrap overflow-hidden text-ellipsis",
@@ -46,14 +46,14 @@ export const tableCellStyles = cva(
 
 export const tableRowStyles = cva(
   [
-    "border-b border-border/20 transition-colors duration-200",
-    "hover:bg-muted/5",
-    "data-[state=selected]:bg-muted/10"
+    "border-b border-border/10",
+    "outline-none focus-within:bg-blue-50/5 focus-within:outline-blue-500/20"
   ].join(" "),
   {
     variants: {
       interactive: {
-        true: "cursor-pointer"
+        true: "cursor-pointer hover:bg-muted/10",
+        false: ""
       }
     },
     defaultVariants: {

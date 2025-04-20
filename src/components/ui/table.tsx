@@ -1,14 +1,19 @@
+
 import * as React from "react"
 import { cn } from "@/lib/utils"
+import { tableStyles, tableCellStyles, tableRowStyles } from "./table-styles"
 
 const Table = React.forwardRef<
   HTMLTableElement,
-  React.HTMLAttributes<HTMLTableElement>
->(({ className, ...props }, ref) => (
+  React.HTMLAttributes<HTMLTableElement> & {
+    variant?: "default" | "striped";
+    size?: "default" | "sm" | "lg";
+  }
+>(({ className, variant = "default", size = "default", ...props }, ref) => (
   <div className="relative w-full overflow-auto">
     <table
       ref={ref}
-      className={cn("w-full caption-bottom text-sm enhanced-table", className)}
+      className={cn(tableStyles({ variant, size }), className)}
       {...props}
     />
   </div>
@@ -19,7 +24,14 @@ const TableHeader = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
-  <thead ref={ref} className={cn("[&_tr]:border-b-0", className)} {...props} />
+  <thead 
+    ref={ref} 
+    className={cn(
+      "bg-muted/50 backdrop-blur-sm sticky top-0 z-20 border-b border-border/30",
+      className
+    )} 
+    {...props} 
+  />
 ))
 TableHeader.displayName = "TableHeader"
 
@@ -52,12 +64,16 @@ TableFooter.displayName = "TableFooter"
 
 const TableRow = React.forwardRef<
   HTMLTableRowElement,
-  React.HTMLAttributes<HTMLTableRowElement>
->(({ className, ...props }, ref) => (
+  React.HTMLAttributes<HTMLTableRowElement> & {
+    interactive?: boolean;
+    isSelected?: boolean;
+  }
+>(({ className, interactive = true, isSelected, ...props }, ref) => (
   <tr
     ref={ref}
     className={cn(
-      "border-b border-border/30 transition-colors hover:bg-muted/30 data-[state=selected]:bg-muted",
+      tableRowStyles({ interactive }),
+      isSelected && "bg-muted/20",
       className
     )}
     {...props}
@@ -67,12 +83,17 @@ TableRow.displayName = "TableRow"
 
 const TableHead = React.forwardRef<
   HTMLTableCellElement,
-  React.ThHTMLAttributes<HTMLTableCellElement>
->(({ className, ...props }, ref) => (
+  React.ThHTMLAttributes<HTMLTableCellElement> & {
+    align?: "left" | "center" | "right";
+  }
+>(({ className, align = "left", ...props }, ref) => (
   <th
     ref={ref}
     className={cn(
-      "h-12 px-4 text-left align-middle font-medium text-foreground [&:has([role=checkbox])]:pr-0",
+      "h-10 px-3 py-2 text-xs font-medium text-muted-foreground tracking-wider uppercase",
+      "border-r border-border/10 last:border-r-0",
+      "transition-colors whitespace-nowrap",
+      tableCellStyles({ align }),
       className
     )}
     {...props}
@@ -82,11 +103,19 @@ TableHead.displayName = "TableHead"
 
 const TableCell = React.forwardRef<
   HTMLTableCellElement,
-  React.TdHTMLAttributes<HTMLTableCellElement>
->(({ className, ...props }, ref) => (
+  React.TdHTMLAttributes<HTMLTableCellElement> & {
+    align?: "left" | "center" | "right";
+    isEditing?: boolean;
+  }
+>(({ className, align = "left", isEditing, ...props }, ref) => (
   <td
     ref={ref}
-    className={cn("p-4 align-middle [&:has([role=checkbox])]:pr-0", className)}
+    className={cn(
+      "p-2 border-r border-border/10 last:border-r-0 relative",
+      isEditing ? "p-0 bg-muted/30" : "p-2",
+      tableCellStyles({ align }),
+      className
+    )}
     {...props}
   />
 ))

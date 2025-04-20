@@ -1,73 +1,11 @@
 
-.hide-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(0,0,0,0.2) transparent;
-  -webkit-overflow-scrolling: touch;
-}
-
+/* Hide scrollbar for Chrome, Safari and Opera */
 .hide-scrollbar::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  display: none;
 }
 
-.hide-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.hide-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(0,0,0,0.2);
-  border-radius: 3px;
-  transition: background-color 0.2s ease;
-}
-
-.hide-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(0,0,0,0.3);
-}
-
-:root {
-  --header-height: 48px;
-}
-
-/* Add smooth scrolling behavior */
-.scroll-smooth {
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* Optimize performance */
-.scroll-optimize {
-  will-change: transform;
-  backface-visibility: hidden;
-  perspective: 1000px;
-  transform: translate3d(0,0,0);
-}
-
-/* Touch optimization styles */
-[data-touch-action="none"] {
-  touch-action: none;
-}
-
-.touch-manipulation {
-  touch-action: manipulation;
-}
-
-/* Larger touch targets for mobile */
-@media (max-width: 640px) {
-  .touch-target {
-    min-height: 44px;
-    min-width: 44px;
-  }
-  
-  button, 
-  [role="button"],
-  a {
-    min-height: 36px;
-    min-width: 36px;
-  }
-}
-
-/* Prevent text selection during drag operations */
-.no-select {
-  user-select: none;
-  -webkit-user-select: none;
+/* Hide scrollbar for IE, Edge and Firefox */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }

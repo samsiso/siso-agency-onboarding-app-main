@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Table, TableBody, TableHeader } from "@/components/ui/table";
 import { deleteTransaction } from "@/utils/financial";
 import { ExpenseDetailsDialog } from "./ExpenseDetailsDialog";
@@ -8,13 +8,11 @@ import { useTableColumns } from "@/hooks/useTableColumns";
 import { useTableViews } from "@/hooks/useTableViews";
 import { useExpensesTableData } from "@/hooks/useExpensesTableData";
 import { ExpensesTableHeader } from "./expense/ExpensesTableHeader";
-import { ExpensesTableBody } from "./expense/ExpensesTableBody";
 import { ExpensesTableLoading } from "./expense/ExpensesTableLoading";
-import { ScrollableTable } from "../clients/ScrollableTable";
+import { SpreadsheetTable } from "./table/SpreadsheetTable";
 import { ExpensesFinanceToolbar } from "./table/ExpensesFinanceToolbar";
-import { Button } from "@/components/ui/button";
 import { ArrowUpDown, Download, Filter, Plus, Trash2 } from "lucide-react";
-import { useEffect } from "react";
+import { SpreadsheetExpensesBody } from "./expense/SpreadsheetExpensesBody";
 
 export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }) {
   const [selectedExpenses, setSelectedExpenses] = useState<string[]>([]);
@@ -26,13 +24,14 @@ export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }
   
   // Define the initial columns configuration with pinning capability
   const initialColumns = [
-    { key: "description", label: "Expense Name", visible: true, pinned: true },
-    { key: "category", label: "Category", visible: true },
-    { key: "amount", label: "Amount", visible: true },
-    { key: "date", label: "Date", visible: true },
-    { key: "recurring_type", label: "Recurrence", visible: true },
-    { key: "vendor", label: "Vendor", visible: true },
-    { key: "payment_method", label: "Payment Method", visible: true }
+    { key: "description", label: "Expense Name", visible: true, pinned: true, width: 180 },
+    { key: "category", label: "Category", visible: true, width: 150 },
+    { key: "amount", label: "Amount", visible: true, width: 120 },
+    { key: "date", label: "Date", visible: true, width: 120 },
+    { key: "recurring_type", label: "Recurrence", visible: true, width: 150 },
+    { key: "vendor", label: "Vendor", visible: true, width: 150 },
+    { key: "payment_method", label: "Payment Method", visible: true, width: 150 },
+    { key: "notes", label: "Notes", visible: false, width: 200 }
   ];
 
   const { columns, visibleColumns, updateColumnVisibility } = useTableColumns(initialColumns);
@@ -108,8 +107,12 @@ export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }
     }
   };
 
-  // Get pinned columns for the ScrollableTable
-  const pinnedColumns = visibleColumns.filter(col => col.pinned) || [];
+  // Handle expense update (after inline editing)
+  const handleUpdateExpense = async (expenseId: string, field: string, value: any) => {
+    console.log("Update expense:", expenseId, field, value);
+    // TODO: Implement actual API call to update expense
+    // For now just show it's working via console
+  };
 
   return (
     <div className="space-y-6">
@@ -130,42 +133,76 @@ export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }
         onExport={() => alert("Export feature coming soon")}
       />
 
-      <ScrollableTable pinnedColumns={pinnedColumns}>
-        <Table>
-          <TableHeader>
-            <ExpensesTableHeader 
-              visibleColumns={visibleColumns} 
-              onSort={handleSort}
-              selectedExpenses={selectedExpenses}
-              expenses={filteredExpenses}
-              onSelectAll={handleSelectAll}
-              sortColumn={sortField}
-              sortDirection={sortDirection} 
-            />
-          </TableHeader>
-          
-          <TableBody>
-            {isLoading ? (
-              <ExpensesTableLoading colSpan={visibleColumns.length + 1} />
-            ) : (
-              <ExpensesTableBody
-                expenses={filteredExpenses}
-                visibleColumns={visibleColumns}
-                onViewDetails={setViewDetailsId}
-                onDelete={handleDelete}
+      <div className="spreadsheet-container">
+        <SpreadsheetTable showGrid containerClassName="border-none shadow rounded-md">
+          <Table variant="striped" size="sm">
+            <TableHeader>
+              <ExpensesTableHeader 
+                visibleColumns={visibleColumns} 
+                onSort={handleSort}
                 selectedExpenses={selectedExpenses}
-                onSelectExpense={handleSelectExpense}
+                expenses={filteredExpenses}
+                onSelectAll={handleSelectAll}
+                sortColumn={sortField}
+                sortDirection={sortDirection} 
               />
-            )}
-          </TableBody>
-        </Table>
-      </ScrollableTable>
+            </TableHeader>
+            
+            <TableBody>
+              {isLoading ? (
+                <ExpensesTableLoading colSpan={visibleColumns.length + 1} />
+              ) : (
+                <SpreadsheetExpensesBody
+                  expenses={filteredExpenses}
+                  visibleColumns={visibleColumns}
+                  onViewDetails={setViewDetailsId}
+                  onDelete={handleDelete}
+                  selectedExpenses={selectedExpenses}
+                  onSelectExpense={handleSelectExpense}
+                  onUpdateExpense={handleUpdateExpense}
+                />
+              )}
+            </TableBody>
+          </Table>
+        </SpreadsheetTable>
+      </div>
 
       <ExpenseDetailsDialog 
         expense={expenseDetails}
         isOpen={!!viewDetailsId}
         onOpenChange={(open) => !open && setViewDetailsId(null)}
       />
+      
+      <style jsx global>{`
+        .spreadsheet-container {
+          overflow: hidden;
+          border-radius: 0.5rem;
+          background: white;
+        }
+        
+        /* Custom scrollbar for spreadsheet */
+        .spreadsheet-container ::-webkit-scrollbar {
+          width: 8px;
+          height: 8px;
+        }
+        
+        .spreadsheet-container ::-webkit-scrollbar-track {
+          background: #f1f1f1;
+        }
+        
+        .spreadsheet-container ::-webkit-scrollbar-thumb {
+          background: #d1d5db;
+          border-radius: 4px;
+        }
+        
+        .spreadsheet-container ::-webkit-scrollbar-thumb:hover {
+          background: #9ca3af;
+        }
+        
+        .spreadsheet-container ::-webkit-scrollbar-corner {
+          background: #f1f1f1;
+        }
+      `}</style>
     </div>
   );
 }
