@@ -4,7 +4,6 @@ import { isValidRelationship } from './relationshipUtils';
 
 /**
  * Transforms raw transaction data from Supabase into the FinancialTransaction type
- * Uses type assertions to prevent deep instantiation chains
  */
 export function transformTransactionData(item: any): FinancialTransaction {
   // Handle null or undefined item
