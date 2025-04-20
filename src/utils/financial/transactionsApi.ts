@@ -21,6 +21,8 @@ export async function fetchTransactions(): Promise<FinancialTransaction[]> {
       return [];
     }
 
+    console.log("Fetching transactions for user:", user.id);
+
     const { data, error } = await supabase
       .from("financial_transactions")
       .select(`
@@ -35,7 +37,7 @@ export async function fetchTransactions(): Promise<FinancialTransaction[]> {
       console.error("Error fetching transactions:", error);
       toast({
         title: "Error",
-        description: "Failed to fetch transactions",
+        description: "Failed to fetch transactions: " + error.message,
         variant: "destructive"
       });
       return [];
@@ -51,7 +53,7 @@ export async function fetchTransactions(): Promise<FinancialTransaction[]> {
     console.error("Unexpected error fetching transactions:", err);
     toast({
       title: "Error",
-      description: "An unexpected error occurred while fetching transactions",
+      description: "An unexpected error occurred while fetching transactions: " + String(err),
       variant: "destructive"
     });
     return [];
