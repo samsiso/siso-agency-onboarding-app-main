@@ -41,6 +41,7 @@ export function SpreadsheetTable({
         showGrid && "spreadsheet-grid",
         containerClassName
       )}
+      style={{ background: "#fff" }} /* enforce white bg for all spreadsheet containers */
     >
       <ScrollArea
         ref={tableRef}
@@ -49,7 +50,7 @@ export function SpreadsheetTable({
         <div className="relative">
           <div
             className="sticky top-0 z-30 border-b border-border/30"
-            style={{ height: `${headerHeight}px` }}
+            style={{ height: `${headerHeight}px`, background: "#fafafb" }}
           />
           {children}
         </div>
@@ -59,43 +60,31 @@ export function SpreadsheetTable({
         .spreadsheet-grid table {
           border-collapse: collapse;
         }
-        .spreadsheet-grid select {
-          background: white !important;
+        .spreadsheet-grid select,
+        .spreadsheet-grid .select-trigger {
+          background: #fff !important;
+          color: #222 !important;
           border: 1px solid #E5E7EB !important;
-          z-index: 40 !important;
+          z-index: 500 !important;
         }
-        .spreadsheet-grid tbody tr:hover {
-          background-color: rgba(0, 0, 0, 0.025);
+        .spreadsheet-grid .dropdown-menu,
+        .spreadsheet-grid .dropdown-content,
+        .spreadsheet-grid .select-content {
+          background-color: #fff !important;
+          color: #1A1F2C !important;
+          z-index: 9999 !important;
         }
-        .spreadsheet-grid td.cell-editable:hover:not(.cell-editing) {
-          background-color: rgba(0, 0, 0, 0.04);
+        .spreadsheet-grid th,
+        .spreadsheet-grid td {
+          background: #fff !important;
         }
-        .spreadsheet-grid td.cell-editing {
-          padding: 0;
-        }
-        .spreadsheet-grid td.cell-editing input, 
-        .spreadsheet-grid td.cell-editing select {
-          width: 100%;
-          height: 100%;
-          padding: 0.5rem;
-          border: none;
-          background: white;
-          box-shadow: inset 0 0 0 2px #6366f1;
-          outline: none;
-        }
-        .spreadsheet-grid .resize-handle {
-          position: absolute;
-          top: 0;
-          right: 0;
-          height: 100%;
-          width: 4px;
-          cursor: col-resize;
-          user-select: none;
-          background: transparent;
-          transition: background 0.2s;
-        }
-        .spreadsheet-grid th:hover .resize-handle {
-          background: rgba(99, 102, 241, 0.3);
+        /* Fix for sticky column always on top and not ghosted */
+        .spreadsheet-grid .sticky,
+        .spreadsheet-grid td.sticky,
+        .spreadsheet-grid th.sticky {
+          background: #fff !important;
+          z-index: 500 !important;
+          box-shadow: 2px 0 4px 0 rgba(0,0,0,0.03);
         }
       `}} />
     </div>

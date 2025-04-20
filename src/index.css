@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap') layer(fonts);
 @import './components/ui/animations.css';
 
@@ -127,4 +126,126 @@
   @apply rounded-lg border border-siso-border bg-siso-bg-alt px-4 py-2 text-siso-text 
     placeholder:text-siso-text-muted focus:border-siso-red focus:outline-none focus:ring-1 
     focus:ring-siso-red transition-all duration-300;
+}
+
+/* Spreadsheet styles */
+.spreadsheet-grid {
+  --grid-border-color: rgba(0, 0, 0, 0.1);
+  --grid-hover-color: #f6f6f7; /* light solid, tweak for clarity */
+  --grid-focus-color: #e0e7ff;
+}
+
+.spreadsheet-grid th {
+  position: relative;
+  background-color: #fafafb !important;
+  border-bottom: 1px solid var(--grid-border-color);
+  font-weight: 500;
+  z-index: 1;
+}
+
+.spreadsheet-grid td {
+  font-size: 0.925rem;
+  background-color: #fff !important;            /* Key: ensure white background for all cells */
+  border-bottom: 1px solid #ececec;
+}
+
+.spreadsheet-grid tbody tr {
+  transition: background-color 0.2s;
+  background-color: #fff !important;
+}
+
+.spreadsheet-grid tbody tr:hover {
+  background-color: var(--grid-hover-color) !important;
+}
+
+.spreadsheet-grid .cell-editable {
+  cursor: cell;
+  transition: background-color 0.18s;
+  background-color: #fff !important;
+}
+
+.spreadsheet-grid .cell-editable:hover {
+  background-color: #f3f4f6 !important;
+}
+
+.spreadsheet-grid td.cell-editing {
+  z-index: 10;
+  background-color: #fafaff !important;
+  box-shadow: 0 0 0 2px #4f46e5;
+}
+
+.spreadsheet-grid td.cell-editing input,
+.spreadsheet-grid td.cell-editing select {
+  background-color: #fff !important;
+  box-shadow: 0 0 0 2px #4f46e5;
+}
+
+/* Fix dropdown/select backgrounds for spreadsheet toolbar & cells */
+.spreadsheet-grid select,
+.spreadsheet-grid .select-trigger {
+  background-color: #fff !important;
+  color: #1A1F2C !important;
+  border: 1px solid #E5E7EB !important;
+  z-index: 500 !important;
+}
+
+.spreadsheet-grid .sticky {
+  background-color: #fff !important;
+  z-index: 20 !important;
+  box-shadow: 2px 0 4px 0 rgba(0,0,0,0.03);
+}
+
+/* Ensure dropdown menus always readable above spreadsheet */
+.spreadsheet-grid .dropdown-menu,
+.spreadsheet-grid .dropdown-content,
+.spreadsheet-grid .select-content {
+  background-color: #fff !important;
+  color: #1A1F2C !important;
+  z-index: 9999 !important;
+  border-radius: 0.5rem;
+  box-shadow: 0 6px 24px 0 rgba(0,0,0,0.13);
+}
+
+.spreadsheet-grid .badge, .spreadsheet-grid [class*="badge"] {
+  background: #f1f0fb;
+  border-radius: 6px;
+}
+
+.spreadsheet-grid .table-row-selected, 
+.spreadsheet-grid tr.bg-muted, 
+.spreadsheet-grid tr.bg-muted\/20 {
+  background-color: #f3f4fa !important;
+}
+
+/* Resizable columns */
+.resizable-header {
+  position: relative;
+}
+
+.resize-handle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  cursor: col-resize;
+}
+
+.resize-handle:hover,
+.resize-handle.active {
+  background-color: rgba(79, 70, 229, 0.3);
+}
+
+/* Ensure sticky left column remains solid on scroll */
+.spreadsheet-grid td.sticky,
+.spreadsheet-grid th.sticky {
+  background-color: #fff !important;
+  z-index: 500 !important;
+}
+
+/* Remove opacity/fade on sticky or focused cells */
+.spreadsheet-grid td[style*="position: sticky"],
+.spreadsheet-grid th[style*="position: sticky"] {
+  background-color: #fff !important;
+  z-index: 500 !important;
 }
