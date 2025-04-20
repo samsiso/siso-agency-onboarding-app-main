@@ -4,25 +4,45 @@ import { toast } from "@/components/ui/use-toast";
 import { FinancialTransaction } from "./types";
 import { transformTransactionData } from "./utils/transactionTransformers";
 
-// Fetch all transactions
+// Fetch all transactions with better error handling
 export async function fetchTransactions(): Promise<FinancialTransaction[]> {
-  const { data, error } = await supabase
-    .from("financial_transactions")
-    .select(`
-      *,
-      category:category_id(id, name),
-      vendor:vendor_id(id, name),
-      payment_method:payment_method_id(id, name)
-    `)
-    .order("date", { ascending: false });
+  try {
+    console.log("Fetching transactions");
+    
+    const { data, error } = await supabase
+      .from("financial_transactions")
+      .select(`
+        *,
+        category:expense_categories(id, name),
+        vendor:vendors(id, name),
+        payment_method:payment_methods(id, name)
+      `)
+      .order("date", { ascending: false });
 
-  if (error) {
-    console.error("Error fetching transactions:", error);
+    if (error) {
+      console.error("Error fetching transactions:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch transactions: " + error.message,
+        variant: "destructive"
+      });
+      return [];
+    }
+
+    // Check if data is available and log for debugging
+    console.log(`Fetched ${data?.length || 0} transactions`);
+    
+    // Transform the data correctly
+    return Array.isArray(data) ? data.map(transformTransactionData) : [];
+  } catch (err) {
+    console.error("Unexpected error fetching transactions:", err);
+    toast({
+      title: "Error",
+      description: "An unexpected error occurred while fetching transactions",
+      variant: "destructive"
+    });
     return [];
   }
-
-  // Use the transformer to convert the raw data to the expected type
-  return Array.isArray(data) ? data.map(transformTransactionData) : [];
 }
 
 // Delete a transaction by ID

@@ -1,12 +1,27 @@
 
 import { FinancialTransaction, ExpenseCategory, Vendor, PaymentMethod } from '../types';
-import { isValidRelationship } from './relationshipUtils';
+
+/**
+ * Helper function to check if a relationship object is valid
+ */
+export function isValidRelationship(relation: any): boolean {
+  return relation && typeof relation === 'object' && relation.id;
+}
 
 /**
  * Transforms raw transaction data from Supabase into the FinancialTransaction type
  * Uses type assertions to prevent deep instantiation chains
  */
 export function transformTransactionData(item: any): FinancialTransaction {
+  // Handle null or undefined item
+  if (!item) {
+    console.error("Received null or undefined transaction data");
+    return {} as FinancialTransaction;
+  }
+
+  // Log for debugging
+  console.log("Transforming transaction:", item.id, item.description);
+
   // Extract related entities with proper type checking
   const category = isValidRelationship(item.category) 
     ? {

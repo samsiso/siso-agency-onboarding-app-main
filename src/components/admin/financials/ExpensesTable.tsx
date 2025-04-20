@@ -14,9 +14,15 @@ import { ScrollableTable } from "../clients/ScrollableTable";
 import { ExpensesFinanceToolbar } from "./table/ExpensesFinanceToolbar";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, Download, Filter, Plus, Trash2 } from "lucide-react";
+import { useEffect } from "react";
 
 export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }) {
   const [selectedExpenses, setSelectedExpenses] = useState<string[]>([]);
+  
+  // Log received expenses for debugging
+  useEffect(() => {
+    console.log(`ExpensesTable received ${expenses?.length || 0} expenses`);
+  }, [expenses]);
   
   // Define the initial columns configuration with pinning capability
   const initialColumns = [
@@ -31,7 +37,7 @@ export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }
 
   const { columns, visibleColumns, updateColumnVisibility } = useTableColumns(initialColumns);
   const { views, currentView, loadViews, saveView, selectView } = useTableViews("expenses");
-  const { sortField, sortDirection, handleSort, sortedExpenses } = useExpensesSort(expenses);
+  const { sortField, sortDirection, handleSort, sortedExpenses } = useExpensesSort(expenses || []);
   const { 
     searchQuery, 
     setSearchQuery, 
@@ -46,9 +52,14 @@ export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }
     selectView(view);
   };
 
+  // Load views when component mounts
+  useEffect(() => {
+    loadViews();
+  }, []);
+
   // Get the expense being viewed in the details dialog
   const expenseDetails = viewDetailsId 
-    ? expenses.find(expense => expense.id === viewDetailsId) 
+    ? expenses?.find(expense => expense?.id === viewDetailsId) 
     : null;
 
   // Handle expense deletion

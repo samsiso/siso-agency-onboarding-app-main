@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { AdminLayout } from "@/components/admin/layout/AdminLayout";
 import { FinancialsHeader } from "@/components/admin/financials/FinancialsHeader";
@@ -24,6 +25,7 @@ export default function AdminPayments() {
   useEffect(() => {
     const checkExpensesExistence = async () => {
       try {
+        console.log("Checking if expenses exist...");
         const { count, error } = await supabase
           .from('financial_transactions')
           .select('*', { count: 'exact' })
@@ -34,6 +36,7 @@ export default function AdminPayments() {
           return;
         }
 
+        console.log(`Found ${count} expenses in database`);
         setExpensesExist(count !== 0);
       } catch (error) {
         console.error("Error checking expenses:", error);
@@ -51,8 +54,10 @@ export default function AdminPayments() {
     setIsLoading(true);
     
     try {
+      console.log("Loading financial data...");
       // Load all transactions
       const transactionData = await fetchTransactions();
+      console.log(`Fetched ${transactionData.length} transactions`);
       
       // Filter expenses and revenues separately
       if (Array.isArray(transactionData)) {
@@ -60,11 +65,13 @@ export default function AdminPayments() {
           transaction.type === 'expense'
         );
         setExpenses(expenseData);
+        console.log(`Found ${expenseData.length} expenses`);
         
         const revenueData = transactionData.filter(transaction => 
           transaction.type === 'revenue'
         );
         setRevenues(revenueData);
+        console.log(`Found ${revenueData.length} revenues`);
       } else {
         console.error("Invalid transaction data format:", transactionData);
         setExpenses([]);
@@ -94,6 +101,7 @@ export default function AdminPayments() {
   const handleSeedExpenses = async () => {
     setIsSeeding(true);
     try {
+      console.log("Seeding expenses...");
       const success = await seedInitialExpenses();
       if (success) {
         await loadData(); // Reload data after seeding
@@ -128,7 +136,7 @@ export default function AdminPayments() {
           )}
         </div>
         
-        <FinancialsHeader onFilterChange={handleFilterChange} />
+        <FinancialsHeader onFilterChange={handleFilterChange} onDataChange={loadData} />
         
         <Tabs defaultValue="dashboard" className="mt-6" onValueChange={setActiveTab}>
           <TabsList className="grid grid-cols-4 w-full max-w-md">
