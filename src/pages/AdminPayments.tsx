@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { AdminLayout } from "@/components/admin/layout/AdminLayout";
 import { FinancialsHeader } from "@/components/admin/financials/FinancialsHeader";
@@ -121,7 +120,8 @@ export default function AdminPayments() {
 
   return (
     <AdminLayout>
-      <div className="container px-6 py-8 max-w-7xl">
+      {/* Apply black page background here */}
+      <div className="container px-6 py-8 max-w-7xl" style={{ background: "#000", minHeight: "100vh" }}>
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
           <h1 className="text-3xl font-bold tracking-tight">Financial Management</h1>
           {!expensesExist && (

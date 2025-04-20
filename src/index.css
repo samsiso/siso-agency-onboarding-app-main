@@ -130,72 +130,46 @@
 
 /* Spreadsheet styles */
 .spreadsheet-grid {
-  --grid-border-color: rgba(0, 0, 0, 0.1);
-  --grid-hover-color: #f6f6f7; /* light solid, tweak for clarity */
-  --grid-focus-color: #e0e7ff;
+  /* OUTER container is white, see SpreadsheetTable for actual parent background */
 }
-
-.spreadsheet-grid th {
-  position: relative;
-  background-color: #fafafb !important;
-  border-bottom: 1px solid var(--grid-border-color);
-  font-weight: 500;
-  z-index: 1;
-}
-
+.spreadsheet-grid th,
 .spreadsheet-grid td {
-  font-size: 0.925rem;
-  background-color: #fff !important;            /* Key: ensure white background for all cells */
-  border-bottom: 1px solid #ececec;
+  background-color: #fff !important;
+  border-color: #ececec !important;
+  color: #1a1a1a;
 }
-
+.spreadsheet-grid thead th {
+  background-color: #fafafb !important;
+  z-index: 5;
+}
+.spreadsheet-grid tr,
 .spreadsheet-grid tbody tr {
-  transition: background-color 0.2s;
-  background-color: #fff !important;
+  background: #fff !important;
+  transition: background 0.18s;
 }
-
+.spreadsheet-grid tr:hover,
 .spreadsheet-grid tbody tr:hover {
-  background-color: var(--grid-hover-color) !important;
+  background-color: #f6f6f7 !important;
 }
 
-.spreadsheet-grid .cell-editable {
-  cursor: cell;
-  transition: background-color 0.18s;
+.spreadsheet-grid .sticky,
+.spreadsheet-grid td.sticky,
+.spreadsheet-grid th.sticky {
   background-color: #fff !important;
+  z-index: 10 !important;
+  box-shadow: none !important;
+  border-right: 1px solid #ececec !important;
 }
 
-.spreadsheet-grid .cell-editable:hover {
-  background-color: #f3f4f6 !important;
-}
-
-.spreadsheet-grid td.cell-editing {
-  z-index: 10;
-  background-color: #fafaff !important;
-  box-shadow: 0 0 0 2px #4f46e5;
-}
-
-.spreadsheet-grid td.cell-editing input,
-.spreadsheet-grid td.cell-editing select {
-  background-color: #fff !important;
-  box-shadow: 0 0 0 2px #4f46e5;
-}
-
-/* Fix dropdown/select backgrounds for spreadsheet toolbar & cells */
 .spreadsheet-grid select,
 .spreadsheet-grid .select-trigger {
-  background-color: #fff !important;
-  color: #1A1F2C !important;
+  background: #fff !important;
+  color: #222 !important;
   border: 1px solid #E5E7EB !important;
-  z-index: 500 !important;
+  z-index: 50 !important;
 }
 
-.spreadsheet-grid .sticky {
-  background-color: #fff !important;
-  z-index: 20 !important;
-  box-shadow: 2px 0 4px 0 rgba(0,0,0,0.03);
-}
-
-/* Ensure dropdown menus always readable above spreadsheet */
+/* For dropdowns above table cells */
 .spreadsheet-grid .dropdown-menu,
 .spreadsheet-grid .dropdown-content,
 .spreadsheet-grid .select-content {
@@ -206,46 +180,27 @@
   box-shadow: 0 6px 24px 0 rgba(0,0,0,0.13);
 }
 
-.spreadsheet-grid .badge, .spreadsheet-grid [class*="badge"] {
-  background: #f1f0fb;
-  border-radius: 6px;
-}
-
-.spreadsheet-grid .table-row-selected, 
-.spreadsheet-grid tr.bg-muted, 
-.spreadsheet-grid tr.bg-muted\/20 {
-  background-color: #f3f4fa !important;
-}
-
-/* Resizable columns */
-.resizable-header {
-  position: relative;
-}
-
-.resize-handle {
-  position: absolute;
-  right: 0;
-  top: 0;
-  height: 100%;
-  width: 4px;
-  cursor: col-resize;
-}
-
-.resize-handle:hover,
-.resize-handle.active {
-  background-color: rgba(79, 70, 229, 0.3);
-}
-
-/* Ensure sticky left column remains solid on scroll */
+/* Remove extra box-shadows that ghost sticky columns */
+.spreadsheet-grid .sticky,
 .spreadsheet-grid td.sticky,
 .spreadsheet-grid th.sticky {
-  background-color: #fff !important;
-  z-index: 500 !important;
+  box-shadow: none !important;
 }
 
-/* Remove opacity/fade on sticky or focused cells */
-.spreadsheet-grid td[style*="position: sticky"],
-.spreadsheet-grid th[style*="position: sticky"] {
-  background-color: #fff !important;
-  z-index: 500 !important;
+/* Cell selection/editing (soft highlight) */
+.spreadsheet-grid td.cell-editing {
+  z-index: 12;
+  background-color: #f3f6ff !important;
+  box-shadow: 0 0 0 2px #6366f1;
+}
+
+/* Action/utility column */
+.spreadsheet-grid th:last-child,
+.spreadsheet-grid td:last-child {
+  background: #fafafb !important;
+}
+
+/* Remove blur from headers */
+.spreadsheet-grid thead {
+  backdrop-filter: none !important;
 }
