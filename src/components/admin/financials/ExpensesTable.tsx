@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Table, TableBody, TableHeader } from "@/components/ui/table";
 import { deleteTransaction } from "@/utils/financial";
@@ -114,6 +115,12 @@ export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }
     // For now just show it's working via console
   };
 
+  // Handle adding a new expense
+  const handleAddExpense = () => {
+    // This function will be replaced by the direct interaction with AddExpenseRow
+    console.log("Add new expense");
+  };
+
   return (
     <div className="space-y-6">
       <ExpensesFinanceToolbar
@@ -129,7 +136,7 @@ export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }
         })}
         selectedCount={selectedExpenses.length}
         onDeleteSelected={handleDeleteSelected}
-        onAddExpense={() => alert("Add expense feature coming soon")}
+        onAddExpense={handleAddExpense}
         onExport={() => alert("Export feature coming soon")}
       />
 
@@ -148,11 +155,12 @@ export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }
               />
             </TableHeader>
             <TableBody>
-              {/* Inline add-expense row (shown always at top) */}
+              {/* Interactive Add Expense Row - always at the top */}
               <AddExpenseRow 
                 onExpenseAdded={onDataChange}
                 visibleColumns={visibleColumns}
               />
+              
               {isLoading ? (
                 <ExpensesTableLoading colSpan={visibleColumns.length + 1} />
               ) : (
@@ -181,7 +189,7 @@ export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }
         .spreadsheet-container {
           overflow: hidden;
           border-radius: 0.5rem;
-          background: white;
+          background: #121212;
         }
         
         /* Custom scrollbar for spreadsheet */
@@ -191,20 +199,20 @@ export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }
         }
         
         .spreadsheet-container ::-webkit-scrollbar-track {
-          background: #f1f1f1;
+          background: #1a1a1a;
         }
         
         .spreadsheet-container ::-webkit-scrollbar-thumb {
-          background: #d1d5db;
+          background: #333333;
           border-radius: 4px;
         }
         
         .spreadsheet-container ::-webkit-scrollbar-thumb:hover {
-          background: #9ca3af;
+          background: #555555;
         }
         
         .spreadsheet-container ::-webkit-scrollbar-corner {
-          background: #f1f1f1;
+          background: #1a1a1a;
         }
       `}} />
     </div>

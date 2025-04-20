@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap') layer(fonts);
 @import './components/ui/animations.css';
 
@@ -130,42 +131,43 @@
 
 /* Spreadsheet styles */
 .spreadsheet-grid {
-  /* OUTER container is white, see SpreadsheetTable for actual parent background */
+  /* Dark theme styles for the grid */
+  background-color: #121212;
 }
 .spreadsheet-grid th,
 .spreadsheet-grid td {
-  background-color: #fff !important;
-  border-color: #ececec !important;
-  color: #1a1a1a;
+  background-color: #1a1a1a !important;
+  border-color: #2a2a2a !important;
+  color: #e0e0e0;
 }
 .spreadsheet-grid thead th {
-  background-color: #fafafb !important;
+  background-color: #222222 !important;
   z-index: 5;
 }
 .spreadsheet-grid tr,
 .spreadsheet-grid tbody tr {
-  background: #fff !important;
+  background: #1a1a1a !important;
   transition: background 0.18s;
 }
 .spreadsheet-grid tr:hover,
 .spreadsheet-grid tbody tr:hover {
-  background-color: #f6f6f7 !important;
+  background-color: #252525 !important;
 }
 
 .spreadsheet-grid .sticky,
 .spreadsheet-grid td.sticky,
 .spreadsheet-grid th.sticky {
-  background-color: #fff !important;
+  background-color: #1a1a1a !important;
   z-index: 10 !important;
   box-shadow: none !important;
-  border-right: 1px solid #ececec !important;
+  border-right: 1px solid #2a2a2a !important;
 }
 
 .spreadsheet-grid select,
 .spreadsheet-grid .select-trigger {
-  background: #fff !important;
-  color: #222 !important;
-  border: 1px solid #E5E7EB !important;
+  background: #1a1a1a !important;
+  color: #e0e0e0 !important;
+  border: 1px solid #2a2a2a !important;
   z-index: 50 !important;
 }
 
@@ -173,11 +175,11 @@
 .spreadsheet-grid .dropdown-menu,
 .spreadsheet-grid .dropdown-content,
 .spreadsheet-grid .select-content {
-  background-color: #fff !important;
-  color: #1A1F2C !important;
+  background-color: #1a1a1a !important;
+  color: #e0e0e0 !important;
   z-index: 9999 !important;
   border-radius: 0.5rem;
-  box-shadow: 0 6px 24px 0 rgba(0,0,0,0.13);
+  box-shadow: 0 6px 24px 0 rgba(0,0,0,0.5);
 }
 
 /* Remove extra box-shadows that ghost sticky columns */
@@ -190,17 +192,43 @@
 /* Cell selection/editing (soft highlight) */
 .spreadsheet-grid td.cell-editing {
   z-index: 12;
-  background-color: #f3f6ff !important;
-  box-shadow: 0 0 0 2px #6366f1;
+  background-color: #2d2d3a !important;
+  box-shadow: 0 0 0 2px var(--primary);
 }
 
 /* Action/utility column */
 .spreadsheet-grid th:last-child,
 .spreadsheet-grid td:last-child {
-  background: #fafafb !important;
+  background: #222222 !important;
 }
 
 /* Remove blur from headers */
 .spreadsheet-grid thead {
   backdrop-filter: none !important;
+}
+
+/* Special styling for the add row */
+.add-expense-row-trigger {
+  border: 1px dashed #3a3a3a;
+  background-color: rgba(255, 87, 34, 0.05) !important;
+  transition: all 0.2s ease;
+}
+
+.add-expense-row-trigger:hover {
+  background-color: rgba(255, 87, 34, 0.1) !important;
+  border-color: rgba(255, 87, 34, 0.3);
+}
+
+/* Input styling within dark spreadsheet */
+.spreadsheet-grid input,
+.spreadsheet-grid select {
+  background-color: #1a1a1a;
+  color: #e0e0e0;
+  border: 1px solid #2a2a2a;
+}
+
+.spreadsheet-grid input:focus,
+.spreadsheet-grid select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px rgba(255, 87, 34, 0.3);
 }

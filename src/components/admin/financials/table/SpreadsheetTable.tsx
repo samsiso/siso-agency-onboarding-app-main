@@ -38,17 +38,17 @@ export function SpreadsheetTable({
         "relative border border-border/30 rounded-lg overflow-hidden spreadsheet-grid",
         containerClassName
       )}
-      style={{ background: "#fff" }} // enforce white bg for spreadsheet container
+      style={{ background: "#121212" }} // dark background for the spreadsheet container
     >
       <ScrollArea
         ref={tableRef}
         className={cn("h-full max-h-[calc(100vh-300px)]", className)}
-        style={{ background: "#fff" }}
+        style={{ background: "#121212" }}
       >
         <div className="relative">
           {/* sticky header background */}
           <div
-            className="sticky top-0 z-20 border-b border-border/20 bg-white"
+            className="sticky top-0 z-20 border-b border-border/20 bg-background"
             style={{ height: `${headerHeight}px` }}
           />
           {children}

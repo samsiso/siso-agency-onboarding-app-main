@@ -6,6 +6,7 @@ import { createTransaction } from "@/utils/financial";
 import { toast } from "@/hooks/use-toast";
 import { TableRow, TableCell } from "@/components/ui/table";
 import { FinancialTransaction } from "@/utils/financial/types";
+import { Plus, Check, X } from "lucide-react";
 
 type RecurringType = "one-time" | "monthly" | "annual";
 
@@ -15,6 +16,7 @@ export interface AddExpenseRowProps {
 }
 
 export function AddExpenseRow({ onExpenseAdded, visibleColumns }: AddExpenseRowProps) {
+  const [isAdding, setIsAdding] = useState(false);
   const [form, setForm] = useState<{
     description: string;
     amount: string;
@@ -78,12 +80,40 @@ export function AddExpenseRow({ onExpenseAdded, visibleColumns }: AddExpenseRowP
         date: "",
         notes: "",
       }));
+      setIsAdding(false);
       onExpenseAdded();
     }
   };
 
+  const handleCancel = () => {
+    setIsAdding(false);
+    setForm(prev => ({
+      ...prev,
+      description: "",
+      amount: "",
+      date: "",
+      notes: "",
+    }));
+  };
+
+  if (!isAdding) {
+    return (
+      <TableRow 
+        className="add-expense-row-trigger cursor-pointer" 
+        onClick={() => setIsAdding(true)}
+      >
+        <TableCell colSpan={visibleColumns.length + 2} className="text-center py-3">
+          <div className="flex items-center justify-center text-muted-foreground">
+            <Plus className="h-4 w-4 mr-2" />
+            <span>Add New Expense</span>
+          </div>
+        </TableCell>
+      </TableRow>
+    );
+  }
+
   return (
-    <TableRow className="bg-background/60">
+    <TableRow className="bg-background/60 hover:bg-muted/10">
       <TableCell />
       {visibleColumns.map(col => {
         switch (col.key) {
@@ -95,6 +125,7 @@ export function AddExpenseRow({ onExpenseAdded, visibleColumns }: AddExpenseRowP
                   onChange={e => handleInput("description", e.target.value)}
                   placeholder="Description"
                   className="min-w-[140px]"
+                  autoFocus
                 />
               </TableCell>
             );
@@ -138,7 +169,7 @@ export function AddExpenseRow({ onExpenseAdded, visibleColumns }: AddExpenseRowP
                 <select
                   value={form.recurring_type}
                   onChange={e => handleInput("recurring_type", e.target.value)}
-                  className="bg-white border px-2 py-1 rounded"
+                  className="bg-muted border px-2 py-1 rounded"
                   style={{ zIndex: 40, minWidth: 80 }}
                 >
                   <option value="one-time">One-Time</option>
@@ -182,11 +213,15 @@ export function AddExpenseRow({ onExpenseAdded, visibleColumns }: AddExpenseRowP
         }
       })}
       <TableCell>
-        <Button size="sm" onClick={handleAdd} disabled={isSaving}>
-          Add
-        </Button>
+        <div className="flex items-center gap-2 justify-end">
+          <Button variant="ghost" size="sm" onClick={handleCancel} disabled={isSaving}>
+            <X className="h-4 w-4" />
+          </Button>
+          <Button variant="default" size="sm" onClick={handleAdd} disabled={isSaving}>
+            <Check className="h-4 w-4 mr-1" /> Save
+          </Button>
+        </div>
       </TableCell>
     </TableRow>
   );
 }
-

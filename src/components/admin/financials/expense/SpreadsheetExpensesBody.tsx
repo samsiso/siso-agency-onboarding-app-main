@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { TableRow } from "@/components/ui/table";
 import { FinancialTransaction } from "@/utils/financial";
@@ -57,9 +58,9 @@ export function SpreadsheetExpensesBody({
 
   const getBadgeColor = (type: string | null) => {
     switch (type) {
-      case 'monthly': return 'bg-green-100/50 text-green-800 border-green-200';
-      case 'annual': return 'bg-purple-100/50 text-purple-800 border-purple-200';
-      default: return 'bg-amber-100/50 text-amber-800 border-amber-200';
+      case 'monthly': return 'bg-green-900/30 text-green-300 border-green-800/50';
+      case 'annual': return 'bg-purple-900/30 text-purple-300 border-purple-800/50';
+      default: return 'bg-amber-900/30 text-amber-300 border-amber-800/50';
     }
   };
 
@@ -112,7 +113,7 @@ export function SpreadsheetExpensesBody({
                         { value: "utilities", label: "Utilities" }
                       ]}
                       formatter={(value) => (
-                        <Badge variant="outline" className="bg-blue-100/50 text-blue-800 border-blue-200">
+                        <Badge variant="outline" className="bg-blue-900/30 text-blue-300 border-blue-800/50">
                           {value}
                         </Badge>
                       )}
