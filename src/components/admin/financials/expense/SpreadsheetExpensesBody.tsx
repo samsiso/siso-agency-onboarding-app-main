@@ -75,7 +75,7 @@ export function SpreadsheetExpensesBody({
             className={cn(
               isSelected ? "bg-muted/20" : ""
             )}
-            isSelected={isSelected}
+            data-state={isSelected ? "selected" : undefined}
           >
             <td className="sticky left-0 bg-inherit z-10 w-10 p-2 text-center">
               <Checkbox 

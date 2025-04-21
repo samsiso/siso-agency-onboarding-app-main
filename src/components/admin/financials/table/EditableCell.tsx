@@ -93,7 +93,7 @@ export function EditableCell({
       )} 
       align={align}
       onDoubleClick={handleDoubleClick}
-      isEditing={isEditing}
+      data-editing={isEditing ? "true" : undefined}
     >
       {isEditing ? (
         <div className="flex items-stretch w-full h-full">
