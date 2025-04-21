@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { AdminLayout } from "@/components/admin/layout/AdminLayout";
 import { FinancialsHeader } from "@/components/admin/financials/FinancialsHeader";
@@ -56,13 +57,9 @@ export default function AdminPayments() {
     try {
       const transactionData = await fetchTransactions();
       if (Array.isArray(transactionData)) {
-        const expenseData = transactionData.filter(transaction =>
-          transaction.type === 'expense'
-        );
+        const expenseData = transactionData.filter(transaction => transaction.type === 'expense');
         setExpenses(expenseData);
-        const revenueData = transactionData.filter(transaction =>
-          transaction.type === 'revenue'
-        );
+        const revenueData = transactionData.filter(transaction => transaction.type === 'revenue');
         setRevenues(revenueData);
       } else {
         setExpenses([]);
@@ -147,8 +144,14 @@ export default function AdminPayments() {
   return (
     <AdminLayout>
       <div className="px-6 py-8 max-w-7xl mx-auto bg-black min-h-screen">
+        {/* SINGLE header and buttons section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold tracking-tight">Financial Management</h1>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Financial Management</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Manage your expenses and revenue
+            </p>
+          </div>
           <div className="flex items-center gap-2">
             {!expensesExist && showBulkImport && (
               <Button
@@ -174,6 +177,7 @@ export default function AdminPayments() {
                 <ImportExpensesButton onImport={loadData} />
               </>
             )}
+            {/* Actions for custom add/filter/import can be handled here */}
           </div>
         </div>
         
@@ -188,7 +192,8 @@ export default function AdminPayments() {
           </Card>
         )}
         
-        <FinancialsHeader onFilterChange={handleFilterChange} onDataChange={loadData} />
+        {/* Remove FinancialsHeader - its controls merged up above */}
+        {/* <FinancialsHeader onFilterChange={handleFilterChange} onDataChange={loadData} /> */}
         <Tabs defaultValue="dashboard" className="mt-6" onValueChange={setActiveTab}>
           <TabsList className="grid grid-cols-4 w-full max-w-md">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
