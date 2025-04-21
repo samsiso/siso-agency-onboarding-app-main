@@ -1,10 +1,10 @@
-
 import { useState, useEffect } from "react";
 import { AdminLayout } from "@/components/admin/layout/AdminLayout";
 import { FinancialsHeader } from "@/components/admin/financials/FinancialsHeader";
 import { FinancialsDashboard } from "@/components/admin/financials/FinancialsDashboard";
 import { ExpensesTable } from "@/components/admin/financials/ExpensesTable";
 import { RevenueTable } from "@/components/admin/financials/RevenueTable";
+import { FinancialPipeline } from "@/components/admin/financials/FinancialPipeline";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { fetchTransactions, FinancialTransaction } from "@/utils/financial";
 import { Button } from "@/components/ui/button";
@@ -12,8 +12,9 @@ import { seedInitialExpenses } from "@/utils/financial/seedExpenses";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ImportExpensesButton } from "@/components/admin/financials/expense/ImportExpensesButton";
-import { Import } from "lucide-react";
+import { Import, AlertCircle } from "lucide-react";
 import { seedExpensesFromList } from "@/utils/financial/bulkExpenseSeeder";
+import { Card } from "@/components/ui/card";
 
 export default function AdminPayments() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -130,6 +131,19 @@ export default function AdminPayments() {
     }
   };
 
+  // Calculate upcoming expenses
+  const upcomingExpenses = expenses.filter(expense => {
+    if (!expense.date) return false;
+    const dueDate = new Date(expense.date);
+    const today = new Date();
+    const differenceInTime = dueDate.getTime() - today.getTime();
+    const differenceInDays = differenceInTime / (1000 * 3600 * 24);
+    return differenceInDays > 0 && differenceInDays <= 7;
+  });
+
+  // Calculate total of upcoming expenses
+  const upcomingExpensesTotal = upcomingExpenses.reduce((total, expense) => total + expense.amount, 0);
+
   return (
     <AdminLayout>
       <div className="px-6 py-8 max-w-7xl mx-auto bg-black min-h-screen">
@@ -162,13 +176,25 @@ export default function AdminPayments() {
             )}
           </div>
         </div>
+        
+        {upcomingExpenses.length > 0 && (
+          <Card className="mb-6 bg-amber-900/20 border border-amber-400/50">
+            <div className="p-4 flex items-center">
+              <AlertCircle className="h-5 w-5 text-amber-400 mr-2" />
+              <span className="text-amber-200 font-medium">
+                {`£${upcomingExpensesTotal.toFixed(2)} in upcoming expenses due in the next 7 days`}
+              </span>
+            </div>
+          </Card>
+        )}
+        
         <FinancialsHeader onFilterChange={handleFilterChange} onDataChange={loadData} />
         <Tabs defaultValue="dashboard" className="mt-6" onValueChange={setActiveTab}>
           <TabsList className="grid grid-cols-4 w-full max-w-md">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
             <TabsTrigger value="expenses">Expenses</TabsTrigger>
             <TabsTrigger value="revenue">Revenue</TabsTrigger>
-            <TabsTrigger value="predictions">Predictions</TabsTrigger>
+            <TabsTrigger value="pipeline">Pipeline</TabsTrigger>
           </TabsList>
           <TabsContent value="dashboard" className="mt-6">
             <FinancialsDashboard />
@@ -187,15 +213,13 @@ export default function AdminPayments() {
               onDataChange={loadData}
             />
           </TabsContent>
-          <TabsContent value="predictions" className="mt-6">
-            <div className="grid gap-6">
-              <div className="bg-card/30 rounded-xl p-6 border border-border/40 shadow-sm">
-                <h2 className="text-xl font-semibold mb-4">Financial Predictions</h2>
-                <p className="text-muted-foreground">
-                  Predictive analytics for future expenses, revenue forecasts, and AI-powered insights will be displayed here.
-                </p>
-              </div>
-            </div>
+          <TabsContent value="pipeline" className="mt-6">
+            <FinancialPipeline 
+              expenses={expenses}
+              revenues={revenues}
+              isLoading={isLoading}
+              onDataChange={loadData}
+            />
           </TabsContent>
         </Tabs>
       </div>

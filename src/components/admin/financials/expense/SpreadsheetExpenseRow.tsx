@@ -34,17 +34,33 @@ export function SpreadsheetExpenseRow({
   let stickyStyleDesc = { left: 48 };
   let stickyStyleCat = { left: 220 };
 
+  // Check if expense is due within the next few days
+  const isDueSoon = () => {
+    if (!expense.date) return false;
+    
+    const dueDate = new Date(expense.date);
+    const today = new Date();
+    const differenceInTime = dueDate.getTime() - today.getTime();
+    const differenceInDays = differenceInTime / (1000 * 3600 * 24);
+    
+    return differenceInDays > 0 && differenceInDays <= 7;
+  };
+
   return (
     <>
       <TableRow
         key={expense.id}
         className={cn(
           "group transition-colors",
-          isSelected ? "bg-muted/20 selected-row" : "hover:bg-blue-950/30",
+          isSelected ? "bg-amber-900/20 selected-row" : isDueSoon() ? "bg-amber-800/10 hover:bg-amber-800/20" : "hover:bg-blue-950/30",
         )}
         data-state={isSelected ? "selected" : undefined}
         style={{
-          borderBottom: "2px solid #3e3763", // Vivid Notion-like horizontal eline
+          borderBottom: isSelected 
+            ? "2px solid #ffc46b" 
+            : isDueSoon() 
+              ? "2px solid #ff884b40" 
+              : "2px solid #3e3763", // Vivid Notion-like horizontal eline
           boxShadow: "0 1.5px 0 0 #3e3763", // Makes eline more visible
         }}
       >
@@ -68,7 +84,8 @@ export function SpreadsheetExpenseRow({
                   onChange={(value) => onUpdateExpense(expense.id, "description", value)}
                   className={cn(
                     "font-medium group-hover:bg-vivid-purple/10 focus-within:bg-vivid-purple/20 aria-[editing=true]:bg-vivid-purple/30 transition-colors min-w-[160px] max-w-[260px]",
-                    "sticky bg-background z-20 shadow-[2px_0px_4px_-2px_rgba(0,0,0,0.01)]"
+                    "sticky bg-background z-20 shadow-[2px_0px_4px_-2px_rgba(0,0,0,0.01)]",
+                    isDueSoon() && "text-amber-300 font-semibold"
                   )}
                   style={stickyStyleDesc}
                   inputClassName="font-normal"
