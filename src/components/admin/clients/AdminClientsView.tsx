@@ -1,6 +1,5 @@
 
 import { useEffect, useState } from 'react';
-import { ClientsTable } from '@/components/admin/clients/ClientsTable';
 import { Loader2, Users } from 'lucide-react';
 import { ClientViewPreference } from '@/types/client.types';
 import { updateExistingClientData, makeCurrentUserAdmin } from '@/utils/clientDataUtils';
@@ -11,6 +10,7 @@ import { ClientsCardGrid } from "@/components/admin/clients/ClientsCardGrid";
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { ViewModeSwitcher } from './ViewModeSwitcher';
+import { AirtableClientsTable } from './AirtableClientsTable';
 
 interface AdminClientsViewProps {
   isAdmin: boolean;
@@ -125,16 +125,12 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
         setViewMode={setViewMode}
       />
       {viewMode === "table" ? (
-        <DndProvider backend={HTML5Backend}>
-          <ClientsTable
-            searchQuery={searchQuery}
-            statusFilter={statusFilter}
-            viewPreference={viewPreference}
-            onViewPreferenceChange={handleViewPreferenceChange}
-            onSearchChange={handleSearchChange}
-            onStatusFilterChange={handleStatusFilterChange}
-          />
-        </DndProvider>
+        <AirtableClientsTable
+          searchQuery={searchQuery}
+          statusFilter={statusFilter}
+          onSearchChange={handleSearchChange}
+          onStatusFilterChange={handleStatusFilterChange}
+        />
       ) : (
         <div>
           {/* Title and icon for Cards view */}
