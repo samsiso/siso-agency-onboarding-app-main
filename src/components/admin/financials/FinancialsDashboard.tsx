@@ -1,173 +1,164 @@
 
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AreaChart, BarChart, PieChart } from "@/components/admin/financials/Charts";
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  ArrowUp, 
-  ArrowDown, 
-  DollarSign, 
-  Receipt, 
-  CreditCard
-} from "lucide-react";
-import { getFinancialSummary } from "@/utils/financial";
-import { Button } from "@/components/ui/button";
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Charts } from "./Charts";
+import { useEffect, useState } from "react";
+import { fetchTransactions, FinancialTransaction } from "@/utils/financial";
+import { SoftwareExpenseStats } from "./SoftwareExpenseStats";
+import { formatCurrency } from "@/lib/formatters";
 
 export function FinancialsDashboard() {
+  const [transactions, setTransactions] = useState<FinancialTransaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [period, setPeriod] = useState<"month" | "year">("month");
-  const [summary, setSummary] = useState({
-    totalRevenue: 0,
-    totalExpenses: 0, 
-    profitMargin: 0,
-    outstandingAmount: 0,
-    revenueByMonth: []
-  });
-
+  const [period, setPeriod] = useState("month");
+  
+  // Load transactions
   useEffect(() => {
-    async function loadSummary() {
-      setIsLoading(true);
-      const data = await getFinancialSummary(period);
-      setSummary(data);
-      setIsLoading(false);
+    async function loadData() {
+      try {
+        const data = await fetchTransactions();
+        if (Array.isArray(data)) {
+          setTransactions(data);
+        }
+      } catch (error) {
+        console.error("Failed to load transactions for dashboard:", error);
+      } finally {
+        setIsLoading(false);
+      }
     }
     
-    loadSummary();
-  }, [period]);
+    loadData();
+  }, []);
+  
+  // Get time period filter dates
+  const getDateFilter = () => {
+    const now = new Date();
+    const dateFilters = {
+      month: new Date(now.getFullYear(), now.getMonth(), 1),
+      quarter: new Date(now.getFullYear(), Math.floor(now.getMonth() / 3) * 3, 1),
+      year: new Date(now.getFullYear(), 0, 1),
+      all: new Date(0) // beginning of time
+    };
+    
+    return dateFilters[period];
+  };
+  
+  // Filter transactions by period
+  const filteredTransactions = transactions.filter(t => {
+    const transactionDate = new Date(t.date);
+    return transactionDate >= getDateFilter();
+  });
+  
+  // Get expenses and revenues
+  const expenses = filteredTransactions.filter(t => t.type === 'expense');
+  const revenues = filteredTransactions.filter(t => t.type === 'revenue');
+  
+  // Calculate totals
+  const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+  const totalRevenue = revenues.reduce((sum, revenue) => sum + revenue.amount, 0);
+  const netProfit = totalRevenue - totalExpenses;
+  const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
 
   return (
-    <div className="grid gap-6">
-      {/* Period selector */}
-      <div className="flex justify-end">
-        <Select value={period} onValueChange={(value: "month" | "year") => setPeriod(value)}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select period" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="month">This Month</SelectItem>
-            <SelectItem value="year">This Year</SelectItem>
-          </SelectContent>
-        </Select>
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <h2 className="text-2xl font-semibold">Financial Overview</h2>
+        <Tabs defaultValue="month" value={period} onValueChange={setPeriod} className="w-[400px]">
+          <TabsList className="grid grid-cols-4">
+            <TabsTrigger value="month">Month</TabsTrigger>
+            <TabsTrigger value="quarter">Quarter</TabsTrigger>
+            <TabsTrigger value="year">Year</TabsTrigger>
+            <TabsTrigger value="all">All Time</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
       
-      {/* Summary Cards */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <SummaryCard 
-          title="Total Revenue" 
-          value={`£${summary.totalRevenue.toLocaleString()}`}
-          trend="+12%" 
-          trendType="up"
-          description="vs last month"
-          icon={<DollarSign className="h-4 w-4" />}
-          isLoading={isLoading}
-        />
-        <SummaryCard 
-          title="Total Expenses" 
-          value={`£${summary.totalExpenses.toLocaleString()}`}
-          trend="+5%" 
-          trendType="up"
-          description="vs last month"
-          icon={<CreditCard className="h-4 w-4" />}
-          isLoading={isLoading}
-        />
-        <SummaryCard 
-          title="Profit Margin" 
-          value={`${summary.profitMargin.toFixed(1)}%`}
-          trend="+3%" 
-          trendType="up"
-          description="vs last month"
-          icon={<TrendingUp className="h-4 w-4" />}
-          isLoading={isLoading}
-        />
-        <SummaryCard 
-          title="Outstanding" 
-          value={`£${summary.outstandingAmount.toLocaleString()}`}
-          trend="-15%" 
-          trendType="down"
-          description="vs last month"
-          icon={<Receipt className="h-4 w-4" />}
-          isLoading={isLoading}
-        />
-      </div>
-
-      {/* Charts */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle>Revenue vs Expenses</CardTitle>
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
           </CardHeader>
           <CardContent>
-            <AreaChart data={summary.revenueByMonth} />
+            <div className="text-2xl font-bold">
+              {isLoading ? (
+                <div className="h-6 w-24 bg-muted animate-pulse rounded" />
+              ) : (
+                formatCurrency(totalRevenue, 'GBP')
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              From {revenues.length} transactions
+            </p>
           </CardContent>
         </Card>
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle>Expense Breakdown</CardTitle>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
           </CardHeader>
           <CardContent>
-            <PieChart data={[]} />
+            <div className="text-2xl font-bold">
+              {isLoading ? (
+                <div className="h-6 w-24 bg-muted animate-pulse rounded" />
+              ) : (
+                formatCurrency(totalExpenses, 'GBP')
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              From {expenses.length} transactions
+            </p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Net Profit</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className={`text-2xl font-bold ${netProfit >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+              {isLoading ? (
+                <div className="h-6 w-24 bg-muted animate-pulse rounded" />
+              ) : (
+                formatCurrency(netProfit, 'GBP')
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {netProfit >= 0 ? 'Profit' : 'Loss'}
+            </p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Profit Margin</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className={`text-2xl font-bold ${profitMargin >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+              {isLoading ? (
+                <div className="h-6 w-24 bg-muted animate-pulse rounded" />
+              ) : (
+                `${profitMargin.toFixed(1)}%`
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {profitMargin >= 20 ? 'Healthy' : profitMargin >= 0 ? 'Moderate' : 'Negative'}
+            </p>
           </CardContent>
         </Card>
       </div>
-
-      {/* Monthly Revenue Breakdown */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Monthly Revenue</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <BarChart data={[]} />
-        </CardContent>
-      </Card>
+      
+      <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
+        <Card className="col-span-1">
+          <CardHeader>
+            <CardTitle>Revenue vs. Expenses</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Charts transactions={filteredTransactions} period={period} />
+          </CardContent>
+        </Card>
+        
+        <SoftwareExpenseStats expenses={expenses} />
+      </div>
     </div>
-  );
-}
-
-interface SummaryCardProps {
-  title: string;
-  value: string;
-  trend: string;
-  trendType: 'up' | 'down';
-  description: string;
-  icon: React.ReactNode;
-  isLoading?: boolean;
-}
-
-function SummaryCard({ title, value, trend, trendType, description, icon, isLoading = false }: SummaryCardProps) {
-  return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
-          {icon}
-        </div>
-      </CardHeader>
-      <CardContent>
-        {isLoading ? (
-          <div className="h-8 w-24 bg-muted animate-pulse rounded"></div>
-        ) : (
-          <div className="text-2xl font-bold">{value}</div>
-        )}
-        <div className="flex items-center mt-1">
-          <span className={`flex items-center text-xs ${
-            trendType === 'up' ? 'text-green-500' : 'text-red-500'
-          }`}>
-            {trendType === 'up' ? <ArrowUp className="h-3 w-3 mr-1" /> : <ArrowDown className="h-3 w-3 mr-1" />}
-            {trend}
-          </span>
-          <span className="text-xs text-muted-foreground ml-1">
-            {description}
-          </span>
-        </div>
-      </CardContent>
-    </Card>
   );
 }

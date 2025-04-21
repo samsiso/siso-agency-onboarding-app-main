@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Table, TableBody, TableHeader } from "@/components/ui/table";
 import { deleteTransaction } from "@/utils/financial";
@@ -10,17 +11,14 @@ import { ExpensesTableHeader } from "./expense/ExpensesTableHeader";
 import { ExpensesTableLoading } from "./expense/ExpensesTableLoading";
 import { SpreadsheetTable } from "./table/SpreadsheetTable";
 import { ExpensesFinanceToolbar } from "./table/ExpensesFinanceToolbar";
-import { ArrowUpDown, Download, Filter, Plus, Trash2 } from "lucide-react";
 import { SpreadsheetExpensesBody } from "./expense/SpreadsheetExpensesBody";
 import { AddExpenseRow } from "./expense/AddExpenseRow";
+import { categorizeExpenses } from "@/utils/financial/expenseCategories";
 
 export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }) {
   const [selectedExpenses, setSelectedExpenses] = useState<string[]>([]);
-  
-  // Log received expenses for debugging
-  useEffect(() => {
-    console.log(`ExpensesTable received ${expenses?.length || 0} expenses`);
-  }, [expenses]);
+  const [categorizedExpenses, setCategorizedExpenses] = useState<any[]>([]);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
   
   // Define the initial columns configuration with pinning capability
   const initialColumns = [
@@ -37,17 +35,40 @@ export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }
   const { columns, visibleColumns, updateColumnVisibility } = useTableColumns(initialColumns);
   const { views, currentView, loadViews, saveView, selectView } = useTableViews("expenses");
   const { sortField, sortDirection, handleSort, sortedExpenses } = useExpensesSort(expenses || []);
+  
+  // Categorize expenses when they change
+  useEffect(() => {
+    if (Array.isArray(expenses)) {
+      const categorized = categorizeExpenses(expenses);
+      setCategorizedExpenses(categorized);
+    }
+  }, [expenses]);
+
+  // Log received expenses for debugging
+  useEffect(() => {
+    console.log(`ExpensesTable received ${expenses?.length || 0} expenses`);
+  }, [expenses]);
+
   const { 
     searchQuery, 
     setSearchQuery, 
     viewDetailsId, 
-    setViewDetailsId, 
+    setViewDetailsId,
+    categoryFilter,
+    setCategoryFilter,
     filteredExpenses 
-  } = useExpensesTableData(sortedExpenses);
+  } = useExpensesTableData(
+    activeCategory ? 
+      categorizedExpenses.filter(exp => 
+        exp.detected_category === activeCategory
+      ) : 
+      sortedExpenses
+  );
 
   // Function to handle view selection
   const handleApplyView = (view) => {
     setSearchQuery(view.filters?.searchQuery || '');
+    setCategoryFilter(view.filters?.categoryFilter || '');
     selectView(view);
   };
 
@@ -114,13 +135,20 @@ export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }
     // For now just show it's working via console
   };
 
-  // Handle adding a new expense
-  const handleAddExpense = () => {
-    // This function will be replaced by the direct interaction with AddExpenseRow
-    console.log("Add new expense");
+  // Get category summary data
+  const categorySummary = Object.entries(
+    categorizedExpenses.reduce((acc, expense) => {
+      const category = expense.detected_category || 'Uncategorized';
+      acc[category] = (acc[category] || 0) + expense.amount;
+      return acc;
+    }, {})
+  ).sort((a, b) => (b[1] as number) - (a[1] as number));
+
+  // Handle category filter change
+  const handleCategoryChange = (category: string | null) => {
+    setActiveCategory(category);
   };
 
-  // Explicitly move AddExpenseRow to render as the very first body row only
   return (
     <div className="space-y-6">
       <ExpensesFinanceToolbar
@@ -131,13 +159,16 @@ export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }
         savedViews={views}
         onViewSelect={handleApplyView}
         onViewSave={(name) => saveView(name, {
-          filters: { searchQuery },
+          filters: { searchQuery, categoryFilter },
           columns
         })}
         selectedCount={selectedExpenses.length}
         onDeleteSelected={handleDeleteSelected}
-        onAddExpense={handleAddExpense}
+        onAddExpense={() => {}}
         onExport={() => alert("Export feature coming soon")}
+        categorySummary={categorySummary}
+        activeCategory={activeCategory}
+        onCategoryChange={handleCategoryChange}
       />
 
       <div className="spreadsheet-container">
@@ -160,7 +191,6 @@ export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }
                 onExpenseAdded={onDataChange}
                 visibleColumns={visibleColumns}
               />
-              {/* ... keep existing conditional rendering for loading/records ... */}
               {isLoading ? (
                 <ExpensesTableLoading colSpan={visibleColumns.length + 1} />
               ) : (
@@ -190,6 +220,7 @@ export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }
           overflow: hidden;
           border-radius: 0.5rem;
           background: #121212;
+          max-height: calc(100vh - 350px);
         }
         
         /* Custom scrollbar for spreadsheet */

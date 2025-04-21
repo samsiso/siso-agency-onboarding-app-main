@@ -1,17 +1,33 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Download, Filter, Plus, Trash2, ArrowUpDown } from "lucide-react";
-import { TableColumn } from "@/hooks/useTableColumns";
-import { SavedView } from "@/hooks/useTableViews";
+import { Search, Filter, FileDown, Plus, Trash2, PieChart } from "lucide-react";
 import { ColumnCustomization } from "./ColumnCustomization";
 import { SavedViewsManager } from "./SavedViewsManager";
-import { Separator } from "@/components/ui/separator";
+import { TableColumn } from "@/hooks/useTableColumns";
+import { SavedView } from "@/hooks/useTableViews";
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
+import { formatCurrency } from "@/lib/formatters";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 interface ExpensesFinanceToolbarProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  onAddExpense?: () => void;
+  onExport?: () => void;
+  onFilter?: () => void;
   columns: TableColumn[];
   onColumnVisibilityChange: (columns: TableColumn[]) => void;
   savedViews: SavedView[];
@@ -19,13 +35,17 @@ interface ExpensesFinanceToolbarProps {
   onViewSave: (name: string) => void;
   selectedCount: number;
   onDeleteSelected: () => void;
-  onAddExpense: () => void;
-  onExport: () => void;
+  categorySummary?: [string, number][];
+  activeCategory: string | null;
+  onCategoryChange: (category: string | null) => void;
 }
 
 export function ExpensesFinanceToolbar({ 
   searchQuery, 
-  onSearchChange, 
+  onSearchChange,
+  onAddExpense,
+  onExport,
+  onFilter,
   columns,
   onColumnVisibilityChange,
   savedViews,
@@ -33,34 +53,47 @@ export function ExpensesFinanceToolbar({
   onViewSave,
   selectedCount,
   onDeleteSelected,
-  onAddExpense,
-  onExport
+  categorySummary = [],
+  activeCategory,
+  onCategoryChange
 }: ExpensesFinanceToolbarProps) {
+  const [showCategorySummary, setShowCategorySummary] = useState(false);
+
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-        <h2 className="text-xl font-semibold">Expenses Tracking</h2>
-        
-        <div className="flex items-center gap-2">
-          {selectedCount > 0 && (
-            <>
-              <Badge className="bg-primary/20 text-primary border border-primary/30 px-2 py-1 text-xs">
-                {selectedCount} selected
-              </Badge>
-              
-              <Button 
-                variant="outline" 
-                size="sm"
-                className="h-9 text-destructive hover:text-destructive hover:bg-destructive/10"
-                onClick={onDeleteSelected}
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete Selected
-              </Button>
-              
-              <Separator orientation="vertical" className="h-6" />
-            </>
-          )}
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search expenses..."
+              className="pl-8 w-[250px]"
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+            />
+          </div>
+          
+          <ColumnCustomization 
+            columns={columns} 
+            onColumnVisibilityChange={onColumnVisibilityChange}
+          />
+          
+          <SavedViewsManager
+            views={savedViews}
+            onViewSelect={onViewSelect}
+            onViewSave={onViewSave}
+          />
+          
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="h-9"
+            onClick={onFilter}
+          >
+            <Filter className="h-4 w-4 mr-2" />
+            Filter
+          </Button>
           
           <Button 
             variant="outline" 
@@ -68,9 +101,80 @@ export function ExpensesFinanceToolbar({
             className="h-9"
             onClick={onExport}
           >
-            <Download className="h-4 w-4 mr-2" />
+            <FileDown className="h-4 w-4 mr-2" />
             Export
           </Button>
+
+          <Popover open={showCategorySummary} onOpenChange={setShowCategorySummary}>
+            <PopoverTrigger asChild>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="h-9"
+              >
+                <PieChart className="h-4 w-4 mr-2" />
+                Categories
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80">
+              <Card className="border-none shadow-none">
+                <CardHeader className="px-0 pt-0">
+                  <CardTitle className="text-base">Expense Categories</CardTitle>
+                  <CardDescription>Summary by category</CardDescription>
+                </CardHeader>
+                <CardContent className="px-0 pb-0">
+                  <div className="space-y-2">
+                    <Button 
+                      variant={!activeCategory ? "secondary" : "outline"}
+                      size="sm"
+                      className="mb-1 w-full justify-between"
+                      onClick={() => {
+                        onCategoryChange(null);
+                        setShowCategorySummary(false);
+                      }}
+                    >
+                      <span>All Categories</span>
+                      <Badge variant="outline" className="ml-2">
+                        {categorySummary.reduce((sum, [_, amount]) => sum + (amount as number), 0).toFixed(2)}
+                      </Badge>
+                    </Button>
+                    
+                    {categorySummary.map(([category, amount]) => (
+                      <Button 
+                        key={category} 
+                        variant={activeCategory === category ? "secondary" : "outline"}
+                        size="sm"
+                        className="mb-1 w-full justify-between"
+                        onClick={() => {
+                          onCategoryChange(category);
+                          setShowCategorySummary(false);
+                        }}
+                      >
+                        <span>{category}</span>
+                        <Badge variant="outline" className="ml-2">
+                          {formatCurrency(amount as number, 'GBP')}
+                        </Badge>
+                      </Button>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </PopoverContent>
+          </Popover>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          {selectedCount > 0 && (
+            <Button 
+              variant="destructive" 
+              size="sm" 
+              className="h-9"
+              onClick={onDeleteSelected}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete Selected ({selectedCount})
+            </Button>
+          )}
           
           <Button 
             size="sm" 
@@ -83,51 +187,19 @@ export function ExpensesFinanceToolbar({
         </div>
       </div>
       
-      <div className="flex flex-wrap gap-4 justify-between items-center bg-muted/30 p-4 rounded-md border border-border/50 shadow-sm">
-        <div className="relative flex-grow max-w-md">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search expenses..."
-            className="pl-9 border-border/50 bg-background shadow-sm h-10"
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-          />
-        </div>
-        
-        <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-9 border-border/50 shadow-sm hover:bg-muted/50"
+      {/* Display active category filter if one is selected */}
+      {activeCategory && (
+        <div className="flex items-center">
+          <span className="text-sm text-muted-foreground mr-2">Filtered by:</span>
+          <Badge 
+            variant="secondary" 
+            className="mr-1 cursor-pointer"
+            onClick={() => onCategoryChange(null)}
           >
-            <Filter className="h-4 w-4 mr-2" />
-            Filter
-          </Button>
-          
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-9 border-border/50 shadow-sm hover:bg-muted/50"
-          >
-            <ArrowUpDown className="h-4 w-4 mr-2" />
-            Sort
-          </Button>
-          
-          <Separator orientation="vertical" className="h-8" />
-          
-          <ColumnCustomization 
-            columns={columns} 
-            onColumnVisibilityChange={onColumnVisibilityChange}
-          />
-          
-          <SavedViewsManager
-            views={savedViews}
-            onViewSelect={onViewSelect}
-            onViewSave={onViewSave}
-          />
+            {activeCategory} ✕
+          </Badge>
         </div>
-      </div>
+      )}
     </div>
   );
 }

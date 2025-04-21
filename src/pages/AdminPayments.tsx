@@ -12,7 +12,6 @@ import { seedInitialExpenses } from "@/utils/financial/seedExpenses";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ImportExpensesButton } from "@/components/admin/financials/expense/ImportExpensesButton";
-import React from "react";
 import { Import } from "lucide-react";
 import { seedExpensesFromList } from "@/utils/financial/bulkExpenseSeeder";
 
@@ -24,8 +23,6 @@ export default function AdminPayments() {
   const [filters, setFilters] = useState({});
   const [isSeeding, setIsSeeding] = useState(false);
   const [expensesExist, setExpensesExist] = useState(false);
-
-  // NEW: Show/hide one-time import button (local session only)
   const [showBulkImport, setShowBulkImport] = useState(true);
 
   // Check if expenses exist when component mounts
@@ -110,7 +107,7 @@ export default function AdminPayments() {
     }
   };
 
-  // NEW: One-time bulk import button for 100+ sample expenses
+  // Bulk import button for 100+ sample expenses
   const handleBulkImportAllExpenses = async () => {
     setIsLoading(true);
     try {
