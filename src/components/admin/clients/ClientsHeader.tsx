@@ -15,21 +15,36 @@ import {
   Plus,
   Download,
   Upload,
-  RefreshCw
+  RefreshCw,
+  ViewColumns
 } from 'lucide-react';
+import { ClientViewPreference, ClientData } from '@/types/client.types';
+import { RefetchOptions } from '@tanstack/react-query';
 
 interface ClientsHeaderProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
   statusFilter: string;
   onStatusFilterChange: (status: string) => void;
+  viewPreference?: ClientViewPreference;
+  onViewPreferenceChange?: (preference: Partial<ClientViewPreference>) => void;
+  onAddClient?: () => void;
+  totalClients?: number;
+  clients?: ClientData[];
+  onRefetch?: (options?: RefetchOptions) => Promise<unknown>;
 }
 
 export function ClientsHeader({
   searchQuery,
   onSearchChange,
   statusFilter,
-  onStatusFilterChange
+  onStatusFilterChange,
+  viewPreference,
+  onViewPreferenceChange,
+  onAddClient,
+  totalClients,
+  clients,
+  onRefetch
 }: ClientsHeaderProps) {
   // Handle search input changes
   const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,6 +54,13 @@ export function ClientsHeader({
   // Handle status filter changes
   const handleStatusChange = (value: string) => {
     onStatusFilterChange(value);
+  };
+
+  // Handle refresh click
+  const handleRefresh = () => {
+    if (onRefetch) {
+      onRefetch();
+    }
   };
 
   return (
@@ -73,10 +95,27 @@ export function ClientsHeader({
           variant="outline" 
           size="sm" 
           className="h-10 border-border/50 bg-card/50 shadow-sm"
+          onClick={handleRefresh}
         >
           <RefreshCw className="h-4 w-4 mr-2" />
           Refresh
         </Button>
+        
+        {viewPreference && onViewPreferenceChange && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-10 border-border/50 bg-card/50 shadow-sm"
+            onClick={() => {
+              // This would open column customization modal in a real implementation
+              console.log("Open column customization");
+            }}
+          >
+            <ViewColumns className="h-4 w-4 mr-2" />
+            Columns
+          </Button>
+        )}
+        
         <Button 
           variant="outline" 
           size="sm" 
@@ -85,6 +124,7 @@ export function ClientsHeader({
           <Upload className="h-4 w-4 mr-2" />
           Import
         </Button>
+        
         <Button 
           variant="outline" 
           size="sm" 
@@ -93,7 +133,11 @@ export function ClientsHeader({
           <Download className="h-4 w-4 mr-2" />
           Export
         </Button>
-        <Button className="bg-primary hover:bg-primary/90 shadow-sm">
+        
+        <Button 
+          className="bg-primary hover:bg-primary/90 shadow-sm"
+          onClick={onAddClient}
+        >
           <Plus className="h-4 w-4 mr-2" />
           Add Client
         </Button>
