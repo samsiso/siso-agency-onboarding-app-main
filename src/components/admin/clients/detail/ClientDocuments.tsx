@@ -1,212 +1,144 @@
 
 import React, { useState } from 'react';
-import { ClientData, ClientDocument } from '@/types/client.types';
-import { useClientDocuments } from '@/hooks/client/useClientDocuments';
-import { Button } from '@/components/ui/button';
+import { ClientData } from '@/types/client.types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { 
-  Sheet, 
-  SheetContent, 
-  SheetHeader, 
-  SheetTitle, 
-  SheetDescription 
-} from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { 
-  FileText, 
-  FileCode, 
-  FileImage, 
-  PlusCircle, 
-  Edit2, 
-  Trash2 
-} from 'lucide-react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
+interface PlanLinks {
+  app_plan: string;
+  inspiration: string;
+  functionalities: string;
+}
+
+// This page is now a lot simpler: it just allows you to view (and edit) 3 Notion URLs.
 export function ClientDocuments({ client }: { client: ClientData }) {
-  const { documents, createDocument, updateDocument, deleteDocument } = useClientDocuments(client.id);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [selectedDocument, setSelectedDocument] = useState<ClientDocument | null>(null);
-  const [newDocument, setNewDocument] = useState<{
-    title: string;
-    content: string;
-    document_type: 'app_plan' | 'functionalities' | 'wireframes' | 'inspiration';
-  }>({
-    title: '',
-    content: '',
-    document_type: 'app_plan'
+  // In a real implementation, these URLs would be stored on the client (and persisted)
+  // For demo purposes, we store them in local state
+  const [links, setLinks] = useState<PlanLinks>({
+    app_plan: client.notion_plan_url || '',
+    inspiration: client.key_research || '', // just using key_research as an example "inspiration" field
+    functionalities: client.next_steps || '', // just using next_steps for "functionalities" as placeholder
   });
 
-  const documentTypes = [
-    { value: 'app_plan', label: 'App Plan', icon: <FileText className="h-5 w-5 text-blue-500" /> },
-    { value: 'functionalities', label: 'Functionalities', icon: <FileCode className="h-5 w-5 text-green-500" /> },
-    { value: 'wireframes', label: 'Wireframe Inspiration', icon: <FileImage className="h-5 w-5 text-purple-500" /> },
-    { value: 'inspiration', label: 'Design Inspiration', icon: <FileImage className="h-5 w-5 text-orange-500" /> }
-  ];
+  const [editing, setEditing] = useState(false);
 
-  const handleCreateDocument = () => {
-    createDocument(newDocument);
-    setIsCreateModalOpen(false);
-    setNewDocument({ title: '', content: '', document_type: 'app_plan' });
-  };
-
-  const handleUpdateDocument = () => {
-    if (selectedDocument) {
-      updateDocument({ 
-        id: selectedDocument.id, 
-        title: selectedDocument.title, 
-        content: selectedDocument.content 
-      });
-      setSelectedDocument(null);
-    }
+  const handleChange = (key: keyof PlanLinks, value: string) => {
+    setLinks((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">Client Documents</h2>
-        <Button 
-          onClick={() => setIsCreateModalOpen(true)} 
-          className="flex items-center gap-2"
-        >
-          <PlusCircle className="h-5 w-5" />
-          New Document
-        </Button>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {documents?.map((doc) => {
-          const docType = documentTypes.find(type => type.value === doc.document_type);
-          return (
-            <Card key={doc.id} className="hover:shadow-md transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="flex items-center gap-2">
-                  {docType?.icon}
-                  {doc.title}
-                </CardTitle>
-                <div className="flex items-center gap-2">
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={() => setSelectedDocument(doc)}
-                  >
-                    <Edit2 className="h-4 w-4" />
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={() => deleteDocument(doc.id)}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground line-clamp-3">
-                  {doc.content}
-                </p>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-
-      <Sheet open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle>Create New Document</SheetTitle>
-            <SheetDescription>
-              Create a new document for this client project
-            </SheetDescription>
-          </SheetHeader>
-          <div className="space-y-4 mt-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">Document Type</label>
-              <Select 
-                value={newDocument.document_type} 
-                onValueChange={(value: 'app_plan' | 'functionalities' | 'wireframes' | 'inspiration') => setNewDocument(prev => ({ ...prev, document_type: value }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select document type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {documentTypes.map(type => (
-                    <SelectItem key={type.value} value={type.value}>
-                      <div className="flex items-center gap-2">
-                        {type.icon}
-                        {type.label}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+    <Card>
+      <CardHeader>
+        <CardTitle>Notion Project Links</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-8">
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <NotionIcon />
+              <span className="font-medium text-lg">App Plan</span>
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Title</label>
-              <Input 
-                value={newDocument.title}
-                onChange={(e) => setNewDocument(prev => ({ ...prev, title: e.target.value }))}
-                placeholder="Enter document title"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Content</label>
-              <Textarea 
-                value={newDocument.content}
-                onChange={(e) => setNewDocument(prev => ({ ...prev, content: e.target.value }))}
-                placeholder="Write your document content here"
-                rows={10}
-              />
-            </div>
-            <Button 
-              onClick={handleCreateDocument} 
-              className="w-full"
-              disabled={!newDocument.title.trim()}
-            >
-              Create Document
-            </Button>
-          </div>
-        </SheetContent>
-      </Sheet>
-
-      {selectedDocument && (
-        <Sheet open={!!selectedDocument} onOpenChange={() => setSelectedDocument(null)}>
-          <SheetContent>
-            <SheetHeader>
-              <SheetTitle>Edit Document</SheetTitle>
-              <SheetDescription>
-                Edit the details of your document
-              </SheetDescription>
-            </SheetHeader>
-            <div className="space-y-4 mt-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">Title</label>
-                <Input 
-                  value={selectedDocument.title}
-                  onChange={(e) => setSelectedDocument(prev => prev ? { ...prev, title: e.target.value } : null)}
-                  placeholder="Enter document title"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Content</label>
-                <Textarea 
-                  value={selectedDocument.content}
-                  onChange={(e) => setSelectedDocument(prev => prev ? { ...prev, content: e.target.value } : null)}
-                  placeholder="Write your document content here"
-                  rows={10}
-                />
-              </div>
-              <Button 
-                onClick={handleUpdateDocument} 
+            {editing ? (
+              <Input
+                type="url"
                 className="w-full"
-                disabled={!selectedDocument.title.trim()}
+                value={links.app_plan}
+                onChange={e => handleChange('app_plan', e.target.value)}
+                placeholder="Paste the Notion App Plan link"
+              />
+            ) : links.app_plan ? (
+              <a
+                href={links.app_plan}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 underline break-all"
               >
-                Save Changes
-              </Button>
+                {links.app_plan}
+              </a>
+            ) : (
+              <p className="text-muted-foreground italic">No link provided.</p>
+            )}
+          </div>
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <NotionIcon color='#E5DEFF' />
+              <span className="font-medium text-lg">Inspiration</span>
             </div>
-          </SheetContent>
-        </Sheet>
-      )}
-    </div>
+            {editing ? (
+              <Input
+                type="url"
+                className="w-full"
+                value={links.inspiration}
+                onChange={e => handleChange('inspiration', e.target.value)}
+                placeholder="Paste the Notion Inspiration link"
+              />
+            ) : links.inspiration ? (
+              <a
+                href={links.inspiration}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 underline break-all"
+              >
+                {links.inspiration}
+              </a>
+            ) : (
+              <p className="text-muted-foreground italic">No link provided.</p>
+            )}
+          </div>
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <NotionIcon color='#FEC6A1' />
+              <span className="font-medium text-lg">Functionalities</span>
+            </div>
+            {editing ? (
+              <Input
+                type="url"
+                className="w-full"
+                value={links.functionalities}
+                onChange={e => handleChange('functionalities', e.target.value)}
+                placeholder="Paste the Notion Functionalities link"
+              />
+            ) : links.functionalities ? (
+              <a
+                href={links.functionalities}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 underline break-all"
+              >
+                {links.functionalities}
+              </a>
+            ) : (
+              <p className="text-muted-foreground italic">No link provided.</p>
+            )}
+          </div>
+          <div className="pt-2">
+            <Button
+              variant="outline"
+              type="button"
+              className="mr-2"
+              onClick={() => setEditing(e => !e)}
+            >
+              {editing ? 'Stop Editing' : 'Edit Links'}
+            </Button>
+            {/* In a real app, you'd persist these to the DB here */}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function NotionIcon(props: { color?: string }) {
+  return (
+    <svg width="24" height="24" fill="none" viewBox="0 0 120 126" {...props}>
+      <path d="M20.6927 21.9927C24.5927 25.4927 25.7927 24.9927 35.4927 23.9927L96.1927 17.3927C97.3927 17.3927 96.4927 16.2927 95.9927 16.0927L85.4927 8.59271C83.3927 6.89271 80.5927 4.79271 74.7927 5.49271L17.6927 12.8927C15.9927 13.1927 15.4927 14.2927 16.1927 14.9927L20.6927 21.9927Z" fill="black"/>
+      <path d="M22.1927 37.1927V105.793C22.1927 109.793 24.1927 111.093 28.9927 110.793L96.6927 103.593C101.493 103.293 102.993 100.793 102.993 97.1927V29.2927C102.993 25.6927 101.193 23.7927 97.1927 24.0927L27.9927 31.4927C23.8927 31.9927 22.1927 33.5927 22.1927 37.1927Z" fill={props.color ?? "white"}/>
+      <path d="M60.1927 40.4928C60.1927 41.9928 58.8927 43.4928 56.7927 43.5928L32.5927 45.8928V81.3928C32.5927 83.7928 31.1927 85.1928 28.9927 85.3928C26.7927 85.5928 25.0927 84.4928 25.0927 81.9928V33.8928C25.0927 31.3928 26.3927 29.7928 28.9927 29.3928L56.9927 26.2928C58.8927 25.9928 60.1927 27.7928 60.1927 29.6928V40.4928Z" fill="black"/>
+      <path d="M63.1927 56.9928V97.1928C63.1927 99.9928 64.9928 100.893 67.3928 98.6928L99.7928 69.6928C101.393 68.1928 101.093 66.7928 99.0928 66.4928L67.9928 62.0928C64.9928 61.4928 63.1927 62.9928 63.1927 65.7928V80.9928L63.1927 56.9928Z" fill="#F2F2F2"/>
+    </svg>
   );
 }
