@@ -16,7 +16,7 @@ import {
   Download,
   Upload,
   RefreshCw,
-  ViewColumns
+  Columns // Replaced ViewColumns with Columns which is a valid lucide-react icon
 } from 'lucide-react';
 import { ClientViewPreference, ClientData } from '@/types/client.types';
 import { RefetchOptions } from '@tanstack/react-query';
@@ -111,7 +111,7 @@ export function ClientsHeader({
               console.log("Open column customization");
             }}
           >
-            <ViewColumns className="h-4 w-4 mr-2" />
+            <Columns className="h-4 w-4 mr-2" />
             Columns
           </Button>
         )}
