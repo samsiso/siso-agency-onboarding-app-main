@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ClientData } from "@/types/client.types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Users, Mail, Phone, DollarSign, Flag } from "lucide-react";
+import { Users, Mail, Phone, DollarSign, Flag, Calendar } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useClientsList } from "@/hooks/client";
 import { Separator } from "@/components/ui/separator";
@@ -52,8 +52,10 @@ export const ClientsCardGrid = ({
     }
   };
 
-  const getPriorityColor = (priority: string | null) => {
-    switch (priority?.toLowerCase()) {
+  const getPriorityColor = (priority: string | null | undefined) => {
+    if (!priority) return 'text-muted-foreground';
+    
+    switch (priority.toLowerCase()) {
       case 'high':
         return 'text-red-500';
       case 'medium':
@@ -131,7 +133,7 @@ export const ClientsCardGrid = ({
                   {client.priority && (
                     <Tooltip>
                       <TooltipTrigger>
-                        <Badge variant="outline" className={cn("gap-1 border-none", getPriorityColor(client.priority))}>
+                        <Badge variant="outline" className={cn("gap-1 border-none", getPriorityColor(client.priority as string | null))}>
                           <Flag className="h-3 w-3" />
                           <span>{client.priority}</span>
                         </Badge>
