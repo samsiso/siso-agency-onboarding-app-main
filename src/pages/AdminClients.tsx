@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AdminLayout } from '@/components/admin/layout/AdminLayout';
@@ -20,7 +19,7 @@ export default function AdminClients() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const { toast } = useToast();
-  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
+  const [viewMode, setViewMode: React.Dispatch<React.SetStateAction<"table" | "cards">> = useState("table");
   
   // Enhanced view preferences with all columns visible by default
   const [viewPreference, setViewPreference] = useState<ClientViewPreference>({
@@ -172,7 +171,7 @@ export default function AdminClients() {
         </div>
         {viewMode === "table" ? (
           <DndProvider backend={HTML5Backend}>
-            <ClientsTable 
+            <ClientsTable
               searchQuery={searchQuery}
               statusFilter={statusFilter}
               viewPreference={viewPreference}
