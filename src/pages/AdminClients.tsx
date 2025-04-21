@@ -10,7 +10,6 @@ import { updateExistingClientData, makeCurrentUserAdmin } from '@/utils/clientDa
 import { useToast } from '@/hooks/use-toast';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { useClientsList } from "@/hooks/client/useClientsList";
 import { ClientsCardGrid } from "@/components/admin/clients/ClientsCardGrid";
 import { Button } from '@/components/ui/button';
 
@@ -20,6 +19,7 @@ export default function AdminClients() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const { toast } = useToast();
+  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
   
   // Enhanced view preferences with all columns visible by default
   const [viewPreference, setViewPreference] = useState<ClientViewPreference>({
@@ -53,9 +53,6 @@ export default function AdminClients() {
     pageSize: 10,
     showAllColumns: true
   });
-
-  // Add view mode: "table" or "cards" - define this BEFORE useEffect hooks to fix the hooks order issue
-  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
 
   // Initialize the clients data and add admin role 
   useEffect(() => {
@@ -150,21 +147,6 @@ export default function AdminClients() {
     return null;
   }
 
-  // Get clients data directly for Cards view, with search/filter/pagination
-  const {
-    clients,
-    totalCount,
-    isLoading: isLoadingClients,
-    refetch
-  } = useClientsList({
-    searchQuery,
-    statusFilter,
-    sortColumn: viewPreference.sortColumn,
-    sortDirection: viewPreference.sortDirection,
-    page: 1, // Override to always show all on cards for simplicity, or enable paging if needed
-    pageSize: 100, // Increase for card grid (can coordinate with table's pageSize)
-  });
-
   return (
     <AdminLayout>
       <div className="container mx-auto px-4 py-8">
@@ -200,9 +182,10 @@ export default function AdminClients() {
           </DndProvider>
         ) : (
           <ClientsCardGrid
-            clients={clients}
-            isLoading={isLoadingClients}
-            onRefetch={refetch}
+            searchQuery={searchQuery}
+            statusFilter={statusFilter}
+            sortColumn={viewPreference.sortColumn}
+            sortDirection={viewPreference.sortDirection}
           />
         )}
       </div>

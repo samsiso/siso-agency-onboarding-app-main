@@ -1,25 +1,49 @@
 
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { ClientData, ClientViewPreference } from "@/types/client.types";
+import { ClientData } from "@/types/client.types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Users, Mail, Phone } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useClientsList } from "@/hooks/client";
 
 interface ClientsCardGridProps {
-  clients: ClientData[];
-  isLoading: boolean;
-  onRefetch: () => void;
-  // For future (search/filter controls), pass in as needed
+  searchQuery: string;
+  statusFilter: string;
+  sortColumn: string;
+  sortDirection: 'asc' | 'desc';
+  onRefetch?: () => void;
 }
 
 export const ClientsCardGrid = ({
-  clients,
-  isLoading,
-  onRefetch,
+  searchQuery,
+  statusFilter,
+  sortColumn,
+  sortDirection,
+  onRefetch
 }: ClientsCardGridProps) => {
   const navigate = useNavigate();
+  
+  const {
+    clients,
+    isLoading,
+    refetch
+  } = useClientsList({
+    searchQuery,
+    statusFilter,
+    sortColumn,
+    sortDirection,
+    pageSize: 100, // Show more items in card view
+  });
+
+  const handleRefetch = () => {
+    if (onRefetch) {
+      onRefetch();
+    } else {
+      refetch();
+    }
+  };
 
   if (isLoading) {
     // Show grid skeleton while loading
@@ -46,7 +70,7 @@ export const ClientsCardGrid = ({
     return (
       <div className="text-center py-10 text-muted-foreground">
         <p>No clients found.</p>
-        <Button variant="outline" className="mt-4" onClick={onRefetch}>
+        <Button variant="outline" className="mt-4" onClick={handleRefetch}>
           Refresh
         </Button>
       </div>
