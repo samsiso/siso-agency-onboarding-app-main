@@ -98,14 +98,6 @@ const columns: ColumnDef<FinancialTransaction>[] = [
     cell: ({ row }) => {
       const expense = row.original;
       
-      // Use props from the component for the onDataChange function
-      const handleDelete = async (id: string, onDataChange: () => Promise<void>) => {
-        const success = await deleteTransaction(id);
-        if (success) {
-          await onDataChange();
-        }
-      };
-
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -126,7 +118,13 @@ const columns: ColumnDef<FinancialTransaction>[] = [
               <Pencil className="mr-2 h-4 w-4" /> Edit
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => handleDelete(expense.id, onDataChange)}
+              onClick={async () => {
+                const success = await deleteTransaction(expense.id);
+                if (success) {
+                  // Access onDataChange from props
+                  await onDataChange();
+                }
+              }}
             >
               <Trash className="mr-2 h-4 w-4" /> Delete
             </DropdownMenuItem>

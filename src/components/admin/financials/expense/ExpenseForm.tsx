@@ -1,10 +1,10 @@
 
-import React from 'react';
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from "react";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Form,
   FormControl,
@@ -13,7 +13,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { toast } from "@/components/ui/use-toast";
+import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -21,53 +26,90 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { addMultipleTransactions } from '@/utils/financial/transactionModifications';
+import { CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { toast } from "@/components/ui/use-toast";
+import { FinancialTransaction } from "@/utils/financial";
+import { addMultipleTransactions } from "@/utils/financial/transactionModifications";
 
-// Define a schema for the expense form with non-optional fields to match the expected type
-const expenseFormSchema = z.object({
-  description: z.string().min(1, "Description is required"),
-  amount: z.string().min(1, "Amount is required").transform(Number),
-  date: z.string().min(1, "Date is required"),
+// Define the schema for the expense form
+const formSchema = z.object({
+  description: z.string().min(2, "Description is required"),
+  amount: z.coerce.number().positive("Amount must be positive"),
+  date: z.date({
+    required_error: "Date is required",
+  }),
   category: z.string().min(1, "Category is required"),
   vendor: z.string().min(1, "Vendor is required"),
-  recurring_type: z.enum(['one-time', 'monthly', 'annual']).default('one-time'),
+  recurring_type: z.enum(["one-time", "monthly", "annual"]),
 });
 
-interface ExpenseFormProps {
-  onExpenseAdded?: () => void;
+// Define the props for the form component
+export interface ExpenseFormProps {
+  onSuccess: () => Promise<void>;
 }
 
-export function ExpenseForm({ onExpenseAdded }: ExpenseFormProps) {
-  const form = useForm<z.infer<typeof expenseFormSchema>>({
-    resolver: zodResolver(expenseFormSchema),
+export function ExpenseForm({ onSuccess }: ExpenseFormProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Initialize the form with default values
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
-      recurring_type: 'one-time',
+      description: "",
+      amount: undefined,
+      date: new Date(),
+      category: "",
+      vendor: "",
+      recurring_type: "one-time",
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof expenseFormSchema>) => {
-    // Explicitly cast the transaction object to ensure all required properties are present
-    const success = await addMultipleTransactions([{
-      description: values.description,
-      amount: Number(values.amount),
-      date: values.date,
-      category: values.category,
-      vendor: values.vendor,
-      type: 'expense',
-      recurring_type: values.recurring_type
-    }]);
+  // Define the submit handler for the form
+  async function onSubmit(data: z.infer<typeof formSchema>) {
+    setIsSubmitting(true);
+    try {
+      // Format the date to YYYY-MM-DD
+      const formattedDate = format(data.date, "yyyy-MM-dd");
+      
+      // Prepare the expense transaction data
+      const expenseData = {
+        description: data.description,
+        amount: data.amount,
+        date: formattedDate,
+        category: data.category,
+        vendor: data.vendor,
+        recurring_type: data.recurring_type,
+        type: "expense" as const,
+      };
 
-    if (success) {
-      toast({
-        title: "Success",
-        description: "Expense added successfully",
-      });
-      form.reset();
-      if (onExpenseAdded) {
-        onExpenseAdded();
+      // Add the expense using the addMultipleTransactions function
+      const success = await addMultipleTransactions([expenseData]);
+      
+      if (success) {
+        toast({
+          title: "Expense added",
+          description: "Your expense has been added successfully.",
+        });
+        
+        // Reset the form
+        form.reset();
+        
+        // Call the onSuccess callback
+        await onSuccess();
       }
+    } catch (error) {
+      console.error("Error adding expense:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add expense. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
-  };
+  }
 
   return (
     <Form {...form}>
@@ -79,7 +121,7 @@ export function ExpenseForm({ onExpenseAdded }: ExpenseFormProps) {
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Input placeholder="Enter description" {...field} />
+                <Input placeholder="Enter expense description" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -91,9 +133,14 @@ export function ExpenseForm({ onExpenseAdded }: ExpenseFormProps) {
           name="amount"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Amount</FormLabel>
+              <FormLabel>Amount (£)</FormLabel>
               <FormControl>
-                <Input type="number" placeholder="Enter amount" {...field} />
+                <Input
+                  type="number"
+                  step="0.01"
+                  placeholder="0.00"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -104,11 +151,39 @@ export function ExpenseForm({ onExpenseAdded }: ExpenseFormProps) {
           control={form.control}
           name="date"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="flex flex-col">
               <FormLabel>Date</FormLabel>
-              <FormControl>
-                <Input type="date" {...field} />
-              </FormControl>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-full pl-3 text-left font-normal",
+                        !field.value && "text-muted-foreground"
+                      )}
+                    >
+                      {field.value ? (
+                        format(field.value, "PPP")
+                      ) : (
+                        <span>Pick a date</span>
+                      )}
+                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={field.value}
+                    onSelect={field.onChange}
+                    disabled={(date) =>
+                      date > new Date() || date < new Date("1900-01-01")
+                    }
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
               <FormMessage />
             </FormItem>
           )}
@@ -127,10 +202,13 @@ export function ExpenseForm({ onExpenseAdded }: ExpenseFormProps) {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="Utilities">Utilities</SelectItem>
-                  <SelectItem value="Services">Services</SelectItem>
-                  <SelectItem value="Equipment">Equipment</SelectItem>
                   <SelectItem value="Software">Software</SelectItem>
+                  <SelectItem value="Hardware">Hardware</SelectItem>
+                  <SelectItem value="Office">Office</SelectItem>
+                  <SelectItem value="Marketing">Marketing</SelectItem>
+                  <SelectItem value="Utilities">Utilities</SelectItem>
+                  <SelectItem value="Travel">Travel</SelectItem>
+                  <SelectItem value="Other">Other</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -158,14 +236,17 @@ export function ExpenseForm({ onExpenseAdded }: ExpenseFormProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Recurring Type</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+              >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select recurring type" />
+                    <SelectValue placeholder="Select frequency" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="one-time">One Time</SelectItem>
+                  <SelectItem value="one-time">One-time</SelectItem>
                   <SelectItem value="monthly">Monthly</SelectItem>
                   <SelectItem value="annual">Annual</SelectItem>
                 </SelectContent>
@@ -175,7 +256,9 @@ export function ExpenseForm({ onExpenseAdded }: ExpenseFormProps) {
           )}
         />
 
-        <Button type="submit">Add Expense</Button>
+        <Button type="submit" className="w-full" disabled={isSubmitting}>
+          {isSubmitting ? "Adding..." : "Add Expense"}
+        </Button>
       </form>
     </Form>
   );
