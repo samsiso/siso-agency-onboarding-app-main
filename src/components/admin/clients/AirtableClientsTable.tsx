@@ -15,15 +15,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Label } from "@/components/ui/label";
-import { 
-  DropdownMenu, 
-  DropdownMenuTrigger, 
-  DropdownMenuContent, 
-  DropdownMenuCheckboxItem, 
-  DropdownMenuLabel 
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuCheckboxItem,
+  DropdownMenuLabel
 } from "@/components/ui/dropdown-menu";
-import { 
-  ChevronDown, ChevronFirst, ChevronLast, ChevronLeft, ChevronRight, ChevronUp,
+import {
+  ChevronDown,
+  ChevronFirst,
+  ChevronLast,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
   CircleX,
   Columns3,
   Filter,
@@ -34,17 +39,30 @@ import {
   CircleAlert
 } from "lucide-react";
 import { useClientsList } from "@/hooks/client";
-import { ColumnDef, flexRender, getCoreRowModel, getSortedRowModel, getPaginationRowModel, getFilteredRowModel, getFacetedUniqueValues, useReactTable, SortingState, ColumnFiltersState, VisibilityState, PaginationState, Row } from "@tanstack/react-table";
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  getSortedRowModel,
+  getPaginationRowModel,
+  getFilteredRowModel,
+  getFacetedUniqueValues,
+  useReactTable,
+  SortingState,
+  ColumnFiltersState,
+  VisibilityState,
+  PaginationState,
+  Row
+} from "@tanstack/react-table";
 import { Pagination, PaginationContent, PaginationItem } from "@/components/ui/pagination";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ClientData } from "@/types/client.types";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
-type TableClient = ClientData & { id: string; };
-
+// Map status to badge color
 function statusToBadge(status: string) {
-  switch(status) {
+  switch (status) {
     case 'completed':
     case 'converted':
       return <Badge className="bg-green-500/20 text-green-400">{status.charAt(0).toUpperCase() + status.slice(1)}</Badge>;
@@ -58,12 +76,15 @@ function statusToBadge(status: string) {
   }
 }
 
+type TableClient = ClientData & { id: string; };
+
+// Columns that look like Airtable demo but use our data fields
 const columns: ColumnDef<TableClient>[] = [
   {
     id: "select",
     header: ({ table }) => (
       <Checkbox
-        checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
+        checked={table.getIsAllPageRowsSelected() ? true : table.getIsSomePageRowsSelected() ? "indeterminate" : false}
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
       />
@@ -86,7 +107,7 @@ const columns: ColumnDef<TableClient>[] = [
     size: 180,
     enableHiding: false,
     filterFn: (row, columnId, filterValue) => {
-      const rowValue = [row.original.full_name, row.original.email].join(" ").toLowerCase();
+      const rowValue = [row.original.full_name, row.original.email || ""].join(" ").toLowerCase();
       return rowValue.includes((filterValue ?? "").toLowerCase());
     },
   },
@@ -94,11 +115,13 @@ const columns: ColumnDef<TableClient>[] = [
     header: "Email",
     accessorKey: "email",
     size: 210,
+    cell: ({ row }) => <span>{row.getValue("email") ?? "-"}</span>
   },
   {
     header: "Business Name",
     accessorKey: "business_name",
     size: 170,
+    cell: ({ row }) => <span>{row.getValue("business_name") ?? "-"}</span>
   },
   {
     header: "Status",
@@ -115,6 +138,7 @@ const columns: ColumnDef<TableClient>[] = [
     header: "Project",
     accessorKey: "project_name",
     size: 190,
+    cell: ({ row }) => <span>{row.getValue("project_name") ?? "-"}</span>
   },
   {
     header: "Balance",
@@ -130,12 +154,11 @@ const columns: ColumnDef<TableClient>[] = [
     id: "actions",
     header: () => <span className="sr-only">Actions</span>,
     cell: ({ row }) => <RowActions row={row} />,
-    size: 42,
+    size: 60,
     enableHiding: false,
   }
 ];
 
-// Row actions component
 function RowActions({ row }: { row: Row<TableClient> }) {
   return (
     <DropdownMenu>
@@ -188,12 +211,14 @@ export function AirtableClientsTable({
   });
   const [sorting, setSorting] = useState<SortingState>([{ id: "full_name", desc: false }]);
 
-  // Airtable demo uses stable ids; our clients have a UUID as id
-  const data: TableClient[] = React.useMemo(() => clients.map(c => ({ ...c, id: c.id })), [clients]);
+  const data: TableClient[] = React.useMemo(
+    () => clients.map(c => ({ ...c, id: c.id })),
+    [clients]
+  );
 
   const table = useReactTable({
-    data: data,
-    columns: columns,
+    data,
+    columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -213,7 +238,7 @@ export function AirtableClientsTable({
     manualPagination: false,
   });
 
-  // For filters:
+  // For filters (status):
   const uniqueStatusValues = useMemo(() => {
     const statusColumn = table.getColumn("status");
     if (!statusColumn) return [];
@@ -256,7 +281,7 @@ export function AirtableClientsTable({
   };
 
   return (
-    <div className="space-y-4 max-w-[1200px] mx-auto">
+    <div className="space-y-4 max-w-[1000px]">
       {/* Filters */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
@@ -396,7 +421,7 @@ export function AirtableClientsTable({
               </AlertDialogContent>
             </AlertDialog>
           )}
-          {/* Add user button (just demo, not hooked up) */}
+          {/* Add user button (just demo, not hooked up yet) */}
           <Button className="ml-auto" variant="outline">
             <Plus className="-ms-1 me-2 opacity-60" size={16} strokeWidth={2} aria-hidden="true" />
             Add client
@@ -575,6 +600,17 @@ export function AirtableClientsTable({
           </Pagination>
         </div>
       </div>
+      <p className="mt-4 text-center text-sm text-muted-foreground">
+        Example of a more complex table made with{" "}
+        <a
+          className="underline hover:text-foreground"
+          href="https://tanstack.com/table"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          TanStack Table
+        </a>
+      </p>
     </div>
   );
 }
