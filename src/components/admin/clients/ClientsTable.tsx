@@ -13,9 +13,9 @@ import { ClientTableBody } from './components/ClientTableBody';
 import { ClientTablePagination } from './components/ClientTablePagination';
 import { cn } from "@/lib/utils";
 import { tableStyles } from '@/components/ui/table-styles';
-import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
-import { Download, Trash2, Users } from "lucide-react";
+// NEW: Import extracted small components:
+import { BulkActionsBar } from './BulkActionsBar';
+import { ClientsTableSkeleton } from './ClientsTableSkeleton';
 
 interface ClientsTableProps {
   searchQuery?: string;
@@ -92,36 +92,7 @@ export function ClientsTable({
   }, [viewPreference.columns, onViewPreferenceChange]);
 
   if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          {Array(4).fill(0).map((_, i) => (
-            <Skeleton key={i} className="h-32 w-full rounded-lg opacity-70" />
-          ))}
-        </div>
-        
-        <Skeleton className="h-14 w-full mb-6 rounded-lg opacity-70" />
-        
-        <div className="rounded-md border bg-card/30 border-border/50">
-          <div className="h-12 border-b border-border/50 flex items-center px-4 py-2">
-            <Skeleton className="h-5 w-5 rounded-md opacity-70" />
-            <Skeleton className="h-5 w-32 ml-4 rounded-md opacity-70" />
-          </div>
-          {Array(5).fill(0).map((_, i) => (
-            <div key={i} className="border-b border-border/50 px-4 py-4 flex justify-between items-center">
-              <div className="flex items-center gap-4">
-                <Skeleton className="h-5 w-5 rounded-md opacity-70" />
-                <div>
-                  <Skeleton className="h-5 w-36 mb-2 rounded-md opacity-70" />
-                  <Skeleton className="h-4 w-24 rounded-md opacity-70" />
-                </div>
-              </div>
-              <Skeleton className="h-6 w-20 rounded-full opacity-70" />
-            </div>
-          ))}
-        </div>
-      </div>
-    );
+    return <ClientsTableSkeleton />;
   }
 
   return (
@@ -142,28 +113,14 @@ export function ClientsTable({
       />
       
       {selectedClients.length > 0 && (
-        <div className="flex items-center gap-2 mb-4 py-2.5 px-4 rounded-lg bg-card/30 border border-border/50 shadow-sm backdrop-blur-sm">
-          <span className="text-sm font-medium text-muted-foreground">
-            {selectedClients.length} clients selected
-          </span>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleDeleteSelected} 
-            className="border-border/50 text-destructive hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
-          >
-            <Trash2 className="h-4 w-4 mr-1.5" />
-            Delete
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="border-border/50 text-muted-foreground hover:bg-muted/50"
-          >
-            <Download className="h-4 w-4 mr-1.5" />
-            Export
-          </Button>
-        </div>
+        <BulkActionsBar
+          selectedCount={selectedClients.length}
+          onDeleteSelected={handleDeleteSelected}
+          onExportSelected={() => {
+            // Placeholder for export logic
+            // You may later want to wire up actual export functionality
+          }}
+        />
       )}
       
       <div ref={tableContainerRef} className="relative rounded-lg overflow-hidden border border-border/30 bg-background/30 shadow-sm backdrop-blur-sm">
@@ -182,7 +139,6 @@ export function ClientsTable({
               sortDirection={viewPreference.sortDirection}
               moveColumn={moveColumn}
             />
-            
             <ClientTableBody
               clients={clients}
               visibleColumns={visibleColumns}
@@ -204,7 +160,6 @@ export function ClientsTable({
         totalPages={totalPages}
         onPageChange={setPage}
       />
-      
       <ClientAddForm 
         open={isAddClientOpen} 
         onOpenChange={setIsAddClientOpen} 
