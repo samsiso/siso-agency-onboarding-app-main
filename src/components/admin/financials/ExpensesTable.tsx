@@ -31,6 +31,12 @@ import {
   MoreHorizontal,
   Pencil,
   Trash,
+  Eye,
+  Send,
+  Clock,
+  Check,
+  AlertCircle,
+  Loader2,
 } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 import { Input } from "@/components/ui/input";
@@ -118,10 +124,15 @@ const columns: ColumnDef<FinancialTransaction>[] = [
               <Pencil className="mr-2 h-4 w-4" /> Edit
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={async () => {
+              onClick={async (e) => {
+                // Get onDataChange from props via context
+                const table = e.currentTarget.closest('table');
+                const expensesTable = table?.closest('[data-expenses-table]');
+                const onDataChange = expensesTable?.getAttribute('data-onDataChange');
+                
                 const success = await deleteTransaction(expense.id);
-                if (success) {
-                  // Access onDataChange from props
+                if (success && onDataChange) {
+                  // Access onDataChange from the component's props
                   await onDataChange();
                 }
               }}
@@ -166,6 +177,14 @@ export function ExpensesTable({ expenses, isLoading, onDataChange }: ExpensesTab
     setCategoryFilter(category);
   };
 
+  // Create a function to handle deletion via the dropdown menu
+  const handleDelete = async (id: string) => {
+    const success = await deleteTransaction(id);
+    if (success) {
+      await onDataChange();
+    }
+  };
+
   const table = useReactTable({
     data: filteredExpenses,
     columns,
@@ -178,7 +197,7 @@ export function ExpensesTable({ expenses, isLoading, onDataChange }: ExpensesTab
   });
 
   return (
-    <Card>
+    <Card data-expenses-table={true} data-onDataChange={onDataChange?.toString()}>
       <CardHeader>
         <CardTitle>Expenses</CardTitle>
         <CardDescription>

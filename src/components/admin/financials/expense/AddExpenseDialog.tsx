@@ -19,7 +19,7 @@ interface AddExpenseDialogProps {
 export function AddExpenseDialog({ onExpenseAdded }: AddExpenseDialogProps) {
   const [open, setOpen] = useState(false);
 
-  const handleExpenseAdded = () => {
+  const handleSuccess = async () => {
     // Close the dialog when expense is added
     setOpen(false);
     // Call the parent's callback if provided
@@ -43,7 +43,7 @@ export function AddExpenseDialog({ onExpenseAdded }: AddExpenseDialogProps) {
             Enter the details for the new expense.
           </DialogDescription>
         </DialogHeader>
-        <ExpenseForm onExpenseAdded={handleExpenseAdded} />
+        <ExpenseForm onSuccess={handleSuccess} />
       </DialogContent>
     </Dialog>
   );
