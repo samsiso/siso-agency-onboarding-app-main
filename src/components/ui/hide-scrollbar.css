@@ -1,11 +1,17 @@
 
-/* Hide scrollbar for Chrome, Safari and Opera */
+/* Hide scrollbars while preserving functionality */
 .hide-scrollbar::-webkit-scrollbar {
-  display: none;
+  display: none; /* Chrome, Safari, Opera */
 }
 
-/* Hide scrollbar for IE, Edge and Firefox */
 .hide-scrollbar {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
+}
+
+/* Cell keyboard navigation focus style */
+.cell-focus-visible:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: -1px;
+  z-index: 10;
 }
