@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { 
   Table, 
@@ -42,6 +41,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+import { Plus } from "lucide-react";
+import { AddRevenueDialog } from "./revenue/AddRevenueDialog";
+
 interface RevenueTableProps {
   revenues: FinancialTransaction[];
   isLoading?: boolean;
@@ -53,6 +55,7 @@ export function RevenueTable({ revenues = [], isLoading = false, onDataChange }:
   const [viewDetailsId, setViewDetailsId] = useState<string | null>(null);
   const [sortField, setSortField] = useState<string>("date");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+  const [showAddDialog, setShowAddDialog] = useState(false);
 
   // Get the revenue being viewed in the details dialog
   const revenueDetails = viewDetailsId 
@@ -128,12 +131,19 @@ export function RevenueTable({ revenues = [], isLoading = false, onDataChange }:
             <FileDown className="h-4 w-4 mr-2" />
             Export
           </Button>
-          <Button size="sm" className="h-9">
-            <FilePlus className="h-4 w-4 mr-2" />
+          <Button size="sm" className="h-9" onClick={() => setShowAddDialog(true)}>
+            <Plus className="h-4 w-4 mr-2" />
             Add Revenue
           </Button>
         </div>
       </div>
+
+      {/* Add Revenue Dialog */}
+      <AddRevenueDialog 
+        open={showAddDialog} 
+        onOpenChange={setShowAddDialog} 
+        onRevenueAdded={onDataChange || (() => {})} 
+      />
 
       <div className="rounded-md border">
         <Table>
