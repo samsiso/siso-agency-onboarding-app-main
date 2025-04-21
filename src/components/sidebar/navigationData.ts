@@ -1,7 +1,7 @@
 
 import { 
   Home, Layout, Briefcase, Folder, CreditCard, 
-  Trophy, Users, HelpCircle, Settings
+  Trophy, Users, HelpCircle
 } from 'lucide-react';
 import { MenuSection } from './types';
 
@@ -59,8 +59,8 @@ export const getMenuSections = (): MenuSection[] => {
     },
     {
       type: 'section',
-      title: 'Support & Settings',
-      icon: Settings,
+      title: 'Support & Changelog',
+      icon: HelpCircle,
       items: [
         {
           href: '/help',
@@ -68,9 +68,9 @@ export const getMenuSections = (): MenuSection[] => {
           label: 'Help & Support',
         },
         {
-          href: '/profile',
-          icon: Settings,
-          label: 'Profile',
+          href: '/changelog',
+          icon: CreditCard,
+          label: 'Changelog',
         }
       ]
     }
