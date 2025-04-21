@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AdminLayout } from '@/components/admin/layout/AdminLayout';
@@ -11,9 +12,6 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { ClientsCardGrid } from "@/components/admin/clients/ClientsCardGrid";
 import { Button } from '@/components/ui/button';
-
-import { useAdminCheck } from '@/hooks/useAdminCheck';
-import { Loader2 } from 'lucide-react';
 import { AdminClientsView } from '@/components/admin/clients/AdminClientsView';
 
 export default function AdminClients() {
