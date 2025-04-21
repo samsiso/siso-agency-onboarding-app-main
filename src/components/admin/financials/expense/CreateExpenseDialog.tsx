@@ -1,18 +1,16 @@
 
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { FilePlus } from "lucide-react";
-import { useState } from "react";
 import { ExpenseForm } from "./ExpenseForm";
-import { toast } from "@/components/ui/use-toast";
+import { useState } from "react";
 
 interface CreateExpenseDialogProps {
   onDataChange: () => Promise<void>;
@@ -22,11 +20,9 @@ export function CreateExpenseDialog({ onDataChange }: CreateExpenseDialogProps) 
   const [open, setOpen] = useState(false);
 
   const handleSuccess = async () => {
-    toast({
-      title: "Expense Created",
-      description: "Your expense has been successfully created.",
-    });
+    // Close the dialog when expense is added
     setOpen(false);
+    // Call the parent's callback if provided
     await onDataChange();
   };
 
@@ -38,19 +34,14 @@ export function CreateExpenseDialog({ onDataChange }: CreateExpenseDialogProps) 
           Add Expense
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-md">
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Add New Expense</DialogTitle>
           <DialogDescription>
-            Enter the details for your new expense.
+            Enter the details for the new expense.
           </DialogDescription>
         </DialogHeader>
         <ExpenseForm onSuccess={handleSuccess} />
-        <DialogFooter className="mt-5">
-          <Button variant="outline" onClick={() => setOpen(false)}>
-            Cancel
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

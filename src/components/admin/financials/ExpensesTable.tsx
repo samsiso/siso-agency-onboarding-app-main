@@ -124,16 +124,27 @@ const columns: ColumnDef<FinancialTransaction>[] = [
               <Pencil className="mr-2 h-4 w-4" /> Edit
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={async (e) => {
-                // Get onDataChange from props via context
-                const table = e.currentTarget.closest('table');
-                const expensesTable = table?.closest('[data-expenses-table]');
-                const onDataChange = expensesTable?.getAttribute('data-onDataChange');
-                
-                const success = await deleteTransaction(expense.id);
-                if (success && onDataChange) {
-                  // Access onDataChange from the component's props
-                  await onDataChange();
+              onClick={(e) => {
+                // Get the expensesTable component to access the onDataChange prop
+                const tableComponent = document.querySelector('[data-expenses-table]');
+                if (tableComponent) {
+                  // Use the handler from the component's instance, not from data attribute
+                  const table = e.currentTarget.closest('[data-expenses-table-id]');
+                  const tableId = table?.getAttribute('data-expenses-table-id');
+                  
+                  // Delete transaction and refresh data
+                  const handleDelete = async () => {
+                    const success = await deleteTransaction(expense.id);
+                    if (success) {
+                      // Use global event to notify the table to refresh
+                      const event = new CustomEvent('expense-deleted', { 
+                        detail: { id: expense.id } 
+                      });
+                      document.dispatchEvent(event);
+                    }
+                  };
+                  
+                  handleDelete();
                 }
               }}
             >
@@ -157,6 +168,19 @@ export function ExpensesTable({ expenses, isLoading, onDataChange }: ExpensesTab
     setViewDetailsId,
     filteredExpenses,
   } = useExpensesTableData(expenses);
+
+  // Listen for expense-deleted events
+  useEffect(() => {
+    const handleExpenseDeleted = (event: Event) => {
+      onDataChange();
+    };
+    
+    document.addEventListener('expense-deleted', handleExpenseDeleted);
+    
+    return () => {
+      document.removeEventListener('expense-deleted', handleExpenseDeleted);
+    };
+  }, [onDataChange]);
 
   // Auto categorize expenses
   const categorizedExpenses = useMemo(() => {
@@ -197,7 +221,7 @@ export function ExpensesTable({ expenses, isLoading, onDataChange }: ExpensesTab
   });
 
   return (
-    <Card data-expenses-table={true} data-onDataChange={onDataChange?.toString()}>
+    <Card data-expenses-table-id="expenses-main-table">
       <CardHeader>
         <CardTitle>Expenses</CardTitle>
         <CardDescription>
