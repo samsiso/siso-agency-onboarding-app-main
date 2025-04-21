@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Loader2, Users } from 'lucide-react';
 import { ClientViewPreference } from '@/types/client.types';
@@ -11,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { ViewModeSwitcher } from './ViewModeSwitcher';
 import { AirtableClientsTable } from './AirtableClientsTable';
+import { SpotTable } from "./SpotTable";
 
 interface AdminClientsViewProps {
   isAdmin: boolean;
@@ -126,16 +126,22 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
       />
       {viewMode === "table" ? (
         <>
-          {/* NEW: Clients title, icon, and description, matching the cards view */}
-          <div className="flex items-center mb-5 gap-3">
-            <div className="h-11 w-11 rounded-full bg-primary/15 flex items-center justify-center shadow-sm">
-              <Users className="h-6 w-6 text-primary" />
+          {/* NEW: Horizontal flex layout for Clients header/desc + SpotTable */}
+          <div className="flex flex-col md:flex-row md:items-start mb-5 gap-4 md:gap-9">
+            <div className="flex items-center gap-3 flex-1">
+              <div className="h-11 w-11 rounded-full bg-primary/15 flex items-center justify-center shadow-sm">
+                <Users className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold tracking-tight">Clients</h2>
+                <p className="text-sm text-muted-foreground mt-0.5">
+                  Manage your agency’s client data, statuses, and project details.
+                </p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-2xl font-bold tracking-tight">Clients</h2>
-              <p className="text-sm text-muted-foreground mt-0.5">
-                Manage your agency’s client data, statuses, and project details.
-              </p>
+            {/* Show SpotTable on right, hide on mobile */}
+            <div className="hidden md:block">
+              <SpotTable />
             </div>
           </div>
           <AirtableClientsTable
@@ -147,7 +153,6 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
         </>
       ) : (
         <div>
-          {/* Title and icon for Cards view */}
           <div className="flex items-center mb-5 gap-3">
             <div className="h-11 w-11 rounded-full bg-primary/15 flex items-center justify-center shadow-sm">
               <Users className="h-6 w-6 text-primary" />
