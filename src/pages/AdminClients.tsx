@@ -12,6 +12,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { ClientsCardGrid } from "@/components/admin/clients/ClientsCardGrid";
 import { Button } from '@/components/ui/button';
+import { Users } from 'lucide-react';
 
 export default function AdminClients() {
   const { isAdmin, isLoading } = useAdminCheck();
@@ -181,12 +182,21 @@ export default function AdminClients() {
             />
           </DndProvider>
         ) : (
-          <ClientsCardGrid
-            searchQuery={searchQuery}
-            statusFilter={statusFilter}
-            sortColumn={viewPreference.sortColumn}
-            sortDirection={viewPreference.sortDirection}
-          />
+          <div>
+            {/* Title and icon for Cards view */}
+            <div className="flex items-center mb-5 gap-3">
+              <div className="h-11 w-11 rounded-full bg-primary/15 flex items-center justify-center shadow-sm">
+                <Users className="h-6 w-6 text-primary" />
+              </div>
+              <h2 className="text-2xl font-bold tracking-tight">Clients</h2>
+            </div>
+            <ClientsCardGrid
+              searchQuery={searchQuery}
+              statusFilter={statusFilter}
+              sortColumn={viewPreference.sortColumn}
+              sortDirection={viewPreference.sortDirection}
+            />
+          </div>
         )}
       </div>
     </AdminLayout>
