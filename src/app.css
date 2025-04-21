@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -177,6 +178,64 @@
   box-shadow: 0 0 0 2px #4f46e5;
 }
 
+/* Airtable-like styles */
+.airtable-grid {
+  --grid-bg: #f9fafb;
+  --header-bg: #edf2f7;
+  --cell-border: #e5e7eb;
+  --row-hover: #f3f4f6;
+  --selection-color: #ebf4ff;
+  --focus-color: #3b82f6;
+}
+
+.dark .airtable-grid {
+  --grid-bg: #1a1b26;
+  --header-bg: #1e212f;
+  --cell-border: #2d3748;
+  --row-hover: #252a3c;
+  --selection-color: #2d3748;
+  --focus-color: #4f46e5;
+}
+
+.airtable-grid table {
+  border-spacing: 0;
+  width: 100%;
+}
+
+.airtable-grid th {
+  background-color: var(--header-bg);
+  border-bottom: 1px solid var(--cell-border);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  box-shadow: 0 1px 0 var(--cell-border);
+}
+
+.airtable-grid td {
+  border-bottom: 1px solid var(--cell-border);
+  border-right: 1px solid var(--cell-border);
+  transition: all 0.2s;
+}
+
+.airtable-grid tr:hover td {
+  background-color: var(--row-hover);
+}
+
+.airtable-grid tr[data-state="selected"] td {
+  background-color: var(--selection-color);
+}
+
+.airtable-grid td[data-editing="true"] {
+  padding: 0;
+  box-shadow: 0 0 0 2px var(--focus-color);
+  z-index: 10;
+  position: relative;
+}
+
 /* Resizable columns */
 .resizable-header {
   position: relative;
@@ -194,4 +253,58 @@
 .resize-handle:hover,
 .resize-handle.active {
   background-color: rgba(79, 70, 229, 0.3);
+}
+
+/* Dropdown menus in headers */
+th:hover .header-column-menu {
+  opacity: 1;
+}
+
+.header-column-menu {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+/* Keyboard navigation highlight */
+.cell-focused {
+  box-shadow: inset 0 0 0 2px var(--focus-color);
+}
+
+/* Cell types */
+.cell-text {
+  font-family: inherit;
+}
+
+.cell-number {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.cell-date {
+  font-variant-numeric: tabular-nums;
+}
+
+.cell-select {}
+
+.cell-checkbox {
+  text-align: center;
+}
+
+/* Add row style */
+.add-row-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--muted-foreground);
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.add-row-button:hover {
+  color: var(--foreground);
+  background-color: var(--row-hover);
 }

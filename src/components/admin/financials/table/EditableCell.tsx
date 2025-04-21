@@ -87,8 +87,8 @@ export function EditableCell({
   return (
     <TableCell 
       className={cn(
-        "cell-editable transition-all",
-        isEditing && "cell-editing p-0",
+        "cell-editable relative border-r border-border/10 transition-all",
+        isEditing ? "p-0 z-20" : "cursor-cell hover:bg-blue-50/10",
         className
       )} 
       align={align}
@@ -104,7 +104,7 @@ export function EditableCell({
               onBlur={handleBlur}
               onKeyDown={handleKeyDown}
               className={cn(
-                "w-full h-full p-2 focus:outline-none focus:ring-0 border-0 bg-white",
+                "w-full h-full px-3 py-2 focus:outline-none focus:ring-0 border-0 bg-white dark:bg-gray-800",
                 inputClassName
               )}
             >
@@ -124,28 +124,29 @@ export function EditableCell({
               className={cn(
                 "border-0 shadow-none focus:ring-0 h-full rounded-none",
                 "focus-visible:ring-0 focus-visible:ring-offset-0",
+                "bg-blue-50/30 dark:bg-blue-900/20",
                 inputClassName
               )}
             />
           )}
           
-          <div className="flex items-center border-l border-border/20">
+          <div className="flex items-center border-l border-border/20 bg-background">
             <button 
               onClick={commitChange}
-              className="p-1 hover:bg-green-50 text-green-600"
+              className="p-1.5 hover:bg-green-50 hover:dark:bg-green-900/20 text-green-600"
             >
               <Check className="h-4 w-4" />
             </button>
             <button 
               onClick={() => setIsEditing(false)}
-              className="p-1 hover:bg-red-50 text-red-600"
+              className="p-1.5 hover:bg-red-50 hover:dark:bg-red-900/20 text-red-600"
             >
               <X className="h-4 w-4" />
             </button>
           </div>
         </div>
       ) : (
-        <div className="px-1 py-0.5">{formattedValue}</div>
+        <div className="px-3 py-2.5">{formattedValue}</div>
       )}
     </TableCell>
   );

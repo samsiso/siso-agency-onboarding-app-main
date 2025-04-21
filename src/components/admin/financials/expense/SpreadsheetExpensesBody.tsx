@@ -73,11 +73,12 @@ export function SpreadsheetExpensesBody({
           <TableRow 
             key={expense.id}
             className={cn(
+              "transition-colors hover:bg-muted/5",
               isSelected ? "bg-muted/20" : ""
             )}
             data-state={isSelected ? "selected" : undefined}
           >
-            <td className="sticky left-0 bg-inherit z-10 w-10 p-2 text-center">
+            <td className="sticky left-0 bg-inherit z-10 w-10 p-2 text-center border-r border-border/10">
               <Checkbox 
                 checked={isSelected}
                 onCheckedChange={() => onSelectExpense(expense.id)}
@@ -149,11 +150,7 @@ export function SpreadsheetExpensesBody({
                       value={expense.recurring_type || "one-time"}
                       onChange={(value) => handleCellUpdate(expense.id, "recurring_type", value)}
                       type="select"
-                      options={[
-                        { value: "one-time", label: "One-Time" },
-                        { value: "monthly", label: "Monthly" },
-                        { value: "annual", label: "Annual" }
-                      ]}
+                      options={recurringOptions}
                       formatter={(value) => (
                         <Badge className={cn("font-medium", getBadgeColor(value))}>
                           {value === 'monthly' ? 'Monthly' : 
@@ -183,7 +180,7 @@ export function SpreadsheetExpensesBody({
 
                 default:
                   return (
-                    <td key={`${expense.id}-${column.key}`}>—</td>
+                    <td key={`${expense.id}-${column.key}`} className="border-r border-border/10 px-3 py-2.5">—</td>
                   );
               }
             })}
