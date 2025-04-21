@@ -1,251 +1,285 @@
-
-import { useState, useEffect } from "react";
-import { Table, TableBody, TableHeader } from "@/components/ui/table";
-import { deleteTransaction } from "@/utils/financial";
-import { ExpenseDetailsDialog } from "./ExpenseDetailsDialog";
-import { useExpensesSort } from "@/hooks/useExpensesSort";
-import { useTableColumns } from "@/hooks/useTableColumns";
-import { useTableViews } from "@/hooks/useTableViews";
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+  SortingState,
+  getSortedRowModel,
+} from "@tanstack/react-table";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import {
+  ArrowDown,
+  ArrowUp,
+  ChevronsUpDown,
+  Copy,
+  MoreHorizontal,
+  Pencil,
+  Trash,
+} from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
+import { Input } from "@/components/ui/input";
 import { useExpensesTableData } from "@/hooks/useExpensesTableData";
-import { ExpensesTableHeader } from "./expense/ExpensesTableHeader";
-import { ExpensesTableLoading } from "./expense/ExpensesTableLoading";
-import { SpreadsheetTable } from "./table/SpreadsheetTable";
-import { ExpensesFinanceToolbar } from "./table/ExpensesFinanceToolbar";
-import { SpreadsheetExpensesBody } from "./expense/SpreadsheetExpensesBody";
-import { AddExpenseRow } from "./expense/AddExpenseRow";
+import { FinancialTransaction } from "@/utils/financial";
+import { formatCurrency } from "@/lib/formatters";
+import { Badge } from "@/components/ui/badge";
+import { deleteTransaction } from "@/utils/financial";
+import { toast } from "@/components/ui/use-toast";
+import { CreateExpenseDialog } from "./expense/CreateExpenseDialog";
 import { categorizeExpenses } from "@/utils/financial/expenseCategories";
 
-export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }) {
-  const [selectedExpenses, setSelectedExpenses] = useState<string[]>([]);
-  const [categorizedExpenses, setCategorizedExpenses] = useState<any[]>([]);
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  
-  // Define the initial columns configuration with pinning capability
-  const initialColumns = [
-    { key: "description", label: "Expense Name", visible: true, pinned: true, width: 180 },
-    { key: "category", label: "Category", visible: true, width: 150 },
-    { key: "amount", label: "Amount", visible: true, width: 120 },
-    { key: "date", label: "Date", visible: true, width: 120 },
-    { key: "recurring_type", label: "Recurrence", visible: true, width: 150 },
-    { key: "vendor", label: "Vendor", visible: true, width: 150 },
-    { key: "payment_method", label: "Payment Method", visible: true, width: 150 },
-    { key: "notes", label: "Notes", visible: false, width: 200 }
-  ];
+interface ExpensesTableProps {
+  expenses: FinancialTransaction[];
+  isLoading: boolean;
+  onDataChange: () => Promise<void>;
+}
 
-  const { columns, visibleColumns, updateColumnVisibility } = useTableColumns(initialColumns);
-  const { views, currentView, loadViews, saveView, selectView } = useTableViews("expenses");
-  const { sortField, sortDirection, handleSort, sortedExpenses } = useExpensesSort(expenses || []);
-  
-  // Categorize expenses when they change
-  useEffect(() => {
-    if (Array.isArray(expenses)) {
-      const categorized = categorizeExpenses(expenses);
-      setCategorizedExpenses(categorized);
-    }
-  }, [expenses]);
+// Define columns for the table
+const columns: ColumnDef<FinancialTransaction>[] = [
+  {
+    accessorKey: "date",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Date
+          <ChevronsUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+  },
+  {
+    accessorKey: "description",
+    header: "Description",
+  },
+  {
+    accessorKey: "category.name",
+    header: "Category",
+  },
+  {
+    accessorKey: "vendor.name",
+    header: "Vendor",
+  },
+  {
+    accessorKey: "amount",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Amount
+          <ChevronsUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => formatCurrency(row.getValue("amount") as number, "GBP"),
+  },
+  {
+    id: "actions",
+    header: "Actions",
+    cell: ({ row }) => {
+      const expense = row.original;
 
-  // Log received expenses for debugging
-  useEffect(() => {
-    console.log(`ExpensesTable received ${expenses?.length || 0} expenses`);
-  }, [expenses]);
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuItem
+              onClick={() => navigator.clipboard.writeText(expense.id)}
+            >
+              <Copy className="mr-2 h-4 w-4" /> Copy Transaction ID
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>
+              <Pencil className="mr-2 h-4 w-4" /> Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={async () => {
+                const success = await deleteTransaction(expense.id);
+                if (success) {
+                  await onDataChange();
+                }
+              }}
+            >
+              <Trash className="mr-2 h-4 w-4" /> Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    },
+  },
+];
 
-  const { 
-    searchQuery, 
-    setSearchQuery, 
-    viewDetailsId, 
-    setViewDetailsId,
+export function ExpensesTable({ expenses, isLoading, onDataChange }: ExpensesTableProps) {
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const {
+    searchQuery,
+    setSearchQuery,
     categoryFilter,
     setCategoryFilter,
-    filteredExpenses 
-  } = useExpensesTableData(
-    activeCategory ? 
-      categorizedExpenses.filter(exp => 
-        exp.detected_category === activeCategory
-      ) : 
-      sortedExpenses
-  );
+    viewDetailsId,
+    setViewDetailsId,
+    filteredExpenses,
+  } = useExpensesTableData(expenses);
 
-  // Function to handle view selection
-  const handleApplyView = (view) => {
-    setSearchQuery(view.filters?.searchQuery || '');
-    setCategoryFilter(view.filters?.categoryFilter || '');
-    selectView(view);
-  };
+  // Auto categorize expenses
+  const categorizedExpenses = useMemo(() => {
+    return categorizeExpenses(expenses);
+  }, [expenses]);
 
-  // Load views when component mounts
-  useEffect(() => {
-    loadViews();
-  }, []);
-
-  // Get the expense being viewed in the details dialog
-  const expenseDetails = viewDetailsId 
-    ? expenses?.find(expense => expense?.id === viewDetailsId) 
-    : null;
-
-  // Handle expense deletion
-  const handleDelete = async (id: string) => {
-    if (window.confirm("Are you sure you want to delete this expense?")) {
-      const success = await deleteTransaction(id);
-      if (success && onDataChange) {
-        onDataChange();
-      }
-    }
-  };
-  
-  // Handle selecting all expenses
-  const handleSelectAll = () => {
-    if (selectedExpenses.length === filteredExpenses.length) {
-      setSelectedExpenses([]);
-    } else {
-      setSelectedExpenses(filteredExpenses.map(expense => expense.id));
-    }
-  };
-  
-  // Handle selecting individual expense
-  const handleSelectExpense = (expenseId: string) => {
-    setSelectedExpenses(prev => 
-      prev.includes(expenseId)
-        ? prev.filter(id => id !== expenseId)
-        : [...prev, expenseId]
-    );
-  };
-  
-  // Handle multiple expenses deletion
-  const handleDeleteSelected = async () => {
-    if (selectedExpenses.length === 0) return;
-    
-    if (window.confirm(`Are you sure you want to delete ${selectedExpenses.length} selected expenses?`)) {
-      let success = true;
-      for (const id of selectedExpenses) {
-        const result = await deleteTransaction(id);
-        if (!result) success = false;
-      }
-      
-      if (success && onDataChange) {
-        onDataChange();
-        setSelectedExpenses([]);
-      }
-    }
-  };
-
-  // Handle expense update (after inline editing)
-  const handleUpdateExpense = async (expenseId: string, field: string, value: any) => {
-    console.log("Update expense:", expenseId, field, value);
-    // TODO: Implement actual API call to update expense
-    // For now just show it's working via console
-  };
-
-  // Get category summary data - fixed to ensure proper typing
-  const categorySummary = Object.entries(
+  // Get category summary data
+  const categorySummary: [string, number][] = Object.entries(
     categorizedExpenses.reduce((acc: Record<string, number>, expense) => {
       const category = expense.detected_category || 'Uncategorized';
       acc[category] = (acc[category] || 0) + expense.amount;
       return acc;
     }, {})
-  ).sort((a, b) => b[1] as number - a[1] as number);
+  ).sort((a, b) => b[1] - a[1]);
 
   // Handle category filter change
   const handleCategoryChange = (category: string | null) => {
-    setActiveCategory(category);
+    setCategoryFilter(category);
   };
 
+  const table = useReactTable({
+    data: filteredExpenses,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    onSortingChange: setSorting,
+    state: {
+      sorting,
+    },
+  });
+
   return (
-    <div className="space-y-6">
-      <ExpensesFinanceToolbar
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        columns={columns}
-        onColumnVisibilityChange={updateColumnVisibility}
-        savedViews={views}
-        onViewSelect={handleApplyView}
-        onViewSave={(name) => saveView(name, {
-          filters: { searchQuery, categoryFilter },
-          columns
-        })}
-        selectedCount={selectedExpenses.length}
-        onDeleteSelected={handleDeleteSelected}
-        onAddExpense={() => {}}
-        onExport={() => alert("Export feature coming soon")}
-        categorySummary={categorySummary}
-        activeCategory={activeCategory}
-        onCategoryChange={handleCategoryChange}
-      />
+    <Card>
+      <CardHeader>
+        <CardTitle>Expenses</CardTitle>
+        <CardDescription>
+          Manage your company expenses. Total expenses:{" "}
+          {formatCurrency(
+            expenses.reduce((acc, expense) => acc + expense.amount, 0),
+            "GBP"
+          )}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 md:space-x-4">
+          <Input
+            type="search"
+            placeholder="Search expenses..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="max-w-sm"
+          />
+          <div className="flex items-center space-x-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="h-10">
+                  {categoryFilter || "Filter by Category"}
+                  <ChevronsUpDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Filter</DropdownMenuLabel>
+                <DropdownMenuItem onClick={() => handleCategoryChange(null)}>
+                  All Categories
+                </DropdownMenuItem>
+                {categorySummary.map(([category, total]) => (
+                  <DropdownMenuItem
+                    key={category}
+                    onClick={() => handleCategoryChange(category)}
+                  >
+                    {category} ({formatCurrency(total, "GBP")})
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <CreateExpenseDialog onDataChange={onDataChange} />
+          </div>
+        </div>
 
-      <div className="spreadsheet-container">
-        <SpreadsheetTable showGrid containerClassName="border-none shadow rounded-md">
-          <Table variant="striped" size="sm">
-            <TableHeader>
-              <ExpensesTableHeader 
-                visibleColumns={visibleColumns}
-                onSort={handleSort}
-                selectedExpenses={selectedExpenses}
-                expenses={filteredExpenses}
-                onSelectAll={handleSelectAll}
-                sortColumn={sortField}
-                sortDirection={sortDirection}
-              />
-            </TableHeader>
-            <TableBody>
-              {/* Always show "Add Expense" row at the top */}
-              <AddExpenseRow 
-                onExpenseAdded={onDataChange}
-                visibleColumns={visibleColumns}
-              />
+        <div className="relative w-full overflow-auto mt-4">
+          <table className="w-full table-auto border-collapse text-sm">
+            <thead>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <th key={header.id} className="px-4 py-2 text-left">
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </th>
+                    );
+                  })}
+                </tr>
+              ))}
+            </thead>
+            <tbody>
               {isLoading ? (
-                <ExpensesTableLoading colSpan={visibleColumns.length + 1} />
+                <tr>
+                  <td
+                    colSpan={columns.length}
+                    className="text-center py-4 italic text-muted-foreground"
+                  >
+                    Loading expenses...
+                  </td>
+                </tr>
+              ) : filteredExpenses.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={columns.length}
+                    className="text-center py-4 italic text-muted-foreground"
+                  >
+                    No expenses found.
+                  </td>
+                </tr>
               ) : (
-                <SpreadsheetExpensesBody
-                  expenses={filteredExpenses}
-                  visibleColumns={visibleColumns}
-                  onViewDetails={setViewDetailsId}
-                  onDelete={handleDelete}
-                  selectedExpenses={selectedExpenses}
-                  onSelectExpense={handleSelectExpense}
-                  onUpdateExpense={handleUpdateExpense}
-                />
+                table.getRowModel().rows.map((row) => (
+                  <tr key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <td key={cell.id} className="px-4 py-2">
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))
               )}
-            </TableBody>
-          </Table>
-        </SpreadsheetTable>
-      </div>
-
-      <ExpenseDetailsDialog 
-        expense={expenseDetails}
-        isOpen={!!viewDetailsId}
-        onOpenChange={(open) => !open && setViewDetailsId(null)}
-      />
-      
-      <style dangerouslySetInnerHTML={{ __html: `
-        .spreadsheet-container {
-          overflow: hidden;
-          border-radius: 0.5rem;
-          background: #121212;
-          max-height: calc(100vh - 350px);
-        }
-        
-        /* Custom scrollbar for spreadsheet */
-        .spreadsheet-container ::-webkit-scrollbar {
-          width: 8px;
-          height: 8px;
-        }
-        
-        .spreadsheet-container ::-webkit-scrollbar-track {
-          background: #1a1a1a;
-        }
-        
-        .spreadsheet-container ::-webkit-scrollbar-thumb {
-          background: #333333;
-          border-radius: 4px;
-        }
-        
-        .spreadsheet-container ::-webkit-scrollbar-thumb:hover {
-          background: #555555;
-        }
-        
-        .spreadsheet-container ::-webkit-scrollbar-corner {
-          background: #1a1a1a;
-        }
-      `}} />
-    </div>
+            </tbody>
+          </table>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
