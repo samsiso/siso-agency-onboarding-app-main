@@ -59,6 +59,8 @@ import { ClientData } from "@/types/client.types";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
+import { ViewClientCard } from "./ViewClientCard";
+
 // Map status to badge color
 function statusToBadge(status: string) {
   switch (status) {
@@ -149,23 +151,12 @@ const columns: ColumnDef<TableClient>[] = [
     },
     size: 120,
   },
-  // New column with button linking to client detail page
   {
     id: "viewClient",
     header: "Client Page",
     cell: ({ row }) => {
-      const clientId = row.original.id;
-      return (
-        <a
-          href={`/admin/clients/${clientId}`}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Button size="sm" variant="outline" className="whitespace-nowrap">
-            Go to client page
-          </Button>
-        </a>
-      );
+      // Use new card component that matches "active" badge styling and in-app navigation
+      return <ViewClientCard clientId={row.original.id} />;
     },
     size: 130,
     enableSorting: false,
