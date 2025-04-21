@@ -32,7 +32,7 @@ export function useExpensesTableData(expenses: FinancialTransaction[] = []) {
       
       // Apply category filter if one is selected
       const matchesCategory = !categoryFilter || 
-        expense.detected_category === categoryFilter;
+        (expense.detected_category === categoryFilter);
       
       return matchesSearch && matchesCategory;
     });

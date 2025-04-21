@@ -1,7 +1,6 @@
-
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Charts } from "./Charts";
+import { AreaChart } from "./Charts";
 import { useEffect, useState } from "react";
 import { fetchTransactions, FinancialTransaction } from "@/utils/financial";
 import { SoftwareExpenseStats } from "./SoftwareExpenseStats";
@@ -153,7 +152,11 @@ export function FinancialsDashboard() {
             <CardTitle>Revenue vs. Expenses</CardTitle>
           </CardHeader>
           <CardContent>
-            <Charts transactions={filteredTransactions} period={period} />
+            <AreaChart data={filteredTransactions.map(t => ({
+              name: new Date(t.date).toLocaleDateString('en-US', { month: 'short' }),
+              revenue: t.type === 'revenue' ? t.amount : 0,
+              expense: t.type === 'expense' ? t.amount : 0,
+            }))} />
           </CardContent>
         </Card>
         

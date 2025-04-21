@@ -135,14 +135,14 @@ export function ExpensesTable({ expenses = [], isLoading = false, onDataChange }
     // For now just show it's working via console
   };
 
-  // Get category summary data
+  // Get category summary data - fixed to ensure proper typing
   const categorySummary = Object.entries(
-    categorizedExpenses.reduce((acc, expense) => {
+    categorizedExpenses.reduce((acc: Record<string, number>, expense) => {
       const category = expense.detected_category || 'Uncategorized';
       acc[category] = (acc[category] || 0) + expense.amount;
       return acc;
     }, {})
-  ).sort((a, b) => (b[1] as number) - (a[1] as number));
+  ).sort((a, b) => b[1] as number - a[1] as number);
 
   // Handle category filter change
   const handleCategoryChange = (category: string | null) => {

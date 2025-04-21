@@ -9,6 +9,12 @@ interface SoftwareExpenseStatsProps {
   expenses: FinancialTransaction[];
 }
 
+interface CategoryData {
+  total: number;
+  count: number;
+  expenses: FinancialTransaction[];
+}
+
 export function SoftwareExpenseStats({ expenses }: SoftwareExpenseStatsProps) {
   const categorizedExpenses = getExpensesByCategory(expenses);
   
@@ -18,8 +24,8 @@ export function SoftwareExpenseStats({ expenses }: SoftwareExpenseStatsProps) {
     .filter(([category]) => softwareCategories.includes(category))
     .map(([category, data]) => ({
       name: category,
-      value: data.total,
-      count: data.count
+      value: (data as CategoryData).total,
+      count: (data as CategoryData).count
     }))
     .sort((a, b) => b.value - a.value);
   

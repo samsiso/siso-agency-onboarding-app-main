@@ -89,6 +89,13 @@ export const VENDOR_CATEGORY_MAPPING = {
   "proxy": OTHER_CATEGORIES.SERVICES,
 };
 
+// Define return type for getExpensesByCategory
+interface CategorySummary {
+  total: number;
+  count: number;
+  expenses: FinancialTransaction[];
+}
+
 /**
  * Auto-categorize expenses based on vendor name and description
  */
@@ -137,9 +144,9 @@ export function categorizeExpenses(expenses: FinancialTransaction[]): FinancialT
 /**
  * Get summary of expenses by category
  */
-export function getExpensesByCategory(expenses: FinancialTransaction[]) {
+export function getExpensesByCategory(expenses: FinancialTransaction[]): Record<string, CategorySummary> {
   const categorized = categorizeExpenses(expenses);
-  const categories = {};
+  const categories: Record<string, CategorySummary> = {};
   
   categorized.forEach(expense => {
     const category = expense.detected_category || OTHER_CATEGORIES.UNCATEGORIZED;

@@ -40,6 +40,9 @@ export interface FinancialTransaction {
   category?: ExpenseCategory;
   vendor?: Vendor;
   payment_method?: PaymentMethod;
+  
+  // Added for categorization
+  detected_category?: string;
 }
 
 export interface Invoice {
