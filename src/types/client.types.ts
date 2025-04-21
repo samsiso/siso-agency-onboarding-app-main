@@ -38,9 +38,16 @@ export interface ClientData {
   initial_contact_date?: string | null;
   start_date?: string | null;
   estimated_completion_date?: string | null;
-  todos?: TodoItem[];
+  client_contact?: string | null;
+  purchase_history?: string | null;
   next_steps?: string | null;
   key_research?: string | null;
+  referral_source?: string | null;
+  industry?: string | null;
+  last_contacted_date?: string | null;
+  assigned_to?: string | null;
+  priority?: string | null;
+  todos?: TodoItem[];
 }
 
 export interface TodoItem {

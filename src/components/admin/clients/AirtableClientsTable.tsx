@@ -1,5 +1,9 @@
-import * as React from "react";
-import { useRef, useMemo, useState, useId } from "react";
+
+"use client";
+
+import React, { useState } from "react";
+import { useClientsList } from "@/hooks/client";
+import { ClientData } from "@/types/client.types";
 import {
   Table,
   TableBody,
@@ -7,269 +11,251 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Label } from "@/components/ui/label";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuCheckboxItem,
-  DropdownMenuLabel
-} from "@/components/ui/dropdown-menu";
-import {
-  ChevronDown,
-  ChevronFirst,
-  ChevronLast,
-  ChevronLeft,
-  ChevronRight,
-  ChevronUp,
-  CircleX,
-  Columns3,
-  Filter,
-  ListFilter,
-  Plus,
-  Trash,
-  Ellipsis,
-  CircleAlert
-} from "lucide-react";
-import { useClientsList } from "@/hooks/client";
+} from "@/components/ui/enhanced-table";
 import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
-  getPaginationRowModel,
-  getFilteredRowModel,
-  getFacetedUniqueValues,
   useReactTable,
   SortingState,
-  ColumnFiltersState,
-  VisibilityState,
-  PaginationState,
-  Row
 } from "@tanstack/react-table";
-import { Pagination, PaginationContent, PaginationItem } from "@/components/ui/pagination";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { ClientData } from "@/types/client.types";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { formatCurrency, formatDate } from "@/lib/formatters";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
-import { ViewClientCard } from "./ViewClientCard";
-
-// Map status to badge color
-function statusToBadge(status: string) {
-  switch (status) {
-    case 'completed':
-    case 'converted':
-      return <Badge className="bg-green-500/20 text-green-400">{status.charAt(0).toUpperCase() + status.slice(1)}</Badge>;
-    case 'contacted':
-    case 'in_progress':
-      return <Badge className="bg-blue-500/20 text-blue-400">{status.charAt(0).toUpperCase() + status.slice(1)}</Badge>;
-    case 'pending':
-    case 'new':
-    default:
-      return <Badge className="bg-amber-500/20 text-amber-400">{status.charAt(0).toUpperCase() + status.slice(1)}</Badge>;
-  }
-}
-
-type TableClient = ClientData & { id: string; };
-
-// Add a new column for "Go to Client Page"
-const columns: ColumnDef<TableClient>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={table.getIsAllPageRowsSelected() ? true : table.getIsSomePageRowsSelected() ? "indeterminate" : false}
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    size: 28,
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    header: "Name",
-    accessorKey: "full_name",
-    cell: ({ row }) => <div className="font-medium">{row.getValue("full_name")}</div>,
-    size: 180,
-    enableHiding: false,
-    filterFn: (row, columnId, filterValue) => {
-      const rowValue = [row.original.full_name, row.original.email || ""].join(" ").toLowerCase();
-      return rowValue.includes((filterValue ?? "").toLowerCase());
-    },
-  },
-  {
-    header: "Email",
-    accessorKey: "email",
-    size: 210,
-    cell: ({ row }) => <span>{row.getValue("email") ?? "-"}</span>
-  },
-  {
-    header: "Business Name",
-    accessorKey: "business_name",
-    size: 170,
-    cell: ({ row }) => <span>{row.getValue("business_name") ?? "-"}</span>
-  },
-  {
-    header: "Status",
-    accessorKey: "status",
-    cell: ({ row }) => statusToBadge(String(row.getValue("status") || "")),
-    size: 120,
-    filterFn: (row, columnId, filterValue: string[]) => {
-      if (!filterValue?.length) return true;
-      const status = row.getValue(columnId) as string;
-      return filterValue.includes(status);
-    },
-  },
-  {
-    header: "Project",
-    accessorKey: "project_name",
-    size: 190,
-    cell: ({ row }) => <span>{row.getValue("project_name") ?? "-"}</span>
-  },
-  {
-    header: "Balance",
-    accessorKey: "estimated_price",
-    cell: ({ row }) => {
-      const price = row.getValue("estimated_price");
-      if (!price) return "-";
-      return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(Number(price));
-    },
-    size: 120,
-  },
-  {
-    id: "viewClient",
-    header: "Client Page",
-    cell: ({ row }) => {
-      // Use new card component that matches "active" badge styling and in-app navigation
-      return <ViewClientCard clientId={row.original.id} />;
-    },
-    size: 130,
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    id: "actions",
-    header: () => <span className="sr-only">Actions</span>,
-    cell: ({ row }) => <RowActions row={row} />,
-    size: 60,
-    enableHiding: false,
-  }
-];
-
-import { AirtableTable } from "@/components/common/AirtableTable";
-
-function RowActions({ row }: { row: Row<TableClient> }) {
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <div className="flex justify-end">
-          <Button size="icon" variant="ghost" className="shadow-none" aria-label="Edit client">
-            <Ellipsis size={16} strokeWidth={2} aria-hidden="true" />
-          </Button>
-        </div>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Client Actions</DropdownMenuLabel>
-        <DropdownMenuCheckboxItem>Add/Edit/Details (Not Implemented)</DropdownMenuCheckboxItem>
-        <DropdownMenuCheckboxItem>Archive Client</DropdownMenuCheckboxItem>
-        <DropdownMenuCheckboxItem>Delete</DropdownMenuCheckboxItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
+interface AirtableClientsTableProps {
+  searchQuery: string;
+  statusFilter: string;
+  onSearchChange?: (query: string) => void;
+  onStatusFilterChange?: (status: string) => void;
 }
 
 export function AirtableClientsTable({
-  searchQuery = "",
-  statusFilter = "all",
+  searchQuery,
+  statusFilter,
   onSearchChange,
   onStatusFilterChange,
-}: {
-  searchQuery?: string;
-  statusFilter?: string;
-  onSearchChange?: (query: string) => void;
-  onStatusFilterChange?: (status: string) => void;
-}) {
-  const id = useId();
-  const inputRef = useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
+}: AirtableClientsTableProps) {
+  const navigate = useNavigate();
+  const [sorting, setSorting] = useState<SortingState>([
+    {
+      id: "updated_at",
+      desc: true,
+    },
+  ]);
 
-  // Use our clients list hook
-  const { clients, totalCount, isLoading } = useClientsList({
+  const columns: ColumnDef<ClientData>[] = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={table.getIsAllPageRowsSelected()}
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
+      ),
+      enableSorting: false,
+      size: 40,
+    },
+    {
+      header: "Name",
+      accessorKey: "full_name",
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+          {row.original.avatar_url && (
+            <img
+              src={row.original.avatar_url}
+              alt={row.original.full_name || "Avatar"}
+              className="h-8 w-8 rounded-full object-cover"
+            />
+          )}
+          <div className="font-medium">{row.getValue("full_name")}</div>
+        </div>
+      ),
+      size: 200,
+    },
+    {
+      header: "Business",
+      accessorKey: "business_name",
+      cell: ({ row }) => row.original.business_name || "-",
+      size: 180,
+    },
+    {
+      header: "Status",
+      accessorKey: "status",
+      cell: ({ row }) => (
+        <Badge variant="outline" className="capitalize">
+          {row.getValue("status")}
+        </Badge>
+      ),
+      size: 120,
+    },
+    {
+      header: "Project",
+      accessorKey: "project_name",
+      cell: ({ row }) => row.original.project_name || "-",
+      size: 180,
+    },
+    {
+      header: "Industry",
+      accessorKey: "company_niche",
+      cell: ({ row }) => row.original.company_niche || "-",
+      size: 160,
+    },
+    {
+      header: "Budget",
+      accessorKey: "estimated_price",
+      cell: ({ row }) => {
+        const amount = row.original.estimated_price;
+        return amount ? formatCurrency(amount) : "-";
+      },
+      size: 120,
+    },
+    {
+      header: "Payment Status",
+      accessorKey: "payment_status",
+      cell: ({ row }) => (
+        row.original.payment_status ? (
+          <Badge variant="outline" className="capitalize">
+            {row.original.payment_status}
+          </Badge>
+        ) : "-"
+      ),
+      size: 140,
+    },
+    {
+      header: "Priority",
+      accessorKey: "priority",
+      cell: ({ row }) => (
+        <Badge variant={row.original.priority?.toLowerCase() === "high" ? "destructive" : "outline"} className="capitalize">
+          {row.original.priority || "None"}
+        </Badge>
+      ),
+      size: 100,
+    },
+    {
+      header: "Start Date",
+      accessorKey: "start_date",
+      cell: ({ row }) => row.original.start_date ? formatDate(row.original.start_date) : "-",
+      size: 120,
+    },
+    {
+      header: "Due Date",
+      accessorKey: "estimated_completion_date",
+      cell: ({ row }) => row.original.estimated_completion_date ? formatDate(row.original.estimated_completion_date) : "-",
+      size: 120,
+    },
+    {
+      header: "Last Updated",
+      accessorKey: "updated_at",
+      cell: ({ row }) => formatDate(row.getValue("updated_at")),
+      size: 120,
+    },
+  ];
+
+  const { clients, isLoading } = useClientsList({
     searchQuery,
     statusFilter,
-    sortColumn: "updated_at",
-    sortDirection: "desc"
+    sortColumn: sorting[0]?.id,
+    sortDirection: sorting[0]?.desc ? "desc" : "asc",
   });
-
-  // Table state
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 10,
-  });
-  const [sorting, setSorting] = useState<SortingState>([{ id: "full_name", desc: false }]);
-
-  const data: TableClient[] = React.useMemo(
-    () => clients.map(c => ({ ...c, id: c.id })),
-    [clients]
-  );
 
   const table = useReactTable({
-    data,
+    data: clients,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
     onSortingChange: setSorting,
-    onPaginationChange: setPagination,
-    onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange: setColumnVisibility,
     state: {
       sorting,
-      pagination,
-      columnFilters,
-      columnVisibility,
     },
     enableSortingRemoval: false,
-    manualPagination: false,
   });
 
-  // Provide add client button, etc. through props to AirtableTable
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <AirtableTable
-      table={table}
-      columns={columns}
-      searchQuery={searchQuery}
-      statusFilter={statusFilter}
-      onSearchChange={onSearchChange}
-      onStatusFilterChange={onStatusFilterChange}
-      renderRowActions={(row) => <RowActions row={row} />}
-      statusBadge={statusToBadge}
-      addButton={
-        <Button className="ml-auto" variant="outline">
-          <Plus className="-ms-1 me-2 opacity-60" size={16} strokeWidth={2} aria-hidden="true" />
-          Add client
-        </Button>
-      }
-      deleteSelectedTitle="Delete client(s)"
-    />
+    <div className="rounded-md border bg-background">
+      <Table>
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id} className="bg-muted/50 hover:bg-muted/50">
+              {headerGroup.headers.map((header) => (
+                <TableHead
+                  key={header.id}
+                  style={{ width: header.getSize() }}
+                  className="relative h-11 select-none [&>.cursor-col-resize]:last:opacity-0"
+                >
+                  {header.isPlaceholder ? null : (
+                    <div
+                      className={cn(
+                        header.column.getCanSort() &&
+                          "flex h-full cursor-pointer select-none items-center justify-between gap-2",
+                      )}
+                      onClick={header.column.getToggleSortingHandler()}
+                      onKeyDown={(e) => {
+                        if (header.column.getCanSort() && (e.key === "Enter" || e.key === " ")) {
+                          e.preventDefault();
+                          header.column.getToggleSortingHandler()?.(e);
+                        }
+                      }}
+                      tabIndex={header.column.getCanSort() ? 0 : undefined}
+                    >
+                      {flexRender(header.column.columnDef.header, header.getContext())}
+                      {{
+                        asc: <ChevronUp className="h-4 w-4" />,
+                        desc: <ChevronDown className="h-4 w-4" />,
+                      }[header.column.getIsSorted() as string] ?? null}
+                    </div>
+                  )}
+                </TableHead>
+              ))}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow
+                key={row.id}
+                className="cursor-pointer"
+                data-state={row.getIsSelected() && "selected"}
+                onClick={(e) => {
+                  // Prevent navigation if clicking checkbox
+                  if (!(e.target as HTMLElement).closest('[role="checkbox"]')) {
+                    navigate(`/admin/clients/${row.original.id}`);
+                  }
+                }}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={columns.length} className="h-24 text-center">
+                No clients found.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </div>
   );
 }
