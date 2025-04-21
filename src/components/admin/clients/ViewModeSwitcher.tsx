@@ -8,14 +8,11 @@ interface ViewModeSwitcherProps {
 
 export function ViewModeSwitcher({ viewMode, setViewMode }: ViewModeSwitcherProps) {
   return (
-    <div className="flex items-center h-16 px-6 bg-background rounded-xl shadow-sm border border-border/30 mb-6 gap-2">
-      <span className="text-base font-medium text-muted-foreground mr-3">
-        View as:
-      </span>
+    <div className="flex items-center gap-2">
       <Button
         size="sm"
         variant={viewMode === "table" ? "default" : "outline"}
-        className="rounded-full px-5 h-10 text-base"
+        className="rounded-md px-3 text-sm"
         onClick={() => setViewMode("table")}
       >
         Table
@@ -23,7 +20,7 @@ export function ViewModeSwitcher({ viewMode, setViewMode }: ViewModeSwitcherProp
       <Button
         size="sm"
         variant={viewMode === "cards" ? "default" : "outline"}
-        className="rounded-full px-5 h-10 text-base"
+        className="rounded-md px-3 text-sm"
         onClick={() => setViewMode("cards")}
       >
         Cards
@@ -31,4 +28,3 @@ export function ViewModeSwitcher({ viewMode, setViewMode }: ViewModeSwitcherProp
     </div>
   );
 }
-

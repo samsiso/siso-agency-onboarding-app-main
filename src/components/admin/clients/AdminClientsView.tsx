@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { ViewModeSwitcher } from './ViewModeSwitcher';
 import { AirtableClientsTable } from './AirtableClientsTable';
-import { SpotTable } from "./SpotTable";
 
 interface AdminClientsViewProps {
   isAdmin: boolean;
@@ -120,52 +119,37 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <ViewModeSwitcher
-        viewMode={viewMode}
-        setViewMode={setViewMode}
-      />
-      {viewMode === "table" ? (
-        <>
-          {/* NEW: Horizontal flex layout for Clients header/desc + SpotTable */}
-          <div className="flex flex-col md:flex-row md:items-start mb-5 gap-4 md:gap-9">
-            <div className="flex items-center gap-3 flex-1">
-              <div className="h-11 w-11 rounded-full bg-primary/15 flex items-center justify-center shadow-sm">
-                <Users className="h-6 w-6 text-primary" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold tracking-tight">Clients</h2>
-                <p className="text-sm text-muted-foreground mt-0.5">
-                  Manage your agency’s client data, statuses, and project details.
-                </p>
-              </div>
-            </div>
-            {/* Show SpotTable on right, hide on mobile */}
-            <div className="hidden md:block">
-              <SpotTable />
-            </div>
-          </div>
-          <AirtableClientsTable
-            searchQuery={searchQuery}
-            statusFilter={statusFilter}
-            onSearchChange={handleSearchChange}
-            onStatusFilterChange={handleStatusFilterChange}
-          />
-        </>
-      ) : (
-        <div>
-          <div className="flex items-center mb-5 gap-3">
+      <div className="mb-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="flex items-center gap-3">
             <div className="h-11 w-11 rounded-full bg-primary/15 flex items-center justify-center shadow-sm">
               <Users className="h-6 w-6 text-primary" />
             </div>
-            <h2 className="text-2xl font-bold tracking-tight">Clients</h2>
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight">Clients</h2>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                Manage your agency's client data, statuses, and project details.
+              </p>
+            </div>
           </div>
-          <ClientsCardGrid
-            searchQuery={searchQuery}
-            statusFilter={statusFilter}
-            sortColumn={viewPreference.sortColumn}
-            sortDirection={viewPreference.sortDirection}
-          />
+          <ViewModeSwitcher viewMode={viewMode} setViewMode={setViewMode} />
         </div>
+      </div>
+      
+      {viewMode === "table" ? (
+        <AirtableClientsTable
+          searchQuery={searchQuery}
+          statusFilter={statusFilter}
+          onSearchChange={handleSearchChange}
+          onStatusFilterChange={handleStatusFilterChange}
+        />
+      ) : (
+        <ClientsCardGrid
+          searchQuery={searchQuery}
+          statusFilter={statusFilter}
+          sortColumn={viewPreference.sortColumn}
+          sortDirection={viewPreference.sortDirection}
+        />
       )}
     </div>
   );
