@@ -1,9 +1,10 @@
+
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AdminLayout } from '@/components/admin/layout/AdminLayout';
 import { ClientsTable } from '@/components/admin/clients/ClientsTable';
 import { useAdminCheck } from '@/hooks/useAdminCheck';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Users } from 'lucide-react';
 import { ClientViewPreference } from '@/types/client.types';
 import { updateExistingClientData, makeCurrentUserAdmin } from '@/utils/clientDataUtils';
 import { useToast } from '@/hooks/use-toast';
@@ -11,7 +12,6 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { ClientsCardGrid } from "@/components/admin/clients/ClientsCardGrid";
 import { Button } from '@/components/ui/button';
-import { Users } from 'lucide-react';
 
 export default function AdminClients() {
   const { isAdmin, isLoading } = useAdminCheck();
@@ -19,7 +19,7 @@ export default function AdminClients() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const { toast } = useToast();
-  const [viewMode, setViewMode: React.Dispatch<React.SetStateAction<"table" | "cards">> = useState("table");
+  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
   
   // Enhanced view preferences with all columns visible by default
   const [viewPreference, setViewPreference] = useState<ClientViewPreference>({
