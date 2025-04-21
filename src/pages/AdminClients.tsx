@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AdminLayout } from '@/components/admin/layout/AdminLayout';
@@ -10,6 +9,8 @@ import { updateExistingClientData, makeCurrentUserAdmin } from '@/utils/clientDa
 import { useToast } from '@/hooks/use-toast';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { useClientsList } from "@/hooks/client/useClientsList";
+import { ClientsCardGrid } from "@/components/admin/clients/ClientsCardGrid";
 
 export default function AdminClients() {
   const { isAdmin, isLoading } = useAdminCheck();
@@ -144,19 +145,64 @@ export default function AdminClients() {
     return null;
   }
 
+  // Add view mode: "table" or "cards"
+  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
+
+  // Get clients data directly for Cards view, with search/filter/pagination
+  const {
+    clients,
+    totalCount,
+    isLoading: isLoadingClients,
+    refetch
+  } = useClientsList({
+    searchQuery,
+    statusFilter,
+    sortColumn: viewPreference.sortColumn,
+    sortDirection: viewPreference.sortDirection,
+    page: 1, // Override to always show all on cards for simplicity, or enable paging if needed
+    pageSize: 100, // Increase for card grid (can coordinate with table's pageSize)
+  });
+
   return (
     <AdminLayout>
       <div className="container mx-auto px-4 py-8">
-        <DndProvider backend={HTML5Backend}>
-          <ClientsTable 
-            searchQuery={searchQuery}
-            statusFilter={statusFilter}
-            viewPreference={viewPreference}
-            onViewPreferenceChange={handleViewPreferenceChange}
-            onSearchChange={handleSearchChange}
-            onStatusFilterChange={handleStatusFilterChange}
+        <div className="flex justify-end items-center mb-4 gap-2">
+          <span className="text-sm text-muted-foreground mr-2">View as:</span>
+          <Button
+            size="sm"
+            variant={viewMode === "table" ? "default" : "outline"}
+            className="rounded-full px-3"
+            onClick={() => setViewMode("table")}
+          >
+            Table
+          </Button>
+          <Button
+            size="sm"
+            variant={viewMode === "cards" ? "default" : "outline"}
+            className="rounded-full px-3"
+            onClick={() => setViewMode("cards")}
+          >
+            Cards
+          </Button>
+        </div>
+        {viewMode === "table" ? (
+          <DndProvider backend={HTML5Backend}>
+            <ClientsTable 
+              searchQuery={searchQuery}
+              statusFilter={statusFilter}
+              viewPreference={viewPreference}
+              onViewPreferenceChange={handleViewPreferenceChange}
+              onSearchChange={handleSearchChange}
+              onStatusFilterChange={handleStatusFilterChange}
+            />
+          </DndProvider>
+        ) : (
+          <ClientsCardGrid
+            clients={clients}
+            isLoading={isLoadingClients}
+            onRefetch={refetch}
           />
-        </DndProvider>
+        )}
       </div>
     </AdminLayout>
   );
