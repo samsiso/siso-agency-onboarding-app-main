@@ -15,6 +15,7 @@ interface EditableCellProps {
   align?: "left" | "center" | "right";
   formatter?: (value: any) => React.ReactNode;
   inputClassName?: string;
+  style?: React.CSSProperties; // Add style prop to the interface
 }
 
 export function EditableCell({
@@ -27,6 +28,7 @@ export function EditableCell({
   align = 'left',
   formatter = (v) => String(v),
   inputClassName,
+  style, // Add style to the destructuring
 }: EditableCellProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value);
@@ -94,6 +96,7 @@ export function EditableCell({
       align={align}
       onDoubleClick={handleDoubleClick}
       data-editing={isEditing ? "true" : undefined}
+      style={style} // Apply the style prop
     >
       {isEditing ? (
         <div className="flex items-stretch w-full h-full">
