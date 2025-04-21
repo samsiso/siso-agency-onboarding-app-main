@@ -13,14 +13,14 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { 
-  ViewColumns, 
+  Columns, 
   Filter, 
   ChevronDown, 
   ChevronUp, 
   CheckIcon, 
-  XIcon,
+  X,
   CalendarIcon,
-  LinkIcon,
+  Link,
   DollarSign
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -413,7 +413,7 @@ export function ClientsEnhancedTable({
                             navigate(`/admin/clients/${client.id}`);
                           }}
                         >
-                          <LinkIcon className="h-4 w-4" />
+                          <Link className="h-4 w-4" />
                           <span className="sr-only">View</span>
                         </Button>
                       </div>

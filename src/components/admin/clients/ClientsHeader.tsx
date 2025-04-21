@@ -13,8 +13,8 @@ import {
   Search, 
   Filter, 
   Plus,
-  DownloadIcon,
-  UploadIcon,
+  Download,
+  Upload,
   RefreshCw
 } from 'lucide-react';
 
@@ -82,7 +82,7 @@ export function ClientsHeader({
           size="sm" 
           className="h-10 border-border/50 bg-card/50 shadow-sm"
         >
-          <UploadIcon className="h-4 w-4 mr-2" />
+          <Upload className="h-4 w-4 mr-2" />
           Import
         </Button>
         <Button 
@@ -90,7 +90,7 @@ export function ClientsHeader({
           size="sm" 
           className="h-10 border-border/50 bg-card/50 shadow-sm"
         >
-          <DownloadIcon className="h-4 w-4 mr-2" />
+          <Download className="h-4 w-4 mr-2" />
           Export
         </Button>
         <Button className="bg-primary hover:bg-primary/90 shadow-sm">

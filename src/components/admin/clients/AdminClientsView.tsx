@@ -82,6 +82,8 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
         <ClientsCardGrid 
           searchQuery={searchQuery}
           statusFilter={statusFilter}
+          sortColumn={viewPreference.sortColumn}
+          sortDirection={viewPreference.sortDirection}
         />
       )}
     </div>

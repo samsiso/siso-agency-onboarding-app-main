@@ -18,18 +18,18 @@ import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/comp
 interface ClientsCardGridProps {
   searchQuery: string;
   statusFilter: string;
-  sortColumn: string;
-  sortDirection: 'asc' | 'desc';
+  sortColumn?: string;
+  sortDirection?: 'asc' | 'desc';
   onRefetch?: () => void;
 }
 
-export const ClientsCardGrid = ({
+export function ClientsCardGrid({
   searchQuery,
   statusFilter,
-  sortColumn,
-  sortDirection,
+  sortColumn = "updated_at",
+  sortDirection = "desc",
   onRefetch
-}: ClientsCardGridProps) => {
+}: ClientsCardGridProps) {
   const navigate = useNavigate();
   
   const {
@@ -133,7 +133,7 @@ export const ClientsCardGrid = ({
                   {client.priority && (
                     <Tooltip>
                       <TooltipTrigger>
-                        <Badge variant="outline" className={cn("gap-1 border-none", getPriorityColor(client.priority as string | null))}>
+                        <Badge variant="outline" className={cn("gap-1 border-none", getPriorityColor(client.priority))}>
                           <Flag className="h-3 w-3" />
                           <span>{client.priority}</span>
                         </Badge>
@@ -240,4 +240,4 @@ export const ClientsCardGrid = ({
       </div>
     </TooltipProvider>
   );
-};
+}

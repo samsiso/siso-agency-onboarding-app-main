@@ -1,3 +1,4 @@
+
 export interface ClientDocument {
   id: string;
   client_id: string;
@@ -41,6 +42,7 @@ export interface ClientData {
   todos?: TodoItem[];
   next_steps?: string | null;
   key_research?: string | null;
+  priority?: string | null;
 }
 
 export interface TodoItem {
