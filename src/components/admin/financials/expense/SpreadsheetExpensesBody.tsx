@@ -1,8 +1,8 @@
 
-import { TableRow } from "@/components/ui/table";
+import { SpreadsheetExpenseRow } from "./SpreadsheetExpenseRow";
+import { SpreadsheetExpensesEmpty } from "./SpreadsheetExpensesEmpty";
 import { FinancialTransaction } from "@/utils/financial";
 import { TableColumn } from "@/hooks/useTableColumns";
-import { SpreadsheetExpensesRow } from "./SpreadsheetExpensesRow";
 
 interface SpreadsheetExpensesBodyProps {
   expenses: FinancialTransaction[];
@@ -24,22 +24,13 @@ export function SpreadsheetExpensesBody({
   onUpdateExpense
 }: SpreadsheetExpensesBodyProps) {
   if (expenses.length === 0) {
-    return (
-      <TableRow>
-        <td 
-          colSpan={visibleColumns.length + 2} 
-          className="text-center py-8 text-muted-foreground"
-        >
-          No expenses found. Try adjusting your filters or add a new expense.
-        </td>
-      </TableRow>
-    );
+    return <SpreadsheetExpensesEmpty />;
   }
 
   return (
     <>
       {expenses.map(expense => (
-        <SpreadsheetExpensesRow
+        <SpreadsheetExpenseRow
           key={expense.id}
           expense={expense}
           visibleColumns={visibleColumns}
