@@ -14,7 +14,6 @@ import Home from './pages/Home';
 import CryptoExchange from './pages/CryptoExchange';
 import HowToEarn from './pages/HowToEarn';
 import LeaderboardPage from './pages/LeaderboardPage';
-import SettingsPage from './pages/SettingsPage';
 import HelpPage from './pages/HelpPage';
 import { AuthGuard } from './components/auth/AuthGuard';
 import MyProjects from './pages/MyProjects';
@@ -32,7 +31,7 @@ import AdminTasks from './pages/AdminTasks';
 import AdminSettings from './pages/AdminSettings';
 import { TeamMemberTasksView } from './components/admin/tasks/TeamMemberTasksView';
 import TeamMemberTasksPage from './pages/TeamMemberTasksPage';
-
+import ChangelogPage from './pages/Changelog';
 function App() {
   return (
     <>
@@ -84,6 +83,7 @@ function App() {
         {/* Protected Support & Settings Routes */}
         <Route path="/help" element={<AuthGuard><HelpPage /></AuthGuard>} />
         <Route path="/settings" element={<AuthGuard><SettingsPage /></AuthGuard>} />
+        <Route path="/changelog" element={<AuthGuard><ChangelogPage /></AuthGuard>} />
       </Routes>
     </>
   );

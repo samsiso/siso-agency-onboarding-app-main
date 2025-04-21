@@ -1,4 +1,3 @@
-
 import { 
   LayoutDashboard, Users, MessageSquare, UserCheck,
   CheckSquare, CalendarClock, CreditCard, Settings,
@@ -83,6 +82,11 @@ export const getAdminMenuSections = (): MenuSection[] => {
           href: '/admin/settings',
           icon: Settings,
           label: 'Settings',
+        },
+        {
+          href: '/changelog',
+          icon: Settings,
+          label: 'Changelog',
         }
       ]
     }
@@ -90,4 +94,3 @@ export const getAdminMenuSections = (): MenuSection[] => {
 
   return sections;
 };
-
