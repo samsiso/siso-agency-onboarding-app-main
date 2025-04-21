@@ -1,21 +1,24 @@
 
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { AdminLayout } from '@/components/admin/layout/AdminLayout';
-import { ClientsTable } from '@/components/admin/clients/ClientsTable';
 import { useAdminCheck } from '@/hooks/useAdminCheck';
-import { Loader2, Users } from 'lucide-react';
-import { ClientViewPreference } from '@/types/client.types';
-import { updateExistingClientData, makeCurrentUserAdmin } from '@/utils/clientDataUtils';
+import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-import { ClientsCardGrid } from "@/components/admin/clients/ClientsCardGrid";
-import { Button } from '@/components/ui/button';
 import { AdminClientsView } from '@/components/admin/clients/AdminClientsView';
 
 export default function AdminClients() {
   const { isAdmin, isLoading } = useAdminCheck();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (!isLoading && !isAdmin) {
+      toast({
+        variant: 'destructive',
+        title: 'Access Denied',
+        description: 'You must be an admin to view this page.',
+      });
+    }
+  }, [isAdmin, isLoading, toast]);
 
   if (isLoading) {
     return (
@@ -31,6 +34,8 @@ export default function AdminClients() {
   }
 
   return (
-    <AdminClientsView isAdmin={isAdmin} />
+    <AdminLayout>
+      <AdminClientsView isAdmin={isAdmin} />
+    </AdminLayout>
   );
 }
