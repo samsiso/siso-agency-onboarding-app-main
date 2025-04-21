@@ -125,12 +125,26 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
         setViewMode={setViewMode}
       />
       {viewMode === "table" ? (
-        <AirtableClientsTable
-          searchQuery={searchQuery}
-          statusFilter={statusFilter}
-          onSearchChange={handleSearchChange}
-          onStatusFilterChange={handleStatusFilterChange}
-        />
+        <>
+          {/* NEW: Clients title, icon, and description, matching the cards view */}
+          <div className="flex items-center mb-5 gap-3">
+            <div className="h-11 w-11 rounded-full bg-primary/15 flex items-center justify-center shadow-sm">
+              <Users className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight">Clients</h2>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                Manage your agency’s client data, statuses, and project details.
+              </p>
+            </div>
+          </div>
+          <AirtableClientsTable
+            searchQuery={searchQuery}
+            statusFilter={statusFilter}
+            onSearchChange={handleSearchChange}
+            onStatusFilterChange={handleStatusFilterChange}
+          />
+        </>
       ) : (
         <div>
           {/* Title and icon for Cards view */}
