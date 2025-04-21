@@ -1,4 +1,3 @@
-
 import * as React from "react";
 import { useRef, useMemo, useState, useId } from "react";
 import {
@@ -281,7 +280,7 @@ export function AirtableClientsTable({
   };
 
   return (
-    <div className="space-y-4 max-w-[1000px]">
+    <div className="w-full px-0 sm:px-2 lg:px-4 xl:px-0">
       {/* Filters */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
@@ -430,8 +429,8 @@ export function AirtableClientsTable({
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-lg border border-border bg-background">
-        <Table className="table-fixed">
+      <div className="overflow-hidden rounded-lg border border-border bg-background w-full">
+        <Table className="table-fixed w-full">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="hover:bg-transparent">
