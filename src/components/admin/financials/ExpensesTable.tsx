@@ -1,3 +1,4 @@
+
 import {
   ColumnDef,
   flexRender,
@@ -96,6 +97,14 @@ const columns: ColumnDef<FinancialTransaction>[] = [
     header: "Actions",
     cell: ({ row }) => {
       const expense = row.original;
+      
+      // Use props from the component for the onDataChange function
+      const handleDelete = async (id: string, onDataChange: () => Promise<void>) => {
+        const success = await deleteTransaction(id);
+        if (success) {
+          await onDataChange();
+        }
+      };
 
       return (
         <DropdownMenu>
@@ -117,12 +126,7 @@ const columns: ColumnDef<FinancialTransaction>[] = [
               <Pencil className="mr-2 h-4 w-4" /> Edit
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={async () => {
-                const success = await deleteTransaction(expense.id);
-                if (success) {
-                  await onDataChange();
-                }
-              }}
+              onClick={() => handleDelete(expense.id, onDataChange)}
             >
               <Trash className="mr-2 h-4 w-4" /> Delete
             </DropdownMenuItem>
