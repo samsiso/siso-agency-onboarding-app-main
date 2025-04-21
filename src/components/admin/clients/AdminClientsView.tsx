@@ -1,11 +1,10 @@
-
 import { useState } from 'react';
 import { ClientsHeader } from './ClientsHeader';
-import { ClientsEnhancedTable } from './ClientsEnhancedTable';
+import { ClientsEnhancedTable } from './ClientsEnhancedTable';  // Corrected import
 import { ViewModeSwitcher } from './ViewModeSwitcher';
 import { ClientsCardGrid } from './ClientsCardGrid';
 import { ClientViewPreference } from '@/types/client.types';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useLocalStorage } from '@/hooks/useLocalStorage';  // Assuming this hook exists
 
 // Default view preference
 const defaultViewPreference: ClientViewPreference = {
