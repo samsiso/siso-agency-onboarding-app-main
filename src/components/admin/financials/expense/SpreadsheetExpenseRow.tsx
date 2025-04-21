@@ -40,15 +40,16 @@ export function SpreadsheetExpenseRow({
         key={expense.id}
         className={cn(
           "group transition-colors",
-          isSelected ? "bg-muted/20" : "hover:bg-blue-950/30",
+          isSelected ? "bg-muted/20 selected-row" : "hover:bg-blue-950/30",
         )}
         data-state={isSelected ? "selected" : undefined}
         style={{
-          borderBottom: "1.5px solid #282434", // Notion-like horizontal eline
+          borderBottom: "2px solid #3e3763", // Vivid Notion-like horizontal eline
+          boxShadow: "0 1.5px 0 0 #3e3763", // Makes eline more visible
         }}
       >
         {/* Checkbox sticky left */}
-        <td className="sticky left-0 bg-background z-30 w-10 p-2 text-center border-r border-border/15">
+        <td className="sticky left-0 bg-background z-30 w-10 p-2 text-center border-r border-amber-400/50 border-solid">
           <Checkbox 
             checked={isSelected}
             onCheckedChange={() => onSelectExpense(expense.id)}
