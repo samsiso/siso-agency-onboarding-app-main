@@ -1,4 +1,3 @@
-
 import React, { useRef } from 'react';
 import { Table } from '@/components/ui/table';
 import { ClientViewPreference } from '@/types/client.types';
@@ -15,6 +14,8 @@ import { cn } from "@/lib/utils";
 import { tableStyles } from '@/components/ui/table-styles';
 import { BulkActionsBar } from './BulkActionsBar';
 import { ClientsTableSkeleton } from './ClientsTableSkeleton';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 interface ClientsTableProps {
   searchQuery?: string;
@@ -58,8 +59,6 @@ export function ClientsTable({
     refetch
   } = useClientTable(searchQuery, statusFilter, viewPreference, onViewPreferenceChange);
 
-  // Removed analytics data retrieval and component usage
-
   const visibleColumns = React.useMemo(() => 
     viewPreference.columns.filter(col => col.visible),
     [viewPreference.columns]
@@ -95,75 +94,76 @@ export function ClientsTable({
   }
 
   return (
-    <div className="space-y-6">
-      {/* Removed <ClientAnalyticsCards {...analyticsData} /> */}
+    <DndProvider backend={HTML5Backend}>
+      <div className="space-y-6">
+        {/* Removed <ClientAnalyticsCards {...analyticsData} /> */}
 
-      <ClientsHeader
-        searchQuery={searchQuery}
-        onSearchChange={onSearchChange}
-        statusFilter={statusFilter}
-        onStatusFilterChange={onStatusFilterChange}
-        viewPreference={viewPreference}
-        onViewPreferenceChange={onViewPreferenceChange}
-        onAddClient={() => setIsAddClientOpen(true)}
-        totalClients={totalCount}
-        clients={clients}
-        onRefetch={refetch}
-      />
-      
-      {selectedClients.length > 0 && (
-        <BulkActionsBar
-          selectedCount={selectedClients.length}
-          onDeleteSelected={handleDeleteSelected}
-          onExportSelected={() => {
-            // Placeholder for export logic
-          }}
+        <ClientsHeader
+          searchQuery={searchQuery}
+          onSearchChange={onSearchChange}
+          statusFilter={statusFilter}
+          onStatusFilterChange={onStatusFilterChange}
+          viewPreference={viewPreference}
+          onViewPreferenceChange={onViewPreferenceChange}
+          onAddClient={() => setIsAddClientOpen(true)}
+          totalClients={totalCount}
+          clients={clients}
+          onRefetch={refetch}
         />
-      )}
-      
-      <div ref={tableContainerRef} className="relative rounded-lg overflow-hidden border border-border/30 bg-background/30 shadow-sm backdrop-blur-sm">
-        <ScrollableTable pinnedColumns={pinnedColumns}>
-          <Table ref={tableElementRef} className={cn(
-            tableStyles(),
-            "backdrop-blur-sm [&_th]:bg-background/95 [&_td]:bg-transparent"
-          )}>
-            <ClientTableHeader
-              visibleColumns={visibleColumns}
-              selectedClients={selectedClients}
-              clients={clients}
-              onSelectAll={handleSelectAll}
-              onSort={handleSort}
-              sortColumn={viewPreference.sortColumn}
-              sortDirection={viewPreference.sortDirection}
-              moveColumn={moveColumn}
-            />
-            <ClientTableBody
-              clients={clients}
-              visibleColumns={visibleColumns}
-              selectedClients={selectedClients}
-              editingCell={editingCell}
-              editValue={editValue}
-              editInputRef={editInputRef}
-              onEditValueChange={setEditValue}
-              onSelectClient={handleSelectClient}
-              onStartEdit={handleStartEdit}
-              onSaveEdit={handleSaveEdit}
-            />
-          </Table>
-        </ScrollableTable>
-      </div>
+        
+        {selectedClients.length > 0 && (
+          <BulkActionsBar
+            selectedCount={selectedClients.length}
+            onDeleteSelected={handleDeleteSelected}
+            onExportSelected={() => {
+              // Placeholder for export logic
+            }}
+          />
+        )}
+        
+        <div ref={tableContainerRef} className="relative rounded-lg overflow-hidden border border-border/30 bg-background/30 shadow-sm backdrop-blur-sm">
+          <ScrollableTable pinnedColumns={pinnedColumns}>
+            <Table ref={tableElementRef} className={cn(
+              tableStyles(),
+              "backdrop-blur-sm [&_th]:bg-background/95 [&_td]:bg-transparent"
+            )}>
+              <ClientTableHeader
+                visibleColumns={visibleColumns}
+                selectedClients={selectedClients}
+                clients={clients}
+                onSelectAll={handleSelectAll}
+                onSort={handleSort}
+                sortColumn={viewPreference.sortColumn}
+                sortDirection={viewPreference.sortDirection}
+                moveColumn={moveColumn}
+              />
+              <ClientTableBody
+                clients={clients}
+                visibleColumns={visibleColumns}
+                selectedClients={selectedClients}
+                editingCell={editingCell}
+                editValue={editValue}
+                editInputRef={editInputRef}
+                onEditValueChange={setEditValue}
+                onSelectClient={handleSelectClient}
+                onStartEdit={handleStartEdit}
+                onSaveEdit={handleSaveEdit}
+              />
+            </Table>
+          </ScrollableTable>
+        </div>
 
-      <ClientTablePagination
-        page={page}
-        totalPages={totalPages}
-        onPageChange={setPage}
-      />
-      <ClientAddForm 
-        open={isAddClientOpen} 
-        onOpenChange={setIsAddClientOpen} 
-        onSuccess={handleClientAddSuccess}
-      />
-    </div>
+        <ClientTablePagination
+          page={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+        />
+        <ClientAddForm 
+          open={isAddClientOpen} 
+          onOpenChange={setIsAddClientOpen} 
+          onSuccess={handleClientAddSuccess}
+        />
+      </div>
+    </DndProvider>
   );
 }
-
