@@ -1,3 +1,4 @@
+
 import { Routes, Route } from 'react-router-dom';
 import Index from './pages/Index';
 import Auth from './pages/Auth';
@@ -32,6 +33,7 @@ import AdminSettings from './pages/AdminSettings';
 import { TeamMemberTasksView } from './components/admin/tasks/TeamMemberTasksView';
 import TeamMemberTasksPage from './pages/TeamMemberTasksPage';
 import ChangelogPage from './pages/Changelog';
+
 function App() {
   return (
     <>
@@ -82,7 +84,7 @@ function App() {
         
         {/* Protected Support & Settings Routes */}
         <Route path="/help" element={<AuthGuard><HelpPage /></AuthGuard>} />
-        <Route path="/settings" element={<AuthGuard><SettingsPage /></AuthGuard>} />
+        <Route path="/settings" element={<AuthGuard><Profile /></AuthGuard>} />
         <Route path="/changelog" element={<AuthGuard><ChangelogPage /></AuthGuard>} />
       </Routes>
     </>
