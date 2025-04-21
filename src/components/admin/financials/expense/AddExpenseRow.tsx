@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -6,6 +5,7 @@ import { createTransaction } from "@/utils/financial";
 import { toast } from "@/hooks/use-toast";
 import { TableRow, TableCell } from "@/components/ui/table";
 import { Plus, Check, X } from "lucide-react";
+import { FinancialTransaction } from "@/utils/financial/types";
 
 type RecurringType = "one-time" | "monthly" | "annual";
 
@@ -36,7 +36,7 @@ export function AddExpenseRow({ onExpenseAdded, visibleColumns }: AddExpenseRowP
     payment_method_id: "",
     recurring_type: "one-time" as RecurringType,
     notes: "",
-    type: "expense",
+    type: "expense" as "expense" | "revenue", // Fix: explicitly type as union type
     currency: "GBP",
     status: "completed"
   });
@@ -55,7 +55,7 @@ export function AddExpenseRow({ onExpenseAdded, visibleColumns }: AddExpenseRowP
       payment_method_id: "",
       recurring_type: "one-time",
       notes: "",
-      type: "expense",
+      type: "expense" as "expense" | "revenue", // Fix: maintain explicit type
       currency: "GBP",
       status: "completed"
     });
@@ -68,7 +68,9 @@ export function AddExpenseRow({ onExpenseAdded, visibleColumns }: AddExpenseRowP
       ...prev,
       [field]: field === "recurring_type"
         ? (["one-time", "monthly", "annual"].includes(value) ? value : "one-time")
-        : value
+        : field === "type"
+          ? (value === "revenue" ? "revenue" : "expense") // Ensure type is always valid
+          : value
     }));
   };
 
