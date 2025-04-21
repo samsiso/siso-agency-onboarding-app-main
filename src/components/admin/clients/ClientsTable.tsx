@@ -3,17 +3,16 @@ import React, { useRef } from 'react';
 import { Table } from '@/components/ui/table';
 import { ClientViewPreference } from '@/types/client.types';
 import { ClientAddForm } from './ClientAddForm';
-import { ClientAnalyticsCards } from './ClientAnalyticsCards';
+// import { ClientAnalyticsCards } from './ClientAnalyticsCards'; // Removed import of analytics cards to avoid unused import warning
 import { ClientsHeader } from './ClientsHeader';
 import { ScrollableTable } from './ScrollableTable';
 import { useClientTable } from './hooks/useClientTable';
-import { useClientAnalytics } from './components/ClientAnalytics';
+// Removed import of clientAnalytics hook since analytics cards are removed
 import { ClientTableHeader } from './components/ClientTableHeader';
 import { ClientTableBody } from './components/ClientTableBody';
 import { ClientTablePagination } from './components/ClientTablePagination';
 import { cn } from "@/lib/utils";
 import { tableStyles } from '@/components/ui/table-styles';
-// NEW: Import extracted small components:
 import { BulkActionsBar } from './BulkActionsBar';
 import { ClientsTableSkeleton } from './ClientsTableSkeleton';
 
@@ -59,8 +58,8 @@ export function ClientsTable({
     refetch
   } = useClientTable(searchQuery, statusFilter, viewPreference, onViewPreferenceChange);
 
-  const analyticsData = useClientAnalytics({ clients, totalCount });
-  
+  // Removed analytics data retrieval and component usage
+
   const visibleColumns = React.useMemo(() => 
     viewPreference.columns.filter(col => col.visible),
     [viewPreference.columns]
@@ -97,8 +96,8 @@ export function ClientsTable({
 
   return (
     <div className="space-y-6">
-      <ClientAnalyticsCards {...analyticsData} />
-      
+      {/* Removed <ClientAnalyticsCards {...analyticsData} /> */}
+
       <ClientsHeader
         searchQuery={searchQuery}
         onSearchChange={onSearchChange}
@@ -118,7 +117,6 @@ export function ClientsTable({
           onDeleteSelected={handleDeleteSelected}
           onExportSelected={() => {
             // Placeholder for export logic
-            // You may later want to wire up actual export functionality
           }}
         />
       )}
@@ -168,3 +166,4 @@ export function ClientsTable({
     </div>
   );
 }
+
