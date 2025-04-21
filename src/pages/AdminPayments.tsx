@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { AdminLayout } from "@/components/admin/layout/AdminLayout";
 import { FinancialsHeader } from "@/components/admin/financials/FinancialsHeader";
@@ -11,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { seedInitialExpenses } from "@/utils/financial/seedExpenses";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { ImportExpensesButton } from "@/components/admin/financials/expense/ImportExpensesButton";
 
 export default function AdminPayments() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -124,16 +124,21 @@ export default function AdminPayments() {
       <div className="px-6 py-8 max-w-7xl mx-auto bg-black min-h-screen">
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
           <h1 className="text-3xl font-bold tracking-tight">Financial Management</h1>
-          {!expensesExist && (
-            <Button 
-              variant="secondary" 
-              onClick={handleSeedExpenses} 
-              disabled={isLoading || isSeeding}
-              className="mt-2 md:mt-0"
-            >
-              {isSeeding ? "Adding Expenses..." : "Add Sample Expenses"}
-            </Button>
-          )}
+          <div className="flex items-center gap-2">
+            {!expensesExist && (
+              <>
+                <Button 
+                  variant="secondary" 
+                  onClick={handleSeedExpenses} 
+                  disabled={isLoading || isSeeding}
+                  className="mt-2 md:mt-0"
+                >
+                  {isSeeding ? "Adding Expenses..." : "Add Sample Expenses"}
+                </Button>
+                <ImportExpensesButton onImport={loadData} />
+              </>
+            )}
+          </div>
         </div>
         
         <FinancialsHeader onFilterChange={handleFilterChange} onDataChange={loadData} />
