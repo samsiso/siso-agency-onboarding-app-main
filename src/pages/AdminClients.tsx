@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AdminLayout } from '@/components/admin/layout/AdminLayout';
@@ -11,6 +12,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useClientsList } from "@/hooks/client/useClientsList";
 import { ClientsCardGrid } from "@/components/admin/clients/ClientsCardGrid";
+import { Button } from '@/components/ui/button';
 
 export default function AdminClients() {
   const { isAdmin, isLoading } = useAdminCheck();
@@ -51,6 +53,9 @@ export default function AdminClients() {
     pageSize: 10,
     showAllColumns: true
   });
+
+  // Add view mode: "table" or "cards" - define this BEFORE useEffect hooks to fix the hooks order issue
+  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
 
   // Initialize the clients data and add admin role 
   useEffect(() => {
@@ -144,9 +149,6 @@ export default function AdminClients() {
   if (!isAdmin) {
     return null;
   }
-
-  // Add view mode: "table" or "cards"
-  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
 
   // Get clients data directly for Cards view, with search/filter/pagination
   const {

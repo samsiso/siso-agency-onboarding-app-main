@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ClientData, ClientViewPreference } from "@/types/client.types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { users, mail, phone } from "lucide-react";
+import { Users, Mail, Phone } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface ClientsCardGridProps {
@@ -70,7 +70,7 @@ export const ClientsCardGrid = ({
               />
             ) : (
               <div className="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center">
-                <users className="h-7 w-7 text-gray-500" />
+                <Users className="h-7 w-7 text-gray-500" />
               </div>
             )}
             <div>
@@ -91,13 +91,13 @@ export const ClientsCardGrid = ({
             <div className="flex flex-col gap-0.5 text-xs text-muted-foreground">
               {client.email && (
                 <div className="flex items-center gap-1">
-                  <mail className="h-3 w-3 mr-1" />
+                  <Mail className="h-3 w-3 mr-1" />
                   {client.email}
                 </div>
               )}
               {client.phone && (
                 <div className="flex items-center gap-1">
-                  <phone className="h-3 w-3 mr-1" />
+                  <Phone className="h-3 w-3 mr-1" />
                   {client.phone}
                 </div>
               )}
