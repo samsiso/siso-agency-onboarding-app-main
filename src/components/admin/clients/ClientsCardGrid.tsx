@@ -1,10 +1,9 @@
-
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { ClientData } from "@/types/client.types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Users, Mail, Phone, DollarSign, Flag, Calendar, ArrowRight, Clock, CheckCircle, Circle } from "lucide-react";
+import { Users, Mail, Phone, DollarSign, Calendar, ArrowRight, Clock, Circle, CheckCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useClientsList } from "@/hooks/client";
 import { Separator } from "@/components/ui/separator";
@@ -13,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
 import { EnhancedStatusBadge } from "./EnhancedStatusBadge";
+import { PriorityBadge } from "./PriorityBadge";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { Progress } from "@/components/ui/progress";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -117,29 +117,36 @@ export function ClientsCardGrid({
     <TooltipProvider>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {clients.map((client) => {
-          // Calculate progress percentage
           const progressPercentage = client.total_steps 
             ? Math.round((client.current_step / client.total_steps) * 100) 
             : 0;
           
-          // Calculate financial percentage
           const financialPercentage = (client.estimated_price && client.estimated_price > 0) 
-            ? Math.min(Math.round(((client.estimated_price * 0.6) / client.estimated_price) * 100), 100) // Simulating 60% collected as an example
+            ? Math.min(Math.round(((client.estimated_price * 0.6) / client.estimated_price) * 100), 100) 
             : 0;
           
-          // Show top 2 incomplete todos if available
           const incompleteTodos = client.todos?.filter(todo => !todo.completed).slice(0, 2) || [];
           const totalRemainingTodos = (client.todos?.filter(todo => !todo.completed).length || 0) - incompleteTodos.length;
 
           return (
             <Card
               key={client.id}
-              className="flex flex-col hover:shadow-lg hover:scale-[1.02] transition-all duration-200 bg-card/50 backdrop-blur-sm"
+              className={cn(
+                "flex flex-col hover:shadow-lg hover:scale-[1.02] transition-all duration-200",
+                "bg-gradient-to-br from-card/90 to-card/50 backdrop-blur-sm",
+                client.priority === 'high' && 'border-red-500/30',
+                client.priority === 'medium' && 'border-amber-500/30',
+                client.priority === 'low' && 'border-green-500/30'
+              )}
             >
               <CardHeader 
-                className="flex flex-row items-center gap-3 pt-6 cursor-pointer"
+                className="flex flex-row items-center gap-3 pt-6 cursor-pointer relative"
                 onClick={() => navigate(`/admin/clients/${client.id}`)}
               >
+                <div className="absolute top-2 right-2">
+                  <PriorityBadge priority={client.priority} />
+                </div>
+                
                 {client.avatar_url ? (
                   <img
                     src={client.avatar_url}
@@ -160,24 +167,13 @@ export function ClientsCardGrid({
                       {client.business_name}
                     </div>
                   )}
-                  <div className="flex items-center gap-2 mt-2 flex-wrap">
+                  <div className="flex items-center gap-2 mt-2">
                     <EnhancedStatusBadge status={client.status} />
-                    {client.priority && (
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <Badge variant="outline" className={cn("gap-1 border-none", getPriorityColor(client.priority))}>
-                            <Flag className="h-3 w-3" />
-                            <span>{client.priority}</span>
-                          </Badge>
-                        </TooltipTrigger>
-                        <TooltipContent>Priority Level</TooltipContent>
-                      </Tooltip>
-                    )}
                   </div>
                 </div>
               </CardHeader>
 
-              <CardContent className="flex-1 space-y-4">
+              <CardContent className="space-y-4">
                 {/* Project Progress */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
@@ -201,30 +197,17 @@ export function ClientsCardGrid({
                   </div>
                 </div>
 
-                {/* Financial Progress (if price available) */}
+                {/* Financial Information */}
                 {client.estimated_price && (
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground flex items-center gap-1.5">
                         <DollarSign className="h-3.5 w-3.5" />
-                        Payment Progress
+                        Project Value
                       </span>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <Badge 
-                            variant="outline" 
-                            className={cn("font-normal", 
-                              client.payment_status === 'paid' ? "text-green-500 border-green-200" : 
-                              client.payment_status === 'pending' ? "text-amber-500 border-amber-200" :
-                              client.payment_status === 'overdue' ? "text-red-500 border-red-200" :
-                              "text-muted-foreground"
-                            )}
-                          >
-                            {client.payment_status || "Not set"}
-                          </Badge>
-                        </TooltipTrigger>
-                        <TooltipContent>Payment Status</TooltipContent>
-                      </Tooltip>
+                      <Badge variant="outline" className="font-normal">
+                        {formatCurrency(client.estimated_price)}
+                      </Badge>
                     </div>
                     <div className="flex items-center gap-2">
                       <Progress 
@@ -235,10 +218,6 @@ export function ClientsCardGrid({
                       <span className="text-xs font-medium min-w-[2rem] text-right">
                         {financialPercentage}%
                       </span>
-                    </div>
-                    <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>Collected: {formatCurrency(client.estimated_price * 0.6)}</span>
-                      <span>Total: {formatCurrency(client.estimated_price)}</span>
                     </div>
                   </div>
                 )}
@@ -296,50 +275,26 @@ export function ClientsCardGrid({
                   </div>
                 )}
 
-                {/* Project Details */}
-                {(client.project_name || client.company_niche) && (
-                  <>
-                    <Separator className="my-2 opacity-50" />
-                    <div className="space-y-1.5">
-                      {client.project_name && (
-                        <div className="space-y-0.5">
-                          <div className="text-xs text-muted-foreground">Project</div>
-                          <div className="font-medium text-sm">{client.project_name}</div>
-                        </div>
-                      )}
-                      {client.company_niche && (
-                        <div className="space-y-0.5">
-                          <div className="text-xs text-muted-foreground">Industry</div>
-                          <div className="text-sm">{client.company_niche}</div>
-                        </div>
-                      )}
-                    </div>
-                  </>
-                )}
-
                 {/* Timeline */}
                 {(client.start_date || client.estimated_completion_date) && (
-                  <>
-                    <Separator className="my-2 opacity-50" />
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      {client.start_date && (
-                        <div>
-                          <div className="text-xs text-muted-foreground flex items-center gap-1">
-                            <Calendar className="h-3 w-3" /> Started
-                          </div>
-                          <div>{formatDate(client.start_date, 'short')}</div>
+                  <div className="grid grid-cols-2 gap-2 text-sm border-t pt-2">
+                    {client.start_date && (
+                      <div>
+                        <div className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Calendar className="h-3 w-3" /> Started
                         </div>
-                      )}
-                      {client.estimated_completion_date && (
-                        <div>
-                          <div className="text-xs text-muted-foreground flex items-center gap-1">
-                            <Calendar className="h-3 w-3" /> Due
-                          </div>
-                          <div>{formatDate(client.estimated_completion_date, 'short')}</div>
+                        <div>{formatDate(client.start_date, 'short')}</div>
+                      </div>
+                    )}
+                    {client.estimated_completion_date && (
+                      <div>
+                        <div className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Calendar className="h-3 w-3" /> Due
                         </div>
-                      )}
-                    </div>
-                  </>
+                        <div>{formatDate(client.estimated_completion_date, 'short')}</div>
+                      </div>
+                    )}
+                  </div>
                 )}
               </CardContent>
               
