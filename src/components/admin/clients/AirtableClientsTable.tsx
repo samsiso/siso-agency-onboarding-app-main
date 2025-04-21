@@ -77,7 +77,7 @@ function statusToBadge(status: string) {
 
 type TableClient = ClientData & { id: string; };
 
-// Columns that look like Airtable demo but use our data fields
+// Add a new column for "Go to Client Page"
 const columns: ColumnDef<TableClient>[] = [
   {
     id: "select",
@@ -148,6 +148,28 @@ const columns: ColumnDef<TableClient>[] = [
       return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(Number(price));
     },
     size: 120,
+  },
+  // New column with button linking to client detail page
+  {
+    id: "viewClient",
+    header: "Client Page",
+    cell: ({ row }) => {
+      const clientId = row.original.id;
+      return (
+        <a
+          href={`/admin/clients/${clientId}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Button size="sm" variant="outline" className="whitespace-nowrap">
+            Go to client page
+          </Button>
+        </a>
+      );
+    },
+    size: 130,
+    enableSorting: false,
+    enableHiding: false,
   },
   {
     id: "actions",
