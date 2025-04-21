@@ -4,9 +4,16 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ClientData } from "@/types/client.types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Users, Mail, Phone } from "lucide-react";
+import { Users, Mail, Phone, DollarSign, Flag } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useClientsList } from "@/hooks/client";
+import { Separator } from "@/components/ui/separator";
+import { formatCurrency } from "@/lib/formatters";
+import { Badge } from "@/components/ui/badge";
+import { formatDate } from "@/lib/formatters";
+import { cn } from "@/lib/utils";
+import { EnhancedStatusBadge } from "./EnhancedStatusBadge";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 
 interface ClientsCardGridProps {
   searchQuery: string;
@@ -34,7 +41,7 @@ export const ClientsCardGrid = ({
     statusFilter,
     sortColumn,
     sortDirection,
-    pageSize: 100, // Show more items in card view
+    pageSize: 100,
   });
 
   const handleRefetch = () => {
@@ -45,12 +52,24 @@ export const ClientsCardGrid = ({
     }
   };
 
+  const getPriorityColor = (priority: string | null) => {
+    switch (priority?.toLowerCase()) {
+      case 'high':
+        return 'text-red-500';
+      case 'medium':
+        return 'text-amber-500';
+      case 'low':
+        return 'text-green-500';
+      default:
+        return 'text-muted-foreground';
+    }
+  };
+
   if (isLoading) {
-    // Show grid skeleton while loading
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {Array.from({ length: 6 }).map((_, i) => (
-          <Card key={i}>
+          <Card key={i} className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <Skeleton className="h-8 w-8 rounded-full mb-2" />
               <Skeleton className="h-4 w-28 mb-1" />
@@ -78,73 +97,145 @@ export const ClientsCardGrid = ({
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      {clients.map((client) => (
-        <Card
-          key={client.id}
-          className="hover:shadow-lg hover:scale-[1.02] transition-transform cursor-pointer"
-          onClick={() => navigate(`/admin/clients/${client.id}`)}
-        >
-          <CardHeader className="flex flex-row items-center gap-3 pt-6">
-            {client.avatar_url ? (
-              <img
-                src={client.avatar_url}
-                alt={client.full_name || "Client"}
-                className="h-12 w-12 rounded-full object-cover border"
-              />
-            ) : (
-              <div className="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center">
-                <Users className="h-7 w-7 text-gray-500" />
-              </div>
-            )}
-            <div>
-              <CardTitle className="text-base font-semibold leading-tight">
-                {client.full_name || "Unknown"}
-              </CardTitle>
-              <div className="text-xs text-muted-foreground">
-                {client.business_name || "—"}
-              </div>
-              <div className="text-xs mt-1">
-                <span className="inline-block rounded bg-gray-900/60 px-2 py-0.5 mr-1 text-primary text-xs">
-                  {client.status}
-                </span>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-2">
-            <div className="flex flex-col gap-0.5 text-xs text-muted-foreground">
-              {client.email && (
-                <div className="flex items-center gap-1">
-                  <Mail className="h-3 w-3 mr-1" />
-                  {client.email}
+    <TooltipProvider>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {clients.map((client) => (
+          <Card
+            key={client.id}
+            className="hover:shadow-lg hover:scale-[1.02] transition-all duration-200 cursor-pointer bg-card/50 backdrop-blur-sm"
+            onClick={() => navigate(`/admin/clients/${client.id}`)}
+          >
+            <CardHeader className="flex flex-row items-center gap-3 pt-6">
+              {client.avatar_url ? (
+                <img
+                  src={client.avatar_url}
+                  alt={client.full_name || "Client"}
+                  className="h-12 w-12 rounded-full object-cover border"
+                />
+              ) : (
+                <div className="h-12 w-12 rounded-full bg-muted/30 flex items-center justify-center">
+                  <Users className="h-7 w-7 text-muted-foreground/70" />
                 </div>
               )}
-              {client.phone && (
-                <div className="flex items-center gap-1">
-                  <Phone className="h-3 w-3 mr-1" />
-                  {client.phone}
+              <div className="flex-1">
+                <CardTitle className="text-base font-semibold leading-tight">
+                  {client.full_name || "Unknown"}
+                </CardTitle>
+                {client.business_name && (
+                  <div className="text-sm text-muted-foreground mt-0.5">
+                    {client.business_name}
+                  </div>
+                )}
+                <div className="flex items-center gap-2 mt-2">
+                  <EnhancedStatusBadge status={client.status} />
+                  {client.priority && (
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Badge variant="outline" className={cn("gap-1 border-none", getPriorityColor(client.priority))}>
+                          <Flag className="h-3 w-3" />
+                          <span>{client.priority}</span>
+                        </Badge>
+                      </TooltipTrigger>
+                      <TooltipContent>Priority Level</TooltipContent>
+                    </Tooltip>
+                  )}
                 </div>
-              )}
-              {client.project_name && (
-                <div>
-                  <span className="font-medium">Project:</span> {client.project_name}
-                </div>
-              )}
-            </div>
-            <Button
-              size="sm"
-              className="w-full mt-4"
-              variant="outline"
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate(`/admin/clients/${client.id}`);
-              }}
-            >
-              View Details
-            </Button>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-2 space-y-4">
+              <div className="grid gap-3 text-sm">
+                {/* Contact Info */}
+                {(client.email || client.phone) && (
+                  <div className="space-y-1.5">
+                    {client.email && (
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Mail className="h-3.5 w-3.5" />
+                        <span className="truncate">{client.email}</span>
+                      </div>
+                    )}
+                    {client.phone && (
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Phone className="h-3.5 w-3.5" />
+                        <span>{client.phone}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Project Details */}
+                {(client.project_name || client.company_niche) && (
+                  <>
+                    <Separator className="my-2 opacity-50" />
+                    <div className="space-y-1.5">
+                      {client.project_name && (
+                        <div className="space-y-0.5">
+                          <div className="text-xs text-muted-foreground">Project</div>
+                          <div className="font-medium">{client.project_name}</div>
+                        </div>
+                      )}
+                      {client.company_niche && (
+                        <div className="space-y-0.5">
+                          <div className="text-xs text-muted-foreground">Industry</div>
+                          <div>{client.company_niche}</div>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+
+                {/* Financial Info */}
+                {(client.estimated_price || client.payment_status) && (
+                  <>
+                    <Separator className="my-2 opacity-50" />
+                    <div className="space-y-1.5">
+                      {client.estimated_price && (
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-1.5 text-muted-foreground">
+                            <DollarSign className="h-3.5 w-3.5" />
+                            <span>Budget</span>
+                          </div>
+                          <span className="font-medium">
+                            {formatCurrency(client.estimated_price)}
+                          </span>
+                        </div>
+                      )}
+                      {client.payment_status && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-muted-foreground">Payment Status</span>
+                          <Badge variant="outline" className="font-normal">
+                            {client.payment_status}
+                          </Badge>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+
+                {/* Timeline */}
+                {(client.start_date || client.estimated_completion_date) && (
+                  <>
+                    <Separator className="my-2 opacity-50" />
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      {client.start_date && (
+                        <div>
+                          <div className="text-xs text-muted-foreground">Started</div>
+                          <div>{formatDate(client.start_date, 'short')}</div>
+                        </div>
+                      )}
+                      {client.estimated_completion_date && (
+                        <div>
+                          <div className="text-xs text-muted-foreground">Due</div>
+                          <div>{formatDate(client.estimated_completion_date, 'short')}</div>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </TooltipProvider>
   );
 };
