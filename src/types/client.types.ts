@@ -43,6 +43,8 @@ export interface ClientData {
   next_steps?: string | null;
   key_research?: string | null;
   priority?: string | null;
+  contact_name?: string | null;
+  company_name?: string | null;
 }
 
 export interface TodoItem {

@@ -7,7 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { TodoList } from "@/components/admin/clients/TodoList";
-import { ClientData } from "@/types/client.types";
+import { ClientData, TodoItem } from "@/types/client.types";
 
 /** Shows dashboard linked to a logged-in client-portal user */
 export default function ClientDashboard() {
