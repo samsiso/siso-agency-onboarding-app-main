@@ -85,8 +85,15 @@ export default function ClientDashboard() {
           setLoading(false);
           return;
         }
-        
-        // Create a complete ClientData object with all required fields
+
+        // Get todos from custom extension data if available (avoid TypeScript error)
+        let todos: TodoItem[] = [];
+        // @ts-ignore
+        if (clientData.todos && Array.isArray(clientData.todos)) {
+          // @ts-ignore
+          todos = clientData.todos as TodoItem[];
+        }
+
         const completeClientData: ClientData = {
           id: clientData.id,
           full_name: clientData.contact_name || '',
@@ -105,9 +112,9 @@ export default function ClientDashboard() {
           company_niche: clientData.company_niche,
           contact_name: clientData.contact_name,
           company_name: clientData.company_name,
-          todos: Array.isArray(clientData.todos) ? clientData.todos : []
+          todos: todos,
         };
-        
+
         setClient(completeClientData);
       } catch (error) {
         console.error('Unexpected error in fetchClientData:', error);
