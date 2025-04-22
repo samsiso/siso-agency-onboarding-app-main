@@ -11,7 +11,8 @@ import {
   GanttHeader,
   GanttStatus,
   GanttFeature,
-  GanttMarker
+  GanttMarker,
+  GanttTimeline
 } from '@/components/ui/gantt';
 
 type TimelineTaskViewProps = {
@@ -103,7 +104,7 @@ export const TimelineTaskView: React.FC<TimelineTaskViewProps> = ({ memberId }) 
             ))}
           </GanttSidebarGroup>
         </GanttSidebar>
-        <div className="relative">
+        <GanttTimeline>
           <GanttHeader />
           <GanttFeatureList>
             <GanttFeatureListGroup>
@@ -124,7 +125,7 @@ export const TimelineTaskView: React.FC<TimelineTaskViewProps> = ({ memberId }) 
               />
             ))}
           </GanttFeatureList>
-        </div>
+        </GanttTimeline>
       </Gantt>
     </div>
   );

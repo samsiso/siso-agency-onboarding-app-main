@@ -12,6 +12,7 @@ import {
   GanttSidebarItem,
   GanttTimeline,
   GanttToday,
+  Gantt,
 } from '@/components/ui/gantt';
 import { Eye as EyeIcon, Link as LinkIcon, Trash as TrashIcon } from 'lucide-react';
 import {
@@ -401,7 +402,7 @@ const Demo = () => {
       ...groups,
       [groupName]: [...(groups[groupName] || []), feature],
     };
-  }, {});
+  }, {} as Record<string, typeof exampleFeatures>);
 
   const sortedGroupedFeatures = Object.fromEntries(
     Object.entries(groupedFeatures).sort(([nameA], [nameB]) =>
@@ -417,7 +418,7 @@ const Demo = () => {
   const handleCreateMarker = (date) => console.log("Create marker: " + date.toISOString());
 
   return (
-    <GanttProvider>
+    <Gantt>
       <GanttSidebar>
         {Object.entries(sortedGroupedFeatures).map(([groupName, groupFeatures]) => (
           <GanttSidebarGroup name={groupName} key={groupName}>
@@ -456,7 +457,7 @@ const Demo = () => {
         <GanttToday />
         <GanttCreateMarkerTrigger onCreateMarker={handleCreateMarker} />
       </GanttTimeline>
-    </GanttProvider>
+    </Gantt>
   );
 };
 

@@ -19,6 +19,22 @@ export * from './gantt/gantt-columns';
 export * from './gantt/gantt-feature-item';
 export * from './gantt/gantt-marker';
 
+// New components to export
+export const GanttProvider: FC<{children: React.ReactNode}> = ({ children }) => (
+  <Gantt>{children}</Gantt>
+);
+
+export const GanttTimeline: FC<{children: React.ReactNode, className?: string}> = ({ children, className }) => (
+  <div data-roadmap-ui="gantt-timeline" className={cn("relative h-max w-max", className)}>
+    {children}
+  </div>
+);
+
+export const GanttToday: FC = () => {
+  const today = new Date();
+  return <GanttMarker id="today" date={today} label="Today" />;
+};
+
 export type GanttProps = {
   className?: string;
   children: React.ReactNode;

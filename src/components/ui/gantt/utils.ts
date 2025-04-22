@@ -12,6 +12,10 @@ import {
   getDaysInMonth,
   startOfDay,
   startOfMonth,
+  isSameDay,
+  format,
+  formatDistance,
+  getDate
 } from 'date-fns';
 import { GanttContextProps } from './gantt-context';
 import { Range, TimelineData } from './types';
@@ -199,4 +203,4 @@ export const calculateInnerOffset = (
 };
 
 // Re-export functions from date-fns that we need
-export { isSameDay, format, formatDistance, getDate } from 'date-fns';
+export { isSameDay, format, formatDistance, getDate, addDays } from 'date-fns';
