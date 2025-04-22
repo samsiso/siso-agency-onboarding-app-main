@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { ClientSidebar } from '@/components/client/ClientSidebar';
 import { Card } from '@/components/ui/card';
@@ -9,6 +8,7 @@ import { FileText, Download, FileArchive, FilePlus, Image, File } from 'lucide-r
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ClientDocument } from '@/types/client.types';
+import { ClientDashboardLayout } from "@/components/client/ClientDashboardLayout";
 
 export default function ClientDocumentsPage() {
   const [documents, setDocuments] = useState<ClientDocument[]>([]);
@@ -98,9 +98,8 @@ export default function ClientDocumentsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex bg-slate-50">
-        <ClientSidebar />
-        <div className="flex-1 p-6">
+      <ClientDashboardLayout>
+        <div>
           <Skeleton className="h-10 w-48 mb-6" />
           <Skeleton className="h-12 w-full mb-6 rounded-lg" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -109,65 +108,62 @@ export default function ClientDocumentsPage() {
             ))}
           </div>
         </div>
-      </div>
+      </ClientDashboardLayout>
     );
   }
 
   return (
-    <div className="min-h-screen flex bg-slate-50">
-      <ClientSidebar />
-      <div className="flex-1 p-6 overflow-y-auto">
-        <div className="max-w-5xl mx-auto">
-          <h1 className="text-3xl font-bold mb-6 text-slate-900">Documents</h1>
-          
-          <div className="mb-6">
-            <Input
-              placeholder="Search documents..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="max-w-md"
-            />
-          </div>
-          
-          {filteredDocuments.length === 0 ? (
-            <Card className="p-8 text-center">
-              <FileText className="h-12 w-12 mx-auto text-slate-300 mb-3" />
-              <h2 className="text-xl font-medium mb-2">No Documents Found</h2>
-              <p className="text-slate-500 mb-6">
-                {documents.length === 0 
-                  ? "No documents have been shared with you yet."
-                  : "No documents match your search criteria."}
-              </p>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {filteredDocuments.map((doc) => (
-                <Card key={doc.id} className="p-5 border border-slate-200 hover:shadow-md transition-shadow">
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-slate-100 rounded-md">
-                      {getDocumentIcon(doc.document_type)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-slate-900 truncate" title={doc.title}>
-                        {doc.title}
-                      </h3>
-                      <p className="text-sm text-slate-500 mb-1">
-                        {getDocumentTypeName(doc.document_type)}
-                      </p>
-                      <p className="text-xs text-slate-400">
-                        Updated: {new Date(doc.updated_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <Button variant="ghost" size="sm" className="mt-0.5">
-                      <Download className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          )}
+    <ClientDashboardLayout>
+      <div className="max-w-5xl mx-auto">
+        <h1 className="text-3xl font-bold mb-6 text-slate-900">Documents</h1>
+
+        <div className="mb-6">
+          <Input
+            placeholder="Search documents..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="max-w-md"
+          />
         </div>
+
+        {filteredDocuments.length === 0 ? (
+          <Card className="p-8 text-center">
+            <FileText className="h-12 w-12 mx-auto text-slate-300 mb-3" />
+            <h2 className="text-xl font-medium mb-2">No Documents Found</h2>
+            <p className="text-slate-500 mb-6">
+              {documents.length === 0 
+                ? "No documents have been shared with you yet."
+                : "No documents match your search criteria."}
+            </p>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {filteredDocuments.map((doc) => (
+              <Card key={doc.id} className="p-5 border border-slate-200 hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 bg-slate-100 rounded-md">
+                    {getDocumentIcon(doc.document_type)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium text-slate-900 truncate" title={doc.title}>
+                      {doc.title}
+                    </h3>
+                    <p className="text-sm text-slate-500 mb-1">
+                      {getDocumentTypeName(doc.document_type)}
+                    </p>
+                    <p className="text-xs text-slate-400">
+                      Updated: {new Date(doc.updated_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <Button variant="ghost" size="sm" className="mt-0.5">
+                    <Download className="h-4 w-4" />
+                  </Button>
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
-    </div>
+    </ClientDashboardLayout>
   );
 }
