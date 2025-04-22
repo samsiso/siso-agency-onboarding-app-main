@@ -34,12 +34,13 @@ export default function AdminClients() {
     return null;
   }
 
-  // Clients Dashboard: polished blue gradient, single title
+  // Clients Dashboard: black background (modern)
   return (
     <AdminLayout>
-      <div className="min-h-screen pb-12" style={{
-        background: "linear-gradient(90deg, hsla(221, 45%, 73%, 1) 0%, hsla(220, 78%, 29%, 1) 100%)"
-      }}>
+      <div className="min-h-screen pb-12"
+        style={{
+          background: "linear-gradient(90deg, #000000 0%, #221F26 100%)"
+        }}>
         <div className="container mx-auto px-2 py-6">
           <AdminPageTitle
             icon={Users}

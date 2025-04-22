@@ -35,7 +35,6 @@ interface AdminClientsViewProps {
 }
 
 export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
-  const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [viewPreference, setViewPreference] = useLocalStorage<ClientViewPreference>(
     'client_view_preference',
@@ -45,7 +44,7 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
 
   // Stats - fetch ONE query for total clients & total financials
   const { clients = [], isLoading } = useClientsList({
-    searchQuery,
+    searchQuery: "", // No top search input anymore; show all for now
     statusFilter,
     sortColumn: viewPreference.sortColumn,
     sortDirection: viewPreference.sortDirection,
@@ -62,11 +61,6 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
     setViewPreference(prev => ({ ...prev, ...updates }));
   };
 
-  // Search handler
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-  };
-
   // Status filter handler
   const handleStatusFilterChange = (status: string) => {
     setStatusFilter(status);
@@ -81,10 +75,8 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
       />
       {/* Priority Clients */}
       <PriorityListing limit={3} />
-      {/* Controls Bar (search/filter/view mode) */}
+      {/* Controls Bar (just status + view switcher) */}
       <ClientsControlsBar
-        searchQuery={searchQuery}
-        onSearchChange={handleSearch}
         statusFilter={statusFilter}
         onStatusFilterChange={handleStatusFilterChange}
         viewMode={viewMode}
@@ -93,15 +85,15 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
       {/* Main Content Area */}
       <div>
         {viewMode === "table" ? (
-          <ClientsEnhancedTable 
-            searchQuery={searchQuery}
+          <ClientsEnhancedTable
+            searchQuery="" // No top search anymore
             statusFilter={statusFilter}
-            onSearchChange={setSearchQuery}
+            onSearchChange={() => {}}
             onStatusFilterChange={setStatusFilter}
           />
         ) : (
-          <ClientsCardGrid 
-            searchQuery={searchQuery}
+          <ClientsCardGrid
+            searchQuery=""
             statusFilter={statusFilter}
             sortColumn={viewPreference.sortColumn}
             sortDirection={viewPreference.sortDirection}
