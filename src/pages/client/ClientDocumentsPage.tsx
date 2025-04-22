@@ -38,7 +38,14 @@ export default function ClientDocumentsPage() {
           .order('created_at', { ascending: false });
 
         if (error) throw error;
-        setDocuments(data || []);
+
+        // Cast the document_type to ensure it matches the ClientDocument type
+        const typedDocuments = (data || []).map(doc => ({
+          ...doc,
+          document_type: doc.document_type as "app_plan" | "functionalities" | "wireframes" | "inspiration"
+        })) as ClientDocument[];
+
+        setDocuments(typedDocuments);
       } catch (error) {
         console.error('Error fetching documents:', error);
         toast({

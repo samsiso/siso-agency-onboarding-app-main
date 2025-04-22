@@ -47,10 +47,19 @@ export default function ClientTasksPage() {
 
         if (error) throw error;
         if (data) {
-          // Parse todos array with safe fallback
+          // Parse todos array with safe fallback and proper casting
           let todos: TodoItem[] = [];
           if (data.todos && Array.isArray(data.todos)) {
-            todos = data.todos as TodoItem[];
+            // Ensure each todo item has the required properties of TodoItem
+            todos = (data.todos as any[]).map(item => ({
+              id: item.id || `temp-${Math.random().toString(36).substr(2, 9)}`,
+              text: item.text || '',
+              completed: !!item.completed,
+              priority: item.priority || 'medium',
+              due_date: item.due_date,
+              related_to: item.related_to,
+              assigned_to: item.assigned_to
+            })) as TodoItem[];
           }
           
           const clientData = {
