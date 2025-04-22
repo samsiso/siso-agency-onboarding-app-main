@@ -1,6 +1,8 @@
 
 import React, { useState } from 'react';
 import { AdminLayout } from '@/components/admin/layout/AdminLayout';
+import { AdminPageTitle } from '@/components/admin/layout/AdminPageTitle';
+import { Settings } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
@@ -9,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Save, Settings, Users, Shield, Bell } from 'lucide-react';
+import { Loader2, Users, Shield, Bell } from 'lucide-react';
 import { useAuthSession } from '@/hooks/useAuthSession';
 
 export default function AdminSettings() {
@@ -20,8 +22,6 @@ export default function AdminSettings() {
 
   const handleSave = (section: string) => {
     setIsSaving(true);
-    
-    // Simulate API call
     setTimeout(() => {
       setIsSaving(false);
       toast({
@@ -34,9 +34,9 @@ export default function AdminSettings() {
   return (
     <AdminLayout>
       <div className="container mx-auto p-6 space-y-6">
+        <AdminPageTitle icon={Settings} title="Settings" />
         <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-2 md:space-y-0">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
             <p className="text-muted-foreground">
               Manage your admin preferences and system configurations
             </p>
@@ -102,7 +102,7 @@ export default function AdminSettings() {
                       </>
                     ) : (
                       <>
-                        <Save className="mr-2 h-4 w-4" />
+                        <span className="sr-only">Save</span> {/* for accessibility */}
                         Save Changes
                       </>
                     )}

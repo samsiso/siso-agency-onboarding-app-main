@@ -1,6 +1,8 @@
 
 import React, { useState } from 'react';
 import { AdminLayout } from '@/components/admin/layout/AdminLayout';
+import { AdminPageTitle } from '@/components/admin/layout/AdminPageTitle';
+import { UsersIcon } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -43,9 +45,12 @@ export default function AdminTeams() {
   return (
     <AdminLayout>
       <div className="container mx-auto p-4">
+        <AdminPageTitle
+          icon={UsersIcon}
+          title="Team Management"
+        />
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
           <div>
-            <h1 className="text-2xl font-bold">Team Management</h1>
             <p className="text-muted-foreground">Manage your team members, tasks, and communication</p>
           </div>
           
