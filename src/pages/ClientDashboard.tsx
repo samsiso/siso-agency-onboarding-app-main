@@ -20,9 +20,10 @@ export default function ClientDashboard() {
     if (!client) return;
 
     try {
+      // Converting the TodoItem[] to a plain JSON object to satisfy the type requirements
       const { error } = await supabase
         .from('client_onboarding')
-        .update({ todos: JSON.parse(JSON.stringify(todos)) }) // Convert to plain JSON object
+        .update({ todos: todos }) // TypeScript will convert this to JSON during the API call
         .eq('id', client.id);
 
       if (error) {
