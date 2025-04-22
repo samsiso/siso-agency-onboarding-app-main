@@ -144,7 +144,8 @@ export default function AdminPayments() {
 
   return (
     <AdminLayout>
-      <div className="px-6 py-8 max-w-7xl mx-auto bg-black min-h-screen">
+      {/* Accent color: purple background for financials; only 1 title */}
+      <div className="px-6 py-8 max-w-7xl mx-auto min-h-screen bg-gradient-to-br from-purple-100 via-purple-50 to-white rounded-lg">
         <AdminPageTitle
           icon={Wallet}
           title="Financial Management"
@@ -153,7 +154,7 @@ export default function AdminPayments() {
         {/* SINGLE header and buttons section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Financial Management</h1>
+            <p className="text-2xl font-bold tracking-tight text-purple-900">Financial Management</p>
             <p className="text-sm text-muted-foreground mt-1">
               Manage your expenses and revenue
             </p>
@@ -183,7 +184,6 @@ export default function AdminPayments() {
                 <ImportExpensesButton onImport={loadData} />
               </>
             )}
-            {/* Actions for custom add/filter/import can be handled here */}
           </div>
         </div>
         
@@ -197,9 +197,7 @@ export default function AdminPayments() {
             </div>
           </Card>
         )}
-        
-        {/* Remove FinancialsHeader - its controls merged up above */}
-        {/* <FinancialsHeader onFilterChange={handleFilterChange} onDataChange={loadData} /> */}
+
         <Tabs defaultValue="dashboard" className="mt-6" onValueChange={setActiveTab}>
           <TabsList className="grid grid-cols-4 w-full max-w-md">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>

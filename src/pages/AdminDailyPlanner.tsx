@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { AdminLayout } from '@/components/admin/layout/AdminLayout';
 import { DailyPlannerHeader } from '@/components/admin/daily-planner/DailyPlannerHeader';
@@ -38,14 +37,16 @@ export default function AdminDailyPlanner() {
     return null; // AuthGuard should handle redirection
   }
 
+  // Daily Planner: single title bar; green accent
   return (
     <AdminLayout>
-      <div className="container mx-auto p-6 space-y-6">
+      <div className="container mx-auto p-6 space-y-6 bg-gradient-to-br from-green-50 via-white to-teal-100 rounded-xl min-h-screen">
         <AdminPageTitle
           icon={CalendarClock}
           title="Daily Planner"
           subtitle="Plan your team's daily agenda, tasks, and meetings"
         />
+        {/* Only keep main header here, don't double up titles */}
         <DailyPlannerHeader />
         <DailyPlannerTabs />
       </div>

@@ -17,8 +17,8 @@ export default function AdminTasks() {
           title="Team Tasks Dashboard"
           subtitle="Click on a team member's card to view and manage their tasks, track progress, and set new goals."
         />
-        {/* Placeholder Card for plan future "stats/data" */}
-        <Card>
+        {/* Polished stat-block */}
+        <Card className="bg-gradient-to-br from-orange-50 via-white to-yellow-50 border border-orange-200">
           <CardContent className="py-8 text-center">
             <span className="text-muted-foreground">
               Analytics/Stats block coming soon!

@@ -34,12 +34,13 @@ export default function AdminClients() {
     return null;
   }
 
+  // MANCHESTER's dashboard: blue accent, single title bar
   return (
     <AdminLayout>
-      <div className="container mx-auto p-4">
+      <div className="container mx-auto p-4 bg-gradient-to-tr from-blue-50 via-blue-100 to-white rounded-lg min-h-screen">
         <AdminPageTitle
           icon={Users}
-          title="Clients"
+          title="Clients Dashboard"
           subtitle="Manage your organization's clients and view details"
         />
         <AdminClientsView isAdmin={isAdmin} />
@@ -47,3 +48,4 @@ export default function AdminClients() {
     </AdminLayout>
   );
 }
+
