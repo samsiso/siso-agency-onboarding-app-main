@@ -19,9 +19,12 @@ export * from './gantt/gantt-columns';
 export * from './gantt/gantt-feature-item';
 export * from './gantt/gantt-marker';
 
+// Define the props types for GanttProvider
+export type GanttProviderProps = GanttProps;
+
 // New components to export
-export const GanttProvider: FC<{children: React.ReactNode}> = ({ children }) => (
-  <Gantt>{children}</Gantt>
+export const GanttProvider: FC<GanttProviderProps> = (props) => (
+  <Gantt {...props} />
 );
 
 export const GanttTimeline: FC<{children: React.ReactNode, className?: string}> = ({ children, className }) => (

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   GanttCreateMarkerTrigger,
@@ -12,7 +13,6 @@ import {
   GanttSidebarItem,
   GanttTimeline,
   GanttToday,
-  Gantt,
 } from '@/components/ui/gantt';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { Eye as EyeIcon, Link as LinkIcon, Trash as TrashIcon } from 'lucide-react';
@@ -411,14 +411,14 @@ const Demo = () => {
     )
   );
 
-  const handleViewFeature = (id) => console.log("Feature selected: " + id);
-  const handleCopyLink = (id) => console.log("Copy link: " + id);
-  const handleRemoveFeature = (id) =>
+  const handleViewFeature = (id: string) => console.log("Feature selected: " + id);
+  const handleCopyLink = (id: string) => console.log("Copy link: " + id);
+  const handleRemoveFeature = (id: string) =>
     setFeatures((prev) => prev.filter((feature) => feature.id !== id));
-  const handleRemoveMarker = (id) => console.log("Remove marker: " + id);
-  const handleCreateMarker = (date) => console.log("Create marker: " + date.toISOString());
+  const handleRemoveMarker = (id: string) => console.log("Remove marker: " + id);
+  const handleCreateMarker = (date: Date) => console.log("Create marker: " + date.toISOString());
 
- const handleMoveFeature = (id: string, startAt: Date, endAt: Date | null) => {
+  const handleMoveFeature = (id: string, startAt: Date, endAt: Date | null) => {
     if (!endAt) {
       return;
     }
