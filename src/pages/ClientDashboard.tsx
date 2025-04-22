@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { TodoList } from "@/components/admin/clients/TodoList";
 import { ClientData, TodoItem } from "@/types/client.types";
+import { ClientSidebar } from "@/components/client/ClientSidebar";
 
 /** Shows dashboard linked to a logged-in client-portal user */
 export default function ClientDashboard() {
@@ -23,7 +24,7 @@ export default function ClientDashboard() {
       // Serialize the todos to JSON to meet Supabase type requirements
       const { error } = await supabase
         .from('client_onboarding')
-        .update({ todos: JSON.parse(JSON.stringify(todos)) }) // Convert to plain JSON objects
+        .update({ todos: JSON.parse(JSON.stringify(todos)) })
         .eq('id', client.id);
 
       if (error) {
@@ -189,30 +190,35 @@ export default function ClientDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6">
-      <Card className="w-full max-w-2xl p-8">
-        <h1 className="text-3xl font-bold mb-4 text-slate-900">
-          Welcome, {client.contact_name || client.company_name || "Client"}
-        </h1>
-        <p className="mb-3">Status: <span className="font-semibold">{client.status}</span></p>
-        <p className="mb-1">Project Name: <span className="font-semibold">{client.project_name || "-"}</span></p>
-        <p className="mb-1">Niche: <span className="font-semibold">{client.company_niche || "-"}</span></p>
-        <p className="mb-1">Website: {client.website_url ? <a href={client.website_url} className="text-blue-600 underline">{client.website_url}</a> : "-"}</p>
-        
-        {/* Todo List Section */}
-        <div className="mt-6">
-          <h2 className="text-xl font-semibold mb-4">Your Tasks</h2>
-          <TodoList 
-            todos={client.todos || []} 
-            onUpdate={handleUpdateTodos} 
-            clientId={client.id} 
-          />
-        </div>
+    <div className="min-h-screen flex bg-slate-950">
+      {/* Client Sidebar */}
+      <ClientSidebar />
+      {/* Main Content */}
+      <div className="flex-1 flex justify-center p-6">
+        <Card className="w-full max-w-2xl p-8">
+          <h1 className="text-3xl font-bold mb-4 text-slate-900">
+            Welcome, {client.contact_name || client.company_name || "Client"}
+          </h1>
+          <p className="mb-3">Status: <span className="font-semibold">{client.status}</span></p>
+          <p className="mb-1">Project Name: <span className="font-semibold">{client.project_name || "-"}</span></p>
+          <p className="mb-1">Niche: <span className="font-semibold">{client.company_niche || "-"}</span></p>
+          <p className="mb-1">Website: {client.website_url ? <a href={client.website_url} className="text-blue-600 underline">{client.website_url}</a> : "-"}</p>
+          
+          {/* Todo List Section */}
+          <div className="mt-6">
+            <h2 className="text-xl font-semibold mb-4">Your Tasks</h2>
+            <TodoList 
+              todos={client.todos || []} 
+              onUpdate={handleUpdateTodos} 
+              clientId={client.id} 
+            />
+          </div>
 
-        <div className="mt-8 flex flex-col sm:flex-row gap-4">
-          <Button variant="outline" onClick={() => navigate("/client-portal")}>Logout</Button>
-        </div>
-      </Card>
+          <div className="mt-8 flex flex-col sm:flex-row gap-4">
+            <Button variant="outline" onClick={() => navigate("/client-portal")}>Logout</Button>
+          </div>
+        </Card>
+      </div>
     </div>
   );
 }
