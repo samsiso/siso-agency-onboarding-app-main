@@ -361,7 +361,6 @@ const AdminOutreach = () => {
         <AdminPageTitle
           icon={Megaphone}
           title="Outreach Management"
-          rightSlot={<span>✨ Amazing day to bits</span>}
         />
         
         <Tabs value={activeTab} onValueChange={setActiveTab}>
