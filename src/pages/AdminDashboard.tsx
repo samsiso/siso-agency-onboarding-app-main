@@ -1,4 +1,3 @@
-
 import { AdminLayout } from '@/components/admin/layout/AdminLayout';
 import { WelcomeBanner } from '@/components/admin/dashboard/WelcomeBanner';
 import { StatsOverview } from '@/components/admin/dashboard/StatsOverview';
@@ -13,6 +12,8 @@ import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useUser } from '@/hooks/useUser';
 import { motion } from 'framer-motion';
+import { AdminPageTitle } from '@/components/admin/layout/AdminPageTitle';
+import { Users } from 'lucide-react';
 
 export default function AdminDashboard() {
   const { isAdmin, isLoading } = useAdminCheck();
@@ -52,8 +53,15 @@ export default function AdminDashboard() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <WelcomeBanner user={user} />
-        
+        <AdminPageTitle
+          icon={Users}
+          title="Admin Dashboard"
+        >
+          <span className="text-muted-foreground text-base block mt-1">
+            Welcome to your admin panel — view statistics, quick actions, and more
+          </span>
+        </AdminPageTitle>
+        {/* StatsOverview and dashboard content */}
         <StatsOverview />
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

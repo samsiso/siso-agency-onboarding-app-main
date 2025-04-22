@@ -5,6 +5,8 @@ import { DailyPlannerHeader } from '@/components/admin/daily-planner/DailyPlanne
 import { DailyPlannerTabs } from '@/components/admin/daily-planner/DailyPlannerTabs';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { useToast } from '@/components/ui/use-toast';
+import { AdminPageTitle } from '@/components/admin/layout/AdminPageTitle';
+import { Users } from 'lucide-react';
 
 export default function AdminDailyPlanner() {
   const { user, loading, isAdmin } = useAuthSession();
@@ -39,6 +41,14 @@ export default function AdminDailyPlanner() {
   return (
     <AdminLayout>
       <div className="container mx-auto p-6 space-y-6">
+        <AdminPageTitle
+          icon={Users}
+          title="Daily Planner"
+        >
+          <span className="text-muted-foreground text-base block mt-1">
+            Plan your team's daily agenda, tasks, and meetings
+          </span>
+        </AdminPageTitle>
         <DailyPlannerHeader />
         <DailyPlannerTabs />
       </div>

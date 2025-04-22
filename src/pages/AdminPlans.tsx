@@ -8,6 +8,8 @@ import { PlansList } from "../components/admin/PlansList";
 import { PlanForm } from "../components/admin/PlanForm";
 import { BulkPlanCreation } from "../components/admin/BulkPlanCreation";
 import { toast } from "sonner";
+import { AdminPageTitle } from "../components/admin/layout/AdminPageTitle";
+import { Users } from "lucide-react";
 
 const AdminPlans = () => {
   const [activeTab, setActiveTab] = React.useState("plans-list");
@@ -24,7 +26,14 @@ const AdminPlans = () => {
   return (
     <AdminLayout>
       <div className="container mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-6">Plans Management</h1>
+        <AdminPageTitle
+          icon={Users}
+          title="Plans Management"
+        >
+          <span className="text-muted-foreground text-base block mt-1">
+            Manage your plans, create or import new plan templates
+          </span>
+        </AdminPageTitle>
         
         <Tabs value={activeTab} onValueChange={handleTabChange}>
           <TabsList className="mb-6">

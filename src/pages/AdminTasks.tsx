@@ -4,11 +4,21 @@ import { AdminLayout } from '@/components/admin/layout/AdminLayout';
 import { motion } from 'framer-motion';
 import { GradientText } from '@/components/ui/gradient-text';
 import { TeamMembersGrid } from '@/components/admin/tasks/TeamMembersGrid';
+import { AdminPageTitle } from '@/components/admin/layout/AdminPageTitle';
+import { Users } from 'lucide-react';
 
 export default function AdminTasks() {
   return (
     <AdminLayout>
       <div className="container mx-auto p-6 space-y-8">
+        <AdminPageTitle
+          icon={Users}
+          title="Team Tasks Dashboard"
+        >
+          <span className="text-muted-foreground text-base block mt-1">
+            Click on a team member's card to view and manage their tasks, track progress, and set new goals.
+          </span>
+        </AdminPageTitle>
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -16,13 +26,13 @@ export default function AdminTasks() {
           className="text-center space-y-4"
         >
           <GradientText className="text-4xl font-bold">
+            {/* The hero text is still present for visual flair */}
             Team Tasks Dashboard
           </GradientText>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Click on a team member's card to view and manage their tasks, track progress, and set new goals.
+            {/* Moved subtitle to AdminPageTitle to standardize layout */}
           </p>
         </motion.div>
-
         <TeamMembersGrid />
       </div>
     </AdminLayout>

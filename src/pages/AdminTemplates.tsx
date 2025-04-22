@@ -5,7 +5,8 @@ import { AdminLayout } from '@/components/admin/layout/AdminLayout';
 import { Card } from '@/components/ui/card';
 import { BulkPlanCreation } from '@/components/admin/BulkPlanCreation';
 import { useAdminCheck } from '@/hooks/useAdminCheck';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Users } from 'lucide-react';
+import { AdminPageTitle } from '@/components/admin/layout/AdminPageTitle';
 
 export default function AdminTemplates() {
   const { isAdmin, isLoading } = useAdminCheck();
@@ -32,7 +33,14 @@ export default function AdminTemplates() {
   return (
     <AdminLayout>
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold text-white mb-6">Plan Templates</h1>
+        <AdminPageTitle
+          icon={Users}
+          title="Plan Templates"
+        >
+          <span className="text-muted-foreground text-base block mt-1">
+            Bulk-create or manage your plan templates for efficient onboarding
+          </span>
+        </AdminPageTitle>
         <div className="space-y-6">
           <BulkPlanCreation />
         </div>

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { AdminLayout } from "@/components/admin/layout/AdminLayout";
 import { FinancialsHeader } from "@/components/admin/financials/FinancialsHeader";
@@ -16,6 +15,8 @@ import { ImportExpensesButton } from "@/components/admin/financials/expense/Impo
 import { Import, AlertCircle } from "lucide-react";
 import { seedExpensesFromList } from "@/utils/financial/bulkExpenseSeeder";
 import { Card } from "@/components/ui/card";
+import { AdminPageTitle } from "@/components/admin/layout/AdminPageTitle";
+import { Users } from "lucide-react";
 
 export default function AdminPayments() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -144,6 +145,14 @@ export default function AdminPayments() {
   return (
     <AdminLayout>
       <div className="px-6 py-8 max-w-7xl mx-auto bg-black min-h-screen">
+        <AdminPageTitle
+          icon={Users}
+          title="Financial Management"
+        >
+          <span className="text-muted-foreground text-base block mt-1">
+            Manage your expenses, revenue, and pipeline statistics
+          </span>
+        </AdminPageTitle>
         {/* SINGLE header and buttons section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
           <div>
