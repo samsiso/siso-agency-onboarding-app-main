@@ -36,14 +36,9 @@ export default function AdminSettings() {
         <AdminPageTitle
           icon={Settings}
           title="Settings"
-        >
-          <div className="flex flex-col">
-            <span className="text-lg font-bold">Settings</span>
-            <span className="text-muted-foreground text-base mt-2">
-              Manage your admin preferences and system configurations
-            </span>
-          </div>
-        </AdminPageTitle>
+          subtitle="Manage your admin preferences and system configurations"
+        />
+        
         <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-2 md:space-y-0">
           <div>
             <p className="text-muted-foreground">

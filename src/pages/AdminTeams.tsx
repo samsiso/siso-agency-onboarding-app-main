@@ -47,14 +47,9 @@ export default function AdminTeams() {
         <AdminPageTitle
           icon={UsersIcon}
           title="Team Management"
-        >
-          <div className="flex flex-col">
-            <span className="text-lg font-bold">Team Management</span>
-            <span className="text-muted-foreground text-base mt-2">
-              Manage your team members, tasks, and communication
-            </span>
-          </div>
-        </AdminPageTitle>
+          subtitle="Manage your team members, tasks, and communication"
+        />
+        
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
           <div>
             <p className="text-muted-foreground">Manage your team members, tasks, and communication</p>

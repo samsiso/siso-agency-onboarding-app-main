@@ -148,14 +148,8 @@ export default function AdminPayments() {
         <AdminPageTitle
           icon={Wallet}
           title="Financial Management"
-        >
-          <div className="flex flex-col">
-            <span className="text-lg font-bold">Financial Management</span>
-            <span className="text-muted-foreground text-base mt-2">
-              Manage your expenses, revenue, and pipeline statistics
-            </span>
-          </div>
-        </AdminPageTitle>
+          subtitle="Manage your expenses, revenue, and pipeline statistics"
+        />
         {/* SINGLE header and buttons section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
           <div>
