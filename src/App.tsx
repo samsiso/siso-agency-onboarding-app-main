@@ -1,4 +1,3 @@
-
 import { Routes, Route } from 'react-router-dom';
 import Index from './pages/Index';
 import Auth from './pages/Auth';
@@ -33,6 +32,9 @@ import AdminSettings from './pages/AdminSettings';
 import { TeamMemberTasksView } from './components/admin/tasks/TeamMemberTasksView';
 import TeamMemberTasksPage from './pages/TeamMemberTasksPage';
 import ChangelogPage from './pages/Changelog';
+import ClientPortalLogin from "./pages/ClientPortalLogin";
+import ClientDashboard from "./pages/ClientDashboard";
+import { ClientRoute } from "./components/auth/ClientRoute";
 
 function App() {
   return (
@@ -86,6 +88,14 @@ function App() {
         <Route path="/help" element={<AuthGuard><HelpPage /></AuthGuard>} />
         <Route path="/settings" element={<AuthGuard><Profile /></AuthGuard>} />
         <Route path="/changelog" element={<AuthGuard><ChangelogPage /></AuthGuard>} />
+
+        {/* Client Portal routes */}
+        <Route path="/client-portal" element={<ClientPortalLogin />} />
+        <Route path="/client-dashboard" element={
+          <ClientRoute>
+            <ClientDashboard />
+          </ClientRoute>
+        } />
       </Routes>
     </>
   );
