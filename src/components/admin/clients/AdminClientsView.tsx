@@ -1,10 +1,14 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { ClientsHeader } from './ClientsHeader';
 import { ClientsEnhancedTable } from './ClientsEnhancedTable';  // Corrected import
 import { ViewModeSwitcher } from './ViewModeSwitcher';
 import { ClientsCardGrid } from './ClientsCardGrid';
 import { ClientViewPreference } from '@/types/client.types';
 import { useLocalStorage } from '@/hooks/useLocalStorage';  // Assuming this hook exists
+import { useClientsList } from '@/hooks/client';
+
+import { DashboardStats } from './DashboardStats';
+import { PriorityListing } from './PriorityListing';
 
 // Default view preference
 const defaultViewPreference: ClientViewPreference = {
@@ -41,6 +45,20 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
   );
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
 
+  // Stats - fetch ONE query for total clients & total financials
+  const { clients = [], isLoading } = useClientsList({
+    searchQuery,
+    statusFilter,
+    sortColumn: viewPreference.sortColumn,
+    sortDirection: viewPreference.sortDirection,
+    pageSize: 1000,
+  });
+  const statsTotalClients = clients.length;
+  const statsProjectValue = useMemo(
+    () => clients.reduce((acc, curr) => acc + (curr.estimated_price || 0), 0),
+    [clients]
+  );
+
   // Update preference handler
   const handleViewPreferenceChange = (updates: Partial<ClientViewPreference>) => {
     setViewPreference({ ...viewPreference, ...updates });
@@ -58,33 +76,69 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
 
   return (
     <div className="container mx-auto p-4 space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Clients Dashboard</h1>
-        <ViewModeSwitcher viewMode={viewMode} setViewMode={setViewMode} />
+      {/* Dashboard Icon and Heading */}
+      <div className="flex items-center gap-4 mb-2">
+        <div className="rounded-full bg-gradient-to-tr from-blue-400/60 to-blue-800/50 p-3 flex items-center justify-center shadow">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="2.7" y="2.7" width="18.6" height="18.6" rx="3" fill="#403E43" />
+            <path d="M7.2,13.2V7.8A.6.6,0,0,1,7.8,7.2h4.4a.6.6,0,0,1,.6.6v5.4Z" fill="#fff"/>
+            <circle cx="17.1" cy="16.8" r="1.5" fill="#D946EF"/>
+          </svg>
+        </div>
+        <h1 className="text-3xl font-bold tracking-tight">Clients Dashboard</h1>
       </div>
-      
-      <ClientsHeader 
-        searchQuery={searchQuery}
-        onSearchChange={handleSearch}
-        statusFilter={statusFilter}
-        onStatusFilterChange={handleStatusFilterChange}
+      {/* Stats Cards */}
+      <DashboardStats
+        totalClients={statsTotalClients}
+        totalProjectValue={statsProjectValue}
       />
-      
-      {viewMode === "table" ? (
-        <ClientsEnhancedTable 
-          searchQuery={searchQuery}
-          statusFilter={statusFilter}
-          onSearchChange={handleSearch}
-          onStatusFilterChange={handleStatusFilterChange}
-        />
-      ) : (
-        <ClientsCardGrid 
-          searchQuery={searchQuery}
-          statusFilter={statusFilter}
-          sortColumn={viewPreference.sortColumn}
-          sortDirection={viewPreference.sortDirection}
-        />
-      )}
+
+      {/* Priority Listing */}
+      <div>
+        <PriorityListing limit={3} />
+      </div>
+
+      {/* Controls */}
+      <div className="grid md:grid-cols-2 gap-6">
+        {/* Card: Search & Filter */}
+        <div className="bg-card/30 border border-border/40 rounded-xl shadow-sm p-5 transition hover:shadow-lg">
+          <ClientsHeader 
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            statusFilter={statusFilter}
+            onStatusFilterChange={setStatusFilter}
+            viewPreference={viewPreference}
+            onViewPreferenceChange={setViewPreference}
+            onAddClient={() => setViewMode("table")} // Reuse add client action
+            totalClients={statsTotalClients}
+            clients={clients}
+          />
+        </div>
+        {/* Card: View Mode Switcher */}
+        <div className="bg-card/30 border border-border/40 rounded-xl shadow-sm p-5 flex flex-col items-center justify-center min-h-[140px] transition hover:shadow-lg">
+          <ViewModeSwitcher viewMode={viewMode} setViewMode={setViewMode} />
+          <div className="mt-4 text-muted-foreground text-sm">Switch between Table and Card views</div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div>
+        {viewMode === "table" ? (
+          <ClientsEnhancedTable 
+            searchQuery={searchQuery}
+            statusFilter={statusFilter}
+            onSearchChange={setSearchQuery}
+            onStatusFilterChange={setStatusFilter}
+          />
+        ) : (
+          <ClientsCardGrid 
+            searchQuery={searchQuery}
+            statusFilter={statusFilter}
+            sortColumn={viewPreference.sortColumn}
+            sortDirection={viewPreference.sortDirection}
+          />
+        )}
+      </div>
     </div>
   );
 }

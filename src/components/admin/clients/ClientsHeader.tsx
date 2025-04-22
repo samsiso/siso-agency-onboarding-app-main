@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React from 'react';
 import { Input } from '@/components/ui/input';
 import { 
   Select, 
@@ -64,84 +63,64 @@ export function ClientsHeader({
   };
 
   return (
-    <div className="flex flex-col sm:flex-row gap-4 justify-between flex-wrap bg-card/30 p-4 rounded-lg border border-border/30 backdrop-blur-sm shadow-sm">
-      <div className="flex flex-1 gap-2 min-w-[300px]">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search clients..."
-            value={searchQuery}
-            onChange={handleSearchInputChange}
-            className="pl-9 border-border/50 bg-card/50 shadow-sm"
-          />
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-row items-center gap-4">
+        <div className="flex-1 flex gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search clients..."
+              value={searchQuery}
+              onChange={handleSearchInputChange}
+              className="pl-9 border-border/50 bg-card/50 shadow-sm"
+            />
+          </div>
+          <Select value={statusFilter} onValueChange={handleStatusChange}>
+            <SelectTrigger className="w-40 border-border/50 bg-card/50 shadow-sm">
+              <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent className="bg-background/90 text-foreground shadow-lg border-border/50 z-50">
+              <SelectItem value="all">All Statuses</SelectItem>
+              <SelectItem value="new">New</SelectItem>
+              <SelectItem value="contacted">Contacted</SelectItem>
+              <SelectItem value="converted">Converted</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-        
-        <Select value={statusFilter} onValueChange={handleStatusChange}>
-          <SelectTrigger className="w-36 border-border/50 bg-card/50 shadow-sm">
-            <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent className="bg-card/80 backdrop-blur-sm shadow-md border-border/50">
-            <SelectItem value="all">All Statuses</SelectItem>
-            <SelectItem value="new">New</SelectItem>
-            <SelectItem value="contacted">Contacted</SelectItem>
-            <SelectItem value="converted">Converted</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      
-      <div className="flex gap-2 flex-shrink-0">
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="h-10 border-border/50 bg-card/50 shadow-sm"
+        <Button
+          variant="outline"
+          size="icon"
+          className="ml-2"
           onClick={handleRefresh}
+          title="Refresh"
         >
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Refresh
+          <RefreshCw className="h-4 w-4" />
         </Button>
-        
         {viewPreference && onViewPreferenceChange && (
           <Button
             variant="outline"
-            size="sm"
-            className="h-10 border-border/50 bg-card/50 shadow-sm"
+            size="icon"
+            className="ml-2"
             onClick={() => {
-              // This would open column customization modal in a real implementation
               console.log("Open column customization");
             }}
+            title="Columns"
           >
-            <Columns className="h-4 w-4 mr-2" />
-            Columns
+            <Columns className="h-4 w-4" />
           </Button>
         )}
-        
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="h-10 border-border/50 bg-card/50 shadow-sm"
-        >
-          <Upload className="h-4 w-4 mr-2" />
-          Import
-        </Button>
-        
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="h-10 border-border/50 bg-card/50 shadow-sm"
-        >
-          <Download className="h-4 w-4 mr-2" />
-          Export
-        </Button>
-        
-        <Button 
-          className="bg-primary hover:bg-primary/90 shadow-sm"
+        <Button
+          variant="outline"
+          size="icon"
+          className="ml-2"
           onClick={onAddClient}
+          title="Add Client"
         >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Client
+          <Plus className="h-4 w-4" />
         </Button>
       </div>
+      {/* Optionally: You can add more controls here */}
     </div>
   );
 }
