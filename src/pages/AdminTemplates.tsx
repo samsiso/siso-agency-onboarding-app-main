@@ -5,7 +5,7 @@ import { AdminLayout } from '@/components/admin/layout/AdminLayout';
 import { Card } from '@/components/ui/card';
 import { BulkPlanCreation } from '@/components/admin/BulkPlanCreation';
 import { useAdminCheck } from '@/hooks/useAdminCheck';
-import { Loader2, Users } from 'lucide-react';
+import { Loader2, FileStack } from 'lucide-react';
 import { AdminPageTitle } from '@/components/admin/layout/AdminPageTitle';
 
 export default function AdminTemplates() {
@@ -34,12 +34,15 @@ export default function AdminTemplates() {
     <AdminLayout>
       <div className="container mx-auto px-4 py-8">
         <AdminPageTitle
-          icon={Users}
+          icon={FileStack}
           title="Plan Templates"
         >
-          <span className="text-muted-foreground text-base block mt-1">
-            Bulk-create or manage your plan templates for efficient onboarding
-          </span>
+          <div className="flex flex-col">
+            <span className="text-lg font-bold">Plan Templates</span>
+            <span className="text-muted-foreground text-base mt-2">
+              Bulk-create or manage your plan templates for efficient onboarding
+            </span>
+          </div>
         </AdminPageTitle>
         <div className="space-y-6">
           <BulkPlanCreation />

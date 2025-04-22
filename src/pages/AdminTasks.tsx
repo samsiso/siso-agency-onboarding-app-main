@@ -15,9 +15,12 @@ export default function AdminTasks() {
           icon={Users}
           title="Team Tasks Dashboard"
         >
-          <span className="text-muted-foreground text-base block mt-1">
-            Click on a team member's card to view and manage their tasks, track progress, and set new goals.
-          </span>
+          <div className="flex flex-col">
+            <span className="text-lg font-bold">Team Tasks Dashboard</span>
+            <span className="text-muted-foreground text-base mt-2">
+              Click on a team member's card to view and manage their tasks, track progress, and set new goals.
+            </span>
+          </div>
         </AdminPageTitle>
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -29,9 +32,6 @@ export default function AdminTasks() {
             {/* The hero text is still present for visual flair */}
             Team Tasks Dashboard
           </GradientText>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            {/* Moved subtitle to AdminPageTitle to standardize layout */}
-          </p>
         </motion.div>
         <TeamMembersGrid />
       </div>

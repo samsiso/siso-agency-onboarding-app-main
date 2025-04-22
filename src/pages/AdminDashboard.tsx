@@ -1,3 +1,4 @@
+
 import { AdminLayout } from '@/components/admin/layout/AdminLayout';
 import { WelcomeBanner } from '@/components/admin/dashboard/WelcomeBanner';
 import { StatsOverview } from '@/components/admin/dashboard/StatsOverview';
@@ -6,14 +7,13 @@ import { ClientsList } from '@/components/admin/dashboard/ClientsList';
 import { AdminTasks } from '@/components/admin/dashboard/AdminTasks';
 import { AdminStats } from '@/components/admin/dashboard/AdminStats';
 import { useAdminCheck } from '@/hooks/useAdminCheck';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Users } from 'lucide-react';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useUser } from '@/hooks/useUser';
 import { motion } from 'framer-motion';
 import { AdminPageTitle } from '@/components/admin/layout/AdminPageTitle';
-import { Users } from 'lucide-react';
 
 export default function AdminDashboard() {
   const { isAdmin, isLoading } = useAdminCheck();
@@ -41,9 +41,7 @@ export default function AdminDashboard() {
     );
   }
 
-  if (!isAdmin) {
-    return null;
-  }
+  if (!isAdmin) return null;
 
   return (
     <AdminLayout>
@@ -57,13 +55,14 @@ export default function AdminDashboard() {
           icon={Users}
           title="Admin Dashboard"
         >
-          <span className="text-muted-foreground text-base block mt-1">
-            Welcome to your admin panel — view statistics, quick actions, and more
-          </span>
+          <div className="flex flex-col">
+            <span className="text-lg font-bold">Admin Dashboard</span>
+            <span className="text-muted-foreground text-base mt-2">
+              Welcome to your admin panel — view statistics, quick actions, and more
+            </span>
+          </div>
         </AdminPageTitle>
-        {/* StatsOverview and dashboard content */}
         <StatsOverview />
-        
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <motion.div 
             className="lg:col-span-2 space-y-6"

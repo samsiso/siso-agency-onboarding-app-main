@@ -2,9 +2,10 @@
 import { useEffect } from 'react';
 import { AdminLayout } from '@/components/admin/layout/AdminLayout';
 import { useAdminCheck } from '@/hooks/useAdminCheck';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Users } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { AdminClientsView } from '@/components/admin/clients/AdminClientsView';
+import { AdminPageTitle } from '@/components/admin/layout/AdminPageTitle';
 
 export default function AdminClients() {
   const { isAdmin, isLoading } = useAdminCheck();
@@ -35,7 +36,20 @@ export default function AdminClients() {
 
   return (
     <AdminLayout>
-      <AdminClientsView isAdmin={isAdmin} />
+      <div className="container mx-auto p-4">
+        <AdminPageTitle
+          icon={Users}
+          title="Clients"
+        >
+          <div className="flex flex-col">
+            <span className="text-lg font-bold">Clients</span>
+            <span className="text-muted-foreground text-base mt-2">
+              Manage your organization's clients and view details
+            </span>
+          </div>
+        </AdminPageTitle>
+        <AdminClientsView isAdmin={isAdmin} />
+      </div>
     </AdminLayout>
   );
 }

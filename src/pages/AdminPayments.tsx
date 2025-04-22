@@ -12,7 +12,7 @@ import { seedInitialExpenses } from "@/utils/financial/seedExpenses";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ImportExpensesButton } from "@/components/admin/financials/expense/ImportExpensesButton";
-import { Import, AlertCircle } from "lucide-react";
+import { Import, AlertCircle, Wallet } from "lucide-react";
 import { seedExpensesFromList } from "@/utils/financial/bulkExpenseSeeder";
 import { Card } from "@/components/ui/card";
 import { AdminPageTitle } from "@/components/admin/layout/AdminPageTitle";
@@ -146,12 +146,15 @@ export default function AdminPayments() {
     <AdminLayout>
       <div className="px-6 py-8 max-w-7xl mx-auto bg-black min-h-screen">
         <AdminPageTitle
-          icon={Users}
+          icon={Wallet}
           title="Financial Management"
         >
-          <span className="text-muted-foreground text-base block mt-1">
-            Manage your expenses, revenue, and pipeline statistics
-          </span>
+          <div className="flex flex-col">
+            <span className="text-lg font-bold">Financial Management</span>
+            <span className="text-muted-foreground text-base mt-2">
+              Manage your expenses, revenue, and pipeline statistics
+            </span>
+          </div>
         </AdminPageTitle>
         {/* SINGLE header and buttons section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">

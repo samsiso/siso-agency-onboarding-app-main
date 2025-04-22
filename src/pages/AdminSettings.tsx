@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { AdminLayout } from '@/components/admin/layout/AdminLayout';
 import { AdminPageTitle } from '@/components/admin/layout/AdminPageTitle';
@@ -34,7 +33,17 @@ export default function AdminSettings() {
   return (
     <AdminLayout>
       <div className="container mx-auto p-6 space-y-6">
-        <AdminPageTitle icon={Settings} title="Settings" />
+        <AdminPageTitle
+          icon={Settings}
+          title="Settings"
+        >
+          <div className="flex flex-col">
+            <span className="text-lg font-bold">Settings</span>
+            <span className="text-muted-foreground text-base mt-2">
+              Manage your admin preferences and system configurations
+            </span>
+          </div>
+        </AdminPageTitle>
         <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-2 md:space-y-0">
           <div>
             <p className="text-muted-foreground">

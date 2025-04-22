@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader } from "../components/ui/card";
 import { Button } from "../components/ui/button";
@@ -30,9 +29,12 @@ const AdminPlans = () => {
           icon={Users}
           title="Plans Management"
         >
-          <span className="text-muted-foreground text-base block mt-1">
-            Manage your plans, create or import new plan templates
-          </span>
+          <div className="flex flex-col">
+            <span className="text-lg font-bold">Plans Management</span>
+            <span className="text-muted-foreground text-base mt-2">
+              Manage your plans, create or import new plan templates
+            </span>
+          </div>
         </AdminPageTitle>
         
         <Tabs value={activeTab} onValueChange={handleTabChange}>
