@@ -1,9 +1,10 @@
 
 import { NavLink } from "@/components/ui/nav-link";
-import { Home, ClipboardList, FileText, FileSearch, HelpCircle, LogOut } from "lucide-react";
+import { Home, ClipboardList, FileText, FileSearch, HelpCircle, LogOut, Calendar, Clock, Receipt } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 const clientNavLinks = [
   {
@@ -36,18 +37,27 @@ const clientNavLinks = [
 export function ClientSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleLogout = () => {
+    navigate("/client-portal");
+    toast({
+      title: "Logged out",
+      description: "You have been successfully logged out.",
+    });
+  };
 
   return (
-    <aside className="min-h-screen w-56 bg-white border-r border-slate-200 flex flex-col py-6 shadow-lg z-20">
+    <aside className="min-h-screen w-64 bg-white border-r border-slate-200 flex flex-col py-6 shadow-lg z-20">
       <div className="px-6 pb-8 border-b border-slate-100">
         <img
           src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png"
           alt="Client Portal Logo"
-          className="h-10 w-10 mb-2"
+          className="h-12 w-12 mb-2"
         />
-        <div className="font-bold text-lg text-slate-800">Client Portal</div>
+        <div className="font-bold text-xl text-slate-800">Client Portal</div>
       </div>
-      <nav className="flex-1 pt-6">
+      <nav className="flex-1 pt-6 px-4">
         <ul className="flex flex-col gap-2">
           {clientNavLinks.map((item) => {
             const active =
@@ -60,9 +70,9 @@ export function ClientSidebar() {
                   href={item.href}
                   active={active}
                   className={cn(
-                    "flex items-center gap-3 rounded-md px-4 py-2 w-full font-medium text-sm transition-colors",
+                    "flex items-center gap-3 rounded-md px-4 py-3 w-full font-medium transition-colors",
                     active
-                      ? "bg-vivid-purple text-white shadow"
+                      ? "bg-vivid-purple text-white shadow-md"
                       : "text-slate-700 hover:bg-vivid-purple/10"
                   )}
                 >
@@ -78,7 +88,7 @@ export function ClientSidebar() {
         <Button
           variant="outline"
           className="w-full flex gap-2"
-          onClick={() => navigate("/client-portal")}
+          onClick={handleLogout}
         >
           <LogOut className="w-4 h-4" />
           Logout

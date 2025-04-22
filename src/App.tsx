@@ -1,3 +1,4 @@
+
 import { Routes, Route } from 'react-router-dom';
 import Index from './pages/Index';
 import Auth from './pages/Auth';
@@ -35,6 +36,10 @@ import ChangelogPage from './pages/Changelog';
 import ClientPortalLogin from "./pages/ClientPortalLogin";
 import ClientDashboard from "./pages/ClientDashboard";
 import { ClientRoute } from "./components/auth/ClientRoute";
+import ClientDocumentsPage from "./pages/client/ClientDocumentsPage";
+import ClientTasksPage from "./pages/client/ClientTasksPage";
+import ClientStatusPage from "./pages/client/ClientStatusPage";
+import ClientSupportPage from "./pages/client/ClientSupportPage";
 
 function App() {
   return (
@@ -94,6 +99,26 @@ function App() {
         <Route path="/client-dashboard" element={
           <ClientRoute>
             <ClientDashboard />
+          </ClientRoute>
+        } />
+        <Route path="/client-dashboard/status" element={
+          <ClientRoute>
+            <ClientStatusPage />
+          </ClientRoute>
+        } />
+        <Route path="/client-dashboard/documents" element={
+          <ClientRoute>
+            <ClientDocumentsPage />
+          </ClientRoute>
+        } />
+        <Route path="/client-dashboard/tasks" element={
+          <ClientRoute>
+            <ClientTasksPage />
+          </ClientRoute>
+        } />
+        <Route path="/client-dashboard/support" element={
+          <ClientRoute>
+            <ClientSupportPage />
           </ClientRoute>
         } />
       </Routes>
