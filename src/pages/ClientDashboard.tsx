@@ -105,7 +105,7 @@ export default function ClientDashboard() {
           company_niche: clientData.company_niche,
           contact_name: clientData.contact_name,
           company_name: clientData.company_name,
-          todos: clientData.todos as TodoItem[] || []
+          todos: Array.isArray(clientData.todos) ? clientData.todos : []
         };
         
         setClient(completeClientData);
