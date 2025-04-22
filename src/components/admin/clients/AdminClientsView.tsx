@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from 'react';
 import { ClientsHeader } from './ClientsHeader';
 import { ClientsEnhancedTable } from './ClientsEnhancedTable';
@@ -10,8 +9,6 @@ import { useClientsList } from '@/hooks/client';
 
 import { DashboardStats } from './DashboardStats';
 import { PriorityListing } from './PriorityListing';
-import { AdminPageTitle } from '@/components/admin/layout/AdminPageTitle';
-import { Users } from 'lucide-react';
 
 // Default view preference
 const defaultViewPreference: ClientViewPreference = {
@@ -79,7 +76,7 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
 
   return (
     <div className="container mx-auto p-4 space-y-6">
-      <AdminPageTitle icon={Users} title="Clients Dashboard" />
+      {/* Removed AdminPageTitle component */}
       
       {/* Stats Cards */}
       <DashboardStats
