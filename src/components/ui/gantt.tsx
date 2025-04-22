@@ -992,3 +992,4 @@ export const GanttMarker: FC<
   const innerOffset = calculateInnerOffset(
     date,
     gantt.range,
+    (gant
