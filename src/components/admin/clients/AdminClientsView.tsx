@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from 'react';
 import { ClientsEnhancedTable } from './ClientsEnhancedTable';
 import { ClientsCardGrid } from './ClientsCardGrid';
@@ -93,6 +92,8 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
             statusFilter={statusFilter}
             onSearchChange={setSearchQuery}
             onStatusFilterChange={setStatusFilter}
+            viewMode={viewMode}
+            setViewMode={setViewMode}
           />
         ) : (
           <ClientsCardGrid
@@ -100,6 +101,8 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
             statusFilter={statusFilter}
             sortColumn={viewPreference.sortColumn}
             sortDirection={viewPreference.sortDirection}
+            viewMode={viewMode}
+            setViewMode={setViewMode}
           />
         )}
       </div>

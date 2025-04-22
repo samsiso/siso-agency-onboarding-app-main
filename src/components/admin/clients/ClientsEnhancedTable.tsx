@@ -44,3 +44,4 @@ export function ClientsEnhancedTable(props: ClientsEnhancedTableProps) {
     </ClientViewPreferenceProvider>
   );
 }
+

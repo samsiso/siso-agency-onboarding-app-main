@@ -4,7 +4,7 @@ import { Table } from '@/components/ui/table';
 import { ClientViewPreference } from '@/types/client.types';
 import { ClientAddForm } from './ClientAddForm';
 // import { ClientAnalyticsCards } from './ClientAnalyticsCards'; // Removed import of analytics cards to avoid unused import warning
-import { ClientsHeader } from './ClientsHeader';
+// import { ClientsHeader } from './ClientsHeader'; // Removed duplicate header rendering!
 import { ScrollableTable } from './ScrollableTable';
 import { useClientTable } from './hooks/useClientTable';
 // Removed import of clientAnalytics hook since analytics cards are removed
@@ -101,23 +101,7 @@ export function ClientsTable({
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="space-y-6">
-        {/* Removed <ClientAnalyticsCards {...analyticsData} /> */}
-
-        <ClientsHeader
-          searchQuery={searchQuery}
-          onSearchChange={onSearchChange}
-          statusFilter={statusFilter}
-          onStatusFilterChange={onStatusFilterChange}
-          viewPreference={viewPreference}
-          onViewPreferenceChange={onViewPreferenceChange}
-          onAddClient={() => setIsAddClientOpen(true)}
-          totalClients={totalCount}
-          clients={clients}
-          onRefetch={refetch}
-          viewMode={viewMode}
-          setViewMode={setViewMode}
-        />
-        
+        {/* Removed <ClientsHeader /> - no duplicate bar! */}
         {selectedClients.length > 0 && (
           <BulkActionsBar
             selectedCount={selectedClients.length}
@@ -174,3 +158,4 @@ export function ClientsTable({
     </DndProvider>
   );
 }
+
