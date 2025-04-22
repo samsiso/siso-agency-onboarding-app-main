@@ -14,6 +14,7 @@ import {
   GanttToday,
   Gantt,
 } from '@/components/ui/gantt';
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { Eye as EyeIcon, Link as LinkIcon, Trash as TrashIcon } from 'lucide-react';
 import {
   addMonths,
@@ -417,12 +418,29 @@ const Demo = () => {
   const handleRemoveMarker = (id) => console.log("Remove marker: " + id);
   const handleCreateMarker = (date) => console.log("Create marker: " + date.toISOString());
 
+ const handleMoveFeature = (id: string, startAt: Date, endAt: Date | null) => {
+    if (!endAt) {
+      return;
+    }
+
+    setFeatures((prev) =>
+      prev.map((feature) =>
+        feature.id === id ? { ...feature, startAt, endAt } : feature
+      )
+    );
+
+    console.log(`Move feature: ${id} from ${startAt} to ${endAt}`);
+  };
+
+  const handleAddFeature = (date: Date) =>
+    console.log(`Add feature: ${date.toISOString()}`);
+
   return (
-    <Gantt>
+    <GanttProvider onAddItem={handleAddFeature} range="monthly" zoom={100} className="h-[500px] border">
       <GanttSidebar>
-        {Object.entries(sortedGroupedFeatures).map(([groupName, groupFeatures]) => (
-          <GanttSidebarGroup name={groupName} key={groupName}>
-            {groupFeatures.map((feature) => (
+        {Object.entries(sortedGroupedFeatures).map(([group, features]) => (
+          <GanttSidebarGroup key={group} name={group}>
+            {features.map((feature) => (
               <GanttSidebarItem
                 key={feature.id}
                 feature={feature}
@@ -435,17 +453,50 @@ const Demo = () => {
       <GanttTimeline>
         <GanttHeader />
         <GanttFeatureList>
-          <GanttFeatureListGroup>
-            {features.map((feature) => (
-              <GanttFeatureItem
-                key={feature.id}
-                {...feature}
-                onMove={handleViewFeature}
-              >
-                {feature.name}
-              </GanttFeatureItem>
-            ))}
-          </GanttFeatureListGroup>
+          {Object.entries(sortedGroupedFeatures).map(([group, features]) => (
+            <GanttFeatureListGroup key={group}>
+              {features.map((feature) => (
+                <div className="flex" key={feature.id}>
+                  <ContextMenu>
+                    <ContextMenuTrigger asChild>
+                      <button
+                        type="button"
+                        onClick={() => handleViewFeature(feature.id)}
+                      >
+                        <GanttFeatureItem
+                          onMove={handleMoveFeature}
+                          {...feature}
+                        />
+                      </button>
+                    </ContextMenuTrigger>
+                    <ContextMenuContent>
+                      <ContextMenuItem
+                        className="flex items-center gap-2"
+                        onClick={() => handleViewFeature(feature.id)}
+                      >
+                        <EyeIcon size={16} className="text-muted-foreground" />
+                        View feature
+                      </ContextMenuItem>
+                      <ContextMenuItem
+                        className="flex items-center gap-2"
+                        onClick={() => handleCopyLink(feature.id)}
+                      >
+                        <LinkIcon size={16} className="text-muted-foreground" />
+                        Copy link
+                      </ContextMenuItem>
+                      <ContextMenuItem
+                        className="flex items-center gap-2 text-destructive"
+                        onClick={() => handleRemoveFeature(feature.id)}
+                      >
+                        <TrashIcon size={16} />
+                        Remove from roadmap
+                      </ContextMenuItem>
+                    </ContextMenuContent>
+                  </ContextMenu>
+                </div>
+              ))}
+            </GanttFeatureListGroup>
+          ))}
         </GanttFeatureList>
         {exampleMarkers.map((marker) => (
           <GanttMarker
@@ -457,8 +508,8 @@ const Demo = () => {
         <GanttToday />
         <GanttCreateMarkerTrigger onCreateMarker={handleCreateMarker} />
       </GanttTimeline>
-    </Gantt>
+    </GanttProvider>
   );
 };
 
-export default Demo;
+export { Demo as default };
