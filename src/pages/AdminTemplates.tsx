@@ -36,14 +36,8 @@ export default function AdminTemplates() {
         <AdminPageTitle
           icon={FileStack}
           title="Plan Templates"
-        >
-          <div className="flex flex-col">
-            <span className="text-lg font-bold">Plan Templates</span>
-            <span className="text-muted-foreground text-base mt-2">
-              Bulk-create or manage your plan templates for efficient onboarding
-            </span>
-          </div>
-        </AdminPageTitle>
+          subtitle="Bulk-create or manage your plan templates for efficient onboarding"
+        />
         <div className="space-y-6">
           <BulkPlanCreation />
         </div>
@@ -51,3 +45,4 @@ export default function AdminTemplates() {
     </AdminLayout>
   );
 }
+

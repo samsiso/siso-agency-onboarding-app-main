@@ -40,14 +40,8 @@ export default function AdminClients() {
         <AdminPageTitle
           icon={Users}
           title="Clients"
-        >
-          <div className="flex flex-col">
-            <span className="text-lg font-bold">Clients</span>
-            <span className="text-muted-foreground text-base mt-2">
-              Manage your organization's clients and view details
-            </span>
-          </div>
-        </AdminPageTitle>
+          subtitle="Manage your organization's clients and view details"
+        />
         <AdminClientsView isAdmin={isAdmin} />
       </div>
     </AdminLayout>

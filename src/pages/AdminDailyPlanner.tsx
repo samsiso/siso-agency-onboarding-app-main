@@ -44,14 +44,8 @@ export default function AdminDailyPlanner() {
         <AdminPageTitle
           icon={CalendarClock}
           title="Daily Planner"
-        >
-          <div className="flex flex-col">
-            <span className="text-lg font-bold">Daily Planner</span>
-            <span className="text-muted-foreground text-base mt-2">
-              Plan your team's daily agenda, tasks, and meetings
-            </span>
-          </div>
-        </AdminPageTitle>
+          subtitle="Plan your team's daily agenda, tasks, and meetings"
+        />
         <DailyPlannerHeader />
         <DailyPlannerTabs />
       </div>

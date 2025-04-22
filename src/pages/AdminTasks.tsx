@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { GradientText } from '@/components/ui/gradient-text';
 import { TeamMembersGrid } from '@/components/admin/tasks/TeamMembersGrid';
 import { AdminPageTitle } from '@/components/admin/layout/AdminPageTitle';
+import { Card, CardContent } from '@/components/ui/card';
 import { Users } from 'lucide-react';
 
 export default function AdminTasks() {
@@ -14,14 +15,17 @@ export default function AdminTasks() {
         <AdminPageTitle
           icon={Users}
           title="Team Tasks Dashboard"
-        >
-          <div className="flex flex-col">
-            <span className="text-lg font-bold">Team Tasks Dashboard</span>
-            <span className="text-muted-foreground text-base mt-2">
-              Click on a team member's card to view and manage their tasks, track progress, and set new goals.
+          subtitle="Click on a team member's card to view and manage their tasks, track progress, and set new goals."
+        />
+        {/* Placeholder Card for plan future "stats/data" */}
+        <Card>
+          <CardContent className="py-8 text-center">
+            <span className="text-muted-foreground">
+              Analytics/Stats block coming soon!
             </span>
-          </div>
-        </AdminPageTitle>
+          </CardContent>
+        </Card>
+
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}

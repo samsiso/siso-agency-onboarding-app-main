@@ -54,14 +54,8 @@ export default function AdminDashboard() {
         <AdminPageTitle
           icon={Users}
           title="Admin Dashboard"
-        >
-          <div className="flex flex-col">
-            <span className="text-lg font-bold">Admin Dashboard</span>
-            <span className="text-muted-foreground text-base mt-2">
-              Welcome to your admin panel — view statistics, quick actions, and more
-            </span>
-          </div>
-        </AdminPageTitle>
+          subtitle="Welcome to your admin panel — view statistics, quick actions, and more"
+        />
         <StatsOverview />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <motion.div 
@@ -87,3 +81,4 @@ export default function AdminDashboard() {
     </AdminLayout>
   );
 }
+
