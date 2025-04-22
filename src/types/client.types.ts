@@ -1,4 +1,3 @@
-
 export interface ClientDocument {
   id: string;
   client_id: string;

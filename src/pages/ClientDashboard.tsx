@@ -86,7 +86,29 @@ export default function ClientDashboard() {
           return;
         }
         
-        setClient(clientData);
+        // Create a complete ClientData object with all required fields
+        const completeClientData: ClientData = {
+          id: clientData.id,
+          full_name: clientData.contact_name || '',
+          email: null,
+          business_name: clientData.company_name || null,
+          phone: null,
+          avatar_url: null,
+          status: clientData.status,
+          current_step: clientData.current_step,
+          total_steps: clientData.total_steps,
+          completed_steps: clientData.completed_steps || [],
+          created_at: clientData.created_at,
+          updated_at: clientData.updated_at,
+          website_url: clientData.website_url,
+          project_name: clientData.project_name,
+          company_niche: clientData.company_niche,
+          contact_name: clientData.contact_name,
+          company_name: clientData.company_name,
+          todos: clientData.todos as TodoItem[] || []
+        };
+        
+        setClient(completeClientData);
       } catch (error) {
         console.error('Unexpected error in fetchClientData:', error);
         toast({
