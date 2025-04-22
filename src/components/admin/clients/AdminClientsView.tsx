@@ -1,10 +1,11 @@
+
 import { useState, useMemo } from 'react';
 import { ClientsHeader } from './ClientsHeader';
-import { ClientsEnhancedTable } from './ClientsEnhancedTable';  // Corrected import
+import { ClientsEnhancedTable } from './ClientsEnhancedTable';
 import { ViewModeSwitcher } from './ViewModeSwitcher';
 import { ClientsCardGrid } from './ClientsCardGrid';
 import { ClientViewPreference } from '@/types/client.types';
-import { useLocalStorage } from '@/hooks/useLocalStorage';  // Assuming this hook exists
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useClientsList } from '@/hooks/client';
 
 import { DashboardStats } from './DashboardStats';
@@ -59,9 +60,9 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
     [clients]
   );
 
-  // Update preference handler
+  // Create adapter function to bridge the type mismatch
   const handleViewPreferenceChange = (updates: Partial<ClientViewPreference>) => {
-    setViewPreference({ ...viewPreference, ...updates });
+    setViewPreference(prev => ({ ...prev, ...updates }));
   };
 
   // Search handler
@@ -108,7 +109,7 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
             statusFilter={statusFilter}
             onStatusFilterChange={setStatusFilter}
             viewPreference={viewPreference}
-            onViewPreferenceChange={setViewPreference}
+            onViewPreferenceChange={handleViewPreferenceChange}
             onAddClient={() => setViewMode("table")} // Reuse add client action
             totalClients={statsTotalClients}
             clients={clients}
