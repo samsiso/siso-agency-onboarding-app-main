@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from 'react';
 import { ClientsEnhancedTable } from './ClientsEnhancedTable';
 import { ClientsCardGrid } from './ClientsCardGrid';
@@ -7,7 +6,6 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useClientsList } from '@/hooks/client';
 import { DashboardStats } from './DashboardStats';
 import { PriorityListing } from './PriorityListing';
-import { ClientsControlsBar } from './ClientsControlsBar';
 
 const defaultViewPreference: ClientViewPreference = {
   columns: [
@@ -42,9 +40,8 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
   );
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
 
-  // Stats - fetch ONE query for total clients & total financials
   const { clients = [], isLoading } = useClientsList({
-    searchQuery: "", // No top search input anymore; show all for now
+    searchQuery: "",
     statusFilter,
     sortColumn: viewPreference.sortColumn,
     sortDirection: viewPreference.sortDirection,
@@ -75,21 +72,17 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
       />
       {/* Priority Clients */}
       <PriorityListing limit={3} />
-      {/* Controls Bar (just status + view switcher) */}
-      <ClientsControlsBar
-        statusFilter={statusFilter}
-        onStatusFilterChange={handleStatusFilterChange}
-        viewMode={viewMode}
-        setViewMode={setViewMode}
-      />
-      {/* Main Content Area */}
+      {/* NO MORE: Controls Bar (status + view switcher) */}
       <div>
         {viewMode === "table" ? (
           <ClientsEnhancedTable
-            searchQuery="" // No top search anymore
+            searchQuery=""
             statusFilter={statusFilter}
             onSearchChange={() => {}}
             onStatusFilterChange={setStatusFilter}
+            // ViewPreferenceProps moved into ClientsHeader
+            viewMode={viewMode}
+            setViewMode={setViewMode}
           />
         ) : (
           <ClientsCardGrid
@@ -97,6 +90,8 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
             statusFilter={statusFilter}
             sortColumn={viewPreference.sortColumn}
             sortDirection={viewPreference.sortDirection}
+            viewMode={viewMode}
+            setViewMode={setViewMode}
           />
         )}
       </div>

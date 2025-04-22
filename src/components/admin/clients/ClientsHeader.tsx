@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { 
@@ -12,13 +13,12 @@ import {
   Search, 
   Filter, 
   Plus,
-  Download,
-  Upload,
   RefreshCw,
-  Columns // Replaced ViewColumns with Columns which is a valid lucide-react icon
+  Columns
 } from 'lucide-react';
 import { ClientViewPreference, ClientData } from '@/types/client.types';
 import { RefetchOptions } from '@tanstack/react-query';
+import { ViewModeSwitcher } from "./ViewModeSwitcher";
 
 interface ClientsHeaderProps {
   searchQuery: string;
@@ -31,6 +31,8 @@ interface ClientsHeaderProps {
   totalClients?: number;
   clients?: ClientData[];
   onRefetch?: (options?: RefetchOptions) => Promise<unknown>;
+  viewMode?: "table" | "cards";
+  setViewMode?: (mode: "table" | "cards") => void;
 }
 
 export function ClientsHeader({
@@ -43,19 +45,18 @@ export function ClientsHeader({
   onAddClient,
   totalClients,
   clients,
-  onRefetch
+  onRefetch,
+  viewMode,
+  setViewMode,
 }: ClientsHeaderProps) {
-  // Handle search input changes
   const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onSearchChange(e.target.value);
   };
 
-  // Handle status filter changes
   const handleStatusChange = (value: string) => {
     onStatusFilterChange(value);
   };
 
-  // Handle refresh click
   const handleRefresh = () => {
     if (onRefetch) {
       onRefetch();
@@ -63,9 +64,9 @@ export function ClientsHeader({
   };
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-row items-center gap-4">
-        <div className="flex-1 flex gap-2">
+    <div className="flex flex-col gap-6 mb-3">
+      <div className="flex flex-row gap-4 items-center justify-between">
+        <div className="flex gap-2 flex-1">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
@@ -82,45 +83,52 @@ export function ClientsHeader({
             </SelectTrigger>
             <SelectContent className="bg-background/90 text-foreground shadow-lg border-border/50 z-50">
               <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="new">New</SelectItem>
-              <SelectItem value="contacted">Contacted</SelectItem>
-              <SelectItem value="converted">Converted</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="in_progress">In Progress</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="proposal">Proposal</SelectItem>
             </SelectContent>
           </Select>
         </div>
-        <Button
-          variant="outline"
-          size="icon"
-          className="ml-2"
-          onClick={handleRefresh}
-          title="Refresh"
-        >
-          <RefreshCw className="h-4 w-4" />
-        </Button>
-        {viewPreference && onViewPreferenceChange && (
+        {/* RIGHT SIDE: View Switch, Refresh, Add Button */}
+        <div className="flex items-center gap-1">
+          {viewMode && setViewMode && (
+            <ViewModeSwitcher viewMode={viewMode} setViewMode={setViewMode} />
+          )}
           <Button
             variant="outline"
             size="icon"
-            className="ml-2"
-            onClick={() => {
-              console.log("Open column customization");
-            }}
-            title="Columns"
+            className="ml-1"
+            onClick={handleRefresh}
+            title="Refresh"
           >
-            <Columns className="h-4 w-4" />
+            <RefreshCw className="h-4 w-4" />
           </Button>
-        )}
-        <Button
-          variant="outline"
-          size="icon"
-          className="ml-2"
-          onClick={onAddClient}
-          title="Add Client"
-        >
-          <Plus className="h-4 w-4" />
-        </Button>
+          {viewPreference && onViewPreferenceChange && (
+            <Button
+              variant="outline"
+              size="icon"
+              className="ml-1"
+              onClick={() => {
+                console.log("Open column customization");
+              }}
+              title="Columns"
+            >
+              <Columns className="h-4 w-4" />
+            </Button>
+          )}
+          <Button
+            variant="outline"
+            size="icon"
+            className="ml-1"
+            onClick={onAddClient}
+            title="Add Client"
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
-      {/* Optionally: You can add more controls here */}
     </div>
   );
 }
