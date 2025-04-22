@@ -22,41 +22,67 @@ export default function ClientDashboard() {
         navigate("/client-portal");
         return;
       }
-      // Fetch link
-      const { data: links, error: linkError } = await supabase
-        .from("client_user_links")
-        .select("client_id")
-        .eq("user_id", user.id)
-        .limit(1);
+      
+      try {
+        // Fetch client link using raw SQL query to avoid type issues
+        const { data: links, error: linkError } = await supabase
+          .from('client_user_links')
+          .select('client_id')
+          .eq('user_id', user.id)
+          .limit(1);
 
-      if (linkError || !links || links.length === 0) {
+        if (linkError) {
+          console.error('Error fetching client link:', linkError);
+          toast({
+            variant: "destructive",
+            title: "Error fetching client data",
+            description: linkError.message,
+          });
+          setLoading(false);
+          return;
+        }
+
+        if (!links || links.length === 0) {
+          toast({
+            variant: "destructive",
+            title: "No client linked",
+            description: "You are not linked to any client profile.",
+          });
+          setLoading(false);
+          return;
+        }
+        
+        const clientId = links[0].client_id;
+
+        // Fetch client info
+        const { data: clientData, error: clientError } = await supabase
+          .from('client_onboarding')
+          .select('*')
+          .eq('id', clientId)
+          .maybeSingle();
+
+        if (clientError) {
+          console.error('Error fetching client data:', clientError);
+          toast({
+            variant: "destructive",
+            title: "Client not found",
+            description: clientError.message,
+          });
+          setLoading(false);
+          return;
+        }
+        
+        setClient(clientData);
+      } catch (error) {
+        console.error('Unexpected error in fetchClientData:', error);
         toast({
           variant: "destructive",
-          title: "No client linked",
-          description: "You are not linked to any client profile.",
+          title: "Error",
+          description: "An unexpected error occurred while fetching client data.",
         });
+      } finally {
         setLoading(false);
-        return;
       }
-      const clientId = links[0].client_id;
-
-      // Fetch client info
-      const { data: clientData, error: clientError } = await supabase
-        .from("client_onboarding")
-        .select("*")
-        .eq("id", clientId)
-        .maybeSingle();
-
-      if (clientError || !clientData) {
-        toast({
-          variant: "destructive",
-          title: "Client not found",
-        });
-        setLoading(false);
-        return;
-      }
-      setClient(clientData);
-      setLoading(false);
     };
 
     fetchClientData();
