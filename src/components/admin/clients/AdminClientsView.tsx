@@ -1,3 +1,4 @@
+
 import { useState, useMemo } from 'react';
 import { ClientsEnhancedTable } from './ClientsEnhancedTable';
 import { ClientsCardGrid } from './ClientsCardGrid';
@@ -6,6 +7,7 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useClientsList } from '@/hooks/client';
 import { DashboardStats } from './DashboardStats';
 import { PriorityListing } from './PriorityListing';
+import { ClientsHeader } from './ClientsHeader';
 
 const defaultViewPreference: ClientViewPreference = {
   columns: [
@@ -39,9 +41,10 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
     defaultViewPreference
   );
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const { clients = [], isLoading } = useClientsList({
-    searchQuery: "",
+  const { clients = [], isLoading, refetch } = useClientsList({
+    searchQuery,
     statusFilter,
     sortColumn: viewPreference.sortColumn,
     sortDirection: viewPreference.sortDirection,
@@ -58,11 +61,6 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
     setViewPreference(prev => ({ ...prev, ...updates }));
   };
 
-  // Status filter handler
-  const handleStatusFilterChange = (status: string) => {
-    setStatusFilter(status);
-  };
-
   return (
     <div className="space-y-6">
       {/* Dashboard stats */}
@@ -72,26 +70,36 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
       />
       {/* Priority Clients */}
       <PriorityListing limit={3} />
-      {/* NO MORE: Controls Bar (status + view switcher) */}
+
+      {/* Controls with ClientsHeader */}
+      <ClientsHeader
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+        viewPreference={viewPreference}
+        onViewPreferenceChange={handleViewPreferenceChange}
+        onAddClient={() => {}}
+        onRefetch={refetch}
+        viewMode={viewMode}
+        setViewMode={setViewMode}
+      />
+
+      {/* Content View (Table or Cards) */}
       <div>
         {viewMode === "table" ? (
           <ClientsEnhancedTable
-            searchQuery=""
+            searchQuery={searchQuery}
             statusFilter={statusFilter}
-            onSearchChange={() => {}}
+            onSearchChange={setSearchQuery}
             onStatusFilterChange={setStatusFilter}
-            // ViewPreferenceProps moved into ClientsHeader
-            viewMode={viewMode}
-            setViewMode={setViewMode}
           />
         ) : (
           <ClientsCardGrid
-            searchQuery=""
+            searchQuery={searchQuery}
             statusFilter={statusFilter}
             sortColumn={viewPreference.sortColumn}
             sortDirection={viewPreference.sortDirection}
-            viewMode={viewMode}
-            setViewMode={setViewMode}
           />
         )}
       </div>

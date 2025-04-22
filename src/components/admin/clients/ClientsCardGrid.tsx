@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { ClientData } from "@/types/client.types";
@@ -24,6 +25,8 @@ interface ClientsCardGridProps {
   sortColumn?: string;
   sortDirection?: 'asc' | 'desc';
   onRefetch?: () => void;
+  viewMode?: "table" | "cards";
+  setViewMode?: (mode: "table" | "cards") => void;
 }
 
 export function ClientsCardGrid({
@@ -31,7 +34,9 @@ export function ClientsCardGrid({
   statusFilter,
   sortColumn = "updated_at",
   sortDirection = "desc",
-  onRefetch
+  onRefetch,
+  viewMode,
+  setViewMode
 }: ClientsCardGridProps) {
   const navigate = useNavigate();
   

@@ -9,13 +9,17 @@ interface ClientsEnhancedTableProps {
   statusFilter: string;
   onSearchChange: (query: string) => void;
   onStatusFilterChange: (status: string) => void;
+  viewMode?: "table" | "cards";
+  setViewMode?: (mode: "table" | "cards") => void;
 }
 
 function ClientsTableContent({ 
   searchQuery, 
   statusFilter,
   onSearchChange,
-  onStatusFilterChange 
+  onStatusFilterChange,
+  viewMode,
+  setViewMode
 }: ClientsEnhancedTableProps) {
   const { viewPreference, handleViewPreferenceChange } = useViewPreference();
 
@@ -27,6 +31,8 @@ function ClientsTableContent({
       onViewPreferenceChange={handleViewPreferenceChange}
       onSearchChange={onSearchChange}
       onStatusFilterChange={onStatusFilterChange}
+      viewMode={viewMode}
+      setViewMode={setViewMode}
     />
   );
 }

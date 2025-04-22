@@ -1,3 +1,4 @@
+
 import React, { useRef } from 'react';
 import { Table } from '@/components/ui/table';
 import { ClientViewPreference } from '@/types/client.types';
@@ -24,6 +25,8 @@ interface ClientsTableProps {
   onViewPreferenceChange: (preference: Partial<ClientViewPreference>) => void;
   onSearchChange?: (query: string) => void;
   onStatusFilterChange?: (status: string) => void;
+  viewMode?: "table" | "cards";
+  setViewMode?: (mode: "table" | "cards") => void;
 }
 
 export function ClientsTable({ 
@@ -32,7 +35,9 @@ export function ClientsTable({
   viewPreference,
   onViewPreferenceChange,
   onSearchChange,
-  onStatusFilterChange
+  onStatusFilterChange,
+  viewMode,
+  setViewMode
 }: ClientsTableProps) {
   const [isAddClientOpen, setIsAddClientOpen] = React.useState(false);
   const tableRef = useRef<HTMLDivElement>(null);
@@ -109,6 +114,8 @@ export function ClientsTable({
           totalClients={totalCount}
           clients={clients}
           onRefetch={refetch}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
         />
         
         {selectedClients.length > 0 && (
