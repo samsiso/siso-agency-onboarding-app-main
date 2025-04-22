@@ -12,7 +12,7 @@ import { ClientTeamAssignments } from '@/components/admin/clients/detail/ClientT
 import { ClientRelatedDocuments } from '@/components/admin/clients/detail/ClientRelatedDocuments';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
 import { 
   Breadcrumb,
@@ -180,7 +180,7 @@ export default function ClientDetailPage() {
   if (isLoading) {
     return (
       <AdminLayout>
-        <div className="container mx-auto py-6">
+        <div className="container mx-auto py-6 bg-black text-white min-h-screen">
           <Breadcrumb className="mb-6">
             <BreadcrumbList>
               <BreadcrumbItem>
@@ -211,7 +211,7 @@ export default function ClientDetailPage() {
   if (error || !client) {
     return (
       <AdminLayout>
-        <div className="container mx-auto py-6">
+        <div className="container mx-auto py-6 bg-black text-white min-h-screen">
           <Breadcrumb className="mb-6">
             <BreadcrumbList>
               <BreadcrumbItem>
@@ -249,7 +249,7 @@ export default function ClientDetailPage() {
 
   return (
     <AdminLayout>
-      <div className="container mx-auto py-6">
+      <div className="container mx-auto py-6 bg-black text-white min-h-screen">
         <Breadcrumb className="mb-6">
           <BreadcrumbList>
             <BreadcrumbItem>
