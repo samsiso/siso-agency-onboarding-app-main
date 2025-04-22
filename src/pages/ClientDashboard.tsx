@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -69,14 +68,48 @@ export default function ClientDashboard() {
 
         const clientId = clientIdData[0].client_id;
 
-        // Fetch client info
-        const { data: clientData, error: clientError } = await supabase
+        // Fetch client info and properly type with todos
+        type DBClient = {
+          id: string;
+          full_name?: string;
+          email?: string | null;
+          business_name?: string | null;
+          phone?: string | null;
+          avatar_url?: string | null;
+          status: string;
+          current_step: number;
+          total_steps: number;
+          completed_steps: string[];
+          created_at: string;
+          updated_at: string;
+          website_url?: string | null;
+          professional_role?: string | null;
+          bio?: string | null;
+          project_name?: string | null;
+          company_niche?: string | null;
+          development_url?: string | null;
+          mvp_build_status?: string | null;
+          notion_plan_url?: string | null;
+          payment_status?: string | null;
+          estimated_price?: number | null;
+          initial_contact_date?: string | null;
+          start_date?: string | null;
+          estimated_completion_date?: string | null;
+          todos?: any;
+          next_steps?: string | null;
+          key_research?: string | null;
+          priority?: string | null;
+          contact_name?: string | null;
+          company_name?: string | null;
+        };
+
+        const { data: clientDataRaw, error: clientError } = await supabase
           .from('client_onboarding')
           .select('*')
           .eq('id', clientId)
           .maybeSingle();
 
-        if (clientError || !clientData) {
+        if (clientError || !clientDataRaw) {
           toast({
             variant: "destructive",
             title: "Client not found",
@@ -86,11 +119,11 @@ export default function ClientDashboard() {
           return;
         }
 
-        // Get todos from custom extension data if available (avoid TypeScript error)
+        const clientData = clientDataRaw as DBClient;
+
+        // Parse todos array with safe fallback
         let todos: TodoItem[] = [];
-        // @ts-ignore
         if (clientData.todos && Array.isArray(clientData.todos)) {
-          // @ts-ignore
           todos = clientData.todos as TodoItem[];
         }
 

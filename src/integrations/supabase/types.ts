@@ -464,6 +464,7 @@ export type Database = {
           id: string
           project_name: string | null
           status: string
+          todos: Json | null
           total_steps: number | null
           updated_at: string | null
           user_id: string | null
@@ -479,6 +480,7 @@ export type Database = {
           id?: string
           project_name?: string | null
           status?: string
+          todos?: Json | null
           total_steps?: number | null
           updated_at?: string | null
           user_id?: string | null
@@ -494,6 +496,7 @@ export type Database = {
           id?: string
           project_name?: string | null
           status?: string
+          todos?: Json | null
           total_steps?: number | null
           updated_at?: string | null
           user_id?: string | null
