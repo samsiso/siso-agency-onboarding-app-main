@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,7 +22,7 @@ export default function ClientDashboard() {
     try {
       const { error } = await supabase
         .from('client_onboarding')
-        .update({ todos })
+        .update({ todos: JSON.parse(JSON.stringify(todos)) }) // Convert to plain JSON object
         .eq('id', client.id);
 
       if (error) {
