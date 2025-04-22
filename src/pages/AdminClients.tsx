@@ -34,18 +34,21 @@ export default function AdminClients() {
     return null;
   }
 
-  // MANCHESTER's dashboard: blue accent, single title bar
+  // Clients Dashboard: polished blue gradient, single title
   return (
     <AdminLayout>
-      <div className="container mx-auto p-4 bg-gradient-to-tr from-blue-50 via-blue-100 to-white rounded-lg min-h-screen">
-        <AdminPageTitle
-          icon={Users}
-          title="Clients Dashboard"
-          subtitle="Manage your organization's clients and view details"
-        />
-        <AdminClientsView isAdmin={isAdmin} />
+      <div className="min-h-screen pb-12" style={{
+        background: "linear-gradient(90deg, hsla(221, 45%, 73%, 1) 0%, hsla(220, 78%, 29%, 1) 100%)"
+      }}>
+        <div className="container mx-auto px-2 py-6">
+          <AdminPageTitle
+            icon={Users}
+            title="Clients Dashboard"
+            subtitle="Manage your organization's clients and view details"
+          />
+          <AdminClientsView isAdmin={isAdmin} />
+        </div>
       </div>
     </AdminLayout>
   );
 }
-
