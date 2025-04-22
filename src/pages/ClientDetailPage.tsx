@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useClientDetails } from '@/hooks/client';
@@ -12,7 +13,7 @@ import { ClientTeamAssignments } from '@/components/admin/clients/detail/ClientT
 import { ClientRelatedDocuments } from '@/components/admin/clients/detail/ClientRelatedDocuments';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
-import { Skeleton } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Loader2 } from 'lucide-react';
 import { 
   Breadcrumb,
