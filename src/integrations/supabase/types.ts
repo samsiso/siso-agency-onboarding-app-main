@@ -501,6 +501,35 @@ export type Database = {
         }
         Relationships: []
       }
+      client_user_links: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_user_links_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "client_onboarding"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       crypto_transactions: {
         Row: {
           created_at: string | null
@@ -2433,6 +2462,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_client_by_user_id: {
+        Args: { user_uuid: string }
+        Returns: {
+          client_id: string
+        }[]
+      }
       is_admin: {
         Args: { user_id: string }
         Returns: boolean
