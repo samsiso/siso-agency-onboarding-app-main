@@ -10,6 +10,8 @@ import { useClientsList } from '@/hooks/client';
 
 import { DashboardStats } from './DashboardStats';
 import { PriorityListing } from './PriorityListing';
+import { AdminPageTitle } from '@/components/admin/layout/AdminPageTitle';
+import { Users } from 'lucide-react';
 
 // Default view preference
 const defaultViewPreference: ClientViewPreference = {
@@ -77,17 +79,8 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
 
   return (
     <div className="container mx-auto p-4 space-y-6">
-      {/* Dashboard Icon and Heading */}
-      <div className="flex items-center gap-4 mb-2">
-        <div className="rounded-full bg-gradient-to-tr from-blue-400/60 to-blue-800/50 p-3 flex items-center justify-center shadow">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="2.7" y="2.7" width="18.6" height="18.6" rx="3" fill="#403E43" />
-            <path d="M7.2,13.2V7.8A.6.6,0,0,1,7.8,7.2h4.4a.6.6,0,0,1,.6.6v5.4Z" fill="#fff"/>
-            <circle cx="17.1" cy="16.8" r="1.5" fill="#D946EF"/>
-          </svg>
-        </div>
-        <h1 className="text-3xl font-bold tracking-tight">Clients Dashboard</h1>
-      </div>
+      <AdminPageTitle icon={Users} title="Clients Dashboard" />
+      
       {/* Stats Cards */}
       <DashboardStats
         totalClients={statsTotalClients}
