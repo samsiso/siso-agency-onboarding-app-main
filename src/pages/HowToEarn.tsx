@@ -1,6 +1,6 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AppLayout } from '@/components/layout/AppLayout';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { SmartEarningSearch } from '@/components/earn/SmartEarningSearch';
@@ -87,7 +87,7 @@ const HowToEarn = () => {
   const isLoading = isLoadingPaths || isLoadingSkills || isLoadingProgress;
 
   return (
-    <MainLayout>
+    <AppLayout>
       <div className="flex-1 p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
           <EarnHeader navigate={navigate} />
@@ -104,7 +104,7 @@ const HowToEarn = () => {
         </div>
       </div>
       <EarningChatAssistant />
-    </MainLayout>
+    </AppLayout>
   );
 };
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { MainLayout } from '@/components/layout/MainLayout';
+import { useNavigate } from 'react-router-dom';
+import { AppLayout } from '@/components/layout/AppLayout';
 import { LeaderboardContent } from '@/components/leaderboard/components/LeaderboardContent';
 import { LeaderboardStats } from '@/components/leaderboard/LeaderboardStats';
 import { useLeaderboardData } from '@/components/leaderboard/hooks/useLeaderboardData';
@@ -59,35 +60,37 @@ export default function LeaderboardPage() {
   const totalSisoTokens = entries.reduce((sum, entry) => sum + (entry.siso_tokens || 0), 0);
 
   return (
-    <MainLayout>
-      <div className="container mx-auto px-4 py-6">
-        <div className="relative">
-          <Spotlight className="-top-40 left-0" />
-          
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent mb-2">
-              Community Leaderboard
-            </h1>
-            <p className="text-siso-text/80">
-              Track community contributions, points earned, and rewards across the SISO platform.
-            </p>
+    <AppLayout>
+      <div className="p-4 md:p-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="relative">
+            <Spotlight className="-top-40 left-0" />
+            
+            <div className="mb-8">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent mb-2">
+                Community Leaderboard
+              </h1>
+              <p className="text-siso-text/80">
+                Track community contributions, points earned, and rewards across the SISO platform.
+              </p>
+            </div>
+            
+            <LeaderboardStats
+              totalUsers={stats.totalParticipants}
+              totalPoints={totalPoints}
+              totalSisoTokens={totalSisoTokens}
+            />
+            
+            <LeaderboardContent 
+              filteredData={filteredEntries}
+              onUserClick={handleUserClick}
+              onSearchChange={handleSearchChange}
+              onPeriodChange={handlePeriodChange}
+              onCategoryChange={handleCategoryChange}
+            />
           </div>
-          
-          <LeaderboardStats
-            totalUsers={stats.totalParticipants}
-            totalPoints={totalPoints}
-            totalSisoTokens={totalSisoTokens}
-          />
-          
-          <LeaderboardContent 
-            filteredData={filteredEntries}
-            onUserClick={handleUserClick}
-            onSearchChange={handleSearchChange}
-            onPeriodChange={handlePeriodChange}
-            onCategoryChange={handleCategoryChange}
-          />
         </div>
       </div>
-    </MainLayout>
+    </AppLayout>
   );
 }

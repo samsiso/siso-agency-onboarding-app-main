@@ -1,5 +1,5 @@
 
-import { MainLayout } from "@/components/layout/MainLayout";
+import { AppLayout } from "@/components/layout/AppLayout";
 import { DocumentTable } from "@/components/resources/DocumentTable";
 
 const demoDocuments = [
@@ -15,13 +15,13 @@ const demoDocuments = [
 
 export default function DocumentLibraryPage() {
   return (
-    <MainLayout>
+    <AppLayout>
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Document Library</h1>
         </div>
         <DocumentTable documents={demoDocuments} />
       </div>
-    </MainLayout>
+    </AppLayout>
   );
 }

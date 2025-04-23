@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ArrowRightLeft, Loader2, Wifi, Database, History, Filter } from 'lucide-react';
+import { AppLayout } from '@/components/layout/AppLayout';
 import { PointsExchange } from "@/components/crypto/PointsExchange";
 import { NFTGallery } from "@/components/crypto/NFTGallery";
 import { WelcomeNFTStatus } from "@/components/crypto/WelcomeNFTStatus";
@@ -134,19 +135,17 @@ const CryptoExchange = () => {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen">
-        <Sidebar />
-        <div className="flex-1 flex items-center justify-center">
+      <AppLayout>
+        <div className="flex items-center justify-center h-full">
           <Loader2 className="h-6 w-6 animate-spin text-siso-red" />
         </div>
-      </div>
+      </AppLayout>
     );
   }
 
   return (
-    <div className="flex min-h-screen">
-      <Sidebar />
-      <div className="flex-1 bg-gradient-to-b from-siso-bg via-black to-siso-bg relative overflow-hidden">
+    <AppLayout>
+      <div className="relative overflow-hidden">
         <FloatingOrbs />
         
         <motion.div 
@@ -252,7 +251,7 @@ const CryptoExchange = () => {
           </div>
         </motion.div>
       </div>
-    </div>
+    </AppLayout>
   );
 };
 
