@@ -9,7 +9,10 @@ import {
 } from "@/components/ui/kanban";
 import { TaskCard } from './TaskCard';
 import { TaskDetailsDialog } from './TaskDetailsDialog';
-import { type DragEndEvent } from "@dnd-kit/core";
+import { useClientTasks } from '@/hooks/useClientTasks';
+import { Skeleton } from '@/components/ui/skeleton';
+import { AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const taskStatuses = [
   { id: "1", name: "To Do", color: "#6B7280" },
@@ -17,79 +20,50 @@ const taskStatuses = [
   { id: "3", name: "Completed", color: "#10B981" },
 ];
 
-const demoTasks = [
-  {
-    id: "1",
-    name: "Research potential tech stack",
-    description: "Evaluate different technology options for the new project, focusing on scalability and performance.",
-    startAt: new Date(),
-    endAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-    status: taskStatuses[0],
-    category: "Research",
-    priority: "high" as const,
-    owner: {
-      name: "Alex Johnson",
-      image: "https://api.dicebear.com/7.x/adventurer-neutral/svg?seed=1",
-    }
-  },
-  {
-    id: "2",
-    name: "Create project architecture",
-    description: "Design the system architecture with microservices approach, defining the relationships between components.",
-    startAt: new Date(),
-    endAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
-    status: taskStatuses[1],
-    category: "Development",
-    priority: "medium" as const,
-    owner: {
-      name: "Sam Wilson",
-      image: "https://api.dicebear.com/7.x/adventurer-neutral/svg?seed=2",
-    }
-  },
-  {
-    id: "3",
-    name: "Setup development environment",
-    description: "Configure development environments, install all required packages and dependencies.",
-    startAt: new Date(),
-    endAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
-    status: taskStatuses[2],
-    category: "Setup",
-    priority: "low" as const,
-    owner: {
-      name: "Maria Garcia",
-      image: "https://api.dicebear.com/7.x/adventurer-neutral/svg?seed=3",
-    }
-  },
-];
-
 export function ActiveTasksView() {
-  const [tasks, setTasks] = useState(demoTasks);
-  const [selectedTask, setSelectedTask] = useState<typeof demoTasks[0] | null>(null);
+  const [selectedTask, setSelectedTask] = useState<any | null>(null);
+  const { tasks, loading, updateTaskStatus } = useClientTasks();
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = async (event: any) => {
     const { active, over } = event;
 
     if (!over) return;
 
-    const status = taskStatuses.find((status) => status.name === over.id);
-    if (!status) return;
+    const task = tasks.find(t => t.id === active.id);
+    if (!task) return;
 
-    setTasks(
-      tasks.map((task) => {
-        if (task.id === active.id) {
-          return { ...task, status };
-        }
-        return task;
-      })
-    );
+    const newStatus = over.id === 'To Do' ? 'pending' :
+                     over.id === 'In Progress' ? 'in_progress' :
+                     'completed';
+
+    await updateTaskStatus(task.id, newStatus);
   };
 
   const handleUpdateTask = (updatedTask: any) => {
-    setTasks(tasks.map(task => 
-      task.id === updatedTask.id ? { ...task, ...updatedTask } : task
-    ));
     setSelectedTask(updatedTask);
   };
+
+  if (loading) {
+    return (
+      <div className="p-4 space-y-4">
+        <Skeleton className="h-[200px] w-full" />
+        <Skeleton className="h-[200px] w-full" />
+        <Skeleton className="h-[200px] w-full" />
+      </div>
+    );
+  }
+
+  if (!tasks.length) {
+    return (
+      <Alert className="m-4">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>No tasks found</AlertTitle>
+        <AlertDescription>
+          There are currently no tasks assigned. Check back later for updates.
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   return (
     <div className="p-4">
@@ -111,7 +85,12 @@ export function ActiveTasksView() {
               <KanbanHeader name={status.name} color={status.color} />
               <KanbanCards>
                 {tasks
-                  .filter((task) => task.status.name === status.name)
+                  .filter((task) => {
+                    const taskStatus = task.status.name;
+                    return (status.name === 'To Do' && taskStatus === 'pending') ||
+                           (status.name === 'In Progress' && taskStatus === 'in_progress') ||
+                           (status.name === 'Completed' && taskStatus === 'completed');
+                  })
                   .map((task, index) => (
                     <KanbanCard
                       key={task.id}
@@ -122,14 +101,7 @@ export function ActiveTasksView() {
                       className="bg-transparent shadow-none p-0"
                     >
                       <TaskCard
-                        name={task.name}
-                        startAt={task.startAt}
-                        endAt={task.endAt}
-                        category={task.category}
-                        owner={task.owner}
-                        priority={task.priority}
-                        status={task.status}
-                        description={task.description}
+                        {...task}
                         onClick={() => setSelectedTask(task)}
                       />
                     </KanbanCard>

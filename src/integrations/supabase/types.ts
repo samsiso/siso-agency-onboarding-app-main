@@ -1938,6 +1938,7 @@ export type Database = {
       }
       tasks: {
         Row: {
+          assigned_client_id: string | null
           assigned_to: string | null
           category: Database["public"]["Enums"]["task_category"]
           completed_at: string | null
@@ -1958,6 +1959,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          assigned_client_id?: string | null
           assigned_to?: string | null
           category: Database["public"]["Enums"]["task_category"]
           completed_at?: string | null
@@ -1978,6 +1980,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          assigned_client_id?: string | null
           assigned_to?: string | null
           category?: Database["public"]["Enums"]["task_category"]
           completed_at?: string | null
@@ -1998,6 +2001,13 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "tasks_assigned_client_id_fkey"
+            columns: ["assigned_client_id"]
+            isOneToOne: false
+            referencedRelation: "client_onboarding"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "tasks_parent_task_id_fkey"
             columns: ["parent_task_id"]
