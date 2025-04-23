@@ -23,7 +23,9 @@ export async function inviteClientUser({
     let authUserId: string | null = null;
 
     if (usersList?.users) {
-      const foundUser = usersList.users.find((u) => u.email === email);
+      // The type of usersList.users is User[], where User has an email property
+      // Using find() to look for a user with matching email
+      const foundUser = usersList.users.find(user => user.email === email);
       if (foundUser) {
         authUserId = foundUser.id;
       }

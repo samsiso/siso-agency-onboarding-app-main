@@ -1,4 +1,3 @@
-
 import React, { useState, createContext, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
@@ -87,8 +86,12 @@ export const DesktopSidebar = ({
 }: React.ComponentProps<typeof motion.div>) => {
   const { open, setOpen, animate } = useSidebar();
 
-  // Only use string/numeric widths for style prop, do not use motion values anywhere else
-  const widthStyle = { width: animate ? (open ? "300px" : "76px") : "300px", minWidth: animate ? (open ? "300px" : "76px") : "300px" };
+  // Fix the TypeScript error by using a properly typed style object
+  const width = animate ? (open ? "300px" : "76px") : "300px";
+  const widthStyle = {
+    width,
+    minWidth: width
+  };
 
   return (
     <motion.div
@@ -217,4 +220,3 @@ export const SidebarLink = ({
     </Link>
   );
 };
-
