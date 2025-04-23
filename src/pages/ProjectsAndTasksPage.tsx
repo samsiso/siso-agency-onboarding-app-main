@@ -96,12 +96,12 @@ export default function ProjectsAndTasksPage() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <div>
             <h1 className="text-3xl font-bold text-gradient-to-r from-siso-red to-siso-orange mb-2">
-              {isTasksView ? "Active Tasks" : "Projects & Tasks"}
+              {isTasksView ? "Active Tasks" : "Project Overview"}
             </h1>
             <p className="text-siso-text">
               {isTasksView 
-                ? "View and manage tasks across all your projects"
-                : "Manage your blockchain application projects and related tasks in one place"
+                ? "View and manage tasks across your project"
+                : "Manage your Ubahcrypt blockchain application development"
               }
             </p>
           </div>
@@ -130,10 +130,10 @@ export default function ProjectsAndTasksPage() {
                 <div className="flex flex-col items-center justify-center p-8 text-center">
                   <AlertCircle className="h-12 w-12 text-siso-orange mb-4" />
                   <h3 className="text-xl font-semibold text-white mb-2">
-                    Failed to Load Projects
+                    Failed to Load Project
                   </h3>
                   <p className="text-siso-text mb-4 max-w-md">
-                    {error instanceof Error ? error.message : 'There was an error loading your projects'}
+                    {error instanceof Error ? error.message : 'There was an error loading your project'}
                   </p>
                   <Button 
                     onClick={() => refetch()}
@@ -144,17 +144,15 @@ export default function ProjectsAndTasksPage() {
                 </div>
               ) : projects && projects.length > 0 ? (
                 <div className="space-y-6">
-                  {projects.map(project => (
-                    <ProjectDirectoryCard
-                      key={project.id}
-                      name={project.name}
-                      logo={project.logo}
-                      description={project.description}
-                      created_at={project.created_at}
-                      status={project.status}
-                      onSelect={() => navigate(`/plan/${project.id}`)}
-                    />
-                  ))}
+                  <ProjectDirectoryCard
+                    key={projects[0].id}
+                    name={projects[0].name}
+                    logo={projects[0].logo}
+                    description={projects[0].description}
+                    created_at={projects[0].created_at}
+                    status={projects[0].status}
+                    onSelect={() => navigate(`/plan/${projects[0].id}`)}
+                  />
                 </div>
               ) : (
                 <div>
