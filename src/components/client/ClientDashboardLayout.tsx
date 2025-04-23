@@ -11,9 +11,9 @@ interface ClientDashboardLayoutProps {
 export function ClientDashboardLayout({ children }: ClientDashboardLayoutProps) {
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-gradient-to-b from-[#f1f0fb] to-[#e5deff]">
+      <div className="flex min-h-screen w-full bg-black">
         <ClientDashboardSidebar />
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6">{children}</main>
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 bg-black">{children}</main>
       </div>
     </SidebarProvider>
   );

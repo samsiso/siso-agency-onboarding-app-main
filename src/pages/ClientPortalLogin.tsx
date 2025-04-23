@@ -1,59 +1,43 @@
 
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
 
 export default function ClientPortalLogin() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
   const navigate = useNavigate();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    setIsLoading(false);
-
-    if (error) {
-      toast({ variant: "destructive", title: "Login failed", description: error.message });
-      return;
-    }
-
-    toast({ title: "Welcome!", description: "Signed in successfully." });
-    navigate("/client-dashboard", { replace: true });
-  };
-
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-950 py-10">
-      <form onSubmit={handleLogin} className="bg-white max-w-sm rounded shadow p-8 w-full space-y-4">
-        <h1 className="text-2xl font-bold text-center mb-2">Client Portal Login</h1>
-        <Input 
-          type="email"
-          placeholder="Your email"
-          autoFocus
-          required
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-        />
-        <Input 
-          type="password"
-          placeholder="Password"
-          required
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-        />
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? "Logging in..." : "Login"}
-        </Button>
-      </form>
+    <div className="min-h-screen bg-black flex items-center justify-center">
+      <Card className="w-full max-w-md p-8 bg-[#1A1A1A] border-gray-800">
+        <div className="flex flex-col items-center mb-6">
+          <img 
+            src="/lovable-uploads/1a3075dc-17a1-45f1-8b31-695c20f70842.png" 
+            alt="Logo" 
+            className="w-20 h-20 mb-4" 
+          />
+          <h1 className="text-2xl font-bold text-white">Welcome to your Client Portal</h1>
+          <p className="text-gray-400 mt-2">
+            We couldn't find a client profile linked to your login.
+          </p>
+        </div>
+        
+        <div className="space-y-4">
+          <Button 
+            onClick={() => navigate("/client-portal")} 
+            variant="outline" 
+            className="w-full bg-gray-800 text-white hover:bg-gray-700"
+          >
+            Return to Login
+          </Button>
+          <Button 
+            onClick={() => navigate("/client-dashboard/support")} 
+            className="w-full bg-red-500 text-white hover:bg-red-600"
+          >
+            Contact Support
+          </Button>
+        </div>
+      </Card>
     </div>
   );
 }
