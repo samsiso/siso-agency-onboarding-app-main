@@ -2,15 +2,7 @@
 import { LucideIcon } from 'lucide-react';
 
 export interface MenuSection {
-  type: 'main' | 'section';
-  href?: string;
-  icon: LucideIcon;
-  label?: string;
-  title?: string;
-  items?: MenuItem[];
-}
-
-export interface MenuItem {
+  type: 'main';
   href: string;
   icon: LucideIcon;
   label: string;
@@ -21,3 +13,4 @@ export interface NavigationProps {
   onItemClick: (e: React.MouseEvent<HTMLAnchorElement>) => void;
   visible: boolean;
 }
+
