@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, ArrowLeft, Home, Component } from 'lucide-react';
+import { PlusCircle, Home, Component } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ProjectDirectoryCard } from '@/components/projects/ProjectDirectoryCard';
 import { ActiveTasksView } from '@/components/projects/ActiveTasksView';
@@ -39,18 +39,6 @@ export default function ProjectsAndTasksPage() {
     navigate('/plan-builder');
   };
 
-  const handleBackToProjects = () => {
-    if (isTasksView) {
-      navigate('/projects');
-    } else {
-      setSelectedProject(null);
-    }
-  };
-
-  const selectedProjectData = selectedProject 
-    ? demoProjects.find(p => p.id === selectedProject)
-    : null;
-
   return (
     <AppLayout>
       <div className="container mx-auto px-4 py-8">
@@ -80,7 +68,7 @@ export default function ProjectsAndTasksPage() {
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
                   <BreadcrumbPage className="text-white">
-                    {isTasksView ? "Active Tasks" : selectedProjectData?.name || "Project Details"}
+                    {isTasksView ? "Active Tasks" : "Project Details"}
                   </BreadcrumbPage>
                 </BreadcrumbItem>
               </>
@@ -90,16 +78,6 @@ export default function ProjectsAndTasksPage() {
 
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <div>
-            {(selectedProject || isTasksView) && (
-              <Button
-                variant="ghost"
-                className="mb-4 text-siso-text hover:text-white"
-                onClick={handleBackToProjects}
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Projects
-              </Button>
-            )}
             <h1 className="text-3xl font-bold text-gradient-to-r from-siso-red to-siso-orange mb-2">
               {isTasksView ? "Active Tasks" : "Projects & Tasks"}
             </h1>
@@ -122,7 +100,7 @@ export default function ProjectsAndTasksPage() {
           )}
         </div>
 
-        {isTasksView || selectedProject ? (
+        {isTasksView ? (
           <ActiveTasksView />
         ) : (
           <Card className="p-6 bg-black/30 border border-siso-text/10">

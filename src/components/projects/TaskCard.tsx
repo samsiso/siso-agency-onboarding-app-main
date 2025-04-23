@@ -1,4 +1,3 @@
-
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -20,6 +19,7 @@ interface TaskCardProps {
     image: string;
   };
   priority: 'low' | 'medium' | 'high';
+  onClick?: () => void;
 }
 
 const priorityColors = {
@@ -28,9 +28,12 @@ const priorityColors = {
   high: 'bg-red-500/20 text-red-400',
 };
 
-export function TaskCard({ title, startAt, endAt, category, owner, priority }: TaskCardProps) {
+export function TaskCard({ title, startAt, endAt, category, owner, priority, onClick }: TaskCardProps) {
   return (
-    <div className="flex flex-col gap-2 p-3 rounded-lg bg-gradient-to-br from-[#1A1F2C] to-[#221F26] border border-[#403E43]/30 backdrop-blur-sm transition-all hover:border-[#403E43]/50">
+    <div 
+      onClick={onClick}
+      className="flex flex-col gap-2 p-3 rounded-lg bg-gradient-to-br from-[#1A1F2C] to-[#221F26] border border-[#403E43]/30 backdrop-blur-sm transition-all hover:border-[#403E43]/50 cursor-pointer"
+    >
       <div className="flex items-start justify-between">
         <div className="flex flex-col gap-1">
           <h3 className="text-sm font-medium text-gray-200">{title}</h3>

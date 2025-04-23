@@ -8,6 +8,7 @@ import {
   KanbanProvider,
 } from "@/components/ui/kanban";
 import { TaskCard } from './TaskCard';
+import { TaskDetailDrawer } from './TaskDetailDrawer';
 import { type DragEndEvent } from "@dnd-kit/core";
 
 const taskStatuses = [
@@ -60,6 +61,7 @@ const demoTasks = [
 
 export function ActiveTasksView() {
   const [tasks, setTasks] = useState(demoTasks);
+  const [selectedTask, setSelectedTask] = useState<typeof demoTasks[0] | null>(null);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -81,6 +83,12 @@ export function ActiveTasksView() {
 
   return (
     <div className="p-4">
+      <TaskDetailDrawer
+        task={selectedTask}
+        isOpen={!!selectedTask}
+        onClose={() => setSelectedTask(null)}
+      />
+      
       <KanbanProvider onDragEnd={handleDragEnd}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {taskStatuses.map((status) => (
@@ -109,6 +117,7 @@ export function ActiveTasksView() {
                         category={task.category}
                         owner={task.owner}
                         priority={task.priority}
+                        onClick={() => setSelectedTask(task)}
                       />
                     </KanbanCard>
                   ))}
