@@ -1,25 +1,31 @@
 
 import { useState } from 'react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card } from '@/components/ui/card';
-import { ProjectsList } from '@/components/projects/ProjectsList';
-import { TasksList } from '@/components/projects/TasksList';
-import { ActiveTasksView } from '@/components/projects/ActiveTasksView';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { ProjectDirectoryCard } from '@/components/projects/ProjectDirectoryCard';
+
+const demoProjects = [
+  {
+    id: '1',
+    name: 'Food Delivery App',
+    logo: 'https://api.dicebear.com/7.x/shapes/svg?seed=1',
+  },
+  {
+    id: '2',
+    name: 'E-commerce Platform',
+    logo: 'https://api.dicebear.com/7.x/shapes/svg?seed=2',
+  }
+];
 
 export default function ProjectsAndTasksPage() {
-  const [activeTab, setActiveTab] = useState('projects');
   const navigate = useNavigate();
+  const [selectedProject, setSelectedProject] = useState<string | null>(null);
 
   const handleCreateNew = () => {
-    if (activeTab === 'projects') {
-      navigate('/plan-builder');
-    } else {
-      console.log('Create new task');
-    }
+    navigate('/plan-builder');
   };
 
   return (
@@ -28,7 +34,7 @@ export default function ProjectsAndTasksPage() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <div>
             <h1 className="text-3xl font-bold text-gradient-to-r from-siso-red to-siso-orange mb-2">
-              Projects & Tasks
+              Projects
             </h1>
             <p className="text-siso-text">
               Manage your application projects and related tasks in one place
@@ -40,35 +46,22 @@ export default function ProjectsAndTasksPage() {
             className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 flex items-center gap-2 mt-4 md:mt-0"
           >
             <PlusCircle size={16} />
-            {activeTab === 'projects' ? 'New Project' : 'New Task'}
+            New Project
           </Button>
         </div>
 
         <Card className="p-6 bg-black/30 border border-siso-text/10">
-          <Tabs 
-            defaultValue="projects" 
-            value={activeTab}
-            onValueChange={(value) => setActiveTab(value)}
-            className="w-full"
-          >
-            <TabsList className="grid w-full max-w-md grid-cols-3 mb-6">
-              <TabsTrigger value="projects">Projects</TabsTrigger>
-              <TabsTrigger value="tasks">Tasks</TabsTrigger>
-              <TabsTrigger value="active">Active</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="projects" className="space-y-4">
-              <ProjectsList />
-            </TabsContent>
-            
-            <TabsContent value="tasks" className="space-y-4">
-              <TasksList />
-            </TabsContent>
-
-            <TabsContent value="active" className="space-y-4">
-              <ActiveTasksView />
-            </TabsContent>
-          </Tabs>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {demoProjects.map(project => (
+              <ProjectDirectoryCard
+                key={project.id}
+                name={project.name}
+                logo={project.logo}
+                onSelect={() => setSelectedProject(project.id)}
+              />
+            ))}
+            <ProjectDirectoryCard />
+          </div>
         </Card>
       </div>
     </AppLayout>
