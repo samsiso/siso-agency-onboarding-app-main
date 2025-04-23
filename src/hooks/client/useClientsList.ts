@@ -91,11 +91,11 @@ export function useClientsList(params: ClientsListParams = {}): ClientsListRespo
           }
 
           // Cast the database result to ClientData with proper type mapping
-          // Fix: Make sure priority property is handled correctly, even if it doesn't exist in the database
+          // Ensure priority property is handled correctly
           return {
             id: item.id,
             full_name: item.contact_name || 'Unknown',
-            email: null,
+            email: item.email || null,
             business_name: item.company_name || null,
             phone: null,
             avatar_url: null,
@@ -121,7 +121,7 @@ export function useClientsList(params: ClientsListParams = {}): ClientsListRespo
             todos: parsedTodos,
             next_steps: null,
             key_research: null,
-            priority: item.priority || null,  // Add safe access to the priority property
+            priority: item.priority || null,  // Add safe access with null fallback
             contact_name: item.contact_name || null,
             company_name: item.company_name || null,
           } as ClientData;

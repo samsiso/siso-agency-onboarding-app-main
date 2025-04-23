@@ -1,3 +1,4 @@
+
 import React, { useState, createContext, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
@@ -86,9 +87,8 @@ export const DesktopSidebar = ({
 }: React.ComponentProps<typeof motion.div>) => {
   const { open, setOpen, animate } = useSidebar();
   
-  // Fix: Explicitly define the width as a string to avoid the type error
-  const widthValue = animate ? (open ? "300px" : "76px") : "300px";
-  const minWidthValue = animate ? (open ? "300px" : "76px") : "300px";
+  // Define the width as a string to avoid the type error
+  const widthStyle = animate ? (open ? "300px" : "76px") : "300px";
 
   return (
     <motion.div
@@ -99,7 +99,7 @@ export const DesktopSidebar = ({
         className,
         open ? "sidebar-open" : "sidebar-collapsed"
       )}
-      style={{ width: widthValue, minWidth: minWidthValue }}
+      style={{ width: widthStyle, minWidth: widthStyle }}
       transition={{ type: "spring", stiffness: 220, damping: 26 }}
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
