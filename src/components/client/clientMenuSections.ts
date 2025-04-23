@@ -7,6 +7,8 @@ import {
   ScrollText,
   Wallet,
   User,
+  Briefcase,
+  FileText,
 } from "lucide-react";
 
 export const clientMenuSections = [
