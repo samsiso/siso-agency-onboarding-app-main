@@ -1,124 +1,103 @@
 
-import { useQuery } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { ClientsListParams, ClientsListResponse, ClientData, TodoItem } from '@/types/client.types';
+import { ClientData, ClientsListParams, ClientsListResponse } from '@/types/client.types';
+import { useAdminCheck } from '@/hooks/useAdminCheck';
 
-export type { ClientData, ClientsListParams } from '@/types/client.types';
+/**
+ * Hook to fetch a list of all clients (admin only)
+ */
+export function useClientsList(params: ClientsListParams = {}) {
+  const { isAdmin, isLoading: adminCheckLoading } = useAdminCheck();
+  const [clients, setClients] = useState<ClientData[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
-export const useClientsList = ({
-  searchQuery = '',
-  statusFilter = 'all',
-  sortColumn = 'updated_at',
-  sortDirection = 'desc'
-}: Partial<ClientsListParams> = {}) => {
-  const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['clients-list', searchQuery, statusFilter, sortColumn, sortDirection],
-    queryFn: async () => {
+  const {
+    searchQuery = '',
+    statusFilter = '',
+    sortColumn = 'updated_at',
+    sortDirection = 'desc',
+    page = 1,
+    pageSize = 10
+  } = params;
+
+  useEffect(() => {
+    const fetchClients = async () => {
+      if (!isAdmin) {
+        setClients([]);
+        setTotalCount(0);
+        setLoading(false);
+        return;
+      }
+
       try {
-        // Build the query
+        setLoading(true);
+        
+        // Start building the query
         let query = supabase
           .from('client_onboarding')
           .select('*', { count: 'exact' });
         
-        // Apply text search
+        // Apply filters
         if (searchQuery) {
-          query = query.or(`
-            contact_name.ilike.%${searchQuery}%,
-            company_name.ilike.%${searchQuery}%,
-            website_url.ilike.%${searchQuery}%,
-            company_niche.ilike.%${searchQuery}%,
-            project_name.ilike.%${searchQuery}%
-          `);
+          query = query.or(`company_name.ilike.%${searchQuery}%,contact_name.ilike.%${searchQuery}%`);
         }
         
-        // Apply status filter
-        if (statusFilter && statusFilter !== 'all') {
+        if (statusFilter) {
           query = query.eq('status', statusFilter);
         }
         
-        // Apply sorting
-        query = query.order(sortColumn, { ascending: sortDirection === 'asc' });
+        // Apply pagination
+        const from = (page - 1) * pageSize;
+        const to = from + pageSize - 1;
         
-        // Get all data at once
-        const { data: allData, error: dataError, count } = await query;
+        // Apply sorting and pagination
+        query = query
+          .order(sortColumn, { ascending: sortDirection === 'asc' })
+          .range(from, to);
         
-        if (dataError) {
-          console.error('Error fetching clients data:', dataError);
-          throw dataError;
+        const { data, error, count } = await query;
+        
+        if (error) {
+          console.error('Error fetching clients:', error);
+          setError(new Error(error.message));
+          setClients([]);
+          setTotalCount(0);
+        } else {
+          setClients(data as ClientData[]);
+          setTotalCount(count || 0);
+          setError(null);
         }
-        
-        if (!allData || allData.length === 0) {
-          return {
-            clients: [],
-            totalCount: 0
-          };
-        }
-        
-        // Process all data
-        const processedData: ClientData[] = allData.map(item => {
-          const contactName = item.contact_name || 'Client';
-          const avatarUrl = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(contactName.substring(0, 2))}`;
-          
-          const defaultTodos: TodoItem[] = [];
-          
-          return {
-            id: item.id,
-            full_name: item.contact_name || 'Unknown Client',
-            email: null,
-            business_name: item.company_name || null,
-            phone: null,
-            avatar_url: avatarUrl,
-            status: item.status || 'pending',
-            current_step: item.current_step || 1,
-            total_steps: item.total_steps || 5,
-            completed_steps: item.completed_steps || [],
-            created_at: item.created_at,
-            updated_at: item.updated_at,
-            website_url: item.website_url || null,
-            professional_role: null,
-            bio: null,
-            project_name: item.project_name || null,
-            company_niche: item.company_niche || null,
-            development_url: null,
-            mvp_build_status: null,
-            notion_plan_url: null,
-            payment_status: null,
-            estimated_price: null,
-            initial_contact_date: item.created_at || null,
-            start_date: null,
-            estimated_completion_date: null,
-            client_contact: null,
-            purchase_history: null,
-            next_steps: null,
-            key_research: null,
-            referral_source: null,
-            industry: null,
-            last_contacted_date: null,
-            assigned_to: null,
-            priority: null,
-            todos: defaultTodos
-          };
-        });
-        
-        return {
-          clients: processedData,
-          totalCount: count || processedData.length
-        };
-      } catch (error: any) {
-        console.error('Error in useClientsList:', error);
-        return {
-          clients: [],
-          totalCount: 0
-        };
+      } catch (err) {
+        console.error('Unexpected error fetching clients:', err);
+        setError(err instanceof Error ? err : new Error('Unknown error'));
+        setClients([]);
+        setTotalCount(0);
+      } finally {
+        setLoading(false);
       }
-    },
-  });
+    };
+
+    if (!adminCheckLoading) {
+      fetchClients();
+    }
+  }, [
+    isAdmin, 
+    adminCheckLoading, 
+    searchQuery, 
+    statusFilter, 
+    sortColumn, 
+    sortDirection, 
+    page, 
+    pageSize
+  ]);
 
   return {
-    clients: data?.clients || [],
-    totalCount: data?.totalCount || 0,
-    isLoading,
-    error,
-    refetch
-  };
-};
+    clients,
+    totalCount,
+    loading: loading || adminCheckLoading,
+    error
+  } as ClientsListResponse;
+}

@@ -1,99 +1,59 @@
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ClientData, TodoItem } from '@/types/client.types';
-import { processClientData } from '@/utils/clientQueryBuilders';
-import { safeSupabase } from '@/utils/supabaseHelpers';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useIsClient } from './useIsClient';
+import { ClientData } from '@/types/client.types';
 
-export const useClientDetails = (clientId: string | null) => {
-  const queryClient = useQueryClient();
-  
-  const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['client-details', clientId],
-    queryFn: async () => {
-      if (!clientId) return null;
-      
+/**
+ * Hook to fetch client details for the current user
+ */
+export function useClientDetails() {
+  const { isClient, clientId, loading: clientCheckLoading } = useIsClient();
+  const [clientData, setClientData] = useState<ClientData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    const fetchClientData = async () => {
+      if (!isClient || !clientId) {
+        setClientData(null);
+        setLoading(false);
+        return;
+      }
+
       try {
-        const { data, error } = await safeSupabase
+        // Fetch client details from the client_onboarding table
+        const { data, error } = await supabase
           .from('client_onboarding')
           .select('*')
           .eq('id', clientId)
           .single();
-        
+
         if (error) {
-          console.error('Error fetching client details:', error);
-          throw error;
+          console.error('Error fetching client data:', error);
+          setError(new Error(error.message));
+          setClientData(null);
+        } else {
+          setClientData(data as ClientData);
+          setError(null);
         }
-        
-        if (!data) {
-          return null;
-        }
-        
-        // Process the client data
-        const [processedClient] = processClientData([data]);
-        return processedClient;
-        
-      } catch (error: any) {
-        console.error('Error in useClientDetails:', error);
-        throw error; // Let the error propagate for better debugging
+      } catch (err) {
+        console.error('Unexpected error fetching client data:', err);
+        setError(err instanceof Error ? err : new Error('Unknown error'));
+        setClientData(null);
+      } finally {
+        setLoading(false);
       }
-    },
-    enabled: !!clientId,
-    retry: 1 // Only retry once to avoid excessive requests
-  });
-  
-  const updateClientMutation = useMutation({
-    mutationFn: async (updateData: Partial<ClientData>) => {
-      if (!clientId) throw new Error('No client ID provided');
-      
-      const { data, error } = await safeSupabase
-        .from('client_onboarding')
-        .update({ 
-          ...updateData,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', clientId)
-        .select()
-        .single();
-        
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      // Invalidate the client details query to trigger a refetch
-      queryClient.invalidateQueries({ queryKey: ['client-details', clientId] });
+    };
+
+    if (!clientCheckLoading) {
+      fetchClientData();
     }
-  });
-  
-  const updateTodosMutation = useMutation({
-    mutationFn: async (todos: TodoItem[]) => {
-      if (!clientId) throw new Error('No client ID provided');
-      
-      const { data, error } = await safeSupabase
-        .from('client_onboarding')
-        .update({ 
-          todos,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', clientId)
-        .select()
-        .single();
-        
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      // Invalidate the client details query to trigger a refetch
-      queryClient.invalidateQueries({ queryKey: ['client-details', clientId] });
-    }
-  });
-  
+  }, [isClient, clientId, clientCheckLoading]);
+
   return {
-    client: data as ClientData | null,
-    isLoading,
-    error,
-    refetch,
-    updateClient: updateClientMutation.mutate,
-    updateTodos: updateTodosMutation.mutate,
-    isUpdating: updateClientMutation.isPending || updateTodosMutation.isPending
+    clientData,
+    loading: loading || clientCheckLoading,
+    error
   };
-};
+}

@@ -33,9 +33,7 @@ import AdminSettings from './pages/AdminSettings';
 import { TeamMemberTasksView } from './components/admin/tasks/TeamMemberTasksView';
 import TeamMemberTasksPage from './pages/TeamMemberTasksPage';
 import ChangelogPage from './pages/Changelog';
-import ClientPortalLogin from "./pages/ClientPortalLogin";
 import ClientDashboard from "./pages/ClientDashboard";
-import { ClientRoute } from "./components/auth/ClientRoute";
 import ClientDocumentsPage from "./pages/client/ClientDocumentsPage";
 import ClientTasksPage from "./pages/client/ClientTasksPage";
 import ClientStatusPage from "./pages/client/ClientStatusPage";
@@ -94,33 +92,12 @@ function App() {
         <Route path="/settings" element={<AuthGuard><Profile /></AuthGuard>} />
         <Route path="/changelog" element={<AuthGuard><ChangelogPage /></AuthGuard>} />
 
-        {/* Client Portal routes */}
-        <Route path="/client-portal" element={<ClientPortalLogin />} />
-        <Route path="/client-dashboard" element={
-          <ClientRoute>
-            <ClientDashboard />
-          </ClientRoute>
-        } />
-        <Route path="/client-dashboard/status" element={
-          <ClientRoute>
-            <ClientStatusPage />
-          </ClientRoute>
-        } />
-        <Route path="/client-dashboard/documents" element={
-          <ClientRoute>
-            <ClientDocumentsPage />
-          </ClientRoute>
-        } />
-        <Route path="/client-dashboard/tasks" element={
-          <ClientRoute>
-            <ClientTasksPage />
-          </ClientRoute>
-        } />
-        <Route path="/client-dashboard/support" element={
-          <ClientRoute>
-            <ClientSupportPage />
-          </ClientRoute>
-        } />
+        {/* Client Dashboard Routes - accessible to all authenticated users but with conditional content */}
+        <Route path="/client-dashboard" element={<AuthGuard><ClientDashboard /></AuthGuard>} />
+        <Route path="/client-dashboard/documents" element={<AuthGuard><ClientDocumentsPage /></AuthGuard>} />
+        <Route path="/client-dashboard/tasks" element={<AuthGuard><ClientTasksPage /></AuthGuard>} />
+        <Route path="/client-dashboard/status" element={<AuthGuard><ClientStatusPage /></AuthGuard>} />
+        <Route path="/client-dashboard/support" element={<AuthGuard><ClientSupportPage /></AuthGuard>} />
       </Routes>
     </>
   );
