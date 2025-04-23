@@ -2,7 +2,7 @@
 import { 
   LayoutDashboard, Briefcase, ScrollText, Wallet, 
   Trophy, FileText, HelpCircle, ClipboardList,
-  ListTodo, Layout, BookOpen
+  ListTodo, Layout, BookOpen, User
 } from 'lucide-react';
 import { MenuSection } from './types';
 
@@ -38,18 +38,23 @@ export const getMenuSections = (): MenuSection[] => {
     },
     {
       type: 'section',
-      title: 'Financial Hub',
+      title: 'Financial & Account',
       icon: Wallet,
       items: [
         {
-          href: '/payments',
+          href: '/financial/payments',
           icon: Wallet,
           label: 'Payments & Billing',
         },
         {
-          href: '/economy/leaderboards',
+          href: '/financial/leaderboards',
           icon: Trophy,
           label: 'Leaderboards',
+        },
+        {
+          href: '/financial/profile',
+          icon: User,
+          label: 'Profile & Settings',
         }
       ]
     },

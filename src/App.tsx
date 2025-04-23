@@ -1,3 +1,4 @@
+
 import { Routes, Route } from 'react-router-dom';
 import Index from './pages/Index';
 import Auth from './pages/Auth';
@@ -39,6 +40,11 @@ import ClientStatusPage from "./pages/client/ClientStatusPage";
 import ClientSupportPage from "./pages/client/ClientSupportPage";
 import ProjectsAndTasksPage from './pages/ProjectsAndTasksPage';
 import DocumentLibraryPage from './pages/resources/DocumentLibraryPage';
+
+// New imports for Financial & Account section
+import PaymentsPage from './pages/financial/PaymentsPage';
+import LeaderboardsPage from './pages/financial/LeaderboardsPage';
+import FinancialProfilePage from './pages/financial/FinancialProfilePage';
 
 function App() {
   return (
@@ -85,10 +91,15 @@ function App() {
         <Route path="/projects/tasks" element={<AuthGuard><ProjectsAndTasksPage /></AuthGuard>} />
         <Route path="/portfolio" element={<AuthGuard><Portfolio /></AuthGuard>} />
         
-        {/* Protected Financial Routes */}
-        <Route path="/payments" element={<AuthGuard><CryptoExchange /></AuthGuard>} />
+        {/* Protected Financial & Account Routes */}
+        <Route path="/financial/payments" element={<AuthGuard><PaymentsPage /></AuthGuard>} />
+        <Route path="/financial/leaderboards" element={<AuthGuard><LeaderboardsPage /></AuthGuard>} />
+        <Route path="/financial/profile" element={<AuthGuard><FinancialProfilePage /></AuthGuard>} />
+        
+        {/* Legacy Financial Routes (redirected for backward compatibility) */}
+        <Route path="/payments" element={<AuthGuard><PaymentsPage /></AuthGuard>} />
         <Route path="/economy/earn" element={<AuthGuard><HowToEarn /></AuthGuard>} />
-        <Route path="/economy/leaderboards" element={<AuthGuard><LeaderboardPage /></AuthGuard>} />
+        <Route path="/economy/leaderboards" element={<AuthGuard><LeaderboardsPage /></AuthGuard>} />
         
         {/* Protected Support & Settings Routes */}
         <Route path="/help" element={<AuthGuard><HelpPage /></AuthGuard>} />
