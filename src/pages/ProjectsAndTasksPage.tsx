@@ -1,8 +1,9 @@
+
 import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Home, Component } from 'lucide-react';
+import { PlusCircle, Home, Component, ExternalLink } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ProjectDirectoryCard } from '@/components/projects/ProjectDirectoryCard';
 import { ActiveTasksView } from '@/components/projects/ActiveTasksView';
@@ -18,13 +19,8 @@ import {
 const demoProjects = [
   {
     id: '1',
-    name: 'Food Delivery App',
-    logo: 'https://api.dicebear.com/7.x/shapes/svg?seed=1',
-  },
-  {
-    id: '2',
-    name: 'E-commerce Platform',
-    logo: 'https://api.dicebear.com/7.x/shapes/svg?seed=2',
+    name: 'Ubahcryp',
+    logo: 'https://api.dicebear.com/7.x/shapes/svg?seed=ubahcryp&backgroundColor=0ea5e9',
   }
 ];
 
@@ -103,19 +99,38 @@ export default function ProjectsAndTasksPage() {
         {isTasksView ? (
           <ActiveTasksView />
         ) : (
-          <Card className="p-6 bg-black/30 border border-siso-text/10">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {demoProjects.map(project => (
-                <ProjectDirectoryCard
-                  key={project.id}
-                  name={project.name}
-                  logo={project.logo}
-                  onSelect={() => setSelectedProject(project.id)}
-                />
-              ))}
-              <ProjectDirectoryCard />
+          <div className="space-y-8">
+            <Card className="p-6 bg-black/30 border border-siso-text/10">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {demoProjects.map(project => (
+                  <ProjectDirectoryCard
+                    key={project.id}
+                    name={project.name}
+                    logo={project.logo}
+                    onSelect={() => setSelectedProject(project.id)}
+                  />
+                ))}
+                <ProjectDirectoryCard />
+              </div>
+            </Card>
+
+            <div className="text-center p-8 bg-black/30 border border-siso-text/10 rounded-lg">
+              <h3 className="text-xl font-semibold text-white mb-3">
+                Discover More Projects
+              </h3>
+              <p className="text-siso-text mb-4">
+                Explore other successful projects in our community leaderboard
+              </p>
+              <Button
+                onClick={() => navigate('/leaderboard')}
+                variant="outline"
+                className="border-siso-orange/30 text-siso-orange hover:bg-siso-orange/10"
+              >
+                <ExternalLink className="w-4 h-4 mr-2" />
+                View Leaderboard
+              </Button>
             </div>
-          </Card>
+          </div>
         )}
       </div>
     </AppLayout>
