@@ -20,7 +20,12 @@ export const LeaderboardStats = ({ totalUsers, totalPoints, totalSisoTokens }: L
               <p className="text-sm text-siso-text/70">Total Users</p>
               <div className="flex items-baseline gap-2">
                 <p className="text-2xl font-bold text-siso-text-bold">
-                  <CountUp end={totalUsers} duration={2} separator="," />
+                  <CountUp
+                    end={totalUsers}
+                    delay={0}
+                    decimals={0}
+                    separator=","
+                  />
                 </p>
                 <span className="text-xs text-green-500 flex items-center">
                   <TrendingUp className="w-3 h-3 mr-1" />
@@ -40,7 +45,12 @@ export const LeaderboardStats = ({ totalUsers, totalPoints, totalSisoTokens }: L
               <p className="text-sm text-siso-text/70">Total Points</p>
               <div className="flex items-baseline gap-2">
                 <p className="text-2xl font-bold text-siso-text-bold">
-                  <CountUp end={totalPoints} duration={2} separator="," />
+                  <CountUp
+                    end={totalPoints}
+                    delay={0}
+                    decimals={0}
+                    separator=","
+                  />
                 </p>
                 <span className="text-xs text-green-500 flex items-center">
                   <TrendingUp className="w-3 h-3 mr-1" />
@@ -60,7 +70,12 @@ export const LeaderboardStats = ({ totalUsers, totalPoints, totalSisoTokens }: L
               <p className="text-sm text-siso-text/70">Total SISO Tokens</p>
               <div className="flex items-baseline gap-2">
                 <p className="text-2xl font-bold text-siso-text-bold">
-                  <CountUp end={totalSisoTokens} duration={2} separator="," />
+                  <CountUp
+                    end={totalSisoTokens}
+                    delay={0}
+                    decimals={0}
+                    separator=","
+                  />
                 </p>
                 <span className="text-xs text-green-500 flex items-center">
                   <TrendingUp className="w-3 h-3 mr-1" />
@@ -80,7 +95,12 @@ export const LeaderboardStats = ({ totalUsers, totalPoints, totalSisoTokens }: L
               <p className="text-sm text-siso-text/70">Daily Active Users</p>
               <div className="flex items-baseline gap-2">
                 <p className="text-2xl font-bold text-siso-text-bold">
-                  <CountUp end={Math.floor(totalUsers * 0.4)} duration={2} separator="," />
+                  <CountUp
+                    end={Math.floor(totalUsers * 0.4)}
+                    delay={0}
+                    decimals={0}
+                    separator=","
+                  />
                 </p>
                 <span className="text-xs text-green-500 flex items-center">
                   <TrendingUp className="w-3 h-3 mr-1" />

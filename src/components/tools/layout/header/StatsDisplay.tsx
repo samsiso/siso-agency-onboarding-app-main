@@ -60,7 +60,8 @@ export const StatsDisplay = ({ totalTools, categoryStats }: StatsDisplayProps) =
             <div className="flex items-baseline gap-1.5">
               <CountUp
                 end={stat.value}
-                duration={2}
+                delay={0}
+                decimals={0}
                 separator=","
                 className="text-lg font-semibold text-siso-text-bold"
               />
