@@ -7,10 +7,9 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { TodoList } from "@/components/admin/clients/TodoList";
 import { ClientData, TodoItem } from "@/types/client.types";
-import { ClientSidebar } from "@/components/client/ClientSidebar";
 import { ArrowUpRight, CheckCircle, Clock } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-import { ClientLayout } from "@/components/client/layout/ClientLayout";
+import { ClientDashboardLayout } from "@/components/client/ClientDashboardLayout";
 
 /** Shows dashboard linked to a logged-in client-portal user */
 export default function ClientDashboard() {
@@ -107,7 +106,6 @@ export default function ClientDashboard() {
           contact_name?: string | null;
           company_name?: string | null;
         };
-
         const { data: clientDataRaw, error: clientError } = await supabase
           .from('client_onboarding')
           .select('*')
@@ -171,7 +169,7 @@ export default function ClientDashboard() {
 
   if (loading) {
     return (
-      <ClientLayout>
+      <ClientDashboardLayout>
         <div className="max-w-5xl mx-auto p-6">
           <Skeleton className="h-8 w-64 mb-6" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -181,13 +179,13 @@ export default function ClientDashboard() {
           </div>
           <Skeleton className="h-64 w-full rounded-lg" />
         </div>
-      </ClientLayout>
+      </ClientDashboardLayout>
     );
   }
 
   if (!client) {
     return (
-      <ClientLayout>
+      <ClientDashboardLayout>
         <div className="flex-1 flex items-center justify-center">
           <Card className="bg-white px-4 py-8 max-w-md">
             <p className="text-2xl font-semibold text-center mb-5">No client profile linked to your login.</p>
@@ -196,7 +194,7 @@ export default function ClientDashboard() {
             </Button>
           </Card>
         </div>
-      </ClientLayout>
+      </ClientDashboardLayout>
     );
   }
 
@@ -206,7 +204,7 @@ export default function ClientDashboard() {
   };
 
   return (
-    <ClientLayout>
+    <ClientDashboardLayout>
       <div className="max-w-5xl mx-auto p-6">
         <h1 className="text-3xl font-bold mb-2 text-slate-900">
           Welcome, {client.contact_name || client.company_name || "Client"}
@@ -294,7 +292,6 @@ export default function ClientDashboard() {
           </Card>
         </div>
 
-        {/* Project Information */}
         <Card className="p-6 border border-slate-200 shadow-sm mb-6">
           <h2 className="text-xl font-semibold mb-4">Project Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -344,6 +341,6 @@ export default function ClientDashboard() {
           />
         </Card>
       </div>
-    </ClientLayout>
+    </ClientDashboardLayout>
   );
 }

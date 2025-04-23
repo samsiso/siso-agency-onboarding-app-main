@@ -1,16 +1,20 @@
 
 import { ReactNode } from "react";
-import { AdminLayout } from "@/components/admin/layout/AdminLayout";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { ClientSidebar } from "./ClientSidebar";
 
 interface ClientDashboardLayoutProps {
   children: ReactNode;
 }
 
-// Reuse the AdminLayout for the client dashboard UI
+// Custom layout for client dashboard with the new sidebar
 export function ClientDashboardLayout({ children }: ClientDashboardLayoutProps) {
   return (
-    <AdminLayout>
-      {children}
-    </AdminLayout>
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full bg-gradient-to-b from-[#f1f0fb] to-[#e5deff]">
+        <ClientSidebar />
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6">{children}</main>
+      </div>
+    </SidebarProvider>
   );
 }
