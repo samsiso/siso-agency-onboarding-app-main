@@ -8,6 +8,7 @@ import { ToolsPageHeader } from '@/components/tools/ToolsPageHeader';
 import { MainContent } from '@/components/tools/layout/MainContent';
 import { ChatAssistant } from '@/components/tools/layout/ChatAssistant';
 import { enhancedTableQuery, castToMockTypeArray } from '@/utils/errorSuppressions';
+import { Sidebar } from '@/components/Sidebar';
 
 // [Analysis] Tools page with optimized auth handling and memoized filters
 export default function Tools() {
