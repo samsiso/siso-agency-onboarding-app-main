@@ -2,6 +2,7 @@
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { SidebarMenuItem } from './SidebarMenuItem';
+import { SidebarSectionHeader } from './SidebarSectionHeader';
 import { MenuSection } from './types';
 
 interface SidebarSectionProps {
@@ -17,17 +18,57 @@ export const SidebarSection = ({
   onItemClick, 
   isItemActive 
 }: SidebarSectionProps) => {
-  // Only main types now
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    show: { 
+      opacity: 1, 
+      y: 0,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 30
+      }
+    }
+  };
+
+  if (section.type === 'main') {
+    return (
+      <SidebarMenuItem
+        href={section.href!}
+        icon={section.icon}
+        label={section.label!}
+        collapsed={collapsed}
+        onClick={onItemClick}
+        isMain={true}
+        isActive={isItemActive(section.href!)}
+      />
+    );
+  }
+
   return (
-    <SidebarMenuItem
-      href={section.href}
-      icon={section.icon}
-      label={section.label}
-      collapsed={collapsed}
-      onClick={onItemClick}
-      isMain={true}
-      isActive={isItemActive(section.href)}
-    />
+    <div className="space-y-1">
+      {!collapsed && section.title && (
+        <SidebarSectionHeader icon={section.icon} title={section.title} />
+      )}
+      <motion.div 
+        className={cn(
+          "space-y-1",
+          !collapsed && "pl-3 border-l-2 border-siso-border ml-4"
+        )}
+        variants={containerVariants}
+      >
+        {section.items?.map((item, index) => (
+          <SidebarMenuItem
+            key={index}
+            href={item.href}
+            icon={item.icon}
+            label={item.label}
+            collapsed={collapsed}
+            onClick={onItemClick}
+            isActive={isItemActive(item.href)}
+          />
+        ))}
+      </motion.div>
+    </div>
   );
 };
-

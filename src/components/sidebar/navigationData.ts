@@ -1,68 +1,80 @@
 
 import { 
-  LayoutDashboard,
-  Folder,
-  ListTodo,
-  Files,
-  CreditCard,
-  HelpCircle,
-  User,
-  Briefcase,
-} from "lucide-react";
+  Home, Layout, Briefcase, Folder, CreditCard, 
+  Trophy, Users, HelpCircle
+} from 'lucide-react';
 import { MenuSection } from './types';
 
-export const getMenuSections = (isClient = false): MenuSection[] => {
+export const getMenuSections = (): MenuSection[] => {
   const sections: MenuSection[] = [
     {
       type: 'main',
-      href: '/dashboard',
-      icon: LayoutDashboard,
+      href: '/home',
+      icon: Home,
       label: 'Dashboard',
     },
     {
-      type: 'main',
-      href: '/projects',
-      icon: Folder,
-      label: 'Projects Hub',
-    },
-    {
-      type: 'main',
-      href: '/tasks',
-      icon: ListTodo,
-      label: 'Task Center',
-    },
-    {
-      type: 'main',
-      href: '/resources',
-      icon: Files,
-      label: 'Documents & Resources',
-    },
-    {
-      type: 'main',
-      href: '/financial',
-      icon: CreditCard,
-      label: 'Financial Hub',
-    },
-    {
-      type: 'main',
-      href: '/support',
-      icon: HelpCircle,
-      label: 'Support Center',
-    },
-    {
-      type: 'main',
-      href: '/profile',
-      icon: User,
-      label: 'Profile & Settings',
-    },
-    // Client Portal section is only shown to client users
-    ...(isClient ? [{
-      type: 'main',
-      href: '/client-portal',
+      type: 'section',
+      title: 'Projects',
       icon: Briefcase,
-      label: 'Client Portal',
-    }] : []),
+      items: [
+        {
+          href: '/plan-builder',
+          icon: Layout,
+          label: 'Plan Builder',
+        },
+        {
+          href: '/my-projects',
+          icon: Folder,
+          label: 'My Projects',
+        },
+        {
+          href: '/portfolio',
+          icon: Users,
+          label: 'Portfolio',
+        }
+      ]
+    },
+    {
+      type: 'section',
+      title: 'Financial',
+      icon: CreditCard,
+      items: [
+        {
+          href: '/payments',
+          icon: CreditCard,
+          label: 'Payments',
+        },
+        {
+          href: '/economy/earn',
+          icon: Trophy,
+          label: 'How to Earn',
+        },
+        {
+          href: '/economy/leaderboards',
+          icon: Trophy,
+          label: 'Leaderboards',
+        }
+      ]
+    },
+    {
+      type: 'section',
+      title: 'Support & Changelog',
+      icon: HelpCircle,
+      items: [
+        {
+          href: '/help',
+          icon: HelpCircle,
+          label: 'Help & Support',
+        },
+        {
+          href: '/changelog',
+          icon: CreditCard,
+          label: 'Changelog',
+        }
+      ]
+    }
   ];
+
   return sections;
 };
-
