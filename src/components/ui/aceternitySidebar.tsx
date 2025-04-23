@@ -68,10 +68,14 @@ export const Sidebar = ({
 };
 
 export const SidebarBody = (props: React.ComponentProps<typeof motion.div>) => {
+  const { className, children, ...otherProps } = props;
+  
   return (
     <>
-      <DesktopSidebar {...props} />
-      <MobileSidebar className={props.className}>{props.children}</MobileSidebar>
+      <DesktopSidebar className={className} {...otherProps}>
+        {children}
+      </DesktopSidebar>
+      <MobileSidebar>{children}</MobileSidebar>
     </>
   );
 };
@@ -106,11 +110,9 @@ export const DesktopSidebar = ({
 };
 
 export const MobileSidebar = ({
-  className,
   children,
 }: {
-  className?: string;
-  children?: React.ReactNode;
+  children: React.ReactNode;
 }) => {
   const { open, setOpen } = useSidebar();
   return (
@@ -205,18 +207,11 @@ export const SidebarLink = ({
       >
         {link.icon}
       </span>
-      <motion.span
-        animate={{
-          display: animate ? (open ? "inline-block" : "none") : "inline-block",
-          opacity: animate ? (open ? 1 : 0) : 1,
-        }}
-        className={cn(
-          "text-siso-text text-base transition-all duration-200 whitespace-pre ml-1"
-        )}
-      >
-        {link.label}
-      </motion.span>
+      {open && (
+        <span className="text-siso-text text-base transition-all duration-200 whitespace-pre ml-1">
+          {link.label}
+        </span>
+      )}
     </Link>
   );
 };
-
