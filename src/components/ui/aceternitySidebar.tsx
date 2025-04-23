@@ -1,4 +1,3 @@
-
 import React, { useState, createContext, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
@@ -87,7 +86,7 @@ export const DesktopSidebar = ({
 }: React.ComponentProps<typeof motion.div>) => {
   const { open, setOpen, animate } = useSidebar();
   
-  // Fix: Convert width and minWidth to string values
+  // Fix: Explicitly define the width as a string to avoid the type error
   const widthValue = animate ? (open ? "300px" : "76px") : "300px";
   const minWidthValue = animate ? (open ? "300px" : "76px") : "300px";
 
@@ -218,3 +217,4 @@ export const SidebarLink = ({
     </Link>
   );
 };
+
