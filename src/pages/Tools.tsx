@@ -145,13 +145,14 @@ export default function Tools() {
 
   if (error) {
     return (
-      <AppLayout>
+      <div className="flex min-h-screen">
+        <Sidebar />
         <div className="p-8">
           <div className="text-red-500">
             Failed to load tools. Please try again later.
           </div>
         </div>
-      </AppLayout>
+      </div>
     );
   }
 
