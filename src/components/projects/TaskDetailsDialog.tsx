@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -34,6 +33,7 @@ interface TaskDetailsDialogProps {
       name: string;
       color: string;
     };
+    description?: string; // Add description as optional property
   } | null;
   isOpen: boolean;
   onClose: () => void;

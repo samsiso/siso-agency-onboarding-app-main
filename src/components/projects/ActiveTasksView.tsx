@@ -21,6 +21,7 @@ const demoTasks = [
   {
     id: "1",
     name: "Research potential tech stack",
+    description: "Evaluate different technology options for the new project, focusing on scalability and performance.",
     startAt: new Date(),
     endAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     status: taskStatuses[0],
@@ -34,6 +35,7 @@ const demoTasks = [
   {
     id: "2",
     name: "Create project architecture",
+    description: "Design the system architecture with microservices approach, defining the relationships between components.",
     startAt: new Date(),
     endAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
     status: taskStatuses[1],
@@ -47,6 +49,7 @@ const demoTasks = [
   {
     id: "3",
     name: "Setup development environment",
+    description: "Configure development environments, install all required packages and dependencies.",
     startAt: new Date(),
     endAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
     status: taskStatuses[2],
