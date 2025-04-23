@@ -183,8 +183,6 @@ export function ClientDetailSheet({ clientId, isOpen, onClose }: ClientDetailShe
                   </div>
                 )}
                 
-                {/* Recent interactions would go here */}
-                
                 <div className="mt-4">
                   <Button onClick={viewFullDetails} className="w-full">
                     View Complete Project Details

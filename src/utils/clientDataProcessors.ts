@@ -1,4 +1,3 @@
-
 import { ClientData } from '@/types/client.types';
 
 /**
@@ -42,7 +41,10 @@ export const processClientDetail = (data: any, clientId: string): ClientData => 
     todos: Array.isArray(data.todos) ? data.todos : [],
     next_steps: null,
     key_research: null,
-    priority: safePropertyAccess(data, 'priority', null)
+    priority: safePropertyAccess(data, 'priority', null),
+    // Keep original fields
+    contact_name: safePropertyAccess(data, 'contact_name', null),
+    company_name: safePropertyAccess(data, 'company_name', null)
   };
   
   return clientData;
@@ -81,7 +83,9 @@ export function createDefaultClientData(clientId: string): ClientData {
     todos: [],
     next_steps: null,
     key_research: null,
-    priority: null
+    priority: null,
+    contact_name: null,
+    company_name: null
   };
 }
 

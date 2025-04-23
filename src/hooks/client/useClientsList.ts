@@ -15,7 +15,6 @@ export function useClientsList(params: ClientsListParams = {}): ClientsListRespo
   const [clients, setClients] = useState<ClientData[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
 
   const {
     searchQuery = '',
@@ -64,7 +63,6 @@ export function useClientsList(params: ClientsListParams = {}): ClientsListRespo
       
       if (error) {
         console.error('Error fetching clients:', error);
-        setError(new Error(error.message));
         setClients([]);
         setTotalCount(0);
       } else {
@@ -122,17 +120,17 @@ export function useClientsList(params: ClientsListParams = {}): ClientsListRespo
             todos: parsedTodos,
             next_steps: null,
             key_research: null,
-            priority: null
+            priority: item.priority || null,
+            contact_name: item.contact_name || null,
+            company_name: item.company_name || null,
           } as ClientData;
         });
 
         setClients(processedClients);
         setTotalCount(count || 0);
-        setError(null);
       }
     } catch (err) {
       console.error('Unexpected error fetching clients:', err);
-      setError(err instanceof Error ? err : new Error('Unknown error'));
       setClients([]);
       setTotalCount(0);
     } finally {
@@ -159,7 +157,6 @@ export function useClientsList(params: ClientsListParams = {}): ClientsListRespo
     clients,
     totalCount,
     isLoading: loading || adminCheckLoading,
-    error,
     refetch: fetchClients
   };
 }

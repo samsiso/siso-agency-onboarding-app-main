@@ -87,9 +87,9 @@ export const DesktopSidebar = ({
 }: React.ComponentProps<typeof motion.div>) => {
   const { open, setOpen, animate } = useSidebar();
   
-  // Calculate width values based on state
-  const width = animate ? (open ? 300 : 76) : 300;
-  const minWidth = animate ? (open ? 300 : 76) : 300;
+  // Fix: Convert width and minWidth to string values
+  const widthValue = animate ? (open ? "300px" : "76px") : "300px";
+  const minWidthValue = animate ? (open ? "300px" : "76px") : "300px";
 
   return (
     <motion.div
@@ -100,7 +100,7 @@ export const DesktopSidebar = ({
         className,
         open ? "sidebar-open" : "sidebar-collapsed"
       )}
-      style={{ width, minWidth }}
+      style={{ width: widthValue, minWidth: minWidthValue }}
       transition={{ type: "spring", stiffness: 220, damping: 26 }}
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}

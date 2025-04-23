@@ -1,3 +1,4 @@
+
 import { useState, useMemo } from 'react';
 import { ClientsEnhancedTable } from './ClientsEnhancedTable';
 import { ClientsCardGrid } from './ClientsCardGrid';
@@ -61,6 +62,14 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
     setViewPreference(prev => ({ ...prev, ...updates }));
   };
 
+  const handleRefetch = async () => {
+    try {
+      await refetch();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Dashboard stats */}
@@ -80,7 +89,7 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
         viewPreference={viewPreference}
         onViewPreferenceChange={handleViewPreferenceChange}
         onAddClient={() => {}}
-        onRefetch={() => { refetch().catch(console.error); }}
+        onRefetch={handleRefetch}
         viewMode={viewMode}
         setViewMode={setViewMode}
       />
