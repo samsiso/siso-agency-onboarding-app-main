@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Home, Component, ExternalLink, AlertCircle } from 'lucide-react';
+import { PlusCircle, Home, Component, AlertCircle } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ProjectDirectoryCard } from '@/components/projects/ProjectDirectoryCard';
 import { ActiveTasksView } from '@/components/projects/ActiveTasksView';
@@ -23,7 +23,7 @@ export default function ProjectsAndTasksPage() {
   const location = useLocation();
   const { toast } = useToast();
   const { user, loading: authLoading } = useAuthSession();
-  const { data: projects, isLoading, error, refetch } = useProjects();
+  const { data: project, isLoading, error, refetch } = useProjects();
   
   const isTasksView = location.pathname === '/projects/tasks';
 
@@ -105,16 +105,6 @@ export default function ProjectsAndTasksPage() {
               }
             </p>
           </div>
-          
-          {!isTasksView && !projects && (
-            <Button 
-              onClick={handleCreateNew}
-              className="bg-gradient-to-r from-[#9b87f5] to-[#6E59A5] hover:opacity-90 flex items-center gap-2 mt-4 md:mt-0"
-            >
-              <PlusCircle size={16} />
-              New Project
-            </Button>
-          )}
         </div>
 
         {isTasksView ? (
@@ -144,12 +134,11 @@ export default function ProjectsAndTasksPage() {
                 </div>
               ) : (
                 <ProjectDirectoryCard
-                  name={projects?.name}
-                  logo={projects?.logo}
-                  description={projects?.description}
-                  created_at={projects?.created_at}
-                  status={projects?.status}
-                  onSelect={() => navigate(`/plan/${projects?.id}`)}
+                  name={project?.name}
+                  description={project?.description}
+                  created_at={project?.created_at}
+                  status={project?.status}
+                  onSelect={() => navigate(`/projects/${project?.name?.toLowerCase()}`)}
                 />
               )}
             </Card>

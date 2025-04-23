@@ -18,45 +18,48 @@ export function useProjects() {
   const { user } = useAuthSession();
 
   return useQuery({
-    queryKey: ['projects', user?.id],
+    queryKey: ['projects'],
     queryFn: async () => {
       if (!user) {
         console.log('No authenticated user found');
         throw new Error('Authentication required');
       }
 
-      console.log('Fetching Ubahcrypt project data');
+      console.log('Fetching projects data');
       
       const { data: plans, error } = await supabase
         .from('plans')
-        .select('*')
-        .eq('app_name', 'Ubahcrypt')
-        .single();
+        .select('*');
 
       if (error) {
-        console.error('Error fetching project:', error);
+        console.error('Error fetching projects:', error);
         toast({
-          title: 'Error fetching project',
+          title: 'Error fetching projects',
           description: error.message,
           variant: 'destructive',
         });
         throw error;
       }
 
-      console.log('Raw plan data:', plans);
+      if (!plans || plans.length === 0) {
+        console.log('No projects found');
+        return null;
+      }
 
-      // Transform plan into Project format
-      const project = {
-        id: plans.id,
-        name: plans.app_name || 'Ubahcrypt',
-        description: plans.description || 'Building a secure and innovative cryptocurrency platform',
-        logo: plans.logo,
-        status: plans.status || 'pending',
-        created_at: plans.created_at
-      };
+      console.log('Raw plans data:', plans);
 
-      console.log('Transformed project:', project);
-      return project;
+      // Transform plans into Project format
+      const projects = plans.map(plan => ({
+        id: plan.id,
+        name: plan.app_name || 'Unnamed Project',
+        description: plan.description || '',
+        logo: plan.logo,
+        status: plan.status || 'pending',
+        created_at: plan.created_at
+      }));
+
+      console.log('Transformed projects:', projects);
+      return projects[0]; // For now, return the first project
     },
     enabled: !!user
   });
