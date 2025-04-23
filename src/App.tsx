@@ -1,4 +1,3 @@
-
 import { Routes, Route } from 'react-router-dom';
 import Index from './pages/Index';
 import Auth from './pages/Auth';
@@ -7,7 +6,7 @@ import OnboardingSocial from './pages/onboarding/social';
 import { Toaster } from '@/components/ui/toaster';
 import OnboardingChat from './pages/OnboardingChat';
 import ThankYou from './pages/ThankYou';
-import ThankYouPlan from './pages/ThankYouPlan';
+import ThankYouPlan from './pages/ThankYou';
 import Plan from './pages/Plan';
 import DecoraPlan from './pages/DecoraPlan';
 import Congratulations from './pages/onboarding/congratulations';
@@ -39,6 +38,7 @@ import ClientTasksPage from "./pages/client/ClientTasksPage";
 import ClientStatusPage from "./pages/client/ClientStatusPage";
 import ClientSupportPage from "./pages/client/ClientSupportPage";
 import ProjectsAndTasksPage from './pages/ProjectsAndTasksPage';
+import DocumentLibraryPage from './pages/resources/DocumentLibraryPage';
 
 function App() {
   return (
@@ -101,6 +101,11 @@ function App() {
         <Route path="/client-dashboard/tasks" element={<AuthGuard><ClientTasksPage /></AuthGuard>} />
         <Route path="/client-dashboard/status" element={<AuthGuard><ClientStatusPage /></AuthGuard>} />
         <Route path="/client-dashboard/support" element={<AuthGuard><ClientSupportPage /></AuthGuard>} />
+
+        {/* Resources & Support Routes */}
+        <Route path="/resources/documents" element={<AuthGuard><DocumentLibraryPage /></AuthGuard>} />
+        <Route path="/resources/help" element={<AuthGuard><HelpPage /></AuthGuard>} />
+        <Route path="/changelog" element={<AuthGuard><ChangelogPage /></AuthGuard>} />
       </Routes>
     </>
   );
