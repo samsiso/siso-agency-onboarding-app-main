@@ -6,6 +6,7 @@ import { ChatMessage } from '@/components/chat/ChatMessage';
 import { ChatInput } from '@/components/chat/ChatInput';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
+import { AppLayout } from '@/components/layout/AppLayout';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -106,87 +107,89 @@ const SisoAI = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-siso-bg to-siso-bg/95">
-      <div className="flex flex-col h-screen">
-        {/* Header */}
-        <div className="border-b border-siso-text/10 bg-siso-bg/80 backdrop-blur-sm">
-          <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <MessageSquare className="h-6 w-6 text-siso-red" />
-              <h1 className="text-xl font-semibold text-siso-text-bold">SISO AI</h1>
+    <AppLayout>
+      <div className="min-h-screen bg-gradient-to-b from-siso-bg to-siso-bg/95">
+        <div className="flex flex-col h-screen">
+          {/* Header */}
+          <div className="border-b border-siso-text/10 bg-siso-bg/80 backdrop-blur-sm">
+            <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <MessageSquare className="h-6 w-6 text-siso-red" />
+                <h1 className="text-xl font-semibold text-siso-text-bold">SISO AI</h1>
+              </div>
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-siso-text/5 hover:bg-siso-text/10 transition-colors">
+                    <div className="flex items-center gap-2">
+                      {React.createElement(assistantTypes.find(a => a.id === selectedAssistant)?.icon || Bot, {
+                        className: "h-4 w-4 text-siso-orange"
+                      })}
+                      <span className="text-sm font-medium text-siso-text">
+                        {assistantTypes.find(a => a.id === selectedAssistant)?.label}
+                      </span>
+                    </div>
+                    <ChevronDown className="h-4 w-4 text-siso-text/70" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-[300px] bg-siso-bg border border-siso-text/10">
+                  <AnimatePresence>
+                    {assistantTypes.map((type) => (
+                      <DropdownMenuItem
+                        key={type.id}
+                        className="flex items-start gap-3 p-3 hover:bg-siso-text/5 cursor-pointer"
+                        onClick={() => handleAssistantChange(type.id as AssistantType)}
+                      >
+                        <div className="mt-1">
+                          {React.createElement(type.icon, {
+                            className: "h-4 w-4 text-siso-orange"
+                          })}
+                        </div>
+                        <div>
+                          <div className="font-medium text-siso-text">{type.label}</div>
+                          <div className="text-sm text-siso-text/70">{type.description}</div>
+                        </div>
+                      </DropdownMenuItem>
+                    ))}
+                  </AnimatePresence>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <div className="w-[100px]" /> {/* Spacer for alignment */}
             </div>
-            
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-siso-text/5 hover:bg-siso-text/10 transition-colors">
-                  <div className="flex items-center gap-2">
-                    {React.createElement(assistantTypes.find(a => a.id === selectedAssistant)?.icon || Bot, {
-                      className: "h-4 w-4 text-siso-orange"
-                    })}
-                    <span className="text-sm font-medium text-siso-text">
-                      {assistantTypes.find(a => a.id === selectedAssistant)?.label}
-                    </span>
-                  </div>
-                  <ChevronDown className="h-4 w-4 text-siso-text/70" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[300px] bg-siso-bg border border-siso-text/10">
-                <AnimatePresence>
-                  {assistantTypes.map((type) => (
-                    <DropdownMenuItem
-                      key={type.id}
-                      className="flex items-start gap-3 p-3 hover:bg-siso-text/5 cursor-pointer"
-                      onClick={() => handleAssistantChange(type.id as AssistantType)}
-                    >
-                      <div className="mt-1">
-                        {React.createElement(type.icon, {
-                          className: "h-4 w-4 text-siso-orange"
-                        })}
-                      </div>
-                      <div>
-                        <div className="font-medium text-siso-text">{type.label}</div>
-                        <div className="text-sm text-siso-text/70">{type.description}</div>
-                      </div>
-                    </DropdownMenuItem>
-                  ))}
-                </AnimatePresence>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            <div className="w-[100px]" /> {/* Spacer for alignment */}
           </div>
-        </div>
 
-        {/* Chat Area */}
-        <div className="flex-1 container mx-auto max-w-5xl px-4">
-          <div className="h-full flex flex-col">
-            <ScrollArea className="flex-1 px-2">
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-4 py-4"
-              >
-                {messages.map((message, index) => (
-                  <ChatMessage
-                    key={index}
-                    role={message.role}
-                    content={message.content}
-                    assistantType={assistantTypes.find(a => a.id === selectedAssistant)?.label}
-                    isLoading={isLoading && index === messages.length - 1 && message.role === 'assistant'}
-                  />
-                ))}
-                <div ref={messagesEndRef} />
-              </motion.div>
-            </ScrollArea>
-            
-            <div className="py-4">
-              <ChatInput onSubmit={handleSubmit} isLoading={isLoading} />
+          {/* Chat Area */}
+          <div className="flex-1 container mx-auto max-w-5xl px-4">
+            <div className="h-full flex flex-col">
+              <ScrollArea className="flex-1 px-2">
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                  className="space-y-4 py-4"
+                >
+                  {messages.map((message, index) => (
+                    <ChatMessage
+                      key={index}
+                      role={message.role}
+                      content={message.content}
+                      assistantType={assistantTypes.find(a => a.id === selectedAssistant)?.label}
+                      isLoading={isLoading && index === messages.length - 1 && message.role === 'assistant'}
+                    />
+                  ))}
+                  <div ref={messagesEndRef} />
+                </motion.div>
+              </ScrollArea>
+              
+              <div className="py-4">
+                <ChatInput onSubmit={handleSubmit} isLoading={isLoading} />
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </AppLayout>
   );
 };
 

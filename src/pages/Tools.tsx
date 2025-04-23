@@ -1,9 +1,8 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { useState, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Tool } from '@/components/tools/types';
-import { Sidebar } from '@/components/Sidebar';
+import { AppLayout } from '@/components/layout/AppLayout';
 import { toast } from 'react-hot-toast';
 import { ToolsPageHeader } from '@/components/tools/ToolsPageHeader';
 import { MainContent } from '@/components/tools/layout/MainContent';
@@ -158,9 +157,8 @@ export default function Tools() {
   }
 
   return (
-    <div className="flex min-h-screen">
-      <Sidebar />
-      <div className="flex-1 p-8 overflow-y-auto">
+    <AppLayout>
+      <div className="p-8">
         <ToolsPageHeader 
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
@@ -181,6 +179,6 @@ export default function Tools() {
 
         <ChatAssistant />
       </div>
-    </div>
+    </AppLayout>
   );
 }

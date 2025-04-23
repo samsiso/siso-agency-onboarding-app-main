@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { MainLayout } from '@/components/layout/MainLayout';
+import { AppLayout } from '@/components/layout/AppLayout';
 import { Card } from '@/components/ui/card';
 import { ProjectsList } from '@/components/projects/ProjectsList';
 import { TasksList } from '@/components/projects/TasksList';
@@ -17,14 +17,12 @@ export default function ProjectsAndTasksPage() {
     if (activeTab === 'projects') {
       navigate('/plan-builder');
     } else {
-      // Open a task creation modal or navigate to task creation page
-      // This will be implemented later
       console.log('Create new task');
     }
   };
 
   return (
-    <MainLayout>
+    <AppLayout>
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <div>
@@ -67,6 +65,6 @@ export default function ProjectsAndTasksPage() {
           </Tabs>
         </Card>
       </div>
-    </MainLayout>
+    </AppLayout>
   );
 }
