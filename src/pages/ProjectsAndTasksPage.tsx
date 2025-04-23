@@ -20,6 +20,7 @@ const demoProjects = [
   {
     id: '1',
     name: 'Ubahcryp',
+    description: 'Web3 trading platform with cryptocurrency integration and real-time market data',
     logo: 'https://api.dicebear.com/7.x/shapes/svg?seed=ubahcryp&backgroundColor=0ea5e9',
   }
 ];
@@ -107,6 +108,7 @@ export default function ProjectsAndTasksPage() {
                     key={project.id}
                     name={project.name}
                     logo={project.logo}
+                    description={project.description}
                     onSelect={() => setSelectedProject(project.id)}
                   />
                 ))}
@@ -114,7 +116,7 @@ export default function ProjectsAndTasksPage() {
               </div>
             </Card>
 
-            <div className="text-center p-8 bg-black/30 border border-siso-text/10 rounded-lg">
+            <div className="text-center p-8 bg-black/30 border border-siso-text/10 rounded-lg animate-fade-in">
               <h3 className="text-xl font-semibold text-white mb-3">
                 Discover More Projects
               </h3>
