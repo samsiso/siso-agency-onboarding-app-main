@@ -1,25 +1,27 @@
 
-import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
-import { X } from "lucide-react"
-
-import { cn } from "@/lib/utils"
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
 
 const chipVariants = cva(
-  "inline-flex items-center justify-center rounded-full text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
   {
     variants: {
       variant: {
-        default: "bg-gray-800 text-gray-200",
-        primary: "bg-primary/10 text-primary",
-        secondary: "bg-secondary/10 text-secondary-foreground",
-        outline: "border border-gray-600 text-gray-300",
-        colored: "border border-transparent",
+        default:
+          "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
+        secondary:
+          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        destructive:
+          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
+        outline: "text-foreground",
+        subtle:
+          "border-transparent bg-muted/30 text-muted-foreground hover:bg-muted/50",
       },
       size: {
-        default: "h-6 px-2.5 py-0.5",
-        sm: "h-5 px-2 py-0 text-xs",
-        lg: "h-7 px-3 py-1",
+        default: "px-2.5 py-0.5 text-xs",
+        sm: "px-2 py-0 text-xs",
+        lg: "px-3 py-1 text-sm",
       },
     },
     defaultVariants: {
@@ -27,42 +29,19 @@ const chipVariants = cva(
       size: "default",
     },
   }
-)
+);
 
 export interface ChipProps
   extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof chipVariants> {
-  onClose?: () => void;
-}
+    VariantProps<typeof chipVariants> {}
 
-export function Chip({ 
-  className, 
-  variant, 
-  size, 
-  onClose, 
-  children, 
-  ...props 
-}: ChipProps) {
+function Chip({ className, variant, size, ...props }: ChipProps) {
   return (
     <div
-      className={cn(
-        chipVariants({ variant, size }),
-        onClose && "pr-1",
-        className
-      )}
+      className={cn(chipVariants({ variant, size }), className)}
       {...props}
-    >
-      {children}
-      {onClose && (
-        <button
-          type="button"
-          className="ml-1 rounded-full p-0.5 hover:bg-gray-700/50"
-          onClick={onClose}
-        >
-          <X className="h-3 w-3" />
-          <span className="sr-only">Close</span>
-        </button>
-      )}
-    </div>
-  )
+    />
+  );
 }
+
+export { Chip, chipVariants };

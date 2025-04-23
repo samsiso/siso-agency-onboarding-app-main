@@ -1,7 +1,7 @@
 
 import { 
   LayoutDashboard, Layout, Briefcase, Folder, CreditCard, 
-  Trophy, Users, HelpCircle
+  Trophy, Users, HelpCircle, ListTodo
 } from 'lucide-react';
 import { MenuSection } from './types';
 
@@ -15,23 +15,23 @@ export const getMenuSections = (): MenuSection[] => {
     },
     {
       type: 'section',
-      title: 'Projects',
+      title: 'Projects & Tasks',
       icon: Briefcase,
       items: [
+        {
+          href: '/projects',
+          icon: Folder,
+          label: 'All Projects',
+        },
+        {
+          href: '/projects/tasks',
+          icon: ListTodo,
+          label: 'Active Tasks',
+        },
         {
           href: '/plan-builder',
           icon: Layout,
           label: 'Plan Builder',
-        },
-        {
-          href: '/my-projects',
-          icon: Folder,
-          label: 'My Projects',
-        },
-        {
-          href: '/portfolio',
-          icon: Users,
-          label: 'Portfolio',
         }
       ]
     },
@@ -62,11 +62,6 @@ export const getMenuSections = (): MenuSection[] => {
       title: 'Support & Changelog',
       icon: HelpCircle,
       items: [
-        {
-          href: '/help',
-          icon: HelpCircle,
-          label: 'Help & Support',
-        },
         {
           href: '/changelog',
           icon: CreditCard,

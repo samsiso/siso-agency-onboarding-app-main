@@ -38,6 +38,7 @@ import ClientDocumentsPage from "./pages/client/ClientDocumentsPage";
 import ClientTasksPage from "./pages/client/ClientTasksPage";
 import ClientStatusPage from "./pages/client/ClientStatusPage";
 import ClientSupportPage from "./pages/client/ClientSupportPage";
+import ProjectsAndTasksPage from './pages/ProjectsAndTasksPage';
 
 function App() {
   return (
@@ -80,6 +81,8 @@ function App() {
         {/* Protected Project Routes */}
         <Route path="/plan-builder" element={<AuthGuard><Home /></AuthGuard>} />
         <Route path="/my-projects" element={<AuthGuard><MyProjects /></AuthGuard>} />
+        <Route path="/projects" element={<AuthGuard><ProjectsAndTasksPage /></AuthGuard>} />
+        <Route path="/projects/tasks" element={<AuthGuard><ProjectsAndTasksPage /></AuthGuard>} />
         <Route path="/portfolio" element={<AuthGuard><Portfolio /></AuthGuard>} />
         
         {/* Protected Financial Routes */}
