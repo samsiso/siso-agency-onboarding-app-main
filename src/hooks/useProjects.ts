@@ -25,41 +25,43 @@ export function useProjects() {
         throw new Error('Authentication required');
       }
 
-      console.log('Fetching projects data');
+      console.log('Fetching Ubahcrypt project data');
       
-      const { data: plans, error } = await supabase
+      const { data: project, error } = await supabase
         .from('plans')
-        .select('*');
+        .select('*')
+        .eq('app_name', 'Ubahcrypt')
+        .single();
 
       if (error) {
-        console.error('Error fetching projects:', error);
+        console.error('Error fetching project:', error);
         toast({
-          title: 'Error fetching projects',
+          title: 'Error fetching project',
           description: error.message,
           variant: 'destructive',
         });
         throw error;
       }
 
-      if (!plans || plans.length === 0) {
-        console.log('No projects found');
+      if (!project) {
+        console.log('No project found');
         return null;
       }
 
-      console.log('Raw plans data:', plans);
+      console.log('Raw project data:', project);
 
-      // Transform plans into Project format
-      const projects = plans.map(plan => ({
-        id: plan.id,
-        name: plan.app_name || 'Unnamed Project',
-        description: plan.description || '',
-        logo: plan.logo,
-        status: plan.status || 'pending',
-        created_at: plan.created_at
-      }));
+      // Transform project into Project format
+      const transformedProject = {
+        id: project.id,
+        name: project.app_name,
+        description: project.description || 'A secure and innovative cryptocurrency platform',
+        logo: project.logo,
+        status: project.status || 'pending',
+        created_at: project.created_at
+      };
 
-      console.log('Transformed projects:', projects);
-      return projects[0]; // For now, return the first project
+      console.log('Transformed project:', transformedProject);
+      return transformedProject;
     },
     enabled: !!user
   });

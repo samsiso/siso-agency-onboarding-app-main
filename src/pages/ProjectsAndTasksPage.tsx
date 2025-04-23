@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Home, Component, AlertCircle } from 'lucide-react';
+import { Home, Component, AlertCircle } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ProjectDirectoryCard } from '@/components/projects/ProjectDirectoryCard';
 import { ActiveTasksView } from '@/components/projects/ActiveTasksView';
@@ -38,10 +38,6 @@ export default function ProjectsAndTasksPage() {
       navigate('/auth');
     }
   }, [user, authLoading, navigate, toast]);
-
-  const handleCreateNew = () => {
-    navigate('/plan-builder');
-  };
 
   if (authLoading) {
     return (
@@ -80,7 +76,7 @@ export default function ProjectsAndTasksPage() {
                 Projects
               </BreadcrumbLink>
             </BreadcrumbItem>
-            {(isTasksView) && (
+            {isTasksView && (
               <>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
@@ -96,7 +92,7 @@ export default function ProjectsAndTasksPage() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <div>
             <h1 className="text-3xl font-bold text-gradient-to-r from-[#9b87f5] to-[#6E59A5] mb-2">
-              {isTasksView ? "Development Tasks" : "Ubahcrypt Project"}
+              Projects
             </h1>
             <p className="text-siso-text">
               {isTasksView 
