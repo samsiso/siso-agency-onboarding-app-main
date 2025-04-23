@@ -32,6 +32,8 @@ export function ProjectDirectoryCard({ name, logo, description, onSelect }: Proj
     );
   }
 
+  console.log('Rendering project card with name:', name);
+
   return (
     <Card 
       onClick={onSelect}
@@ -39,9 +41,14 @@ export function ProjectDirectoryCard({ name, logo, description, onSelect }: Proj
     >
       <div className="relative">
         {logo ? (
-          <img src={logo} alt={name} className="h-24 w-24 rounded-full object-cover ring-2 ring-siso-orange/20 group-hover:ring-siso-orange/40 transition-all duration-300" />
+          <img
+            src={logo}
+            alt={`${name} logo`}
+            className="h-24 w-24 rounded-full object-cover ring-2 ring-siso-orange/20 group-hover:ring-siso-orange/40 transition-all duration-300"
+            loading="lazy"
+          />
         ) : (
-          <div className="h-24 w-24 rounded-full bg-gradient-to-r from-[#9b87f5] to-[#6E59A5] flex items-center justify-center ring-2 ring-siso-orange/20 group-hover:ring-siso-orange/40 transition-all duration-300">
+          <div className="h-24 w-24 rounded-full bg-gradient-to-br from-[#9b87f5] to-[#6E59A5] flex items-center justify-center ring-2 ring-siso-orange/20 group-hover:ring-siso-orange/40 transition-all duration-300">
             <Bitcoin size={40} className="text-white" />
           </div>
         )}
