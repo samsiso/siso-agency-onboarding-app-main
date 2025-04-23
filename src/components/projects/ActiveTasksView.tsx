@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   KanbanBoard,
   KanbanCard,
@@ -13,7 +13,7 @@ import { useClientTasks } from '@/hooks/useClientTasks';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuthSession } from '@/hooks/useAuthSession';
 
 const taskStatuses = [
   { id: "1", name: "To Do", color: "#6B7280" },
@@ -23,24 +23,13 @@ const taskStatuses = [
 
 export function ActiveTasksView() {
   const [selectedTask, setSelectedTask] = useState<any | null>(null);
-  const [authUser, setAuthUser] = useState<any>(null);
-  const { tasks, loading, updateTaskStatus } = useClientTasks();
-
-  useEffect(() => {
-    // Get auth session to help debug
-    const checkAuth = async () => {
-      const { data } = await supabase.auth.getUser();
-      console.log('Current auth user:', data.user);
-      setAuthUser(data.user);
-    };
-    
-    checkAuth();
-  }, []);
+  const { tasks, loading, error, updateTaskStatus } = useClientTasks();
+  const { user } = useAuthSession();
 
   const handleDragEnd = async (event: any) => {
     const { active, over } = event;
 
-    if (!over) return;
+    if (!over || !user) return;
 
     const task = tasks.find(t => t.id === active.id);
     if (!task) return;
@@ -50,10 +39,6 @@ export function ActiveTasksView() {
                      'completed';
 
     await updateTaskStatus(task.id, newStatus);
-  };
-
-  const handleUpdateTask = (updatedTask: any) => {
-    setSelectedTask(updatedTask);
   };
 
   if (loading) {
@@ -66,15 +51,35 @@ export function ActiveTasksView() {
     );
   }
 
+  if (error) {
+    return (
+      <Alert variant="destructive" className="m-4">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Error loading tasks</AlertTitle>
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (!user) {
+    return (
+      <Alert className="m-4">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Authentication Required</AlertTitle>
+        <AlertDescription>
+          Please sign in to view your tasks.
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
   if (!tasks.length) {
     return (
       <Alert className="m-4">
         <AlertCircle className="h-4 w-4" />
         <AlertTitle>No tasks found</AlertTitle>
         <AlertDescription>
-          {authUser ? 
-            `No tasks found for user ID: ${authUser.id}. Make sure tasks are assigned to this user or client.` :
-            'Please sign in to view your assigned tasks.'}
+          No tasks are currently assigned to you or your client.
         </AlertDescription>
       </Alert>
     );

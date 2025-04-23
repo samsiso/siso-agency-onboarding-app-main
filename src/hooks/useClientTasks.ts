@@ -7,20 +7,20 @@ import { useAuthSession } from '@/hooks/useAuthSession';
 export function useClientTasks(clientId?: string) {
   const [tasks, setTasks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   const { isAdmin, user } = useAuthSession();
   
   useEffect(() => {
-    if (!user && !clientId) {
-      console.log('No user or clientId provided, skipping task fetch');
+    if (!user) {
+      setError('Authentication required to view tasks');
       setLoading(false);
       return;
     }
     
     const fetchTasks = async () => {
       try {
-        console.log('Fetching tasks with user:', user?.id, 'isAdmin:', isAdmin, 'clientId:', clientId);
-        
+        setError(null);
         let query = supabase
           .from('tasks')
           .select(`
@@ -32,24 +32,19 @@ export function useClientTasks(clientId?: string) {
             )
           `);
 
-        // If clientId is provided, filter by it
         if (clientId) {
-          console.log('Filtering tasks by clientId:', clientId);
           query = query.eq('assigned_client_id', clientId);
         }
 
-        console.log('Executing tasks query');
         const { data, error } = await query;
 
         if (error) {
           console.error('Error fetching tasks:', error);
+          setError(error.message);
           throw error;
         }
         
-        console.log('Tasks data received:', data);
-
         if (data && data.length > 0) {
-          // Map the data to include client information
           const mappedTasks = data.map(task => ({
             id: task.id,
             name: task.title,
@@ -68,18 +63,17 @@ export function useClientTasks(clientId?: string) {
               image: `https://api.dicebear.com/7.x/initials/svg?seed=${task.client_onboarding?.company_name || 'Client'}`
             }
           }));
-          console.log('Mapped tasks:', mappedTasks);
           setTasks(mappedTasks);
         } else {
-          console.log('No tasks found');
           setTasks([]);
         }
       } catch (error) {
-        console.error('Error fetching tasks:', error);
+        const message = error instanceof Error ? error.message : 'Failed to load tasks';
+        setError(message);
         toast({
           variant: "destructive",
           title: "Error loading tasks",
-          description: "Failed to load tasks. Please try again later."
+          description: message
         });
       } finally {
         setLoading(false);
@@ -88,8 +82,6 @@ export function useClientTasks(clientId?: string) {
 
     fetchTasks();
 
-    // Set up real-time subscription
-    console.log('Setting up real-time subscription for tasks table');
     const channel = supabase
       .channel('tasks_changes')
       .on(
@@ -99,22 +91,19 @@ export function useClientTasks(clientId?: string) {
           schema: 'public',
           table: 'tasks'
         },
-        (payload) => {
-          console.log('Real-time update received:', payload);
+        () => {
           fetchTasks();
         }
       )
       .subscribe();
 
     return () => {
-      console.log('Cleaning up supabase channel');
       supabase.removeChannel(channel);
     };
   }, [clientId, toast, user, isAdmin]);
 
   const updateTaskStatus = async (taskId: string, status: string) => {
     try {
-      console.log(`Updating task ${taskId} status to ${status}`);
       const { error } = await supabase
         .from('tasks')
         .update({ status })
@@ -139,7 +128,7 @@ export function useClientTasks(clientId?: string) {
   return {
     tasks,
     loading,
-    isAdmin,
+    error,
     updateTaskStatus
   };
 }
