@@ -1,10 +1,10 @@
 
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarFooter, SidebarHeader } from "@/components/ui/sidebar";
 import { useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Folder, List, Calendar, FileText, Wallet, User } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { LayoutDashboard, Folder, ListTodo, Calendar, FileText, File, Wallet, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+// Update nav items for the client
 const sidebarItems = [
   {
     label: "Dashboard",
@@ -19,7 +19,7 @@ const sidebarItems = [
   {
     label: "Todo List",
     href: "/client-dashboard/tasks",
-    icon: List,
+    icon: ListTodo,
   },
   {
     label: "Timeline",
@@ -34,7 +34,7 @@ const sidebarItems = [
   {
     label: "Documents",
     href: "/client-dashboard/documents",
-    icon: FileText,
+    icon: File,
   },
   {
     label: "Financial",
@@ -108,3 +108,4 @@ export function ClientSidebar() {
     </Sidebar>
   );
 }
+

@@ -1,13 +1,13 @@
 
 import { ReactNode } from "react";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { ClientSidebar } from "./ClientSidebar";
 
 interface ClientDashboardLayoutProps {
   children: ReactNode;
 }
 
-// Custom layout for client dashboard with the new sidebar
+// Custom layout for client dashboard using the sidebar
 export function ClientDashboardLayout({ children }: ClientDashboardLayoutProps) {
   return (
     <SidebarProvider>
