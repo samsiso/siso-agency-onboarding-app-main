@@ -5,8 +5,27 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { Task } from '@/types/task.types';
 
+// Define a UI-friendly task type that matches the TaskCard component's expected props
+export interface UiTask {
+  id: string;
+  name: string;
+  description?: string;
+  startAt: Date;
+  endAt: Date;
+  category: string;
+  priority: 'low' | 'medium' | 'high';
+  owner: {
+    name: string;
+    image: string;
+  };
+  status: {
+    name: string;
+    color: string;
+  };
+}
+
 export function useClientTasks(clientId?: string) {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<UiTask[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
@@ -34,7 +53,28 @@ export function useClientTasks(clientId?: string) {
           throw error;
         }
         
-        setTasks(data || []);
+        // Transform DB tasks to UI-friendly format
+        const mappedTasks = (data || []).map(task => ({
+          id: task.id,
+          name: task.title,
+          description: task.description,
+          startAt: new Date(task.due_date || Date.now() - 86400000), // Default to yesterday
+          endAt: new Date(task.due_date || Date.now() + 86400000),   // Default to tomorrow
+          category: String(task.category),
+          priority: (task.priority || 'medium') as 'low' | 'medium' | 'high',
+          status: {
+            name: task.status === 'completed' ? 'Completed' : 
+                  task.status === 'in_progress' ? 'In Progress' : 'To Do',
+            color: task.status === 'completed' ? '#10B981' : 
+                  task.status === 'in_progress' ? '#F59E0B' : '#6B7280'
+          },
+          owner: {
+            name: task.assigned_to ? 'Assigned User' : 'Unassigned',
+            image: `https://api.dicebear.com/7.x/initials/svg?seed=${task.assigned_to || 'User'}`
+          }
+        }));
+        
+        setTasks(mappedTasks);
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Failed to load tasks';
         setError(message);

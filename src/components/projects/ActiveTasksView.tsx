@@ -43,7 +43,6 @@ export function ActiveTasksView() {
     await updateTaskStatus(task.id, newStatus);
   };
 
-  // Add the missing handleUpdateTask function
   const handleUpdateTask = async (updatedTask: any) => {
     try {
       if (!updatedTask || !updatedTask.id) return;
@@ -137,12 +136,7 @@ export function ActiveTasksView() {
               <KanbanHeader name={status.name} color={status.color} />
               <KanbanCards>
                 {tasks
-                  .filter((task) => {
-                    const taskStatus = task.status.name;
-                    return (status.name === 'To Do' && taskStatus === 'pending') ||
-                           (status.name === 'In Progress' && taskStatus === 'in_progress') ||
-                           (status.name === 'Completed' && taskStatus === 'completed');
-                  })
+                  .filter((task) => task.status.name === status.name)
                   .map((task, index) => (
                     <KanbanCard
                       key={task.id}
