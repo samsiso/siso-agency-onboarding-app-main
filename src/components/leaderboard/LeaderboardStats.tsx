@@ -26,7 +26,6 @@ export const LeaderboardStats = ({ totalUsers, totalPoints, totalSisoTokens }: L
                     end={totalUsers}
                     delay={0}
                     decimals={0}
-                    formattingFn={formatNumber}
                   />
                 </p>
                 <span className="text-xs text-green-500 flex items-center">
@@ -51,7 +50,6 @@ export const LeaderboardStats = ({ totalUsers, totalPoints, totalSisoTokens }: L
                     end={totalPoints}
                     delay={0}
                     decimals={0}
-                    formattingFn={formatNumber}
                   />
                 </p>
                 <span className="text-xs text-green-500 flex items-center">
@@ -76,7 +74,6 @@ export const LeaderboardStats = ({ totalUsers, totalPoints, totalSisoTokens }: L
                     end={totalSisoTokens}
                     delay={0}
                     decimals={0}
-                    formattingFn={formatNumber}
                   />
                 </p>
                 <span className="text-xs text-green-500 flex items-center">
@@ -101,7 +98,6 @@ export const LeaderboardStats = ({ totalUsers, totalPoints, totalSisoTokens }: L
                     end={Math.floor(totalUsers * 0.4)}
                     delay={0}
                     decimals={0}
-                    formattingFn={formatNumber}
                   />
                 </p>
                 <span className="text-xs text-green-500 flex items-center">

@@ -65,7 +65,6 @@ export const StatsDisplay = ({ totalTools, categoryStats }: StatsDisplayProps) =
                 end={stat.value}
                 delay={0}
                 decimals={0}
-                formattingFn={formatNumber}
                 className="text-lg font-semibold text-siso-text-bold"
               />
               <span className="text-sm text-siso-text/70">{stat.label}</span>
