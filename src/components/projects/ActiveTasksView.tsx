@@ -11,9 +11,9 @@ import {
 import { type DragEndEvent } from "@dnd-kit/core";
 
 const taskStatuses = [
-  { id: "todo", name: "To Do", color: "#6B7280" },
-  { id: "in_progress", name: "In Progress", color: "#F59E0B" },
-  { id: "completed", name: "Completed", color: "#10B981" },
+  { id: "1", name: "To Do", color: "#6B7280" },
+  { id: "2", name: "In Progress", color: "#F59E0B" },
+  { id: "3", name: "Completed", color: "#10B981" },
 ];
 
 const demoTasks = [

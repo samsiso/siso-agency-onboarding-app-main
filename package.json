@@ -11,7 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@dnd-kit/modifiers": "^7.0.0",
+    "@dnd-kit/modifiers": "^9.0.0",
     "@heroicons/react": "^2.1.2",
     "@hookform/resolvers": "^5.0.1",
     "@radix-ui/react-accordion": "^1.2.0",
