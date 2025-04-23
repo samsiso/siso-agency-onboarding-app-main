@@ -8,9 +8,14 @@ export function useClientTasks(clientId?: string) {
   const [tasks, setTasks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  const { isAdmin } = useAuthSession();
-
+  const { isAdmin, user } = useAuthSession();
+  
   useEffect(() => {
+    if (!user && !clientId) {
+      setLoading(false);
+      return;
+    }
+    
     const fetchTasks = async () => {
       try {
         let query = supabase
@@ -29,29 +34,36 @@ export function useClientTasks(clientId?: string) {
           query = query.eq('assigned_client_id', clientId);
         }
 
+        console.log('Fetching tasks with query:', JSON.stringify(query));
         const { data, error } = await query;
 
         if (error) throw error;
+        
+        console.log('Tasks data from API:', data);
 
-        // Map the data to include client information
-        setTasks(data.map(task => ({
-          id: task.id,
-          name: task.title,
-          description: task.description,
-          startAt: new Date(task.start_time || Date.now()),
-          endAt: new Date(task.due_date || Date.now()),
-          category: task.category,
-          priority: task.priority,
-          status: {
-            name: task.status,
-            color: task.status === 'completed' ? '#10B981' : 
-                   task.status === 'in_progress' ? '#F59E0B' : '#6B7280'
-          },
-          owner: {
-            name: task.client_onboarding?.company_name || 'Unknown Client',
-            image: `https://api.dicebear.com/7.x/initials/svg?seed=${task.client_onboarding?.company_name || 'Client'}`
-          }
-        })));
+        if (data && data.length > 0) {
+          // Map the data to include client information
+          setTasks(data.map(task => ({
+            id: task.id,
+            name: task.title,
+            description: task.description,
+            startAt: new Date(task.start_time || Date.now()),
+            endAt: new Date(task.due_date || Date.now()),
+            category: task.category,
+            priority: task.priority,
+            status: {
+              name: task.status,
+              color: task.status === 'completed' ? '#10B981' : 
+                    task.status === 'in_progress' ? '#F59E0B' : '#6B7280'
+            },
+            owner: {
+              name: task.client_onboarding?.company_name || 'Unknown Client',
+              image: `https://api.dicebear.com/7.x/initials/svg?seed=${task.client_onboarding?.company_name || 'Client'}`
+            }
+          })));
+        } else {
+          setTasks([]);
+        }
       } catch (error) {
         console.error('Error fetching tasks:', error);
         toast({
@@ -76,7 +88,8 @@ export function useClientTasks(clientId?: string) {
           schema: 'public',
           table: 'tasks'
         },
-        () => {
+        (payload) => {
+          console.log('Real-time update received:', payload);
           fetchTasks();
         }
       )
@@ -85,7 +98,7 @@ export function useClientTasks(clientId?: string) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [clientId, toast]);
+  }, [clientId, toast, user]);
 
   const updateTaskStatus = async (taskId: string, status: string) => {
     try {
