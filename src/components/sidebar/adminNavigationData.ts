@@ -1,7 +1,8 @@
+
 import { 
   LayoutDashboard, Users, MessageSquare, UserCheck,
-  CheckSquare, CalendarClock, CreditCard, Settings,
-  ClipboardCheck, UsersIcon
+  ListTodo, CalendarClock, Wallet, Settings,
+  ClipboardList
 } from 'lucide-react';
 import { MenuSection } from './types';
 
@@ -34,17 +35,17 @@ export const getAdminMenuSections = (): MenuSection[] => {
     {
       type: 'section',
       title: 'Team Operations',
-      icon: UsersIcon,
+      icon: UserCheck,
       label: 'Team Operations',
       items: [
         {
           href: '/admin/teams',
-          icon: UsersIcon,
+          icon: UserCheck,
           label: 'Teams',
         },
         {
           href: '/admin/tasks',
-          icon: CheckSquare,
+          icon: ListTodo,
           label: 'Tasks',
         }
       ]
@@ -52,7 +53,7 @@ export const getAdminMenuSections = (): MenuSection[] => {
     {
       type: 'section',
       title: 'Business Tools',
-      icon: ClipboardCheck,
+      icon: ClipboardList,
       label: 'Business Tools',
       items: [
         {
@@ -62,7 +63,7 @@ export const getAdminMenuSections = (): MenuSection[] => {
         },
         {
           href: '/admin/payments',
-          icon: CreditCard,
+          icon: Wallet,
           label: 'Financials',
         },
         {
@@ -85,7 +86,7 @@ export const getAdminMenuSections = (): MenuSection[] => {
         },
         {
           href: '/changelog',
-          icon: Settings,
+          icon: ClipboardList,
           label: 'Changelog',
         }
       ]

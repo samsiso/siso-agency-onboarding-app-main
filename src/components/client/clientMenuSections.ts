@@ -1,12 +1,11 @@
 
 import {
   LayoutDashboard,
-  Folder,
-  List,
+  ListTodo,
   Clock,
-  FileText,
-  File,
-  DollarSign,
+  ClipboardList,
+  FileBox,
+  Wallet,
   User,
 } from "lucide-react";
 
@@ -20,16 +19,16 @@ export const clientMenuSections = [
   {
     type: 'section',
     title: 'Your Portal',
-    icon: Folder,
+    icon: FileBox,
     items: [
       {
         href: '/client-dashboard/projects',
-        icon: Folder,
+        icon: FileBox,
         label: 'Projects',
       },
       {
         href: '/client-dashboard/tasks',
-        icon: List,
+        icon: ListTodo,
         label: 'Todo List',
       },
       {
@@ -39,17 +38,17 @@ export const clientMenuSections = [
       },
       {
         href: '/client-dashboard/changelog',
-        icon: FileText,
+        icon: ClipboardList,
         label: 'Changelog',
       },
       {
         href: '/client-dashboard/documents',
-        icon: File,
+        icon: FileBox,
         label: 'Documents',
       },
       {
         href: '/client-dashboard/financial',
-        icon: DollarSign,
+        icon: Wallet,
         label: 'Financial',
       },
     ]

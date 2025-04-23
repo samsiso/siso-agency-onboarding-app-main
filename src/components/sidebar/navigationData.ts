@@ -1,6 +1,8 @@
+
 import { 
-  LayoutDashboard, Layout, Briefcase, Folder, CreditCard, 
-  Trophy, Users, FileText, HelpCircle, ListTodo, ClipboardList
+  LayoutDashboard, Briefcase, Folder, Wallet, 
+  Trophy, FileText, HelpCircle, ClipboardList,
+  ListTodo, Layout
 } from 'lucide-react';
 import { MenuSection } from './types';
 
@@ -37,11 +39,11 @@ export const getMenuSections = (): MenuSection[] => {
     {
       type: 'section',
       title: 'Financial Hub',
-      icon: CreditCard,
+      icon: Wallet,
       items: [
         {
           href: '/payments',
-          icon: CreditCard,
+          icon: Wallet,
           label: 'Payments & Billing',
         },
         {
