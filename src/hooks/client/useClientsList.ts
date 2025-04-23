@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { ClientData, ClientsListParams, ClientsListResponse, TodoItem } from '@/types/client.types';
@@ -72,7 +71,6 @@ export function useClientsList(params: ClientsListParams = {}): ClientsListRespo
           let parsedTodos: TodoItem[] = [];
           if (item.todos) {
             try {
-              // Ensure todos is properly formatted as TodoItem[]
               parsedTodos = Array.isArray(item.todos) 
                 ? item.todos.map((todo: any) => ({
                     id: todo.id || crypto.randomUUID(),
@@ -90,8 +88,7 @@ export function useClientsList(params: ClientsListParams = {}): ClientsListRespo
             }
           }
 
-          // Cast the database result to ClientData with proper type mapping
-          // Ensure priority property is handled correctly
+          // Do NOT try to map priority, as the field does not exist
           return {
             id: item.id,
             full_name: item.contact_name || 'Unknown',
@@ -121,7 +118,7 @@ export function useClientsList(params: ClientsListParams = {}): ClientsListRespo
             todos: parsedTodos,
             next_steps: null,
             key_research: null,
-            priority: item.priority || null,  // Add safe access with null fallback
+            priority: null,
             contact_name: item.contact_name || null,
             company_name: item.company_name || null,
           } as ClientData;

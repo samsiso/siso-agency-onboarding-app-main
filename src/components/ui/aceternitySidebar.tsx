@@ -86,9 +86,9 @@ export const DesktopSidebar = ({
   ...props
 }: React.ComponentProps<typeof motion.div>) => {
   const { open, setOpen, animate } = useSidebar();
-  
-  // Define the width as a string to avoid the type error
-  const widthStyle = animate ? (open ? "300px" : "76px") : "300px";
+
+  // Only use string/numeric widths for style prop, do not use motion values anywhere else
+  const widthStyle = { width: animate ? (open ? "300px" : "76px") : "300px", minWidth: animate ? (open ? "300px" : "76px") : "300px" };
 
   return (
     <motion.div
@@ -99,7 +99,7 @@ export const DesktopSidebar = ({
         className,
         open ? "sidebar-open" : "sidebar-collapsed"
       )}
-      style={{ width: widthStyle, minWidth: widthStyle }}
+      style={widthStyle}
       transition={{ type: "spring", stiffness: 220, damping: 26 }}
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}

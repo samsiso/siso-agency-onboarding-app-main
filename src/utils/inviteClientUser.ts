@@ -15,20 +15,21 @@ export async function inviteClientUser({
 }): Promise<{ success: boolean; message: string; }> {
   try {
     // 1. See if the user already exists in Supabase Auth
-    const { data: userCheck, error: userCheckErr } = await supabase.auth.admin.listUsers({
-      filter: `email.eq.${email}`
-    });
+    const { data: usersList, error: userListError } = await supabase.auth.admin.listUsers();
+    if (userListError) {
+      return { success: false, message: "Could not check if email already exists." };
+    }
 
     let authUserId: string | null = null;
 
-    if (userCheckErr) {
-      return { success: false, message: "Could not check if email already exists." };
+    if (usersList?.users) {
+      const foundUser = usersList.users.find((u) => u.email === email);
+      if (foundUser) {
+        authUserId = foundUser.id;
+      }
     }
     
-    if (userCheck?.users && userCheck.users.length > 0) {
-      authUserId = userCheck.users[0].id;
-      // User already exists; you may optionally handle this differently (add UI feedback)
-    } else {
+    if (!authUserId) {
       // Create the auth user
       const { data: created, error: createErr } = await supabase.auth.admin.createUser({
         email,
