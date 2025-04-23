@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { ClientSidebar } from '@/components/client/ClientSidebar';
 import { Card } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';

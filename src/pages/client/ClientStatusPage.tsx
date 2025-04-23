@@ -1,5 +1,5 @@
+
 import { useState, useEffect } from 'react';
-import { ClientSidebar } from '@/components/client/ClientSidebar';
 import { Card } from '@/components/ui/card';
 import { Timeline } from '@/components/ui/timeline';
 import { supabase } from '@/integrations/supabase/client';
