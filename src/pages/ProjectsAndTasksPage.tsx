@@ -5,6 +5,7 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { Card } from '@/components/ui/card';
 import { ProjectsList } from '@/components/projects/ProjectsList';
 import { TasksList } from '@/components/projects/TasksList';
+import { ActiveTasksView } from '@/components/projects/ActiveTasksView';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -50,9 +51,10 @@ export default function ProjectsAndTasksPage() {
             onValueChange={(value) => setActiveTab(value)}
             className="w-full"
           >
-            <TabsList className="grid w-full max-w-md grid-cols-2 mb-6">
+            <TabsList className="grid w-full max-w-md grid-cols-3 mb-6">
               <TabsTrigger value="projects">Projects</TabsTrigger>
               <TabsTrigger value="tasks">Tasks</TabsTrigger>
+              <TabsTrigger value="active">Active</TabsTrigger>
             </TabsList>
             
             <TabsContent value="projects" className="space-y-4">
@@ -61,6 +63,10 @@ export default function ProjectsAndTasksPage() {
             
             <TabsContent value="tasks" className="space-y-4">
               <TasksList />
+            </TabsContent>
+
+            <TabsContent value="active" className="space-y-4">
+              <ActiveTasksView />
             </TabsContent>
           </Tabs>
         </Card>
