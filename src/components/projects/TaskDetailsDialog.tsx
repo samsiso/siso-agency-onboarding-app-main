@@ -50,6 +50,20 @@ export function TaskDetailsDialog({ task, isOpen, onClose, onSave }: TaskDetails
     });
   };
 
+  const handleStatusChange = (status: string) => {
+    setEditedTask(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        status: {
+          name: status,
+          color: status === 'Completed' ? '#10B981' : 
+                 status === 'In Progress' ? '#F59E0B' : '#6B7280'
+        }
+      };
+    });
+  };
+
   const handlePriorityChange = (value: 'low' | 'medium' | 'high') => {
     setEditedTask(prev => {
       if (!prev) return prev;
@@ -92,6 +106,7 @@ export function TaskDetailsDialog({ task, isOpen, onClose, onSave }: TaskDetails
               <TaskDetailsTab
                 task={editedTask}
                 isEditing={isEditing}
+                onStatusChange={handleStatusChange}
                 onPriorityChange={handlePriorityChange}
                 onCategoryChange={handleInputChange}
               />

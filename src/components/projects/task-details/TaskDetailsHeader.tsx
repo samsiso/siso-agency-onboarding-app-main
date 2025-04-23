@@ -1,6 +1,6 @@
-
-import { DialogHeader, DialogTitle, DialogClose, Button } from '@/components/ui/dialog';
+import { DialogHeader, DialogTitle, DialogClose } from '@/components/ui/dialog';
 import { Edit2, Save, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 interface TaskDetailsHeaderProps {

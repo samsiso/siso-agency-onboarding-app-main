@@ -2,15 +2,17 @@
 import { TabsContent } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, CheckSquare } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 interface TaskDetailsTabProps {
   task: any;
   isEditing: boolean;
+  onStatusChange: (value: string) => void;
   onPriorityChange: (value: 'low' | 'medium' | 'high') => void;
   onCategoryChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
@@ -18,6 +20,7 @@ interface TaskDetailsTabProps {
 export function TaskDetailsTab({
   task,
   isEditing,
+  onStatusChange,
   onPriorityChange,
   onCategoryChange
 }: TaskDetailsTabProps) {
@@ -36,15 +39,30 @@ export function TaskDetailsTab({
         <div className="space-y-6">
           <div className="space-y-2">
             <label className="text-sm text-gray-400">Status</label>
-            <Badge 
-              className="bg-opacity-20"
-              style={{ 
-                backgroundColor: `${task.status?.color}20`, 
-                color: task.status?.color 
-              }}
-            >
-              {task.status?.name || "To Do"}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Button 
+                variant={task.status?.name === 'To Do' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => onStatusChange('To Do')}
+              >
+                To Do
+              </Button>
+              <Button 
+                variant={task.status?.name === 'In Progress' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => onStatusChange('In Progress')}
+              >
+                In Progress
+              </Button>
+              <Button 
+                variant={task.status?.name === 'Completed' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => onStatusChange('Completed')}
+              >
+                <CheckSquare className="h-4 w-4 mr-1" />
+                Completed
+              </Button>
+            </div>
           </div>
 
           <div className="space-y-2">
