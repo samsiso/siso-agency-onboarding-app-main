@@ -39,6 +39,28 @@ export function useClientDetails(specificClientId: string | null = null) {
           setError(new Error(error.message));
           setClientData(null);
         } else {
+          // Parse todos if they exist
+          let parsedTodos: TodoItem[] = [];
+          if (data.todos) {
+            try {
+              // Ensure todos is properly formatted as TodoItem[]
+              parsedTodos = Array.isArray(data.todos) 
+                ? data.todos.map((item: any) => ({
+                    id: item.id || crypto.randomUUID(),
+                    text: item.text || '',
+                    completed: Boolean(item.completed),
+                    priority: item.priority || 'medium',
+                    due_date: item.due_date,
+                    related_to: item.related_to,
+                    assigned_to: item.assigned_to,
+                  }))
+                : [];
+            } catch (err) {
+              console.warn('Error parsing todos:', err);
+              parsedTodos = [];
+            }
+          }
+
           // Transform database result to match ClientData type
           const processedData: ClientData = {
             id: data.id,
@@ -66,7 +88,7 @@ export function useClientDetails(specificClientId: string | null = null) {
             initial_contact_date: null,
             start_date: null,
             estimated_completion_date: null,
-            todos: Array.isArray(data.todos) ? data.todos : [],
+            todos: parsedTodos,
             next_steps: null,
             key_research: null,
             priority: null
@@ -95,9 +117,12 @@ export function useClientDetails(specificClientId: string | null = null) {
     
     setIsUpdating(true);
     try {
+      // Convert TodoItem[] to a JSON structure the database expects
       const { error } = await supabase
         .from('client_onboarding')
-        .update({ todos })
+        .update({ 
+          todos: JSON.parse(JSON.stringify(todos)) // Ensure proper JSON serialization 
+        })
         .eq('id', targetClientId);
       
       if (error) throw error;
@@ -156,12 +181,11 @@ export function useClientDetails(specificClientId: string | null = null) {
 
   return {
     clientData,
-    client: clientData, // Alias for backward compatibility
     loading,
-    isLoading: loading, // Alias for backward compatibility
     error,
     updateTodos,
     updateClient,
-    isUpdating
+    isUpdating,
+    isLoading: loading, // Add alias for backward compatibility
   };
 }

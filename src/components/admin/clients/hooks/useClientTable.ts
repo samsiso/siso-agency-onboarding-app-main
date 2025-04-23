@@ -1,3 +1,4 @@
+
 import { useState, useRef, useCallback } from 'react';
 import { ClientData, ClientViewPreference } from '@/types/client.types';
 import { useClientsList } from '@/hooks/client';
@@ -76,7 +77,7 @@ export const useClientTable = (
         description: `Updated ${field} for this client.`
       });
       
-      refetch();
+      refetch().catch(console.error);
     } catch (error: any) {
       console.error('Error saving edit:', error);
       toast({
@@ -107,7 +108,7 @@ export const useClientTable = (
         });
         
         setSelectedClients([]);
-        refetch();
+        refetch().catch(console.error);
       } catch (error: any) {
         console.error('Error deleting clients:', error);
         toast({

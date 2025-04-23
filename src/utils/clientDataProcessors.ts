@@ -1,6 +1,5 @@
 
 import { ClientData } from '@/types/client.types';
-import { safePropertyAccess } from '@/utils/errorSuppressions';
 
 /**
  * Process client detail data from the API response to ClientData format
@@ -86,12 +85,14 @@ export function createDefaultClientData(clientId: string): ClientData {
   };
 }
 
-// Add the error suppression utility if it doesn't exist
-export const safePropertyAccess = (obj: any, path: string, defaultValue: any): any => {
+/**
+ * Safe property access utility function
+ */
+export function safePropertyAccess(obj: any, path: string, defaultValue: any): any {
   try {
     if (!obj) return defaultValue;
     return obj[path] !== undefined ? obj[path] : defaultValue;
   } catch (error) {
     return defaultValue;
   }
-};
+}

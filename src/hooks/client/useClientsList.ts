@@ -1,16 +1,15 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { ClientData, ClientsListParams, ClientsListResponse } from '@/types/client.types';
+import { ClientData, ClientsListParams, ClientsListResponse, TodoItem } from '@/types/client.types';
 import { useAdminCheck } from '@/hooks/useAdminCheck';
-import { processClientDetail, createDefaultClientData } from '@/utils/clientDataProcessors';
 
 /**
  * Hook to fetch a list of all clients (admin only)
  */
 export function useClientsList(params: ClientsListParams = {}): ClientsListResponse & { 
   isLoading: boolean;
-  refetch: () => void;
+  refetch: () => Promise<void>;
 } {
   const { isAdmin, isLoading: adminCheckLoading } = useAdminCheck();
   const [clients, setClients] = useState<ClientData[]>([]);
@@ -27,7 +26,7 @@ export function useClientsList(params: ClientsListParams = {}): ClientsListRespo
     pageSize = 10
   } = params;
 
-  const fetchClients = async () => {
+  const fetchClients = async (): Promise<void> => {
     if (!isAdmin) {
       setClients([]);
       setTotalCount(0);
@@ -70,7 +69,29 @@ export function useClientsList(params: ClientsListParams = {}): ClientsListRespo
         setTotalCount(0);
       } else {
         // Process data to match ClientData type
-        const processedClients = data.map(item => {
+        const processedClients: ClientData[] = data.map(item => {
+          // Parse todos if they exist
+          let parsedTodos: TodoItem[] = [];
+          if (item.todos) {
+            try {
+              // Ensure todos is properly formatted as TodoItem[]
+              parsedTodos = Array.isArray(item.todos) 
+                ? item.todos.map((todo: any) => ({
+                    id: todo.id || crypto.randomUUID(),
+                    text: todo.text || '',
+                    completed: Boolean(todo.completed),
+                    priority: todo.priority || 'medium',
+                    due_date: todo.due_date,
+                    related_to: todo.related_to,
+                    assigned_to: todo.assigned_to,
+                  }))
+                : [];
+            } catch (err) {
+              console.warn('Error parsing todos for client:', item.id, err);
+              parsedTodos = [];
+            }
+          }
+
           // Cast the database result to ClientData with proper type mapping
           return {
             id: item.id,
@@ -98,7 +119,7 @@ export function useClientsList(params: ClientsListParams = {}): ClientsListRespo
             initial_contact_date: null,
             start_date: null,
             estimated_completion_date: null,
-            todos: Array.isArray(item.todos) ? item.todos : [],
+            todos: parsedTodos,
             next_steps: null,
             key_research: null,
             priority: null
@@ -137,9 +158,8 @@ export function useClientsList(params: ClientsListParams = {}): ClientsListRespo
   return {
     clients,
     totalCount,
-    loading: loading || adminCheckLoading,
-    error,
     isLoading: loading || adminCheckLoading,
+    error,
     refetch: fetchClients
   };
 }

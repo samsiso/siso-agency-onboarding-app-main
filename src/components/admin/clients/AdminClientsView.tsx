@@ -49,6 +49,7 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
     sortDirection: viewPreference.sortDirection,
     pageSize: 1000,
   });
+  
   const statsTotalClients = clients.length;
   const statsProjectValue = useMemo(
     () => clients.reduce((acc, curr) => acc + (curr.estimated_price || 0), 0),
@@ -79,7 +80,7 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
         viewPreference={viewPreference}
         onViewPreferenceChange={handleViewPreferenceChange}
         onAddClient={() => {}}
-        onRefetch={refetch}
+        onRefetch={() => { refetch().catch(console.error); }}
         viewMode={viewMode}
         setViewMode={setViewMode}
       />

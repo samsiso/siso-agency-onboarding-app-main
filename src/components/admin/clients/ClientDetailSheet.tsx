@@ -99,34 +99,34 @@ export function ClientDetailSheet({ clientId, isOpen, onClose }: ClientDetailShe
             </div>
             
             <div className="space-y-2 mb-6">
-              {client.project_name && (
+              {clientData.project_name && (
                 <div>
                   <span className="text-sm font-medium">Project:</span>{' '}
-                  <span className="text-sm">{client.project_name}</span>
+                  <span className="text-sm">{clientData.project_name}</span>
                 </div>
               )}
-              {client.company_niche && (
+              {clientData.company_niche && (
                 <div>
                   <span className="text-sm font-medium">Industry:</span>{' '}
-                  <span className="text-sm">{client.company_niche}</span>
+                  <span className="text-sm">{clientData.company_niche}</span>
                 </div>
               )}
-              {client.website_url && (
+              {clientData.website_url && (
                 <div>
                   <span className="text-sm font-medium">Website:</span>{' '}
                   <a 
-                    href={client.website_url} 
+                    href={clientData.website_url} 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-sm text-blue-600 hover:underline"
                   >
-                    {client.website_url}
+                    {clientData.website_url}
                   </a>
                 </div>
               )}
               <div>
                 <span className="text-sm font-medium">Client Since:</span>{' '}
-                <span className="text-sm">{new Date(client.created_at).toLocaleDateString()}</span>
+                <span className="text-sm">{new Date(clientData.created_at).toLocaleDateString()}</span>
               </div>
             </div>
             
@@ -147,24 +147,24 @@ export function ClientDetailSheet({ clientId, isOpen, onClose }: ClientDetailShe
                     <div className="border rounded p-3">
                       <div className="text-sm text-muted-foreground">Onboarding</div>
                       <div className="text-2xl font-semibold mt-1">
-                        {client.current_step || 0}/{client.total_steps || 5}
+                        {clientData.current_step || 0}/{clientData.total_steps || 5}
                       </div>
                     </div>
                     
                     <div className="border rounded p-3">
                       <div className="text-sm text-muted-foreground">Completion</div>
                       <div className="text-2xl font-semibold mt-1">
-                        {Math.round((client.current_step / (client.total_steps || 5)) * 100)}%
+                        {Math.round((clientData.current_step / (clientData.total_steps || 5)) * 100)}%
                       </div>
                     </div>
                   </div>
                 </div>
                 
-                {client.notion_plan_url && (
+                {clientData.notion_plan_url && (
                   <div>
                     <h3 className="text-lg font-medium mb-2">Project Plan</h3>
                     <a 
-                      href={client.notion_plan_url} 
+                      href={clientData.notion_plan_url} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="flex items-center gap-2 p-3 border rounded hover:bg-muted/50"
@@ -195,8 +195,8 @@ export function ClientDetailSheet({ clientId, isOpen, onClose }: ClientDetailShe
               <TabsContent value="tasks">
                 <h3 className="text-lg font-medium mb-4">Tasks & To-Do Items</h3>
                 <TodoList 
-                  todos={client.todos || []} 
-                  clientId={client.id}
+                  todos={clientData.todos || []} 
+                  clientId={clientData.id}
                   onUpdate={(todos) => updateTodos(todos)}
                   disabled={isUpdating}
                 />
@@ -205,9 +205,9 @@ export function ClientDetailSheet({ clientId, isOpen, onClose }: ClientDetailShe
               <TabsContent value="documents">
                 <h3 className="text-lg font-medium mb-4">Documents & Links</h3>
                 <div className="space-y-2">
-                  {client.notion_plan_url && (
+                  {clientData.notion_plan_url && (
                     <a 
-                      href={client.notion_plan_url} 
+                      href={clientData.notion_plan_url} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="flex items-center gap-3 p-3 border rounded hover:bg-muted/50"
@@ -222,9 +222,9 @@ export function ClientDetailSheet({ clientId, isOpen, onClose }: ClientDetailShe
                     </a>
                   )}
                   
-                  {client.website_url && (
+                  {clientData.website_url && (
                     <a 
-                      href={client.website_url} 
+                      href={clientData.website_url} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="flex items-center gap-3 p-3 border rounded hover:bg-muted/50"
@@ -234,9 +234,9 @@ export function ClientDetailSheet({ clientId, isOpen, onClose }: ClientDetailShe
                     </a>
                   )}
                   
-                  {client.development_url && (
+                  {clientData.development_url && (
                     <a 
-                      href={client.development_url} 
+                      href={clientData.development_url} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="flex items-center gap-3 p-3 border rounded hover:bg-muted/50"

@@ -1,3 +1,4 @@
+
 import React, { useState, createContext, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
@@ -86,7 +87,7 @@ export const DesktopSidebar = ({
 }: React.ComponentProps<typeof motion.div>) => {
   const { open, setOpen, animate } = useSidebar();
   
-  // Calculate width values based on state instead of using in animate prop
+  // Calculate width values based on state
   const width = animate ? (open ? 300 : 76) : 300;
   const minWidth = animate ? (open ? 300 : 76) : 300;
 
@@ -99,7 +100,7 @@ export const DesktopSidebar = ({
         className,
         open ? "sidebar-open" : "sidebar-collapsed"
       )}
-      style={{ width, minWidth }} // Apply directly to style prop instead
+      style={{ width, minWidth }}
       transition={{ type: "spring", stiffness: 220, damping: 26 }}
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
@@ -168,6 +169,22 @@ export const SidebarLink = ({
   className?: string;
 } & Partial<LinkProps>) => {
   const { open, animate } = useSidebar();
+  // Calculate link styles based on state
+  const linkStyles = open
+    ? {
+        minHeight: 48,
+        paddingLeft: active ? 16 : 12,
+        fontWeight: active ? 600 : 500,
+        color: active ? "#FFA726" : "",
+        borderLeft: active ? "4px solid #FFA726" : "4px solid transparent",
+        boxShadow: active
+          ? "0 0 14px 1px rgba(255,167,38,0.12)"
+          : undefined,
+      }
+    : {
+        minHeight: 48,
+      };
+  
   // Left bar highlight, glowing if active
   return (
     <Link
@@ -180,22 +197,7 @@ export const SidebarLink = ({
         className,
         open ? "justify-start" : "justify-center"
       )}
-      style={
-        open
-          ? {
-              minHeight: 48,
-              paddingLeft: active ? 16 : 12,
-              fontWeight: active ? 600 : 500,
-              color: active ? "#FFA726" : "",
-              borderLeft: active ? "4px solid #FFA726" : "4px solid transparent",
-              boxShadow: active
-                ? "0 0 14px 1px rgba(255,167,38,0.12)"
-                : undefined,
-            }
-          : {
-              minHeight: 48,
-            }
-      }
+      style={linkStyles}
       {...props}
     >
       <span
