@@ -177,19 +177,30 @@ export default function ClientDashboard() {
           <img
             src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png"
             alt="Client Portal"
-            className="w-20 h-20 rounded border border-slate-200"
+            className="w-20 h-20 rounded border border-gray-700"
           />
-          <h1 className="font-bold text-2xl text-slate-800 mt-2">Welcome to your Client Portal</h1>
-          <Card className="p-6 bg-white/90 border border-slate-200 flex flex-col items-center gap-2">
-            <p className="text-md text-slate-700 mb-2">
+          <h1 className="font-bold text-2xl text-white mt-2">Welcome to your Client Portal</h1>
+          <div className="p-8 w-full bg-[#1A1A1A] border border-gray-800 rounded-lg flex flex-col items-center gap-2">
+            <p className="text-md text-gray-300 mb-2 text-center">
               We couldn't find a client profile linked to your login.<br />
               If you believe this is an error, please contact your project manager or support.
             </p>
             <div className="flex gap-2 flex-wrap w-full">
-              <Button onClick={() => navigate("/client-portal")} variant="outline" className="w-full">Return to Login</Button>
-              <Button onClick={() => navigate("/client-dashboard/support")} className="w-full">Contact Support</Button>
+              <Button
+                onClick={() => navigate("/client-portal")}
+                variant="outline"
+                className="w-full bg-gray-800 text-white hover:bg-gray-700 border-gray-700"
+              >
+                Return to Login
+              </Button>
+              <Button
+                onClick={() => navigate("/client-dashboard/support")}
+                className="w-full bg-red-500 text-white hover:bg-red-600"
+              >
+                Contact Support
+              </Button>
             </div>
-          </Card>
+          </div>
         </div>
       </ClientDashboardLayout>
     );
