@@ -45,6 +45,7 @@ import ProjectDetailsPage from './pages/ProjectDetailsPage';
 import PaymentsPage from './pages/financial/PaymentsPage';
 import LeaderboardsPage from './pages/financial/LeaderboardsPage';
 import FinancialProfilePage from './pages/financial/FinancialProfilePage';
+import PlanBuilder from './pages/PlanBuilder';
 
 function App() {
   return (
@@ -83,6 +84,7 @@ function App() {
         {/* Protected Dashboard Routes */}
         <Route path="/home" element={<AuthGuard><Home /></AuthGuard>} />
         <Route path="/dashboard" element={<AuthGuard><Home /></AuthGuard>} />
+        <Route path="/plan-builder" element={<AuthGuard><PlanBuilder /></AuthGuard>} />
         
         {/* Protected Project Routes */}
         <Route path="/projects" element={<AuthGuard><ProjectsAndTasksPage /></AuthGuard>} />
