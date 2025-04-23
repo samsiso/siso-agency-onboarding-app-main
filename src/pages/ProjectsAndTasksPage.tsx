@@ -101,7 +101,7 @@ export default function ProjectsAndTasksPage() {
             <p className="text-siso-text">
               {isTasksView 
                 ? "View and manage tasks across all your projects"
-                : "Manage your application projects and related tasks in one place"
+                : "Manage your blockchain application projects and related tasks in one place"
               }
             </p>
           </div>
@@ -123,10 +123,8 @@ export default function ProjectsAndTasksPage() {
           <div className="space-y-8">
             <Card className="p-6 bg-black/30 border border-siso-text/10">
               {isLoading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {[...Array(3)].map((_, i) => (
-                    <div key={i} className="h-64 animate-pulse bg-black/20 rounded-lg" />
-                  ))}
+                <div className="animate-pulse space-y-8">
+                  <div className="h-64 bg-black/20 rounded-lg" />
                 </div>
               ) : error ? (
                 <div className="flex flex-col items-center justify-center p-8 text-center">
@@ -145,40 +143,25 @@ export default function ProjectsAndTasksPage() {
                   </Button>
                 </div>
               ) : projects && projects.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="space-y-6">
                   {projects.map(project => (
                     <ProjectDirectoryCard
                       key={project.id}
                       name={project.name}
                       logo={project.logo}
                       description={project.description}
+                      created_at={project.created_at}
+                      status={project.status}
                       onSelect={() => navigate(`/plan/${project.id}`)}
                     />
                   ))}
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div>
                   <ProjectDirectoryCard />
                 </div>
               )}
             </Card>
-
-            <div className="text-center p-8 bg-black/30 border border-siso-text/10 rounded-lg animate-fade-in">
-              <h3 className="text-xl font-semibold text-white mb-3">
-                Discover More Projects
-              </h3>
-              <p className="text-siso-text mb-4">
-                Explore other successful projects in our community leaderboard
-              </p>
-              <Button
-                onClick={() => navigate('/leaderboard')}
-                variant="outline"
-                className="border-siso-orange/30 text-siso-orange hover:bg-siso-orange/10"
-              >
-                <ExternalLink className="w-4 h-4 mr-2" />
-                View Leaderboard
-              </Button>
-            </div>
           </div>
         )}
       </div>
