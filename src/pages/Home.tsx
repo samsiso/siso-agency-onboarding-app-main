@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
@@ -300,6 +299,15 @@ export default function Home() {
           <div className="text-sm text-gray-500 mb-4">Admin features not available for your account.</div>
         )}
       </div>
+
+      <div className="container mx-auto px-4 pb-12">
+        {/* HELP CENTER SECTION */}
+        <section>
+          <DashboardHelpCenter />
+        </section>
+      </div>
     </DashboardLayout>
   );
 }
+
+import { DashboardHelpCenter } from "@/components/dashboard/DashboardHelpCenter";

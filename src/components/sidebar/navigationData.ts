@@ -1,6 +1,6 @@
 
 import { 
-  Home, Layout, Briefcase, Folder, CreditCard, 
+  LayoutDashboard, Layout, Briefcase, Folder, CreditCard, 
   Trophy, Users, HelpCircle
 } from 'lucide-react';
 import { MenuSection } from './types';
@@ -10,7 +10,7 @@ export const getMenuSections = (): MenuSection[] => {
     {
       type: 'main',
       href: '/home',
-      icon: Home,
+      icon: LayoutDashboard,
       label: 'Dashboard',
     },
     {
