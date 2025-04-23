@@ -1,5 +1,10 @@
-
 import { supabase } from "@/integrations/supabase/client";
+
+type SupabaseUser = {
+  id: string;
+  email?: string;
+  // ... other properties can be added as needed
+};
 
 /**
  * Creates a Supabase auth user (if not exists), links the user to the client in client_user_auth, and returns result.
@@ -23,9 +28,9 @@ export async function inviteClientUser({
     let authUserId: string | null = null;
 
     if (usersList?.users) {
-      // The type of usersList.users is User[], where User has an email property
-      // Using find() to look for a user with matching email
-      const foundUser = usersList.users.find(user => user.email === email);
+      // Explicitly cast usersList.users for TypeScript safety
+      const users = usersList.users as SupabaseUser[];
+      const foundUser = users.find(user => user.email === email);
       if (foundUser) {
         authUserId = foundUser.id;
       }

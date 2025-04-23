@@ -86,11 +86,11 @@ export const DesktopSidebar = ({
 }: React.ComponentProps<typeof motion.div>) => {
   const { open, setOpen, animate } = useSidebar();
 
-  // Fix the TypeScript error by using a properly typed style object
-  const width = animate ? (open ? "300px" : "76px") : "300px";
-  const widthStyle = {
+  // Set up correct types for the style prop
+  const width: string = animate ? (open ? "300px" : "76px") : "300px";
+  const widthStyle: React.CSSProperties = {
     width,
-    minWidth: width
+    minWidth: width,
   };
 
   return (
