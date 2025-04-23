@@ -5,6 +5,7 @@ import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link, LinkProps } from "react-router-dom";
 
+/* --- Sidebar Types --- */
 interface Links {
   label: string;
   href: string;
@@ -70,8 +71,7 @@ export const SidebarBody = (props: React.ComponentProps<typeof motion.div>) => {
   return (
     <>
       <DesktopSidebar {...props} />
-      {/* Fix: Remove the props spreading to MobileSidebar to avoid type issues */}
-      <MobileSidebar className={props.className} />
+      <MobileSidebar className={props.className}>{props.children}</MobileSidebar>
     </>
   );
 };
@@ -85,12 +85,17 @@ export const DesktopSidebar = ({
   return (
     <motion.div
       className={cn(
-        "h-full px-4 py-4 hidden md:flex md:flex-col bg-neutral-100 dark:bg-neutral-800 w-[300px] flex-shrink-0",
-        className
+        // Glass + shadow + border for glassmorphism
+        "h-full hidden md:flex md:flex-col bg-[#18141e]/80 backdrop-blur-md border-r border-siso-border shadow-xl transition-all",
+        "w-[300px] flex-shrink-0 px-3 py-6 relative z-10",
+        className,
+        open ? "sidebar-open" : "sidebar-collapsed"
       )}
       animate={{
-        width: animate ? (open ? "300px" : "60px") : "300px",
+        width: animate ? (open ? 300 : 76) : 300,
+        minWidth: animate ? (open ? 300 : 76) : 300,
       }}
+      transition={{ type: "spring", stiffness: 220, damping: 26 }}
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
       {...props}
@@ -111,12 +116,12 @@ export const MobileSidebar = ({
   return (
     <div
       className={cn(
-        "h-10 px-4 py-4 flex flex-row md:hidden items-center justify-between bg-neutral-100 dark:bg-neutral-800 w-full"
+        "h-10 px-4 py-4 flex flex-row md:hidden items-center justify-between bg-[#18141e]/90 backdrop-blur-md w-full z-20 border-b border-siso-border"
       )}
     >
       <div className="flex justify-end z-20 w-full">
         <Menu
-          className="text-neutral-800 dark:text-neutral-200 cursor-pointer"
+          className="text-neutral-200 cursor-pointer"
           onClick={() => setOpen(!open)}
         />
       </div>
@@ -131,12 +136,11 @@ export const MobileSidebar = ({
               ease: "easeInOut",
             }}
             className={cn(
-              "fixed h-full w-full inset-0 bg-white dark:bg-neutral-900 p-10 z-[100] flex flex-col justify-between",
-              className
+              "fixed h-full w-full inset-0 bg-[#18141e] dark:bg-[#18141e] backdrop-blur-xl p-8 z-[100] flex flex-col justify-between"
             )}
           >
             <div
-              className="absolute right-10 top-10 z-50 text-neutral-800 dark:text-neutral-200 cursor-pointer"
+              className="absolute right-8 top-8 z-50 text-white cursor-pointer"
               onClick={() => setOpen(!open)}
             >
               <X />
@@ -149,34 +153,70 @@ export const MobileSidebar = ({
   );
 };
 
+/* SidebarLink with orange left bar for active */
 export const SidebarLink = ({
   link,
+  active,
   className,
   ...props
 }: {
   link: Links;
+  active?: boolean;
   className?: string;
 } & Partial<LinkProps>) => {
   const { open, animate } = useSidebar();
+  // Left bar highlight, glowing if active
   return (
     <Link
       to={link.href}
       className={cn(
-        "flex items-center justify-start gap-2 group/sidebar py-2 px-2 rounded transition-all cursor-pointer",
-        className
+        "group/sidebar flex items-center gap-3 rounded-xl px-3 py-3 mb-1 transition-all cursor-pointer relative font-medium",
+        active
+          ? "bg-orange-500/10 shadow-[0_2px_10px_0_rgba(255,166,38,0.07)]"
+          : "hover:bg-siso-orange/5 hover:text-siso-orange",
+        className,
+        open ? "justify-start" : "justify-center"
       )}
+      style={
+        open
+          ? {
+              minHeight: 48,
+              paddingLeft: active ? 16 : 12,
+              fontWeight: active ? 600 : 500,
+              color: active ? "#FFA726" : "",
+              borderLeft: active ? "4px solid #FFA726" : "4px solid transparent",
+              boxShadow: active
+                ? "0 0 14px 1px rgba(255,167,38,0.12)"
+                : undefined,
+            }
+          : {
+              minHeight: 48,
+            }
+      }
       {...props}
     >
-      {link.icon}
+      <span
+        className={cn(
+          open
+            ? ""
+            : "flex items-center justify-center w-full",
+          "transition-colors"
+        )}
+      >
+        {link.icon}
+      </span>
       <motion.span
         animate={{
           display: animate ? (open ? "inline-block" : "none") : "inline-block",
           opacity: animate ? (open ? 1 : 0) : 1,
         }}
-        className="text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
+        className={cn(
+          "text-siso-text text-base transition-all duration-200 whitespace-pre ml-1"
+        )}
       >
         {link.label}
       </motion.span>
     </Link>
   );
 };
+
