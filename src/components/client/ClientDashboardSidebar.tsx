@@ -4,7 +4,6 @@ import {
   Sidebar,
   SidebarBody,
   SidebarLink,
-  SidebarLogo,
 } from "@/components/ui/aceternitySidebar";
 import {
   LayoutDashboard,
@@ -19,12 +18,13 @@ import {
   DollarSign,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 export function ClientDashboardSidebar() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
-  // These routes must match your client dashboard structure!
   const mainLinks = [
     {
       label: "Dashboard",
@@ -81,14 +81,60 @@ export function ClientDashboardSidebar() {
       icon: (
         <UserCog className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
-    }
+    },
   ];
+
+  // Sidebar logo components (show label on expanded)
+  const Logo = () => (
+    <a
+      href="/client-dashboard"
+      onClick={e => {
+        e.preventDefault();
+        navigate("/client-dashboard");
+      }}
+      className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20"
+      aria-label="Client Dashboard Home"
+    >
+      <img
+        src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png"
+        className="h-7 w-7 flex-shrink-0 rounded border"
+        alt="Logo"
+      />
+      {open && (
+        <motion.span
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="font-semibold text-black dark:text-white whitespace-pre"
+        >
+          Client Portal
+        </motion.span>
+      )}
+    </a>
+  );
+
+  const LogoIcon = () => (
+    <a
+      href="/client-dashboard"
+      onClick={e => {
+        e.preventDefault();
+        navigate("/client-dashboard");
+      }}
+      className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20"
+      aria-label="Client Dashboard Home"
+    >
+      <img
+        src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png"
+        className="h-7 w-7 flex-shrink-0 rounded border"
+        alt="Logo"
+      />
+    </a>
+  );
 
   return (
     <Sidebar open={open} setOpen={setOpen}>
       <SidebarBody className="justify-between gap-10">
         <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-          <SidebarLogo expanded={open} />
+          {open ? <Logo /> : <LogoIcon />}
           <div className="mt-8 flex flex-col gap-2">
             {mainLinks.map((link, idx) => (
               <SidebarLink key={idx} link={link} />

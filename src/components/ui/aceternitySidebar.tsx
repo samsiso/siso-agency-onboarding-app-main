@@ -1,9 +1,9 @@
 
-import { cn } from "@/lib/utils";
-import { Link, useLocation } from "react-router-dom";
 import React, { useState, createContext, useContext } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { LayoutDashboard, UserCog, Settings, LogOut, Menu, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Link, LinkProps } from "react-router-dom";
 
 interface Links {
   label: string;
@@ -39,10 +39,8 @@ export const SidebarProvider = ({
   animate?: boolean;
 }) => {
   const [openState, setOpenState] = useState(false);
-
   const open = openProp !== undefined ? openProp : openState;
   const setOpen = setOpenProp !== undefined ? setOpenProp : setOpenState;
-
   return (
     <SidebarContext.Provider value={{ open, setOpen, animate }}>
       {children}
@@ -86,11 +84,11 @@ export const DesktopSidebar = ({
   return (
     <motion.div
       className={cn(
-        "h-full px-4 py-4 hidden md:flex md:flex-col bg-neutral-100 dark:bg-neutral-800 w-[260px] flex-shrink-0 transition-all",
+        "h-full px-4 py-4 hidden md:flex md:flex-col bg-neutral-100 dark:bg-neutral-800 w-[300px] flex-shrink-0",
         className
       )}
       animate={{
-        width: animate ? (open ? "260px" : "60px") : "260px",
+        width: animate ? (open ? "300px" : "60px") : "300px",
       }}
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
@@ -149,28 +147,23 @@ export const MobileSidebar = ({
   );
 };
 
-interface SidebarLinkProps {
-  link: Links;
-  className?: string;
-}
-
 export const SidebarLink = ({
   link,
   className,
-}: SidebarLinkProps) => {
+  ...props
+}: {
+  link: Links;
+  className?: string;
+} & Partial<LinkProps>) => {
   const { open, animate } = useSidebar();
-  const location = useLocation();
-  const isActive = link.href === location.pathname;
   return (
     <Link
       to={link.href}
       className={cn(
         "flex items-center justify-start gap-2 group/sidebar py-2 px-2 rounded transition-all cursor-pointer",
-        isActive
-          ? "bg-neutral-200 dark:bg-neutral-700 font-semibold"
-          : "hover:bg-neutral-100 dark:hover:bg-neutral-700",
         className
       )}
+      {...props}
     >
       {link.icon}
       <motion.span
@@ -185,26 +178,3 @@ export const SidebarLink = ({
     </Link>
   );
 };
-
-export const SidebarLogo = ({ expanded }: { expanded: boolean }) => (
-  <Link
-    to="/client-dashboard"
-    className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20"
-    aria-label="Client Dashboard Home"
-  >
-    <img
-      src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png"
-      className="h-7 w-7 flex-shrink-0 rounded border"
-      alt="Logo"
-    />
-    {expanded && (
-      <motion.span
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="font-semibold text-black dark:text-white whitespace-pre"
-      >
-        Client Portal
-      </motion.span>
-    )}
-  </Link>
-);
