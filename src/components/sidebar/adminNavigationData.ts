@@ -1,8 +1,9 @@
 
 import { 
   LayoutDashboard, Users, MessageSquare, UserCheck,
-  ListTodo, CalendarClock, Wallet, Settings,
-  ClipboardList
+  ListTodo, CalendarClock, CreditCard, Settings,
+  ClipboardList, Building2, UserCog, FileText,
+  ScrollText
 } from 'lucide-react';
 import { MenuSection } from './types';
 
@@ -18,11 +19,10 @@ export const getAdminMenuSections = (): MenuSection[] => {
       type: 'section',
       title: 'Client Management',
       icon: Users,
-      label: 'Client Management',
       items: [
         {
           href: '/admin/clients',
-          icon: Users,
+          icon: Building2,
           label: 'Clients',
         },
         {
@@ -36,11 +36,10 @@ export const getAdminMenuSections = (): MenuSection[] => {
       type: 'section',
       title: 'Team Operations',
       icon: UserCheck,
-      label: 'Team Operations',
       items: [
         {
           href: '/admin/teams',
-          icon: UserCheck,
+          icon: UserCog,
           label: 'Teams',
         },
         {
@@ -53,8 +52,7 @@ export const getAdminMenuSections = (): MenuSection[] => {
     {
       type: 'section',
       title: 'Business Tools',
-      icon: ClipboardList,
-      label: 'Business Tools',
+      icon: ScrollText,
       items: [
         {
           href: '/admin/daily-planner',
@@ -63,12 +61,12 @@ export const getAdminMenuSections = (): MenuSection[] => {
         },
         {
           href: '/admin/payments',
-          icon: Wallet,
+          icon: CreditCard,
           label: 'Financials',
         },
         {
           href: '/admin/templates',
-          icon: UserCheck,
+          icon: FileText,
           label: 'Templates',
         }
       ]
@@ -77,7 +75,6 @@ export const getAdminMenuSections = (): MenuSection[] => {
       type: 'section',
       title: 'System',
       icon: Settings,
-      label: 'System',
       items: [
         {
           href: '/admin/settings',

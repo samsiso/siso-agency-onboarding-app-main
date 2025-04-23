@@ -4,7 +4,7 @@ import {
   ListTodo,
   Clock,
   ClipboardList,
-  FileBox,
+  ScrollText,
   Wallet,
   User,
 } from "lucide-react";
@@ -19,11 +19,11 @@ export const clientMenuSections = [
   {
     type: 'section',
     title: 'Your Portal',
-    icon: FileBox,
+    icon: ScrollText,
     items: [
       {
         href: '/client-dashboard/projects',
-        icon: FileBox,
+        icon: Briefcase,
         label: 'Projects',
       },
       {
@@ -43,7 +43,7 @@ export const clientMenuSections = [
       },
       {
         href: '/client-dashboard/documents',
-        icon: FileBox,
+        icon: FileText,
         label: 'Documents',
       },
       {

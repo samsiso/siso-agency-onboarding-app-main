@@ -1,8 +1,8 @@
 
 import { 
-  LayoutDashboard, Briefcase, Folder, Wallet, 
+  LayoutDashboard, Briefcase, ScrollText, Wallet, 
   Trophy, FileText, HelpCircle, ClipboardList,
-  ListTodo, Layout
+  ListTodo, Layout, BookOpen
 } from 'lucide-react';
 import { MenuSection } from './types';
 
@@ -21,7 +21,7 @@ export const getMenuSections = (): MenuSection[] => {
       items: [
         {
           href: '/projects',
-          icon: Folder,
+          icon: ScrollText,
           label: 'All Projects',
         },
         {
@@ -56,7 +56,7 @@ export const getMenuSections = (): MenuSection[] => {
     {
       type: 'section',
       title: 'Resources & Support',
-      icon: FileText,
+      icon: BookOpen,
       items: [
         {
           href: '/resources/documents',
