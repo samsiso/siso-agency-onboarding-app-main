@@ -111,7 +111,7 @@ export function ActiveTasksView() {
                       className="bg-transparent shadow-none p-0"
                     >
                       <TaskCard
-                        title={task.name}
+                        name={task.name}
                         startAt={task.startAt}
                         endAt={task.endAt}
                         category={task.category}

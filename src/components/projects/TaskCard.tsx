@@ -1,3 +1,4 @@
+
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -10,7 +11,7 @@ import {
 import { format } from 'date-fns';
 
 interface TaskCardProps {
-  title: string;
+  name: string;  // Changed from title to name
   startAt: Date;
   endAt: Date;
   category: string;
@@ -28,7 +29,7 @@ const priorityColors = {
   high: 'bg-red-500/20 text-red-400',
 };
 
-export function TaskCard({ title, startAt, endAt, category, owner, priority, onClick }: TaskCardProps) {
+export function TaskCard({ name, startAt, endAt, category, owner, priority, onClick }: TaskCardProps) {
   return (
     <div 
       onClick={onClick}
@@ -36,7 +37,7 @@ export function TaskCard({ title, startAt, endAt, category, owner, priority, onC
     >
       <div className="flex items-start justify-between">
         <div className="flex flex-col gap-1">
-          <h3 className="text-sm font-medium text-gray-200">{title}</h3>
+          <h3 className="text-sm font-medium text-gray-200">{name}</h3>
           <Badge 
             variant="outline" 
             className={cn(
