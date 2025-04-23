@@ -1,5 +1,4 @@
-
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Index from './pages/Index';
 import Auth from './pages/Auth';
 import Profile from './pages/Profile';
@@ -101,12 +100,12 @@ function App() {
         <Route path="/economy/earn" element={<AuthGuard><HowToEarn /></AuthGuard>} />
         <Route path="/economy/leaderboards" element={<AuthGuard><LeaderboardsPage /></AuthGuard>} />
         
-        {/* Protected Support & Settings Routes */}
-        <Route path="/help" element={<AuthGuard><HelpPage /></AuthGuard>} />
+        {/* Protected Support & Settings Routes - Updated to use resource help page */}
+        <Route path="/help" element={<AuthGuard><Navigate to="/resources/help" replace /></AuthGuard>} />
         <Route path="/settings" element={<AuthGuard><Profile /></AuthGuard>} />
         <Route path="/changelog" element={<AuthGuard><ChangelogPage /></AuthGuard>} />
 
-        {/* Client Dashboard Routes - accessible to all authenticated users but with conditional content */}
+        {/* Client Dashboard Routes */}
         <Route path="/client-dashboard" element={<AuthGuard><ClientDashboard /></AuthGuard>} />
         <Route path="/client-dashboard/documents" element={<AuthGuard><ClientDocumentsPage /></AuthGuard>} />
         <Route path="/client-dashboard/tasks" element={<AuthGuard><ClientTasksPage /></AuthGuard>} />
