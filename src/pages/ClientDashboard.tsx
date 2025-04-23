@@ -17,6 +17,8 @@ import { TasksOverviewCard } from "@/components/client/dashboard/TasksOverviewCa
 import { TimelineCard } from "@/components/client/dashboard/TimelineCard";
 import { ProjectInformationCard } from "@/components/client/dashboard/ProjectInformationCard";
 import { ClientTodoListCard } from "@/components/client/dashboard/ClientTodoListCard";
+import { ClientPageTitle } from "@/components/client/layout/ClientPageTitle";
+import { ArrowRight } from "lucide-react";
 
 export default function ClientDashboard() {
   const [client, setClient] = useState<ClientData | null>(null);
@@ -156,31 +158,32 @@ export default function ClientDashboard() {
   if (loading) {
     return (
       <ClientDashboardLayout>
-        <div className="max-w-5xl mx-auto p-6">
-          <Skeleton className="h-8 w-64 mb-6" />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <Skeleton className="h-40 w-full rounded-lg" />
-            <Skeleton className="h-40 w-full rounded-lg" />
-            <Skeleton className="h-40 w-full rounded-lg" />
-          </div>
-          <Skeleton className="h-64 w-full rounded-lg" />
+        <Skeleton className="h-10 w-72 mb-8 rounded-lg" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
+          <Skeleton className="h-40 w-full rounded-xl" />
+          <Skeleton className="h-40 w-full rounded-xl" />
+          <Skeleton className="h-40 w-full rounded-xl" />
         </div>
+        <Skeleton className="h-72 w-full rounded-xl" />
       </ClientDashboardLayout>
     );
   }
 
   if (!client) {
-    // Show a clear, user-friendly message consistent with the client portal UI
     return (
       <ClientDashboardLayout>
-        <div className="max-w-2xl mx-auto flex flex-col gap-6 justify-center items-center min-h-[65vh]">
+        <ClientPageTitle
+          icon={ArrowRight}
+          title="Client Portal"
+          subtitle="Welcome to your client portal"
+        />
+        <div className="flex flex-col gap-6 justify-center items-center min-h-[55vh]">
           <img
             src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png"
             alt="Client Portal"
             className="w-20 h-20 rounded border border-gray-700"
           />
-          <h1 className="font-bold text-2xl text-white mt-2">Welcome to your Client Portal</h1>
-          <div className="p-8 w-full bg-[#1A1A1A] border border-gray-800 rounded-lg flex flex-col items-center gap-2">
+          <div className="p-8 w-full bg-[#1A1A1A] border border-gray-800 rounded-lg flex flex-col items-center gap-2 max-w-xl mx-auto">
             <p className="text-md text-gray-300 mb-2 text-center">
               We couldn't find a client profile linked to your login.<br />
               If you believe this is an error, please contact your project manager or support.
@@ -213,49 +216,52 @@ export default function ClientDashboard() {
 
   return (
     <ClientDashboardLayout>
-      <div className="max-w-5xl mx-auto p-6">
-        <h1 className="text-3xl font-bold mb-2 text-white bg-gradient-to-r from-purple-200 via-violet-300 to-purple-600 bg-clip-text text-transparent">
-          Welcome, {client.contact_name || client.company_name || "Client"}
-        </h1>
-        <p className="text-gray-400 mb-6">Here's an overview of your project</p>
+      <ClientPageTitle
+        icon={ArrowRight}
+        title={
+          client.contact_name || client.company_name
+            ? `Welcome, ${client.contact_name || client.company_name}`
+            : "Welcome, Client"
+        }
+        subtitle="Here's an overview of your project"
+      />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
+        {/* Project Status Card */}
+        <ProjectStatusCard
+          status={client.status}
+          completed={client.completed_steps?.length || 0}
+          total={client.total_steps}
+          onViewDetails={() => navigate('/client-dashboard/status')}
+        />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {/* Project Status Card */}
-          <ProjectStatusCard
-            status={client.status}
-            completed={client.completed_steps?.length || 0}
-            total={client.total_steps}
-            onViewDetails={() => navigate('/client-dashboard/status')}
-          />
+        {/* Tasks Overview Card */}
+        <TasksOverviewCard
+          taskCount={client.todos?.length || 0}
+          onManageTasks={() => navigate('/client-dashboard/tasks')}
+        />
 
-          {/* Tasks Overview Card */}
-          <TasksOverviewCard
-            taskCount={client.todos?.length || 0}
-            onManageTasks={() => navigate('/client-dashboard/tasks')}
-          />
+        {/* Timeline Card */}
+        <TimelineCard
+          startDate={client.start_date || null}
+          completionDate={client.estimated_completion_date || null}
+          onViewTimeline={() => navigate('/client-dashboard/status')}
+        />
+      </div>
 
-          {/* Timeline Card */}
-          <TimelineCard
-            startDate={client.start_date || null}
-            completionDate={client.estimated_completion_date || null}
-            onViewTimeline={() => navigate('/client-dashboard/status')}
-          />
-        </div>
-
+      <div className="mb-10">
         <ProjectInformationCard
           projectName={client.project_name}
           companyName={client.company_name}
           companyNiche={client.company_niche}
           websiteUrl={client.website_url}
         />
-
-        {/* Todo List Section */}
-        <ClientTodoListCard
-          todos={client.todos || []}
-          onUpdate={handleUpdateTodos}
-          clientId={client.id}
-        />
       </div>
+
+      <ClientTodoListCard
+        todos={client.todos || []}
+        onUpdate={handleUpdateTodos}
+        clientId={client.id}
+      />
     </ClientDashboardLayout>
   );
 }
