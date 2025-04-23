@@ -11,7 +11,6 @@ import { ArrowUpRight, CheckCircle, Clock } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { ClientDashboardLayout } from "@/components/client/ClientDashboardLayout";
 
-/** Shows dashboard linked to a logged-in client-portal user */
 export default function ClientDashboard() {
   const [client, setClient] = useState<ClientData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -20,9 +19,7 @@ export default function ClientDashboard() {
 
   const handleUpdateTodos = async (todos: TodoItem[]) => {
     if (!client) return;
-
     try {
-      // Serialize the todos to JSON to meet Supabase type requirements
       const { error } = await supabase
         .from('client_onboarding')
         .update({ todos: JSON.parse(JSON.stringify(todos)) })
@@ -56,22 +53,14 @@ export default function ClientDashboard() {
           navigate("/client-portal");
           return;
         }
-
         // Use RPC to fetch client ID safely
         const { data: clientIdData, error: clientIdError } = await supabase.rpc('get_client_by_user_id', { user_uuid: user.id });
-
         if (clientIdError || !clientIdData || clientIdData.length === 0) {
-          toast({
-            variant: "destructive",
-            title: "No client linked",
-            description: "You are not linked to any client profile.",
-          });
           setLoading(false);
+          setClient(null);
           return;
         }
-
         const clientId = clientIdData[0].client_id;
-
         // Fetch client info and properly type with todos
         type DBClient = {
           id: string;
@@ -111,25 +100,16 @@ export default function ClientDashboard() {
           .select('*')
           .eq('id', clientId)
           .maybeSingle();
-
         if (clientError || !clientDataRaw) {
-          toast({
-            variant: "destructive",
-            title: "Client not found",
-            description: clientError?.message || "Unable to retrieve client data",
-          });
+          setClient(null);
           setLoading(false);
           return;
         }
-
         const clientData = clientDataRaw as DBClient;
-
-        // Parse todos array with safe fallback
         let todos: TodoItem[] = [];
         if (clientData.todos && Array.isArray(clientData.todos)) {
           todos = clientData.todos as TodoItem[];
         }
-
         const completeClientData: ClientData = {
           id: clientData.id,
           full_name: clientData.contact_name || '',
@@ -150,7 +130,6 @@ export default function ClientDashboard() {
           company_name: clientData.company_name,
           todos: todos,
         };
-
         setClient(completeClientData);
       } catch (error) {
         console.error('Unexpected error in fetchClientData:', error);
@@ -159,11 +138,11 @@ export default function ClientDashboard() {
           title: "Error",
           description: "An unexpected error occurred while fetching client data.",
         });
+        setClient(null);
       } finally {
         setLoading(false);
       }
     };
-
     fetchClientData();
   }, [navigate, toast]);
 
@@ -184,14 +163,25 @@ export default function ClientDashboard() {
   }
 
   if (!client) {
+    // Show a clear, user-friendly message consistent with the client portal UI
     return (
       <ClientDashboardLayout>
-        <div className="flex-1 flex items-center justify-center">
-          <Card className="bg-white px-4 py-8 max-w-md">
-            <p className="text-2xl font-semibold text-center mb-5">No client profile linked to your login.</p>
-            <Button onClick={() => navigate("/client-portal")} className="w-full">
-              Go to Login
-            </Button>
+        <div className="max-w-2xl mx-auto flex flex-col gap-6 justify-center items-center min-h-[65vh]">
+          <img
+            src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png"
+            alt="Client Portal"
+            className="w-20 h-20 rounded border border-slate-200"
+          />
+          <h1 className="font-bold text-2xl text-slate-800 mt-2">Welcome to your Client Portal</h1>
+          <Card className="p-6 bg-white/90 border border-slate-200 flex flex-col items-center gap-2">
+            <p className="text-md text-slate-700 mb-2">
+              We couldn't find a client profile linked to your login.<br />
+              If you believe this is an error, please contact your project manager or support.
+            </p>
+            <div className="flex gap-2 flex-wrap w-full">
+              <Button onClick={() => navigate("/client-portal")} variant="outline" className="w-full">Return to Login</Button>
+              <Button onClick={() => navigate("/client-dashboard/support")} className="w-full">Contact Support</Button>
+            </div>
           </Card>
         </div>
       </ClientDashboardLayout>
