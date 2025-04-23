@@ -95,21 +95,21 @@ export default function ProjectsAndTasksPage() {
 
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-gradient-to-r from-siso-red to-siso-orange mb-2">
-              {isTasksView ? "Active Tasks" : "Project Overview"}
+            <h1 className="text-3xl font-bold text-gradient-to-r from-[#9b87f5] to-[#6E59A5] mb-2">
+              {isTasksView ? "Development Tasks" : "Ubahcrypt Project"}
             </h1>
             <p className="text-siso-text">
               {isTasksView 
-                ? "View and manage tasks across your project"
-                : "Manage your Ubahcrypt blockchain application development"
+                ? "Track and manage development tasks for your cryptocurrency project"
+                : "Monitor and manage your blockchain application development"
               }
             </p>
           </div>
           
-          {!isTasksView && (
+          {!isTasksView && !projects && (
             <Button 
               onClick={handleCreateNew}
-              className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 flex items-center gap-2 mt-4 md:mt-0"
+              className="bg-gradient-to-r from-[#9b87f5] to-[#6E59A5] hover:opacity-90 flex items-center gap-2 mt-4 md:mt-0"
             >
               <PlusCircle size={16} />
               New Project
@@ -128,7 +128,7 @@ export default function ProjectsAndTasksPage() {
                 </div>
               ) : error ? (
                 <div className="flex flex-col items-center justify-center p-8 text-center">
-                  <AlertCircle className="h-12 w-12 text-siso-orange mb-4" />
+                  <AlertCircle className="h-12 w-12 text-[#9b87f5] mb-4" />
                   <h3 className="text-xl font-semibold text-white mb-2">
                     Failed to Load Project
                   </h3>
@@ -137,27 +137,20 @@ export default function ProjectsAndTasksPage() {
                   </p>
                   <Button 
                     onClick={() => refetch()}
-                    className="bg-siso-orange hover:bg-siso-orange/80"
+                    className="bg-[#9b87f5] hover:bg-[#9b87f5]/80"
                   >
                     Retry
                   </Button>
                 </div>
-              ) : projects && projects.length > 0 ? (
-                <div className="space-y-6">
-                  <ProjectDirectoryCard
-                    key={projects[0].id}
-                    name={projects[0].name}
-                    logo={projects[0].logo}
-                    description={projects[0].description}
-                    created_at={projects[0].created_at}
-                    status={projects[0].status}
-                    onSelect={() => navigate(`/plan/${projects[0].id}`)}
-                  />
-                </div>
               ) : (
-                <div>
-                  <ProjectDirectoryCard />
-                </div>
+                <ProjectDirectoryCard
+                  name={projects?.name}
+                  logo={projects?.logo}
+                  description={projects?.description}
+                  created_at={projects?.created_at}
+                  status={projects?.status}
+                  onSelect={() => navigate(`/plan/${projects?.id}`)}
+                />
               )}
             </Card>
           </div>

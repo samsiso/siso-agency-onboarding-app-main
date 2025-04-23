@@ -25,13 +25,13 @@ export function useProjects() {
         throw new Error('Authentication required');
       }
 
-      console.log('Fetching Ubahcrypt project data for user:', user.id);
+      console.log('Fetching Ubahcrypt project data');
       
       const { data: plans, error } = await supabase
         .from('plans')
         .select('*')
         .eq('app_name', 'Ubahcrypt')
-        .order('created_at', { ascending: false });
+        .single();
 
       if (error) {
         console.error('Error fetching project:', error);
@@ -45,18 +45,18 @@ export function useProjects() {
 
       console.log('Raw plan data:', plans);
 
-      // Transform plans into Project format
-      const projects = plans.map(plan => ({
-        id: plan.id,
-        name: plan.app_name || 'Unnamed Project',
-        description: plan.description || 'Building a secure and innovative cryptocurrency platform',
-        logo: plan.logo,
-        status: plan.status || 'pending',
-        created_at: plan.created_at
-      }));
+      // Transform plan into Project format
+      const project = {
+        id: plans.id,
+        name: plans.app_name || 'Ubahcrypt',
+        description: plans.description || 'Building a secure and innovative cryptocurrency platform',
+        logo: plans.logo,
+        status: plans.status || 'pending',
+        created_at: plans.created_at
+      };
 
-      console.log('Transformed project:', projects);
-      return projects;
+      console.log('Transformed project:', project);
+      return project;
     },
     enabled: !!user
   });

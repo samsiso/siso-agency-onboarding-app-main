@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, Bitcoin, ExternalLink } from 'lucide-react';
+import { Bitcoin, ExternalLink, GitBranch, Code, Server } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -33,13 +33,13 @@ export function ProjectDirectoryCard({
         onClick={() => navigate('/plan-builder')}
         className="p-12 flex flex-col items-center justify-center gap-8 cursor-pointer bg-black/30 border border-dashed border-siso-text/10 hover:border-siso-orange/50 transition-all duration-300"
       >
-        <div className="h-40 w-40 rounded-full bg-gradient-to-r from-siso-red/20 to-siso-orange/20 flex items-center justify-center">
-          <Plus size={80} className="text-siso-orange" />
+        <div className="h-40 w-40 rounded-full bg-gradient-to-r from-[#9b87f5] to-[#6E59A5] flex items-center justify-center">
+          <Bitcoin size={80} className="text-white" />
         </div>
         <div className="text-center space-y-4">
-          <h3 className="text-3xl font-semibold text-white">Start New Project</h3>
+          <h3 className="text-3xl font-semibold text-white">Start New Crypto Project</h3>
           <p className="text-siso-text max-w-xl text-lg">
-            Create your blockchain project and start managing your development tasks
+            Begin your blockchain journey by creating a new cryptocurrency project
           </p>
           <Button 
             className="mt-6 bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 px-8 py-6 text-lg"
@@ -54,7 +54,7 @@ export function ProjectDirectoryCard({
   return (
     <Card 
       onClick={onSelect}
-      className="p-8 bg-black/30 border border-siso-text/10 hover:border-siso-orange/50 transition-all duration-300 group"
+      className="p-8 bg-black/30 border border-siso-text/10 hover:border-siso-orange/50 transition-all duration-300 group w-full"
     >
       <div className="flex flex-col md:flex-row gap-8">
         <div className="flex-shrink-0">
@@ -62,11 +62,11 @@ export function ProjectDirectoryCard({
             <img
               src={logo}
               alt={`${name} logo`}
-              className="h-40 w-40 rounded-full object-cover ring-4 ring-siso-orange/20 group-hover:ring-siso-orange/40 transition-all duration-300"
+              className="h-40 w-40 rounded-full object-cover ring-4 ring-[#9b87f5]/20 group-hover:ring-[#9b87f5]/40 transition-all duration-300"
               loading="lazy"
             />
           ) : (
-            <div className="h-40 w-40 rounded-full bg-gradient-to-br from-[#9b87f5] to-[#6E59A5] flex items-center justify-center ring-4 ring-siso-orange/20 group-hover:ring-siso-orange/40 transition-all duration-300">
+            <div className="h-40 w-40 rounded-full bg-gradient-to-br from-[#9b87f5] to-[#6E59A5] flex items-center justify-center ring-4 ring-[#9b87f5]/20 group-hover:ring-[#9b87f5]/40 transition-all duration-300">
               <Bitcoin size={64} className="text-white" />
             </div>
           )}
@@ -75,14 +75,17 @@ export function ProjectDirectoryCard({
         <div className="flex-grow space-y-6">
           <div className="flex items-start justify-between">
             <div>
-              <h3 className="text-3xl font-semibold text-white group-hover:text-siso-orange transition-colors duration-300">
+              <h3 className="text-3xl font-semibold text-white group-hover:text-[#9b87f5] transition-colors duration-300">
                 {name}
               </h3>
               <p className="text-base text-siso-text mt-2">
                 Created on {formatDate(created_at || '', 'long')}
               </p>
             </div>
-            <Badge variant="success" className="text-base px-4 py-1">
+            <Badge 
+              variant="secondary" 
+              className="text-base px-4 py-1 bg-[#9b87f5]/20 text-[#9b87f5]"
+            >
               {status}
             </Badge>
           </div>
@@ -93,12 +96,28 @@ export function ProjectDirectoryCard({
             </p>
           )}
           
-          <div className="space-y-3">
-            <div className="flex justify-between text-base text-siso-text">
-              <span>Development Progress</span>
-              <span>75%</span>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-siso-text">
+                <Code size={16} />
+                <span>Smart Contract</span>
+              </div>
+              <Progress value={80} className="h-2" indicatorClassName="bg-[#9b87f5]" />
             </div>
-            <Progress value={75} className="h-2" />
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-siso-text">
+                <Server size={16} />
+                <span>Backend Integration</span>
+              </div>
+              <Progress value={65} className="h-2" indicatorClassName="bg-[#9b87f5]" />
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-siso-text">
+                <GitBranch size={16} />
+                <span>Testing</span>
+              </div>
+              <Progress value={45} className="h-2" indicatorClassName="bg-[#9b87f5]" />
+            </div>
           </div>
           
           <div className="flex gap-4 mt-8">
@@ -108,15 +127,15 @@ export function ProjectDirectoryCard({
                 navigate('/projects/tasks');
               }}
               variant="outline"
-              className="border-siso-orange/30 text-siso-orange hover:bg-siso-orange/10 flex-1 py-6 text-lg"
+              className="border-[#9b87f5]/30 text-[#9b87f5] hover:bg-[#9b87f5]/10 flex-1 py-6 text-lg"
             >
-              View Tasks
+              View Development Tasks
             </Button>
             <Button 
               onClick={onSelect}
-              className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 flex-1 py-6 text-lg"
+              className="bg-gradient-to-r from-[#9b87f5] to-[#6E59A5] hover:opacity-90 flex-1 py-6 text-lg"
             >
-              Open Project
+              Open Project Dashboard
             </Button>
           </div>
         </div>
