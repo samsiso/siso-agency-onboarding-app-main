@@ -1465,10 +1465,12 @@ export type Database = {
           branding: Json | null
           company_name: string | null
           created_at: string | null
+          description: string | null
           estimated_cost: number | null
           estimated_days: number | null
           features: string[] | null
           id: string
+          logo: string | null
           status: string | null
           username: string
         }
@@ -1477,10 +1479,12 @@ export type Database = {
           branding?: Json | null
           company_name?: string | null
           created_at?: string | null
+          description?: string | null
           estimated_cost?: number | null
           estimated_days?: number | null
           features?: string[] | null
           id?: string
+          logo?: string | null
           status?: string | null
           username: string
         }
@@ -1489,10 +1493,12 @@ export type Database = {
           branding?: Json | null
           company_name?: string | null
           created_at?: string | null
+          description?: string | null
           estimated_cost?: number | null
           estimated_days?: number | null
           features?: string[] | null
           id?: string
+          logo?: string | null
           status?: string | null
           username?: string
         }

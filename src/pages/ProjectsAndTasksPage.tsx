@@ -1,5 +1,4 @@
 
-import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,6 +6,7 @@ import { PlusCircle, Home, Component, ExternalLink } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ProjectDirectoryCard } from '@/components/projects/ProjectDirectoryCard';
 import { ActiveTasksView } from '@/components/projects/ActiveTasksView';
+import { useProjects } from '@/hooks/useProjects';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -15,26 +15,27 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-
-const demoProjects = [
-  {
-    id: '1',
-    name: 'Ubahcryp',
-    description: 'Web3 trading platform with cryptocurrency integration and real-time market data',
-    logo: 'https://api.dicebear.com/7.x/shapes/svg?seed=ubahcryp&backgroundColor=0ea5e9',
-  }
-];
+import { useToast } from '@/hooks/use-toast';
 
 export default function ProjectsAndTasksPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [selectedProject, setSelectedProject] = useState<string | null>(null);
+  const { toast } = useToast();
+  const { data: projects, isLoading, error } = useProjects();
   
   const isTasksView = location.pathname === '/projects/tasks';
 
   const handleCreateNew = () => {
     navigate('/plan-builder');
   };
+
+  if (error) {
+    toast({
+      title: "Error loading projects",
+      description: "There was a problem loading your projects. Please try again.",
+      variant: "destructive"
+    });
+  }
 
   return (
     <AppLayout>
@@ -102,18 +103,26 @@ export default function ProjectsAndTasksPage() {
         ) : (
           <div className="space-y-8">
             <Card className="p-6 bg-black/30 border border-siso-text/10">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {demoProjects.map(project => (
-                  <ProjectDirectoryCard
-                    key={project.id}
-                    name={project.name}
-                    logo={project.logo}
-                    description={project.description}
-                    onSelect={() => setSelectedProject(project.id)}
-                  />
-                ))}
-                <ProjectDirectoryCard />
-              </div>
+              {isLoading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="h-64 animate-pulse bg-black/20 rounded-lg" />
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {projects?.map(project => (
+                    <ProjectDirectoryCard
+                      key={project.id}
+                      name={project.name}
+                      logo={project.logo}
+                      description={project.description}
+                      onSelect={() => navigate(`/plan/${project.id}`)}
+                    />
+                  ))}
+                  <ProjectDirectoryCard />
+                </div>
+              )}
             </Card>
 
             <div className="text-center p-8 bg-black/30 border border-siso-text/10 rounded-lg animate-fade-in">
