@@ -3,8 +3,8 @@ import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { PlusCircle, ArrowLeft } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ProjectDirectoryCard } from '@/components/projects/ProjectDirectoryCard';
 import { ActiveTasksView } from '@/components/projects/ActiveTasksView';
 
@@ -23,10 +23,21 @@ const demoProjects = [
 
 export default function ProjectsAndTasksPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
+  
+  const isTasksView = location.pathname === '/projects/tasks';
 
   const handleCreateNew = () => {
     navigate('/plan-builder');
+  };
+
+  const handleBackToProjects = () => {
+    if (isTasksView) {
+      navigate('/projects');
+    } else {
+      setSelectedProject(null);
+    }
   };
 
   return (
@@ -34,24 +45,39 @@ export default function ProjectsAndTasksPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <div>
+            {(selectedProject || isTasksView) && (
+              <Button
+                variant="ghost"
+                className="mb-4 text-siso-text hover:text-white"
+                onClick={handleBackToProjects}
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Projects
+              </Button>
+            )}
             <h1 className="text-3xl font-bold text-gradient-to-r from-siso-red to-siso-orange mb-2">
-              Projects & Tasks
+              {isTasksView ? "Active Tasks" : "Projects & Tasks"}
             </h1>
             <p className="text-siso-text">
-              Manage your application projects and related tasks in one place
+              {isTasksView 
+                ? "View and manage tasks across all your projects"
+                : "Manage your application projects and related tasks in one place"
+              }
             </p>
           </div>
           
-          <Button 
-            onClick={handleCreateNew}
-            className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 flex items-center gap-2 mt-4 md:mt-0"
-          >
-            <PlusCircle size={16} />
-            New Project
-          </Button>
+          {!isTasksView && (
+            <Button 
+              onClick={handleCreateNew}
+              className="bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 flex items-center gap-2 mt-4 md:mt-0"
+            >
+              <PlusCircle size={16} />
+              New Project
+            </Button>
+          )}
         </div>
 
-        {selectedProject ? (
+        {isTasksView || selectedProject ? (
           <ActiveTasksView />
         ) : (
           <Card className="p-6 bg-black/30 border border-siso-text/10">
