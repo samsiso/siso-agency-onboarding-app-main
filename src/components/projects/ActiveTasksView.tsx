@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -9,6 +8,7 @@ import {
   ListProvider,
 } from "@/components/ui/list";
 import { type DragEndEvent } from "@dnd-kit/core";
+import { ProjectDirectoryCard } from './ProjectDirectoryCard';
 
 const taskStatuses = [
   { id: "1", name: "To Do", color: "#6B7280" },
@@ -46,8 +46,17 @@ const demoTasks = [
   },
 ];
 
+const demoProjects = [
+  {
+    id: '1',
+    name: 'Food Delivery App',
+    logo: 'https://api.dicebear.com/7.x/shapes/svg?seed=1',
+  }
+];
+
 export function ActiveTasksView() {
   const [tasks, setTasks] = useState(demoTasks);
+  const [selectedProject, setSelectedProject] = useState<string | null>(null);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -66,6 +75,22 @@ export function ActiveTasksView() {
       }),
     );
   };
+
+  if (!selectedProject) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {demoProjects.map(project => (
+          <ProjectDirectoryCard
+            key={project.id}
+            name={project.name}
+            logo={project.logo}
+            onSelect={() => setSelectedProject(project.id)}
+          />
+        ))}
+        <ProjectDirectoryCard />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
