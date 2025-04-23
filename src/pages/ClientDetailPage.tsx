@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useClientDetails } from '@/hooks/client';
@@ -30,7 +29,7 @@ export default function ClientDetailPage() {
   const { clientId } = useParams<{ clientId: string }>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<string>('overview');
-  const { client, isLoading, error } = useClientDetails(clientId || null);
+  const { clientData, loading, error } = useClientDetails(clientId || null);
 
   // TimelineDemo data
   const changelogData = [
@@ -178,7 +177,7 @@ export default function ClientDetailPage() {
     },
   ];
 
-  if (isLoading) {
+  if (loading) {
     return (
       <AdminLayout>
         <div className="container mx-auto py-6 bg-black text-white min-h-screen">
@@ -209,7 +208,7 @@ export default function ClientDetailPage() {
     );
   }
 
-  if (error || !client) {
+  if (error || !clientData) {
     return (
       <AdminLayout>
         <div className="container mx-auto py-6 bg-black text-white min-h-screen">
@@ -262,12 +261,12 @@ export default function ClientDetailPage() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>{client.full_name || client.business_name || 'Client Details'}</BreadcrumbPage>
+              <BreadcrumbPage>{clientData.full_name || clientData.business_name || 'Client Details'}</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
 
-        <ClientDetailHeader client={client} />
+        <ClientDetailHeader client={clientData} />
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
           <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 mb-6">
@@ -282,23 +281,23 @@ export default function ClientDetailPage() {
           </TabsList>
 
           <TabsContent value="overview" className="space-y-4">
-            <ClientProjectOverview client={client} />
+            <ClientProjectOverview client={clientData} />
           </TabsContent>
           
           <TabsContent value="timeline" className="space-y-4">
-            <ClientProjectTimeline client={client} />
+            <ClientProjectTimeline client={clientData} />
           </TabsContent>
           
           <TabsContent value="interactions" className="space-y-4">
-            <ClientInteractionLog client={client} />
+            <ClientInteractionLog client={clientData} />
           </TabsContent>
           
           <TabsContent value="tasks" className="space-y-4">
-            <ClientTasksList client={client} />
+            <ClientTasksList client={clientData} />
           </TabsContent>
           
           <TabsContent value="financials" className="space-y-4">
-            <ClientFinancialSummary client={client} />
+            <ClientFinancialSummary client={clientData} />
           </TabsContent>
           
           {/* Team section removed/replaced */}
@@ -307,7 +306,7 @@ export default function ClientDetailPage() {
           </TabsContent> */}
           
           <TabsContent value="documents" className="space-y-4">
-            <ClientDocuments client={client} />
+            <ClientDocuments client={clientData} />
           </TabsContent>
 
           <TabsContent value="changelog" className="space-y-4">

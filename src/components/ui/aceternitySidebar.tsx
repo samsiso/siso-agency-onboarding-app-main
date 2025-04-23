@@ -1,4 +1,3 @@
-
 import React, { useState, createContext, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
@@ -87,7 +86,7 @@ export const DesktopSidebar = ({
 }: React.ComponentProps<typeof motion.div>) => {
   const { open, setOpen, animate } = useSidebar();
   
-  // Define the animation values directly instead of using them in the animate prop
+  // Calculate width values based on state instead of using in animate prop
   const width = animate ? (open ? 300 : 76) : 300;
   const minWidth = animate ? (open ? 300 : 76) : 300;
 
@@ -100,7 +99,7 @@ export const DesktopSidebar = ({
         className,
         open ? "sidebar-open" : "sidebar-collapsed"
       )}
-      style={{ width: width, minWidth: minWidth }}
+      style={{ width, minWidth }} // Apply directly to style prop instead
       transition={{ type: "spring", stiffness: 220, damping: 26 }}
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}

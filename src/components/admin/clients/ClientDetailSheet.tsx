@@ -20,12 +20,12 @@ interface ClientDetailSheetProps {
 }
 
 export function ClientDetailSheet({ clientId, isOpen, onClose }: ClientDetailSheetProps) {
-  const { client, isLoading, updateClient, updateTodos, isUpdating } = useClientDetails(clientId);
+  const { clientData, loading, updateClient, updateTodos, isUpdating } = useClientDetails(clientId);
   const navigate = useNavigate();
   
   const viewFullDetails = () => {
-    if (client) {
-      navigate(`/admin/clients/${client.id}`);
+    if (clientData) {
+      navigate(`/admin/clients/${clientData.id}`);
       onClose();
     }
   };
@@ -33,7 +33,7 @@ export function ClientDetailSheet({ clientId, isOpen, onClose }: ClientDetailShe
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent className="sm:max-w-xl overflow-y-auto">
-        {isLoading || !client ? (
+        {loading || !clientData ? (
           <div className="space-y-6 pt-6">
             <div className="flex items-center space-x-4">
               <Skeleton className="h-12 w-12 rounded-full" />
@@ -52,7 +52,7 @@ export function ClientDetailSheet({ clientId, isOpen, onClose }: ClientDetailShe
           <>
             <SheetHeader className="pb-4">
               <div className="flex justify-between items-start">
-                <SheetTitle className="text-2xl">{client.full_name || 'Unnamed Client'}</SheetTitle>
+                <SheetTitle className="text-2xl">{clientData.full_name || 'Unnamed Client'}</SheetTitle>
                 <Button 
                   variant="outline" 
                   size="sm"
@@ -64,23 +64,23 @@ export function ClientDetailSheet({ clientId, isOpen, onClose }: ClientDetailShe
                 </Button>
               </div>
               <SheetDescription>
-                {client.business_name || 'No business name provided'}
+                {clientData.business_name || 'No business name provided'}
               </SheetDescription>
             </SheetHeader>
             
             <div className="flex items-center gap-4 mb-6">
               <Avatar className="h-16 w-16 border-2 border-muted">
-                <AvatarImage src={client.avatar_url || undefined} alt={client.full_name || 'Client'} />
+                <AvatarImage src={clientData.avatar_url || undefined} alt={clientData.full_name || 'Client'} />
                 <AvatarFallback className="text-lg bg-primary/10">
-                  {client.full_name?.substring(0, 2).toUpperCase() || 'CL'}
+                  {clientData.full_name?.substring(0, 2).toUpperCase() || 'CL'}
                 </AvatarFallback>
               </Avatar>
               
               <div className="flex flex-col gap-1">
-                <ClientStatusBadge status={client.status} />
+                <ClientStatusBadge status={clientData.status} />
                 
                 <div className="flex items-center gap-2">
-                  {client.email && (
+                  {clientData.email && (
                     <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                       <Mail className="h-4 w-4" />
                     </Button>

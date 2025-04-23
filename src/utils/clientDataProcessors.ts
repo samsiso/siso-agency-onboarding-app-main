@@ -20,18 +20,18 @@ export const processClientDetail = (data: any, clientId: string): ClientData => 
       : [],
     created_at: safePropertyAccess(data, 'created_at', new Date().toISOString()),
     updated_at: safePropertyAccess(data, 'updated_at', new Date().toISOString()),
-    full_name: safePropertyAccess(profileData, 'full_name', 'Unknown'),
-    email: safePropertyAccess(profileData, 'email', null),
-    business_name: safePropertyAccess(profileData, 'business_name', null),
-    avatar_url: safePropertyAccess(profileData, 'avatar_url', null),
-    phone: safePropertyAccess(profileData, 'phone', null),
+    full_name: safePropertyAccess(data, 'contact_name', 'Unknown'),
+    email: null,
+    business_name: safePropertyAccess(data, 'company_name', null),
+    avatar_url: null,
+    phone: null,
     // Additional fields for the detailed view
-    website_url: safePropertyAccess(profileData, 'website_url', null),
-    professional_role: safePropertyAccess(profileData, 'professional_role', null),
-    bio: safePropertyAccess(profileData, 'bio', null),
+    website_url: safePropertyAccess(data, 'website_url', null),
+    professional_role: null,
+    bio: null,
     // Project-related fields
-    project_name: null,
-    company_niche: null,
+    project_name: safePropertyAccess(data, 'project_name', null),
+    company_niche: safePropertyAccess(data, 'company_niche', null),
     development_url: null,
     mvp_build_status: null,
     notion_plan_url: null,
@@ -40,6 +40,10 @@ export const processClientDetail = (data: any, clientId: string): ClientData => 
     initial_contact_date: null,
     start_date: null,
     estimated_completion_date: null,
+    todos: Array.isArray(data.todos) ? data.todos : [],
+    next_steps: null,
+    key_research: null,
+    priority: safePropertyAccess(data, 'priority', null)
   };
   
   return clientData;
@@ -75,5 +79,19 @@ export function createDefaultClientData(clientId: string): ClientData {
     initial_contact_date: null,
     start_date: null,
     estimated_completion_date: null,
+    todos: [],
+    next_steps: null,
+    key_research: null,
+    priority: null
   };
 }
+
+// Add the error suppression utility if it doesn't exist
+export const safePropertyAccess = (obj: any, path: string, defaultValue: any): any => {
+  try {
+    if (!obj) return defaultValue;
+    return obj[path] !== undefined ? obj[path] : defaultValue;
+  } catch (error) {
+    return defaultValue;
+  }
+};

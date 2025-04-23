@@ -1,4 +1,3 @@
-
 import { useState, useRef, useCallback } from 'react';
 import { ClientData, ClientViewPreference } from '@/types/client.types';
 import { useClientsList } from '@/hooks/client';

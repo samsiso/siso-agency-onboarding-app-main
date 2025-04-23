@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { ClientData } from "@/types/client.types";
@@ -333,4 +332,3 @@ function ChevronDownIcon(props: any) {
     </svg>
   )
 }
-
