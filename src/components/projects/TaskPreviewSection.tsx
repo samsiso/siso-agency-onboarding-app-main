@@ -1,4 +1,7 @@
 
+// NOTE: This component has been replaced by TaskDetailsDialog.tsx
+// It's kept for reference but no longer used in the application.
+
 import React from 'react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';

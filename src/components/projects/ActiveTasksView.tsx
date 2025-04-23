@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import {
   KanbanBoard,
@@ -7,7 +8,7 @@ import {
   KanbanProvider,
 } from "@/components/ui/kanban";
 import { TaskCard } from './TaskCard';
-import { TaskPreviewSection } from './TaskPreviewSection';
+import { TaskDetailsDialog } from './TaskDetailsDialog';
 import { type DragEndEvent } from "@dnd-kit/core";
 
 const taskStatuses = [
@@ -80,11 +81,20 @@ export function ActiveTasksView() {
     );
   };
 
+  const handleUpdateTask = (updatedTask: any) => {
+    setTasks(tasks.map(task => 
+      task.id === updatedTask.id ? { ...task, ...updatedTask } : task
+    ));
+    setSelectedTask(updatedTask);
+  };
+
   return (
     <div className="p-4">
-      <TaskPreviewSection
+      <TaskDetailsDialog
         task={selectedTask}
+        isOpen={!!selectedTask}
         onClose={() => setSelectedTask(null)}
+        onSave={handleUpdateTask}
       />
       
       <KanbanProvider onDragEnd={handleDragEnd}>
