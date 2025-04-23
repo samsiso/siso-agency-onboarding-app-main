@@ -1,12 +1,13 @@
-
+import { useEffect } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PlusCircle, Home, Component, ExternalLink, AlertCircle } from 'lucide-react';
-import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ProjectDirectoryCard } from '@/components/projects/ProjectDirectoryCard';
 import { ActiveTasksView } from '@/components/projects/ActiveTasksView';
 import { useProjects } from '@/hooks/useProjects';
+import { useAuthSession } from '@/hooks/useAuthSession';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -16,51 +17,43 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { useToast } from '@/hooks/use-toast';
-import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 
 export default function ProjectsAndTasksPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
+  const { user, loading: authLoading } = useAuthSession();
   const { data: projects, isLoading, error, refetch } = useProjects();
-  const [selectedProject, setSelectedProject] = useState<string | null>(null);
-  const [authChecked, setAuthChecked] = useState(false);
   
   const isTasksView = location.pathname === '/projects/tasks';
 
-  // Check authentication status
   useEffect(() => {
-    const checkAuth = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (!data.session) {
-        console.log('No authenticated user found');
-        toast({
-          title: "Authentication required",
-          description: "Please log in to view your projects",
-          variant: "destructive"
-        });
-      } else {
-        console.log('Authenticated user:', data.session.user.id);
-        refetch(); // Refetch projects data when authenticated
-      }
-      setAuthChecked(true);
-    };
-    
-    checkAuth();
-  }, [toast, refetch]);
+    if (!authLoading && !user) {
+      console.log('No authenticated user, redirecting to auth');
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to view your projects",
+        variant: "destructive"
+      });
+      navigate('/auth');
+    }
+  }, [user, authLoading, navigate, toast]);
 
   const handleCreateNew = () => {
     navigate('/plan-builder');
   };
 
-  if (error) {
-    console.error('Projects data error:', error);
-    toast({
-      title: "Error loading projects",
-      description: "There was a problem loading your projects. Please try again.",
-      variant: "destructive"
-    });
+  if (authLoading) {
+    return (
+      <AppLayout>
+        <div className="container mx-auto px-4 py-8">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
+            <div className="h-32 bg-gray-200 rounded mb-4"></div>
+          </div>
+        </div>
+      </AppLayout>
+    );
   }
 
   return (
@@ -87,12 +80,12 @@ export default function ProjectsAndTasksPage() {
                 Projects
               </BreadcrumbLink>
             </BreadcrumbItem>
-            {(isTasksView || selectedProject) && (
+            {(isTasksView) && (
               <>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
                   <BreadcrumbPage className="text-white">
-                    {isTasksView ? "Active Tasks" : "Project Details"}
+                    Active Tasks
                   </BreadcrumbPage>
                 </BreadcrumbItem>
               </>
@@ -135,6 +128,22 @@ export default function ProjectsAndTasksPage() {
                     <div key={i} className="h-64 animate-pulse bg-black/20 rounded-lg" />
                   ))}
                 </div>
+              ) : error ? (
+                <div className="flex flex-col items-center justify-center p-8 text-center">
+                  <AlertCircle className="h-12 w-12 text-siso-orange mb-4" />
+                  <h3 className="text-xl font-semibold text-white mb-2">
+                    Failed to Load Projects
+                  </h3>
+                  <p className="text-siso-text mb-4 max-w-md">
+                    {error instanceof Error ? error.message : 'There was an error loading your projects'}
+                  </p>
+                  <Button 
+                    onClick={() => refetch()}
+                    className="bg-siso-orange hover:bg-siso-orange/80"
+                  >
+                    Retry
+                  </Button>
+                </div>
               ) : projects && projects.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {projects.map(project => (
@@ -147,22 +156,6 @@ export default function ProjectsAndTasksPage() {
                     />
                   ))}
                   <ProjectDirectoryCard />
-                </div>
-              ) : error ? (
-                <div className="flex flex-col items-center justify-center p-8 text-center">
-                  <AlertCircle className="h-12 w-12 text-siso-orange mb-4" />
-                  <h3 className="text-xl font-semibold text-white mb-2">
-                    Failed to Load Projects
-                  </h3>
-                  <p className="text-siso-text mb-4 max-w-md">
-                    There was an error loading your projects. Please check your connection and try again.
-                  </p>
-                  <Button 
-                    onClick={() => refetch()}
-                    className="bg-siso-orange hover:bg-siso-orange/80"
-                  >
-                    Retry
-                  </Button>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

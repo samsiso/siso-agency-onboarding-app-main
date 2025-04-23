@@ -2,6 +2,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAuthSession } from '@/hooks/useAuthSession';
 
 export interface Project {
   id: string;
@@ -14,11 +15,17 @@ export interface Project {
 
 export function useProjects() {
   const { toast } = useToast();
+  const { user } = useAuthSession();
 
   return useQuery({
-    queryKey: ['projects'],
+    queryKey: ['projects', user?.id],
     queryFn: async () => {
-      console.log('Fetching projects data...');
+      if (!user) {
+        console.log('No authenticated user found');
+        throw new Error('Authentication required');
+      }
+
+      console.log('Fetching projects data for user:', user.id);
       
       const { data: plans, error } = await supabase
         .from('plans')
@@ -38,19 +45,18 @@ export function useProjects() {
       console.log('Raw plans data:', plans);
 
       // Transform plans into Project format
-      const projects = plans.map(plan => {
-        return {
-          id: plan.id,
-          name: plan.app_name || 'Unnamed Project',
-          description: plan.description || 'No description available',
-          logo: plan.logo,
-          status: plan.status || 'pending',
-          created_at: plan.created_at
-        };
-      });
+      const projects = plans.map(plan => ({
+        id: plan.id,
+        name: plan.app_name || 'Unnamed Project',
+        description: plan.description || 'No description available',
+        logo: plan.logo,
+        status: plan.status || 'pending',
+        created_at: plan.created_at
+      }));
 
       console.log('Transformed projects:', projects);
       return projects;
-    }
+    },
+    enabled: !!user // Only run query when user is authenticated
   });
 }
