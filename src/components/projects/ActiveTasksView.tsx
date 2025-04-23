@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import {
   KanbanBoard,
@@ -8,7 +7,7 @@ import {
   KanbanProvider,
 } from "@/components/ui/kanban";
 import { TaskCard } from './TaskCard';
-import { TaskDetailDrawer } from './TaskDetailDrawer';
+import { TaskPreviewSection } from './TaskPreviewSection';
 import { type DragEndEvent } from "@dnd-kit/core";
 
 const taskStatuses = [
@@ -83,9 +82,8 @@ export function ActiveTasksView() {
 
   return (
     <div className="p-4">
-      <TaskDetailDrawer
+      <TaskPreviewSection
         task={selectedTask}
-        isOpen={!!selectedTask}
         onClose={() => setSelectedTask(null)}
       />
       
