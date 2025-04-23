@@ -3,9 +3,10 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuthSession } from '@/hooks/useAuthSession';
+import { Task } from '@/types/task.types';
 
 export function useClientTasks(clientId?: string) {
-  const [tasks, setTasks] = useState<any[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
@@ -21,16 +22,7 @@ export function useClientTasks(clientId?: string) {
     const fetchTasks = async () => {
       try {
         setError(null);
-        let query = supabase
-          .from('tasks')
-          .select(`
-            *,
-            client_onboarding(
-              id,
-              company_name,
-              contact_name
-            )
-          `);
+        let query = supabase.from('tasks').select('*');
 
         if (clientId) {
           query = query.eq('assigned_client_id', clientId);
@@ -42,30 +34,7 @@ export function useClientTasks(clientId?: string) {
           throw error;
         }
         
-        if (data && data.length > 0) {
-          const mappedTasks = data.map(task => ({
-            id: task.id,
-            name: task.title,
-            description: task.description,
-            startAt: new Date(task.start_time || Date.now()),
-            endAt: new Date(task.due_date || Date.now()),
-            category: task.category,
-            priority: task.priority,
-            status: {
-              name: task.status === 'completed' ? 'completed' : 
-                    task.status === 'in_progress' ? 'in_progress' : 'pending',
-              color: task.status === 'completed' ? '#10B981' : 
-                    task.status === 'in_progress' ? '#F59E0B' : '#6B7280'
-            },
-            owner: {
-              name: task.client_onboarding?.company_name || 'Unknown Client',
-              image: `https://api.dicebear.com/7.x/initials/svg?seed=${task.client_onboarding?.company_name || 'Client'}`
-            }
-          }));
-          setTasks(mappedTasks);
-        } else {
-          setTasks([]);
-        }
+        setTasks(data || []);
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Failed to load tasks';
         setError(message);
