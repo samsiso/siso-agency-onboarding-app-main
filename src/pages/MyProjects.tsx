@@ -6,7 +6,7 @@ export default function MyProjects() {
   const navigate = useNavigate();
   
   useEffect(() => {
-    navigate('/projects');
+    navigate('/projects', { replace: true });
   }, [navigate]);
   
   return null;

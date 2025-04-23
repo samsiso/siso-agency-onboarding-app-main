@@ -1,4 +1,3 @@
-
 import { Routes, Route } from 'react-router-dom';
 import Index from './pages/Index';
 import Auth from './pages/Auth';
@@ -85,10 +84,10 @@ function App() {
         <Route path="/dashboard" element={<AuthGuard><Home /></AuthGuard>} />
         
         {/* Protected Project Routes */}
-        <Route path="/plan-builder" element={<AuthGuard><Home /></AuthGuard>} />
-        <Route path="/my-projects" element={<AuthGuard><MyProjects /></AuthGuard>} />
         <Route path="/projects" element={<AuthGuard><ProjectsAndTasksPage /></AuthGuard>} />
         <Route path="/projects/tasks" element={<AuthGuard><ProjectsAndTasksPage /></AuthGuard>} />
+        <Route path="/my-projects" element={<AuthGuard><MyProjects /></AuthGuard>} />
+        <Route path="/plan-builder" element={<AuthGuard><Home /></AuthGuard>} />
         <Route path="/portfolio" element={<AuthGuard><Portfolio /></AuthGuard>} />
         
         {/* Protected Financial & Account Routes */}

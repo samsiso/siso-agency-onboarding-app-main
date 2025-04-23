@@ -1,4 +1,3 @@
-
 import { 
   LayoutDashboard, Briefcase, ScrollText, Wallet, 
   Trophy, FileText, HelpCircle, ClipboardList,
@@ -7,7 +6,7 @@ import {
 import { MenuSection } from './types';
 
 export const getMenuSections = (): MenuSection[] => {
-  const sections: MenuSection[] = [
+  return [
     {
       type: 'main',
       href: '/home',
@@ -81,6 +80,4 @@ export const getMenuSections = (): MenuSection[] => {
       ]
     }
   ];
-
-  return sections;
 };
