@@ -13,6 +13,7 @@ export function useClientTasks(clientId?: string) {
   
   useEffect(() => {
     if (!user) {
+      console.log('No authenticated user found');
       setError('Authentication required to view tasks');
       setLoading(false);
       return;
@@ -20,7 +21,28 @@ export function useClientTasks(clientId?: string) {
     
     const fetchTasks = async () => {
       try {
+        console.log('Fetching tasks for user:', user.id);
         setError(null);
+
+        // Check if client-user link exists
+        const { data: clientLink, error: linkError } = await supabase
+          .from('client_user_links')
+          .select('client_id')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (linkError) {
+          console.error('Error checking client link:', linkError);
+          throw new Error('Failed to verify client association');
+        }
+
+        if (!clientLink && !isAdmin) {
+          console.log('No client link found for user');
+          setTasks([]);
+          setError('No client association found');
+          return;
+        }
+
         let query = supabase
           .from('tasks')
           .select(`
@@ -33,18 +55,22 @@ export function useClientTasks(clientId?: string) {
           `);
 
         if (clientId) {
+          console.log('Filtering tasks by client:', clientId);
           query = query.eq('assigned_client_id', clientId);
+        } else if (!isAdmin) {
+          // If not admin, only show tasks for linked client
+          query = query.eq('assigned_client_id', clientLink?.client_id);
         }
 
-        const { data, error } = await query;
+        const { data, error: tasksError } = await query;
 
-        if (error) {
-          console.error('Error fetching tasks:', error);
-          setError(error.message);
-          throw error;
+        if (tasksError) {
+          console.error('Error fetching tasks:', tasksError);
+          throw tasksError;
         }
         
         if (data && data.length > 0) {
+          console.log('Successfully fetched tasks:', data.length);
           const mappedTasks = data.map(task => ({
             id: task.id,
             name: task.title,
@@ -54,7 +80,8 @@ export function useClientTasks(clientId?: string) {
             category: task.category,
             priority: task.priority,
             status: {
-              name: task.status,
+              name: task.status === 'completed' ? 'completed' : 
+                    task.status === 'in_progress' ? 'in_progress' : 'pending',
               color: task.status === 'completed' ? '#10B981' : 
                     task.status === 'in_progress' ? '#F59E0B' : '#6B7280'
             },
@@ -65,10 +92,12 @@ export function useClientTasks(clientId?: string) {
           }));
           setTasks(mappedTasks);
         } else {
+          console.log('No tasks found');
           setTasks([]);
         }
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Failed to load tasks';
+        console.error('Error in fetchTasks:', message);
         setError(message);
         toast({
           variant: "destructive",
@@ -82,6 +111,7 @@ export function useClientTasks(clientId?: string) {
 
     fetchTasks();
 
+    // Set up real-time subscription
     const channel = supabase
       .channel('tasks_changes')
       .on(
@@ -92,6 +122,7 @@ export function useClientTasks(clientId?: string) {
           table: 'tasks'
         },
         () => {
+          console.log('Tasks changed, refreshing...');
           fetchTasks();
         }
       )
@@ -104,6 +135,7 @@ export function useClientTasks(clientId?: string) {
 
   const updateTaskStatus = async (taskId: string, status: string) => {
     try {
+      console.log('Updating task status:', { taskId, status });
       const { error } = await supabase
         .from('tasks')
         .update({ status })
