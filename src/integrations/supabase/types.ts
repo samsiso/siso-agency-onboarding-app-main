@@ -461,6 +461,7 @@ export type Database = {
           contact_name: string | null
           created_at: string | null
           current_step: number | null
+          email: string | null
           id: string
           project_name: string | null
           status: string
@@ -477,6 +478,7 @@ export type Database = {
           contact_name?: string | null
           created_at?: string | null
           current_step?: number | null
+          email?: string | null
           id?: string
           project_name?: string | null
           status?: string
@@ -493,6 +495,7 @@ export type Database = {
           contact_name?: string | null
           created_at?: string | null
           current_step?: number | null
+          email?: string | null
           id?: string
           project_name?: string | null
           status?: string
@@ -503,6 +506,35 @@ export type Database = {
           website_url?: string | null
         }
         Relationships: []
+      }
+      client_user_auth: {
+        Row: {
+          auth_user_id: string | null
+          client_id: string | null
+          created_at: string | null
+          id: string
+        }
+        Insert: {
+          auth_user_id?: string | null
+          client_id?: string | null
+          created_at?: string | null
+          id?: string
+        }
+        Update: {
+          auth_user_id?: string | null
+          client_id?: string | null
+          created_at?: string | null
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_user_auth_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "client_onboarding"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       client_user_links: {
         Row: {
