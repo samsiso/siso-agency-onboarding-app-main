@@ -12,6 +12,9 @@ export const StatsDisplay = ({ totalTools, categoryStats }: StatsDisplayProps) =
   const featuredCount = Object.values(categoryStats).find(count => count > 0) || 0;
   const activeCategories = Object.keys(categoryStats).length;
   
+  // Helper function to format numbers with thousand separators
+  const formatNumber = (num: number) => num.toLocaleString('en-US');
+
   const stats = [
     {
       icon: Package,
@@ -62,7 +65,7 @@ export const StatsDisplay = ({ totalTools, categoryStats }: StatsDisplayProps) =
                 end={stat.value}
                 delay={0}
                 decimals={0}
-                separator=","
+                formattingFn={formatNumber}
                 className="text-lg font-semibold text-siso-text-bold"
               />
               <span className="text-sm text-siso-text/70">{stat.label}</span>

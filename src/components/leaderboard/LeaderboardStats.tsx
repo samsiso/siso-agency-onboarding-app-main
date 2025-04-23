@@ -2,7 +2,6 @@
 import { Trophy, Users, Coins, TrendingUp } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import CountUp from 'react-countup';
-import { formatCompactNumber } from '@/lib/formatters';
 
 interface LeaderboardStatsProps {
   totalUsers: number;
@@ -11,6 +10,9 @@ interface LeaderboardStatsProps {
 }
 
 export const LeaderboardStats = ({ totalUsers, totalPoints, totalSisoTokens }: LeaderboardStatsProps) => {
+  // Helper function to format numbers with thousand separators
+  const formatNumber = (num: number) => num.toLocaleString('en-US');
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
       <Card className="bg-gradient-to-br from-siso-bg-alt to-siso-bg-alt/50 hover:border-siso-border-hover transition-all duration-300">
@@ -24,7 +26,7 @@ export const LeaderboardStats = ({ totalUsers, totalPoints, totalSisoTokens }: L
                     end={totalUsers}
                     delay={0}
                     decimals={0}
-                    separator=","
+                    formattingFn={formatNumber}
                   />
                 </p>
                 <span className="text-xs text-green-500 flex items-center">
@@ -49,7 +51,7 @@ export const LeaderboardStats = ({ totalUsers, totalPoints, totalSisoTokens }: L
                     end={totalPoints}
                     delay={0}
                     decimals={0}
-                    separator=","
+                    formattingFn={formatNumber}
                   />
                 </p>
                 <span className="text-xs text-green-500 flex items-center">
@@ -74,7 +76,7 @@ export const LeaderboardStats = ({ totalUsers, totalPoints, totalSisoTokens }: L
                     end={totalSisoTokens}
                     delay={0}
                     decimals={0}
-                    separator=","
+                    formattingFn={formatNumber}
                   />
                 </p>
                 <span className="text-xs text-green-500 flex items-center">
@@ -99,7 +101,7 @@ export const LeaderboardStats = ({ totalUsers, totalPoints, totalSisoTokens }: L
                     end={Math.floor(totalUsers * 0.4)}
                     delay={0}
                     decimals={0}
-                    separator=","
+                    formattingFn={formatNumber}
                   />
                 </p>
                 <span className="text-xs text-green-500 flex items-center">
