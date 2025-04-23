@@ -3,7 +3,7 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PlusCircle, Home, Component, ExternalLink } from 'lucide-react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { ProjectDirectoryCard } from '@/components/projects/ProjectDirectoryCard';
 import { ActiveTasksView } from '@/components/projects/ActiveTasksView';
 import { useProjects } from '@/hooks/useProjects';
@@ -16,12 +16,14 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react';
 
 export default function ProjectsAndTasksPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
   const { data: projects, isLoading, error } = useProjects();
+  const [selectedProject, setSelectedProject] = useState<string | null>(null);
   
   const isTasksView = location.pathname === '/projects/tasks';
 
