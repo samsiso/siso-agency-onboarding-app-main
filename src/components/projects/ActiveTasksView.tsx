@@ -2,12 +2,12 @@
 import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  ListGroup,
-  ListHeader,
-  ListItem,
-  ListItems,
-  ListProvider,
-} from "@/components/ui/list";
+  KanbanBoard,
+  KanbanCard,
+  KanbanCards,
+  KanbanHeader,
+  KanbanProvider,
+} from "@/components/ui/kanban";
 import { type DragEndEvent } from "@dnd-kit/core";
 
 const taskStatuses = [
@@ -20,6 +20,8 @@ const demoTasks = [
   {
     id: "1",
     name: "Research potential tech stack",
+    startAt: new Date(),
+    endAt: new Date(),
     status: taskStatuses[0],
     owner: {
       name: "Alex Johnson",
@@ -29,6 +31,8 @@ const demoTasks = [
   {
     id: "2",
     name: "Create project architecture",
+    startAt: new Date(),
+    endAt: new Date(),
     status: taskStatuses[1],
     owner: {
       name: "Sam Wilson",
@@ -38,6 +42,8 @@ const demoTasks = [
   {
     id: "3",
     name: "Setup development environment",
+    startAt: new Date(),
+    endAt: new Date(),
     status: taskStatuses[2],
     owner: {
       name: "Maria Garcia",
@@ -63,34 +69,32 @@ export function ActiveTasksView() {
           return { ...task, status };
         }
         return task;
-      }),
+      })
     );
   };
 
   return (
-    <div className="space-y-4">
-      <ListProvider onDragEnd={handleDragEnd}>
-        {taskStatuses.map((status) => (
-          <ListGroup key={status.name} id={status.name}>
-            <ListHeader name={status.name} color={status.color} />
-            <ListItems>
-              {tasks
-                .filter((task) => task.status.name === status.name)
-                .map((task, index) => (
-                  <ListItem
-                    key={task.id}
-                    id={task.id}
-                    name={task.name}
-                    parent={task.status.name}
-                    index={index}
-                  >
-                    <div
-                      className="h-2 w-2 shrink-0 rounded-full"
-                      style={{ backgroundColor: task.status.color }}
-                    />
-                    <p className="m-0 flex-1 font-medium text-sm">
-                      {task.name}
-                    </p>
+    <KanbanProvider onDragEnd={handleDragEnd}>
+      {taskStatuses.map((status) => (
+        <KanbanBoard key={status.name} id={status.name}>
+          <KanbanHeader name={status.name} color={status.color} />
+          <KanbanCards>
+            {tasks
+              .filter((task) => task.status.name === status.name)
+              .map((task, index) => (
+                <KanbanCard
+                  key={task.id}
+                  id={task.id}
+                  name={task.name}
+                  parent={status.name}
+                  index={index}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex flex-col gap-1">
+                      <p className="m-0 flex-1 font-medium text-sm">
+                        {task.name}
+                      </p>
+                    </div>
                     {task.owner && (
                       <Avatar className="h-6 w-6 shrink-0">
                         <AvatarImage src={task.owner.image} />
@@ -99,12 +103,12 @@ export function ActiveTasksView() {
                         </AvatarFallback>
                       </Avatar>
                     )}
-                  </ListItem>
-                ))}
-            </ListItems>
-          </ListGroup>
-        ))}
-      </ListProvider>
-    </div>
+                  </div>
+                </KanbanCard>
+              ))}
+          </KanbanCards>
+        </KanbanBoard>
+      ))}
+    </KanbanProvider>
   );
 }
