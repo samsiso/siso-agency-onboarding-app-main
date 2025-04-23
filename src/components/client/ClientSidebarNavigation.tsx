@@ -148,10 +148,10 @@ export function ClientSidebarNavigation({ collapsed = false, onItemClick = () =>
                         >
                           <a
                             href={section.href}
-                            onClick={e => {
+                            onClick={(e) => {
                               e.preventDefault();
                               navigate(section.href!);
-                              onItemClick(e);
+                              onItemClick(); // Removed the argument here
                             }}
                             className="flex items-center gap-3 w-full"
                           >
@@ -179,10 +179,10 @@ export function ClientSidebarNavigation({ collapsed = false, onItemClick = () =>
                               >
                                 <a
                                   href={item.href}
-                                  onClick={e => {
+                                  onClick={(e) => {
                                     e.preventDefault();
                                     navigate(item.href);
-                                    onItemClick(e);
+                                    onItemClick(); // Removed the argument here
                                   }}
                                   className="flex items-center gap-3 w-full"
                                 >
