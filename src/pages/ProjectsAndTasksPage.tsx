@@ -1,12 +1,19 @@
-
 import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, ArrowLeft } from 'lucide-react';
+import { PlusCircle, ArrowLeft, Home, Component } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ProjectDirectoryCard } from '@/components/projects/ProjectDirectoryCard';
 import { ActiveTasksView } from '@/components/projects/ActiveTasksView';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 
 const demoProjects = [
   {
@@ -40,9 +47,47 @@ export default function ProjectsAndTasksPage() {
     }
   };
 
+  const selectedProjectData = selectedProject 
+    ? demoProjects.find(p => p.id === selectedProject)
+    : null;
+
   return (
     <AppLayout>
       <div className="container mx-auto px-4 py-8">
+        <Breadcrumb className="mb-6">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink 
+                href="/home" 
+                className="inline-flex items-center gap-1.5 text-siso-text hover:text-white"
+              >
+                <Home size={16} strokeWidth={2} aria-hidden="true" />
+                Home
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink 
+                href="/projects" 
+                className="inline-flex items-center gap-1.5 text-siso-text hover:text-white"
+              >
+                <Component size={16} strokeWidth={2} aria-hidden="true" />
+                Projects
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            {(isTasksView || selectedProject) && (
+              <>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage className="text-white">
+                    {isTasksView ? "Active Tasks" : selectedProjectData?.name || "Project Details"}
+                  </BreadcrumbPage>
+                </BreadcrumbItem>
+              </>
+            )}
+          </BreadcrumbList>
+        </Breadcrumb>
+
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <div>
             {(selectedProject || isTasksView) && (
