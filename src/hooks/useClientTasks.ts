@@ -33,6 +33,7 @@ export function useClientTasks(clientId?: string) {
 
         if (error) throw error;
 
+        // Map the data to include client information
         setTasks(data.map(task => ({
           id: task.id,
           name: task.title,
@@ -47,9 +48,7 @@ export function useClientTasks(clientId?: string) {
                    task.status === 'in_progress' ? '#F59E0B' : '#6B7280'
           },
           owner: {
-            // Check if client_onboarding data exists and use the appropriate name field
-            name: task.client_onboarding?.contact_name || task.client_onboarding?.company_name || 'Unknown Client',
-            // Generate avatar based on company name if available, otherwise use a fallback
+            name: task.client_onboarding?.company_name || 'Unknown Client',
             image: `https://api.dicebear.com/7.x/initials/svg?seed=${task.client_onboarding?.company_name || 'Client'}`
           }
         })));
