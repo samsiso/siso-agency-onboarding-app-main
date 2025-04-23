@@ -39,6 +39,7 @@ import ClientStatusPage from "./pages/client/ClientStatusPage";
 import ClientSupportPage from "./pages/client/ClientSupportPage";
 import ProjectsAndTasksPage from './pages/ProjectsAndTasksPage';
 import DocumentLibraryPage from './pages/resources/DocumentLibraryPage';
+import ProjectDetailsPage from './pages/ProjectDetailsPage';
 
 // New imports for Financial & Account section
 import PaymentsPage from './pages/financial/PaymentsPage';
@@ -85,6 +86,7 @@ function App() {
         
         {/* Protected Project Routes */}
         <Route path="/projects" element={<AuthGuard><ProjectsAndTasksPage /></AuthGuard>} />
+        <Route path="/projects/:id" element={<AuthGuard><ProjectDetailsPage /></AuthGuard>} />
         <Route path="/projects/tasks" element={<AuthGuard><ProjectsAndTasksPage /></AuthGuard>} />
         <Route path="/my-projects" element={<AuthGuard><MyProjects /></AuthGuard>} />
         <Route path="/plan-builder" element={<AuthGuard><Home /></AuthGuard>} />

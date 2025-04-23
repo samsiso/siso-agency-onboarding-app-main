@@ -51,10 +51,14 @@ export function ProjectDirectoryCard({
     );
   }
 
+  const handleCardClick = () => {
+    navigate(`/projects/${name?.toLowerCase()}`);
+  };
+
   return (
     <Card 
-      onClick={onSelect}
-      className="p-8 bg-black/30 border border-siso-text/10 hover:border-siso-orange/50 transition-all duration-300 group w-full"
+      onClick={handleCardClick}
+      className="p-8 bg-black/30 border border-siso-text/10 hover:border-siso-orange/50 transition-all duration-300 group w-full cursor-pointer"
     >
       <div className="flex flex-col md:flex-row gap-8">
         <div className="flex-shrink-0">
