@@ -17,9 +17,9 @@ export function useClientTasks(clientId?: string) {
           .from('tasks')
           .select(`
             *,
-            client_onboarding!inner(
+            client_onboarding(
               id,
-              full_name,
+              company_name,
               contact_name
             )
           `);
@@ -47,8 +47,10 @@ export function useClientTasks(clientId?: string) {
                    task.status === 'in_progress' ? '#F59E0B' : '#6B7280'
           },
           owner: {
-            name: task.client_onboarding.contact_name || task.client_onboarding.full_name,
-            image: `https://api.dicebear.com/7.x/initials/svg?seed=${task.client_onboarding.full_name}`
+            // Check if client_onboarding data exists and use the appropriate name field
+            name: task.client_onboarding?.contact_name || task.client_onboarding?.company_name || 'Unknown Client',
+            // Generate avatar based on company name if available, otherwise use a fallback
+            image: `https://api.dicebear.com/7.x/initials/svg?seed=${task.client_onboarding?.company_name || 'Client'}`
           }
         })));
       } catch (error) {
