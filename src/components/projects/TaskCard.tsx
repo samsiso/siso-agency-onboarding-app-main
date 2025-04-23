@@ -11,7 +11,7 @@ import {
 import { format } from 'date-fns';
 
 interface TaskCardProps {
-  name: string;  // Changed from title to name
+  name: string;
   startAt: Date;
   endAt: Date;
   category: string;
@@ -20,6 +20,11 @@ interface TaskCardProps {
     image: string;
   };
   priority: 'low' | 'medium' | 'high';
+  status?: {
+    name: string;
+    color: string;
+  };
+  description?: string;
   onClick?: () => void;
 }
 
@@ -29,7 +34,15 @@ const priorityColors = {
   high: 'bg-red-500/20 text-red-400',
 };
 
-export function TaskCard({ name, startAt, endAt, category, owner, priority, onClick }: TaskCardProps) {
+export function TaskCard({ 
+  name, 
+  startAt, 
+  endAt, 
+  category, 
+  owner, 
+  priority,
+  onClick 
+}: TaskCardProps) {
   return (
     <div 
       onClick={onClick}

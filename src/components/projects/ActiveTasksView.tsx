@@ -128,6 +128,8 @@ export function ActiveTasksView() {
                         category={task.category}
                         owner={task.owner}
                         priority={task.priority}
+                        status={task.status}
+                        description={task.description}
                         onClick={() => setSelectedTask(task)}
                       />
                     </KanbanCard>
