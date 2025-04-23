@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Card } from '@/components/ui/card';
@@ -38,8 +37,8 @@ export const KanbanBoard = ({ id, children, className }: KanbanBoardProps) => {
   return (
     <div
       className={cn(
-        'flex h-full min-h-40 flex-col gap-2 rounded-md border bg-secondary p-2 text-xs shadow-sm outline outline-2 transition-all',
-        isOver ? 'outline-primary' : 'outline-transparent',
+        'flex h-full min-h-40 flex-col gap-2 rounded-lg border bg-black/20 p-4 shadow-sm transition-all',
+        isOver ? 'border-primary/50 bg-black/30' : 'border-[#403E43]/20',
         className
       )}
       ref={setNodeRef}
@@ -71,23 +70,23 @@ export const KanbanCard = ({
     });
 
   return (
-    <Card
+    <div
       className={cn(
-        'rounded-md p-3 shadow-sm',
-        isDragging && 'cursor-grabbing',
+        'rounded-lg transition-all',
+        isDragging && 'cursor-grabbing opacity-85 shadow-lg',
         className
       )}
       style={{
         transform: transform
           ? `translateX(${transform.x}px) translateY(${transform.y}px)`
-          : 'none',
+          : undefined,
       }}
       {...listeners}
       {...attributes}
       ref={setNodeRef}
     >
       {children ?? <p className="m-0 font-medium text-sm">{name}</p>}
-    </Card>
+    </div>
   );
 };
 
@@ -114,12 +113,12 @@ export const KanbanHeader = (props: KanbanHeaderProps) =>
   'children' in props ? (
     props.children
   ) : (
-    <div className={cn('flex shrink-0 items-center gap-2', props.className)}>
+    <div className={cn('flex shrink-0 items-center gap-2 mb-2', props.className)}>
       <div
         className="h-2 w-2 rounded-full"
         style={{ backgroundColor: props.color }}
       />
-      <p className="m-0 font-semibold text-sm">{props.name}</p>
+      <p className="m-0 font-semibold text-sm text-gray-200">{props.name}</p>
     </div>
   );
 
