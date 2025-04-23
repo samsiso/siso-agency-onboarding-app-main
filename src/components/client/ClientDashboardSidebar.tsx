@@ -1,28 +1,33 @@
 
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarHeader,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarProvider,
+} from "@/components/ui/sidebar";
 import { useLocation, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { 
-  LayoutDashboard, 
-  Folder, 
-  List, 
-  Calendar, 
-  FileText, 
-  File, 
-  FileText as ChangelogIcon, 
-  DollarSign, 
-  User 
+import {
+  LayoutDashboard,
+  Folder,
+  List,
+  Clock,
+  FileText,
+  File,
+  DollarSign,
+  User,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { useSidebar } from "@/components/ui/sidebar";
 
-type ClientNavItem = {
-  label: string;
-  href: string;
-  icon: React.ElementType;
-};
-
-const navItems: ClientNavItem[] = [
+const sidebarItems = [
   {
     label: "Dashboard",
     href: "/client-dashboard",
@@ -41,17 +46,17 @@ const navItems: ClientNavItem[] = [
   {
     label: "Timeline",
     href: "/client-dashboard/timeline",
-    icon: Calendar,
+    icon: Clock,
   },
   {
     label: "Changelog",
     href: "/client-dashboard/changelog",
-    icon: ChangelogIcon,
+    icon: FileText,
   },
   {
     label: "Documents",
     href: "/client-dashboard/documents",
-    icon: FileText,
+    icon: File,
   },
   {
     label: "Financial",
@@ -66,81 +71,96 @@ const navItems: ClientNavItem[] = [
 ];
 
 export function ClientDashboardSidebar() {
-  const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { state, toggleSidebar } = useSidebar();
 
   return (
-    <motion.aside
-      initial={{ width: 240 }}
-      animate={{ width: collapsed ? 64 : 240 }}
-      className={cn(
-        "h-screen bg-gradient-to-b from-[#f1f0fb] to-[#e5deff] border-r border-slate-200 flex flex-col z-20 shadow-md transition-all fixed md:static"
-      )}
-    >
-      {/* Logo/Header */}
-      <div className="flex items-center p-4 mb-2">
-        <img
-          src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png"
-          alt="Client Portal Logo"
-          className={cn(
-            "h-9 w-9 rounded mr-3 transition-all",
-            collapsed && "mx-auto mr-0"
+    <Sidebar>
+      <SidebarHeader>
+        <div className="flex items-center gap-3 px-1 py-2">
+          <img
+            src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png"
+            alt="Client Portal Logo"
+            className="h-9 w-9 rounded transition-all"
+          />
+          {state === "expanded" && (
+            <span className="font-semibold text-lg text-[#8B5CF6] tracking-tight">Client Portal</span>
           )}
-        />
-        {!collapsed && (
-          <span className="text-xl font-bold text-gray-800 tracking-tight">Client Portal</span>
-        )}
-        <Button
-          size="icon"
-          variant="ghost"
-          className={cn(
-            "ml-auto",
-            collapsed && "mx-auto"
-          )}
-          onClick={() => setCollapsed((c) => !c)}
-        >
-          <svg
-            className={cn("w-5 h-5 text-gray-500 transition-transform duration-200", collapsed ? "rotate-180" : "")}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
+          <Button
+            size="icon"
+            variant="ghost"
+            className="ml-auto"
+            onClick={toggleSidebar}
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={collapsed ? "M13 5l7 7-7 7" : "M11 19l-7-7 7-7"} />
-          </svg>
-        </Button>
-      </div>
-
-      {/* Nav */}
-      <nav className="flex-1">
-        <ul className="flex flex-col gap-1 px-2">
-          {navItems.map((item) => {
-            const active =
-              location.pathname === item.href ||
-              location.pathname.startsWith(item.href + "/");
-            return (
-              <li key={item.href}>
-                <Button
-                  variant={active ? "default" : "ghost"}
-                  className={cn(
-                    "w-full flex items-center gap-3 px-4 py-3 rounded-md text-base justify-start font-medium transition-colors group sidebar-navbutton",
-                    active
-                      ? "bg-vivid-purple text-white shadow"
-                      : "text-slate-700 hover:bg-vivid-purple/10"
-                  )}
-                  onClick={() => navigate(item.href)}
-                >
-                  <item.icon className={cn("w-5 h-5", active ? "text-white" : "text-vivid-purple")} />
-                  {!collapsed && (
-                    <span className={cn("transition-all", collapsed && "opacity-0 w-0")}>{item.label}</span>
-                  )}
-                </Button>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
-      <div className="px-4 py-4 mt-auto">
+            {/* chevron left/right */}
+            {state === "expanded" ? (
+              <span className="sr-only">Collapse</span>
+            ) : (
+              <span className="sr-only">Expand</span>
+            )}
+            <svg
+              className="w-5 h-5 text-vivid-purple"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              style={{
+                transform:
+                  state === "expanded" ? "rotate(180deg)" : "rotate(0deg)",
+                transition: "transform 0.2s",
+              }}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d={
+                  state === "expanded"
+                    ? "M15 19l-7-7 7-7"
+                    : "M9 5l7 7-7 7"
+                }
+              />
+            </svg>
+          </Button>
+        </div>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Your Portal</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {sidebarItems.map((item) => {
+                const isActive =
+                  location.pathname === item.href ||
+                  location.pathname.startsWith(item.href + "/");
+                return (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActive}
+                    >
+                      <a
+                        onClick={(e) => {
+                          e.preventDefault();
+                          navigate(item.href);
+                        }}
+                        href={item.href}
+                        className={cn(
+                          "flex items-center gap-3 w-full"
+                        )}
+                      >
+                        <item.icon className="w-5 h-5" />
+                        <span>{item.label}</span>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+      <SidebarFooter>
         <Button
           variant="outline"
           className="w-full"
@@ -148,7 +168,7 @@ export function ClientDashboardSidebar() {
         >
           Logout
         </Button>
-      </div>
-    </motion.aside>
+      </SidebarFooter>
+    </Sidebar>
   );
 }
