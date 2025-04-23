@@ -37,18 +37,13 @@ export const getMenuSections = (): MenuSection[] => {
     },
     {
       type: 'section',
-      title: 'Financial',
+      title: 'Financial Hub',
       icon: CreditCard,
       items: [
         {
           href: '/payments',
           icon: CreditCard,
-          label: 'Payments',
-        },
-        {
-          href: '/economy/earn',
-          icon: Trophy,
-          label: 'How to Earn',
+          label: 'Payments & Billing',
         },
         {
           href: '/economy/leaderboards',
