@@ -46,7 +46,7 @@ export function TaskCard({
   return (
     <div 
       onClick={onClick}
-      className="flex flex-col gap-2 p-3 rounded-lg bg-gradient-to-br from-[#1A1F2C] to-[#221F26] border border-[#403E43]/30 backdrop-blur-sm transition-all hover:border-[#403E43]/50 cursor-pointer"
+      className="flex flex-col gap-2 p-3 rounded-lg bg-black/40 border border-white/5 backdrop-blur-sm transition-all hover:bg-black/60 hover:border-white/10 cursor-pointer"
     >
       <div className="flex items-start justify-between">
         <div className="flex flex-col gap-1">
@@ -77,7 +77,7 @@ export function TaskCard({
       </div>
       
       <div className="flex flex-col gap-1">
-        <span className="text-xs text-[#aaadb0]">
+        <span className="text-xs text-gray-400">
           {format(startAt, 'MMM d')} - {format(endAt, 'MMM d, yyyy')}
         </span>
         <Badge variant="outline" className="w-fit text-[10px] bg-purple-500/20 text-purple-400">

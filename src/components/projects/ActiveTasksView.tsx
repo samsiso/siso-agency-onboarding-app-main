@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import {
   KanbanBoard,
@@ -10,6 +9,7 @@ import {
 import { TaskCard } from './TaskCard';
 import { TaskDetailsSheet } from './TaskDetailsSheet';
 import { useToast } from '@/hooks/use-toast';
+import { GlowEffect } from '@/components/ui/glow-effect';
 
 const taskStatuses = [
   { id: "1", name: "To Do", color: "#6B7280" },
@@ -135,6 +135,19 @@ export function ActiveTasksView() {
     });
   };
 
+  const getStatusColors = (statusName: string) => {
+    switch (statusName) {
+      case 'To Do':
+        return ['#FF4747', '#FF1A1A', '#CC0000', '#990000'];
+      case 'In Progress':
+        return ['#F97316', '#FB923C', '#FDBA74', '#FFB266'];
+      case 'Completed':
+        return ['#22C55E', '#16A34A', '#15803D', '#166534'];
+      default:
+        return ['#6B7280', '#4B5563', '#374151', '#1F2937'];
+    }
+  };
+
   return (
     <div className="p-4">
       <TaskDetailsSheet
@@ -150,27 +163,36 @@ export function ActiveTasksView() {
             <KanbanBoard 
               key={status.name} 
               id={status.name}
-              className="bg-black/20 border-[#403E43]/30 hover:border-[#403E43]/50"
+              className="relative bg-transparent border-none"
             >
-              <KanbanHeader name={status.name} color={status.color} />
-              <KanbanCards>
-                {tasks
-                  .filter((task) => task.status.name === status.name)
-                  .map((task, index) => (
-                    <KanbanCard
-                      key={task.id}
-                      id={task.id}
-                      name={task.name}
-                      parent={status.name}
-                      index={index}
-                      className="bg-transparent shadow-none p-0"
-                    >
-                      <div onClick={() => setSelectedTask(task)}>
-                        <TaskCard {...task} />
-                      </div>
-                    </KanbanCard>
-                  ))}
-              </KanbanCards>
+              <div className="relative w-full h-full">
+                <GlowEffect
+                  colors={getStatusColors(status.name)}
+                  mode="static"
+                  blur="medium"
+                />
+                <div className="relative bg-black/80 backdrop-blur-xl border border-white/10 rounded-lg p-4">
+                  <KanbanHeader name={status.name} color={status.color} />
+                  <KanbanCards>
+                    {tasks
+                      .filter((task) => task.status.name === status.name)
+                      .map((task, index) => (
+                        <KanbanCard
+                          key={task.id}
+                          id={task.id}
+                          name={task.name}
+                          parent={status.name}
+                          index={index}
+                          className="bg-transparent shadow-none p-0"
+                        >
+                          <div onClick={() => setSelectedTask(task)}>
+                            <TaskCard {...task} />
+                          </div>
+                        </KanbanCard>
+                      ))}
+                  </KanbanCards>
+                </div>
+              </div>
             </KanbanBoard>
           ))}
         </div>
