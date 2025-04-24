@@ -2,6 +2,7 @@
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Waves } from '@/components/ui/waves-background';
 import { FloatingOrbs } from '@/components/effects/FloatingOrbs';
+import { VercelV0Chat } from "@/components/ui/v0-ai-chat";
 
 export default function PlanBuilder() {
   return (
@@ -28,9 +29,9 @@ export default function PlanBuilder() {
           />
         </div>
 
-        {/* Content container - empty for now */}
+        {/* Content container with VercelV0Chat */}
         <div className="relative z-20 container mx-auto px-4 py-8">
-          {/* Future content will go here */}
+          <VercelV0Chat />
         </div>
       </div>
     </AppLayout>
