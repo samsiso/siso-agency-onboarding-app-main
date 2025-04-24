@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import {
   KanbanBoard,
@@ -8,7 +7,7 @@ import {
   KanbanProvider,
 } from "@/components/ui/kanban";
 import { TaskCard } from './TaskCard';
-import { TaskDetailsDialog } from './TaskDetailsDialog';
+import { TaskDetailsSheet } from './TaskDetailsSheet';
 import { useToast } from '@/hooks/use-toast';
 
 const taskStatuses = [
@@ -137,11 +136,10 @@ export function ActiveTasksView() {
 
   return (
     <div className="p-4">
-      <TaskDetailsDialog
+      <TaskDetailsSheet
         task={selectedTask}
         isOpen={!!selectedTask}
         onClose={() => setSelectedTask(null)}
-        onSave={handleUpdateTask}
       />
       
       <KanbanProvider onDragEnd={handleDragEnd}>

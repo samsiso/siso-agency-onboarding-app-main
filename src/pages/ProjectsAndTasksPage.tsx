@@ -67,24 +67,25 @@ export default function ProjectsAndTasksPage() {
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink 
-                href="/projects" 
-                className="inline-flex items-center gap-1.5 text-siso-text hover:text-white"
-              >
-                <Component size={16} strokeWidth={2} aria-hidden="true" />
-                Projects
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            {isTasksView && (
+            {isTasksView ? (
               <>
+                <BreadcrumbItem>
+                  <BreadcrumbLink 
+                    href="/projects"
+                    className="inline-flex items-center gap-1.5 text-siso-text hover:text-white"
+                  >
+                    Tasks
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <BreadcrumbPage className="text-white">
-                    Active Tasks
-                  </BreadcrumbPage>
+                  <BreadcrumbPage>Active Tasks</BreadcrumbPage>
                 </BreadcrumbItem>
               </>
+            ) : (
+              <BreadcrumbItem>
+                <BreadcrumbPage>Projects</BreadcrumbPage>
+              </BreadcrumbItem>
             )}
           </BreadcrumbList>
         </Breadcrumb>
@@ -92,12 +93,12 @@ export default function ProjectsAndTasksPage() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <div>
             <h1 className="text-3xl font-bold text-gradient-to-r from-[#9b87f5] to-[#6E59A5] mb-2">
-              Projects
+              {isTasksView ? 'Tasks' : 'Projects'}
             </h1>
             <p className="text-siso-text">
               {isTasksView 
-                ? "Track and manage development tasks for your cryptocurrency project"
-                : "Monitor and manage your blockchain application development"
+                ? "Track and manage your tasks efficiently"
+                : "Monitor and manage your projects"
               }
             </p>
           </div>
