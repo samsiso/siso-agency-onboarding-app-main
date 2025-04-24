@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import {
   KanbanBoard,
@@ -140,6 +141,7 @@ export function ActiveTasksView() {
         task={selectedTask}
         isOpen={!!selectedTask}
         onClose={() => setSelectedTask(null)}
+        onUpdateTask={handleUpdateTask}
       />
       
       <KanbanProvider onDragEnd={handleDragEnd}>
@@ -163,10 +165,9 @@ export function ActiveTasksView() {
                       index={index}
                       className="bg-transparent shadow-none p-0"
                     >
-                      <TaskCard
-                        {...task}
-                        onClick={() => setSelectedTask(task)}
-                      />
+                      <div onClick={() => setSelectedTask(task)}>
+                        <TaskCard {...task} />
+                      </div>
                     </KanbanCard>
                   ))}
               </KanbanCards>

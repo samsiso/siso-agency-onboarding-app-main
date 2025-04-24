@@ -9,6 +9,7 @@ import {
   useDroppable,
 } from '@dnd-kit/core';
 import type { DragEndEvent } from '@dnd-kit/core';
+import { GripVertical } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 export type Status = {
@@ -63,11 +64,10 @@ export const KanbanCard = ({
   children,
   className,
 }: KanbanCardProps) => {
-  const { attributes, listeners, setNodeRef, transform, isDragging } =
-    useDraggable({
-      id,
-      data: { index, parent },
-    });
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id,
+    data: { index, parent },
+  });
 
   return (
     <div
@@ -81,11 +81,20 @@ export const KanbanCard = ({
           ? `translateX(${transform.x}px) translateY(${transform.y}px)`
           : undefined,
       }}
-      {...listeners}
-      {...attributes}
       ref={setNodeRef}
     >
-      {children ?? <p className="m-0 font-medium text-sm">{name}</p>}
+      <div className="flex items-start gap-2">
+        <div 
+          className="p-1 rounded hover:bg-gray-500/10 cursor-grab active:cursor-grabbing"
+          {...listeners} 
+          {...attributes}
+        >
+          <GripVertical className="h-4 w-4 text-gray-500" />
+        </div>
+        <div className="flex-1">
+          {children ?? <p className="m-0 font-medium text-sm">{name}</p>}
+        </div>
+      </div>
     </div>
   );
 };
