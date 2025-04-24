@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { usePlanData, PlanDataType } from '@/hooks/usePlanData';
@@ -12,10 +11,10 @@ interface ClientAppDetailsResult {
   error: Error | null;
 }
 
-const mockAppData = (businessName: string): PlanDataType => {
-  // Generate consistent mock data based on business name
-  const mockTemplates = {
-    gym: {
+const getMockAppData = (userId: string): PlanDataType => {
+  // Generate consistent mock data based on user ID
+  const mockData = {
+    'user-1': {
       app_name: 'FitFlow Manager',
       description: 'A comprehensive gym management platform with member tracking, class scheduling, and payment processing.',
       features: [
@@ -27,61 +26,101 @@ const mockAppData = (businessName: string): PlanDataType => {
       ],
       estimated_cost: 7500,
       estimated_days: 45,
-      industry_type: 'fitness'
+      status: 'active'
     },
-    agency: {
-      app_name: 'Agency Suite Pro',
-      description: 'All-in-one agency management platform for client relationships, project tracking, and resource allocation.',
+    'user-2': {
+      app_name: 'CreatorHub Studio',
+      description: 'All-in-one content creator management platform for OnlyFans creators and agencies.',
       features: [
-        'Client Portal',
-        'Project Management',
-        'Resource Allocation',
-        'Time Tracking',
-        'Invoicing System'
+        'Content Calendar',
+        'Analytics Dashboard',
+        'Automated Scheduling',
+        'Revenue Tracking',
+        'Chat Management'
       ],
       estimated_cost: 12000,
       estimated_days: 60,
-      industry_type: 'agency'
+      status: 'in_progress'
     },
-    default: {
-      app_name: 'Business Management Suite',
-      description: 'Custom business management solution tailored to streamline operations and boost efficiency.',
+    'user-3': {
+      app_name: 'Agency Suite Pro',
+      description: 'Complete agency management solution for digital marketing and creative agencies.',
       features: [
-        'User Management',
-        'Dashboard Analytics',
-        'Task Management',
-        'Reporting System',
-        'Client Communication'
+        'Project Management',
+        'Client Portal',
+        'Team Collaboration',
+        'Resource Planning',
+        'Invoicing System'
       ],
-      estimated_cost: 5000,
-      estimated_days: 30,
-      industry_type: 'business'
+      estimated_cost: 9500,
+      estimated_days: 50,
+      status: 'completed'
     }
   };
 
-  // Determine template based on business name
-  let template = mockTemplates.default;
-  if (businessName.toLowerCase().includes('gym') || businessName.toLowerCase().includes('fitness')) {
-    template = mockTemplates.gym;
-  } else if (businessName.toLowerCase().includes('agency') || businessName.toLowerCase().includes('studio')) {
-    template = mockTemplates.agency;
-  }
+  const defaultData = {
+    app_name: 'Custom Business Suite',
+    description: 'Tailored business management platform designed to streamline operations and boost efficiency.',
+    features: [
+      'User Management',
+      'Dashboard Analytics',
+      'Task Management',
+      'Reporting System',
+      'Client Communication'
+    ],
+    estimated_cost: 5000,
+    estimated_days: 30,
+    status: 'pending'
+  };
+
+  const mockEntry = mockData[userId as keyof typeof mockData] || defaultData;
 
   return {
-    id: crypto.randomUUID(),
-    username: businessName.toLowerCase().replace(/\s+/g, '-'),
-    company_name: businessName,
-    app_name: template.app_name,
-    description: template.description,
-    features: template.features,
+    id: userId,
+    username: userId,
+    company_name: `Company ${userId.split('-')[1]}`,
+    ...mockEntry,
     branding: {
       primary_color: '#3182CE',
       secondary_color: '#805AD5'
     },
-    estimated_cost: template.estimated_cost,
-    estimated_days: template.estimated_days,
-    status: Math.random() > 0.5 ? 'active' : 'completed',
-    industry_type: template.industry_type
+    industry_type: 'software'
+  };
+};
+
+const getMockClientData = (userId: string): ClientData => {
+  return {
+    id: userId,
+    full_name: `Demo User ${userId.split('-')[1]}`,
+    email: `user${userId.split('-')[1]}@example.com`,
+    business_name: `Business ${userId.split('-')[1]}`,
+    phone: null,
+    avatar_url: null,
+    status: 'active',
+    current_step: 3,
+    total_steps: 5,
+    completed_steps: ['setup', 'design', 'development'],
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    website_url: null,
+    professional_role: 'Business Owner',
+    bio: null,
+    project_name: null,
+    company_niche: 'Technology',
+    development_url: null,
+    mvp_build_status: null,
+    notion_plan_url: null,
+    payment_status: null,
+    estimated_price: null,
+    initial_contact_date: null,
+    start_date: null,
+    estimated_completion_date: null,
+    todos: [],
+    next_steps: null,
+    key_research: null,
+    priority: null,
+    contact_name: null,
+    company_name: null
   };
 };
 
@@ -90,20 +129,24 @@ export function useClientAppDetails(clientId?: string | null): ClientAppDetailsR
   const [error, setError] = useState<Error | null>(null);
   const [username, setUsername] = useState<string | undefined>(undefined);
   
-  // Use existing hooks to fetch data
-  const { clientData, loading: clientLoading } = useClientDetails(clientId);
-  const { planData, loading: planLoading, error: planError } = usePlanData(username);
+  // Use existing hooks
+  const { clientData: realClientData, loading: clientLoading } = useClientDetails(clientId);
+  const { planData, loading: planLoading } = usePlanData(username);
 
-  // Generate mock data when real data is not found
   useEffect(() => {
-    if (clientData && !planData && !planLoading) {
-      const mockData = mockAppData(clientData.business_name || 'Default Business');
-      setUsername(mockData.username);
+    if (!clientId) {
+      setLoading(false);
+      setError(new Error('No client ID provided'));
+      return;
     }
-  }, [clientData, planData, planLoading]);
 
-  // Find the username from client data for plans lookup
-  useEffect(() => {
+    // For mock data (user-1, user-2, etc), skip the real data fetch
+    if (clientId.startsWith('user-')) {
+      setUsername(clientId);
+      setLoading(false);
+      return;
+    }
+
     const fetchUsername = async () => {
       if (!clientId) return;
       
@@ -134,8 +177,8 @@ export function useClientAppDetails(clientId?: string | null): ClientAppDetailsR
           }
           
           // Use client business name as username for plan lookup
-          if (clientData?.business_name) {
-            const formattedUsername = clientData.business_name.toLowerCase().replace(/\s+/g, '-');
+          if (realClientData?.business_name) {
+            const formattedUsername = realClientData.business_name.toLowerCase().replace(/\s+/g, '-');
             setUsername(formattedUsername);
           }
         }
@@ -145,24 +188,22 @@ export function useClientAppDetails(clientId?: string | null): ClientAppDetailsR
       }
     };
 
-    if (clientData && !username) {
+    if (realClientData && !username) {
       fetchUsername();
     }
-  }, [clientId, clientData, username]);
+  }, [clientId, realClientData, username]);
 
   // Combine loading states
   useEffect(() => {
     setLoading(clientLoading || planLoading || !username);
     
-    if (planError) {
-      setError(planError);
-    }
-  }, [clientLoading, planLoading, username, planError]);
+  }, [clientLoading, planLoading, username]);
 
   return {
-    appData: planData || (clientData ? mockAppData(clientData.business_name || 'Default Business') : null),
-    clientData,
-    loading,
+    // If it's a mock user ID, return mock data, otherwise use real data
+    appData: clientId?.startsWith('user-') ? getMockAppData(clientId) : planData,
+    clientData: clientId?.startsWith('user-') ? getMockClientData(clientId) : realClientData,
+    loading: loading || (clientLoading && planLoading),
     error
   };
 }

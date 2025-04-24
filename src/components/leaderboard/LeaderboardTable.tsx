@@ -94,10 +94,9 @@ export const LeaderboardTable = ({ leaderboardData, onUserClick }: LeaderboardTa
   };
   
   const handleRowClick = (entry: LeaderboardEntry) => {
-    // Navigate to the client app details page
-    if (entry.id) {
-      navigate(`/client-app/${entry.id}`);
-    }
+    // Ensure we're using the correct ID format for our mock data
+    const userId = entry.id.startsWith('user-') ? entry.id : `user-${entry.id}`;
+    navigate(`/client-app/${userId}`);
     onUserClick(entry);
   };
 

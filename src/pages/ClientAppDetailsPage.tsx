@@ -21,8 +21,16 @@ export default function ClientAppDetailsPage() {
       <AppLayout>
         <div className="container mx-auto px-4 py-8">
           <div className="bg-black/30 border border-siso-text/10 rounded-lg p-8 text-center">
-            <h2 className="text-2xl font-semibold mb-4 text-white">Error Loading App Details</h2>
-            <p className="text-siso-text mb-6">{error?.message || "Unable to load app details"}</p>
+            <h2 className="text-2xl font-semibold mb-4 text-white">App Details Not Found</h2>
+            <p className="text-siso-text mb-6">
+              We couldn't find the app details you're looking for. This might be because:
+              <br />
+              - The client ID is invalid
+              <br />
+              - You don't have access to this client
+              <br />
+              - The client hasn't set up their app yet
+            </p>
             <Button asChild>
               <Link to="/financial/leaderboards">Return to Leaderboard</Link>
             </Button>
