@@ -1,11 +1,9 @@
-
 import { useProjects } from '@/hooks/useProjects';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card } from '@/components/ui/card';
-import { Tabs, TabsContent } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Timeline } from '@/components/ui/timeline';
 import { ProjectHeader } from './details/ProjectHeader';
-import { ProjectCardNavigation } from './details/ProjectCardNavigation';
 import { ProjectStatsCards } from './details/ProjectStatsCards';
 import { PriorityTasksSection } from './details/PriorityTasksSection';
 import { DevelopmentProgress } from './details/DevelopmentProgress';
@@ -69,17 +67,19 @@ export function ProjectDetails() {
   const location = useLocation();
   const navigate = useNavigate();
   const { data: project, isLoading } = useProjects();
-  const [tasksViewMode, setTasksViewMode] = useState<"table" | "cards">("cards");
+  const [activeTab, setActiveTab] = useState<string>("overview");
 
-  // Get the current tab from the URL
-  const currentTab = location.pathname.split('/').pop() || 'overview';
-  
-  // Redirect to overview tab if on base URL
+  // Update URL when tab changes
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    navigate(`/projects/${id}/${value}`);
+  };
+
+  // Set initial tab from URL
   useEffect(() => {
-    if (location.pathname === `/projects/${id}`) {
-      navigate(`/projects/${id}/overview`, { replace: true });
-    }
-  }, [location.pathname, id, navigate]);
+    const tab = location.pathname.split('/').pop() || 'overview';
+    setActiveTab(tab);
+  }, [location.pathname]);
 
   const teamMembers = [
     {
@@ -134,9 +134,14 @@ export function ProjectDetails() {
         created_at={project.created_at}
       />
 
-      <ProjectCardNavigation projectId={id || ''} />
-      
-      <Tabs value={currentTab} className="w-full">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+        <TabsList className="border-b border-gray-800 pb-0 mb-8">
+          <TabsTrigger value="overview" className="px-4 py-2">Overview</TabsTrigger>
+          <TabsTrigger value="timeline" className="px-4 py-2">Timeline</TabsTrigger>
+          <TabsTrigger value="tasks" className="px-4 py-2">Tasks & Features</TabsTrigger>
+          <TabsTrigger value="team" className="px-4 py-2">Team & Resources</TabsTrigger>
+        </TabsList>
+
         <TabsContent value="overview">
           <div className="space-y-8">
             <ProjectStatsCards />
