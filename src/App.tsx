@@ -1,3 +1,4 @@
+
 import { Routes, Route } from 'react-router-dom';
 import Index from './pages/Index';
 import Auth from './pages/Auth';
@@ -46,6 +47,7 @@ import PaymentsPage from './pages/financial/PaymentsPage';
 import LeaderboardsPage from './pages/financial/LeaderboardsPage';
 import FinancialProfilePage from './pages/financial/FinancialProfilePage';
 import PlanBuilder from './pages/PlanBuilder';
+import ClientAppDetailsPage from './pages/ClientAppDetailsPage';
 
 function App() {
   return (
@@ -98,6 +100,9 @@ function App() {
         <Route path="/financial/payments" element={<AuthGuard><PaymentsPage /></AuthGuard>} />
         <Route path="/financial/leaderboards" element={<AuthGuard><LeaderboardsPage /></AuthGuard>} />
         <Route path="/financial/profile" element={<AuthGuard><FinancialProfilePage /></AuthGuard>} />
+        
+        {/* Client App Details Route */}
+        <Route path="/client-app/:clientId" element={<AuthGuard><ClientAppDetailsPage /></AuthGuard>} />
         
         {/* Legacy Financial Routes (redirected for backward compatibility) */}
         <Route path="/payments" element={<AuthGuard><PaymentsPage /></AuthGuard>} />

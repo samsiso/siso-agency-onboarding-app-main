@@ -4,6 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { cn } from '@/lib/utils';
 import { LeaderboardEntry } from './types';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 interface LeaderboardTableProps {
   leaderboardData: LeaderboardEntry[];
@@ -11,6 +12,8 @@ interface LeaderboardTableProps {
 }
 
 export const LeaderboardTable = ({ leaderboardData, onUserClick }: LeaderboardTableProps) => {
+  const navigate = useNavigate();
+  
   const getDisplayName = (entry: LeaderboardEntry) => {
     if (entry.profile?.full_name) return entry.profile.full_name;
     if (entry.profile?.email) {
@@ -89,6 +92,14 @@ export const LeaderboardTable = ({ leaderboardData, onUserClick }: LeaderboardTa
     }
     return <span className="px-2 py-0.5 text-xs bg-orange-500/30 text-orange-200 rounded-full">Bronze</span>;
   };
+  
+  const handleRowClick = (entry: LeaderboardEntry) => {
+    // Navigate to the client app details page
+    if (entry.id) {
+      navigate(`/client-app/${entry.id}`);
+    }
+    onUserClick(entry);
+  };
 
   return (
     <div className="relative overflow-x-auto rounded-lg border border-siso-border bg-black/20 backdrop-blur-sm">
@@ -121,7 +132,7 @@ export const LeaderboardTable = ({ leaderboardData, onUserClick }: LeaderboardTa
                   "transition-all duration-200 cursor-pointer group",
                   getRowClassName(index)
                 )}
-                onClick={() => onUserClick(entry)}
+                onClick={() => handleRowClick(entry)}
               >
                 <TableCell className="text-center font-medium">
                   <div className="flex items-center justify-center gap-2">

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -19,6 +20,7 @@ export default function LeaderboardPage() {
     refreshLeaderboard 
   } = useLeaderboardData();
   
+  const navigate = useNavigate();
   const { user } = useUser();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPeriod, setSelectedPeriod] = useState('week');
@@ -27,14 +29,14 @@ export default function LeaderboardPage() {
   // Filter the entries based on search query and filters
   const filteredEntries = entries.filter(entry => {
     const nameMatch = entry.profile?.full_name?.toLowerCase().includes(searchQuery.toLowerCase());
-    // Add more filtering logic here as needed
     return nameMatch || searchQuery === '';
   });
 
-  // Handle user click - can be expanded to show detailed profile
+  // Handle user click - navigate to client app details
   const handleUserClick = (entry: LeaderboardEntry) => {
-    console.log('User clicked:', entry);
-    // Could navigate to profile page or open modal with details
+    if (entry.id) {
+      navigate(`/client-app/${entry.id}`);
+    }
   };
 
   const handleSearchChange = (query: string) => {
@@ -51,7 +53,6 @@ export default function LeaderboardPage() {
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
-    // Update filter with category when backend supports this
   };
 
   // Calculate total stats from entries
@@ -71,7 +72,8 @@ export default function LeaderboardPage() {
                 Community Leaderboard
               </h1>
               <p className="text-siso-text/80">
-                Track community contributions, points earned, and rewards across the SISO platform.
+                Track community contributions, points earned, and rewards across the SISO platform. 
+                <span className="text-white font-medium ml-1">Click on any user to view their app details!</span>
               </p>
             </div>
             
