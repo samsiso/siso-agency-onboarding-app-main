@@ -1,4 +1,3 @@
-
 import { useProjects } from '@/hooks/useProjects';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card } from '@/components/ui/card';
@@ -14,6 +13,7 @@ import { ProjectStatsCards } from './details/ProjectStatsCards';
 import { PriorityTasksSection } from './details/PriorityTasksSection';
 import { ViewModeSwitcher } from '@/components/admin/clients/ViewModeSwitcher';
 import { useState } from 'react';
+import { Pill, PillAvatar, PillAvatarGroup, PillIndicator } from '@/components/ui/pill';
 
 interface ProjectDetailsProps {
   projectId?: string;
@@ -67,6 +67,27 @@ const milestones = [
 export function ProjectDetails({ projectId }: ProjectDetailsProps) {
   const { data: project, isLoading } = useProjects();
   const [tasksViewMode, setTasksViewMode] = useState<"table" | "cards">("cards");
+
+  const teamMembers = [
+    {
+      name: "Sarah Designer",
+      role: "UI/UX Designer",
+      avatar: "https://api.dicebear.com/7.x/initials/svg?seed=SD",
+      status: "active"
+    },
+    {
+      name: "John Developer",
+      role: "Smart Contract Developer",
+      avatar: "https://api.dicebear.com/7.x/initials/svg?seed=JD",
+      status: "offline"
+    },
+    {
+      name: "Mike Writer",
+      role: "Technical Writer",
+      avatar: "https://api.dicebear.com/7.x/initials/svg?seed=MW",
+      status: "away"
+    }
+  ];
 
   if (isLoading) {
     return (
@@ -132,39 +153,49 @@ export function ProjectDetails({ projectId }: ProjectDetailsProps) {
 
         <TabsContent value="team">
           <Card className="p-8 bg-black/30 border-siso-text/10">
-            <h2 className="text-2xl font-semibold mb-6">Team Members</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[
-                {
-                  name: "Sarah Designer",
-                  role: "UI/UX Designer",
-                  avatar: "https://api.dicebear.com/7.x/initials/svg?seed=SD"
-                },
-                {
-                  name: "John Developer",
-                  role: "Smart Contract Developer",
-                  avatar: "https://api.dicebear.com/7.x/initials/svg?seed=JD"
-                },
-                {
-                  name: "Mike Writer",
-                  role: "Technical Writer",
-                  avatar: "https://api.dicebear.com/7.x/initials/svg?seed=MW"
-                }
-              ].map((member) => (
-                <Card key={member.name} className="p-6 bg-black/20 border-siso-text/10">
-                  <div className="flex items-center gap-4">
-                    <img
-                      src={member.avatar}
-                      alt={member.name}
-                      className="h-12 w-12 rounded-full"
-                    />
-                    <div>
-                      <h3 className="font-medium text-white">{member.name}</h3>
-                      <p className="text-sm text-siso-text">{member.role}</p>
+            <div className="space-y-6">
+              <h2 className="text-2xl font-semibold mb-6">Team Members</h2>
+              
+              <div className="grid gap-4">
+                {teamMembers.map((member) => (
+                  <div key={member.name} className="flex items-center justify-between p-4 rounded-lg bg-black/20 border border-siso-text/10">
+                    <div className="flex items-center gap-4">
+                      <PillAvatar
+                        src={member.avatar}
+                        fallback={member.name.split(' ').map(n => n[0]).join('')}
+                        className="h-10 w-10"
+                      />
+                      <div>
+                        <h3 className="font-medium text-white">{member.name}</h3>
+                        <p className="text-sm text-siso-text">{member.role}</p>
+                      </div>
                     </div>
+                    
+                    <Pill variant="secondary" className="bg-black/30">
+                      <PillIndicator 
+                        variant={member.status === 'active' ? 'success' : member.status === 'away' ? 'warning' : 'error'} 
+                        pulse={member.status === 'active'}
+                      />
+                      {member.status.charAt(0).toUpperCase() + member.status.slice(1)}
+                    </Pill>
                   </div>
-                </Card>
-              ))}
+                ))}
+              </div>
+              
+              <div className="mt-8">
+                <Pill className="bg-black/30">
+                  <PillAvatarGroup>
+                    {teamMembers.map((member) => (
+                      <PillAvatar
+                        key={member.name}
+                        src={member.avatar}
+                        fallback={member.name.split(' ').map(n => n[0]).join('')}
+                      />
+                    ))}
+                  </PillAvatarGroup>
+                  {teamMembers.length} Active Team Members
+                </Pill>
+              </div>
             </div>
           </Card>
         </TabsContent>
