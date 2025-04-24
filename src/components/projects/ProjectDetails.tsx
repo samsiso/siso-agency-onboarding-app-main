@@ -1,3 +1,4 @@
+
 import { useProjects } from '@/hooks/useProjects';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card } from '@/components/ui/card';
@@ -9,6 +10,10 @@ import { ProjectHeader } from './details/ProjectHeader';
 import { DevelopmentProgress } from './details/DevelopmentProgress';
 import { ProjectActions } from './details/ProjectActions';
 import { ProjectNavigation } from './details/ProjectNavigation';
+import { ProjectStatsCards } from './details/ProjectStatsCards';
+import { PriorityTasksSection } from './details/PriorityTasksSection';
+import { ViewModeSwitcher } from '@/components/admin/clients/ViewModeSwitcher';
+import { useState } from 'react';
 
 interface ProjectDetailsProps {
   projectId?: string;
@@ -61,6 +66,7 @@ const milestones = [
 
 export function ProjectDetails({ projectId }: ProjectDetailsProps) {
   const { data: project, isLoading } = useProjects();
+  const [tasksViewMode, setTasksViewMode] = useState<"table" | "cards">("cards");
 
   if (isLoading) {
     return (
@@ -94,6 +100,10 @@ export function ProjectDetails({ projectId }: ProjectDetailsProps) {
         created_at={project.created_at}
       />
 
+      <ProjectStatsCards />
+      
+      <PriorityTasksSection />
+
       <Tabs defaultValue="overview" className="w-full">
         <ProjectNavigation />
 
@@ -112,7 +122,11 @@ export function ProjectDetails({ projectId }: ProjectDetailsProps) {
 
         <TabsContent value="tasks">
           <Card className="p-8 bg-black/30 border-siso-text/10">
-            <TasksList />
+            <div className="flex justify-between mb-6">
+              <h2 className="text-2xl font-semibold">Project Tasks</h2>
+              <ViewModeSwitcher viewMode={tasksViewMode} setViewMode={setTasksViewMode} />
+            </div>
+            <TasksList viewMode={tasksViewMode} />
           </Card>
         </TabsContent>
 
