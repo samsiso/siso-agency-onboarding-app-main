@@ -2,7 +2,8 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BookOpen, PlayCircle, FileImage } from 'lucide-react';
+import { BookOpen, PlayCircle, FileImage, Shield, Check, X } from 'lucide-react';
+import { StatusBadge } from '@/components/ui/status-badge';
 
 interface ClientAppMediaPreviewProps {
   videoUrl?: string;
@@ -13,7 +14,25 @@ export function ClientAppMediaPreview({ videoUrl, wireframeUrls }: ClientAppMedi
   return (
     <Card className="bg-black/30 border-siso-text/10">
       <CardContent className="p-8">
-        <h2 className="text-xl font-semibold mb-6 text-white">App Preview</h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold text-white">App Preview</h2>
+          <div className="flex gap-2">
+            <StatusBadge 
+              leftIcon={Shield}
+              rightIcon={Check}
+              leftLabel="Protection"
+              rightLabel="Enabled"
+              status="success"
+            />
+            <StatusBadge 
+              leftIcon={Check}
+              rightIcon={Shield}
+              leftLabel="Live"
+              rightLabel="Production"
+              status="success"
+            />
+          </div>
+        </div>
         
         <Tabs defaultValue="video" className="w-full">
           <TabsList className="mb-4">
