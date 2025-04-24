@@ -1,3 +1,4 @@
+
 import { Routes, Route } from 'react-router-dom';
 import Index from './pages/Index';
 import Auth from './pages/Auth';
@@ -14,7 +15,6 @@ import Home from './pages/Home';
 import CryptoExchange from './pages/CryptoExchange';
 import HowToEarn from './pages/HowToEarn';
 import LeaderboardPage from './pages/LeaderboardPage';
-import HelpPage from './pages/HelpPage';
 import { AuthGuard } from './components/auth/AuthGuard';
 import MyProjects from './pages/MyProjects';
 import AdminPlans from './pages/AdminPlans';
@@ -31,7 +31,6 @@ import AdminTasks from './pages/AdminTasks';
 import AdminSettings from './pages/AdminSettings';
 import { TeamMemberTasksView } from './components/admin/tasks/TeamMemberTasksView';
 import TeamMemberTasksPage from './pages/TeamMemberTasksPage';
-import ChangelogPage from './pages/Changelog';
 import ClientDashboard from "./pages/ClientDashboard";
 import ClientDocumentsPage from "./pages/client/ClientDocumentsPage";
 import ClientTasksPage from "./pages/client/ClientTasksPage";
@@ -40,8 +39,9 @@ import ClientSupportPage from "./pages/client/ClientSupportPage";
 import ProjectsAndTasksPage from './pages/ProjectsAndTasksPage';
 import DocumentLibraryPage from './pages/resources/DocumentLibraryPage';
 import ProjectDetailsPage from './pages/ProjectDetailsPage';
+import ResourcesPage from './pages/resources/ResourcesPage';
 
-// New imports for Financial & Account section
+// Financial & Account section
 import PaymentsPage from './pages/financial/PaymentsPage';
 import LeaderboardsPage from './pages/financial/LeaderboardsPage';
 import FinancialProfilePage from './pages/financial/FinancialProfilePage';
@@ -108,28 +108,24 @@ function App() {
         <Route path="/economy/earn" element={<AuthGuard><HowToEarn /></AuthGuard>} />
         <Route path="/economy/leaderboards" element={<AuthGuard><LeaderboardsPage /></AuthGuard>} />
         
-        {/* Protected Support & Settings Routes */}
-        <Route path="/help" element={<AuthGuard><HelpPage /></AuthGuard>} />
-        <Route path="/settings" element={<AuthGuard><Profile /></AuthGuard>} />
-        <Route path="/changelog" element={<AuthGuard><ChangelogPage /></AuthGuard>} />
-
+        {/* Protected Support & Settings Routes - New consolidated pages */}
+        <Route path="/resources" element={<AuthGuard><ResourcesPage /></AuthGuard>} />
+        <Route path="/resources/documents" element={<AuthGuard><DocumentLibraryPage /></AuthGuard>} />
+        
+        {/* Redirect old Routes to new consolidated page */}
+        <Route path="/help" element={<AuthGuard><ResourcesPage /></AuthGuard>} />
+        <Route path="/settings" element={<AuthGuard><ResourcesPage /></AuthGuard>} />
+        <Route path="/resources/help" element={<AuthGuard><ResourcesPage /></AuthGuard>} />
+        <Route path="/resources/help/getting-started" element={<AuthGuard><ResourcesPage /></AuthGuard>} />
+        <Route path="/resources/help/documentation" element={<AuthGuard><ResourcesPage /></AuthGuard>} />
+        <Route path="/resources/help/faq" element={<AuthGuard><ResourcesPage /></AuthGuard>} />
+        
         {/* Client Dashboard Routes - accessible to all authenticated users but with conditional content */}
         <Route path="/client-dashboard" element={<AuthGuard><ClientDashboard /></AuthGuard>} />
         <Route path="/client-dashboard/documents" element={<AuthGuard><ClientDocumentsPage /></AuthGuard>} />
         <Route path="/client-dashboard/tasks" element={<AuthGuard><ClientTasksPage /></AuthGuard>} />
         <Route path="/client-dashboard/status" element={<AuthGuard><ClientStatusPage /></AuthGuard>} />
         <Route path="/client-dashboard/support" element={<AuthGuard><ClientSupportPage /></AuthGuard>} />
-
-        {/* Resources & Support Routes */}
-        <Route path="/resources/documents" element={<AuthGuard><DocumentLibraryPage /></AuthGuard>} />
-        
-        {/* Help Center Routes - make sure these are in the right order */}
-        <Route path="/resources/help" element={<AuthGuard><HelpPage /></AuthGuard>} />
-        <Route path="/resources/help/getting-started" element={<AuthGuard><HelpPage /></AuthGuard>} />
-        <Route path="/resources/help/documentation" element={<AuthGuard><HelpPage /></AuthGuard>} />
-        <Route path="/resources/help/faq" element={<AuthGuard><HelpPage /></AuthGuard>} />
-        
-        <Route path="/changelog" element={<AuthGuard><ChangelogPage /></AuthGuard>} />
       </Routes>
     </>
   );

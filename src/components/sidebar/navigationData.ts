@@ -1,7 +1,8 @@
+
 import { 
   LayoutDashboard, Briefcase, ScrollText, Wallet, 
-  Trophy, FileText, HelpCircle, ClipboardList,
-  ListTodo, Layout, BookOpen, User
+  Trophy, FileText, HelpCircle, ListTodo, 
+  Layout, BookOpen, User
 } from 'lucide-react';
 import { MenuSection } from './types';
 
@@ -63,29 +64,14 @@ export const getMenuSections = (): MenuSection[] => {
       icon: BookOpen,
       items: [
         {
+          href: '/resources',
+          icon: HelpCircle,
+          label: 'Help & Support',
+        },
+        {
           href: '/resources/documents',
           icon: FileText,
           label: 'Document Library',
-        },
-        {
-          href: '/resources/help/getting-started',
-          icon: HelpCircle,
-          label: 'Getting Started',
-        },
-        {
-          href: '/resources/help/documentation',
-          icon: BookOpen,
-          label: 'Documentation',
-        },
-        {
-          href: '/resources/help/faq',
-          icon: ListTodo,
-          label: 'FAQ',
-        },
-        {
-          href: '/changelog',
-          icon: ClipboardList,
-          label: 'Changelog',
         }
       ]
     }
