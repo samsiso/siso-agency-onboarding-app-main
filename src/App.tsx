@@ -1,4 +1,3 @@
-
 import { Routes, Route } from 'react-router-dom';
 import Index from './pages/Index';
 import Auth from './pages/Auth';
@@ -123,7 +122,13 @@ function App() {
 
         {/* Resources & Support Routes */}
         <Route path="/resources/documents" element={<AuthGuard><DocumentLibraryPage /></AuthGuard>} />
+        
+        {/* Help Center Routes */}
         <Route path="/resources/help" element={<AuthGuard><HelpPage /></AuthGuard>} />
+        <Route path="/resources/help/getting-started" element={<AuthGuard><HelpPage /></AuthGuard>} />
+        <Route path="/resources/help/documentation" element={<AuthGuard><HelpPage /></AuthGuard>} />
+        <Route path="/resources/help/faq" element={<AuthGuard><HelpPage /></AuthGuard>} />
+        
         <Route path="/changelog" element={<AuthGuard><ChangelogPage /></AuthGuard>} />
       </Routes>
     </>
