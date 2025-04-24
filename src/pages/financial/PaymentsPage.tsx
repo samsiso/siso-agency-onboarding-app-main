@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { FinancialLayout } from '@/components/layout/FinancialLayout';
 import { useQuery } from '@tanstack/react-query';
@@ -5,10 +6,11 @@ import { fetchInvoices, fetchInvoiceById } from '@/utils/financial/invoicesApi';
 import { fetchTransactions, getFinancialSummary } from '@/utils/financial';
 import { TotalCostCard } from '@/components/admin/financials/TotalCostCard';
 import { ExpensesTimeline } from '@/components/admin/financials/ExpensesTimeline';
-import { Card } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import { 
   Wallet, FileText, AlertCircle, Download, CreditCard, 
   Clock, DownloadCloud, Filter, ChevronDown, PieChart
