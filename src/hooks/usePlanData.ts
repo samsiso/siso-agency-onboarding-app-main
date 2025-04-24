@@ -7,6 +7,7 @@ export interface PlanDataType {
   username: string;
   company_name: string | null;
   app_name: string | null;
+  description: string | null; // Added description property
   features: string[] | null;
   branding: {
     logo?: string;
@@ -22,7 +23,7 @@ export interface PlanDataType {
 export function usePlanData(username: string | undefined) {
   const [loading, setLoading] = useState<boolean>(true);
   const [planData, setPlanData] = useState<PlanDataType | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<Error | null>(null);
   const isMounted = useRef(true);
   
   useEffect(() => {
@@ -37,7 +38,7 @@ export function usePlanData(username: string | undefined) {
       if (!username) {
         if (isMounted.current) {
           setLoading(false);
-          setError("No username provided");
+          setError(new Error("No username provided"));
         }
         return;
       }
@@ -64,6 +65,7 @@ export function usePlanData(username: string | undefined) {
             username: username,
             company_name: username === 'decora' ? 'Decora Agency' : 'Siso Agency',
             app_name: 'OnlyFans Management Suite',
+            description: 'A comprehensive platform to manage OnlyFans content, analytics, and client relationships.',
             features: ['Content Management', 'Analytics Dashboard', 'Client Portal', 'Messaging System'],
             branding: {
               primary_color: '#3182CE',
@@ -84,6 +86,7 @@ export function usePlanData(username: string | undefined) {
             // Convert the branding to the correct format if needed
             const formattedData: PlanDataType = {
               ...data,
+              description: data.description || null,
               branding: typeof data.branding === 'string' 
                 ? JSON.parse(data.branding) 
                 : data.branding
@@ -97,7 +100,7 @@ export function usePlanData(username: string | undefined) {
       } catch (error) {
         console.error('Error in fetchPlanData:', error);
         if (isMounted.current) {
-          setError("Failed to load plan data");
+          setError(error instanceof Error ? error : new Error(String(error)));
           setLoading(false);
         }
       }

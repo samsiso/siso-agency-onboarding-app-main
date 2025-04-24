@@ -64,7 +64,8 @@ export function useClientAppDetails(clientId?: string | null): ClientAppDetailsR
         }
       } catch (err) {
         console.error('Error in fetchUsername:', err);
-        setError(err instanceof Error ? err : new Error('Unknown error fetching username'));
+        // Convert string error to Error object
+        setError(err instanceof Error ? err : new Error(String(err)));
       }
     };
 
