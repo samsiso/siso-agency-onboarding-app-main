@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import {
   KanbanBoard,
@@ -140,9 +141,9 @@ export function ActiveTasksView() {
       case 'To Do':
         return ['#FF4747', '#FF1A1A', '#CC0000', '#990000'];
       case 'In Progress':
-        return ['#F97316', '#FB923C', '#FDBA74', '#FFB266'];
+        return ['#fb923c80', '#f97316', '#fdba74', '#ffb266'];  // Softer orange tones
       case 'Completed':
-        return ['#22C55E', '#16A34A', '#15803D', '#166534'];
+        return ['#22c55e80', '#16a34a', '#15803d', '#166534'];  // Muted green tones
       default:
         return ['#6B7280', '#4B5563', '#374151', '#1F2937'];
     }
@@ -158,22 +159,23 @@ export function ActiveTasksView() {
       />
       
       <KanbanProvider onDragEnd={handleDragEnd}>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 auto-rows-fr">
           {taskStatuses.map((status) => (
             <KanbanBoard 
               key={status.name} 
               id={status.name}
-              className="relative bg-transparent border-none"
+              className="relative bg-transparent border-none min-h-0"
             >
               <div className="relative w-full h-full">
                 <GlowEffect
                   colors={getStatusColors(status.name)}
                   mode="static"
-                  blur="medium"
+                  blur="soft"
+                  scale={0.8}
                 />
-                <div className="relative bg-black/80 backdrop-blur-xl border border-white/10 rounded-lg p-4">
+                <div className="relative bg-black/60 backdrop-blur-xl border border-white/5 rounded-lg p-4">
                   <KanbanHeader name={status.name} color={status.color} />
-                  <KanbanCards>
+                  <KanbanCards className="mt-4 space-y-3">
                     {tasks
                       .filter((task) => task.status.name === status.name)
                       .map((task, index) => (

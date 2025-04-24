@@ -46,7 +46,7 @@ export function TaskCard({
   return (
     <div 
       onClick={onClick}
-      className="flex flex-col gap-2 p-3 rounded-lg bg-black/40 border border-white/5 backdrop-blur-sm transition-all hover:bg-black/60 hover:border-white/10 cursor-pointer"
+      className="flex flex-col gap-2 p-3 rounded-lg bg-black/40 border border-white/5 backdrop-blur-sm transition-all hover:bg-black/50 hover:border-white/10 cursor-pointer"
     >
       <div className="flex items-start justify-between">
         <div className="flex flex-col gap-1">
