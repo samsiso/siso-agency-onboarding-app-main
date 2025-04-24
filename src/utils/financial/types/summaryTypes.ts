@@ -1,25 +1,15 @@
 
-import { FinancialSummary } from '../types';
-
 /**
- * Interface for summary period options
+ * Summary period type - either month or year
  */
-export type SummaryPeriod = 'month' | 'year';
+export type SummaryPeriod = 'month' | 'year' | 'all';
 
 /**
- * Interface for monthly revenue data
- */
-export interface MonthlyRevenue {
-  name: string;
-  revenue: number;
-  expense: number;
-}
-
-/**
- * Summary filters interface
+ * Summary filters for financial data
  */
 export interface SummaryFilters {
-  period?: SummaryPeriod;
-  startDate?: string;
-  endDate?: string;
+  category?: string;
+  vendor?: string;
+  paymentMethod?: string;
+  [key: string]: any;
 }

@@ -1,110 +1,68 @@
 
-import { ResponsiveContainer, AreaChart as RechartsAreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, BarChart as RechartsBarChart, Bar, PieChart as RechartsPieChart, Pie, Cell, Legend } from 'recharts';
+import { ResponsiveContainer, AreaChart as RechartsAreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 
-// Sample data for charts that don't have real data yet
-const barChartData = [
-  { name: 'Jan', value: 4000 },
-  { name: 'Feb', value: 3000 },
-  { name: 'Mar', value: 2000 },
-  { name: 'Apr', value: 2780 },
-  { name: 'May', value: 1890 },
-  { name: 'Jun', value: 2390 },
-  { name: 'Jul', value: 3490 },
-];
+type ChartData = {
+  name: string;
+  revenue: number;
+  expense: number;
+};
 
-const pieChartData = [
-  { name: 'Software', value: 400 },
-  { name: 'Marketing', value: 300 },
-  { name: 'Office', value: 300 },
-  { name: 'Salaries', value: 200 },
-  { name: 'Misc', value: 100 },
-];
+interface AreaChartProps {
+  data: ChartData[];
+}
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
-
-export function AreaChart({ data = [] }) {
-  // Use provided data or fallback to empty array
+export function AreaChart({ data }: AreaChartProps) {
+  // If no data is provided, create some placeholder data
   const chartData = data.length > 0 ? data : [
-    { name: 'Jan', revenue: 4000, expense: 2400 },
-    { name: 'Feb', revenue: 3000, expense: 1398 },
-    { name: 'Mar', revenue: 2000, expense: 9800 },
-    { name: 'Apr', revenue: 2780, expense: 3908 },
-    { name: 'May', revenue: 1890, expense: 4800 },
-    { name: 'Jun', revenue: 2390, expense: 3800 },
-    { name: 'Jul', revenue: 3490, expense: 4300 },
+    { name: 'Jan', revenue: 0, expense: 0 },
+    { name: 'Feb', revenue: 0, expense: 0 },
+    { name: 'Mar', revenue: 0, expense: 0 },
   ];
 
   return (
-    <ResponsiveContainer width="100%" height={300}>
+    <ResponsiveContainer width="100%" height={350}>
       <RechartsAreaChart
         data={chartData}
-        margin={{
-          top: 10,
-          right: 30,
-          left: 0,
-          bottom: 0,
-        }}
+        margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
       >
-        <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-        <XAxis dataKey="name" className="text-xs" />
-        <YAxis className="text-xs" />
-        <Tooltip />
-        <Area type="monotone" dataKey="revenue" stroke="#8884d8" fill="rgba(136, 132, 216, 0.3)" />
-        <Area type="monotone" dataKey="expense" stroke="#82ca9d" fill="rgba(130, 202, 157, 0.3)" />
+        <defs>
+          <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#10B981" stopOpacity={0.8} />
+            <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
+          </linearGradient>
+          <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#EF4444" stopOpacity={0.8} />
+            <stop offset="95%" stopColor="#EF4444" stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+        <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke="#444444" />
+        <Tooltip 
+          contentStyle={{ 
+            backgroundColor: '#111827', 
+            border: '1px solid #374151',
+            borderRadius: '6px'
+          }} 
+          labelStyle={{ color: '#F9FAFB' }} 
+        />
+        <Area 
+          type="monotone" 
+          dataKey="revenue" 
+          stroke="#10B981" 
+          fillOpacity={1} 
+          fill="url(#colorRevenue)" 
+          name="Revenue"
+        />
+        <Area 
+          type="monotone" 
+          dataKey="expense" 
+          stroke="#EF4444" 
+          fillOpacity={1} 
+          fill="url(#colorExpense)"
+          name="Expense" 
+        />
       </RechartsAreaChart>
-    </ResponsiveContainer>
-  );
-}
-
-export function BarChart({ data = [] }) {
-  // Use provided data or fallback to sample data
-  const chartData = data?.length > 0 ? data : barChartData;
-  
-  return (
-    <ResponsiveContainer width="100%" height={300}>
-      <RechartsBarChart
-        data={chartData}
-        margin={{
-          top: 5,
-          right: 30,
-          left: 20,
-          bottom: 5,
-        }}
-      >
-        <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-        <XAxis dataKey="name" className="text-xs" />
-        <YAxis className="text-xs" />
-        <Tooltip />
-        <Bar dataKey="value" fill="#8884d8" />
-      </RechartsBarChart>
-    </ResponsiveContainer>
-  );
-}
-
-export function PieChart({ data = [] }) {
-  // Use provided data or fallback to sample data
-  const chartData = data?.length > 0 ? data : pieChartData;
-  
-  return (
-    <ResponsiveContainer width="100%" height={300}>
-      <RechartsPieChart>
-        <Pie
-          data={chartData}
-          cx="50%"
-          cy="50%"
-          labelLine={false}
-          outerRadius={80}
-          fill="#8884d8"
-          dataKey="value"
-          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-        >
-          {chartData.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-          ))}
-        </Pie>
-        <Tooltip />
-        <Legend />
-      </RechartsPieChart>
     </ResponsiveContainer>
   );
 }
