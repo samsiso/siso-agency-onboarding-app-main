@@ -6,15 +6,16 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, Edit2, MessageSquare, Paperclip, User, X } from "lucide-react";
 import { format } from 'date-fns';
-import { Task } from '@/types/task.types';
+import { UiTask } from './ActiveTasksView';
 
 interface TaskDetailsSheetProps {
-  task: Task | null;
+  task: UiTask | null;
   isOpen: boolean;
   onClose: () => void;
+  onUpdateTask?: (task: UiTask) => void;
 }
 
-export function TaskDetailsSheet({ task, isOpen, onClose }: TaskDetailsSheetProps) {
+export function TaskDetailsSheet({ task, isOpen, onClose, onUpdateTask }: TaskDetailsSheetProps) {
   if (!task) return null;
 
   const getPriorityColor = (priority: string) => {
@@ -30,15 +31,8 @@ export function TaskDetailsSheet({ task, isOpen, onClose }: TaskDetailsSheetProp
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return 'bg-green-500/10 text-green-500 border-green-500/20';
-      case 'in_progress':
-        return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
-      default:
-        return 'bg-gray-500/10 text-gray-500 border-gray-500/20';
-    }
+  const getStatusColor = (status: { name: string, color: string }) => {
+    return `bg-opacity-10 border-opacity-20 text-opacity-90 bg-${status.color} text-${status.color} border-${status.color}`;
   };
 
   return (
@@ -46,13 +40,13 @@ export function TaskDetailsSheet({ task, isOpen, onClose }: TaskDetailsSheetProp
       <SheetContent className="w-[90vw] sm:w-[600px]">
         <SheetHeader className="flex flex-row items-start justify-between">
           <div className="space-y-2">
-            <SheetTitle>{task.title}</SheetTitle>
+            <SheetTitle>{task.name}</SheetTitle>
             <div className="flex gap-2">
               <Badge variant="outline" className={getPriorityColor(task.priority)}>
                 {task.priority}
               </Badge>
-              <Badge variant="outline" className={getStatusColor(task.status)}>
-                {task.status}
+              <Badge variant="outline" style={{backgroundColor: `${task.status.color}20`, color: task.status.color, borderColor: `${task.status.color}40`}}>
+                {task.status.name}
               </Badge>
             </div>
           </div>
@@ -76,7 +70,7 @@ export function TaskDetailsSheet({ task, isOpen, onClose }: TaskDetailsSheetProp
                 Due Date
               </div>
               <p className="text-sm font-medium">
-                {task.due_date ? format(new Date(task.due_date), 'PPP') : 'No due date'}
+                {task.endAt ? format(task.endAt, 'PPP') : 'No due date'}
               </p>
             </div>
 
@@ -86,7 +80,7 @@ export function TaskDetailsSheet({ task, isOpen, onClose }: TaskDetailsSheetProp
                 Assigned To
               </div>
               <p className="text-sm font-medium">
-                {task.assigned_to || 'Unassigned'}
+                {task.owner?.name || 'Unassigned'}
               </p>
             </div>
           </div>
