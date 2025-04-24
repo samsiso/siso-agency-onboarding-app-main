@@ -5,6 +5,8 @@ import { ClientAppHeader } from '@/components/client-app/ClientAppHeader';
 import { ClientAppStats } from '@/components/client-app/ClientAppStats';
 import { ClientAppTimeline } from '@/components/client-app/ClientAppTimeline';
 import { ClientAppFeatures } from '@/components/client-app/ClientAppFeatures';
+import { ClientAppMediaPreview } from '@/components/client-app/ClientAppMediaPreview';
+import { ClientAppCaseStudy } from '@/components/client-app/ClientAppCaseStudy';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -40,6 +42,30 @@ export default function ClientAppDetailsPage() {
     );
   }
 
+  // Mock data for our new components - in a real app this would come from the API
+  const mockCaseStudy = {
+    challenge: "The client needed a comprehensive platform to manage their OnlyFans content creation business, struggling with manual processes and scattered tools.",
+    solution: "We developed a centralized management platform with automated scheduling, analytics, and team collaboration features.",
+    results: [
+      "Reduced content scheduling time by 75%",
+      "Increased revenue by 40% through better analytics",
+      "Improved team coordination and communication"
+    ],
+    metrics: {
+      timeToMarket: "45 days",
+      costSavings: "$50,000/year",
+      userBase: "500+ creators"
+    }
+  };
+
+  const mockPreviewData = {
+    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    wireframeUrls: [
+      "https://via.placeholder.com/800x450",
+      "https://via.placeholder.com/800x450"
+    ]
+  };
+
   return (
     <AppLayout>
       <div className="container mx-auto px-4 py-8 relative">
@@ -72,32 +98,28 @@ export default function ClientAppDetailsPage() {
                 Math.round((clientData.current_step / (clientData.total_steps || 1)) * 100) : 20}
             />
 
-            <Tabs defaultValue="overview" className="w-full">
+            <Tabs defaultValue="preview" className="w-full">
               <TabsList className="mb-8">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="timeline">Timeline</TabsTrigger>
+                <TabsTrigger value="preview">Preview</TabsTrigger>
                 <TabsTrigger value="features">Features</TabsTrigger>
+                <TabsTrigger value="case-study">Case Study</TabsTrigger>
+                <TabsTrigger value="timeline">Timeline</TabsTrigger>
               </TabsList>
 
-              <TabsContent value="overview">
-                <div className="space-y-8">
-                  <div className="bg-black/30 border border-siso-text/10 rounded-lg p-8">
-                    <h3 className="text-xl font-medium mb-4 text-white">App Description</h3>
-                    <p className="text-siso-text">
-                      {appData?.description || 
-                       "This app is being built for the client to help manage their business operations."}
-                    </p>
-                    <ProjectActions />
-                  </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="timeline">
-                <ClientAppTimeline clientData={clientData} />
+              <TabsContent value="preview">
+                <ClientAppMediaPreview {...mockPreviewData} />
               </TabsContent>
 
               <TabsContent value="features">
                 <ClientAppFeatures features={appData?.features || []} />
+              </TabsContent>
+
+              <TabsContent value="case-study">
+                <ClientAppCaseStudy {...mockCaseStudy} />
+              </TabsContent>
+
+              <TabsContent value="timeline">
+                <ClientAppTimeline clientData={clientData} />
               </TabsContent>
             </Tabs>
           </div>
