@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { FinancialLayout } from '@/components/layout/FinancialLayout';
 import { useQuery } from '@tanstack/react-query';
@@ -19,6 +18,9 @@ import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Progress } from '@/components/ui/progress';
 import { Invoice, FinancialTransaction } from '@/utils/financial/types';
+import { PaymentsSummaryCards } from '@/components/admin/financials/payments/PaymentsSummaryCards';
+import { PaymentsHeader } from '@/components/admin/financials/payments/PaymentsHeader';
+import { PaymentMethodsSection } from '@/components/admin/financials/payments/PaymentMethodsSection';
 
 export default function PaymentsPage() {
   const { toast } = useToast();
@@ -160,9 +162,11 @@ export default function PaymentsPage() {
     .filter(expense => expense.recurring_type === 'monthly')
     .reduce((sum, expense) => sum + Number(expense.amount), 0);
 
+    // Calculate total of upcoming expenses
+    const upcomingExpensesTotal = upcomingPayments.reduce((total, invoice) => total + invoice.amount, 0);
+
   return (
     <FinancialLayout title="Payments & Billing">
-      {/* Total Cost Overview Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <TotalCostCard 
           currentCosts={totalCurrentCosts}
@@ -171,28 +175,26 @@ export default function PaymentsPage() {
         <ExpensesTimeline expenses={activeExpenses} />
       </div>
 
-      <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <div className="flex items-center justify-between mb-6">
-          <TabsList className="grid w-full max-w-md grid-cols-3">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="history">Payment History</TabsTrigger>
-            <TabsTrigger value="expenses">Expenses</TabsTrigger>
-          </TabsList>
-          
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={handleDownloadAll}>
-              <DownloadCloud className="mr-2 h-4 w-4" />
-              Download All
-            </Button>
-            
-            <Button variant="default" size="sm">
-              <CreditCard className="mr-2 h-4 w-4" />
-              Manage Payment
-            </Button>
-          </div>
-        </div>
+      <PaymentsHeader handleDownloadAll={handleDownloadAll} />
 
-        {/* Financial Overview Tab */}
+      {upcomingExpenses.length > 0 && (
+        <Card className="mb-6 bg-amber-900/20 border border-amber-400/50">
+          <div className="p-4 flex items-center">
+            <AlertCircle className="h-5 w-5 text-amber-400 mr-2" />
+            <span className="text-amber-200 font-medium">
+              {`£${upcomingExpensesTotal.toFixed(2)} in upcoming expenses due in the next 7 days`}
+            </span>
+          </div>
+        </Card>
+      )}
+
+      <Tabs defaultValue="overview" className="mt-6" onValueChange={setActiveTab}>
+        <TabsList className="grid grid-cols-4 w-full max-w-md">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="history">Payment History</TabsTrigger>
+          <TabsTrigger value="expenses">Expenses</TabsTrigger>
+        </TabsList>
+
         <TabsContent value="overview">
           {isLoading ? (
             <div className="flex justify-center py-10">
@@ -205,97 +207,16 @@ export default function PaymentsPage() {
             </div>
           ) : (
             <>
-              {/* Financial Summary Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <Card className="bg-black/20 border border-siso-text/10 backdrop-blur-sm">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium flex items-center gap-2">
-                      <CreditCard className="h-4 w-4 text-siso-orange" />
-                      Total Current Expenses
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-2xl font-bold">{activeExpenses[0]?.currency || '£'} {totalCurrentExpenses.toFixed(2)}</p>
-                    <p className="text-xs text-muted-foreground">Monthly recurring expenses</p>
-                  </CardContent>
-                </Card>
-                
-                <Card className="bg-black/20 border border-siso-text/10 backdrop-blur-sm">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium flex items-center gap-2">
-                      <Wallet className="h-4 w-4 text-siso-orange" />
-                      Outstanding Balance
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-2xl font-bold">£ {totalOutstandingInvoices.toFixed(2)}</p>
-                    <p className="text-xs text-muted-foreground">{invoices?.filter(i => i.status === 'pending' || i.status === 'overdue').length || 0} pending invoices</p>
-                  </CardContent>
-                </Card>
-                
-                <Card className="bg-black/20 border border-siso-text/10 backdrop-blur-sm">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium flex items-center gap-2">
-                      <PieChart className="h-4 w-4 text-siso-orange" />
-                      Total App Cost
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-2xl font-bold">£ {(financialSummary?.totalExpenses || 0).toFixed(2)}</p>
-                    <p className="text-xs text-muted-foreground">Total investment to date</p>
-                  </CardContent>
-                </Card>
-                
-                <Card className="bg-black/20 border border-siso-text/10 backdrop-blur-sm">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-siso-orange" />
-                      Next Payment Due
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {nextPaymentDue ? (
-                      <>
-                        <p className="text-2xl font-bold">{formatDate(nextPaymentDue.due_date)}</p>
-                        <p className="text-xs text-muted-foreground">£{nextPaymentDue.amount.toFixed(2)} ({nextPaymentDue.invoice_number})</p>
-                      </>
-                    ) : (
-                      <>
-                        <p className="text-2xl font-bold">No payments due</p>
-                        <p className="text-xs text-muted-foreground">All invoices are paid</p>
-                      </>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
+              <PaymentsSummaryCards
+                activeExpenses={activeExpenses}
+                invoices={invoices}
+                financialSummary={financialSummary}
+                nextPaymentDue={nextPaymentDue}
+                formatDate={formatDate}
+              />
               
-              {/* Payment Methods Section */}
-              <Card className="bg-black/20 border border-siso-text/10 backdrop-blur-sm mb-6">
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle className="text-xl">Payment Methods</CardTitle>
-                  <Button variant="outline" size="sm">
-                    <CreditCard className="mr-2 h-4 w-4" />
-                    Add New
-                  </Button>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="flex items-center p-4 border border-siso-text/10 rounded-lg bg-gradient-to-r from-purple-900/10 to-blue-900/10">
-                      <div className="pr-4">
-                        <CreditCard className="h-10 w-10 text-siso-orange" />
-                      </div>
-                      <div className="flex-grow">
-                        <p className="font-medium">**** **** **** 4285</p>
-                        <p className="text-sm text-muted-foreground">Expires 09/25</p>
-                      </div>
-                      <div>
-                        <Button variant="ghost" size="sm">Change</Button>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
+              <PaymentMethodsSection />
+              
               {/* Upcoming Payments */}
               <Card className="bg-black/20 border border-siso-text/10 backdrop-blur-sm mb-6">
                 <CardHeader>
