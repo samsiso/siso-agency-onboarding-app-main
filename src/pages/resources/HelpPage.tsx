@@ -1,14 +1,29 @@
 
 import { AppLayout } from "@/components/layout/AppLayout";
-import { DashboardHelpCenter } from "@/components/dashboard/DashboardHelpCenter";
 import { HelpNavigation } from "@/components/help/HelpNavigation";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { useLocation } from "react-router-dom";
+import { GettingStartedContent } from "@/components/help/content/GettingStartedContent";
+import { DocumentationContent } from "@/components/help/content/DocumentationContent";
+import { FAQContent } from "@/components/help/content/FAQContent";
 
 export default function HelpPage() {
   const location = useLocation();
   const pathSegments = location.pathname.split('/').filter(Boolean);
   
+  const getContent = () => {
+    const path = location.pathname;
+    if (path.includes('/getting-started')) {
+      return <GettingStartedContent />;
+    } else if (path.includes('/documentation')) {
+      return <DocumentationContent />;
+    } else if (path.includes('/faq')) {
+      return <FAQContent />;
+    }
+    // Default to Getting Started
+    return <GettingStartedContent />;
+  };
+
   return (
     <AppLayout>
       <div className="container mx-auto px-4 py-8">
@@ -39,7 +54,7 @@ export default function HelpPage() {
             <HelpNavigation />
           </div>
           <div className="flex-1">
-            <DashboardHelpCenter />
+            {getContent()}
           </div>
         </div>
       </div>
