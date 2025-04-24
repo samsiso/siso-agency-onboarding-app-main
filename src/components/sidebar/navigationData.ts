@@ -59,7 +59,7 @@ export const getMenuSections = (): MenuSection[] => {
       icon: BookOpen,
       items: [
         {
-          href: '/financial/profile',
+          href: '/profile',
           icon: User,
           label: 'Profile & Settings',
         },
@@ -77,3 +77,4 @@ export const getMenuSections = (): MenuSection[] => {
     }
   ];
 };
+

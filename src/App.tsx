@@ -93,14 +93,14 @@ function App() {
         <Route path="/financial/leaderboards" element={<AuthGuard><LeaderboardsPage /></AuthGuard>} />
         
         {/* Account & Resources Routes */}
-        <Route path="/financial/profile" element={<AuthGuard><FinancialProfilePage /></AuthGuard>} />
+        <Route path="/profile" element={<AuthGuard><FinancialProfilePage /></AuthGuard>} />
         <Route path="/resources" element={<AuthGuard><ResourcesPage /></AuthGuard>} />
         <Route path="/resources/documents" element={<AuthGuard><DocumentLibraryPage /></AuthGuard>} />
         
         {/* Redirect legacy routes */}
-        <Route path="/profile" element={<AuthGuard><Navigate to="/financial/profile" replace /></AuthGuard>} />
+        <Route path="/financial/profile" element={<AuthGuard><Navigate to="/profile" replace /></AuthGuard>} />
         <Route path="/help" element={<AuthGuard><Navigate to="/resources" replace /></AuthGuard>} />
-        <Route path="/settings" element={<AuthGuard><Navigate to="/financial/profile" replace /></AuthGuard>} />
+        <Route path="/settings" element={<AuthGuard><Navigate to="/profile" replace /></AuthGuard>} />
         <Route path="/resources/help" element={<AuthGuard><Navigate to="/resources" replace /></AuthGuard>} />
         <Route path="/resources/help/getting-started" element={<AuthGuard><ResourcesPage /></AuthGuard>} />
         <Route path="/resources/help/documentation" element={<AuthGuard><ResourcesPage /></AuthGuard>} />
@@ -112,7 +112,7 @@ function App() {
         {/* Legacy Financial Routes (redirected for backward compatibility) */}
         <Route path="/payments" element={<AuthGuard><PaymentsPage /></AuthGuard>} />
         <Route path="/economy/earn" element={<AuthGuard><HowToEarn /></AuthGuard>} />
-        <Route path="/economy/leaderboards" element={<AuthGuard><LeaderboardsPage /></AuthGuard>} />
+        <Route path="/economy/leaderboards" element={<AuthGuard><LeaderboardPage /></AuthGuard>} />
         
         {/* Client Dashboard Routes - accessible to all authenticated users but with conditional content */}
         <Route path="/client-dashboard" element={<AuthGuard><ClientDashboard /></AuthGuard>} />
