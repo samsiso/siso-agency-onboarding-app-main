@@ -1,10 +1,12 @@
+
 import { 
   LayoutDashboard, Briefcase, ScrollText, Wallet, 
   Trophy, FileText, HelpCircle, ClipboardList,
   ListTodo, Layout, BookOpen, User
 } from 'lucide-react';
+import { MenuSection } from './types';
 
-export const getMenuSections = () => {
+export const getMenuSections = (): MenuSection[] => {
   return [
     {
       type: 'main',
