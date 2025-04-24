@@ -1,4 +1,3 @@
-
 import { useProjects } from '@/hooks/useProjects';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card } from '@/components/ui/card';
@@ -152,20 +151,24 @@ export function ProjectDetails() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="tasks">
-          <div className="space-y-8">
-            <ActiveTasksSection />
-            <FinancialSummarySection />
-            <FeatureRequestsSection />
-          </div>
+        <TabsContent value="active-tasks">
+          <ActiveTasksSection />
         </TabsContent>
 
-        <TabsContent value="team">
-          <div className="space-y-8">
-            <TeamSection teamMembers={teamMembers} />
-            <WireframeSection />
-            <ColorPickerSection />
-          </div>
+        <TabsContent value="financial">
+          <FinancialSummarySection />
+        </TabsContent>
+
+        <TabsContent value="features">
+          <FeatureRequestsSection />
+        </TabsContent>
+
+        <TabsContent value="wireframe">
+          <WireframeSection />
+        </TabsContent>
+
+        <TabsContent value="colors">
+          <ColorPickerSection />
         </TabsContent>
       </Tabs>
     </div>

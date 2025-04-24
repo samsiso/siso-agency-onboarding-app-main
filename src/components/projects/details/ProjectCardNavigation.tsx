@@ -1,13 +1,16 @@
 
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FileText, Calendar, GitBranch, Users } from 'lucide-react';
+import { FileText, Calendar, ListTodo, Wallet, GitBranch, LayoutDashboard, Palette } from 'lucide-react';
 import { Pill } from '@/components/ui/pill';
 
 const navigationItems = [
   { id: 'overview', label: 'Overview', icon: FileText },
   { id: 'timeline', label: 'Timeline', icon: Calendar },
-  { id: 'tasks', label: 'Tasks & Features', icon: GitBranch },
-  { id: 'team', label: 'Team & Resources', icon: Users },
+  { id: 'active-tasks', label: 'Active Tasks', icon: ListTodo },
+  { id: 'financial', label: 'Financial', icon: Wallet },
+  { id: 'features', label: 'Features', icon: GitBranch },
+  { id: 'wireframe', label: 'Wireframe', icon: LayoutDashboard },
+  { id: 'colors', label: 'Colors', icon: Palette }
 ] as const;
 
 interface ProjectCardNavigationProps {
