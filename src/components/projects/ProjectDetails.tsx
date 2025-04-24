@@ -2,26 +2,105 @@
 import { useProjects } from '@/hooks/useProjects';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card } from '@/components/ui/card';
-import { 
-  Accordion, 
-  AccordionContent, 
-  AccordionItem, 
-  AccordionTrigger 
-} from '@/components/ui/accordion';
-import { ListTodo, Timeline, Wallet, FileText, LayoutDashboard, Palette } from 'lucide-react';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
+import { Timeline } from '@/components/ui/timeline';
 import { ProjectHeader } from './details/ProjectHeader';
+import { ProjectCardNavigation } from './details/ProjectCardNavigation';
 import { ProjectStatsCards } from './details/ProjectStatsCards';
-import { ActiveTasksSection } from './details/ActiveTasksSection';
-import { ProjectTimeline } from './details/ProjectTimeline';
-import { FinancialSummarySection } from './details/FinancialSummarySection';
-import { FeatureRequestsSection } from './details/FeatureRequestsSection';
+import { PriorityTasksSection } from './details/PriorityTasksSection';
+import { DevelopmentProgress } from './details/DevelopmentProgress';
+import { ProjectActions } from './details/ProjectActions';
+import { TeamSection } from './details/TeamSection';
 import { WireframeSection } from './details/WireframeSection';
 import { ColorPickerSection } from './details/ColorPickerSection';
-import { useParams } from 'react-router-dom';
+import { FinancialSummarySection } from './details/FinancialSummarySection';
+import { FeatureRequestsSection } from './details/FeatureRequestsSection';
+import { ActiveTasksSection } from './details/ActiveTasksSection';
+import { useState, useEffect } from 'react';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
+
+const milestones = [
+  {
+    title: "Project Initialization",
+    content: (
+      <div className="bg-black/20 rounded-lg p-6 space-y-4">
+        <h3 className="text-lg font-medium text-white">Initial Setup & Planning</h3>
+        <ul className="list-disc list-inside space-y-2 text-siso-text">
+          <li>Project requirements gathering</li>
+          <li>Technical architecture design</li>
+          <li>Development environment setup</li>
+          <li>Team roles assignment</li>
+        </ul>
+      </div>
+    ),
+  },
+  {
+    title: "Smart Contract Development",
+    content: (
+      <div className="bg-black/20 rounded-lg p-6 space-y-4">
+        <h3 className="text-lg font-medium text-white">Core Contract Features</h3>
+        <ul className="list-disc list-inside space-y-2 text-siso-text">
+          <li>Token contract implementation</li>
+          <li>Security measures integration</li>
+          <li>Testing framework setup</li>
+          <li>Audit preparation</li>
+        </ul>
+      </div>
+    ),
+  },
+  {
+    title: "Frontend Development",
+    content: (
+      <div className="bg-black/20 rounded-lg p-6 space-y-4">
+        <h3 className="text-lg font-medium text-white">User Interface</h3>
+        <ul className="list-disc list-inside space-y-2 text-siso-text">
+          <li>Wallet integration</li>
+          <li>Transaction interface</li>
+          <li>Dashboard development</li>
+          <li>Analytics visualization</li>
+        </ul>
+      </div>
+    ),
+  },
+];
 
 export function ProjectDetails() {
   const { id } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
   const { data: project, isLoading } = useProjects();
+  const [tasksViewMode, setTasksViewMode] = useState<"table" | "cards">("cards");
+
+  // Get the current tab from the URL
+  const currentTab = location.pathname.split('/').pop() || 'overview';
+  
+  // Redirect to overview tab if on base URL
+  useEffect(() => {
+    if (location.pathname === `/projects/${id}`) {
+      navigate(`/projects/${id}/overview`, { replace: true });
+    }
+  }, [location.pathname, id, navigate]);
+
+  const teamMembers = [
+    {
+      name: "Sarah Designer",
+      role: "UI/UX Designer",
+      avatar: "https://api.dicebear.com/7.x/initials/svg?seed=SD",
+      status: "active"
+    },
+    {
+      name: "John Developer",
+      role: "Smart Contract Developer",
+      avatar: "https://api.dicebear.com/7.x/initials/svg?seed=JD",
+      status: "offline"
+    },
+    {
+      name: "Mike Writer",
+      role: "Technical Writer",
+      avatar: "https://api.dicebear.com/7.x/initials/svg?seed=MW",
+      status: "away"
+    }
+  ] as const;
 
   if (isLoading) {
     return (
@@ -54,82 +133,41 @@ export function ProjectDetails() {
         status={project.status}
         created_at={project.created_at}
       />
+
+      <ProjectCardNavigation projectId={id || ''} />
       
-      <ProjectStatsCards />
-      
-      <Accordion type="multiple" className="space-y-4">
-        <AccordionItem value="active-tasks" className="border-0">
-          <AccordionTrigger className="bg-black/30 hover:bg-black/40 rounded-lg px-6 py-4 transition-all">
-            <div className="flex items-center gap-2">
-              <ListTodo className="h-5 w-5 text-[#9b87f5]" />
-              <span className="font-semibold">Active Tasks</span>
-            </div>
-          </AccordionTrigger>
-          <AccordionContent className="pt-4">
+      <Tabs value={currentTab} className="w-full">
+        <TabsContent value="overview">
+          <div className="space-y-8">
+            <ProjectStatsCards />
+            <PriorityTasksSection />
+            <DevelopmentProgress />
+            <ProjectActions />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="timeline">
+          <Card className="p-8 bg-black/30 border-siso-text/10">
+            <Timeline data={milestones} />
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="tasks">
+          <div className="space-y-8">
             <ActiveTasksSection />
-          </AccordionContent>
-        </AccordionItem>
-
-        <AccordionItem value="timeline" className="border-0">
-          <AccordionTrigger className="bg-black/30 hover:bg-black/40 rounded-lg px-6 py-4 transition-all">
-            <div className="flex items-center gap-2">
-              <Timeline className="h-5 w-5 text-[#9b87f5]" />
-              <span className="font-semibold">Project Timeline</span>
-            </div>
-          </AccordionTrigger>
-          <AccordionContent className="pt-4">
-            <ProjectTimeline />
-          </AccordionContent>
-        </AccordionItem>
-
-        <AccordionItem value="financial" className="border-0">
-          <AccordionTrigger className="bg-black/30 hover:bg-black/40 rounded-lg px-6 py-4 transition-all">
-            <div className="flex items-center gap-2">
-              <Wallet className="h-5 w-5 text-[#9b87f5]" />
-              <span className="font-semibold">Financial Summary</span>
-            </div>
-          </AccordionTrigger>
-          <AccordionContent className="pt-4">
             <FinancialSummarySection />
-          </AccordionContent>
-        </AccordionItem>
-
-        <AccordionItem value="features" className="border-0">
-          <AccordionTrigger className="bg-black/30 hover:bg-black/40 rounded-lg px-6 py-4 transition-all">
-            <div className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-[#9b87f5]" />
-              <span className="font-semibold">Feature Requests</span>
-            </div>
-          </AccordionTrigger>
-          <AccordionContent className="pt-4">
             <FeatureRequestsSection />
-          </AccordionContent>
-        </AccordionItem>
+          </div>
+        </TabsContent>
 
-        <AccordionItem value="wireframe" className="border-0">
-          <AccordionTrigger className="bg-black/30 hover:bg-black/40 rounded-lg px-6 py-4 transition-all">
-            <div className="flex items-center gap-2">
-              <LayoutDashboard className="h-5 w-5 text-[#9b87f5]" />
-              <span className="font-semibold">Wireframe Elements</span>
-            </div>
-          </AccordionTrigger>
-          <AccordionContent className="pt-4">
+        <TabsContent value="team">
+          <div className="space-y-8">
+            <TeamSection teamMembers={teamMembers} />
             <WireframeSection />
-          </AccordionContent>
-        </AccordionItem>
-
-        <AccordionItem value="colors" className="border-0">
-          <AccordionTrigger className="bg-black/30 hover:bg-black/40 rounded-lg px-6 py-4 transition-all">
-            <div className="flex items-center gap-2">
-              <Palette className="h-5 w-5 text-[#9b87f5]" />
-              <span className="font-semibold">Color Pickers</span>
-            </div>
-          </AccordionTrigger>
-          <AccordionContent className="pt-4">
             <ColorPickerSection />
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
