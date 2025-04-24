@@ -1,4 +1,3 @@
-
 import { useParams, Link } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useClientAppDetails } from '@/hooks/useClientAppDetails';
@@ -55,6 +54,7 @@ export default function ClientAppDetailsPage() {
               appName={appData?.app_name || "App Name"} 
               clientName={clientData?.full_name || clientData?.business_name || "Client"} 
               status={appData?.status || "pending"}
+              description={appData?.description || undefined}
             />
             
             <ClientAppStats 
