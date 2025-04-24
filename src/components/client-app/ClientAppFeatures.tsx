@@ -1,4 +1,5 @@
 
+import React from 'react';  // Add this import at the top of the file
 import { Check, Code, Shield, Zap, Users, BarChart } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
