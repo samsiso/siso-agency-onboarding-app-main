@@ -6,8 +6,8 @@ import { Pill } from '@/components/ui/pill';
 const navigationItems = [
   { id: 'overview', label: 'Overview', icon: FileText },
   { id: 'timeline', label: 'Timeline', icon: Calendar },
-  { id: 'tasks', label: 'Tasks', icon: GitBranch },
-  { id: 'team', label: 'Team', icon: Users },
+  { id: 'tasks', label: 'Tasks & Features', icon: GitBranch },
+  { id: 'team', label: 'Team & Resources', icon: Users },
 ] as const;
 
 interface ProjectCardNavigationProps {

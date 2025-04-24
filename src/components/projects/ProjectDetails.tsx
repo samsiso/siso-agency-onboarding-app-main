@@ -1,18 +1,21 @@
+
 import { useProjects } from '@/hooks/useProjects';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { Timeline } from '@/components/ui/timeline';
-import { KanbanProvider } from '@/components/ui/kanban';
-import { TasksList } from '@/components/projects/TasksList';
 import { ProjectHeader } from './details/ProjectHeader';
 import { DevelopmentProgress } from './details/DevelopmentProgress';
 import { ProjectActions } from './details/ProjectActions';
 import { ProjectStatsCards } from './details/ProjectStatsCards';
 import { PriorityTasksSection } from './details/PriorityTasksSection';
-import { ViewModeSwitcher } from '@/components/admin/clients/ViewModeSwitcher';
 import { TeamSection } from './details/TeamSection';
 import { ProjectCardNavigation } from './details/ProjectCardNavigation';
+import { ActiveTasksSection } from './details/ActiveTasksSection';
+import { FinancialSummarySection } from './details/FinancialSummarySection';
+import { FeatureRequestsSection } from './details/FeatureRequestsSection';
+import { WireframeSection } from './details/WireframeSection';
+import { ColorPickerSection } from './details/ColorPickerSection';
 import { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 
@@ -150,17 +153,19 @@ export function ProjectDetails() {
         </TabsContent>
 
         <TabsContent value="tasks">
-          <Card className="p-8 bg-black/30 border-siso-text/10">
-            <div className="flex justify-between mb-6">
-              <h2 className="text-2xl font-semibold">Project Tasks</h2>
-              <ViewModeSwitcher viewMode={tasksViewMode} setViewMode={setTasksViewMode} />
-            </div>
-            <TasksList viewMode={tasksViewMode} />
-          </Card>
+          <div className="space-y-8">
+            <ActiveTasksSection />
+            <FinancialSummarySection />
+            <FeatureRequestsSection />
+          </div>
         </TabsContent>
 
         <TabsContent value="team">
-          <TeamSection teamMembers={teamMembers} />
+          <div className="space-y-8">
+            <TeamSection teamMembers={teamMembers} />
+            <WireframeSection />
+            <ColorPickerSection />
+          </div>
         </TabsContent>
       </Tabs>
     </div>
