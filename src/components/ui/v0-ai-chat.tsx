@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useRef, useCallback } from "react";
@@ -91,12 +90,12 @@ export function VercelV0Chat() {
 
     return (
         <div className="flex flex-col items-center w-full max-w-4xl mx-auto p-4 space-y-8">
-            <h1 className="text-4xl font-bold text-black dark:text-white">
+            <h1 className="text-4xl font-bold text-white">
                 What can I help you ship?
             </h1>
 
-            <div className="w-full">
-                <div className="relative bg-neutral-900 rounded-xl border border-neutral-800">
+            <div className="w-full shadow-lg">
+                <div className="relative bg-neutral-900/90 backdrop-blur-sm rounded-xl border border-neutral-800">
                     <div className="overflow-y-auto">
                         <Textarea
                             ref={textareaRef}
@@ -124,7 +123,7 @@ export function VercelV0Chat() {
                         />
                     </div>
 
-                    <div className="flex items-center justify-between p-3">
+                    <div className="flex items-center justify-between p-3 border-t border-neutral-800">
                         <div className="flex items-center gap-2">
                             <button
                                 type="button"
@@ -167,7 +166,7 @@ export function VercelV0Chat() {
                     </div>
                 </div>
 
-                <div className="flex items-center justify-center gap-3 mt-4">
+                <div className="flex items-center justify-center gap-3 mt-6">
                     <ActionButton
                         icon={<ImageIcon className="w-4 h-4" />}
                         label="Clone a Screenshot"

@@ -7,7 +7,7 @@ import { VercelV0Chat } from "@/components/ui/v0-ai-chat";
 export default function PlanBuilder() {
   return (
     <AppLayout>
-      <div className="relative min-h-screen w-full">
+      <div className="relative flex items-center justify-center min-h-screen w-full">
         {/* Background layers */}
         <div className="absolute inset-0 z-0">
           <FloatingOrbs />
@@ -15,7 +15,7 @@ export default function PlanBuilder() {
         
         <div className="absolute inset-0 z-10">
           <Waves 
-            lineColor="rgba(155, 135, 245, 0.2)"
+            lineColor="rgba(249, 115, 22, 0.15)"
             backgroundColor="transparent"
             waveSpeedX={0.018}
             waveSpeedY={0.015}
@@ -30,7 +30,7 @@ export default function PlanBuilder() {
         </div>
 
         {/* Content container with VercelV0Chat */}
-        <div className="relative z-20 container mx-auto px-4 py-8">
+        <div className="relative z-20 container mx-auto px-4">
           <VercelV0Chat />
         </div>
       </div>

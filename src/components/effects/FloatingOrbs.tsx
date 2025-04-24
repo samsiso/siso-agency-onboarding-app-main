@@ -19,11 +19,11 @@ export function FloatingOrbs() {
     // Create 5 random orbs
     const newOrbs = Array.from({ length: 5 }, (_, i) => {
       const colors = [
-        'from-siso-red/5 to-siso-orange/5',
-        'from-purple-500/5 to-blue-500/5',
-        'from-blue-500/5 to-green-500/5',
-        'from-green-500/5 to-yellow-500/5',
-        'from-yellow-500/5 to-siso-red/5'
+        'from-orange-500/5 to-orange-400/5',
+        'from-orange-400/5 to-amber-500/5',
+        'from-amber-500/5 to-orange-500/5',
+        'from-orange-600/5 to-amber-400/5',
+        'from-amber-400/5 to-orange-300/5'
       ];
       
       return {
