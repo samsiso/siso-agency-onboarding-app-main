@@ -1,13 +1,15 @@
-
 import React from 'react';
 import { Sheet, SheetContent, SheetHeader } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Share2, Expand, Clock, Star, FileText, Paperclip, MessageSquare, MessageSquarePlus } from "lucide-react";
+import { Share2, Expand, Clock, Star, FileText, Paperclip, MessageSquare, MessageSquarePlus, Square } from "lucide-react";
 import { format } from 'date-fns';
 import { UiTask } from './ActiveTasksView';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import { Progress } from '@/components/ui/progress';
+import { useSubtasks } from '@/hooks/useSubtasks';
+import { SubtaskList } from '@/components/admin/teams/subtasks/SubtaskList';
 
 interface TaskDetailsSheetProps {
   task: UiTask | null;
@@ -19,13 +21,27 @@ interface TaskDetailsSheetProps {
 export function TaskDetailsSheet({ task, isOpen, onClose, onUpdateTask }: TaskDetailsSheetProps) {
   if (!task) return null;
 
+  const {
+    subtasks,
+    handleSubtaskToggle,
+    handleAddSubtask,
+    handleDeleteSubtask,
+    getProgress
+  } = useSubtasks([
+    { id: '1', title: 'Research requirements', completed: false },
+    { id: '2', title: 'Create initial mockups', completed: false },
+    { id: '3', title: 'Get feedback', completed: false }
+  ]);
+
   const getTimePeriod = (start: Date, end: Date) => {
     return `${format(start, 'MMM d')} - ${format(end, 'MMM d, yyyy')}`;
   };
 
+  const progress = getProgress();
+
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="w-[90vw] sm:w-[800px] p-0 bg-background/80 backdrop-blur-xl border-border/20">
+      <SheetContent className="w-[95vw] sm:w-[900px] p-0 bg-background/80 backdrop-blur-xl border-border/20">
         <ScrollArea className="h-[calc(100vh-2rem)]">
           <div className="p-6 space-y-6">
             {/* Category & Actions Header */}
@@ -75,6 +91,40 @@ export function TaskDetailsSheet({ task, isOpen, onClose, onUpdateTask }: TaskDe
               <p className="text-sm text-muted-foreground pl-6">
                 {task.description || "No description provided."}
               </p>
+            </div>
+
+            {/* Subtasks Section */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                  <Square className="h-4 w-4" />
+                  <h3>Subtasks</h3>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={handleAddSubtask}
+                  className="text-xs hover:bg-purple-500/10 text-muted-foreground hover:text-foreground"
+                >
+                  Add Subtask
+                </Button>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Progress value={progress} className="h-2" />
+                  <span className="text-xs text-muted-foreground min-w-[44px]">
+                    {Math.round(progress)}%
+                  </span>
+                </div>
+                
+                <SubtaskList
+                  subtasks={subtasks}
+                  onToggle={handleSubtaskToggle}
+                  onDelete={handleDeleteSubtask}
+                  className="pl-6"
+                />
+              </div>
             </div>
 
             {/* Attachments Section */}
