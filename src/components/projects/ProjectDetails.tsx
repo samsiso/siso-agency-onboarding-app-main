@@ -1,4 +1,3 @@
-
 import { useProjects } from '@/hooks/useProjects';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card } from '@/components/ui/card';
@@ -133,14 +132,12 @@ export function ProjectDetails() {
       />
 
       <ProjectCardNavigation projectId={id || ''} />
-
-      <ProjectStatsCards />
       
-      <PriorityTasksSection />
-
       <Tabs value={currentTab} className="w-full">
         <TabsContent value="overview">
           <div className="space-y-8">
+            <ProjectStatsCards />
+            <PriorityTasksSection />
             <DevelopmentProgress />
             <ProjectActions />
           </div>
