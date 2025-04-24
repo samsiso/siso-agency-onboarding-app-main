@@ -21,6 +21,7 @@ import { Invoice, FinancialTransaction } from '@/utils/financial/types';
 import { PaymentsSummaryCards } from '@/components/admin/financials/payments/PaymentsSummaryCards';
 import { PaymentsHeader } from '@/components/admin/financials/payments/PaymentsHeader';
 import { PaymentMethodsSection } from '@/components/admin/financials/payments/PaymentMethodsSection';
+import { ExpenseCreditCard } from '@/components/admin/financials/ExpenseCreditCard';
 
 export default function PaymentsPage() {
   const { toast } = useToast();
@@ -168,7 +169,7 @@ export default function PaymentsPage() {
   return (
     <FinancialLayout title="Payments & Billing">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <TotalCostCard 
+        <ExpenseCreditCard 
           currentCosts={totalCurrentCosts}
           predictedCosts={predictedMonthlyCosts}
         />
