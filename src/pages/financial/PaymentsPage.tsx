@@ -1,14 +1,14 @@
-
 import { useState, useEffect } from 'react';
 import { FinancialLayout } from '@/components/layout/FinancialLayout';
 import { useQuery } from '@tanstack/react-query';
 import { fetchInvoices, fetchInvoiceById } from '@/utils/financial/invoicesApi';
 import { fetchTransactions, getFinancialSummary } from '@/utils/financial';
-import { Invoice, FinancialTransaction } from '@/utils/financial/types';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { TotalCostCard } from '@/components/admin/financials/TotalCostCard';
+import { ExpensesTimeline } from '@/components/admin/financials/ExpensesTimeline';
+import { Card } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   Wallet, FileText, AlertCircle, Download, CreditCard, 
   Clock, DownloadCloud, Filter, ChevronDown, PieChart
@@ -16,6 +16,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Progress } from '@/components/ui/progress';
+import { Invoice, FinancialTransaction } from '@/utils/financial/types';
 
 export default function PaymentsPage() {
   const { toast } = useToast();
@@ -149,8 +150,25 @@ export default function PaymentsPage() {
     }).format(date);
   };
 
+  // Calculate total current costs from expenses
+  const totalCurrentCosts = activeExpenses.reduce((sum, expense) => sum + Number(expense.amount), 0);
+
+  // Calculate predicted costs (recurring expenses for the next month)
+  const predictedMonthlyCosts = activeExpenses
+    .filter(expense => expense.recurring_type === 'monthly')
+    .reduce((sum, expense) => sum + Number(expense.amount), 0);
+
   return (
     <FinancialLayout title="Payments & Billing">
+      {/* Total Cost Overview Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <TotalCostCard 
+          currentCosts={totalCurrentCosts}
+          predictedCosts={predictedMonthlyCosts}
+        />
+        <ExpensesTimeline expenses={activeExpenses} />
+      </div>
+
       <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="w-full">
         <div className="flex items-center justify-between mb-6">
           <TabsList className="grid w-full max-w-md grid-cols-3">
