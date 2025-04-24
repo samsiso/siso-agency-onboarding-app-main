@@ -4,9 +4,10 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, Edit2, MessageSquare, Paperclip, User, X } from "lucide-react";
+import { Share2, Expand, Clock, Star, FileText, Paperclip, MessageSquare, MessageSquarePlus } from "lucide-react";
 import { format } from 'date-fns';
 import { UiTask } from './ActiveTasksView';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface TaskDetailsSheetProps {
   task: UiTask | null;
@@ -18,101 +19,88 @@ interface TaskDetailsSheetProps {
 export function TaskDetailsSheet({ task, isOpen, onClose, onUpdateTask }: TaskDetailsSheetProps) {
   if (!task) return null;
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high':
-        return 'bg-red-500/10 text-red-500 border-red-500/20';
-      case 'medium':
-        return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
-      case 'low':
-        return 'bg-green-500/10 text-green-500 border-green-500/20';
-      default:
-        return 'bg-gray-500/10 text-gray-500 border-gray-500/20';
-    }
-  };
-
-  const getStatusColor = (status: { name: string, color: string }) => {
-    return `bg-opacity-10 border-opacity-20 text-opacity-90 bg-${status.color} text-${status.color} border-${status.color}`;
+  const getTimePeriod = (start: Date, end: Date) => {
+    return `${format(start, 'MMM d')} - ${format(end, 'MMM d, yyyy')}`;
   };
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="w-[90vw] sm:w-[600px]">
-        <SheetHeader className="flex flex-row items-start justify-between">
-          <div className="space-y-2">
-            <SheetTitle>{task.name}</SheetTitle>
-            <div className="flex gap-2">
-              <Badge variant="outline" className={getPriorityColor(task.priority)}>
-                {task.priority}
-              </Badge>
-              <Badge variant="outline" style={{backgroundColor: `${task.status.color}20`, color: task.status.color, borderColor: `${task.status.color}40`}}>
-                {task.status.name}
-              </Badge>
-            </div>
-          </div>
-          <Button variant="ghost" size="icon" onClick={onClose}>
-            <X className="h-4 w-4" />
-          </Button>
-        </SheetHeader>
-
-        <div className="mt-6 space-y-6">
-          {task.description && (
-            <div className="space-y-2">
-              <h3 className="text-sm font-medium">Description</h3>
-              <p className="text-sm text-muted-foreground">{task.description}</p>
-            </div>
-          )}
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <div className="flex items-center text-sm text-muted-foreground">
-                <Calendar className="mr-2 h-4 w-4" />
-                Due Date
+      <SheetContent className="w-[90vw] sm:w-[600px] p-0 bg-[#1A1F2C]">
+        <ScrollArea className="h-[calc(100vh-2rem)]">
+          <div className="p-6">
+            {/* Header Section */}
+            <SheetHeader className="flex flex-col space-y-4">
+              <div className="flex justify-between items-start">
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="icon">
+                    <Share2 className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon">
+                    <Expand className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-              <p className="text-sm font-medium">
-                {task.endAt ? format(task.endAt, 'PPP') : 'No due date'}
-              </p>
-            </div>
-
-            <div className="space-y-1">
-              <div className="flex items-center text-sm text-muted-foreground">
-                <User className="mr-2 h-4 w-4" />
-                Assigned To
+              
+              <div className="space-y-2 text-left">
+                <SheetTitle className="text-xl font-semibold">{task.name}</SheetTitle>
+                <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500/20">
+                  <Star className="h-3 w-3 mr-1" />
+                  High Priority
+                </Badge>
               </div>
-              <p className="text-sm font-medium">
-                {task.owner?.name || 'Unassigned'}
-              </p>
+            </SheetHeader>
+
+            <div className="mt-6 space-y-6">
+              {/* Time Spent Section */}
+              <div className="flex items-center gap-2 text-sm text-gray-400">
+                <Clock className="h-4 w-4" />
+                <span>{getTimePeriod(task.startAt, task.endAt)}</span>
+              </div>
+
+              {/* Description Section */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <FileText className="h-4 w-4" />
+                  <h3>Description</h3>
+                </div>
+                <p className="text-sm text-gray-400 pl-6">
+                  {task.description || "No description provided."}
+                </p>
+              </div>
+
+              {/* Attachments Section */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <Paperclip className="h-4 w-4" />
+                  <h3>Attachments</h3>
+                </div>
+                <div className="pl-6 text-sm text-gray-400">
+                  No attachments yet.
+                </div>
+              </div>
+
+              <Separator className="my-6" />
+
+              {/* Comments & Updates Section */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-sm font-medium">
+                    <MessageSquare className="h-4 w-4" />
+                    <h3>Comments & Updates</h3>
+                  </div>
+                  <Button variant="ghost" size="sm" className="text-xs">
+                    <MessageSquarePlus className="h-3 w-3 mr-1" />
+                    Add Update
+                  </Button>
+                </div>
+                
+                <div className="rounded-lg bg-black/20 p-4">
+                  <p className="text-sm text-gray-400">No comments or updates yet.</p>
+                </div>
+              </div>
             </div>
           </div>
-
-          <Separator />
-
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-medium">Activity</h3>
-              <Button variant="outline" size="sm">
-                <MessageSquare className="mr-2 h-4 w-4" />
-                Add Comment
-              </Button>
-            </div>
-            
-            <div className="rounded-md bg-muted p-4">
-              <p className="text-sm text-muted-foreground">No activity yet</p>
-            </div>
-          </div>
-
-          <Separator />
-
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={onClose}>
-              Close
-            </Button>
-            <Button>
-              <Edit2 className="mr-2 h-4 w-4" />
-              Edit Task
-            </Button>
-          </div>
-        </div>
+        </ScrollArea>
       </SheetContent>
     </Sheet>
   );
