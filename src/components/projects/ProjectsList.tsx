@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
@@ -59,8 +58,31 @@ export function ProjectsList() {
     
     fetchProjects();
   }, [user, toast]);
+
+  const mockTasks = [
+    {
+      title: "Review Smart Contract",
+      due_date: new Date(Date.now() + 86400000 * 2).toISOString(), // 2 days from now
+    },
+    {
+      title: "Approve UI Designs",
+      due_date: new Date().toISOString(), // Today
+    },
+    {
+      title: "Test Token Distribution",
+      due_date: new Date(Date.now() + 86400000 * 5).toISOString(), // 5 days from now
+    }
+  ];
+
+  // Enhance projects with mock data (this would come from the backend in production)
+  const enhancedProjects = projects.map(project => ({
+    ...project,
+    completion_percentage: Math.floor(Math.random() * 100),
+    due_date: new Date(Date.now() + 86400000 * 30).toISOString(), // 30 days from now
+    tasks: mockTasks,
+  }));
   
-  const filteredProjects = projects.filter(project => 
+  const filteredProjects = enhancedProjects.filter(project => 
     project.app_name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
     project.company_name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -86,7 +108,7 @@ export function ProjectsList() {
       {isLoading ? (
         <div className="space-y-4">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="animate-pulse bg-black/30 border border-siso-text/10 rounded-lg p-6 h-32" />
+            <div key={i} className="animate-pulse bg-black/30 border border-siso-text/10 rounded-lg p-6 h-64" />
           ))}
         </div>
       ) : filteredProjects.length > 0 ? (
