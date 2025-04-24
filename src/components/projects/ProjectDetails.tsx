@@ -12,7 +12,6 @@ import { ProjectStatsCards } from './details/ProjectStatsCards';
 import { PriorityTasksSection } from './details/PriorityTasksSection';
 import { ViewModeSwitcher } from '@/components/admin/clients/ViewModeSwitcher';
 import { TeamSection } from './details/TeamSection';
-import { ProjectQuickAccess } from './details/ProjectQuickAccess';
 import { ProjectCardNavigation } from './details/ProjectCardNavigation';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -118,11 +117,6 @@ export function ProjectDetails() {
         description={project.description}
         status={project.status}
         created_at={project.created_at}
-      />
-
-      <ProjectQuickAccess 
-        name={project.name}
-        description={project.description}
       />
 
       <ProjectCardNavigation projectId={id || ''} />
