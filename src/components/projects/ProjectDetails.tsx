@@ -8,18 +8,15 @@ import { TasksList } from '@/components/projects/TasksList';
 import { ProjectHeader } from './details/ProjectHeader';
 import { DevelopmentProgress } from './details/DevelopmentProgress';
 import { ProjectActions } from './details/ProjectActions';
-import { ProjectNavigation } from './details/ProjectNavigation';
 import { ProjectStatsCards } from './details/ProjectStatsCards';
 import { PriorityTasksSection } from './details/PriorityTasksSection';
 import { ViewModeSwitcher } from '@/components/admin/clients/ViewModeSwitcher';
 import { TeamSection } from './details/TeamSection';
+import { ProjectQuickAccess } from './details/ProjectQuickAccess';
+import { ProjectCardNavigation } from './details/ProjectCardNavigation';
 import { useState } from 'react';
+import { useParams } from 'react-router-dom';
 
-interface ProjectDetailsProps {
-  projectId?: string;
-}
-
-// Keep milestones data the same
 const milestones = [
   {
     title: "Project Initialization",
@@ -65,7 +62,8 @@ const milestones = [
   },
 ];
 
-export function ProjectDetails({ projectId }: ProjectDetailsProps) {
+export function ProjectDetails() {
+  const { id } = useParams();
   const { data: project, isLoading } = useProjects();
   const [tasksViewMode, setTasksViewMode] = useState<"table" | "cards">("cards");
 
@@ -122,13 +120,19 @@ export function ProjectDetails({ projectId }: ProjectDetailsProps) {
         created_at={project.created_at}
       />
 
+      <ProjectQuickAccess 
+        name={project.name}
+        description={project.description}
+        projectUrl={project.url}
+      />
+
+      <ProjectCardNavigation projectId={id || ''} />
+
       <ProjectStatsCards />
       
       <PriorityTasksSection />
 
       <Tabs defaultValue="overview" className="w-full">
-        <ProjectNavigation />
-
         <TabsContent value="overview">
           <div className="space-y-8">
             <DevelopmentProgress />
