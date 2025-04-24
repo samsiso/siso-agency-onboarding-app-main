@@ -1,5 +1,4 @@
-
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Index from './pages/Index';
 import Auth from './pages/Auth';
 import Profile from './pages/Profile';
@@ -77,28 +76,35 @@ function App() {
         <Route path="/admin/plans/create" element={<AuthGuard adminOnly={true}><AdminPlans /></AuthGuard>} />
         <Route path="/admin/plans/:planId/edit" element={<AuthGuard adminOnly={true}><AdminPlans /></AuthGuard>} />
         
-        {/* Protected routes */}
-        <Route path="/profile" element={<AuthGuard><Profile /></AuthGuard>} />
-        <Route path="/onboarding/social" element={<AuthGuard><OnboardingSocial /></AuthGuard>} />
-        <Route path="/onboarding/congratulations" element={<AuthGuard><Congratulations /></AuthGuard>} />
-        
         {/* Protected Dashboard Routes */}
         <Route path="/home" element={<AuthGuard><Home /></AuthGuard>} />
         <Route path="/dashboard" element={<AuthGuard><Home /></AuthGuard>} />
-        <Route path="/plan-builder" element={<AuthGuard><PlanBuilder /></AuthGuard>} />
         
         {/* Protected Project Routes */}
         <Route path="/projects" element={<AuthGuard><ProjectsAndTasksPage /></AuthGuard>} />
         <Route path="/projects/:id" element={<AuthGuard><ProjectDetailsPage /></AuthGuard>} />
         <Route path="/projects/tasks" element={<AuthGuard><ProjectsAndTasksPage /></AuthGuard>} />
         <Route path="/my-projects" element={<AuthGuard><MyProjects /></AuthGuard>} />
-        <Route path="/plan-builder" element={<AuthGuard><Home /></AuthGuard>} />
+        <Route path="/plan-builder" element={<AuthGuard><PlanBuilder /></AuthGuard>} />
         <Route path="/portfolio" element={<AuthGuard><Portfolio /></AuthGuard>} />
         
-        {/* Protected Financial & Account Routes */}
+        {/* Financial Routes */}
         <Route path="/financial/payments" element={<AuthGuard><PaymentsPage /></AuthGuard>} />
         <Route path="/financial/leaderboards" element={<AuthGuard><LeaderboardsPage /></AuthGuard>} />
+        
+        {/* Account & Resources Routes */}
         <Route path="/financial/profile" element={<AuthGuard><FinancialProfilePage /></AuthGuard>} />
+        <Route path="/resources" element={<AuthGuard><ResourcesPage /></AuthGuard>} />
+        <Route path="/resources/documents" element={<AuthGuard><DocumentLibraryPage /></AuthGuard>} />
+        
+        {/* Redirect legacy routes */}
+        <Route path="/profile" element={<AuthGuard><Navigate to="/financial/profile" replace /></AuthGuard>} />
+        <Route path="/help" element={<AuthGuard><Navigate to="/resources" replace /></AuthGuard>} />
+        <Route path="/settings" element={<AuthGuard><Navigate to="/financial/profile" replace /></AuthGuard>} />
+        <Route path="/resources/help" element={<AuthGuard><Navigate to="/resources" replace /></AuthGuard>} />
+        <Route path="/resources/help/getting-started" element={<AuthGuard><ResourcesPage /></AuthGuard>} />
+        <Route path="/resources/help/documentation" element={<AuthGuard><ResourcesPage /></AuthGuard>} />
+        <Route path="/resources/help/faq" element={<AuthGuard><ResourcesPage /></AuthGuard>} />
         
         {/* Client App Details Route */}
         <Route path="/client-app/:clientId" element={<AuthGuard><ClientAppDetailsPage /></AuthGuard>} />
@@ -107,18 +113,6 @@ function App() {
         <Route path="/payments" element={<AuthGuard><PaymentsPage /></AuthGuard>} />
         <Route path="/economy/earn" element={<AuthGuard><HowToEarn /></AuthGuard>} />
         <Route path="/economy/leaderboards" element={<AuthGuard><LeaderboardsPage /></AuthGuard>} />
-        
-        {/* Protected Support & Settings Routes - New consolidated pages */}
-        <Route path="/resources" element={<AuthGuard><ResourcesPage /></AuthGuard>} />
-        <Route path="/resources/documents" element={<AuthGuard><DocumentLibraryPage /></AuthGuard>} />
-        
-        {/* Redirect old Routes to new consolidated page */}
-        <Route path="/help" element={<AuthGuard><ResourcesPage /></AuthGuard>} />
-        <Route path="/settings" element={<AuthGuard><ResourcesPage /></AuthGuard>} />
-        <Route path="/resources/help" element={<AuthGuard><ResourcesPage /></AuthGuard>} />
-        <Route path="/resources/help/getting-started" element={<AuthGuard><ResourcesPage /></AuthGuard>} />
-        <Route path="/resources/help/documentation" element={<AuthGuard><ResourcesPage /></AuthGuard>} />
-        <Route path="/resources/help/faq" element={<AuthGuard><ResourcesPage /></AuthGuard>} />
         
         {/* Client Dashboard Routes - accessible to all authenticated users but with conditional content */}
         <Route path="/client-dashboard" element={<AuthGuard><ClientDashboard /></AuthGuard>} />

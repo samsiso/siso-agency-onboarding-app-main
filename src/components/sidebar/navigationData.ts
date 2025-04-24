@@ -38,7 +38,7 @@ export const getMenuSections = (): MenuSection[] => {
     },
     {
       type: 'section',
-      title: 'Financial & Account',
+      title: 'Financial',
       icon: Wallet,
       items: [
         {
@@ -50,19 +50,19 @@ export const getMenuSections = (): MenuSection[] => {
           href: '/financial/leaderboards',
           icon: Trophy,
           label: 'Leaderboards',
-        },
-        {
-          href: '/financial/profile',
-          icon: User,
-          label: 'Profile & Settings',
         }
       ]
     },
     {
       type: 'section',
-      title: 'Resources & Support',
+      title: 'Account & Resources',
       icon: BookOpen,
       items: [
+        {
+          href: '/financial/profile',
+          icon: User,
+          label: 'Profile & Settings',
+        },
         {
           href: '/resources',
           icon: HelpCircle,
