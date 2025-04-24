@@ -1,3 +1,4 @@
+
 import { useProjects } from '@/hooks/useProjects';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card } from '@/components/ui/card';
@@ -13,8 +14,8 @@ import { PriorityTasksSection } from './details/PriorityTasksSection';
 import { ViewModeSwitcher } from '@/components/admin/clients/ViewModeSwitcher';
 import { TeamSection } from './details/TeamSection';
 import { ProjectCardNavigation } from './details/ProjectCardNavigation';
-import { useState } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 
 const milestones = [
   {
@@ -64,11 +65,19 @@ const milestones = [
 export function ProjectDetails() {
   const { id } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const { data: project, isLoading } = useProjects();
   const [tasksViewMode, setTasksViewMode] = useState<"table" | "cards">("cards");
 
   // Get the current tab from the URL
   const currentTab = location.pathname.split('/').pop() || 'overview';
+  
+  // Redirect to overview tab if on base URL
+  useEffect(() => {
+    if (location.pathname === `/projects/${id}`) {
+      navigate(`/projects/${id}/overview`, { replace: true });
+    }
+  }, [location.pathname, id, navigate]);
 
   const teamMembers = [
     {
