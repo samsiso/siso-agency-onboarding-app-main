@@ -14,7 +14,7 @@ import { ViewModeSwitcher } from '@/components/admin/clients/ViewModeSwitcher';
 import { TeamSection } from './details/TeamSection';
 import { ProjectCardNavigation } from './details/ProjectCardNavigation';
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 
 const milestones = [
   {
@@ -63,8 +63,12 @@ const milestones = [
 
 export function ProjectDetails() {
   const { id } = useParams();
+  const location = useLocation();
   const { data: project, isLoading } = useProjects();
   const [tasksViewMode, setTasksViewMode] = useState<"table" | "cards">("cards");
+
+  // Get the current tab from the URL
+  const currentTab = location.pathname.split('/').pop() || 'overview';
 
   const teamMembers = [
     {
@@ -125,7 +129,7 @@ export function ProjectDetails() {
       
       <PriorityTasksSection />
 
-      <Tabs defaultValue="overview" className="w-full">
+      <Tabs value={currentTab} className="w-full">
         <TabsContent value="overview">
           <div className="space-y-8">
             <DevelopmentProgress />
