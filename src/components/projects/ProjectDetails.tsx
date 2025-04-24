@@ -1,3 +1,4 @@
+
 import { useProjects } from '@/hooks/useProjects';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card } from '@/components/ui/card';
@@ -7,7 +8,7 @@ import {
   AccordionItem, 
   AccordionTrigger 
 } from '@/components/ui/accordion';
-import { ListTodo, CalendarIcon, Wallet, FileText, LayoutDashboard, Palette } from 'lucide-react';
+import { ListTodo, Timeline, Wallet, FileText, LayoutDashboard, Palette } from 'lucide-react';
 import { ProjectHeader } from './details/ProjectHeader';
 import { ProjectStatsCards } from './details/ProjectStatsCards';
 import { ActiveTasksSection } from './details/ActiveTasksSection';
@@ -72,7 +73,7 @@ export function ProjectDetails() {
         <AccordionItem value="timeline" className="border-0">
           <AccordionTrigger className="bg-black/30 hover:bg-black/40 rounded-lg px-6 py-4 transition-all">
             <div className="flex items-center gap-2">
-              <CalendarIcon className="h-5 w-5 text-[#9b87f5]" />
+              <Timeline className="h-5 w-5 text-[#9b87f5]" />
               <span className="font-semibold">Project Timeline</span>
             </div>
           </AccordionTrigger>
