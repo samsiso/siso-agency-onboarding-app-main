@@ -177,7 +177,7 @@ export default function PaymentsPage() {
 
       <PaymentsHeader handleDownloadAll={handleDownloadAll} />
 
-      {upcomingExpenses.length > 0 && (
+      {upcomingPayments.length > 0 && (
         <Card className="mb-6 bg-amber-900/20 border border-amber-400/50">
           <div className="p-4 flex items-center">
             <AlertCircle className="h-5 w-5 text-amber-400 mr-2" />

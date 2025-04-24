@@ -1,6 +1,5 @@
-
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { CircleDollarSign, Clock, Wallet, PieChart } from "lucide-react";
+import { CircleDollarSign, Clock, Wallet, PieChart, CreditCard } from "lucide-react";
 
 interface PaymentsSummaryCardsProps {
   activeExpenses: any[];
