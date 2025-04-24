@@ -1,4 +1,3 @@
-
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { AreaChart } from "./Charts";
@@ -6,6 +5,7 @@ import { useEffect, useState } from "react";
 import { fetchTransactions, FinancialTransaction } from "@/utils/financial";
 import { SoftwareExpenseStats } from "./SoftwareExpenseStats";
 import { formatCurrency } from "@/lib/formatters";
+import { ExpenseCreditCard } from "./ExpenseCreditCard";
 
 export function FinancialsDashboard() {
   const [transactions, setTransactions] = useState<FinancialTransaction[]>([]);
@@ -56,6 +56,10 @@ export function FinancialsDashboard() {
   // Calculate totals
   const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
   const totalRevenue = revenues.reduce((sum, revenue) => sum + revenue.amount, 0);
+    // Calculate predicted costs (recurring expenses for the next month)
+    const predictedMonthlyCosts = expenses
+    .filter(expense => expense.recurring_type === 'monthly')
+    .reduce((sum, expense) => sum + Number(expense.amount), 0);
   const netProfit = totalRevenue - totalExpenses;
   const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
 
@@ -74,6 +78,13 @@ export function FinancialsDashboard() {
       </div>
       
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="lg:col-span-2">
+          <ExpenseCreditCard 
+            currentCosts={totalExpenses}
+            predictedCosts={predictedMonthlyCosts}
+          />
+        </div>
+        
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
@@ -88,24 +99,6 @@ export function FinancialsDashboard() {
             </div>
             <p className="text-xs text-muted-foreground mt-1">
               From {revenues.length} transactions
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {isLoading ? (
-                <div className="h-6 w-24 bg-muted animate-pulse rounded" />
-              ) : (
-                formatCurrency(totalExpenses, 'GBP')
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              From {expenses.length} transactions
             </p>
           </CardContent>
         </Card>
