@@ -123,7 +123,7 @@ function App() {
         {/* Resources & Support Routes */}
         <Route path="/resources/documents" element={<AuthGuard><DocumentLibraryPage /></AuthGuard>} />
         
-        {/* Help Center Routes */}
+        {/* Help Center Routes - make sure these are in the right order */}
         <Route path="/resources/help" element={<AuthGuard><HelpPage /></AuthGuard>} />
         <Route path="/resources/help/getting-started" element={<AuthGuard><HelpPage /></AuthGuard>} />
         <Route path="/resources/help/documentation" element={<AuthGuard><HelpPage /></AuthGuard>} />
