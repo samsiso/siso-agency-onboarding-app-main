@@ -10,7 +10,7 @@ interface TeamMember {
 }
 
 interface TeamSectionProps {
-  teamMembers: TeamMember[];
+  teamMembers: readonly TeamMember[] | TeamMember[];
 }
 
 export function TeamSection({ teamMembers }: TeamSectionProps) {
