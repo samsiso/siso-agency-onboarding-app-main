@@ -123,7 +123,6 @@ export function ProjectDetails() {
       <ProjectQuickAccess 
         name={project.name}
         description={project.description}
-        projectUrl={project.url}
       />
 
       <ProjectCardNavigation projectId={id || ''} />

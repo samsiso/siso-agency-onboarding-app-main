@@ -1,8 +1,7 @@
 
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FileText, Calendar, GitBranch, Users } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import { GlowEffect } from '@/components/ui/glow-effect';
+import { Pill } from '@/components/ui/pill';
 
 const navigationItems = [
   { id: 'overview', label: 'Overview', icon: FileText },
@@ -21,29 +20,21 @@ export function ProjectCardNavigation({ projectId }: ProjectCardNavigationProps)
   const currentPath = location.pathname.split('/').pop();
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div className="flex gap-2 mb-8 overflow-x-auto pb-2 scrollbar-hide">
       {navigationItems.map(({ id, label, icon: Icon }) => {
         const isActive = currentPath === id || (!currentPath && id === 'overview');
         
         return (
-          <Card
+          <Pill
             key={id}
-            className={`relative p-6 cursor-pointer transition-all duration-300 overflow-hidden bg-black/30 border-siso-text/10 
-              ${isActive ? 'ring-2 ring-[#9b87f5]' : 'hover:border-[#9b87f5]/50'}`}
+            variant={isActive ? 'purple' : 'secondary'}
+            className={`cursor-pointer transition-all duration-300 hover:bg-[#9b87f5]/20
+              ${isActive ? 'bg-[#9b87f5]/20 hover:bg-[#9b87f5]/30' : 'bg-black/30'}`}
             onClick={() => navigate(`/projects/${projectId}/${id}`)}
           >
-            {isActive && (
-              <GlowEffect
-                colors={['#9b87f5', '#6E59A5']}
-                mode="colorShift"
-                className="opacity-10"
-              />
-            )}
-            <div className="relative z-10 flex flex-col items-center gap-3">
-              <Icon className={`w-6 h-6 ${isActive ? 'text-[#9b87f5]' : 'text-siso-text'}`} />
-              <span className={isActive ? 'text-white font-medium' : 'text-siso-text'}>{label}</span>
-            </div>
-          </Card>
+            <Icon className="w-4 h-4" />
+            {label}
+          </Pill>
         );
       })}
     </div>
