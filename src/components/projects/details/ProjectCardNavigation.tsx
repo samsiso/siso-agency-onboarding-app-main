@@ -43,8 +43,8 @@ export function ProjectCardNavigation({ projectId }: { projectId: string }) {
             <Pill
               variant={isActive ? 'default' : 'secondary'}
               className={isActive 
-                ? "bg-[#9b87f5]/20 text-[#9b87f5] hover:bg-[#9b87f5]/30 border border-[#9b87f5]/20" 
-                : "hover:bg-black/30 text-gray-400 border border-transparent"
+                ? "bg-gray-200/20 text-gray-700 hover:bg-gray-200/30 border border-gray-200/20" 
+                : "hover:bg-gray-100/30 text-gray-500 border border-transparent"
               }
             >
               <Icon className="w-4 h-4" />
@@ -56,3 +56,4 @@ export function ProjectCardNavigation({ projectId }: { projectId: string }) {
     </div>
   );
 }
+
