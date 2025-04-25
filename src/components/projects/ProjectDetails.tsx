@@ -1,3 +1,4 @@
+
 import { useProjects } from '@/hooks/useProjects';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card } from '@/components/ui/card';
@@ -6,6 +7,7 @@ import { Timeline } from '@/components/ui/timeline';
 import { ProjectHeader } from './details/ProjectHeader';
 import { ProjectCardNavigation } from './details/ProjectCardNavigation';
 import { ProjectStatsCards } from './details/ProjectStatsCards';
+import { ProjectOverviewCards } from './details/ProjectOverviewCards';
 import { PriorityTasksSection } from './details/PriorityTasksSection';
 import { DevelopmentProgress } from './details/DevelopmentProgress';
 import { ProjectActions } from './details/ProjectActions';
@@ -15,6 +17,9 @@ import { ColorPickerSection } from './details/ColorPickerSection';
 import { FinancialSummarySection } from './details/FinancialSummarySection';
 import { FeatureRequestsSection } from './details/FeatureRequestsSection';
 import { ActiveTasksSection } from './details/ActiveTasksSection';
+import { ResearchSection } from './details/ResearchSection';
+import { AppPlanSection } from './details/AppPlanSection';
+import { APIsSection } from './details/APIsSection';
 import { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 
@@ -139,6 +144,7 @@ export function ProjectDetails() {
         <TabsContent value="overview">
           <div className="space-y-8">
             <ProjectStatsCards />
+            <ProjectOverviewCards projectId={id || ''} />
             <PriorityTasksSection />
             <DevelopmentProgress />
             <ProjectActions />
@@ -161,6 +167,18 @@ export function ProjectDetails() {
 
         <TabsContent value="features">
           <FeatureRequestsSection />
+        </TabsContent>
+
+        <TabsContent value="research">
+          <ResearchSection />
+        </TabsContent>
+
+        <TabsContent value="app-plan">
+          <AppPlanSection />
+        </TabsContent>
+
+        <TabsContent value="apis">
+          <APIsSection />
         </TabsContent>
 
         <TabsContent value="wireframe">

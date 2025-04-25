@@ -1,6 +1,6 @@
 
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FileText, Calendar, ListTodo, Wallet, GitBranch, LayoutDashboard, Palette } from 'lucide-react';
+import { FileText, Calendar, ListTodo, Wallet, GitBranch, LayoutDashboard, Palette, FileSearch, FileCheck, Terminal } from 'lucide-react';
 import { Pill } from '@/components/ui/pill';
 
 const navigationItems = [
@@ -9,6 +9,9 @@ const navigationItems = [
   { id: 'active-tasks', label: 'Active Tasks', icon: ListTodo },
   { id: 'financial', label: 'Financial', icon: Wallet },
   { id: 'features', label: 'Features', icon: GitBranch },
+  { id: 'research', label: 'Research', icon: FileSearch },
+  { id: 'app-plan', label: 'App Plan', icon: FileCheck },
+  { id: 'apis', label: 'APIs', icon: Terminal },
   { id: 'wireframe', label: 'Wireframe', icon: LayoutDashboard },
   { id: 'colors', label: 'Colors', icon: Palette }
 ] as const;
