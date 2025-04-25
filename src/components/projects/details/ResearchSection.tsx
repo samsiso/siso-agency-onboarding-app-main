@@ -1,27 +1,13 @@
 import { useState } from 'react';
 import { Card } from '@/components/ui/card';
-import { AnimatedCard } from '@/components/ui/animated-card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { FileText, Search, Tag, Download, Calendar, Clock, Filter, ChevronDown, ChevronUp } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-
-type ResearchDocument = {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  created_at: string;
-  updated_at: string;
-  tags: string[];
-  fileUrl?: string;
-  insights?: string[];
-  nextSteps?: string[];
-  code_snippet?: string;
-  isPinned?: boolean;
-};
+import { FileText } from 'lucide-react';
+import { TooltipProvider, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { ResearchFilters } from './research/ResearchFilters';
+import { ResearchCategories } from './research/ResearchCategories';
+import { PinnedResearchAsset } from './research/PinnedResearchAsset';
+import { ResearchDocumentCard } from './research/ResearchDocument';
+import { ResearchDocument } from './types';
 
 // Mock data - would be replaced with real data from API/database
 const researchDocuments: ResearchDocument[] = [
@@ -124,11 +110,14 @@ export function ResearchSection() {
     }));
   };
 
+  const getCategoryCount = (category: string) => {
+    return researchDocuments.filter(doc => 
+      category === 'All' ? true : doc.category === category
+    ).length;
+  };
+
   const filteredDocuments = [...pinnedAssets, ...researchDocuments].filter(doc => {
-    // Category filter
     const categoryMatch = activeCategory === 'All' || doc.category === activeCategory;
-    
-    // Search filter
     const searchMatch = 
       doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       doc.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -148,7 +137,6 @@ export function ResearchSection() {
     return 0;
   });
 
-  // Separate pinned docs for display
   const pinnedDocs = sortedDocuments.filter(doc => doc.isPinned);
   const regularDocs = sortedDocuments.filter(doc => !doc.isPinned);
   
@@ -161,38 +149,12 @@ export function ResearchSection() {
         </div>
         
         <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-500 h-4 w-4" />
-              <input 
-                type="text" 
-                placeholder="Search documents..." 
-                className="pl-10 pr-4 py-2 bg-black/40 border border-white/10 rounded-md text-white w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            
-            <TooltipProvider delayDuration={300}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="relative">
-                    <Select value={sortBy} onValueChange={setSortBy}>
-                      <SelectTrigger className="w-10 h-10 p-0 justify-center border-white/10 bg-black/40">
-                        <Filter className="h-4 w-4 text-neutral-400" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="updated">Latest Updated</SelectItem>
-                        <SelectItem value="title">Alphabetical</SelectItem>
-                        <SelectItem value="category">By Category</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>Sort documents</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
+          <ResearchFilters
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            sortBy={sortBy}
+            onSortChange={setSortBy}
+          />
           
           <TooltipProvider>
             <Tooltip>
@@ -209,27 +171,14 @@ export function ResearchSection() {
         </div>
       </div>
       
-      <div className="flex flex-nowrap overflow-x-auto pb-2 gap-2 scrollbar-hide">
-        {categories.map((category) => {
-          const count = researchDocuments.filter(doc => 
-            category === 'All' ? true : doc.category === category).length;
-          
-          return (
-            <Badge 
-              key={category} 
-              variant={category === activeCategory ? 'purple' : 'secondary'} 
-              className={`cursor-pointer px-4 py-2 whitespace-nowrap ${
-                category !== 'All' && categoryColors[category]
-              }`}
-              onClick={() => setActiveCategory(category)}
-            >
-              {category} {count > 0 && <span className="ml-1 opacity-70">({count})</span>}
-            </Badge>
-          );
-        })}
-      </div>
+      <ResearchCategories
+        categories={categories}
+        activeCategory={activeCategory}
+        onCategoryChange={setActiveCategory}
+        categoryColors={categoryColors}
+        getCategoryCount={getCategoryCount}
+      />
       
-      {/* Pinned Assets Section */}
       {pinnedDocs.length > 0 && (
         <div className="mb-6">
           <h3 className="text-lg font-semibold text-white/90 mb-3 border-b border-white/10 pb-2">
@@ -237,151 +186,27 @@ export function ResearchSection() {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {pinnedDocs.map((doc) => (
-              <AnimatedCard key={doc.id} className="border border-purple-500/20 bg-purple-500/5">
-                <div className="flex flex-col h-full">
-                  <div className="mb-2 flex items-center justify-between">
-                    <Badge 
-                      variant="outline" 
-                      className={`${categoryColors[doc.category] || ''} text-xs`}
-                    >
-                      {doc.category}
-                    </Badge>
-                    <div className="text-xs text-neutral-500 flex items-center gap-1">
-                      <Calendar className="h-3 w-3" /> 
-                      {new Date(doc.updated_at).toLocaleDateString()}
-                    </div>
-                  </div>
-                  
-                  <h3 className="text-lg font-semibold text-white mb-2">{doc.title}</h3>
-                  <p className="text-neutral-400 text-sm mb-3 flex-grow">{doc.description}</p>
-                  
-                  <div className="mt-auto">
-                    <div className="flex justify-between items-center">
-                      <Button variant="ghost" className="text-[#9b87f5] hover:text-[#8a76e4] p-0">
-                        View Details
-                      </Button>
-                      {doc.fileUrl && (
-                        <Button variant="ghost" size="icon" className="text-neutral-400 hover:text-white">
-                          <Download className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </AnimatedCard>
+              <PinnedResearchAsset 
+                key={doc.id} 
+                doc={doc} 
+                categoryColors={categoryColors} 
+              />
             ))}
           </div>
         </div>
       )}
       
-      {/* Main Documents Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {regularDocs.map((doc) => (
-          <Collapsible 
-            key={doc.id} 
-            open={expandedDocs[doc.id]} 
-            onOpenChange={() => toggleExpanded(doc.id)}
-          >
-            <AnimatedCard className="border border-white/10 h-full">
-              <div className="flex flex-col h-full">
-                <div className="mb-3 flex items-center justify-between">
-                  <Badge 
-                    variant="outline" 
-                    className={`${categoryColors[doc.category] || ''} text-xs`}
-                  >
-                    {doc.category}
-                  </Badge>
-                  <div className="text-xs text-neutral-500 flex items-center gap-1">
-                    <Clock className="h-3 w-3" /> 
-                    Updated {new Date(doc.updated_at).toLocaleDateString()}
-                  </div>
-                </div>
-                
-                <h3 className="text-lg font-semibold text-white mb-2">{doc.title}</h3>
-                <p className="text-neutral-400 text-sm mb-4">{doc.description}</p>
-                
-                {/* Document Tags */}
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {doc.tags.map((tag) => (
-                    <Badge key={tag} variant="outline" className="text-xs">
-                      <Tag className="h-3 w-3 mr-1" />{tag}
-                    </Badge>
-                  ))}
-                </div>
-                
-                {/* Expandable Content */}
-                <CollapsibleContent className="mb-4 space-y-3">
-                  {/* Key Insights Section */}
-                  {doc.insights && doc.insights.length > 0 && (
-                    <div className="bg-black/30 rounded-md p-3">
-                      <h4 className="text-sm font-semibold text-purple-400 mb-2">Key Insights</h4>
-                      <ul className="list-disc list-inside text-xs text-neutral-300 space-y-1">
-                        {doc.insights.map((insight, idx) => (
-                          <li key={idx}>{insight}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  
-                  {/* Next Steps Section */}
-                  {doc.nextSteps && doc.nextSteps.length > 0 && (
-                    <div className="bg-black/30 rounded-md p-3">
-                      <h4 className="text-sm font-semibold text-blue-400 mb-2">Recommended Actions</h4>
-                      <ul className="list-disc list-inside text-xs text-neutral-300 space-y-1">
-                        {doc.nextSteps.map((step, idx) => (
-                          <li key={idx}>{step}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  
-                  {/* Code Snippet for Technical Docs */}
-                  {doc.code_snippet && (
-                    <div className="bg-black/50 rounded-md p-3 font-mono">
-                      <h4 className="text-sm font-semibold text-green-400 mb-2">Code Example</h4>
-                      <pre className="text-xs overflow-x-auto whitespace-pre-wrap text-neutral-300">
-                        {doc.code_snippet}
-                      </pre>
-                    </div>
-                  )}
-                </CollapsibleContent>
-                
-                <div className="flex justify-between items-center mt-auto">
-                  <div className="flex items-center gap-2">
-                    <Button variant="ghost" className="text-[#9b87f5] hover:text-[#8a76e4] p-0 h-8">
-                      View Details
-                    </Button>
-                    <CollapsibleTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-6 p-0 text-xs text-neutral-400">
-                        {expandedDocs[doc.id] ? (
-                          <div className="flex items-center">
-                            <ChevronUp className="h-3 w-3 mr-1" /> Less
-                          </div>
-                        ) : (
-                          <div className="flex items-center">
-                            <ChevronDown className="h-3 w-3 mr-1" /> More
-                          </div>
-                        )}
-                      </Button>
-                    </CollapsibleTrigger>
-                  </div>
-                  {doc.fileUrl && (
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="text-neutral-400 hover:text-white"
-                      aria-label={`Download ${doc.title}`}
-                    >
-                      <Download className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </AnimatedCard>
-          </Collapsible>
+          <ResearchDocumentCard
+            key={doc.id}
+            doc={doc}
+            isExpanded={expandedDocs[doc.id]}
+            onToggleExpand={() => toggleExpanded(doc.id)}
+            categoryColors={categoryColors}
+          />
         ))}
         
-        {/* Contribute Research Button for empty categories */}
         {activeCategory === 'Competition' && regularDocs.filter(d => d.category === 'Competition').length === 0 && (
           <Card className="border border-white/10 bg-black/20 flex flex-col items-center justify-center p-6 h-64">
             <FileText className="h-12 w-12 text-neutral-500 mb-4" />
