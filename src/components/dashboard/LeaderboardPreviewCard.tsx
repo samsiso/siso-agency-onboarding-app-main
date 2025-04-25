@@ -4,18 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Trophy, ArrowRight, TrendingUp, TrendingDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-
-// Sample leaderboard data - in a real app, these would come from an API
-const leaders = [
-  { rank: 1, name: "Alex Smith", points: 2450, avatar: "😎" },
-  { rank: 2, name: "Jordan Lee", points: 2280, avatar: "🚀" },
-  { rank: 3, name: "Casey Jones", points: 2120, avatar: "🔥" },
-  { rank: 4, name: "Riley Taylor", points: 1980, avatar: "⚡" },
-  { rank: 5, name: "Jamie Wilson", points: 1845, avatar: "💫" }
-];
+import { useLeaderboardData } from '@/components/leaderboard/hooks/useLeaderboardData';
 
 export function LeaderboardPreviewCard() {
   const navigate = useNavigate();
+  const { entries, loading } = useLeaderboardData();
 
   return (
     <motion.div
@@ -32,9 +25,9 @@ export function LeaderboardPreviewCard() {
         </CardHeader>
         <CardContent className="pt-2">
           <div className="space-y-2">
-            {leaders.slice(0, 5).map((leader, index) => (
+            {entries.slice(0, 5).map((leader, index) => (
               <motion.div 
-                key={leader.rank}
+                key={leader.id}
                 whileHover={{ scale: 1.02 }}
                 className={`flex items-center justify-between p-3 rounded-lg transition-colors ${
                   index === 0 ? 'bg-gradient-to-r from-yellow-500/10 via-yellow-500/5 to-transparent' :
@@ -52,9 +45,13 @@ export function LeaderboardPreviewCard() {
                   }`}>
                     {index + 1}
                   </div>
-                  <span className="text-xl mr-2">{leader.avatar}</span>
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-siso-red to-siso-orange flex items-center justify-center text-white font-bold">
+                    {leader.profile?.full_name?.[0] || '?'}
+                  </div>
                   <div>
-                    <span className="text-white font-medium">{leader.name}</span>
+                    <span className="text-white font-medium">
+                      {leader.profile?.full_name || 'Anonymous'}
+                    </span>
                     <div className="flex items-center gap-2 text-xs text-siso-text">
                       <span>{leader.points} points</span>
                       {Math.random() > 0.5 ? (
@@ -65,7 +62,14 @@ export function LeaderboardPreviewCard() {
                     </div>
                   </div>
                 </div>
-                <span className="font-semibold text-purple-400">{leader.points}</span>
+                <div className="text-right">
+                  <span className="font-semibold text-purple-400">{leader.points}</span>
+                  {leader.siso_tokens > 0 && (
+                    <div className="text-xs text-siso-text mt-1">
+                      {leader.siso_tokens} SISO
+                    </div>
+                  )}
+                </div>
               </motion.div>
             ))}
           </div>
