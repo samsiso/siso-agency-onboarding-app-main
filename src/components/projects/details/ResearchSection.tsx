@@ -1,9 +1,13 @@
 
+import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { AnimatedCard } from '@/components/ui/animated-card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { FileText, Search, Tag, Download, Calendar, Clock } from 'lucide-react';
+import { FileText, Search, Tag, Download, Calendar, Clock, Filter, ChevronDown, ChevronUp } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 type ResearchDocument = {
   id: string;
@@ -14,6 +18,10 @@ type ResearchDocument = {
   updated_at: string;
   tags: string[];
   fileUrl?: string;
+  insights?: string[];
+  nextSteps?: string[];
+  code_snippet?: string;
+  isPinned?: boolean;
 };
 
 // Mock data - would be replaced with real data from API/database
@@ -26,6 +34,9 @@ const researchDocuments: ResearchDocument[] = [
     created_at: '2025-03-15T10:30:00Z',
     updated_at: '2025-04-01T14:20:00Z',
     tags: ['market', 'trends', 'analysis'],
+    insights: ['Key trends predict a 30% rise in DeFi adoption by 2025', 'NFT marketplaces forecasted to consolidate by 40%'],
+    nextSteps: ['Consider DeFi integration in phase 2', 'Monitor regulation developments in EU markets'],
+    isPinned: true,
   },
   {
     id: '2',
@@ -35,6 +46,10 @@ const researchDocuments: ResearchDocument[] = [
     created_at: '2025-02-10T09:15:00Z',
     updated_at: '2025-04-10T11:45:00Z',
     tags: ['security', 'smart contracts', 'audit'],
+    insights: ['75% of vulnerabilities come from reentrancy attacks', 'Formal verification reduces exploits by 62%'],
+    nextSteps: ['Recommendation: Adopt multi-sig wallets for enhanced security', 'Schedule quarterly security audits'],
+    code_snippet: '// Example multi-signature wallet pattern\ncontract MultiSigWallet {\n  mapping(address => bool) public isOwner;\n  uint public required;\n\n  function execute(address dest, uint value, bytes data) public {\n    // Implementation\n  }\n}',
+    fileUrl: '#',
   },
   {
     id: '3',
@@ -44,6 +59,8 @@ const researchDocuments: ResearchDocument[] = [
     created_at: '2025-01-25T15:40:00Z',
     updated_at: '2025-03-18T09:30:00Z',
     tags: ['UX', 'design', 'usability'],
+    insights: ['Simple onboarding increases conversion by 46%', 'Educational tooltips reduce support tickets by 32%'],
+    nextSteps: ['Implement guided wallet setup', 'Add interactive tutorials for new users'],
   },
   {
     id: '4',
@@ -53,81 +70,331 @@ const researchDocuments: ResearchDocument[] = [
     created_at: '2025-03-05T11:20:00Z',
     updated_at: '2025-04-15T10:10:00Z',
     tags: ['legal', 'compliance', 'regulation'],
+    insights: ['KYC implementation needed in 89% of jurisdictions', 'AML policies required for all fiat on/off ramps'],
+    nextSteps: ['Develop compliance checklist for each target market', 'Consult with legal team on KYC implementation'],
+    fileUrl: '#',
   },
+];
+
+const pinnedAssets = [
+  {
+    id: 'pin-1',
+    title: 'UbahCryp Roadmap',
+    description: 'View our development timeline and milestone tracking',
+    category: 'Project Planning',
+    created_at: '2025-04-01T08:00:00Z',
+    updated_at: '2025-04-20T14:30:00Z',
+    tags: ['roadmap', 'milestones', 'planning'],
+    fileUrl: '#',
+    isPinned: true,
+  },
+  {
+    id: 'pin-2',
+    title: 'API Documentation',
+    description: 'Complete API reference for UbahCryp platform integration',
+    category: 'Technical',
+    created_at: '2025-04-05T11:45:00Z',
+    updated_at: '2025-04-22T09:15:00Z',
+    tags: ['api', 'integration', 'documentation'],
+    fileUrl: '#',
+    isPinned: true,
+  }
 ];
 
 const categories = ['All', 'Market Research', 'Technical', 'UX Research', 'Legal', 'Competition'];
 
+const categoryColors: Record<string, string> = {
+  'Market Research': 'bg-purple-500/10 text-purple-500 border-purple-500/20',
+  'Technical': 'bg-blue-500/10 text-blue-500 border-blue-500/20',
+  'UX Research': 'bg-green-500/10 text-green-500 border-green-500/20',
+  'Legal': 'bg-amber-500/10 text-amber-500 border-amber-500/20',
+  'Competition': 'bg-red-500/10 text-red-500 border-red-500/20',
+  'Project Planning': 'bg-indigo-500/10 text-indigo-500 border-indigo-500/20'
+};
+
 export function ResearchSection() {
+  const [activeCategory, setActiveCategory] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('updated');
+  const [expandedDocs, setExpandedDocs] = useState<Record<string, boolean>>({});
+
+  const toggleExpanded = (id: string) => {
+    setExpandedDocs(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
+
+  const filteredDocuments = [...pinnedAssets, ...researchDocuments].filter(doc => {
+    // Category filter
+    const categoryMatch = activeCategory === 'All' || doc.category === activeCategory;
+    
+    // Search filter
+    const searchMatch = 
+      doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      doc.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      doc.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    return categoryMatch && searchMatch;
+  });
+
+  const sortedDocuments = [...filteredDocuments].sort((a, b) => {
+    if (sortBy === 'updated') {
+      return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+    } else if (sortBy === 'title') {
+      return a.title.localeCompare(b.title);
+    } else if (sortBy === 'category') {
+      return a.category.localeCompare(b.category);
+    }
+    return 0;
+  });
+
+  // Separate pinned docs for display
+  const pinnedDocs = sortedDocuments.filter(doc => doc.isPinned);
+  const regularDocs = sortedDocuments.filter(doc => !doc.isPinned);
+  
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
         <div>
           <h2 className="text-2xl font-bold text-white mb-2">Research Documents</h2>
-          <p className="text-neutral-400">Explore our research findings and background information for Ubahcrypt.</p>
+          <p className="text-neutral-400">Explore our research findings and background information for UbahCryp.</p>
         </div>
         
         <div className="flex flex-col sm:flex-row gap-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-500 h-4 w-4" />
-            <input 
-              type="text" 
-              placeholder="Search documents..." 
-              className="pl-10 pr-4 py-2 bg-black/40 border border-white/10 rounded-md text-white w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
-            />
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-500 h-4 w-4" />
+              <input 
+                type="text" 
+                placeholder="Search documents..." 
+                className="pl-10 pr-4 py-2 bg-black/40 border border-white/10 rounded-md text-white w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            
+            <TooltipProvider delayDuration={300}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="relative">
+                    <Select value={sortBy} onValueChange={setSortBy}>
+                      <SelectTrigger className="w-10 h-10 p-0 justify-center border-white/10 bg-black/40">
+                        <Filter className="h-4 w-4 text-neutral-400" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="updated">Latest Updated</SelectItem>
+                        <SelectItem value="title">Alphabetical</SelectItem>
+                        <SelectItem value="category">By Category</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>Sort documents</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
-          <Button className="bg-[#9b87f5] hover:bg-[#8a76e4] text-white">
-            Add Document
-          </Button>
+          
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button className="bg-[#9b87f5] hover:bg-[#8a76e4] text-white">
+                  Add Document
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                Upload PDFs or links (admin access required)
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
       
       <div className="flex flex-nowrap overflow-x-auto pb-2 gap-2 scrollbar-hide">
-        {categories.map((category) => (
-          <Badge 
-            key={category} 
-            variant={category === 'All' ? 'purple' : 'secondary'} 
-            className="cursor-pointer px-4 py-2 whitespace-nowrap"
-          >
-            {category}
-          </Badge>
-        ))}
+        {categories.map((category) => {
+          const count = researchDocuments.filter(doc => 
+            category === 'All' ? true : doc.category === category).length;
+          
+          return (
+            <Badge 
+              key={category} 
+              variant={category === activeCategory ? 'purple' : 'secondary'} 
+              className={`cursor-pointer px-4 py-2 whitespace-nowrap ${
+                category !== 'All' && categoryColors[category]
+              }`}
+              onClick={() => setActiveCategory(category)}
+            >
+              {category} {count > 0 && <span className="ml-1 opacity-70">({count})</span>}
+            </Badge>
+          );
+        })}
       </div>
       
+      {/* Pinned Assets Section */}
+      {pinnedDocs.length > 0 && (
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold text-white/90 mb-3 border-b border-white/10 pb-2">
+            Pinned Project Assets
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {pinnedDocs.map((doc) => (
+              <AnimatedCard key={doc.id} className="border border-purple-500/20 bg-purple-500/5">
+                <div className="flex flex-col h-full">
+                  <div className="mb-2 flex items-center justify-between">
+                    <Badge 
+                      variant="outline" 
+                      className={`${categoryColors[doc.category] || ''} text-xs`}
+                    >
+                      {doc.category}
+                    </Badge>
+                    <div className="text-xs text-neutral-500 flex items-center gap-1">
+                      <Calendar className="h-3 w-3" /> 
+                      {new Date(doc.updated_at).toLocaleDateString()}
+                    </div>
+                  </div>
+                  
+                  <h3 className="text-lg font-semibold text-white mb-2">{doc.title}</h3>
+                  <p className="text-neutral-400 text-sm mb-3 flex-grow">{doc.description}</p>
+                  
+                  <div className="mt-auto">
+                    <div className="flex justify-between items-center">
+                      <Button variant="ghost" className="text-[#9b87f5] hover:text-[#8a76e4] p-0">
+                        View Details
+                      </Button>
+                      {doc.fileUrl && (
+                        <Button variant="ghost" size="icon" className="text-neutral-400 hover:text-white">
+                          <Download className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </AnimatedCard>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {/* Main Documents Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {researchDocuments.map((doc) => (
-          <AnimatedCard key={doc.id} className="border border-white/10">
-            <div className="flex flex-col h-full">
-              <div className="mb-3 flex items-center gap-2">
-                <Badge variant="secondary" className="bg-black/30">{doc.category}</Badge>
-                <div className="text-xs text-neutral-500 flex items-center gap-1">
-                  <Clock className="h-3 w-3" /> 
-                  Updated {new Date(doc.updated_at).toLocaleDateString()}
+        {regularDocs.map((doc) => (
+          <Collapsible 
+            key={doc.id} 
+            open={expandedDocs[doc.id]} 
+            onOpenChange={() => toggleExpanded(doc.id)}
+          >
+            <AnimatedCard className="border border-white/10 h-full">
+              <div className="flex flex-col h-full">
+                <div className="mb-3 flex items-center justify-between">
+                  <Badge 
+                    variant="outline" 
+                    className={`${categoryColors[doc.category] || ''} text-xs`}
+                  >
+                    {doc.category}
+                  </Badge>
+                  <div className="text-xs text-neutral-500 flex items-center gap-1">
+                    <Clock className="h-3 w-3" /> 
+                    Updated {new Date(doc.updated_at).toLocaleDateString()}
+                  </div>
+                </div>
+                
+                <h3 className="text-lg font-semibold text-white mb-2">{doc.title}</h3>
+                <p className="text-neutral-400 text-sm mb-4">{doc.description}</p>
+                
+                {/* Document Tags */}
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {doc.tags.map((tag) => (
+                    <Badge key={tag} variant="outline" className="text-xs">
+                      <Tag className="h-3 w-3 mr-1" />{tag}
+                    </Badge>
+                  ))}
+                </div>
+                
+                {/* Expandable Content */}
+                <CollapsibleContent className="mb-4 space-y-3">
+                  {/* Key Insights Section */}
+                  {doc.insights && doc.insights.length > 0 && (
+                    <div className="bg-black/30 rounded-md p-3">
+                      <h4 className="text-sm font-semibold text-purple-400 mb-2">Key Insights</h4>
+                      <ul className="list-disc list-inside text-xs text-neutral-300 space-y-1">
+                        {doc.insights.map((insight, idx) => (
+                          <li key={idx}>{insight}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  {/* Next Steps Section */}
+                  {doc.nextSteps && doc.nextSteps.length > 0 && (
+                    <div className="bg-black/30 rounded-md p-3">
+                      <h4 className="text-sm font-semibold text-blue-400 mb-2">Recommended Actions</h4>
+                      <ul className="list-disc list-inside text-xs text-neutral-300 space-y-1">
+                        {doc.nextSteps.map((step, idx) => (
+                          <li key={idx}>{step}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  {/* Code Snippet for Technical Docs */}
+                  {doc.code_snippet && (
+                    <div className="bg-black/50 rounded-md p-3 font-mono">
+                      <h4 className="text-sm font-semibold text-green-400 mb-2">Code Example</h4>
+                      <pre className="text-xs overflow-x-auto whitespace-pre-wrap text-neutral-300">
+                        {doc.code_snippet}
+                      </pre>
+                    </div>
+                  )}
+                </CollapsibleContent>
+                
+                <div className="flex justify-between items-center mt-auto">
+                  <div className="flex items-center gap-2">
+                    <Button variant="ghost" className="text-[#9b87f5] hover:text-[#8a76e4] p-0 h-8">
+                      View Details
+                    </Button>
+                    <CollapsibleTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-6 p-0 text-xs text-neutral-400">
+                        {expandedDocs[doc.id] ? (
+                          <div className="flex items-center">
+                            <ChevronUp className="h-3 w-3 mr-1" /> Less
+                          </div>
+                        ) : (
+                          <div className="flex items-center">
+                            <ChevronDown className="h-3 w-3 mr-1" /> More
+                          </div>
+                        )}
+                      </Button>
+                    </CollapsibleTrigger>
+                  </div>
+                  {doc.fileUrl && (
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="text-neutral-400 hover:text-white"
+                      aria-label={`Download ${doc.title}`}
+                    >
+                      <Download className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
               </div>
-              
-              <h3 className="text-lg font-semibold text-white mb-2">{doc.title}</h3>
-              <p className="text-neutral-400 text-sm mb-4 flex-grow">{doc.description}</p>
-              
-              <div className="flex flex-wrap gap-2 mb-4">
-                {doc.tags.map((tag) => (
-                  <Badge key={tag} variant="outline" className="text-xs">
-                    <Tag className="h-3 w-3 mr-1" />{tag}
-                  </Badge>
-                ))}
-              </div>
-              
-              <div className="flex justify-between items-center mt-2">
-                <Button variant="ghost" className="text-[#9b87f5] hover:text-[#8a76e4] p-0">
-                  View Details
-                </Button>
-                <Button variant="ghost" size="icon" className="text-neutral-400 hover:text-white">
-                  <Download className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </AnimatedCard>
+            </AnimatedCard>
+          </Collapsible>
         ))}
+        
+        {/* Contribute Research Button for empty categories */}
+        {activeCategory === 'Competition' && regularDocs.filter(d => d.category === 'Competition').length === 0 && (
+          <Card className="border border-white/10 bg-black/20 flex flex-col items-center justify-center p-6 h-64">
+            <FileText className="h-12 w-12 text-neutral-500 mb-4" />
+            <h3 className="text-lg font-semibold text-white mb-2">No Competition Research Yet</h3>
+            <p className="text-neutral-400 text-sm text-center mb-4">
+              Help the project by contributing research on competitors.
+            </p>
+            <Button className="bg-[#9b87f5] hover:bg-[#8a76e4] text-white">
+              Contribute Research
+            </Button>
+          </Card>
+        )}
       </div>
     </div>
   );
