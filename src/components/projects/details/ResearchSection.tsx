@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { AnimatedCard } from '@/components/ui/animated-card';
@@ -76,7 +75,7 @@ const researchDocuments: ResearchDocument[] = [
   },
 ];
 
-const pinnedAssets = [
+const pinnedAssets: ResearchDocument[] = [
   {
     id: 'pin-1',
     title: 'UbahCryp Roadmap',
