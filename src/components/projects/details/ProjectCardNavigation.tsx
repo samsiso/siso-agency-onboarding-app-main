@@ -1,14 +1,15 @@
+
 import { Link, useParams } from 'react-router-dom';
 import { 
   FileText, 
-  Calendar, 
-  GitBranch, 
-  Users, 
-  BarChart, 
-  PuzzleIcon, 
   Layout, 
-  Code, 
-  Palette 
+  PuzzleIcon, 
+  GitBranch, 
+  Calendar,
+  Palette,
+  Code,
+  BarChart,
+  Users
 } from 'lucide-react';
 import { Pill } from '@/components/ui/pill';
 
@@ -17,15 +18,15 @@ export function ProjectCardNavigation({ projectId }: { projectId: string }) {
 
   const tabs = [
     { id: 'overview', icon: FileText, label: 'Overview' },
-    { id: 'timeline', icon: Calendar, label: 'Timeline' },
-    { id: 'active-tasks', icon: GitBranch, label: 'Tasks' },
-    { id: 'features', icon: PuzzleIcon, label: 'Features' },
-    { id: 'financial', icon: BarChart, label: 'Financial' },
-    { id: 'research', icon: Users, label: 'Research' },
     { id: 'app-plan', icon: Layout, label: 'App Plan' },
-    { id: 'apis', icon: Code, label: 'APIs' },
+    { id: 'features', icon: PuzzleIcon, label: 'Features' },
+    { id: 'active-tasks', icon: GitBranch, label: 'Tasks' },
+    { id: 'timeline', icon: Calendar, label: 'Timeline' },
     { id: 'wireframe', icon: Layout, label: 'Wireframe' },
-    { id: 'colors', icon: Palette, label: 'Colors' }
+    { id: 'colors', icon: Palette, label: 'Colors' },
+    { id: 'apis', icon: Code, label: 'APIs' },
+    { id: 'financial', icon: BarChart, label: 'Financial' },
+    { id: 'research', icon: Users, label: 'Research' }
   ];
 
   return (
