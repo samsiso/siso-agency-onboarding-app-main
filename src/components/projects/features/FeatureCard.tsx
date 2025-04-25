@@ -2,9 +2,7 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { 
-  FeatureCardProps 
-} from '@/types/feature.types';
+import { FeatureCardProps } from '@/types/feature.types';
 
 export function FeatureCard({ 
   feature, 
