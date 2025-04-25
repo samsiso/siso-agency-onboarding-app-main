@@ -1770,6 +1770,62 @@ export type Database = {
           },
         ]
       }
+      project_features: {
+        Row: {
+          cost_breakdown: Json | null
+          created_at: string | null
+          description: string | null
+          difficulty: Database["public"]["Enums"]["feature_difficulty"] | null
+          estimated_cost: number | null
+          id: string
+          implementation_plan: string | null
+          priority: Database["public"]["Enums"]["feature_priority"] | null
+          project_id: string | null
+          status: Database["public"]["Enums"]["feature_status"] | null
+          timeline_week: number | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          cost_breakdown?: Json | null
+          created_at?: string | null
+          description?: string | null
+          difficulty?: Database["public"]["Enums"]["feature_difficulty"] | null
+          estimated_cost?: number | null
+          id?: string
+          implementation_plan?: string | null
+          priority?: Database["public"]["Enums"]["feature_priority"] | null
+          project_id?: string | null
+          status?: Database["public"]["Enums"]["feature_status"] | null
+          timeline_week?: number | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          cost_breakdown?: Json | null
+          created_at?: string | null
+          description?: string | null
+          difficulty?: Database["public"]["Enums"]["feature_difficulty"] | null
+          estimated_cost?: number | null
+          id?: string
+          implementation_plan?: string | null
+          priority?: Database["public"]["Enums"]["feature_priority"] | null
+          project_id?: string | null
+          status?: Database["public"]["Enums"]["feature_status"] | null
+          timeline_week?: number | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_features_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       projects: {
         Row: {
           completion_percentage: number
@@ -2533,6 +2589,9 @@ export type Database = {
       }
     }
     Enums: {
+      feature_difficulty: "low" | "medium" | "high"
+      feature_priority: "low" | "medium" | "high"
+      feature_status: "pending" | "in_progress" | "completed"
       task_category:
         | "main"
         | "weekly"
@@ -2657,6 +2716,9 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      feature_difficulty: ["low", "medium", "high"],
+      feature_priority: ["low", "medium", "high"],
+      feature_status: ["pending", "in_progress", "completed"],
       task_category: [
         "main",
         "weekly",
