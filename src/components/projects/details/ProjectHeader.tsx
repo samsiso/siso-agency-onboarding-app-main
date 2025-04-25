@@ -13,9 +13,9 @@ export function ProjectHeader({ name, description, status, created_at }: Project
   return (
     <div className="relative overflow-hidden rounded-xl bg-black/30 border border-white/10 p-8 backdrop-blur-xl">
       <div className="flex flex-col md:flex-row gap-8 items-start relative z-10">
-        <div className="h-40 w-40 rounded-full bg-gradient-to-br from-[#ea384c] to-[#ff1a1a] flex items-center justify-center ring-4 ring-[#ea384c]/20 animate-pulse">
+        <div className="h-40 w-40 rounded-full bg-gradient-to-br from-black to-[#222] flex items-center justify-center ring-4 ring-[#ea384c]/20">
           <img 
-            src="/public/lovable-uploads/ubahcrypt-logo.png" 
+            src="/public/lovable-uploads/37c88c59-ac56-4cf7-a671-e918e9338bc9.png" 
             alt="UbahCrypt Logo"
             className="w-24 h-24 object-contain"
           />
