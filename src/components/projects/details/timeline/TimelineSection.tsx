@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { Timeline } from '@/components/ui/timeline';
-import { TimelineHeader } from './timeline/TimelineHeader';
-import { MilestoneCard } from './timeline/MilestoneCard';
+import { TimelineHeader } from './TimelineHeader';
+import { MilestoneCard } from './MilestoneCard';
 
 const milestones = [
   {

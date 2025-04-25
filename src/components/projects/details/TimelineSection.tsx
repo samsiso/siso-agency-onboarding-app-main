@@ -8,6 +8,7 @@ const milestones = [
   {
     title: "Initial Setup & Planning",
     date: "May 2, 2025 (Week 1)",
+    description: "Project setup and initial technical architecture design phase.",
     status: "completed" as const,
     deliverables: [
       "Project setup on Lovable platform",
@@ -22,6 +23,7 @@ const milestones = [
   {
     title: "Web3 Wallet Integration",
     date: "May 5, 2025 (Week 1.5)",
+    description: "Integration of Web3 wallet functionality and basic authentication.",
     status: "in-progress" as const,
     payment: {
       amount: 1200,
@@ -38,6 +40,7 @@ const milestones = [
   {
     title: "Basic UI & Dashboard",
     date: "May 9, 2025 (Week 2)",
+    description: "Implementation of core UI components and initial portfolio overview.",
     status: "upcoming" as const,
     deliverables: [
       "Basic UI layout (dashboard, navigation)",
@@ -51,6 +54,7 @@ const milestones = [
   {
     title: "P2P Trading System",
     date: "May 16, 2025 (Week 3)",
+    description: "Development of the peer-to-peer trading system with escrow protection.",
     status: "upcoming" as const,
     payment: {
       amount: 1200,
@@ -67,6 +71,7 @@ const milestones = [
   {
     title: "Staking System & Transaction History",
     date: "May 23, 2025 (Week 4)",
+    description: "Implementation of staking functionality and transaction tracking.",
     status: "upcoming" as const,
     deliverables: [
       "Staking system with token locking (3, 6, 12 months)",
@@ -80,6 +85,7 @@ const milestones = [
   {
     title: "Security Features & Market Data",
     date: "May 26, 2025 (Week 4.5)",
+    description: "Integration of security features and real-time market data.",
     status: "upcoming" as const,
     payment: {
       amount: 1200,
@@ -98,6 +104,7 @@ const milestones = [
   {
     title: "Community Features",
     date: "May 30, 2025 (Week 5)",
+    description: "Development of community engagement and educational features.",
     status: "upcoming" as const,
     deliverables: [
       "Referral rewards system",
@@ -112,6 +119,7 @@ const milestones = [
   {
     title: "Final Testing & Deployment",
     date: "June 6, 2025 (Week 6)",
+    description: "Final testing phase and production deployment.",
     status: "upcoming" as const,
     payment: {
       amount: 1500,
