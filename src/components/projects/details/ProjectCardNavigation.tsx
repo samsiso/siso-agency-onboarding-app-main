@@ -44,7 +44,7 @@ export function ProjectCardNavigation({ projectId }: { projectId: string }) {
               variant={isActive ? 'default' : 'secondary'}
               className={isActive 
                 ? "bg-black/20 text-white hover:bg-black/30 border border-black/20" 
-                : "hover:bg-black/10 text-gray-400 border border-transparent"
+                : "hover:bg-black/5 text-gray-400 border border-transparent"
               }
             >
               <Icon className="w-4 h-4" />
