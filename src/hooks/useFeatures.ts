@@ -18,17 +18,17 @@ export function useFeatures() {
     error: projectError,
     refetch: refetchProject
   } = useQuery({
-    queryKey: ['ubahcrypt_project'],
+    queryKey: ['project_id', routeId],
     queryFn: async () => {
-      console.log('Fetching project ID for Ubahcrypt');
+      console.log('Fetching project ID for route:', routeId);
       const { data, error } = await supabase
-        .from('plans')
+        .from('projects')
         .select('id')
-        .eq('app_name', 'Ubahcrypt')
+        .eq('name', 'UbahCryp')
         .single();
 
       if (error) {
-        console.error('Error fetching Ubahcrypt project:', error);
+        console.error('Error fetching project:', error);
         toast({
           title: "Error loading project",
           description: "Could not load project details. Please try again.",
