@@ -2,6 +2,8 @@
 export type FeatureDifficulty = 'low' | 'medium' | 'high';
 export type FeaturePriority = 'low' | 'medium' | 'high';
 export type FeatureStatus = 'pending' | 'in_progress' | 'completed';
+export type FeatureFilter = 'all' | 'pending' | 'in_progress' | 'completed' | 'high_priority';
+export type SortOption = 'priority' | 'difficulty' | 'cost' | 'title';
 
 export interface Feature {
   id: string;
