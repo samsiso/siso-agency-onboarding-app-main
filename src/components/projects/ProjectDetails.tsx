@@ -1,4 +1,3 @@
-
 import { useProjects } from '@/hooks/useProjects';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card } from '@/components/ui/card';
@@ -8,7 +7,6 @@ import { ProjectHeader } from './details/ProjectHeader';
 import { ProjectCardNavigation } from './details/ProjectCardNavigation';
 import { ProjectStatsCards } from './details/ProjectStatsCards';
 import { ProjectOverviewCards } from './details/ProjectOverviewCards';
-import { PriorityTasksSection } from './details/PriorityTasksSection';
 import { DevelopmentProgress } from './details/DevelopmentProgress';
 import { ProjectActions } from './details/ProjectActions';
 import { TeamSection } from './details/TeamSection';
@@ -145,7 +143,6 @@ export function ProjectDetails() {
           <div className="space-y-8">
             <ProjectStatsCards />
             <ProjectOverviewCards projectId={id || ''} />
-            <PriorityTasksSection />
             <DevelopmentProgress />
             <ProjectActions />
           </div>
