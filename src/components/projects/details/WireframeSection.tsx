@@ -115,7 +115,11 @@ export function WireframeSection() {
                 className="bg-black/20 border border-gray-800 rounded-lg overflow-hidden cursor-pointer hover:border-purple-500/30 transition-colors"
                 onClick={() => {
                   setActiveWireframeId(wireframe.id);
-                  document.querySelector('[data-state="active"][value="viewer"]')?.click();
+                  // Find the viewer tab trigger and navigate to it
+                  const viewerTab = document.querySelector('[data-value="viewer"]');
+                  if (viewerTab && viewerTab instanceof HTMLElement) {
+                    viewerTab.click();
+                  }
                 }}
               >
                 <div className="h-36 overflow-hidden bg-black/30">
