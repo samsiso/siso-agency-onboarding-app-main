@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { motion } from 'framer-motion';
-import { Clock, Tag, Activity, CheckCircle, Circle, ArrowRight } from 'lucide-react';
+import { Clock, Tag, Activity, CheckCircle, Circle, ArrowRight, Zap, Shield, Users, Coins } from 'lucide-react';
 import { FeatureCardProps } from '@/types/feature.types';
 import { cn } from '@/lib/utils';
 
@@ -59,6 +59,25 @@ export function FeatureCard({
     }
   };
 
+  // Get the category icon based on feature title
+  const getCategoryIcon = () => {
+    const title = feature.title.toLowerCase();
+    
+    if (title.includes('wallet') || title.includes('trading') || title.includes('transaction') || title.includes('market')) {
+      return <Zap className="w-3 h-3 text-blue-400" />;
+    } else if (title.includes('smart contract') || title.includes('2fa') || title.includes('security') || title.includes('kyc') || title.includes('ddos')) {
+      return <Shield className="w-3 h-3 text-purple-400" />;
+    } else if (title.includes('staking') || title.includes('token') || title.includes('interest') || title.includes('compound')) {
+      return <Coins className="w-3 h-3 text-amber-400" />;
+    } else if (title.includes('referral') || title.includes('community') || title.includes('social') || title.includes('engagement') || title.includes('education')) {
+      return <Users className="w-3 h-3 text-green-400" />;
+    }
+    
+    return null;
+  };
+
+  const categoryIcon = getCategoryIcon();
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -86,6 +105,15 @@ export function FeatureCard({
         </div>
 
         <div className="flex flex-wrap gap-2 mb-3">
+          {categoryIcon && (
+            <Badge variant="outline" className="gap-1 bg-black/30">
+              {categoryIcon} 
+              {feature.title.toLowerCase().includes('wallet') || feature.title.toLowerCase().includes('trading') ? "Trading & Transactions" : 
+               feature.title.toLowerCase().includes('smart contract') || feature.title.toLowerCase().includes('2fa') ? "Security & Trust" :
+               feature.title.toLowerCase().includes('staking') || feature.title.toLowerCase().includes('token') ? "Staking & Earning" :
+               "Community & Engagement"}
+            </Badge>
+          )}
           {getDifficultyBadge()}
           {getPriorityBadge()}
           {feature.timeline_week && (

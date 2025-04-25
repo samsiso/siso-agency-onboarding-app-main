@@ -144,6 +144,11 @@ function sortFeatures(features: Feature[], sortBy: SortOption): Feature[] {
       case 'title':
         // Sort alphabetically by title
         return a.title.localeCompare(b.title);
+      case 'timeline':
+        // Sort by timeline_week (if available)
+        const timelineA = a.timeline_week || Infinity;
+        const timelineB = b.timeline_week || Infinity;
+        return timelineA - timelineB;
       default:
         return 0;
     }

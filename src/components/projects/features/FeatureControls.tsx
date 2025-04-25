@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Filter, SortAsc, RefreshCw, ListFilter } from 'lucide-react';
+import { Filter, SortAsc, RefreshCw, ListFilter, Zap, Shield, Coins, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
@@ -22,6 +22,8 @@ interface FeatureControlsProps {
   onRetry?: () => void;
   isLoading?: boolean;
   hasError?: boolean;
+  categoryFilter: string | null;
+  setCategoryFilter: (category: string | null) => void;
 }
 
 export function FeatureControls({
@@ -31,12 +33,14 @@ export function FeatureControls({
   setSortBy,
   onRetry,
   isLoading,
-  hasError
+  hasError,
+  categoryFilter,
+  setCategoryFilter
 }: FeatureControlsProps) {
   return (
-    <div className="flex flex-wrap items-center gap-3">
+    <div className="space-y-3">
       {/* Status Tabs */}
-      <Tabs value={filter} onValueChange={(value) => setFilter(value as FeatureFilter)} className="mr-2">
+      <Tabs value={filter} onValueChange={(value) => setFilter(value as FeatureFilter)} className="mb-2">
         <TabsList className="bg-black/40">
           <TabsTrigger value="all">All</TabsTrigger>
           <TabsTrigger value="pending">Pending</TabsTrigger>
@@ -45,7 +49,33 @@ export function FeatureControls({
         </TabsList>
       </Tabs>
       
-      <div className="flex flex-wrap gap-3 ml-auto">
+      {/* Category Tabs */}
+      <Tabs value={categoryFilter || 'all'} onValueChange={(value) => setCategoryFilter(value === 'all' ? null : value)}>
+        <TabsList className="bg-black/40 w-full">
+          <TabsTrigger value="all" className="flex items-center gap-1">
+            <Filter className="h-3.5 w-3.5" />
+            All Categories
+          </TabsTrigger>
+          <TabsTrigger value="trading" className="flex items-center gap-1">
+            <Zap className="h-3.5 w-3.5 text-blue-400" />
+            Trading
+          </TabsTrigger>
+          <TabsTrigger value="security" className="flex items-center gap-1">
+            <Shield className="h-3.5 w-3.5 text-purple-400" />
+            Security
+          </TabsTrigger>
+          <TabsTrigger value="staking" className="flex items-center gap-1">
+            <Coins className="h-3.5 w-3.5 text-amber-400" />
+            Staking
+          </TabsTrigger>
+          <TabsTrigger value="community" className="flex items-center gap-1">
+            <Users className="h-3.5 w-3.5 text-green-400" />
+            Community
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
+      
+      <div className="flex flex-wrap gap-3 justify-end">
         {/* Priority filter dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -91,6 +121,7 @@ export function FeatureControls({
               <DropdownMenuRadioItem value="difficulty">Difficulty</DropdownMenuRadioItem>
               <DropdownMenuRadioItem value="cost">Cost (High to Low)</DropdownMenuRadioItem>
               <DropdownMenuRadioItem value="title">Name (A-Z)</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="timeline">Timeline</DropdownMenuRadioItem>
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>
