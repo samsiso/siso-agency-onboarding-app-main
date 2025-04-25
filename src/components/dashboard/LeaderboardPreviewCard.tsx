@@ -32,36 +32,52 @@ export function LeaderboardPreviewCard() {
         </CardHeader>
         <CardContent className="pt-2">
           <div className="space-y-2">
-            {leaders.map(leader => (
-              <div 
+            {leaders.slice(0, 5).map((leader, index) => (
+              <motion.div 
                 key={leader.rank}
-                className="flex items-center justify-between p-2 rounded-lg hover:bg-white/5 transition-colors"
+                whileHover={{ scale: 1.02 }}
+                className={`flex items-center justify-between p-3 rounded-lg transition-colors ${
+                  index === 0 ? 'bg-gradient-to-r from-yellow-500/10 via-yellow-500/5 to-transparent' :
+                  index === 1 ? 'bg-gradient-to-r from-gray-400/10 via-gray-400/5 to-transparent' :
+                  index === 2 ? 'bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent' :
+                  'bg-black/20'
+                }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                    leader.rank === 1 ? 'bg-yellow-500/20 text-yellow-500' :
-                    leader.rank === 2 ? 'bg-gray-400/20 text-gray-400' :
-                    leader.rank === 3 ? 'bg-amber-600/20 text-amber-600' :
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                    index === 0 ? 'bg-yellow-500/20 text-yellow-500' :
+                    index === 1 ? 'bg-gray-400/20 text-gray-400' :
+                    index === 2 ? 'bg-amber-600/20 text-amber-600' :
                     'bg-purple-500/20 text-purple-400'
                   }`}>
-                    {leader.rank}
+                    {index + 1}
                   </div>
-                  <span className="text-lg mr-2">{leader.avatar}</span>
-                  <span className="text-white">{leader.name}</span>
+                  <span className="text-xl mr-2">{leader.avatar}</span>
+                  <div>
+                    <span className="text-white font-medium">{leader.name}</span>
+                    <div className="flex items-center gap-2 text-xs text-siso-text">
+                      <span>{leader.points} points</span>
+                      {Math.random() > 0.5 ? (
+                        <TrendingUp className="h-3 w-3 text-green-400" />
+                      ) : (
+                        <TrendingDown className="h-3 w-3 text-red-400" />
+                      )}
+                    </div>
+                  </div>
                 </div>
                 <span className="font-semibold text-purple-400">{leader.points}</span>
-              </div>
+              </motion.div>
             ))}
           </div>
           
           <Button 
             variant="outline" 
             size="sm" 
-            className="w-full mt-3 bg-black/30 border-purple-500/30 text-purple-400 hover:bg-purple-500/10"
+            className="w-full mt-4 bg-black/30 border-purple-500/30 text-purple-400 hover:bg-purple-500/10"
             onClick={() => navigate('/economy/leaderboards')}
           >
-            Full Leaderboard
-            <ArrowRight className="ml-1 h-4 w-4" />
+            View Full Leaderboard
+            <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </CardContent>
       </Card>
