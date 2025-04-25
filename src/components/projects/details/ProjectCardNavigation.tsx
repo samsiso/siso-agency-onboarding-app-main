@@ -9,7 +9,7 @@ import {
   BarChart, 
   PuzzleIcon, 
   Layout, 
-  Code, 
+  Api, 
   Palette 
 } from 'lucide-react';
 
@@ -24,7 +24,7 @@ export function ProjectCardNavigation({ projectId }: { projectId: string }) {
     { id: 'financial', icon: BarChart, label: 'Financial' },
     { id: 'research', icon: Users, label: 'Research' },
     { id: 'app-plan', icon: Layout, label: 'App Plan' },
-    { id: 'apis', icon: Code, label: 'APIs' }, // Changed from Api to Code
+    { id: 'apis', icon: Api, label: 'APIs' },
     { id: 'wireframe', icon: Layout, label: 'Wireframe' },
     { id: 'colors', icon: Palette, label: 'Colors' }
   ];
