@@ -1,5 +1,4 @@
 
-import { Bitcoin } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { formatDate } from '@/lib/formatters';
 
@@ -14,8 +13,12 @@ export function ProjectHeader({ name, description, status, created_at }: Project
   return (
     <div className="relative overflow-hidden rounded-xl bg-black/30 border border-white/10 p-8 backdrop-blur-xl">
       <div className="flex flex-col md:flex-row gap-8 items-start relative z-10">
-        <div className="h-40 w-40 rounded-full bg-gradient-to-br from-[#9b87f5] to-[#6E59A5] flex items-center justify-center ring-4 ring-[#9b87f5]/20 animate-pulse">
-          <Bitcoin size={64} className="text-white" />
+        <div className="h-40 w-40 rounded-full bg-gradient-to-br from-[#ea384c] to-[#ff1a1a] flex items-center justify-center ring-4 ring-[#ea384c]/20 animate-pulse">
+          <img 
+            src="/public/lovable-uploads/ubahcrypt-logo.png" 
+            alt="UbahCrypt Logo"
+            className="w-24 h-24 object-contain"
+          />
         </div>
         
         <div className="flex-grow">
@@ -30,7 +33,7 @@ export function ProjectHeader({ name, description, status, created_at }: Project
             </div>
             <Badge 
               variant="secondary" 
-              className="text-base px-4 py-1.5 bg-[#9b87f5]/20 text-[#9b87f5] border border-[#9b87f5]/20 uppercase tracking-wide"
+              className="text-base px-4 py-1.5 bg-[#ea384c]/20 text-[#ea384c] border border-[#ea384c]/20 uppercase tracking-wide"
             >
               {status}
             </Badge>
@@ -44,9 +47,7 @@ export function ProjectHeader({ name, description, status, created_at }: Project
         </div>
       </div>
       
-      {/* Decorative gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/5 via-transparent to-blue-500/5" />
+      <div className="absolute inset-0 bg-gradient-to-tr from-[#ea384c]/5 via-transparent to-red-500/5" />
     </div>
   );
 }
-

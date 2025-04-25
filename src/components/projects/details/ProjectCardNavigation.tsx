@@ -1,4 +1,3 @@
-
 import { Link, useParams } from 'react-router-dom';
 import { 
   FileText, 
@@ -12,6 +11,7 @@ import {
   Users
 } from 'lucide-react';
 import { Pill } from '@/components/ui/pill';
+import { cn } from '@/lib/utils';
 
 export function ProjectCardNavigation({ projectId }: { projectId: string }) {
   const { tab } = useParams<{ tab: string }>();
@@ -42,10 +42,12 @@ export function ProjectCardNavigation({ projectId }: { projectId: string }) {
           >
             <Pill
               variant={isActive ? 'default' : 'secondary'}
-              className={isActive 
-                ? "border border-black/20" 
-                : "border border-transparent"
-              }
+              className={cn(
+                isActive 
+                  ? "border border-[#ea384c]/20 bg-[#ea384c]/20 text-[#ea384c]" 
+                  : "border border-transparent hover:border-[#ea384c]/10 hover:bg-[#ea384c]/10",
+                "transition-all duration-300"
+              )}
             >
               <Icon className="w-4 h-4" />
               <span>{item.label}</span>
