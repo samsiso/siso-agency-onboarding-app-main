@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -31,15 +32,15 @@ export function ProjectDirectoryCard({
     return (
       <div className="relative">
         <GlowEffect
-          colors={['#9b87f5', '#7E69AB', '#6E59A5', '#8B5CF6']}
+          colors={['#ea384c', '#8B0000', '#FF0000', '#600000']}
           mode="static"
           blur="medium"
         />
         <Card 
           onClick={() => navigate('/plan-builder')}
-          className="relative p-12 flex flex-col items-center justify-center gap-8 cursor-pointer bg-black/80 backdrop-blur-xl border border-white/10 hover:border-siso-orange/50 transition-all duration-300"
+          className="relative p-12 flex flex-col items-center justify-center gap-8 cursor-pointer bg-black/80 backdrop-blur-xl border border-[#ea384c]/20 hover:border-[#ea384c]/50 transition-all duration-300"
         >
-          <div className="h-40 w-40 rounded-full bg-gradient-to-r from-[#9b87f5] to-[#6E59A5] flex items-center justify-center">
+          <div className="h-40 w-40 rounded-full bg-gradient-to-r from-[#ea384c] to-black flex items-center justify-center">
             <Bitcoin size={80} className="text-white" />
           </div>
           <div className="text-center space-y-4">
@@ -48,7 +49,7 @@ export function ProjectDirectoryCard({
               Begin your blockchain journey by creating a new cryptocurrency project
             </p>
             <Button 
-              className="mt-6 bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 px-8 py-6 text-lg"
+              className="mt-6 bg-gradient-to-r from-[#ea384c] to-black hover:opacity-90 px-8 py-6 text-lg"
             >
               Create Project
             </Button>
@@ -65,13 +66,13 @@ export function ProjectDirectoryCard({
   return (
     <div className="relative w-full">
       <GlowEffect
-        colors={['#9b87f5', '#7E69AB', '#6E59A5', '#8B5CF6']}
+        colors={['#ea384c', '#8B0000', '#FF0000', '#600000']}
         mode="static"
         blur="medium"
       />
       <Card 
         onClick={handleCardClick}
-        className="relative p-8 bg-black/80 backdrop-blur-xl border border-white/10 hover:border-siso-orange/50 transition-all duration-300 group w-full cursor-pointer"
+        className="relative p-8 bg-black/80 backdrop-blur-xl border border-[#ea384c]/20 hover:border-[#ea384c]/50 transition-all duration-300 group w-full cursor-pointer"
       >
         <div className="flex flex-col md:flex-row gap-8">
           <div className="flex-shrink-0">
@@ -79,12 +80,16 @@ export function ProjectDirectoryCard({
               <img
                 src={logo}
                 alt={`${name} logo`}
-                className="h-40 w-40 rounded-full object-cover ring-4 ring-[#9b87f5]/20 group-hover:ring-[#9b87f5]/40 transition-all duration-300"
+                className="h-40 w-40 rounded-full object-cover ring-4 ring-[#ea384c]/20 group-hover:ring-[#ea384c]/40 transition-all duration-300"
                 loading="lazy"
               />
             ) : (
-              <div className="h-40 w-40 rounded-full bg-gradient-to-br from-[#9b87f5] to-[#6E59A5] flex items-center justify-center ring-4 ring-[#9b87f5]/20 group-hover:ring-[#9b87f5]/40 transition-all duration-300">
-                <Bitcoin size={64} className="text-white" />
+              <div className="h-40 w-40 rounded-full bg-gradient-to-br from-[#ea384c] to-black flex items-center justify-center ring-4 ring-[#ea384c]/20 group-hover:ring-[#ea384c]/40 transition-all duration-300">
+                <img 
+                  src="/public/lovable-uploads/37c88c59-ac56-4cf7-a671-e918e9338bc9.png" 
+                  alt={`${name} logo`} 
+                  className="h-24 w-24 object-contain"
+                />
               </div>
             )}
           </div>
@@ -92,7 +97,7 @@ export function ProjectDirectoryCard({
           <div className="flex-grow space-y-6">
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="text-3xl font-semibold text-white group-hover:text-[#9b87f5] transition-colors duration-300">
+                <h3 className="text-3xl font-semibold text-white group-hover:text-[#ea384c] transition-colors duration-300">
                   {name}
                 </h3>
                 <p className="text-base text-siso-text mt-2">
@@ -101,7 +106,7 @@ export function ProjectDirectoryCard({
               </div>
               <Badge 
                 variant="secondary" 
-                className="text-base px-4 py-1 bg-[#9b87f5]/20 text-[#9b87f5]"
+                className="text-base px-4 py-1 bg-[#ea384c]/20 text-[#ea384c]"
               >
                 {status}
               </Badge>
@@ -119,21 +124,21 @@ export function ProjectDirectoryCard({
                   <Code size={16} />
                   <span>Smart Contract</span>
                 </div>
-                <Progress value={80} className="h-2" indicatorClassName="bg-[#9b87f5]" />
+                <Progress value={80} className="h-2" indicatorClassName="bg-[#ea384c]" />
               </div>
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-siso-text">
                   <Server size={16} />
                   <span>Backend Integration</span>
                 </div>
-                <Progress value={65} className="h-2" indicatorClassName="bg-[#9b87f5]" />
+                <Progress value={65} className="h-2" indicatorClassName="bg-[#ea384c]" />
               </div>
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-siso-text">
                   <GitBranch size={16} />
                   <span>Testing</span>
                 </div>
-                <Progress value={45} className="h-2" indicatorClassName="bg-[#9b87f5]" />
+                <Progress value={45} className="h-2" indicatorClassName="bg-[#ea384c]" />
               </div>
             </div>
             
@@ -144,13 +149,13 @@ export function ProjectDirectoryCard({
                   navigate('/projects/tasks');
                 }}
                 variant="outline"
-                className="border-[#9b87f5]/30 text-[#9b87f5] hover:bg-[#9b87f5]/10 flex-1 py-6 text-lg"
+                className="border-[#ea384c]/30 text-[#ea384c] hover:bg-[#ea384c]/10 flex-1 py-6 text-lg"
               >
                 View Development Tasks
               </Button>
               <Button 
                 onClick={onSelect}
-                className="bg-gradient-to-r from-[#9b87f5] to-[#6E59A5] hover:opacity-90 flex-1 py-6 text-lg"
+                className="bg-gradient-to-r from-[#ea384c] to-black hover:opacity-90 flex-1 py-6 text-lg"
               >
                 Open Project Dashboard
               </Button>
