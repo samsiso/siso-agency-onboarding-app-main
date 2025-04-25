@@ -1,46 +1,54 @@
 
-import { useNavigate, useLocation } from 'react-router-dom';
-import { FileText, Calendar, ListTodo, Wallet, GitBranch, LayoutDashboard, Palette, FileSearch, FileCheck, Terminal } from 'lucide-react';
-import { Pill } from '@/components/ui/pill';
+import { Link, useParams } from 'react-router-dom';
+import { cn } from '@/lib/utils';
+import { 
+  FileText, 
+  Calendar, 
+  GitBranch, 
+  Users, 
+  BarChart, 
+  PuzzleIcon, 
+  Layout, 
+  Api, 
+  Palette 
+} from 'lucide-react';
 
-const navigationItems = [
-  { id: 'overview', label: 'Overview', icon: FileText },
-  { id: 'timeline', label: 'Timeline', icon: Calendar },
-  { id: 'active-tasks', label: 'Active Tasks', icon: ListTodo },
-  { id: 'financial', label: 'Financial', icon: Wallet },
-  { id: 'features', label: 'Features', icon: GitBranch },
-  { id: 'research', label: 'Research', icon: FileSearch },
-  { id: 'app-plan', label: 'App Plan', icon: FileCheck },
-  { id: 'apis', label: 'APIs', icon: Terminal },
-  { id: 'wireframe', label: 'Wireframe', icon: LayoutDashboard },
-  { id: 'colors', label: 'Colors', icon: Palette }
-] as const;
+export function ProjectCardNavigation({ projectId }: { projectId: string }) {
+  const { tab } = useParams<{ tab: string }>();
 
-interface ProjectCardNavigationProps {
-  projectId: string;
-}
-
-export function ProjectCardNavigation({ projectId }: ProjectCardNavigationProps) {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const currentPath = location.pathname.split('/').pop();
+  const tabs = [
+    { id: 'overview', icon: FileText, label: 'Overview' },
+    { id: 'timeline', icon: Calendar, label: 'Timeline' },
+    { id: 'active-tasks', icon: GitBranch, label: 'Tasks' },
+    { id: 'features', icon: PuzzleIcon, label: 'Features' },
+    { id: 'financial', icon: BarChart, label: 'Financial' },
+    { id: 'research', icon: Users, label: 'Research' },
+    { id: 'app-plan', icon: Layout, label: 'App Plan' },
+    { id: 'apis', icon: Api, label: 'APIs' },
+    { id: 'wireframe', icon: Layout, label: 'Wireframe' },
+    { id: 'colors', icon: Palette, label: 'Colors' }
+  ];
 
   return (
-    <div className="flex gap-2 mb-8 overflow-x-auto pb-2 scrollbar-hide">
-      {navigationItems.map(({ id, label, icon: Icon }) => {
-        const isActive = currentPath === id || (!currentPath && id === 'overview');
+    <div className="flex flex-wrap gap-2 mb-8">
+      {tabs.map((item) => {
+        const Icon = item.icon;
+        const isActive = tab === item.id;
         
         return (
-          <Pill
-            key={id}
-            variant={isActive ? 'purple' : 'secondary'}
-            className={`cursor-pointer transition-all duration-300 hover:bg-[#9b87f5]/20
-              ${isActive ? 'bg-[#9b87f5]/20 hover:bg-[#9b87f5]/30' : 'bg-black/30'}`}
-            onClick={() => navigate(`/projects/${projectId}/${id}`)}
+          <Link
+            key={item.id}
+            to={`/projects/${projectId}/${item.id}`}
+            className={cn(
+              "flex items-center gap-2 px-3 py-2 rounded-lg transition-colors",
+              isActive 
+                ? "bg-[#9b87f5]/20 text-[#9b87f5] font-medium border border-[#9b87f5]/20" 
+                : "hover:bg-black/30 text-gray-400 border border-transparent"
+            )}
           >
             <Icon className="w-4 h-4" />
-            {label}
-          </Pill>
+            <span>{item.label}</span>
+          </Link>
         );
       })}
     </div>
