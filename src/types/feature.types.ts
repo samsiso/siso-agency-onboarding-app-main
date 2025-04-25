@@ -9,12 +9,12 @@ export interface Feature {
   title: string;
   description?: string;
   difficulty: FeatureDifficulty;
-  priority: FeaturePriority;
-  status: FeatureStatus;
   estimated_cost: number;
+  priority: FeaturePriority;
   implementation_plan?: string;
   timeline_week?: number;
   cost_breakdown?: Record<string, number>;
+  status: FeatureStatus;
   created_at: string;
   updated_at: string;
 }
