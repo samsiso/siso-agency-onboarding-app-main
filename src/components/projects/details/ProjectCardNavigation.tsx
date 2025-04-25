@@ -1,4 +1,3 @@
-
 import { Link, useParams } from 'react-router-dom';
 import { 
   FileText, 
@@ -43,8 +42,8 @@ export function ProjectCardNavigation({ projectId }: { projectId: string }) {
             <Pill
               variant={isActive ? 'default' : 'secondary'}
               className={isActive 
-                ? "bg-black/20 text-white hover:bg-black/30 border border-black/20" 
-                : "hover:bg-black/5 text-gray-400 border border-transparent"
+                ? "border border-black/20" 
+                : "border border-transparent"
               }
             >
               <Icon className="w-4 h-4" />
