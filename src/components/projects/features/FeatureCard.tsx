@@ -3,6 +3,7 @@ import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 import { motion } from 'framer-motion';
 import { Clock, Tag, Activity, CheckCircle, Circle, ArrowRight } from 'lucide-react';
 import { FeatureCardProps } from '@/types/feature.types';
@@ -39,6 +40,24 @@ export function FeatureCard({
         return <Badge variant="success" className="gap-1"><CheckCircle className="w-3 h-3" /> Completed</Badge>;
     }
   };
+  
+  // Calculate progress based on status
+  const getProgress = () => {
+    switch (feature.status) {
+      case 'pending': return 0;
+      case 'in_progress': return 50;
+      case 'completed': return 100;
+    }
+  };
+  
+  // Get progress bar color based on status
+  const getProgressColor = () => {
+    switch (feature.status) {
+      case 'pending': return 'bg-gray-400';
+      case 'in_progress': return 'bg-blue-500';
+      case 'completed': return 'bg-green-500';
+    }
+  };
 
   return (
     <motion.div 
@@ -56,6 +75,14 @@ export function FeatureCard({
         <div className="flex justify-between items-start mb-3">
           <h3 className="text-lg font-semibold text-white">{feature.title}</h3>
           {getStatusBadge()}
+        </div>
+        
+        <div className="mb-3">
+          <Progress 
+            value={getProgress()} 
+            className="h-1.5" 
+            indicatorClassName={getProgressColor()} 
+          />
         </div>
 
         <div className="flex flex-wrap gap-2 mb-3">
