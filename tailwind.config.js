@@ -1,4 +1,3 @@
-
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: ["class"],
@@ -31,10 +30,6 @@ module.exports = {
           text: "hsl(var(--siso-text))",
           "text-bold": "#FFFFFF",
           border: "rgba(255, 136, 75, 0.3)",
-          "border-hover": "rgba(255, 136, 75, 0.5)", // Added missing border-hover color
-          bg: "#121212",
-          "bg-alt": "#1A1A1A",
-          "text-muted": "#9E9E9E",
         },
         primary: {
           DEFAULT: "hsl(var(--primary))",
