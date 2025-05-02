@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { ClientSidebarNavigation } from "./ClientSidebarNavigation";
-import { ChevronDown, User, HelpCircle, FileText, LogOut } from "lucide-react";
+import { ChevronDown, User, HelpCircle, FileText, LogOut, Briefcase } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useProjects } from "@/hooks/useProjects";
 import { SidebarProvider, SidebarContent } from "@/components/ui/sidebar";
