@@ -209,15 +209,26 @@ export function ActiveTasksView() {
     setTasks(currentTasks => {
       return currentTasks.map(task => {
         if (task.id === active.id) {
-          return {
+          const statusColor = 
+            over.id === 'Awaiting Your Action' ? '#FF0000' :
+            over.id === 'In Development' ? '#F59E0B' :
+            '#10B981';
+            
+          const updatedTask = {
             ...task,
             status: {
               name: over.id,
-              color: over.id === 'Awaiting Your Action' ? '#FF0000' :
-                     over.id === 'In Development' ? '#F59E0B' :
-                     '#10B981'
+              color: statusColor
             }
           };
+          
+          // Show toast when status changes
+          toast({
+            title: "Task Status Updated",
+            description: `"${task.name}" moved to ${over.id}`,
+          });
+          
+          return updatedTask;
         }
         return task;
       });
@@ -248,14 +259,19 @@ export function ActiveTasksView() {
       />
       
       <KanbanProvider onDragEnd={handleDragEnd}>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {taskStatuses.map((status) => (
             <KanbanBoard 
               key={status.name} 
               id={status.name}
-              className="bg-black/20 border-[#403E43]/30 hover:border-[#403E43]/50"
+              className="bg-[#1A1A1A]/80 border border-[#333] hover:border-[#444] rounded-xl"
             >
-              <KanbanHeader name={status.name} color={status.color} />
+              <KanbanHeader 
+                name={status.name} 
+                color={status.name === "Awaiting Your Action" ? "#FF5555" : 
+                       status.name === "In Development" ? "#FFAA33" : 
+                       "#55AA55"} 
+              />
               <KanbanCards>
                 {tasks
                   .filter((task) => task.status.name === status.name)
@@ -266,13 +282,19 @@ export function ActiveTasksView() {
                       name={task.name}
                       parent={status.name}
                       index={index}
-                      className="bg-transparent shadow-none p-0"
+                      className="bg-transparent shadow-none p-0 mb-4"
                     >
                       <div onClick={() => setSelectedTask(task)}>
                         <TaskCard {...task} />
                       </div>
                     </KanbanCard>
                   ))}
+                  
+                {tasks.filter((task) => task.status.name === status.name).length === 0 && (
+                  <div className="flex items-center justify-center h-28 border border-dashed border-[#333] rounded-lg bg-[#1f2533]/30 text-sm text-muted-foreground">
+                    No tasks in this section
+                  </div>
+                )}
               </KanbanCards>
             </KanbanBoard>
           ))}

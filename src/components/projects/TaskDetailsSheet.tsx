@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { 
   Share2, Expand, Clock, Star, FileText, 
   Paperclip, MessageSquare, MessageSquarePlus, 
-  Square, Check, X
+  Square, Check, X, Calendar, DollarSign
 } from "lucide-react";
 import { format } from 'date-fns';
 import { UiTask } from './ActiveTasksView';
@@ -77,10 +77,11 @@ export function TaskDetailsSheet({ task, isOpen, onClose, onUpdateTask }: TaskDe
   };
 
   const progress = getProgress();
+  const isPaymentTask = task.category.includes('Payment') || task.category.includes('Deposit') || task.category.includes('Instalment');
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="w-[95vw] sm:w-[900px] p-0 bg-background/80 backdrop-blur-xl border-border/20">
+      <SheetContent className="w-[95vw] sm:w-[900px] p-0 bg-[#222]/95 backdrop-blur-xl border-[#333] shadow-xl">
         <ScrollArea className="h-[calc(100vh-2rem)]">
           <div className="p-6 space-y-6">
             {/* Category & Actions Header */}
@@ -103,37 +104,38 @@ export function TaskDetailsSheet({ task, isOpen, onClose, onUpdateTask }: TaskDe
             
             {/* Title & Priority Section */}
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold text-foreground">{task.name}</h2>
-              <Badge 
-                variant="outline" 
-                className={task.priority === 'high' 
-                  ? "bg-red-500/10 text-red-400 border-red-500/20" 
-                  : task.priority === 'medium'
-                  ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                  : "bg-green-500/10 text-green-400 border-green-500/20"
-                }
-              >
-                <Star className="h-3 w-3 mr-1" />
-                {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)} Priority
-              </Badge>
-              
-              <Badge 
-                variant="outline" 
-                className="ml-2"
-                style={{ 
-                  backgroundColor: `${task.status.color}20`, 
-                  color: task.status.color,
-                  borderColor: `${task.status.color}30`
-                }}
-              >
-                {task.status.name}
-              </Badge>
+              <h2 className="text-xl font-semibold text-white">{task.name}</h2>
+              <div className="flex flex-wrap gap-2">
+                <Badge 
+                  variant="outline" 
+                  className={task.priority === 'high' 
+                    ? "bg-red-500/10 text-red-400 border-red-500/20" 
+                    : task.priority === 'medium'
+                    ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                    : "bg-green-500/10 text-green-400 border-green-500/20"
+                  }
+                >
+                  <Star className="h-3 w-3 mr-1" />
+                  {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)} Priority
+                </Badge>
+                
+                <Badge 
+                  variant="outline"
+                  style={{ 
+                    backgroundColor: `${task.status.color}20`, 
+                    color: task.status.color,
+                    borderColor: `${task.status.color}30`
+                  }}
+                >
+                  {task.status.name}
+                </Badge>
+              </div>
             </div>
 
             {/* Time Period Panel */}
-            <div className="bg-purple-950/30 rounded-lg p-4">
+            <div className="bg-purple-950/30 rounded-lg p-4 border border-purple-500/20">
               <div className="flex items-center gap-2 text-sm text-purple-300">
-                <Clock className="h-4 w-4" />
+                <Calendar className="h-4 w-4" />
                 <span>{getTimePeriod(task.startAt, task.endAt)}</span>
               </div>
             </div>
@@ -141,36 +143,44 @@ export function TaskDetailsSheet({ task, isOpen, onClose, onUpdateTask }: TaskDe
             {/* Progress Bar */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <div className="flex items-center gap-2 text-sm font-medium text-white">
                   <h3>Progress</h3>
                 </div>
                 <span className="text-sm text-muted-foreground">{progress}%</span>
               </div>
               
-              <Progress value={progress} className="h-2" />
+              <Progress 
+                value={progress} 
+                className="h-2.5" 
+                indicatorClassName={cn(
+                  progress === 100 ? "bg-green-500" : "bg-gradient-to-r from-[#0078D4] to-[#1A91FF]"
+                )}
+              />
             </div>
 
             {/* Description Section */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+            <div className="space-y-3 border-t border-[#333] pt-5">
+              <div className="flex items-center gap-2 text-sm font-medium text-white">
                 <FileText className="h-4 w-4" />
                 <h3>Description</h3>
               </div>
-              <p className="text-sm text-muted-foreground pl-6">
+              <p className="text-sm text-muted-foreground pl-6 leading-relaxed">
                 {task.description || "No description provided."}
               </p>
             </div>
 
             {/* Action Buttons Section */}
-            <div className="space-y-3 pt-4">
-              <h3 className="text-sm font-medium text-foreground">Actions</h3>
+            <div className="space-y-3 border-t border-[#333] pt-5">
+              <h3 className="text-sm font-medium text-white">Actions</h3>
               
               <div className="flex flex-wrap gap-3">
                 {task.actionButton && (
                   <Button 
                     onClick={handleAction} 
-                    className="bg-[#0078D4] hover:bg-[#0078D4]/80"
+                    className="bg-[#0078D4] hover:bg-[#1A91FF] hover:scale-[1.02] transition-all"
+                    size="lg"
                   >
+                    {isPaymentTask && <DollarSign className="mr-1 h-4 w-4" />}
                     {task.actionButton}
                   </Button>
                 )}
@@ -180,7 +190,8 @@ export function TaskDetailsSheet({ task, isOpen, onClose, onUpdateTask }: TaskDe
                     <Button 
                       variant="outline" 
                       onClick={handleApprove}
-                      className="border-green-500/30 text-green-500 hover:bg-green-500/10"
+                      className="border-green-500/30 text-green-500 hover:bg-green-500/10 hover:scale-[1.02] transition-all"
+                      size="lg"
                     >
                       <Check className="mr-1 h-4 w-4" />
                       Approve
@@ -189,7 +200,8 @@ export function TaskDetailsSheet({ task, isOpen, onClose, onUpdateTask }: TaskDe
                     <Button 
                       variant="outline" 
                       onClick={handleFeedback}
-                      className="border-blue-500/30 text-blue-500 hover:bg-blue-500/10"
+                      className="border-blue-500/30 text-blue-500 hover:bg-blue-500/10 hover:scale-[1.02] transition-all"
+                      size="lg"
                     >
                       <MessageSquare className="mr-1 h-4 w-4" />
                       Submit Feedback
@@ -198,7 +210,7 @@ export function TaskDetailsSheet({ task, isOpen, onClose, onUpdateTask }: TaskDe
                 )}
                 
                 {task.status.name === "Done" && (
-                  <Badge variant="outline" className="bg-green-500/10 text-green-400 border-green-500/20 py-1 px-2">
+                  <Badge variant="outline" className="bg-green-500/10 text-green-400 border-green-500/20 py-1.5 px-3">
                     <Check className="mr-1 h-4 w-4" />
                     Completed
                   </Badge>
@@ -208,22 +220,22 @@ export function TaskDetailsSheet({ task, isOpen, onClose, onUpdateTask }: TaskDe
             
             {/* Related Links Section */}
             {task.actionLink && (
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-foreground">Related Links</h3>
+              <div className="space-y-3 border-t border-[#333] pt-5">
+                <h3 className="text-sm font-medium text-white">Related Links</h3>
                 
                 <div className="pl-6 space-y-2">
                   <Button 
                     variant="link" 
-                    className="text-[#0078D4] p-0 h-auto"
+                    className="text-[#0078D4] hover:text-[#1A91FF] p-0 h-auto transition-colors"
                     onClick={() => navigate('/projects/ubahcrypt')}
                   >
                     View Project Details
                   </Button>
                   
-                  {task.category.includes('Payment') || task.category.includes('Deposit') || task.category.includes('Instalment') && (
+                  {isPaymentTask && (
                     <Button 
                       variant="link" 
-                      className="text-[#0078D4] p-0 h-auto ml-4"
+                      className="text-[#0078D4] hover:text-[#1A91FF] p-0 h-auto ml-4 transition-colors"
                       onClick={() => navigate('/financial')}
                     >
                       View Billing History
@@ -234,23 +246,23 @@ export function TaskDetailsSheet({ task, isOpen, onClose, onUpdateTask }: TaskDe
             )}
 
             {/* Notes or Comments Section */}
-            <div className="space-y-4 mt-6">
+            <div className="space-y-4 mt-6 border-t border-[#333] pt-5">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <div className="flex items-center gap-2 text-sm font-medium text-white">
                   <MessageSquare className="h-4 w-4" />
                   <h3>Comments & Updates</h3>
                 </div>
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  className="text-xs hover:bg-purple-500/10 text-muted-foreground hover:text-foreground"
+                  className="text-xs hover:bg-purple-500/10 text-muted-foreground hover:text-white transition-colors"
                 >
                   <MessageSquarePlus className="h-3 w-3 mr-1" />
                   Add Comment
                 </Button>
               </div>
               
-              <div className="rounded-lg bg-muted/20 p-4">
+              <div className="rounded-lg bg-[#1A1A1A] border border-[#333] p-4">
                 <p className="text-sm text-muted-foreground">No comments or updates yet.</p>
               </div>
             </div>

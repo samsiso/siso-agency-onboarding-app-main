@@ -71,21 +71,21 @@ export function TaskCard({
   return (
     <div 
       onClick={onClick}
-      className="flex flex-col gap-2 p-4 rounded-lg bg-gradient-to-br from-[#1A1F2C]/90 to-[#221F26]/90 border border-[#403E43]/30 backdrop-blur-sm transition-all hover:border-[#9b87f5]/50 hover:shadow-md cursor-pointer"
+      className="flex flex-col gap-2.5 p-5 rounded-lg bg-gradient-to-br from-[#1f2533]/90 to-[#252229]/90 border border-[#3a3942]/50 backdrop-blur-sm transition-all hover:border-[#9b87f5]/60 hover:shadow-lg hover:scale-[1.01] cursor-pointer animate-fade-in shadow-md"
     >
       <div className="flex items-start justify-between">
-        <div className="flex flex-col gap-1">
-          <h3 className="text-sm font-medium text-gray-200">{name}</h3>
+        <div className="flex flex-col gap-1.5">
+          <h3 className="text-[15px] font-medium text-gray-100">{name}</h3>
           <div className="flex items-center gap-1.5">
             <Badge 
               variant="outline" 
               className={cn(
-                'flex items-center gap-1 text-[10px] py-0.5',
+                'flex items-center gap-1 text-[10px] py-0.5 border-opacity-40',
                 priorityColors[priority]
               )}
             >
               {priorityIcons[priority]}
-              <span>{priority}</span>
+              <span className="capitalize">{priority}</span>
             </Badge>
             
             {status && (
@@ -104,9 +104,9 @@ export function TaskCard({
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger>
-              <Avatar className="h-7 w-7">
+              <Avatar className="h-7 w-7 ring-1 ring-[#9b87f5]/30">
                 <AvatarImage src={owner.image} />
-                <AvatarFallback>{owner.name.slice(0, 2)}</AvatarFallback>
+                <AvatarFallback className="bg-[#1f2533] text-xs">{owner.name.slice(0, 2)}</AvatarFallback>
               </Avatar>
             </TooltipTrigger>
             <TooltipContent>
@@ -116,22 +116,22 @@ export function TaskCard({
         </TooltipProvider>
       </div>
       
-      <div className="flex flex-col gap-1.5 mt-1">
+      <div className="flex flex-col gap-2 mt-1">
         <div className="flex items-center justify-between">
           <Badge 
             variant="outline" 
-            className="w-fit text-[10px] py-0.5 bg-purple-500/20 text-purple-400"
+            className="w-fit text-[10px] py-0.5 bg-purple-500/20 text-purple-400 border-purple-500/30"
           >
             {category}
           </Badge>
           
           <span className={cn(
-            "text-xs px-2 py-0.5 rounded",
+            "text-xs px-2.5 py-1 rounded-full",
             isOverdue 
-              ? "bg-red-500/15 text-red-400" 
+              ? "bg-red-500/20 text-red-400" 
               : daysLeft <= 2 
-              ? "bg-amber-500/15 text-amber-400" 
-              : "bg-green-500/15 text-green-400"
+              ? "bg-amber-500/20 text-amber-400" 
+              : "bg-green-500/20 text-green-400"
           )}>
             {isOverdue 
               ? `Overdue by ${Math.abs(daysLeft)} day${Math.abs(daysLeft) === 1 ? '' : 's'}` 
@@ -146,7 +146,7 @@ export function TaskCard({
         {actionButton && (
           <Button 
             size="sm" 
-            className="w-full mt-2 bg-[#0078D4] hover:bg-[#0078D4]/80 text-white"
+            className="w-full mt-2 bg-[#0078D4] hover:bg-[#1A91FF] text-white transition-all hover:scale-[1.02] font-medium"
             onClick={handleActionClick}
           >
             {actionButton}
