@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { ProjectHeader } from './ProjectHeader';
 import { ProjectStatsCards } from './ProjectStatsCards';
 import { ProjectCardNavigation } from './ProjectCardNavigation';
-import { ProjectOverviewCards } from './ProjectOverviewCards';
 import { ProjectMetricsDashboard } from './ProjectMetricsDashboard';
 import { ActiveTasksSection } from './ActiveTasksSection';
 import { AppPlanSection } from './AppPlanSection';
