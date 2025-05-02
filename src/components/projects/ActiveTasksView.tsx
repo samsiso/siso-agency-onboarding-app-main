@@ -12,67 +12,168 @@ import { TaskDetailsSheet } from './TaskDetailsSheet';
 import { useToast } from '@/hooks/use-toast';
 
 const taskStatuses = [
-  { id: "1", name: "To Do", color: "#6B7280" },
-  { id: "2", name: "In Progress", color: "#F59E0B" },
-  { id: "3", name: "Completed", color: "#10B981" },
+  { id: "1", name: "Awaiting Your Action", color: "#FF0000" },
+  { id: "2", name: "In Development", color: "#F59E0B" },
+  { id: "3", name: "Done", color: "#10B981" },
 ];
 
-const mockTasks = [
+// Client-focused tasks
+const clientTasks = [
   {
     id: "1",
-    name: "Design User Interface",
-    description: "Create wireframes and mockups for the dashboard",
-    startAt: new Date(Date.now() - 86400000),
-    endAt: new Date(Date.now() + 86400000),
-    category: "Design",
+    name: "Collect Project Information",
+    description: "Please fill out the form with your business details, project goals, and technical specs to help us create your app plan.",
+    startAt: new Date(Date.now()),
+    endAt: new Date(Date.now()),
+    category: "Onboarding: 0%",
     priority: "high" as const,
     owner: {
-      name: "Sarah Designer",
-      image: "https://api.dicebear.com/7.x/initials/svg?seed=SD",
+      name: "Your Project Manager",
+      image: "https://api.dicebear.com/7.x/initials/svg?seed=PM",
     },
-    status: { name: "To Do", color: "#6B7280" }
+    status: { name: "Awaiting Your Action", color: "#FF0000" },
+    actionButton: "Complete Now",
+    actionLink: "/onboarding"
   },
   {
     id: "2",
-    name: "Implement Authentication",
-    description: "Set up user authentication flow",
+    name: "Approve App Plan",
+    description: "We've created a proposed app plan with milestones and costs. Review it and let us know if any changes are needed.",
     startAt: new Date(Date.now()),
-    endAt: new Date(Date.now() + 172800000),
-    category: "Development",
+    endAt: new Date(Date.now() + 86400000), // tomorrow
+    category: "Planning: 50%",
     priority: "high" as const,
     owner: {
-      name: "John Developer",
-      image: "https://api.dicebear.com/7.x/initials/svg?seed=JD",
+      name: "Your Project Manager",
+      image: "https://api.dicebear.com/7.x/initials/svg?seed=PM",
     },
-    status: { name: "In Progress", color: "#F59E0B" }
+    status: { name: "Awaiting Your Action", color: "#FF0000" },
+    actionButton: "Review Now",
+    actionLink: "/plan-builder"
   },
   {
     id: "3",
-    name: "Write API Documentation",
-    description: "Document all API endpoints",
-    startAt: new Date(Date.now() - 172800000),
-    endAt: new Date(Date.now() + 86400000),
-    category: "Documentation",
-    priority: "medium" as const,
+    name: "Make Deposit Payment",
+    description: "A £1,000 deposit is required to start development. You can pay securely using Stripe or crypto (with a 20% SISO coin bonus).",
+    startAt: new Date(Date.now()),
+    endAt: new Date(Date.now() + 172800000), // 2 days
+    category: "Deposit: £1,000",
+    priority: "high" as const,
     owner: {
-      name: "Mike Writer",
-      image: "https://api.dicebear.com/7.x/initials/svg?seed=MW",
+      name: "Finance Team",
+      image: "https://api.dicebear.com/7.x/initials/svg?seed=FT",
     },
-    status: { name: "Completed", color: "#10B981" }
+    status: { name: "Awaiting Your Action", color: "#FF0000" },
+    actionButton: "Pay Now",
+    actionLink: "/financial"
   },
   {
     id: "4",
-    name: "Test Payment Integration",
-    description: "Verify payment processing functionality",
+    name: "Phase 1: Initial Development",
+    description: "Our team is currently designing the UI and wireframes for your app. You'll be able to review them soon.",
     startAt: new Date(Date.now()),
-    endAt: new Date(Date.now() + 259200000),
-    category: "Testing",
+    endAt: new Date(Date.now() + 30 * 86400000), // 1 month
+    category: "Phase 1: 30%",
+    priority: "medium" as const,
+    owner: {
+      name: "Development Team",
+      image: "https://api.dicebear.com/7.x/initials/svg?seed=DT",
+    },
+    status: { name: "In Development", color: "#F59E0B" },
+    actionButton: "View Progress",
+    actionLink: "/projects/ubahcrypt"
+  },
+  {
+    id: "5",
+    name: "Phase 2: Core Development",
+    description: "We're building the core functionality of your app, including user login and payment gateway integration.",
+    startAt: new Date(Date.now()),
+    endAt: new Date(Date.now() + 60 * 86400000), // 2 months
+    category: "Phase 2: 0%",
+    priority: "medium" as const,
+    owner: {
+      name: "Development Team",
+      image: "https://api.dicebear.com/7.x/initials/svg?seed=DT",
+    },
+    status: { name: "In Development", color: "#F59E0B" },
+    actionButton: "View Progress",
+    actionLink: "/projects/ubahcrypt"
+  },
+  {
+    id: "6",
+    name: "Client Kickoff Call",
+    description: "We discussed your project goals and expectations during the kickoff call.",
+    startAt: new Date("2025-04-30"),
+    endAt: new Date("2025-04-30"),
+    category: "Completed",
+    priority: "medium" as const,
+    owner: {
+      name: "Your Project Manager",
+      image: "https://api.dicebear.com/7.x/initials/svg?seed=PM",
+    },
+    status: { name: "Done", color: "#10B981" }
+  },
+  {
+    id: "7",
+    name: "Review Phase 1 Deliverables",
+    description: "We've completed the UI designs and wireframes. Please review and provide feedback or approval.",
+    startAt: new Date(Date.now()),
+    endAt: new Date(Date.now() + 5 * 86400000), // 5 days
+    category: "Phase 1: 50%",
     priority: "high" as const,
     owner: {
-      name: "Alice Tester",
-      image: "https://api.dicebear.com/7.x/initials/svg?seed=AT",
+      name: "Your Project Manager",
+      image: "https://api.dicebear.com/7.x/initials/svg?seed=PM",
     },
-    status: { name: "To Do", color: "#6B7280" }
+    status: { name: "Awaiting Your Action", color: "#FF0000" },
+    actionButton: "Review Now",
+    actionLink: "/projects/ubahcrypt"
+  },
+  {
+    id: "8",
+    name: "Collect Phase 1 Instalment",
+    description: "A £1,500 instalment is due for the completion of Phase 1. Pay securely to continue development.",
+    startAt: new Date(Date.now()),
+    endAt: new Date(Date.now() + 3 * 86400000), // 3 days
+    category: "Instalment: £1,500",
+    priority: "high" as const,
+    owner: {
+      name: "Finance Team",
+      image: "https://api.dicebear.com/7.x/initials/svg?seed=FT",
+    },
+    status: { name: "Awaiting Your Action", color: "#FF0000" },
+    actionButton: "Pay Now",
+    actionLink: "/financial"
+  },
+  {
+    id: "9",
+    name: "Phase 3: Final Development",
+    description: "We're polishing the app, adding final features, and preparing for launch.",
+    startAt: new Date(Date.now()),
+    endAt: new Date(Date.now() + 30 * 86400000), // 1 month
+    category: "Phase 3: 0%",
+    priority: "medium" as const,
+    owner: {
+      name: "Development Team",
+      image: "https://api.dicebear.com/7.x/initials/svg?seed=DT",
+    },
+    status: { name: "In Development", color: "#F59E0B" },
+    actionButton: "View Progress",
+    actionLink: "/projects/ubahcrypt"
+  },
+  {
+    id: "10",
+    name: "Project Completed",
+    description: "Congratulations! Your app has been successfully launched and transferred to your hosting provider.",
+    startAt: new Date("2025-05-30"),
+    endAt: new Date("2025-05-30"),
+    category: "Completed",
+    priority: "low" as const,
+    owner: {
+      name: "Your Project Manager",
+      image: "https://api.dicebear.com/7.x/initials/svg?seed=PM",
+    },
+    status: { name: "Done", color: "#10B981" }
   }
 ];
 
@@ -92,10 +193,12 @@ export interface UiTask {
     name: string;
     color: string;
   };
+  actionButton?: string;
+  actionLink?: string;
 }
 
 export function ActiveTasksView() {
-  const [tasks, setTasks] = useState<UiTask[]>(mockTasks);
+  const [tasks, setTasks] = useState<UiTask[]>(clientTasks);
   const [selectedTask, setSelectedTask] = useState<UiTask | null>(null);
   const { toast } = useToast();
 
@@ -110,8 +213,8 @@ export function ActiveTasksView() {
             ...task,
             status: {
               name: over.id,
-              color: over.id === 'To Do' ? '#6B7280' :
-                     over.id === 'In Progress' ? '#F59E0B' :
+              color: over.id === 'Awaiting Your Action' ? '#FF0000' :
+                     over.id === 'In Development' ? '#F59E0B' :
                      '#10B981'
             }
           };

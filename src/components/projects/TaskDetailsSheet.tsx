@@ -1,15 +1,20 @@
+
 import React from 'react';
 import { Sheet, SheetContent, SheetHeader } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Share2, Expand, Clock, Star, FileText, Paperclip, MessageSquare, MessageSquarePlus, Square } from "lucide-react";
+import { 
+  Share2, Expand, Clock, Star, FileText, 
+  Paperclip, MessageSquare, MessageSquarePlus, 
+  Square, Check, X
+} from "lucide-react";
 import { format } from 'date-fns';
 import { UiTask } from './ActiveTasksView';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
-import { useSubtasks } from '@/hooks/useSubtasks';
-import { SubtaskList } from '@/components/admin/teams/subtasks/SubtaskList';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 
 interface TaskDetailsSheetProps {
   task: UiTask | null;
@@ -19,22 +24,56 @@ interface TaskDetailsSheetProps {
 }
 
 export function TaskDetailsSheet({ task, isOpen, onClose, onUpdateTask }: TaskDetailsSheetProps) {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  
   if (!task) return null;
 
-  const {
-    subtasks,
-    handleSubtaskToggle,
-    handleAddSubtask,
-    handleDeleteSubtask,
-    getProgress
-  } = useSubtasks([
-    { id: '1', title: 'Research requirements', completed: false },
-    { id: '2', title: 'Create initial mockups', completed: false },
-    { id: '3', title: 'Get feedback', completed: false }
-  ]);
+  // Get progress percentage from category
+  const getProgress = () => {
+    if (task.category.includes('%')) {
+      const match = task.category.match(/(\d+)%/);
+      return match ? parseInt(match[1], 10) : 0;
+    }
+    
+    if (task.status.name === "Done") {
+      return 100;
+    }
+    
+    return 0;
+  };
 
   const getTimePeriod = (start: Date, end: Date) => {
     return `${format(start, 'MMM d')} - ${format(end, 'MMM d, yyyy')}`;
+  };
+  
+  const handleAction = () => {
+    if (task.actionLink) {
+      navigate(task.actionLink);
+      onClose();
+    }
+  };
+  
+  const handleApprove = () => {
+    if (onUpdateTask && task) {
+      onUpdateTask({
+        ...task,
+        status: { name: "Done", color: "#10B981" }
+      });
+      
+      toast({
+        title: "Task Approved",
+        description: "You've successfully approved this task!",
+      });
+    }
+  };
+  
+  const handleFeedback = () => {
+    toast({
+      title: "Feedback Submitted",
+      description: "Thank you for your feedback. Our team will review it shortly.",
+    });
+    onClose();
   };
 
   const progress = getProgress();
@@ -67,10 +106,27 @@ export function TaskDetailsSheet({ task, isOpen, onClose, onUpdateTask }: TaskDe
               <h2 className="text-xl font-semibold text-foreground">{task.name}</h2>
               <Badge 
                 variant="outline" 
-                className="bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20"
+                className={task.priority === 'high' 
+                  ? "bg-red-500/10 text-red-400 border-red-500/20" 
+                  : task.priority === 'medium'
+                  ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                  : "bg-green-500/10 text-green-400 border-green-500/20"
+                }
               >
                 <Star className="h-3 w-3 mr-1" />
-                High Priority
+                {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)} Priority
+              </Badge>
+              
+              <Badge 
+                variant="outline" 
+                className="ml-2"
+                style={{ 
+                  backgroundColor: `${task.status.color}20`, 
+                  color: task.status.color,
+                  borderColor: `${task.status.color}30`
+                }}
+              >
+                {task.status.name}
               </Badge>
             </div>
 
@@ -80,6 +136,18 @@ export function TaskDetailsSheet({ task, isOpen, onClose, onUpdateTask }: TaskDe
                 <Clock className="h-4 w-4" />
                 <span>{getTimePeriod(task.startAt, task.endAt)}</span>
               </div>
+            </div>
+            
+            {/* Progress Bar */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                  <h3>Progress</h3>
+                </div>
+                <span className="text-sm text-muted-foreground">{progress}%</span>
+              </div>
+              
+              <Progress value={progress} className="h-2" />
             </div>
 
             {/* Description Section */}
@@ -93,63 +161,80 @@ export function TaskDetailsSheet({ task, isOpen, onClose, onUpdateTask }: TaskDe
               </p>
             </div>
 
-            {/* Subtasks Section */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-                  <Square className="h-4 w-4" />
-                  <h3>Subtasks</h3>
-                </div>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={handleAddSubtask}
-                  className="text-xs hover:bg-purple-500/10 text-muted-foreground hover:text-foreground"
-                >
-                  Add Subtask
-                </Button>
-              </div>
+            {/* Action Buttons Section */}
+            <div className="space-y-3 pt-4">
+              <h3 className="text-sm font-medium text-foreground">Actions</h3>
               
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Progress value={progress} className="h-2" />
-                  <span className="text-xs text-muted-foreground min-w-[44px]">
-                    {Math.round(progress)}%
-                  </span>
-                </div>
+              <div className="flex flex-wrap gap-3">
+                {task.actionButton && (
+                  <Button 
+                    onClick={handleAction} 
+                    className="bg-[#0078D4] hover:bg-[#0078D4]/80"
+                  >
+                    {task.actionButton}
+                  </Button>
+                )}
                 
-                <SubtaskList
-                  subtasks={subtasks}
-                  onToggle={handleSubtaskToggle}
-                  onDelete={handleDeleteSubtask}
-                  className="pl-6"
-                />
+                {task.status.name === "Awaiting Your Action" && (
+                  <>
+                    <Button 
+                      variant="outline" 
+                      onClick={handleApprove}
+                      className="border-green-500/30 text-green-500 hover:bg-green-500/10"
+                    >
+                      <Check className="mr-1 h-4 w-4" />
+                      Approve
+                    </Button>
+                    
+                    <Button 
+                      variant="outline" 
+                      onClick={handleFeedback}
+                      className="border-blue-500/30 text-blue-500 hover:bg-blue-500/10"
+                    >
+                      <MessageSquare className="mr-1 h-4 w-4" />
+                      Submit Feedback
+                    </Button>
+                  </>
+                )}
+                
+                {task.status.name === "Done" && (
+                  <Badge variant="outline" className="bg-green-500/10 text-green-400 border-green-500/20 py-1 px-2">
+                    <Check className="mr-1 h-4 w-4" />
+                    Completed
+                  </Badge>
+                )}
               </div>
             </div>
-
-            {/* Attachments Section */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-                <Paperclip className="h-4 w-4" />
-                <h3>Attachments</h3>
-              </div>
-              <div className="space-y-2">
+            
+            {/* Related Links Section */}
+            {task.actionLink && (
+              <div className="space-y-3">
+                <h3 className="text-sm font-medium text-foreground">Related Links</h3>
+                
                 <div className="pl-6 space-y-2">
-                  <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/30 transition-colors">
-                    <div className="h-10 w-10 rounded bg-blue-950/50 flex items-center justify-center">
-                      <FileText className="h-5 w-5 text-blue-400" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-foreground">Project Brief.pdf</p>
-                      <p className="text-xs text-muted-foreground">Added 2 days ago</p>
-                    </div>
-                  </div>
+                  <Button 
+                    variant="link" 
+                    className="text-[#0078D4] p-0 h-auto"
+                    onClick={() => navigate('/projects/ubahcrypt')}
+                  >
+                    View Project Details
+                  </Button>
+                  
+                  {task.category.includes('Payment') || task.category.includes('Deposit') || task.category.includes('Instalment') && (
+                    <Button 
+                      variant="link" 
+                      className="text-[#0078D4] p-0 h-auto ml-4"
+                      onClick={() => navigate('/financial')}
+                    >
+                      View Billing History
+                    </Button>
+                  )}
                 </div>
               </div>
-            </div>
+            )}
 
-            {/* Comments Section */}
-            <div className="space-y-4">
+            {/* Notes or Comments Section */}
+            <div className="space-y-4 mt-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-sm font-medium text-foreground">
                   <MessageSquare className="h-4 w-4" />

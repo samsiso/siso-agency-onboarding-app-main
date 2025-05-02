@@ -2,6 +2,7 @@
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import {
   Tooltip,
   TooltipContent,
@@ -10,6 +11,7 @@ import {
 } from '@/components/ui/tooltip';
 import { format } from 'date-fns';
 import { Clock, CheckSquare, AlertTriangle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface TaskCardProps {
   name: string;
@@ -26,11 +28,13 @@ interface TaskCardProps {
     color: string;
   };
   description?: string;
+  actionButton?: string;
+  actionLink?: string;
   onClick?: () => void;
 }
 
 const priorityColors = {
-  low: 'bg-blue-500/20 text-blue-400',
+  low: 'bg-green-500/20 text-green-400',
   medium: 'bg-amber-500/20 text-amber-400',
   high: 'bg-red-500/20 text-red-400',
 };
@@ -49,10 +53,20 @@ export function TaskCard({
   owner, 
   priority,
   status,
+  actionButton,
+  actionLink,
   onClick 
 }: TaskCardProps) {
+  const navigate = useNavigate();
   const daysLeft = Math.ceil((endAt.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
   const isOverdue = daysLeft < 0;
+  
+  const handleActionClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (actionLink) {
+      navigate(actionLink);
+    }
+  };
   
   return (
     <div 
@@ -123,13 +137,34 @@ export function TaskCard({
               ? `Overdue by ${Math.abs(daysLeft)} day${Math.abs(daysLeft) === 1 ? '' : 's'}` 
               : daysLeft === 0 
               ? "Due today" 
+              : status?.name === "Done"
+              ? "Completed"
               : `${daysLeft} day${daysLeft === 1 ? '' : 's'} left`}
           </span>
         </div>
         
-        <span className="text-xs text-[#aaadb0] mt-1">
-          {format(startAt, 'MMM d')} - {format(endAt, 'MMM d, yyyy')}
-        </span>
+        {actionButton && (
+          <Button 
+            size="sm" 
+            className="w-full mt-2 bg-[#0078D4] hover:bg-[#0078D4]/80 text-white"
+            onClick={handleActionClick}
+          >
+            {actionButton}
+          </Button>
+        )}
+        
+        {!actionButton && status?.name !== "Done" && (
+          <span className="text-xs text-[#aaadb0] mt-1">
+            {format(startAt, 'MMM d')} - {format(endAt, 'MMM d, yyyy')}
+          </span>
+        )}
+        
+        {status?.name === "Done" && (
+          <span className="text-xs text-[#10B981] mt-1 flex items-center gap-1">
+            <CheckSquare className="h-3.5 w-3.5" />
+            Completed {format(endAt, 'MMM d, yyyy')}
+          </span>
+        )}
       </div>
     </div>
   );
