@@ -48,16 +48,6 @@ import FinancialProfilePage from './pages/financial/FinancialProfilePage';
 import PlanBuilder from './pages/PlanBuilder';
 import ClientAppDetailsPage from './pages/ClientAppDetailsPage';
 
-// Client pages
-import ClientProjectsPage from './pages/client/ClientProjectsPage';
-import ClientProjectDetailsPage from './pages/client/ClientProjectDetailsPage';
-import ClientProjectPlanPage from './pages/client/ClientProjectPlanPage';
-import ClientProjectTasksPage from './pages/client/ClientProjectTasksPage';
-import ClientFinancialPage from './pages/client/ClientFinancialPage';
-import ClientLeaderboardsPage from './pages/client/ClientLeaderboardsPage';
-import ClientProfilePage from './pages/client/ClientProfilePage';
-import ClientHelpPage from './pages/client/ClientHelpPage';
-
 function App() {
   return (
     <>
@@ -128,22 +118,10 @@ function App() {
         
         {/* Client Dashboard Routes - accessible to all authenticated users but with conditional content */}
         <Route path="/client-dashboard" element={<AuthGuard><ClientDashboard /></AuthGuard>} />
-        
-        {/* Client Project Routes */}
-        <Route path="/client-dashboard/projects" element={<AuthGuard><ClientProjectsPage /></AuthGuard>} />
-        <Route path="/client-dashboard/plan-builder" element={<AuthGuard><PlanBuilder /></AuthGuard>} />
-        <Route path="/client-dashboard/projects/:projectId" element={<AuthGuard><ClientProjectDetailsPage /></AuthGuard>} />
-        <Route path="/client-dashboard/projects/:projectId/plan" element={<AuthGuard><ClientProjectPlanPage /></AuthGuard>} />
-        <Route path="/client-dashboard/projects/:projectId/tasks" element={<AuthGuard><ClientProjectTasksPage /></AuthGuard>} />
-        
-        {/* Financial Routes */}
-        <Route path="/client-dashboard/financial" element={<AuthGuard><ClientFinancialPage /></AuthGuard>} />
-        <Route path="/client-dashboard/leaderboards" element={<AuthGuard><ClientLeaderboardsPage /></AuthGuard>} />
-        
-        {/* User Menu Routes */}
-        <Route path="/client-dashboard/profile" element={<AuthGuard><ClientProfilePage /></AuthGuard>} />
-        <Route path="/client-dashboard/help" element={<AuthGuard><ClientHelpPage /></AuthGuard>} />
         <Route path="/client-dashboard/documents" element={<AuthGuard><ClientDocumentsPage /></AuthGuard>} />
+        <Route path="/client-dashboard/tasks" element={<AuthGuard><ClientTasksPage /></AuthGuard>} />
+        <Route path="/client-dashboard/status" element={<AuthGuard><ClientStatusPage /></AuthGuard>} />
+        <Route path="/client-dashboard/support" element={<AuthGuard><ClientSupportPage /></AuthGuard>} />
       </Routes>
     </>
   );
