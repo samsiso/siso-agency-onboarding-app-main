@@ -11,7 +11,6 @@ import {
   HelpCircle,
   Library,
   PlusCircle,
-  ChevronDown,
 } from "lucide-react";
 
 // Sample projects for dropdown - in a real app, this would come from an API
