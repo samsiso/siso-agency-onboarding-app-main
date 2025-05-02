@@ -8,6 +8,21 @@ import { ProjectOverviewCards } from './details/ProjectOverviewCards';
 import { ProjectMetricsDashboard } from './details/ProjectMetricsDashboard';
 import { ActiveTasksSection } from './details/ActiveTasksSection';
 import { DevelopmentProgress } from './details/DevelopmentProgress';
+import { AppPlanSection } from './details/AppPlanSection';
+import { FeatureRequestsSection } from './details/FeatureRequestsSection';
+import { TimelineSection } from './details/TimelineSection';
+import { WireframeSection } from './details/WireframeSection';
+import { ColorPickerSection } from './details/ColorPickerSection';
+import { FinancialSummarySection } from './details/FinancialSummarySection';
+import { ResearchSection } from './details/ResearchSection';
+
+// Placeholder component for APIs section
+const APIsSection = () => (
+  <div className="p-6 text-center bg-black/30 rounded-lg border border-white/10">
+    <h2 className="text-2xl font-bold text-white mb-4">API Documentation</h2>
+    <p className="text-neutral-400">Complete API reference for UbahCrypt platform integration is under development.</p>
+  </div>
+);
 
 export function ProjectDetails() {
   const { id, tab } = useParams<{ id?: string; tab?: string }>();
@@ -52,6 +67,22 @@ export function ProjectDetails() {
         );
       case 'active-tasks':
         return <ActiveTasksSection />;
+      case 'app-plan':
+        return <AppPlanSection />;
+      case 'features':
+        return <FeatureRequestsSection />;
+      case 'timeline':
+        return <TimelineSection />;
+      case 'wireframe':
+        return <WireframeSection />;
+      case 'colors':
+        return <ColorPickerSection />;
+      case 'apis':
+        return <APIsSection />;
+      case 'financial':
+        return <FinancialSummarySection />;
+      case 'research':
+        return <ResearchSection />;
       default:
         return (
           <div className="p-6 text-center text-neutral-400 bg-black/30 rounded-lg border border-white/10">
