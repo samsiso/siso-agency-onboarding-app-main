@@ -279,7 +279,7 @@ export function ProjectStatsCards() {
       <StatCard 
         title="Next Milestone"
         value={stats.nextMilestone.name}
-        subtitle={`${stats.nextMilestone.date} (${stats.nextMilestone.tasksCompleted}/${stats.nextMilestone.totalTasks)`}
+        subtitle={`${stats.nextMilestone.date} (${stats.nextMilestone.tasksCompleted}/${stats.nextMilestone.totalTasks})`}
         icon={<ListTodo className="h-6 w-6" />}
         bgColor="bg-gradient-to-br from-[#ea384c]/10 to-red-900/5"
         textColor="text-[#ea384c]"
