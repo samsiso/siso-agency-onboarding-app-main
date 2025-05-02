@@ -6,10 +6,9 @@ import {
   PuzzleIcon, 
   GitBranch, 
   Calendar,
-  Palette,
-  Code,
   BarChart,
-  Users
+  Users,
+  File
 } from 'lucide-react';
 import { Pill } from '@/components/ui/pill';
 import { cn } from '@/lib/utils';
@@ -24,11 +23,8 @@ export function ProjectCardNavigation({ projectId }: { projectId: string }) {
     { id: 'features', icon: PuzzleIcon, label: 'Features' },
     { id: 'active-tasks', icon: GitBranch, label: 'Tasks' },
     { id: 'timeline', icon: Calendar, label: 'Timeline' },
-    { id: 'wireframe', icon: Layout, label: 'Wireframe' },
-    { id: 'colors', icon: Palette, label: 'Colors' },
-    { id: 'apis', icon: Code, label: 'APIs' },
     { id: 'financial', icon: BarChart, label: 'Financial' },
-    { id: 'research', icon: Users, label: 'Research' }
+    { id: 'documents', icon: File, label: 'Documents' }
   ];
 
   return (
