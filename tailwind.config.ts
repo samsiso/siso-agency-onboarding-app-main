@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -35,7 +36,7 @@ export default {
           "text-bold": "#FFFFFF",
           "text-muted": "#9E9E9E",
           border: "#2A2A2A",
-          "border-hover": "#3A3A3A",
+          "border-hover": "#3A3A3A", // Added the missing border-hover color
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
