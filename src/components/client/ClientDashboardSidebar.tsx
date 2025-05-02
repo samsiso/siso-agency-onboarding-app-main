@@ -1,24 +1,49 @@
 
-import React from "react";
+import React, { useState } from "react";
+import { ClientSidebarNavigation } from "./ClientSidebarNavigation";
 
-// This Sidebar now just shows a message to the developer/team.
-// You can update this later to add your own links or logic if you want.
 export function ClientDashboardSidebar() {
+  const [collapsed, setCollapsed] = useState(false);
+  
   return (
-    <aside className="w-60 md:w-60 flex-shrink-0 flex flex-col justify-center items-center p-6 bg-siso-bg border-r border-siso-border min-h-screen">
-      <div className="flex flex-col gap-4 items-center justify-center">
-        <img
-          src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png"
-          alt="Logo"
-          className="h-10 w-10 rounded-xl border border-siso-orange/60 shadow-lg bg-black/40 mb-2"
-        />
-        <div className="text-siso-text-bold text-lg font-bold text-center">
-          Client Sidebar Removed
+    <aside className={`${collapsed ? 'w-16' : 'w-60'} flex-shrink-0 flex flex-col transition-all duration-300 bg-siso-bg border-r border-siso-border min-h-screen`}>
+      {/* Logo */}
+      <div className="p-4 flex items-center justify-between border-b border-siso-border/30">
+        <div className="flex items-center">
+          <img
+            src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png"
+            alt="SISO Agency"
+            className="h-8 w-8 rounded-xl border border-siso-orange/60 shadow-lg bg-black/40"
+          />
+          {!collapsed && (
+            <span className="ml-3 text-lg font-bold bg-gradient-to-r from-siso-orange to-siso-red bg-clip-text text-transparent">
+              SISO Agency
+            </span>
+          )}
         </div>
-        <div className="text-siso-text text-xs text-center opacity-70">
-          You can add your sidebar links and navigation here.<br />
-          (aceternitySidebar was removed.)
-        </div>
+        
+        {/* Toggle button */}
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="p-1 rounded-md hover:bg-siso-border/20 text-siso-text"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            {collapsed ? (
+              <>
+                <path d="M9 18l6-6-6-6" />
+              </>
+            ) : (
+              <>
+                <path d="M15 18l-6-6 6-6" />
+              </>
+            )}
+          </svg>
+        </button>
+      </div>
+      
+      {/* Navigation */}
+      <div className="flex-1 overflow-y-auto">
+        <ClientSidebarNavigation collapsed={collapsed} />
       </div>
     </aside>
   );
