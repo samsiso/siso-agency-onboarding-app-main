@@ -1,17 +1,17 @@
 
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { ProjectHeader } from './details/ProjectHeader';
-import { ProjectStatsCards } from './details/ProjectStatsCards';
-import { ProjectCardNavigation } from './details/ProjectCardNavigation';
-import { ProjectOverviewCards } from './details/ProjectOverviewCards';
-import { ProjectMetricsDashboard } from './details/ProjectMetricsDashboard';
-import { ActiveTasksSection } from './details/ActiveTasksSection';
-import { AppPlanSection } from './details/AppPlanSection';
-import { FeatureRequestsSection } from './details/FeatureRequestsSection';
-import { TimelineSection } from './details/TimelineSection';
-import { FinancialSummarySection } from './details/FinancialSummarySection';
-import { ResearchSection } from './details/ResearchSection';
+import { ProjectHeader } from './ProjectHeader';
+import { ProjectStatsCards } from './ProjectStatsCards';
+import { ProjectCardNavigation } from './ProjectCardNavigation';
+import { ProjectOverviewCards } from './ProjectOverviewCards';
+import { ProjectMetricsDashboard } from './ProjectMetricsDashboard';
+import { ActiveTasksSection } from './ActiveTasksSection';
+import { AppPlanSection } from './AppPlanSection';
+import { FeatureRequestsSection } from './FeatureRequestsSection';
+import { TimelineSection } from './TimelineSection';
+import { FinancialSummarySection } from './FinancialSummarySection';
+import { ResearchSection } from './ResearchSection';
 
 export function ProjectDetails() {
   const { id, tab } = useParams<{ id?: string; tab?: string }>();
