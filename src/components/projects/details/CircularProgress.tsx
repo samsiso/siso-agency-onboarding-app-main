@@ -6,18 +6,16 @@ interface CircularProgressProps {
   percentage: number;
   size: number;
   strokeWidth: number;
-  circleOneColor?: string;
-  circleTwoColor?: string;
-  className?: string;
+  circleOneColor: string;
+  circleTwoColor: string;
 }
 
 export const CircularProgress: React.FC<CircularProgressProps> = ({
   percentage,
   size,
   strokeWidth,
-  circleOneColor = "rgba(0, 0, 0, 0.1)",
-  circleTwoColor = "#ea384c",
-  className,
+  circleOneColor,
+  circleTwoColor,
 }) => {
   const center = size / 2;
   const radius = center - strokeWidth;
@@ -32,7 +30,6 @@ export const CircularProgress: React.FC<CircularProgressProps> = ({
       initial={{ opacity: 0, rotate: -90 }}
       animate={{ opacity: 1, rotate: 0 }}
       transition={{ duration: 1, ease: "easeInOut" }}
-      className={className}
     >
       <motion.circle
         cx={center}
