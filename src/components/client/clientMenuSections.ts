@@ -1,14 +1,15 @@
 
 import {
   LayoutDashboard,
-  ListTodo,
-  Clock,
-  ClipboardList,
-  ScrollText,
-  Wallet,
-  User,
   Briefcase,
+  Plus,
   FileText,
+  ListTodo,
+  ClipboardList,
+  MessageSquare,
+  Wallet,
+  CreditCard,
+  Trophy,
 } from "lucide-react";
 
 export const clientMenuSections = [
@@ -20,45 +21,70 @@ export const clientMenuSections = [
   },
   {
     type: 'section',
-    title: 'Your Portal',
-    icon: ScrollText,
+    title: 'Projects',
+    icon: Briefcase,
     items: [
       {
         href: '/client-dashboard/projects',
         icon: Briefcase,
-        label: 'Projects',
+        label: 'All Projects',
       },
       {
-        href: '/client-dashboard/tasks',
-        icon: ListTodo,
-        label: 'Todo List',
-      },
-      {
-        href: '/client-dashboard/timeline',
-        icon: Clock,
-        label: 'Timeline',
-      },
-      {
-        href: '/client-dashboard/changelog',
-        icon: ClipboardList,
-        label: 'Changelog',
-      },
-      {
-        href: '/client-dashboard/documents',
-        icon: FileText,
-        label: 'Documents',
-      },
-      {
-        href: '/client-dashboard/financial',
-        icon: Wallet,
-        label: 'Financial',
+        href: '/client-dashboard/projects/new',
+        icon: Plus,
+        label: 'Create New Project',
       },
     ]
   },
   {
-    type: 'main',
-    href: '/client-dashboard/profile',
-    icon: User,
-    label: 'Profile',
+    type: 'section',
+    title: 'Current Project',
+    icon: FileText,
+    items: [
+      {
+        href: '/client-dashboard/overview',
+        icon: FileText,
+        label: 'Overview',
+      },
+      {
+        href: '/client-dashboard/plan-features',
+        icon: ClipboardList,
+        label: 'Plan & Features',
+      },
+      {
+        href: '/client-dashboard/tasks',
+        icon: ListTodo,
+        label: 'Tasks',
+      },
+    ]
   },
+  {
+    type: 'section',
+    title: 'Messages',
+    icon: MessageSquare,
+    items: [
+      {
+        href: '/client-dashboard/messages',
+        icon: MessageSquare,
+        label: 'Messages',
+      }
+    ]
+  },
+  {
+    type: 'section',
+    title: 'Financial',
+    icon: Wallet,
+    items: [
+      {
+        href: '/client-dashboard/financial/payments',
+        icon: CreditCard,
+        label: 'Payments & Billing',
+      },
+      {
+        href: '/client-dashboard/financial/leaderboards',
+        icon: Trophy,
+        label: 'Leaderboards',
+      },
+    ]
+  }
 ];
