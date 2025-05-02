@@ -1,5 +1,6 @@
+
 import { Card } from "@/components/ui/card";
-import { Clock, FileText, ListTodo, Coins, AlertCircle, Mail } from "lucide-react";
+import { Clock, FileText, ListTodo, Coin, AlertCircle, Envelope } from "lucide-react";
 import { motion } from "framer-motion";
 import { NavLink } from "@/components/ui/nav-link";
 import { Badge } from "@/components/ui/badge";
@@ -185,7 +186,7 @@ function ActionMessageCard({
                 <div className="flex items-start gap-2">
                   <div className="mt-0.5">
                     {item.type === "warning" && <AlertCircle className="h-4 w-4 text-amber-400" />}
-                    {item.type === "message" && <Mail className="h-4 w-4 text-blue-400" />}
+                    {item.type === "message" && <Envelope className="h-4 w-4 text-blue-400" />}
                     {!item.type && <div className="w-4 h-4" />}
                   </div>
                   <div className="flex-grow">
@@ -279,7 +280,7 @@ export function ProjectStatsCards() {
       <StatCard 
         title="Next Milestone"
         value={stats.nextMilestone.name}
-        subtitle={`${stats.nextMilestone.date} (${stats.nextMilestone.tasksCompleted}/${stats.nextMilestone.totalTasks})`}
+        subtitle={`${stats.nextMilestone.date} (${stats.nextMilestone.tasksCompleted}/${stats.nextMilestone.totalTasks} tasks)`}
         icon={<ListTodo className="h-6 w-6" />}
         bgColor="bg-gradient-to-br from-[#ea384c]/10 to-red-900/5"
         textColor="text-[#ea384c]"
@@ -300,7 +301,7 @@ export function ProjectStatsCards() {
         title="Credits Spent"
         value={`£${totalSpent.toFixed(2)}`}
         subtitle={`${stats.credits.spent} credits (${(stats.credits.tokens / 1000000).toFixed(1)}M tokens)`}
-        icon={<Coins className="h-6 w-6" />}
+        icon={<Coin className="h-6 w-6" />}
         bgColor="bg-gradient-to-br from-red-500/10 to-red-700/5"
         textColor="text-red-400"
         delay={4}
@@ -321,7 +322,7 @@ export function ProjectStatsCards() {
       
       <ActionMessageCard
         title="Messages & Updates"
-        icon={<Mail className="h-6 w-6" />}
+        icon={<Envelope className="h-6 w-6" />}
         bgColor="bg-gradient-to-br from-blue-500/10 to-blue-700/5"
         textColor="text-blue-400"
         items={stats.messages}
