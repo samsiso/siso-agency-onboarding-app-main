@@ -1,11 +1,18 @@
 
 import { useLocation, useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { cn } from '@/lib/utils';
-import { useEffect, useState } from "react";
-import { SidebarContent } from "@/components/ui/sidebar";
+import { useState } from "react";
+import { 
+  SidebarContent,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarGroupContent
+} from "@/components/ui/sidebar";
 import { clientMenuSections, clientProjects, userDropdownMenuItems } from "./clientMenuSections";
-import { ClientSidebarMenuSection } from "./ClientSidebarMenuSection";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import {
   Select,
@@ -17,18 +24,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export function ClientSidebarNavigation({ collapsed = false, onItemClick = () => {}, visible = true }) {
+export function ClientSidebarNavigation({ collapsed = false }) {
   const location = useLocation();
   const navigate = useNavigate();
-  const [activeSection, setActiveSection] = useState<string | null>(null);
   const [selectedProject, setSelectedProject] = useState<string>("ubahcrypt");
   const [showUserMenu, setShowUserMenu] = useState(false);
   
   // Handle project change
   const handleProjectChange = (value: string) => {
     setSelectedProject(value);
-    // In a real app, you would update the current project context or state
-    // and potentially navigate to that project's overview page
     navigate(`/client-dashboard/projects/${value}`);
   };
 
@@ -37,25 +41,6 @@ export function ClientSidebarNavigation({ collapsed = false, onItemClick = () =>
     const project = clientProjects.find(p => p.id === selectedProject);
     return project ? project.name : "Select a Project";
   };
-
-  useEffect(() => {
-    if (location.hash) {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              setActiveSection(`#${entry.target.id}`);
-            }
-          });
-        },
-        { threshold: 0.5 }
-      );
-      document.querySelectorAll('section[id]').forEach((section) => {
-        observer.observe(section);
-      });
-      return () => observer.disconnect();
-    }
-  }, [location.hash]);
 
   const isItemActive = (href: string, isMain: boolean = false) => {
     if (!href) return false;
@@ -69,7 +54,9 @@ export function ClientSidebarNavigation({ collapsed = false, onItemClick = () =>
     return exactMatch;
   };
 
-  if (!visible) return null;
+  const handleItemClick = (href: string) => {
+    navigate(href);
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -113,26 +100,80 @@ export function ClientSidebarNavigation({ collapsed = false, onItemClick = () =>
         
         {/* Main Navigation */}
         <div className="space-y-2">
-          <AnimatePresence mode="wait">
-            {clientMenuSections.map((section, index) => (
-              // Only show the Current Project section if a project is selected
-              (!section.isDynamic || (section.isDynamic && selectedProject)) && (
-                <ClientSidebarMenuSection
-                  key={index}
-                  section={{
-                    ...section,
-                    // For dynamic sections, update title to include the project name
-                    title: section.isDynamic 
-                      ? `${section.title}: ${getCurrentProjectName()}`
-                      : section.title
-                  }}
-                  isItemActive={isItemActive}
-                  onItemClick={onItemClick}
-                  collapsed={collapsed}
-                />
-              )
-            ))}
-          </AnimatePresence>
+          {clientMenuSections.map((section, index) => {
+            // Skip dynamic sections when no project is selected
+            if (section.isDynamic && !selectedProject) {
+              return null;
+            }
+            
+            if (section.type === "main") {
+              return (
+                <SidebarMenu key={index}>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton 
+                      asChild 
+                      isActive={isItemActive(section.href!, true)}
+                      tooltip={collapsed ? section.label : undefined}
+                    >
+                      <a 
+                        href={section.href} 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleItemClick(section.href!);
+                        }}
+                        className="flex items-center gap-3 w-full"
+                      >
+                        <section.icon className="w-5 h-5 text-siso-orange" />
+                        {!collapsed && <span>{section.label}</span>}
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              );
+            }
+            
+            return (
+              <SidebarGroup key={index}>
+                <SidebarGroupLabel>
+                  <div className="flex items-center gap-2">
+                    <section.icon className="w-4 h-4 text-siso-orange/80" />
+                    {!collapsed && (
+                      <span>
+                        {section.isDynamic ? `${section.title}: ${getCurrentProjectName()}` : section.title}
+                      </span>
+                    )}
+                  </div>
+                </SidebarGroupLabel>
+                {section.items && section.items.length > 0 && (
+                  <SidebarGroupContent>
+                    <SidebarMenu>
+                      {section.items.map((item, itemIndex) => (
+                        <SidebarMenuItem key={itemIndex}>
+                          <SidebarMenuButton 
+                            asChild 
+                            isActive={isItemActive(item.href)}
+                            tooltip={collapsed ? item.label : undefined}
+                          >
+                            <a 
+                              href={item.href} 
+                              onClick={(e) => {
+                                e.preventDefault();
+                                handleItemClick(item.href);
+                              }}
+                              className="flex items-center gap-3 w-full"
+                            >
+                              <item.icon className="w-5 h-5" />
+                              {!collapsed && <span>{item.label}</span>}
+                            </a>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      ))}
+                    </SidebarMenu>
+                  </SidebarGroupContent>
+                )}
+              </SidebarGroup>
+            );
+          })}
         </div>
         
         {/* User Dropdown Menu (at the bottom) */}
@@ -166,7 +207,6 @@ export function ClientSidebarNavigation({ collapsed = false, onItemClick = () =>
                   onClick={(e) => {
                     e.preventDefault();
                     navigate(item.href);
-                    onItemClick();
                   }}
                 >
                   <item.icon className="h-4 w-4 text-siso-orange/70" />
@@ -180,9 +220,7 @@ export function ClientSidebarNavigation({ collapsed = false, onItemClick = () =>
                 className="flex items-center gap-2 px-2 py-1.5 text-sm text-siso-text hover:text-white rounded-md hover:bg-red-500/20"
                 onClick={(e) => {
                   e.preventDefault();
-                  // Handle logout
                   navigate('/auth');
-                  onItemClick();
                 }}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -1,12 +1,14 @@
 
 import React, { useState } from "react";
+import { Sidebar } from "@/components/ui/sidebar";
 import { ClientSidebarNavigation } from "./ClientSidebarNavigation";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export function ClientDashboardSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   
   return (
-    <aside className={`${collapsed ? 'w-16' : 'w-60'} flex-shrink-0 flex flex-col transition-all duration-300 bg-siso-bg border-r border-siso-border min-h-screen`}>
+    <Sidebar variant="sidebar" collapsible={collapsed ? "icon" : "none"}>
       {/* Logo */}
       <div className="p-4 flex items-center justify-between border-b border-siso-border/30">
         <div className="flex items-center">
@@ -27,24 +29,16 @@ export function ClientDashboardSidebar() {
           onClick={() => setCollapsed(!collapsed)}
           className="p-1 rounded-md hover:bg-siso-border/20 text-siso-text"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            {collapsed ? (
-              <>
-                <path d="M9 18l6-6-6-6" />
-              </>
-            ) : (
-              <>
-                <path d="M15 18l-6-6 6-6" />
-              </>
-            )}
-          </svg>
+          {collapsed ? (
+            <ChevronRight className="w-5 h-5" />
+          ) : (
+            <ChevronLeft className="w-5 h-5" />
+          )}
         </button>
       </div>
       
       {/* Navigation */}
-      <div className="flex-1 overflow-y-auto">
-        <ClientSidebarNavigation collapsed={collapsed} />
-      </div>
-    </aside>
+      <ClientSidebarNavigation collapsed={collapsed} />
+    </Sidebar>
   );
 }
