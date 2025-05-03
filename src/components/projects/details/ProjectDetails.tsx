@@ -1,17 +1,17 @@
 
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { ProjectHeader } from './details/ProjectHeader';
-import { ProjectCardNavigation } from './details/ProjectCardNavigation';
-import { ProjectOverviewCards } from './details/ProjectOverviewCards';
-import { ProjectMetricsDashboard } from './details/ProjectMetricsDashboard';
-import { ActiveTasksSection } from './details/ActiveTasksSection';
-import { DevelopmentProgress } from './details/DevelopmentProgress';
-import { AppPlanSection } from './details/AppPlanSection';
-import { FeatureRequestsSection } from './details/FeatureRequestsSection';
-import { TimelineSection } from './details/TimelineSection';
-import { FinancialSummarySection } from './details/FinancialSummarySection';
-import { ResearchSection } from './details/ResearchSection';
+import { ProjectHeader } from './ProjectHeader';
+import { ProjectCardNavigation } from './ProjectCardNavigation';
+import { ProjectOverviewCards } from './ProjectOverviewCards';
+import { ProjectMetricsDashboard } from './ProjectMetricsDashboard';
+import { ActiveTasksSection } from './ActiveTasksSection';
+import { DevelopmentProgress } from './DevelopmentProgress';
+import { AppPlanSection } from './AppPlanSection';
+import { FeatureRequestsSection } from './FeatureRequestsSection';
+import { TimelineSection } from './TimelineSection';
+import { FinancialSummarySection } from './FinancialSummarySection';
+import { ResearchSection } from './ResearchSection';
 import { AnimatedCard } from '@/components/ui/animated-card';
 import { FileCheck, Framer, Code, TestTube, CloudCog, FileSpreadsheet } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -51,7 +51,7 @@ export function ProjectDetails() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="col-span-1 mb-6"
+      className="col-span-1 mb-6 w-full"
     >
       <AnimatedCard className="h-full">
         <div className="flex flex-col h-full">
@@ -387,14 +387,6 @@ export function ProjectDetails() {
                   <span className="font-medium text-purple-400">Security and Compliance:</span>
                   <span>Monitor pipelines for anomalies (e.g., unauthorized dependency changes) and ensure crypto-specific compliance (e.g., KYC/AML).</span>
                 </li>
-                <li className="flex gap-2">
-                  <span className="font-medium text-purple-400">Continuous Delivery & Rollouts:</span>
-                  <span>Implement canary releases with AI monitoring to detect issues (e.g., transaction errors) and auto-rollback if needed.</span>
-                </li>
-                <li className="flex gap-2">
-                  <span className="font-medium text-purple-400">Self-Healing Deployments:</span>
-                  <span>Configure AI to restart failed services or apply known fixes during deployment.</span>
-                </li>
               </ul>
             </div>
             
@@ -405,8 +397,6 @@ export function ProjectDetails() {
                 <li>Set up AI failure prediction to flag 80% of risky commits.</li>
                 <li>Reduce CI costs by 20% with AI resource optimization.</li>
                 <li>Scan pipelines for security and compliance issues daily.</li>
-                <li>Deploy with canary releases, monitored by AI for 99.9% uptime.</li>
-                <li>Enable AI self-healing for 50% of common deployment failures.</li>
               </ul>
             </div>
             
@@ -440,7 +430,6 @@ export function ProjectDetails() {
                 <li>Enable AI anomaly detection for proactive monitoring.</li>
                 <li>Adopt AIOps for faster incident resolution.</li>
                 <li>Close feedback loops with AI-driven user insights.</li>
-                <li>Monitor AI tool performance and refine prompts.</li>
               </ul>
             </div>
           </div>
@@ -451,30 +440,32 @@ export function ProjectDetails() {
           <FileCheck className="w-6 h-6 text-purple-400" />,
           "Phase 6",
           <div className="space-y-4">
-            <h4 className="text-lg font-medium text-purple-400">Strategic approach for successfully implementing AI tools</h4>
+            <h4 className="text-lg font-medium text-purple-400">Strategic Approach for AI Implementation</h4>
             
-            <ul className="mt-2 space-y-3">
-              <li className="flex gap-2">
-                <span className="font-medium text-purple-400">Assess Toolchain:</span>
-                <span>Select AI tools for each phase (e.g., Ideamap for PM, Uizard for design, Copilot for dev, Applitools for QA, AIOps for monitoring). Ensure tools comply with crypto app security standards.</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="font-medium text-purple-400">Upskill Team:</span>
-                <span>Train team on AI tools via workshops, focusing on prompting techniques and validating AI outputs. Run a hackathon to build confidence.</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="font-medium text-purple-400">Start Small, Then Scale:</span>
-                <span>Begin with AI code review on one module, then expand to full pipeline. Refine processes before company-wide adoption.</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="font-medium text-purple-400">Embed AI in Process:</span>
-                <span>Update SDLC to include AI checks (e.g., AI accessibility for designs, AI static analysis for code). Make AI a checklist item.</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="font-medium text-purple-400">Maintain Oversight:</span>
-                <span>Require human review for all AI outputs (e.g., code, tests, designs). Ensure compliance with GDPR and crypto regulations for user data.</span>
-              </li>
-            </ul>
+            <div>
+              <ul className="mt-2 space-y-4">
+                <li className="flex gap-2">
+                  <span className="font-medium text-purple-400">Assess Toolchain:</span>
+                  <span>Select AI tools for each phase (e.g., Ideamap for PM, Uizard for design, Copilot for dev, Applitools for QA, AIOps for monitoring). Ensure tools comply with crypto app security standards.</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="font-medium text-purple-400">Upskill Team:</span>
+                  <span>Train team on AI tools via workshops, focusing on prompting techniques and validating AI outputs. Run a hackathon to build confidence.</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="font-medium text-purple-400">Start Small, Then Scale:</span>
+                  <span>Begin with AI code review on one module, then expand to full pipeline. Refine processes before company-wide adoption.</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="font-medium text-purple-400">Embed AI in Process:</span>
+                  <span>Update SDLC to include AI checks (e.g., AI accessibility for designs, AI static analysis for code). Make AI a checklist item.</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="font-medium text-purple-400">Maintain Oversight:</span>
+                  <span>Require human review for all AI outputs (e.g., code, tests, designs). Ensure compliance with GDPR and crypto regulations for user data.</span>
+                </li>
+              </ul>
+            </div>
             
             <div className="bg-black/30 p-4 rounded-md">
               <h5 className="text-md font-medium text-white">Actionable Steps:</h5>
