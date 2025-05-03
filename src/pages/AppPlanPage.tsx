@@ -5,8 +5,8 @@ import { DashboardLayout } from '@/components/dashboard/layout/DashboardLayout';
 import { useAdminCheck } from '@/hooks/useAdminCheck';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Home, Users } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { WelcomeHeader } from '@/components/dashboard/WelcomeHeader';
 import { MainProjectCard } from '@/components/dashboard/MainProjectCard';
@@ -14,10 +14,22 @@ import { NotificationsCard } from '@/components/dashboard/NotificationsCard';
 import { LeaderboardPreviewCard } from '@/components/dashboard/LeaderboardPreviewCard';
 import { HelpSupportCard } from '@/components/dashboard/HelpSupportCard';
 import { PlanBuilderCard } from '@/components/dashboard/PlanBuilderCard';
+import { ProjectDirectoryCard } from '@/components/projects/ProjectDirectoryCard';
+import { useProjects } from '@/hooks/useProjects';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 
 export default function AppPlanPage() {
   const { user } = useAuthSession();
   const { isAdmin } = useAdminCheck();
+  const navigate = useNavigate();
+  const { data: project, isLoading, error, refetch } = useProjects();
   
   return (
     <DashboardLayout>
@@ -26,6 +38,71 @@ export default function AppPlanPage() {
       </Helmet>
       
       <div className="container mx-auto px-4 py-8">
+        {/* Breadcrumb Navigation */}
+        <Breadcrumb className="mb-6">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink 
+                href="/home" 
+                className="inline-flex items-center gap-1.5 text-siso-text hover:text-white"
+              >
+                <Home size={16} strokeWidth={2} aria-hidden="true" />
+                Home
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Dashboard</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        
+        {/* Page Title */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+          <div>
+            <h1 className="text-3xl font-bold text-gradient-to-r from-[#9b87f5] to-[#6E59A5] mb-2">
+              Dashboard
+            </h1>
+            <p className="text-siso-text">
+              Manage your projects and tasks efficiently
+            </p>
+          </div>
+        </div>
+        
+        {/* Project Card (Red UI from Projects page) */}
+        <div className="mb-8">
+          <Card className="p-6 bg-black/30 border border-siso-text/10">
+            {isLoading ? (
+              <div className="animate-pulse space-y-8">
+                <div className="h-64 bg-black/20 rounded-lg" />
+              </div>
+            ) : error ? (
+              <div className="flex flex-col items-center justify-center p-8 text-center">
+                <h3 className="text-xl font-semibold text-white mb-2">
+                  Failed to Load Project
+                </h3>
+                <p className="text-siso-text mb-4 max-w-md">
+                  {error instanceof Error ? error.message : 'There was an error loading your project'}
+                </p>
+                <Button 
+                  onClick={() => refetch()}
+                  className="bg-[#9b87f5] hover:bg-[#9b87f5]/80"
+                >
+                  Retry
+                </Button>
+              </div>
+            ) : (
+              <ProjectDirectoryCard
+                name={project?.name}
+                description={project?.description}
+                created_at={project?.created_at}
+                status={project?.status}
+                onSelect={() => navigate(`/projects/${project?.name?.toLowerCase()}`)}
+              />
+            )}
+          </Card>
+        </div>
+        
         {/* Welcome Header */}
         <WelcomeHeader />
         
