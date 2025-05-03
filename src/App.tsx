@@ -41,12 +41,12 @@ import DocumentLibraryPage from './pages/resources/DocumentLibraryPage';
 import ProjectDetailsPage from './pages/ProjectDetailsPage';
 import ResourcesPage from './pages/resources/ResourcesPage';
 import TimelinePage from './pages/TimelinePage';
+import Communication from './pages/Communication';
 
 // Financial & Account section
 import PaymentsPage from './pages/financial/PaymentsPage';
 import LeaderboardsPage from './pages/financial/LeaderboardsPage';
 import FinancialProfilePage from './pages/financial/FinancialProfilePage';
-import PlanBuilder from './pages/PlanBuilder';
 import ClientAppDetailsPage from './pages/ClientAppDetailsPage';
 
 function App() {
@@ -89,7 +89,7 @@ function App() {
         <Route path="/projects/tasks" element={<AuthGuard><ProjectsAndTasksPage /></AuthGuard>} />
         <Route path="/projects/timeline" element={<AuthGuard><TimelinePage /></AuthGuard>} />
         <Route path="/my-projects" element={<AuthGuard><MyProjects /></AuthGuard>} />
-        <Route path="/plan-builder" element={<AuthGuard><PlanBuilder /></AuthGuard>} />
+        <Route path="/plan-builder" element={<AuthGuard><Communication /></AuthGuard>} />
         <Route path="/portfolio" element={<AuthGuard><Portfolio /></AuthGuard>} />
         
         {/* Financial Routes */}
