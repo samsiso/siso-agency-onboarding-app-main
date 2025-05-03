@@ -1,11 +1,10 @@
-
 import { Helmet } from 'react-helmet';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { DashboardLayout } from '@/components/dashboard/layout/DashboardLayout';
 import { useAdminCheck } from '@/hooks/useAdminCheck';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users } from 'lucide-react';
+import { Users, ChevronDown, ChevronUp, ClipboardList } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { WelcomeHeader } from '@/components/dashboard/WelcomeHeader';
@@ -17,7 +16,6 @@ import { PlanBuilderCard } from '@/components/dashboard/PlanBuilderCard';
 import { AppPlanSection } from '@/components/projects/details/AppPlanSection';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function Home() {
   const { user } = useAuthSession();
