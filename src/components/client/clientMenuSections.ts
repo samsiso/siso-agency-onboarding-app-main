@@ -8,7 +8,7 @@ import {
   HelpCircle,
   ClipboardList,
   FileText as Documents,
-  Timeline,
+  CalendarClock,
   MessageSquare,
 } from "lucide-react";
 
@@ -64,7 +64,7 @@ export const clientMenuSections = [
   {
     type: 'main',
     href: '/client-dashboard/timeline',
-    icon: Timeline,
+    icon: CalendarClock,
     label: 'Timeline',
   }
 ];

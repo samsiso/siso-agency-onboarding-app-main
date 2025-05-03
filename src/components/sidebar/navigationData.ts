@@ -2,7 +2,7 @@
 import { 
   LayoutDashboard, ListTodo, MessageSquare, Wallet, 
   Trophy, FileText, HelpCircle, 
-  ClipboardList, Timeline, User
+  ClipboardList, CalendarClock, User
 } from 'lucide-react';
 import { MenuSection } from './types';
 
@@ -59,7 +59,7 @@ export const getMenuSections = (): MenuSection[] => {
     {
       type: 'main',
       href: '/projects/timeline',
-      icon: Timeline,
+      icon: CalendarClock,
       label: 'Timeline',
     }
   ];
