@@ -40,7 +40,7 @@ export const clientMenuSections = [
         label: 'Timeline',
       },
       {
-        href: '/client-dashboard/plan-features',
+        href: '/app-plan',
         icon: ClipboardList,
         label: 'App Plan',
       }

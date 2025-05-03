@@ -35,7 +35,7 @@ export const getMenuSections = (): MenuSection[] => {
           label: 'Timeline',
         },
         {
-          href: '/projects/plan-features',
+          href: '/app-plan',
           icon: ClipboardList,
           label: 'App Plan',
         }
