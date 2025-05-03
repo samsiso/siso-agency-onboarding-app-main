@@ -8,7 +8,11 @@ import {
   Calendar,
   BarChart,
   Users,
-  File
+  File,
+  Workflow,
+  Search,
+  Framer,
+  MessageSquare
 } from 'lucide-react';
 import { Pill } from '@/components/ui/pill';
 import { cn } from '@/lib/utils';
@@ -19,8 +23,12 @@ export function ProjectCardNavigation({ projectId }: { projectId: string }) {
 
   const tabs = [
     { id: 'overview', icon: FileText, label: 'Overview' },
-    { id: 'app-plan', icon: Layout, label: 'App Plan' },
+    { id: 'agency-steps', icon: Workflow, label: 'Agency Steps' },
+    { id: 'market-research', icon: Search, label: 'Market Research' },
     { id: 'features', icon: PuzzleIcon, label: 'Features' },
+    { id: 'wireframe', icon: Framer, label: 'Wireframe' },
+    { id: 'user-flow', icon: Layout, label: 'User Flow' },
+    { id: 'feedback-log', icon: MessageSquare, label: 'Feedback Log' },
     { id: 'active-tasks', icon: GitBranch, label: 'Tasks' },
     { id: 'timeline', icon: Calendar, label: 'Timeline' },
     { id: 'financial', icon: BarChart, label: 'Financial' },

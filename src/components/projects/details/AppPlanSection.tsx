@@ -3,69 +3,10 @@ import { Card } from '@/components/ui/card';
 import { AnimatedCard } from '@/components/ui/animated-card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { FileCheck, ChevronRight, Clock, ArrowRight, CheckCircle } from 'lucide-react';
+import { FileCheck, ChevronRight, Clock, ArrowRight, CheckCircle, ExternalLink } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export function AppPlanSection() {
-  // Mock data for development phases
-  const developmentPhases = [
-    { 
-      name: 'Research & Analysis', 
-      status: 'completed', 
-      progress: 100,
-      startDate: '2025-01-10',
-      endDate: '2025-02-15',
-      description: 'Market research, competitor analysis, and defining core requirements.',
-    },
-    { 
-      name: 'Planning & Architecture', 
-      status: 'completed', 
-      progress: 100,
-      startDate: '2025-02-20',
-      endDate: '2025-03-25',
-      description: 'Technical architecture design, system planning, and technology selection.',
-    },
-    { 
-      name: 'Design & Prototyping', 
-      status: 'in_progress', 
-      progress: 65,
-      startDate: '2025-03-30',
-      endDate: '2025-05-15',
-      description: 'UI/UX design, wireframing, and interactive prototyping.',
-    },
-    { 
-      name: 'Core Development', 
-      status: 'upcoming', 
-      progress: 0,
-      startDate: '2025-05-20',
-      endDate: '2025-08-30',
-      description: 'Building the core functionality, smart contract development, and backend implementation.',
-    },
-    { 
-      name: 'Testing & QA', 
-      status: 'upcoming', 
-      progress: 0,
-      startDate: '2025-09-01',
-      endDate: '2025-10-15',
-      description: 'Comprehensive testing, security audits, and quality assurance.',
-    },
-    { 
-      name: 'Deployment & Launch', 
-      status: 'upcoming', 
-      progress: 0,
-      startDate: '2025-10-20',
-      endDate: '2025-11-30',
-      description: 'Production deployment, soft launch, and official release.',
-    }
-  ];
-
-  // Mock technical requirements
-  const technicalRequirements = [
-    { category: 'Frontend', items: ['React Native for mobile apps', 'React with TypeScript for web interface', 'State management with Redux'] },
-    { category: 'Backend', items: ['Node.js API layer', 'PostgreSQL database', 'Redis for caching'] },
-    { category: 'Blockchain', items: ['Ethereum and Solidity for smart contracts', 'IPFS for decentralized storage', 'MetaMask and WalletConnect integration'] },
-    { category: 'Security', items: ['Two-factor authentication', 'End-to-end encryption', 'Smart contract audit by third party'] },
-  ];
-
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -83,139 +24,305 @@ export function AppPlanSection() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <AnimatedCard className="xl:col-span-2 border border-white/10">
-          <div>
-            <h3 className="text-lg font-semibold text-white mb-4">Development Roadmap</h3>
-            <div className="space-y-5">
-              {developmentPhases.map((phase, index) => (
-                <div key={index} className="relative">
-                  <div className="flex items-center gap-4">
-                    <div className={`h-10 w-10 rounded-full flex items-center justify-center ${
-                      phase.status === 'completed' ? 'bg-green-500/20 text-green-400' : 
-                      phase.status === 'in_progress' ? 'bg-[#9b87f5]/20 text-[#9b87f5]' : 
-                      'bg-neutral-500/20 text-neutral-400'
-                    }`}>
-                      {phase.status === 'completed' ? <CheckCircle className="h-5 w-5" /> : <Clock className="h-5 w-5" />}
-                    </div>
-                    <div className="flex-grow">
-                      <div className="flex justify-between items-center">
-                        <h4 className="text-white font-medium">{phase.name}</h4>
-                        <Badge variant={
-                          phase.status === 'completed' ? 'success' : 
-                          phase.status === 'in_progress' ? 'purple' : 
-                          'secondary'
-                        }>
-                          {phase.status === 'completed' ? 'Completed' : 
-                           phase.status === 'in_progress' ? 'In Progress' : 
-                           'Upcoming'}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-neutral-400">{phase.description}</p>
-                      <div className="flex items-center gap-2 mt-1 text-xs text-neutral-500">
-                        <span>{phase.startDate}</span>
-                        <ArrowRight className="h-3 w-3" />
-                        <span>{phase.endDate}</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {index < developmentPhases.length - 1 && (
-                    <div className="absolute left-5 top-10 bottom-0 w-0.5 bg-white/10 h-6"></div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </AnimatedCard>
+      <Tabs defaultValue="agency-steps" className="w-full">
+        <TabsList className="bg-black/30 border border-white/10 mb-6">
+          <TabsTrigger value="agency-steps">Agency Steps</TabsTrigger>
+          <TabsTrigger value="market-research">Market Research</TabsTrigger>
+          <TabsTrigger value="features">Features</TabsTrigger>
+          <TabsTrigger value="wireframe">Wireframe</TabsTrigger>
+          <TabsTrigger value="user-flow">User Flow</TabsTrigger>
+          <TabsTrigger value="feedback-log">Feedback Log</TabsTrigger>
+        </TabsList>
 
-        <AnimatedCard className="border border-white/10">
-          <div>
-            <h3 className="text-lg font-semibold text-white mb-4">Technical Requirements</h3>
-            <div className="space-y-6">
-              {technicalRequirements.map((req, index) => (
-                <div key={index}>
-                  <h4 className="font-medium text-[#9b87f5] mb-2">{req.category}</h4>
-                  <ul className="space-y-1 text-sm">
-                    {req.items.map((item, i) => (
-                      <li key={i} className="text-neutral-300 flex items-center gap-2">
-                        <div className="h-1.5 w-1.5 rounded-full bg-[#9b87f5]/70"></div>
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
+        {/* Agency Steps Tab Content */}
+        <TabsContent value="agency-steps" className="space-y-6">
+          <h3 className="text-lg font-semibold text-white">SISO Agency's App-Building Framework</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[
+              {
+                title: "Step 1: Project Kickoff",
+                description: "Define project scope and requirements."
+              },
+              {
+                title: "Step 2: Market Research",
+                description: "Analyze competitors and market needs."
+              },
+              {
+                title: "Step 3: Design & Wireframing",
+                description: "Create wireframes and UI designs."
+              },
+              {
+                title: "Step 4: Development",
+                description: "Build core functionality and features."
+              },
+              {
+                title: "Step 5: Testing & Feedback",
+                description: "Test the app and gather feedback."
+              },
+              {
+                title: "Step 6: Deployment",
+                description: "Launch the app and provide handover."
+              }
+            ].map((step, index) => (
+              <AnimatedCard key={index} className="border border-white/10">
+                <div>
+                  <h4 className="font-medium text-[#9b87f5] mb-2">{step.title}</h4>
+                  <p className="text-neutral-300 text-sm">{step.description}</p>
                 </div>
-              ))}
-            </div>
-            <Button variant="ghost" className="text-[#9b87f5] hover:text-[#8a76e4] mt-4 flex items-center gap-1">
-              View full technical specification
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+              </AnimatedCard>
+            ))}
           </div>
-        </AnimatedCard>
-      </div>
+        </TabsContent>
 
-      <AnimatedCard className="border border-white/10">
-        <div>
-          <h3 className="text-lg font-semibold text-white mb-4">Dependencies & Risk Assessment</h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <h4 className="font-medium text-[#9b87f5] mb-3">External Dependencies</h4>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-3">
-                  <Badge variant="outline" className="mt-0.5">API</Badge>
-                  <div>
-                    <p className="text-white text-sm">Chainlink Oracle Integration</p>
-                    <p className="text-xs text-neutral-400">For real-time price feeds and external data</p>
-                  </div>
-                </li>
-                <li className="flex items-start gap-3">
-                  <Badge variant="outline" className="mt-0.5">Service</Badge>
-                  <div>
-                    <p className="text-white text-sm">Crypto Payment Processor</p>
-                    <p className="text-xs text-neutral-400">For fiat-to-crypto conversion services</p>
-                  </div>
-                </li>
-                <li className="flex items-start gap-3">
-                  <Badge variant="outline" className="mt-0.5">Library</Badge>
-                  <div>
-                    <p className="text-white text-sm">OpenZeppelin Contracts</p>
-                    <p className="text-xs text-neutral-400">For secure smart contract implementation</p>
-                  </div>
-                </li>
-              </ul>
+        {/* Market Research Tab Content */}
+        <TabsContent value="market-research" className="space-y-6">
+          <h3 className="text-lg font-semibold text-white">Competitor Analysis</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[
+              {
+                title: "Competitor Analysis: Binance",
+                description: "Analysis of Binance's features and market position.",
+                link: "https://sprout-draw-9ec.notion.site/Competitor-Analysis-Binance"
+              },
+              {
+                title: "Competitor Analysis: Coinbase",
+                description: "Analysis of Coinbase's user experience and features.",
+                link: "https://sprout-draw-9ec.notion.site/Competitor-Analysis-Coinbase"
+              },
+              {
+                title: "Market Trends",
+                description: "Overview of current trends in Web3 trading platforms.",
+                link: "https://sprout-draw-9ec.notion.site/Market-Trends-Web3"
+              }
+            ].map((item, index) => (
+              <AnimatedCard key={index} className="border border-white/10">
+                <div>
+                  <h4 className="font-medium text-[#9b87f5] mb-2">{item.title}</h4>
+                  <p className="text-neutral-300 text-sm mb-4">{item.description}</p>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="text-[#9b87f5] hover:text-[#8a76e4] border-[#9b87f5]/20"
+                    onClick={() => window.open(item.link, '_blank')}
+                  >
+                    View Details
+                    <ExternalLink className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+              </AnimatedCard>
+            ))}
+          </div>
+        </TabsContent>
+
+        {/* Features Tab Content */}
+        <TabsContent value="features" className="space-y-6">
+          <AnimatedCard className="xl:col-span-2 border border-white/10">
+            <div className="grid grid-cols-3 gap-4 mb-6">
+              <div className="p-4 bg-[#9b87f5]/10 rounded-lg text-center">
+                <h4 className="font-medium text-white mb-2">Total Features</h4>
+                <p className="text-2xl font-bold text-[#9b87f5]">24</p>
+              </div>
+              <div className="p-4 bg-green-500/10 rounded-lg text-center">
+                <h4 className="font-medium text-white mb-2">Implemented</h4>
+                <p className="text-2xl font-bold text-green-500">8</p>
+              </div>
+              <div className="p-4 bg-[#ea384c]/10 rounded-lg text-center">
+                <h4 className="font-medium text-white mb-2">In Progress</h4>
+                <p className="text-2xl font-bold text-[#ea384c]">6</p>
+              </div>
             </div>
             
-            <div>
-              <h4 className="font-medium text-[#9b87f5] mb-3">Risk Assessment</h4>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-3">
-                  <Badge variant="warning" className="mt-0.5">Medium</Badge>
-                  <div>
-                    <p className="text-white text-sm">Regulatory Compliance</p>
-                    <p className="text-xs text-neutral-400">Changing regulations in target markets</p>
+            <h3 className="text-lg font-semibold text-white mb-4">Core Features</h3>
+            <div className="space-y-3">
+              {[
+                { name: "Wallet Integration", status: "completed" },
+                { name: "Trading Interface", status: "in_progress" },
+                { name: "User Authentication", status: "completed" },
+                { name: "Token Staking", status: "in_progress" },
+                { name: "Transaction History", status: "upcoming" }
+              ].map((feature, index) => (
+                <div key={index} className="flex items-center justify-between p-3 border border-white/10 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className={`h-2 w-2 rounded-full ${
+                      feature.status === 'completed' ? 'bg-green-500' : 
+                      feature.status === 'in_progress' ? 'bg-[#9b87f5]' : 
+                      'bg-neutral-500'
+                    }`} />
+                    <span className="text-white">{feature.name}</span>
                   </div>
-                </li>
-                <li className="flex items-start gap-3">
-                  <Badge variant="destructive" className="mt-0.5">High</Badge>
-                  <div>
-                    <p className="text-white text-sm">Security Vulnerabilities</p>
-                    <p className="text-xs text-neutral-400">Smart contract exploits and attacks</p>
-                  </div>
-                </li>
-                <li className="flex items-start gap-3">
-                  <Badge variant="info" className="mt-0.5">Low</Badge>
-                  <div>
-                    <p className="text-white text-sm">Market Adoption</p>
-                    <p className="text-xs text-neutral-400">User acquisition challenges</p>
-                  </div>
-                </li>
-              </ul>
+                  <Badge variant={
+                    feature.status === 'completed' ? 'success' : 
+                    feature.status === 'in_progress' ? 'purple' : 
+                    'secondary'
+                  }>
+                    {feature.status === 'completed' ? 'Completed' : 
+                     feature.status === 'in_progress' ? 'In Progress' : 
+                     'Upcoming'}
+                  </Badge>
+                </div>
+              ))}
             </div>
+            <div className="mt-6">
+              <Button 
+                variant="ghost" 
+                className="text-[#9b87f5] hover:text-[#8a76e4]"
+                onClick={() => window.location.href = `/projects/features`}
+              >
+                View all features
+                <ChevronRight className="ml-1 h-4 w-4" />
+              </Button>
+            </div>
+          </AnimatedCard>
+        </TabsContent>
+
+        {/* Wireframe Tab Content */}
+        <TabsContent value="wireframe" className="space-y-6">
+          <h3 className="text-lg font-semibold text-white">Wireframes</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <AnimatedCard className="border border-white/10">
+              <div>
+                <h4 className="font-medium text-[#9b87f5] mb-2">All Pages Overview</h4>
+                <p className="text-neutral-300 text-sm mb-4">Overview of all pages in the UbahCrypt Project.</p>
+                <ul className="space-y-2 mb-4">
+                  <li className="text-neutral-300 text-sm flex items-center gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-[#9b87f5]/70"></div>
+                    Landing Page
+                  </li>
+                  <li className="text-neutral-300 text-sm flex items-center gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-[#9b87f5]/70"></div>
+                    Dashboard
+                  </li>
+                  <li className="text-neutral-300 text-sm flex items-center gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-[#9b87f5]/70"></div>
+                    Trading Interface
+                  </li>
+                  <li className="text-neutral-300 text-sm flex items-center gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-[#9b87f5]/70"></div>
+                    Wallet Connection
+                  </li>
+                  <li className="text-neutral-300 text-sm flex items-center gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-[#9b87f5]/70"></div>
+                    Settings
+                  </li>
+                </ul>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-[#9b87f5] hover:text-[#8a76e4] border-[#9b87f5]/20"
+                  onClick={() => window.open('https://sprout-draw-9ec.notion.site/Wireframe-All-Pages', '_blank')}
+                >
+                  View Details
+                  <ExternalLink className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            </AnimatedCard>
+            
+            <AnimatedCard className="border border-white/10">
+              <div>
+                <h4 className="font-medium text-[#9b87f5] mb-2">Detailed Pages</h4>
+                <p className="text-neutral-300 text-sm mb-4">Detailed wireframes with UI photos and descriptions.</p>
+                
+                <div className="space-y-4">
+                  {[
+                    { 
+                      name: "Landing Page", 
+                      description: "Entry point for users with wallet connection.",
+                      link: "https://sprout-draw-9ec.notion.site/Wireframe-Landing-Page"
+                    },
+                    { 
+                      name: "Dashboard", 
+                      description: "Main interface showing portfolio and assets.",
+                      link: "https://sprout-draw-9ec.notion.site/Wireframe-Dashboard"
+                    },
+                    { 
+                      name: "Trading Interface", 
+                      description: "Interface for buying and selling tokens.",
+                      link: "https://sprout-draw-9ec.notion.site/Wireframe-Trading-Interface"
+                    }
+                  ].map((page, index) => (
+                    <div key={index} className="border border-white/10 rounded-lg p-3">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h5 className="text-white text-sm font-medium">{page.name}</h5>
+                          <p className="text-neutral-400 text-xs mt-1">{page.description}</p>
+                        </div>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="text-[#9b87f5] hover:text-[#8a76e4]"
+                          onClick={() => window.open(page.link, '_blank')}
+                        >
+                          <ExternalLink className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </AnimatedCard>
           </div>
-        </div>
-      </AnimatedCard>
+        </TabsContent>
+
+        {/* User Flow Tab Content */}
+        <TabsContent value="user-flow" className="space-y-6">
+          <AnimatedCard className="border border-white/10">
+            <div>
+              <h4 className="font-medium text-[#9b87f5] mb-2">User Flow Graph</h4>
+              <p className="text-neutral-300 text-sm mb-4">Navigation flow between pages in the application.</p>
+              
+              <div className="p-4 bg-black/30 border border-white/10 rounded-lg mb-4">
+                <p className="text-neutral-300 text-sm leading-relaxed">
+                  Flow: Landing Page → Wallet Connection → Dashboard → Trading Interface → Staking System → Transaction History → Community Features → Logout
+                </p>
+              </div>
+              
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="text-[#9b87f5] hover:text-[#8a76e4] border-[#9b87f5]/20"
+                onClick={() => window.open('https://sprout-draw-9ec.notion.site/User-Flow-Graph', '_blank')}
+              >
+                View Details
+                <ExternalLink className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </AnimatedCard>
+        </TabsContent>
+
+        {/* Feedback Log Tab Content */}
+        <TabsContent value="feedback-log" className="space-y-6">
+          <h3 className="text-lg font-semibold text-white">Feedback Log</h3>
+          <div className="space-y-4">
+            {[
+              {
+                source: "Client Feedback",
+                content: "The wallet connection needs to be faster.",
+                date: "May 1, 2025"
+              },
+              {
+                source: "User Feedback",
+                content: "Trading interface is intuitive but needs more customization options.",
+                date: "May 2, 2025"
+              },
+              {
+                source: "AI Feedback",
+                content: "Optimize loading times for the dashboard page.",
+                date: "May 3, 2025"
+              }
+            ].map((feedback, index) => (
+              <AnimatedCard key={index} className="border border-white/10">
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <h4 className="font-medium text-[#9b87f5]">{feedback.source}</h4>
+                    <span className="text-neutral-500 text-xs">{feedback.date}</span>
+                  </div>
+                  <p className="text-neutral-300 text-sm">{feedback.content}</p>
+                </div>
+              </AnimatedCard>
+            ))}
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
