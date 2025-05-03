@@ -8,7 +8,12 @@ import { Button } from '@/components/ui/button';
 import { Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { AppPlanSection } from '@/components/projects/details/AppPlanSection';
+import { WelcomeHeader } from '@/components/dashboard/WelcomeHeader';
+import { MainProjectCard } from '@/components/dashboard/MainProjectCard';
+import { NotificationsCard } from '@/components/dashboard/NotificationsCard';
+import { LeaderboardPreviewCard } from '@/components/dashboard/LeaderboardPreviewCard';
+import { HelpSupportCard } from '@/components/dashboard/HelpSupportCard';
+import { PlanBuilderCard } from '@/components/dashboard/PlanBuilderCard';
 
 export default function Home() {
   const { user } = useAuthSession();
@@ -17,12 +22,34 @@ export default function Home() {
   return (
     <DashboardLayout>
       <Helmet>
-        <title>App Plan | SISO Resource Hub</title>
+        <title>Dashboard | SISO Resource Hub</title>
       </Helmet>
       
       <div className="container mx-auto px-4 py-8">
-        {/* App Plan Content */}
-        <AppPlanSection />
+        {/* Welcome Header */}
+        <WelcomeHeader />
+        
+        {/* Main Content */}
+        <div className="space-y-6">
+          {/* Main Project Card */}
+          <MainProjectCard />
+          
+          {/* Additional Cards */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-1">
+              <NotificationsCard />
+            </div>
+            <div className="lg:col-span-1">
+              <LeaderboardPreviewCard />
+            </div>
+            <div className="lg:col-span-1">
+              <HelpSupportCard />
+            </div>
+          </div>
+          
+          {/* Plan Builder Card */}
+          <PlanBuilderCard />
+        </div>
         
         {/* Admin Access Card - Only shown to admin users */}
         {isAdmin && (
