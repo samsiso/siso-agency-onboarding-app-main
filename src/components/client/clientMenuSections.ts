@@ -1,15 +1,15 @@
 
 import {
   LayoutDashboard,
-  Briefcase,
-  Plus,
-  FileText,
   ListTodo,
-  ClipboardList,
-  MessageSquare,
+  FileText,
   Wallet,
-  CreditCard,
   Trophy,
+  HelpCircle,
+  ClipboardList,
+  FileText as Documents,
+  Timeline,
+  MessageSquare,
 } from "lucide-react";
 
 export const clientMenuSections = [
@@ -20,71 +20,51 @@ export const clientMenuSections = [
     label: 'Dashboard',
   },
   {
-    type: 'section',
-    title: 'Projects',
-    icon: Briefcase,
-    items: [
-      {
-        href: '/client-dashboard/projects',
-        icon: Briefcase,
-        label: 'All Projects',
-      },
-      {
-        href: '/client-dashboard/projects/new',
-        icon: Plus,
-        label: 'Create New Project',
-      },
-    ]
+    type: 'main',
+    href: '/client-dashboard/tasks',
+    icon: ListTodo,
+    label: 'Active Tasks',
   },
   {
-    type: 'section',
-    title: 'Current Project',
-    icon: FileText,
-    items: [
-      {
-        href: '/client-dashboard/overview',
-        icon: FileText,
-        label: 'Overview',
-      },
-      {
-        href: '/client-dashboard/plan-features',
-        icon: ClipboardList,
-        label: 'Plan & Features',
-      },
-      {
-        href: '/client-dashboard/tasks',
-        icon: ListTodo,
-        label: 'Tasks',
-      },
-    ]
-  },
-  {
-    type: 'section',
-    title: 'Messages',
+    type: 'main',
+    href: '/plan-builder',
     icon: MessageSquare,
-    items: [
-      {
-        href: '/client-dashboard/messages',
-        icon: MessageSquare,
-        label: 'Messages',
-      }
-    ]
+    label: 'SISO Assistant',
   },
   {
-    type: 'section',
-    title: 'Financial',
+    type: 'main',
+    href: '/client-dashboard/financial/payments',
     icon: Wallet,
-    items: [
-      {
-        href: '/client-dashboard/financial/payments',
-        icon: CreditCard,
-        label: 'Payments & Billing',
-      },
-      {
-        href: '/client-dashboard/financial/leaderboards',
-        icon: Trophy,
-        label: 'Leaderboards',
-      },
-    ]
+    label: 'Financial',
+  },
+  {
+    type: 'main',
+    href: '/financial/leaderboards',
+    icon: Trophy,
+    label: 'Leaderboards',
+  },
+  {
+    type: 'main',
+    href: '/resources',
+    icon: HelpCircle,
+    label: 'Help & Support',
+  },
+  {
+    type: 'main',
+    href: '/client-dashboard/plan-features',
+    icon: ClipboardList,
+    label: 'App Plan',
+  },
+  {
+    type: 'main',
+    href: '/resources/documents',
+    icon: Documents,
+    label: 'Documents',
+  },
+  {
+    type: 'main',
+    href: '/client-dashboard/timeline',
+    icon: Timeline,
+    label: 'Timeline',
   }
 ];

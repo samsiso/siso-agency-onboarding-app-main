@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { SidebarLogo } from './sidebar/SidebarLogo';
 import { SidebarNavigation } from './sidebar/SidebarNavigation';
 import { SidebarFooter } from './sidebar/SidebarFooter';
-import { Menu, X, FolderOpen, ChevronDown } from 'lucide-react';
+import { Menu, X, FolderOpen, ChevronDown, User, LogOut } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from './ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -118,7 +118,7 @@ export const Sidebar = () => {
             className="fixed top-4 right-4 z-50 bg-siso-bg/80 backdrop-blur-sm"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
-            <AnimatePresence initial={false}>
+            <AnimatePresence initial={false} mode="sync">
               <motion.div
                 key={isMobileMenuOpen ? 'close' : 'menu'}
                 initial={{ opacity: 0, rotate: -90 }}
@@ -258,7 +258,7 @@ export const Sidebar = () => {
           </div>
         )}
         
-        <AnimatePresence>
+        <AnimatePresence mode="sync">
           <SidebarNavigation 
             collapsed={!isExpanded} 
             onItemClick={handleItemClick}

@@ -4,8 +4,6 @@ import { ClientSidebarNavigation } from "./ClientSidebarNavigation";
 import { 
   ChevronDown, 
   User, 
-  HelpCircle, 
-  FileText, 
   LogOut, 
   Briefcase,
   FolderOpen,
@@ -152,7 +150,7 @@ export function ClientDashboardSidebar() {
             <ClientSidebarNavigation collapsed={!sidebarOpen} onItemClick={() => {}} visible={true} />
           </div>
           
-          {/* User Dropdown */}
+          {/* User Dropdown - Updated with Profile & Settings */}
           <div className="p-4 border-t border-siso-border">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -174,14 +172,6 @@ export function ClientDashboardSidebar() {
                 <DropdownMenuItem className="text-siso-text" onClick={() => navigate('/profile')}>
                   <User className="mr-2 h-4 w-4" />
                   <span>Profile & Settings</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="text-siso-text" onClick={() => navigate('/resources')}>
-                  <HelpCircle className="mr-2 h-4 w-4" />
-                  <span>Help & Support</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="text-siso-text" onClick={() => navigate('/resources/documents')}>
-                  <FileText className="mr-2 h-4 w-4" />
-                  <span>Document Library</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-siso-border" />
                 <DropdownMenuItem className="text-siso-text">

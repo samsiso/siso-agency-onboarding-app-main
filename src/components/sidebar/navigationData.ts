@@ -1,8 +1,8 @@
 
 import { 
-  LayoutDashboard, Briefcase, ScrollText, Wallet, 
-  Trophy, FileText, HelpCircle, ListTodo, 
-  Layout, BookOpen, User
+  LayoutDashboard, ListTodo, MessageSquare, Wallet, 
+  Trophy, FileText, HelpCircle, 
+  ClipboardList, Timeline, User
 } from 'lucide-react';
 import { MenuSection } from './types';
 
@@ -15,66 +15,52 @@ export const getMenuSections = (): MenuSection[] => {
       label: 'Dashboard',
     },
     {
-      type: 'section',
-      title: 'Projects & Tasks',
-      icon: Briefcase,
-      items: [
-        {
-          href: '/projects',
-          icon: ScrollText,
-          label: 'All Projects',
-        },
-        {
-          href: '/projects/tasks',
-          icon: ListTodo,
-          label: 'Active Tasks',
-        },
-        {
-          href: '/plan-builder',
-          icon: Layout,
-          label: 'Plan Builder',
-        }
-      ]
+      type: 'main',
+      href: '/projects/tasks',
+      icon: ListTodo,
+      label: 'Active Tasks',
     },
     {
-      type: 'section',
-      title: 'Financial',
+      type: 'main',
+      href: '/plan-builder',
+      icon: MessageSquare,
+      label: 'SISO Assistant',
+    },
+    {
+      type: 'main',
+      href: '/financial/payments',
       icon: Wallet,
-      items: [
-        {
-          href: '/financial/payments',
-          icon: Wallet,
-          label: 'Payments & Billing',
-        },
-        {
-          href: '/financial/leaderboards',
-          icon: Trophy,
-          label: 'Leaderboards',
-        }
-      ]
+      label: 'Financial',
     },
     {
-      type: 'section',
-      title: 'Account & Resources',
-      icon: BookOpen,
-      items: [
-        {
-          href: '/profile',
-          icon: User,
-          label: 'Profile & Settings',
-        },
-        {
-          href: '/resources',
-          icon: HelpCircle,
-          label: 'Help & Support',
-        },
-        {
-          href: '/resources/documents',
-          icon: FileText,
-          label: 'Document Library',
-        }
-      ]
+      type: 'main',
+      href: '/financial/leaderboards',
+      icon: Trophy,
+      label: 'Leaderboards',
+    },
+    {
+      type: 'main',
+      href: '/resources',
+      icon: HelpCircle,
+      label: 'Help & Support',
+    },
+    {
+      type: 'main',
+      href: '/projects/plan-features',
+      icon: ClipboardList,
+      label: 'App Plan',
+    },
+    {
+      type: 'main',
+      href: '/resources/documents',
+      icon: FileText,
+      label: 'Documents',
+    },
+    {
+      type: 'main',
+      href: '/projects/timeline',
+      icon: Timeline,
+      label: 'Timeline',
     }
   ];
 };
-
