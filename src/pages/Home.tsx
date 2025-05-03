@@ -1,10 +1,11 @@
+
 import { Helmet } from 'react-helmet';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { DashboardLayout } from '@/components/dashboard/layout/DashboardLayout';
 import { useAdminCheck } from '@/hooks/useAdminCheck';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users, ChevronDown, ChevronUp, ClipboardList } from 'lucide-react';
+import { Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { WelcomeHeader } from '@/components/dashboard/WelcomeHeader';
@@ -13,14 +14,10 @@ import { NotificationsCard } from '@/components/dashboard/NotificationsCard';
 import { LeaderboardPreviewCard } from '@/components/dashboard/LeaderboardPreviewCard';
 import { HelpSupportCard } from '@/components/dashboard/HelpSupportCard';
 import { PlanBuilderCard } from '@/components/dashboard/PlanBuilderCard';
-import { AppPlanSection } from '@/components/projects/details/AppPlanSection';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { useState } from 'react';
 
 export default function Home() {
   const { user } = useAuthSession();
   const { isAdmin } = useAdminCheck();
-  const [isAppPlanOpen, setIsAppPlanOpen] = useState(true);
   
   return (
     <DashboardLayout>
@@ -52,34 +49,6 @@ export default function Home() {
           
           {/* Plan Builder Card */}
           <PlanBuilderCard />
-          
-          {/* App Plan Section (from the old page, now in dashboard) */}
-          <div className="mt-8">
-            <Collapsible 
-              open={isAppPlanOpen} 
-              onOpenChange={setIsAppPlanOpen}
-              className="bg-black/30 border border-white/10 rounded-xl overflow-hidden"
-            >
-              <CollapsibleTrigger className="w-full flex justify-between items-center p-4 hover:bg-black/40">
-                <h2 className="text-xl font-semibold text-white flex items-center gap-2">
-                  <ClipboardList className="h-5 w-5 text-purple-400" />
-                  App Development Plan
-                </h2>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  {isAppPlanOpen ? (
-                    <ChevronUp className="h-4 w-4" />
-                  ) : (
-                    <ChevronDown className="h-4 w-4" />
-                  )}
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <div className="p-4">
-                  <AppPlanSection />
-                </div>
-              </CollapsibleContent>
-            </Collapsible>
-          </div>
         </div>
         
         {/* Admin Access Card - Only shown to admin users */}

@@ -40,7 +40,6 @@ import ProjectsAndTasksPage from './pages/ProjectsAndTasksPage';
 import DocumentLibraryPage from './pages/resources/DocumentLibraryPage';
 import ProjectDetailsPage from './pages/ProjectDetailsPage';
 import ResourcesPage from './pages/resources/ResourcesPage';
-import AppPlanPage from './pages/AppPlanPage';
 
 // Financial & Account section
 import PaymentsPage from './pages/financial/PaymentsPage';
@@ -90,7 +89,6 @@ function App() {
         <Route path="/my-projects" element={<AuthGuard><MyProjects /></AuthGuard>} />
         <Route path="/plan-builder" element={<AuthGuard><PlanBuilder /></AuthGuard>} />
         <Route path="/portfolio" element={<AuthGuard><Portfolio /></AuthGuard>} />
-        <Route path="/app-plan" element={<AuthGuard><AppPlanPage /></AuthGuard>} />
         
         {/* Financial Routes */}
         <Route path="/financial/payments" element={<AuthGuard><PaymentsPage /></AuthGuard>} />
