@@ -1,112 +1,475 @@
 
-import { useState, useEffect } from 'react';
-import { Card } from '@/components/ui/card';
+import { useState } from 'react';
 import { AnimatedCard } from '@/components/ui/animated-card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { FileCheck, ChevronRight, Clock, ArrowRight, CheckCircle, ExternalLink, Search, File, FileArchive, FilePlus, Image } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from '@/components/ui/input';
 import { ClientDocument } from '@/types/client.types';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { 
+  FileCheck, ChevronRight, Clock, ArrowRight, CheckCircle, 
+  ExternalLink, Search, File, FileArchive, FilePlus, Image,
+  FileSpreadsheet, Framer, Code, TestTube, CloudCog, ChevronDown
+} from 'lucide-react';
+import { motion } from 'framer-motion';
+
+type PhaseSection = {
+  id: string;
+  title: string;
+  description: string;
+  subsections: {
+    id: string;
+    title: string;
+    content: React.ReactNode;
+    bestPractices?: string[];
+    actionableSteps?: string[];
+  }[];
+};
 
 export function AppPlanSection() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [documents, setDocuments] = useState<ClientDocument[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  // Mock documents data for the Market Research tab
-  const mockDocuments: ClientDocument[] = [
+  const [expandedSections, setExpandedSections] = useState<string[]>([]);
+  const [activePhaseTab, setActivePhaseTab] = useState("phase-1");
+  
+  const phases: PhaseSection[] = [
     {
-      id: "1",
-      client_id: "123",
-      title: "Competitor Analysis: Binance",
-      content: "Detailed analysis of Binance's features and market position.",
-      document_type: "app_plan",
-      created_at: "2025-05-01",
-      updated_at: "2025-05-01"
+      id: "phase-1",
+      title: "1. Product Management",
+      description: "AI-Enhanced Ideation & Planning",
+      subsections: [
+        {
+          id: "phase-1-1",
+          title: "1.1 Ideation and Market Research with AI",
+          content: (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <div className="flex gap-3 items-start">
+                    <div className="p-2 rounded-md bg-purple-500/10">
+                      <FileSpreadsheet className="h-5 w-5 text-purple-400" />
+                    </div>
+                    <div>
+                      <h5 className="font-medium text-white">AI Brainstorming</h5>
+                      <p className="text-neutral-300 text-sm">
+                        Use AI tools like Ideamap or GPT-based assistants to generate ideas for the crypto app. 
+                        Prompt the AI with: "Generate innovative features for a crypto app targeting retail investors." 
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-3 items-start">
+                    <div className="p-2 rounded-md bg-purple-500/10">
+                      <Search className="h-5 w-5 text-purple-400" />
+                    </div>
+                    <div>
+                      <h5 className="font-medium text-white">Market Analysis</h5>
+                      <p className="text-neutral-300 text-sm">
+                        Deploy NLP-driven tools to analyze user reviews of existing crypto apps (e.g., Coinbase, Binance) 
+                        and support tickets.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex gap-3 items-start">
+                    <div className="p-2 rounded-md bg-purple-500/10">
+                      <FileCheck className="h-5 w-5 text-purple-400" />
+                    </div>
+                    <div>
+                      <h5 className="font-medium text-white">Data-Backed Validation</h5>
+                      <p className="text-neutral-300 text-sm">
+                        Use generative AI to analyze crypto market reports and predict trends 
+                        (e.g., growing demand for DeFi integration).
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-black/30 p-4 rounded-md">
+                    <h5 className="text-md font-medium text-purple-400 mb-2">Expected Outcomes:</h5>
+                    <ul className="list-disc pl-5 space-y-1 text-neutral-300 text-sm">
+                      <li>Innovative feature ideas aligned with market trends</li>
+                      <li>Comprehensive understanding of user pain points</li>
+                      <li>Data-driven validation of top features</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ),
+          actionableSteps: [
+            "Run AI brainstorming sessions to list 20+ feature ideas, then cluster them by user value.",
+            "Analyze 5,000+ user reviews and support tickets from competitor apps to identify top 5 pain points.",
+            "Validate top 3 features using AI-driven market trend analysis and user adoption modeling."
+          ]
+        },
+        {
+          id: "phase-1-2",
+          title: "1.2 Roadmapping and Requirements Gathering",
+          content: (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <div className="flex gap-3 items-start">
+                    <div className="p-2 rounded-md bg-purple-500/10">
+                      <FileSpreadsheet className="h-5 w-5 text-purple-400" />
+                    </div>
+                    <div>
+                      <h5 className="font-medium text-white">AI-Powered Prioritization</h5>
+                      <p className="text-neutral-300 text-sm">
+                        Use Zeda.io's AI roadmap planner to prioritize features based on user impact, 
+                        business value, and development effort.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-3 items-start">
+                    <div className="p-2 rounded-md bg-purple-500/10">
+                      <File className="h-5 w-5 text-purple-400" />
+                    </div>
+                    <div>
+                      <h5 className="font-medium text-white">Automated Requirements</h5>
+                      <p className="text-neutral-300 text-sm">
+                        Input high-level feature ideas (e.g., "portfolio tracker") into AI tools to generate 
+                        detailed user stories and functional specifications.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex gap-3 items-start">
+                    <div className="p-2 rounded-md bg-purple-500/10">
+                      <ArrowRight className="h-5 w-5 text-purple-400" />
+                    </div>
+                    <div>
+                      <h5 className="font-medium text-white">Continuous Feedback Loop</h5>
+                      <p className="text-neutral-300 text-sm">
+                        Set up AI to analyze user feedback and usage data every sprint, 
+                        dynamically adjusting the roadmap as needed.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-black/30 p-4 rounded-md">
+                    <h5 className="text-md font-medium text-purple-400 mb-2">Expected Outcomes:</h5>
+                    <ul className="list-disc pl-5 space-y-1 text-neutral-300 text-sm">
+                      <li>Data-driven feature prioritization</li>
+                      <li>Comprehensive user stories and requirements</li>
+                      <li>Adaptive roadmap that evolves with user feedback</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ),
+          bestPractices: [
+            "Use AI brainstorming to explore diverse feature ideas and reduce bias.",
+            "Leverage NLP to mine user feedback for actionable insights.",
+            "Auto-generate PRDs with AI, then validate with human review.",
+            "Maintain a continuous feedback loop to keep the roadmap data-driven."
+          ]
+        }
+      ]
     },
     {
-      id: "2",
-      client_id: "123",
-      title: "Competitor Analysis: Coinbase",
-      content: "Analysis of Coinbase's user experience and features.",
-      document_type: "functionalities",
-      created_at: "2025-05-01",
-      updated_at: "2025-05-01"
+      id: "phase-2",
+      title: "2. UX/UI Design",
+      description: "AI-Assisted Design and Usability",
+      subsections: [
+        {
+          id: "phase-2-1",
+          title: "2.1 AI-Driven Wireframing & Prototyping",
+          content: (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <div className="flex gap-3 items-start">
+                    <div className="p-2 rounded-md bg-purple-500/10">
+                      <Framer className="h-5 w-5 text-purple-400" />
+                    </div>
+                    <div>
+                      <h5 className="font-medium text-white">Instant Prototypes</h5>
+                      <p className="text-neutral-300 text-sm">
+                        Use Uizard or Lovable to convert sketches or descriptions into high-fidelity wireframes. 
+                        AI outputs React or HTML/CSS code for rapid front-end development.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-3 items-start">
+                    <div className="p-2 rounded-md bg-purple-500/10">
+                      <CheckCircle className="h-5 w-5 text-purple-400" />
+                    </div>
+                    <div>
+                      <h5 className="font-medium text-white">Design Best Practices Built-In</h5>
+                      <p className="text-neutral-300 text-sm">
+                        Ensure AI enforces accessibility (e.g., high-contrast price charts for vision-impaired users) 
+                        and UX standards.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex gap-3 items-start">
+                    <div className="p-2 rounded-md bg-purple-500/10">
+                      <Code className="h-5 w-5 text-purple-400" />
+                    </div>
+                    <div>
+                      <h5 className="font-medium text-white">Lovable & Bolt for UI</h5>
+                      <p className="text-neutral-300 text-sm">
+                        Use Lovable to generate a functional UI with components like price tickers 
+                        and transaction forms.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-black/30 p-4 rounded-md">
+                    <h5 className="text-md font-medium text-purple-400 mb-2">Expected Outcomes:</h5>
+                    <ul className="list-disc pl-5 space-y-1 text-neutral-300 text-sm">
+                      <li>Rapid creation of high-fidelity wireframes</li>
+                      <li>Accessible and user-friendly designs</li>
+                      <li>Functional UI components ready for development</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ),
+          actionableSteps: [
+            "Create initial wireframes for 3 key screens (dashboard, portfolio, transaction) using AI tools.",
+            "Run AI accessibility checks to ensure compliance with WCAG standards.",
+            "Generate a functional UI prototype with Lovable, then customize for brand consistency."
+          ]
+        },
+        {
+          id: "phase-2-2",
+          title: "2.2 AI in User Research & Usability Testing",
+          content: (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <div className="flex gap-3 items-start">
+                    <div className="p-2 rounded-md bg-purple-500/10">
+                      <Search className="h-5 w-5 text-purple-400" />
+                    </div>
+                    <div>
+                      <h5 className="font-medium text-white">Synthetic User Testing</h5>
+                      <p className="text-neutral-300 text-sm">
+                        Use AI agents to simulate user interactions and identify friction points, 
+                        like unclear wallet connection steps.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-3 items-start">
+                    <div className="p-2 rounded-md bg-purple-500/10">
+                      <FileCheck className="h-5 w-5 text-purple-400" />
+                    </div>
+                    <div>
+                      <h5 className="font-medium text-white">Automated Feedback Analysis</h5>
+                      <p className="text-neutral-300 text-sm">
+                        Analyze beta tester feedback with NLP to categorize themes 
+                        (e.g., "confusing transaction flow").
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex gap-3 items-start">
+                    <div className="p-2 rounded-md bg-purple-500/10">
+                      <ArrowRight className="h-5 w-5 text-purple-400" />
+                    </div>
+                    <div>
+                      <h5 className="font-medium text-white">AI-Augmented A/B Testing</h5>
+                      <p className="text-neutral-300 text-sm">
+                        Generate design variants and analyze A/B test results to optimize 
+                        for user segments (e.g., novice vs. expert traders).
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-black/30 p-4 rounded-md">
+                    <h5 className="text-md font-medium text-purple-400 mb-2">Expected Outcomes:</h5>
+                    <ul className="list-disc pl-5 space-y-1 text-neutral-300 text-sm">
+                      <li>Identification of UX issues before launch</li>
+                      <li>Actionable insights from user feedback</li>
+                      <li>Optimized designs for different user segments</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ),
+          bestPractices: [
+            "Use AI prototyping for rapid mocks, then refine with human creativity.",
+            "Ensure accessibility with AI checks, verified by designers.",
+            "Leverage AI for synthetic and real user feedback analysis.",
+            "Embrace A/B testing with AI to optimize designs iteratively."
+          ]
+        }
+      ]
     },
     {
-      id: "3",
-      client_id: "123",
-      title: "Market Trends",
-      content: "Overview of current trends in Web3 trading platforms.",
-      document_type: "wireframes",
-      created_at: "2025-05-02",
-      updated_at: "2025-05-02"
-    },
-    {
-      id: "4",
-      client_id: "123",
-      title: "Target Audience Analysis",
-      content: "Detailed breakdown of target user demographics and needs.",
-      document_type: "inspiration",
-      created_at: "2025-05-02",
-      updated_at: "2025-05-02"
-    },
-    {
-      id: "5",
-      client_id: "123",
-      title: "Competitive Edge Assessment",
-      content: "Analysis of UbahCrypt's unique value propositions.",
-      document_type: "app_plan",
-      created_at: "2025-05-03",
-      updated_at: "2025-05-03"
+      id: "phase-3",
+      title: "3. Development",
+      description: "AI-Augmented Coding and Collaboration",
+      subsections: [
+        {
+          id: "phase-3-1",
+          title: "3.1 Coding with AI Assistance",
+          content: (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <div className="flex gap-3 items-start">
+                    <div className="p-2 rounded-md bg-purple-500/10">
+                      <Code className="h-5 w-5 text-purple-400" />
+                    </div>
+                    <div>
+                      <h5 className="font-medium text-white">AI Pair Programming</h5>
+                      <p className="text-neutral-300 text-sm">
+                        Integrate GitHub Copilot or Cursor into the IDE to autocomplete code for features 
+                        like real-time price APIs or wallet integration.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-3 items-start">
+                    <div className="p-2 rounded-md bg-purple-500/10">
+                      <FileCheck className="h-5 w-5 text-purple-400" />
+                    </div>
+                    <div>
+                      <h5 className="font-medium text-white">Code Generation Platforms</h5>
+                      <p className="text-neutral-300 text-sm">
+                        Use Bolt.new to scaffold a full-stack crypto app from a prompt like 
+                        "build a crypto price tracker with portfolio."
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex gap-3 items-start">
+                    <div className="p-2 rounded-md bg-purple-500/10">
+                      <ArrowRight className="h-5 w-5 text-purple-400" />
+                    </div>
+                    <div>
+                      <h5 className="font-medium text-white">Version Control & Merging</h5>
+                      <p className="text-neutral-300 text-sm">
+                        Use AI to write commit messages, resolve simple merge conflicts, 
+                        and enforce conventional commit standards.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-black/30 p-4 rounded-md">
+                    <h5 className="text-md font-medium text-purple-400 mb-2">Expected Outcomes:</h5>
+                    <ul className="list-disc pl-5 space-y-1 text-neutral-300 text-sm">
+                      <li>Increased developer productivity and code quality</li>
+                      <li>Rapid prototyping and development</li>
+                      <li>Standardized codebase with consistent practices</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ),
+          actionableSteps: [
+            "Set up Copilot or Cursor for all developers to boost coding speed by 20%.",
+            "Generate a full-stack prototype with Bolt.new, then refine for production use.",
+            "Implement AI-driven commit message generation and merge conflict resolution in Git workflow."
+          ]
+        }
+      ]
     }
   ];
-
-  useEffect(() => {
-    // Simulating document fetching
-    setLoading(true);
-    setTimeout(() => {
-      setDocuments(mockDocuments);
-      setLoading(false);
-    }, 800);
-  }, []);
-
-  const getDocumentIcon = (documentType: string) => {
-    switch (documentType) {
-      case 'app_plan':
-        return <FileArchive className="h-5 w-5 text-orange-500" />;
-      case 'functionalities':
-        return <FileCheck className="h-5 w-5 text-blue-500" />;
-      case 'wireframes':
-        return <Image className="h-5 w-5 text-purple-500" />;
-      case 'inspiration':
-        return <FilePlus className="h-5 w-5 text-green-500" />;
-      default:
-        return <File className="h-5 w-5 text-slate-500" />;
-    }
+  
+  const toggleSection = (sectionId: string) => {
+    setExpandedSections(prevSections => 
+      prevSections.includes(sectionId)
+        ? prevSections.filter(id => id !== sectionId)
+        : [...prevSections, sectionId]
+    );
   };
-
-  const getDocumentTypeName = (documentType: string) => {
-    switch (documentType) {
-      case 'app_plan':
-        return 'App Plan';
-      case 'functionalities':
-        return 'Functionalities';
-      case 'wireframes':
-        return 'Wireframes';
-      case 'inspiration':
-        return 'Inspiration';
-      default:
-        return documentType;
-    }
+  
+  const isExpanded = (sectionId: string) => expandedSections.includes(sectionId);
+  
+  const renderPhase = (phase: PhaseSection) => {
+    return (
+      <TabsContent value={phase.id} key={phase.id} className="mt-6">
+        <AnimatedCard className="mb-8 border border-white/10">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-3">
+            <div>
+              <h3 className="text-xl font-semibold text-white">{phase.title}</h3>
+              <p className="text-lg text-purple-400">{phase.description}</p>
+            </div>
+            <Badge variant="outline" className="bg-purple-500/10 text-purple-400 border-purple-500/20 px-3 py-1">
+              {phase.id.replace("-", " ").toUpperCase()}
+            </Badge>
+          </div>
+          
+          <div className="space-y-6">
+            {phase.subsections.map(subsection => (
+              <Collapsible 
+                key={subsection.id} 
+                open={isExpanded(subsection.id)} 
+                onOpenChange={() => toggleSection(subsection.id)}
+                className="border border-white/10 rounded-lg overflow-hidden"
+              >
+                <CollapsibleTrigger className="w-full p-4 flex items-center justify-between bg-black/20 hover:bg-black/30 transition-colors">
+                  <h4 className="text-md font-medium text-white text-left">{subsection.title}</h4>
+                  <div className="flex items-center">
+                    <Badge className="mr-2 bg-purple-500/80 hover:bg-purple-500">Details</Badge>
+                    <ChevronDown 
+                      className={`h-5 w-5 text-purple-400 transition-transform duration-200 ${isExpanded(subsection.id) ? 'rotate-180' : ''}`}
+                    />
+                  </div>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="p-4 bg-black/10">
+                  {subsection.content}
+                  
+                  <div className="mt-6 space-y-4">
+                    {subsection.actionableSteps && (
+                      <div className="bg-purple-500/5 border border-purple-500/20 p-4 rounded-md">
+                        <h5 className="text-md font-medium text-purple-400 mb-3 flex items-center gap-2">
+                          <CheckCircle className="h-5 w-5" />
+                          Actionable Steps
+                        </h5>
+                        <ul className="list-disc pl-5 space-y-2 text-neutral-300 text-sm">
+                          {subsection.actionableSteps.map((step, idx) => (
+                            <li key={idx}>{step}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    {subsection.bestPractices && (
+                      <div className="bg-black/30 p-4 rounded-md">
+                        <h5 className="text-md font-medium text-purple-400 mb-3 flex items-center gap-2">
+                          <FileCheck className="h-5 w-5" />
+                          Best Practices
+                        </h5>
+                        <ul className="list-disc pl-5 space-y-2 text-neutral-300 text-sm">
+                          {subsection.bestPractices.map((practice, idx) => (
+                            <li key={idx}>{practice}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+            ))}
+          </div>
+        </AnimatedCard>
+      </TabsContent>
+    );
   };
-
-  const filteredDocuments = documents.filter(doc => 
-    doc.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    getDocumentTypeName(doc.document_type).toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
+  
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -124,345 +487,36 @@ export function AppPlanSection() {
         </div>
       </div>
 
-      <Tabs defaultValue="agency-steps" className="w-full">
-        <TabsList className="bg-black/30 border border-white/10 mb-6">
-          <TabsTrigger value="agency-steps">Agency Steps</TabsTrigger>
-          <TabsTrigger value="market-research">Market Research</TabsTrigger>
-          <TabsTrigger value="features">Features</TabsTrigger>
-          <TabsTrigger value="wireframe">Wireframe</TabsTrigger>
-          <TabsTrigger value="user-flow">User Flow</TabsTrigger>
-          <TabsTrigger value="feedback-log">Feedback Log</TabsTrigger>
-        </TabsList>
-
-        {/* Agency Steps Tab Content */}
-        <TabsContent value="agency-steps" className="space-y-6">
-          <h3 className="text-lg font-semibold text-white">SISO Agency's App-Building Framework</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {[
-              {
-                title: "Step 1: Project Kickoff",
-                description: "Define project scope and requirements."
-              },
-              {
-                title: "Step 2: Market Research",
-                description: "Analyze competitors and market needs."
-              },
-              {
-                title: "Step 3: Design & Wireframing",
-                description: "Create wireframes and UI designs."
-              },
-              {
-                title: "Step 4: Development",
-                description: "Build core functionality and features."
-              },
-              {
-                title: "Step 5: Testing & Feedback",
-                description: "Test the app and gather feedback."
-              },
-              {
-                title: "Step 6: Deployment",
-                description: "Launch the app and provide handover."
-              }
-            ].map((step, index) => (
-              <AnimatedCard key={index} className="border border-white/10">
-                <div>
-                  <h4 className="font-medium text-[#9b87f5] mb-2">{step.title}</h4>
-                  <p className="text-neutral-300 text-sm">{step.description}</p>
-                </div>
-              </AnimatedCard>
-            ))}
+      <div className="relative">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="sticky top-4 z-10 mb-4"
+        >
+          <div className="bg-black/50 backdrop-blur-md rounded-lg border border-white/10 p-1">
+            <Tabs value={activePhaseTab} onValueChange={setActivePhaseTab} className="w-full">
+              <TabsList className="w-full bg-black/30 grid grid-cols-3 md:grid-cols-6">
+                {phases.map(phase => (
+                  <TabsTrigger 
+                    key={phase.id} 
+                    value={phase.id}
+                    className="data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-400"
+                  >
+                    {phase.title.split(".")[0]}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
           </div>
-        </TabsContent>
+        </motion.div>
 
-        {/* Market Research Tab Content - Adapted from ClientDocumentsPage */}
-        <TabsContent value="market-research" className="space-y-6">
-          <h3 className="text-lg font-semibold text-white mb-4">Market Research Documents</h3>
-
-          <div className="mb-6">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
-              <Input
-                placeholder="Search market research documents..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-black/20 border border-white/10 text-white placeholder-neutral-500"
-              />
-            </div>
-          </div>
-
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[1, 2, 3, 4].map((i) => (
-                <Card key={i} className="p-5 border border-white/10 bg-black/20">
-                  <div className="animate-pulse flex items-start gap-3">
-                    <div className="p-2 bg-white/5 rounded-md h-10 w-10"></div>
-                    <div className="flex-1">
-                      <div className="h-5 bg-white/5 rounded w-3/4 mb-2"></div>
-                      <div className="h-4 bg-white/5 rounded w-1/2 mb-1"></div>
-                      <div className="h-3 bg-white/5 rounded w-1/4"></div>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          ) : filteredDocuments.length === 0 ? (
-            <Card className="p-8 text-center border border-white/10 bg-black/20">
-              <FileCheck className="h-12 w-12 mx-auto text-neutral-500 mb-3" />
-              <h2 className="text-xl font-medium mb-2 text-white">No Documents Found</h2>
-              <p className="text-neutral-400 mb-6">
-                {documents.length === 0 
-                  ? "No market research documents are available yet."
-                  : "No documents match your search criteria."}
-              </p>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {filteredDocuments.map((doc) => (
-                <Card key={doc.id} className="p-5 border border-white/10 bg-black/20 hover:bg-black/30 transition-colors">
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-black/30 rounded-md">
-                      {getDocumentIcon(doc.document_type)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-white truncate" title={doc.title}>
-                        {doc.title}
-                      </h3>
-                      <p className="text-sm text-neutral-400 mb-1">
-                        {getDocumentTypeName(doc.document_type)}
-                      </p>
-                      <p className="text-xs text-neutral-500">
-                        Updated: {new Date(doc.updated_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <Button variant="ghost" size="sm" className="text-[#9b87f5] hover:text-[#8a76e4]">
-                      <ExternalLink className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          )}
-
-          <div className="flex justify-center mt-8">
-            <Button 
-              variant="outline" 
-              className="border-white/10 text-[#9b87f5] hover:text-[#8a76e4] hover:bg-[#9b87f5]/10"
-            >
-              View All Documents
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
-        </TabsContent>
-
-        {/* Features Tab Content */}
-        <TabsContent value="features" className="space-y-6">
-          <AnimatedCard className="xl:col-span-2 border border-white/10">
-            <div className="grid grid-cols-3 gap-4 mb-6">
-              <div className="p-4 bg-[#9b87f5]/10 rounded-lg text-center">
-                <h4 className="font-medium text-white mb-2">Total Features</h4>
-                <p className="text-2xl font-bold text-[#9b87f5]">24</p>
-              </div>
-              <div className="p-4 bg-green-500/10 rounded-lg text-center">
-                <h4 className="font-medium text-white mb-2">Implemented</h4>
-                <p className="text-2xl font-bold text-green-500">8</p>
-              </div>
-              <div className="p-4 bg-[#ea384c]/10 rounded-lg text-center">
-                <h4 className="font-medium text-white mb-2">In Progress</h4>
-                <p className="text-2xl font-bold text-[#ea384c]">6</p>
-              </div>
-            </div>
-            
-            <h3 className="text-lg font-semibold text-white mb-4">Core Features</h3>
-            <div className="space-y-3">
-              {[
-                { name: "Wallet Integration", status: "completed" },
-                { name: "Trading Interface", status: "in_progress" },
-                { name: "User Authentication", status: "completed" },
-                { name: "Token Staking", status: "in_progress" },
-                { name: "Transaction History", status: "upcoming" }
-              ].map((feature, index) => (
-                <div key={index} className="flex items-center justify-between p-3 border border-white/10 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className={`h-2 w-2 rounded-full ${
-                      feature.status === 'completed' ? 'bg-green-500' : 
-                      feature.status === 'in_progress' ? 'bg-[#9b87f5]' : 
-                      'bg-neutral-500'
-                    }`} />
-                    <span className="text-white">{feature.name}</span>
-                  </div>
-                  <Badge variant={
-                    feature.status === 'completed' ? 'success' : 
-                    feature.status === 'in_progress' ? 'purple' : 
-                    'secondary'
-                  }>
-                    {feature.status === 'completed' ? 'Completed' : 
-                     feature.status === 'in_progress' ? 'In Progress' : 
-                     'Upcoming'}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-            <div className="mt-6">
-              <Button 
-                variant="ghost" 
-                className="text-[#9b87f5] hover:text-[#8a76e4]"
-                onClick={() => window.location.href = `/projects/features`}
-              >
-                View all features
-                <ChevronRight className="ml-1 h-4 w-4" />
-              </Button>
-            </div>
-          </AnimatedCard>
-        </TabsContent>
-
-        {/* Wireframe Tab Content */}
-        <TabsContent value="wireframe" className="space-y-6">
-          <h3 className="text-lg font-semibold text-white">Wireframes</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <AnimatedCard className="border border-white/10">
-              <div>
-                <h4 className="font-medium text-[#9b87f5] mb-2">All Pages Overview</h4>
-                <p className="text-neutral-300 text-sm mb-4">Overview of all pages in the UbahCrypt Project.</p>
-                <ul className="space-y-2 mb-4">
-                  <li className="text-neutral-300 text-sm flex items-center gap-2">
-                    <div className="h-1.5 w-1.5 rounded-full bg-[#9b87f5]/70"></div>
-                    Landing Page
-                  </li>
-                  <li className="text-neutral-300 text-sm flex items-center gap-2">
-                    <div className="h-1.5 w-1.5 rounded-full bg-[#9b87f5]/70"></div>
-                    Dashboard
-                  </li>
-                  <li className="text-neutral-300 text-sm flex items-center gap-2">
-                    <div className="h-1.5 w-1.5 rounded-full bg-[#9b87f5]/70"></div>
-                    Trading Interface
-                  </li>
-                  <li className="text-neutral-300 text-sm flex items-center gap-2">
-                    <div className="h-1.5 w-1.5 rounded-full bg-[#9b87f5]/70"></div>
-                    Wallet Connection
-                  </li>
-                  <li className="text-neutral-300 text-sm flex items-center gap-2">
-                    <div className="h-1.5 w-1.5 rounded-full bg-[#9b87f5]/70"></div>
-                    Settings
-                  </li>
-                </ul>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="text-[#9b87f5] hover:text-[#8a76e4] border-[#9b87f5]/20"
-                  onClick={() => window.open('https://sprout-draw-9ec.notion.site/Wireframe-All-Pages', '_blank')}
-                >
-                  View Details
-                  <ExternalLink className="ml-2 h-4 w-4" />
-                </Button>
-              </div>
-            </AnimatedCard>
-            
-            <AnimatedCard className="border border-white/10">
-              <div>
-                <h4 className="font-medium text-[#9b87f5] mb-2">Detailed Pages</h4>
-                <p className="text-neutral-300 text-sm mb-4">Detailed wireframes with UI photos and descriptions.</p>
-                
-                <div className="space-y-4">
-                  {[
-                    { 
-                      name: "Landing Page", 
-                      description: "Entry point for users with wallet connection.",
-                      link: "https://sprout-draw-9ec.notion.site/Wireframe-Landing-Page"
-                    },
-                    { 
-                      name: "Dashboard", 
-                      description: "Main interface showing portfolio and assets.",
-                      link: "https://sprout-draw-9ec.notion.site/Wireframe-Dashboard"
-                    },
-                    { 
-                      name: "Trading Interface", 
-                      description: "Interface for buying and selling tokens.",
-                      link: "https://sprout-draw-9ec.notion.site/Wireframe-Trading-Interface"
-                    }
-                  ].map((page, index) => (
-                    <div key={index} className="border border-white/10 rounded-lg p-3">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h5 className="text-white text-sm font-medium">{page.name}</h5>
-                          <p className="text-neutral-400 text-xs mt-1">{page.description}</p>
-                        </div>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="text-[#9b87f5] hover:text-[#8a76e4]"
-                          onClick={() => window.open(page.link, '_blank')}
-                        >
-                          <ExternalLink className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </AnimatedCard>
-          </div>
-        </TabsContent>
-
-        {/* User Flow Tab Content */}
-        <TabsContent value="user-flow" className="space-y-6">
-          <AnimatedCard className="border border-white/10">
-            <div>
-              <h4 className="font-medium text-[#9b87f5] mb-2">User Flow Graph</h4>
-              <p className="text-neutral-300 text-sm mb-4">Navigation flow between pages in the application.</p>
-              
-              <div className="p-4 bg-black/30 border border-white/10 rounded-lg mb-4">
-                <p className="text-neutral-300 text-sm leading-relaxed">
-                  Flow: Landing Page → Wallet Connection → Dashboard → Trading Interface → Staking System → Transaction History → Community Features → Logout
-                </p>
-              </div>
-              
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="text-[#9b87f5] hover:text-[#8a76e4] border-[#9b87f5]/20"
-                onClick={() => window.open('https://sprout-draw-9ec.notion.site/User-Flow-Graph', '_blank')}
-              >
-                View Details
-                <ExternalLink className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
-          </AnimatedCard>
-        </TabsContent>
-
-        {/* Feedback Log Tab Content */}
-        <TabsContent value="feedback-log" className="space-y-6">
-          <h3 className="text-lg font-semibold text-white">Feedback Log</h3>
-          <div className="space-y-4">
-            {[
-              {
-                source: "Client Feedback",
-                content: "The wallet connection needs to be faster.",
-                date: "May 1, 2025"
-              },
-              {
-                source: "User Feedback",
-                content: "Trading interface is intuitive but needs more customization options.",
-                date: "May 2, 2025"
-              },
-              {
-                source: "AI Feedback",
-                content: "Optimize loading times for the dashboard page.",
-                date: "May 3, 2025"
-              }
-            ].map((feedback, index) => (
-              <AnimatedCard key={index} className="border border-white/10">
-                <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <h4 className="font-medium text-[#9b87f5]">{feedback.source}</h4>
-                    <span className="text-neutral-500 text-xs">{feedback.date}</span>
-                  </div>
-                  <p className="text-neutral-300 text-sm">{feedback.content}</p>
-                </div>
-              </AnimatedCard>
-            ))}
-          </div>
-        </TabsContent>
-      </Tabs>
+        <div className="mt-8">
+          <Tabs value={activePhaseTab} onValueChange={setActivePhaseTab}>
+            {phases.map(phase => renderPhase(phase))}
+          </Tabs>
+        </div>
+      </div>
     </div>
   );
 }
