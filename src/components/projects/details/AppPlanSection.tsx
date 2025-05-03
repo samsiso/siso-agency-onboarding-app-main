@@ -12,7 +12,7 @@ import {
   FileCheck, ChevronRight, Clock, ArrowRight, CheckCircle, 
   ExternalLink, Search, File, FileArchive, FilePlus, Image,
   FileSpreadsheet, Framer, Code, TestTube, CloudCog, ChevronDown,
-  ChevronUp
+  ChevronUp, TrendingUp
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -31,7 +31,6 @@ type PhaseSection = {
 
 export function AppPlanSection() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [expandedSections, setExpandedSections] = useState<string[]>([]);
   const [activePhaseId, setActivePhaseId] = useState("phase-1");
   
   const phaseSectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -40,37 +39,37 @@ export function AppPlanSection() {
     {
       id: "phase-1",
       title: "1. Product Management",
-      description: "AI-Enhanced Ideation & Planning",
+      description: "Forging Your Vision",
       subsections: [
         {
           id: "phase-1-1",
-          title: "1.1 Ideation and Market Research with AI",
+          title: "1.1 Ideation and User Needs",
           content: (
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-3">
                   <div className="flex gap-3 items-start">
-                    <div className="p-2 rounded-md bg-purple-500/10">
-                      <FileSpreadsheet className="h-5 w-5 text-purple-400" />
+                    <div className="p-2 rounded-md bg-orange-500/10">
+                      <FileSpreadsheet className="h-5 w-5 text-orange-400" />
                     </div>
                     <div>
                       <h5 className="font-medium text-white">AI Brainstorming</h5>
                       <p className="text-neutral-300 text-sm">
-                        Use AI tools like Ideamap or GPT-based assistants to generate ideas for the crypto app. 
-                        Prompt the AI with: "Generate innovative features for a crypto app targeting retail investors." 
+                        Host high-energy workshops with you and users to unearth pain points, like clunky wallet 
+                        navigation or unclear market signals, using dynamic visualization to spark ideas.
                       </p>
                     </div>
                   </div>
                   
                   <div className="flex gap-3 items-start">
-                    <div className="p-2 rounded-md bg-purple-500/10">
-                      <Search className="h-5 w-5 text-purple-400" />
+                    <div className="p-2 rounded-md bg-orange-500/10">
+                      <TrendingUp className="h-5 w-5 text-orange-400" />
                     </div>
                     <div>
-                      <h5 className="font-medium text-white">Market Analysis</h5>
+                      <h5 className="font-medium text-white">Feature Ideation</h5>
                       <p className="text-neutral-300 text-sm">
-                        Deploy NLP-driven tools to analyze user reviews of existing crypto apps (e.g., Coinbase, Binance) 
-                        and support tickets.
+                        Unleash AI to generate 30+ bold feature ideas, from sentiment-driven trade alerts to gamified 
+                        portfolio challenges, tailored for novices and crypto pros alike.
                       </p>
                     </div>
                   </div>
@@ -78,24 +77,25 @@ export function AppPlanSection() {
                 
                 <div className="space-y-3">
                   <div className="flex gap-3 items-start">
-                    <div className="p-2 rounded-md bg-purple-500/10">
-                      <FileCheck className="h-5 w-5 text-purple-400" />
+                    <div className="p-2 rounded-md bg-orange-500/10">
+                      <FileCheck className="h-5 w-5 text-orange-400" />
                     </div>
                     <div>
-                      <h5 className="font-medium text-white">Data-Backed Validation</h5>
+                      <h5 className="font-medium text-white">User Insights</h5>
                       <p className="text-neutral-300 text-sm">
-                        Use generative AI to analyze crypto market reports and predict trends 
-                        (e.g., growing demand for DeFi integration).
+                        Engage diverse user personas (newbies to traders) to eliminate bias, 
+                        ensuring features resonate across your audience.
                       </p>
                     </div>
                   </div>
                   
                   <div className="bg-black/30 p-4 rounded-md">
-                    <h5 className="text-md font-medium text-purple-400 mb-2">Expected Outcomes:</h5>
+                    <h5 className="text-md font-medium text-orange-400 mb-2">Expected Outcomes:</h5>
                     <ul className="list-disc pl-5 space-y-1 text-neutral-300 text-sm">
-                      <li>Innovative feature ideas aligned with market trends</li>
-                      <li>Comprehensive understanding of user pain points</li>
-                      <li>Data-driven validation of top features</li>
+                      <li>Vibrant workshop report capturing user struggles and your strategic goals</li>
+                      <li>Catalog of 30+ innovative feature ideas, buzzing with crypto flair</li>
+                      <li>Top 5 feature shortlist, laser-focused on user impact and approved by you</li>
+                      <li>Unified vision statement, blending your ambitions with user needs</li>
                     </ul>
                   </div>
                 </div>
@@ -103,40 +103,41 @@ export function AppPlanSection() {
             </div>
           ),
           actionableSteps: [
-            "Run AI brainstorming sessions to list 20+ feature ideas, then cluster them by user value.",
-            "Analyze 5,000+ user reviews and support tickets from competitor apps to identify top 5 pain points.",
-            "Validate top 3 features using AI-driven market trend analysis and user adoption modeling."
+            "Host high-energy workshops with you and users to unearth pain points, like clunky wallet navigation or unclear market signals.",
+            "Unleash AI to generate 30+ bold feature ideas, from sentiment-driven trade alerts to gamified portfolio challenges.",
+            "Engage diverse user personas (newbies to traders) to eliminate bias, ensuring features resonate across your audience.",
+            "Refine ideas with you, spotlighting 5 blockbuster features that solve real user frustrations."
           ]
         },
         {
           id: "phase-1-2",
-          title: "1.2 Roadmapping and Requirements Gathering",
+          title: "1.2 Market Analysis and Validation",
           content: (
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-3">
                   <div className="flex gap-3 items-start">
-                    <div className="p-2 rounded-md bg-purple-500/10">
-                      <FileSpreadsheet className="h-5 w-5 text-purple-400" />
+                    <div className="p-2 rounded-md bg-orange-500/10">
+                      <Search className="h-5 w-5 text-orange-400" />
                     </div>
                     <div>
-                      <h5 className="font-medium text-white">AI-Powered Prioritization</h5>
+                      <h5 className="font-medium text-white">Competitor Analysis</h5>
                       <p className="text-neutral-300 text-sm">
-                        Use Zeda.io's AI roadmap planner to prioritize features based on user impact, 
-                        business value, and development effort.
+                        Dive into 10+ rival crypto apps, dissecting features, pricing, and 10,000+ user reviews 
+                        to expose gaps, like weak DeFi tools or sluggish interfaces.
                       </p>
                     </div>
                   </div>
                   
                   <div className="flex gap-3 items-start">
-                    <div className="p-2 rounded-md bg-purple-500/10">
-                      <File className="h-5 w-5 text-purple-400" />
+                    <div className="p-2 rounded-md bg-orange-500/10">
+                      <File className="h-5 w-5 text-orange-400" />
                     </div>
                     <div>
-                      <h5 className="font-medium text-white">Automated Requirements</h5>
+                      <h5 className="font-medium text-white">Unmet Needs Discovery</h5>
                       <p className="text-neutral-300 text-sm">
-                        Input high-level feature ideas (e.g., "portfolio tracker") into AI tools to generate 
-                        detailed user stories and functional specifications.
+                        Scour crypto forums and social channels with AI to pinpoint unmet needs, 
+                        such as real-time yield tracking or simplified staking.
                       </p>
                     </div>
                   </div>
@@ -144,35 +145,122 @@ export function AppPlanSection() {
                 
                 <div className="space-y-3">
                   <div className="flex gap-3 items-start">
-                    <div className="p-2 rounded-md bg-purple-500/10">
-                      <ArrowRight className="h-5 w-5 text-purple-400" />
+                    <div className="p-2 rounded-md bg-orange-500/10">
+                      <ArrowRight className="h-5 w-5 text-orange-400" />
                     </div>
                     <div>
-                      <h5 className="font-medium text-white">Continuous Feedback Loop</h5>
+                      <h5 className="font-medium text-white">Feature Impact Simulation</h5>
                       <p className="text-neutral-300 text-sm">
-                        Set up AI to analyze user feedback and usage data every sprint, 
-                        dynamically adjusting the roadmap as needed.
+                        Simulate feature impact with AI, forecasting adoption for ideas like 
+                        AI-powered market predictions, prioritizing winners that spike engagement.
                       </p>
                     </div>
                   </div>
                   
                   <div className="bg-black/30 p-4 rounded-md">
-                    <h5 className="text-md font-medium text-purple-400 mb-2">Expected Outcomes:</h5>
+                    <h5 className="text-md font-medium text-orange-400 mb-2">Expected Outcomes:</h5>
                     <ul className="list-disc pl-5 space-y-1 text-neutral-300 text-sm">
-                      <li>Data-driven feature prioritization</li>
-                      <li>Comprehensive user stories and requirements</li>
-                      <li>Adaptive roadmap that evolves with user feedback</li>
+                      <li>Slick competitor report revealing 5 critical market gaps and opportunities</li>
+                      <li>User feedback summary highlighting 3 must-have needs from forums</li>
+                      <li>AI-driven feature ranking, showcasing top 3 with projected user uptake</li>
+                      <li>Your green light on a feature set poised to dominate the crypto space</li>
                     </ul>
                   </div>
                 </div>
               </div>
             </div>
           ),
-          bestPractices: [
-            "Use AI brainstorming to explore diverse feature ideas and reduce bias.",
-            "Leverage NLP to mine user feedback for actionable insights.",
-            "Auto-generate PRDs with AI, then validate with human review.",
-            "Maintain a continuous feedback loop to keep the roadmap data-driven."
+          actionableSteps: [
+            "Dive into 10+ rival crypto apps, dissecting features, pricing, and 10,000+ user reviews to expose gaps.",
+            "Scour crypto forums and social channels with AI to pinpoint unmet needs.",
+            "Simulate feature impact with AI, forecasting adoption for ideas like AI-powered market predictions.",
+            "Validate the top 3 features with you, ensuring they crush competitor weaknesses and align with market hype."
+          ]
+        },
+        {
+          id: "phase-1-3",
+          title: "1.3 Planning and Feedback",
+          content: (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <div className="flex gap-3 items-start">
+                    <div className="p-2 rounded-md bg-orange-500/10">
+                      <FileSpreadsheet className="h-5 w-5 text-orange-400" />
+                    </div>
+                    <div>
+                      <h5 className="font-medium text-white">Problem Statement & Goals</h5>
+                      <p className="text-neutral-300 text-sm">
+                        Craft a razor-sharp problem statement (e.g., "Investors crave intuitive crypto platforms") and 
+                        set ambitious goals, like slashing onboarding time by 50%.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-3 items-start">
+                    <div className="p-2 rounded-md bg-orange-500/10">
+                      <TrendingUp className="h-5 w-5 text-orange-400" />
+                    </div>
+                    <div>
+                      <h5 className="font-medium text-white">Feature Roadmap</h5>
+                      <p className="text-neutral-300 text-sm">
+                        Build a roadmap, ranking features (e.g., ironclad transactions, DeFi yield trackers) 
+                        by user value and feasibility, with crystal-clear prioritization logic.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex gap-3 items-start">
+                    <div className="p-2 rounded-md bg-orange-500/10">
+                      <ArrowRight className="h-5 w-5 text-orange-400" />
+                    </div>
+                    <div>
+                      <h5 className="font-medium text-white">Feedback Loop</h5>
+                      <p className="text-neutral-300 text-sm">
+                        Launch an AI-charged feedback loop, analyzing user input to pivot
+                        priorities and keep the app red-hot.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-black/30 p-4 rounded-md">
+                    <h5 className="text-md font-medium text-orange-400 mb-2">Expected Outcomes:</h5>
+                    <ul className="list-disc pl-5 space-y-1 text-neutral-300 text-sm">
+                      <li>Compelling value proposition and measurable goals document</li>
+                      <li>Sleek roadmap with top-ranked features and transparent reasoning</li>
+                      <li>Polished requirements for 3 key features, ready for your approval</li>
+                      <li>Dynamic feedback system delivering real-time user insights and plan tweaks</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-orange-500/10 border border-orange-500/20 p-4 rounded-md mt-4">
+                <h5 className="text-md font-medium text-orange-400 mb-2 flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5" />
+                  Why This Matters for You
+                </h5>
+                <p className="text-neutral-300 text-sm mb-2">Your crypto app will be:</p>
+                <ul className="list-disc pl-5 space-y-1 text-neutral-300 text-sm">
+                  <li><span className="font-medium text-white">User-Obsessed:</span> Tackling investor pain points with precision.</li>
+                  <li><span className="font-medium text-white">Market-Crushing:</span> Outshining rivals with next-level features.</li>
+                  <li><span className="font-medium text-white">Laser-Focused:</span> Driven by bold goals and a killer roadmap.</li>
+                  <li><span className="font-medium text-white">Your Vision:</span> Shaped by your feedback at every turn.</li>
+                </ul>
+                <p className="text-neutral-300 text-sm mt-2">
+                  We'll deliver electrifying reports and demos to keep you in the loop, forging a foundation that's 
+                  as unstoppable as the crypto market.
+                </p>
+              </div>
+            </div>
+          ),
+          actionableSteps: [
+            "Craft a razor-sharp problem statement and set ambitious goals.",
+            "Build a roadmap, ranking features by user value and feasibility.",
+            "Detail requirements for the top 3 features, mapping user stories and edge cases for your sign-off.",
+            "Launch an AI-charged feedback loop, analyzing user input to pivot priorities and keep the app red-hot."
           ]
         }
       ]
@@ -190,8 +278,8 @@ export function AppPlanSection() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-3">
                   <div className="flex gap-3 items-start">
-                    <div className="p-2 rounded-md bg-purple-500/10">
-                      <Framer className="h-5 w-5 text-purple-400" />
+                    <div className="p-2 rounded-md bg-orange-500/10">
+                      <Framer className="h-5 w-5 text-orange-400" />
                     </div>
                     <div>
                       <h5 className="font-medium text-white">Instant Prototypes</h5>
@@ -203,8 +291,8 @@ export function AppPlanSection() {
                   </div>
                   
                   <div className="flex gap-3 items-start">
-                    <div className="p-2 rounded-md bg-purple-500/10">
-                      <CheckCircle className="h-5 w-5 text-purple-400" />
+                    <div className="p-2 rounded-md bg-orange-500/10">
+                      <CheckCircle className="h-5 w-5 text-orange-400" />
                     </div>
                     <div>
                       <h5 className="font-medium text-white">Design Best Practices Built-In</h5>
@@ -218,8 +306,8 @@ export function AppPlanSection() {
                 
                 <div className="space-y-3">
                   <div className="flex gap-3 items-start">
-                    <div className="p-2 rounded-md bg-purple-500/10">
-                      <Code className="h-5 w-5 text-purple-400" />
+                    <div className="p-2 rounded-md bg-orange-500/10">
+                      <Code className="h-5 w-5 text-orange-400" />
                     </div>
                     <div>
                       <h5 className="font-medium text-white">Lovable & Bolt for UI</h5>
@@ -231,7 +319,7 @@ export function AppPlanSection() {
                   </div>
                   
                   <div className="bg-black/30 p-4 rounded-md">
-                    <h5 className="text-md font-medium text-purple-400 mb-2">Expected Outcomes:</h5>
+                    <h5 className="text-md font-medium text-orange-400 mb-2">Expected Outcomes:</h5>
                     <ul className="list-disc pl-5 space-y-1 text-neutral-300 text-sm">
                       <li>Rapid creation of high-fidelity wireframes</li>
                       <li>Accessible and user-friendly designs</li>
@@ -256,8 +344,8 @@ export function AppPlanSection() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-3">
                   <div className="flex gap-3 items-start">
-                    <div className="p-2 rounded-md bg-purple-500/10">
-                      <Search className="h-5 w-5 text-purple-400" />
+                    <div className="p-2 rounded-md bg-orange-500/10">
+                      <Search className="h-5 w-5 text-orange-400" />
                     </div>
                     <div>
                       <h5 className="font-medium text-white">Synthetic User Testing</h5>
@@ -269,8 +357,8 @@ export function AppPlanSection() {
                   </div>
                   
                   <div className="flex gap-3 items-start">
-                    <div className="p-2 rounded-md bg-purple-500/10">
-                      <FileCheck className="h-5 w-5 text-purple-400" />
+                    <div className="p-2 rounded-md bg-orange-500/10">
+                      <FileCheck className="h-5 w-5 text-orange-400" />
                     </div>
                     <div>
                       <h5 className="font-medium text-white">Automated Feedback Analysis</h5>
@@ -284,8 +372,8 @@ export function AppPlanSection() {
                 
                 <div className="space-y-3">
                   <div className="flex gap-3 items-start">
-                    <div className="p-2 rounded-md bg-purple-500/10">
-                      <ArrowRight className="h-5 w-5 text-purple-400" />
+                    <div className="p-2 rounded-md bg-orange-500/10">
+                      <ArrowRight className="h-5 w-5 text-orange-400" />
                     </div>
                     <div>
                       <h5 className="font-medium text-white">AI-Augmented A/B Testing</h5>
@@ -297,7 +385,7 @@ export function AppPlanSection() {
                   </div>
                   
                   <div className="bg-black/30 p-4 rounded-md">
-                    <h5 className="text-md font-medium text-purple-400 mb-2">Expected Outcomes:</h5>
+                    <h5 className="text-md font-medium text-orange-400 mb-2">Expected Outcomes:</h5>
                     <ul className="list-disc pl-5 space-y-1 text-neutral-300 text-sm">
                       <li>Identification of UX issues before launch</li>
                       <li>Actionable insights from user feedback</li>
@@ -330,8 +418,8 @@ export function AppPlanSection() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-3">
                   <div className="flex gap-3 items-start">
-                    <div className="p-2 rounded-md bg-purple-500/10">
-                      <Code className="h-5 w-5 text-purple-400" />
+                    <div className="p-2 rounded-md bg-orange-500/10">
+                      <Code className="h-5 w-5 text-orange-400" />
                     </div>
                     <div>
                       <h5 className="font-medium text-white">AI Pair Programming</h5>
@@ -343,8 +431,8 @@ export function AppPlanSection() {
                   </div>
                   
                   <div className="flex gap-3 items-start">
-                    <div className="p-2 rounded-md bg-purple-500/10">
-                      <FileCheck className="h-5 w-5 text-purple-400" />
+                    <div className="p-2 rounded-md bg-orange-500/10">
+                      <FileCheck className="h-5 w-5 text-orange-400" />
                     </div>
                     <div>
                       <h5 className="font-medium text-white">Code Generation Platforms</h5>
@@ -358,8 +446,8 @@ export function AppPlanSection() {
                 
                 <div className="space-y-3">
                   <div className="flex gap-3 items-start">
-                    <div className="p-2 rounded-md bg-purple-500/10">
-                      <ArrowRight className="h-5 w-5 text-purple-400" />
+                    <div className="p-2 rounded-md bg-orange-500/10">
+                      <ArrowRight className="h-5 w-5 text-orange-400" />
                     </div>
                     <div>
                       <h5 className="font-medium text-white">Version Control & Merging</h5>
@@ -371,7 +459,7 @@ export function AppPlanSection() {
                   </div>
                   
                   <div className="bg-black/30 p-4 rounded-md">
-                    <h5 className="text-md font-medium text-purple-400 mb-2">Expected Outcomes:</h5>
+                    <h5 className="text-md font-medium text-orange-400 mb-2">Expected Outcomes:</h5>
                     <ul className="list-disc pl-5 space-y-1 text-neutral-300 text-sm">
                       <li>Increased developer productivity and code quality</li>
                       <li>Rapid prototyping and development</li>
@@ -391,15 +479,7 @@ export function AppPlanSection() {
       ]
     }
   ];
-  
-  // Initialize all sections to be expanded by default
-  useEffect(() => {
-    const allSectionIds = phases.flatMap(phase => 
-      phase.subsections.map(subsection => subsection.id)
-    );
-    setExpandedSections(allSectionIds);
-  }, []);
-  
+
   // Scroll to the active phase section when activePhaseId changes
   useEffect(() => {
     const sectionRef = phaseSectionRefs.current[activePhaseId];
@@ -407,16 +487,6 @@ export function AppPlanSection() {
       sectionRef.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, [activePhaseId]);
-  
-  const toggleSection = (sectionId: string) => {
-    setExpandedSections(prevSections => 
-      prevSections.includes(sectionId)
-        ? prevSections.filter(id => id !== sectionId)
-        : [...prevSections, sectionId]
-    );
-  };
-  
-  const isExpanded = (sectionId: string) => expandedSections.includes(sectionId);
   
   return (
     <div className="space-y-8">
@@ -483,18 +553,15 @@ export function AppPlanSection() {
                 <div className="space-y-6">
                   {phase.subsections.map(subsection => (
                     <Collapsible 
-                      key={subsection.id} 
-                      open={isExpanded(subsection.id)} 
-                      onOpenChange={() => toggleSection(subsection.id)}
+                      key={subsection.id}
+                      defaultOpen={true}
                       className="border border-white/10 rounded-lg overflow-hidden"
                     >
                       <CollapsibleTrigger className="w-full p-4 flex items-center justify-between bg-black/20 hover:bg-black/30 transition-colors">
                         <h4 className="text-md font-medium text-white text-left">{subsection.title}</h4>
                         <div className="flex items-center">
                           <Badge className="mr-2 bg-[#FF5722] hover:bg-[#E64A19]">Details</Badge>
-                          <ChevronDown 
-                            className={`h-5 w-5 text-[#FF9800] transition-transform duration-200 ${isExpanded(subsection.id) ? 'rotate-180' : ''}`}
-                          />
+                          <ChevronDown className="h-5 w-5 text-[#FF9800] transition-transform duration-200" />
                         </div>
                       </CollapsibleTrigger>
                       <CollapsibleContent className="p-4 bg-black/10">

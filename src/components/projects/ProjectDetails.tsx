@@ -1,6 +1,6 @@
 
 import { useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { ProjectHeader } from './details/ProjectHeader';
 import { ProjectCardNavigation } from './details/ProjectCardNavigation';
 import { ProjectOverviewCards } from './details/ProjectOverviewCards';
@@ -14,11 +14,13 @@ import { FinancialSummarySection } from './details/FinancialSummarySection';
 import { ResearchSection } from './details/ResearchSection';
 import { AnimatedCard } from '@/components/ui/animated-card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 export function ProjectDetails() {
   const { id, tab } = useParams<{ id?: string; tab?: string }>();
   const projectId = id || 'ubahcrypt';
   const activeTab = tab || 'overview';
+  const contentRef = useRef<HTMLDivElement>(null);
   
   const [projectData, setProjectData] = useState({
     name: 'UbahCrypt Project',
@@ -39,8 +41,15 @@ export function ProjectDetails() {
     // For now using static data
   }, [projectId]);
 
+  // Handle tab navigation with automatic scrolling
+  useEffect(() => {
+    if (contentRef.current) {
+      contentRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [activeTab]);
+
   const renderAppPlanOverview = () => (
-    <div className="space-y-6">
+    <div className="space-y-6" ref={contentRef}>
       <div className="mb-8">
         <AnimatedCard>
           <h2 className="text-2xl font-bold text-white mb-4">Crypto App Development Plan</h2>
@@ -70,25 +79,25 @@ export function ProjectDetails() {
         return <FeatureRequestsSection />;
       case 'wireframe':
         return (
-          <div className="p-6 text-center text-neutral-400 bg-black/30 rounded-lg border border-white/10">
+          <div className="p-6 text-center text-neutral-400 bg-black/30 rounded-lg border border-white/10" ref={contentRef}>
             <p>Wireframe content is under development.</p>
           </div>
         );
       case 'user-flow':
         return (
-          <div className="p-6 text-center text-neutral-400 bg-black/30 rounded-lg border border-white/10">
+          <div className="p-6 text-center text-neutral-400 bg-black/30 rounded-lg border border-white/10" ref={contentRef}>
             <p>User Flow content is under development.</p>
           </div>
         );
       case 'feedback-log':
         return (
-          <div className="p-6 text-center text-neutral-400 bg-black/30 rounded-lg border border-white/10">
+          <div className="p-6 text-center text-neutral-400 bg-black/30 rounded-lg border border-white/10" ref={contentRef}>
             <p>Feedback Log content is under development.</p>
           </div>
         );
       default:
         return (
-          <div className="p-6 text-center text-neutral-400 bg-black/30 rounded-lg border border-white/10">
+          <div className="p-6 text-center text-neutral-400 bg-black/30 rounded-lg border border-white/10" ref={contentRef}>
             <p>Content for {activeTab} tab is under development.</p>
           </div>
         );
