@@ -16,6 +16,7 @@ import { HelpSupportCard } from '@/components/dashboard/HelpSupportCard';
 import { PlanBuilderCard } from '@/components/dashboard/PlanBuilderCard';
 import { ProjectHeader } from '@/components/projects/details/ProjectHeader';
 import { ProjectMetricsDashboard } from '@/components/projects/details/ProjectMetricsDashboard';
+import { ProjectProgressCards } from '@/components/dashboard/ProjectProgressCards';
 import { useProjects } from '@/hooks/useProjects';
 import { AlertCircle } from 'lucide-react';
 
@@ -61,6 +62,9 @@ export default function Home() {
               <div className="mt-6">
                 <ProjectMetricsDashboard projectId={project.id} />
               </div>
+              
+              {/* Project Progress Cards - Added here */}
+              <ProjectProgressCards />
             </>
           ) : null}
         </div>
