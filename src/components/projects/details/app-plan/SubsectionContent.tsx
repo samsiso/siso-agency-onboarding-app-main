@@ -1,15 +1,23 @@
 
 import { ExternalLink } from 'lucide-react';
-import { PhaseSubsection } from './types';
 
-interface SubsectionContentProps {
-  subsection: PhaseSubsection;
+export interface SubsectionContentProps {
+  subsection: {
+    id: string;
+    title: string;
+    content: string;
+    actionableSteps?: string[];
+    expectedOutcomes?: string[];
+    bestPractices?: string[];
+  };
 }
 
 export function SubsectionContent({ subsection }: SubsectionContentProps) {
   return (
     <div className="space-y-4">
-      {subsection.content}
+      <div className="text-neutral-300">
+        {subsection.content}
+      </div>
       
       {subsection.actionableSteps && subsection.actionableSteps.length > 0 && (
         <div className="bg-[#FF5722]/5 border border-[#FF5722]/20 p-4 rounded-md mt-4">
@@ -49,7 +57,7 @@ export function SubsectionContent({ subsection }: SubsectionContentProps) {
           
           <div className="mt-4 flex items-center justify-end">
             <a 
-              href={`https://notion.io/ubahcrypt-${subsection.id.split('-').slice(-1)[0]}`}
+              href={`https://notion.io/ubahcrypt-${subsection.id.slice(0, 8)}`}
               target="_blank" 
               rel="noopener noreferrer"
               className="flex items-center gap-1 text-sm font-medium text-[#FF5722] hover:text-[#FF7A50] transition-colors"

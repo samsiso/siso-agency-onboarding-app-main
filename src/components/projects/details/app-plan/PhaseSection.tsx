@@ -5,7 +5,15 @@ import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown } from 'lucide-react';
 import { SubsectionContent } from './SubsectionContent';
-import { PhaseSubsection } from './types';
+
+export interface PhaseSubsection {
+  id: string;
+  title: string;
+  content: string;
+  actionableSteps?: string[];
+  expectedOutcomes?: string[];
+  bestPractices?: string[];
+}
 
 interface PhaseSectionProps {
   id: string;
@@ -37,7 +45,7 @@ export function PhaseSection({
             <p className="text-lg text-[#FF9800]">{description}</p>
           </div>
           <Badge variant="outline" className="bg-[#FF5722]/10 text-[#FF9800] border-[#FF5722]/20 px-3 py-1">
-            {id.replace("-", " ").toUpperCase()}
+            {id.substring(0, 8).toUpperCase()}
           </Badge>
         </div>
         

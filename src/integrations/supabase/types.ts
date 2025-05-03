@@ -507,6 +507,41 @@ export type Database = {
         }
         Relationships: []
       }
+      client_plans: {
+        Row: {
+          client_id: string | null
+          created_at: string
+          id: string
+          project_plan_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          project_plan_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          project_plan_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_plans_project_plan_id_fkey"
+            columns: ["project_plan_id"]
+            isOneToOne: false
+            referencedRelation: "project_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_user_auth: {
         Row: {
           auth_user_id: string | null
@@ -1385,6 +1420,91 @@ export type Database = {
           },
         ]
       }
+      plan_phases: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          order_index: number
+          plan_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          order_index?: number
+          plan_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          order_index?: number
+          plan_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_phases_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "project_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plan_subsections: {
+        Row: {
+          action_steps: string[] | null
+          best_practices: string[] | null
+          content: string
+          created_at: string
+          expected_outcomes: string[] | null
+          id: string
+          order_index: number
+          phase_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          action_steps?: string[] | null
+          best_practices?: string[] | null
+          content: string
+          created_at?: string
+          expected_outcomes?: string[] | null
+          id?: string
+          order_index?: number
+          phase_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          action_steps?: string[] | null
+          best_practices?: string[] | null
+          content?: string
+          created_at?: string
+          expected_outcomes?: string[] | null
+          id?: string
+          order_index?: number
+          phase_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_subsections_phase_id_fkey"
+            columns: ["phase_id"]
+            isOneToOne: false
+            referencedRelation: "plan_phases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       plan_templates: {
         Row: {
           app_name: string | null
@@ -1825,6 +1945,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      project_plans: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       projects: {
         Row: {

@@ -2,10 +2,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { PhaseData } from './types';
+import { PlanPhase } from '@/hooks/usePlanData';
 
 interface PhasesNavigationProps {
-  phases: PhaseData[];
+  phases: PlanPhase[];
   activePhaseId: string;
   setActivePhaseId: (id: string) => void;
 }
@@ -30,7 +30,7 @@ export function PhasesNavigation({ phases, activePhaseId, setActivePhaseId }: Ph
               }
               onClick={() => setActivePhaseId(phase.id)}
             >
-              {phase.title}
+              {phase.title.split('.')[0]}
             </Button>
           ))}
         </div>

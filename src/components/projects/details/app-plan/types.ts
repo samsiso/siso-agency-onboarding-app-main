@@ -4,7 +4,7 @@ import { ReactNode } from 'react';
 export interface PhaseSubsection {
   id: string;
   title: string;
-  content: ReactNode;
+  content: ReactNode | string;
   bestPractices?: string[];
   actionableSteps?: string[];
   expectedOutcomes?: string[];
