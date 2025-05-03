@@ -1,16 +1,18 @@
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { AnimatedCard } from '@/components/ui/animated-card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from '@/components/ui/input';
 import { ClientDocument } from '@/types/client.types';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { useSmoothScroll } from '@/hooks/use-smooth-scroll';
+import { useAutoScroll } from '@/hooks/use-auto-scroll';
 import { 
   FileCheck, ChevronRight, Clock, ArrowRight, CheckCircle, 
   ExternalLink, Search, File, FileArchive, FilePlus, Image,
-  FileSpreadsheet, Framer, Code, TestTube, CloudCog, ChevronDown
+  FileSpreadsheet, Framer, Code, TestTube, CloudCog, ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -30,7 +32,9 @@ type PhaseSection = {
 export function AppPlanSection() {
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedSections, setExpandedSections] = useState<string[]>([]);
-  const [activePhaseTab, setActivePhaseTab] = useState("phase-1");
+  const [activePhaseId, setActivePhaseId] = useState("phase-1");
+  
+  const phaseSectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
   
   const phases: PhaseSection[] = [
     {
@@ -388,6 +392,22 @@ export function AppPlanSection() {
     }
   ];
   
+  // Initialize all sections to be expanded by default
+  useEffect(() => {
+    const allSectionIds = phases.flatMap(phase => 
+      phase.subsections.map(subsection => subsection.id)
+    );
+    setExpandedSections(allSectionIds);
+  }, []);
+  
+  // Scroll to the active phase section when activePhaseId changes
+  useEffect(() => {
+    const sectionRef = phaseSectionRefs.current[activePhaseId];
+    if (sectionRef) {
+      sectionRef.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [activePhaseId]);
+  
   const toggleSection = (sectionId: string) => {
     setExpandedSections(prevSections => 
       prevSections.includes(sectionId)
@@ -398,78 +418,6 @@ export function AppPlanSection() {
   
   const isExpanded = (sectionId: string) => expandedSections.includes(sectionId);
   
-  const renderPhase = (phase: PhaseSection) => {
-    return (
-      <TabsContent value={phase.id} key={phase.id} className="mt-6">
-        <AnimatedCard className="mb-8 border border-white/10">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-3">
-            <div>
-              <h3 className="text-xl font-semibold text-white">{phase.title}</h3>
-              <p className="text-lg text-purple-400">{phase.description}</p>
-            </div>
-            <Badge variant="outline" className="bg-purple-500/10 text-purple-400 border-purple-500/20 px-3 py-1">
-              {phase.id.replace("-", " ").toUpperCase()}
-            </Badge>
-          </div>
-          
-          <div className="space-y-6">
-            {phase.subsections.map(subsection => (
-              <Collapsible 
-                key={subsection.id} 
-                open={isExpanded(subsection.id)} 
-                onOpenChange={() => toggleSection(subsection.id)}
-                className="border border-white/10 rounded-lg overflow-hidden"
-              >
-                <CollapsibleTrigger className="w-full p-4 flex items-center justify-between bg-black/20 hover:bg-black/30 transition-colors">
-                  <h4 className="text-md font-medium text-white text-left">{subsection.title}</h4>
-                  <div className="flex items-center">
-                    <Badge className="mr-2 bg-purple-500/80 hover:bg-purple-500">Details</Badge>
-                    <ChevronDown 
-                      className={`h-5 w-5 text-purple-400 transition-transform duration-200 ${isExpanded(subsection.id) ? 'rotate-180' : ''}`}
-                    />
-                  </div>
-                </CollapsibleTrigger>
-                <CollapsibleContent className="p-4 bg-black/10">
-                  {subsection.content}
-                  
-                  <div className="mt-6 space-y-4">
-                    {subsection.actionableSteps && (
-                      <div className="bg-purple-500/5 border border-purple-500/20 p-4 rounded-md">
-                        <h5 className="text-md font-medium text-purple-400 mb-3 flex items-center gap-2">
-                          <CheckCircle className="h-5 w-5" />
-                          Actionable Steps
-                        </h5>
-                        <ul className="list-disc pl-5 space-y-2 text-neutral-300 text-sm">
-                          {subsection.actionableSteps.map((step, idx) => (
-                            <li key={idx}>{step}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    
-                    {subsection.bestPractices && (
-                      <div className="bg-black/30 p-4 rounded-md">
-                        <h5 className="text-md font-medium text-purple-400 mb-3 flex items-center gap-2">
-                          <FileCheck className="h-5 w-5" />
-                          Best Practices
-                        </h5>
-                        <ul className="list-disc pl-5 space-y-2 text-neutral-300 text-sm">
-                          {subsection.bestPractices.map((practice, idx) => (
-                            <li key={idx}>{practice}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                </CollapsibleContent>
-              </Collapsible>
-            ))}
-          </div>
-        </AnimatedCard>
-      </TabsContent>
-    );
-  };
-  
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -478,7 +426,7 @@ export function AppPlanSection() {
           <p className="text-neutral-400">Comprehensive roadmap for Ubahcrypt's development lifecycle.</p>
         </div>
         <div className="flex gap-3">
-          <Button className="bg-[#9b87f5] hover:bg-[#8a76e4] text-white">
+          <Button className="bg-[#FF5722] hover:bg-[#E64A19] text-white">
             Export Plan
           </Button>
           <Button variant="outline" className="border-white/10 text-white">
@@ -494,27 +442,100 @@ export function AppPlanSection() {
           transition={{ delay: 0.2 }}
           className="sticky top-4 z-10 mb-4"
         >
-          <div className="bg-black/50 backdrop-blur-md rounded-lg border border-white/10 p-1">
-            <Tabs value={activePhaseTab} onValueChange={setActivePhaseTab} className="w-full">
-              <TabsList className="w-full bg-black/30 grid grid-cols-3 md:grid-cols-6">
-                {phases.map(phase => (
-                  <TabsTrigger 
-                    key={phase.id} 
-                    value={phase.id}
-                    className="data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-400"
-                  >
-                    {phase.title.split(".")[0]}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </Tabs>
+          <div className="bg-black/50 backdrop-blur-md rounded-lg border border-white/10 p-4">
+            <div className="flex flex-wrap gap-2">
+              {phases.map(phase => (
+                <Button 
+                  key={phase.id}
+                  variant={activePhaseId === phase.id ? "default" : "outline"}
+                  className={activePhaseId === phase.id 
+                    ? "bg-[#FF5722] hover:bg-[#E64A19] text-white border-transparent" 
+                    : "bg-transparent border-white/10 text-white hover:bg-white/5"
+                  }
+                  onClick={() => setActivePhaseId(phase.id)}
+                >
+                  {phase.title}
+                </Button>
+              ))}
+            </div>
           </div>
         </motion.div>
 
-        <div className="mt-8">
-          <Tabs value={activePhaseTab} onValueChange={setActivePhaseTab}>
-            {phases.map(phase => renderPhase(phase))}
-          </Tabs>
+        <div className="mt-8 space-y-12">
+          {phases.map(phase => (
+            <div 
+              key={phase.id} 
+              id={phase.id}
+              ref={el => phaseSectionRefs.current[phase.id] = el}
+              className="scroll-mt-20"
+            >
+              <AnimatedCard className="mb-8 border border-white/10">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-3">
+                  <div>
+                    <h3 className="text-xl font-semibold text-white">{phase.title}</h3>
+                    <p className="text-lg text-[#FF9800]">{phase.description}</p>
+                  </div>
+                  <Badge variant="outline" className="bg-[#FF5722]/10 text-[#FF9800] border-[#FF5722]/20 px-3 py-1">
+                    {phase.id.replace("-", " ").toUpperCase()}
+                  </Badge>
+                </div>
+                
+                <div className="space-y-6">
+                  {phase.subsections.map(subsection => (
+                    <Collapsible 
+                      key={subsection.id} 
+                      open={isExpanded(subsection.id)} 
+                      onOpenChange={() => toggleSection(subsection.id)}
+                      className="border border-white/10 rounded-lg overflow-hidden"
+                    >
+                      <CollapsibleTrigger className="w-full p-4 flex items-center justify-between bg-black/20 hover:bg-black/30 transition-colors">
+                        <h4 className="text-md font-medium text-white text-left">{subsection.title}</h4>
+                        <div className="flex items-center">
+                          <Badge className="mr-2 bg-[#FF5722] hover:bg-[#E64A19]">Details</Badge>
+                          <ChevronDown 
+                            className={`h-5 w-5 text-[#FF9800] transition-transform duration-200 ${isExpanded(subsection.id) ? 'rotate-180' : ''}`}
+                          />
+                        </div>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="p-4 bg-black/10">
+                        {subsection.content}
+                        
+                        <div className="mt-6 space-y-4">
+                          {subsection.actionableSteps && (
+                            <div className="bg-[#FF5722]/5 border border-[#FF5722]/20 p-4 rounded-md">
+                              <h5 className="text-md font-medium text-[#FF9800] mb-3 flex items-center gap-2">
+                                <CheckCircle className="h-5 w-5" />
+                                Actionable Steps
+                              </h5>
+                              <ul className="list-disc pl-5 space-y-2 text-neutral-300 text-sm">
+                                {subsection.actionableSteps.map((step, idx) => (
+                                  <li key={idx}>{step}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          
+                          {subsection.bestPractices && (
+                            <div className="bg-black/30 p-4 rounded-md">
+                              <h5 className="text-md font-medium text-[#FF9800] mb-3 flex items-center gap-2">
+                                <FileCheck className="h-5 w-5" />
+                                Best Practices
+                              </h5>
+                              <ul className="list-disc pl-5 space-y-2 text-neutral-300 text-sm">
+                                {subsection.bestPractices.map((practice, idx) => (
+                                  <li key={idx}>{practice}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
+                  ))}
+                </div>
+              </AnimatedCard>
+            </div>
+          ))}
         </div>
       </div>
     </div>
