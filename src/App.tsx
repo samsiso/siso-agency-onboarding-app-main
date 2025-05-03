@@ -87,7 +87,6 @@ function App() {
         <Route path="/projects/:id" element={<AuthGuard><ProjectDetailsPage /></AuthGuard>} />
         <Route path="/projects/:id/:tab" element={<AuthGuard><ProjectDetailsPage /></AuthGuard>} />
         <Route path="/projects/tasks" element={<AuthGuard><ProjectsAndTasksPage /></AuthGuard>} />
-        <Route path="/projects/timeline" element={<AuthGuard><TimelinePage /></AuthGuard>} />
         <Route path="/my-projects" element={<AuthGuard><MyProjects /></AuthGuard>} />
         <Route path="/plan-builder" element={<AuthGuard><Communication /></AuthGuard>} />
         <Route path="/portfolio" element={<AuthGuard><Portfolio /></AuthGuard>} />
