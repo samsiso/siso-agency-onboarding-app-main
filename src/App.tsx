@@ -40,6 +40,7 @@ import ProjectsAndTasksPage from './pages/ProjectsAndTasksPage';
 import DocumentLibraryPage from './pages/resources/DocumentLibraryPage';
 import ProjectDetailsPage from './pages/ProjectDetailsPage';
 import ResourcesPage from './pages/resources/ResourcesPage';
+import AppPlanPage from './pages/AppPlanPage';
 
 // Financial & Account section
 import PaymentsPage from './pages/financial/PaymentsPage';
@@ -79,13 +80,14 @@ function App() {
         
         {/* Protected Dashboard Routes */}
         <Route path="/home" element={<AuthGuard><Home /></AuthGuard>} />
-        <Route path="/dashboard" element={<AuthGuard><Home /></AuthGuard>} />
+        <Route path="/dashboard" element={<AuthGuard><AppPlanPage /></AuthGuard>} />
         
         {/* Protected Project Routes */}
         <Route path="/projects" element={<AuthGuard><ProjectsAndTasksPage /></AuthGuard>} />
         <Route path="/projects/:id" element={<AuthGuard><ProjectDetailsPage /></AuthGuard>} />
         <Route path="/projects/:id/:tab" element={<AuthGuard><ProjectDetailsPage /></AuthGuard>} />
         <Route path="/projects/tasks" element={<AuthGuard><ProjectsAndTasksPage /></AuthGuard>} />
+        <Route path="/projects/plan-features" element={<AuthGuard><AppPlanPage /></AuthGuard>} />
         <Route path="/my-projects" element={<AuthGuard><MyProjects /></AuthGuard>} />
         <Route path="/plan-builder" element={<AuthGuard><PlanBuilder /></AuthGuard>} />
         <Route path="/portfolio" element={<AuthGuard><Portfolio /></AuthGuard>} />
