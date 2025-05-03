@@ -20,51 +20,64 @@ export const clientMenuSections = [
     label: 'Dashboard',
   },
   {
-    type: 'main',
-    href: '/client-dashboard/tasks',
+    type: 'section',
+    title: 'Projects & Tasks',
     icon: ListTodo,
-    label: 'Active Tasks',
+    items: [
+      {
+        href: '/client-dashboard/tasks',
+        icon: ListTodo,
+        label: 'Active Tasks',
+      },
+      {
+        href: '/plan-builder',
+        icon: MessageSquare,
+        label: 'SISO Assistant',
+      },
+      {
+        href: '/client-dashboard/timeline',
+        icon: CalendarClock,
+        label: 'Timeline',
+      },
+      {
+        href: '/client-dashboard/plan-features',
+        icon: ClipboardList,
+        label: 'App Plan',
+      }
+    ]
   },
   {
-    type: 'main',
-    href: '/plan-builder',
-    icon: MessageSquare,
-    label: 'SISO Assistant',
-  },
-  {
-    type: 'main',
-    href: '/client-dashboard/financial/payments',
+    type: 'section',
+    title: 'Financial',
     icon: Wallet,
-    label: 'Financial',
+    items: [
+      {
+        href: '/client-dashboard/financial/payments',
+        icon: Wallet,
+        label: 'Financial',
+      },
+      {
+        href: '/financial/leaderboards',
+        icon: Trophy,
+        label: 'Leaderboards',
+      }
+    ]
   },
   {
-    type: 'main',
-    href: '/financial/leaderboards',
-    icon: Trophy,
-    label: 'Leaderboards',
-  },
-  {
-    type: 'main',
-    href: '/resources',
+    type: 'section',
+    title: 'Resources',
     icon: HelpCircle,
-    label: 'Help & Support',
-  },
-  {
-    type: 'main',
-    href: '/client-dashboard/plan-features',
-    icon: ClipboardList,
-    label: 'App Plan',
-  },
-  {
-    type: 'main',
-    href: '/resources/documents',
-    icon: Documents,
-    label: 'Documents',
-  },
-  {
-    type: 'main',
-    href: '/client-dashboard/timeline',
-    icon: CalendarClock,
-    label: 'Timeline',
+    items: [
+      {
+        href: '/resources',
+        icon: HelpCircle,
+        label: 'Help & Support',
+      },
+      {
+        href: '/resources/documents',
+        icon: Documents,
+        label: 'Documents',
+      }
+    ]
   }
 ];

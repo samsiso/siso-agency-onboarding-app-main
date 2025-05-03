@@ -15,52 +15,65 @@ export const getMenuSections = (): MenuSection[] => {
       label: 'Dashboard',
     },
     {
-      type: 'main',
-      href: '/projects/tasks',
+      type: 'section',
+      title: 'Projects & Tasks',
       icon: ListTodo,
-      label: 'Active Tasks',
+      items: [
+        {
+          href: '/projects/tasks',
+          icon: ListTodo,
+          label: 'Active Tasks',
+        },
+        {
+          href: '/plan-builder',
+          icon: MessageSquare,
+          label: 'SISO Assistant',
+        },
+        {
+          href: '/projects/timeline',
+          icon: CalendarClock,
+          label: 'Timeline',
+        },
+        {
+          href: '/projects/plan-features',
+          icon: ClipboardList,
+          label: 'App Plan',
+        }
+      ]
     },
     {
-      type: 'main',
-      href: '/plan-builder',
-      icon: MessageSquare,
-      label: 'SISO Assistant',
-    },
-    {
-      type: 'main',
-      href: '/financial/payments',
+      type: 'section',
+      title: 'Financial',
       icon: Wallet,
-      label: 'Financial',
+      items: [
+        {
+          href: '/financial/payments',
+          icon: Wallet,
+          label: 'Financial',
+        },
+        {
+          href: '/financial/leaderboards',
+          icon: Trophy,
+          label: 'Leaderboards',
+        }
+      ]
     },
     {
-      type: 'main',
-      href: '/financial/leaderboards',
-      icon: Trophy,
-      label: 'Leaderboards',
-    },
-    {
-      type: 'main',
-      href: '/resources',
+      type: 'section',
+      title: 'Resources',
       icon: HelpCircle,
-      label: 'Help & Support',
-    },
-    {
-      type: 'main',
-      href: '/projects/plan-features',
-      icon: ClipboardList,
-      label: 'App Plan',
-    },
-    {
-      type: 'main',
-      href: '/resources/documents',
-      icon: FileText,
-      label: 'Documents',
-    },
-    {
-      type: 'main',
-      href: '/projects/timeline',
-      icon: CalendarClock,
-      label: 'Timeline',
+      items: [
+        {
+          href: '/resources',
+          icon: HelpCircle,
+          label: 'Help & Support',
+        },
+        {
+          href: '/resources/documents',
+          icon: FileText,
+          label: 'Documents',
+        }
+      ]
     }
   ];
 };
