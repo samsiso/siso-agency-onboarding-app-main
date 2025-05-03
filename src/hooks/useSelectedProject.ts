@@ -1,8 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useProjects } from './useProjects';
-import { useNavigate } from 'react-router-dom';
-import { useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export interface Project {
   id: string;
