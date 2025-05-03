@@ -4,7 +4,19 @@ import { Button } from '@/components/ui/button';
 import { Calendar, Download, Tag, ChevronUp, ChevronDown } from 'lucide-react';
 import { AnimatedCard } from '@/components/ui/animated-card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ResearchDocument } from '../types';
+
+interface ResearchDocument {
+  id: string;
+  title: string;
+  category: string;
+  tags: string[];
+  updated_at: string;
+  description: string;
+  insights?: string[];
+  nextSteps?: string[];
+  code_snippet?: string;
+  fileUrl?: string;
+}
 
 interface ResearchDocumentProps {
   doc: ResearchDocument;
