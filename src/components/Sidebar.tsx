@@ -18,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export const Sidebar = () => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -117,7 +118,7 @@ export const Sidebar = () => {
             className="fixed top-4 right-4 z-50 bg-siso-bg/80 backdrop-blur-sm"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
-            <AnimatePresence mode="wait" initial={false}>
+            <AnimatePresence initial={false}>
               <motion.div
                 key={isMobileMenuOpen ? 'close' : 'menu'}
                 initial={{ opacity: 0, rotate: -90 }}
@@ -167,13 +168,29 @@ export const Sidebar = () => {
               <DropdownMenuTrigger asChild>
                 <Button 
                   variant="outline" 
-                  className="w-full justify-between bg-siso-bg-alt border-siso-border hover:bg-siso-bg-alt/80 hover:border-siso-border-hover group transition-all duration-300"
+                  className="w-full h-16 justify-between bg-siso-bg-alt border-siso-border hover:bg-siso-bg-alt/80 hover:border-siso-border-hover group transition-all duration-300"
                 >
-                  <div className="flex items-center gap-2 overflow-hidden">
-                    <FolderOpen className="h-4 w-4 flex-shrink-0 text-siso-orange group-hover:text-siso-red transition-colors" />
-                    <span className="truncate text-siso-text group-hover:text-siso-text-bold transition-colors">
-                      {selectedProject ? selectedProject.name : "Select a Project"}
-                    </span>
+                  <div className="flex items-center gap-3 overflow-hidden">
+                    {selectedProject?.logo ? (
+                      <Avatar className="h-10 w-10 rounded-md border border-siso-border/30">
+                        <AvatarImage src={selectedProject.logo} alt={selectedProject.name} />
+                        <AvatarFallback className="rounded-md bg-siso-orange/20 text-siso-orange">
+                          {selectedProject?.name.substring(0, 2)}
+                        </AvatarFallback>
+                      </Avatar>
+                    ) : (
+                      <FolderOpen className="h-5 w-5 flex-shrink-0 text-siso-orange group-hover:text-siso-red transition-colors" />
+                    )}
+                    <div className="flex flex-col items-start">
+                      <span className="truncate text-siso-text-bold group-hover:text-siso-text-bold transition-colors">
+                        {selectedProject ? selectedProject.name : "Select a Project"}
+                      </span>
+                      <span className="text-xs text-siso-text-muted">
+                        {selectedProject?.status === 'active' ? 'Active Project' : 
+                         selectedProject?.status === 'paused' ? 'Paused' : 
+                         selectedProject?.status === 'completed' ? 'Completed' : 'Select Project'}
+                      </span>
+                    </div>
                   </div>
                   <ChevronDown className="h-4 w-4 text-siso-text-muted group-hover:text-siso-text transition-colors" />
                 </Button>
@@ -189,11 +206,20 @@ export const Sidebar = () => {
                 {projects.map((project) => (
                   <DropdownMenuItem 
                     key={project.id}
-                    className="flex items-center justify-between cursor-pointer hover:bg-black/20"
+                    className="flex items-center justify-between cursor-pointer hover:bg-black/20 py-2"
                     onClick={() => selectProject(project.id)}
                   >
                     <div className="flex items-center gap-2">
-                      <FolderOpen className={`h-4 w-4 ${project.status === 'active' ? 'text-siso-orange' : 'text-siso-text-muted'}`} />
+                      {project.logo ? (
+                        <Avatar className="h-6 w-6 rounded-md">
+                          <AvatarImage src={project.logo} />
+                          <AvatarFallback className="rounded-md bg-siso-bg-alt text-siso-text-muted">
+                            {project.name.substring(0, 2)}
+                          </AvatarFallback>
+                        </Avatar>
+                      ) : (
+                        <FolderOpen className={`h-4 w-4 ${project.status === 'active' ? 'text-siso-orange' : 'text-siso-text-muted'}`} />
+                      )}
                       <span className="text-siso-text">{project.name}</span>
                     </div>
                     <Badge 
@@ -226,12 +252,13 @@ export const Sidebar = () => {
           <div className="px-2 my-2">
             <CollapsedProjectCard 
               projectName={selectedProject?.name || "Select Project"}
+              projectLogo={selectedProject?.logo}
               onClick={() => setIsExpanded(true)}
             />
           </div>
         )}
         
-        <AnimatePresence mode="wait">
+        <AnimatePresence>
           <SidebarNavigation 
             collapsed={!isExpanded} 
             onItemClick={handleItemClick}

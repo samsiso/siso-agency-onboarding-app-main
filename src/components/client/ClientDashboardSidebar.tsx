@@ -23,32 +23,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
-
-interface Project {
-  id: string;
-  name: string;
-  status: "active" | "completed" | "paused";
-}
+import { useSelectedProject } from "@/hooks/useSelectedProject";
 
 export function ClientDashboardSidebar() {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { data: currentProject } = useProjects();
-  
-  // Mock data for multiple projects - would be replaced with actual API call
-  const [projects] = useState<Project[]>([
-    { id: "1", name: "UbahCrypt Project", status: "active" },
-    { id: "2", name: "Gritness", status: "paused" },
-    { id: "3", name: "NM Construction", status: "completed" }
-  ]);
+  const { projects, selectProject } = useSelectedProject();
   
   // Function to handle project selection
   const handleProjectSelect = (projectId: string) => {
-    // This would typically update the selected project in context/state
-    // and then navigate or refresh the current page
-    navigate(`/projects/${projectId}`);
+    selectProject(projectId);
   };
   
   const getStatusColor = (status: string) => {
@@ -80,13 +66,29 @@ export function ClientDashboardSidebar() {
               <DropdownMenuTrigger asChild>
                 <Button 
                   variant="outline" 
-                  className="w-full justify-between bg-siso-bg-alt border-siso-border hover:bg-siso-bg-alt/80 hover:border-siso-border-hover group transition-all duration-300"
+                  className="w-full h-16 justify-between bg-siso-bg-alt border-siso-border hover:bg-siso-bg-alt/80 hover:border-siso-border-hover group transition-all duration-300"
                 >
-                  <div className="flex items-center gap-2 overflow-hidden">
-                    <FolderOpen className="h-4 w-4 flex-shrink-0 text-siso-orange group-hover:text-siso-red transition-colors" />
-                    <span className="truncate text-siso-text group-hover:text-siso-text-bold transition-colors">
-                      {currentProject ? currentProject.name : "Select a Project"}
-                    </span>
+                  <div className="flex items-center gap-3 overflow-hidden">
+                    {currentProject?.logo ? (
+                      <Avatar className="h-10 w-10 rounded-md border border-siso-border/30">
+                        <AvatarImage src={"/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png"} alt={currentProject.name} />
+                        <AvatarFallback className="rounded-md bg-siso-orange/20 text-siso-orange">
+                          {currentProject.name.substring(0, 2)}
+                        </AvatarFallback>
+                      </Avatar>
+                    ) : (
+                      <FolderOpen className="h-5 w-5 flex-shrink-0 text-siso-orange group-hover:text-siso-red transition-colors" />
+                    )}
+                    <div className="flex flex-col items-start">
+                      <span className="truncate text-siso-text-bold group-hover:text-siso-text-bold transition-colors">
+                        {currentProject ? currentProject.name : "Select a Project"}
+                      </span>
+                      <span className="text-xs text-siso-text-muted">
+                        {currentProject?.status === 'active' ? 'Active Project' : 
+                         currentProject?.status === 'paused' ? 'Paused' : 
+                         currentProject?.status === 'completed' ? 'Completed' : 'Select Project'}
+                      </span>
+                    </div>
                   </div>
                   <ChevronDown className="h-4 w-4 text-siso-text-muted group-hover:text-siso-text transition-colors" />
                 </Button>
@@ -102,11 +104,20 @@ export function ClientDashboardSidebar() {
                 {projects.map((project) => (
                   <DropdownMenuItem 
                     key={project.id}
-                    className="flex items-center justify-between cursor-pointer hover:bg-black/20"
+                    className="flex items-center justify-between cursor-pointer hover:bg-black/20 py-2"
                     onClick={() => handleProjectSelect(project.id)}
                   >
                     <div className="flex items-center gap-2">
-                      <FolderOpen className={`h-4 w-4 ${project.status === 'active' ? 'text-siso-orange' : 'text-siso-text-muted'}`} />
+                      {project.logo ? (
+                        <Avatar className="h-6 w-6 rounded-md">
+                          <AvatarImage src={project.logo} />
+                          <AvatarFallback className="rounded-md bg-siso-bg-alt text-siso-text-muted">
+                            {project.name.substring(0, 2)}
+                          </AvatarFallback>
+                        </Avatar>
+                      ) : (
+                        <FolderOpen className={`h-4 w-4 ${project.status === 'active' ? 'text-siso-orange' : 'text-siso-text-muted'}`} />
+                      )}
                       <span className="text-siso-text">{project.name}</span>
                     </div>
                     <Badge 

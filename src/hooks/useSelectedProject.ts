@@ -7,6 +7,7 @@ export interface Project {
   id: string;
   name: string;
   status: 'active' | 'paused' | 'completed';
+  logo?: string;
 }
 
 export function useSelectedProject() {
@@ -17,9 +18,24 @@ export function useSelectedProject() {
 
   // Mock data for projects - would be replaced with API call
   const [projects] = useState<Project[]>([
-    { id: "ubahcrypt", name: "UbahCrypt Project", status: "active" },
-    { id: "gritness", name: "Gritness", status: "paused" },
-    { id: "nmconstruction", name: "NM Construction", status: "completed" }
+    { 
+      id: "ubahcrypt", 
+      name: "UbahCrypt Project", 
+      status: "active",
+      logo: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png"
+    },
+    { 
+      id: "gritness", 
+      name: "Gritness", 
+      status: "paused",
+      logo: "/lovable-uploads/3b17a23d-630e-4e55-94bf-9d6fef9e6fc4.png"
+    },
+    { 
+      id: "nmconstruction", 
+      name: "NM Construction", 
+      status: "completed",
+      logo: "/lovable-uploads/67e004ed-6861-4d6a-b05e-d885a03e5c1e.png"
+    }
   ]);
 
   // Parse the current project ID from the URL
@@ -39,8 +55,12 @@ export function useSelectedProject() {
       setSelectedProject({
         id: currentProject.id || 'ubahcrypt',
         name: currentProject.name || 'UbahCrypt Project',
-        status: 'active'
+        status: 'active',
+        logo: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png"
       });
+    } else {
+      // Default to first project if nothing is selected
+      setSelectedProject(projects[0]);
     }
   }, [location.pathname, currentProject, projects]);
 

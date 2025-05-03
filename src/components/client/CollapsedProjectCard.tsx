@@ -8,13 +8,15 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface CollapsedProjectCardProps {
   projectName: string;
+  projectLogo?: string;
   onClick: () => void;
 }
 
-export function CollapsedProjectCard({ projectName, onClick }: CollapsedProjectCardProps) {
+export function CollapsedProjectCard({ projectName, projectLogo, onClick }: CollapsedProjectCardProps) {
   // Get the first letter or shortened name for display
   const getShortName = (name: string) => {
     if (!name) return 'P';
@@ -38,9 +40,20 @@ export function CollapsedProjectCard({ projectName, onClick }: CollapsedProjectC
             variant="ghost"
             size="icon"
             onClick={onClick}
-            className="w-full h-10 flex items-center justify-center my-2 bg-siso-bg-alt hover:bg-siso-bg-alt/80 border border-siso-border"
+            className="w-full h-16 flex items-center justify-center my-2 bg-siso-bg-alt hover:bg-siso-bg-alt/80 border border-siso-border"
           >
-            <FolderOpen className="h-4 w-4 text-siso-orange" />
+            {projectLogo ? (
+              <div className="relative h-8 w-8 rounded-md overflow-hidden">
+                <Avatar className="h-8 w-8 rounded-md">
+                  <AvatarImage src={projectLogo} alt={projectName} />
+                  <AvatarFallback className="rounded-md bg-siso-orange/20 text-siso-orange">
+                    {shortName.substring(0, 2)}
+                  </AvatarFallback>
+                </Avatar>
+              </div>
+            ) : (
+              <FolderOpen className="h-5 w-5 text-siso-orange" />
+            )}
             <span className="sr-only">{projectName}</span>
           </Button>
         </TooltipTrigger>
