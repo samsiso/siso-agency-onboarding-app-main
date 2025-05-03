@@ -49,19 +49,17 @@ export function ProjectDetails() {
   }, [activeTab]);
 
   const renderAppPlanOverview = () => (
-    <div className="space-y-6" ref={contentRef}>
-      <div className="mb-8">
-        <AnimatedCard>
-          <h2 className="text-2xl font-bold text-white mb-4">Crypto App Development Plan</h2>
-          <p className="text-gray-300">
-            This plan outlines the step-by-step process for developing the UbahCrypt application, 
-            following the AI-Powered SaaS Development Best Practices Framework. The app will provide 
-            users with features such as real-time crypto price tracking, portfolio management, and 
-            secure transaction capabilities. Each phase leverages AI tools to enhance efficiency, quality, 
-            and user satisfaction, tailored to the unique needs of a crypto app.
-          </p>
-        </AnimatedCard>
-      </div>
+    <div ref={contentRef}>
+      <AnimatedCard className="mb-6">
+        <h2 className="text-2xl font-bold text-white mb-4">Crypto App Development Plan</h2>
+        <p className="text-gray-300">
+          This plan outlines the step-by-step process for developing the UbahCrypt application, 
+          following the AI-Powered SaaS Development Best Practices Framework. The app will provide 
+          users with features such as real-time crypto price tracking, portfolio management, and 
+          secure transaction capabilities. Each phase leverages AI tools to enhance efficiency, quality, 
+          and user satisfaction, tailored to the unique needs of a crypto app.
+        </p>
+      </AnimatedCard>
       
       <AppPlanSection />
     </div>
