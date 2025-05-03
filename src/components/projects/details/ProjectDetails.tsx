@@ -1,16 +1,17 @@
+
 import { useParams } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
-import { ProjectHeader } from './details/ProjectHeader';
-import { ProjectCardNavigation } from './details/ProjectCardNavigation';
-import { ProjectOverviewCards } from './details/ProjectOverviewCards';
-import { ProjectMetricsDashboard } from './details/ProjectMetricsDashboard';
-import { ActiveTasksSection } from './details/ActiveTasksSection';
-import { DevelopmentProgress } from './details/DevelopmentProgress';
+import { ProjectHeader } from './ProjectHeader';
+import { ProjectCardNavigation } from './ProjectCardNavigation';
+import { ProjectOverviewCards } from './ProjectOverviewCards';
+import { ProjectMetricsDashboard } from './ProjectMetricsDashboard';
+import { ActiveTasksSection } from './ActiveTasksSection';
+import { DevelopmentProgress } from './DevelopmentProgress';
 import { AppPlanSection } from './app-plan/AppPlanSection';
-import { FeatureRequestsSection } from './details/FeatureRequestsSection';
-import { TimelineSection } from './details/TimelineSection';
-import { FinancialSummarySection } from './details/FinancialSummarySection';
-import { ResearchSection } from './details/ResearchSection';
+import { FeatureRequestsSection } from './FeatureRequestsSection';
+import { TimelineSection } from './TimelineSection';
+import { FinancialSummarySection } from './FinancialSummarySection';
+import { ResearchSection } from './ResearchSection';
 import { AnimatedCard } from '@/components/ui/animated-card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
