@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Timeline } from '@/components/ui/timeline';
-import { TimelineHeader } from './timeline/TimelineHeader';
 import { MilestoneCard } from './timeline/MilestoneCard';
 
 const milestones = [
@@ -141,7 +140,6 @@ const milestones = [
 export function TimelineSection() {
   return (
     <div className="space-y-8">
-      <TimelineHeader />
       <Timeline 
         data={milestones.map(milestone => ({
           title: milestone.title,
