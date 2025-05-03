@@ -1,12 +1,23 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SidebarLogo } from './sidebar/SidebarLogo';
 import { SidebarNavigation } from './sidebar/SidebarNavigation';
 import { SidebarFooter } from './sidebar/SidebarFooter';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, FolderOpen, ChevronDown } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from './ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSelectedProject } from '@/hooks/useSelectedProject';
+import { CollapsedProjectCard } from '@/components/client/CollapsedProjectCard';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Badge } from '@/components/ui/badge';
 
 export const Sidebar = () => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -15,6 +26,7 @@ export const Sidebar = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { selectedProject, projects, selectProject } = useSelectedProject();
 
   const handleItemClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
@@ -69,7 +81,6 @@ export const Sidebar = () => {
     }
   };
 
-  // [Analysis] Keep sidebar expanded when profile is open
   const handleMouseEnter = () => {
     if (!isMobile && !isProfileOpen) {
       setIsExpanded(true);
@@ -79,6 +90,15 @@ export const Sidebar = () => {
   const handleMouseLeave = () => {
     if (!isMobile && !isProfileOpen) {
       setIsExpanded(false);
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch(status) {
+      case "active": return "bg-green-500/20 text-green-400 border-green-500/20";
+      case "paused": return "bg-amber-500/20 text-amber-400 border-amber-500/20";
+      case "completed": return "bg-blue-500/20 text-blue-400 border-blue-500/20";
+      default: return "bg-gray-500/20 text-gray-400 border-gray-500/20";
     }
   };
 
@@ -139,6 +159,78 @@ export const Sidebar = () => {
           setCollapsed={() => setIsExpanded(!isExpanded)}
           onLogoClick={() => setShowNavigation(!showNavigation)}
         />
+        
+        {/* Project Selector - Expanded View */}
+        {isExpanded ? (
+          <div className="mx-4 my-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-between bg-siso-bg-alt border-siso-border hover:bg-siso-bg-alt/80 hover:border-siso-border-hover group transition-all duration-300"
+                >
+                  <div className="flex items-center gap-2 overflow-hidden">
+                    <FolderOpen className="h-4 w-4 flex-shrink-0 text-siso-orange group-hover:text-siso-red transition-colors" />
+                    <span className="truncate text-siso-text group-hover:text-siso-text-bold transition-colors">
+                      {selectedProject ? selectedProject.name : "Select a Project"}
+                    </span>
+                  </div>
+                  <ChevronDown className="h-4 w-4 text-siso-text-muted group-hover:text-siso-text transition-colors" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent 
+                align="start" 
+                className="w-64 bg-siso-bg-alt border-siso-border"
+              >
+                <div className="py-2 px-3 text-xs font-medium text-siso-text-muted uppercase tracking-wider">
+                  Your Projects
+                </div>
+                
+                {projects.map((project) => (
+                  <DropdownMenuItem 
+                    key={project.id}
+                    className="flex items-center justify-between cursor-pointer hover:bg-black/20"
+                    onClick={() => selectProject(project.id)}
+                  >
+                    <div className="flex items-center gap-2">
+                      <FolderOpen className={`h-4 w-4 ${project.status === 'active' ? 'text-siso-orange' : 'text-siso-text-muted'}`} />
+                      <span className="text-siso-text">{project.name}</span>
+                    </div>
+                    <Badge 
+                      variant="outline" 
+                      className={`text-xs py-0 px-1.5 ${getStatusColor(project.status)}`}
+                    >
+                      {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
+                    </Badge>
+                  </DropdownMenuItem>
+                ))}
+                
+                <DropdownMenuSeparator className="bg-siso-border" />
+                <DropdownMenuItem 
+                  className="flex items-center gap-2 cursor-pointer text-siso-orange hover:text-siso-red hover:bg-black/20"
+                  onClick={() => navigate('/plan-builder')}
+                >
+                  <FolderOpen className="h-4 w-4" />
+                  <span>Create New Project</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  className="text-siso-text hover:bg-black/20"
+                  onClick={() => navigate('/projects')}
+                >
+                  View all projects
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        ) : (
+          <div className="px-2 my-2">
+            <CollapsedProjectCard 
+              projectName={selectedProject?.name || "Select Project"}
+              onClick={() => setIsExpanded(true)}
+            />
+          </div>
+        )}
+        
         <AnimatePresence mode="wait">
           <SidebarNavigation 
             collapsed={!isExpanded} 

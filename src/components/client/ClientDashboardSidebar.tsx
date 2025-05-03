@@ -1,7 +1,16 @@
 
 import React, { useState } from "react";
 import { ClientSidebarNavigation } from "./ClientSidebarNavigation";
-import { ChevronDown, User, HelpCircle, FileText, LogOut, Briefcase } from "lucide-react";
+import { 
+  ChevronDown, 
+  User, 
+  HelpCircle, 
+  FileText, 
+  LogOut, 
+  Briefcase,
+  FolderOpen,
+  Plus
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useProjects } from "@/hooks/useProjects";
 import { SidebarProvider, SidebarContent } from "@/components/ui/sidebar";
@@ -14,11 +23,42 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { motion } from "framer-motion";
+import { Badge } from "@/components/ui/badge";
+
+interface Project {
+  id: string;
+  name: string;
+  status: "active" | "completed" | "paused";
+}
 
 export function ClientDashboardSidebar() {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const { data: project } = useProjects();
+  const { data: currentProject } = useProjects();
+  
+  // Mock data for multiple projects - would be replaced with actual API call
+  const [projects] = useState<Project[]>([
+    { id: "1", name: "UbahCrypt Project", status: "active" },
+    { id: "2", name: "Gritness", status: "paused" },
+    { id: "3", name: "NM Construction", status: "completed" }
+  ]);
+  
+  // Function to handle project selection
+  const handleProjectSelect = (projectId: string) => {
+    // This would typically update the selected project in context/state
+    // and then navigate or refresh the current page
+    navigate(`/projects/${projectId}`);
+  };
+  
+  const getStatusColor = (status: string) => {
+    switch(status) {
+      case "active": return "bg-green-500/20 text-green-400 border-green-500/20";
+      case "paused": return "bg-amber-500/20 text-amber-400 border-amber-500/20";
+      case "completed": return "bg-blue-500/20 text-blue-400 border-blue-500/20";
+      default: return "bg-gray-500/20 text-gray-400 border-gray-500/20";
+    }
+  };
   
   return (
     <SidebarProvider defaultOpen={true}>
@@ -34,30 +74,61 @@ export function ClientDashboardSidebar() {
             <span className="ml-3 text-siso-text-bold text-lg font-bold">SISO Agency</span>
           </div>
           
-          {/* Project Selection Dropdown */}
-          <div className="p-4 border-b border-siso-border">
+          {/* Enhanced Project Selection Dropdown */}
+          <div className="mx-4 my-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="w-full justify-between bg-siso-bg-alt border-siso-border">
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-between bg-siso-bg-alt border-siso-border hover:bg-siso-bg-alt/80 hover:border-siso-border-hover group transition-all duration-300"
+                >
                   <div className="flex items-center gap-2 overflow-hidden">
-                    <Briefcase className="h-4 w-4 flex-shrink-0 text-siso-orange" />
-                    <span className="truncate text-siso-text">
-                      {project ? project.name : "Select a Project"}
+                    <FolderOpen className="h-4 w-4 flex-shrink-0 text-siso-orange group-hover:text-siso-red transition-colors" />
+                    <span className="truncate text-siso-text group-hover:text-siso-text-bold transition-colors">
+                      {currentProject ? currentProject.name : "Select a Project"}
                     </span>
                   </div>
-                  <ChevronDown className="h-4 w-4 opacity-50" />
+                  <ChevronDown className="h-4 w-4 text-siso-text-muted group-hover:text-siso-text transition-colors" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-56 bg-siso-bg-alt border-siso-border">
-                {project ? (
-                  <DropdownMenuItem className="text-siso-text">{project.name}</DropdownMenuItem>
-                ) : (
-                  <DropdownMenuItem className="text-siso-text-muted">No projects available</DropdownMenuItem>
-                )}
+              <DropdownMenuContent 
+                align="start" 
+                className="w-64 bg-siso-bg-alt border-siso-border"
+              >
+                <div className="py-2 px-3 text-xs font-medium text-siso-text-muted uppercase tracking-wider">
+                  Your Projects
+                </div>
+                
+                {projects.map((project) => (
+                  <DropdownMenuItem 
+                    key={project.id}
+                    className="flex items-center justify-between cursor-pointer hover:bg-black/20"
+                    onClick={() => handleProjectSelect(project.id)}
+                  >
+                    <div className="flex items-center gap-2">
+                      <FolderOpen className={`h-4 w-4 ${project.status === 'active' ? 'text-siso-orange' : 'text-siso-text-muted'}`} />
+                      <span className="text-siso-text">{project.name}</span>
+                    </div>
+                    <Badge 
+                      variant="outline" 
+                      className={`text-xs py-0 px-1.5 ${getStatusColor(project.status)}`}
+                    >
+                      {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
+                    </Badge>
+                  </DropdownMenuItem>
+                ))}
+                
                 <DropdownMenuSeparator className="bg-siso-border" />
                 <DropdownMenuItem 
-                  className="text-siso-text"
-                  onClick={() => navigate('/client-dashboard/projects')}
+                  className="flex items-center gap-2 cursor-pointer text-siso-orange hover:text-siso-red hover:bg-black/20"
+                  onClick={() => navigate('/plan-builder')}
+                >
+                  <Plus className="h-4 w-4" />
+                  <span>Create New Project</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  className="text-siso-text hover:bg-black/20"
+                  onClick={() => navigate('/projects')}
                 >
                   View all projects
                 </DropdownMenuItem>
