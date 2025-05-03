@@ -14,10 +14,15 @@ import { NotificationsCard } from '@/components/dashboard/NotificationsCard';
 import { LeaderboardPreviewCard } from '@/components/dashboard/LeaderboardPreviewCard';
 import { HelpSupportCard } from '@/components/dashboard/HelpSupportCard';
 import { PlanBuilderCard } from '@/components/dashboard/PlanBuilderCard';
+import { ProjectHeader } from '@/components/projects/details/ProjectHeader';
+import { ProjectMetricsDashboard } from '@/components/projects/details/ProjectMetricsDashboard';
+import { useProjects } from '@/hooks/useProjects';
+import { AlertCircle } from 'lucide-react';
 
 export default function Home() {
   const { user } = useAuthSession();
   const { isAdmin } = useAdminCheck();
+  const { data: project, isLoading, error } = useProjects();
   
   return (
     <DashboardLayout>
@@ -29,8 +34,39 @@ export default function Home() {
         {/* Welcome Header */}
         <WelcomeHeader />
         
+        {/* Project Header */}
+        <div className="mb-6">
+          {isLoading ? (
+            <div className="animate-pulse space-y-8">
+              <div className="h-64 bg-black/20 rounded-lg" />
+            </div>
+          ) : error ? (
+            <div className="flex flex-col items-center justify-center p-8 text-center rounded-lg bg-black/30 border border-white/10">
+              <AlertCircle className="h-12 w-12 text-[#ea384c] mb-4" />
+              <h3 className="text-xl font-semibold text-white mb-2">
+                Failed to Load Project
+              </h3>
+              <p className="text-gray-400 mb-4 max-w-md">
+                {error instanceof Error ? error.message : 'There was an error loading your project'}
+              </p>
+            </div>
+          ) : project ? (
+            <>
+              <ProjectHeader
+                name={project.name}
+                description={project.description}
+                status={project.status}
+                created_at={project.created_at}
+              />
+              <div className="mt-6">
+                <ProjectMetricsDashboard projectId={project.id} />
+              </div>
+            </>
+          ) : null}
+        </div>
+        
         {/* Main Content */}
-        <div className="space-y-6">
+        <div className="space-y-6 mt-6">
           {/* Main Project Card */}
           <MainProjectCard />
           
