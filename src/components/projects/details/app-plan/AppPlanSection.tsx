@@ -79,7 +79,8 @@ export function AppPlanSection() {
                 content: subsection.content,
                 actionableSteps: subsection.action_steps || [],
                 expectedOutcomes: subsection.expected_outcomes || [],
-                bestPractices: subsection.best_practices || []
+                bestPractices: subsection.best_practices || [],
+                notionUrl: subsection.notion_url
               }))}
               isActive={activePhaseId === phase.id}
               onSectionRef={handleSectionRef}
