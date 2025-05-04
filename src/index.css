@@ -27,6 +27,8 @@
     --input: 0 0% 15%;
     --ring: 16 100% 50%;
     --radius: 0.5rem;
+    --orange-500: 39 93% 50%;
+    --orange-400: 39 93% 60%;
   }
 
   * {
@@ -92,6 +94,18 @@
 
 .title-glow {
   @apply bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent;
+}
+
+.node-orange {
+  @apply bg-orange-500/30 text-orange-400 transition-colors duration-300;
+}
+
+.node-orange:hover {
+  @apply bg-orange-500/50 text-orange-400;
+}
+
+.node-orange.active {
+  @apply bg-orange-500/60 text-orange-400;
 }
 
 .gradient-border {

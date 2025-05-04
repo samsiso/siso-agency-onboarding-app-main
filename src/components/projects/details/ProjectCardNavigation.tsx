@@ -51,9 +51,10 @@ export function ProjectCardNavigation({ projectId }: { projectId: string }) {
               <Pill
                 variant={isActive ? 'default' : 'secondary'}
                 className={cn(
+                  'node-orange',
                   isActive 
-                    ? "border border-[#ea384c]/20 bg-[#ea384c]/20 text-[#ea384c]" 
-                    : "border border-transparent hover:border-[#ea384c]/10 hover:bg-[#ea384c]/10 hover:text-[#ea384c]",
+                    ? 'active border-orange-500/40' 
+                    : 'border border-transparent hover:border-orange-500/30',
                   "transition-all duration-300 backdrop-blur-sm shadow-sm hover:shadow-md"
                 )}
               >

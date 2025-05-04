@@ -24,10 +24,12 @@ export function PhasesNavigation({ phases, activePhaseId, setActivePhaseId }: Ph
             <Button 
               key={phase.id}
               variant={activePhaseId === phase.id ? "default" : "outline"}
-              className={activePhaseId === phase.id 
-                ? "bg-[#FF5722] hover:bg-[#E64A19] text-white border-transparent" 
-                : "bg-transparent border-white/10 text-white hover:bg-white/5"
-              }
+              className={cn(
+                'node-orange',
+                activePhaseId === phase.id 
+                  ? 'active'
+                  : 'hover:bg-orange-500/40'
+              )}
               onClick={() => setActivePhaseId(phase.id)}
             >
               {phase.title.split('.')[0]}
