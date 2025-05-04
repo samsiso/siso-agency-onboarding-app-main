@@ -9,6 +9,7 @@ export interface SubsectionContentProps {
     actionableSteps?: string[];
     expectedOutcomes?: string[];
     bestPractices?: string[];
+    notionUrl?: string;
   };
 }
 
@@ -57,7 +58,7 @@ export function SubsectionContent({ subsection }: SubsectionContentProps) {
           
           <div className="mt-4 flex items-center justify-end">
             <a 
-              href={`https://notion.io/ubahcrypt-${subsection.id.slice(0, 8)}`}
+              href={subsection.notionUrl || `https://notion.io/ubahcrypt-${subsection.id.slice(0, 8)}`}
               target="_blank" 
               rel="noopener noreferrer"
               className="flex items-center gap-1 text-sm font-medium text-[#FF5722] hover:text-[#FF7A50] transition-colors"

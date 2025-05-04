@@ -8,6 +8,7 @@ export interface PhaseSubsection {
   bestPractices?: string[];
   actionableSteps?: string[];
   expectedOutcomes?: string[];
+  notionUrl?: string; // Added notion URL property
 }
 
 export interface PhaseData {

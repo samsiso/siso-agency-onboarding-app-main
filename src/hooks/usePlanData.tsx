@@ -31,6 +31,7 @@ export interface PlanSubsection {
   expected_outcomes: string[] | null;
   best_practices: string[] | null;
   order_index: number;
+  notion_url?: string;
 }
 
 export interface PlanPhase {
