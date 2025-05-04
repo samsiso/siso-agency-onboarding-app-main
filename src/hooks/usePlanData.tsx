@@ -1,3 +1,4 @@
+
 import { useQuery } from '@tanstack/react-query';
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
@@ -163,7 +164,8 @@ export function useProjectPlan(projectId?: string) {
         const planId = clientPlan?.project_plan_id;
         
         // Fetch the plan details
-        const { data: plan, error: planError } = await supabase
+        let plan;
+        const { data: planData, error: planError } = await supabase
           .from('project_plans')
           .select('*')
           .eq('id', planId || '')
@@ -193,6 +195,8 @@ export function useProjectPlan(projectId?: string) {
           
           if (!defaultPlan) return null;
           plan = defaultPlan;
+        } else {
+          plan = planData;
         }
 
         if (!plan) return null;
