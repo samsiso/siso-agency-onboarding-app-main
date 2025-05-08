@@ -23,50 +23,50 @@ export function PaymentsSummaryCards({
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <Card className="bg-black/20 border border-siso-text/10 backdrop-blur-sm">
+      <Card className="bg-black/30 border border-purple-400/30 backdrop-blur-sm shadow-lg">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium flex items-center gap-2">
+          <CardTitle className="text-sm font-medium flex items-center gap-2 text-white">
             <CreditCard className="h-4 w-4 text-siso-orange" />
             Total Current Expenses
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-2xl font-bold">{activeExpenses[0]?.currency || '£'} {totalCurrentExpenses.toFixed(2)}</p>
-          <p className="text-xs text-muted-foreground">Monthly recurring expenses</p>
+          <p className="text-2xl font-bold text-white">{activeExpenses[0]?.currency || '£'} {totalCurrentExpenses.toFixed(2)}</p>
+          <p className="text-xs text-white/70">Monthly recurring expenses</p>
         </CardContent>
       </Card>
       
-      <Card className="bg-black/20 border border-siso-text/10 backdrop-blur-sm">
+      <Card className="bg-black/30 border border-purple-400/30 backdrop-blur-sm shadow-lg">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium flex items-center gap-2">
+          <CardTitle className="text-sm font-medium flex items-center gap-2 text-white">
             <Wallet className="h-4 w-4 text-siso-orange" />
             Outstanding Balance
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-2xl font-bold">£ {totalOutstandingInvoices.toFixed(2)}</p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-2xl font-bold text-white">£ {totalOutstandingInvoices.toFixed(2)}</p>
+          <p className="text-xs text-white/70">
             {invoices?.filter(i => i.status === 'pending' || i.status === 'overdue').length || 0} pending invoices
           </p>
         </CardContent>
       </Card>
       
-      <Card className="bg-black/20 border border-siso-text/10 backdrop-blur-sm">
+      <Card className="bg-black/30 border border-purple-400/30 backdrop-blur-sm shadow-lg">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium flex items-center gap-2">
+          <CardTitle className="text-sm font-medium flex items-center gap-2 text-white">
             <PieChart className="h-4 w-4 text-siso-orange" />
             Total App Cost
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-2xl font-bold">£ {(financialSummary?.totalExpenses || 0).toFixed(2)}</p>
-          <p className="text-xs text-muted-foreground">Total investment to date</p>
+          <p className="text-2xl font-bold text-white">£ {(financialSummary?.totalExpenses || 0).toFixed(2)}</p>
+          <p className="text-xs text-white/70">Total investment to date</p>
         </CardContent>
       </Card>
       
-      <Card className="bg-black/20 border border-siso-text/10 backdrop-blur-sm">
+      <Card className="bg-black/30 border border-purple-400/30 backdrop-blur-sm shadow-lg">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium flex items-center gap-2">
+          <CardTitle className="text-sm font-medium flex items-center gap-2 text-white">
             <Clock className="h-4 w-4 text-siso-orange" />
             Next Payment Due
           </CardTitle>
@@ -74,15 +74,15 @@ export function PaymentsSummaryCards({
         <CardContent>
           {nextPaymentDue ? (
             <>
-              <p className="text-2xl font-bold">{formatDate(nextPaymentDue.due_date)}</p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-2xl font-bold text-white">{formatDate(nextPaymentDue.due_date)}</p>
+              <p className="text-xs text-white/70">
                 £{nextPaymentDue.amount.toFixed(2)} ({nextPaymentDue.invoice_number})
               </p>
             </>
           ) : (
             <>
-              <p className="text-2xl font-bold">No payments due</p>
-              <p className="text-xs text-muted-foreground">All invoices are paid</p>
+              <p className="text-2xl font-bold text-white">No payments due</p>
+              <p className="text-xs text-white/70">All invoices are paid</p>
             </>
           )}
         </CardContent>

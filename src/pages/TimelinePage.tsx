@@ -14,19 +14,12 @@ export default function TimelinePage() {
       </Helmet>
       
       <div className="container mx-auto px-4 py-8">
-        <Card className="mb-8 bg-black/30 border-siso-text/10">
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-3">
-              <CalendarClock className="h-6 w-6 text-purple-400" />
-              <CardTitle className="text-2xl font-semibold">Project Timeline</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-400">
-              Track your project's progress with key milestones, deliverables, and deadlines.
-            </p>
-          </CardContent>
-        </Card>
+        <div className="mb-8">
+          <div className="flex items-center gap-3">
+            <CalendarClock className="h-6 w-6 text-purple-400" />
+            <h1 className="text-2xl font-semibold text-white">Project Timeline</h1>
+          </div>
+        </div>
         
         <TimelineHeader />
         <TimelineSection />

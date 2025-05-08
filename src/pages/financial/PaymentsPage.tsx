@@ -1,432 +1,362 @@
 import { useState, useEffect } from 'react';
 import { FinancialLayout } from '@/components/layout/FinancialLayout';
-import { useQuery } from '@tanstack/react-query';
-import { fetchInvoices, fetchInvoiceById } from '@/utils/financial/invoicesApi';
-import { fetchTransactions, getFinancialSummary } from '@/utils/financial';
-import { TotalCostCard } from '@/components/admin/financials/TotalCostCard';
-import { ExpensesTimeline } from '@/components/admin/financials/ExpensesTimeline';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Wallet, CreditCard, PiggyBank, Calendar, ArrowRight, Download, BarChart, Receipt } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { 
-  Wallet, FileText, AlertCircle, Download, CreditCard, 
-  Clock, DownloadCloud, Filter, ChevronDown, PieChart
-} from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Progress } from '@/components/ui/progress';
-import { Invoice, FinancialTransaction } from '@/utils/financial/types';
 import { PaymentsSummaryCards } from '@/components/admin/financials/payments/PaymentsSummaryCards';
-import { PaymentsHeader } from '@/components/admin/financials/payments/PaymentsHeader';
-import { PaymentMethodsSection } from '@/components/admin/financials/payments/PaymentMethodsSection';
-import { ExpenseCreditCard } from '@/components/admin/financials/ExpenseCreditCard';
+import { ExpensesList } from '@/components/admin/financials/expenses/ExpensesList';
+import { fetchProjectExpenses, Expense } from '@/utils/financial/expenses';
+import { ConnectWalletDialog } from '@/components/admin/financials/payments/dialogs/ConnectWalletDialog';
+import { AddCardDialog } from '@/components/admin/financials/payments/dialogs/AddCardDialog';
+import { BankDetailsDialog } from '@/components/admin/financials/payments/dialogs/BankDetailsDialog';
 
+// Step 1: Basic structure with Summary Cards
 export default function PaymentsPage() {
-  const { toast } = useToast();
+  // Basic state for tabs
   const [activeTab, setActiveTab] = useState('overview');
   
-  // Fetch invoices
-  const { 
-    data: invoices, 
-    isLoading: isLoadingInvoices, 
-    error: invoicesError 
-  } = useQuery({
-    queryKey: ['invoices'],
-    queryFn: fetchInvoices,
-  });
-
-  // Fetch transactions for expenses
-  const {
-    data: transactions,
-    isLoading: isLoadingTransactions,
-    error: transactionsError
-  } = useQuery({
-    queryKey: ['transactions'],
-    queryFn: fetchTransactions,
-  });
-
-  // Fetch financial summary
-  const {
-    data: financialSummary,
-    isLoading: isLoadingSummary,
-    error: summaryError
-  } = useQuery({
-    queryKey: ['financialSummary'],
-    queryFn: () => getFinancialSummary('month'),
-  });
-
-  const isLoading = isLoadingInvoices || isLoadingTransactions || isLoadingSummary;
-  const error = invoicesError || transactionsError || summaryError;
+  // Dialog states
+  const [connectWalletOpen, setConnectWalletOpen] = useState(false);
+  const [addCardOpen, setAddCardOpen] = useState(false);
+  const [bankDetailsOpen, setBankDetailsOpen] = useState(false);
   
-  // Filter active expenses (paid by agency for client)
-  const activeExpenses = transactions?.filter(tx => 
-    tx.type === 'expense' && tx.status === 'completed'
-  ) || [];
+  // Mock project ID
+  const projectId = 'demo-project';
   
-  // Calculate upcoming payments (due in next 7 days)
-  const upcomingPayments = invoices?.filter(invoice => {
-    if (invoice.status !== 'pending' && invoice.status !== 'overdue') return false;
-    const dueDate = new Date(invoice.due_date);
-    const today = new Date();
-    const diffTime = dueDate.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays <= 7 && diffDays >= 0;
-  }) || [];
-  
-  // Group expenses by category
-  const expensesByCategory = activeExpenses.reduce((acc, expense) => {
-    const category = expense.category?.name || 'Uncategorized';
-    if (!acc[category]) acc[category] = [];
-    acc[category].push(expense);
-    return acc;
-  }, {} as Record<string, FinancialTransaction[]>);
-  
-  // Calculate totals
-  const totalCurrentExpenses = activeExpenses.reduce((sum, item) => sum + Number(item.amount), 0);
-  const totalOutstandingInvoices = (invoices || [])
-    .filter(inv => inv.status === 'pending' || inv.status === 'overdue')
-    .reduce((sum, inv) => sum + Number(inv.amount), 0);
-  
-  // Find next payment due
-  const nextPaymentDue = upcomingPayments.length > 0 
-    ? upcomingPayments.reduce((earliest, inv) => {
-        return new Date(inv.due_date) < new Date(earliest.due_date) ? inv : earliest;
-      }) 
-    : null;
-
-  const handlePayNow = (invoice: Invoice) => {
-    toast({
-      title: "Payment Initiated",
-      description: `Processing payment for invoice ${invoice.invoice_number}`,
-    });
-    // Here you would implement actual payment processing
-  };
-
-  const handleDownloadInvoice = (invoiceId: string) => {
-    toast({
-      title: "Downloading Invoice",
-      description: "Your invoice will begin downloading shortly.",
-    });
-    // Here you would implement the download functionality
-  };
-
-  const handleDownloadAll = () => {
-    toast({
-      title: "Downloading All Invoices",
-      description: "Your invoices will begin downloading shortly.",
-    });
-    // Here you would implement batch download functionality
-  };
-
-  const getStatusBadgeClass = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'paid':
-        return 'bg-green-100 text-green-800';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'overdue':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+  // Demo expenses data
+  const expenses: Expense[] = [
+    {
+      id: 'exp-1',
+      project_id: projectId,
+      name: 'Server Hosting',
+      description: 'Monthly AWS server costs',
+      amount: 450,
+      currency: '£',
+      category: 'Infrastructure',
+      status: 'active',
+      frequency: 'monthly',
+      start_date: '2025-01-01',
+      next_billing_date: '2025-06-01',
+      created_at: '2025-01-01'
+    },
+    {
+      id: 'exp-2',
+      project_id: projectId,
+      name: 'Security Monitoring',
+      description: 'Ongoing security service',
+      amount: 350,
+      currency: '£',
+      category: 'Security',
+      status: 'active',
+      frequency: 'monthly',
+      start_date: '2025-01-01',
+      next_billing_date: '2025-06-05',
+      created_at: '2025-01-01'
+    },
+    {
+      id: 'exp-3',
+      project_id: projectId,
+      name: 'Wallet Integration',
+      description: 'Development of crypto wallet',
+      amount: 1500,
+      currency: '£',
+      category: 'Development',
+      status: 'completed',
+      frequency: 'one-time',
+      start_date: '2025-02-15',
+      end_date: '2025-03-15',
+      created_at: '2025-02-15'
+    },
+    {
+      id: 'exp-4',
+      project_id: projectId,
+      name: 'Developer Time',
+      description: 'Frontend developer hours',
+      amount: 2400,
+      currency: '£',
+      category: 'Development',
+      status: 'completed',
+      frequency: 'one-time',
+      start_date: '2025-02-01',
+      end_date: '2025-04-30',
+      created_at: '2025-02-01'
+    },
+    {
+      id: 'exp-5',
+      project_id: projectId,
+      name: 'Database Hosting',
+      description: 'PostgreSQL database hosting',
+      amount: 120,
+      currency: '£',
+      category: 'Infrastructure',
+      status: 'active',
+      frequency: 'monthly',
+      start_date: '2025-01-15',
+      next_billing_date: '2025-06-15',
+      created_at: '2025-01-15'
     }
+  ];
+  
+  // Mock data for financial summaries
+  const financialSummary = {
+    totalCurrentExpenses: 4200,
+    outstandingBalance: 1500,
+    totalAppCost: 30000
   };
-
-  const getCategoryColor = (category: string) => {
-    const categoryColors: Record<string, string> = {
-      'Hosting': 'bg-blue-500',
-      'Software': 'bg-purple-500',
-      'API Services': 'bg-green-500',
-      'Infrastructure': 'bg-orange-500',
-      'Support': 'bg-cyan-500',
-      'Development': 'bg-indigo-500',
-    };
-    
-    return categoryColors[category] || 'bg-gray-500';
+  
+  // Mock active expenses
+  const activeExpenses = [
+    {
+      id: 'exp-1',
+      name: 'Server Hosting',
+      amount: 450,
+      status: 'active',
+      frequency: 'monthly',
+      nextDue: '2025-06-01'
+    },
+    {
+      id: 'exp-2',
+      name: 'Security Monitoring',
+      amount: 350,
+      status: 'active',
+      frequency: 'monthly',
+      nextDue: '2025-06-05'
+    }
+  ];
+  
+  // Mock invoices
+  const invoices = [
+    {
+      id: 'inv-1',
+      invoiceNumber: 'INV-2025-001',
+      amount: 1500,
+      status: 'due',
+      dueDate: '2025-05-30',
+      items: [{ description: 'Wallet Integration', amount: 1500 }]
+    }
+  ];
+  
+  // Next payment due info
+  const nextPaymentDue = {
+    amount: 1500,
+    dueDate: '2025-05-30',
+    invoiceId: 'inv-1'
   };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-US', {
-      day: 'numeric', 
-      month: 'short', 
+  
+  // Date formatter function
+  const formatDate = (date: string) => {
+    if (!date) return '';
+    const dateObj = new Date(date);
+    return new Intl.DateTimeFormat('en-GB', {
+      day: 'numeric',
+      month: 'short',
       year: 'numeric'
-    }).format(date);
+    }).format(dateObj);
   };
-
-  // Calculate total current costs from expenses
-  const totalCurrentCosts = activeExpenses.reduce((sum, expense) => sum + Number(expense.amount), 0);
-
-  // Calculate predicted costs (recurring expenses for the next month)
-  const predictedMonthlyCosts = activeExpenses
-    .filter(expense => expense.recurring_type === 'monthly')
-    .reduce((sum, expense) => sum + Number(expense.amount), 0);
-
-    // Calculate total of upcoming expenses
-    const upcomingExpensesTotal = upcomingPayments.reduce((total, invoice) => total + invoice.amount, 0);
-
+  
   return (
-    <FinancialLayout title="Payments & Billing">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <ExpenseCreditCard 
-          currentCosts={totalCurrentCosts}
-          predictedCosts={predictedMonthlyCosts}
+    <>
+      <FinancialLayout title="Payments & Billing">
+      {/* Summary Cards */}
+      <div className="mb-8">
+        <PaymentsSummaryCards
+          activeExpenses={activeExpenses}
+          invoices={invoices}
+          financialSummary={financialSummary}
+          nextPaymentDue={nextPaymentDue}
+          formatDate={formatDate}
         />
-        <ExpensesTimeline expenses={activeExpenses} />
       </div>
-
-      <PaymentsHeader handleDownloadAll={handleDownloadAll} />
-
-      {upcomingPayments.length > 0 && (
-        <Card className="mb-6 bg-amber-900/20 border border-amber-400/50">
-          <div className="p-4 flex items-center">
-            <AlertCircle className="h-5 w-5 text-amber-400 mr-2" />
-            <span className="text-amber-200 font-medium">
-              {`£${upcomingExpensesTotal.toFixed(2)} in upcoming expenses due in the next 7 days`}
-            </span>
+      
+      {/* Simple Payment Methods */}
+      <Card className="bg-black/30 border border-purple-400/30 backdrop-blur-sm shadow-lg mb-8">
+        <CardHeader>
+          <CardTitle className="text-xl flex items-center gap-2 text-white">
+            <Wallet className="h-5 w-5 text-orange-500" />
+            Payment Methods
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Crypto Payment */}
+            <div className="p-4 bg-black/20 rounded-lg border border-purple-400/20">
+              <div className="flex gap-2 items-center mb-2">
+                <PiggyBank className="h-5 w-5 text-orange-500" />
+                <h3 className="text-lg text-white">Crypto Payment</h3>
+                <span className="ml-auto text-xs bg-gradient-to-r from-orange-500 to-red-500 text-white px-2 py-1 rounded">20% OFF</span>
+              </div>
+              <p className="text-white/80 mb-3">Get 20% discount when paying with cryptocurrency</p>
+              <Button 
+                variant="outline" 
+                className="w-full text-white hover:text-white"
+                onClick={() => setConnectWalletOpen(true)}
+              >
+                Connect Wallet
+              </Button>
+            </div>
+            
+            {/* Card Payment */}
+            <div className="p-4 bg-black/20 rounded-lg border border-purple-400/20">
+              <div className="flex gap-2 items-center mb-2">
+                <CreditCard className="h-5 w-5 text-purple-400" />
+                <h3 className="text-lg text-white">Card Payment</h3>
+              </div>
+              <p className="text-white/80 mb-3">Pay securely with your credit or debit card</p>
+              <Button 
+                variant="outline" 
+                className="w-full text-white hover:text-white"
+                onClick={() => setAddCardOpen(true)}
+              >
+                Add Card
+              </Button>
+            </div>
+            
+            {/* Bank Transfer */}
+            <div className="p-4 bg-black/20 rounded-lg border border-purple-400/20">
+              <div className="flex gap-2 items-center mb-2">
+                <Calendar className="h-5 w-5 text-blue-400" />
+                <h3 className="text-lg text-white">Bank Transfer</h3>
+              </div>
+              <p className="text-white/80 mb-3">Pay via direct bank transfer to our account</p>
+              <Button 
+                variant="outline" 
+                className="w-full text-white hover:text-white"
+                onClick={() => setBankDetailsOpen(true)}
+              >
+                View Bank Details
+              </Button>
+            </div>
           </div>
-        </Card>
-      )}
-
-      <Tabs defaultValue="overview" className="mt-6" onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-4 w-full max-w-md">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="history">Payment History</TabsTrigger>
-          <TabsTrigger value="expenses">Expenses</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview">
-          {isLoading ? (
-            <div className="flex justify-center py-10">
-              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-siso-orange"></div>
+        </CardContent>
+      </Card>
+      
+      {/* Feature Costs Preview */}
+      <Card className="bg-black/30 border border-purple-400/30 backdrop-blur-sm shadow-lg">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-xl flex items-center gap-2 text-white">
+            <BarChart className="h-5 w-5 text-orange-500" />
+            Feature Cost Breakdown
+          </CardTitle>
+          <Button variant="outline" size="sm" className="text-white hover:text-white">
+            <Download className="mr-2 h-4 w-4" />
+            Export
+          </Button>
+        </CardHeader>
+        <CardContent>
+          <p className="mb-4 text-white">View a detailed breakdown of your project's feature costs.</p>
+          
+          {/* Feature Cost Categories */}
+          <div className="space-y-4">
+            {/* Trading & Transactions */}
+            <div className="p-4 rounded-lg bg-gradient-to-r from-blue-500/20 to-blue-600/10 border border-blue-500/30">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-medium text-white">Trading & Transactions</h3>
+                  <p className="text-sm text-white/70">3 features</p>
+                </div>
+                <p className="font-bold text-white">£2,400</p>
+              </div>
             </div>
-          ) : error ? (
-            <div className="text-center py-8 text-siso-text">
-              <AlertCircle className="h-8 w-8 mx-auto mb-2 text-siso-red" />
-              <p>There was an error loading your financial data.</p>
+            
+            {/* Security & Trust */}
+            <div className="p-4 rounded-lg bg-gradient-to-r from-green-500/20 to-green-600/10 border border-green-500/30">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-medium text-white">Security & Trust</h3>
+                  <p className="text-sm text-white/70">2 features</p>
+                </div>
+                <p className="font-bold text-white">£1,800</p>
+              </div>
             </div>
-          ) : (
-            <>
-              <PaymentsSummaryCards
-                activeExpenses={activeExpenses}
-                invoices={invoices}
-                financialSummary={financialSummary}
-                nextPaymentDue={nextPaymentDue}
-                formatDate={formatDate}
-              />
-              
-              <PaymentMethodsSection />
-              
-              {/* Upcoming Payments */}
-              <Card className="bg-black/20 border border-siso-text/10 backdrop-blur-sm mb-6">
-                <CardHeader>
-                  <CardTitle className="text-xl">Upcoming Payments</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {upcomingPayments.length > 0 ? (
-                    <div className="space-y-4">
-                      {upcomingPayments.map(invoice => (
-                        <div key={invoice.id} className="flex items-center justify-between p-4 border border-siso-text/10 rounded-lg">
-                          <div className="flex items-center gap-3">
-                            <div className="p-2 bg-siso-orange/20 rounded-full">
-                              <Clock className="h-4 w-4 text-siso-orange" />
-                            </div>
-                            <div>
-                              <p className="font-medium">{invoice.invoice_number}</p>
-                              <p className="text-sm text-muted-foreground">Due {formatDate(invoice.due_date)}</p>
-                            </div>
-                          </div>
-                          <div className="flex gap-2">
-                            <Badge variant="outline" className={getStatusBadgeClass(invoice.status)}>
-                              {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
-                            </Badge>
-                            <p className="font-bold">{invoice.currency} {invoice.amount.toFixed(2)}</p>
-                          </div>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={() => handlePayNow(invoice)}
-                          >
-                            Pay Now
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-6">
-                      <p className="text-muted-foreground">No upcoming payments due</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </>
-          )}
-        </TabsContent>
-
-        {/* Payment History Tab */}
-        <TabsContent value="history">
-          <Card className="bg-black/20 border border-siso-text/10 backdrop-blur-sm">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-xl flex items-center gap-2">
-                <FileText className="h-5 w-5 text-siso-orange" />
-                Payment History
-              </CardTitle>
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm">
-                  <Filter className="mr-2 h-4 w-4" />
-                  Filter
-                  <ChevronDown className="ml-2 h-4 w-4" />
+            
+            {/* Staking & Earning */}
+            <div className="p-4 rounded-lg bg-gradient-to-r from-purple-500/20 to-purple-600/10 border border-purple-500/30">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-medium text-white">Staking & Earning</h3>
+                  <p className="text-sm text-white/70">2 features</p>
+                </div>
+                <p className="font-bold text-white">£1,500</p>
+              </div>
+            </div>
+            
+            {/* Community & Engagement */}
+            <div className="p-4 rounded-lg bg-gradient-to-r from-orange-500/20 to-orange-600/10 border border-orange-500/30">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-medium text-white">Community & Engagement</h3>
+                  <p className="text-sm text-white/70">1 feature</p>
+                </div>
+                <p className="font-bold text-white">£900</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="mt-6">
+            <Button className="w-full bg-gradient-to-r from-purple-500 to-purple-700 text-white hover:opacity-90">
+              View Detailed Breakdown
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+      
+      {/* Expenses List */}
+      <div className="mt-8">
+        <ExpensesList expenses={expenses} formatDate={formatDate} />
+      </div>
+      
+      {/* Upcoming Payments */}
+      <Card className="bg-black/30 border border-purple-400/30 backdrop-blur-sm shadow-lg mt-8">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-xl flex items-center gap-2 text-white">
+            <Calendar className="h-5 w-5 text-orange-500" />
+            Upcoming Payments
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="mb-6 text-white">Your next scheduled payments and due dates.</p>
+          
+          <div className="space-y-4">
+            <div className="p-4 bg-black/20 rounded-lg border border-orange-500/30">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-medium text-white">Invoice #INV-2025-001</h3>
+                <div>
+                  <span className="text-xs bg-orange-500/20 text-orange-300 px-2 py-1 rounded">Due Soon</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-white/70">Due on {formatDate('2025-05-30')}</p>
+                <p className="font-bold text-white">£1,500.00</p>
+              </div>
+              <div className="mt-4">
+                <Button size="sm" className="bg-gradient-to-r from-orange-500 to-red-500 text-white hover:opacity-90">
+                  Pay Now
                 </Button>
               </div>
-            </CardHeader>
-            <ScrollArea className="h-[450px]">
-              <CardContent>
-                {isLoadingInvoices ? (
-                  <div className="text-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-siso-orange mx-auto"></div>
-                    <p className="mt-2 text-siso-text">Loading invoices...</p>
-                  </div>
-                ) : invoicesError ? (
-                  <div className="text-center py-8 text-siso-text">
-                    <AlertCircle className="h-8 w-8 mx-auto mb-2 text-siso-red" />
-                    <p>There was an error loading your invoices.</p>
-                  </div>
-                ) : invoices && invoices.length > 0 ? (
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b border-siso-text/10">
-                          <th className="text-left py-3 px-4 text-sm font-medium text-siso-text">Invoice Number</th>
-                          <th className="text-left py-3 px-4 text-sm font-medium text-siso-text">Date</th>
-                          <th className="text-left py-3 px-4 text-sm font-medium text-siso-text">Amount</th>
-                          <th className="text-left py-3 px-4 text-sm font-medium text-siso-text">Channel</th>
-                          <th className="text-left py-3 px-4 text-sm font-medium text-siso-text">Status</th>
-                          <th className="text-right py-3 px-4 text-sm font-medium text-siso-text">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {invoices.map((invoice) => (
-                          <tr key={invoice.id} className="border-b border-siso-text/5 hover:bg-siso-text/5">
-                            <td className="py-3 px-4">{invoice.invoice_number}</td>
-                            <td className="py-3 px-4">{formatDate(invoice.due_date)}</td>
-                            <td className="py-3 px-4">{invoice.currency} {invoice.amount.toFixed(2)}</td>
-                            <td className="py-3 px-4">
-                              <div className="flex items-center gap-2">
-                                <div className={`h-2 w-2 rounded-full ${getCategoryColor('Software')}`}></div>
-                                <span>Software</span>
-                              </div>
-                            </td>
-                            <td className="py-3 px-4">
-                              <span className={`px-2 py-1 text-xs rounded-full ${getStatusBadgeClass(invoice.status)}`}>
-                                {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
-                              </span>
-                            </td>
-                            <td className="py-3 px-4 text-right">
-                              <div className="flex gap-2 justify-end">
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
-                                  onClick={() => handleDownloadInvoice(invoice.id)}
-                                >
-                                  <Download className="h-4 w-4" />
-                                </Button>
-                                
-                                {invoice.status.toLowerCase() !== 'paid' && (
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    onClick={() => handlePayNow(invoice)}
-                                  >
-                                    Pay Now
-                                  </Button>
-                                )}
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <div className="text-center py-12">
-                    <p className="text-siso-text">No invoices found.</p>
-                  </div>
-                )}
-              </CardContent>
-            </ScrollArea>
-          </Card>
-        </TabsContent>
-
-        {/* Expenses Tab */}
-        <TabsContent value="expenses">
-          <Card className="bg-black/20 border border-siso-text/10 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="text-xl flex items-center gap-2">
-                <Wallet className="h-5 w-5 text-siso-orange" />
-                Active Expenses
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {isLoadingTransactions ? (
-                <div className="text-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-siso-orange mx-auto"></div>
-                  <p className="mt-2 text-siso-text">Loading expenses...</p>
+            </div>
+            
+            <div className="p-4 bg-black/20 rounded-lg border border-purple-400/30">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-medium text-white">Server Hosting (Monthly)</h3>
+                <div>
+                  <span className="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded">Upcoming</span>
                 </div>
-              ) : transactionsError ? (
-                <div className="text-center py-8 text-siso-text">
-                  <AlertCircle className="h-8 w-8 mx-auto mb-2 text-siso-red" />
-                  <p>There was an error loading expenses.</p>
-                </div>
-              ) : activeExpenses.length > 0 ? (
-                <div className="space-y-6">
-                  {Object.entries(expensesByCategory).map(([category, expenses]) => {
-                    const categoryTotal = expenses.reduce((sum, exp) => sum + Number(exp.amount), 0);
-                    const categoryPercentage = (categoryTotal / totalCurrentExpenses) * 100;
-                    
-                    return (
-                      <div key={category} className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <div className={`h-3 w-3 rounded-full ${getCategoryColor(category)}`}></div>
-                            <h3 className="font-medium">{category}</h3>
-                          </div>
-                          <p className="font-medium">{expenses[0]?.currency || '£'} {categoryTotal.toFixed(2)}</p>
-                        </div>
-                        
-                        <Progress value={categoryPercentage} className="h-2" />
-                        
-                        <div className="pl-5 space-y-2">
-                          {expenses.map((expense) => (
-                            <div key={expense.id} className="flex justify-between items-center py-2 border-b border-siso-text/5 last:border-0">
-                              <div>
-                                <p className="font-medium">{expense.description}</p>
-                                <p className="text-xs text-muted-foreground">
-                                  {expense.recurring_type ? 'Recurring' : 'One-time'} • 
-                                  {expense.vendor?.name && ` ${expense.vendor.name} • `}
-                                  Last paid {formatDate(expense.date)}
-                                </p>
-                              </div>
-                              <div className="text-right">
-                                <p className="font-medium">{expense.currency} {expense.amount.toFixed(2)}</p>
-                                <Badge variant="outline" className="text-xs">Active</Badge>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <p className="text-siso-text">No active expenses found.</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </FinancialLayout>
+              </div>
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-white/70">Due on {formatDate('2025-06-01')}</p>
+                <p className="font-bold text-white">£450.00</p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      </FinancialLayout>
+      
+      {/* Payment Method Dialogs */}
+      <ConnectWalletDialog open={connectWalletOpen} onOpenChange={setConnectWalletOpen} />
+      <AddCardDialog open={addCardOpen} onOpenChange={setAddCardOpen} />
+      <BankDetailsDialog open={bankDetailsOpen} onOpenChange={setBankDetailsOpen} />
+    </>
   );
 }
