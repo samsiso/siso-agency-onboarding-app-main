@@ -21,7 +21,7 @@ export function FinancialLayout({ children, title = "Financial & Account" }: Fin
                 Payments & Billing
               </a>
               <span className="text-siso-text/30">•</span>
-              <a href="/financial/leaderboards" className="text-sm text-siso-text hover:text-siso-text-bold transition-colors">
+              <a href="/economy/leaderboards" className="text-sm text-siso-text hover:text-siso-text-bold transition-colors">
                 Leaderboards
               </a>
               <span className="text-siso-text/30">•</span>

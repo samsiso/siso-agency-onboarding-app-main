@@ -20,7 +20,7 @@ export const LeaderboardContent = ({
   onCategoryChange,
 }: LeaderboardContentProps) => {
   return (
-    <Card className="border-siso-border">
+    <Card className="bg-black/30 border border-purple-400/30 backdrop-blur-sm shadow-lg">
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span className="text-siso-text-bold">Leaderboard Rankings</span>

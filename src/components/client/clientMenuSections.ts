@@ -57,7 +57,7 @@ export const clientMenuSections = [
         label: 'Financial',
       },
       {
-        href: '/financial/leaderboards',
+        href: '/economy/leaderboards',
         icon: Trophy,
         label: 'Leaderboards',
       }

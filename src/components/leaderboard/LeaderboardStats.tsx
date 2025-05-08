@@ -15,7 +15,7 @@ export const LeaderboardStats = ({ totalUsers, totalPoints, totalSisoTokens }: L
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-      <Card className="bg-gradient-to-br from-siso-bg-alt to-siso-bg-alt/50 hover:border-siso-border-hover transition-all duration-300">
+      <Card className="bg-black/30 border border-purple-400/30 backdrop-blur-sm shadow-lg hover:border-purple-400/50 transition-all duration-300">
         <CardContent className="pt-6">
           <div className="flex items-center justify-between">
             <div>
@@ -39,7 +39,7 @@ export const LeaderboardStats = ({ totalUsers, totalPoints, totalSisoTokens }: L
         </CardContent>
       </Card>
       
-      <Card className="bg-gradient-to-br from-siso-bg-alt to-siso-bg-alt/50 hover:border-siso-border-hover transition-all duration-300">
+      <Card className="bg-black/30 border border-purple-400/30 backdrop-blur-sm shadow-lg hover:border-purple-400/50 transition-all duration-300">
         <CardContent className="pt-6">
           <div className="flex items-center justify-between">
             <div>
@@ -63,7 +63,7 @@ export const LeaderboardStats = ({ totalUsers, totalPoints, totalSisoTokens }: L
         </CardContent>
       </Card>
       
-      <Card className="bg-gradient-to-br from-siso-bg-alt to-siso-bg-alt/50 hover:border-siso-border-hover transition-all duration-300">
+      <Card className="bg-black/30 border border-purple-400/30 backdrop-blur-sm shadow-lg hover:border-purple-400/50 transition-all duration-300">
         <CardContent className="pt-6">
           <div className="flex items-center justify-between">
             <div>
@@ -87,7 +87,7 @@ export const LeaderboardStats = ({ totalUsers, totalPoints, totalSisoTokens }: L
         </CardContent>
       </Card>
 
-      <Card className="bg-gradient-to-br from-siso-bg-alt to-siso-bg-alt/50 hover:border-siso-border-hover transition-all duration-300">
+      <Card className="bg-black/30 border border-purple-400/30 backdrop-blur-sm shadow-lg hover:border-purple-400/50 transition-all duration-300">
         <CardContent className="pt-6">
           <div className="flex items-center justify-between">
             <div>

@@ -34,7 +34,7 @@ export default function ClientAppDetailsPage() {
               - The client hasn't set up their app yet
             </p>
             <Button asChild>
-              <Link to="/financial/leaderboards">Return to Leaderboard</Link>
+              <Link to="/economy/leaderboards">Return to Leaderboard</Link>
             </Button>
           </div>
         </div>
@@ -73,7 +73,7 @@ export default function ClientAppDetailsPage() {
         
         <div className="flex items-center mb-6">
           <Button variant="ghost" size="sm" asChild className="mr-2">
-            <Link to="/financial/leaderboards">
+            <Link to="/economy/leaderboards">
               <ArrowLeft className="mr-1 h-4 w-4" />
               Back to Leaderboard
             </Link>
