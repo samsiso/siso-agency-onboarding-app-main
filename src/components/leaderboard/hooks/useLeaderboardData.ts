@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,11 +14,11 @@ export const useLeaderboardData = () => {
   });
   
   const [trends, setTrends] = useState<TrendStats>({
-    trend: 'stable',
+    trend: 'up',
     percentage: 0,
     points: 0,
     users: 0,
-    tokens: 0
+    tokens: 0,
   });
   
   const [filter, setFilter] = useState<LeaderboardFilter>({
@@ -50,46 +49,179 @@ export const useLeaderboardData = () => {
         console.log('Using mock leaderboard data');
         
         // Create mock entries with realistic data structure
-        const mockEntries: LeaderboardEntry[] = Array.from({ length: 20 }, (_, i) => ({
-          id: `user-${i + 1}`,
-          user_id: `user-${i + 1}`,
-          points: Math.floor(Math.random() * 1000) + 100,
-          level: Math.floor(Math.random() * 10) + 1,
-          streak_days: Math.floor(Math.random() * 30),
-          rank: i === 0 ? 'Master' : i < 3 ? 'Expert' : i < 7 ? 'Advanced' : i < 15 ? 'Intermediate' : 'Beginner',
-          siso_tokens: Math.floor(Math.random() * 500),
-          updated_at: new Date(Date.now() - Math.floor(Math.random() * 10000000)).toISOString(),
-          contribution_count: Math.floor(Math.random() * 50),
-          referral_count: Math.floor(Math.random() * 20),
-          achievements: [
-            { name: 'First Contribution', icon: '🏆' },
-            { name: 'Streak Master', icon: '🔥' }
-          ],
-          profile: {
-            full_name: `User ${i + 1}`,
-            email: `user${i+1}@example.com`,
-            avatar_url: '',
-            bio: `This is user ${i + 1}'s bio`,
-            professional_role: 'Developer'
+        const mockEntries: LeaderboardEntry[] = [
+          {
+            id: '1',
+            name: 'Optimal Construction',
+            website_url: 'https://optimal-building-maintenance.vercel.app/',
+            points: 1500,
+            spending: 15000,
+            siso_tokens: 3000,
+            milestones_achieved: '4/8',
+            client_engagement: 60,
+            community_impact: 5,
+            updated_at: '2025-03-01T00:00:00Z',
+            description: 'Building maintenance and construction services',
+            status: 'in-progress',
+            rank: 1
+          },
+          {
+            id: '2',
+            name: 'UbahCryp',
+            website_url: 'https://ubahcrypcom.vercel.app/',
+            points: 500,
+            spending: 5000,
+            siso_tokens: 1000,
+            milestones_achieved: '8/8',
+            client_engagement: 90,
+            community_impact: 10,
+            updated_at: '2025-03-20T00:00:00Z',
+            description: 'A cryptocurrency trading platform built with React and Web3 technologies',
+            status: 'completed',
+            rank: 2
+          },
+          {
+            id: '3',
+            name: 'Gritness',
+            website_url: 'https://gritnessgym.vercel.app/',
+            points: 25,
+            spending: 249,
+            siso_tokens: 50,
+            milestones_achieved: '6/8',
+            client_engagement: 40,
+            community_impact: 3,
+            updated_at: '2025-05-09T00:00:00Z',
+            description: 'A gym management and fitness tracking application',
+            status: 'in-progress',
+            rank: 3
+          },
+          {
+            id: '4',
+            name: 'Trojan MMA',
+            website_url: 'https://trojan-mma.vercel.app/',
+            points: 25,
+            spending: 249,
+            siso_tokens: 50,
+            milestones_achieved: '6/8',
+            client_engagement: 35,
+            community_impact: 2,
+            updated_at: '2025-03-27T00:00:00Z',
+            description: 'MMA gym and training center website',
+            status: 'in-progress',
+            rank: 4
+          },
+          {
+            id: '5',
+            name: 'Lets Go',
+            website_url: 'https://lets-go-u7hh.vercel.app/',
+            points: 25,
+            spending: 249,
+            siso_tokens: 50,
+            milestones_achieved: '7/8',
+            client_engagement: 80,
+            community_impact: 4,
+            updated_at: '2025-03-26T00:00:00Z',
+            description: 'Travel and adventure booking platform',
+            status: 'nearly-completed',
+            rank: 5
+          },
+          {
+            id: '6',
+            name: 'NM Construction',
+            website_url: 'https://nm-construction.vercel.app/',
+            points: 0,
+            spending: 0,
+            siso_tokens: 0,
+            milestones_achieved: '4/8',
+            client_engagement: 50,
+            community_impact: 1,
+            updated_at: '2025-03-01T00:00:00Z',
+            description: 'Construction company website with project portfolio',
+            status: 'in-progress',
+            rank: 6
+          },
+          {
+            id: '7',
+            name: 'Elementree',
+            website_url: 'https://elementree.vercel.app/',
+            points: 0,
+            spending: 0,
+            siso_tokens: 0,
+            milestones_achieved: '5/8',
+            client_engagement: 30,
+            community_impact: 1,
+            updated_at: '2025-05-09T00:00:00Z',
+            description: 'Arborist and tree care services website',
+            status: 'in-progress',
+            rank: 7
+          },
+          {
+            id: '8',
+            name: 'Mu Shin',
+            website_url: 'https://siso-mu-shin.vercel.app/',
+            points: 0,
+            spending: 0,
+            siso_tokens: 0,
+            milestones_achieved: '8/8',
+            client_engagement: 20,
+            community_impact: 0,
+            updated_at: '2025-03-20T00:00:00Z',
+            description: 'Martial arts school and training center',
+            status: 'declined',
+            rank: 8
+          },
+          {
+            id: '9',
+            name: '5 Star Hire',
+            website_url: 'https://5-star-hire.vercel.app/',
+            points: 0,
+            spending: 0,
+            siso_tokens: 0,
+            milestones_achieved: '3/8',
+            client_engagement: 25,
+            community_impact: 0,
+            updated_at: '2025-05-09T00:00:00Z',
+            description: 'Equipment hire and rental service',
+            status: 'early-progress',
+            rank: 9
+          },
+          {
+            id: '10',
+            name: 'Keegan Saas',
+            website_url: '',
+            points: 0,
+            spending: 0,
+            siso_tokens: 0,
+            milestones_achieved: '0/8',
+            client_engagement: 15,
+            community_impact: 0,
+            updated_at: '2025-05-09T00:00:00Z',
+            description: 'SaaS platform for business management',
+            status: 'not-started',
+            rank: 10
           }
-        }));
+        ];
         
         setEntries(mockEntries);
         
-        // Set mock statistics based on the mock entries
+        // Set realistic stats based on the project data
+        const totalPoints = mockEntries.reduce((sum, entry) => sum + entry.points, 0);
+        const avgPoints = Math.round(totalPoints / mockEntries.length);
+        const topScore = mockEntries[0]?.points || 0;
+
         setStats({
           totalParticipants: mockEntries.length,
-          avgPoints: Math.floor(mockEntries.reduce((sum, entry) => sum + entry.points, 0) / mockEntries.length),
-          topScore: Math.max(...mockEntries.map(entry => entry.points))
+          avgPoints,
+          topScore,
         });
-        
-        // Set mock trends
+
+        // Set realistic trends
         setTrends({
-          trend: Math.random() > 0.5 ? 'up' : 'down',
-          percentage: Math.floor(Math.random() * 30),
-          points: Math.floor(mockEntries.reduce((sum, entry) => sum + entry.points, 0) * 0.1),
-          users: Math.floor(mockEntries.length * 0.05),
-          tokens: Math.floor(mockEntries.reduce((sum, entry) => sum + (entry.siso_tokens || 0), 0) * 0.08)
+          trend: 'up',
+          percentage: 12,
+          points: 125,
+          users: 3,
+          tokens: 250,
         });
       } else {
         console.log('Using real leaderboard data');
@@ -97,7 +229,8 @@ export const useLeaderboardData = () => {
         // Map database entries to our LeaderboardEntry type using safe property access
         const mappedEntries: LeaderboardEntry[] = dbEntries.map((dbEntry, index) => ({
           id: dbEntry.id,
-          user_id: dbEntry.user_id,
+          name: safeGet(dbEntry, 'name', ''),
+          website_url: safeGet(dbEntry, 'website_url', ''),
           points: dbEntry.points || 0,
           level: dbEntry.level || 1,
           streak_days: dbEntry.streak_days || 0,

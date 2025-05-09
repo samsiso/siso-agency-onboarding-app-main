@@ -8,6 +8,7 @@ import { ProjectMetricsDashboard } from './details/ProjectMetricsDashboard';
 import { ActiveTasksSection } from './details/ActiveTasksSection';
 import { DevelopmentProgress } from './details/DevelopmentProgress';
 import { AppPlanSection } from './details/AppPlanSection';
+import { AgencyStepsSection } from './details/AgencyStepsSection';
 import { FeatureRequestsSection } from './details/FeatureRequestsSection';
 import { TimelineSection } from './details/TimelineSection';
 import { FinancialSummarySection } from './details/FinancialSummarySection';
@@ -24,12 +25,77 @@ export function ProjectDetails() {
   const activeTab = tab || 'overview';
   const contentRef = useRef<HTMLDivElement>(null);
   
-  const [projectData, setProjectData] = useState({
-    name: 'UbahCrypt Project',
-    description: 'A revolutionary blockchain-based cryptocurrency platform with enhanced security features and cross-chain capabilities.',
-    status: 'ACTIVE',
-    created_at: '2025-04-01T10:00:00Z',
-  });
+  // Define project data mapping based on projectId
+  const projectsData: Record<string, any> = {
+    '1': {
+      name: 'Optimal Construction',
+      description: 'Building maintenance and construction services',
+      status: 'IN-PROGRESS',
+      created_at: '2025-03-01T00:00:00Z',
+    },
+    '2': {
+      name: 'UbahCryp',
+      description: 'A cryptocurrency trading platform built with React and Web3 technologies',
+      status: 'COMPLETED',
+      created_at: '2025-03-20T00:00:00Z',
+    },
+    '3': {
+      name: 'Gritness',
+      description: 'A gym management and fitness tracking application',
+      status: 'IN-PROGRESS',
+      created_at: '2025-05-09T00:00:00Z',
+    },
+    '4': {
+      name: 'Trojan MMA',
+      description: 'MMA gym and training center website',
+      status: 'IN-PROGRESS',
+      created_at: '2025-03-27T00:00:00Z',
+    },
+    '5': {
+      name: 'Lets Go',
+      description: 'Travel and adventure booking platform',
+      status: 'NEARLY-COMPLETED',
+      created_at: '2025-03-26T00:00:00Z',
+    },
+    '6': {
+      name: 'NM Construction',
+      description: 'Construction company website with project portfolio',
+      status: 'IN-PROGRESS',
+      created_at: '2025-03-01T00:00:00Z',
+    },
+    '7': {
+      name: 'Elementree',
+      description: 'Arborist and tree care services website',
+      status: 'IN-PROGRESS',
+      created_at: '2025-05-09T00:00:00Z',
+    },
+    '8': {
+      name: 'Mu Shin',
+      description: 'Martial arts school and training center',
+      status: 'DECLINED',
+      created_at: '2025-03-20T00:00:00Z',
+    },
+    '9': {
+      name: '5 Star Hire',
+      description: 'Equipment hire and rental service',
+      status: 'EARLY-PROGRESS',
+      created_at: '2025-05-09T00:00:00Z',
+    },
+    '10': {
+      name: 'Keegan Saas',
+      description: 'SaaS platform for business management',
+      status: 'NOT-STARTED',
+      created_at: '2025-05-09T00:00:00Z',
+    },
+    'ubahcrypt': {
+      name: 'UbahCrypt Project',
+      description: 'A revolutionary blockchain-based cryptocurrency platform with enhanced security features and cross-chain capabilities.',
+      status: 'ACTIVE',
+      created_at: '2025-04-01T10:00:00Z',
+    }
+  };
+  
+  const [projectData, setProjectData] = useState(projectsData[projectId] || projectsData['ubahcrypt']);
 
   // This would typically fetch project data from your API
   useEffect(() => {
@@ -72,7 +138,7 @@ export function ProjectDetails() {
       case 'overview':
         return renderAppPlanOverview();
       case 'agency-steps':
-        return <AppPlanSection />;
+        return <AgencyStepsSection />;
       case 'market-research':
         return <ResearchSection />;
       case 'features':

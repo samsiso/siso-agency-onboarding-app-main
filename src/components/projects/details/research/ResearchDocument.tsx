@@ -4,37 +4,34 @@ import { Button } from '@/components/ui/button';
 import { Calendar, Download, Tag, ChevronUp, ChevronDown } from 'lucide-react';
 import { AnimatedCard } from '@/components/ui/animated-card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-
-interface ResearchDocument {
-  id: string;
-  title: string;
-  category: string;
-  tags: string[];
-  updated_at: string;
-  description: string;
-  insights?: string[];
-  nextSteps?: string[];
-  code_snippet?: string;
-  fileUrl?: string;
-}
+import { ResearchDocument } from '../types';
 
 interface ResearchDocumentProps {
   doc: ResearchDocument;
   isExpanded: boolean;
   onToggleExpand: () => void;
   categoryColors: Record<string, string>;
+  onClick?: (doc: ResearchDocument) => void;
 }
 
 export function ResearchDocumentCard({ 
   doc, 
   isExpanded, 
   onToggleExpand,
-  categoryColors 
+  categoryColors,
+  onClick
 }: ResearchDocumentProps) {
+  const handleClick = () => {
+    if (onClick) {
+      onClick(doc);
+    }
+  };
   return (
     <Collapsible open={isExpanded} onOpenChange={onToggleExpand}>
-      <AnimatedCard className="border border-white/10 h-full">
-        <div className="flex flex-col h-full">
+      <AnimatedCard className="border border-white/10 h-full cursor-pointer transition-all hover:border-white/30 hover:shadow-lg">
+        <div 
+          className="flex flex-col h-full"
+          onClick={handleClick}>
           <div className="mb-3 flex items-center justify-between">
             <Badge 
               variant="outline" 

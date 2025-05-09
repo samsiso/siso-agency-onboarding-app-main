@@ -68,12 +68,12 @@ export default function ClientStatusPage() {
     {
       title: "Project Kickoff",
       content: (
-        <Card className="p-4 bg-white border border-slate-200">
-          <h3 className="font-medium mb-2">Project Initialization</h3>
-          <p className="text-sm text-slate-600">Project requirements and goals established</p>
+        <Card className="p-4 bg-[#181A20] border border-white/10 text-gray-100">
+          <h3 className="font-semibold mb-2 text-white">Project Initialization</h3>
+          <p className="text-sm text-gray-400">Project requirements and goals established</p>
           <div className="flex items-center gap-2 mt-2">
-            <Clock className="h-4 w-4 text-slate-400" />
-            <span className="text-xs text-slate-500">
+            <Clock className="h-4 w-4 text-gray-500" />
+            <span className="text-xs text-gray-500">
               {new Date().toLocaleDateString()}
             </span>
           </div>
@@ -83,12 +83,12 @@ export default function ClientStatusPage() {
     {
       title: "Development",
       content: (
-        <Card className="p-4 bg-white border border-slate-200">
-          <h3 className="font-medium mb-2">Development In Progress</h3>
-          <p className="text-sm text-slate-600">Building core functionalities and features</p>
+        <Card className="p-4 bg-[#181A20] border border-white/10 text-gray-100">
+          <h3 className="font-semibold mb-2 text-white">Development In Progress</h3>
+          <p className="text-sm text-gray-400">Building core functionalities and features</p>
           <div className="flex items-center gap-2 mt-2">
-            <Clock className="h-4 w-4 text-slate-400" />
-            <span className="text-xs text-slate-500">In Progress</span>
+            <Clock className="h-4 w-4 text-gray-500" />
+            <span className="text-xs text-gray-500">In Progress</span>
           </div>
         </Card>
       ),
@@ -96,12 +96,12 @@ export default function ClientStatusPage() {
     {
       title: "Testing",
       content: (
-        <Card className="p-4 bg-white border border-slate-200">
-          <h3 className="font-medium mb-2">Quality Assurance</h3>
-          <p className="text-sm text-slate-600">Testing and bug fixing</p>
+        <Card className="p-4 bg-[#181A20] border border-white/10 text-gray-100">
+          <h3 className="font-semibold mb-2 text-white">Quality Assurance</h3>
+          <p className="text-sm text-gray-400">Testing and bug fixing</p>
           <div className="flex items-center gap-2 mt-2">
-            <Clock className="h-4 w-4 text-slate-400" />
-            <span className="text-xs text-slate-500">Upcoming</span>
+            <Clock className="h-4 w-4 text-gray-500" />
+            <span className="text-xs text-gray-500">Upcoming</span>
           </div>
         </Card>
       ),
@@ -109,12 +109,12 @@ export default function ClientStatusPage() {
     {
       title: "Launch",
       content: (
-        <Card className="p-4 bg-white border border-slate-200">
-          <h3 className="font-medium mb-2">Project Deployment</h3>
-          <p className="text-sm text-slate-600">Final launch and deployment</p>
+        <Card className="p-4 bg-[#181A20] border border-white/10 text-gray-100">
+          <h3 className="font-semibold mb-2 text-white">Project Deployment</h3>
+          <p className="text-sm text-gray-400">Final launch and deployment</p>
           <div className="flex items-center gap-2 mt-2">
-            <Clock className="h-4 w-4 text-slate-400" />
-            <span className="text-xs text-slate-500">Planned</span>
+            <Clock className="h-4 w-4 text-gray-500" />
+            <span className="text-xs text-gray-500">Planned</span>
           </div>
         </Card>
       ),

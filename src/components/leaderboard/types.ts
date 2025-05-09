@@ -2,17 +2,28 @@
 // Define types for the leaderboard component
 export interface LeaderboardEntry {
   id: string;
-  user_id: string;
+  user_id?: string;
   points: number;
   rank: string | number;
-  level: number;
-  streak_days: number;
+  level?: number;
+  streak_days?: number;
   siso_tokens: number;
   updated_at: string;
-  contribution_count: number;
-  referral_count: number;
-  achievements: Achievement[];
-  profile: UserProfile;
+  contribution_count?: number;
+  referral_count?: number;
+  achievements?: Achievement[];
+  profile?: UserProfile;
+  
+  // Project fields
+  name?: string;
+  description?: string;
+  website_url?: string;
+  spending?: number;
+  milestones_achieved?: string;
+  client_engagement?: number;
+  community_impact?: number;
+  projectProfile?: ProjectProfile;
+  status?: string;
 }
 
 export interface Achievement {
@@ -31,6 +42,18 @@ export interface UserProfile {
   instagram_url?: string;
   twitter_url?: string;
   professional_role?: string;
+}
+
+export interface ProjectProfile {
+  name: string;
+  category?: string;
+  description?: string;
+  image?: string;
+  website_url?: string;
+  status?: string;
+  created_at?: string;
+  total_milestones?: number;
+  completed_milestones?: number;
 }
 
 export interface LeaderboardStats {

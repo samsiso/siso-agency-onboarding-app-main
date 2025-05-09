@@ -1,4 +1,4 @@
-import { Trophy, Users, UserPlus, Clock, Award, Medal, TrendingUp, TrendingDown, CircleDollarSign, CreditCard } from 'lucide-react';
+import { Trophy, Users, Clock, Award, Medal, TrendingUp, TrendingDown, CircleDollarSign, CreditCard, BarChart3, Heart, Milestone } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from '@/lib/utils';
@@ -15,12 +15,8 @@ export const LeaderboardTable = ({ leaderboardData, onUserClick }: LeaderboardTa
   const navigate = useNavigate();
   
   const getDisplayName = (entry: LeaderboardEntry) => {
-    if (entry.profile?.full_name) return entry.profile.full_name;
-    if (entry.profile?.email) {
-      const emailParts = entry.profile.email.split('@');
-      return emailParts[0];
-    }
-    return 'Anonymous User';
+    if (entry.name) return entry.name;
+    return 'Project ' + entry.id.substring(0, 6);
   };
 
   const formatLastActive = (date: string | undefined) => {
@@ -94,9 +90,15 @@ export const LeaderboardTable = ({ leaderboardData, onUserClick }: LeaderboardTa
   };
   
   const handleRowClick = (entry: LeaderboardEntry) => {
-    // Ensure we're using the correct ID format for our mock data
-    const userId = entry.id.startsWith('user-') ? entry.id : `user-${entry.id}`;
-    navigate(`/client-app/${userId}`);
+    // Navigate to the new project portfolio page which shows detailed project information
+    // Use either numeric ID or project name for the URL (more SEO friendly)
+    const projectId = entry.id.toString();
+    
+    // Get project name for the URL (for better UX)
+    const projectName = entry.name || `project-${projectId}`;
+    const formattedName = projectName.toLowerCase().replace(/\s+/g, '-');
+    
+    navigate(`/project-portfolio/${projectId}`);
     onUserClick(entry);
   };
 
@@ -106,12 +108,12 @@ export const LeaderboardTable = ({ leaderboardData, onUserClick }: LeaderboardTa
         <TableHeader className="sticky top-0 bg-siso-bg z-10">
           <TableRow className="border-b border-siso-border">
             <TableHead className="w-[80px] text-center">Rank</TableHead>
-            <TableHead>Name</TableHead>
+            <TableHead>Project Name</TableHead>
             <TableHead className="text-center">Points</TableHead>
-            <TableHead className="text-center">Trend</TableHead>
             <TableHead className="text-center">Spending</TableHead>
-            <TableHead className="text-center">Contributions</TableHead>
-            <TableHead className="text-center">Referrals</TableHead>
+            <TableHead className="text-center">Milestones</TableHead>
+            <TableHead className="text-center">Client Engagement</TableHead>
+            <TableHead className="text-center">Community Impact</TableHead>
             <TableHead className="text-center">SISO Tokens</TableHead>
             <TableHead className="text-center">Last Active</TableHead>
           </TableRow>
@@ -147,21 +149,17 @@ export const LeaderboardTable = ({ leaderboardData, onUserClick }: LeaderboardTa
                 <TableCell className="font-medium">
                   <div className="flex items-center gap-3">
                     <div className="relative">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-siso-red to-siso-orange flex items-center justify-center text-white font-bold">
-                        {getDisplayName(entry).charAt(0)}
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-siso-red to-siso-orange flex items-center justify-center text-white font-bold border-2 border-siso-border shadow-md">
+                        {getDisplayName(entry).charAt(0).toUpperCase()}
                       </div>
-                      {entry.achievements && entry.achievements.length > 0 && (
-                        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-siso-orange rounded-full flex items-center justify-center text-[10px] text-white">
-                          {entry.achievements.length}
-                        </div>
-                      )}
                     </div>
                     <div>
                       <p className="text-siso-text-bold font-semibold">{getDisplayName(entry)}</p>
-                      <div className="flex items-center gap-2">
-                        <p className="text-xs text-siso-text/70">{entry.rank || 'Rookie'}</p>
-                        {getSpendingBadge(spendingAmount)}
-                      </div>
+                      {entry.status && (
+                        <span className="px-2 py-0.5 text-xs rounded-md bg-siso-bg-alt text-siso-text-muted inline-block mt-1">
+                          {entry.status.replace('-', ' ')}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </TableCell>
@@ -172,24 +170,27 @@ export const LeaderboardTable = ({ leaderboardData, onUserClick }: LeaderboardTa
                   </div>
                 </TableCell>
                 <TableCell className="text-center">
-                  {getTrendIndicator(index)}
-                </TableCell>
-                <TableCell className="text-center">
                   <div className="flex items-center justify-center gap-2">
-                    <CreditCard className="h-4 w-4 text-siso-text/70" />
-                    <span>${spendingAmount.toLocaleString()}</span>
+                    <CreditCard className="h-4 w-4 text-blue-400" />
+                    <span>£{(entry.spending || 0).toLocaleString()}</span>
                   </div>
                 </TableCell>
                 <TableCell className="text-center">
                   <div className="flex items-center justify-center gap-2">
-                    <Users className="h-4 w-4 text-siso-text/70" />
-                    <span>{entry.contribution_count || 0}</span>
+                    <Milestone className="h-4 w-4 text-purple-400" />
+                    <span>{entry.milestones_achieved || '0/8'}</span>
                   </div>
                 </TableCell>
                 <TableCell className="text-center">
                   <div className="flex items-center justify-center gap-2">
-                    <UserPlus className="h-4 w-4 text-siso-text/70" />
-                    <span>{entry.referral_count || 0}</span>
+                    <BarChart3 className="h-4 w-4 text-green-400" />
+                    <span>{entry.client_engagement || 0}</span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-center">
+                  <div className="flex items-center justify-center gap-2">
+                    <Heart className="h-4 w-4 text-red-400" />
+                    <span>{entry.community_impact || 0}</span>
                   </div>
                 </TableCell>
                 <TableCell className="text-center">

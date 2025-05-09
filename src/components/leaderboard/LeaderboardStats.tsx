@@ -19,7 +19,7 @@ export const LeaderboardStats = ({ totalUsers, totalPoints, totalSisoTokens }: L
         <CardContent className="pt-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-siso-text/70">Total Users</p>
+              <p className="text-sm text-siso-text/70">Total Projects</p>
               <div className="flex items-baseline gap-2">
                 <p className="text-2xl font-bold text-siso-text-bold">
                   <CountUp

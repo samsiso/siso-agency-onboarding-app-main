@@ -39,15 +39,15 @@ function StatCard({
       transition={{ duration: 0.3, delay: delay * 0.1 }}
       whileHover={{ y: -5, transition: { duration: 0.2 } }}
     >
-      <Card className={`border-0 ${bgColor} shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden h-full`}>
-        <div className="p-6 flex flex-col h-full">
+      <Card className={`border border-gray-800/60 ${bgColor || 'bg-[#181A20]'} shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden h-full`}>
+        <div className="p-6 flex flex-col h-full bg-gradient-to-br from-black/40 to-transparent">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <p className="text-gray-400 text-sm font-medium">{title}</p>
+              <p className="text-gray-300 text-sm font-medium">{title}</p>
               <p className={`text-2xl font-bold mt-1 ${textColor}`}>{value}</p>
               {subtitle && <p className="text-xs text-gray-500 mt-1">{subtitle}</p>}
             </div>
-            <div className={`h-12 w-12 rounded-full bg-white/5 flex items-center justify-center ${textColor}`}>
+            <div className={`h-12 w-12 rounded-full bg-black/30 border border-gray-700/50 flex items-center justify-center ${textColor}`}>
               {icon}
             </div>
           </div>
@@ -60,10 +60,10 @@ function StatCard({
                 indicatorClassName={`${progress >= 70 ? 'bg-green-500' : progress >= 40 ? 'bg-amber-500' : 'bg-[#ea384c]'}`} 
               />
               <div className="flex justify-between mt-1.5">
-                <p className="text-xs text-gray-500">{progress}% Complete</p>
+                <p className="text-xs text-gray-400">{progress}% Complete</p>
                 <Badge 
                   variant="outline" 
-                  className={`text-xs py-0 px-1.5 ${
+                  className={`text-xs py-0.5 px-2 ${
                     progress >= 70 ? 'bg-green-500/10 text-green-400 border-green-500/20' : 
                     progress >= 40 ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 
                     'bg-[#ea384c]/10 text-[#ea384c] border-[#ea384c]/20'

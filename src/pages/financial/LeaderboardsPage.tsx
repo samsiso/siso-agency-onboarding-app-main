@@ -6,37 +6,162 @@ import { Spotlight } from '@/components/ui/spotlight';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, FolderOpen } from 'lucide-react';
+import { ExternalLink, FolderOpen, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { LeaderboardTable } from '@/components/leaderboard/LeaderboardTable';
+import { LeaderboardEntry } from '@/components/leaderboard/types';
 
-// Sample portfolio data - in a real app, this would come from an API
-const portfolioApps = [
+// Project data for the leaderboard
+const projectData: LeaderboardEntry[] = [
   {
-    id: 'ubahcrypt',
-    name: 'UbahCrypt',
-    category: 'Web3 Trading',
-    description: 'A cryptocurrency trading platform built with React and Web3 technologies.',
-    image: '/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png',
-    website: 'https://ubahcrypcom.vercel.app/',
-    status: 'active'
+    id: '1',
+    name: 'Optimal Construction',
+    website_url: 'https://optimal-building-maintenance.vercel.app/',
+    points: 1500,
+    spending: 15000,
+    siso_tokens: 3000,
+    milestones_achieved: '4/8',
+    client_engagement: 60,
+    community_impact: 5,
+    updated_at: '2025-03-01T00:00:00Z',
+    description: 'Building maintenance and construction services',
+    status: 'in-progress',
+    rank: 1
   },
   {
-    id: 'gritness',
+    id: '2',
+    name: 'UbahCryp',
+    website_url: 'https://ubahcrypcom.vercel.app/',
+    points: 500,
+    spending: 5000,
+    siso_tokens: 1000,
+    milestones_achieved: '8/8',
+    client_engagement: 90,
+    community_impact: 10,
+    updated_at: '2025-03-20T00:00:00Z',
+    description: 'A cryptocurrency trading platform built with React and Web3 technologies',
+    status: 'completed',
+    rank: 2
+  },
+  {
+    id: '3',
     name: 'Gritness',
-    category: 'Fitness',
-    description: 'A gym management and fitness tracking application for personal trainers and clients.',
-    image: '/lovable-uploads/3b17a23d-630e-4e55-94bf-9d6fef9e6fc4.png',
-    website: 'https://gritness-app.vercel.app/',
-    status: 'paused'
+    website_url: 'https://gritnessgym.vercel.app/',
+    points: 25,
+    spending: 249,
+    siso_tokens: 50,
+    milestones_achieved: '6/8',
+    client_engagement: 40,
+    community_impact: 3,
+    updated_at: '2025-05-09T00:00:00Z',
+    description: 'A gym management and fitness tracking application',
+    status: 'in-progress',
+    rank: 3
   },
   {
-    id: 'nmconstruction',
+    id: '4',
+    name: 'Trojan MMA',
+    website_url: 'https://trojan-mma.vercel.app/',
+    points: 25,
+    spending: 249,
+    siso_tokens: 50,
+    milestones_achieved: '6/8',
+    client_engagement: 35,
+    community_impact: 2,
+    updated_at: '2025-03-27T00:00:00Z',
+    description: 'MMA gym and training center website',
+    status: 'in-progress',
+    rank: 4
+  },
+  {
+    id: '5',
+    name: 'Lets Go',
+    website_url: 'https://lets-go-u7hh.vercel.app/',
+    points: 25,
+    spending: 249,
+    siso_tokens: 50,
+    milestones_achieved: '7/8',
+    client_engagement: 80,
+    community_impact: 4,
+    updated_at: '2025-03-26T00:00:00Z',
+    description: 'Travel and adventure booking platform',
+    status: 'nearly-completed',
+    rank: 5
+  },
+  {
+    id: '6',
     name: 'NM Construction',
-    category: 'Business',
-    description: 'A construction company website with project portfolio and quote request features.',
-    image: '/lovable-uploads/67e004ed-6861-4d6a-b05e-d885a03e5c1e.png',
-    website: 'https://nm-construction.vercel.app/',
-    status: 'completed'
+    website_url: 'https://nm-construction.vercel.app/',
+    points: 0,
+    spending: 0,
+    siso_tokens: 0,
+    milestones_achieved: '4/8',
+    client_engagement: 50,
+    community_impact: 1,
+    updated_at: '2025-03-01T00:00:00Z',
+    description: 'Construction company website with project portfolio',
+    status: 'in-progress',
+    rank: 6
+  },
+  {
+    id: '7',
+    name: 'Elementree',
+    website_url: 'https://elementree.vercel.app/',
+    points: 0,
+    spending: 0,
+    siso_tokens: 0,
+    milestones_achieved: '5/8',
+    client_engagement: 30,
+    community_impact: 1,
+    updated_at: '2025-05-09T00:00:00Z',
+    description: 'Arborist and tree care services website',
+    status: 'in-progress',
+    rank: 7
+  },
+  {
+    id: '8',
+    name: 'Mu Shin',
+    website_url: 'https://siso-mu-shin.vercel.app/',
+    points: 0,
+    spending: 0,
+    siso_tokens: 0,
+    milestones_achieved: '8/8',
+    client_engagement: 20,
+    community_impact: 0,
+    updated_at: '2025-03-20T00:00:00Z',
+    description: 'Martial arts school and training center',
+    status: 'declined',
+    rank: 8
+  },
+  {
+    id: '9',
+    name: '5 Star Hire',
+    website_url: 'https://5-star-hire.vercel.app/',
+    points: 0,
+    spending: 0,
+    siso_tokens: 0,
+    milestones_achieved: '3/8',
+    client_engagement: 25,
+    community_impact: 0,
+    updated_at: '2025-05-09T00:00:00Z',
+    description: 'Equipment hire and rental service',
+    status: 'early-progress',
+    rank: 9
+  },
+  {
+    id: '10',
+    name: 'Keegan Saas',
+    website_url: '',
+    points: 0,
+    spending: 0,
+    siso_tokens: 0,
+    milestones_achieved: '0/8',
+    client_engagement: 15,
+    community_impact: 0,
+    updated_at: '2025-05-09T00:00:00Z',
+    description: 'SaaS platform for business management',
+    status: 'not-started',
+    rank: 10
   }
 ];
 
@@ -45,87 +170,104 @@ export default function LeaderboardsPage() {
 
   const getStatusColor = (status: string) => {
     switch(status) {
-      case "active": return "bg-green-500/20 text-green-400 border-green-500/20";
-      case "paused": return "bg-amber-500/20 text-amber-400 border-amber-500/20";
-      case "completed": return "bg-blue-500/20 text-blue-400 border-blue-500/20";
+      case "completed": return "bg-green-500/20 text-green-400 border-green-500/20";
+      case "in-progress": return "bg-amber-500/20 text-amber-400 border-amber-500/20";
+      case "nearly-completed": return "bg-blue-500/20 text-blue-400 border-blue-500/20";
+      case "early-progress": return "bg-purple-500/20 text-purple-400 border-purple-500/20";
+      case "not-started": return "bg-gray-500/20 text-gray-400 border-gray-500/20";
+      case "declined": return "bg-red-500/20 text-red-400 border-red-500/20";
       default: return "bg-gray-500/20 text-gray-400 border-gray-500/20";
     }
   };
 
   return (
-    <FinancialLayout title="Project Portfolio">
+    <FinancialLayout title="Leaderboards">
       <div className="relative">
         <Spotlight className="-top-40 left-0" />
         
         <div className="mb-8">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent">
-            SISO Agency Portfolio
+            Top 10 Projects: Celebrating Our Biggest Achievements
           </h1>
-          <p className="text-siso-text/80 mt-2">
-            Explore some of the amazing projects we've built for our clients. Check out their live websites and see what we can do for your business.
+          <p className="text-siso-text mt-2 max-w-3xl">
+            Our top 10 projects showcase innovation and investment, ranked by project value, points, and SISO tokens earned.
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {portfolioApps.map((app, index) => (
-            <motion.div
-              key={app.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Card className="bg-siso-bg-alt border-siso-border h-full flex flex-col">
-                <div className="relative aspect-video overflow-hidden">
-                  {app.image ? (
-                    <img 
-                      src={app.image} 
-                      alt={app.name} 
-                      className="w-full h-full object-cover object-center"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-siso-bg">
-                      <FolderOpen className="h-16 w-16 text-siso-orange/30" />
+        <div className="mb-10">
+          <LeaderboardTable leaderboardData={projectData} />
+          
+          <div className="mt-4 text-center italic text-gray-500 text-sm">
+            Want to see your project shine on the leaderboard? Start building with Siso Agency and earn points and SISO tokens with every milestone!
+          </div>
+        </div>
+        
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold text-white mb-6">Project Showcase</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {projectData.slice(0, 3).map((project) => (
+              <motion.div
+                key={project.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+                className="group"
+              >
+                <Card className="overflow-hidden border border-white/10 bg-black/30 transition-all duration-300 hover:border-siso-orange/30 hover:shadow-lg">
+                  <div className="relative h-52 w-full">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10"></div>
+                    <div className="h-full w-full bg-gradient-to-br from-siso-bg-alt to-black"></div>
+                    <div className="absolute bottom-4 left-4 z-20">
+                      <Badge className={getStatusColor(project.status)}>
+                        {project.status.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                      </Badge>
                     </div>
-                  )}
-                  <Badge 
-                    variant="outline" 
-                    className={`absolute top-2 right-2 ${getStatusColor(app.status)}`}
-                  >
-                    {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
-                  </Badge>
-                </div>
-                <CardContent className="pt-6 flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-xl font-semibold text-siso-text-bold">{app.name}</h3>
-                    <Badge variant="outline" className="bg-siso-bg-alt text-siso-text-muted border-siso-border">
-                      {app.category}
-                    </Badge>
                   </div>
-                  <p className="text-sm text-siso-text/80 line-clamp-3">
-                    {app.description}
-                  </p>
-                </CardContent>
-                <CardFooter className="border-t border-siso-border pt-4">
-                  <div className="w-full flex justify-between items-center">
+                  
+                  <CardContent className="p-6">
+                    <div className="mb-6 flex items-start justify-between">
+                      <div>
+                        <h3 className="text-xl font-bold text-white">{project.name}</h3>
+                        <p className="text-sm text-siso-text">
+                          {project.points} Points · £{project.spending.toLocaleString()} · {project.siso_tokens} SISO
+                        </p>
+                      </div>
+                      <div className="flex gap-1">
+                        {project.website_url && (
+                          <Button size="icon" variant="ghost" className="h-8 w-8 rounded-full hover:bg-white/10" asChild>
+                            <a href={project.website_url} target="_blank" rel="noopener noreferrer">
+                              <ExternalLink className="h-4 w-4" />
+                            </a>
+                          </Button>
+                        )}
+                        <Button 
+                          size="icon" 
+                          variant="ghost" 
+                          className="h-8 w-8 rounded-full hover:bg-white/10" 
+                          onClick={() => navigate(`/portfolio/${project.id.toLowerCase()}`)}
+                        >
+                          <FolderOpen className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <p className="mb-6 text-sm text-gray-400 line-clamp-3">
+                      {project.description}
+                    </p>
+                  </CardContent>
+                  
+                  <CardFooter className="border-t border-white/10 p-4 bg-black/20">
                     <Button 
-                      variant="outline" 
-                      className="border-siso-border text-siso-text hover:bg-siso-bg hover:text-siso-text-bold"
-                      onClick={() => navigate(`/projects/${app.id}`)}
+                      className="w-full bg-gradient-to-r from-siso-red to-siso-orange hover:from-siso-red/90 hover:to-siso-orange/90 text-white"
+                      onClick={() => navigate(`/portfolio/${project.id.toLowerCase()}`)}
                     >
-                      View Details
+                      View Portfolio
                     </Button>
-                    <Button 
-                      variant="default"
-                      className="bg-siso-orange hover:bg-siso-red text-white"
-                      onClick={() => window.open(app.website, '_blank')}
-                    >
-                      <ExternalLink className="mr-2 h-4 w-4" /> Visit Site
-                    </Button>
-                  </div>
-                </CardFooter>
-              </Card>
-            </motion.div>
-          ))}
+                  </CardFooter>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     </FinancialLayout>

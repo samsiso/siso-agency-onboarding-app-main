@@ -58,7 +58,7 @@ function StatCard({
                 indicatorClassName={`${progress >= 70 ? 'bg-green-500' : progress >= 40 ? 'bg-amber-500' : 'bg-[#ea384c]'}`} 
               />
               <div className="flex justify-between mt-1.5">
-                <p className="text-xs text-gray-500">{progress}% Complete</p>
+                <p className="text-xs text-gray-400">{progress}% Complete</p>
                 <Badge 
                   variant="outline" 
                   className={`text-xs py-0 px-1.5 ${

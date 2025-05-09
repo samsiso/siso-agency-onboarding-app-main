@@ -23,9 +23,9 @@ export const LeaderboardContent = ({
     <Card className="bg-black/30 border border-purple-400/30 backdrop-blur-sm shadow-lg">
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
-          <span className="text-siso-text-bold">Leaderboard Rankings</span>
+          <span className="text-siso-text-bold">Top 10 Projects: Celebrating Our Biggest Achievements</span>
           <span className="text-sm font-normal text-siso-text-muted">
-            Top {Math.min(filteredData.length, 100)} Users
+            Showcasing innovation and investment across {Math.min(filteredData.length, 10)} projects
           </span>
         </CardTitle>
       </CardHeader>

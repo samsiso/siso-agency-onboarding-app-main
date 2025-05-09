@@ -42,6 +42,7 @@ import ProjectDetailsPage from './pages/ProjectDetailsPage';
 import ResourcesPage from './pages/resources/ResourcesPage';
 import TimelinePage from './pages/TimelinePage';
 import Communication from './pages/Communication';
+import { ResearchDocumentDetail } from './components/projects/details/research/ResearchDocumentDetail';
 
 // Financial & Account section
 import PaymentsPage from './pages/financial/PaymentsPage';
@@ -51,6 +52,7 @@ import ClientAppDetailsPage from './pages/ClientAppDetailsPage';
 import AdminWireframes from './pages/AdminWireframes';
 import UserFlow from './pages/UserFlow';
 import AdminUserFlow from './pages/AdminUserFlow';
+import ProjectPortfolioPage from './pages/ProjectPortfolioPage';
 
 function App() {
   return (
@@ -102,6 +104,8 @@ function App() {
         <Route path="/projects/:id/userflow" element={<AuthGuard><UserFlow /></AuthGuard>} />
         <Route path="/projects/:id" element={<AuthGuard><ProjectDetailsPage /></AuthGuard>} />
         <Route path="/projects/:id/:tab" element={<AuthGuard><ProjectDetailsPage /></AuthGuard>} />
+        {/* New route for research document detail page */}
+        <Route path="/projects/:projectId/market-research/:documentId" element={<AuthGuard><ResearchDocumentDetail /></AuthGuard>} />
         
         <Route path="/my-projects" element={<AuthGuard><MyProjects /></AuthGuard>} />
         <Route path="/plan-builder" element={<AuthGuard><Communication /></AuthGuard>} />
@@ -127,6 +131,10 @@ function App() {
         
         {/* Client App Details Route */}
         <Route path="/client-app/:clientId" element={<AuthGuard><ClientAppDetailsPage /></AuthGuard>} />
+        
+        {/* Project Portfolio Routes - support both ID only and name-based URLs */}
+        <Route path="/project-portfolio/:projectId" element={<AuthGuard><ProjectPortfolioPage /></AuthGuard>} />
+        <Route path="/project-portfolio/:projectId/:projectName" element={<AuthGuard><ProjectPortfolioPage /></AuthGuard>} />
         
         {/* Legacy Financial Routes (redirected for backward compatibility) */}
         <Route path="/payments" element={<AuthGuard><PaymentsPage /></AuthGuard>} />
