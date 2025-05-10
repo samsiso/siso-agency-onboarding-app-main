@@ -1,4 +1,3 @@
-
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc"; // Using plugin-react-swc which is already in the project
 import path from "path";
@@ -36,6 +35,9 @@ export default defineConfig(({ mode }) => ({
           'react-core': ['react', 'react-dom'],
           'react-router': ['react-router-dom'],
           
+          // Add ReactFlow to manual chunks
+          'reactflow': ['reactflow', 'reactflow/dist/style.css'],
+          
           // UI Components bundles - split by feature
           'ui-core': ['@radix-ui/react-slot'],
           'ui-navigation': ['@radix-ui/react-navigation-menu'],
@@ -50,7 +52,7 @@ export default defineConfig(({ mode }) => ({
           // Landing page chunks - split by section
           'landing-hero': ['@/components/ui/animated-hero'],
           'landing-features': ['@/components/blocks/feature-section-with-hover-effects'],
-          'landing-testimonials': ['@/components/landing/TestimonialSection'],
+          'landing-testimonials': ['@/components/landing/sections/TestimonialsSection'],
           'landing-pricing': ['@/components/ui/pricing-card'],
           
           // Chat components - split by functionality
