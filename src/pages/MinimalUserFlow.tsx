@@ -4,11 +4,21 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ArrowDownToLine, ArrowLeft, Expand, MessageSquare } from 'lucide-react';
+import { 
+  ArrowDownToLine, 
+  ArrowLeft, 
+  Expand, 
+  MessageSquare, 
+  ChevronRight,
+  LayoutGrid,
+  BoxSelect 
+} from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { ProjectHeader } from '@/components/projects/details/ProjectHeader';
 import { ProjectCardNavigation } from '@/components/projects/details/ProjectCardNavigation';
 import { SimpleUserFlowDiagram } from '@/components/projects/userflow/SimpleUserFlowDiagram';
+import { EnhancedUserFlowDiagram } from '@/components/projects/userflow/EnhancedUserFlowDiagram';
+import { UserFlowCardGrid } from '@/components/projects/userflow/cards/UserFlowCardGrid';
 import { FeedbackLogSection } from '@/components/projects/details/FeedbackLogSection';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -17,6 +27,7 @@ export default function MinimalUserFlow() {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState('diagram');
+  const [viewType, setViewType] = useState<'cards' | 'diagram'>('diagram');
   
   // Parse the tab from query params and URL path
   useEffect(() => {
@@ -32,6 +43,12 @@ export default function MinimalUserFlow() {
     if (tabParam === 'feedback') {
       setActiveTab('feedback');
     }
+    
+    // Check for view type
+    const viewParam = searchParams.get('view');
+    if (viewParam === 'cards') {
+      setViewType('cards');
+    }
   }, [location.pathname, location.search]);
   
   // Handle tab change and update URL
@@ -42,6 +59,20 @@ export default function MinimalUserFlow() {
       searchParams.set('tab', 'feedback');
     } else {
       searchParams.delete('tab');
+    }
+    navigate({ search: searchParams.toString() });
+  };
+  
+  // Handle view type change
+  const toggleViewType = () => {
+    const newType = viewType === 'cards' ? 'diagram' : 'cards';
+    setViewType(newType);
+    
+    const searchParams = new URLSearchParams(location.search);
+    if (newType === 'cards') {
+      searchParams.set('view', 'cards');
+    } else {
+      searchParams.delete('view');
     }
     navigate({ search: searchParams.toString() });
   };
@@ -67,6 +98,29 @@ export default function MinimalUserFlow() {
           />
           <ProjectCardNavigation projectId={projectId || 'minimal-flow'} />
         </div>
+        
+        {/* Breadcrumb Navigation */}
+        <div className="flex items-center text-sm text-gray-400 mb-4">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="p-0 h-auto hover:bg-transparent hover:text-indigo-400"
+            onClick={() => navigate('/projects')}
+          >
+            Projects
+          </Button>
+          <ChevronRight className="w-4 h-4 mx-1" />
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="p-0 h-auto hover:bg-transparent hover:text-indigo-400"
+            onClick={() => navigate(`/projects/${projectId || 'minimal-flow'}`)}
+          >
+            {projectData.name}
+          </Button>
+          <ChevronRight className="w-4 h-4 mx-1" />
+          <span>User Flow</span>
+        </div>
       
         <Card className="bg-black/20 border-gray-800 mb-6">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -83,16 +137,34 @@ export default function MinimalUserFlow() {
                 </Button>
               </div>
               <CardTitle className="text-2xl font-bold text-white">
-                {activeTab === 'feedback' ? 'Feedback Log' : 'Simplified User Flow'}
+                {activeTab === 'feedback' ? 'Feedback Log' : 
+                 viewType === 'cards' ? 'User Flow Cards' : 'User Flow Diagram'}
               </CardTitle>
               <CardDescription className="text-gray-400">
                 {activeTab === 'feedback' 
                   ? 'Track and manage feedback for your project' 
-                  : 'View user journey and provide feedback'
+                  : viewType === 'cards'
+                  ? 'View and manage all user flows for this project'
+                  : 'Interactive diagram of user journey through your application'
                 }
               </CardDescription>
             </div>
             <div className="flex items-center gap-3">
+              {activeTab !== 'feedback' && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-black/30 border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/10"
+                  onClick={toggleViewType}
+                >
+                  {viewType === 'cards' 
+                    ? <BoxSelect className="w-4 h-4 mr-2" />
+                    : <LayoutGrid className="w-4 h-4 mr-2" />
+                  }
+                  <span>{viewType === 'cards' ? 'Show Diagram' : 'Show Cards'}</span>
+                </Button>
+              )}
+              
               <Button
                 variant="outline"
                 size="sm"
@@ -107,6 +179,7 @@ export default function MinimalUserFlow() {
                 <Expand className="w-4 h-4 mr-2" />
                 <span>Full Screen</span>
               </Button>
+              
               <Button
                 variant="outline"
                 size="sm"
@@ -132,7 +205,7 @@ export default function MinimalUserFlow() {
             >
               <TabsList className="grid grid-cols-2 mb-6">
                 <TabsTrigger value="diagram" className="data-[state=active]:bg-indigo-500/20">
-                  User Flow Diagram
+                  {viewType === 'cards' ? 'Flow Cards' : 'Flow Diagram'}
                 </TabsTrigger>
                 <TabsTrigger value="feedback" className="data-[state=active]:bg-indigo-500/20">
                   <MessageSquare className="w-4 h-4 mr-2" />
@@ -141,22 +214,29 @@ export default function MinimalUserFlow() {
               </TabsList>
               
               <TabsContent value="diagram" className="mt-0">
-                <div className="mb-4 p-3 bg-black/20 rounded-lg border border-blue-500/20">
-                  <p className="text-sm text-gray-300">
-                    This simplified diagram shows the key user journey through your application.
-                    <span className="ml-1 text-blue-400">Each node represents a key screen or action.</span>
-                  </p>
-                </div>
-                
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <Badge className="bg-emerald-600/80">Core Flow</Badge>
-                    <Badge className="bg-amber-600/80">Secondary Paths</Badge>
-                  </div>
-                </div>
-                
-                {/* Render the SimpleUserFlowDiagram component */}
-                <SimpleUserFlowDiagram projectId={projectId || 'minimal-flow'} />
+                {viewType === 'cards' ? (
+                  <UserFlowCardGrid projectId={projectId || 'minimal-flow'} />
+                ) : (
+                  <>
+                    <div className="mb-4 p-3 bg-black/20 rounded-lg border border-blue-500/20">
+                      <p className="text-sm text-gray-300">
+                        Interactive diagram showing the key user journey through your application.
+                        <span className="ml-1 text-blue-400">Click on any node to see details or add feedback.</span>
+                      </p>
+                    </div>
+                    
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <Badge className="bg-indigo-600/80">Screen</Badge>
+                        <Badge className="bg-amber-600/80">Action</Badge>
+                        <Badge className="bg-emerald-600/80">Decision</Badge>
+                      </div>
+                    </div>
+                    
+                    {/* Render the EnhancedUserFlowDiagram component */}
+                    <EnhancedUserFlowDiagram projectId={projectId || 'minimal-flow'} />
+                  </>
+                )}
               </TabsContent>
               
               <TabsContent value="feedback" className="mt-0">

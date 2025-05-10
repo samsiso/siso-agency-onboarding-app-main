@@ -3,11 +3,21 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ArrowDownToLine, ArrowLeft, Expand, Loader2, MessageSquare } from 'lucide-react';
+import { 
+  ArrowDownToLine, 
+  ArrowLeft, 
+  Expand, 
+  Loader2, 
+  MessageSquare, 
+  LayoutGrid, 
+  Network 
+} from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { ProjectHeader } from '@/components/projects/details/ProjectHeader';
 import { ProjectCardNavigation } from '@/components/projects/details/ProjectCardNavigation';
 import { UserFlowDiagram } from '@/components/projects/userflow/UserFlowDiagram';
+import { EnhancedUserFlowDiagram } from '@/components/projects/userflow/EnhancedUserFlowDiagram';
+import { UserFlowCardGrid } from '@/components/projects/userflow/cards/UserFlowCardGrid';
 import { FeedbackLogSection } from '@/components/projects/details/FeedbackLogSection';
 import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -17,6 +27,7 @@ export default function UserFlow() {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState('diagram');
+  const [viewMode, setViewMode] = useState<'diagram' | 'cards'>('diagram');
   
   // Parse the tab from query params
   useEffect(() => {
@@ -24,6 +35,11 @@ export default function UserFlow() {
     const tabParam = searchParams.get('tab');
     if (tabParam === 'feedback') {
       setActiveTab('feedback');
+    }
+    
+    const viewParam = searchParams.get('view');
+    if (viewParam === 'cards') {
+      setViewMode('cards');
     }
   }, [location.search]);
   
@@ -35,6 +51,18 @@ export default function UserFlow() {
       searchParams.set('tab', 'feedback');
     } else {
       searchParams.delete('tab');
+    }
+    navigate({ search: searchParams.toString() });
+  };
+  
+  // Handle view mode change
+  const handleViewModeChange = (mode: 'diagram' | 'cards') => {
+    setViewMode(mode);
+    const searchParams = new URLSearchParams(location.search);
+    if (mode === 'cards') {
+      searchParams.set('view', 'cards');
+    } else {
+      searchParams.delete('view');
     }
     navigate({ search: searchParams.toString() });
   };
@@ -81,6 +109,29 @@ export default function UserFlow() {
               </CardDescription>
             </div>
             <div className="flex items-center gap-3">
+              {activeTab === 'diagram' && (
+                <div className="bg-black/30 border border-gray-800 rounded-md flex items-center p-1 mr-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={`h-8 ${viewMode === 'diagram' ? 'bg-indigo-900/50 text-indigo-300' : 'text-gray-400'}`}
+                    onClick={() => handleViewModeChange('diagram')}
+                  >
+                    <Network className="w-4 h-4 mr-2" />
+                    <span>Diagram</span>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={`h-8 ${viewMode === 'cards' ? 'bg-indigo-900/50 text-indigo-300' : 'text-gray-400'}`}
+                    onClick={() => handleViewModeChange('cards')}
+                  >
+                    <LayoutGrid className="w-4 h-4 mr-2" />
+                    <span>Cards</span>
+                  </Button>
+                </div>
+              )}
+            
               <Button
                 variant="outline"
                 size="sm"
@@ -129,23 +180,29 @@ export default function UserFlow() {
               </TabsList>
               
               <TabsContent value="diagram" className="mt-0">
-                <div className="mb-4 p-3 bg-black/20 rounded-lg border border-blue-500/20">
-                  <p className="text-sm text-gray-300">
-                    This diagram shows the full user journey through your application. Each node represents a page or action in the flow.
-                    <span className="ml-1 text-blue-400">Click on any node to see more details.</span>
-                  </p>
-                </div>
-                
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <Badge className="bg-emerald-600/80">Live</Badge>
-                    <Badge className="bg-amber-600/80">In Development</Badge>
-                    <Badge className="bg-slate-600/80">Planned</Badge>
-                  </div>
-                </div>
-                
-                {/* Render the actual UserFlowDiagram component */}
-                <UserFlowDiagram projectId={projectId || 'ubahcrypt'} />
+                {viewMode === 'diagram' ? (
+                  <>
+                    <div className="mb-4 p-3 bg-black/20 rounded-lg border border-blue-500/20">
+                      <p className="text-sm text-gray-300">
+                        This diagram shows the full user journey through your application. Each node represents a page or action in the flow.
+                        <span className="ml-1 text-blue-400">Click on any node to see more details or right-click for more actions.</span>
+                      </p>
+                    </div>
+                    
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <Badge className="bg-emerald-600/80">Live</Badge>
+                        <Badge className="bg-amber-600/80">In Development</Badge>
+                        <Badge className="bg-slate-600/80">Planned</Badge>
+                      </div>
+                    </div>
+                    
+                    {/* Use the enhanced user flow diagram component */}
+                    <EnhancedUserFlowDiagram projectId={projectId || 'ubahcrypt'} />
+                  </>
+                ) : (
+                  <UserFlowCardGrid projectId={projectId || 'ubahcrypt'} />
+                )}
               </TabsContent>
               
               <TabsContent value="feedback" className="mt-0">
