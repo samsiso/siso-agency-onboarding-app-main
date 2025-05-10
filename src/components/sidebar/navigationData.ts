@@ -1,4 +1,3 @@
-
 import { 
   LayoutDashboard, ListTodo, MessageSquare, Wallet, 
   Trophy, FileText, HelpCircle, 
@@ -67,11 +66,6 @@ export const getMenuSections = (): MenuSection[] => {
           href: '/resources',
           icon: HelpCircle,
           label: 'Help & Support',
-        },
-        {
-          href: '/resources/documents',
-          icon: FileText,
-          label: 'Documents',
         }
       ]
     }

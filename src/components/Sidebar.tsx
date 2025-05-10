@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SidebarLogo } from './sidebar/SidebarLogo';
@@ -25,6 +24,7 @@ export const Sidebar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showNavigation, setShowNavigation] = useState(true);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isProjectDropdownOpen, setIsProjectDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { selectedProject, projects, selectProject } = useSelectedProject();
@@ -103,6 +103,12 @@ export const Sidebar = () => {
     }
   };
 
+  // Handle project selection with dropdown control
+  const handleProjectSelect = (projectId: string) => {
+    selectProject(projectId);
+    // Don't automatically close the dropdown - let the user close it
+  };
+
   return (
     <>
       {/* Mobile Menu Button with smooth icon transition */}
@@ -150,6 +156,7 @@ export const Sidebar = () => {
           fixed top-0 h-screen overflow-y-auto
           bg-gradient-to-b from-siso-bg to-siso-bg/95 
           border-r border-siso-text/10 shadow-lg
+          flex flex-col
           ${isMobile ? 'left-0 z-40' : ''}
         `}
         onMouseEnter={handleMouseEnter}
@@ -164,7 +171,10 @@ export const Sidebar = () => {
         {/* Project Selector - Expanded View */}
         {isExpanded ? (
           <div className="mx-4 my-4">
-            <DropdownMenu>
+            <DropdownMenu 
+              open={isProjectDropdownOpen} 
+              onOpenChange={setIsProjectDropdownOpen}
+            >
               <DropdownMenuTrigger asChild>
                 <Button 
                   variant="outline" 
@@ -198,6 +208,7 @@ export const Sidebar = () => {
               <DropdownMenuContent 
                 align="start" 
                 className="w-64 bg-siso-bg-alt border-siso-border"
+                onClick={(e) => e.stopPropagation()} // Prevent clicks from bubbling up
               >
                 <div className="py-2 px-3 text-xs font-medium text-siso-text-muted uppercase tracking-wider">
                   Your Projects
@@ -207,7 +218,11 @@ export const Sidebar = () => {
                   <DropdownMenuItem 
                     key={project.id}
                     className="flex items-center justify-between cursor-pointer hover:bg-black/20 py-2"
-                    onClick={() => selectProject(project.id)}
+                    onClick={() => handleProjectSelect(project.id)}
+                    onSelect={(e) => {
+                      // Prevent the automatic closing behavior
+                      e.preventDefault();
+                    }}
                   >
                     <div className="flex items-center gap-2">
                       {project.logo ? (
@@ -258,13 +273,18 @@ export const Sidebar = () => {
           </div>
         )}
         
-        <AnimatePresence mode="sync">
-          <SidebarNavigation 
-            collapsed={!isExpanded} 
-            onItemClick={handleItemClick}
-            visible={showNavigation}
-          />
-        </AnimatePresence>
+        {/* Main navigation - ensure it fills available space */}
+        <div className="flex-grow overflow-y-auto">
+          <AnimatePresence mode="sync">
+            <SidebarNavigation 
+              collapsed={!isExpanded} 
+              onItemClick={handleItemClick}
+              visible={showNavigation}
+            />
+          </AnimatePresence>
+        </div>
+
+        {/* Footer always at the bottom */}
         <SidebarFooter 
           collapsed={!isExpanded} 
           onProfileOpen={(isOpen) => {

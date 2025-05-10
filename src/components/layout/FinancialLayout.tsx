@@ -1,6 +1,6 @@
-
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { AppLayout } from './AppLayout';
+import { Link, useLocation } from 'react-router-dom';
 
 interface FinancialLayoutProps {
   children: ReactNode;
@@ -8,6 +8,17 @@ interface FinancialLayoutProps {
 }
 
 export function FinancialLayout({ children, title = "Financial & Account" }: FinancialLayoutProps) {
+  const location = useLocation();
+  
+  // Log when the component mounts
+  useEffect(() => {
+    console.log("FinancialLayout mounted", { path: location.pathname });
+  }, [location.pathname]);
+  
+  const isActive = (path: string) => {
+    return location.pathname.startsWith(path);
+  };
+  
   return (
     <AppLayout>
       <div className="p-4 md:p-8">
@@ -17,17 +28,26 @@ export function FinancialLayout({ children, title = "Financial & Account" }: Fin
               {title}
             </h1>
             <div className="flex items-center gap-4 mb-6">
-              <a href="/financial/payments" className="text-sm text-siso-text hover:text-siso-text-bold transition-colors">
+              <Link 
+                to="/financial/payments" 
+                className={`text-sm transition-colors ${isActive('/financial/payments') ? 'text-siso-orange font-medium' : 'text-siso-text hover:text-siso-text-bold'}`}
+              >
                 Payments & Billing
-              </a>
+              </Link>
               <span className="text-siso-text/30">•</span>
-              <a href="/economy/leaderboards" className="text-sm text-siso-text hover:text-siso-text-bold transition-colors">
+              <Link 
+                to="/economy/leaderboards" 
+                className={`text-sm transition-colors ${isActive('/economy/leaderboards') ? 'text-siso-orange font-medium' : 'text-siso-text hover:text-siso-text-bold'}`}
+              >
                 Leaderboards
-              </a>
+              </Link>
               <span className="text-siso-text/30">•</span>
-              <a href="/financial/profile" className="text-sm text-siso-text hover:text-siso-text-bold transition-colors">
+              <Link 
+                to="/profile" 
+                className={`text-sm transition-colors ${isActive('/profile') ? 'text-siso-orange font-medium' : 'text-siso-text hover:text-siso-text-bold'}`}
+              >
                 Profile & Settings
-              </a>
+              </Link>
             </div>
           </div>
           {children}
