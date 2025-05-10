@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SidebarLogo } from './sidebar/SidebarLogo';
 import { SidebarNavigation } from './sidebar/SidebarNavigation';
@@ -24,6 +24,8 @@ export const Sidebar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showNavigation, setShowNavigation] = useState(true);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { selectedProject, projects, selectProject } = useSelectedProject();
@@ -88,7 +90,8 @@ export const Sidebar = () => {
   };
 
   const handleMouseLeave = () => {
-    if (!isMobile && !isProfileOpen) {
+    // Don't collapse if dropdown is open
+    if (!isMobile && !isProfileOpen && !isDropdownOpen) {
       setIsExpanded(false);
     }
   };
@@ -106,6 +109,16 @@ export const Sidebar = () => {
   const handleProjectSelect = (projectId: string) => {
     // Select the project and close dropdown
     selectProject(projectId);
+    setIsDropdownOpen(false);
+  };
+
+  // Handle dropdown state change
+  const handleDropdownChange = (open: boolean) => {
+    setIsDropdownOpen(open);
+    // If dropdown is opening, make sure sidebar stays expanded
+    if (open && !isExpanded) {
+      setIsExpanded(true);
+    }
   };
 
   return (
@@ -169,8 +182,8 @@ export const Sidebar = () => {
         
         {/* Project Selector - Expanded View */}
         {isExpanded ? (
-          <div className="mx-4 my-4">
-            <DropdownMenu>
+          <div className="mx-4 my-4" ref={dropdownRef}>
+            <DropdownMenu open={isDropdownOpen} onOpenChange={handleDropdownChange}>
               <DropdownMenuTrigger asChild>
                 <Button 
                   variant="outline" 
@@ -240,14 +253,20 @@ export const Sidebar = () => {
                 <DropdownMenuSeparator className="bg-siso-border" />
                 <DropdownMenuItem 
                   className="flex items-center gap-2 cursor-pointer text-siso-orange hover:text-siso-red hover:bg-black/20"
-                  onClick={() => navigate('/plan-builder')}
+                  onClick={() => {
+                    navigate('/plan-builder');
+                    setIsDropdownOpen(false);
+                  }}
                 >
                   <FolderOpen className="h-4 w-4" />
                   <span>Create New Project</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                   className="text-siso-text hover:bg-black/20"
-                  onClick={() => navigate('/projects')}
+                  onClick={() => {
+                    navigate('/projects');
+                    setIsDropdownOpen(false);
+                  }}
                 >
                   View all projects
                 </DropdownMenuItem>
