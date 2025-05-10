@@ -52,7 +52,7 @@ export default defineConfig(({ mode }) => ({
           // Landing page chunks - split by section
           'landing-hero': ['@/components/ui/animated-hero'],
           'landing-features': ['@/components/blocks/feature-section-with-hover-effects'],
-          'landing-testimonials': ['@/components/landing/TestimonialSection'],
+          'landing-testimonials': ['@/components/landing/sections/TestimonialsSection'],
           'landing-pricing': ['@/components/ui/pricing-card'],
           
           // Chat components - split by functionality
