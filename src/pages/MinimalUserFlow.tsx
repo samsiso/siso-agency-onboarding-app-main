@@ -1,18 +1,18 @@
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ArrowDownToLine, ArrowLeft, Expand, Loader2, MessageSquare } from 'lucide-react';
+import { ArrowDownToLine, ArrowLeft, Expand, MessageSquare } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { ProjectHeader } from '@/components/projects/details/ProjectHeader';
 import { ProjectCardNavigation } from '@/components/projects/details/ProjectCardNavigation';
-import { UserFlowDiagram } from '@/components/projects/userflow/UserFlowDiagram';
+import { SimpleUserFlowDiagram } from '@/components/projects/userflow/SimpleUserFlowDiagram';
 import { FeedbackLogSection } from '@/components/projects/details/FeedbackLogSection';
-import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-export default function UserFlow() {
+export default function MinimalUserFlow() {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
@@ -41,16 +41,16 @@ export default function UserFlow() {
   
   // Basic project data for header
   const projectData = {
-    name: 'UbahCrypt Project',
-    description: 'A revolutionary blockchain-based cryptocurrency platform with enhanced security features and cross-chain capabilities.',
+    name: 'UbahCrypt Minimal Flow',
+    description: 'A lightweight version of the user flow diagram with feedback tracking capabilities',
     status: 'ACTIVE',
-    created_at: '2025-04-01T10:00:00Z',
+    created_at: '2023-07-01T10:00:00Z',
   };
   
   return (
     <AppLayout>
       <div className="container mx-auto px-4 py-6">
-        {/* Project Header - same as in ProjectDetails */}
+        {/* Project Header */}
         <div className="space-y-8 mb-6">
           <ProjectHeader 
             name={projectData.name} 
@@ -58,7 +58,7 @@ export default function UserFlow() {
             status={projectData.status} 
             created_at={projectData.created_at} 
           />
-          <ProjectCardNavigation projectId={projectId || 'ubahcrypt'} />
+          <ProjectCardNavigation projectId={projectId || 'minimal-flow'} />
         </div>
       
         <Card className="bg-black/20 border-gray-800 mb-6">
@@ -69,15 +69,15 @@ export default function UserFlow() {
                   variant="ghost" 
                   size="sm" 
                   className="text-gray-400 hover:text-white p-0 h-auto"
-                  onClick={() => navigate(`/projects/${projectId || 'ubahcrypt'}`)}
+                  onClick={() => navigate(`/projects/${projectId || 'minimal-flow'}`)}
                 >
                   <ArrowLeft className="w-4 h-4 mr-1" />
                   <span>Back to Project</span>
                 </Button>
               </div>
-              <CardTitle className="text-2xl font-bold text-white">User Flow & Journey</CardTitle>
+              <CardTitle className="text-2xl font-bold text-white">Simplified User Flow</CardTitle>
               <CardDescription className="text-gray-400">
-                Visualize the complete user experience and app flows
+                View user journey and provide feedback
               </CardDescription>
             </div>
             <div className="flex items-center gap-3">
@@ -131,21 +131,20 @@ export default function UserFlow() {
               <TabsContent value="diagram" className="mt-0">
                 <div className="mb-4 p-3 bg-black/20 rounded-lg border border-blue-500/20">
                   <p className="text-sm text-gray-300">
-                    This diagram shows the full user journey through your application. Each node represents a page or action in the flow.
-                    <span className="ml-1 text-blue-400">Click on any node to see more details.</span>
+                    This simplified diagram shows the key user journey through your application.
+                    <span className="ml-1 text-blue-400">Each node represents a key screen or action.</span>
                   </p>
                 </div>
                 
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <Badge className="bg-emerald-600/80">Live</Badge>
-                    <Badge className="bg-amber-600/80">In Development</Badge>
-                    <Badge className="bg-slate-600/80">Planned</Badge>
+                    <Badge className="bg-emerald-600/80">Core Flow</Badge>
+                    <Badge className="bg-amber-600/80">Secondary Paths</Badge>
                   </div>
                 </div>
                 
-                {/* Render the actual UserFlowDiagram component */}
-                <UserFlowDiagram projectId={projectId || 'ubahcrypt'} />
+                {/* Render the SimpleUserFlowDiagram component */}
+                <SimpleUserFlowDiagram projectId={projectId || 'minimal-flow'} />
               </TabsContent>
               
               <TabsContent value="feedback" className="mt-0">
@@ -157,4 +156,4 @@ export default function UserFlow() {
       </div>
     </AppLayout>
   );
-}
+} 

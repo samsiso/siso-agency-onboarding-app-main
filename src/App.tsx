@@ -53,14 +53,43 @@ import AdminWireframes from './pages/AdminWireframes';
 import UserFlow from './pages/UserFlow';
 import AdminUserFlow from './pages/AdminUserFlow';
 import ProjectPortfolioPage from './pages/ProjectPortfolioPage';
+import { useEffect } from 'react';
+import { runMigrations } from './api/migrations';
+import TestFlowPage from './components/projects/userflow/TestFlowPage';
+import MinimalUserFlow from './pages/MinimalUserFlow';
 
 function App() {
+  // Run migrations on app start
+  useEffect(() => {
+    const initializeMigrations = async () => {
+      try {
+        console.log('Running database migrations...');
+        const result = await runMigrations();
+        if (result.success) {
+          console.log('Database migrations completed successfully!');
+        } else {
+          console.error('Error running migrations:', result.error);
+        }
+      } catch (error) {
+        console.error('Unexpected error during migrations:', error);
+      }
+    };
+
+    initializeMigrations();
+  }, []);
+
   return (
     <>
       <Toaster />
       <Routes>
         {/* Test route for diagnosis */}
         <Route path="/test" element={<TestPage />} />
+        <Route path="/test-flow" element={<TestFlowPage />} />
+        
+        {/* User Flow routes */}
+        <Route path="/minimal-flow" element={<MinimalUserFlow />} />
+        <Route path="/minimal-flow/:projectId" element={<MinimalUserFlow />} />
+        <Route path="/projects/:projectId/feedback" element={<MinimalUserFlow />} />
         
         {/* Public routes */}
         <Route path="/" element={<Index />} />
@@ -104,7 +133,10 @@ function App() {
         <Route path="/projects/:id/userflow" element={<AuthGuard><UserFlow /></AuthGuard>} />
         <Route path="/projects/:id" element={<AuthGuard><ProjectDetailsPage /></AuthGuard>} />
         <Route path="/projects/:id/:tab" element={<AuthGuard><ProjectDetailsPage /></AuthGuard>} />
-        {/* New route for research document detail page */}
+        {/* Route order matters - put more specific routes first */}
+        {/* New route for creating research documents */}
+        <Route path="/projects/:projectId/market-research/new" element={<AuthGuard><ResearchDocumentDetail /></AuthGuard>} />
+        {/* Route for viewing existing research documents */}
         <Route path="/projects/:projectId/market-research/:documentId" element={<AuthGuard><ResearchDocumentDetail /></AuthGuard>} />
         
         <Route path="/my-projects" element={<AuthGuard><MyProjects /></AuthGuard>} />

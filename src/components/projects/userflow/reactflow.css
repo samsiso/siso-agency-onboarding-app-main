@@ -1,0 +1,90 @@
+/* ReactFlow specific styles to ensure proper display */
+.react-flow {
+  width: 100%;
+  height: 100%;
+  min-height: 600px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.react-flow__container {
+  flex-grow: 1;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.react-flow__renderer {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.react-flow__viewport {
+  transform-origin: 0 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.react-flow__pane {
+  z-index: 1;
+  cursor: grab;
+}
+
+.react-flow__pane.dragging {
+  cursor: grabbing;
+}
+
+/* Node styles */
+.react-flow__node {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.react-flow__node:hover {
+  transform: scale(1.05);
+}
+
+/* Edge styles */
+.react-flow__edge {
+  pointer-events: all;
+}
+
+.react-flow__edge-path {
+  stroke: #6b7280;
+  stroke-width: 2;
+}
+
+.react-flow__edge:hover .react-flow__edge-path {
+  stroke: #7c3aed;
+  stroke-width: 3;
+}
+
+/* Controls and panels */
+.react-flow__panel {
+  z-index: 5;
+}
+
+/* Background */
+.react-flow__background {
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Minimap */
+.react-flow__minimap {
+  bottom: 20px;
+  right: 20px;
+  z-index: 5;
+}
+
+/* Handle styles */
+.react-flow__handle {
+  width: 8px;
+  height: 8px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+} 
