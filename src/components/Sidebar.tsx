@@ -24,7 +24,6 @@ export const Sidebar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showNavigation, setShowNavigation] = useState(true);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isProjectDropdownOpen, setIsProjectDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { selectedProject, projects, selectProject } = useSelectedProject();
@@ -103,10 +102,10 @@ export const Sidebar = () => {
     }
   };
 
-  // Handle project selection with dropdown control
+  // Handle project selection
   const handleProjectSelect = (projectId: string) => {
+    // Select the project and close dropdown
     selectProject(projectId);
-    // Don't automatically close the dropdown - let the user close it
   };
 
   return (
@@ -171,10 +170,7 @@ export const Sidebar = () => {
         {/* Project Selector - Expanded View */}
         {isExpanded ? (
           <div className="mx-4 my-4">
-            <DropdownMenu 
-              open={isProjectDropdownOpen} 
-              onOpenChange={setIsProjectDropdownOpen}
-            >
+            <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button 
                   variant="outline" 
@@ -208,7 +204,6 @@ export const Sidebar = () => {
               <DropdownMenuContent 
                 align="start" 
                 className="w-64 bg-siso-bg-alt border-siso-border"
-                onClick={(e) => e.stopPropagation()} // Prevent clicks from bubbling up
               >
                 <div className="py-2 px-3 text-xs font-medium text-siso-text-muted uppercase tracking-wider">
                   Your Projects
@@ -219,10 +214,6 @@ export const Sidebar = () => {
                     key={project.id}
                     className="flex items-center justify-between cursor-pointer hover:bg-black/20 py-2"
                     onClick={() => handleProjectSelect(project.id)}
-                    onSelect={(e) => {
-                      // Prevent the automatic closing behavior
-                      e.preventDefault();
-                    }}
                   >
                     <div className="flex items-center gap-2">
                       {project.logo ? (
