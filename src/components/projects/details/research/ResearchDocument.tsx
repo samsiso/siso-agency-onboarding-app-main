@@ -1,10 +1,11 @@
-
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar, Download, Tag, ChevronUp, ChevronDown } from 'lucide-react';
+import { Calendar, Download, Tag, ChevronUp, ChevronDown, Info, ArrowRight, Clock } from 'lucide-react';
 import { AnimatedCard } from '@/components/ui/animated-card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ResearchDocument } from '../types';
+import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface ResearchDocumentProps {
   doc: ResearchDocument;
@@ -26,12 +27,75 @@ export function ResearchDocumentCard({
       onClick(doc);
     }
   };
+
+  // Format date to be more readable
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays < 7) {
+      // Show relative time for recent dates
+      if (diffDays === 0) {
+        return 'Today';
+      } else if (diffDays === 1) {
+        return 'Yesterday';
+      } else {
+        return `${diffDays} days ago`;
+      }
+    }
+    
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric'
+    });
+  };
+
+  // Calculate time difference for highlighting recent updates
+  const isRecent = () => {
+    const date = new Date(doc.updated_at);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays < 3; // Consider "recent" if updated in the last 3 days
+  };
+
   return (
     <Collapsible open={isExpanded} onOpenChange={onToggleExpand}>
-      <AnimatedCard className="border border-white/10 h-full cursor-pointer transition-all hover:border-white/30 hover:shadow-lg">
+      <AnimatedCard 
+        className={cn(
+          "border h-full transition-all hover:shadow-lg relative",
+          doc.isPinned 
+            ? "border-white/20 hover:border-purple-400/50 bg-black/40" 
+            : "border-white/10 hover:border-white/30 bg-black/20"
+        )}
+      >
+        {doc.isPinned && (
+          <div className="absolute -top-1 -right-1 w-0 h-0 border-t-[20px] border-r-[20px] border-purple-500 border-solid" />
+        )}
+        
+        {isRecent() && (
+          <div className="absolute top-2 right-2">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Badge className="bg-green-600 hover:bg-green-700 text-white border-none p-1">
+                    <Clock className="h-3 w-3" />
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Recently updated</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        )}
+        
         <div 
-          className="flex flex-col h-full"
-          onClick={handleClick}>
+          className="flex flex-col h-full p-5"
+        >
           <div className="mb-3 flex items-center justify-between">
             <Badge 
               variant="outline" 
@@ -39,61 +103,82 @@ export function ResearchDocumentCard({
             >
               {doc.category}
             </Badge>
-            <div className="text-xs text-neutral-500 flex items-center gap-1">
+            <div className="text-xs text-neutral-400 flex items-center gap-1">
               <Calendar className="h-3 w-3" /> 
-              Updated {new Date(doc.updated_at).toLocaleDateString()}
+              {formatDate(doc.updated_at)}
             </div>
           </div>
           
-          <h3 className="text-lg font-semibold text-white mb-2">{doc.title}</h3>
-          <p className="text-neutral-400 text-sm mb-4">{doc.description}</p>
+          <h3 
+            className="text-lg font-semibold text-white mb-2 hover:text-purple-300 transition-colors cursor-pointer"
+            onClick={handleClick}
+          >
+            {doc.title}
+          </h3>
+          
+          <p className="text-neutral-400 text-sm mb-4 line-clamp-3">{doc.description}</p>
           
           <div className="flex flex-wrap gap-2 mb-4">
-            {doc.tags.map((tag) => (
+            {doc.tags.slice(0, 3).map((tag) => (
               <Badge key={tag} variant="outline" className="text-xs">
                 <Tag className="h-3 w-3 mr-1" />{tag}
               </Badge>
             ))}
+            {doc.tags.length > 3 && (
+              <Badge variant="outline" className="text-xs bg-black/50">
+                +{doc.tags.length - 3} more
+              </Badge>
+            )}
           </div>
           
-          <CollapsibleContent className="mb-4 space-y-3">
+          <CollapsibleContent className="mb-4 text-sm">
             {doc.insights && doc.insights.length > 0 && (
-              <div className="bg-black/30 rounded-md p-3">
-                <h4 className="text-sm font-semibold text-[#FF9800] mb-2">Key Insights</h4>
-                <ul className="list-disc list-inside text-xs text-neutral-300 space-y-1">
-                  {doc.insights.map((insight, idx) => (
-                    <li key={idx}>{insight}</li>
+              <div className="mb-4">
+                <h4 className="text-sm font-medium text-white/80 mb-2 flex items-center">
+                  <Info className="h-3 w-3 mr-1 text-purple-400" />
+                  Key Insights
+                </h4>
+                <ul className="list-disc list-inside text-neutral-400 space-y-1 pl-2">
+                  {doc.insights.slice(0, 2).map((insight, idx) => (
+                    <li key={idx} className="text-xs">{insight}</li>
                   ))}
+                  {doc.insights.length > 2 && (
+                    <li className="text-xs text-purple-400">...and {doc.insights.length - 2} more insights</li>
+                  )}
                 </ul>
               </div>
             )}
-            
+
             {doc.nextSteps && doc.nextSteps.length > 0 && (
-              <div className="bg-black/30 rounded-md p-3">
-                <h4 className="text-sm font-semibold text-[#FF9800] mb-2">Recommended Actions</h4>
-                <ul className="list-disc list-inside text-xs text-neutral-300 space-y-1">
-                  {doc.nextSteps.map((step, idx) => (
-                    <li key={idx}>{step}</li>
+              <div className="mb-3">
+                <h4 className="text-sm font-medium text-white/80 mb-2 flex items-center">
+                  <ArrowRight className="h-3 w-3 mr-1 text-teal-400" />
+                  Next Steps
+                </h4>
+                <ul className="list-disc list-inside text-neutral-400 space-y-1 pl-2">
+                  {doc.nextSteps.slice(0, 1).map((step, idx) => (
+                    <li key={idx} className="text-xs">{step}</li>
                   ))}
+                  {doc.nextSteps.length > 1 && (
+                    <li className="text-xs text-teal-400">...and {doc.nextSteps.length - 1} more steps</li>
+                  )}
                 </ul>
-              </div>
-            )}
-            
-            {doc.code_snippet && (
-              <div className="bg-black/50 rounded-md p-3 font-mono">
-                <h4 className="text-sm font-semibold text-[#FF9800] mb-2">Code Example</h4>
-                <pre className="text-xs overflow-x-auto whitespace-pre-wrap text-neutral-300">
-                  {doc.code_snippet}
-                </pre>
               </div>
             )}
           </CollapsibleContent>
           
           <div className="flex justify-between items-center mt-auto">
             <div className="flex items-center gap-2">
-              <Button variant="ghost" className="text-[#FF5722] hover:text-[#E64A19] p-0 h-8">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="text-purple-400 hover:text-purple-300 hover:bg-purple-900/20 p-0 h-8 flex items-center gap-1"
+                onClick={handleClick}
+              >
                 View Details
+                <ArrowRight className="h-3 w-3 ml-1" />
               </Button>
+              
               <CollapsibleTrigger asChild>
                 <Button variant="ghost" size="sm" className="h-6 p-0 text-xs text-neutral-400">
                   {isExpanded ? (
@@ -108,6 +193,7 @@ export function ResearchDocumentCard({
                 </Button>
               </CollapsibleTrigger>
             </div>
+            
             {doc.fileUrl && (
               <Button 
                 variant="ghost" 

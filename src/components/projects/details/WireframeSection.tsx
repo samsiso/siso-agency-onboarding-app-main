@@ -1,15 +1,16 @@
-
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Image, Upload, Download } from "lucide-react";
+import { AlertCircle, ArrowRight, Image, Upload, Download, RefreshCcw, UserCheck, Lock, Info } from "lucide-react";
 import { NavLink } from "@/components/ui/nav-link";
 import { WireframeViewer } from "@/components/projects/wireframes/WireframeViewer";
 import { WireframeNavigation } from "@/components/projects/wireframes/WireframeNavigation";
 import { WireframeFlowConnector } from "@/components/projects/wireframes/WireframeFlowConnector";
 import { useProjectWireframes } from "@/hooks/useProjectWireframes";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/components/ui/use-toast";
 
 export function WireframeSection() {
+  const { toast } = useToast();
   const {
     wireframes,
     connections,
@@ -18,8 +19,18 @@ export function WireframeSection() {
     activeWireframeId,
     setActiveWireframeId,
     activeWireframe,
-    downloadWireframe
+    downloadWireframe,
+    connectionStatus,
+    isMcpEnvironment
   } = useProjectWireframes();
+
+  const handleRetry = () => {
+    window.location.reload();
+    toast({
+      title: "Retrying connection",
+      description: "Attempting to reconnect to the database..."
+    });
+  };
 
   if (loading) {
     return (
@@ -35,8 +46,69 @@ export function WireframeSection() {
     );
   }
 
-  // Even if there's an error, we'll show the default wireframes
-  // So we only respect the loading state
+  // Display an error message if there was an error and no wireframes were loaded
+  if (error && wireframes.length === 0 && !isMcpEnvironment) {
+    const isAuthError = error.includes('Authentication') || (connectionStatus && !connectionStatus.authenticated);
+    const isConnectionError = error.includes('connect') || (connectionStatus && !connectionStatus.connected);
+    
+    return (
+      <Card className="p-6 bg-black/30 border-siso-text/10">
+        <div className="flex items-center gap-2 mb-4">
+          <h3 className="text-xl font-semibold text-white">Wireframes</h3>
+          <Image className="w-5 h-5 text-[#9b87f5]" />
+        </div>
+        <div className="space-y-4">
+          <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-6 text-center">
+            {isAuthError ? (
+              <Lock className="w-12 h-12 text-red-500 mx-auto mb-4" />
+            ) : isConnectionError ? (
+              <AlertCircle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+            ) : (
+              <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+            )}
+            
+            <h4 className="text-lg font-medium text-white mb-2">
+              {isAuthError ? "Authentication Required" : 
+               isConnectionError ? "Connection Error" : 
+               "Error loading wireframes"}
+            </h4>
+            
+            <p className="text-gray-300 mb-4">
+              {isAuthError 
+                ? "You need to be signed in to view wireframes." 
+                : isConnectionError 
+                  ? "Failed to connect to the Supabase database." 
+                  : error || "Failed to load wireframes from the database."}
+            </p>
+            
+            <p className="text-gray-400 text-sm mb-6">
+              {isAuthError 
+                ? "Please sign in to your account to access this feature." 
+                : isConnectionError 
+                  ? "Check your network connection or try again later." 
+                  : "This could be due to a database issue or missing permissions."}
+            </p>
+            
+            <Button 
+              variant="outline" 
+              onClick={handleRetry}
+              className="bg-black/30 border-red-500/30 text-red-400 hover:bg-red-500/10"
+            >
+              <RefreshCcw className="w-4 h-4 mr-2" />
+              <span>Retry Connection</span>
+            </Button>
+            
+            {isAuthError && (
+              <NavLink href="/auth/signin" className="ml-2 inline-flex items-center bg-black/30 border border-blue-500/30 text-blue-400 hover:bg-blue-500/10 py-2 px-3 rounded-md">
+                <UserCheck className="w-4 h-4 mr-2" />
+                <span>Sign In</span>
+              </NavLink>
+            )}
+          </div>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className="p-6 bg-black/30 border-siso-text/10">
@@ -54,6 +126,53 @@ export function WireframeSection() {
           <span>Upload New</span>
         </Button>
       </div>
+      
+      {error && !isMcpEnvironment && (
+        <div className="mb-4 p-3 bg-red-900/20 rounded-lg border border-red-500/30">
+          <div className="flex items-start gap-2">
+            <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm text-red-300 mb-1">
+                {connectionStatus && !connectionStatus.authenticated
+                  ? "Authentication required: You need to be signed in to access the full wireframe data."
+                  : connectionStatus && !connectionStatus.connected
+                  ? "Connection error: Could not connect to the database."
+                  : "There was an issue loading wireframes from the database, but we've loaded all wireframes for you to preview."}
+              </p>
+              <div className="flex gap-2 mt-1">
+                <Button 
+                  variant="link" 
+                  onClick={handleRetry} 
+                  className="h-auto p-0 text-red-400 hover:text-red-300"
+                >
+                  <RefreshCcw className="w-3.5 h-3.5 mr-1 inline-block" />
+                  <span className="text-xs">Retry connection</span>
+                </Button>
+                
+                {connectionStatus && !connectionStatus.authenticated && !isMcpEnvironment && (
+                  <NavLink href="/auth/signin" className="text-blue-400 hover:text-blue-300 text-xs flex items-center">
+                    <UserCheck className="w-3.5 h-3.5 mr-1" />
+                    <span>Sign in</span>
+                  </NavLink>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {isMcpEnvironment && (
+        <div className="mb-4 p-3 bg-blue-900/20 rounded-lg border border-blue-500/30">
+          <div className="flex items-start gap-2">
+            <Info className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm text-blue-300 mb-1">
+                Connected to Supabase through MCP server. Displaying all UbahCrypt wireframes.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
       
       <div className="mb-4 p-3 bg-black/20 rounded-lg border border-purple-500/20">
         <p className="text-sm text-gray-300">

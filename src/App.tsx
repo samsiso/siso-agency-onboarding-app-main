@@ -90,6 +90,7 @@ function App() {
         <Route path="/minimal-flow" element={<MinimalUserFlow />} />
         <Route path="/minimal-flow/:projectId" element={<MinimalUserFlow />} />
         <Route path="/projects/:projectId/feedback" element={<MinimalUserFlow />} />
+        <Route path="/projects/:projectId/feedback-log" element={<MinimalUserFlow />} />
         
         {/* Public routes */}
         <Route path="/" element={<Index />} />

@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
 import { ProjectHeader } from './details/ProjectHeader';
@@ -17,6 +16,9 @@ import { WireframeSection } from './details/WireframeSection';
 import { AnimatedCard } from '@/components/ui/animated-card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+// Use the simplified version for now to fix the white screen issue
+import { SimpleUserFlowDiagram } from './userflow/SimpleUserFlowDiagram';
+import { toast } from '@/components/ui/use-toast';
 
 export function ProjectDetails() {
   const { id, tab } = useParams<{ id?: string; tab?: string }>();
@@ -150,12 +152,40 @@ export function ProjectDetails() {
           </div>
         );
       case 'user-flow':
-        // Use React Router navigation to avoid full page reload
-        // This will properly navigate using the React Router context
-        navigate(`/projects/${projectId}/userflow`);
         return (
-          <div className="p-6 text-center text-neutral-400 bg-black/30 rounded-lg border border-white/10" ref={contentRef}>
-            <p>Redirecting to User Flow page...</p>
+          <div ref={contentRef}>
+            <AnimatedCard className="mb-6">
+              <h2 className="text-2xl font-bold text-white mb-4">User Flow & Journey</h2>
+              <p className="text-gray-300">
+                This diagram shows the full user journey through your application. Each node represents a 
+                page or action in the flow. Click on any node to see more details.
+              </p>
+              <div className="flex items-center justify-between mt-4">
+                <div className="flex items-center gap-2">
+                  <Badge className="bg-emerald-600/80">Live</Badge>
+                  <Badge className="bg-amber-600/80">In Development</Badge>
+                  <Badge className="bg-slate-600/80">Planned</Badge>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-black/30 border-blue-500/30 text-blue-400 hover:bg-blue-500/10"
+                    onClick={() => {
+                      toast({
+                        title: "Coming Soon",
+                        description: "Full screen mode will be available in the next update."
+                      });
+                    }}
+                  >
+                    <span>Full Screen</span>
+                  </Button>
+                </div>
+              </div>
+            </AnimatedCard>
+            <div className="bg-black/20 border border-gray-800 rounded-lg overflow-hidden h-[600px]">
+              <SimpleUserFlowDiagram projectId={projectId} />
+            </div>
           </div>
         );
       case 'feedback-log':

@@ -1,8 +1,11 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Use environment variables or fallback to hardcoded values for demo
-const supabaseUrl = 'https://avdgyrepwrvsvwgxrccr.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF2ZGd5cmVwd3J2c3Z3Z3hyY2NyIiwicm9sZSI6ImFub24iLCJpYXQiOjE2ODUxODcxNjEsImV4cCI6MjAwMDc2MzE2MX0.o_S5XvxL7WLjzfO4e_ld_FKhWZGjbJGfCqQULPFjH20'; // Demo key for example only
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables');
+}
 
 // Create client with custom settings for better error reporting
 const options = {

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { FileText, Search, SlidersHorizontal, AlertCircle, X, Plus, Calendar } from 'lucide-react';
+import { FileText, Search, SlidersHorizontal, AlertCircle, X, Plus, Calendar, Bot } from 'lucide-react';
 import { PinnedResearchAsset } from './research/PinnedResearchAsset';
 import { ResearchDocumentCard } from './research/ResearchDocument';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -155,53 +155,45 @@ export function ResearchSection() {
     setError(null);
     
     try {
-      // Try Supabase first but prepare for failure
-      const mockData = createEnhancedMockData();
-      
-      try {
-        // Attempt to fetch from Supabase
-        const { data, error } = await supabase
-          .from('project_documentation')
-          .select('*')
-          .order('created_at', { ascending: false });
-          
-        // Use Supabase data if available
-        if (!error && data && data.length > 0) {
-          console.log('Successfully loaded data from Supabase:', data.length);
-          
-          // Transform the data
-          const formattedData: ResearchDocument[] = data.map(doc => ({
-            id: doc.id || `doc-${Math.random()}`,
-            title: doc.title || 'Untitled Document',
-            description: doc.content ? (doc.content.substring(0, 150) + '...') : 'No description available',
-            content: doc.content || 'Detailed content unavailable',
-            category: doc.section || 'Uncategorized',
-            section: doc.section || 'general',
-            created_at: doc.created_at || new Date().toISOString(),
-            updated_at: doc.updated_at || new Date().toISOString(),
-            tags: doc.related_components || [], 
-            project_id: doc.project_id || projectId || 'default',
-            order_index: doc.order_index || 999,
-            related_components: doc.related_components || [],
-            isPinned: doc.order_index !== null && doc.order_index < 3,
-          }));
-          
-          setResearchDocuments(formattedData);
-        } else {
-          // Fall back to mock data
-          console.log('No data in Supabase, using mock data');
-          setResearchDocuments(mockData);
-        }
-      } catch (supabaseError) {
-        // Handle Supabase error gracefully
-        console.log('Supabase error, using mock data:', supabaseError);
-        setResearchDocuments(mockData);
+      // Fetch directly from research_documents table
+      const { data, error } = await supabase
+        .from('research_documents')
+        .select('*')
+        .order('created_at', { ascending: false });
+        
+      if (!error && data && data.length > 0) {
+        console.log('Successfully loaded data from research_documents:', data.length);
+        
+        // Transform the data
+        const formattedData: ResearchDocument[] = data.map(doc => ({
+          id: doc.id || `doc-${Math.random()}`,
+          title: doc.title || 'Untitled Document',
+          description: doc.description || 'No description available',
+          content: doc.description || 'Detailed content unavailable',
+          category: doc.category || 'Uncategorized',
+          section: doc.category || 'general',
+          created_at: doc.created_at || new Date().toISOString(),
+          updated_at: doc.updated_at || new Date().toISOString(),
+          tags: doc.tags || [], 
+          insights: doc.insights || [],
+          nextSteps: doc.next_steps || [],
+          project_id: doc.project_id || projectId || 'default',
+          order_index: doc.is_pinned ? 1 : 999,
+          related_components: doc.tags || [],
+          isPinned: doc.is_pinned || false,
+        }));
+        
+        setResearchDocuments(formattedData);
+      } else {
+        // Fall back to mock data
+        console.log('No data in research_documents, using mock data:', error);
+        setResearchDocuments(createEnhancedMockData());
       }
     } catch (err) {
-      // Ultimate fallback - this should never fail
-      console.error('Error in research documents logic:', err);
-      const ultimateFallbackData = createEnhancedMockData();
-      setResearchDocuments(ultimateFallbackData);
+      // Handle errors
+      console.error('Error fetching research documents:', err);
+      setResearchDocuments(createEnhancedMockData());
+      setError('Failed to load research documents. Using sample data instead.');
     } finally {
       setIsLoading(false);
     }
@@ -229,18 +221,20 @@ export function ResearchSection() {
       // Prepare document data
       const documentData = {
         title: newDocument.title,
-        content: newDocument.content,
-        section: newDocument.section,
-        related_components: tagsArray,
+        description: newDocument.content,
+        category: newDocument.section,
+        tags: tagsArray,
+        insights: [],
+        next_steps: [],
         project_id: projectId || 'default',
+        is_pinned: false,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        order_index: 999, // High number for non-pinned items
       };
       
-      // Insert into Supabase
+      // Insert into Supabase research_documents table
       const { data, error } = await supabase
-        .from('project_documentation')
+        .from('research_documents')
         .insert(documentData)
         .select();
         
@@ -248,13 +242,13 @@ export function ResearchSection() {
         throw new Error(error.message);
       }
       
-      // Success handling
       toast({
         title: "Document Added",
-        description: "Your research document has been successfully added.",
+        description: "Your research document has been added successfully.",
       });
       
-      // Reset form and close dialog
+      // Close dialog and reset form
+      setIsDialogOpen(false);
       setNewDocument({
         title: '',
         content: '',
@@ -262,16 +256,15 @@ export function ResearchSection() {
         related_components: [],
         tags: ''
       });
-      setIsDialogOpen(false);
       
-      // Refresh documents list
+      // Refresh the list
       fetchResearchDocuments();
       
     } catch (err) {
       console.error('Error adding document:', err);
       toast({
         title: "Error",
-        description: `Failed to add document: ${err instanceof Error ? err.message : 'Unknown error'}`,
+        description: "Failed to add the document. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -291,7 +284,7 @@ export function ResearchSection() {
     setIsDialogOpen(false);
   };
   
-  // Fetch research documents on component mount and when projectId changes
+  // Load data when component mounts
   useEffect(() => {
     fetchResearchDocuments();
   }, [projectId]);
@@ -308,6 +301,18 @@ export function ResearchSection() {
   const handleDocumentClick = (doc: ResearchDocument) => {
     console.log('Document clicked:', doc.title);
     navigate(`/projects/${projectId}/market-research/${doc.id}`);
+  };
+
+  // Add a function to create a new Grok chat document
+  const createNewGrokChat = () => {
+    navigate(`/projects/${projectId}/market-research/new`);
+  };
+  
+  // Handle sort selection change
+  const handleSortChange = (value: string) => {
+    if (value === 'updated' || value === 'title' || value === 'category') {
+      setSortBy(value);
+    }
   };
 
   // Get count of documents in a category
@@ -339,10 +344,6 @@ export function ResearchSection() {
     }
     return 0;
   });
-
-  // Separate pinned and regular documents
-  const pinnedDocs = sortedDocuments.filter(doc => doc.isPinned);
-  const regularDocs = sortedDocuments.filter(doc => !doc.isPinned);
   
   // Render loading skeletons while data is being fetched
   if (isLoading) {
@@ -401,6 +402,24 @@ export function ResearchSection() {
               </TooltipTrigger>
               <TooltipContent>
                 <p>Add new research documents</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="default" 
+                  className="bg-purple-600 hover:bg-purple-700" 
+                  onClick={createNewGrokChat}
+                >  
+                  <Bot className="mr-2 h-4 w-4" />
+                  Add Detailed Research
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Create a document from your research text</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -511,31 +530,39 @@ export function ResearchSection() {
         getCategoryCount={getCategoryCount}
       />
       
-      {pinnedDocs.length > 0 && (
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold text-white/90 mb-3 border-b border-white/10 pb-2">
-            Pinned Project Assets
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {pinnedDocs.map((doc) => (
-              <PinnedResearchAsset 
-                key={doc.id} 
-                doc={doc} 
-                categoryColors={categoryColors}
-                onClick={() => handleDocumentClick(doc)}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-      
-      {regularDocs.length > 0 ? (
+      {sortedDocuments.length > 0 ? (
         <div>
-          <h3 className="text-lg font-semibold text-white/90 mb-3 border-b border-white/10 pb-2">
-            All Research Documents
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {regularDocs.map((doc) => (
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
+            <h3 className="text-lg font-semibold text-white/90 border-b border-white/10 pb-2">
+              Research Documents ({sortedDocuments.length})
+            </h3>
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <Button variant="outline" size="sm" onClick={() => setIsDialogOpen(true)}>
+                <Plus className="h-3.5 w-3.5 mr-1.5" />
+                Add Document
+              </Button>
+              <Button variant="default" size="sm" onClick={createNewGrokChat} className="bg-purple-600 hover:bg-purple-700">
+                <Plus className="h-3.5 w-3.5 mr-1.5" />
+                Add Detailed Research
+              </Button>
+              <Select
+                value={sortBy}
+                onValueChange={handleSortChange}
+              >
+                <SelectTrigger className="h-8 text-xs w-[140px]">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="updated">Latest Updated</SelectItem>
+                  <SelectItem value="title">Title (A-Z)</SelectItem>
+                  <SelectItem value="category">Category</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {sortedDocuments.map((doc) => (
               <ResearchDocumentCard
                 key={doc.id}
                 doc={doc}
@@ -554,7 +581,9 @@ export function ResearchSection() {
           <p className="text-neutral-400 max-w-md mx-auto mt-2">
             {activeCategory !== 'All' 
               ? `No documents in the '${activeCategory}' category.` 
-              : 'Try adjusting your filters or add a new document.'}
+              : searchQuery 
+                ? `No results for "${searchQuery}"`
+                : 'Try adjusting your filters or add a new document.'}
           </p>
           <Button 
             className="mt-4" 

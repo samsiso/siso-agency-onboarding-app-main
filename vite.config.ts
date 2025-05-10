@@ -1,4 +1,3 @@
-
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc"; // Using plugin-react-swc which is already in the project
 import path from "path";
@@ -35,6 +34,9 @@ export default defineConfig(({ mode }) => ({
           // Core vendor bundles - split by functionality
           'react-core': ['react', 'react-dom'],
           'react-router': ['react-router-dom'],
+          
+          // Add ReactFlow to manual chunks
+          'reactflow': ['reactflow', 'reactflow/dist/style.css'],
           
           // UI Components bundles - split by feature
           'ui-core': ['@radix-ui/react-slot'],
@@ -129,7 +131,9 @@ export default defineConfig(({ mode }) => ({
       '@radix-ui/react-tabs',
       'clsx',
       'tailwind-merge',
-      'lucide-react'
+      'lucide-react',
+      'reactflow',
+      'html-to-image'
     ],
     exclude: ['moralis']
   },

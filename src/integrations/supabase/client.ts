@@ -8,4 +8,110 @@ const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+// Create Supabase client with enhanced options for proxy compatibility
+export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
+  },
+  global: {
+    headers: {
+      'X-Client-Info': 'siso-agency-app',
+      'X-Supabase-Auth-MCP': 'true' // Special header for MCP server
+    }
+  },
+  // Increase timeout for slow connections through MCP
+  realtime: {
+    timeout: 60000
+  }
+});
+
+/**
+ * Checks if the Supabase connection is working and authenticated
+ * @returns A promise that resolves to an object with connection status
+ */
+export const checkSupabaseConnection = async () => {
+  try {
+    // First try to get the current user session
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    
+    if (sessionError) {
+      console.error('Session error:', sessionError);
+      return {
+        connected: false,
+        authenticated: false,
+        error: sessionError.message
+      };
+    }
+    
+    // Check if we need to force proxy-aware authentication
+    const isRunningOnProxy = window.location.port === '8083' || window.location.host.includes('mcp');
+    
+    if (isRunningOnProxy && !session) {
+      console.log('Running on MCP proxy, using direct connection');
+    }
+    
+    // Try a query that doesn't require authentication first - use 'projects' table instead of 'public_data'
+    try {
+      const { error: publicQueryError } = await supabase
+        .from('projects')
+        .select('id')
+        .limit(1)
+        .maybeSingle();
+      
+      if (!publicQueryError) {
+        // We can connect to public data at least
+        console.log('Successfully connected to Supabase through MCP server');
+      }
+    } catch (e) {
+      // Ignore errors on this check
+    }
+    
+    // Even if no session, try a basic query to see if connection works
+    const { error: queryError } = await supabase
+      .from('projects')
+      .select('id')
+      .limit(1);
+      
+    if (queryError) {
+      console.error('Query error:', queryError);
+      
+      // Special handling for common MCP-related errors
+      if (queryError.message.includes('JWT') || queryError.message.includes('token')) {
+        return {
+          connected: true, // Connection works but auth doesn't
+          authenticated: false,
+          error: 'Authentication required for this operation',
+          isProxyAuth: isRunningOnProxy,
+          usingMcp: true
+        };
+      }
+      
+      return {
+        connected: false,
+        authenticated: false,
+        error: queryError.message,
+        isProxyAuth: isRunningOnProxy
+      };
+    }
+    
+    return {
+      connected: true,
+      authenticated: !!session,
+      userId: session?.user?.id,
+      isProxyAuth: isRunningOnProxy,
+      usingMcp: isRunningOnProxy
+    };
+  } catch (error) {
+    console.error('Connection check error:', error);
+    const isRunningOnProxy = window.location.port === '8083' || window.location.host.includes('mcp');
+    
+    return {
+      connected: false,
+      authenticated: false,
+      error: error instanceof Error ? error.message : 'Unknown error checking connection',
+      isProxyAuth: isRunningOnProxy
+    };
+  }
+};

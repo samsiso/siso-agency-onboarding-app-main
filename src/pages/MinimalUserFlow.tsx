@@ -18,14 +18,21 @@ export default function MinimalUserFlow() {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState('diagram');
   
-  // Parse the tab from query params
+  // Parse the tab from query params and URL path
   useEffect(() => {
+    // Check if URL path includes "feedback-log"
+    if (location.pathname.includes('feedback-log')) {
+      setActiveTab('feedback');
+      return;
+    }
+    
+    // Check query parameters for tab=feedback
     const searchParams = new URLSearchParams(location.search);
     const tabParam = searchParams.get('tab');
     if (tabParam === 'feedback') {
       setActiveTab('feedback');
     }
-  }, [location.search]);
+  }, [location.pathname, location.search]);
   
   // Handle tab change and update URL
   const handleTabChange = (value: string) => {
@@ -75,9 +82,14 @@ export default function MinimalUserFlow() {
                   <span>Back to Project</span>
                 </Button>
               </div>
-              <CardTitle className="text-2xl font-bold text-white">Simplified User Flow</CardTitle>
+              <CardTitle className="text-2xl font-bold text-white">
+                {activeTab === 'feedback' ? 'Feedback Log' : 'Simplified User Flow'}
+              </CardTitle>
               <CardDescription className="text-gray-400">
-                View user journey and provide feedback
+                {activeTab === 'feedback' 
+                  ? 'Track and manage feedback for your project' 
+                  : 'View user journey and provide feedback'
+                }
               </CardDescription>
             </div>
             <div className="flex items-center gap-3">

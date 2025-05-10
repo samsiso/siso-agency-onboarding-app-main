@@ -2711,6 +2711,68 @@ export type Database = {
         }
         Relationships: []
       }
+      research_documents: {
+        Row: {
+          id: string
+          title: string
+          description: string | null
+          content: string | null
+          category: string
+          tags: string[] | null
+          insights: string[] | null
+          next_steps: string[] | null
+          code_snippet: string | null
+          file_url: string | null
+          project_id: string | null
+          is_pinned: boolean | null
+          order_index: number | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          title: string
+          description?: string | null
+          content?: string | null
+          category?: string
+          tags?: string[] | null
+          insights?: string[] | null
+          next_steps?: string[] | null
+          code_snippet?: string | null
+          file_url?: string | null
+          project_id?: string | null
+          is_pinned?: boolean | null
+          order_index?: number | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          title?: string
+          description?: string | null
+          content?: string | null
+          category?: string
+          tags?: string[] | null
+          insights?: string[] | null
+          next_steps?: string[] | null
+          code_snippet?: string | null
+          file_url?: string | null
+          project_id?: string | null
+          is_pinned?: boolean | null
+          order_index?: number | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "research_documents_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
