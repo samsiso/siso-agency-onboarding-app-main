@@ -9,11 +9,6 @@ import MinimalUserFlow from './pages/MinimalUserFlow';
 import Index from './pages/Index';
 import Home from './pages/Home';
 import LeaderboardPage from './pages/LeaderboardPage';
-import TasksPage from './pages/projects/TasksPage';
-import TimelinePage from './pages/projects/TimelinePage';
-import PlanFeaturesPage from './pages/projects/PlanFeaturesPage';
-import PlanBuilderPage from './pages/PlanBuilderPage';
-import ResourcesPage from './pages/ResourcesPage';
 
 function App() {
   return (
@@ -31,10 +26,10 @@ function App() {
         <Route path="/projects/:id/userflow" element={<AuthGuard><UserFlow /></AuthGuard>} />
         
         {/* Project Routes */}
-        <Route path="/projects/tasks" element={<AuthGuard><TasksPage /></AuthGuard>} />
-        <Route path="/projects/timeline" element={<AuthGuard><TimelinePage /></AuthGuard>} />
-        <Route path="/projects/plan-features" element={<AuthGuard><PlanFeaturesPage /></AuthGuard>} />
-        <Route path="/plan-builder" element={<AuthGuard><PlanBuilderPage /></AuthGuard>} />
+        <Route path="/projects/tasks" element={<AuthGuard><Home /></AuthGuard>} />
+        <Route path="/projects/timeline" element={<AuthGuard><Home /></AuthGuard>} />
+        <Route path="/projects/plan-features" element={<AuthGuard><Home /></AuthGuard>} />
+        <Route path="/plan-builder" element={<AuthGuard><Home /></AuthGuard>} />
         
         {/* Financial Routes */}
         <Route path="/financial/payments" element={<AuthGuard><PaymentsPage /></AuthGuard>} />
@@ -46,7 +41,7 @@ function App() {
         <Route path="/economy/leaderboards" element={<AuthGuard><LeaderboardPage /></AuthGuard>} />
         
         {/* Resources Routes */}
-        <Route path="/resources" element={<AuthGuard><ResourcesPage /></AuthGuard>} />
+        <Route path="/resources" element={<AuthGuard><Home /></AuthGuard>} />
         
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
