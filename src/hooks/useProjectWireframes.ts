@@ -2,9 +2,21 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client'; 
 import { toast } from '@/components/ui/use-toast';
-import { Wireframe } from '@/components/projects/wireframes/WireframeNavigation';
 
-interface Connection {
+// Types for wireframes and connections
+export interface Wireframe {
+  id: string;
+  title: string;
+  category: string;
+  description: string;
+  notionUiPlanLink?: string;
+  wireframeStatus: 'planned' | 'in-progress' | 'complete';
+  specsStatus: 'pending' | 'in-review' | 'approved';
+  devStatus: 'pending' | 'in-progress' | 'complete';
+  imageUrl?: string;
+}
+
+export interface Connection {
   from: string;
   to: string;
   label?: string;
@@ -304,17 +316,15 @@ const SAMPLE_CONNECTIONS: Connection[] = [
   { from: '8', to: '10', label: 'View transaction history' },
   { from: '8', to: '11', label: 'Calculate fees' },
   { from: '7', to: '13', label: 'View earning options' },
-  { from: '7', to: '22', label: 'View analytics' },
-  { from: '3', to: '14', label: 'Browse NFTs' },
-  { from: '3', to: '15', label: 'Security settings' },
-  { from: '3', to: '16', label: 'Update profile' },
-  { from: '3', to: '17', label: 'View notifications' },
-  { from: '3', to: '18', label: 'Get help' },
-  { from: '3', to: '19', label: 'Refer a friend' },
-  { from: '6', to: '21', label: 'Manage payment methods' },
-  { from: '3', to: '23', label: 'App settings' },
-  { from: '6', to: '24', label: 'Bridge assets' },
-  { from: '3', to: '25', label: 'View DeFi options' }
+  { from: '7', to: '22', label: 'View assets' },
+  { from: '9', to: '16', label: 'Manage order' },
+  { from: '13', to: '17', label: 'Deploy staking' },
+  { from: '17', to: '18', label: 'View rewards' },
+  { from: '14', to: '19', label: 'Purchase NFT' },
+  { from: '15', to: '21', label: 'Enable 2FA' },
+  { from: '21', to: '23', label: 'Add recovery options' },
+  { from: '22', to: '24', label: 'View asset details' },
+  { from: '19', to: '25', label: 'View NFT details' },
 ];
 
 export function useProjectWireframes() {
