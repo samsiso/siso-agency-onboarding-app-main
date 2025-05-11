@@ -1,9 +1,10 @@
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Trophy, ArrowRight, TrendingUp, TrendingDown } from 'lucide-react';
+import { Trophy, ArrowRight, TrendingUp, TrendingDown, Briefcase } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useLeaderboardData } from '@/components/leaderboard/hooks/useLeaderboardData';
+import { Badge } from '@/components/ui/badge';
 
 export function LeaderboardPreviewCard() {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ export function LeaderboardPreviewCard() {
         <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-gray-800/50">
           <CardTitle className="text-lg font-semibold flex items-center text-white">
             <Trophy className="mr-2 h-5 w-5 text-yellow-500" />
-            Top Contributors
+            Top Clients
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-4">
@@ -44,30 +45,33 @@ export function LeaderboardPreviewCard() {
                   }`}>
                     {index + 1}
                   </div>
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-siso-red to-siso-orange flex items-center justify-center text-white font-bold">
-                    {leader.profile?.full_name?.[0] || '?'}
-                  </div>
-                  <div>
+                  <div className="flex flex-col">
                     <span className="text-white font-medium">
                       {leader.profile?.full_name || 'Anonymous'}
                     </span>
-                    <div className="flex items-center gap-2 text-xs text-gray-400">
-                      <span>{leader.points} points</span>
-                      {Math.random() > 0.5 ? (
-                        <TrendingUp className="h-3 w-3 text-green-400" />
-                      ) : (
-                        <TrendingDown className="h-3 w-3 text-red-400" />
-                      )}
+                    <div className="flex items-center gap-1 text-xs text-gray-400">
+                      <Briefcase className="h-3 w-3" />
+                      <span className="truncate max-w-[120px]">
+                        {leader.profile?.business_name || leader.profile?.professional_role || 'Business'}
+                      </span>
                     </div>
                   </div>
                 </div>
                 <div className="text-right">
                   <span className="font-semibold text-white">{leader.points}</span>
-                  {leader.siso_tokens > 0 && (
-                    <div className="text-xs text-gray-400 mt-1">
-                      {leader.siso_tokens} SISO
-                    </div>
-                  )}
+                  <div className="flex items-center justify-end gap-1 text-xs">
+                    {Math.random() > 0.5 ? (
+                      <TrendingUp className="h-3 w-3 text-green-400" />
+                    ) : (
+                      <TrendingDown className="h-3 w-3 text-red-400" />
+                    )}
+                    <Badge 
+                      variant="outline" 
+                      className="text-xs py-0 px-1.5 h-4 border-gray-700/50 bg-black/30"
+                    >
+                      {leader.profile?.industry || 'Technology'}
+                    </Badge>
+                  </div>
                 </div>
               </motion.div>
             ))}

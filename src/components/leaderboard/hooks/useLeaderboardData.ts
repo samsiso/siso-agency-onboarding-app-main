@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -49,14 +48,30 @@ export const useLeaderboardData = () => {
       if (error || !dbEntries || dbEntries.length === 0) {
         console.log('Using mock leaderboard data');
         
+        // Mock client data with realistic names and companies
+        const clients = [
+          { name: 'Sarah Johnson', company: 'FitFlow Manager', role: 'Fitness Studio Owner', industry: 'Health & Wellness' },
+          { name: 'Michael Chen', company: 'CreatorHub Studio', role: 'Content Creator', industry: 'Digital Media' },
+          { name: 'Alex Rodriguez', company: 'Agency Suite Pro', role: 'Agency Director', industry: 'Marketing' },
+          { name: 'Jessica Williams', company: 'TechSolve AI', role: 'CTO', industry: 'Technology' },
+          { name: 'David Kim', company: 'Foodie Marketplace', role: 'Restaurant Owner', industry: 'Food & Beverage' },
+          { name: 'Priya Patel', company: 'EduLearn Platform', role: 'Educational Consultant', industry: 'Education' },
+          { name: 'James Anderson', company: 'Property Connect', role: 'Real Estate Agent', industry: 'Real Estate' },
+          { name: 'Emma Thompson', company: 'Beauty Booking Pro', role: 'Salon Owner', industry: 'Beauty & Wellness' },
+          { name: 'Omar Hassan', company: 'TravelPlanner AI', role: 'Travel Agency Director', industry: 'Travel' },
+          { name: 'Sophia Garcia', company: 'RetailFlow Systems', role: 'Retail Manager', industry: 'Retail' },
+          { name: 'Ryan Mitchell', company: 'EventMaster Pro', role: 'Event Coordinator', industry: 'Events & Entertainment' },
+          { name: 'Olivia Wilson', company: 'HealthTrack Solutions', role: 'Healthcare Administrator', industry: 'Healthcare' }
+        ];
+        
         // Create mock entries with realistic data structure
-        const mockEntries: LeaderboardEntry[] = Array.from({ length: 20 }, (_, i) => ({
+        const mockEntries: LeaderboardEntry[] = clients.map((client, i) => ({
           id: `user-${i + 1}`,
           user_id: `user-${i + 1}`,
           points: Math.floor(Math.random() * 1000) + 100,
           level: Math.floor(Math.random() * 10) + 1,
           streak_days: Math.floor(Math.random() * 30),
-          rank: i === 0 ? 'Master' : i < 3 ? 'Expert' : i < 7 ? 'Advanced' : i < 15 ? 'Intermediate' : 'Beginner',
+          rank: i === 0 ? 'Master' : i < 3 ? 'Expert' : i < 7 ? 'Advanced' : 'Intermediate',
           siso_tokens: Math.floor(Math.random() * 500),
           updated_at: new Date(Date.now() - Math.floor(Math.random() * 10000000)).toISOString(),
           contribution_count: Math.floor(Math.random() * 50),
@@ -66,11 +81,13 @@ export const useLeaderboardData = () => {
             { name: 'Streak Master', icon: '🔥' }
           ],
           profile: {
-            full_name: `User ${i + 1}`,
-            email: `user${i+1}@example.com`,
+            full_name: client.name,
+            email: `${client.name.toLowerCase().replace(' ', '.')}@example.com`,
             avatar_url: '',
-            bio: `This is user ${i + 1}'s bio`,
-            professional_role: 'Developer'
+            bio: `${client.role} at ${client.company}`,
+            professional_role: client.role,
+            business_name: client.company,
+            industry: client.industry
           }
         }));
         
@@ -112,7 +129,9 @@ export const useLeaderboardData = () => {
             email: safeGet(dbEntry.profile, 'email', ''),
             avatar_url: safeGet(dbEntry.profile, 'avatar_url', ''),
             bio: safeGet(dbEntry.profile, 'bio', ''),
-            professional_role: safeGet(dbEntry.profile, 'professional_role', '')
+            professional_role: safeGet(dbEntry.profile, 'professional_role', ''),
+            business_name: safeGet(dbEntry.profile, 'business_name', ''),
+            industry: safeGet(dbEntry.profile, 'industry', '')
           }
         }));
         

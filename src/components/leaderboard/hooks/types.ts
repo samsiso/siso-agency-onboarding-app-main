@@ -1,4 +1,3 @@
-
 // Define types for the leaderboard component
 export interface LeaderboardEntry {
   id: string;
@@ -29,6 +28,8 @@ export interface UserProfile {
   instagram_url?: string;
   twitter_url?: string;
   professional_role?: string;
+  business_name?: string;
+  industry?: string;
 }
 
 export interface LeaderboardData {
@@ -39,11 +40,14 @@ export interface LeaderboardData {
 }
 
 export interface LeaderboardFilter {
-  timeRange: 'all' | 'week' | 'month' | 'year';
+  timeframe: string;
+  timeRange?: 'all' | 'week' | 'month' | 'year';
   category?: string;
 }
 
 export interface TrendStats {
+  trend: 'up' | 'down' | 'stable';
+  percentage: number;
   points: number;
   users: number;
   tokens: number;
