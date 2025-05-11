@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client'; 
 import { toast } from '@/components/ui/use-toast';
@@ -336,7 +336,9 @@ export function useProjectWireframes() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeWireframeId, setActiveWireframeId] = useState<string>('');
-  const [fetchTried, setFetchTried] = useState(false);
+  
+  // Use a ref instead of state to track fetch attempts - prevents re-renders
+  const fetchTriedRef = useRef(false);
   
   // Function to load sample data when database fetch fails
   const loadSampleWireframesAsFallback = useCallback(() => {
@@ -353,27 +355,44 @@ export function useProjectWireframes() {
 
   // Fetch data effect
   useEffect(() => {
+    let isMounted = true;
+    
     // Skip if we've already tried fetching (to avoid React Strict Mode double-fetching)
-    if (fetchTried) {
+    if (fetchTriedRef.current) {
       return;
     }
     
     const fetchWireframesData = async () => {
+      if (!isMounted) return;
+      
       setLoading(true);
       setError(null);
-      setFetchTried(true);
+      fetchTriedRef.current = true;
 
       try {
         // Try fetching with the project ID from URL or fallback to 'ubahcrypt'
         const currentProjectId = projectId || 'ubahcrypt';
         console.log("Fetching wireframes for project:", currentProjectId);
 
-        // Use Supabase client to fetch wireframes
-        const { data, error } = await supabase
-          .from('project_wireframes')
-          .select('*')
-          .eq('project_id', currentProjectId)
-          .order('created_at', { ascending: false });
+        // Simple timeout to avoid infinite waiting on connection issues
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error("Supabase connection timed out")), 5000);
+        });
+
+        // Race between actual fetch and timeout
+        const result = await Promise.race([
+          supabase
+            .from('project_wireframes')
+            .select('*')
+            .eq('project_id', currentProjectId)
+            .order('created_at', { ascending: false }),
+          timeoutPromise
+        ]);
+
+        if (!isMounted) return;
+        
+        // @ts-ignore - handle the Supabase response type
+        const { data, error } = result;
         
         console.log("Supabase response:", { data, error });
         
@@ -384,7 +403,7 @@ export function useProjectWireframes() {
 
         if (data && data.length > 0) {
           // Map database fields to Wireframe interface
-          const mappedWireframes: Wireframe[] = data.map(item => ({
+          const mappedWireframes: Wireframe[] = data.map((item: any) => ({
             id: item.id.toString(),
             title: item.title,
             category: item.category || 'page',
@@ -397,34 +416,63 @@ export function useProjectWireframes() {
           }));
           
           console.log("Mapped wireframes:", mappedWireframes);
-          setWireframes(mappedWireframes);
           
-          // Set the first wireframe as active
-          if (mappedWireframes.length > 0) {
-            setActiveWireframeId(mappedWireframes[0].id);
-          }
+          if (isMounted) {
+            setWireframes(mappedWireframes);
+            
+            // Set the first wireframe as active
+            if (mappedWireframes.length > 0) {
+              setActiveWireframeId(mappedWireframes[0].id);
+            }
 
-          // Also load sample connections for now
-          setConnections(SAMPLE_CONNECTIONS);
+            // Also load sample connections for now
+            setConnections(SAMPLE_CONNECTIONS);
+            setLoading(false);
+          }
         } else {
           console.log("No wireframes found in database, using sample data");
           // Fallback to sample data if no wireframes were found
-          loadSampleWireframesAsFallback();
+          if (isMounted) {
+            loadSampleWireframesAsFallback();
+          }
         }
       } catch (err: any) {
         console.error("Error fetching wireframes:", err);
-        setError(err.message || "Failed to load wireframes");
-        loadSampleWireframesAsFallback();
+        if (isMounted) {
+          setError(err.message || "Failed to load wireframes");
+          loadSampleWireframesAsFallback();
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
     
+    // Start the fetch process
     fetchWireframesData();
-  }, [projectId, fetchTried, loadSampleWireframesAsFallback]);
+    
+    // Cleanup function to handle component unmounting
+    return () => {
+      isMounted = false;
+    };
+  }, [projectId, loadSampleWireframesAsFallback]);
+
+  // Ensure we have some data to display even if everything else fails
+  useEffect(() => {
+    // If still loading after 3 seconds, load sample data as a fallback
+    const timeoutId = setTimeout(() => {
+      if (loading && wireframes.length === 0) {
+        console.log("Loading timeout reached, forcing sample data");
+        loadSampleWireframesAsFallback();
+      }
+    }, 3000);
+    
+    return () => clearTimeout(timeoutId);
+  }, [loading, wireframes.length, loadSampleWireframesAsFallback]);
 
   // Find active wireframe from the current state
-  const activeWireframe = wireframes.find(w => w.id === activeWireframeId);
+  const activeWireframe = wireframes.find(w => w.id === activeWireframeId) || null;
 
   // Function for downloading a wireframe
   const downloadWireframe = useCallback(() => {

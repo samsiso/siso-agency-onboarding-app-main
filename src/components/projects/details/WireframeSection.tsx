@@ -9,10 +9,15 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export function WireframeSection() {
   const { id: projectId } = useParams();
-  const { wireframes, loading, error, activeWireframeId, setActiveWireframeId } = useProjectWireframes();
+  const { 
+    wireframes, 
+    loading, 
+    error, 
+    activeWireframeId, 
+    setActiveWireframeId 
+  } = useProjectWireframes();
 
-  // IMPORTANT: All hooks must be called at the top level, before any conditional logic
-  // Log state for debugging - always call this hook, don't conditionally render it
+  // Log state for debugging - always at the top level, never conditional
   useEffect(() => {
     console.log("WireframeSection rendered with:", { 
       projectId, 
@@ -22,7 +27,12 @@ export function WireframeSection() {
     });
   }, [projectId, wireframes, loading, error]);
 
-  // Rest of the render logic - put conditionals AFTER all hooks have been called
+  // Group wireframes by status for tabs - do this before any conditionals
+  const complete = wireframes.filter(w => w.wireframeStatus === 'complete');
+  const inProgress = wireframes.filter(w => w.wireframeStatus === 'in-progress');
+  const planned = wireframes.filter(w => w.wireframeStatus === 'planned');
+
+  // Render loading state
   if (loading) {
     return (
       <div className="space-y-6 text-gray-900 dark:text-white">
@@ -59,6 +69,7 @@ export function WireframeSection() {
     );
   }
 
+  // Handle error state
   if (error) {
     return (
       <div className="p-6 text-center">
@@ -70,6 +81,7 @@ export function WireframeSection() {
     );
   }
 
+  // Handle empty state
   if (wireframes.length === 0) {
     return (
       <div className="p-6 text-center border rounded-lg border-gray-200 dark:border-gray-700">
@@ -83,11 +95,7 @@ export function WireframeSection() {
     );
   }
 
-  // Group wireframes by status for tabs
-  const complete = wireframes.filter(w => w.wireframeStatus === 'complete');
-  const inProgress = wireframes.filter(w => w.wireframeStatus === 'in-progress');
-  const planned = wireframes.filter(w => w.wireframeStatus === 'planned');
-
+  // Main render with wireframes
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
