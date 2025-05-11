@@ -1,71 +1,69 @@
-import { memo } from 'react';
-// import { Handle, Position, NodeProps } from 'reactflow';
+/**
+ * DRAFT IMPLEMENTATION - TO BE USED IN NEXT UPDATE
+ * 
+ * This file contains a draft implementation of the ActionNode component
+ * for the ReactFlow user flow diagram.
+ */
 
-// Temporarily disabled to fix rendering issues
-// Using 'any' type as a temporary fix while ReactFlow is disabled
-export const ActionNode = memo(({ data, isConnectable }: any) => {
-  // Determine background color based on status
-  const getBackgroundColor = () => {
-    switch (data.status) {
-      case 'live':
-        return 'bg-gradient-to-br from-indigo-800/50 to-indigo-900/50 border-indigo-500/30';
-      case 'development':
-        return 'bg-gradient-to-br from-purple-800/50 to-purple-900/50 border-purple-500/30';
-      case 'planned':
-      default:
-        return 'bg-gradient-to-br from-gray-800/50 to-gray-900/50 border-gray-500/30';
-    }
-  };
+import { Handle, NodeProps, Position } from 'reactflow';
+import { BadgePlusIcon, MousePointer, Finger } from 'lucide-react';
 
-  // Get status badge
-  const getStatusBadge = () => {
-    switch (data.status) {
-      case 'live':
-        return <div className="bg-indigo-500/80 rounded-sm px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-white">Live</div>;
-      case 'development':
-        return <div className="bg-purple-500/80 rounded-sm px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-white">In Dev</div>;
-      case 'planned':
-      default:
-        return <div className="bg-gray-500/80 rounded-sm px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-white">Planned</div>;
-    }
-  };
+interface ActionNodeData {
+  label: string;
+  action: string;
+  description?: string;
+}
+
+// Action icon mapping
+const actionIcons = {
+  button_click: MousePointer,
+  tap: Finger,
+  form_submit: BadgePlusIcon,
+};
+
+export function ActionNode({ data, selected }: NodeProps<ActionNodeData>) {
+  // Default to button click if action isn't recognized
+  const ActionIcon = actionIcons[data.action] || MousePointer;
 
   return (
-    <div className={`px-4 py-3 rounded-md border ${getBackgroundColor()} shadow-lg min-w-[180px]`}>
-      {/* Top Handle */}
-      {/* Temporarily commented out to fix React Flow issues
+    <div 
+      className={`px-4 py-3 rounded-lg shadow-md ${
+        selected 
+          ? 'ring-2 ring-blue-500 bg-blue-950/50 border border-blue-500/50' 
+          : 'bg-black/60 border border-white/10 hover:border-blue-500/30'
+      } transition-all duration-200 w-[160px]`}
+    >
+      {/* Input handle */}
       <Handle
         type="target"
         position={Position.Top}
-        isConnectable={isConnectable}
-      /> */}
-      {/* className="w-3 h-3 bg-purple-500/80 border-2 border-purple-700" */}
+        className="w-3 h-3 bg-blue-500 border-2 border-black"
+      />
       
-      <div className="flex items-center justify-between mb-1">
-        {getStatusBadge()}
-        <div className="bg-black/30 rounded-full p-1">
-          <svg className="w-3 h-3 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-        </div>
-      </div>
-      
-      <div className="text-white font-medium text-sm">{data.label}</div>
-      
-      {data.description && (
-        <div className="text-white/70 text-xs mt-1 line-clamp-2">{data.description}</div>
-      )}
-      
-      {/* Bottom Handle */}
-      {/* Temporarily commented out to fix React Flow issues
+      {/* Output handle */}
       <Handle
         type="source"
         position={Position.Bottom}
-        isConnectable={isConnectable}
-      /> */}
-      {/* className="w-3 h-3 bg-purple-500/80 border-2 border-purple-700" */}
+        className="w-3 h-3 bg-blue-500 border-2 border-black"
+      />
+      
+      <div className="flex flex-col">
+        <div className="flex items-center justify-center mb-2">
+          <div className="p-1.5 rounded-full bg-blue-900/30 text-blue-400">
+            <ActionIcon className="w-4 h-4" />
+          </div>
+        </div>
+        
+        <h3 className="text-sm font-medium text-white mb-1 text-center">{data.label}</h3>
+        
+        {data.description && (
+          <p className="text-xs text-gray-400 mb-2 text-center line-clamp-2">{data.description}</p>
+        )}
+        
+        <div className="mt-1 bg-blue-900/20 text-blue-400 rounded-sm px-2 py-1 text-xs text-center">
+          {data.action.replace('_', ' ')}
+        </div>
+      </div>
     </div>
   );
-});
-
-ActionNode.displayName = 'ActionNode';
+}
