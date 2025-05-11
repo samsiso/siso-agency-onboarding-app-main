@@ -90,10 +90,10 @@ export function ResearchDocumentDetail() {
       {/* Breadcrumbs Navigation */}
       <Breadcrumb className="mb-6">
         <BreadcrumbItem>
-          <BreadcrumbLink onClick={() => navigate(`/projects/${projectId}`)}>Project</BreadcrumbLink>
+          <BreadcrumbLink href={`/projects/${projectId}`}>Project</BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbItem>
-          <BreadcrumbLink onClick={() => navigate(`/projects/${projectId}/market-research`)}>Research</BreadcrumbLink>
+          <BreadcrumbLink href={`/projects/${projectId}/market-research`}>Research</BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbItem isCurrentPage>
           <BreadcrumbLink>{document.title}</BreadcrumbLink>
