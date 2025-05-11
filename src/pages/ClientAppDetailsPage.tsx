@@ -14,6 +14,47 @@ import { ProjectActions } from '@/components/projects/details/ProjectActions';
 import { ArrowLeft } from 'lucide-react';
 import { Spotlight } from '@/components/ui/spotlight';
 
+// Function to get preview data based on client ID
+const getPreviewData = (clientId: string) => {
+  // Default wireframe URLs for all projects
+  const defaultWireframes = [
+    "/images/wireframes/wireframe-1.png",
+    "/images/wireframes/wireframe-2.png",
+    "/images/wireframes/wireframe-3.png"
+  ];
+  
+  // Map project IDs to specific wireframe images
+  const wireframeMap: Record<string, string[]> = {
+    'project-1': [
+      "/images/wireframes/construction-dashboard.png",
+      "/images/wireframes/construction-scheduling.png",
+      "/images/wireframes/construction-estimating.png"
+    ],
+    'project-2': [
+      "/images/wireframes/crypto-dashboard.png",
+      "/images/wireframes/crypto-trading.png",
+      "/images/wireframes/crypto-portfolio.png"
+    ],
+    'project-3': [
+      "/images/wireframes/fitness-dashboard.png",
+      "/images/wireframes/fitness-classes.png",
+      "/images/wireframes/fitness-members.png"
+    ]
+  };
+  
+  // Map project IDs to demo videos
+  const videoMap: Record<string, string> = {
+    'project-1': "https://www.youtube.com/embed/dQw4w9WgXcQ?si=demo-construction",
+    'project-2': "https://www.youtube.com/embed/dQw4w9WgXcQ?si=demo-crypto",
+    'project-3': "https://www.youtube.com/embed/dQw4w9WgXcQ?si=demo-fitness"
+  };
+  
+  return {
+    videoUrl: videoMap[clientId] || "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    wireframeUrls: wireframeMap[clientId] || defaultWireframes
+  };
+};
+
 export default function ClientAppDetailsPage() {
   const { clientId } = useParams<{ clientId: string }>();
   const { appData, clientData, loading, error } = useClientAppDetails(clientId);
@@ -34,7 +75,7 @@ export default function ClientAppDetailsPage() {
               - The client hasn't set up their app yet
             </p>
             <Button asChild>
-              <Link to="/financial/leaderboards">Return to Leaderboard</Link>
+              <Link to="/economy/leaderboards">Return to Leaderboard</Link>
             </Button>
           </div>
         </div>
@@ -42,28 +83,23 @@ export default function ClientAppDetailsPage() {
     );
   }
 
+  // Get preview data for this client
+  const previewData = getPreviewData(clientId || '');
+
   // Mock data for our new components - in a real app this would come from the API
   const mockCaseStudy = {
-    challenge: "The client needed a comprehensive platform to manage their OnlyFans content creation business, struggling with manual processes and scattered tools.",
-    solution: "We developed a centralized management platform with automated scheduling, analytics, and team collaboration features.",
+    challenge: "The client needed a comprehensive platform to manage their business operations, struggling with manual processes and scattered tools.",
+    solution: `We developed a centralized management platform for ${appData?.app_name || 'their business'} with automated processes and analytics features.`,
     results: [
-      "Reduced content scheduling time by 75%",
-      "Increased revenue by 40% through better analytics",
+      "Reduced manual processing time by 65%",
+      "Increased revenue by 30% through better management",
       "Improved team coordination and communication"
     ],
     metrics: {
-      timeToMarket: "45 days",
-      costSavings: "$50,000/year",
-      userBase: "500+ creators"
+      timeToMarket: `${appData?.estimated_days || 30} days`,
+      costSavings: "£25,000/year",
+      userBase: "100+ users"
     }
-  };
-
-  const mockPreviewData = {
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-    wireframeUrls: [
-      "https://via.placeholder.com/800x450",
-      "https://via.placeholder.com/800x450"
-    ]
   };
 
   return (
@@ -73,7 +109,7 @@ export default function ClientAppDetailsPage() {
         
         <div className="flex items-center mb-6">
           <Button variant="ghost" size="sm" asChild className="mr-2">
-            <Link to="/financial/leaderboards">
+            <Link to="/economy/leaderboards">
               <ArrowLeft className="mr-1 h-4 w-4" />
               Back to Leaderboard
             </Link>
@@ -107,7 +143,7 @@ export default function ClientAppDetailsPage() {
               </TabsList>
 
               <TabsContent value="preview">
-                <ClientAppMediaPreview {...mockPreviewData} />
+                <ClientAppMediaPreview {...previewData} />
               </TabsContent>
 
               <TabsContent value="features">
@@ -129,27 +165,24 @@ export default function ClientAppDetailsPage() {
   );
 }
 
-function LoadingState() {
-  return (
-    <div className="space-y-8">
-      <div className="bg-black/30 border border-siso-text/10 rounded-lg p-8">
-        <Skeleton className="h-10 w-64 mb-4" />
-        <Skeleton className="h-6 w-full max-w-2xl mb-2" />
-        <Skeleton className="h-6 w-full max-w-md" />
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Skeleton className="h-32 rounded-lg" />
-        <Skeleton className="h-32 rounded-lg" />
-        <Skeleton className="h-32 rounded-lg" />
-      </div>
-      
-      <div>
-        <Skeleton className="h-8 w-64 mb-6" />
-        <div className="bg-black/30 border border-siso-text/10 rounded-lg p-8">
-          <Skeleton className="h-40 w-full" />
-        </div>
-      </div>
+// Loading state component
+const LoadingState = () => (
+  <div className="space-y-8">
+    <div className="space-y-4">
+      <Skeleton className="h-12 w-1/3" />
+      <Skeleton className="h-4 w-full" />
+      <Skeleton className="h-4 w-4/5" />
     </div>
-  );
-}
+    
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <Skeleton className="h-24 w-full" />
+      <Skeleton className="h-24 w-full" />
+      <Skeleton className="h-24 w-full" />
+    </div>
+    
+    <div className="space-y-4">
+      <Skeleton className="h-60 w-full" />
+      <Skeleton className="h-40 w-full" />
+    </div>
+  </div>
+);

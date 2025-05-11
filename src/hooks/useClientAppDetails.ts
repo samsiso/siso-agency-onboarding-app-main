@@ -11,6 +11,167 @@ interface ClientAppDetailsResult {
   error: Error | null;
 }
 
+// Project data for real projects from the leaderboard
+const getProjectData = (projectId: string): PlanDataType => {
+  const projectsData = {
+    'project-1': {
+      id: 'project-1',
+      username: 'optimal-construction',
+      company_name: 'Optimal Construction',
+      app_name: 'Optimal Construction',
+      description: 'A comprehensive building maintenance and construction management platform.',
+      features: [
+        'Project Timeline Management',
+        'Estimating & Invoicing',
+        'Team Coordination',
+        'Client Portal',
+        'Document Management'
+      ],
+      estimated_cost: 15000,
+      estimated_days: 90,
+      website_url: 'https://optimal-building-maintenance.vercel.app/',
+      status: 'in_progress',
+      branding: {
+        primary_color: '#3182CE',
+        secondary_color: '#805AD5'
+      },
+      industry_type: 'construction'
+    },
+    'project-2': {
+      id: 'project-2',
+      username: 'ubahcryp',
+      company_name: 'UbahCryp',
+      app_name: 'UbahCryp',
+      description: 'Cryptocurrency trading and portfolio management platform.',
+      features: [
+        'Real-time Market Data',
+        'Portfolio Tracking',
+        'Trading Automation',
+        'Security Features',
+        'Analytics Dashboard'
+      ],
+      estimated_cost: 5000,
+      estimated_days: 60,
+      website_url: 'https://ubahcrypcom.vercel.app/',
+      status: 'completed',
+      branding: {
+        primary_color: '#38A169',
+        secondary_color: '#D69E2E'
+      },
+      industry_type: 'finance'
+    },
+    'project-3': {
+      id: 'project-3',
+      username: 'gritness',
+      company_name: 'Gritness',
+      app_name: 'Gritness',
+      description: 'Fitness studio management platform with class scheduling and member management.',
+      features: [
+        'Class Scheduling',
+        'Member Management',
+        'Payment Processing',
+        'Digital Waivers',
+        'Trainer Portal'
+      ],
+      estimated_cost: 249,
+      estimated_days: 30,
+      website_url: 'https://gritnessgym.vercel.app/',
+      status: 'in_progress',
+      branding: {
+        primary_color: '#E53E3E',
+        secondary_color: '#2D3748'
+      },
+      industry_type: 'fitness'
+    },
+    'project-4': {
+      id: 'project-4',
+      username: 'trojan-mma',
+      company_name: 'Trojan MMA',
+      app_name: 'Trojan MMA',
+      description: 'MMA gym management platform with membership and competition tracking.',
+      features: [
+        'Member Management',
+        'Competition Tracking',
+        'Training Plans',
+        'Progress Tracking',
+        'Communication Portal'
+      ],
+      estimated_cost: 249,
+      estimated_days: 30,
+      website_url: 'https://trojan-mma.vercel.app/',
+      status: 'in_progress',
+      branding: {
+        primary_color: '#DD6B20',
+        secondary_color: '#1A202C'
+      },
+      industry_type: 'fitness'
+    },
+    'project-5': {
+      id: 'project-5',
+      username: 'lets-go',
+      company_name: 'Lets Go',
+      app_name: 'Lets Go',
+      description: 'Travel planning and management app for adventure seekers.',
+      features: [
+        'Trip Planning',
+        'Itinerary Creation',
+        'Location Sharing',
+        'Budget Tracking',
+        'Photo Albums'
+      ],
+      estimated_cost: 249,
+      estimated_days: 30,
+      website_url: 'https://lets-go-u7hh.vercel.app/',
+      status: 'near_complete',
+      branding: {
+        primary_color: '#3182CE',
+        secondary_color: '#48BB78'
+      },
+      industry_type: 'travel'
+    },
+    'project-6': {
+      id: 'project-6',
+      username: 'nm-construction',
+      company_name: 'NM Construction',
+      app_name: 'NM Construction',
+      description: 'Construction project management and client communication platform.',
+      features: [
+        'Project Planning',
+        'Resource Management',
+        'Client Communication',
+        'Document Sharing',
+        'Progress Tracking'
+      ],
+      estimated_cost: 0,
+      estimated_days: 60,
+      website_url: 'https://nm-construction.vercel.app/',
+      status: 'in_progress',
+      branding: {
+        primary_color: '#F6E05E',
+        secondary_color: '#4A5568'
+      },
+      industry_type: 'construction'
+    }
+  };
+
+  return projectsData[projectId as keyof typeof projectsData] || {
+    id: projectId,
+    username: 'custom-project',
+    company_name: 'Custom Project',
+    app_name: 'Custom Project',
+    description: 'A custom development project.',
+    features: ['Feature 1', 'Feature 2', 'Feature 3'],
+    estimated_cost: 0,
+    estimated_days: 0,
+    status: 'pending',
+    branding: {
+      primary_color: '#3182CE',
+      secondary_color: '#805AD5'
+    },
+    industry_type: 'other'
+  };
+};
+
 const getMockAppData = (userId: string): PlanDataType => {
   // Generate consistent mock data based on user ID
   const mockData = {
@@ -88,6 +249,67 @@ const getMockAppData = (userId: string): PlanDataType => {
   };
 };
 
+const getProjectClientData = (projectId: string): ClientData => {
+  // Extract project number and map to milestone data
+  const projectNum = projectId.split('-')[1];
+  const milestoneMap = {
+    '1': { currentStep: 4, totalSteps: 8 }, // Optimal Construction
+    '2': { currentStep: 8, totalSteps: 8 }, // UbahCryp
+    '3': { currentStep: 6, totalSteps: 8 }, // Gritness
+    '4': { currentStep: 6, totalSteps: 8 }, // Trojan MMA
+    '5': { currentStep: 7, totalSteps: 8 }, // Lets Go
+    '6': { currentStep: 4, totalSteps: 8 }, // NM Construction
+  };
+  
+  const milestone = milestoneMap[projectNum as keyof typeof milestoneMap] || { currentStep: 0, totalSteps: 8 };
+  
+  // Mapping project IDs to client names from the leaderboard
+  const nameMap = {
+    '1': 'Optimal Construction',
+    '2': 'UbahCryp',
+    '3': 'Gritness',
+    '4': 'Trojan MMA',
+    '5': 'Lets Go',
+    '6': 'NM Construction'
+  };
+  
+  const clientName = nameMap[projectNum as keyof typeof nameMap] || `Project ${projectNum}`;
+
+  return {
+    id: projectId,
+    full_name: clientName,
+    email: `info@${clientName.toLowerCase().replace(/\s+/g, '-')}.com`,
+    business_name: clientName,
+    phone: null,
+    avatar_url: null,
+    status: 'active',
+    current_step: milestone.currentStep,
+    total_steps: milestone.totalSteps,
+    completed_steps: Array(milestone.currentStep).fill('').map((_, i) => `step-${i+1}`),
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    website_url: null,
+    professional_role: 'Business Owner',
+    bio: null,
+    project_name: clientName,
+    company_niche: 'Construction & Development',
+    development_url: null,
+    mvp_build_status: null,
+    notion_plan_url: null,
+    payment_status: null,
+    estimated_price: null,
+    initial_contact_date: null,
+    start_date: null,
+    estimated_completion_date: null,
+    todos: [],
+    next_steps: null,
+    key_research: null,
+    priority: null,
+    contact_name: null,
+    company_name: null
+  };
+};
+
 const getMockClientData = (userId: string): ClientData => {
   return {
     id: userId,
@@ -141,7 +363,7 @@ export function useClientAppDetails(clientId?: string | null): ClientAppDetailsR
     }
 
     // For mock data (user-1, user-2, etc), skip the real data fetch
-    if (clientId.startsWith('user-')) {
+    if (clientId.startsWith('user-') || clientId.startsWith('project-')) {
       setUsername(clientId);
       setLoading(false);
       return;
@@ -200,9 +422,17 @@ export function useClientAppDetails(clientId?: string | null): ClientAppDetailsR
   }, [clientLoading, planLoading, username]);
 
   return {
-    // If it's a mock user ID, return mock data, otherwise use real data
-    appData: clientId?.startsWith('user-') ? getMockAppData(clientId) : planData,
-    clientData: clientId?.startsWith('user-') ? getMockClientData(clientId) : realClientData,
+    // Return data based on ID type
+    appData: clientId?.startsWith('user-') 
+      ? getMockAppData(clientId) 
+      : clientId?.startsWith('project-')
+        ? getProjectData(clientId)
+        : planData,
+    clientData: clientId?.startsWith('user-') 
+      ? getMockClientData(clientId) 
+      : clientId?.startsWith('project-')
+        ? getProjectClientData(clientId)
+        : realClientData,
     loading: loading || (clientLoading && planLoading),
     error
   };
