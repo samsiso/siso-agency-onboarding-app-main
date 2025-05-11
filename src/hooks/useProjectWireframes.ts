@@ -32,8 +32,7 @@ const SAMPLE_WIREFRAMES: Wireframe[] = [
     notionUiPlanLink: "https://www.notion.so/Login-Signup-Page-1e849797be68802f8803e8671c05c518?pvs=21",
     wireframeStatus: "complete",
     specsStatus: "approved",
-    devStatus: "pending",
-    imageUrl: "https://via.placeholder.com/300x200/3B82F6/FFFFFF?text=Login/Signup"
+    devStatus: "pending"
   },
   {
     id: "2",
@@ -43,8 +42,7 @@ const SAMPLE_WIREFRAMES: Wireframe[] = [
     notionUiPlanLink: "https://www.notion.so/Onboarding-Tutorial-Page-1e849797be68805a9d69f05b5781b9a1?pvs=21",
     wireframeStatus: "complete",
     specsStatus: "approved",
-    devStatus: "pending",
-    imageUrl: "https://via.placeholder.com/300x200/8B5CF6/FFFFFF?text=Onboarding"
+    devStatus: "pending"
   },
   {
     id: "3",
@@ -54,8 +52,7 @@ const SAMPLE_WIREFRAMES: Wireframe[] = [
     notionUiPlanLink: "https://www.notion.so/Dashboard-1e849797be6880f89473f75ef252f8a9?pvs=21",
     wireframeStatus: "complete",
     specsStatus: "approved",
-    devStatus: "pending",
-    imageUrl: "https://via.placeholder.com/300x200/10B981/FFFFFF?text=Dashboard"
+    devStatus: "pending"
   },
   {
     id: "4",
@@ -65,8 +62,7 @@ const SAMPLE_WIREFRAMES: Wireframe[] = [
     notionUiPlanLink: "https://www.notion.so/Markets-Page-1e849797be688011928ee483a7ccd276?pvs=21",
     wireframeStatus: "complete",
     specsStatus: "in-review",
-    devStatus: "pending",
-    imageUrl: "https://via.placeholder.com/300x200/F59E0B/FFFFFF?text=Markets"
+    devStatus: "pending"
   },
   {
     id: "5",
@@ -76,8 +72,7 @@ const SAMPLE_WIREFRAMES: Wireframe[] = [
     notionUiPlanLink: "https://www.notion.so/News-Page-1e849797be68800d9409c5ac93576035?pvs=21",
     wireframeStatus: "in-progress",
     specsStatus: "pending",
-    devStatus: "pending",
-    imageUrl: "https://via.placeholder.com/300x200/EC4899/FFFFFF?text=News"
+    devStatus: "pending"
   },
   {
     id: "6",
@@ -87,8 +82,7 @@ const SAMPLE_WIREFRAMES: Wireframe[] = [
     notionUiPlanLink: "https://www.notion.so/Wallet-Page-1e849797be6880888511e402d0c8c22b?pvs=21",
     wireframeStatus: "complete",
     specsStatus: "approved",
-    devStatus: "pending",
-    imageUrl: "https://via.placeholder.com/300x200/6366F1/FFFFFF?text=Wallet"
+    devStatus: "pending"
   },
   {
     id: "7",
@@ -98,8 +92,7 @@ const SAMPLE_WIREFRAMES: Wireframe[] = [
     notionUiPlanLink: "https://www.notion.so/Portfolio-Page-1e849797be6880e4bdfcd690c879e0c8?pvs=21",
     wireframeStatus: "complete",
     specsStatus: "approved",
-    devStatus: "in-progress",
-    imageUrl: "https://via.placeholder.com/300x200/8B5CF6/FFFFFF?text=Portfolio"
+    devStatus: "in-progress"
   },
   {
     id: "8",
@@ -109,8 +102,7 @@ const SAMPLE_WIREFRAMES: Wireframe[] = [
     notionUiPlanLink: "https://www.notion.so/Trading-Page-1e849797be688024a0fcc17a14ad2d24?pvs=21",
     wireframeStatus: "complete",
     specsStatus: "approved",
-    devStatus: "in-progress",
-    imageUrl: "https://via.placeholder.com/300x200/EF4444/FFFFFF?text=Trading"
+    devStatus: "in-progress"
   },
   {
     id: "9",
@@ -120,8 +112,7 @@ const SAMPLE_WIREFRAMES: Wireframe[] = [
     notionUiPlanLink: "https://www.notion.so/Open-Orders-Page-1e849797be688044b715c230b834da69?pvs=21",
     wireframeStatus: "complete",
     specsStatus: "pending",
-    devStatus: "pending",
-    imageUrl: "https://via.placeholder.com/300x200/F59E0B/FFFFFF?text=Orders"
+    devStatus: "pending"
   },
   {
     id: "10",
@@ -131,8 +122,7 @@ const SAMPLE_WIREFRAMES: Wireframe[] = [
     notionUiPlanLink: "https://www.notion.so/Transaction-History-Page-1e849797be68804ebdc2c0e23e20109c?pvs=21",
     wireframeStatus: "complete",
     specsStatus: "pending",
-    devStatus: "pending",
-    imageUrl: "https://via.placeholder.com/300x200/10B981/FFFFFF?text=History"
+    devStatus: "pending"
   },
   {
     id: "11",
@@ -142,8 +132,7 @@ const SAMPLE_WIREFRAMES: Wireframe[] = [
     notionUiPlanLink: "https://www.notion.so/Transaction-Fee-Estimator-Page-1e849797be6880ae804ffe752399b065?pvs=21",
     wireframeStatus: "in-progress",
     specsStatus: "pending",
-    devStatus: "pending",
-    imageUrl: "https://via.placeholder.com/300x200/6366F1/FFFFFF?text=Fees"
+    devStatus: "pending"
   },
   {
     id: "12",
@@ -153,8 +142,7 @@ const SAMPLE_WIREFRAMES: Wireframe[] = [
     notionUiPlanLink: "https://www.notion.so/Staking-Page-1e849797be688000a6a9c1cd7cc61a3f?pvs=21",
     wireframeStatus: "complete",
     specsStatus: "pending",
-    devStatus: "pending",
-    imageUrl: "https://via.placeholder.com/300x200/8B5CF6/FFFFFF?text=Staking"
+    devStatus: "pending"
   },
   {
     id: "13",
@@ -164,8 +152,7 @@ const SAMPLE_WIREFRAMES: Wireframe[] = [
     notionUiPlanLink: "https://www.notion.so/Staking-Comparison-Page-1e849797be6880c8a401dcd37ff4e08c?pvs=21",
     wireframeStatus: "complete",
     specsStatus: "approved",
-    devStatus: "pending",
-    imageUrl: "https://via.placeholder.com/300x200/10B981/FFFFFF?text=StakingComp"
+    devStatus: "pending"
   },
   {
     id: "14",
@@ -175,8 +162,7 @@ const SAMPLE_WIREFRAMES: Wireframe[] = [
     notionUiPlanLink: "https://www.notion.so/Security-Settings-Page-1e849797be6880f1a834ccfbc58adf55?pvs=21",
     wireframeStatus: "in-progress",
     specsStatus: "in-review",
-    devStatus: "pending",
-    imageUrl: "https://via.placeholder.com/300x200/EC4899/FFFFFF?text=Security"
+    devStatus: "pending"
   },
   {
     id: "15",
@@ -186,8 +172,7 @@ const SAMPLE_WIREFRAMES: Wireframe[] = [
     notionUiPlanLink: "https://www.notion.so/KYC-Management-Page-1e849797be68808b99cdf411e612fcdf?pvs=21",
     wireframeStatus: "complete",
     specsStatus: "approved",
-    devStatus: "in-progress",
-    imageUrl: "https://via.placeholder.com/300x200/3B82F6/FFFFFF?text=KYC"
+    devStatus: "in-progress"
   },
   {
     id: "16",
@@ -197,8 +182,7 @@ const SAMPLE_WIREFRAMES: Wireframe[] = [
     notionUiPlanLink: "https://www.notion.so/Security-Information-Page-1e849797be6880a99504cc1b47c6e2dd?pvs=21",
     wireframeStatus: "complete",
     specsStatus: "approved",
-    devStatus: "complete",
-    imageUrl: "https://via.placeholder.com/300x200/6366F1/FFFFFF?text=SecInfo"
+    devStatus: "complete"
   },
   {
     id: "17",
@@ -208,8 +192,7 @@ const SAMPLE_WIREFRAMES: Wireframe[] = [
     notionUiPlanLink: "https://www.notion.so/Educational-Content-Page-1e849797be6880949216c97ee43476ec?pvs=21",
     wireframeStatus: "complete",
     specsStatus: "in-review",
-    devStatus: "pending",
-    imageUrl: "https://via.placeholder.com/300x200/F59E0B/FFFFFF?text=Education"
+    devStatus: "pending"
   },
   {
     id: "18",
@@ -219,8 +202,7 @@ const SAMPLE_WIREFRAMES: Wireframe[] = [
     notionUiPlanLink: "https://www.notion.so/Educational-Search-Categories-Page-1e849797be6880a99351dce125e4fb2e?pvs=21",
     wireframeStatus: "complete",
     specsStatus: "approved",
-    devStatus: "complete",
-    imageUrl: "https://via.placeholder.com/300x200/10B981/FFFFFF?text=EduSearch"
+    devStatus: "complete"
   },
   {
     id: "19",
@@ -230,8 +212,7 @@ const SAMPLE_WIREFRAMES: Wireframe[] = [
     notionUiPlanLink: "https://www.notion.so/Community-Forum-Page-1e849797be6880e5bc0dd27d60c1cde9?pvs=21",
     wireframeStatus: "in-progress",
     specsStatus: "pending",
-    devStatus: "pending",
-    imageUrl: "https://via.placeholder.com/300x200/EC4899/FFFFFF?text=Community"
+    devStatus: "pending"
   },
   {
     id: "20",
@@ -241,8 +222,7 @@ const SAMPLE_WIREFRAMES: Wireframe[] = [
     notionUiPlanLink: "https://www.notion.so/Affiliate-Page-1e849797be6880ad8107d83094741b5d?pvs=21",
     wireframeStatus: "complete",
     specsStatus: "approved",
-    devStatus: "in-progress",
-    imageUrl: "https://via.placeholder.com/300x200/8B5CF6/FFFFFF?text=Affiliate"
+    devStatus: "in-progress"
   },
   {
     id: "21",
@@ -252,8 +232,7 @@ const SAMPLE_WIREFRAMES: Wireframe[] = [
     notionUiPlanLink: "https://www.notion.so/Referral-Leaderboard-Page-1e849797be68807db567e1f2bbc7e27f?pvs=21",
     wireframeStatus: "complete",
     specsStatus: "approved",
-    devStatus: "pending",
-    imageUrl: "https://via.placeholder.com/300x200/3B82F6/FFFFFF?text=Leaderboard"
+    devStatus: "pending"
   },
   {
     id: "22",
@@ -263,8 +242,7 @@ const SAMPLE_WIREFRAMES: Wireframe[] = [
     notionUiPlanLink: "https://www.notion.so/Notifications-Page-1e849797be6880288936f026eec4cdcf?pvs=21",
     wireframeStatus: "in-progress",
     specsStatus: "pending",
-    devStatus: "pending",
-    imageUrl: "https://via.placeholder.com/300x200/6366F1/FFFFFF?text=Notifications"
+    devStatus: "pending"
   },
   {
     id: "23",
@@ -274,8 +252,7 @@ const SAMPLE_WIREFRAMES: Wireframe[] = [
     notionUiPlanLink: "https://www.notion.so/API-Management-Page-1e849797be6880109099c72fa2a2c5ff?pvs=21",
     wireframeStatus: "complete",
     specsStatus: "approved",
-    devStatus: "complete",
-    imageUrl: "https://via.placeholder.com/300x200/F59E0B/FFFFFF?text=API"
+    devStatus: "complete"
   },
   {
     id: "24",
@@ -285,8 +262,7 @@ const SAMPLE_WIREFRAMES: Wireframe[] = [
     notionUiPlanLink: "https://www.notion.so/Settings-Page-1e849797be6880d1b043ebbb4ab3e4e4?pvs=21",
     wireframeStatus: "complete",
     specsStatus: "approved",
-    devStatus: "complete",
-    imageUrl: "https://via.placeholder.com/300x200/10B981/FFFFFF?text=Settings"
+    devStatus: "complete"
   },
   {
     id: "25",
@@ -296,8 +272,7 @@ const SAMPLE_WIREFRAMES: Wireframe[] = [
     notionUiPlanLink: "https://www.notion.so/Support-Help-Page-1e849797be6880bba09be35bdcd4bc2a?pvs=21",
     wireframeStatus: "in-progress",
     specsStatus: "in-review",
-    devStatus: "pending",
-    imageUrl: "https://via.placeholder.com/300x200/8B5CF6/FFFFFF?text=Support"
+    devStatus: "pending"
   }
 ];
 

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus } from 'lucide-react';
+import { Plus, AlertTriangle, FileImage } from 'lucide-react';
 import { useProjectWireframes } from '@/hooks/useProjectWireframes';
 import { WireframeCard } from '@/components/projects/wireframes/WireframeCard';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -65,17 +65,17 @@ export function WireframeSection() {
 
   // UI components for different states
   const LoadingContent = () => (
-    <div className="space-y-6 text-gray-900 dark:text-white">
+    <div className="space-y-6 text-slate-900 dark:text-white">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Wireframes</h2>
-        <Button disabled>
+        <Button disabled className="bg-indigo-500 hover:bg-indigo-600 text-white">
           <Plus className="mr-2 h-4 w-4" />
           Add Wireframe
         </Button>
       </div>
       
       <Tabs defaultValue="all" className="w-full">
-        <TabsList>
+        <TabsList className="bg-slate-100 dark:bg-slate-800">
           <TabsTrigger value="all">All</TabsTrigger>
           <TabsTrigger value="complete">Complete</TabsTrigger>
           <TabsTrigger value="in-progress">In Progress</TabsTrigger>
@@ -86,10 +86,10 @@ export function WireframeSection() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {Array.from({ length: 8 }).map((_, index) => (
               <div key={index} className="space-y-3">
-                <Skeleton className="h-48 w-full rounded-md bg-gray-200 dark:bg-gray-700" />
-                <Skeleton className="h-5 w-3/4 rounded-md bg-gray-200 dark:bg-gray-700" />
-                <Skeleton className="h-4 w-full rounded-md bg-gray-200 dark:bg-gray-700" />
-                <Skeleton className="h-10 w-full rounded-md bg-gray-200 dark:bg-gray-700" />
+                <Skeleton className="h-48 w-full rounded-md bg-slate-200 dark:bg-slate-700" />
+                <Skeleton className="h-5 w-3/4 rounded-md bg-slate-200 dark:bg-slate-700" />
+                <Skeleton className="h-4 w-full rounded-md bg-slate-200 dark:bg-slate-700" />
+                <Skeleton className="h-10 w-full rounded-md bg-slate-200 dark:bg-slate-700" />
               </div>
             ))}
           </div>
@@ -99,19 +99,23 @@ export function WireframeSection() {
   );
 
   const ErrorContent = () => (
-    <div className="p-6 text-center">
-      <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Error loading wireframes</h3>
-      <p className="text-gray-500 mb-4">We couldn't load the wireframes. Please try again later.</p>
-      <p className="text-red-500 mb-4 text-sm">{error}</p>
-      <Button onClick={handleRetry}>Retry</Button>
+    <div className="p-8 text-center border rounded-lg border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-900/50">
+      <AlertTriangle className="h-12 w-12 text-amber-500 mx-auto mb-4" />
+      <h3 className="text-xl font-semibold mb-2 text-slate-900 dark:text-white">Error loading wireframes</h3>
+      <p className="text-slate-600 dark:text-slate-300 mb-4">We couldn't load the wireframes. Please try again later.</p>
+      <p className="text-red-500 mb-4 text-sm font-mono p-2 bg-red-50 dark:bg-red-950/20 rounded border border-red-200 dark:border-red-900/50 max-w-md mx-auto">{error}</p>
+      <Button onClick={handleRetry} className="bg-indigo-500 hover:bg-indigo-600 text-white">
+        Retry
+      </Button>
     </div>
   );
 
   const EmptyContent = () => (
-    <div className="p-6 text-center border rounded-lg border-gray-200 dark:border-gray-700">
-      <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">No wireframes found</h3>
-      <p className="text-gray-500 mb-4">Get started by creating your first wireframe</p>
-      <Button>
+    <div className="p-8 text-center border rounded-lg border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+      <FileImage className="h-12 w-12 text-slate-400 mx-auto mb-4" />
+      <h3 className="text-xl font-semibold mb-2 text-slate-900 dark:text-white">No wireframes found</h3>
+      <p className="text-slate-500 mb-6">Get started by creating your first wireframe</p>
+      <Button className="bg-indigo-500 hover:bg-indigo-600 text-white">
         <Plus className="mr-2 h-4 w-4" />
         Create Wireframe
       </Button>
@@ -121,15 +125,15 @@ export function WireframeSection() {
   const NormalContent = () => (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Wireframes ({wireframes?.length || 0})</h2>
-        <Button>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Wireframes ({wireframes?.length || 0})</h2>
+        <Button className="bg-indigo-500 hover:bg-indigo-600 text-white">
           <Plus className="mr-2 h-4 w-4" />
           Add Wireframe
         </Button>
       </div>
       
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList>
+        <TabsList className="bg-slate-100 dark:bg-slate-800">
           <TabsTrigger value="all">All ({wireframes?.length || 0})</TabsTrigger>
           <TabsTrigger value="complete">Complete ({complete.length})</TabsTrigger>
           <TabsTrigger value="in-progress">In Progress ({inProgress.length})</TabsTrigger>
