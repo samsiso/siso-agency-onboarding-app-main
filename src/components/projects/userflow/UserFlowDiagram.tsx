@@ -3,6 +3,9 @@ import { toast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
 import { ActivitySquare, ArrowRightCircle, Workflow } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { ReactFlowImplementation } from './ReactFlowImplementation';
 
 // Simplified interface for the placeholder
 interface UserFlowDiagramProps {
@@ -66,8 +69,11 @@ interface UserFlowDiagramProps {
  *    - Integration with other project sections
  */
 
-// Temporarily providing a simplified placeholder component until React Flow is implemented
+// UserFlowDiagram component that can toggle between placeholder and implementation
 export function UserFlowDiagram({ projectId, onNodeSelect, setIsLoading }: UserFlowDiagramProps) {
+  // State to determine whether to show the placeholder or the actual implementation
+  const [showImplementation, setShowImplementation] = useState(true);
+  
   // Handle loading state if setIsLoading is provided
   if (setIsLoading) {
     // This ensures any parent component knows we're not actually loading
@@ -106,54 +112,93 @@ export function UserFlowDiagram({ projectId, onNodeSelect, setIsLoading }: UserF
     { id: 'e1-2', source: 'screen-1', target: 'screen-2' },
     { id: 'e2-3', source: 'screen-2', target: 'screen-3' }
   ];
+
+  // If showing implementation, render the ReactFlowImplementation
+  if (showImplementation) {
+    return (
+      <div className="h-full flex flex-col">
+        <div className="flex items-center justify-end gap-2 p-2 bg-black/30 border-b border-white/10">
+          <div className="flex items-center gap-2 ml-auto">
+            <Label htmlFor="preview-mode" className="text-xs text-gray-400">Preview Mode</Label>
+            <Switch
+              id="preview-mode"
+              checked={showImplementation}
+              onCheckedChange={setShowImplementation}
+            />
+          </div>
+        </div>
+        <div className="flex-1">
+          <ReactFlowImplementation 
+            projectId={projectId}
+            onNodeSelect={onNodeSelect}
+            setIsLoading={setIsLoading}
+          />
+        </div>
+      </div>
+    );
+  }
   
+  // Otherwise show the placeholder
   return (
-    <div className="h-full rounded-lg border border-white/10 bg-gradient-to-b from-black/30 to-black/10 flex flex-col items-center justify-center py-16">
-      <div className="max-w-xl text-center px-6">
-        <div className="w-16 h-16 rounded-xl bg-indigo-900/30 text-indigo-400 flex items-center justify-center mx-auto mb-6 border border-indigo-500/20">
-          <Workflow className="w-8 h-8" />
+    <div className="h-full flex flex-col">
+      <div className="flex items-center justify-end gap-2 p-2 bg-black/30 border-b border-white/10">
+        <div className="flex items-center gap-2 ml-auto">
+          <Label htmlFor="preview-mode" className="text-xs text-gray-400">Preview Mode</Label>
+          <Switch
+            id="preview-mode"
+            checked={showImplementation}
+            onCheckedChange={setShowImplementation}
+          />
         </div>
-        
-        <h2 className="text-2xl font-bold text-white mb-3">User Flow Coming Soon</h2>
-        
-        <div className="mb-6">
-          <Badge variant="outline" className="bg-amber-500/20 text-amber-400 border-amber-500/30">Coming in Next Update</Badge>
-        </div>
-        
-        <p className="text-gray-300 mb-8 max-w-md mx-auto">
-          We're working on implementing a powerful flow diagram to visualize your app's user journey. This feature will be available in the next update.
-        </p>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left mb-6 max-w-md mx-auto">
-          <div className="bg-black/30 rounded p-3 border border-white/10">
-            <h4 className="text-white text-sm font-medium mb-1">Map User Journeys</h4>
-            <p className="text-xs text-gray-400">Visualize complete user flows and interactions</p>
+      </div>
+      <div className="flex-1 h-full rounded-lg border border-white/10 bg-gradient-to-b from-black/30 to-black/10 flex flex-col items-center justify-center py-16">
+        <div className="max-w-xl text-center px-6">
+          <div className="w-16 h-16 rounded-xl bg-indigo-900/30 text-indigo-400 flex items-center justify-center mx-auto mb-6 border border-indigo-500/20">
+            <Workflow className="w-8 h-8" />
           </div>
           
-          <div className="bg-black/30 rounded p-3 border border-white/10">
-            <h4 className="text-white text-sm font-medium mb-1">Screen Connections</h4>
-            <p className="text-xs text-gray-400">Link screens together with logical transitions</p>
+          <h2 className="text-2xl font-bold text-white mb-3">User Flow Coming Soon</h2>
+          
+          <div className="mb-6">
+            <Badge variant="outline" className="bg-amber-500/20 text-amber-400 border-amber-500/30">Coming in Next Update</Badge>
           </div>
           
-          <div className="bg-black/30 rounded p-3 border border-white/10">
-            <h4 className="text-white text-sm font-medium mb-1">Export Options</h4>
-            <p className="text-xs text-gray-400">Share diagrams with your team in various formats</p>
+          <p className="text-gray-300 mb-8 max-w-md mx-auto">
+            We're working on implementing a powerful flow diagram to visualize your app's user journey. This feature will be available in the next update.
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left mb-6 max-w-md mx-auto">
+            <div className="bg-black/30 rounded p-3 border border-white/10">
+              <h4 className="text-white text-sm font-medium mb-1">Map User Journeys</h4>
+              <p className="text-xs text-gray-400">Visualize complete user flows and interactions</p>
+            </div>
+            
+            <div className="bg-black/30 rounded p-3 border border-white/10">
+              <h4 className="text-white text-sm font-medium mb-1">Screen Connections</h4>
+              <p className="text-xs text-gray-400">Link screens together with logical transitions</p>
+            </div>
+            
+            <div className="bg-black/30 rounded p-3 border border-white/10">
+              <h4 className="text-white text-sm font-medium mb-1">Export Options</h4>
+              <p className="text-xs text-gray-400">Share diagrams with your team in various formats</p>
+            </div>
           </div>
+          
+          <Button 
+            variant="outline" 
+            className="bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border-indigo-500/30"
+            onClick={() => {
+              setShowImplementation(true);
+              toast({
+                title: "Previewing Implementation",
+                description: "You are now viewing the ReactFlow implementation preview.",
+                duration: 5000,
+              });
+            }}
+          >
+            Preview Implementation
+          </Button>
         </div>
-        
-        <Button 
-          variant="outline" 
-          className="bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border-indigo-500/30"
-          onClick={() => {
-            toast({
-              title: "Implementation Plan",
-              description: "Check the component code for a detailed implementation plan.",
-              duration: 5000,
-            });
-          }}
-        >
-          View Implementation Plan
-        </Button>
       </div>
     </div>
   );

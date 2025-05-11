@@ -6,7 +6,7 @@
  */
 
 import { Handle, NodeProps, Position } from 'reactflow';
-import { BadgePlusIcon, MousePointer, Finger } from 'lucide-react';
+import { BadgePlusIcon, MousePointer, FingerprintIcon } from 'lucide-react';
 
 interface ActionNodeData {
   label: string;
@@ -17,7 +17,7 @@ interface ActionNodeData {
 // Action icon mapping
 const actionIcons = {
   button_click: MousePointer,
-  tap: Finger,
+  tap: FingerprintIcon,
   form_submit: BadgePlusIcon,
 };
 
