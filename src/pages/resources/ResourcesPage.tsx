@@ -2,12 +2,13 @@ import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, FileText, HelpCircle, User, Search, ArrowRight, Sparkles, MessageCircle } from "lucide-react";
+import { BookOpen, FileText, HelpCircle, User, Search, ArrowRight, Sparkles, MessageCircle, Users } from "lucide-react";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { GettingStartedContent } from "@/components/help/content/GettingStartedContent";
 import { DocumentationContent } from "@/components/help/content/DocumentationContent";
 import { FAQContent } from "@/components/help/content/FAQContent";
 import { ProfileContent } from "@/components/resources/ProfileContent";
+import { ParticlesBackground } from "@/components/resources/ParticlesBackground";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -70,6 +71,7 @@ export default function ResourcesPage() {
         >
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/40 z-10"></div>
           <div className="absolute inset-0 bg-[url('/images/resources-bg.jpg')] bg-cover bg-center z-0 opacity-40"></div>
+          <ParticlesBackground className="opacity-40" />
           
           <div className="relative z-20 px-8 py-12 md:py-16 max-w-3xl">
             <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white">
@@ -229,6 +231,60 @@ export default function ResourcesPage() {
               </TabsContent>
             </Tabs>
           </Card>
+        </motion.div>
+
+        {/* Help Center */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+          className="mt-12 mb-8"
+        >
+          <div className="flex items-center gap-2 mb-6">
+            <HelpCircle className="h-5 w-5 text-siso-orange" />
+            <h2 className="text-2xl font-bold text-white">Help Center</h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card className="bg-black/70 border-gray-800 hover:border-siso-orange/40 transition-all shadow-lg">
+              <CardContent className="pt-6 flex flex-col items-center text-center">
+                <div className="h-16 w-16 rounded-full bg-siso-orange/20 border border-siso-orange/30 flex items-center justify-center mb-4">
+                  <MessageCircle className="h-8 w-8 text-siso-orange" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2 text-white">Contact Support</h3>
+                <p className="text-gray-300 mb-4">Get help from our support team via email or chat</p>
+                <Button className="bg-siso-orange hover:bg-siso-orange/90 text-white shadow-md">
+                  Contact Us
+                </Button>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-black/70 border-gray-800 hover:border-purple-500/40 transition-all shadow-lg">
+              <CardContent className="pt-6 flex flex-col items-center text-center">
+                <div className="h-16 w-16 rounded-full bg-purple-500/20 border border-purple-500/30 flex items-center justify-center mb-4">
+                  <BookOpen className="h-8 w-8 text-purple-400" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2 text-white">Documentation</h3>
+                <p className="text-gray-300 mb-4">Explore our comprehensive knowledge base</p>
+                <Button variant="outline" className="border-purple-500/30 text-purple-300 hover:bg-purple-500/10 hover:text-purple-200 shadow-md">
+                  Browse Docs
+                </Button>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-black/70 border-gray-800 hover:border-blue-500/40 transition-all shadow-lg">
+              <CardContent className="pt-6 flex flex-col items-center text-center">
+                <div className="h-16 w-16 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center mb-4">
+                  <Users className="h-8 w-8 text-blue-400" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2 text-white">Community</h3>
+                <p className="text-gray-300 mb-4">Join our community forum for discussions and collaboration</p>
+                <Button variant="outline" className="border-blue-500/30 text-blue-300 hover:bg-blue-500/10 hover:text-blue-200 shadow-md">
+                  Join Community
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </motion.div>
       </div>
     </AppLayout>
