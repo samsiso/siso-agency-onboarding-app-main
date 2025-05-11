@@ -7,7 +7,10 @@ import { ResearchFilters } from './research/ResearchFilters';
 import { ResearchCategories } from './research/ResearchCategories';
 import { PinnedResearchAsset } from './research/PinnedResearchAsset';
 import { ResearchDocumentCard } from './research/ResearchDocument';
+import { ResearchDocumentSkeleton, PinnedResearchAssetSkeleton } from './research/ResearchDocumentSkeleton';
 import { ResearchDocument } from './types';
+import { Skeleton } from '@/components/ui/skeleton';
+import React from 'react';
 
 // Mock data - would be replaced with real data from API/database
 const researchDocuments: ResearchDocument[] = [
@@ -102,6 +105,15 @@ export function ResearchSection() {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('updated');
   const [expandedDocs, setExpandedDocs] = useState<Record<string, boolean>>({});
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Simulate loading state for demo purposes
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
 
   const toggleExpanded = (id: string) => {
     setExpandedDocs(prev => ({
@@ -140,6 +152,49 @@ export function ResearchSection() {
   const pinnedDocs = sortedDocuments.filter(doc => doc.isPinned);
   const regularDocs = sortedDocuments.filter(doc => !doc.isPinned);
   
+  if (isLoading) {
+    return (
+      <div className="space-y-8">
+        <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-2">Research Documents</h2>
+            <p className="text-neutral-400">Explore our research findings and background information for UbahCryp.</p>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Skeleton className="h-10 w-64 bg-slate-800 rounded-md" />
+            <Skeleton className="h-10 w-32 bg-slate-800 rounded-md" />
+          </div>
+        </div>
+        
+        <div className="flex overflow-auto pb-2 gap-2">
+          {categories.map((_, i) => (
+            <Skeleton key={i} className="h-9 w-28 bg-slate-800 rounded-md flex-shrink-0" />
+          ))}
+        </div>
+        
+        {/* Pinned Skeletons */}
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold text-white/90 mb-3 border-b border-white/10 pb-2">
+            Pinned Project Assets
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[1, 2].map((i) => (
+              <PinnedResearchAssetSkeleton key={i} />
+            ))}
+          </div>
+        </div>
+        
+        {/* Regular Document Skeletons */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array(6).fill(0).map((_, i) => (
+            <ResearchDocumentSkeleton key={i} />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
