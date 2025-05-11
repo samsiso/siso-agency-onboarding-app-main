@@ -1,4 +1,3 @@
-
 import { Card } from '@/components/ui/card';
 import { useFeatures } from '@/hooks/useFeatures';
 import { FeatureCard } from '../features/FeatureCard';
@@ -289,11 +288,11 @@ export function FeatureRequestsSection() {
             <div className="bg-black/30 rounded-lg p-4 border border-indigo-500/20 backdrop-blur-sm">
               <div className="text-sm text-gray-400 mb-1">Total Cost</div>
               <div className="text-2xl font-bold text-green-400">
-                £{totalCost.toLocaleString()}
+                £5,000
               </div>
               <div className="flex justify-between text-xs text-gray-500 mt-2">
-                <span>Avg. cost per feature:</span>
-                <span className="text-green-400">£{(totalCost / features.length).toLocaleString(undefined, {maximumFractionDigits: 0})}</span>
+                <span>Package price:</span>
+                <span className="text-green-400">Enterprise</span>
               </div>
             </div>
           </div>
@@ -393,16 +392,6 @@ export function FeatureRequestsSection() {
           </div>
         )}
       </div>
-
-      {/* Total Cost Summary */}
-      {features && features.length > 0 && (
-        <div className="bg-black/20 rounded-lg p-4 border border-siso-text/10 mb-8">
-          <div className="flex justify-between items-center">
-            <p className="text-gray-400">Total Estimated Cost:</p>
-            <p className="text-xl font-bold text-blue-400">£{totalCost.toLocaleString()}</p>
-          </div>
-        </div>
-      )}
 
       {/* Feature Details Modal */}
       <FeatureDetailsModal 
