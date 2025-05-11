@@ -12,6 +12,39 @@ import { toast } from '@/components/ui/use-toast';
 // This would come from an API or context in a real app
 import { researchDocuments } from './mockData';
 
+// A fallback document to use if the requested document is not found
+const fallbackDocument: ResearchDocument = {
+  id: 'template',
+  title: 'Research Document Template',
+  description: 'This is a template for a research document. In a real application, this would be replaced with actual data from your Supabase database.',
+  category: 'Market Research',
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+  tags: ['template', 'research', 'example'],
+  insights: [
+    'Key insight 1: This is where you would put your first key insight',
+    'Key insight 2: This is where you would put your second key insight',
+    'Key insight 3: This is where you would put a third insight with more details about what was found'
+  ],
+  nextSteps: [
+    'Recommendation 1: Implement feature based on findings',
+    'Recommendation 2: Further research needed in specific area',
+    'Recommendation 3: Consider alternative approach based on data'
+  ],
+  code_snippet: `// Example code snippet
+function analyzeData(data) {
+  // This is where your code implementation would go
+  const results = data.map(item => {
+    return {
+      ...item,
+      analyzed: true
+    };
+  });
+  
+  return results;
+}`,
+};
+
 export function ResearchDocumentDetail() {
   const { id, documentId } = useParams<{ id: string; documentId: string }>();
   const projectId = id; // Alias for clearer code within component
@@ -19,23 +52,8 @@ export function ResearchDocumentDetail() {
   const [activeTab, setActiveTab] = useState('overview');
 
   // Find the document by ID (in a real app, you would fetch this from an API)
-  const document = researchDocuments.find(doc => doc.id === documentId);
-
-  if (!document) {
-    return (
-      <div className="flex flex-col items-center justify-center p-12 bg-black/30 rounded-lg border border-white/10">
-        <FileText className="h-12 w-12 text-neutral-500 mb-4" />
-        <h2 className="text-xl font-bold text-white mb-2">Research Document Not Found</h2>
-        <p className="text-neutral-400 mb-6">The document you're looking for doesn't exist or has been removed.</p>
-        <Button 
-          onClick={() => navigate(`/projects/${projectId}/market-research`)}
-          className="flex items-center gap-2"
-        >
-          <ChevronLeft className="h-4 w-4" /> Back to Research
-        </Button>
-      </div>
-    );
-  }
+  // If not found, use the fallback template document
+  const document = researchDocuments.find(doc => doc.id === documentId) || fallbackDocument;
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -72,10 +90,10 @@ export function ResearchDocumentDetail() {
       {/* Breadcrumbs Navigation */}
       <Breadcrumb className="mb-6">
         <BreadcrumbItem>
-          <BreadcrumbLink href={`/projects/${projectId}`}>Project</BreadcrumbLink>
+          <BreadcrumbLink onClick={() => navigate(`/projects/${projectId}`)}>Project</BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbItem>
-          <BreadcrumbLink href={`/projects/${projectId}/market-research`}>Research</BreadcrumbLink>
+          <BreadcrumbLink onClick={() => navigate(`/projects/${projectId}/market-research`)}>Research</BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbItem isCurrentPage>
           <BreadcrumbLink>{document.title}</BreadcrumbLink>
@@ -248,7 +266,6 @@ export function ResearchDocumentDetail() {
               <div className="space-y-4">
                 {document.insights.map((insight, idx) => (
                   <div key={idx} className="bg-black/30 p-4 rounded-lg border border-white/5">
-                    <h3 className="text-md font-medium text-[#FF9800] mb-1">Insight #{idx + 1}</h3>
                     <p className="text-neutral-200">{insight}</p>
                   </div>
                 ))}
@@ -262,12 +279,11 @@ export function ResearchDocumentDetail() {
             <Card className="bg-black/30 border-white/10 p-6">
               <div className="flex items-center gap-2 mb-4">
                 <ListChecks className="h-6 w-6 text-green-500" />
-                <h2 className="text-xl font-semibold text-white">Recommended Actions</h2>
+                <h2 className="text-xl font-semibold text-white">Recommendations & Next Steps</h2>
               </div>
               <div className="space-y-4">
                 {document.nextSteps.map((step, idx) => (
                   <div key={idx} className="bg-black/30 p-4 rounded-lg border border-white/5">
-                    <h3 className="text-md font-medium text-[#FF9800] mb-1">Recommendation #{idx + 1}</h3>
                     <p className="text-neutral-200">{step}</p>
                   </div>
                 ))}
@@ -285,17 +301,19 @@ export function ResearchDocumentDetail() {
                   <h2 className="text-xl font-semibold text-white">Code Examples</h2>
                 </div>
                 <Button 
-                  variant="outline" 
+                  variant="ghost" 
                   size="sm" 
-                  className="flex items-center gap-1"
-                  onClick={() => copyToClipboard(document.code_snippet)}
+                  className="text-sm"
+                  onClick={() => copyToClipboard(document.code_snippet as string)}
                 >
-                  <Copy className="h-3 w-3" /> Copy
+                  <Copy className="h-4 w-4 mr-1" /> Copy
                 </Button>
               </div>
-              <pre className="bg-black/50 rounded-md p-4 font-mono text-sm overflow-x-auto whitespace-pre-wrap text-neutral-300">
-                {document.code_snippet}
-              </pre>
+              <div className="bg-black/50 p-4 rounded-lg border border-white/10 font-mono text-sm overflow-x-auto">
+                <pre className="whitespace-pre-wrap text-neutral-200">
+                  {document.code_snippet}
+                </pre>
+              </div>
             </Card>
           </TabsContent>
         )}
