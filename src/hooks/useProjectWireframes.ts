@@ -328,20 +328,23 @@ const SAMPLE_CONNECTIONS: Connection[] = [
 ];
 
 export function useProjectWireframes() {
-  // All React hooks must be called at the top level - DO NOT re-order these
+  // All React hooks must be called unconditionally at the top level
   const { id: projectId } = useParams();
-  // Initialize all state hooks first
   const [wireframes, setWireframes] = useState<Wireframe[]>([]);
-  const [connections, setConnections] = useState<Connection[]>([]);
+  const [connections, setConnections] = useState<Connection[]>(SAMPLE_CONNECTIONS);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeWireframeId, setActiveWireframeId] = useState<string>('');
   
-  // Use a ref instead of state to track fetch attempts - prevents re-renders
+  // Use refs to track component mounting state and fetch attempts
+  const isMountedRef = useRef(true);
   const fetchTriedRef = useRef(false);
+  const timeoutRef = useRef<number | null>(null);
   
   // Function to load sample data when database fetch fails
   const loadSampleWireframesAsFallback = useCallback(() => {
+    if (!isMountedRef.current) return;
+    
     console.log("Loading sample wireframe data as fallback");
     setWireframes(SAMPLE_WIREFRAMES);
     setConnections(SAMPLE_CONNECTIONS);
@@ -355,16 +358,15 @@ export function useProjectWireframes() {
 
   // Fetch data effect
   useEffect(() => {
-    let isMounted = true;
+    // Set mounted ref to true on mount
+    isMountedRef.current = true;
     
-    // Skip if we've already tried fetching (to avoid React Strict Mode double-fetching)
-    if (fetchTriedRef.current) {
-      return;
-    }
-    
+    // Function to fetch wireframes
     const fetchWireframesData = async () => {
-      if (!isMounted) return;
+      // Don't proceed if we've already tried fetching or component is unmounted
+      if (fetchTriedRef.current || !isMountedRef.current) return;
       
+      // Set loading state and mark fetch as attempted
       setLoading(true);
       setError(null);
       fetchTriedRef.current = true;
@@ -374,33 +376,30 @@ export function useProjectWireframes() {
         const currentProjectId = projectId || 'ubahcrypt';
         console.log("Fetching wireframes for project:", currentProjectId);
 
-        // Simple timeout to avoid infinite waiting on connection issues
-        const timeoutPromise = new Promise((_, reject) => {
-          setTimeout(() => reject(new Error("Supabase connection timed out")), 5000);
-        });
-
-        // Race between actual fetch and timeout
-        const result = await Promise.race([
-          supabase
-            .from('project_wireframes')
-            .select('*')
-            .eq('project_id', currentProjectId)
-            .order('created_at', { ascending: false }),
-          timeoutPromise
-        ]);
-
-        if (!isMounted) return;
+        // Use the raw query method to avoid type issues with custom tables
+        const result = await supabase
+          .rpc('get_project_wireframes', { project_id_param: currentProjectId })
+          .catch(() => {
+            // If the RPC doesn't exist, fallback to direct query
+            return supabase
+              .from('project_wireframes')
+              .select('*')
+              .eq('project_id', currentProjectId)
+              .order('created_at', { ascending: false });
+          });
         
-        // @ts-ignore - handle the Supabase response type
-        const { data, error } = result;
+        // Check if component is still mounted
+        if (!isMountedRef.current) return;
         
-        console.log("Supabase response:", { data, error });
-        
-        if (error) {
-          console.error("Supabase error:", error);
-          throw new Error(`Failed to fetch wireframes: ${error.message}`);
+        // Handle database error
+        if (result.error) {
+          console.error("Supabase error:", result.error);
+          throw new Error(`Failed to fetch wireframes: ${result.error.message}`);
         }
 
+        const data = result.data || [];
+        
+        // Process data if successful
         if (data && data.length > 0) {
           // Map database fields to Wireframe interface
           const mappedWireframes: Wireframe[] = data.map((item: any) => ({
@@ -415,36 +414,28 @@ export function useProjectWireframes() {
             imageUrl: item.image_url || `https://via.placeholder.com/300x200/6366F1/FFFFFF?text=${encodeURIComponent(item.title)}`
           }));
           
-          console.log("Mapped wireframes:", mappedWireframes);
-          
-          if (isMounted) {
+          // Only update state if component is still mounted
+          if (isMountedRef.current) {
             setWireframes(mappedWireframes);
             
             // Set the first wireframe as active
             if (mappedWireframes.length > 0) {
               setActiveWireframeId(mappedWireframes[0].id);
             }
-
-            // Also load sample connections for now
-            setConnections(SAMPLE_CONNECTIONS);
             setLoading(false);
           }
         } else {
           console.log("No wireframes found in database, using sample data");
           // Fallback to sample data if no wireframes were found
-          if (isMounted) {
+          if (isMountedRef.current) {
             loadSampleWireframesAsFallback();
           }
         }
       } catch (err: any) {
         console.error("Error fetching wireframes:", err);
-        if (isMounted) {
+        if (isMountedRef.current) {
           setError(err.message || "Failed to load wireframes");
           loadSampleWireframesAsFallback();
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
         }
       }
     };
@@ -452,24 +443,22 @@ export function useProjectWireframes() {
     // Start the fetch process
     fetchWireframesData();
     
-    // Cleanup function to handle component unmounting
-    return () => {
-      isMounted = false;
-    };
-  }, [projectId, loadSampleWireframesAsFallback]);
-
-  // Ensure we have some data to display even if everything else fails
-  useEffect(() => {
-    // If still loading after 3 seconds, load sample data as a fallback
-    const timeoutId = setTimeout(() => {
-      if (loading && wireframes.length === 0) {
+    // Setup the fallback timeout - use window.setTimeout to ensure proper cleanup
+    timeoutRef.current = window.setTimeout(() => {
+      if (isMountedRef.current && loading && wireframes.length === 0) {
         console.log("Loading timeout reached, forcing sample data");
         loadSampleWireframesAsFallback();
       }
     }, 3000);
     
-    return () => clearTimeout(timeoutId);
-  }, [loading, wireframes.length, loadSampleWireframesAsFallback]);
+    // Cleanup function
+    return () => {
+      isMountedRef.current = false;
+      if (timeoutRef.current !== null) {
+        window.clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [projectId, loadSampleWireframesAsFallback, loading, wireframes.length]);
 
   // Find active wireframe from the current state
   const activeWireframe = wireframes.find(w => w.id === activeWireframeId) || null;

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -8,7 +8,10 @@ import { WireframeCard } from '@/components/projects/wireframes/WireframeCard';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export function WireframeSection() {
+  // Use hooks at the top level, never conditionally
   const { id: projectId } = useParams();
+  const [activeTab, setActiveTab] = useState('all');
+  
   const { 
     wireframes, 
     loading, 
@@ -17,20 +20,26 @@ export function WireframeSection() {
     setActiveWireframeId 
   } = useProjectWireframes();
 
-  // Log state for debugging - always at the top level, never conditional
+  // Log state for debugging
   useEffect(() => {
     console.log("WireframeSection rendered with:", { 
       projectId, 
       wireframesCount: wireframes.length,
       loading,
-      error 
+      error,
+      activeTab
     });
-  }, [projectId, wireframes, loading, error]);
+  }, [projectId, wireframes, loading, error, activeTab]);
 
-  // Group wireframes by status for tabs - do this before any conditionals
+  // Group wireframes by status
   const complete = wireframes.filter(w => w.wireframeStatus === 'complete');
   const inProgress = wireframes.filter(w => w.wireframeStatus === 'in-progress');
   const planned = wireframes.filter(w => w.wireframeStatus === 'planned');
+
+  // Handle tab change
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+  };
 
   // Render loading state
   if (loading) {
@@ -106,7 +115,7 @@ export function WireframeSection() {
         </Button>
       </div>
       
-      <Tabs defaultValue="all" className="w-full">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         <TabsList>
           <TabsTrigger value="all">All ({wireframes.length})</TabsTrigger>
           <TabsTrigger value="complete">Complete ({complete.length})</TabsTrigger>

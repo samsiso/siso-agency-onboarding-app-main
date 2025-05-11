@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS project_wireframes (
   specs_status TEXT DEFAULT 'pending',
   dev_status TEXT DEFAULT 'pending',
   notion_link TEXT,
+  image_url TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -69,3 +70,14 @@ CREATE TRIGGER update_project_wireframes_updated_at
 BEFORE UPDATE ON project_wireframes
 FOR EACH ROW
 EXECUTE FUNCTION update_updated_at_column();
+
+-- Create a function to get project wireframes
+CREATE OR REPLACE FUNCTION get_project_wireframes(project_id_param UUID)
+RETURNS SETOF project_wireframes
+LANGUAGE SQL
+SECURITY DEFINER
+AS $$
+  SELECT * FROM project_wireframes
+  WHERE project_id = project_id_param
+  ORDER BY created_at DESC;
+$$;
