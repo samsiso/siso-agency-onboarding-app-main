@@ -34,12 +34,14 @@ export function WireframeCard({ wireframe, projectId, onClick, isActive = false 
 
   return (
     <Card 
-      className={`transition-all hover:shadow-md ${isActive ? 'ring-2 ring-blue-500 shadow-md' : ''}`}
+      className={`transition-all hover:shadow-md border border-gray-200 dark:border-gray-800 ${
+        isActive ? 'ring-2 ring-blue-500 shadow-md' : ''
+      }`}
       onClick={onClick}
     >
-      <div className="relative overflow-hidden h-48">
+      <div className="relative overflow-hidden h-48 bg-gray-50 dark:bg-gray-900">
         <img 
-          src={wireframe.imageUrl || `https://via.placeholder.com/300x200/3B82F6/FFFFFF?text=${encodeURIComponent(wireframe.title)}`} 
+          src={wireframe.imageUrl || `https://via.placeholder.com/300x200/6366F1/FFFFFF?text=${encodeURIComponent(wireframe.title)}`} 
           alt={wireframe.title}
           className="w-full h-full object-cover transition-transform hover:scale-105"
         />
@@ -67,12 +69,15 @@ export function WireframeCard({ wireframe, projectId, onClick, isActive = false 
       
       <CardFooter className="flex justify-between pt-2">
         {wireframe.notionUiPlanLink && (
-          <Button variant="outline" size="sm" onClick={() => window.open(wireframe.notionUiPlanLink, '_blank')}>
+          <Button variant="outline" size="sm" className="text-indigo-500 hover:text-indigo-600 border-indigo-200 hover:border-indigo-300 dark:border-indigo-900 dark:hover:border-indigo-800" onClick={(e) => {
+            e.stopPropagation();
+            window.open(wireframe.notionUiPlanLink, '_blank');
+          }}>
             <ExternalLink className="h-4 w-4 mr-2" />
             Notion
           </Button>
         )}
-        <Button variant="default" size="sm" onClick={(e) => {
+        <Button variant="default" size="sm" className="bg-indigo-500 hover:bg-indigo-600 text-white" onClick={(e) => {
           e.stopPropagation();
           navigate(`/projects/${projectId}/wireframes/${wireframe.id}`);
         }}>

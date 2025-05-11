@@ -37,6 +37,8 @@ export function ProjectDetails({ initialTab }: ProjectDetailsProps) {
     created_at: '2025-04-01T10:00:00Z',
   });
 
+  const [tabs, setTabs] = useState([]);
+
   // Determine if we're on a research document detail page
   const isResearchDocumentDetail = location.pathname.includes('/market-research/') && documentId;
 
@@ -58,6 +60,20 @@ export function ProjectDetails({ initialTab }: ProjectDetailsProps) {
       contentRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, [activeTab]);
+
+  useEffect(() => {
+    const projectTabs = [
+      { id: 'overview', label: 'Overview' },
+      { id: 'agency-steps', label: 'Agency Steps' },
+      { id: 'market-research', label: 'Market Research' },
+      { id: 'wireframes', label: 'Wireframes' },
+      { id: 'features', label: 'Feature Requests' },
+      { id: 'user-flow', label: 'User Flow' },
+      { id: 'feedback', label: 'Feedback' },
+      { id: 'timeline', label: 'Timeline' },
+    ];
+    setTabs(projectTabs);
+  }, []);
 
   const renderAppPlanOverview = () => (
     <div ref={contentRef}>
@@ -92,6 +108,7 @@ export function ProjectDetails({ initialTab }: ProjectDetailsProps) {
       case 'features':
         return <FeatureRequestsSection />;
       case 'wireframes':
+        console.log("Rendering wireframes section");
         return (
           <div ref={contentRef}>
             <WireframeSection />
@@ -101,23 +118,23 @@ export function ProjectDetails({ initialTab }: ProjectDetailsProps) {
         // Use React Router navigation to avoid full page reload
         // This will properly navigate using the React Router context
         navigate(`/projects/${projectId}/userflow`);
+        return null;
+      case 'feedback':
         return (
-          <div className="p-6 text-center text-neutral-400 bg-black/30 rounded-lg border border-white/10" ref={contentRef}>
-            <p>Redirecting to User Flow page...</p>
+          <div className="p-6 text-center" ref={contentRef}>
+            <h3 className="text-xl font-semibold mb-2">Feedback</h3>
+            <p className="text-gray-500 mb-4">Feedback section is coming soon.</p>
           </div>
         );
-      case 'feedback-log':
+      case 'timeline':
         return (
-          <div className="p-6 text-center text-neutral-400 bg-black/30 rounded-lg border border-white/10" ref={contentRef}>
-            <p>Feedback Log content is under development.</p>
+          <div className="p-6 text-center" ref={contentRef}>
+            <h3 className="text-xl font-semibold mb-2">Timeline</h3>
+            <p className="text-gray-500 mb-4">Timeline section is coming soon.</p>
           </div>
         );
       default:
-        return (
-          <div className="p-6 text-center text-neutral-400 bg-black/30 rounded-lg border border-white/10" ref={contentRef}>
-            <p>Content for {activeTab} tab is under development.</p>
-          </div>
-        );
+        return renderAppPlanOverview();
     }
   };
 

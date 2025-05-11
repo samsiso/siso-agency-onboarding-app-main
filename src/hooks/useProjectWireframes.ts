@@ -328,7 +328,7 @@ const SAMPLE_CONNECTIONS: Connection[] = [
 ];
 
 export function useProjectWireframes() {
-  const { id: projectId } = useParams<{ id: string }>();
+  const { id: projectId } = useParams();
   const [wireframes, setWireframes] = useState<Wireframe[]>([]);
   const [connections, setConnections] = useState<Connection[]>([]);
   const [loading, setLoading] = useState(true);
@@ -351,62 +351,54 @@ export function useProjectWireframes() {
       setLoading(true);
       setError(null);
 
+      // Try fetching with the project ID from URL or fallback to 'ubahcrypt'
+      const currentProjectId = projectId || 'ubahcrypt';
+      console.log("Fetching wireframes for project:", currentProjectId);
+
       try {
-        if (!projectId) {
-          // Silently load sample data if no project ID
-          loadSampleWireframesAsFallback();
-          setLoading(false);
-          return;
-        }
+        // Use Supabase client to fetch wireframes
+        const { data, error } = await supabase
+          .from('project_wireframes')
+          .select('*')
+          .eq('project_id', currentProjectId)
+          .order('created_at', { ascending: false });
+          
+        console.log("Supabase response:", { data, error });
+        
+        if (error) throw error;
 
-        // Try to fetch from database, but silently fallback to sample data
-        // without showing error messages to the user
-        try {
-          // Use Supabase client to fetch wireframes
-          const { data, error } = await supabase
-            .from('project_wireframes')
-            .select('*')
-            .eq('project_id', projectId)
-            .order('created_at', { ascending: false });
-            
-          if (error) throw error;
-
-          if (data && data.length > 0) {
-            // Map database fields to Wireframe interface
-            const mappedWireframes: Wireframe[] = data.map(item => ({
-              id: item.id,
-              title: item.title,
-              category: item.category,
-              description: item.description,
-              notionUiPlanLink: item.notion_link,
-              wireframeStatus: item.wireframe_status,
-              specsStatus: item.specs_status,
-              devStatus: item.dev_status,
-              imageUrl: item.image_url
-            }));
-            
-            setWireframes(mappedWireframes);
-            
-            // Set the first wireframe as active
-            if (mappedWireframes.length > 0) {
-              setActiveWireframeId(mappedWireframes[0].id);
-            }
-
-            // Also load sample connections for now
-            setConnections(SAMPLE_CONNECTIONS);
-          } else {
-            // Fallback to sample data if no wireframes were found
-            loadSampleWireframesAsFallback();
+        if (data && data.length > 0) {
+          // Map database fields to Wireframe interface
+          const mappedWireframes: Wireframe[] = data.map(item => ({
+            id: item.id,
+            title: item.title,
+            category: item.category || 'page',
+            description: item.description || '',
+            notionUiPlanLink: item.notion_link,
+            wireframeStatus: item.wireframe_status || 'planned',
+            specsStatus: item.specs_status || 'pending',
+            devStatus: item.dev_status || 'pending',
+            imageUrl: item.image_url || `https://via.placeholder.com/300x200/3B82F6/FFFFFF?text=${encodeURIComponent(item.title)}`
+          }));
+          
+          console.log("Mapped wireframes:", mappedWireframes);
+          setWireframes(mappedWireframes);
+          
+          // Set the first wireframe as active
+          if (mappedWireframes.length > 0) {
+            setActiveWireframeId(mappedWireframes[0].id);
           }
-        } catch (err) {
-          console.log("Silently falling back to sample wireframe data:", err);
-          // Simply use sample data without showing error messages to the user
+
+          // Also load sample connections for now
+          setConnections(SAMPLE_CONNECTIONS);
+        } else {
+          console.log("No wireframes found in database, using sample data");
+          // Fallback to sample data if no wireframes were found
           loadSampleWireframesAsFallback();
         }
       } catch (err) {
-        // This only happens for critical errors outside the database fetch
-        console.error("Critical error in wireframes:", err);
-        setError("Failed to load wireframes");
+        console.error("Error fetching from Supabase:", err);
+        // Simply use sample data without showing error messages to the user
         loadSampleWireframesAsFallback();
       } finally {
         setLoading(false);
