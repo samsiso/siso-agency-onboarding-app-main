@@ -18,12 +18,16 @@ import { AnimatedCard } from '@/components/ui/animated-card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
-export function ProjectDetails() {
+interface ProjectDetailsProps {
+  initialTab?: string;
+}
+
+export function ProjectDetails({ initialTab }: ProjectDetailsProps) {
   const { id, tab, documentId } = useParams<{ id?: string; tab?: string; documentId?: string }>();
   const location = useLocation();
   const projectId = id || 'ubahcrypt';
   const navigate = useNavigate();
-  const activeTab = tab || 'overview';
+  const activeTab = initialTab || tab || 'overview';
   const contentRef = useRef<HTMLDivElement>(null);
   
   const [projectData, setProjectData] = useState({
@@ -87,7 +91,7 @@ export function ProjectDetails() {
         return <ResearchSection />;
       case 'features':
         return <FeatureRequestsSection />;
-      case 'wireframe':
+      case 'wireframes':
         return (
           <div ref={contentRef}>
             <WireframeSection />

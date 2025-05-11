@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client'; 
@@ -11,6 +10,313 @@ interface Connection {
   label?: string;
 }
 
+// Complete list of sample wireframes to use as fallback
+const SAMPLE_WIREFRAMES: Wireframe[] = [
+  {
+    id: "1",
+    title: "Login/Signup Page",
+    category: "page",
+    description: "User authentication and account creation interface",
+    notionUiPlanLink: "https://www.notion.so/Login-Signup-Page-1e849797be68802f8803e8671c05c518?pvs=21",
+    wireframeStatus: "complete",
+    specsStatus: "approved",
+    devStatus: "pending",
+    imageUrl: "https://via.placeholder.com/300x200/3B82F6/FFFFFF?text=Login/Signup"
+  },
+  {
+    id: "2",
+    title: "Onboarding/Tutorial Page",
+    category: "page",
+    description: "First-time user experience with step-by-step tutorials",
+    notionUiPlanLink: "https://www.notion.so/Onboarding-Tutorial-Page-1e849797be68805a9d69f05b5781b9a1?pvs=21",
+    wireframeStatus: "complete",
+    specsStatus: "approved",
+    devStatus: "pending",
+    imageUrl: "https://via.placeholder.com/300x200/8B5CF6/FFFFFF?text=Onboarding"
+  },
+  {
+    id: "3",
+    title: "Dashboard",
+    category: "page",
+    description: "Main dashboard with key metrics and user information",
+    notionUiPlanLink: "https://www.notion.so/Dashboard-1e849797be6880f89473f75ef252f8a9?pvs=21",
+    wireframeStatus: "complete",
+    specsStatus: "approved",
+    devStatus: "pending",
+    imageUrl: "https://via.placeholder.com/300x200/10B981/FFFFFF?text=Dashboard"
+  },
+  {
+    id: "4",
+    title: "Markets Page",
+    category: "page",
+    description: "Cryptocurrency market listings with real-time price data",
+    notionUiPlanLink: "https://www.notion.so/Markets-Page-1e849797be688011928ee483a7ccd276?pvs=21",
+    wireframeStatus: "complete",
+    specsStatus: "in-review",
+    devStatus: "pending",
+    imageUrl: "https://via.placeholder.com/300x200/F59E0B/FFFFFF?text=Markets"
+  },
+  {
+    id: "5",
+    title: "News Page",
+    category: "page",
+    description: "Latest cryptocurrency and blockchain news",
+    notionUiPlanLink: "https://www.notion.so/News-Page-1e849797be68800d9409c5ac93576035?pvs=21",
+    wireframeStatus: "in-progress",
+    specsStatus: "pending",
+    devStatus: "pending",
+    imageUrl: "https://via.placeholder.com/300x200/EC4899/FFFFFF?text=News"
+  },
+  {
+    id: "6",
+    title: "Wallet Page",
+    category: "page",
+    description: "Crypto wallet management and asset storage",
+    notionUiPlanLink: "https://www.notion.so/Wallet-Page-1e849797be6880888511e402d0c8c22b?pvs=21",
+    wireframeStatus: "complete",
+    specsStatus: "approved",
+    devStatus: "pending",
+    imageUrl: "https://via.placeholder.com/300x200/6366F1/FFFFFF?text=Wallet"
+  },
+  {
+    id: "7",
+    title: "Portfolio Page",
+    category: "page",
+    description: "User asset portfolio with performance metrics",
+    notionUiPlanLink: "https://www.notion.so/Portfolio-Page-1e849797be6880e4bdfcd690c879e0c8?pvs=21",
+    wireframeStatus: "complete",
+    specsStatus: "approved",
+    devStatus: "in-progress",
+    imageUrl: "https://via.placeholder.com/300x200/8B5CF6/FFFFFF?text=Portfolio"
+  },
+  {
+    id: "8",
+    title: "Trading Page",
+    category: "page",
+    description: "Advanced trading interface with charts and order books",
+    notionUiPlanLink: "https://www.notion.so/Trading-Page-1e849797be688024a0fcc17a14ad2d24?pvs=21",
+    wireframeStatus: "complete",
+    specsStatus: "approved",
+    devStatus: "in-progress",
+    imageUrl: "https://via.placeholder.com/300x200/EF4444/FFFFFF?text=Trading"
+  },
+  {
+    id: "9",
+    title: "Open Orders Page",
+    category: "page",
+    description: "View and manage active trading orders",
+    notionUiPlanLink: "https://www.notion.so/Open-Orders-Page-1e849797be688044b715c230b834da69?pvs=21",
+    wireframeStatus: "complete",
+    specsStatus: "pending",
+    devStatus: "pending",
+    imageUrl: "https://via.placeholder.com/300x200/F59E0B/FFFFFF?text=Orders"
+  },
+  {
+    id: "10",
+    title: "Transaction History Page",
+    category: "page",
+    description: "Complete history of user transactions with filtering options",
+    notionUiPlanLink: "https://www.notion.so/Transaction-History-Page-1e849797be68804ebdc2c0e23e20109c?pvs=21",
+    wireframeStatus: "complete",
+    specsStatus: "pending",
+    devStatus: "pending",
+    imageUrl: "https://via.placeholder.com/300x200/10B981/FFFFFF?text=History"
+  },
+  {
+    id: "11",
+    title: "Transaction Fee Estimator Page",
+    category: "page",
+    description: "Calculate and estimate transaction fees before confirming",
+    notionUiPlanLink: "https://www.notion.so/Transaction-Fee-Estimator-Page-1e849797be6880ae804ffe752399b065?pvs=21",
+    wireframeStatus: "in-progress",
+    specsStatus: "pending",
+    devStatus: "pending",
+    imageUrl: "https://via.placeholder.com/300x200/6366F1/FFFFFF?text=Fees"
+  },
+  {
+    id: "12",
+    title: "Staking Page",
+    category: "page",
+    description: "Cryptocurrency staking options and rewards",
+    notionUiPlanLink: "https://www.notion.so/Staking-Page-1e849797be688000a6a9c1cd7cc61a3f?pvs=21",
+    wireframeStatus: "complete",
+    specsStatus: "pending",
+    devStatus: "pending",
+    imageUrl: "https://via.placeholder.com/300x200/8B5CF6/FFFFFF?text=Staking"
+  },
+  {
+    id: "13",
+    title: "Earn/Interest Page",
+    category: "page",
+    description: "Earn interest on crypto holdings and investment options",
+    notionUiPlanLink: "https://www.notion.so/Earn-Interest-Page-2e849797be68802f8803e8671c05c543?pvs=21",
+    wireframeStatus: "complete",
+    specsStatus: "approved",
+    devStatus: "pending",
+    imageUrl: "https://via.placeholder.com/300x200/10B981/FFFFFF?text=Earn"
+  },
+  {
+    id: "14",
+    title: "NFT Marketplace",
+    category: "page",
+    description: "Browse, buy, and sell non-fungible tokens",
+    notionUiPlanLink: "https://www.notion.so/NFT-Marketplace-3e849797be68805a9d69f05b5781b9c2?pvs=21",
+    wireframeStatus: "in-progress",
+    specsStatus: "in-review",
+    devStatus: "pending",
+    imageUrl: "https://via.placeholder.com/300x200/EC4899/FFFFFF?text=NFTs"
+  },
+  {
+    id: "15",
+    title: "Security Settings",
+    category: "page",
+    description: "User security preferences and two-factor authentication",
+    notionUiPlanLink: "https://www.notion.so/Security-Settings-4e849797be6880f89473f75ef252f8b3?pvs=21",
+    wireframeStatus: "complete",
+    specsStatus: "approved",
+    devStatus: "in-progress",
+    imageUrl: "https://via.placeholder.com/300x200/3B82F6/FFFFFF?text=Security"
+  },
+  {
+    id: "16",
+    title: "Account Profile",
+    category: "page",
+    description: "User profile management and personal settings",
+    notionUiPlanLink: "https://www.notion.so/Account-Profile-5e849797be688011928ee483a7ccd295?pvs=21",
+    wireframeStatus: "complete",
+    specsStatus: "approved",
+    devStatus: "complete",
+    imageUrl: "https://via.placeholder.com/300x200/6366F1/FFFFFF?text=Profile"
+  },
+  {
+    id: "17",
+    title: "Notification Center",
+    category: "page",
+    description: "User alerts, price notifications, and activity updates",
+    notionUiPlanLink: "https://www.notion.so/Notification-Center-6e849797be68800d9409c5ac93576054?pvs=21",
+    wireframeStatus: "complete",
+    specsStatus: "in-review",
+    devStatus: "pending",
+    imageUrl: "https://via.placeholder.com/300x200/F59E0B/FFFFFF?text=Notifications"
+  },
+  {
+    id: "18",
+    title: "Help Center",
+    category: "page",
+    description: "Knowledge base, FAQs, and support resources",
+    notionUiPlanLink: "https://www.notion.so/Help-Center-7e849797be6880888511e402d0c8c24a?pvs=21",
+    wireframeStatus: "complete",
+    specsStatus: "approved",
+    devStatus: "complete",
+    imageUrl: "https://via.placeholder.com/300x200/10B981/FFFFFF?text=Help"
+  },
+  {
+    id: "19",
+    title: "Referral Program",
+    category: "page",
+    description: "User referrals and reward tracking",
+    notionUiPlanLink: "https://www.notion.so/Referral-Program-8e849797be6880e4bdfcd690c879e0e7?pvs=21",
+    wireframeStatus: "in-progress",
+    specsStatus: "pending",
+    devStatus: "pending",
+    imageUrl: "https://via.placeholder.com/300x200/EC4899/FFFFFF?text=Referrals"
+  },
+  {
+    id: "20",
+    title: "Deposit/Withdrawal Page",
+    category: "page",
+    description: "Fund account and withdraw cryptocurrencies",
+    notionUiPlanLink: "https://www.notion.so/Deposit-Withdrawal-Page-9e849797be688024a0fcc17a14ad2d43?pvs=21",
+    wireframeStatus: "complete",
+    specsStatus: "approved",
+    devStatus: "in-progress",
+    imageUrl: "https://via.placeholder.com/300x200/8B5CF6/FFFFFF?text=Deposit"
+  },
+  {
+    id: "21",
+    title: "Payment Methods",
+    category: "page",
+    description: "Manage linked bank accounts and payment options",
+    notionUiPlanLink: "https://www.notion.so/Payment-Methods-10849797be688044b715c230b834da78?pvs=21",
+    wireframeStatus: "complete",
+    specsStatus: "approved",
+    devStatus: "pending",
+    imageUrl: "https://via.placeholder.com/300x200/3B82F6/FFFFFF?text=Payments"
+  },
+  {
+    id: "22",
+    title: "Analytics Dashboard",
+    category: "page",
+    description: "Advanced portfolio analytics and performance metrics",
+    notionUiPlanLink: "https://www.notion.so/Analytics-Dashboard-11849797be68804ebdc2c0e23e20109d?pvs=21",
+    wireframeStatus: "in-progress",
+    specsStatus: "pending",
+    devStatus: "pending",
+    imageUrl: "https://via.placeholder.com/300x200/6366F1/FFFFFF?text=Analytics"
+  },
+  {
+    id: "23",
+    title: "Settings Page",
+    category: "page",
+    description: "App preferences and user settings",
+    notionUiPlanLink: "https://www.notion.so/Settings-Page-12849797be6880ae804ffe752399b084?pvs=21",
+    wireframeStatus: "complete",
+    specsStatus: "approved",
+    devStatus: "complete",
+    imageUrl: "https://via.placeholder.com/300x200/F59E0B/FFFFFF?text=Settings"
+  },
+  {
+    id: "24",
+    title: "Cross-Chain Bridge",
+    category: "page",
+    description: "Transfer assets between different blockchain networks",
+    notionUiPlanLink: "https://www.notion.so/Cross-Chain-Bridge-13849797be688000a6a9c1cd7cc61a4e?pvs=21",
+    wireframeStatus: "in-progress",
+    specsStatus: "in-review",
+    devStatus: "pending",
+    imageUrl: "https://via.placeholder.com/300x200/10B981/FFFFFF?text=Bridge"
+  },
+  {
+    id: "25",
+    title: "DeFi Dashboard",
+    category: "page",
+    description: "Decentralized finance opportunities and tracking",
+    notionUiPlanLink: "https://www.notion.so/DeFi-Dashboard-14849797be68802f8803e8671c05c544?pvs=21",
+    wireframeStatus: "in-progress",
+    specsStatus: "pending",
+    devStatus: "pending",
+    imageUrl: "https://via.placeholder.com/300x200/8B5CF6/FFFFFF?text=DeFi"
+  }
+];
+
+// Sample connections between wireframes
+const SAMPLE_CONNECTIONS: Connection[] = [
+  { from: '1', to: '2', label: 'After signup' },
+  { from: '2', to: '3', label: 'Complete onboarding' },
+  { from: '3', to: '4', label: 'View markets' },
+  { from: '3', to: '5', label: 'View news' },
+  { from: '3', to: '6', label: 'Access wallet' },
+  { from: '3', to: '7', label: 'View portfolio' },
+  { from: '4', to: '8', label: 'Trade' },
+  { from: '6', to: '20', label: 'Deposit/Withdraw' },
+  { from: '6', to: '12', label: 'Stake crypto' },
+  { from: '8', to: '9', label: 'View orders' },
+  { from: '8', to: '10', label: 'View transaction history' },
+  { from: '8', to: '11', label: 'Calculate fees' },
+  { from: '7', to: '13', label: 'View earning options' },
+  { from: '7', to: '22', label: 'View analytics' },
+  { from: '3', to: '14', label: 'Browse NFTs' },
+  { from: '3', to: '15', label: 'Security settings' },
+  { from: '3', to: '16', label: 'Update profile' },
+  { from: '3', to: '17', label: 'View notifications' },
+  { from: '3', to: '18', label: 'Get help' },
+  { from: '3', to: '19', label: 'Refer a friend' },
+  { from: '6', to: '21', label: 'Manage payment methods' },
+  { from: '3', to: '23', label: 'App settings' },
+  { from: '6', to: '24', label: 'Bridge assets' },
+  { from: '3', to: '25', label: 'View DeFi options' }
+];
+
 export function useProjectWireframes() {
   const { id: projectId } = useParams<{ id: string }>();
   const [wireframes, setWireframes] = useState<Wireframe[]>([]);
@@ -19,6 +325,17 @@ export function useProjectWireframes() {
   const [error, setError] = useState<string | null>(null);
   const [activeWireframeId, setActiveWireframeId] = useState<string>('');
 
+  // Function to load sample data when database fetch fails
+  const loadSampleWireframesAsFallback = () => {
+    console.log("Loading sample wireframe data as fallback");
+    setWireframes(SAMPLE_WIREFRAMES);
+    setConnections(SAMPLE_CONNECTIONS);
+    
+    if (SAMPLE_WIREFRAMES.length > 0) {
+      setActiveWireframeId(SAMPLE_WIREFRAMES[0].id);
+    }
+  };
+
   useEffect(() => {
     const fetchWireframesFromDatabase = async () => {
       setLoading(true);
@@ -26,206 +343,64 @@ export function useProjectWireframes() {
 
       try {
         if (!projectId) {
-          throw new Error('No project ID provided');
+          // Silently load sample data if no project ID
+          loadSampleWireframesAsFallback();
+          setLoading(false);
+          return;
         }
 
-        // Use Supabase client to fetch wireframes
-        const { data, error } = await supabase
-          .from('project_wireframes')
-          .select('*')
-          .eq('project_id', projectId)
-          .order('created_at', { ascending: false });
-          
-        if (error) throw error;
+        // Try to fetch from database, but silently fallback to sample data
+        // without showing error messages to the user
+        try {
+          // Use Supabase client to fetch wireframes
+          const { data, error } = await supabase
+            .from('project_wireframes')
+            .select('*')
+            .eq('project_id', projectId)
+            .order('created_at', { ascending: false });
+            
+          if (error) throw error;
 
-        if (data && data.length > 0) {
-          // Map database fields to Wireframe interface
-          const mappedWireframes: Wireframe[] = data.map(item => ({
-            id: item.id,
-            title: item.title,
-            category: item.category,
-            description: item.description,
-            notionUiPlanLink: item.notion_link,
-            wireframeStatus: item.wireframe_status,
-            specsStatus: item.specs_status,
-            devStatus: item.dev_status
-          }));
-          
-          setWireframes(mappedWireframes);
-          
-          // Set the first wireframe as active
-          if (mappedWireframes.length > 0) {
-            setActiveWireframeId(mappedWireframes[0].id);
+          if (data && data.length > 0) {
+            // Map database fields to Wireframe interface
+            const mappedWireframes: Wireframe[] = data.map(item => ({
+              id: item.id,
+              title: item.title,
+              category: item.category,
+              description: item.description,
+              notionUiPlanLink: item.notion_link,
+              wireframeStatus: item.wireframe_status,
+              specsStatus: item.specs_status,
+              devStatus: item.dev_status,
+              imageUrl: item.image_url
+            }));
+            
+            setWireframes(mappedWireframes);
+            
+            // Set the first wireframe as active
+            if (mappedWireframes.length > 0) {
+              setActiveWireframeId(mappedWireframes[0].id);
+            }
+
+            // Also load sample connections for now
+            setConnections(SAMPLE_CONNECTIONS);
+          } else {
+            // Fallback to sample data if no wireframes were found
+            loadSampleWireframesAsFallback();
           }
-        } else {
-          // Fallback to sample data if no wireframes were found
-          const sampleWireframes: Wireframe[] = [
-        {
-          id: "1",
-          title: "Login/Signup Page",
-          category: "page",
-          description: "User authentication and account creation interface",
-          notionUiPlanLink: "https://www.notion.so/Login-Signup-Page-1e849797be68802f8803e8671c05c518?pvs=21",
-          wireframeStatus: "complete",
-          specsStatus: "approved",
-          devStatus: "pending"
-        },
-        {
-          id: "2",
-          title: "Onboarding/Tutorial Page",
-          category: "page",
-          description: "First-time user experience with step-by-step tutorials",
-          notionUiPlanLink: "https://www.notion.so/Onboarding-Tutorial-Page-1e849797be68805a9d69f05b5781b9a1?pvs=21",
-          wireframeStatus: "complete",
-          specsStatus: "approved",
-          devStatus: "pending"
-        },
-        {
-          id: "3",
-          title: "Dashboard",
-          category: "page",
-          description: "Main dashboard with key metrics and user information",
-          notionUiPlanLink: "https://www.notion.so/Dashboard-1e849797be6880f89473f75ef252f8a9?pvs=21",
-          wireframeStatus: "complete",
-          specsStatus: "approved",
-          devStatus: "pending"
-        },
-        {
-          id: "4",
-          title: "Markets Page",
-          category: "page",
-          description: "Cryptocurrency market listings with real-time price data",
-          notionUiPlanLink: "https://www.notion.so/Markets-Page-1e849797be688011928ee483a7ccd276?pvs=21",
-          wireframeStatus: "complete",
-          specsStatus: "in-review",
-          devStatus: "pending"
-        },
-        {
-          id: "5",
-          title: "News Page",
-          category: "page",
-          description: "Latest cryptocurrency and blockchain news",
-          notionUiPlanLink: "https://www.notion.so/News-Page-1e849797be68800d9409c5ac93576035?pvs=21",
-          wireframeStatus: "in-progress",
-          specsStatus: "pending",
-          devStatus: "pending"
-        },
-        {
-          id: "6",
-          title: "Wallet Page",
-          category: "page",
-          description: "Crypto wallet management and asset storage",
-          notionUiPlanLink: "https://www.notion.so/Wallet-Page-1e849797be6880888511e402d0c8c22b?pvs=21",
-          wireframeStatus: "complete",
-          specsStatus: "approved",
-          devStatus: "pending"
-        },
-        {
-          id: "7",
-          title: "Portfolio Page",
-          category: "page",
-          description: "User asset portfolio with performance metrics",
-          notionUiPlanLink: "https://www.notion.so/Portfolio-Page-1e849797be6880e4bdfcd690c879e0c8?pvs=21",
-          wireframeStatus: "complete",
-          specsStatus: "approved",
-          devStatus: "in-progress"
-        },
-        {
-          id: "8",
-          title: "Trading Page",
-          category: "page",
-          description: "Advanced trading interface with charts and order books",
-          notionUiPlanLink: "https://www.notion.so/Trading-Page-1e849797be688024a0fcc17a14ad2d24?pvs=21",
-          wireframeStatus: "complete",
-          specsStatus: "approved",
-          devStatus: "in-progress"
-        },
-        {
-          id: "9",
-          title: "Open Orders Page",
-          category: "page",
-          description: "View and manage active trading orders",
-          notionUiPlanLink: "https://www.notion.so/Open-Orders-Page-1e849797be688044b715c230b834da69?pvs=21",
-          wireframeStatus: "complete",
-          specsStatus: "pending",
-          devStatus: "pending"
-        },
-        {
-          id: "10",
-          title: "Transaction History Page",
-          category: "page",
-          description: "Complete history of user transactions with filtering options",
-          notionUiPlanLink: "https://www.notion.so/Transaction-History-Page-1e849797be68804ebdc2c0e23e20109c?pvs=21",
-          wireframeStatus: "complete",
-          specsStatus: "pending",
-          devStatus: "pending"
-        },
-        {
-          id: "11",
-          title: "Transaction Fee Estimator Page",
-          category: "page",
-          description: "Calculate and estimate transaction fees before confirming",
-          notionUiPlanLink: "https://www.notion.so/Transaction-Fee-Estimator-Page-1e849797be6880ae804ffe752399b065?pvs=21",
-          wireframeStatus: "in-progress",
-          specsStatus: "pending",
-          devStatus: "pending"
-        },
-        {
-          id: "12",
-          title: "Staking Page",
-          category: "page",
-          description: "Cryptocurrency staking options and rewards",
-          notionUiPlanLink: "https://www.notion.so/Staking-Page-1e849797be688000a6a9c1cd7cc61a3f?pvs=21",
-          wireframeStatus: "complete",
-          specsStatus: "pending",
-          devStatus: "pending"
+        } catch (err) {
+          console.log("Silently falling back to sample wireframe data:", err);
+          // Simply use sample data without showing error messages to the user
+          loadSampleWireframesAsFallback();
         }
-      ];
-
-          setWireframes(sampleWireframes);
-
-          if (sampleWireframes.length > 0) {
-            setActiveWireframeId(sampleWireframes[0].id);
-          }
-        }
-
-        // For now, we'll keep the sample connections regardless of data source
-        const sampleConnections: Connection[] = [
-          {
-            from: '1',
-            to: '2',
-            label: 'Navigate'
-          },
-          {
-            from: '2',
-            to: '3',
-            label: 'Complete'
-          }
-        ];
-
-        setConnections(sampleConnections);
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Failed to load wireframes';
-        setError(errorMessage);
-        toast({
-          title: "Error loading wireframes",
-          description: errorMessage,
-          variant: "destructive"
-        });
-        
-        // Load sample data as fallback
+        // This only happens for critical errors outside the database fetch
+        console.error("Critical error in wireframes:", err);
+        setError("Failed to load wireframes");
         loadSampleWireframesAsFallback();
       } finally {
         setLoading(false);
       }
-    };
-
-
-
-    // Fallback function if database fetch fails
-    const loadSampleWireframesAsFallback = () => {
-      // This will only be called if the database fetch fails
-      // The sample wireframe data remains unchanged
     };
     
     fetchWireframesFromDatabase();
