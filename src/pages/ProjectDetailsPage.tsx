@@ -1,10 +1,9 @@
-
 import { useParams } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ProjectDetails } from '@/components/projects/ProjectDetails';
 
 export default function ProjectDetailsPage() {
-  const { id, tab } = useParams();
+  const { id, tab, documentId } = useParams();
   
   return (
     <AppLayout>

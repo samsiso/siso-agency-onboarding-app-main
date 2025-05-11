@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
 import { ProjectHeader } from './details/ProjectHeader';
 import { ProjectCardNavigation } from './details/ProjectCardNavigation';
@@ -12,13 +12,15 @@ import { FeatureRequestsSection } from './details/FeatureRequestsSection';
 import { TimelineSection } from './details/TimelineSection';
 import { FinancialSummarySection } from './details/FinancialSummarySection';
 import { ResearchSection } from './details/ResearchSection';
+import { ResearchDocumentDetail } from './details/research/ResearchDocumentDetail';
 import { WireframeSection } from './details/WireframeSection';
 import { AnimatedCard } from '@/components/ui/animated-card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
 export function ProjectDetails() {
-  const { id, tab } = useParams<{ id?: string; tab?: string }>();
+  const { id, tab, documentId } = useParams<{ id?: string; tab?: string; documentId?: string }>();
+  const location = useLocation();
   const projectId = id || 'ubahcrypt';
   const navigate = useNavigate();
   const activeTab = tab || 'overview';
@@ -30,6 +32,9 @@ export function ProjectDetails() {
     status: 'ACTIVE',
     created_at: '2025-04-01T10:00:00Z',
   });
+
+  // Determine if we're on a research document detail page
+  const isResearchDocumentDetail = location.pathname.includes('/market-research/') && documentId;
 
   // This would typically fetch project data from your API
   useEffect(() => {
@@ -68,6 +73,11 @@ export function ProjectDetails() {
   );
 
   const renderTabContent = () => {
+    // If we're on a research document detail page, render the detail component
+    if (isResearchDocumentDetail) {
+      return <ResearchDocumentDetail />;
+    }
+
     switch (activeTab) {
       case 'overview':
         return renderAppPlanOverview();
@@ -115,7 +125,7 @@ export function ProjectDetails() {
         status={projectData.status} 
         created_at={projectData.created_at} 
       />
-      <ProjectCardNavigation projectId={projectId} />
+      {!isResearchDocumentDetail && <ProjectCardNavigation projectId={projectId} />}
       {renderTabContent()}
     </div>
   );
