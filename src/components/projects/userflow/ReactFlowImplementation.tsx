@@ -52,10 +52,11 @@ interface UserFlowDiagramProps {
 export function ReactFlowImplementation({ projectId, onNodeSelect, setIsLoading }: UserFlowDiagramProps) {
   // Sample initial data - would be loaded from API in real implementation
   const initialNodes: Node[] = [
+    // Authentication Flow
     {
-      id: 'screen-1',
+      id: 'screen-login',
       type: 'screenNode',
-      position: { x: 250, y: 5 },
+      position: { x: 250, y: 0 },
       data: { 
         label: 'Login Screen', 
         status: 'implemented',
@@ -64,31 +65,9 @@ export function ReactFlowImplementation({ projectId, onNodeSelect, setIsLoading 
       },
     },
     {
-      id: 'screen-2',
-      type: 'screenNode',
-      position: { x: 250, y: 100 },
-      data: { 
-        label: 'Dashboard', 
-        status: 'implemented',
-        description: 'Main dashboard showing app features',
-        screenshot: null
-      },
-    },
-    {
-      id: 'screen-3',
-      type: 'screenNode',
-      position: { x: 250, y: 200 },
-      data: { 
-        label: 'User Profile', 
-        status: 'in-progress',
-        description: 'User can view and edit their profile information',
-        screenshot: null
-      },
-    },
-    {
-      id: 'action-1',
+      id: 'action-login',
       type: 'actionNode',
-      position: { x: 100, y: 50 },
+      position: { x: 100, y: 80 },
       data: { 
         label: 'Login Button Click', 
         action: 'button_click',
@@ -96,20 +75,164 @@ export function ReactFlowImplementation({ projectId, onNodeSelect, setIsLoading 
       },
     },
     {
-      id: 'decision-1',
+      id: 'decision-first-login',
       type: 'decisionNode',
-      position: { x: 400, y: 150 },
+      position: { x: 250, y: 150 },
       data: { 
         label: 'Is First Login?', 
         description: 'Check if this is the user\'s first login'
       },
     },
+    {
+      id: 'screen-onboarding',
+      type: 'screenNode',
+      position: { x: 450, y: 150 },
+      data: { 
+        label: 'Onboarding', 
+        status: 'implemented',
+        description: 'First-time user onboarding process',
+        screenshot: null
+      },
+    },
+    
+    // Main Screens
+    {
+      id: 'screen-dashboard',
+      type: 'screenNode',
+      position: { x: 250, y: 250 },
+      data: { 
+        label: 'Dashboard', 
+        status: 'implemented',
+        description: 'Main dashboard showing market overview and portfolio',
+        screenshot: null
+      },
+    },
+    {
+      id: 'screen-profile',
+      type: 'screenNode',
+      position: { x: 0, y: 250 },
+      data: { 
+        label: 'User Profile', 
+        status: 'in-progress',
+        description: 'Profile details and account settings',
+        screenshot: null
+      },
+    },
+    
+    // Cryptocurrency Management
+    {
+      id: 'screen-wallet',
+      type: 'screenNode',
+      position: { x: 250, y: 350 },
+      data: { 
+        label: 'Wallet View', 
+        status: 'implemented',
+        description: 'View and manage crypto assets',
+        screenshot: null
+      },
+    },
+    {
+      id: 'screen-trading',
+      type: 'screenNode',
+      position: { x: 450, y: 350 },
+      data: { 
+        label: 'Trading Interface', 
+        status: 'in-progress',
+        description: 'Buy, sell, or exchange cryptocurrencies',
+        screenshot: null
+      },
+    },
+    {
+      id: 'action-transaction',
+      type: 'actionNode',
+      position: { x: 450, y: 450 },
+      data: { 
+        label: 'Create Transaction', 
+        action: 'button_click',
+        description: 'Initiate a crypto transaction'
+      },
+    },
+    {
+      id: 'decision-confirm',
+      type: 'decisionNode',
+      position: { x: 600, y: 450 },
+      data: { 
+        label: 'Confirm Transaction?', 
+        description: 'User confirms or cancels the transaction'
+      },
+    },
+    
+    // Advanced Features
+    {
+      id: 'screen-cross-chain',
+      type: 'screenNode',
+      position: { x: 100, y: 450 },
+      data: { 
+        label: 'Cross-Chain Operations', 
+        status: 'planned',
+        description: 'Transfer assets between different blockchains',
+        screenshot: null
+      },
+    },
+    {
+      id: 'screen-contracts',
+      type: 'screenNode',
+      position: { x: 250, y: 450 },
+      data: { 
+        label: 'Smart Contracts', 
+        status: 'planned',
+        description: 'Deploy or interact with smart contracts',
+        screenshot: null
+      },
+    },
+    {
+      id: 'screen-security',
+      type: 'screenNode',
+      position: { x: 0, y: 350 },
+      data: { 
+        label: 'Security Center', 
+        status: 'in-progress',
+        description: 'Enhanced security features and settings',
+        screenshot: null
+      },
+    },
+    {
+      id: 'decision-security-verify',
+      type: 'decisionNode',
+      position: { x: 100, y: 350 },
+      data: { 
+        label: 'Security Verification', 
+        description: 'Additional security checks for sensitive operations'
+      },
+    },
   ];
 
   const initialEdges: Edge[] = [
-    { id: 'e1-2', source: 'screen-1', target: 'screen-2', animated: true },
-    { id: 'e2-3', source: 'screen-2', target: 'screen-3' },
-    { id: 'e2-d1', source: 'screen-2', target: 'decision-1', label: 'Check' },
+    // Authentication flow connections
+    { id: 'e-login-action', source: 'screen-login', target: 'action-login', animated: true },
+    { id: 'e-action-decision', source: 'action-login', target: 'decision-first-login' },
+    { id: 'e-decision-onboarding', source: 'decision-first-login', target: 'screen-onboarding', label: 'Yes' },
+    { id: 'e-decision-dashboard', source: 'decision-first-login', target: 'screen-dashboard', label: 'No' },
+    { id: 'e-onboarding-dashboard', source: 'screen-onboarding', target: 'screen-dashboard' },
+    
+    // Dashboard connections
+    { id: 'e-dashboard-profile', source: 'screen-dashboard', target: 'screen-profile' },
+    { id: 'e-dashboard-wallet', source: 'screen-dashboard', target: 'screen-wallet' },
+    { id: 'e-dashboard-trading', source: 'screen-dashboard', target: 'screen-trading' },
+    
+    // Profile connections
+    { id: 'e-profile-security', source: 'screen-profile', target: 'screen-security' },
+    
+    // Wallet & Trading connections
+    { id: 'e-wallet-cross-chain', source: 'screen-wallet', target: 'screen-cross-chain' },
+    { id: 'e-wallet-contracts', source: 'screen-wallet', target: 'screen-contracts' },
+    { id: 'e-trading-transaction', source: 'screen-trading', target: 'action-transaction' },
+    { id: 'e-transaction-confirm', source: 'action-transaction', target: 'decision-confirm' },
+    { id: 'e-confirm-wallet', source: 'decision-confirm', target: 'screen-wallet', label: 'Yes' },
+    
+    // Security connections
+    { id: 'e-security-verify', source: 'screen-security', target: 'decision-security-verify' },
+    { id: 'e-verify-profile', source: 'decision-security-verify', target: 'screen-profile', label: 'Pass' },
   ];
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
