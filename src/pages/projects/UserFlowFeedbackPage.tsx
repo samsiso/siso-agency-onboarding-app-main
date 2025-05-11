@@ -1,5 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
+import { AppLayout } from '@/components/layout/AppLayout';
 import { ProjectHeader } from '@/components/projects/details/ProjectHeader';
 import { ProjectCardNavigation } from '@/components/projects/details/ProjectCardNavigation';
 import { UserFlowNavigation } from '@/components/projects/userflow/UserFlowNavigation';
@@ -17,33 +18,35 @@ export default function UserFlowFeedbackPage() {
   };
   
   return (
-    <div className="container mx-auto px-4 space-y-6">
-      {/* Project Header */}
-      <ProjectHeader 
-        name={projectData.name} 
-        description={projectData.description} 
-        status={projectData.status} 
-        created_at={projectData.created_at} 
-      />
-      
-      {/* Project Card Navigation */}
-      <div className="mt-6">
-        <ProjectCardNavigation projectId={projectId} />
-      </div>
-      
-      {/* User Flow Navigation */}
-      <div className="mt-6">
-        <UserFlowNavigation 
-          projectId={projectId}
-          projectName="UbahCrypt Project"
-          status="draft"
+    <AppLayout>
+      <div className="container mx-auto px-4 py-8 space-y-6">
+        {/* Project Header */}
+        <ProjectHeader 
+          name={projectData.name} 
+          description={projectData.description} 
+          status={projectData.status} 
+          created_at={projectData.created_at} 
         />
+        
+        {/* Project Card Navigation */}
+        <div className="mt-6">
+          <ProjectCardNavigation projectId={projectId} />
+        </div>
+        
+        {/* User Flow Navigation */}
+        <div className="mt-6">
+          <UserFlowNavigation 
+            projectId={projectId}
+            projectName="UbahCrypt Project"
+            status="draft"
+          />
+        </div>
+        
+        {/* Feedback Log Content */}
+        <div className="mt-6">
+          <FeedbackLogPage />
+        </div>
       </div>
-      
-      {/* Feedback Log Content */}
-      <div className="mt-6">
-        <FeedbackLogPage />
-      </div>
-    </div>
+    </AppLayout>
   );
 } 
