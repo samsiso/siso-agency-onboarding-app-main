@@ -83,8 +83,8 @@ export function WireframeSection() {
         </TabsList>
         
         <TabsContent value="all" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {Array.from({ length: 8 }).map((_, index) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, index) => (
               <div key={index} className="space-y-3">
                 <div className="h-3 w-full bg-slate-200 dark:bg-slate-700 rounded-t-md"></div>
                 <div className="p-4 border border-slate-200 dark:border-slate-700 rounded-b-md bg-white dark:bg-slate-800">
@@ -152,7 +152,7 @@ export function WireframeSection() {
         </TabsList>
         
         <TabsContent value="all" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {wireframes?.map((wireframe) => (
               <WireframeCard
                 key={wireframe.id}
@@ -166,7 +166,7 @@ export function WireframeSection() {
         </TabsContent>
         
         <TabsContent value="complete" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {complete.map((wireframe) => (
               <WireframeCard
                 key={wireframe.id}
@@ -180,7 +180,7 @@ export function WireframeSection() {
         </TabsContent>
         
         <TabsContent value="in-progress" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {inProgress.map((wireframe) => (
               <WireframeCard
                 key={wireframe.id}
@@ -194,7 +194,7 @@ export function WireframeSection() {
         </TabsContent>
         
         <TabsContent value="planned" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {planned.map((wireframe) => (
               <WireframeCard
                 key={wireframe.id}
