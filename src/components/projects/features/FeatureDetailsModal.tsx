@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import { 
   AlertCircle, Clock, PieChart, Tag, CheckCircle, X, 
   TrendingUp, ScrollText, Calendar, BarChart4 
@@ -17,6 +16,24 @@ interface FeatureDetailsModalProps {
 
 export function FeatureDetailsModal({ feature, onClose }: FeatureDetailsModalProps) {
   if (!feature) return null;
+
+  // Prevent background scrolling when modal is open
+  useEffect(() => {
+    // Add class to body to prevent scrolling
+    document.body.classList.add('overflow-hidden');
+    
+    // Cleanup function to remove class when component unmounts
+    return () => {
+      document.body.classList.remove('overflow-hidden');
+    };
+  }, []);
+
+  // Handle backdrop click to close the modal
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
 
   // Calculate progress based on status
   const getProgress = () => {
@@ -63,13 +80,18 @@ export function FeatureDetailsModal({ feature, onClose }: FeatureDetailsModalPro
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" 
+      onClick={handleBackdropClick}
+      aria-modal="true"
+      role="dialog"
+    >
       <div 
-        className="bg-black/80 border border-siso-text/20 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+        className="bg-black/80 border border-siso-text/20 rounded-lg w-full max-w-2xl my-4 flex flex-col max-h-[90vh]"
         onClick={e => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="p-6 border-b border-siso-text/20 flex justify-between items-center">
+        {/* Header - Fixed at top */}
+        <div className="p-6 border-b border-siso-text/20 flex justify-between items-center sticky top-0 bg-black/95 backdrop-blur-sm z-10">
           <h2 className="text-xl font-bold text-white">{feature.title}</h2>
           <Button 
             variant="ghost" 
@@ -81,8 +103,8 @@ export function FeatureDetailsModal({ feature, onClose }: FeatureDetailsModalPro
           </Button>
         </div>
         
-        {/* Content */}
-        <div className="p-6 space-y-6">
+        {/* Content - Scrollable */}
+        <div className="p-6 space-y-6 overflow-y-auto flex-grow">
           {/* Status and Progress */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
@@ -172,8 +194,8 @@ export function FeatureDetailsModal({ feature, onClose }: FeatureDetailsModalPro
           </div>
         </div>
         
-        {/* Footer */}
-        <div className="p-6 border-t border-siso-text/20 flex justify-end">
+        {/* Footer - Fixed at bottom */}
+        <div className="p-6 border-t border-siso-text/20 flex justify-end sticky bottom-0 bg-black/95 backdrop-blur-sm">
           <Button 
             variant="default"
             onClick={onClose}
