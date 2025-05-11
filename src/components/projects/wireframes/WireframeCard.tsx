@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,8 @@ interface WireframeCardProps {
 export function WireframeCard({ wireframe, projectId, onClick, isActive = false }: WireframeCardProps) {
   const navigate = useNavigate();
   
-  const getStatusColor = (status: string) => {
+  // Define status color logic as a memoized function
+  const getStatusColor = useCallback((status: string) => {
     switch (status) {
       case 'complete':
         return 'bg-green-500 text-white';
@@ -30,7 +31,27 @@ export function WireframeCard({ wireframe, projectId, onClick, isActive = false 
       default:
         return 'bg-gray-300 text-gray-700';
     }
-  };
+  }, []);
+
+  // Handle image errors
+  const handleImageError = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
+    // Fallback if image fails to load
+    e.currentTarget.src = `https://via.placeholder.com/300x200/6366F1/FFFFFF?text=${encodeURIComponent(wireframe.title)}`;
+  }, [wireframe.title]);
+
+  // Handle external link click
+  const handleExternalLinkClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (wireframe.notionUiPlanLink) {
+      window.open(wireframe.notionUiPlanLink, '_blank');
+    }
+  }, [wireframe.notionUiPlanLink]);
+
+  // Handle view click
+  const handleViewClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate(`/projects/${projectId}/wireframes/${wireframe.id}`);
+  }, [navigate, projectId, wireframe.id]);
 
   // Enforce color for placeholder images
   const imageUrl = wireframe.imageUrl || `https://via.placeholder.com/300x200/6366F1/FFFFFF?text=${encodeURIComponent(wireframe.title)}`;
@@ -47,10 +68,7 @@ export function WireframeCard({ wireframe, projectId, onClick, isActive = false 
           src={imageUrl}
           alt={wireframe.title}
           className="w-full h-full object-cover transition-transform hover:scale-105"
-          onError={(e) => {
-            // Fallback if image fails to load
-            e.currentTarget.src = `https://via.placeholder.com/300x200/6366F1/FFFFFF?text=${encodeURIComponent(wireframe.title)}`;
-          }}
+          onError={handleImageError}
         />
         <Badge className="absolute top-2 right-2 capitalize">{wireframe.category}</Badge>
       </div>
@@ -76,18 +94,22 @@ export function WireframeCard({ wireframe, projectId, onClick, isActive = false 
       
       <CardFooter className="flex justify-between pt-2">
         {wireframe.notionUiPlanLink && (
-          <Button variant="outline" size="sm" className="text-indigo-500 hover:text-indigo-600 border-indigo-200 hover:border-indigo-300 dark:border-indigo-900 dark:hover:border-indigo-800 dark:text-indigo-400" onClick={(e) => {
-            e.stopPropagation();
-            window.open(wireframe.notionUiPlanLink, '_blank');
-          }}>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="text-indigo-500 hover:text-indigo-600 border-indigo-200 hover:border-indigo-300 dark:border-indigo-900 dark:hover:border-indigo-800 dark:text-indigo-400" 
+            onClick={handleExternalLinkClick}
+          >
             <ExternalLink className="h-4 w-4 mr-2" />
             Notion
           </Button>
         )}
-        <Button variant="default" size="sm" className="bg-indigo-500 hover:bg-indigo-600 text-white" onClick={(e) => {
-          e.stopPropagation();
-          navigate(`/projects/${projectId}/wireframes/${wireframe.id}`);
-        }}>
+        <Button 
+          variant="default" 
+          size="sm" 
+          className="bg-indigo-500 hover:bg-indigo-600 text-white" 
+          onClick={handleViewClick}
+        >
           <Eye className="h-4 w-4 mr-2" />
           View
         </Button>
