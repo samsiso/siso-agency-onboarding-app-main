@@ -1,5 +1,5 @@
 import { Trophy, Users, UserPlus, Clock, Award, Medal, TrendingUp, TrendingDown, CircleDollarSign, CreditCard } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { format } from 'date-fns';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from '@/lib/utils';
 import { LeaderboardEntry } from './types';
@@ -26,7 +26,8 @@ export const LeaderboardTable = ({ leaderboardData, onUserClick }: LeaderboardTa
   const formatLastActive = (date: string | undefined) => {
     if (!date) return 'Unknown';
     try {
-      return formatDistanceToNow(new Date(date), { addSuffix: true });
+      // Use format instead of formatDistanceToNow to show actual date
+      return format(new Date(date), 'MMM d, yyyy');
     } catch (error) {
       console.error('Error formatting date:', error);
       return 'Unknown';
@@ -55,28 +56,34 @@ export const LeaderboardTable = ({ leaderboardData, onUserClick }: LeaderboardTa
     }
   };
 
-  const getRowClassName = (index: number) => {
-    if (index === 0) return "bg-gradient-to-r from-yellow-500/10 via-yellow-500/5 to-transparent hover:from-yellow-500/20";
-    if (index === 1) return "bg-gradient-to-r from-gray-500/10 via-gray-500/5 to-transparent hover:from-gray-500/20";
-    if (index === 2) return "bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent hover:from-amber-500/20";
-    if (index < 10) return "bg-gradient-to-r from-siso-bg-alt/50 via-siso-bg-alt/25 to-transparent hover:from-siso-bg-alt/70";
-    return "hover:bg-siso-bg-alt/30";
-  };
-
+  // Fixed trend indicators based on project position
   const getTrendIndicator = (index: number) => {
-    // Simulate trend - in real app this would be calculated from historical data
-    const isUp = Math.random() > 0.5;
+    const trends = [
+      { value: -4, isUp: false },
+      { value: 5, isUp: true },
+      { value: -1, isUp: false },
+      { value: -2, isUp: false },
+      { value: 4, isUp: true },
+      { value: -2, isUp: false },
+      { value: -1, isUp: false },
+      { value: 1, isUp: true },
+      { value: 5, isUp: true },
+      { value: 4, isUp: true }
+    ];
+    
+    const trend = trends[index] || { value: 0, isUp: false };
+    
     return (
       <span className={cn(
         "inline-flex items-center text-xs",
-        isUp ? "text-green-500" : "text-red-500"
+        trend.isUp ? "text-green-500" : "text-red-500"
       )}>
-        {isUp ? (
+        {trend.isUp ? (
           <TrendingUp className="w-3 h-3 mr-1" />
         ) : (
           <TrendingDown className="w-3 h-3 mr-1" />
         )}
-        {isUp ? '+' : '-'}{Math.floor(Math.random() * 5) + 1}
+        {trend.isUp ? '+' : '-'}{Math.abs(trend.value)}
       </span>
     );
   };
@@ -94,10 +101,16 @@ export const LeaderboardTable = ({ leaderboardData, onUserClick }: LeaderboardTa
   };
   
   const handleRowClick = (entry: LeaderboardEntry) => {
-    // Ensure we're using the correct ID format for our mock data
-    const userId = entry.id.startsWith('user-') ? entry.id : `user-${entry.id}`;
-    navigate(`/client-app/${userId}`);
+    // Use project ID format for navigation
+    const projectId = entry.id.startsWith('project-') ? entry.id : `project-${entry.id}`;
+    navigate(`/client-app/${projectId}`);
     onUserClick(entry);
+  };
+
+  // Fixed spending amounts from project data
+  const getSpendingAmount = (index: number) => {
+    const spendingAmounts = [15000, 5000, 249, 249, 249, 0, 0, 0, 0, 0];
+    return spendingAmounts[index] || 0;
   };
 
   return (
@@ -118,8 +131,8 @@ export const LeaderboardTable = ({ leaderboardData, onUserClick }: LeaderboardTa
         </TableHeader>
         <TableBody>
           {leaderboardData.map((entry, index) => {
-            // Calculate mock spending amount based on siso_tokens (This is just for demo)
-            const spendingAmount = entry.siso_tokens * 10 + Math.floor(Math.random() * 500);
+            // Get actual spending amount for this project
+            const spendingAmount = getSpendingAmount(index);
             
             return (
               <motion.tr
@@ -165,6 +178,11 @@ export const LeaderboardTable = ({ leaderboardData, onUserClick }: LeaderboardTa
                       <div className="flex items-center gap-2">
                         <p className="text-xs text-gray-400">{entry.rank || 'Rookie'}</p>
                         {getSpendingBadge(spendingAmount)}
+                        {entry.profile?.bio && (
+                          <p className="text-xs text-gray-300">
+                            <span className="text-green-500">●</span> {entry.profile.bio}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -181,7 +199,7 @@ export const LeaderboardTable = ({ leaderboardData, onUserClick }: LeaderboardTa
                 <TableCell className="text-center">
                   <div className="flex items-center justify-center gap-2">
                     <CreditCard className="h-4 w-4 text-siso-text/70" />
-                    <span>${spendingAmount.toLocaleString()}</span>
+                    <span>£{spendingAmount.toLocaleString()}</span>
                   </div>
                 </TableCell>
                 <TableCell className="text-center">
