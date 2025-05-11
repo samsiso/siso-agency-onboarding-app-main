@@ -51,6 +51,9 @@ import ClientAppDetailsPage from './pages/ClientAppDetailsPage';
 import AdminWireframes from './pages/AdminWireframes';
 import UserFlow from './pages/UserFlow';
 import AdminUserFlow from './pages/AdminUserFlow';
+import UserFlowFeedbackPage from './pages/projects/UserFlowFeedbackPage';
+import UserFlowNodesPage from './pages/projects/UserFlowNodesPage';
+import UserFlowCodePage from './pages/projects/UserFlowCodePage';
 
 function App() {
   return (
@@ -100,6 +103,9 @@ function App() {
         
         {/* Key route order - specific routes must come before the generic routes */}
         <Route path="/projects/:id/userflow" element={<AuthGuard><UserFlow /></AuthGuard>} />
+        <Route path="/projects/:projectId/userflow/feedback" element={<AuthGuard><UserFlowFeedbackPage /></AuthGuard>} />
+        <Route path="/projects/:projectId/userflow/nodes" element={<AuthGuard><UserFlowNodesPage /></AuthGuard>} />
+        <Route path="/projects/:projectId/userflow/code" element={<AuthGuard><UserFlowCodePage /></AuthGuard>} />
         
         {/* Handle both wireframe (singular) and wireframes (plural) routes */}
         <Route path="/projects/:id/wireframe" element={<AuthGuard><ProjectDetailsPage tab="wireframes" /></AuthGuard>} />
