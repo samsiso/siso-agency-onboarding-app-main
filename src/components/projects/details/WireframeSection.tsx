@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, AlertTriangle, FileImage } from 'lucide-react';
+import { Plus, AlertTriangle, FileIcon } from 'lucide-react';
 import { useProjectWireframes } from '@/hooks/useProjectWireframes';
 import { WireframeCard } from '@/components/projects/wireframes/WireframeCard';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -86,10 +86,21 @@ export function WireframeSection() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {Array.from({ length: 8 }).map((_, index) => (
               <div key={index} className="space-y-3">
-                <Skeleton className="h-48 w-full rounded-md bg-slate-200 dark:bg-slate-700" />
-                <Skeleton className="h-5 w-3/4 rounded-md bg-slate-200 dark:bg-slate-700" />
-                <Skeleton className="h-4 w-full rounded-md bg-slate-200 dark:bg-slate-700" />
-                <Skeleton className="h-10 w-full rounded-md bg-slate-200 dark:bg-slate-700" />
+                <div className="h-3 w-full bg-slate-200 dark:bg-slate-700 rounded-t-md"></div>
+                <div className="p-4 border border-slate-200 dark:border-slate-700 rounded-b-md bg-white dark:bg-slate-800">
+                  <Skeleton className="h-5 w-3/4 rounded-md bg-slate-200 dark:bg-slate-700 mb-2" />
+                  <Skeleton className="h-4 w-full rounded-md bg-slate-200 dark:bg-slate-700 mb-2" />
+                  <Skeleton className="h-4 w-full rounded-md bg-slate-200 dark:bg-slate-700 mb-3" />
+                  <div className="flex gap-2 mb-3">
+                    <Skeleton className="h-6 w-20 rounded-full bg-slate-200 dark:bg-slate-700" />
+                    <Skeleton className="h-6 w-20 rounded-full bg-slate-200 dark:bg-slate-700" />
+                    <Skeleton className="h-6 w-20 rounded-full bg-slate-200 dark:bg-slate-700" />
+                  </div>
+                  <div className="flex justify-between">
+                    <Skeleton className="h-8 w-20 rounded-md bg-slate-200 dark:bg-slate-700" />
+                    <Skeleton className="h-8 w-20 rounded-md bg-slate-200 dark:bg-slate-700" />
+                  </div>
+                </div>
               </div>
             ))}
           </div>
@@ -112,7 +123,7 @@ export function WireframeSection() {
 
   const EmptyContent = () => (
     <div className="p-8 text-center border rounded-lg border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
-      <FileImage className="h-12 w-12 text-slate-400 mx-auto mb-4" />
+      <FileIcon className="h-12 w-12 text-slate-400 mx-auto mb-4" />
       <h3 className="text-xl font-semibold mb-2 text-slate-900 dark:text-white">No wireframes found</h3>
       <p className="text-slate-500 mb-6">Get started by creating your first wireframe</p>
       <Button className="bg-indigo-500 hover:bg-indigo-600 text-white">
@@ -141,7 +152,7 @@ export function WireframeSection() {
         </TabsList>
         
         <TabsContent value="all" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
             {wireframes?.map((wireframe) => (
               <WireframeCard
                 key={wireframe.id}
@@ -155,7 +166,7 @@ export function WireframeSection() {
         </TabsContent>
         
         <TabsContent value="complete" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
             {complete.map((wireframe) => (
               <WireframeCard
                 key={wireframe.id}
@@ -169,7 +180,7 @@ export function WireframeSection() {
         </TabsContent>
         
         <TabsContent value="in-progress" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
             {inProgress.map((wireframe) => (
               <WireframeCard
                 key={wireframe.id}
@@ -183,7 +194,7 @@ export function WireframeSection() {
         </TabsContent>
         
         <TabsContent value="planned" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
             {planned.map((wireframe) => (
               <WireframeCard
                 key={wireframe.id}

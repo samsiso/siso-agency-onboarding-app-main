@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, Eye, FileImage } from 'lucide-react';
+import { ExternalLink, Eye, FileIcon } from 'lucide-react';
 import { Wireframe } from '@/hooks/useProjectWireframes';
 import { useNavigate } from 'react-router-dom';
 
@@ -47,6 +47,24 @@ export function WireframeCard({ wireframe, projectId, onClick, isActive = false 
     }
   }, [wireframe.notionUiPlanLink]);
 
+  // Get a background color based on the first letter of the title
+  const getCardColor = () => {
+    const colorOptions = [
+      'bg-indigo-50 dark:bg-indigo-950/30',
+      'bg-blue-50 dark:bg-blue-950/30',
+      'bg-emerald-50 dark:bg-emerald-950/30',
+      'bg-amber-50 dark:bg-amber-950/30',
+      'bg-violet-50 dark:bg-violet-950/30',
+      'bg-pink-50 dark:bg-pink-950/30',
+      'bg-cyan-50 dark:bg-cyan-950/30',
+      'bg-rose-50 dark:bg-rose-950/30'
+    ];
+    
+    // Simple hash function based on the title
+    const index = wireframe.title.charCodeAt(0) % colorOptions.length;
+    return colorOptions[index];
+  };
+
   return (
     <Card 
       className={`transition-all hover:shadow-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 ${
@@ -54,30 +72,20 @@ export function WireframeCard({ wireframe, projectId, onClick, isActive = false 
       }`}
       onClick={onClick}
     >
-      <div className="relative overflow-hidden h-48 bg-slate-100 dark:bg-slate-900 flex items-center justify-center">
-        {wireframe.imageUrl ? (
-          <img 
-            src={wireframe.imageUrl}
-            alt={wireframe.title}
-            className="w-full h-full object-cover transition-transform hover:scale-105"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-              (e.currentTarget.parentNode as HTMLElement).classList.add('fallback-active');
-            }}
-          />
-        ) : (
-          <div className="flex flex-col items-center justify-center text-slate-400 p-4 text-center">
-            <FileImage className="h-12 w-12 mb-2" />
-            <span className="text-sm font-medium">{wireframe.title}</span>
-          </div>
-        )}
-        
-        <Badge className="absolute top-2 right-2 capitalize bg-indigo-500 hover:bg-indigo-600">{wireframe.category}</Badge>
-      </div>
+      <div className={`h-3 w-full rounded-t-lg ${getCardColor()} border-b border-slate-200 dark:border-slate-700`}></div>
       
       <CardHeader className="pb-2 pt-4">
-        <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white truncate">{wireframe.title}</CardTitle>
-        <CardDescription className="line-clamp-2 text-slate-600 dark:text-slate-300 text-sm">{wireframe.description}</CardDescription>
+        <div className="flex justify-between items-start mb-1">
+          <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white truncate flex-1">
+            {wireframe.title}
+          </CardTitle>
+          <Badge className="capitalize bg-indigo-500 hover:bg-indigo-600 ml-2 shrink-0">
+            {wireframe.category}
+          </Badge>
+        </div>
+        <CardDescription className="line-clamp-3 text-slate-600 dark:text-slate-300 text-sm">
+          {wireframe.description}
+        </CardDescription>
       </CardHeader>
       
       <CardContent className="pb-2">
