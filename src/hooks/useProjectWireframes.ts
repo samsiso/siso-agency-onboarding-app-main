@@ -334,7 +334,8 @@ export function useProjectWireframes() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeWireframeId, setActiveWireframeId] = useState<string>('');
-
+  const [fetchTried, setFetchTried] = useState(false);
+  
   // Function to load sample data when database fetch fails
   const loadSampleWireframesAsFallback = () => {
     console.log("Loading sample wireframe data as fallback");
@@ -344,12 +345,20 @@ export function useProjectWireframes() {
     if (SAMPLE_WIREFRAMES.length > 0) {
       setActiveWireframeId(SAMPLE_WIREFRAMES[0].id);
     }
+    
+    setLoading(false);
   };
 
   useEffect(() => {
-    const fetchWireframesFromDatabase = async () => {
+    // Prevent multiple fetches due to React strict mode
+    if (fetchTried) {
+      return;
+    }
+    
+    const fetchWireframesData = async () => {
       setLoading(true);
       setError(null);
+      setFetchTried(true);
 
       // Try fetching with the project ID from URL or fallback to 'ubahcrypt'
       const currentProjectId = projectId || 'ubahcrypt';
@@ -362,15 +371,18 @@ export function useProjectWireframes() {
           .select('*')
           .eq('project_id', currentProjectId)
           .order('created_at', { ascending: false });
-          
+        
         console.log("Supabase response:", { data, error });
         
-        if (error) throw error;
+        if (error) {
+          console.error("Supabase error:", error);
+          throw new Error(`Failed to fetch wireframes: ${error.message}`);
+        }
 
         if (data && data.length > 0) {
           // Map database fields to Wireframe interface
           const mappedWireframes: Wireframe[] = data.map(item => ({
-            id: item.id,
+            id: item.id.toString(),
             title: item.title,
             category: item.category || 'page',
             description: item.description || '',
@@ -378,7 +390,7 @@ export function useProjectWireframes() {
             wireframeStatus: item.wireframe_status || 'planned',
             specsStatus: item.specs_status || 'pending',
             devStatus: item.dev_status || 'pending',
-            imageUrl: item.image_url || `https://via.placeholder.com/300x200/3B82F6/FFFFFF?text=${encodeURIComponent(item.title)}`
+            imageUrl: item.image_url || `https://via.placeholder.com/300x200/6366F1/FFFFFF?text=${encodeURIComponent(item.title)}`
           }));
           
           console.log("Mapped wireframes:", mappedWireframes);
@@ -396,17 +408,17 @@ export function useProjectWireframes() {
           // Fallback to sample data if no wireframes were found
           loadSampleWireframesAsFallback();
         }
-      } catch (err) {
-        console.error("Error fetching from Supabase:", err);
-        // Simply use sample data without showing error messages to the user
+      } catch (err: any) {
+        console.error("Error fetching wireframes:", err);
+        setError(err.message || "Failed to load wireframes");
         loadSampleWireframesAsFallback();
       } finally {
         setLoading(false);
       }
     };
     
-    fetchWireframesFromDatabase();
-  }, [projectId]);
+    fetchWireframesData();
+  }, [projectId, fetchTried]);
 
   const activeWireframe = wireframes.find(w => w.id === activeWireframeId);
 

@@ -32,25 +32,32 @@ export function WireframeCard({ wireframe, projectId, onClick, isActive = false 
     }
   };
 
+  // Enforce color for placeholder images
+  const imageUrl = wireframe.imageUrl || `https://via.placeholder.com/300x200/6366F1/FFFFFF?text=${encodeURIComponent(wireframe.title)}`;
+
   return (
     <Card 
-      className={`transition-all hover:shadow-md border border-gray-200 dark:border-gray-800 ${
+      className={`transition-all hover:shadow-md border border-gray-700 dark:border-gray-700 bg-white dark:bg-gray-800 ${
         isActive ? 'ring-2 ring-blue-500 shadow-md' : ''
       }`}
       onClick={onClick}
     >
       <div className="relative overflow-hidden h-48 bg-gray-50 dark:bg-gray-900">
         <img 
-          src={wireframe.imageUrl || `https://via.placeholder.com/300x200/6366F1/FFFFFF?text=${encodeURIComponent(wireframe.title)}`} 
+          src={imageUrl}
           alt={wireframe.title}
           className="w-full h-full object-cover transition-transform hover:scale-105"
+          onError={(e) => {
+            // Fallback if image fails to load
+            e.currentTarget.src = `https://via.placeholder.com/300x200/6366F1/FFFFFF?text=${encodeURIComponent(wireframe.title)}`;
+          }}
         />
         <Badge className="absolute top-2 right-2 capitalize">{wireframe.category}</Badge>
       </div>
       
       <CardHeader className="pb-2">
-        <CardTitle className="text-lg">{wireframe.title}</CardTitle>
-        <CardDescription className="line-clamp-2">{wireframe.description}</CardDescription>
+        <CardTitle className="text-lg text-gray-900 dark:text-white">{wireframe.title}</CardTitle>
+        <CardDescription className="line-clamp-2 text-gray-600 dark:text-gray-300">{wireframe.description}</CardDescription>
       </CardHeader>
       
       <CardContent className="pb-2">
@@ -69,7 +76,7 @@ export function WireframeCard({ wireframe, projectId, onClick, isActive = false 
       
       <CardFooter className="flex justify-between pt-2">
         {wireframe.notionUiPlanLink && (
-          <Button variant="outline" size="sm" className="text-indigo-500 hover:text-indigo-600 border-indigo-200 hover:border-indigo-300 dark:border-indigo-900 dark:hover:border-indigo-800" onClick={(e) => {
+          <Button variant="outline" size="sm" className="text-indigo-500 hover:text-indigo-600 border-indigo-200 hover:border-indigo-300 dark:border-indigo-900 dark:hover:border-indigo-800 dark:text-indigo-400" onClick={(e) => {
             e.stopPropagation();
             window.open(wireframe.notionUiPlanLink, '_blank');
           }}>

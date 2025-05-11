@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -11,9 +11,19 @@ export function WireframeSection() {
   const { id: projectId } = useParams();
   const { wireframes, loading, error, activeWireframeId, setActiveWireframeId } = useProjectWireframes();
 
+  // Log state for debugging
+  useEffect(() => {
+    console.log("WireframeSection rendered with:", { 
+      projectId, 
+      wireframesCount: wireframes.length,
+      loading,
+      error 
+    });
+  }, [projectId, wireframes, loading, error]);
+
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 text-gray-900 dark:text-white">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold">Wireframes</h2>
           <Button disabled>
@@ -34,10 +44,10 @@ export function WireframeSection() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {Array.from({ length: 8 }).map((_, index) => (
                 <div key={index} className="space-y-3">
-                  <Skeleton className="h-48 w-full rounded-md" />
-                  <Skeleton className="h-5 w-3/4 rounded-md" />
-                  <Skeleton className="h-4 w-full rounded-md" />
-                  <Skeleton className="h-10 w-full rounded-md" />
+                  <Skeleton className="h-48 w-full rounded-md bg-gray-200 dark:bg-gray-700" />
+                  <Skeleton className="h-5 w-3/4 rounded-md bg-gray-200 dark:bg-gray-700" />
+                  <Skeleton className="h-4 w-full rounded-md bg-gray-200 dark:bg-gray-700" />
+                  <Skeleton className="h-10 w-full rounded-md bg-gray-200 dark:bg-gray-700" />
                 </div>
               ))}
             </div>
@@ -50,17 +60,18 @@ export function WireframeSection() {
   if (error) {
     return (
       <div className="p-6 text-center">
-        <h3 className="text-xl font-semibold mb-2">Error loading wireframes</h3>
+        <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Error loading wireframes</h3>
         <p className="text-gray-500 mb-4">We couldn't load the wireframes. Please try again later.</p>
-        <Button>Retry</Button>
+        <p className="text-red-500 mb-4 text-sm">{error}</p>
+        <Button onClick={() => window.location.reload()}>Retry</Button>
       </div>
     );
   }
 
   if (wireframes.length === 0) {
     return (
-      <div className="p-6 text-center border rounded-lg">
-        <h3 className="text-xl font-semibold mb-2">No wireframes found</h3>
+      <div className="p-6 text-center border rounded-lg border-gray-200 dark:border-gray-700">
+        <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">No wireframes found</h3>
         <p className="text-gray-500 mb-4">Get started by creating your first wireframe</p>
         <Button>
           <Plus className="mr-2 h-4 w-4" />
@@ -70,6 +81,8 @@ export function WireframeSection() {
     );
   }
 
+  console.log("Rendering wireframes:", wireframes);
+
   // Group wireframes by status for tabs
   const complete = wireframes.filter(w => w.wireframeStatus === 'complete');
   const inProgress = wireframes.filter(w => w.wireframeStatus === 'in-progress');
@@ -78,7 +91,7 @@ export function WireframeSection() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Wireframes ({wireframes.length})</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Wireframes ({wireframes.length})</h2>
         <Button>
           <Plus className="mr-2 h-4 w-4" />
           Add Wireframe
@@ -99,7 +112,7 @@ export function WireframeSection() {
               <WireframeCard
                 key={wireframe.id}
                 wireframe={wireframe}
-                projectId={projectId || ''}
+                projectId={projectId || 'ubahcrypt'}
                 isActive={wireframe.id === activeWireframeId}
                 onClick={() => setActiveWireframeId(wireframe.id)}
               />
@@ -113,7 +126,7 @@ export function WireframeSection() {
               <WireframeCard
                 key={wireframe.id}
                 wireframe={wireframe}
-                projectId={projectId || ''}
+                projectId={projectId || 'ubahcrypt'}
                 isActive={wireframe.id === activeWireframeId}
                 onClick={() => setActiveWireframeId(wireframe.id)}
               />
@@ -127,7 +140,7 @@ export function WireframeSection() {
               <WireframeCard
                 key={wireframe.id}
                 wireframe={wireframe}
-                projectId={projectId || ''}
+                projectId={projectId || 'ubahcrypt'}
                 isActive={wireframe.id === activeWireframeId}
                 onClick={() => setActiveWireframeId(wireframe.id)}
               />
@@ -141,7 +154,7 @@ export function WireframeSection() {
               <WireframeCard
                 key={wireframe.id}
                 wireframe={wireframe}
-                projectId={projectId || ''}
+                projectId={projectId || 'ubahcrypt'}
                 isActive={wireframe.id === activeWireframeId}
                 onClick={() => setActiveWireframeId(wireframe.id)}
               />

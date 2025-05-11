@@ -1,6 +1,6 @@
-
-import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
+import React from 'react';
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from "./card";
 
 interface AnimatedCardProps {
@@ -8,14 +8,20 @@ interface AnimatedCardProps {
   className?: string;
   title?: string;
   headerClassName?: string;
+  delay?: number;
 }
 
-export function AnimatedCard({ children, className, title, headerClassName }: AnimatedCardProps) {
+export function AnimatedCard({ children, className, title, headerClassName, delay = 0 }: AnimatedCardProps) {
+  // Use a key to prevent the "multiple children in AnimatePresence" warning
+  const cardKey = React.useId();
+  
   return (
     <motion.div
+      key={cardKey}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3, delay }}
       className="will-change-transform"
     >
       <Card className={cn(
