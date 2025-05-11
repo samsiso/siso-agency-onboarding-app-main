@@ -51,36 +51,34 @@ export default function UserFlowPage() {
   };
   
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-b from-siso-bg-alt to-siso-bg">
-      {/* Add Project Header */}
-      <div className="container mx-auto px-4 py-6">
-        <ProjectHeader 
-          name={projectData.name} 
-          description={projectData.description} 
-          status={projectData.status} 
-          created_at={projectData.created_at} 
-        />
-        
-        {/* Add Project Card Navigation */}
-        <ProjectCardNavigation projectId={projectId} />
-        
-        {/* User Flow Info Card */}
-        <Card className="p-4 mb-6 bg-black/30 border border-white/10">
-          <div className="flex items-start gap-3">
-            <div className="p-2 rounded-md bg-blue-500/20 text-blue-400">
-              <Info className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-lg font-medium text-white mb-1">User Flow Designer</h3>
-              <p className="text-sm text-gray-300">
-                Create and edit user flows to map out how users will navigate through your application. 
-                Connect screens, define interactions, and visualize the entire user journey.
-              </p>
-            </div>
-            <Badge className="ml-auto" variant="outline">PRO Feature</Badge>
+    <>
+      {/* Project Header */}
+      <ProjectHeader 
+        name={projectData.name} 
+        description={projectData.description} 
+        status={projectData.status} 
+        created_at={projectData.created_at} 
+      />
+      
+      {/* Project Card Navigation */}
+      <ProjectCardNavigation projectId={projectId} />
+      
+      {/* User Flow Info Card */}
+      <Card className="p-4 mb-6 bg-black/30 border border-white/10">
+        <div className="flex items-start gap-3">
+          <div className="p-2 rounded-md bg-blue-500/20 text-blue-400">
+            <Info className="w-5 h-5" />
           </div>
-        </Card>
-      </div>
+          <div>
+            <h3 className="text-lg font-medium text-white mb-1">User Flow Designer</h3>
+            <p className="text-sm text-gray-300">
+              Create and edit user flows to map out how users will navigate through your application. 
+              Connect screens, define interactions, and visualize the entire user journey.
+            </p>
+          </div>
+          <Badge className="ml-auto" variant="outline">PRO Feature</Badge>
+        </div>
+      </Card>
       
       <UserFlowNavigation 
         projectId={projectId}
@@ -95,7 +93,7 @@ export default function UserFlowPage() {
         <div className="flex-1 flex flex-col overflow-hidden">
           <UserFlowToolbar />
           
-          <div className="flex-1 overflow-auto p-4">
+          <div className="flex-1 overflow-auto">
             <UserFlowDiagram 
               projectId={projectId}
               onNodeSelect={handleNodeSelect}
@@ -111,6 +109,6 @@ export default function UserFlowPage() {
           />
         )}
       </div>
-    </div>
+    </>
   );
 } 

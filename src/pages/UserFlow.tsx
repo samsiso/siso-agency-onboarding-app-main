@@ -7,7 +7,9 @@ export default function UserFlow() {
   
   return (
     <AppLayout>
-      <UserFlowPage />
+      <div className="container mx-auto px-4 py-8">
+        <UserFlowPage />
+      </div>
     </AppLayout>
   );
 }
