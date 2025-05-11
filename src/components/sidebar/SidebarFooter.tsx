@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -40,7 +39,7 @@ export const SidebarFooter = ({ collapsed, onProfileOpen }: SidebarFooterProps) 
   return (
     <motion.div
       className={cn(
-        'border-t border-siso-border p-4',
+        'border-t border-siso-border p-4 absolute bottom-0 left-0 right-0 bg-siso-bg/95',
         collapsed && 'p-2'
       )}
       animate={{ opacity: 1, y: 0 }}

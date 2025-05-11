@@ -58,36 +58,29 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: Navigatio
     }
   };
 
-  // [Analysis] Improved route matching with exact, nested, and parent path handling
-  const isItemActive = (href: string, isMainRoute: boolean = false) => {
-    // Handle hash-based navigation
+  const isItemActive = (href: string, isMainItem = false) => {
+    // Always use the URL pathname for matching, not the hash fragment
     if (href.startsWith('#')) {
       return href === activeSection;
     }
 
-    // Remove trailing slashes for consistency
-    const currentPath = location.pathname.replace(/\/$/, '');
-    const targetPath = href.replace(/\/$/, '');
+    // Perfect match for dashboard items
+    if (location.pathname === href) {
+      return true;
+    }
 
-    // Check if the current path exactly matches the target path
-    const exactMatch = currentPath === targetPath;
-    
-    // Check if the current path is a child of the target path
-    // This is important for sections like /economy/* where we want the parent item to be active
-    const isChildPath = currentPath.startsWith(targetPath + '/');
-    
-    // For main routes like /ai-news, match both exact and child routes
-    if (isMainRoute) {
-      return exactMatch || isChildPath;
+    // For main items, do a more permissive match
+    if (isMainItem) {
+      return location.pathname.startsWith(href);
     }
-    
-    // For economy section items, we need special handling to ensure they activate properly
-    if (targetPath.startsWith('/economy/')) {
-      return exactMatch;
+
+    // For sub-items that are top-level paths with slugs, match the pattern
+    if (href.includes(':') && location.pathname.startsWith(href.split(':')[0])) {
+      return true;
     }
-    
-    // For section items (like /tools), use strict matching by default
-    return exactMatch;
+
+    // Otherwise, use exact or prefix match depending on the specificity needed
+    return location.pathname.startsWith(href);
   };
 
   return (
@@ -95,7 +88,7 @@ export const SidebarNavigation = ({ collapsed, onItemClick, visible }: Navigatio
       initial="hidden"
       animate="show"
       variants={containerVariants}
-      className={cn("px-2 py-4", collapsed && "px-1")}
+      className={cn("px-2 py-4 pb-24", collapsed && "px-1")}
     >
       <div className="space-y-2">
         <AnimatePresence mode="wait">

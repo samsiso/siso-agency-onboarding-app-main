@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SidebarLogo } from './sidebar/SidebarLogo';
 import { SidebarNavigation } from './sidebar/SidebarNavigation';
@@ -25,14 +24,26 @@ export const Sidebar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showNavigation, setShowNavigation] = useState(true);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [wasManuallyExpanded, setWasManuallyExpanded] = useState(false);
+  const [isProjectMenuOpen, setIsProjectMenuOpen] = useState(false);
+  const ignoreMouseLeaveUntil = useRef<number>(0);
+  const projectMenuButtonRef = useRef<HTMLButtonElement>(null);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { selectedProject, projects, selectProject } = useSelectedProject();
 
   const handleItemClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    const href = e.currentTarget.getAttribute('href');
+    e.stopPropagation(); // Prevent event bubbling
     
+    // Set the sidebar to stay expanded when clicking navigation items
+    if (!isMobile) {
+      ignoreMouseLeaveUntil.current = Date.now() + 2000; // 2 seconds
+      setWasManuallyExpanded(true);
+      setIsExpanded(true);
+    }
+    
+    const href = e.currentTarget.getAttribute('href');
     if (!href) return;
 
     if (href.startsWith('/')) {
@@ -83,15 +94,44 @@ export const Sidebar = () => {
   };
 
   const handleMouseEnter = () => {
-    if (!isMobile && !isProfileOpen) {
+    if (!isMobile && !isProfileOpen && !wasManuallyExpanded) {
       setIsExpanded(true);
     }
   };
 
   const handleMouseLeave = () => {
-    if (!isMobile && !isProfileOpen) {
+    // Prevent sidebar from collapsing if we recently had a manual click
+    if (!isMobile && !isProfileOpen && Date.now() > ignoreMouseLeaveUntil.current) {
       setIsExpanded(false);
+      setWasManuallyExpanded(false);
+      setIsProjectMenuOpen(false);
     }
+  };
+
+  const handleProjectIconClick = () => {
+    // Set a timestamp to ignore mouseLeave events for a short period
+    ignoreMouseLeaveUntil.current = Date.now() + 2000; // Increase to 2 seconds
+    
+    // Expand the sidebar
+    setIsExpanded(true);
+    setWasManuallyExpanded(true);
+    
+    // Use a small timeout to ensure the expanded view is rendered before opening dropdown
+    setTimeout(() => {
+      setIsProjectMenuOpen(true);
+      
+      // Simulate click on the project menu button to open the dropdown
+      if (projectMenuButtonRef.current) {
+        projectMenuButtonRef.current.click();
+      }
+    }, 300);
+  };
+
+  // For programmatic navigation without closing sidebar
+  const handleManualNavigation = (path: string) => {
+    ignoreMouseLeaveUntil.current = Date.now() + 2000;
+    setWasManuallyExpanded(true);
+    navigate(path);
   };
 
   const getStatusColor = (status: string) => {
@@ -157,18 +197,31 @@ export const Sidebar = () => {
       >
         <SidebarLogo 
           collapsed={!isExpanded} 
-          setCollapsed={() => setIsExpanded(!isExpanded)}
+          setCollapsed={() => {
+            setIsExpanded(!isExpanded);
+            if (!isExpanded) {
+              // When expanding via logo click, treat as manual expansion
+              setWasManuallyExpanded(true);
+              ignoreMouseLeaveUntil.current = Date.now() + 2000;
+            }
+          }}
           onLogoClick={() => setShowNavigation(!showNavigation)}
         />
         
         {/* Project Selector - Expanded View */}
         {isExpanded ? (
           <div className="mx-4 my-4">
-            <DropdownMenu>
+            <DropdownMenu open={isProjectMenuOpen} onOpenChange={setIsProjectMenuOpen}>
               <DropdownMenuTrigger asChild>
                 <Button 
+                  ref={projectMenuButtonRef}
                   variant="outline" 
                   className="w-full h-16 justify-between bg-siso-bg-alt border-siso-border hover:bg-siso-bg-alt/80 hover:border-siso-border-hover group transition-all duration-300"
+                  onClick={() => {
+                    // When clicking project button, keep sidebar open
+                    ignoreMouseLeaveUntil.current = Date.now() + 2000;
+                    setWasManuallyExpanded(true);
+                  }}
                 >
                   <div className="flex items-center gap-3 overflow-hidden">
                     {selectedProject?.logo ? (
@@ -198,6 +251,11 @@ export const Sidebar = () => {
               <DropdownMenuContent 
                 align="start" 
                 className="w-64 bg-siso-bg-alt border-siso-border"
+                onCloseAutoFocus={(e) => {
+                  // Prevent focus from automatically closing the sidebar
+                  e.preventDefault();
+                  ignoreMouseLeaveUntil.current = Date.now() + 1000;
+                }}
               >
                 <div className="py-2 px-3 text-xs font-medium text-siso-text-muted uppercase tracking-wider">
                   Your Projects
@@ -207,7 +265,11 @@ export const Sidebar = () => {
                   <DropdownMenuItem 
                     key={project.id}
                     className="flex items-center justify-between cursor-pointer hover:bg-black/20 py-2"
-                    onClick={() => selectProject(project.id)}
+                    onClick={() => {
+                      selectProject(project.id);
+                      setIsProjectMenuOpen(false);
+                      ignoreMouseLeaveUntil.current = Date.now() + 2000;
+                    }}
                   >
                     <div className="flex items-center gap-2">
                       {project.logo ? (
@@ -234,14 +296,22 @@ export const Sidebar = () => {
                 <DropdownMenuSeparator className="bg-siso-border" />
                 <DropdownMenuItem 
                   className="flex items-center gap-2 cursor-pointer text-siso-orange hover:text-siso-red hover:bg-black/20"
-                  onClick={() => navigate('/plan-builder')}
+                  onClick={() => {
+                    navigate('/plan-builder');
+                    setIsProjectMenuOpen(false);
+                    ignoreMouseLeaveUntil.current = Date.now() + 2000;
+                  }}
                 >
                   <FolderOpen className="h-4 w-4" />
                   <span>Create New Project</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                   className="text-siso-text hover:bg-black/20"
-                  onClick={() => navigate('/projects')}
+                  onClick={() => {
+                    navigate('/projects');
+                    setIsProjectMenuOpen(false);
+                    ignoreMouseLeaveUntil.current = Date.now() + 2000;
+                  }}
                 >
                   View all projects
                 </DropdownMenuItem>
@@ -253,7 +323,7 @@ export const Sidebar = () => {
             <CollapsedProjectCard 
               projectName={selectedProject?.name || "Select Project"}
               projectLogo={selectedProject?.logo}
-              onClick={() => setIsExpanded(true)}
+              onClick={handleProjectIconClick}
             />
           </div>
         )}
@@ -269,7 +339,11 @@ export const Sidebar = () => {
           collapsed={!isExpanded} 
           onProfileOpen={(isOpen) => {
             setIsProfileOpen(isOpen);
-            if (isOpen) setIsExpanded(true);
+            if (isOpen) {
+              setIsExpanded(true);
+              setWasManuallyExpanded(true);
+              ignoreMouseLeaveUntil.current = Date.now() + 2000;
+            }
           }}
         />
       </motion.div>
