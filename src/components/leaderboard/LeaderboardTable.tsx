@@ -101,19 +101,19 @@ export const LeaderboardTable = ({ leaderboardData, onUserClick }: LeaderboardTa
   };
 
   return (
-    <div className="relative overflow-x-auto rounded-lg border border-siso-border bg-black/20 backdrop-blur-sm">
+    <div className="relative overflow-x-auto rounded-lg border border-gray-700 bg-black">
       <Table>
-        <TableHeader className="sticky top-0 bg-siso-bg z-10">
-          <TableRow className="border-b border-siso-border">
-            <TableHead className="w-[80px] text-center">Rank</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead className="text-center">Points</TableHead>
-            <TableHead className="text-center">Trend</TableHead>
-            <TableHead className="text-center">Spending</TableHead>
-            <TableHead className="text-center">Contributions</TableHead>
-            <TableHead className="text-center">Referrals</TableHead>
-            <TableHead className="text-center">SISO Tokens</TableHead>
-            <TableHead className="text-center">Last Active</TableHead>
+        <TableHeader className="sticky top-0 bg-gray-900 z-10">
+          <TableRow className="border-b border-gray-800">
+            <TableHead className="w-[80px] text-center text-gray-300">Rank</TableHead>
+            <TableHead className="text-gray-300">Name</TableHead>
+            <TableHead className="text-center text-gray-300">Points</TableHead>
+            <TableHead className="text-center text-gray-300">Trend</TableHead>
+            <TableHead className="text-center text-gray-300">Spending</TableHead>
+            <TableHead className="text-center text-gray-300">Contributions</TableHead>
+            <TableHead className="text-center text-gray-300">Referrals</TableHead>
+            <TableHead className="text-center text-gray-300">SISO Tokens</TableHead>
+            <TableHead className="text-center text-gray-300">Last Active</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -128,8 +128,12 @@ export const LeaderboardTable = ({ leaderboardData, onUserClick }: LeaderboardTa
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.05 }}
                 className={cn(
-                  "transition-all duration-200 cursor-pointer group",
-                  getRowClassName(index)
+                  "transition-all duration-200 cursor-pointer group text-white border-b border-gray-800",
+                  index === 0 ? "bg-yellow-500/10 hover:bg-yellow-500/20" :
+                  index === 1 ? "bg-gray-500/10 hover:bg-gray-500/20" :
+                  index === 2 ? "bg-amber-500/10 hover:bg-amber-500/20" :
+                  index < 10 ? "bg-gray-800/50 hover:bg-gray-800/70" :
+                  "hover:bg-gray-800/30"
                 )}
                 onClick={() => handleRowClick(entry)}
               >
@@ -138,7 +142,7 @@ export const LeaderboardTable = ({ leaderboardData, onUserClick }: LeaderboardTa
                     {getRankBadge(index)}
                     <span className={cn(
                       "font-bold",
-                      index < 3 ? "text-siso-text-bold" : "text-siso-text"
+                      index < 3 ? "text-white" : "text-gray-300"
                     )}>
                       {index + 1}
                     </span>
@@ -157,9 +161,9 @@ export const LeaderboardTable = ({ leaderboardData, onUserClick }: LeaderboardTa
                       )}
                     </div>
                     <div>
-                      <p className="text-siso-text-bold font-semibold">{getDisplayName(entry)}</p>
+                      <p className="text-white font-semibold">{getDisplayName(entry)}</p>
                       <div className="flex items-center gap-2">
-                        <p className="text-xs text-siso-text/70">{entry.rank || 'Rookie'}</p>
+                        <p className="text-xs text-gray-400">{entry.rank || 'Rookie'}</p>
                         {getSpendingBadge(spendingAmount)}
                       </div>
                     </div>

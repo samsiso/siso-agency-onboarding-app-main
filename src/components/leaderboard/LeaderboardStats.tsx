@@ -1,4 +1,3 @@
-
 import { Trophy, Users, Coins, TrendingUp } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import CountUp from 'react-countup';
@@ -15,13 +14,13 @@ export const LeaderboardStats = ({ totalUsers, totalPoints, totalSisoTokens }: L
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-      <Card className="bg-gradient-to-br from-siso-bg-alt to-siso-bg-alt/50 hover:border-siso-border-hover transition-all duration-300">
+      <Card className="bg-gray-900 border-gray-700 hover:border-gray-600 transition-all duration-300">
         <CardContent className="pt-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-siso-text/70">Total Users</p>
+              <p className="text-sm text-gray-400">Total Users</p>
               <div className="flex items-baseline gap-2">
-                <p className="text-2xl font-bold text-siso-text-bold">
+                <p className="text-2xl font-bold text-white">
                   <CountUp
                     end={totalUsers}
                     delay={0}
@@ -39,13 +38,13 @@ export const LeaderboardStats = ({ totalUsers, totalPoints, totalSisoTokens }: L
         </CardContent>
       </Card>
       
-      <Card className="bg-gradient-to-br from-siso-bg-alt to-siso-bg-alt/50 hover:border-siso-border-hover transition-all duration-300">
+      <Card className="bg-gray-900 border-gray-700 hover:border-gray-600 transition-all duration-300">
         <CardContent className="pt-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-siso-text/70">Total Points</p>
+              <p className="text-sm text-gray-400">Total Points</p>
               <div className="flex items-baseline gap-2">
-                <p className="text-2xl font-bold text-siso-text-bold">
+                <p className="text-2xl font-bold text-white">
                   <CountUp
                     end={totalPoints}
                     delay={0}
@@ -63,13 +62,13 @@ export const LeaderboardStats = ({ totalUsers, totalPoints, totalSisoTokens }: L
         </CardContent>
       </Card>
       
-      <Card className="bg-gradient-to-br from-siso-bg-alt to-siso-bg-alt/50 hover:border-siso-border-hover transition-all duration-300">
+      <Card className="bg-gray-900 border-gray-700 hover:border-gray-600 transition-all duration-300">
         <CardContent className="pt-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-siso-text/70">Total SISO Tokens</p>
+              <p className="text-sm text-gray-400">Total SISO Tokens</p>
               <div className="flex items-baseline gap-2">
-                <p className="text-2xl font-bold text-siso-text-bold">
+                <p className="text-2xl font-bold text-white">
                   <CountUp
                     end={totalSisoTokens}
                     delay={0}
@@ -87,13 +86,13 @@ export const LeaderboardStats = ({ totalUsers, totalPoints, totalSisoTokens }: L
         </CardContent>
       </Card>
 
-      <Card className="bg-gradient-to-br from-siso-bg-alt to-siso-bg-alt/50 hover:border-siso-border-hover transition-all duration-300">
+      <Card className="bg-gray-900 border-gray-700 hover:border-gray-600 transition-all duration-300">
         <CardContent className="pt-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-siso-text/70">Daily Active Users</p>
+              <p className="text-sm text-gray-400">Daily Active Users</p>
               <div className="flex items-baseline gap-2">
-                <p className="text-2xl font-bold text-siso-text-bold">
+                <p className="text-2xl font-bold text-white">
                   <CountUp
                     end={Math.floor(totalUsers * 0.4)}
                     delay={0}

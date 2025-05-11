@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -62,7 +61,7 @@ export default function LeaderboardPage() {
 
   return (
     <AppLayout>
-      <div className="p-4 md:p-8">
+      <div className="p-4 md:p-8 bg-black">
         <div className="max-w-7xl mx-auto">
           <div className="relative">
             <Spotlight className="-top-40 left-0" />
@@ -71,7 +70,7 @@ export default function LeaderboardPage() {
               <h1 className="text-3xl font-bold bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent mb-2">
                 Community Leaderboard
               </h1>
-              <p className="text-siso-text/80">
+              <p className="text-gray-300">
                 Track community contributions, points earned, and rewards across the SISO platform. 
                 <span className="text-white font-medium ml-1">Click on any user to view their app details!</span>
               </p>
