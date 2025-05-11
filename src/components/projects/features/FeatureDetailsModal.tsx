@@ -17,6 +17,17 @@ interface FeatureDetailsModalProps {
 export function FeatureDetailsModal({ feature, onClose }: FeatureDetailsModalProps) {
   if (!feature) return null;
 
+  // Function to ensure scrolling is restored
+  const enableScrolling = () => {
+    document.body.classList.remove('overflow-hidden');
+  };
+
+  // Enhanced close handler to ensure scrolling is restored
+  const handleClose = () => {
+    enableScrolling();
+    onClose();
+  };
+
   // Prevent background scrolling when modal is open
   useEffect(() => {
     // Add class to body to prevent scrolling
@@ -24,14 +35,14 @@ export function FeatureDetailsModal({ feature, onClose }: FeatureDetailsModalPro
     
     // Cleanup function to remove class when component unmounts
     return () => {
-      document.body.classList.remove('overflow-hidden');
+      enableScrolling();
     };
   }, []);
 
   // Handle backdrop click to close the modal
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
-      onClose();
+      handleClose();
     }
   };
 
@@ -96,7 +107,7 @@ export function FeatureDetailsModal({ feature, onClose }: FeatureDetailsModalPro
           <Button 
             variant="ghost" 
             size="icon" 
-            onClick={onClose} 
+            onClick={handleClose} 
             className="h-8 w-8 rounded-full"
           >
             <X className="h-4 w-4" />
@@ -198,7 +209,7 @@ export function FeatureDetailsModal({ feature, onClose }: FeatureDetailsModalPro
         <div className="p-6 border-t border-siso-text/20 flex justify-end sticky bottom-0 bg-black/95 backdrop-blur-sm">
           <Button 
             variant="default"
-            onClick={onClose}
+            onClick={handleClose}
             className="bg-[#9b87f5] hover:bg-[#9b87f5]/90"
           >
             Close
