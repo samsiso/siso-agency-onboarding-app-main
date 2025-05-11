@@ -1,4 +1,3 @@
-
 import { Helmet } from 'react-helmet';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { DashboardLayout } from '@/components/dashboard/layout/DashboardLayout';
@@ -71,18 +70,13 @@ export default function Home() {
         
         {/* Main Content */}
         <div className="space-y-6 mt-6">
-          {/* Main Project Card */}
-          <MainProjectCard />
-          
-          {/* Additional Cards */}
+          {/* Additional Cards with new layout */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-1">
-              <NotificationsCard />
-            </div>
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-2 order-2 lg:order-1">
               <LeaderboardPreviewCard />
             </div>
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-1 order-1 lg:order-2 space-y-6">
+              <NotificationsCard />
               <HelpSupportCard />
             </div>
           </div>
@@ -99,27 +93,19 @@ export default function Home() {
             transition={{ delay: 0.7 }}
             className="mt-8"
           >
-            <Card className="bg-gradient-to-r from-purple-800/20 to-purple-600/10 border-purple-500/20">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5 text-purple-400" />
-                  Admin Dashboard
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm">
-                  As an administrator, you have access to additional tools to manage users, 
-                  view system analytics, and control platform settings.
-                </p>
+            <Card className="bg-black/30 border border-siso-text/10 hover:bg-black/40 hover:border-siso-orange/20 transition-all duration-300">
+              <CardContent className="flex items-center gap-4 p-6">
+                <div className="h-12 w-12 bg-siso-orange/10 rounded-full flex items-center justify-center">
+                  <Users className="h-6 w-6 text-siso-orange" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-semibold text-white">Admin Dashboard</h3>
+                  <p className="text-muted-foreground">Manage clients, templates, and organization settings</p>
+                </div>
+                <Button asChild>
+                  <Link to="/admin/dashboard">Access Admin</Link>
+                </Button>
               </CardContent>
-              <CardFooter className="flex gap-4">
-                <Button asChild variant="default" className="bg-purple-600 hover:bg-purple-700">
-                  <Link to="/admin">Admin Dashboard</Link>
-                </Button>
-                <Button asChild variant="outline" className="border-purple-500/50 text-purple-500">
-                  <Link to="/admin/clients">Client Management</Link>
-                </Button>
-              </CardFooter>
             </Card>
           </motion.div>
         )}

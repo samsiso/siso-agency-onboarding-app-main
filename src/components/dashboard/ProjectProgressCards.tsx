@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { CheckSquare, Clock, CreditCard } from "lucide-react";
@@ -39,15 +38,15 @@ function StatCard({
       transition={{ duration: 0.3, delay: delay * 0.1 }}
       whileHover={{ y: -5, transition: { duration: 0.2 } }}
     >
-      <Card className={`border-0 ${bgColor} shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden h-full`}>
+      <Card className={`border border-gray-800 ${bgColor} shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden h-full`}>
         <div className="p-6 flex flex-col h-full">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <p className="text-gray-400 text-sm font-medium">{title}</p>
+              <p className="text-white text-sm font-medium">{title}</p>
               <p className={`text-2xl font-bold mt-1 ${textColor}`}>{value}</p>
-              {subtitle && <p className="text-xs text-gray-500 mt-1">{subtitle}</p>}
+              {subtitle && <p className="text-xs text-gray-400 mt-1">{subtitle}</p>}
             </div>
-            <div className={`h-12 w-12 rounded-full bg-white/5 flex items-center justify-center ${textColor}`}>
+            <div className={`h-12 w-12 rounded-full bg-black/40 flex items-center justify-center ${textColor}`}>
               {icon}
             </div>
           </div>
@@ -56,11 +55,11 @@ function StatCard({
             <div className="mt-4">
               <Progress 
                 value={progress} 
-                className="h-1.5" 
+                className="h-1.5 bg-black/30" 
                 indicatorClassName={`${progress >= 70 ? 'bg-green-500' : progress >= 40 ? 'bg-amber-500' : 'bg-[#ea384c]'}`} 
               />
               <div className="flex justify-between mt-1.5">
-                <p className="text-xs text-gray-500">{progress}% Complete</p>
+                <p className="text-xs text-gray-400">{progress}% Complete</p>
                 <Badge 
                   variant="outline" 
                   className={`text-xs py-0 px-1.5 ${
@@ -123,7 +122,7 @@ export function ProjectProgressCards() {
         value="25%"
         subtitle="1.5 weeks out of 6"
         icon={<CheckSquare className="h-6 w-6 text-[#ea384c]" />}
-        bgColor="bg-gradient-to-br from-[#ea384c]/10 to-red-900/5"
+        bgColor="bg-black/40"
         textColor="text-[#ea384c]"
         delay={0}
         progress={stats.overallProgress}
@@ -136,7 +135,7 @@ export function ProjectProgressCards() {
         value={`${stats.timelineRemaining.days} days`}
         subtitle={`until ${stats.timelineRemaining.endDate}`}
         icon={<Clock className="h-6 w-6 text-red-400" />}
-        bgColor="bg-gradient-to-br from-red-500/10 to-red-700/5"
+        bgColor="bg-black/40"
         textColor="text-red-400"
         delay={1}
         progress={stats.timelineRemaining.percentComplete}
@@ -149,7 +148,7 @@ export function ProjectProgressCards() {
         value={stats.nextMilestone.name}
         subtitle={`${stats.nextMilestone.date} (${stats.nextMilestone.tasksCompleted}/${stats.nextMilestone.totalTasks} tasks)`}
         icon={<CheckSquare className="h-6 w-6 text-[#ea384c]" />}
-        bgColor="bg-gradient-to-br from-[#ea384c]/10 to-red-900/5"
+        bgColor="bg-black/40"
         textColor="text-[#ea384c]"
         delay={2}
         progress={stats.nextMilestone.percentComplete}
@@ -162,7 +161,7 @@ export function ProjectProgressCards() {
         value={`£${stats.credits.cost}`}
         subtitle={`${stats.credits.spent} credits (${(stats.credits.tokens/1000000).toFixed(1)}M tokens)`}
         icon={<CreditCard className="h-6 w-6 text-red-400" />}
-        bgColor="bg-gradient-to-br from-red-500/10 to-red-700/5"
+        bgColor="bg-black/40"
         textColor="text-red-400"
         delay={3}
         linkText="View Financial Details"
