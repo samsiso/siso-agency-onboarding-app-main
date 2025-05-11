@@ -115,38 +115,52 @@ export function ResearchDocumentCard({
         {/* Category indicator band */}
         <div className={`h-1.5 w-full ${categoryStyle.badgeColor}`} />
         
-        {/* Header section */}
-        <div className="p-5 pb-3">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <div className={`p-1.5 rounded-md ${categoryStyle.bgColor} ${categoryStyle.borderColor}`}>
-                <div className={categoryStyle.color}>
-                  {categoryStyle.icon}
+        <Collapsible open={isExpanded} onOpenChange={onToggleExpand} className="flex flex-col h-full">
+          {/* Main content area */}
+          <div className="p-5 pb-3 flex-1">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <div className={`p-1.5 rounded-md ${categoryStyle.bgColor} ${categoryStyle.borderColor}`}>
+                  <div className={categoryStyle.color}>
+                    {categoryStyle.icon}
+                  </div>
                 </div>
+                <h3 className="text-lg font-semibold text-white line-clamp-1">{doc.title}</h3>
               </div>
-              <h3 className="text-lg font-semibold text-white line-clamp-1">{doc.title}</h3>
+              
+              {doc.fileUrl && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white h-7 w-7">
+                        <Download className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">
+                      <p className="text-xs">Download document</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
             </div>
             
-            {doc.fileUrl && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white h-7 w-7">
-                      <Download className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">
-                    <p className="text-xs">Download document</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
-          </div>
-          
-          <p className="text-sm text-slate-300 line-clamp-2 mb-3">{doc.description}</p>
-          
-          <Collapsible open={isExpanded}>
-            <CollapsibleContent className="mb-4 space-y-3">
+            <p className="text-sm text-slate-300 line-clamp-2 mb-3">{doc.description}</p>
+            
+            {/* Tags */}
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              {doc.tags.map((tag) => (
+                <Badge 
+                  key={tag} 
+                  variant="outline" 
+                  className="text-xs bg-slate-800/60 border-slate-700 text-slate-300 flex items-center"
+                >
+                  <Tag className="h-3 w-3 mr-1 text-slate-400" />{tag}
+                </Badge>
+              ))}
+            </div>
+            
+            {/* Collapsible content - insights, nextSteps, code */}
+            <CollapsibleContent className="space-y-3 mt-3">
               {doc.insights && doc.insights.length > 0 && (
                 <div className="bg-slate-800/50 rounded-md p-3 border border-slate-700/50">
                   <h4 className="text-sm font-semibold text-indigo-300 mb-2 flex items-center gap-1.5">
@@ -187,63 +201,50 @@ export function ResearchDocumentCard({
                 </div>
               )}
             </CollapsibleContent>
-          </Collapsible>
-          
-          {/* Tags */}
-          <div className="flex flex-wrap gap-1.5 mt-2">
-            {doc.tags.map((tag) => (
-              <Badge 
-                key={tag} 
-                variant="outline" 
-                className="text-xs bg-slate-800/60 border-slate-700 text-slate-300 flex items-center"
-              >
-                <Tag className="h-3 w-3 mr-1 text-slate-400" />{tag}
-              </Badge>
-            ))}
           </div>
-        </div>
-        
-        {/* Bottom section and actions */}
-        <div className="mt-auto">
-          <div className="px-5 py-4 bg-slate-950 border-t border-slate-800/50">
-            <div className="flex justify-between items-center mb-3">
-              <Link 
-                to={`/projects/${projectId}/market-research/${doc.id}`}
-                className="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 text-sm font-medium"
-              >
-                View Details
-                <ExternalLink className="h-3 w-3" />
-              </Link>
+          
+          {/* Bottom section and actions */}
+          <div className="mt-auto">
+            <div className="px-5 py-4 bg-slate-950 border-t border-slate-800/50">
+              <div className="flex justify-between items-center mb-3">
+                <Link 
+                  to={`/projects/${projectId}/market-research/${doc.id}`}
+                  className="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 text-sm font-medium"
+                >
+                  View Details
+                  <ExternalLink className="h-3 w-3" />
+                </Link>
+                
+                <CollapsibleTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-7 p-0 text-xs text-slate-400 hover:text-white hover:bg-slate-800">
+                    {isExpanded ? (
+                      <div className="flex items-center">
+                        <ChevronUp className="h-3 w-3 mr-1" /> Less
+                      </div>
+                    ) : (
+                      <div className="flex items-center">
+                        <ChevronDown className="h-3 w-3 mr-1" /> More
+                      </div>
+                    )}
+                  </Button>
+                </CollapsibleTrigger>
+              </div>
               
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-7 p-0 text-xs text-slate-400 hover:text-white hover:bg-slate-800">
-                  {isExpanded ? (
-                    <div className="flex items-center">
-                      <ChevronUp className="h-3 w-3 mr-1" /> Less
-                    </div>
-                  ) : (
-                    <div className="flex items-center">
-                      <ChevronDown className="h-3 w-3 mr-1" /> More
-                    </div>
-                  )}
-                </Button>
-              </CollapsibleTrigger>
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <Badge 
-                variant="outline" 
-                className={`bg-slate-800/60 text-xs border-0 ${categoryStyle.color}`}
-              >
-                {doc.category}
-              </Badge>
-              <div className="text-xs text-slate-500 flex items-center gap-1">
-                <Calendar className="h-3 w-3" /> 
-                {new Date(doc.updated_at).toLocaleDateString()}
+              <div className="flex items-center justify-between">
+                <Badge 
+                  variant="outline" 
+                  className={`bg-slate-800/60 text-xs border-0 ${categoryStyle.color}`}
+                >
+                  {doc.category}
+                </Badge>
+                <div className="text-xs text-slate-500 flex items-center gap-1">
+                  <Calendar className="h-3 w-3" /> 
+                  {new Date(doc.updated_at).toLocaleDateString()}
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </Collapsible>
       </Card>
     </motion.div>
   );
