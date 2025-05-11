@@ -35,11 +35,17 @@ export default defineConfig(({ mode }) => ({
           'react-core': ['react', 'react-dom'],
           'react-router': ['react-router-dom'],
           
-          // Add ReactFlow to manual chunks
-          'reactflow': ['reactflow', 'reactflow/dist/style.css'],
-          
           // UI Components bundles - split by feature
-          'ui-core': ['@radix-ui/react-slot'],
+          'ui-core': [
+            '@radix-ui/react-slot',
+            '@/components/ui/button',
+            '@/components/ui/dialog',
+            '@/components/ui/input',
+            '@/components/ui/form',
+            '@/components/ui/avatar',
+            '@/components/ui/select',
+            '@/components/ui/tabs',
+          ],
           'ui-navigation': ['@radix-ui/react-navigation-menu'],
           'ui-overlay': ['@radix-ui/react-dialog', '@radix-ui/react-popover'],
           'ui-tooltip': ['@radix-ui/react-tooltip'],
@@ -61,13 +67,14 @@ export default defineConfig(({ mode }) => ({
           'chat-thread': ['@/components/ui/chat-message-list'],
           
           // Modal variants
-          'modal-dialog': ['@/components/ui/dialog'],
           'modal-drawer': ['@/components/ui/drawer'],
           'modal-sheet': ['@/components/ui/sheet'],
           
           // Animation bundles
-          'animation-transitions': ['framer-motion'],
-          'animation-loading': ['@/components/ui/message-loading'],
+          'animation': [
+            'framer-motion',
+            '@/components/ui/message-loading'
+          ],
           
           // Utility bundles
           'utils-styling': ['clsx', 'tailwind-merge'],
@@ -79,7 +86,7 @@ export default defineConfig(({ mode }) => ({
           'form-validation': ['zod'],
           
           // Data management bundles
-          'data-query': ['@tanstack/react-query'],
+          'data-query': ['@tanstack/react-query', 'jotai'],
           'data-charts': ['recharts'],
           
           // Auth bundles
@@ -101,6 +108,12 @@ export default defineConfig(({ mode }) => ({
             '@/components/ui/expandable-chat',
             '@/components/Footer',
             '@/components/effects/FloatingOrbs'
+          ],
+          
+          // Testimonial section
+          'testimonials': [
+            './src/components/landing/TestimonialSection.tsx',
+            './src/components/landing/TestimonialCard.tsx',
           ],
         },
         
