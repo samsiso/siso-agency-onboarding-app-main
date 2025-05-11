@@ -27,7 +27,16 @@ export function ProjectDetails({ initialTab }: ProjectDetailsProps) {
   const location = useLocation();
   const projectId = id || 'ubahcrypt';
   const navigate = useNavigate();
-  const activeTab = initialTab || tab || 'overview';
+  
+  // Normalize tab name - handle both wireframe and wireframes
+  let normalizedInitialTab = initialTab;
+  if (initialTab === 'wireframe') normalizedInitialTab = 'wireframes';
+  
+  let normalizedTab = tab;
+  if (tab === 'wireframe') normalizedTab = 'wireframes';
+  
+  const activeTab = normalizedInitialTab || normalizedTab || 'overview';
+  
   const contentRef = useRef<HTMLDivElement>(null);
   
   const [projectData, setProjectData] = useState({

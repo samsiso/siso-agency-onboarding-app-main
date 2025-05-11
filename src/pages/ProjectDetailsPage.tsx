@@ -8,7 +8,15 @@ interface ProjectDetailsPageProps {
 
 export default function ProjectDetailsPage({ tab: propTab }: ProjectDetailsPageProps = {}) {
   const { id, tab: paramTab, documentId } = useParams();
-  const activeTab = propTab || paramTab;
+  
+  // Normalize tab name - handle both wireframe and wireframes
+  let normalizedPropTab = propTab;
+  if (propTab === 'wireframe') normalizedPropTab = 'wireframes';
+  
+  let normalizedParamTab = paramTab;
+  if (paramTab === 'wireframe') normalizedParamTab = 'wireframes';
+  
+  const activeTab = normalizedPropTab || normalizedParamTab;
   
   return (
     <AppLayout>
