@@ -13,7 +13,8 @@ import { toast } from '@/components/ui/use-toast';
 import { researchDocuments } from './mockData';
 
 export function ResearchDocumentDetail() {
-  const { projectId, documentId } = useParams<{ projectId: string; documentId: string }>();
+  const { id, documentId } = useParams<{ id: string; documentId: string }>();
+  const projectId = id; // Alias for clearer code within component
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
 
