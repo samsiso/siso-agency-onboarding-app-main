@@ -26,21 +26,21 @@ export default function ResourcesPage() {
     {
       title: "Getting Started with SISO",
       description: "Learn the basics of the platform and set up your account",
-      icon: <BookOpen className="h-5 w-5" />,
+      icon: <BookOpen className="h-5 w-5 text-siso-orange" />,
       tag: "Guide",
       category: "getting-started"
     },
     {
       title: "Building Your First Project",
       description: "Step-by-step walkthrough of creating a new project",
-      icon: <FileText className="h-5 w-5" />,
+      icon: <FileText className="h-5 w-5 text-blue-400" />,
       tag: "Tutorial",
       category: "documentation"
     },
     {
       title: "API Integration Guide",
       description: "How to integrate with external APIs and services",
-      icon: <HelpCircle className="h-5 w-5" />,
+      icon: <HelpCircle className="h-5 w-5 text-purple-400" />,
       tag: "Advanced",
       category: "documentation"
     }
@@ -52,11 +52,11 @@ export default function ResourcesPage() {
         <Breadcrumb className="mb-6">
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/home">Home</BreadcrumbLink>
+              <BreadcrumbLink href="/home" className="text-gray-300 hover:text-white">Home</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href="/resources">Resources & Support</BreadcrumbLink>
+              <BreadcrumbLink href="/resources" className="text-white">Resources & Support</BreadcrumbLink>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
@@ -68,11 +68,11 @@ export default function ResourcesPage() {
           variants={fadeIn}
           className="relative mb-10 rounded-xl overflow-hidden"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent z-10"></div>
-          <div className="absolute inset-0 bg-[url('/images/resources-bg.jpg')] bg-cover bg-center z-0 opacity-50"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/40 z-10"></div>
+          <div className="absolute inset-0 bg-[url('/images/resources-bg.jpg')] bg-cover bg-center z-0 opacity-40"></div>
           
           <div className="relative z-20 px-8 py-12 md:py-16 max-w-3xl">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-300">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white">
               Resources & Support
             </h1>
             <p className="text-xl text-gray-200 mb-6">
@@ -83,11 +83,11 @@ export default function ResourcesPage() {
               <Input
                 type="text"
                 placeholder="Search for help articles..."
-                className="pr-10 bg-black/30 border-gray-700 backdrop-blur-sm focus:ring-siso-orange/50 text-white"
+                className="pr-10 bg-black/50 border-gray-700 backdrop-blur-sm focus:ring-siso-orange/50 text-white"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <Search className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
+              <Search className="absolute right-3 top-2.5 h-5 w-5 text-gray-300" />
             </div>
           </div>
         </motion.div>
@@ -102,9 +102,9 @@ export default function ResourcesPage() {
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-siso-orange" />
-              <h2 className="text-2xl font-bold">Featured Resources</h2>
+              <h2 className="text-2xl font-bold text-white">Featured Resources</h2>
             </div>
-            <Button variant="link" className="text-siso-orange">
+            <Button variant="link" className="text-siso-orange hover:text-white">
               View all <ArrowRight className="ml-1 h-4 w-4" />
             </Button>
           </div>
@@ -117,18 +117,18 @@ export default function ResourcesPage() {
                 className="cursor-pointer"
                 onClick={() => setActiveTab(article.category)}
               >
-                <Card className="bg-black/30 border-gray-800 h-full hover:border-siso-orange/40 transition-all">
+                <Card className="bg-black/60 border-gray-800 h-full hover:border-siso-orange/40 hover:bg-black/70 transition-all shadow-lg shadow-black/20">
                   <CardHeader className="pb-2">
                     <div className="flex justify-between items-start">
-                      <div className="h-10 w-10 rounded-full bg-black/40 border border-gray-700 flex items-center justify-center">
+                      <div className="h-10 w-10 rounded-full bg-black/80 border border-gray-700 flex items-center justify-center">
                         {article.icon}
                       </div>
-                      <Badge variant="secondary" className="bg-black/40 text-gray-300 border-gray-700">
+                      <Badge variant="secondary" className="bg-black/70 text-gray-300 border-gray-700">
                         {article.tag}
                       </Badge>
                     </div>
-                    <CardTitle className="mt-4 text-xl">{article.title}</CardTitle>
-                    <CardDescription className="text-gray-400">{article.description}</CardDescription>
+                    <CardTitle className="mt-4 text-xl text-white">{article.title}</CardTitle>
+                    <CardDescription className="text-gray-300">{article.description}</CardDescription>
                   </CardHeader>
                 </Card>
               </motion.div>
@@ -145,35 +145,39 @@ export default function ResourcesPage() {
         >
           <div className="flex items-center gap-2 mb-6">
             <MessageCircle className="h-5 w-5 text-siso-orange" />
-            <h2 className="text-2xl font-bold">Need Help?</h2>
+            <h2 className="text-2xl font-bold text-white">Need Help?</h2>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="bg-gradient-to-br from-black/40 to-black/20 border-gray-800 hover:border-siso-orange/40 transition-all">
+            <Card className="bg-gradient-to-br from-black/70 to-black/50 border-gray-800 hover:border-siso-orange/40 transition-all shadow-lg">
               <CardContent className="pt-6">
                 <div className="flex gap-4 items-start">
                   <div className="h-12 w-12 rounded-full bg-siso-orange/20 border border-siso-orange/30 flex items-center justify-center flex-shrink-0">
                     <MessageCircle className="h-6 w-6 text-siso-orange" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold mb-2">Live Chat Support</h3>
-                    <p className="text-gray-400 mb-4">Get instant help from our support team via live chat</p>
-                    <Button>Start a Conversation</Button>
+                    <h3 className="text-xl font-semibold mb-2 text-white">Live Chat Support</h3>
+                    <p className="text-gray-300 mb-4">Get instant help from our support team via live chat</p>
+                    <Button className="bg-siso-orange hover:bg-siso-orange/90 text-white shadow-md">
+                      Start a Conversation
+                    </Button>
                   </div>
                 </div>
               </CardContent>
             </Card>
             
-            <Card className="bg-gradient-to-br from-black/40 to-black/20 border-gray-800 hover:border-siso-orange/40 transition-all">
+            <Card className="bg-gradient-to-br from-black/70 to-black/50 border-gray-800 hover:border-siso-orange/40 transition-all shadow-lg">
               <CardContent className="pt-6">
                 <div className="flex gap-4 items-start">
                   <div className="h-12 w-12 rounded-full bg-purple-500/20 border border-purple-500/30 flex items-center justify-center flex-shrink-0">
-                    <BookOpen className="h-6 w-6 text-purple-500" />
+                    <BookOpen className="h-6 w-6 text-purple-400" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold mb-2">Browse Knowledge Base</h3>
-                    <p className="text-gray-400 mb-4">Find answers in our comprehensive documentation</p>
-                    <Button variant="outline">View Articles</Button>
+                    <h3 className="text-xl font-semibold mb-2 text-white">Browse Knowledge Base</h3>
+                    <p className="text-gray-300 mb-4">Find answers in our comprehensive documentation</p>
+                    <Button variant="outline" className="border-purple-500/30 text-purple-300 hover:bg-purple-500/10 hover:text-purple-200 shadow-md">
+                      View Articles
+                    </Button>
                   </div>
                 </div>
               </CardContent>
@@ -187,22 +191,22 @@ export default function ResourcesPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          <Card className="bg-black/30 border-gray-800 backdrop-blur-sm p-6">
+          <Card className="bg-black/60 border-gray-800 backdrop-blur-sm p-6 shadow-xl">
             <Tabs defaultValue="getting-started" value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid grid-cols-2 md:grid-cols-4 mb-8 bg-black/40">
-                <TabsTrigger value="getting-started" className="flex items-center gap-2 data-[state=active]:bg-siso-orange/20 data-[state=active]:text-white">
+              <TabsList className="grid grid-cols-2 md:grid-cols-4 mb-8 bg-black/70 p-1">
+                <TabsTrigger value="getting-started" className="flex items-center gap-2 data-[state=active]:bg-siso-orange/30 data-[state=active]:text-white text-gray-300">
                   <BookOpen className="h-4 w-4" />
                   <span>Getting Started</span>
                 </TabsTrigger>
-                <TabsTrigger value="documentation" className="flex items-center gap-2 data-[state=active]:bg-siso-orange/20 data-[state=active]:text-white">
+                <TabsTrigger value="documentation" className="flex items-center gap-2 data-[state=active]:bg-siso-orange/30 data-[state=active]:text-white text-gray-300">
                   <FileText className="h-4 w-4" />
                   <span>Documentation</span>
                 </TabsTrigger>
-                <TabsTrigger value="faq" className="flex items-center gap-2 data-[state=active]:bg-siso-orange/20 data-[state=active]:text-white">
+                <TabsTrigger value="faq" className="flex items-center gap-2 data-[state=active]:bg-siso-orange/30 data-[state=active]:text-white text-gray-300">
                   <HelpCircle className="h-4 w-4" />
                   <span>FAQ</span>
                 </TabsTrigger>
-                <TabsTrigger value="profile" className="flex items-center gap-2 data-[state=active]:bg-siso-orange/20 data-[state=active]:text-white">
+                <TabsTrigger value="profile" className="flex items-center gap-2 data-[state=active]:bg-siso-orange/30 data-[state=active]:text-white text-gray-300">
                   <User className="h-4 w-4" />
                   <span>Profile & Settings</span>
                 </TabsTrigger>

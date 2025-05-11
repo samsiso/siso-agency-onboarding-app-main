@@ -84,48 +84,48 @@ export function FAQContent() {
   const getCategoryColor = (category: FaqCategory) => {
     switch (category) {
       case 'account':
-        return 'text-blue-500 bg-blue-500/10 border-blue-500/20';
+        return 'text-blue-400 bg-blue-500/20 border-blue-500/30';
       case 'billing':
-        return 'text-purple-500 bg-purple-500/10 border-purple-500/20';
+        return 'text-purple-400 bg-purple-500/20 border-purple-500/30';
       case 'security':
-        return 'text-green-500 bg-green-500/10 border-green-500/20';
+        return 'text-green-400 bg-green-500/20 border-green-500/30';
       case 'features':
-        return 'text-amber-500 bg-amber-500/10 border-amber-500/20';
+        return 'text-amber-400 bg-amber-500/20 border-amber-500/30';
     }
   };
 
   return (
     <div className="space-y-8">
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 bg-siso-orange/10 rounded-lg">
+        <div className="p-2 bg-siso-orange/20 rounded-lg">
           <HelpCircle className="w-8 h-8 text-siso-orange" />
         </div>
         <div>
-          <h1 className="text-3xl font-bold">Frequently Asked Questions</h1>
-          <p className="text-muted-foreground">Find answers to common questions about our platform</p>
+          <h1 className="text-3xl font-bold text-white">Frequently Asked Questions</h1>
+          <p className="text-gray-300">Find answers to common questions about our platform</p>
         </div>
       </div>
 
       {/* Search and Filters */}
-      <Card className="bg-gradient-to-br from-black/40 to-black/20 border-gray-800">
+      <Card className="bg-gradient-to-br from-black/70 to-black/50 border-gray-800 shadow-lg">
         <CardContent className="pt-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="md:col-span-2 relative">
               <Input
                 type="text"
                 placeholder="Search FAQs..."
-                className="pr-10 bg-black/30 border-gray-700 backdrop-blur-sm"
+                className="pr-10 bg-black/50 border-gray-700 backdrop-blur-sm text-white"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <Search className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
+              <Search className="absolute right-3 top-2.5 h-5 w-5 text-gray-300" />
             </div>
             
             <div className="flex gap-2 md:col-span-2 overflow-x-auto pb-2">
               <Button 
                 variant="outline" 
                 size="sm" 
-                className={`whitespace-nowrap ${activeCategory === 'all' ? 'bg-siso-orange/20 text-siso-orange border-siso-orange/30' : 'bg-black/30 border-gray-700'}`}
+                className={`whitespace-nowrap ${activeCategory === 'all' ? 'bg-siso-orange/30 text-white border-siso-orange/40' : 'bg-black/50 border-gray-700 text-gray-300'}`}
                 onClick={() => setActiveCategory('all')}
               >
                 All Categories
@@ -133,7 +133,7 @@ export function FAQContent() {
               <Button 
                 variant="outline" 
                 size="sm" 
-                className={`whitespace-nowrap ${activeCategory === 'account' ? 'bg-blue-500/20 text-blue-500 border-blue-500/30' : 'bg-black/30 border-gray-700'}`}
+                className={`whitespace-nowrap ${activeCategory === 'account' ? 'bg-blue-500/30 text-white border-blue-500/40' : 'bg-black/50 border-gray-700 text-gray-300'}`}
                 onClick={() => setActiveCategory('account')}
               >
                 <Users className="mr-1 h-4 w-4" />
@@ -142,7 +142,7 @@ export function FAQContent() {
               <Button 
                 variant="outline" 
                 size="sm" 
-                className={`whitespace-nowrap ${activeCategory === 'billing' ? 'bg-purple-500/20 text-purple-500 border-purple-500/30' : 'bg-black/30 border-gray-700'}`}
+                className={`whitespace-nowrap ${activeCategory === 'billing' ? 'bg-purple-500/30 text-white border-purple-500/40' : 'bg-black/50 border-gray-700 text-gray-300'}`}
                 onClick={() => setActiveCategory('billing')}
               >
                 <CreditCard className="mr-1 h-4 w-4" />
@@ -151,7 +151,7 @@ export function FAQContent() {
               <Button 
                 variant="outline" 
                 size="sm" 
-                className={`whitespace-nowrap ${activeCategory === 'security' ? 'bg-green-500/20 text-green-500 border-green-500/30' : 'bg-black/30 border-gray-700'}`}
+                className={`whitespace-nowrap ${activeCategory === 'security' ? 'bg-green-500/30 text-white border-green-500/40' : 'bg-black/50 border-gray-700 text-gray-300'}`}
                 onClick={() => setActiveCategory('security')}
               >
                 <LockKeyhole className="mr-1 h-4 w-4" />
@@ -160,7 +160,7 @@ export function FAQContent() {
               <Button 
                 variant="outline" 
                 size="sm" 
-                className={`whitespace-nowrap ${activeCategory === 'features' ? 'bg-amber-500/20 text-amber-500 border-amber-500/30' : 'bg-black/30 border-gray-700'}`}
+                className={`whitespace-nowrap ${activeCategory === 'features' ? 'bg-amber-500/30 text-white border-amber-500/40' : 'bg-black/50 border-gray-700 text-gray-300'}`}
                 onClick={() => setActiveCategory('features')}
               >
                 <Settings className="mr-1 h-4 w-4" />
@@ -177,10 +177,10 @@ export function FAQContent() {
           filteredFaqs.map((faq, index) => (
             <Card 
               key={index} 
-              className="bg-black/30 border-gray-800 overflow-hidden transition-all"
+              className={`bg-black/60 border-gray-800 overflow-hidden transition-all shadow-md ${openItems.includes(index) ? 'shadow-lg' : ''}`}
             >
               <div
-                className="p-4 cursor-pointer flex justify-between items-center"
+                className="p-4 cursor-pointer flex justify-between items-center hover:bg-black/80 transition-colors"
                 onClick={() => toggleItem(index)}
               >
                 <div className="flex items-center gap-3">
@@ -188,9 +188,9 @@ export function FAQContent() {
                     {getCategoryIcon(faq.category)}
                     <span className="ml-1 capitalize">{faq.category}</span>
                   </Badge>
-                  <h3 className="text-lg font-medium">{faq.question}</h3>
+                  <h3 className="text-lg font-medium text-white">{faq.question}</h3>
                 </div>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-300 hover:text-white hover:bg-black/60">
                   {openItems.includes(index) ? (
                     <Minus className="h-4 w-4" />
                   ) : (
@@ -206,8 +206,8 @@ export function FAQContent() {
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <CardContent className="pt-0 pb-4 border-t border-gray-800/50">
-                      <p className="text-gray-300">{faq.answer}</p>
+                    <CardContent className="pt-0 pb-4 border-t border-gray-800/50 bg-black/40">
+                      <p className="text-gray-200">{faq.answer}</p>
                     </CardContent>
                   </motion.div>
                 )}
@@ -215,10 +215,10 @@ export function FAQContent() {
             </Card>
           ))
         ) : (
-          <Card className="bg-black/20 border-gray-800 p-8 text-center">
-            <HelpCircle className="h-12 w-12 mx-auto text-gray-500 mb-4" />
-            <CardTitle className="text-xl mb-2">No Results Found</CardTitle>
-            <CardDescription>
+          <Card className="bg-black/60 border-gray-800 p-8 text-center shadow-md">
+            <HelpCircle className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+            <CardTitle className="text-xl mb-2 text-white">No Results Found</CardTitle>
+            <CardDescription className="text-gray-300">
               No FAQs match your current search criteria. Try adjusting your search or filters.
             </CardDescription>
           </Card>
@@ -226,19 +226,19 @@ export function FAQContent() {
       </div>
 
       {/* Contact Support */}
-      <Card className="bg-black/30 border-gray-800">
+      <Card className="bg-black/60 border-gray-800 shadow-lg">
         <CardHeader>
-          <CardTitle className="text-xl">Still need help?</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-xl text-white">Still need help?</CardTitle>
+          <CardDescription className="text-gray-300">
             If you can't find the answer you're looking for, our support team is here to help
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col sm:flex-row gap-4">
-          <Button className="flex-1">
+          <Button className="flex-1 bg-siso-orange hover:bg-siso-orange/90 text-white shadow-md">
             <HelpCircle className="mr-2 h-4 w-4" />
             Contact Support
           </Button>
-          <Button variant="outline" className="flex-1 bg-black/40 border-gray-700">
+          <Button variant="outline" className="flex-1 bg-black/50 border-gray-700 text-white hover:bg-black/70 hover:border-siso-orange/30 hover:text-siso-orange shadow-md">
             Submit a Feature Request
           </Button>
         </CardContent>
