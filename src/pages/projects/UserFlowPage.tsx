@@ -3,15 +3,29 @@ import { UserFlowNavigation } from '@/components/projects/userflow/UserFlowNavig
 import { UserFlowDiagram } from '@/components/projects/userflow/UserFlowDiagram';
 import { NodeDetailsSidebar } from '@/components/projects/userflow/NodeDetailsSidebar';
 import { UserFlowToolbar } from '@/components/projects/userflow/UserFlowToolbar';
-import { useToast } from '@/hooks/use-toast';
-import { useParams } from 'react-router-dom';
+import { useToast } from '@/components/ui/use-toast';
+import { useParams, useNavigate } from 'react-router-dom';
+import { ProjectHeader } from '@/components/projects/details/ProjectHeader';
+import { ProjectCardNavigation } from '@/components/projects/details/ProjectCardNavigation';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Info } from 'lucide-react';
 
 export default function UserFlowPage() {
   const { projectId = '123' } = useParams<{ projectId: string }>();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [selectedNode, setSelectedNode] = useState<any>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Mock project data - this would come from an API in a real app
+  const projectData = {
+    name: 'UbahCrypt Project',
+    description: 'A revolutionary blockchain-based cryptocurrency platform with enhanced security features and cross-chain capabilities.',
+    status: 'ACTIVE',
+    created_at: '2025-04-01T10:00:00Z',
+  };
   
   const handleNodeSelect = (node: any) => {
     setSelectedNode(node);
@@ -37,7 +51,37 @@ export default function UserFlowPage() {
   };
   
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-b from-siso-bg-alt to-siso-bg">
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-siso-bg-alt to-siso-bg">
+      {/* Add Project Header */}
+      <div className="container mx-auto px-4 py-6">
+        <ProjectHeader 
+          name={projectData.name} 
+          description={projectData.description} 
+          status={projectData.status} 
+          created_at={projectData.created_at} 
+        />
+        
+        {/* Add Project Card Navigation */}
+        <ProjectCardNavigation projectId={projectId} />
+        
+        {/* User Flow Info Card */}
+        <Card className="p-4 mb-6 bg-black/30 border border-white/10">
+          <div className="flex items-start gap-3">
+            <div className="p-2 rounded-md bg-blue-500/20 text-blue-400">
+              <Info className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-lg font-medium text-white mb-1">User Flow Designer</h3>
+              <p className="text-sm text-gray-300">
+                Create and edit user flows to map out how users will navigate through your application. 
+                Connect screens, define interactions, and visualize the entire user journey.
+              </p>
+            </div>
+            <Badge className="ml-auto" variant="outline">PRO Feature</Badge>
+          </div>
+        </Card>
+      </div>
+      
       <UserFlowNavigation 
         projectId={projectId}
         projectName="Agency Onboarding App"
