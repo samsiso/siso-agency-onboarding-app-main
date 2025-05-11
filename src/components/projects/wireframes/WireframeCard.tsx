@@ -29,7 +29,7 @@ export function WireframeCard({ wireframe, projectId, onClick, isActive = false 
         return 'bg-amber-500 text-white';
       case 'pending':
       default:
-        return 'bg-slate-300 text-slate-800 dark:bg-slate-600 dark:text-slate-100';
+        return 'bg-slate-600 text-slate-100';
     }
   }, []);
 
@@ -51,39 +51,39 @@ export function WireframeCard({ wireframe, projectId, onClick, isActive = false 
   const getCardColor = () => {
     const colorOptions = [
       {
-        header: 'bg-indigo-500 dark:bg-indigo-600',
-        bg: 'bg-indigo-50 dark:bg-indigo-900/40',
-        border: 'border-indigo-100 dark:border-indigo-800'
+        header: 'bg-indigo-600',
+        bg: 'bg-indigo-900/40',
+        border: 'border-indigo-700'
       },
       {
-        header: 'bg-blue-500 dark:bg-blue-600',
-        bg: 'bg-blue-50 dark:bg-blue-900/40',
-        border: 'border-blue-100 dark:border-blue-800'
+        header: 'bg-blue-600',
+        bg: 'bg-blue-900/40',
+        border: 'border-blue-700'
       },
       {
-        header: 'bg-emerald-500 dark:bg-emerald-600',
-        bg: 'bg-emerald-50 dark:bg-emerald-900/40',
-        border: 'border-emerald-100 dark:border-emerald-800'
+        header: 'bg-emerald-600',
+        bg: 'bg-emerald-900/40',
+        border: 'border-emerald-700'
       },
       {
-        header: 'bg-amber-500 dark:bg-amber-600',
-        bg: 'bg-amber-50 dark:bg-amber-900/40',
-        border: 'border-amber-100 dark:border-amber-800'
+        header: 'bg-amber-600',
+        bg: 'bg-amber-900/40',
+        border: 'border-amber-700'
       },
       {
-        header: 'bg-violet-500 dark:bg-violet-600',
-        bg: 'bg-violet-50 dark:bg-violet-900/40',
-        border: 'border-violet-100 dark:border-violet-800'
+        header: 'bg-violet-600',
+        bg: 'bg-violet-900/40',
+        border: 'border-violet-700'
       },
       {
-        header: 'bg-pink-500 dark:bg-pink-600',
-        bg: 'bg-pink-50 dark:bg-pink-900/40',
-        border: 'border-pink-100 dark:border-pink-800'
+        header: 'bg-pink-600',
+        bg: 'bg-pink-900/40',
+        border: 'border-pink-700'
       },
       {
-        header: 'bg-cyan-500 dark:bg-cyan-600',
-        bg: 'bg-cyan-50 dark:bg-cyan-900/40',
-        border: 'border-cyan-100 dark:border-cyan-800'
+        header: 'bg-cyan-600',
+        bg: 'bg-cyan-900/40',
+        border: 'border-cyan-700'
       }
     ];
     
@@ -97,46 +97,46 @@ export function WireframeCard({ wireframe, projectId, onClick, isActive = false 
   return (
     <Card 
       className={`transition-all hover:shadow-lg overflow-hidden 
-        border ${colorSet.border} bg-white dark:bg-slate-800 h-full
-        ${isActive ? 'ring-2 ring-indigo-500 dark:ring-indigo-400 shadow-md' : ''}
+        border ${colorSet.border} bg-slate-800 h-full
+        ${isActive ? 'ring-2 ring-indigo-400 shadow-md' : ''}
       `}
       onClick={onClick}
     >
       <div className={`h-6 w-full ${colorSet.header} relative`}>
-        <Badge className="absolute right-2 top-1 text-xs capitalize bg-white text-slate-900 dark:bg-slate-800 dark:text-white border-0">
+        <Badge className="absolute right-2 top-1 text-xs capitalize bg-slate-800 text-white border-0">
           {wireframe.category}
         </Badge>
       </div>
       
       <CardHeader className={`pb-2 pt-4 ${colorSet.bg}`}>
-        <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white truncate">
+        <CardTitle className="text-lg font-semibold text-white truncate">
           {wireframe.title}
         </CardTitle>
-        <CardDescription className="line-clamp-3 text-slate-600 dark:text-slate-300 text-sm">
+        <CardDescription className="line-clamp-3 text-slate-300 text-sm">
           {wireframe.description}
         </CardDescription>
       </CardHeader>
       
       <CardContent className="pb-2 space-y-3">
         <div className="flex flex-wrap gap-2 text-xs">
-          <Badge variant="outline" className={`capitalize ${getStatusColor(wireframe.wireframeStatus)}`}>
+          <Badge variant="outline" className={`capitalize ${getStatusColor(wireframe.wireframeStatus)} border-slate-600`}>
             Design: {wireframe.wireframeStatus}
           </Badge>
-          <Badge variant="outline" className={`capitalize ${getStatusColor(wireframe.specsStatus)}`}>
+          <Badge variant="outline" className={`capitalize ${getStatusColor(wireframe.specsStatus)} border-slate-600`}>
             Specs: {wireframe.specsStatus}
           </Badge>
-          <Badge variant="outline" className={`capitalize ${getStatusColor(wireframe.devStatus)}`}>
+          <Badge variant="outline" className={`capitalize ${getStatusColor(wireframe.devStatus)} border-slate-600`}>
             Dev: {wireframe.devStatus}
           </Badge>
         </div>
       </CardContent>
       
-      <CardFooter className="flex justify-between pt-2 mt-auto">
+      <CardFooter className="flex justify-between pt-2 mt-auto bg-slate-900/50">
         {wireframe.notionUiPlanLink ? (
           <Button 
             variant="outline" 
             size="sm" 
-            className="text-indigo-500 hover:text-indigo-600 border-indigo-200 hover:border-indigo-300 dark:border-indigo-700 dark:hover:border-indigo-600 dark:text-indigo-400" 
+            className="text-indigo-300 hover:text-indigo-200 border-indigo-700 hover:border-indigo-600 bg-slate-800/70"
             onClick={handleExternalLinkClick}
           >
             <ExternalLink className="h-4 w-4 mr-2" />
@@ -148,7 +148,7 @@ export function WireframeCard({ wireframe, projectId, onClick, isActive = false 
         <Button 
           variant="default" 
           size="sm" 
-          className="bg-indigo-500 hover:bg-indigo-600 text-white" 
+          className="bg-indigo-600 hover:bg-indigo-500 text-white" 
           onClick={handleViewClick}
         >
           <Eye className="h-4 w-4 mr-2" />

@@ -85,21 +85,23 @@ export function WireframeSection() {
         <TabsContent value="all" className="mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {Array.from({ length: 6 }).map((_, index) => (
-              <div key={index} className="space-y-3">
-                <div className="h-3 w-full bg-slate-200 dark:bg-slate-700 rounded-t-md"></div>
-                <div className="p-4 border border-slate-200 dark:border-slate-700 rounded-b-md bg-white dark:bg-slate-800">
-                  <Skeleton className="h-5 w-3/4 rounded-md bg-slate-200 dark:bg-slate-700 mb-2" />
-                  <Skeleton className="h-4 w-full rounded-md bg-slate-200 dark:bg-slate-700 mb-2" />
-                  <Skeleton className="h-4 w-full rounded-md bg-slate-200 dark:bg-slate-700 mb-3" />
+              <div key={index} className="space-y-0 overflow-hidden border border-slate-700 rounded-md bg-slate-800">
+                <div className="h-6 w-full bg-indigo-600"></div>
+                <div className="p-4 bg-indigo-900/40">
+                  <Skeleton className="h-5 w-3/4 rounded-md bg-slate-700 mb-2" />
+                  <Skeleton className="h-4 w-full rounded-md bg-slate-700 mb-2" />
+                  <Skeleton className="h-4 w-full rounded-md bg-slate-700 mb-3" />
+                </div>
+                <div className="p-4">
                   <div className="flex gap-2 mb-3">
-                    <Skeleton className="h-6 w-20 rounded-full bg-slate-200 dark:bg-slate-700" />
-                    <Skeleton className="h-6 w-20 rounded-full bg-slate-200 dark:bg-slate-700" />
-                    <Skeleton className="h-6 w-20 rounded-full bg-slate-200 dark:bg-slate-700" />
+                    <Skeleton className="h-6 w-20 rounded-full bg-slate-700" />
+                    <Skeleton className="h-6 w-20 rounded-full bg-slate-700" />
+                    <Skeleton className="h-6 w-20 rounded-full bg-slate-700" />
                   </div>
-                  <div className="flex justify-between">
-                    <Skeleton className="h-8 w-20 rounded-md bg-slate-200 dark:bg-slate-700" />
-                    <Skeleton className="h-8 w-20 rounded-md bg-slate-200 dark:bg-slate-700" />
-                  </div>
+                </div>
+                <div className="p-4 flex justify-between bg-slate-900/50">
+                  <Skeleton className="h-8 w-20 rounded-md bg-slate-700" />
+                  <Skeleton className="h-8 w-20 rounded-md bg-slate-700" />
                 </div>
               </div>
             ))}
@@ -110,23 +112,23 @@ export function WireframeSection() {
   );
 
   const ErrorContent = () => (
-    <div className="p-8 text-center border rounded-lg border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-900/50">
+    <div className="p-8 text-center border rounded-lg border-amber-800 bg-amber-950/30">
       <AlertTriangle className="h-12 w-12 text-amber-500 mx-auto mb-4" />
-      <h3 className="text-xl font-semibold mb-2 text-slate-900 dark:text-white">Error loading wireframes</h3>
-      <p className="text-slate-600 dark:text-slate-300 mb-4">We couldn't load the wireframes. Please try again later.</p>
-      <p className="text-red-500 mb-4 text-sm font-mono p-2 bg-red-50 dark:bg-red-950/20 rounded border border-red-200 dark:border-red-900/50 max-w-md mx-auto">{error}</p>
-      <Button onClick={handleRetry} className="bg-indigo-500 hover:bg-indigo-600 text-white">
+      <h3 className="text-xl font-semibold mb-2 text-white">Error loading wireframes</h3>
+      <p className="text-slate-300 mb-4">We couldn't load the wireframes. Please try again later.</p>
+      <p className="text-red-400 mb-4 text-sm font-mono p-2 bg-red-950/30 rounded border border-red-800 max-w-md mx-auto">{error}</p>
+      <Button onClick={handleRetry} className="bg-indigo-600 hover:bg-indigo-500 text-white">
         Retry
       </Button>
     </div>
   );
 
   const EmptyContent = () => (
-    <div className="p-8 text-center border rounded-lg border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+    <div className="p-8 text-center border rounded-lg border-slate-700 bg-slate-800/50">
       <FileIcon className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-      <h3 className="text-xl font-semibold mb-2 text-slate-900 dark:text-white">No wireframes found</h3>
-      <p className="text-slate-500 mb-6">Get started by creating your first wireframe</p>
-      <Button className="bg-indigo-500 hover:bg-indigo-600 text-white">
+      <h3 className="text-xl font-semibold mb-2 text-white">No wireframes found</h3>
+      <p className="text-slate-300 mb-6">Get started by creating your first wireframe</p>
+      <Button className="bg-indigo-600 hover:bg-indigo-500 text-white">
         <Plus className="mr-2 h-4 w-4" />
         Create Wireframe
       </Button>
@@ -137,7 +139,7 @@ export function WireframeSection() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Wireframes ({wireframes?.length || 0})</h2>
-        <Button className="bg-indigo-500 hover:bg-indigo-600 text-white">
+        <Button className="bg-indigo-600 hover:bg-indigo-500 text-white">
           <Plus className="mr-2 h-4 w-4" />
           Add Wireframe
         </Button>
