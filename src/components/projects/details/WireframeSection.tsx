@@ -11,7 +11,8 @@ export function WireframeSection() {
   const { id: projectId } = useParams();
   const { wireframes, loading, error, activeWireframeId, setActiveWireframeId } = useProjectWireframes();
 
-  // Log state for debugging
+  // IMPORTANT: All hooks must be called at the top level, before any conditional logic
+  // Log state for debugging - always call this hook, don't conditionally render it
   useEffect(() => {
     console.log("WireframeSection rendered with:", { 
       projectId, 
@@ -21,6 +22,7 @@ export function WireframeSection() {
     });
   }, [projectId, wireframes, loading, error]);
 
+  // Rest of the render logic - put conditionals AFTER all hooks have been called
   if (loading) {
     return (
       <div className="space-y-6 text-gray-900 dark:text-white">
@@ -80,8 +82,6 @@ export function WireframeSection() {
       </div>
     );
   }
-
-  console.log("Rendering wireframes:", wireframes);
 
   // Group wireframes by status for tabs
   const complete = wireframes.filter(w => w.wireframeStatus === 'complete');

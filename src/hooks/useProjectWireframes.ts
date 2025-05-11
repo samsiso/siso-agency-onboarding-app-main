@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client'; 
 import { toast } from '@/components/ui/use-toast';
@@ -328,7 +328,9 @@ const SAMPLE_CONNECTIONS: Connection[] = [
 ];
 
 export function useProjectWireframes() {
+  // All React hooks must be called at the top level - DO NOT re-order these
   const { id: projectId } = useParams();
+  // Initialize all state hooks first
   const [wireframes, setWireframes] = useState<Wireframe[]>([]);
   const [connections, setConnections] = useState<Connection[]>([]);
   const [loading, setLoading] = useState(true);
@@ -337,7 +339,7 @@ export function useProjectWireframes() {
   const [fetchTried, setFetchTried] = useState(false);
   
   // Function to load sample data when database fetch fails
-  const loadSampleWireframesAsFallback = () => {
+  const loadSampleWireframesAsFallback = useCallback(() => {
     console.log("Loading sample wireframe data as fallback");
     setWireframes(SAMPLE_WIREFRAMES);
     setConnections(SAMPLE_CONNECTIONS);
@@ -347,10 +349,11 @@ export function useProjectWireframes() {
     }
     
     setLoading(false);
-  };
+  }, []);
 
+  // Fetch data effect
   useEffect(() => {
-    // Prevent multiple fetches due to React strict mode
+    // Skip if we've already tried fetching (to avoid React Strict Mode double-fetching)
     if (fetchTried) {
       return;
     }
@@ -360,11 +363,11 @@ export function useProjectWireframes() {
       setError(null);
       setFetchTried(true);
 
-      // Try fetching with the project ID from URL or fallback to 'ubahcrypt'
-      const currentProjectId = projectId || 'ubahcrypt';
-      console.log("Fetching wireframes for project:", currentProjectId);
-
       try {
+        // Try fetching with the project ID from URL or fallback to 'ubahcrypt'
+        const currentProjectId = projectId || 'ubahcrypt';
+        console.log("Fetching wireframes for project:", currentProjectId);
+
         // Use Supabase client to fetch wireframes
         const { data, error } = await supabase
           .from('project_wireframes')
@@ -418,17 +421,20 @@ export function useProjectWireframes() {
     };
     
     fetchWireframesData();
-  }, [projectId, fetchTried]);
+  }, [projectId, fetchTried, loadSampleWireframesAsFallback]);
 
+  // Find active wireframe from the current state
   const activeWireframe = wireframes.find(w => w.id === activeWireframeId);
 
-  const downloadWireframe = () => {
+  // Function for downloading a wireframe
+  const downloadWireframe = useCallback(() => {
     toast({
       title: "No Download Available",
       description: `Wireframe images are not currently available for ${activeWireframe?.title || 'this wireframe'}`,
     });
-  };
+  }, [activeWireframe]);
 
+  // Return hook data
   return {
     wireframes,
     connections,
