@@ -56,7 +56,7 @@ export function ReactFlowImplementation({ projectId, onNodeSelect, setIsLoading 
     {
       id: 'screen-login',
       type: 'screenNode',
-      position: { x: 250, y: 0 },
+      position: { x: 0, y: 0 },
       data: { 
         label: 'Login Screen', 
         status: 'implemented',
@@ -67,7 +67,7 @@ export function ReactFlowImplementation({ projectId, onNodeSelect, setIsLoading 
     {
       id: 'action-login',
       type: 'actionNode',
-      position: { x: 100, y: 80 },
+      position: { x: 250, y: 0 },
       data: { 
         label: 'Login Button Click', 
         action: 'button_click',
@@ -77,7 +77,7 @@ export function ReactFlowImplementation({ projectId, onNodeSelect, setIsLoading 
     {
       id: 'decision-first-login',
       type: 'decisionNode',
-      position: { x: 250, y: 150 },
+      position: { x: 500, y: 0 },
       data: { 
         label: 'Is First Login?', 
         description: 'Check if this is the user\'s first login'
@@ -86,7 +86,7 @@ export function ReactFlowImplementation({ projectId, onNodeSelect, setIsLoading 
     {
       id: 'screen-onboarding',
       type: 'screenNode',
-      position: { x: 450, y: 150 },
+      position: { x: 750, y: 0 },
       data: { 
         label: 'Onboarding', 
         status: 'implemented',
@@ -99,7 +99,7 @@ export function ReactFlowImplementation({ projectId, onNodeSelect, setIsLoading 
     {
       id: 'screen-dashboard',
       type: 'screenNode',
-      position: { x: 250, y: 250 },
+      position: { x: 500, y: 150 },
       data: { 
         label: 'Dashboard', 
         status: 'implemented',
@@ -110,7 +110,7 @@ export function ReactFlowImplementation({ projectId, onNodeSelect, setIsLoading 
     {
       id: 'screen-profile',
       type: 'screenNode',
-      position: { x: 0, y: 250 },
+      position: { x: 250, y: 150 },
       data: { 
         label: 'User Profile', 
         status: 'in-progress',
@@ -123,7 +123,7 @@ export function ReactFlowImplementation({ projectId, onNodeSelect, setIsLoading 
     {
       id: 'screen-wallet',
       type: 'screenNode',
-      position: { x: 250, y: 350 },
+      position: { x: 500, y: 300 },
       data: { 
         label: 'Wallet View', 
         status: 'implemented',
@@ -134,7 +134,7 @@ export function ReactFlowImplementation({ projectId, onNodeSelect, setIsLoading 
     {
       id: 'screen-trading',
       type: 'screenNode',
-      position: { x: 450, y: 350 },
+      position: { x: 750, y: 300 },
       data: { 
         label: 'Trading Interface', 
         status: 'in-progress',
@@ -145,7 +145,7 @@ export function ReactFlowImplementation({ projectId, onNodeSelect, setIsLoading 
     {
       id: 'action-transaction',
       type: 'actionNode',
-      position: { x: 450, y: 450 },
+      position: { x: 750, y: 450 },
       data: { 
         label: 'Create Transaction', 
         action: 'button_click',
@@ -155,7 +155,7 @@ export function ReactFlowImplementation({ projectId, onNodeSelect, setIsLoading 
     {
       id: 'decision-confirm',
       type: 'decisionNode',
-      position: { x: 600, y: 450 },
+      position: { x: 1000, y: 450 },
       data: { 
         label: 'Confirm Transaction?', 
         description: 'User confirms or cancels the transaction'
@@ -166,7 +166,7 @@ export function ReactFlowImplementation({ projectId, onNodeSelect, setIsLoading 
     {
       id: 'screen-cross-chain',
       type: 'screenNode',
-      position: { x: 100, y: 450 },
+      position: { x: 250, y: 300 },
       data: { 
         label: 'Cross-Chain Operations', 
         status: 'planned',
@@ -177,7 +177,7 @@ export function ReactFlowImplementation({ projectId, onNodeSelect, setIsLoading 
     {
       id: 'screen-contracts',
       type: 'screenNode',
-      position: { x: 250, y: 450 },
+      position: { x: 500, y: 450 },
       data: { 
         label: 'Smart Contracts', 
         status: 'planned',
@@ -188,7 +188,7 @@ export function ReactFlowImplementation({ projectId, onNodeSelect, setIsLoading 
     {
       id: 'screen-security',
       type: 'screenNode',
-      position: { x: 0, y: 350 },
+      position: { x: 0, y: 300 },
       data: { 
         label: 'Security Center', 
         status: 'in-progress',
@@ -199,7 +199,7 @@ export function ReactFlowImplementation({ projectId, onNodeSelect, setIsLoading 
     {
       id: 'decision-security-verify',
       type: 'decisionNode',
-      position: { x: 100, y: 350 },
+      position: { x: 0, y: 150 },
       data: { 
         label: 'Security Verification', 
         description: 'Additional security checks for sensitive operations'
@@ -273,10 +273,14 @@ export function ReactFlowImplementation({ projectId, onNodeSelect, setIsLoading 
     console.log('ReactFlow initialized', instance);
     setReactFlowInstance(instance);
     
-    // Fit the view to show all nodes
+    // First resize the viewport to get the proper size
+    instance.fitView({ padding: 0.2, includeHiddenNodes: true });
+    
+    // Then after short delay, fit the view again for good measure
     setTimeout(() => {
-      instance.fitView({ padding: 0.2 });
-    }, 200);
+      instance.fitView({ padding: 0.25, duration: 800 });
+      instance.zoomTo(0.8, { duration: 800 });
+    }, 300);
     
   }, []);
 

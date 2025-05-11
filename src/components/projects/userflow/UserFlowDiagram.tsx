@@ -9,6 +9,9 @@ import { ReactFlowImplementation } from './ReactFlowImplementation';
 import { ReactFlowProvider } from 'reactflow';
 import 'reactflow/dist/style.css';
 
+// Additional custom styles for ReactFlow
+import './userflow.css';
+
 // Simplified interface for the placeholder
 interface UserFlowDiagramProps {
   projectId: string;
@@ -118,7 +121,7 @@ export function UserFlowDiagram({ projectId, onNodeSelect, setIsLoading }: UserF
   // If showing implementation, render the ReactFlowImplementation
   if (showImplementation) {
     return (
-      <div className="h-full flex flex-col" style={{ minHeight: '700px' }}>
+      <div className="h-full flex flex-col" style={{ minHeight: '800px' }}>
         <div className="flex items-center justify-end gap-2 p-2 bg-black/30 border-b border-white/10">
           <div className="flex items-center gap-2 ml-auto">
             <Label htmlFor="preview-mode" className="text-xs text-gray-400">Preview Mode</Label>
@@ -129,7 +132,7 @@ export function UserFlowDiagram({ projectId, onNodeSelect, setIsLoading }: UserF
             />
           </div>
         </div>
-        <div className="flex-1" style={{ height: 'calc(100% - 40px)' }}>
+        <div className="flex-1 userflow-container" style={{ height: 'calc(100% - 40px)', minHeight: '750px' }}>
           <ReactFlowProvider>
             <ReactFlowImplementation 
               projectId={projectId}
