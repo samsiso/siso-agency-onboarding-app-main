@@ -20,9 +20,10 @@ import ReactFlow, {
   ReactFlowProvider,
   useEdgesState,
   useNodesState,
+  ReactFlowInstance,
 } from 'reactflow';
-// Uncomment when implementing:
-// import 'reactflow/dist/style.css';
+// Import the reactflow styles
+import 'reactflow/dist/style.css';
 
 import { ScreenNode } from './nodes/ScreenNode';
 import { ActionNode } from './nodes/ActionNode';
@@ -113,7 +114,7 @@ export function ReactFlowImplementation({ projectId, onNodeSelect, setIsLoading 
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const [reactFlowInstance, setReactFlowInstance] = useState(null);
+  const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
   
   // Handle when connections are created
   const onConnect = useCallback(
@@ -144,36 +145,47 @@ export function ReactFlowImplementation({ projectId, onNodeSelect, setIsLoading 
     }
   }, [reactFlowInstance]);
 
+  // Initialize ReactFlow instance
+  const onInit = useCallback((instance: ReactFlowInstance) => {
+    console.log('ReactFlow initialized', instance);
+    setReactFlowInstance(instance);
+    
+    // Fit the view to show all nodes
+    setTimeout(() => {
+      instance.fitView({ padding: 0.2 });
+    }, 200);
+    
+  }, []);
+
   return (
-    <div className="h-full w-full">
-      <ReactFlowProvider>
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          onNodeClick={onNodeClick}
-          connectionMode={ConnectionMode.Loose}
-          nodeTypes={nodeTypes}
-          fitView
-          snapToGrid
-          snapGrid={[15, 15]}
-          defaultViewport={{ x: 0, y: 0, zoom: 1.5 }}
-        >
-          <Controls />
-          <MiniMap
-            nodeStrokeWidth={3}
-            zoomable
-            pannable
-            nodeColor={(node) => {
-              const status = node.data?.status || 'planned';
-              return nodeColors[status];
-            }}
-          />
-          <Background color="#aaa" gap={16} />
-        </ReactFlow>
-      </ReactFlowProvider>
+    <div className="reactflow-wrapper" style={{ width: '100%', height: '100%', minHeight: '600px' }}>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        onNodeClick={onNodeClick}
+        onInit={onInit}
+        connectionMode={ConnectionMode.Loose}
+        nodeTypes={nodeTypes}
+        fitView
+        snapToGrid
+        snapGrid={[15, 15]}
+        defaultViewport={{ x: 0, y: 0, zoom: 1.5 }}
+      >
+        <Controls />
+        <MiniMap
+          nodeStrokeWidth={3}
+          zoomable
+          pannable
+          nodeColor={(node) => {
+            const status = node.data?.status || 'planned';
+            return nodeColors[status];
+          }}
+        />
+        <Background color="#aaa" gap={16} />
+      </ReactFlow>
     </div>
   );
 } 

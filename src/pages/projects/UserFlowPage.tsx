@@ -89,11 +89,11 @@ export default function UserFlowPage() {
         status="draft"
       />
       
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden" style={{ minHeight: "700px", height: "calc(100vh - 300px)" }}>
         <div className="flex-1 flex flex-col overflow-hidden">
           <UserFlowToolbar />
           
-          <div className="flex-1 overflow-auto">
+          <div className="flex-1 overflow-auto" style={{ minHeight: "600px" }}>
             <UserFlowDiagram 
               projectId={projectId}
               onNodeSelect={handleNodeSelect}
