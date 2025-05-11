@@ -51,7 +51,7 @@ export const getMenuSections = (): MenuSection[] => {
           label: 'Financial',
         },
         {
-          href: '/financial/leaderboards',
+          href: '/economy/leaderboards',
           icon: Trophy,
           label: 'Leaderboards',
         }

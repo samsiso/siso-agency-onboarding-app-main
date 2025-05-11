@@ -124,7 +124,7 @@ function App() {
         
         {/* Financial Routes */}
         <Route path="/financial/payments" element={<AuthGuard><PaymentsPage /></AuthGuard>} />
-        <Route path="/financial/leaderboards" element={<AuthGuard><LeaderboardsPage /></AuthGuard>} />
+        <Route path="/financial/leaderboards" element={<AuthGuard><LeaderboardPage /></AuthGuard>} />
         
         {/* Account & Resources Routes */}
         <Route path="/profile" element={<AuthGuard><FinancialProfilePage /></AuthGuard>} />

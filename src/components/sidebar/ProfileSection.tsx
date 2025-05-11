@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trophy, Star, ChevronDown, LogOut } from 'lucide-react';
@@ -171,7 +170,7 @@ export const ProfileSection = ({ collapsed, onOpenChange }: ProfileSectionProps)
             className="text-siso-text hover:text-siso-text-bold hover:bg-siso-text/5 cursor-pointer"
             onSelect={(e) => {
               e.preventDefault();
-              handleItemClick('/leaderboards');
+              handleItemClick('/economy/leaderboards');
             }}
           >
             Leaderboard
