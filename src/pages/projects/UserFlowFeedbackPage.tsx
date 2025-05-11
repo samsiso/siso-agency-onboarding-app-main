@@ -17,7 +17,7 @@ export default function UserFlowFeedbackPage() {
   };
   
   return (
-    <>
+    <div className="container mx-auto px-4 space-y-6">
       {/* Project Header */}
       <ProjectHeader 
         name={projectData.name} 
@@ -27,19 +27,23 @@ export default function UserFlowFeedbackPage() {
       />
       
       {/* Project Card Navigation */}
-      <ProjectCardNavigation projectId={projectId} />
+      <div className="mt-6">
+        <ProjectCardNavigation projectId={projectId} />
+      </div>
       
       {/* User Flow Navigation */}
-      <UserFlowNavigation 
-        projectId={projectId}
-        projectName="Agency Onboarding App"
-        status="draft"
-      />
+      <div className="mt-6">
+        <UserFlowNavigation 
+          projectId={projectId}
+          projectName="UbahCrypt Project"
+          status="draft"
+        />
+      </div>
       
       {/* Feedback Log Content */}
-      <div className="container mx-auto pb-12">
+      <div className="mt-6">
         <FeedbackLogPage />
       </div>
-    </>
+    </div>
   );
 } 
