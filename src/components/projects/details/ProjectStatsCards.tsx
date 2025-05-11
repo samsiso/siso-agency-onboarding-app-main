@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Users, Code, CheckSquare, Clock, Calendar, Settings, CreditCard, FileText } from "lucide-react";
 import { motion } from "framer-motion";
@@ -369,7 +368,6 @@ function PaymentScheduleCard({
                 {nextPayment.dueDate}
               </Badge>
             </div>
-            <p className="text-sm text-gray-400">Total Project Value: <span className="text-white font-medium">{totalBudget}</span></p>
           </div>
 
           {linkText && linkHref && (
