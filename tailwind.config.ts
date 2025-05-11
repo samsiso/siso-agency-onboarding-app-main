@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -112,6 +111,10 @@ export default {
           "70%": { width: "90%" },
           "100%": { width: "95%" }
         },
+        "spin": {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" }
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -122,6 +125,7 @@ export default {
         "float-slower": "float-slower 8s ease-in-out infinite",
         "fade-in": "fade-in 0.5s ease-out forwards",
         "loadingBar": "loadingBar 2s ease-in-out infinite",
+        "spin-slow": "spin 3s linear infinite",
       },
     },
   },

@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
 import { ProjectHeader } from './details/ProjectHeader';
@@ -8,6 +7,7 @@ import { ProjectMetricsDashboard } from './details/ProjectMetricsDashboard';
 import { ActiveTasksSection } from './details/ActiveTasksSection';
 import { DevelopmentProgress } from './details/DevelopmentProgress';
 import { AppPlanSection } from './details/AppPlanSection';
+import { AgencyStepsSection } from './details/agency-steps/AgencyStepsSection';
 import { FeatureRequestsSection } from './details/FeatureRequestsSection';
 import { TimelineSection } from './details/TimelineSection';
 import { FinancialSummarySection } from './details/FinancialSummarySection';
@@ -72,7 +72,7 @@ export function ProjectDetails() {
       case 'overview':
         return renderAppPlanOverview();
       case 'agency-steps':
-        return <AppPlanSection />;
+        return <AgencyStepsSection />;
       case 'market-research':
         return <ResearchSection />;
       case 'features':
