@@ -1,7 +1,7 @@
 import { 
   LayoutDashboard, ListTodo, MessageSquare, Wallet, 
   Trophy, FileText, HelpCircle, 
-  ClipboardList, CalendarClock, User, Plus
+  ClipboardList, CalendarClock, User
 } from 'lucide-react';
 import { MenuSection } from './types';
 
@@ -18,16 +18,6 @@ export const getMenuSections = (): MenuSection[] => {
       title: 'Projects & Tasks',
       icon: ListTodo,
       items: [
-        {
-          href: '/projects/ubahcrypt',
-          icon: ListTodo,
-          label: 'UbahCrypt',
-        },
-        {
-          href: '/projects/new',
-          icon: Plus,
-          label: 'New Project',
-        },
         {
           href: '/projects/tasks',
           icon: ListTodo,

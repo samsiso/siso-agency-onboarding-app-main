@@ -83,18 +83,18 @@ export function SidebarLogo({
         className="flex items-center"
       >
         <img 
-          src="/images/siso-logo.svg" 
+          src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png" 
           alt="SISO AGENCY" 
-          className="w-9 h-9 dark:invert-0" 
+          className="w-8 h-8 dark:invert-0" 
         />
         {expanded && (
           <motion.span
             initial={{ opacity: 0, width: 0 }}
             animate={{ opacity: 1, width: "auto" }}
             transition={{ duration: 0.3, delay: 0.1 }}
-            className="ml-2.5 font-semibold text-xl"
+            className="ml-2.5 text-xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text"
           >
-            SISO AGENCY
+            SISO
           </motion.span>
         )}
       </motion.div>
