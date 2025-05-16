@@ -1,17 +1,19 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
+// Enhanced local storage hook with better error handling
 export function useLocalStorage<T>(
   key: string,
   initialValue: T
 ): [T, (value: T | ((val: T) => T)) => void] {
   // State to store our value
   const [storedValue, setStoredValue] = useState<T>(() => {
+    // Don't try to access localStorage during SSR or when unavailable
     if (typeof window === 'undefined') {
       return initialValue;
     }
     
     try {
-      // Check if localStorage is available
+      // Safely check if localStorage is available and accessible
       if (!isLocalStorageAvailable()) {
         return initialValue;
       }
@@ -21,15 +23,15 @@ export function useLocalStorage<T>(
       // Parse stored json or if none return initialValue
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
-      // If error also return initialValue
-      console.error('Error reading from localStorage:', error);
+      // If any error occurs, return initialValue
+      console.warn(`Could not read "${key}" from localStorage:`, error);
       return initialValue;
     }
   });
 
   // Return a wrapped version of useState's setter function that
   // persists the new value to localStorage.
-  const setValue = (value: T | ((val: T) => T)) => {
+  const setValue = useCallback((value: T | ((val: T) => T)) => {
     try {
       // Allow value to be a function so we have same API as useState
       const valueToStore =
@@ -37,28 +39,39 @@ export function useLocalStorage<T>(
       // Save state
       setStoredValue(valueToStore);
       
-      // Check if localStorage is available before trying to use it
+      // Only attempt to use localStorage if it's available
       if (typeof window !== 'undefined' && isLocalStorageAvailable()) {
-        window.localStorage.setItem(key, JSON.stringify(valueToStore));
+        // Use try-catch for the actual storage operation
+        try {
+          window.localStorage.setItem(key, JSON.stringify(valueToStore));
+        } catch (storageError) {
+          console.warn(`Could not save "${key}" to localStorage:`, storageError);
+          // Continue with the state update but don't break if storage fails
+        }
       }
     } catch (error) {
-      // A more advanced implementation would handle the error case
-      console.error('Error writing to localStorage:', error);
+      console.error('Error updating state:', error);
+      // Still update state even if there was an error with localStorage
     }
-  };
+  }, [key, storedValue]);
 
   return [storedValue, setValue];
 }
 
-// Helper function to check if localStorage is available
+// Helper function to safely check if localStorage is available and accessible
 function isLocalStorageAvailable(): boolean {
   try {
-    // Try to access localStorage
+    // Try to access localStorage with a test key
+    if (!window.localStorage) {
+      return false;
+    }
+    
     const testKey = '__storage_test__';
-    localStorage.setItem(testKey, testKey);
-    localStorage.removeItem(testKey);
+    window.localStorage.setItem(testKey, testKey);
+    window.localStorage.removeItem(testKey);
     return true;
   } catch (e) {
+    // Any errors indicate localStorage is not fully available
     return false;
   }
 }

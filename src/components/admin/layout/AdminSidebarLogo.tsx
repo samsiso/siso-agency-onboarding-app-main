@@ -1,3 +1,4 @@
+import React from "react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
@@ -17,7 +18,9 @@ const logoVariants = cva("transition-all", {
 });
 
 export interface LogoProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof logoVariants> {
-  expanded?: boolean;
+  collapsed?: boolean;
+  setCollapsed?: (collapsed: boolean) => void;
+  onLogoClick?: () => void;
   tooltip?: boolean;
   link?: string;
   className?: string;
@@ -27,23 +30,41 @@ interface LogoLinkProps {
   children: React.ReactNode;
   href: string;
   className?: string;
+  onClick?: () => void;
 }
 
-const LogoLink = ({ children, href = "/", className }: LogoLinkProps) => {
+const LogoLink = ({ children, href = "/", className, onClick }: LogoLinkProps) => {
   return (
-    <Link to={href} className={cn("flex items-center", className)}>
+    <Link to={href} className={cn("flex items-center", className)} onClick={onClick}>
       {children}
     </Link>
   );
 };
 
-export default function AdminSidebarLogo({
-  expanded = true,
+export function AdminSidebarLogo({
+  collapsed = false,
+  setCollapsed,
+  onLogoClick,
   tooltip = false,
   link = "/",
   className,
   ...props
 }: LogoProps) {
+  // Convert collapsed to expanded for internal use
+  const expanded = !collapsed;
+  
+  const handleLogoClick = () => {
+    if (onLogoClick) {
+      onLogoClick();
+    }
+  };
+
+  const handleToggleCollapse = () => {
+    if (setCollapsed) {
+      setCollapsed(!collapsed);
+    }
+  };
+
   const Logo = () => (
     <div
       className={cn(
@@ -51,6 +72,8 @@ export default function AdminSidebarLogo({
         logoVariants({ expanded }),
         className
       )}
+      onClick={handleToggleCollapse}
+      role="button"
       {...props}
     >
       <motion.div
@@ -84,7 +107,7 @@ export default function AdminSidebarLogo({
         <Tooltip delayDuration={0}>
           <TooltipTrigger asChild>
             <div className="cursor-pointer">
-              <LogoLink href={link}>
+              <LogoLink href={link} onClick={handleLogoClick}>
                 <Logo />
               </LogoLink>
             </div>
@@ -98,8 +121,11 @@ export default function AdminSidebarLogo({
   }
 
   return (
-    <LogoLink href={link}>
+    <LogoLink href={link} onClick={handleLogoClick}>
       <Logo />
     </LogoLink>
   );
 }
+
+// Make this the default export to maintain backward compatibility
+export { AdminSidebarLogo as default };

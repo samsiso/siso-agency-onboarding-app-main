@@ -18,7 +18,8 @@ const logoVariants = cva("transition-all", {
 });
 
 export interface LogoProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof logoVariants> {
-  expanded?: boolean;
+  collapsed?: boolean;
+  setCollapsed?: (collapsed: boolean) => void;
   tooltip?: boolean;
   link?: string;
   className?: string;
@@ -28,23 +29,34 @@ interface LogoLinkProps {
   children: React.ReactNode;
   href: string;
   className?: string;
+  onClick?: () => void;
 }
 
-const LogoLink = ({ children, href = "/", className }: LogoLinkProps) => {
+const LogoLink = ({ children, href = "/", className, onClick }: LogoLinkProps) => {
   return (
-    <Link to={href} className={cn("flex items-center no-underline", className)}>
+    <Link to={href} className={cn("flex items-center no-underline", className)} onClick={onClick}>
       {children}
     </Link>
   );
 };
 
 export function SidebarLogo({
-  expanded = true,
+  collapsed = false,
+  setCollapsed,
   tooltip = false,
   link = "/",
   className,
   ...props
 }: LogoProps) {
+  // Convert collapsed to expanded for internal use
+  const expanded = !collapsed;
+  
+  const handleToggleCollapse = () => {
+    if (setCollapsed) {
+      setCollapsed(!collapsed);
+    }
+  };
+
   const Logo = () => (
     <div
       className={cn(
@@ -52,6 +64,8 @@ export function SidebarLogo({
         logoVariants({ expanded }),
         className
       )}
+      onClick={handleToggleCollapse}
+      role="button"
       {...props}
     >
       <motion.div
@@ -105,5 +119,5 @@ export function SidebarLogo({
   );
 }
 
-// For backwards compatibility, also export as default
-export default SidebarLogo;
+// Make this the default export to maintain backward compatibility
+export { SidebarLogo as default };
