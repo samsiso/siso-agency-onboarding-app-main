@@ -7,6 +7,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
 import { Mic, ArrowRight, Sparkles } from 'lucide-react';
 
+// Extracted text constants to avoid parsing issues
+const TEXT = {
+  step1Title: "Create New Project",
+  step2Title: "Project Description",
+  step1Description: "Lets start by giving your project a name",
+  step2Description: "Tell us briefly what you want to build",
+};
+
 export function ProjectOnboarding() {
   const [projectName, setProjectName] = useState('');
   const [projectDescription, setProjectDescription] = useState('');
@@ -169,18 +177,20 @@ export function ProjectOnboarding() {
     </div>
   );
 
+  // Get the appropriate title and description based on current step
+  const pageTitle = step === 1 ? TEXT.step1Title : TEXT.step2Title;
+  const pageDescription = step === 1 ? TEXT.step1Description : TEXT.step2Description;
+
   return (
     <div className="max-w-3xl mx-auto p-4 md:p-6">
       <Card className="p-6 md:p-8 bg-black/30 border border-siso-text/10">
         <div className="space-y-6">
           <div className="text-center space-y-2">
             <h2 className="text-2xl md:text-3xl font-bold text-white">
-              {step === 1 ? "Create New Project" : "Project Description"}
+              {pageTitle}
             </h2>
             <p className="text-siso-text">
-              {step === 1 
-                ? "Let's start by giving your project a name"
-                : "Tell us briefly what you want to build"}
+              {pageDescription}
             </p>
           </div>
           
