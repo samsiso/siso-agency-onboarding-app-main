@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AdminSidebarLogo } from './AdminSidebarLogo';
+import AdminSidebarLogo from './AdminSidebarLogo';
 import { AdminSidebarNavigation } from './AdminSidebarNavigation';
 import { SidebarFooter } from '@/components/sidebar/SidebarFooter';
 import { Menu, X } from 'lucide-react';

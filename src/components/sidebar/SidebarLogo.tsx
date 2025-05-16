@@ -20,6 +20,7 @@ const logoVariants = cva("transition-all", {
 export interface LogoProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof logoVariants> {
   collapsed?: boolean;
   setCollapsed?: (collapsed: boolean) => void;
+  onLogoClick?: () => void;
   tooltip?: boolean;
   link?: string;
   className?: string;
@@ -43,6 +44,7 @@ const LogoLink = ({ children, href = "/", className, onClick }: LogoLinkProps) =
 export function SidebarLogo({
   collapsed = false,
   setCollapsed,
+  onLogoClick,
   tooltip = false,
   link = "/",
   className,
@@ -54,6 +56,12 @@ export function SidebarLogo({
   const handleToggleCollapse = () => {
     if (setCollapsed) {
       setCollapsed(!collapsed);
+    }
+  };
+  
+  const handleLogoClick = () => {
+    if (onLogoClick) {
+      onLogoClick();
     }
   };
 
@@ -99,7 +107,7 @@ export function SidebarLogo({
         <Tooltip delayDuration={0}>
           <TooltipTrigger asChild>
             <div className="cursor-pointer">
-              <LogoLink href={link}>
+              <LogoLink href={link} onClick={handleLogoClick}>
                 <Logo />
               </LogoLink>
             </div>
@@ -113,7 +121,7 @@ export function SidebarLogo({
   }
 
   return (
-    <LogoLink href={link}>
+    <LogoLink href={link} onClick={handleLogoClick}>
       <Logo />
     </LogoLink>
   );

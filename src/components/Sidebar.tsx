@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SidebarLogo } from './sidebar/SidebarLogo';
+import SidebarLogo from './sidebar/SidebarLogo';
 import { SidebarNavigation } from './sidebar/SidebarNavigation';
 import { SidebarFooter } from './sidebar/SidebarFooter';
 import { Menu, X, FolderOpen, ChevronDown, User, LogOut } from 'lucide-react';
