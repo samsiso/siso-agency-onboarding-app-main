@@ -29,9 +29,24 @@ export const getMenuSections = (): MenuSection[] => {
           label: 'New Project',
         },
         {
+          href: '/projects/tasks',
+          icon: ListTodo,
+          label: 'Active Tasks',
+        },
+        {
           href: '/plan-builder',
           icon: MessageSquare,
           label: 'SISO Assistant',
+        },
+        {
+          href: '/projects/timeline',
+          icon: CalendarClock,
+          label: 'Timeline',
+        },
+        {
+          href: '/projects/plan-features',
+          icon: ClipboardList,
+          label: 'App Plan',
         }
       ]
     },
@@ -61,6 +76,11 @@ export const getMenuSections = (): MenuSection[] => {
           href: '/resources',
           icon: HelpCircle,
           label: 'Help & Support',
+        },
+        {
+          href: '/resources/documents',
+          icon: FileText,
+          label: 'Documents',
         }
       ]
     }
