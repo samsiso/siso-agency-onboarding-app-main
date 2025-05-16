@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search } from 'lucide-react';
+import { Search, Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useUser } from '@/hooks/useUser';
@@ -20,13 +21,54 @@ interface Plan {
   created_at: string;
 }
 
+interface ProjectTask {
+  title: string;
+  due_date: string;
+}
+
+interface EnhancedProject extends Plan {
+  completion_percentage: number;
+  due_date: string;
+  tasks: ProjectTask[];
+  logo?: string;
+}
+
 export function ProjectsList() {
-  const [projects, setProjects] = useState<Plan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const { toast } = useToast();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { user } = useUser();
+  
+  // Hardcoded UbahCrypt project
+  const ubahCryptProject: EnhancedProject = {
+    id: "ubah-123",
+    app_name: "UbahCrypt",
+    company_name: "SISO AGENCY",
+    username: "admin",
+    estimated_cost: 12500,
+    estimated_days: 45,
+    features: ["Crypto Exchange", "NFT Marketplace", "Token Management", "Wallet Integration"],
+    status: "in_progress",
+    created_at: new Date().toISOString(),
+    completion_percentage: 65,
+    due_date: new Date(Date.now() + 86400000 * 30).toISOString(), // 30 days from now
+    tasks: [
+      {
+        title: "Review Smart Contract",
+        due_date: new Date(Date.now() + 86400000 * 2).toISOString(), // 2 days from now
+      },
+      {
+        title: "Approve UI Designs",
+        due_date: new Date().toISOString(), // Today
+      },
+      {
+        title: "Test Token Distribution",
+        due_date: new Date(Date.now() + 86400000 * 5).toISOString(), // 5 days from now
+      }
+    ],
+    logo: "/images/siso-logo.svg"
+  };
   
   useEffect(() => {
     async function fetchProjects() {
@@ -43,7 +85,12 @@ export function ProjectsList() {
           throw error;
         }
         
-        setProjects(data || []);
+        // Simulate loading
+        const timer = setTimeout(() => {
+          setIsLoading(false);
+        }, 800);
+        
+        return () => clearTimeout(timer);
       } catch (error) {
         console.error('Error fetching projects:', error);
         toast({
@@ -51,50 +98,24 @@ export function ProjectsList() {
           description: 'Please try again later',
           variant: 'destructive',
         });
-      } finally {
-        setIsLoading(false);
       }
     }
     
     fetchProjects();
   }, [user, toast]);
 
-  const mockTasks = [
-    {
-      title: "Review Smart Contract",
-      due_date: new Date(Date.now() + 86400000 * 2).toISOString(), // 2 days from now
-    },
-    {
-      title: "Approve UI Designs",
-      due_date: new Date().toISOString(), // Today
-    },
-    {
-      title: "Test Token Distribution",
-      due_date: new Date(Date.now() + 86400000 * 5).toISOString(), // 5 days from now
-    }
-  ];
-
-  // Enhance projects with mock data (this would come from the backend in production)
-  const enhancedProjects = projects.map(project => ({
-    ...project,
-    completion_percentage: Math.floor(Math.random() * 100),
-    due_date: new Date(Date.now() + 86400000 * 30).toISOString(), // 30 days from now
-    tasks: mockTasks,
-  }));
-  
-  const filteredProjects = enhancedProjects.filter(project => 
-    project.app_name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    project.company_name?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  
   const handleCreateNew = () => {
-    navigate('/plan-builder');
+    navigate('/projects/new');
   };
+  
+  const showProject = !searchQuery || 
+    ubahCryptProject.app_name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    (ubahCryptProject.company_name && ubahCryptProject.company_name.toLowerCase().includes(searchQuery.toLowerCase()));
   
   return (
     <div>
-      <div className="mb-6">
-        <div className="relative">
+      <div className="flex justify-between items-center mb-6">
+        <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-siso-text" />
           <Input
             placeholder="Search projects..."
@@ -103,22 +124,52 @@ export function ProjectsList() {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
+        <Button 
+          onClick={handleCreateNew} 
+          className="bg-siso-orange hover:bg-siso-orange/80 text-white"
+        >
+          <Plus className="mr-2 h-4 w-4" />
+          New Project
+        </Button>
       </div>
       
       {isLoading ? (
         <div className="space-y-4">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="animate-pulse bg-black/30 border border-siso-text/10 rounded-lg p-6 h-64" />
-          ))}
+          <div className="animate-pulse bg-black/30 border border-siso-text/10 rounded-lg p-6 h-64" />
         </div>
-      ) : filteredProjects.length > 0 ? (
-        <div className="grid grid-cols-1 gap-4">
-          {filteredProjects.map(project => (
-            <ProjectCard key={project.id} project={project} />
-          ))}
+      ) : !showProject ? (
+        <div className="text-center py-12">
+          <h3 className="text-xl font-semibold text-white mb-2">No projects found</h3>
+          <p className="text-siso-text mb-6">Try a different search term or create a new project.</p>
+          <Button 
+            onClick={handleCreateNew} 
+            className="bg-siso-orange hover:bg-siso-orange/80 text-white"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Create New Project
+          </Button>
         </div>
       ) : (
-        <ProjectsEmptyState onCreateNew={handleCreateNew} />
+        <div className="grid grid-cols-1 gap-4">
+          <ProjectCard key={ubahCryptProject.id} project={ubahCryptProject} />
+          
+          <div className="mt-8 border-t border-siso-text/10 pt-8">
+            <div className="text-center">
+              <h3 className="text-xl font-semibold text-white mb-2">Ready to build something new?</h3>
+              <p className="text-siso-text mb-6 max-w-md mx-auto">
+                Create a new project and our SISO Assistant will help you bring your ideas to life.
+              </p>
+              <Button 
+                onClick={handleCreateNew} 
+                className="bg-siso-orange hover:bg-siso-orange/80 text-white"
+                size="lg"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Create New Project
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -54,6 +54,7 @@ import AdminUserFlow from './pages/AdminUserFlow';
 import UserFlowFeedbackPage from './pages/projects/UserFlowFeedbackPage';
 import UserFlowNodesPage from './pages/projects/UserFlowNodesPage';
 import UserFlowCodePage from './pages/projects/UserFlowCodePage';
+import ProjectOnboardingPage from './pages/ProjectOnboardingPage';
 
 function App() {
   return (
@@ -100,6 +101,7 @@ function App() {
         <Route path="/projects/tasks" element={<AuthGuard><ProjectsAndTasksPage /></AuthGuard>} />
         <Route path="/projects/timeline" element={<AuthGuard><TimelinePage /></AuthGuard>} />
         <Route path="/projects/plan-features" element={<AuthGuard><ProjectDetailsPage /></AuthGuard>} />
+        <Route path="/projects/new" element={<AuthGuard><ProjectOnboardingPage /></AuthGuard>} />
         
         {/* Key route order - specific routes must come before the generic routes */}
         <Route path="/projects/:id/userflow" element={<AuthGuard><UserFlow /></AuthGuard>} />
