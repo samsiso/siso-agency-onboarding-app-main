@@ -64,8 +64,8 @@ export function ProjectOnboarding() {
             </h2>
             <p className="text-siso-text">
               {step === 1 
-                ? 'Let's start by giving your project a name'
-                : 'Tell us briefly what you want to build'}
+                ? "Let's start by giving your project a name"
+                : "Tell us briefly what you want to build"}
             </p>
           </div>
           
