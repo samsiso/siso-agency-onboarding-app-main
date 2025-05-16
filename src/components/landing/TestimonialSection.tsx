@@ -1,112 +1,122 @@
+import React from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card } from "@/components/ui/card";
+import { Star } from "lucide-react";
 
-import { TestimonialCard } from './TestimonialCard';
-
-// [Analysis] Sample testimonial data - alternating video and audio reviews for visual balance
+// Sample testimonial data
 const testimonials = [
   {
-    name: "Sarah K.",
-    role: "Digital Marketing Director",
-    company: "Growth Co",
-    image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
-    quote: "The AI tools have revolutionized how we approach client campaigns. Our efficiency has increased by 300%.",
-    linkedinUrl: "https://linkedin.com",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1"
+    id: 1,
+    name: 'Sarah Jenkins',
+    role: 'Marketing Director',
+    company: 'GrowthTech',
+    image: "/images/siso-logo.svg",
+    quote: "SISO AGENCY's resource hub has been a game-changer. The ROI from implementing these tools has been incredible.",
+    stars: 5,
   },
   {
-    name: "Michael R.",
-    role: "Agency Owner",
-    company: "Digital Spark",
-    image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
-    quote: "Lovable's resource hub has been a game-changer. The ROI from implementing these tools has been incredible.",
-    linkedinUrl: "https://linkedin.com",
-    audioReview: true
+    id: 2,
+    name: 'Michael Rodriguez',
+    role: 'Agency Owner',
+    company: 'DigitalLeap',
+    image: "/images/siso-logo.svg",
+    quote: "The dashboard analytics alone saved us 15 hours per week in reporting time. Highly recommended!",
+    stars: 5,
   },
   {
-    name: "Lisa M.",
-    role: "Content Strategy Lead",
-    company: "Content Kings",
-    image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
-    quote: "Finally, a platform that understands what modern agencies need. The automation tools are exceptional.",
-    linkedinUrl: "https://linkedin.com",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1"
+    id: 3,
+    name: 'Amy Chen',
+    role: 'Operations Manager',
+    company: 'Visionary Media',
+    image: "/images/siso-logo.svg",
+    quote: "Since adopting these client management tools, we've increased client retention by 35%.",
+    stars: 5,
   },
   {
-    name: "James H.",
-    role: "Technical Director",
-    company: "Web Wizards",
-    image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
-    quote: "The AI features are cutting-edge and actually deliver real value. Our team's productivity has skyrocketed.",
-    linkedinUrl: "https://linkedin.com",
-    audioReview: true
+    id: 4,
+    name: 'David Thompson',
+    role: 'Creative Director',
+    company: 'Altitude Design',
+    image: "/images/siso-logo.svg",
+    quote: "The client approval workflows have transformed how we handle feedback. So intuitive!",
+    stars: 5,
   },
   {
-    name: "Emma T.",
-    role: "Operations Manager",
-    company: "Tech Solutions Ltd",
-    image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
-    quote: "Integration was seamless and the support team is incredibly responsive. A must-have for modern agencies.",
-    linkedinUrl: "https://linkedin.com",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1"
+    id: 5,
+    name: 'Emily Watkins',
+    role: 'CEO',
+    company: 'InnovateNow',
+    image: "/images/siso-logo.svg",
+    quote: "As someone running multiple teams, the task management system is exactly what I needed.",
+    stars: 5,
   },
   {
-    name: "David W.",
-    role: "Marketing Strategist",
-    company: "Innovate Digital",
-    image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
-    quote: "The automation capabilities have transformed our workflow. We're seeing incredible results with minimal effort.",
-    linkedinUrl: "https://linkedin.com",
-    audioReview: true
+    id: 6,
+    name: 'Jonathan Lee',
+    role: 'Digital Strategist',
+    company: 'FutureFocus',
+    image: "/images/siso-logo.svg",
+    quote: "SISO AGENCY has become an essential part of our tech stack. The continuous improvements keep getting better.",
+    stars: 5,
   },
   {
-    name: "Rachel D.",
-    role: "Agency Founder",
-    company: "Digital Dreams",
-    image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
-    quote: "Lovable has become an essential part of our tech stack. The continuous improvements keep getting better.",
-    linkedinUrl: "https://linkedin.com",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1"
+    id: 7,
+    name: 'Rebecca Moore',
+    role: 'Project Manager',
+    company: 'Elevate Agency',
+    image: "/images/siso-logo.svg",
+    quote: "The resource allocation features alone have paid for the subscription many times over.",
+    stars: 5,
   },
-  {
-    name: "Alex P.",
-    role: "Growth Specialist",
-    company: "Scale Up Agency",
-    image: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png",
-    quote: "The platform paid for itself within the first month. The AI capabilities are genuinely impressive.",
-    linkedinUrl: "https://linkedin.com",
-    audioReview: true
-  }
 ];
 
-export function TestimonialSection() {
+export const TestimonialSection: React.FC = () => {
   return (
-    <section className="py-12 md:py-24 relative overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute inset-0 bg-gradient-radial from-siso-orange/5 via-transparent to-transparent opacity-30" />
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-        {/* Section Header */}
-        <div className="text-center mb-6 md:mb-12">
-          <h2 className="text-2xl md:text-4xl font-bold text-white mb-3 md:mb-4">
-            What Our Partners Say About Lovable
+    <div className="py-16 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-950">
+      <div className="container mx-auto px-4">
+        <div className="flex flex-col items-center text-center mb-12">
+          <span className="text-primary uppercase font-semibold tracking-wide mb-2">TESTIMONIALS</span>
+          <h2 className="text-3xl md:text-5xl font-bold mb-4">
+            What Our Partners Say About SISO AGENCY
           </h2>
-          <p className="text-base md:text-xl text-gray-400 max-w-2xl mx-auto">
-            Real stories from businesses that have grown with Lovable's solutions
+          <p className="text-gray-500 dark:text-gray-400 max-w-3xl">
+            Real stories from businesses that have grown with SISO AGENCY's solutions
           </p>
         </div>
 
-        {/* Masonry Grid */}
-        <div className="columns-1 md:columns-2 lg:columns-3 gap-4 md:gap-6 [column-fill:_balance] space-y-4 md:space-y-6">
-          {testimonials.map((testimonial, index) => (
-            <div
-              key={testimonial.name}
-              className="break-inside-avoid animate-fade-in"
-              style={{ animationDelay: `${index * 150}ms` }}
-            >
-              <TestimonialCard {...testimonial} />
-            </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {testimonials.map((testimonial) => (
+            <Card key={testimonial.id} className="p-6 h-full border border-gray-200 dark:border-gray-800 hover:shadow-md transition-shadow">
+              <div className="flex flex-col justify-between h-full">
+                <div>
+                  <div className="flex mb-3">
+                    {[...Array(testimonial.stars)].map((_, i) => (
+                      <Star key={i} className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                    ))}
+                  </div>
+                  <blockquote className="italic mb-6 text-gray-700 dark:text-gray-300">
+                    "{testimonial.quote}"
+                  </blockquote>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Avatar className="border border-gray-200 dark:border-gray-700">
+                    <AvatarImage src={testimonial.image} alt={testimonial.name} />
+                    <AvatarFallback>{testimonial.name[0]}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-bold text-sm">
+                      {testimonial.name}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {testimonial.role}, {testimonial.company}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </Card>
           ))}
         </div>
       </div>
-    </section>
+    </div>
   );
-}
+};

@@ -1,128 +1,106 @@
-import { useState } from 'react';
-import { ChevronDown, ChevronRight, Link, Users, ShoppingBag, ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React from "react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { cva, type VariantProps } from "class-variance-authority";
+import { Link } from "react-router-dom";
 
-interface SidebarLogoProps {
-  collapsed: boolean;
-  setCollapsed: (collapsed: boolean) => void;
-  onLogoClick: () => void;
+const logoVariants = cva("transition-all", {
+  variants: {
+    expanded: {
+      true: "w-40 justify-start",
+      false: "w-10 justify-center",
+    },
+  },
+  defaultVariants: {
+    expanded: true,
+  },
+});
+
+export interface LogoProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof logoVariants> {
+  expanded?: boolean;
+  tooltip?: boolean;
+  link?: string;
+  className?: string;
 }
 
-export const SidebarLogo = ({ collapsed, setCollapsed, onLogoClick }: SidebarLogoProps) => {
-  const [showAlternateMenu, setShowAlternateMenu] = useState(false);
+interface LogoLinkProps {
+  children: React.ReactNode;
+  href: string;
+  className?: string;
+}
 
-  const businessLinks = [
-    {
-      name: 'SISO LinkedIn Sales Team',
-      description: 'Automate and earn from LinkedIn B2B deal closing',
-      icon: <Link className="w-5 h-5" />,
-      url: 'https://sisosaas.framer.website/',
-    },
-    {
-      name: 'SISO Sales Partners',
-      description: 'Join our partner program and earn from deal flow',
-      icon: <Users className="w-5 h-5" />,
-      url: 'https://siso-sales-team.framer.website/',
-    },
-    {
-      name: 'SISO Apparel',
-      description: 'Exclusive clothing brand for business leaders',
-      icon: <ShoppingBag className="w-5 h-5" />,
-      url: 'https://sisoapparel.framer.website/',
-    },
-  ];
-
-  const toggleMenu = () => {
-    setShowAlternateMenu(!showAlternateMenu);
-    onLogoClick();
-  };
-
+const LogoLink = ({ children, href = "/", className }: LogoLinkProps) => {
   return (
-    <div className="p-4 border-b border-siso-text/10 bg-gradient-to-r from-siso-bg to-siso-bg/95">
-      {showAlternateMenu ? (
-        <div className="animate-fade-in">
-          <div className="flex items-center justify-between mb-6">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleMenu}
-              className="hover:bg-siso-text/5"
-            >
-              <ArrowLeft className="w-5 h-5 text-siso-text" />
-            </Button>
-            <img 
-              src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png" 
-              alt="Siso Logo" 
-              className="w-8 h-8"
-            />
-          </div>
-
-          <div className="space-y-6">
-            {/* Welcome Message */}
-            <div className="text-sm text-siso-text">
-              <p className="font-medium mb-2">👋 Welcome to SISO AGENCY</p>
-              <p className="text-siso-text/70">
-                Discover our suite of powerful tools and exclusive offerings for business growth
-              </p>
-            </div>
-
-            {/* Business Links */}
-            <div className="space-y-2">
-              {businessLinks.map((link) => (
-                <a
-                  key={link.name}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-gradient-to-r from-siso-red/10 to-siso-orange/10 transition-all duration-300 group cursor-pointer"
-                >
-                  <div className="p-2 rounded-lg bg-gradient-to-r from-siso-red/10 to-siso-orange/10 group-hover:from-siso-red/20 group-hover:to-siso-orange/20 transition-colors">
-                    {link.icon}
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-siso-text group-hover:text-siso-text-bold">
-                      {link.name}
-                    </h3>
-                    <p className="text-xs text-siso-text/70 mt-1">
-                      {link.description}
-                    </p>
-                  </div>
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="flex items-center justify-between">
-          <div 
-            className="flex items-center gap-2 cursor-pointer group" 
-            onClick={toggleMenu}
-          >
-            {!collapsed && (
-              <img 
-                src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png" 
-                alt="Siso Logo" 
-                className="w-8 h-8"
-              />
-            )}
-            {!collapsed && (
-              <span className="text-xl font-bold bg-gradient-to-r from-siso-red to-siso-orange text-transparent bg-clip-text">
-                SISO
-              </span>
-            )}
-          </div>
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            className="p-2 hover:bg-siso-text/5 rounded-lg transition-colors"
-          >
-            {collapsed ? (
-              <ChevronRight className="text-siso-text" />
-            ) : (
-              <ChevronDown className="text-siso-text" />
-            )}
-          </button>
-        </div>
-      )}
-    </div>
+    <Link to={href} className={cn("flex items-center no-underline", className)}>
+      {children}
+    </Link>
   );
 };
+
+export default function SidebarLogo({
+  expanded = true,
+  tooltip = false,
+  link = "/",
+  className,
+  ...props
+}: LogoProps) {
+  const Logo = () => (
+    <div
+      className={cn(
+        "flex items-center px-4 py-1.5 min-h-14",
+        logoVariants({ expanded }),
+        className
+      )}
+      {...props}
+    >
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="flex items-center"
+      >
+        <img 
+          src="/images/siso-logo.svg" 
+          alt="SISO AGENCY" 
+          className="w-9 h-9 dark:invert-0" 
+        />
+        {expanded && (
+          <motion.span
+            initial={{ opacity: 0, width: 0 }}
+            animate={{ opacity: 1, width: "auto" }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+            className="ml-2.5 font-semibold text-xl"
+          >
+            SISO AGENCY
+          </motion.span>
+        )}
+      </motion.div>
+    </div>
+  );
+
+  if (tooltip && !expanded) {
+    return (
+      <TooltipProvider>
+        <Tooltip delayDuration={0}>
+          <TooltipTrigger asChild>
+            <div className="cursor-pointer">
+              <LogoLink href={link}>
+                <Logo />
+              </LogoLink>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent side="right" sideOffset={5} className="bg-primary text-primary-foreground">
+            SISO AGENCY
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  }
+
+  return (
+    <LogoLink href={link}>
+      <Logo />
+    </LogoLink>
+  );
+}

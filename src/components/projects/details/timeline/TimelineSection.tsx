@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Timeline } from '@/components/ui/timeline';
 import { TimelineHeader } from './TimelineHeader';
@@ -11,12 +10,12 @@ const milestones = [
     description: "Project setup and initial technical architecture design phase.",
     status: "completed" as const,
     deliverables: [
-      "Project setup on Lovable platform",
+      "Project setup on SISO AGENCY platform",
       "Initial technical architecture design",
       "Development environment setup"
     ],
     criteria: [
-      "Project environment is live on Lovable",
+      "Project environment is live on SISO AGENCY",
       "Client can see the initial setup"
     ]
   },
