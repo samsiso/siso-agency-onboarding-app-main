@@ -38,7 +38,7 @@ const LogoLink = ({ children, href = "/", className }: LogoLinkProps) => {
   );
 };
 
-export default function SidebarLogo({
+export function SidebarLogo({
   expanded = true,
   tooltip = false,
   link = "/",
@@ -104,3 +104,6 @@ export default function SidebarLogo({
     </LogoLink>
   );
 }
+
+// For backwards compatibility, also export as default
+export default SidebarLogo;

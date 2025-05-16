@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 export function useLocalStorage<T>(
   key: string,
@@ -10,7 +9,13 @@ export function useLocalStorage<T>(
     if (typeof window === 'undefined') {
       return initialValue;
     }
+    
     try {
+      // Check if localStorage is available
+      if (!isLocalStorageAvailable()) {
+        return initialValue;
+      }
+      
       // Get from local storage by key
       const item = window.localStorage.getItem(key);
       // Parse stored json or if none return initialValue
@@ -31,8 +36,9 @@ export function useLocalStorage<T>(
         value instanceof Function ? value(storedValue) : value;
       // Save state
       setStoredValue(valueToStore);
-      // Save to local storage
-      if (typeof window !== 'undefined') {
+      
+      // Check if localStorage is available before trying to use it
+      if (typeof window !== 'undefined' && isLocalStorageAvailable()) {
         window.localStorage.setItem(key, JSON.stringify(valueToStore));
       }
     } catch (error) {
@@ -42,4 +48,17 @@ export function useLocalStorage<T>(
   };
 
   return [storedValue, setValue];
+}
+
+// Helper function to check if localStorage is available
+function isLocalStorageAvailable(): boolean {
+  try {
+    // Try to access localStorage
+    const testKey = '__storage_test__';
+    localStorage.setItem(testKey, testKey);
+    localStorage.removeItem(testKey);
+    return true;
+  } catch (e) {
+    return false;
+  }
 }
