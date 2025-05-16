@@ -305,16 +305,6 @@ export const Sidebar = () => {
                   <FolderOpen className="h-4 w-4" />
                   <span>Create New Project</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem 
-                  className="text-siso-text hover:bg-black/20"
-                  onClick={() => {
-                    navigate('/projects');
-                    setIsProjectMenuOpen(false);
-                    ignoreMouseLeaveUntil.current = Date.now() + 2000;
-                  }}
-                >
-                  View all projects
-                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

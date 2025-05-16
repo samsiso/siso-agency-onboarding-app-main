@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useProjects } from './useProjects';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -23,18 +22,6 @@ export function useSelectedProject() {
       name: "UbahCrypt Project", 
       status: "active",
       logo: "/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png"
-    },
-    { 
-      id: "gritness", 
-      name: "Gritness", 
-      status: "paused",
-      logo: "/lovable-uploads/3b17a23d-630e-4e55-94bf-9d6fef9e6fc4.png"
-    },
-    { 
-      id: "nmconstruction", 
-      name: "NM Construction", 
-      status: "completed",
-      logo: "/lovable-uploads/67e004ed-6861-4d6a-b05e-d885a03e5c1e.png"
     }
   ]);
 
