@@ -199,15 +199,15 @@ export const useLeaderboardData = () => {
       const totalPoints = sortedEntries.reduce((sum, entry) => sum + entry.points, 0);
       const totalTokens = sortedEntries.reduce((sum, entry) => sum + entry.siso_tokens, 0);
       
-      setStats({
+        setStats({
         totalParticipants: sortedEntries.length,
         avgPoints: Math.floor(totalPoints / sortedEntries.length),
         topScore: Math.max(...sortedEntries.map(entry => entry.points))
       });
       
       // Set trends
-      setTrends({
-        trend: 'up',
+        setTrends({
+          trend: 'up',
         percentage: 15,
         points: Math.floor(totalPoints * 0.15),
         users: 2,

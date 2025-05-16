@@ -22,12 +22,12 @@ export function PaymentProgress({
   return (
     <Card className="bg-black/20 border border-siso-text/10 backdrop-blur-sm">
       <CardHeader className="pb-2">
-        <CardTitle className="text-lg">Payment Progress</CardTitle>
+        <CardTitle className="text-lg text-white">Payment Progress</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <div className="flex justify-between mb-1">
-            <span className="text-sm font-medium">
+            <span className="text-sm font-medium text-white">
               {currency}{paidAmount.toFixed(2)} paid of {currency}{totalAmount.toFixed(2)}
             </span>
             <span className="text-sm font-medium text-siso-orange">{percentPaid}%</span>
@@ -40,12 +40,12 @@ export function PaymentProgress({
           
           <div className="grid grid-cols-2 gap-4 mt-4">
             <div className="bg-siso-bg-alt rounded-lg p-3 border border-siso-text/10">
-              <p className="text-sm text-muted-foreground">Paid</p>
+              <p className="text-sm text-gray-300">Paid</p>
               <p className="text-xl font-bold text-siso-orange">{currency}{paidAmount.toFixed(2)}</p>
             </div>
             <div className="bg-siso-bg-alt rounded-lg p-3 border border-siso-text/10">
-              <p className="text-sm text-muted-foreground">Remaining</p>
-              <p className="text-xl font-bold">{currency}{remainingAmount.toFixed(2)}</p>
+              <p className="text-sm text-gray-300">Remaining</p>
+              <p className="text-xl font-bold text-white">{currency}{remainingAmount.toFixed(2)}</p>
             </div>
           </div>
         </div>

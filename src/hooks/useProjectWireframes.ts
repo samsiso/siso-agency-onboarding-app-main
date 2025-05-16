@@ -24,125 +24,125 @@ export interface Connection {
 
 // Complete list of hardcoded wireframes
 const SAMPLE_WIREFRAMES: Wireframe[] = [
-  {
-    id: "1",
-    title: "Login/Signup Page",
-    category: "page",
+        {
+          id: "1",
+          title: "Login/Signup Page",
+          category: "page",
     description: "Web3 wallet integration (MetaMask, Trust Wallet, Coinbase Wallet via Web3Modal), secure authentication.",
-    notionUiPlanLink: "https://www.notion.so/Login-Signup-Page-1e849797be68802f8803e8671c05c518?pvs=21",
-    wireframeStatus: "complete",
-    specsStatus: "approved",
-    devStatus: "pending"
-  },
-  {
-    id: "2",
-    title: "Onboarding/Tutorial Page",
-    category: "page",
+          notionUiPlanLink: "https://www.notion.so/Login-Signup-Page-1e849797be68802f8803e8671c05c518?pvs=21",
+          wireframeStatus: "complete",
+          specsStatus: "approved",
+          devStatus: "pending"
+        },
+        {
+          id: "2",
+          title: "Onboarding/Tutorial Page",
+          category: "page",
     description: "Guides new users through wallet setup, trading, staking, and community features.",
-    notionUiPlanLink: "https://www.notion.so/Onboarding-Tutorial-Page-1e849797be68805a9d69f05b5781b9a1?pvs=21",
-    wireframeStatus: "complete",
-    specsStatus: "approved",
-    devStatus: "pending"
-  },
-  {
-    id: "3",
-    title: "Dashboard",
-    category: "page",
+          notionUiPlanLink: "https://www.notion.so/Onboarding-Tutorial-Page-1e849797be68805a9d69f05b5781b9a1?pvs=21",
+          wireframeStatus: "complete",
+          specsStatus: "approved",
+          devStatus: "pending"
+        },
+        {
+          id: "3",
+          title: "Dashboard",
+          category: "page",
     description: "Portfolio overview, real-time market rates (via Chainlink), quick links to trading/staking/community.",
-    notionUiPlanLink: "https://www.notion.so/Dashboard-1e849797be6880f89473f75ef252f8a9?pvs=21",
-    wireframeStatus: "complete",
-    specsStatus: "approved",
-    devStatus: "pending"
-  },
-  {
-    id: "4",
-    title: "Markets Page",
-    category: "page",
+          notionUiPlanLink: "https://www.notion.so/Dashboard-1e849797be6880f89473f75ef252f8a9?pvs=21",
+          wireframeStatus: "complete",
+          specsStatus: "approved",
+          devStatus: "pending"
+        },
+        {
+          id: "4",
+          title: "Markets Page",
+          category: "page",
     description: "Detailed market data including crypto prices, market cap, and trends (via Chainlink or CoinGecko).",
-    notionUiPlanLink: "https://www.notion.so/Markets-Page-1e849797be688011928ee483a7ccd276?pvs=21",
-    wireframeStatus: "complete",
-    specsStatus: "in-review",
-    devStatus: "pending"
-  },
-  {
-    id: "5",
-    title: "News Page",
-    category: "page",
+          notionUiPlanLink: "https://www.notion.so/Markets-Page-1e849797be688011928ee483a7ccd276?pvs=21",
+          wireframeStatus: "complete",
+          specsStatus: "in-review",
+          devStatus: "pending"
+        },
+        {
+          id: "5",
+          title: "News Page",
+          category: "page",
     description: "Displays crypto news updates (via Crypto News API or News API), supports bookmarking and sharing.",
-    notionUiPlanLink: "https://www.notion.so/News-Page-1e849797be68800d9409c5ac93576035?pvs=21",
-    wireframeStatus: "in-progress",
-    specsStatus: "pending",
-    devStatus: "pending"
-  },
-  {
-    id: "6",
-    title: "Wallet Page",
-    category: "page",
+          notionUiPlanLink: "https://www.notion.so/News-Page-1e849797be68800d9409c5ac93576035?pvs=21",
+          wireframeStatus: "in-progress",
+          specsStatus: "pending",
+          devStatus: "pending"
+        },
+        {
+          id: "6",
+          title: "Wallet Page",
+          category: "page",
     description: "Manages wallet connections, displays balances, supports network selection.",
-    notionUiPlanLink: "https://www.notion.so/Wallet-Page-1e849797be6880888511e402d0c8c22b?pvs=21",
-    wireframeStatus: "complete",
-    specsStatus: "approved",
-    devStatus: "pending"
-  },
-  {
-    id: "7",
-    title: "Portfolio Page",
-    category: "page",
+          notionUiPlanLink: "https://www.notion.so/Wallet-Page-1e849797be6880888511e402d0c8c22b?pvs=21",
+          wireframeStatus: "complete",
+          specsStatus: "approved",
+          devStatus: "pending"
+        },
+        {
+          id: "7",
+          title: "Portfolio Page",
+          category: "page",
     description: "Tracks crypto holdings, transaction history (via The Graph), staking performance.",
-    notionUiPlanLink: "https://www.notion.so/Portfolio-Page-1e849797be6880e4bdfcd690c879e0c8?pvs=21",
-    wireframeStatus: "complete",
-    specsStatus: "approved",
-    devStatus: "in-progress"
-  },
-  {
-    id: "8",
-    title: "Trading Page",
-    category: "page",
+          notionUiPlanLink: "https://www.notion.so/Portfolio-Page-1e849797be6880e4bdfcd690c879e0c8?pvs=21",
+          wireframeStatus: "complete",
+          specsStatus: "approved",
+          devStatus: "in-progress"
+        },
+        {
+          id: "8",
+          title: "Trading Page",
+          category: "page",
     description: "Facilitates P2P trading with smart contract escrow (inspired by Hodl Hodl), real-time market rates.",
-    notionUiPlanLink: "https://www.notion.so/Trading-Page-1e849797be688024a0fcc17a14ad2d24?pvs=21",
-    wireframeStatus: "complete",
-    specsStatus: "approved",
-    devStatus: "in-progress"
-  },
-  {
-    id: "9",
-    title: "Open Orders Page",
-    category: "page",
+          notionUiPlanLink: "https://www.notion.so/Trading-Page-1e849797be688024a0fcc17a14ad2d24?pvs=21",
+          wireframeStatus: "complete",
+          specsStatus: "approved",
+          devStatus: "in-progress"
+        },
+        {
+          id: "9",
+          title: "Open Orders Page",
+          category: "page",
     description: "Displays and manages pending trades or open orders.",
-    notionUiPlanLink: "https://www.notion.so/Open-Orders-Page-1e849797be688044b715c230b834da69?pvs=21",
-    wireframeStatus: "complete",
-    specsStatus: "pending",
-    devStatus: "pending"
-  },
-  {
-    id: "10",
-    title: "Transaction History Page",
-    category: "page",
+          notionUiPlanLink: "https://www.notion.so/Open-Orders-Page-1e849797be688044b715c230b834da69?pvs=21",
+          wireframeStatus: "complete",
+          specsStatus: "pending",
+          devStatus: "pending"
+        },
+        {
+          id: "10",
+          title: "Transaction History Page",
+          category: "page",
     description: "Logs all transactions (trades, staking events) via The Graph.",
-    notionUiPlanLink: "https://www.notion.so/Transaction-History-Page-1e849797be68804ebdc2c0e23e20109c?pvs=21",
-    wireframeStatus: "complete",
-    specsStatus: "pending",
-    devStatus: "pending"
-  },
-  {
-    id: "11",
-    title: "Transaction Fee Estimator Page",
-    category: "page",
+          notionUiPlanLink: "https://www.notion.so/Transaction-History-Page-1e849797be68804ebdc2c0e23e20109c?pvs=21",
+          wireframeStatus: "complete",
+          specsStatus: "pending",
+          devStatus: "pending"
+        },
+        {
+          id: "11",
+          title: "Transaction Fee Estimator Page",
+          category: "page",
     description: "Estimates fees for trades, staking, or withdrawals based on network conditions.",
-    notionUiPlanLink: "https://www.notion.so/Transaction-Fee-Estimator-Page-1e849797be6880ae804ffe752399b065?pvs=21",
-    wireframeStatus: "in-progress",
-    specsStatus: "pending",
-    devStatus: "pending"
-  },
-  {
-    id: "12",
-    title: "Staking Page",
-    category: "page",
+          notionUiPlanLink: "https://www.notion.so/Transaction-Fee-Estimator-Page-1e849797be6880ae804ffe752399b065?pvs=21",
+          wireframeStatus: "in-progress",
+          specsStatus: "pending",
+          devStatus: "pending"
+        },
+        {
+          id: "12",
+          title: "Staking Page",
+          category: "page",
     description: "Supports token locking (3, 6, 12 months), auto-compounding, dynamic APY (using OpenZeppelin).",
-    notionUiPlanLink: "https://www.notion.so/Staking-Page-1e849797be688000a6a9c1cd7cc61a3f?pvs=21",
-    wireframeStatus: "complete",
-    specsStatus: "pending",
-    devStatus: "pending"
+          notionUiPlanLink: "https://www.notion.so/Staking-Page-1e849797be688000a6a9c1cd7cc61a3f?pvs=21",
+          wireframeStatus: "complete",
+          specsStatus: "pending",
+          devStatus: "pending"
   },
   {
     id: "13",

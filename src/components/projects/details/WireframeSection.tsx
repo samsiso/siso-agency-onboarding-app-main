@@ -12,11 +12,11 @@ export function WireframeSection() {
   const { id: projectId } = useParams();
   const [activeTab, setActiveTab] = useState('all');
   
-  const { 
-    wireframes, 
-    loading, 
-    error, 
-    activeWireframeId, 
+  const {
+    wireframes,
+    loading,
+    error,
+    activeWireframeId,
     setActiveWireframeId 
   } = useProjectWireframes();
 
@@ -37,7 +37,7 @@ export function WireframeSection() {
 
   // Determine content type based on loading/error/empty states
   useEffect(() => {
-    if (loading) {
+  if (loading) {
       setContentType('loading');
     } else if (error) {
       setContentType('error');
@@ -91,7 +91,7 @@ export function WireframeSection() {
                   <Skeleton className="h-5 w-3/4 rounded-md bg-slate-700 mb-2" />
                   <Skeleton className="h-4 w-full rounded-md bg-slate-700 mb-2" />
                   <Skeleton className="h-4 w-full rounded-md bg-slate-700 mb-3" />
-                </div>
+                    </div>
                 <div className="p-4">
                   <div className="flex gap-2 mb-3">
                     <Skeleton className="h-6 w-20 rounded-full bg-slate-700" />

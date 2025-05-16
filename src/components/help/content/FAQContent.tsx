@@ -98,14 +98,14 @@ export function FAQContent() {
     <div className="space-y-8">
       <div className="flex items-center gap-3 mb-6">
         <div className="p-2 bg-siso-orange/20 rounded-lg">
-          <HelpCircle className="w-8 h-8 text-siso-orange" />
+        <HelpCircle className="w-8 h-8 text-siso-orange" />
         </div>
         <div>
           <h1 className="text-3xl font-bold text-white">Frequently Asked Questions</h1>
           <p className="text-gray-300">Find answers to common questions about our platform</p>
         </div>
       </div>
-
+      
       {/* Search and Filters */}
       <Card className="bg-gradient-to-br from-black/70 to-black/50 border-gray-800 shadow-lg">
         <CardContent className="pt-6">

@@ -54,7 +54,7 @@ export function GettingStartedContent() {
     >
       <div className="flex items-center gap-3 mb-6">
         <div className="p-2 bg-siso-orange/20 rounded-lg">
-          <BookOpen className="w-8 h-8 text-siso-orange" />
+        <BookOpen className="w-8 h-8 text-siso-orange" />
         </div>
         <div>
           <h1 className="text-3xl font-bold text-white">Getting Started Guide</h1>
@@ -177,8 +177,8 @@ export function GettingStartedContent() {
               <Users className="mr-2 h-4 w-4" />
               Collaboration Guide
             </Button>
-          </CardContent>
-        </Card>
+        </CardContent>
+      </Card>
       </motion.div>
     </motion.div>
   );

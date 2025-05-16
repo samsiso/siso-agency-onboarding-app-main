@@ -152,8 +152,8 @@ export default function PaymentsPage() {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat('en-US', {
-      day: 'numeric', 
-      month: 'short', 
+      day: 'numeric',
+      month: 'short',
       year: 'numeric'
     }).format(date);
   };
@@ -172,7 +172,7 @@ export default function PaymentsPage() {
   // Define the total project cost and paid amount
   const totalProjectCost = 4000; // £4,000 total cost
   const paidAmount = 500; // £500 paid so far
-
+  
   return (
     <FinancialLayout title="Payments & Billing">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
@@ -216,13 +216,13 @@ export default function PaymentsPage() {
             </div>
           ) : (
             <>
-              <PaymentsSummaryCards
-                activeExpenses={activeExpenses}
-                invoices={invoices}
-                financialSummary={financialSummary}
-                nextPaymentDue={nextPaymentDue}
-                formatDate={formatDate}
-              />
+        <PaymentsSummaryCards
+          activeExpenses={activeExpenses}
+          invoices={invoices}
+          financialSummary={financialSummary}
+          nextPaymentDue={nextPaymentDue}
+          formatDate={formatDate}
+        />
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                 <PaymentProgress 
@@ -231,38 +231,38 @@ export default function PaymentsPage() {
                 />
                 
                 <Card className="bg-black/20 border border-siso-text/10 backdrop-blur-sm">
-                  <CardHeader>
-                    <CardTitle className="text-lg">Upcoming Payments</CardTitle>
-                  </CardHeader>
-                  <CardContent>
+        <CardHeader>
+                    <CardTitle className="text-lg text-white">Upcoming Payments</CardTitle>
+        </CardHeader>
+        <CardContent>
                     {upcomingPayments.length > 0 ? (
-                      <div className="space-y-4">
+          <div className="space-y-4">
                         {upcomingPayments.slice(0, 3).map(invoice => (
                           <div key={invoice.id} className="flex items-center justify-between p-4 border border-siso-text/10 rounded-lg">
                             <div className="flex items-center gap-3">
                               <div className="p-2 bg-siso-orange/20 rounded-full">
                                 <Clock className="h-4 w-4 text-siso-orange" />
-                              </div>
-                              <div>
-                                <p className="font-medium">{invoice.invoice_number}</p>
-                                <p className="text-sm text-muted-foreground">Due {formatDate(invoice.due_date)}</p>
-                              </div>
-                            </div>
-                            <div>
+            </div>
+                <div>
+                                <p className="font-medium text-white">{invoice.invoice_number}</p>
+                                <p className="text-sm text-gray-300">Due {formatDate(invoice.due_date)}</p>
+              </div>
+            </div>
+                <div>
                               <Badge variant="outline" className={getStatusBadgeClass(invoice.status)}>
                                 {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
                               </Badge>
-                            </div>
-                          </div>
+              </div>
+            </div>
                         ))}
-                      </div>
+                </div>
                     ) : (
-                      <div className="text-center py-4 text-muted-foreground">
+                      <div className="text-center py-4 text-white">
                         <p>No upcoming payments due</p>
-                      </div>
+              </div>
                     )}
-                  </CardContent>
-                </Card>
+        </CardContent>
+      </Card>
               </div>
             </>
           )}
@@ -289,6 +289,6 @@ export default function PaymentsPage() {
           <TokenUsageTracker totalTokens={800} />
         </TabsContent>
       </Tabs>
-    </FinancialLayout>
+      </FinancialLayout>
   );
 }
