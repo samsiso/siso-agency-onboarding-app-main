@@ -42,6 +42,7 @@ import ProjectDetailsPage from './pages/ProjectDetailsPage';
 import ResourcesPage from './pages/resources/ResourcesPage';
 import TimelinePage from './pages/TimelinePage';
 import Communication from './pages/Communication';
+import { AdminDebug } from './pages/AdminDebug';
 
 // Financial & Account section
 import PaymentsPage from './pages/financial/PaymentsPage';
@@ -55,6 +56,7 @@ import UserFlowFeedbackPage from './pages/projects/UserFlowFeedbackPage';
 import UserFlowNodesPage from './pages/projects/UserFlowNodesPage';
 import UserFlowCodePage from './pages/projects/UserFlowCodePage';
 import ProjectOnboardingPage from './pages/ProjectOnboardingPage';
+import PromptAgentPage from './pages/admin/PromptAgentPage';
 
 function App() {
   return (
@@ -85,6 +87,7 @@ function App() {
         <Route path="/admin/tasks" element={<AuthGuard adminOnly={true}><AdminTasks /></AuthGuard>} />
         <Route path="/admin/tasks/:memberId" element={<AuthGuard adminOnly={true}><TeamMemberTasksPage /></AuthGuard>} />
         <Route path="/admin/settings" element={<AuthGuard adminOnly={true}><AdminSettings /></AuthGuard>} />
+        <Route path="/admin/plans" element={<AuthGuard adminOnly={true}><AdminPlans /></AuthGuard>} />
         <Route path="/admin/plans/create" element={<AuthGuard adminOnly={true}><AdminPlans /></AuthGuard>} />
         <Route path="/admin/plans/:planId/edit" element={<AuthGuard adminOnly={true}><AdminPlans /></AuthGuard>} />
         <Route path="/admin/wireframes" element={<AuthGuard adminOnly={true}><AdminWireframes /></AuthGuard>} />
@@ -92,7 +95,15 @@ function App() {
         <Route path="/admin/userflow" element={<AuthGuard adminOnly={true}><AdminUserFlow /></AuthGuard>} />
         <Route path="/admin/userflow/:projectId" element={<AuthGuard adminOnly={true}><UserFlow /></AuthGuard>} />
         
-        {/* Protected Dashboard Routes */}
+        {/* Prompt Agent Routes */}
+        <Route path="/admin/prompt-agent" element={<AuthGuard adminOnly={true}><PromptAgentPage /></AuthGuard>} />
+        <Route path="/admin/prompt-agent/:projectName" element={<AuthGuard adminOnly={true}><PromptAgentPage /></AuthGuard>} />
+        <Route path="/admin/prompt-agent/:projectName/:promptId" element={<AuthGuard adminOnly={true}><PromptAgentPage /></AuthGuard>} />
+        
+        {/* Debug routes - available to anyone with a session */}
+        <Route path="/admin-debug" element={<AuthGuard><AdminDebug /></AuthGuard>} />
+        
+        {/* Protected routes for all authenticated users */}
         <Route path="/home" element={<AuthGuard><Home /></AuthGuard>} />
         <Route path="/dashboard" element={<AuthGuard><Home /></AuthGuard>} />
         

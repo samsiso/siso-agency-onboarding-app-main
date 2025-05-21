@@ -1,9 +1,8 @@
-
 import { 
   LayoutDashboard, Users, MessageSquare, UserCheck,
   ListTodo, CalendarClock, CreditCard, Settings,
   ClipboardList, Building2, UserCog, FileText,
-  ScrollText
+  ScrollText, Sparkles
 } from 'lucide-react';
 import { MenuSection } from './types';
 
@@ -68,6 +67,11 @@ export const getAdminMenuSections = (): MenuSection[] => {
           href: '/admin/templates',
           icon: FileText,
           label: 'Templates',
+        },
+        {
+          href: '/admin/prompt-agent',
+          icon: Sparkles,
+          label: 'Prompt Agent',
         }
       ]
     },

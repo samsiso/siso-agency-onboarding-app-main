@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 // Create a "safe" version of supabase that handles common errors
@@ -79,6 +78,58 @@ export const addUserToAdminRole = async (userId: string): Promise<boolean> => {
     return true;
   } catch (error) {
     console.error('Error adding user to admin role:', error);
+    return false;
+  }
+};
+
+// Helper function to make the specified email address an admin
+export const makeUserAdmin = async (email: string): Promise<boolean> => {
+  try {
+    console.log('Making user an admin by email:', email);
+    
+    // Get auth user ID from the current session
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    
+    if (sessionError) {
+      console.error('Error getting session:', sessionError);
+      return false;
+    }
+    
+    if (!session || !session.user) {
+      console.error('No active session');
+      return false;
+    }
+    
+    // Compare with requested email
+    if (session.user.email !== email) {
+      console.warn('Cannot make another user admin. You can only make yourself admin.');
+      console.warn('Current user:', session.user.email, 'Requested:', email);
+      return false;
+    }
+    
+    const userId = session.user.id;
+    
+    // Check if user already has admin role
+    const { data: existingRole, error: roleCheckError } = await supabase
+      .from('user_roles')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('role', 'admin')
+      .maybeSingle();
+      
+    if (roleCheckError) {
+      console.error('Error checking existing role:', roleCheckError);
+    }
+    
+    if (existingRole) {
+      console.log('User already has admin role');
+      return true;
+    }
+    
+    // Add to admin role
+    return await addUserToAdminRole(userId);
+  } catch (error) {
+    console.error('Error making user admin by email:', error);
     return false;
   }
 };

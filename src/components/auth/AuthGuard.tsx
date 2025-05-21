@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -39,10 +38,23 @@ export const AuthGuard = ({ children, adminOnly = false }: AuthGuardProps) => {
         console.log('AuthGuard - Session found:', session.user.id, session.user.email);
         setIsAuthenticated(true);
         
+        // Check if user has a role in user_roles table
+        const { data: userRole, error: userRoleError } = await supabase
+          .from('user_roles')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+          
+        console.log('AuthGuard - User role data:', userRole, 'Error:', userRoleError);
+        
         // Always check admin status for all authenticated users
         try {
           const adminStatus = await checkIsAdmin();
           console.log('AuthGuard - Admin check result:', adminStatus);
+          
+          // Check return value from RPC function directly
+          const { data: rpcResult, error: rpcError } = await supabase.rpc('is_admin', { user_id: session.user.id });
+          console.log('AuthGuard - RPC is_admin direct result:', rpcResult, 'Error:', rpcError);
           
           setIsAdmin(adminStatus);
           

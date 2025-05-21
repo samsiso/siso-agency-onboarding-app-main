@@ -16,6 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useAuthSession } from '@/hooks/useAuthSession';
 
 interface SidebarFooterProps {
   collapsed: boolean;
@@ -25,6 +26,7 @@ interface SidebarFooterProps {
 export const SidebarFooter = ({ collapsed, onProfileOpen }: SidebarFooterProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+  const { handleSignOut } = useAuthSession();
 
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
@@ -91,7 +93,10 @@ export const SidebarFooter = ({ collapsed, onProfileOpen }: SidebarFooterProps) 
           
           <DropdownMenuSeparator className="bg-siso-border" />
           
-          <DropdownMenuItem className="text-siso-text cursor-pointer">
+          <DropdownMenuItem 
+            className="text-siso-text cursor-pointer"
+            onClick={handleSignOut}
+          >
             <LogOut className="mr-2 h-4 w-4" />
             <span>Logout</span>
           </DropdownMenuItem>
