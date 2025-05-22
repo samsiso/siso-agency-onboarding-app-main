@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { autoPromptsService } from '@/utils/auto-prompts-service';
 import { ProjectPrompt } from '@/types/project-prompts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
-import { Search, RefreshCw, ArrowDown, ArrowUp, Play, CheckCircle, X, Info, Eye, Wand2 } from 'lucide-react';
+import { Search, RefreshCw, ArrowDown, ArrowUp, Play, CheckCircle, X, Info, Eye, Wand2, LayoutList, LayoutGrid } from 'lucide-react';
 import { debounce } from 'lodash';
 import { supabase } from '@/integrations/supabase/client';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -18,6 +18,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { PromptPageCards } from './components/PromptPageCards';
+import { PageCycleView } from './PageCycleView';
 
 interface PromptListProps {
   projectName: string;
@@ -49,6 +51,9 @@ export const PromptList: React.FC<PromptListProps> = ({ projectName }) => {
   const [sortField, setSortField] = useState<SortField>('id');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [selectedPrompt, setSelectedPrompt] = useState<ProjectPrompt | null>(null);
+  const [viewMode, setViewMode] = useState<'table' | 'cards'>('table');
+  const [selectedPage, setSelectedPage] = useState<string | null>(null);
+  const [isCycleViewOpen, setIsCycleViewOpen] = useState(false);
 
   const fetchPrompts = async (search?: string) => {
     setLoading(true);
@@ -302,249 +307,374 @@ export const PromptList: React.FC<PromptListProps> = ({ projectName }) => {
     return pageMap;
   }, [prompts]);
 
+  // Group prompts by page
+  const promptsByPage = useMemo(() => {
+    const pages: Record<string, {
+      id: string;
+      name: string;
+      description?: string;
+      status: string;
+      prompts: Array<{
+        id: string;
+        cycle: number;
+        status: string;
+        lastUsed: string;
+        timesUsed: number;
+      }>;
+    }> = {};
+
+    prompts.forEach(prompt => {
+      if (!prompt.page) return;
+      
+      if (!pages[prompt.page]) {
+        pages[prompt.page] = {
+          id: String(prompt.id),
+          name: prompt.page,
+          status: 'in_progress',
+          prompts: []
+        };
+      }
+
+      pages[prompt.page].prompts.push({
+        id: String(prompt.id),
+        cycle: prompt.prompt_cycle_number || 1,
+        status: prompt.is_done ? 'completed' : 'active',
+        lastUsed: prompt.last_used,
+        timesUsed: prompt.times_used || 0
+      });
+    });
+
+    return Object.values(pages);
+  }, [prompts]);
+
   return (
-    <div className="flex flex-col h-[calc(100vh-6rem)] bg-gray-900 rounded-lg shadow-md border border-gray-800">
-      {/* Header section */}
-      <div className="p-4 border-b border-gray-800">
-        <div className="flex gap-2 items-center">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-            <Input
-              placeholder="Search prompts..."
-              value={searchTerm}
-              onChange={handleSearchChange}
-              className="pl-10 border-gray-700 bg-gray-800 text-gray-200"
-            />
-          </div>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleRefresh}
-            title="Refresh prompts"
-            className="h-10 px-3 border-gray-700 text-gray-200 hover:bg-gray-800"
+    <div className="space-y-6">
+      {/* View toggle buttons */}
+      <div className="flex justify-between items-center">
+        <div className="flex items-center space-x-2">
+          <Button
+            variant={viewMode === 'table' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setViewMode('table')}
           >
+            <LayoutList className="h-4 w-4 mr-2" />
+            Table View
+          </Button>
+          <Button
+            variant={viewMode === 'cards' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setViewMode('cards')}
+          >
+            <LayoutGrid className="h-4 w-4 mr-2" />
+            Card View
+          </Button>
+        </div>
+
+        <div className="flex items-center space-x-4">
+          <Input
+            placeholder="Filter prompts..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-[250px]"
+          />
+          <Button onClick={handleRefresh}>
             <RefreshCw className="h-4 w-4 mr-2" />
             Refresh
           </Button>
         </div>
-        
-        <div className="flex justify-between items-center mt-4">
-          <div className="text-sm text-gray-400">
-            {searchTerm.trim().length > 0 ? 
-              `Found ${prompts.length} results` : 
-              `Total prompts: ${totalCount}`
-            }
-          </div>
-        </div>
       </div>
-      
-      {loading ? (
-        <div className="p-6 space-y-4">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="p-3 border border-gray-800 rounded-md bg-gray-800">
-              <div className="flex items-center space-x-4">
-                <Skeleton className="h-8 w-8 rounded-full bg-gray-700" />
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-[250px] bg-gray-700" />
-                  <Skeleton className="h-4 w-[200px] bg-gray-700" />
-                </div>
+
+      {/* View content */}
+      {viewMode === 'table' ? (
+        <div className="flex flex-col h-[calc(100vh-6rem)] bg-gray-900 rounded-lg shadow-md border border-gray-800">
+          {/* Header section */}
+          <div className="p-4 border-b border-gray-800">
+            <div className="flex gap-2 items-center">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Search prompts..."
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  className="pl-10 border-gray-700 bg-gray-800 text-gray-200"
+                />
               </div>
-            </div>
-          ))}
-        </div>
-      ) : error ? (
-        <div className="p-6">
-          <Card className="bg-red-900/30 border-red-800">
-            <CardContent className="p-4">
-              <p className="text-red-300">Error: {error}</p>
               <Button 
                 variant="outline" 
-                className="mt-2 border-red-800 text-gray-200 hover:bg-red-900/40" 
+                size="sm" 
                 onClick={handleRefresh}
+                title="Refresh prompts"
+                className="h-10 px-3 border-gray-700 text-gray-200 hover:bg-gray-800"
               >
-                Try Again
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Refresh
               </Button>
-            </CardContent>
-          </Card>
-        </div>
-      ) : (
-        <div className="flex-1 flex flex-col">
-          {/* Table Header */}
-          <div className="grid grid-cols-8 gap-4 px-4 py-3 bg-gray-800 border-y border-gray-700 text-xs font-medium sticky top-0 z-10">
-            <div className="flex items-center cursor-pointer hover:text-blue-400 transition-colors w-14" onClick={() => handleSort('id')}>
-              ID {renderSortArrow('id')}
             </div>
-            <div className="flex items-center w-10">
-              Status
-            </div>
-            <div className="flex items-center cursor-pointer hover:text-blue-400 transition-colors" onClick={() => handleSort('page')}>
-              Page {renderSortArrow('page')}
-            </div>
-            <div className="flex items-center cursor-pointer hover:text-blue-400 transition-colors" onClick={() => handleSort('domain')}>
-              Domain {renderSortArrow('domain')}
-            </div>
-            <div className="flex items-center cursor-pointer hover:text-blue-400 transition-colors" onClick={() => handleSort('prompt_cycle_number')}>
-              Cycle {renderSortArrow('prompt_cycle_number')}
-            </div>
-            <div className="flex items-center cursor-pointer hover:text-blue-400 transition-colors" onClick={() => handleSort('model')}>
-              Model {renderSortArrow('model')}
-            </div>
-            <div className="flex items-center cursor-pointer hover:text-blue-400 transition-colors" onClick={() => handleSort('times_used')}>
-              Used {renderSortArrow('times_used')}
-            </div>
-            <div className="flex items-center justify-between cursor-pointer hover:text-blue-400 transition-colors" onClick={() => handleSort('last_used')}>
-              <span>Last Used</span> {renderSortArrow('last_used')}
+            
+            <div className="flex justify-between items-center mt-4">
+              <div className="text-sm text-gray-400">
+                {searchTerm.trim().length > 0 ? 
+                  `Found ${prompts.length} results` : 
+                  `Total prompts: ${totalCount}`
+                }
+              </div>
             </div>
           </div>
-
-          <ScrollArea className="flex-1">
-            {sortedPrompts.length === 0 ? (
-              <div className="p-12 text-center text-gray-400">
-                <div className="mx-auto w-20 h-20 flex items-center justify-center rounded-full bg-gray-800 mb-4">
-                  <Info className="h-10 w-10 text-gray-500" />
-                </div>
-                <h3 className="text-lg font-medium mb-1 text-gray-300">No prompts found</h3>
-                <p className="text-sm text-gray-500 max-w-md mx-auto">
-                  Try adjusting your search or filters to find what you're looking for
-                </p>
-              </div>
-            ) : (
-              <div className="divide-y divide-gray-800">
-                {sortedPrompts.map((prompt) => {
-                  const pageStyle = prompt.page ? pageGroups.get(prompt.page) : undefined;
-                  return (
-                    <div 
-                      key={prompt.id} 
-                      className={`grid grid-cols-8 gap-4 px-4 py-3 text-sm hover:bg-gray-800/50 transition-colors relative group ${pageStyle?.shade || ''}`}
-                    >
-                      {/* Left color indicator */}
-                      {pageStyle && (
-                        <div className={`absolute left-0 top-0 bottom-0 w-1 ${pageStyle.color.split(' ')[0]}`}></div>
-                      )}
-                      {/* Right color indicator */}
-                      {pageStyle && (
-                        <div className={`absolute right-0 top-0 bottom-0 w-1 ${pageStyle.color.split(' ')[0]}`}></div>
-                      )}
-                      
-                      <div className="flex items-center font-mono text-xs text-gray-500 w-14">
-                        {prompt.id}
-                      </div>
-                      <div className="flex items-center w-10">
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger>
-                              {prompt.is_done ? (
-                                <CheckCircle className="h-4 w-4 text-green-500" />
-                              ) : (
-                                <Play className="h-4 w-4 text-amber-500" />
-                              )}
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              {prompt.is_done ? "Completed" : "Active"}
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </div>
-                      <div className="flex items-center overflow-hidden">
-                        <span className={`font-medium truncate ${pageStyle?.color.split(' ')[1] || 'text-gray-200'}`}>
-                          {prompt.page}
-                        </span>
-                      </div>
-                      <div className="flex items-center">
-                        <Badge variant="outline" className="font-normal text-gray-300 border-gray-700 truncate">
-                          {prompt.domain || 'N/A'}
-                        </Badge>
-                      </div>
-                      <div className="flex items-center">
-                        {getCycleBadge(prompt.prompt_cycle_number)}
-                      </div>
-                      <div className="flex items-center">
-                        <Badge variant="outline" className="font-normal bg-gray-800 border-gray-700 text-purple-300 truncate">
-                          <Wand2 className="h-3 w-3 mr-1" />
-                          Claude 3.5
-                        </Badge>
-                      </div>
-                      <div className="flex items-center text-gray-300">
-                        {prompt.times_used || 0}
-                      </div>
-                      <div className="flex items-center justify-between pr-3">
-                        <span className="text-xs text-gray-500">
-                          {formatDate(prompt.last_used)}
-                        </span>
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              onClick={() => setSelectedPrompt(prompt)}
-                              className="opacity-0 group-hover:opacity-100 -my-1 h-7 px-2 hover:bg-gray-700 text-gray-300"
-                            >
-                              <Eye className="h-3.5 w-3.5" />
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto bg-gray-900 border-gray-800 text-gray-200">
-                            <DialogHeader>
-                              <DialogTitle className="flex items-center pb-2 border-b border-gray-800">
-                                <div className="flex-1">
-                                  <span className="text-lg">#{prompt.id} - {prompt.page}</span>
-                                  {prompt.prompt_cycle_number && cycleDescriptions[prompt.prompt_cycle_number] && (
-                                    <Badge variant="secondary" className={`ml-2 text-white ${cycleDescriptions[prompt.prompt_cycle_number].color}`}>
-                                      {cycleDescriptions[prompt.prompt_cycle_number].name}
-                                    </Badge>
-                                  )}
-                                </div>
-                                <Badge variant={prompt.is_done ? "success" : "warning"} className="ml-2">
-                                  {prompt.is_done ? "Completed" : "Active"}
-                                </Badge>
-                              </DialogTitle>
-                            </DialogHeader>
-                            <div className="mt-4 space-y-6">
-                              <div className="grid grid-cols-4 gap-4 text-sm">
-                                <div className="border border-gray-800 rounded-md p-3 bg-gray-800/50">
-                                  <span className="block text-xs uppercase text-gray-500 mb-1">Domain</span>
-                                  <span className="font-medium">{prompt.domain || 'N/A'}</span>
-                                </div>
-                                <div className="border border-gray-800 rounded-md p-3 bg-gray-800/50">
-                                  <span className="block text-xs uppercase text-gray-500 mb-1">Model</span>
-                                  <span className="font-medium text-purple-300">Claude 3.5 Sonnet</span>
-                                </div>
-                                <div className="border border-gray-800 rounded-md p-3 bg-gray-800/50">
-                                  <span className="block text-xs uppercase text-gray-500 mb-1">Times Used</span>
-                                  <span className="font-medium">{prompt.times_used || 0}</span>
-                                </div>
-                                <div className="border border-gray-800 rounded-md p-3 bg-gray-800/50">
-                                  <span className="block text-xs uppercase text-gray-500 mb-1">Last Used</span>
-                                  <span className="font-medium">{formatDate(prompt.last_used)}</span>
-                                </div>
-                              </div>
-                              
-                              {prompt.prompt_cycle_number && cycleDescriptions[prompt.prompt_cycle_number] && (
-                                <div className="bg-gray-800/30 p-4 rounded-md border border-gray-800">
-                                  <h4 className="text-sm font-medium mb-2">Cycle Description</h4>
-                                  <p className="text-sm text-gray-400">
-                                    {cycleDescriptions[prompt.prompt_cycle_number].description}
-                                  </p>
-                                </div>
-                              )}
-                              
-                              <div>
-                                <h4 className="text-sm font-medium mb-2">Prompt Content</h4>
-                                <div className="bg-gray-800 p-5 rounded-md whitespace-pre-wrap text-sm font-mono border border-gray-700 overflow-auto max-h-[300px] text-gray-300">
-                                  {prompt.prompt}
-                                </div>
-                              </div>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
-                      </div>
+          
+          {loading ? (
+            <div className="p-6 space-y-4">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="p-3 border border-gray-800 rounded-md bg-gray-800">
+                  <div className="flex items-center space-x-4">
+                    <Skeleton className="h-8 w-8 rounded-full bg-gray-700" />
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-[250px] bg-gray-700" />
+                      <Skeleton className="h-4 w-[200px] bg-gray-700" />
                     </div>
-                  );
-                })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : error ? (
+            <div className="p-6">
+              <Card className="bg-red-900/30 border-red-800">
+                <CardContent className="p-4">
+                  <p className="text-red-300">Error: {error}</p>
+                  <Button 
+                    variant="outline" 
+                    className="mt-2 border-red-800 text-gray-200 hover:bg-red-900/40" 
+                    onClick={handleRefresh}
+                  >
+                    Try Again
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          ) : (
+            <div className="flex-1 flex flex-col">
+              {/* Table Header */}
+              <div className="grid grid-cols-8 gap-4 px-4 py-3 bg-gray-800 border-y border-gray-700 text-xs font-medium sticky top-0 z-10">
+                <div className="flex items-center cursor-pointer hover:text-blue-400 transition-colors w-14" onClick={() => handleSort('id')}>
+                  ID {renderSortArrow('id')}
+                </div>
+                <div className="flex items-center w-10">
+                  Status
+                </div>
+                <div className="flex items-center cursor-pointer hover:text-blue-400 transition-colors" onClick={() => handleSort('page')}>
+                  Page {renderSortArrow('page')}
+                </div>
+                <div className="flex items-center cursor-pointer hover:text-blue-400 transition-colors" onClick={() => handleSort('domain')}>
+                  Domain {renderSortArrow('domain')}
+                </div>
+                <div className="flex items-center cursor-pointer hover:text-blue-400 transition-colors" onClick={() => handleSort('prompt_cycle_number')}>
+                  Cycle {renderSortArrow('prompt_cycle_number')}
+                </div>
+                <div className="flex items-center cursor-pointer hover:text-blue-400 transition-colors" onClick={() => handleSort('model')}>
+                  Model {renderSortArrow('model')}
+                </div>
+                <div className="flex items-center cursor-pointer hover:text-blue-400 transition-colors" onClick={() => handleSort('times_used')}>
+                  Used {renderSortArrow('times_used')}
+                </div>
+                <div className="flex items-center justify-between cursor-pointer hover:text-blue-400 transition-colors" onClick={() => handleSort('last_used')}>
+                  <span>Last Used</span> {renderSortArrow('last_used')}
+                </div>
               </div>
-            )}
-          </ScrollArea>
+
+              <ScrollArea className="flex-1">
+                {sortedPrompts.length === 0 ? (
+                  <div className="p-12 text-center text-gray-400">
+                    <div className="mx-auto w-20 h-20 flex items-center justify-center rounded-full bg-gray-800 mb-4">
+                      <Info className="h-10 w-10 text-gray-500" />
+                    </div>
+                    <h3 className="text-lg font-medium mb-1 text-gray-300">No prompts found</h3>
+                    <p className="text-sm text-gray-500 max-w-md mx-auto">
+                      Try adjusting your search or filters to find what you're looking for
+                    </p>
+                  </div>
+                ) : (
+                  <div className="divide-y divide-gray-800">
+                    {sortedPrompts.map((prompt) => {
+                      const pageStyle = prompt.page ? pageGroups.get(prompt.page) : undefined;
+                      return (
+                        <div 
+                          key={prompt.id} 
+                          className={`grid grid-cols-8 gap-4 px-4 py-3 text-sm hover:bg-gray-800/50 transition-colors relative group ${pageStyle?.shade || ''}`}
+                        >
+                          {/* Left color indicator */}
+                          {pageStyle && (
+                            <div className={`absolute left-0 top-0 bottom-0 w-1 ${pageStyle.color.split(' ')[0]}`}></div>
+                          )}
+                          {/* Right color indicator */}
+                          {pageStyle && (
+                            <div className={`absolute right-0 top-0 bottom-0 w-1 ${pageStyle.color.split(' ')[0]}`}></div>
+                          )}
+                          
+                          <div className="flex items-center font-mono text-xs text-gray-500 w-14">
+                            {prompt.id}
+                          </div>
+                          <div className="flex items-center w-10">
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  {prompt.is_done ? (
+                                    <CheckCircle className="h-4 w-4 text-green-500" />
+                                  ) : (
+                                    <Play className="h-4 w-4 text-amber-500" />
+                                  )}
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  {prompt.is_done ? "Completed" : "Active"}
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </div>
+                          <div className="flex items-center overflow-hidden">
+                            <span className={`font-medium truncate ${pageStyle?.color.split(' ')[1] || 'text-gray-200'}`}>
+                              {prompt.page}
+                            </span>
+                          </div>
+                          <div className="flex items-center">
+                            <Badge variant="outline" className="font-normal text-gray-300 border-gray-700 truncate">
+                              {prompt.domain || 'N/A'}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center">
+                            {getCycleBadge(prompt.prompt_cycle_number)}
+                          </div>
+                          <div className="flex items-center">
+                            <Badge variant="outline" className="font-normal bg-gray-800 border-gray-700 text-purple-300 truncate">
+                              <Wand2 className="h-3 w-3 mr-1" />
+                              Claude 3.5
+                            </Badge>
+                          </div>
+                          <div className="flex items-center text-gray-300">
+                            {prompt.times_used || 0}
+                          </div>
+                          <div className="flex items-center justify-between pr-3">
+                            <span className="text-xs text-gray-500">
+                              {formatDate(prompt.last_used)}
+                            </span>
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  onClick={() => setSelectedPrompt(prompt)}
+                                  className="opacity-0 group-hover:opacity-100 -my-1 h-7 px-2 hover:bg-gray-700 text-gray-300"
+                                >
+                                  <Eye className="h-3.5 w-3.5" />
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto bg-gray-900 border-gray-800 text-gray-200">
+                                <DialogHeader>
+                                  <DialogTitle className="flex items-center pb-2 border-b border-gray-800">
+                                    <div className="flex-1">
+                                      <span className="text-lg">#{prompt.id} - {prompt.page}</span>
+                                      {prompt.prompt_cycle_number && cycleDescriptions[prompt.prompt_cycle_number] && (
+                                        <Badge variant="secondary" className={`ml-2 text-white ${cycleDescriptions[prompt.prompt_cycle_number].color}`}>
+                                          {cycleDescriptions[prompt.prompt_cycle_number].name}
+                                        </Badge>
+                                      )}
+                                    </div>
+                                    <Badge variant={prompt.is_done ? "success" : "warning"} className="ml-2">
+                                      {prompt.is_done ? "Completed" : "Active"}
+                                    </Badge>
+                                  </DialogTitle>
+                                </DialogHeader>
+                                <div className="mt-4 space-y-6">
+                                  <div className="grid grid-cols-4 gap-4 text-sm">
+                                    <div className="border border-gray-800 rounded-md p-3 bg-gray-800/50">
+                                      <span className="block text-xs uppercase text-gray-500 mb-1">Domain</span>
+                                      <span className="font-medium">{prompt.domain || 'N/A'}</span>
+                                    </div>
+                                    <div className="border border-gray-800 rounded-md p-3 bg-gray-800/50">
+                                      <span className="block text-xs uppercase text-gray-500 mb-1">Model</span>
+                                      <span className="font-medium text-purple-300">Claude 3.5 Sonnet</span>
+                                    </div>
+                                    <div className="border border-gray-800 rounded-md p-3 bg-gray-800/50">
+                                      <span className="block text-xs uppercase text-gray-500 mb-1">Times Used</span>
+                                      <span className="font-medium">{prompt.times_used || 0}</span>
+                                    </div>
+                                    <div className="border border-gray-800 rounded-md p-3 bg-gray-800/50">
+                                      <span className="block text-xs uppercase text-gray-500 mb-1">Last Used</span>
+                                      <span className="font-medium">{formatDate(prompt.last_used)}</span>
+                                    </div>
+                                  </div>
+                                  
+                                  {prompt.prompt_cycle_number && cycleDescriptions[prompt.prompt_cycle_number] && (
+                                    <div className="bg-gray-800/30 p-4 rounded-md border border-gray-800">
+                                      <h4 className="text-sm font-medium mb-2">Cycle Description</h4>
+                                      <p className="text-sm text-gray-400">
+                                        {cycleDescriptions[prompt.prompt_cycle_number].description}
+                                      </p>
+                                    </div>
+                                  )}
+                                  
+                                  <div>
+                                    <h4 className="text-sm font-medium mb-2">Prompt Content</h4>
+                                    <div className="bg-gray-800 p-5 rounded-md whitespace-pre-wrap text-sm font-mono border border-gray-700 overflow-auto max-h-[300px] text-gray-300">
+                                      {prompt.prompt}
+                                    </div>
+                                  </div>
+                                </div>
+                              </DialogContent>
+                            </Dialog>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </ScrollArea>
+            </div>
+          )}
         </div>
+      ) : (
+        <PromptPageCards 
+          pages={promptsByPage}
+          onViewPage={(pageId) => {
+            const page = promptsByPage.find(p => p.id === pageId);
+            if (page) {
+              setSelectedPage(page.name);
+              setIsCycleViewOpen(true);
+            }
+          }}
+        />
       )}
+
+      {/* Page Cycle View Dialog */}
+      {selectedPage && (
+        <Dialog open={isCycleViewOpen} onOpenChange={(open) => setIsCycleViewOpen(open)}>
+          <DialogContent className="max-w-5xl max-h-[90vh] overflow-auto bg-gray-900 border-gray-800 text-gray-200">
+            <DialogHeader>
+              <DialogTitle className="text-xl flex items-center">
+                {selectedPage} Development Cycle
+              </DialogTitle>
+            </DialogHeader>
+            <div className="mt-4">
+              <PageCycleView
+                projectName={projectName}
+                pageName={selectedPage}
+                pageRoute={`/${selectedPage.toLowerCase().replace(/\s+/g, '-')}`}
+                domain="UI/UX"
+                onPromptSelect={(prompt) => {
+                  setIsCycleViewOpen(false);
+                  // Find the corresponding ProjectPrompt
+                  const projectPrompt = prompts.find(p => 
+                    p.page === selectedPage && 
+                    p.prompt_cycle_number === prompt.cycle
+                  );
+                  if (projectPrompt) {
+                    setSelectedPrompt(projectPrompt);
+                  }
+                }}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* ... existing prompt dialog code ... */}
     </div>
   );
 }; 

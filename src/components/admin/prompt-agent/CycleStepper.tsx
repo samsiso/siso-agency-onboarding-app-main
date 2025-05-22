@@ -1,66 +1,85 @@
 import React from 'react';
+import { CycleStep, CycleStatus, CYCLE_STEP_LABELS, CYCLE_STEP_ORDER } from '@/types/auto-prompts';
+import { CheckCircle, Circle, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { CycleStep, CycleStatus, CYCLE_STEP_ORDER, CYCLE_STEP_LABELS } from '@/types/auto-prompts';
-import { CheckCircle, Circle, ArrowDown } from 'lucide-react';
 
 interface CycleStepperProps {
   currentStep: CycleStep;
   cycleNumber: number;
   cycleStatus: CycleStatus;
-  onStepClick?: (step: CycleStep) => void;
   className?: string;
 }
 
-export const CycleStepper: React.FC<CycleStepperProps> = ({
-  currentStep,
-  cycleNumber,
-  cycleStatus,
-  onStepClick,
-  className
-}) => {
-  const getCurrentStepIndex = () => CYCLE_STEP_ORDER.indexOf(currentStep);
+export function CycleStepper({ 
+  currentStep, 
+  cycleNumber, 
+  cycleStatus, 
+  className 
+}: CycleStepperProps) {
+  // Display a subset of steps from the full cycle for simplicity
+  const displaySteps = [
+    CycleStep.Review,
+    CycleStep.Analysis,
+    CycleStep.Innovation,
+    CycleStep.Planning,
+    CycleStep.Execution1
+  ];
 
   return (
-    <div className={cn("flex flex-col space-y-2", className)}>
-      {CYCLE_STEP_ORDER.map((step, index) => {
-        const isCompleted = index < getCurrentStepIndex();
+    <div className={cn("flex items-center space-x-1", className)}>
+      {displaySteps.map((step, index) => {
+        // Determine if this step is completed, current, or upcoming
+        const isCompleted = (
+          cycleStatus === CycleStatus.Completed || 
+          CYCLE_STEP_ORDER.indexOf(step) < CYCLE_STEP_ORDER.indexOf(currentStep)
+        );
         const isCurrent = step === currentStep;
         
+        // Determine colors based on state
+        const bgColor = isCompleted 
+          ? 'bg-green-500' 
+          : isCurrent 
+            ? 'bg-blue-500' 
+            : 'bg-gray-700';
+        
+        const textColor = isCompleted 
+          ? 'text-green-500' 
+          : isCurrent 
+            ? 'text-blue-500' 
+            : 'text-gray-500';
+            
         return (
-          <div key={step} className="flex flex-col">
-            <div 
-              className={cn(
-                "flex items-center space-x-3 p-2 rounded-lg transition-colors",
-                (isCompleted || isCurrent) && "text-primary",
-                isCurrent && "bg-primary/10",
-                onStepClick && "cursor-pointer hover:bg-muted"
-              )}
-              onClick={() => onStepClick?.(step)}
-            >
-              <div className="flex items-center justify-center w-8 h-8">
+          <React.Fragment key={step}>
+            {/* Step indicator */}
+            <div className="flex flex-col items-center">
+              <div 
+                className={cn(
+                  "w-8 h-8 rounded-full flex items-center justify-center",
+                  bgColor,
+                  "text-white text-xs font-medium"
+                )}
+              >
                 {isCompleted ? (
-                  <CheckCircle className="w-6 h-6 text-primary" />
-                ) : isCurrent ? (
-                  <Circle className="w-6 h-6 text-primary fill-primary/20" />
+                  <CheckCircle className="h-5 w-5" />
                 ) : (
-                  <Circle className="w-6 h-6 text-muted-foreground" />
+                  index + 1
                 )}
               </div>
-              <span className={cn(
-                "font-medium",
-                isCompleted && "text-primary",
-                isCurrent && "text-primary font-semibold",
-                !isCompleted && !isCurrent && "text-muted-foreground"
-              )}>
+              <span className={cn("text-xs mt-1 truncate", textColor)}>
                 {CYCLE_STEP_LABELS[step]}
               </span>
             </div>
-            {index < CYCLE_STEP_ORDER.length - 1 && (
-              <div className="ml-[15px] h-4 w-px bg-border" />
+            
+            {/* Connector (except after the last step) */}
+            {index < displaySteps.length - 1 && (
+              <div className={cn(
+                "w-4 h-0.5", 
+                isCompleted ? "bg-green-500" : "bg-gray-700"
+              )}/>
             )}
-          </div>
+          </React.Fragment>
         );
       })}
     </div>
   );
-}; 
+} 
