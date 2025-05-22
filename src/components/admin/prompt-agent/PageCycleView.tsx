@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCyclePrompts } from '@/hooks/useCyclePrompts';
 import { CycleStep, CycleStatus, AutoPrompt, CYCLE_STEP_LABELS } from '@/types/auto-prompts';
 import { FRONTEND_CYCLE_TEMPLATES } from '@/types/cycle-prompts';
@@ -23,10 +23,12 @@ import {
   Clock,
   File,
   Plus,
-  Sparkles
+  Sparkles,
+  RefreshCcw
 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
 
 interface PageCycleViewProps {
   projectName: string;
@@ -44,6 +46,9 @@ export function PageCycleView({
   onPromptSelect
 }: PageCycleViewProps) {
   const [notes, setNotes] = useState('');
+  
+  console.log('PageCycleView props:', { projectName, pageName, pageRoute, domain });
+  
   const {
     isLoading,
     error,
@@ -60,8 +65,16 @@ export function PageCycleView({
     projectName,
     pageName,
     pageRoute,
-    domain
+    domain,
+    autoInit: true // Auto-initialize if no cycle exists
   });
+
+  useEffect(() => {
+    if (!isInitialized && !isLoading) {
+      console.log('Initializing cycle for:', { pageName, pageRoute });
+      initializeCycle();
+    }
+  }, [isInitialized, isLoading, pageName, pageRoute, initializeCycle]);
 
   const handleNewPrompt = async () => {
     await createNewPrompt(notes);
@@ -86,28 +99,21 @@ export function PageCycleView({
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        <Skeleton className="h-8 w-full" />
-        <Skeleton className="h-24 w-full" />
-        <div className="grid grid-cols-3 gap-4">
-          <Skeleton className="h-12 w-full" />
-          <Skeleton className="h-12 w-full" />
-          <Skeleton className="h-12 w-full" />
+      <div className="flex justify-center items-center p-8">
+        <div className="flex items-center space-x-2">
+          <RefreshCcw className="h-5 w-5 animate-spin" />
+          <span>Loading cycle data...</span>
         </div>
-        <Skeleton className="h-64 w-full" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <Alert variant="destructive">
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Error</AlertTitle>
-        <AlertDescription>
-          {error}
-        </AlertDescription>
-      </Alert>
+      <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-md">
+        <p className="font-medium">Error Loading Cycle</p>
+        <p className="text-sm">{error}</p>
+      </div>
     );
   }
 

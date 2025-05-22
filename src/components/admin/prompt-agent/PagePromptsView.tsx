@@ -473,15 +473,16 @@ export const PagePromptsView: React.FC<PagePromptsViewProps> = ({ projectId }) =
           .map(pageId => {
             const pagePrompts = allPromptsData.filter(p => p.page_id === pageId);
             const firstPrompt = pagePrompts[0];
+            const pageName = firstPrompt?.page?.name || pageId;
             return {
               id: pageId,
-              name: firstPrompt?.page?.name || pageId,
+              name: pageName,
               category: firstPrompt?.page?.category || 'Uncategorized',
               status: pagePrompts.every(p => p.status === 'completed') ? 'completed' : 'in_progress',
               project_id: projectId,
-              route: `/${pageId.toLowerCase().replace(/\s+/g, '-')}`,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
+              route: firstPrompt?.page?.route || `/${pageName.toLowerCase().replace(/\s+/g, '-')}`,
+              created_at: firstPrompt?.page?.created_at || new Date().toISOString(),
+              updated_at: firstPrompt?.page?.updated_at || new Date().toISOString()
             } as Page;
           });
         
@@ -515,18 +516,54 @@ export const PagePromptsView: React.FC<PagePromptsViewProps> = ({ projectId }) =
   );
 
   const handleViewCycle = async (page: Page) => {
+    console.log('Opening cycle view for page:', page);
     setSelectedPage(page.name);
     setSelectedPageId(page.id);
     setIsCycleViewOpen(true);
 
     try {
-      const prompts = await getPromptsByPage(page.id);
-      setPagePrompts(prev => ({
-        ...prev,
-        [page.id]: prompts
-      }));
+      // Get the prompts from the already loaded data
+      const existingPrompts = pagePrompts[page.id] || [];
+      
+      if (existingPrompts.length === 0) {
+        // If no prompts are loaded, try to fetch them
+        const { data: newPrompts, error } = await supabase
+          .from('project_prompts')
+          .select('*')
+          .eq('page', page.name)
+          .order('prompt_cycle_number');
+
+        if (error) {
+          throw error;
+        }
+
+        // Format the prompts
+        const formattedPrompts = newPrompts.map(prompt => ({
+          ...prompt,
+          id: prompt.id.toString(),
+          page_id: prompt.page,
+          cycle_number: prompt.prompt_cycle_number,
+          template: { 
+            step: `cycle_${prompt.prompt_cycle_number}`,
+            title: prompt.page 
+          },
+          page: { 
+            name: prompt.page,
+            category: prompt.domain,
+            id: prompt.page
+          },
+          status: prompt.is_done ? 'completed' : prompt.times_used > 0 ? 'in_progress' : 'not_started',
+          step: `cycle_${prompt.prompt_cycle_number}`
+        }));
+
+        setPagePrompts(prev => ({
+          ...prev,
+          [page.id]: formattedPrompts
+        }));
+      }
     } catch (error) {
       console.error('Error loading prompts:', error);
+      setError(`Failed to load prompts: ${error instanceof Error ? error.message : String(error)}`);
     }
   };
 
@@ -727,54 +764,16 @@ export const PagePromptsView: React.FC<PagePromptsViewProps> = ({ projectId }) =
           <DialogHeader>
             <DialogTitle>{selectedPage} Prompt Cycle</DialogTitle>
           </DialogHeader>
-          {selectedPageId && pagePrompts[selectedPageId] && (
-            <div className="space-y-4">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Step</TableHead>
-                    <TableHead>Prompt</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {pagePrompts[selectedPageId].map((prompt) => (
-                    <TableRow key={prompt.id}>
-                      <TableCell>{prompt.cycle_number}</TableCell>
-                      <TableCell>
-                        <div className="max-w-xl">
-                          <p className="line-clamp-2">{prompt.prompt}</p>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={prompt.is_done ? 'default' : 'secondary'}>
-                          {prompt.is_done ? 'Completed' : 'Pending'}
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-              
-              <div className="flex justify-end">
-                <Button 
-                  onClick={() => handleAdvanceStep(selectedPageId)}
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <>
-                      <RefreshCcw className="mr-2 h-4 w-4 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      <ArrowRight className="mr-2 h-4 w-4" />
-                      Advance to Next Step
-                    </>
-                  )}
-                </Button>
-              </div>
-            </div>
+          {selectedPageId && (
+            <PageCycleView
+              projectName={projectId}
+              pageName={selectedPage}
+              pageRoute={pages.find(p => p.id === selectedPageId)?.route || ''}
+              onPromptSelect={(prompt) => {
+                // Handle prompt selection if needed
+                console.log('Selected prompt:', prompt);
+              }}
+            />
           )}
         </DialogContent>
       </Dialog>

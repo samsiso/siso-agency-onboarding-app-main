@@ -33,13 +33,17 @@ export enum PromptStatus {
  */
 export interface Page {
   id: string;
+  project_id: string;
   name: string;
   route: string;
-  description?: string;
-  category?: string;
-  status: 'not_started' | 'in_progress' | 'completed';
+  description: string | null;
+  status: string | null;
   created_at: string;
   updated_at: string;
+  metadata: Record<string, any>;
+  priority: number;
+  category: string | null;
+  pdr_source: string | null;
 }
 
 /**
@@ -48,11 +52,14 @@ export interface Page {
 export interface PromptTemplate {
   id: string;
   title: string;
-  description?: string;
-  step: string;
-  estimated_time?: string;
+  description: string | null;
+  step: UIPromptStep;
+  template_content: string;
+  estimated_time: string | null;
+  order_position: number;
   created_at: string;
   updated_at: string;
+  category: string | null;
 }
 
 /**
@@ -61,17 +68,19 @@ export interface PromptTemplate {
 export interface UIPrompt {
   id: string;
   page_id: string;
-  template_id: string;
-  cycle_number: number;
-  prompt: string;
-  times_used: number;
-  is_done: boolean;
-  step: string;
-  status: 'not_started' | 'in_progress' | 'completed';
+  template_id: string | null;
+  step: UIPromptStep;
+  content: string;
+  status: PromptStatus;
+  response: string | null;
+  iteration: number;
+  notes: string | null;
   created_at: string;
   updated_at: string;
-  page?: Page;
-  template?: PromptTemplate;
+  metadata: Record<string, any>;
+  assigned_to: string | null;
+  issues: Record<string, any>[];
+  suggestions: Record<string, any>[];
 }
 
 /**

@@ -8,6 +8,7 @@ import {
   getPageCyclePrompts,
   getPageCycleStatus
 } from '@/api/cycle-prompts';
+import { supabase } from '@/integrations/supabase';
 
 interface UseCyclePromptsParams {
   projectName: string;
@@ -25,6 +26,7 @@ interface CyclePromptsState {
   cycleNumber: number;
   cycleStatus: CycleStatus;
   completedSteps: CycleStep[];
+  isInitialized: boolean;
 }
 
 export function useCyclePrompts({
@@ -41,112 +43,142 @@ export function useCyclePrompts({
     currentStep: CycleStep.Review,
     cycleNumber: 1,
     cycleStatus: CycleStatus.InProgress,
-    completedSteps: []
+    completedSteps: [],
+    isInitialized: false
   });
 
   const fetchCycleData = async () => {
     setState(prev => ({ ...prev, isLoading: true, error: null }));
     
     try {
-      // Get the current status of the page cycle
-      const status = await getPageCycleStatus(projectName, pageName, pageRoute, domain);
+      console.log('Fetching cycle data for:', { projectName, pageName, pageRoute, domain });
       
-      if (!status && autoInit) {
-        // Initialize a new cycle if there isn't one and autoInit is true
-        const success = await initializePageCycle(
-          projectName,
-          pageName,
-          pageRoute,
-          domain,
-          Object.values(FRONTEND_CYCLE_TEMPLATES)
-        );
+      // Get the current prompts for the page
+      const { data: existingPrompts, error: promptsError } = await supabase
+        .from('project_prompts')
+        .select('*')
+        .eq('page', pageName)
+        .eq('project', projectName)
+        .order('prompt_cycle_number');
+
+      if (promptsError) {
+        throw promptsError;
+      }
+
+      if (existingPrompts.length === 0 && autoInit) {
+        console.log('No existing prompts found, initializing new cycle');
         
-        if (!success) {
-          throw new Error('Failed to initialize page cycle');
+        // Create initial prompts for the cycle
+        const initialPrompts = [
+          {
+            project: projectName,
+            page: pageName,
+            prompt_cycle_number: 1,
+            prompt_type: 'review',
+            description: 'Initial page review',
+            is_done: false,
+            times_used: 0
+          },
+          {
+            project: projectName,
+            page: pageName,
+            prompt_cycle_number: 1,
+            prompt_type: 'plan',
+            description: 'Plan page improvements',
+            is_done: false,
+            times_used: 0
+          },
+          {
+            project: projectName,
+            page: pageName,
+            prompt_cycle_number: 1,
+            prompt_type: 'implement',
+            description: 'Implement planned changes',
+            is_done: false,
+            times_used: 0
+          }
+        ];
+
+        // Insert the initial prompts
+        const { data: newPrompts, error: insertError } = await supabase
+          .from('project_prompts')
+          .insert(initialPrompts)
+          .select();
+
+        if (insertError) {
+          throw insertError;
         }
-        
-        // Fetch the newly created cycle
-        const prompts = await getPageCyclePrompts(
-          projectName,
-          pageName,
-          pageRoute,
-          domain,
-          1
-        );
-        
+
         setState({
           isLoading: false,
           error: null,
-          cyclePrompts: prompts,
+          cyclePrompts: newPrompts,
           currentStep: CycleStep.Review,
           cycleNumber: 1,
           cycleStatus: CycleStatus.InProgress,
-          completedSteps: []
+          completedSteps: [],
+          isInitialized: true
         });
+      } else {
+        console.log('Found existing prompts:', existingPrompts);
         
-        return;
-      } else if (!status) {
-        // No cycle exists and autoInit is false
+        // Calculate current step and status
+        const lastPrompt = existingPrompts[existingPrompts.length - 1];
+        const cycleNumber = lastPrompt?.prompt_cycle_number || 1;
+        const completedPrompts = existingPrompts.filter(p => p.is_done);
+        const cycleStatus = completedPrompts.length === existingPrompts.length 
+          ? CycleStatus.Completed 
+          : CycleStatus.InProgress;
+
         setState({
           isLoading: false,
           error: null,
-          cyclePrompts: [],
-          currentStep: CycleStep.Review,
-          cycleNumber: 1,
-          cycleStatus: CycleStatus.InProgress,
-          completedSteps: []
+          cyclePrompts: existingPrompts,
+          currentStep: lastPrompt?.prompt_type || CycleStep.Review,
+          cycleNumber,
+          cycleStatus,
+          completedSteps: completedPrompts.map(p => p.prompt_type),
+          isInitialized: true
         });
-        
-        return;
       }
-      
-      // Fetch the prompts for the current cycle
-      const prompts = await getPageCyclePrompts(
-        projectName,
-        pageName,
-        pageRoute,
-        domain,
-        status.cycleNumber
-      );
-      
-      setState({
-        isLoading: false,
-        error: null,
-        cyclePrompts: prompts,
-        currentStep: status.currentStep,
-        cycleNumber: status.cycleNumber,
-        cycleStatus: status.status,
-        completedSteps: status.completedSteps
-      });
     } catch (error) {
+      console.error('Error in fetchCycleData:', error);
       setState(prev => ({
         ...prev,
         isLoading: false,
-        error: error instanceof Error ? error.message : 'An unknown error occurred'
+        error: error instanceof Error ? error.message : 'An unknown error occurred',
+        isInitialized: false
       }));
     }
   };
 
-  // Initialize the cycle
   const initializeCycle = async () => {
-    setState(prev => ({ ...prev, isLoading: true, error: null }));
+    if (state.isInitialized) {
+      console.log('Cycle already initialized');
+      return;
+    }
+
+    await fetchCycleData();
+  };
+
+  const advanceToNextStep = async (promptId: string) => {
+    setState(prev => ({ ...prev, isLoading: true }));
     
     try {
-      const success = await initializePageCycle(
-        projectName,
-        pageName,
-        pageRoute,
-        domain,
-        Object.values(FRONTEND_CYCLE_TEMPLATES)
-      );
-      
-      if (!success) {
-        throw new Error('Failed to initialize page cycle');
+      // Mark the current prompt as completed
+      const { error: updateError } = await supabase
+        .from('project_prompts')
+        .update({ is_done: true })
+        .eq('id', promptId);
+
+      if (updateError) {
+        throw updateError;
       }
-      
-      // Refresh the data
-      fetchCycleData();
+
+      // Refresh the cycle data
+      await fetchCycleData();
     } catch (error) {
+      console.error('Error in advanceToNextStep:', error);
       setState(prev => ({
         ...prev,
         isLoading: false,
@@ -155,28 +187,34 @@ export function useCyclePrompts({
     }
   };
 
-  // Advance to the next step
-  const advanceToNextStep = async () => {
-    setState(prev => ({ ...prev, isLoading: true, error: null }));
+  const createNewPrompt = async (notes: string) => {
+    setState(prev => ({ ...prev, isLoading: true }));
     
     try {
-      const success = await advancePageCycle(
-        projectName,
-        pageName,
-        pageRoute,
-        domain,
-        state.currentStep,
-        state.cycleNumber,
-        Object.values(FRONTEND_CYCLE_TEMPLATES)
-      );
-      
-      if (!success) {
-        throw new Error('Failed to advance to next step');
+      const newPrompt = {
+        project: projectName,
+        page: pageName,
+        prompt_cycle_number: state.cycleNumber,
+        prompt_type: 'custom',
+        description: notes,
+        is_done: false,
+        times_used: 0
+      };
+
+      const { data: insertedPrompt, error: insertError } = await supabase
+        .from('project_prompts')
+        .insert(newPrompt)
+        .select()
+        .single();
+
+      if (insertError) {
+        throw insertError;
       }
-      
-      // Refresh the data
-      fetchCycleData();
+
+      // Refresh the cycle data
+      await fetchCycleData();
     } catch (error) {
+      console.error('Error in createNewPrompt:', error);
       setState(prev => ({
         ...prev,
         isLoading: false,
@@ -185,50 +223,15 @@ export function useCyclePrompts({
     }
   };
 
-  // Create a new prompt for the current step
-  const createNewPrompt = async (notes?: string) => {
-    setState(prev => ({ ...prev, isLoading: true, error: null }));
-    
-    try {
-      const template = FRONTEND_CYCLE_TEMPLATES[state.currentStep];
-      
-      if (!template) {
-        throw new Error('No template found for current step');
-      }
-      
-      await createCyclePrompt({
-        projectName,
-        pageName,
-        pageRoute,
-        domain,
-        cycleStep: state.currentStep,
-        cycleNumber: state.cycleNumber,
-        promptTemplate: template,
-        userNotes: notes
-      });
-      
-      // Refresh the data
-      fetchCycleData();
-    } catch (error) {
-      setState(prev => ({
-        ...prev,
-        isLoading: false,
-        error: error instanceof Error ? error.message : 'An unknown error occurred'
-      }));
-    }
-  };
-
-  // Load cycle data on mount
+  // Load initial data
   useEffect(() => {
     fetchCycleData();
   }, [projectName, pageName, pageRoute, domain]);
 
   return {
     ...state,
-    refresh: fetchCycleData,
     initializeCycle,
     advanceToNextStep,
-    createNewPrompt,
-    isInitialized: state.cyclePrompts.length > 0
+    createNewPrompt
   };
 } 

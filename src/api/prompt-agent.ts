@@ -15,7 +15,8 @@ export const getPagesByProject = async (projectId: string): Promise<Page[]> => {
   const { data, error } = await supabase
     .from('pages')
     .select('*')
-    .order('name');
+    .eq('project_id', projectId)
+    .order('priority', { ascending: true });
 
   if (error) {
     console.error('Error fetching pages:', error);
@@ -61,10 +62,10 @@ export const getPromptTemplates = async (): Promise<PromptTemplate[]> => {
   const { data, error } = await supabase
     .from('prompt_templates')
     .select('*')
-    .order('step');
+    .order('order_position', { ascending: true });
 
   if (error) {
-    console.error('Error fetching prompt templates:', error);
+    console.error('Error fetching templates:', error);
     throw error;
   }
 
@@ -89,36 +90,24 @@ export const createPromptTemplate = async (template: Omit<PromptTemplate, 'id'>)
 // Prompts API
 export const getPromptsByPage = async (pageId: string): Promise<UIPrompt[]> => {
   const { data, error } = await supabase
-    .from('project_prompts')
-    .select(`
-      *,
-      page:pages(*),
-      template:prompt_templates(*)
-    `)
+    .from('ui_prompts')
+    .select('*')
     .eq('page_id', pageId)
-    .order('cycle_number');
+    .order('created_at', { ascending: true });
 
   if (error) {
     console.error('Error fetching prompts:', error);
     throw error;
   }
 
-  return data.map(prompt => ({
-    ...prompt,
-    step: prompt.template?.step || '',
-    status: prompt.is_done ? 'completed' : prompt.times_used > 0 ? 'in_progress' : 'not_started'
-  }));
+  return data;
 };
 
-export const createPrompt = async (prompt: Omit<UIPrompt, 'id' | 'step' | 'status'>): Promise<UIPrompt> => {
+export const createPrompt = async (prompt: Partial<UIPrompt>): Promise<UIPrompt> => {
   const { data, error } = await supabase
-    .from('project_prompts')
+    .from('ui_prompts')
     .insert([prompt])
-    .select(`
-      *,
-      page:pages(*),
-      template:prompt_templates(*)
-    `)
+    .select()
     .single();
 
   if (error) {
@@ -126,23 +115,15 @@ export const createPrompt = async (prompt: Omit<UIPrompt, 'id' | 'step' | 'statu
     throw error;
   }
 
-  return {
-    ...data,
-    step: data.template?.step || '',
-    status: data.is_done ? 'completed' : data.times_used > 0 ? 'in_progress' : 'not_started'
-  };
+  return data;
 };
 
-export const updatePrompt = async (id: string, prompt: Partial<UIPrompt>): Promise<UIPrompt> => {
+export const updatePrompt = async (promptId: string, updates: Partial<UIPrompt>): Promise<UIPrompt> => {
   const { data, error } = await supabase
-    .from('project_prompts')
-    .update(prompt)
-    .eq('id', id)
-    .select(`
-      *,
-      page:pages(*),
-      template:prompt_templates(*)
-    `)
+    .from('ui_prompts')
+    .update(updates)
+    .eq('id', promptId)
+    .select()
     .single();
 
   if (error) {
@@ -150,11 +131,7 @@ export const updatePrompt = async (id: string, prompt: Partial<UIPrompt>): Promi
     throw error;
   }
 
-  return {
-    ...data,
-    step: data.template?.step || '',
-    status: data.is_done ? 'completed' : data.times_used > 0 ? 'in_progress' : 'not_started'
-  };
+  return data;
 };
 
 export const advancePageStep = async (pageId: string): Promise<void> => {

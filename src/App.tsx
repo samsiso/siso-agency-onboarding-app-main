@@ -56,7 +56,7 @@ import UserFlowFeedbackPage from './pages/projects/UserFlowFeedbackPage';
 import UserFlowNodesPage from './pages/projects/UserFlowNodesPage';
 import UserFlowCodePage from './pages/projects/UserFlowCodePage';
 import ProjectOnboardingPage from './pages/ProjectOnboardingPage';
-import PromptAgentPage from './pages/admin/PromptAgentPage';
+import { PromptAgentPage } from './pages/admin/PromptAgentPage';
 
 function App() {
   return (
