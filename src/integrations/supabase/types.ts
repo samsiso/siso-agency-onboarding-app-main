@@ -2711,6 +2711,42 @@ export type Database = {
         }
         Relationships: []
       }
+      project_prompts: {
+        Row: {
+          domain: string
+          id: number
+          is_done: boolean
+          last_used: string | null
+          page: string
+          project: string
+          prompt: string
+          prompt_cycle_number: number
+          times_used: number
+        }
+        Insert: {
+          domain: string
+          id?: number
+          is_done?: boolean
+          last_used?: string | null
+          page: string
+          project: string
+          prompt: string
+          prompt_cycle_number: number
+          times_used?: number
+        }
+        Update: {
+          domain?: string
+          id?: number
+          is_done?: boolean
+          last_used?: string | null
+          page?: string
+          project?: string
+          prompt?: string
+          prompt_cycle_number?: number
+          times_used?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -1,7 +1,11 @@
 import { supabase } from '@/integrations/supabase/client';
-import { AutoPrompt, AutoPromptInsert, AutoPromptUpdate } from '@/types/auto-prompts';
+import { AutoPrompt, AutoPromptInsert, AutoPromptUpdate, CycleStep, CycleStatus } from '@/types/auto-prompts';
+import { ProjectPrompt, ProjectPromptInsert, ProjectPromptUpdate, ProjectPromptResponse } from '@/types/project-prompts';
 
-const TABLE_NAME = 'auto_prompts';
+// Table name for project prompts
+const TABLE_NAME = 'project_prompts';
+// Secondary table name - try this if primary doesn't work
+const SECONDARY_TABLE_NAME = 'ui_prompts';
 
 // Mock data for testing
 const MOCK_DATA: AutoPrompt[] = [
@@ -16,6 +20,10 @@ const MOCK_DATA: AutoPrompt[] = [
     feature: 'User Login',
     component: 'LoginForm',
     prompt: 'Create a React component for user login with email and password fields, with proper validation using zod schema. It should connect to the Supabase auth.signIn method and include error handling for invalid credentials.',
+    response: '',
+    cycle_number: 1,
+    cycle_step: CycleStep.Planning,
+    cycle_status: CycleStatus.InProgress,
     status: 'completed',
     priority: 'high',
     notes: 'Login feature for cryptocurrency exchange',
@@ -252,6 +260,14 @@ const MOCK_DATA: AutoPrompt[] = [
   }
 ];
 
+// Update all mock data entries to include required fields
+MOCK_DATA.forEach(prompt => {
+  if (!prompt.response) prompt.response = '';
+  if (!prompt.cycle_number) prompt.cycle_number = 1;
+  if (!prompt.cycle_step) prompt.cycle_step = CycleStep.Planning;
+  if (!prompt.cycle_status) prompt.cycle_status = CycleStatus.InProgress;
+});
+
 // Add to our mock data some page_name and prompt_type values
 MOCK_DATA.forEach((prompt, index) => {
   if (index < 3) { // First 3 prompts for UbahCrypt
@@ -289,6 +305,80 @@ MOCK_DATA.forEach((prompt) => {
 
 export const autoPromptsService = {
   /**
+   * Get the current table name being used
+   */
+  getTableName: () => TABLE_NAME,
+
+  /**
+   * Debug function to test database connection and query for a specific project
+   */
+  debugProjectPrompts: async (project: string): Promise<any> => {
+    console.log(`Debug query for project "${project}" on table "${TABLE_NAME}"`);
+    
+    try {
+      // Test 1: Direct exact match
+      const exactMatch = await supabase
+        .from(TABLE_NAME)
+        .select('*', { count: 'exact' })
+        .eq('project', project);
+      
+      console.log('Exact match result:', {
+        count: exactMatch.count,
+        error: exactMatch.error,
+        data: exactMatch.data?.length || 0,
+        first: exactMatch.data?.[0]
+      });
+      
+      // Test 2: Case-insensitive match
+      const caseInsensitiveMatch = await supabase
+        .from(TABLE_NAME)
+        .select('*', { count: 'exact' })
+        .ilike('project', project);
+      
+      console.log('Case-insensitive match result:', {
+        count: caseInsensitiveMatch.count,
+        error: caseInsensitiveMatch.error,
+        data: caseInsensitiveMatch.data?.length || 0,
+        first: caseInsensitiveMatch.data?.[0]
+      });
+      
+      // Test 3: List all available projects
+      const { data: projectNames, error: projectsError } = await supabase
+        .from(TABLE_NAME)
+        .select('project')
+        .limit(10);
+      
+      const uniqueProjects = projectNames 
+        ? Array.from(new Set(projectNames.map(item => item.project)))
+        : [];
+      
+      console.log('Available projects in database:', {
+        error: projectsError,
+        projects: uniqueProjects
+      });
+
+      return {
+        exactMatch: {
+          count: exactMatch.count,
+          hasError: !!exactMatch.error,
+          errorMessage: exactMatch.error?.message,
+          dataCount: exactMatch.data?.length || 0
+        },
+        caseInsensitiveMatch: {
+          count: caseInsensitiveMatch.count,
+          hasError: !!caseInsensitiveMatch.error,
+          errorMessage: caseInsensitiveMatch.error?.message,
+          dataCount: caseInsensitiveMatch.data?.length || 0
+        },
+        availableProjects: uniqueProjects
+      };
+    } catch (err) {
+      console.error('Debug error:', err);
+      return { error: String(err) };
+    }
+  },
+
+  /**
    * Get all auto prompts
    */
   getAll: async (): Promise<AutoPrompt[]> => {
@@ -300,43 +390,57 @@ export const autoPromptsService = {
 
       if (error) {
         console.error('Error fetching auto prompts:', error);
-        // Return mock data if the table doesn't exist yet
-        return MOCK_DATA;
+        // Return empty array instead of mock data
+        return [];
       }
 
       return data as AutoPrompt[];
     } catch (err) {
       console.error('Exception fetching auto prompts:', err);
-      return MOCK_DATA;
+      return [];
     }
   },
 
   /**
    * Get auto prompts for a specific project
    */
-  getByProject: async (project: string): Promise<AutoPrompt[]> => {
-    if (!project) {
-      console.error('Project name is undefined or empty');
-      return [];
-    }
-    
+  getByProject: async (project: string): Promise<ProjectPromptResponse> => {
     try {
+      // First get the count
+      const { count, error: countError } = await supabase
+        .from(TABLE_NAME)
+        .select('*', { count: 'exact', head: true })
+        .eq('project', project);
+
+      if (countError) {
+        console.error('Error getting count:', countError);
+        return { data: null, error: countError, count: 0 };
+      }
+
+      // Then get the actual data
       const { data, error } = await supabase
         .from(TABLE_NAME)
         .select('*')
         .eq('project', project)
-        .order('created_at', { ascending: false });
+        .order('prompt_cycle_number', { ascending: true });
 
       if (error) {
-        console.error(`Error fetching auto prompts for project ${project}:`, error);
-        // Return filtered mock data if the table doesn't exist yet
-        return MOCK_DATA.filter(item => item.project === project);
+        console.error('Error fetching prompts:', error);
+        return { data: null, error, count: 0 };
       }
 
-      return data as AutoPrompt[];
-    } catch (err) {
-      console.error(`Exception fetching auto prompts for project ${project}:`, err);
-      return MOCK_DATA.filter(item => item.project === project);
+      return { 
+        data: data as ProjectPrompt[], 
+        error: null, 
+        count: count || 0 
+      };
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      return { 
+        data: null, 
+        error: error as Error, 
+        count: 0 
+      };
     }
   },
 
@@ -359,29 +463,28 @@ export const autoPromptsService = {
             
           if (fallbackError) {
             console.error('Error in fallback project fetch:', fallbackError);
-            // Return unique project names from mock data
-            return Array.from(new Set(MOCK_DATA.map(item => item.project)));
+            return [];
           }
           
           const uniqueProjects = Array.from(new Set(fallbackData.map(item => item.project)));
           return uniqueProjects;
         } catch (fallbackErr) {
           console.error('Exception in fallback approach:', fallbackErr);
-          return Array.from(new Set(MOCK_DATA.map(item => item.project)));
+          return [];
         }
       }
       
       return data || [];
     } catch (err) {
       console.error('Exception getting projects:', err);
-      return Array.from(new Set(MOCK_DATA.map(item => item.project)));
+      return [];
     }
   },
 
   /**
    * Create a new auto prompt
    */
-  create: async (prompt: AutoPromptInsert): Promise<AutoPrompt> => {
+  create: async (prompt: ProjectPromptInsert): Promise<{ data: ProjectPrompt | null; error: Error | null }> => {
     try {
       const { data, error } = await supabase
         .from(TABLE_NAME)
@@ -390,39 +493,21 @@ export const autoPromptsService = {
         .single();
 
       if (error) {
-        console.error('Error creating auto prompt:', error);
-        // Return a mock created prompt
-        const mockCreated: AutoPrompt = {
-          id: Date.now().toString(),
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          ...prompt
-        };
-        // Add to mock data for future operations
-        MOCK_DATA.push(mockCreated);
-        return mockCreated;
+        console.error('Error creating prompt:', error);
+        return { data: null, error };
       }
 
-      return data as AutoPrompt;
-    } catch (err) {
-      console.error('Exception creating auto prompt:', err);
-      // Return a mock created prompt
-      const mockCreated: AutoPrompt = {
-        id: Date.now().toString(),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        ...prompt
-      };
-      // Add to mock data for future operations
-      MOCK_DATA.push(mockCreated);
-      return mockCreated;
+      return { data: data as ProjectPrompt, error: null };
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      return { data: null, error: error as Error };
     }
   },
 
   /**
    * Update an existing auto prompt
    */
-  update: async (id: string, updates: AutoPromptUpdate): Promise<AutoPrompt> => {
+  update: async (id: number, updates: ProjectPromptUpdate): Promise<{ data: ProjectPrompt | null; error: Error | null }> => {
     try {
       const { data, error } = await supabase
         .from(TABLE_NAME)
@@ -432,43 +517,21 @@ export const autoPromptsService = {
         .single();
 
       if (error) {
-        console.error(`Error updating auto prompt ${id}:`, error);
-        
-        // Update the mock data and return the updated item
-        const mockIndex = MOCK_DATA.findIndex(item => item.id === id);
-        if (mockIndex !== -1) {
-          MOCK_DATA[mockIndex] = {
-            ...MOCK_DATA[mockIndex],
-            ...updates,
-            updated_at: new Date().toISOString()
-          };
-          return MOCK_DATA[mockIndex];
-        }
-        throw new Error(`Prompt with ID ${id} not found`);
+        console.error('Error updating prompt:', error);
+        return { data: null, error };
       }
 
-      return data as AutoPrompt;
-    } catch (err) {
-      console.error(`Exception updating auto prompt ${id}:`, err);
-      
-      // Update the mock data and return the updated item
-      const mockIndex = MOCK_DATA.findIndex(item => item.id === id);
-      if (mockIndex !== -1) {
-        MOCK_DATA[mockIndex] = {
-          ...MOCK_DATA[mockIndex],
-          ...updates,
-          updated_at: new Date().toISOString()
-        };
-        return MOCK_DATA[mockIndex];
-      }
-      throw new Error(`Prompt with ID ${id} not found`);
+      return { data: data as ProjectPrompt, error: null };
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      return { data: null, error: error as Error };
     }
   },
 
   /**
    * Delete an auto prompt
    */
-  delete: async (id: string): Promise<void> => {
+  delete: async (id: number): Promise<{ error: Error | null }> => {
     try {
       const { error } = await supabase
         .from(TABLE_NAME)
@@ -476,22 +539,14 @@ export const autoPromptsService = {
         .eq('id', id);
 
       if (error) {
-        console.error(`Error deleting auto prompt ${id}:`, error);
+        console.error('Error deleting prompt:', error);
+        return { error };
       }
-      
-      // Also remove from mock data
-      const mockIndex = MOCK_DATA.findIndex(item => item.id === id);
-      if (mockIndex !== -1) {
-        MOCK_DATA.splice(mockIndex, 1);
-      }
-    } catch (err) {
-      console.error(`Exception deleting auto prompt ${id}:`, err);
-      
-      // Remove from mock data
-      const mockIndex = MOCK_DATA.findIndex(item => item.id === id);
-      if (mockIndex !== -1) {
-        MOCK_DATA.splice(mockIndex, 1);
-      }
+
+      return { error: null };
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      return { error: error as Error };
     }
   },
 
@@ -526,26 +581,20 @@ export const autoPromptsService = {
             
           if (fallbackError) {
             console.error('Error in fallback prompts fetch:', fallbackError);
-            return MOCK_DATA.filter(item => 
-              item.project === project && item.page_name === pageName
-            );
+            return [];
           }
           
           return fallbackData as AutoPrompt[];
         } catch (fallbackErr) {
           console.error('Exception in fallback approach:', fallbackErr);
-          return MOCK_DATA.filter(item => 
-            item.project === project && item.page_name === pageName
-          );
+          return [];
         }
       }
       
       return data as AutoPrompt[];
     } catch (err) {
       console.error(`Exception fetching prompts for page ${pageName}:`, err);
-      return MOCK_DATA.filter(item => 
-        item.project === project && item.page_name === pageName
-      );
+      return [];
     }
   },
 
@@ -578,14 +627,7 @@ export const autoPromptsService = {
             
           if (fallbackError) {
             console.error('Error in fallback page names fetch:', fallbackError);
-            // Get unique page names from mock data for this project
-            return Array.from(
-              new Set(
-                MOCK_DATA
-                  .filter(item => item.project === project && item.page_name)
-                  .map(item => item.page_name!)
-              )
-            );
+            return [];
           }
           
           // Extract unique page names
@@ -600,26 +642,14 @@ export const autoPromptsService = {
           return uniquePages;
         } catch (fallbackErr) {
           console.error('Exception in fallback approach:', fallbackErr);
-          return Array.from(
-            new Set(
-              MOCK_DATA
-                .filter(item => item.project === project && item.page_name)
-                .map(item => item.page_name!)
-            )
-          );
+          return [];
         }
       }
       
       return data || [];
     } catch (err) {
       console.error(`Exception fetching page names for project ${project}:`, err);
-      return Array.from(
-        new Set(
-          MOCK_DATA
-            .filter(item => item.project === project && item.page_name)
-            .map(item => item.page_name!)
-        )
-      );
+      return [];
     }
   },
 
@@ -642,14 +672,7 @@ export const autoPromptsService = {
         
       if (error) {
         console.error(`Error fetching domains for project ${project}:`, error);
-        // Return unique domains from mock data for this project
-        return Array.from(
-          new Set(
-            MOCK_DATA
-              .filter(item => item.project === project && item.domain)
-              .map(item => item.domain)
-          )
-        );
+        return [];
       }
       
       // Extract unique domains
@@ -664,13 +687,7 @@ export const autoPromptsService = {
       return uniqueDomains;
     } catch (err) {
       console.error(`Exception fetching domains for project ${project}:`, err);
-      return Array.from(
-        new Set(
-          MOCK_DATA
-            .filter(item => item.project === project && item.domain)
-            .map(item => item.domain)
-        )
-      );
+      return [];
     }
   },
   
@@ -695,17 +712,140 @@ export const autoPromptsService = {
         
       if (error) {
         console.error(`Error fetching prompts for domain ${domain}:`, error);
-        return MOCK_DATA.filter(item => 
-          item.project === project && item.domain === domain
-        );
+        return [];
       }
       
       return data as AutoPrompt[];
     } catch (err) {
       console.error(`Exception fetching prompts for domain ${domain}:`, err);
-      return MOCK_DATA.filter(item => 
-        item.project === project && item.domain === domain
-      );
+      return [];
+    }
+  },
+
+  /**
+   * Get project prompts by project name
+   */
+  getProjectPrompts: async (project: string): Promise<ProjectPromptResponse> => {
+    if (!project) {
+      console.error('Project name is undefined or empty');
+      return { data: null, error: new Error('Project name is required'), count: 0 };
+    }
+
+    try {
+      const { data, error, count } = await supabase
+        .from(TABLE_NAME)
+        .select('*', { count: 'exact' })
+        .ilike('project', project) // Using ilike for case-insensitive comparison
+        .order('prompt_cycle_number', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching project prompts:', error);
+        return { data: null, error, count: 0 };
+      }
+
+      return { data: data as ProjectPrompt[], error: null, count: count || 0 };
+    } catch (err) {
+      console.error('Exception fetching project prompts:', err);
+      return { data: null, error: err as Error, count: 0 };
+    }
+  },
+
+  /**
+   * Create a new project prompt
+   */
+  createProjectPrompt: async (prompt: ProjectPromptInsert): Promise<{ data: ProjectPrompt | null; error: Error | null }> => {
+    try {
+      const { data, error } = await supabase
+        .from(TABLE_NAME)
+        .insert(prompt)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error creating project prompt:', error);
+        return { data: null, error };
+      }
+
+      return { data: data as ProjectPrompt, error: null };
+    } catch (err) {
+      console.error('Exception creating project prompt:', err);
+      return { data: null, error: err as Error };
+    }
+  },
+
+  /**
+   * Update a project prompt
+   */
+  updateProjectPrompt: async (id: number, updates: ProjectPromptUpdate): Promise<{ data: ProjectPrompt | null; error: Error | null }> => {
+    try {
+      const { data, error } = await supabase
+        .from(TABLE_NAME)
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error updating project prompt:', error);
+        return { data: null, error };
+      }
+
+      return { data: data as ProjectPrompt, error: null };
+    } catch (err) {
+      console.error('Exception updating project prompt:', err);
+      return { data: null, error: err as Error };
+    }
+  },
+
+  /**
+   * Delete a project prompt
+   */
+  deleteProjectPrompt: async (id: number): Promise<{ error: Error | null }> => {
+    try {
+      const { error } = await supabase
+        .from(TABLE_NAME)
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error deleting project prompt:', error);
+        return { error };
+      }
+
+      return { error: null };
+    } catch (err) {
+      console.error('Exception deleting project prompt:', err);
+      return { error: err as Error };
+    }
+  },
+
+  /**
+   * Search project prompts by keyword
+   */
+  searchProjectPrompts: async (project: string, searchTerm: string): Promise<ProjectPromptResponse> => {
+    if (!project) {
+      console.error('Project name is undefined or empty');
+      return { data: null, error: new Error('Project name is required'), count: 0 };
+    }
+
+    try {
+      // Use ilike for case-insensitive search across multiple columns
+      const { data, error, count } = await supabase
+        .from(TABLE_NAME)
+        .select('*', { count: 'exact' })
+        .ilike('project', project) // Using ilike for case-insensitive comparison
+        .or(`prompt.ilike.%${searchTerm}%,page.ilike.%${searchTerm}%,domain.ilike.%${searchTerm}%`)
+        .order('prompt_cycle_number', { ascending: true });
+
+      if (error) {
+        console.error('Error searching project prompts:', error);
+        return { data: null, error, count: 0 };
+      }
+
+      return { data: data as ProjectPrompt[], error: null, count: count || 0 };
+    } catch (err) {
+      console.error('Exception searching project prompts:', err);
+      return { data: null, error: err as Error, count: 0 };
     }
   }
 }; 

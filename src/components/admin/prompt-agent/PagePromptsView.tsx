@@ -73,14 +73,13 @@ import {
   DialogTitle,
   DialogDescription
 } from '@/components/ui/dialog';
-import { getPagesByProject, getPromptsByPage, getPromptTemplates, advancePageStep } from '@/api/ui-prompts';
+import { getPagesByProject, getPromptsByPage, getPromptTemplates, advancePageStep } from '@/api/prompt-agent';
 import { UIPrompt, UIPromptStep, Page } from '@/types/ui-prompts';
 import { PageCycleView } from './PageCycleView';
+import { supabase } from '@/integrations/supabase';
 
 interface PagePromptsViewProps {
-  projectName: string;
-  onPromptCreate?: (prompt: Partial<UIPrompt>) => void;
-  onPromptSelect?: (prompt: UIPrompt) => void;
+  projectId: string;
 }
 
 // Default page icons by category
@@ -128,144 +127,407 @@ interface PromptTableProps {
 }
 
 const PromptTable: React.FC<PromptTableProps> = ({ prompts, onPromptSelect, onAdvanceStep }) => {
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+  const totalPages = Math.ceil(prompts.length / pageSize);
+  
+  const paginatedPrompts = prompts.slice((page - 1) * pageSize, page * pageSize);
+  
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Prompt Step</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Last Updated</TableHead>
-          <TableHead className="text-right">Actions</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {prompts.length === 0 ? (
-          <TableRow>
-            <TableCell colSpan={4} className="text-center text-muted-foreground">
-              No prompts found for this page
-            </TableCell>
-          </TableRow>
-        ) : (
-          prompts.map((prompt) => (
-            <TableRow 
-              key={prompt.id}
-              className="cursor-pointer hover:bg-muted/50"
-            >
-              <TableCell>
-                <div className="flex items-center">
-                  {getStepIcon(prompt.step)}
-                  <span className="ml-2 font-medium">{formatStepName(prompt.step)}</span>
-                </div>
-              </TableCell>
-              <TableCell>
-                <Badge 
-                  variant={
-                    prompt.status === 'completed' ? 'default' :
-                    prompt.status === 'in_progress' ? 'secondary' :
-                    prompt.status === 'draft' ? 'outline' :
-                    'destructive'
-                  }
-                >
-                  {prompt.status.replace('_', ' ')}
-                </Badge>
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <Clock className="mr-1 h-3 w-3" />
-                  {new Date(prompt.updated_at).toLocaleDateString()}
-                </div>
-              </TableCell>
-              <TableCell className="text-right">
-                <div className="flex justify-end space-x-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onPromptSelect?.(prompt);
-                    }}
-                  >
-                    View
-                  </Button>
-                  {prompt.status !== 'completed' && (
-                    <Button
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onAdvanceStep?.(prompt.page_id);
-                      }}
-                    >
-                      <ArrowRight className="mr-1 h-3 w-3" />
-                      Next Step
-                    </Button>
-                  )}
-                </div>
-              </TableCell>
+    <div className="bg-white rounded-lg border shadow-sm">
+      <div className="flex justify-between items-center p-4 border-b">
+        <div className="flex items-center space-x-4">
+          <h3 className="text-lg font-semibold">All Prompts</h3>
+          <Badge variant="outline" className="px-3 py-1 text-sm font-medium bg-blue-50 text-blue-700 border-blue-200">
+            Total Prompts: {prompts.length}
+          </Badge>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Input 
+            type="search"
+            placeholder="Filter prompts..."
+            className="w-64"
+          />
+          <Button variant="outline" size="sm">
+            <Search className="h-4 w-4 mr-2" />
+            Filter
+          </Button>
+        </div>
+      </div>
+      
+      <div className="overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-gray-50 hover:bg-gray-50">
+              <TableHead className="font-semibold text-gray-700">Feature</TableHead>
+              <TableHead className="font-semibold text-gray-700">Module</TableHead>
+              <TableHead className="font-semibold text-gray-700">Component</TableHead>
+              <TableHead className="font-semibold text-gray-700">Step</TableHead>
+              <TableHead className="font-semibold text-gray-700">Status</TableHead>
+              <TableHead className="font-semibold text-gray-700">Priority</TableHead>
+              <TableHead className="text-right font-semibold text-gray-700">Actions</TableHead>
             </TableRow>
-          ))
-        )}
-      </TableBody>
-    </Table>
+          </TableHeader>
+          <TableBody>
+            {prompts.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className="h-32 text-center text-muted-foreground">
+                  <div className="flex flex-col items-center justify-center space-y-2">
+                    <Search className="h-8 w-8 text-gray-400" />
+                    <p>No prompts found</p>
+                    <Button variant="outline" size="sm">Add New Prompt</Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : (
+              paginatedPrompts.map((prompt) => (
+                <TableRow 
+                  key={prompt.id}
+                  className="group cursor-pointer transition-colors hover:bg-blue-50/50"
+                >
+                  <TableCell>
+                    <div className="flex items-center space-x-2">
+                      {getStepIcon(prompt.step)}
+                      <span className="font-medium text-gray-900">{prompt.page?.name || prompt.page_id || 'N/A'}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-gray-700">{prompt.template?.title || prompt.step || 'N/A'}</TableCell>
+                  <TableCell className="text-gray-700">{prompt.page?.category || 'N/A'}</TableCell>
+                  <TableCell className="text-gray-700">{prompt.cycle_number}</TableCell>
+                  <TableCell>
+                    <Badge 
+                      variant={
+                        prompt.status === 'completed' ? 'default' :
+                        prompt.status === 'in_progress' ? 'secondary' :
+                        'outline'
+                      }
+                      className={
+                        prompt.status === 'completed' ? 'bg-green-100 text-green-800 border-green-200' :
+                        prompt.status === 'in_progress' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' :
+                        'bg-gray-100 text-gray-800 border-gray-200'
+                      }
+                    >
+                      {prompt.status.replace('_', ' ')}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge 
+                      variant={
+                        (prompt.template?.step && prompt.template?.step.includes('execute')) ? 'destructive' :
+                        (prompt.template?.step && prompt.template?.step.includes('plan')) ? 'secondary' :
+                        'default'
+                      }
+                      className={
+                        (prompt.template?.step && prompt.template?.step.includes('execute')) ? 'bg-red-100 text-red-800 border-red-200' :
+                        (prompt.template?.step && prompt.template?.step.includes('plan')) ? 'bg-purple-100 text-purple-800 border-purple-200' :
+                        'bg-blue-100 text-blue-800 border-blue-200'
+                      }
+                    >
+                      {(prompt.template?.step && prompt.template?.step.includes('execute') ? 'High' :
+                       prompt.template?.step && prompt.template?.step.includes('plan') ? 'Medium' :
+                       'Low')}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        className="hover:bg-blue-100 hover:text-blue-700"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onPromptSelect?.(prompt);
+                        }}
+                      >
+                        View
+                      </Button>
+                      {prompt.status !== 'completed' && (
+                        <Button
+                          size="sm"
+                          className="bg-blue-600 hover:bg-blue-700 text-white"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onAdvanceStep?.(prompt.page_id);
+                          }}
+                        >
+                          <ArrowRight className="mr-1 h-3 w-3" />
+                          Next Step
+                        </Button>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      
+      {totalPages > 1 && (
+        <div className="flex justify-between items-center p-4 border-t bg-gray-50">
+          <div className="text-sm text-gray-600">
+            Showing {Math.min(prompts.length, (page - 1) * pageSize + 1)} to {Math.min(prompts.length, page * pageSize)} of {prompts.length} prompts
+          </div>
+          <div className="flex space-x-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="hover:bg-blue-50"
+            >
+              Previous
+            </Button>
+            <div className="flex items-center space-x-1">
+              {Array.from({length: Math.min(totalPages, 5)}, (_, i) => {
+                const pageNum = i + 1;
+                return (
+                  <Button 
+                    key={i}
+                    variant={pageNum === page ? "default" : "outline"}
+                    size="sm"
+                    className={`w-8 h-8 p-0 ${
+                      pageNum === page 
+                        ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                        : 'hover:bg-blue-50'
+                    }`}
+                    onClick={() => setPage(pageNum)}
+                  >
+                    {pageNum}
+                  </Button>
+                );
+              })}
+              {totalPages > 5 && <span className="mx-1">...</span>}
+              {totalPages > 5 && (
+                <Button 
+                  variant={totalPages === page ? "default" : "outline"}
+                  size="sm"
+                  className={`w-8 h-8 p-0 ${
+                    totalPages === page 
+                      ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                      : 'hover:bg-blue-50'
+                  }`}
+                  onClick={() => setPage(totalPages)}
+                >
+                  {totalPages}
+                </Button>
+              )}
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="hover:bg-blue-50"
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
-export const PagePromptsView: React.FC<PagePromptsViewProps> = ({
-  projectName,
-  onPromptCreate,
-  onPromptSelect
-}) => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedPage, setSelectedPage] = useState<string | null>(null);
-  const [selectedPageId, setSelectedPageId] = useState<string | null>(null);
-  const [isCycleViewOpen, setIsCycleViewOpen] = useState(false);
+export const PagePromptsView: React.FC<PagePromptsViewProps> = ({ projectId }) => {
   const [pages, setPages] = useState<Page[]>([]);
+  const [allPrompts, setAllPrompts] = useState<UIPrompt[]>([]);
   const [pagePrompts, setPagePrompts] = useState<Record<string, UIPrompt[]>>({});
-  const [templates, setTemplates] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [selectedPage, setSelectedPage] = useState<string>('');
+  const [selectedPageId, setSelectedPageId] = useState<string>('');
+  const [isCycleViewOpen, setIsCycleViewOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [debugInfo, setDebugInfo] = useState<string>('');
+  const location = window.location;
   const navigate = useNavigate();
 
-  // Fetch pages and templates on mount
+  // Add comprehensive debug output to help diagnose
   useEffect(() => {
-    const fetchData = async () => {
+    // Capture route information
+    const routeInfo = {
+      pathname: location.pathname,
+      search: location.search,
+      hash: location.hash,
+      projectId,
+      href: location.href,
+    };
+    console.log("Route debug info:", routeInfo);
+    
+    // Check if we're in the correct route for UbahCrypt
+    const isUbahCryptRoute = location.pathname.toLowerCase().includes('ubahcrypt');
+    console.log(`Is this an UbahCrypt route? ${isUbahCryptRoute}`);
+    
+    // Parse route to extract specific project if present
+    const segments = location.pathname.split('/');
+    const projectSegment = segments.find(s => 
+      s.toLowerCase() === 'ubahcrypt' || 
+      decodeURIComponent(s).toLowerCase() === 'ubahcrypt'
+    );
+    
+    console.log(`Project segment found in URL: ${projectSegment || 'none'}`);
+    
+    // If we're on a UbahCrypt route, immediately trigger a query with the right case
+    if (isUbahCryptRoute) {
+      console.log("UbahCrypt route detected, will use 'UbahCrypt' for queries");
+    }
+    
+    setDebugInfo(JSON.stringify({
+      ...routeInfo,
+      isUbahCryptRoute,
+      projectSegment,
+      effectiveProject: isUbahCryptRoute ? 'UbahCrypt' : projectId
+    }, null, 2));
+  }, [location, projectId]);
+
+  // Function to directly fetch all prompts from project_prompts table
+  const fetchAllPrompts = async () => {
+    try {
+      console.log(`ProjectId passed to component: "${projectId}"`);
+      
+      // UbahCrypt is a special case - our component receives a projectId but the database 
+      // uses a specific project name string
+      const isUbahCryptRoute = location.pathname.toLowerCase().includes('ubahcrypt');
+      const effectiveProjectName = isUbahCryptRoute ? 'UbahCrypt' : projectId;
+      
+      console.log(`Using effective project name for query: "${effectiveProjectName}"`);
+      
+      // Query project_prompts table with the effective project name
+      const { data, error } = await supabase
+        .from('project_prompts')
+        .select('*')
+        .eq('project', effectiveProjectName)
+        .order('id');
+
+      if (error) {
+        console.error('Error fetching all prompts:', error);
+        setError(`Failed to fetch prompts: ${error.message}`);
+        return [];
+      }
+
+      console.log(`Successfully loaded ${data?.length || 0} prompts for project=${effectiveProjectName}`);
+
+      // Format the prompts for display
+      const formattedPrompts = data.map(prompt => ({
+        ...prompt,
+        id: prompt.id.toString(),
+        page_id: prompt.page,
+        cycle_number: prompt.prompt_cycle_number,
+        template: { 
+          step: `cycle_${prompt.prompt_cycle_number}`,
+          title: prompt.page 
+        },
+        page: { 
+          name: prompt.page,
+          category: prompt.domain,
+          id: prompt.page
+        },
+        status: prompt.is_done ? 'completed' : prompt.times_used > 0 ? 'in_progress' : 'not_started',
+        step: `cycle_${prompt.prompt_cycle_number}`
+      }));
+
+      return formattedPrompts;
+    } catch (e) {
+      console.error('Exception fetching all prompts:', e);
+      setError(`Exception fetching prompts: ${e instanceof Error ? e.message : String(e)}`);
+      return [];
+    }
+  };
+
+  // Function to directly fetch all pages
+  const fetchAllPages = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('pages')
+        .select('*')
+        .order('name');
+
+      if (error) {
+        console.error('Error fetching pages:', error);
+        setError(`Failed to fetch pages: ${error.message}`);
+        return [];
+      }
+
+      console.log(`Successfully loaded ${data.length} pages`);
+      return data;
+    } catch (e) {
+      console.error('Exception fetching pages:', e);
+      setError(`Exception fetching pages: ${e instanceof Error ? e.message : String(e)}`);
+      return [];
+    }
+  };
+
+  useEffect(() => {
+    const loadData = async () => {
       setIsLoading(true);
+      setError(null);
+      
       try {
-        // Fetch all pages for the project
-        const fetchedPages = await getPagesByProject('ubahcrypt');
-        setPages(fetchedPages);
+        // Load prompts directly from the project_prompts table
+        const allPromptsData = await fetchAllPrompts();
+        setAllPrompts(allPromptsData);
         
-        // Fetch templates
-        const fetchedTemplates = await getPromptTemplates();
-        setTemplates(fetchedTemplates);
+        // Group prompts by page
+        const pages = Array.from(new Set(allPromptsData.map(p => p.page_id)))
+          .map(pageId => {
+            const pagePrompts = allPromptsData.filter(p => p.page_id === pageId);
+            const firstPrompt = pagePrompts[0];
+            return {
+              id: pageId,
+              name: firstPrompt?.page?.name || pageId,
+              category: firstPrompt?.page?.category || 'Uncategorized',
+              status: pagePrompts.every(p => p.status === 'completed') ? 'completed' : 'in_progress',
+              project_id: projectId,
+              route: `/${pageId.toLowerCase().replace(/\s+/g, '-')}`,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            } as Page;
+          });
         
-        // Fetch prompts for each page
-        const promptsMap: Record<string, UIPrompt[]> = {};
-        for (const page of fetchedPages) {
-          const pagePrompts = await getPromptsByPage(page.id);
-          promptsMap[page.id] = pagePrompts;
-        }
-        setPagePrompts(promptsMap);
-      } catch (error) {
-        console.error('Error fetching data:', error);
+        setPages(pages);
+        
+        // Organize prompts by page
+        const promptsByPage: Record<string, UIPrompt[]> = {};
+        allPromptsData.forEach(prompt => {
+          if (prompt.page_id) {
+            if (!promptsByPage[prompt.page_id]) {
+              promptsByPage[prompt.page_id] = [];
+            }
+            promptsByPage[prompt.page_id].push(prompt);
+          }
+        });
+        setPagePrompts(promptsByPage);
+      } catch (e) {
+        console.error('Error loading data:', e);
+        setError(`Failed to load data: ${e instanceof Error ? e.message : String(e)}`);
       } finally {
         setIsLoading(false);
       }
     };
     
-    fetchData();
-  }, []);
+    loadData();
+  }, [projectId]);
 
-  // Filter pages based on search query
-  const filteredPages = pages.filter((page) => {
-    const searchLower = searchQuery.toLowerCase();
-    return page.name.toLowerCase().includes(searchLower) ||
-           page.description?.toLowerCase().includes(searchLower) ||
-           page.category?.toLowerCase().includes(searchLower);
-  });
+  const filteredPages = pages.filter(page => 
+    page.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    page.category?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  const handleViewCycle = (page: Page) => {
+  const handleViewCycle = async (page: Page) => {
     setSelectedPage(page.name);
     setSelectedPageId(page.id);
     setIsCycleViewOpen(true);
+
+    try {
+      const prompts = await getPromptsByPage(page.id);
+      setPagePrompts(prev => ({
+        ...prev,
+        [page.id]: prompts
+      }));
+    } catch (error) {
+      console.error('Error loading prompts:', error);
+    }
   };
 
   const handleAdvanceStep = async (pageId: string) => {
@@ -300,11 +562,90 @@ export const PagePromptsView: React.FC<PagePromptsViewProps> = ({
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Crypto Trading Platform</h2>
-        <Button onClick={() => navigate('/admin/database-setup')}>
-          <RefreshCcw className="h-4 w-4 mr-2" />
-          Refresh Database
-        </Button>
+        <div className="flex space-x-3">
+          <Badge variant="outline" className="px-2 py-1 text-sm">
+            Total Prompts: {allPrompts.length}
+          </Badge>
+          <Button onClick={() => navigate('/admin/database-setup')}>
+            <RefreshCcw className="h-4 w-4 mr-2" />
+            Refresh Database
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={async () => {
+              try {
+                // Try case-specific UbahCrypt query
+                const { count: ubahCryptCount, error: ubahCryptError } = await supabase
+                  .from('project_prompts')
+                  .select('*', { count: 'exact', head: true })
+                  .eq('project', 'UbahCrypt');
+                
+                if (ubahCryptError) {
+                  console.error("Error querying 'UbahCrypt':", ubahCryptError);
+                  return;
+                }
+                
+                // Check if we got the right count
+                if (ubahCryptCount === 210) {
+                  console.log("Found 210 records with 'UbahCrypt'!");
+                  alert(`Success! Found ${ubahCryptCount} records with project='UbahCrypt'`);
+                  
+                  // Now refresh the data with this specific value
+                  setIsLoading(true);
+                  const allPromptsData = await fetchAllPrompts();
+                  setAllPrompts(allPromptsData);
+                  setIsLoading(false);
+                } else {
+                  console.log(`Found ${ubahCryptCount} records with 'UbahCrypt', expected 210`);
+                  alert(`Found ${ubahCryptCount} records with project='UbahCrypt'`);
+                }
+              } catch (e) {
+                console.error('Exception in debug:', e);
+              }
+            }}
+          >
+            <Database className="h-4 w-4 mr-2" />
+            Force UbahCrypt
+          </Button>
+          <Button 
+            variant="secondary"
+            onClick={() => {
+              // Log detailed component state for debugging
+              const state = {
+                projectId,
+                pagesCount: pages.length,
+                allPromptsCount: allPrompts.length,
+                pagePromptsCount: Object.keys(pagePrompts).length,
+                searchTerm,
+                url: window.location.href,
+                routeParams: location.pathname.split('/'),
+              };
+              console.log("Component State:", state);
+              
+              // Display in alert for easy viewing
+              alert(
+                `Debug Info:\n\n` +
+                `URL: ${window.location.href}\n` +
+                `Project ID: ${projectId}\n` + 
+                `Pages: ${pages.length}\n` +
+                `Prompts: ${allPrompts.length}\n` +
+                `Route: ${location.pathname}\n\n` +
+                `Route Analysis: ${JSON.stringify(location.pathname.split('/'), null, 2)}`
+              );
+            }}
+          >
+            <Search className="h-4 w-4 mr-2" />
+            Debug Routes
+          </Button>
+        </div>
       </div>
+
+      {debugInfo && (
+        <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs font-mono">
+          <div className="font-semibold mb-1">Debug Info:</div>
+          <pre>{debugInfo}</pre>
+        </div>
+      )}
 
       <div className="relative">
         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -312,10 +653,17 @@ export const PagePromptsView: React.FC<PagePromptsViewProps> = ({
           type="search"
           placeholder="Search pages..."
           className="pl-8"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+          <p className="font-medium">Error Loading Data</p>
+          <p className="text-sm">{error}</p>
+        </div>
+      )}
 
       {isLoading ? (
         <div className="flex justify-center py-8">
@@ -325,92 +673,88 @@ export const PagePromptsView: React.FC<PagePromptsViewProps> = ({
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6">
-          {Object.entries(pagesByCategory).map(([category, categoryPages]) => (
-            <Card key={category} className="w-full">
-              <CardHeader>
-                <div className="flex items-center space-x-2">
-                  <div className="p-2 rounded-md bg-primary/10">
-                    {categoryIcons[category] || <Layers className="h-6 w-6" />}
-                  </div>
-                  <CardTitle>{category}</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {categoryPages.map(page => (
-                    <Card key={page.id} className="w-full">
-                      <CardHeader className="pb-2">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <CardTitle className="text-lg">{page.name}</CardTitle>
-                            <CardDescription className="mt-1">
-                              {page.description || `Route: ${page.route}`}
-                            </CardDescription>
-                          </div>
-                          <Badge variant="outline">{page.status}</Badge>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <PromptTable 
-                          prompts={pagePrompts[page.id] || []} 
-                          onPromptSelect={onPromptSelect}
-                          onAdvanceStep={handleAdvanceStep}
-                        />
-                        <div className="flex justify-end mt-4">
-                          <Button 
+        <>
+          <PromptTable 
+            prompts={allPrompts} 
+            onPromptSelect={(prompt) => {
+              setSelectedPage(prompt.page?.name || '');
+              setSelectedPageId(prompt.page_id);
+              setIsCycleViewOpen(true);
+            }}
+            onAdvanceStep={handleAdvanceStep}
+          />
+
+          <div className="space-y-8">
+            {Object.entries(pagesByCategory).map(([category, pages]) => (
+              <div key={category}>
+                <h3 className="mb-4 text-lg font-semibold">{category}</h3>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {pages.map((page) => (
+                    <div
+                      key={page.id}
+                      className="rounded-lg border bg-card text-card-foreground shadow-sm"
+                    >
+                      <div className="p-6">
+                        <h4 className="text-lg font-semibold">{page.name}</h4>
+                        {page.description && (
+                          <p className="mt-2 text-sm text-muted-foreground">
+                            {page.description}
+                          </p>
+                        )}
+                        <div className="mt-4 flex items-center justify-between">
+                          <Badge variant={page.status === 'completed' ? 'default' : 'secondary'}>
+                            {page.status}
+                          </Badge>
+                          <Button
+                            variant="outline"
                             onClick={() => handleViewCycle(page)}
                           >
-                            View Complete Development Cycle
+                            View Cycle
                           </Button>
                         </div>
-                      </CardContent>
-                    </Card>
+                      </div>
+                    </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
 
-      {/* Cycle View Dialog */}
       <Dialog open={isCycleViewOpen} onOpenChange={setIsCycleViewOpen}>
-        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl">
           <DialogHeader>
-            <DialogTitle>{selectedPage} Development Cycle</DialogTitle>
-            <DialogDescription>
-              This page shows the complete development cycle for this component
-            </DialogDescription>
+            <DialogTitle>{selectedPage} Prompt Cycle</DialogTitle>
           </DialogHeader>
-
-          {selectedPageId && (
+          {selectedPageId && pagePrompts[selectedPageId] && (
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                {templates.map(template => (
-                  <Card key={template.id} className="w-full">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-md flex items-center">
-                        {getStepIcon(template.step)}
-                        <span className="ml-2">{template.title}</span>
-                      </CardTitle>
-                      <div className="flex items-center text-sm text-muted-foreground mt-1">
-                        <Clock className="mr-1 h-3 w-3" />
-                        <span>{template.estimated_time}</span>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="text-sm">
-                      <p>{template.description}</p>
-                      
-                      {pagePrompts[selectedPageId]?.some(p => p.step === template.step) ? (
-                        <Badge className="mt-2" variant="default">Prompt Generated</Badge>
-                      ) : (
-                        <Badge className="mt-2" variant="outline">Not Started</Badge>
-                      )}
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Step</TableHead>
+                    <TableHead>Prompt</TableHead>
+                    <TableHead>Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {pagePrompts[selectedPageId].map((prompt) => (
+                    <TableRow key={prompt.id}>
+                      <TableCell>{prompt.cycle_number}</TableCell>
+                      <TableCell>
+                        <div className="max-w-xl">
+                          <p className="line-clamp-2">{prompt.prompt}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={prompt.is_done ? 'default' : 'secondary'}>
+                          {prompt.is_done ? 'Completed' : 'Pending'}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
               
               <div className="flex justify-end">
                 <Button 

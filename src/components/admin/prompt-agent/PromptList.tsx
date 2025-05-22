@@ -370,30 +370,30 @@ export const PromptList: React.FC<PromptListProps> = ({ projectName }) => {
       ) : (
         <div className="flex-1 flex flex-col">
           {/* Table Header */}
-          <div className="grid grid-cols-9 gap-1 px-4 py-3 bg-gray-800 border-y border-gray-700 text-xs font-medium sticky top-0 z-10">
-            <div className="flex items-center cursor-pointer hover:text-blue-400 transition-colors w-12" onClick={() => handleSort('id')}>
+          <div className="grid grid-cols-8 gap-4 px-4 py-3 bg-gray-800 border-y border-gray-700 text-xs font-medium sticky top-0 z-10">
+            <div className="flex items-center cursor-pointer hover:text-blue-400 transition-colors w-14" onClick={() => handleSort('id')}>
               ID {renderSortArrow('id')}
             </div>
-            <div className="flex items-center justify-center w-12">
+            <div className="flex items-center w-10">
               Status
             </div>
-            <div className="col-span-2 flex items-center cursor-pointer hover:text-blue-400 transition-colors" onClick={() => handleSort('page')}>
+            <div className="flex items-center cursor-pointer hover:text-blue-400 transition-colors" onClick={() => handleSort('page')}>
               Page {renderSortArrow('page')}
             </div>
             <div className="flex items-center cursor-pointer hover:text-blue-400 transition-colors" onClick={() => handleSort('domain')}>
               Domain {renderSortArrow('domain')}
             </div>
-            <div className="flex items-center cursor-pointer hover:text-blue-400 transition-colors w-24" onClick={() => handleSort('prompt_cycle_number')}>
+            <div className="flex items-center cursor-pointer hover:text-blue-400 transition-colors" onClick={() => handleSort('prompt_cycle_number')}>
               Cycle {renderSortArrow('prompt_cycle_number')}
             </div>
-            <div className="flex items-center cursor-pointer hover:text-blue-400 transition-colors col-span-2" onClick={() => handleSort('model')}>
+            <div className="flex items-center cursor-pointer hover:text-blue-400 transition-colors" onClick={() => handleSort('model')}>
               Model {renderSortArrow('model')}
             </div>
-            <div className="flex items-center cursor-pointer hover:text-blue-400 transition-colors w-28" onClick={() => handleSort('times_used')}>
+            <div className="flex items-center cursor-pointer hover:text-blue-400 transition-colors" onClick={() => handleSort('times_used')}>
               Used {renderSortArrow('times_used')}
             </div>
-            <div className="flex items-center cursor-pointer hover:text-blue-400 transition-colors" onClick={() => handleSort('last_used')}>
-              Last Used {renderSortArrow('last_used')}
+            <div className="flex items-center justify-between cursor-pointer hover:text-blue-400 transition-colors" onClick={() => handleSort('last_used')}>
+              <span>Last Used</span> {renderSortArrow('last_used')}
             </div>
           </div>
 
@@ -415,23 +415,28 @@ export const PromptList: React.FC<PromptListProps> = ({ projectName }) => {
                   return (
                     <div 
                       key={prompt.id} 
-                      className={`grid grid-cols-9 gap-1 px-4 py-3 text-sm hover:bg-gray-800/50 transition-colors relative ${pageStyle?.shade || ''}`}
+                      className={`grid grid-cols-8 gap-4 px-4 py-3 text-sm hover:bg-gray-800/50 transition-colors relative group ${pageStyle?.shade || ''}`}
                     >
-                      {/* Vertical color indicator */}
+                      {/* Left color indicator */}
                       {pageStyle && (
                         <div className={`absolute left-0 top-0 bottom-0 w-1 ${pageStyle.color.split(' ')[0]}`}></div>
                       )}
-                      <div className="flex items-center font-mono text-xs text-gray-500 w-12">
+                      {/* Right color indicator */}
+                      {pageStyle && (
+                        <div className={`absolute right-0 top-0 bottom-0 w-1 ${pageStyle.color.split(' ')[0]}`}></div>
+                      )}
+                      
+                      <div className="flex items-center font-mono text-xs text-gray-500 w-14">
                         {prompt.id}
                       </div>
-                      <div className="flex items-center justify-center w-12">
+                      <div className="flex items-center w-10">
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger>
                               {prompt.is_done ? (
-                                <CheckCircle className="h-5 w-5 text-green-500" />
+                                <CheckCircle className="h-4 w-4 text-green-500" />
                               ) : (
-                                <Play className="h-5 w-5 text-amber-500" />
+                                <Play className="h-4 w-4 text-amber-500" />
                               )}
                             </TooltipTrigger>
                             <TooltipContent>
@@ -440,29 +445,29 @@ export const PromptList: React.FC<PromptListProps> = ({ projectName }) => {
                           </Tooltip>
                         </TooltipProvider>
                       </div>
-                      <div className="col-span-2 flex items-center">
+                      <div className="flex items-center overflow-hidden">
                         <span className={`font-medium truncate ${pageStyle?.color.split(' ')[1] || 'text-gray-200'}`}>
                           {prompt.page}
                         </span>
                       </div>
                       <div className="flex items-center">
-                        <Badge variant="outline" className="font-normal text-gray-300 border-gray-700">
+                        <Badge variant="outline" className="font-normal text-gray-300 border-gray-700 truncate">
                           {prompt.domain || 'N/A'}
                         </Badge>
                       </div>
-                      <div className="flex items-center w-24">
+                      <div className="flex items-center">
                         {getCycleBadge(prompt.prompt_cycle_number)}
                       </div>
-                      <div className="flex items-center col-span-2">
-                        <Badge variant="outline" className="font-normal bg-gray-800 border-gray-700 text-purple-300 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <Badge variant="outline" className="font-normal bg-gray-800 border-gray-700 text-purple-300 truncate">
                           <Wand2 className="h-3 w-3 mr-1" />
-                          Claude 3.5 Sonnet
+                          Claude 3.5
                         </Badge>
                       </div>
-                      <div className="flex items-center text-gray-300 w-28">
+                      <div className="flex items-center text-gray-300">
                         {prompt.times_used || 0}
                       </div>
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between pr-3">
                         <span className="text-xs text-gray-500">
                           {formatDate(prompt.last_used)}
                         </span>
@@ -472,10 +477,9 @@ export const PromptList: React.FC<PromptListProps> = ({ projectName }) => {
                               variant="ghost" 
                               size="sm"
                               onClick={() => setSelectedPrompt(prompt)}
-                              className="ml-2 hover:bg-gray-700 text-gray-300"
+                              className="opacity-0 group-hover:opacity-100 -my-1 h-7 px-2 hover:bg-gray-700 text-gray-300"
                             >
-                              <Eye className="h-4 w-4 mr-1" />
-                              View
+                              <Eye className="h-3.5 w-3.5" />
                             </Button>
                           </DialogTrigger>
                           <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto bg-gray-900 border-gray-800 text-gray-200">

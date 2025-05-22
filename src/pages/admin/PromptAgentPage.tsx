@@ -134,7 +134,10 @@ export const PromptAgentPage = () => {
                   
                   {/* Pages View - New grouped by page view */}
                   <TabsContent value="pages" className="mt-0">
-                    <PagePromptsView projectName={decodedProjectName} />
+                    <div className="text-xs bg-yellow-50 rounded p-2 mb-4">
+                      Debug: projectName={decodedProjectName || "undefined"}
+                    </div>
+                    <PagePromptsView projectId={decodedProjectName || ""} />
                   </TabsContent>
                   
                   {/* List View - Original flat list view */}

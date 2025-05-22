@@ -128,4 +128,28 @@ export const CYCLE_STEP_LABELS: Record<CycleStep, string> = {
   [CycleStep.Execution2]: 'Execution Phase 2',
   [CycleStep.Execution3]: 'Execution Phase 3',
   [CycleStep.FinalReview]: 'Final Review'
+};
+
+import { Database } from '@/integrations/supabase/types';
+
+export type ProjectPrompt = {
+  id: number;
+  project: string;
+  page: string;
+  domain: string;
+  prompt_cycle_number: number;
+  prompt: string;
+  times_used: number;
+  is_done: boolean;
+  last_used: string;
+};
+
+export type ProjectPromptInsert = Omit<ProjectPrompt, 'id' | 'times_used' | 'last_used'>;
+export type ProjectPromptUpdate = Partial<ProjectPromptInsert>;
+
+// Type for the response from getByProject
+export type ProjectPromptResponse = {
+  data: ProjectPrompt[] | null;
+  error: Error | null;
+  count: number;
 }; 
