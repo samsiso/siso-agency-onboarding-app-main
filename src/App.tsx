@@ -10,6 +10,7 @@ import ThankYou from './pages/ThankYou';
 import ThankYouPlan from './pages/ThankYou';
 import Plan from './pages/Plan';
 import DecoraPlan from './pages/DecoraPlan';
+import PublicPlanView from './pages/PublicPlanView';
 import Congratulations from './pages/onboarding/congratulations';
 import Home from './pages/Home';
 import CryptoExchange from './pages/CryptoExchange';
@@ -71,6 +72,7 @@ function App() {
         <Route path="/thankyou" element={<ThankYou />} />
         <Route path="/thankyou-plan" element={<ThankYouPlan />} />
         <Route path="/plan/:username" element={<Plan />} />
+        <Route path="/plan/:slug" element={<PublicPlanView />} />
         <Route path="/decora-plan" element={<DecoraPlan />} />
         
         {/* Admin routes - using adminOnly prop to enforce admin access */}

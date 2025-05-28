@@ -1,9 +1,9 @@
-
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AdminLayout } from '@/components/admin/layout/AdminLayout';
 import { Card } from '@/components/ui/card';
 import { BulkPlanCreation } from '@/components/admin/BulkPlanCreation';
+import { ShareablePlansSection } from '@/components/admin/templates/ShareablePlansSection';
 import { useAdminCheck } from '@/hooks/useAdminCheck';
 import { Loader2, FileStack } from 'lucide-react';
 import { AdminPageTitle } from '@/components/admin/layout/AdminPageTitle';
@@ -38,8 +38,9 @@ export default function AdminTemplates() {
           title="Plan Templates"
           subtitle="Bulk-create or manage your plan templates for efficient onboarding"
         />
-        <div className="space-y-6">
+        <div className="space-y-8">
           <BulkPlanCreation />
+          <ShareablePlansSection />
         </div>
       </div>
     </AdminLayout>
