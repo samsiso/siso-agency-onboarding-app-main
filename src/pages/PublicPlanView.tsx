@@ -15,6 +15,65 @@ import {
 
 // Mock plan data for demonstration
 const mockPlanData = {
+  'juice-bar': {
+    title: 'Juice Bar Mobile App Development Plan',
+    company: 'SISO Agency',
+    sections: {
+      overview: `We'll create a comprehensive mobile application for your juice bar that allows customers to browse your menu, customize orders, make payments, and schedule pickups. This solution includes both iOS and Android versions with a robust admin panel for order management and analytics.
+
+The app will feature modern UI/UX design with vibrant branding, secure payment processing, real-time order tracking, and comprehensive analytics dashboard for business insights.`,
+      features: [
+        'User Registration & Profiles',
+        'Interactive Menu with Nutritional Info',
+        'Custom Juice Builder with Ingredients',
+        'Secure Payment Gateway',
+        'Order Scheduling & Pickup Times',
+        'Loyalty Program Integration',
+        'Push Notifications for Order Updates',
+        'Admin Dashboard for Order Management',
+        'Inventory Management System',
+        'Customer Analytics & Insights',
+        'Social Media Integration',
+        'Review & Rating System'
+      ],
+      timeline: `Phase 1: UI/UX Design & Branding (2 weeks)
+Phase 2: Backend Development & API Setup (3 weeks)
+Phase 3: Mobile App Development (5 weeks)
+Phase 4: Payment & Loyalty Integration (2 weeks)
+Phase 5: Admin Panel Development (2 weeks)
+Phase 6: Testing & App Store Deployment (1 week)
+
+Total Duration: 15 weeks`,
+      pricing: `Development Cost: $32,000
+Includes:
+• Native mobile apps for iOS & Android
+• Admin web dashboard
+• Payment gateway integration
+• Loyalty program system
+• 3 months of post-launch support
+• Source code & documentation
+• App store submission assistance
+
+Payment Terms:
+• 30% upfront ($9,600)
+• 40% at midpoint milestone ($12,800)
+• 30% upon completion ($9,600)`,
+      contact: `Ready to boost your juice bar business?
+
+📧 Email: hello@sisoagency.com
+📞 Phone: +1 (555) 123-4567
+🌐 Website: www.sisoagency.com
+
+Next Steps:
+1. Schedule a discovery call to discuss your specific needs
+2. Finalize menu structure & branding requirements
+3. Sign contract & begin development
+4. Weekly progress updates & demos
+5. Launch your app and grow your business!`
+    },
+    created_at: new Date().toISOString(),
+    view_count: 5
+  },
   'ecommerce-app-development-plan': {
     title: 'E-commerce App Development Plan',
     company: 'SISO Agency',

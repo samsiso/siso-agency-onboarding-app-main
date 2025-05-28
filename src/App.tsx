@@ -71,8 +71,10 @@ function App() {
         <Route path="/onboarding-chat" element={<OnboardingChat />} />
         <Route path="/thankyou" element={<ThankYou />} />
         <Route path="/thankyou-plan" element={<ThankYouPlan />} />
+        {/* Shareable app plans route - must come before generic plan route */}
+        <Route path="/plan/share/:slug" element={<PublicPlanView />} />
+        {/* User-specific plans route */}
         <Route path="/plan/:username" element={<Plan />} />
-        <Route path="/plan/:slug" element={<PublicPlanView />} />
         <Route path="/decora-plan" element={<DecoraPlan />} />
         
         {/* Admin routes - using adminOnly prop to enforce admin access */}

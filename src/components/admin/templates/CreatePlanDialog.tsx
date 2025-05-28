@@ -128,7 +128,7 @@ export function CreatePlanDialog({ open, onOpenChange }: CreatePlanDialogProps) 
         .replace(/\s+/g, '-')
         .trim('-');
       
-      const url = `${window.location.origin}/plan/${mockSlug}`;
+      const url = `${window.location.origin}/plan/share/${mockSlug}`;
       setGeneratedUrl(url);
       
       toast({

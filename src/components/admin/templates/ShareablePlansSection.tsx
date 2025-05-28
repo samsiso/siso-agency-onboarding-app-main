@@ -55,14 +55,14 @@ export function ShareablePlansSection() {
   });
 
   const copyPlanUrl = async (slug: string) => {
-    const url = `${window.location.origin}/plan/${slug}`;
+    const url = `${window.location.origin}/plan/share/${slug}`;
     await navigator.clipboard.writeText(url);
     setCopiedSlug(slug);
     setTimeout(() => setCopiedSlug(null), 2000);
   };
 
   const openPlanInNewTab = (slug: string) => {
-    window.open(`/plan/${slug}`, '_blank');
+    window.open(`/plan/share/${slug}`, '_blank');
   };
 
   return (
