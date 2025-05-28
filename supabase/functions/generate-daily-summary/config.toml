@@ -1,0 +1,6 @@
+
+project_id = "fzuwsjxjymwcjsbpwfsl"
+
+[verify_jwt]
+verify_jwt = false
+
