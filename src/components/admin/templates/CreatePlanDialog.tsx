@@ -126,7 +126,7 @@ export function CreatePlanDialog({ open, onOpenChange }: CreatePlanDialogProps) 
       const mockSlug = title.toLowerCase()
         .replace(/[^a-z0-9\s-]/g, '')
         .replace(/\s+/g, '-')
-        .trim('-');
+        .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
       
       const url = `${window.location.origin}/plan/share/${mockSlug}`;
       setGeneratedUrl(url);

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, Share2, Eye, Edit, Trash2, ExternalLink, Copy } from 'lucide-react';
+import { Plus, Share2, Eye, Edit, Trash2, ExternalLink, Copy, Calendar, TrendingUp } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -38,6 +38,15 @@ const mockPlans: PlanTemplate[] = [
     status: 'active',
     created_at: new Date(Date.now() - 86400000).toISOString(),
     is_public: true
+  },
+  {
+    id: '3', 
+    title: 'Juice Bar Mobile App Plan',
+    slug: 'juice-bar',
+    view_count: 5,
+    status: 'active',
+    created_at: new Date(Date.now() - 172800000).toISOString(),
+    is_public: true
   }
 ];
 
@@ -65,114 +74,148 @@ export function ShareablePlansSection() {
     window.open(`/plan/share/${slug}`, '_blank');
   };
 
+  const handlePlanClick = (slug: string) => {
+    window.open(`/plan/share/${slug}`, '_blank');
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header Section */}
-      <Card className="border border-gray-800 bg-black/30">
+      <Card className="border-purple-500/20 bg-gradient-to-r from-purple-900/20 to-blue-900/20 backdrop-blur-sm">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center">
-                <Share2 className="mr-2 h-5 w-5 text-purple-400" />
+            <div className="space-y-2">
+              <CardTitle className="flex items-center text-white text-xl">
+                <Share2 className="mr-3 h-6 w-6 text-purple-400" />
                 Shareable App Plans
               </CardTitle>
-              <p className="text-sm text-neutral-100 mt-1">
-                Create professional app plans from ChatGPT content and share with clients
+              <p className="text-neutral-200 text-sm max-w-2xl">
+                Create professional app plans from ChatGPT content and share with clients via secure URLs. 
+                Perfect for proposals, quotes, and project presentations.
               </p>
             </div>
             <Button 
               onClick={() => setShowCreateDialog(true)}
-              className="bg-purple-600 hover:bg-purple-700"
+              className="bg-purple-600 hover:bg-purple-700 text-white shadow-lg hover:shadow-purple-500/25 transition-all duration-200 px-6 py-2"
+              size="lg"
             >
-              <Plus className="mr-2 h-4 w-4" />
-              Create Plan
+              <Plus className="mr-2 h-5 w-5" />
+              Create New Plan
             </Button>
           </div>
         </CardHeader>
       </Card>
 
-      {/* Plans List */}
-      <Card className="border border-gray-800 bg-black/30">
-        <CardHeader>
-          <CardTitle className="text-lg">Your Shareable Plans</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="space-y-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center justify-between p-4 bg-gray-900/50 rounded-lg">
-                  <div className="space-y-2">
-                    <Skeleton className="h-5 w-48" />
-                    <Skeleton className="h-4 w-32" />
-                  </div>
+      {/* Plans Grid */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold text-white">Your Shareable Plans</h2>
+          <div className="text-sm text-neutral-300">
+            {plans.length} plan{plans.length !== 1 ? 's' : ''} created
+          </div>
+        </div>
+
+        {isLoading ? (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3].map((i) => (
+              <Card key={i} className="border-gray-700 bg-gray-800/50">
+                <CardHeader className="space-y-3">
+                  <Skeleton className="h-6 w-3/4 bg-gray-700" />
+                  <Skeleton className="h-4 w-1/2 bg-gray-700" />
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <Skeleton className="h-4 w-full bg-gray-700" />
                   <div className="flex space-x-2">
-                    <Skeleton className="h-8 w-8" />
-                    <Skeleton className="h-8 w-8" />
-                    <Skeleton className="h-8 w-8" />
+                    <Skeleton className="h-8 w-16 bg-gray-700" />
+                    <Skeleton className="h-8 w-16 bg-gray-700" />
                   </div>
-                </div>
-              ))}
-            </div>
-          ) : plans.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Share2 className="w-8 h-8 text-purple-400" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : plans.length === 0 ? (
+          <Card className="border-dashed border-2 border-gray-600 bg-gray-800/30">
+            <CardContent className="py-16 text-center">
+              <div className="w-20 h-20 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Share2 className="w-10 h-10 text-purple-400" />
               </div>
-              <h3 className="text-lg font-medium text-white mb-2">No plans created yet</h3>
-              <p className="text-neutral-100 mb-4">
-                Create your first shareable app plan to get started
+              <h3 className="text-xl font-medium text-white mb-3">No plans created yet</h3>
+              <p className="text-neutral-300 mb-6 max-w-md mx-auto">
+                Create your first shareable app plan to get started. Perfect for client proposals and project presentations.
               </p>
               <Button 
                 onClick={() => setShowCreateDialog(true)}
-                className="bg-purple-600 hover:bg-purple-700"
+                className="bg-purple-600 hover:bg-purple-700 text-white"
+                size="lg"
               >
-                <Plus className="mr-2 h-4 w-4" />
+                <Plus className="mr-2 h-5 w-5" />
                 Create Your First Plan
               </Button>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {plans.map((plan) => (
-                <div 
-                  key={plan.id} 
-                  className="flex items-center justify-between p-4 bg-gray-900/50 rounded-lg hover:bg-gray-900/70 transition-colors"
-                >
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-3">
-                      <h3 className="font-medium text-white">{plan.title}</h3>
-                      {plan.is_public && (
-                        <Badge variant="success" className="bg-green-500/20 text-green-400">
-                          Public
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {plans.map((plan) => (
+              <Card 
+                key={plan.id} 
+                className="border-gray-600 bg-gradient-to-br from-gray-800/90 to-gray-900/90 hover:from-gray-700/90 hover:to-gray-800/90 transition-all duration-300 cursor-pointer group hover:shadow-lg hover:shadow-purple-500/10 hover:border-purple-500/30"
+                onClick={() => handlePlanClick(plan.slug)}
+              >
+                <CardHeader className="pb-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1 min-w-0">
+                      <CardTitle className="text-white text-lg group-hover:text-purple-200 transition-colors duration-200 truncate">
+                        {plan.title}
+                      </CardTitle>
+                      <div className="flex items-center mt-2 space-x-3">
+                        {plan.is_public && (
+                          <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-xs">
+                            Public
+                          </Badge>
+                        )}
+                        <Badge variant="outline" className="text-gray-300 border-gray-500 text-xs">
+                          {plan.status}
                         </Badge>
-                      )}
+                      </div>
                     </div>
-                    <div className="flex items-center space-x-4 mt-2 text-sm text-neutral-100">
-                      <span className="flex items-center">
-                        <Eye className="w-4 h-4 mr-1" />
-                        {plan.view_count} views
-                      </span>
-                      <span>/{plan.slug}</span>
-                      <span>
-                        Created {new Date(plan.created_at).toLocaleDateString()}
+                  </div>
+                </CardHeader>
+                
+                <CardContent className="pt-0 space-y-4">
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="flex items-center text-neutral-300">
+                      <Eye className="w-4 h-4 mr-2 text-blue-400" />
+                      <span className="text-white font-medium">{plan.view_count}</span>
+                      <span className="ml-1">views</span>
+                    </div>
+                    <div className="flex items-center text-neutral-300">
+                      <Calendar className="w-4 h-4 mr-2 text-green-400" />
+                      <span className="text-white font-medium">
+                        {new Date(plan.created_at).toLocaleDateString()}
                       </span>
                     </div>
                   </div>
                   
-                  <div className="flex items-center space-x-2">
+                  <div className="text-xs text-neutral-400 bg-gray-800/50 rounded px-2 py-1 font-mono">
+                    /plan/share/{plan.slug}
+                  </div>
+                  
+                  <div className="flex items-center space-x-2 pt-2">
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => copyPlanUrl(plan.slug)}
-                      className="text-neutral-100 hover:text-white"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        copyPlanUrl(plan.slug);
+                      }}
+                      className="text-neutral-300 hover:text-white hover:bg-gray-700/50 flex-1"
                     >
                       {copiedSlug === plan.slug ? (
-                        <>
-                          <span className="mr-2 text-green-400">Copied!</span>
-                        </>
+                        <span className="text-green-400 text-xs">Copied!</span>
                       ) : (
                         <>
                           <Copy className="w-4 h-4 mr-1" />
-                          Copy URL
+                          <span className="text-xs">Copy URL</span>
                         </>
                       )}
                     </Button>
@@ -180,8 +223,11 @@ export function ShareablePlansSection() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => openPlanInNewTab(plan.slug)}
-                      className="text-neutral-100 hover:text-white"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openPlanInNewTab(plan.slug);
+                      }}
+                      className="text-neutral-300 hover:text-white hover:bg-gray-700/50"
                     >
                       <ExternalLink className="w-4 h-4" />
                     </Button>
@@ -189,7 +235,8 @@ export function ShareablePlansSection() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-neutral-100 hover:text-white"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-neutral-300 hover:text-white hover:bg-gray-700/50"
                     >
                       <Edit className="w-4 h-4" />
                     </Button>
@@ -197,17 +244,18 @@ export function ShareablePlansSection() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-red-400 hover:text-red-300"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Create Plan Dialog */}
       <CreatePlanDialog 
