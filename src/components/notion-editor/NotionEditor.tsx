@@ -31,7 +31,7 @@ interface NotionEditorProps {
 export const NotionEditor: React.FC<NotionEditorProps> = ({
   initialContent = '',
   onChange,
-  placeholder = 'Start typing...',
+  placeholder = 'Type \'/\' for commands, or start writing...',
   className = '',
   readOnly = false
 }) => {
@@ -39,8 +39,11 @@ export const NotionEditor: React.FC<NotionEditorProps> = ({
   const [showSlashMenu, setShowSlashMenu] = useState(false);
   const [slashMenuPosition, setSlashMenuPosition] = useState({ x: 0, y: 0 });
   const [currentBlockId, setCurrentBlockId] = useState<string | null>(null);
+  const [focusedBlockId, setFocusedBlockId] = useState<string | null>(null);
+  const [slashFilter, setSlashFilter] = useState('');
   const editorRef = useRef<HTMLDivElement>(null);
   const slashMenuRef = useRef<HTMLDivElement>(null);
+  const blockRefs = useRef<{ [key: string]: HTMLElement }>({});
 
   // Initialize editor with content
   useEffect(() => {
@@ -50,12 +53,30 @@ export const NotionEditor: React.FC<NotionEditorProps> = ({
     }
   }, [initialContent]);
 
-  // Handle content changes
+  // Auto-generate initial block if empty
+  useEffect(() => {
+    if (blocks.length === 0 && !readOnly) {
+      const initialBlock: NotionBlock = {
+        id: `block_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        type: 'paragraph',
+        content: ''
+      };
+      setBlocks([initialBlock]);
+      setFocusedBlockId(initialBlock.id);
+    }
+  }, [blocks.length, readOnly]);
+
+  // Handle content changes with auto-formatting
   const handleContentChange = useCallback((blockId: string, content: string) => {
     setBlocks(prevBlocks => {
-      const updatedBlocks = prevBlocks.map(block =>
-        block.id === blockId ? { ...block, content } : block
-      );
+      const updatedBlocks = prevBlocks.map(block => {
+        if (block.id === blockId) {
+          // Apply auto-formatting
+          const formattedBlock = applyAutoFormatting({ ...block, content });
+          return formattedBlock;
+        }
+        return block;
+      });
       
       // Convert blocks back to markdown for onChange callback
       if (onChange) {
@@ -66,6 +87,94 @@ export const NotionEditor: React.FC<NotionEditorProps> = ({
       return updatedBlocks;
     });
   }, [onChange]);
+
+  // Auto-formatting function that detects patterns and converts them
+  const applyAutoFormatting = (block: NotionBlock): NotionBlock => {
+    const { content } = block;
+    
+    // Skip if block is already formatted or empty
+    if (!content || content.trim().length === 0) {
+      return block;
+    }
+
+    // Heading patterns
+    if (content.startsWith('# ') && block.type !== 'heading1') {
+      return {
+        ...block,
+        type: 'heading1',
+        content: content.substring(2)
+      };
+    }
+    
+    if (content.startsWith('## ') && block.type !== 'heading2') {
+      return {
+        ...block,
+        type: 'heading2',
+        content: content.substring(3)
+      };
+    }
+    
+    if (content.startsWith('### ') && block.type !== 'heading3') {
+      return {
+        ...block,
+        type: 'heading3',
+        content: content.substring(4)
+      };
+    }
+
+    // List patterns
+    if (content.startsWith('- ') && block.type !== 'bulleted_list') {
+      return {
+        ...block,
+        type: 'bulleted_list',
+        content: content.substring(2)
+      };
+    }
+    
+    if (content.match(/^\d+\. /) && block.type !== 'numbered_list') {
+      return {
+        ...block,
+        type: 'numbered_list',
+        content: content.replace(/^\d+\. /, '')
+      };
+    }
+
+    // Quote pattern
+    if (content.startsWith('> ') && block.type !== 'quote') {
+      return {
+        ...block,
+        type: 'quote',
+        content: content.substring(2)
+      };
+    }
+
+    // Code block pattern
+    if (content.startsWith('```') && block.type !== 'code') {
+      return {
+        ...block,
+        type: 'code',
+        content: content.substring(3),
+        properties: {
+          language: 'javascript'
+        }
+      };
+    }
+
+    // Callout pattern
+    if (content.startsWith('> 💡 ') && block.type !== 'callout') {
+      return {
+        ...block,
+        type: 'callout',
+        content: content.substring(5),
+        properties: {
+          emoji: '💡',
+          color: 'blue'
+        }
+      };
+    }
+
+    return block;
+  };
 
   // Handle block type changes
   const handleBlockTypeChange = useCallback((blockId: string, newType: string) => {
@@ -99,22 +208,66 @@ export const NotionEditor: React.FC<NotionEditorProps> = ({
     });
   }, [onChange]);
 
-  // Handle keyboard events for real-time formatting
+  // Enhanced keyboard handling
   const handleKeyDown = (e: React.KeyboardEvent) => {
     const selection = window.getSelection();
     if (!selection || !editorRef.current) return;
 
     // Handle slash commands
     if (e.key === '/') {
-      const rect = selection.getRangeAt(0).getBoundingClientRect();
-      setSlashMenuPosition({ x: rect.left, y: rect.bottom });
-      setShowSlashMenu(true);
+      setTimeout(() => {
+        const rect = selection.getRangeAt(0).getBoundingClientRect();
+        setSlashMenuPosition({ x: rect.left, y: rect.bottom });
+        setShowSlashMenu(true);
+        setSlashFilter('');
+      }, 10);
       return;
     }
 
-    // Hide slash menu on other keys
+    // Handle slash menu filtering
+    if (showSlashMenu && e.key.length === 1 && !e.ctrlKey && !e.metaKey) {
+      setSlashFilter(prev => prev + e.key);
+      return;
+    }
+
+    // Handle slash menu navigation
     if (showSlashMenu) {
+      if (e.key === 'Escape') {
+        setShowSlashMenu(false);
+        setSlashFilter('');
+        return;
+      }
+      if (e.key === 'Backspace' && slashFilter.length > 0) {
+        setSlashFilter(prev => prev.slice(0, -1));
+        return;
+      }
+    }
+
+    // Hide slash menu on navigation keys
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
       setShowSlashMenu(false);
+    }
+
+    // Handle formatting shortcuts
+    if (e.metaKey || e.ctrlKey) {
+      switch (e.key) {
+        case 'b':
+          e.preventDefault();
+          applyInlineFormatting('bold');
+          return;
+        case 'i':
+          e.preventDefault();
+          applyInlineFormatting('italic');
+          return;
+        case 'u':
+          e.preventDefault();
+          applyInlineFormatting('underline');
+          return;
+        case 'k':
+          e.preventDefault();
+          applyInlineFormatting('link');
+          return;
+      }
     }
 
     // Handle Enter key for new blocks
@@ -131,31 +284,145 @@ export const NotionEditor: React.FC<NotionEditorProps> = ({
       return;
     }
 
-    // Handle backspace for block deletion
+    // Handle backspace for block deletion/merging
     if (e.key === 'Backspace') {
-      handleBackspace();
+      handleBackspace(e);
       return;
     }
   };
 
-  const handleEnterKey = () => {
-    const newBlock: NotionBlock = {
-      id: `block_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      type: 'paragraph',
-      content: ''
-    };
+  // Apply inline formatting (bold, italic, etc.)
+  const applyInlineFormatting = (format: string) => {
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
+
+    const range = selection.getRangeAt(0);
+    const selectedText = range.toString();
     
-    setBlocks(prevBlocks => [...prevBlocks, newBlock]);
+    if (selectedText) {
+      let formattedText = '';
+      switch (format) {
+        case 'bold':
+          formattedText = `**${selectedText}**`;
+          break;
+        case 'italic':
+          formattedText = `*${selectedText}*`;
+          break;
+        case 'underline':
+          formattedText = `<u>${selectedText}</u>`;
+          break;
+        case 'link':
+          formattedText = `[${selectedText}](url)`;
+          break;
+        default:
+          return;
+      }
+      
+      // Replace selected text with formatted version
+      range.deleteContents();
+      range.insertNode(document.createTextNode(formattedText));
+      
+      // Clear selection
+      selection.removeAllRanges();
+    }
+  };
+
+  // Enhanced Enter key handling
+  const handleEnterKey = () => {
+    const selection = window.getSelection();
+    if (!selection) return;
+
+    const focusedElement = document.activeElement;
+    const blockElement = focusedElement?.closest('[data-block-id]');
+    const currentBlockId = blockElement?.getAttribute('data-block-id');
+    
+    if (currentBlockId) {
+      const currentBlock = blocks.find(b => b.id === currentBlockId);
+      if (currentBlock) {
+        // Create new block after current one
+        const newBlock: NotionBlock = {
+          id: `block_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          type: 'paragraph',
+          content: ''
+        };
+        
+        const currentIndex = blocks.findIndex(b => b.id === currentBlockId);
+        const newBlocks = [
+          ...blocks.slice(0, currentIndex + 1),
+          newBlock,
+          ...blocks.slice(currentIndex + 1)
+        ];
+        
+        setBlocks(newBlocks);
+        setFocusedBlockId(newBlock.id);
+        
+        // Focus the new block after render
+        setTimeout(() => {
+          const newBlockElement = blockRefs.current[newBlock.id];
+          if (newBlockElement) {
+            const editableElement = newBlockElement.querySelector('[contenteditable="true"]') as HTMLElement;
+            if (editableElement) {
+              editableElement.focus();
+            }
+          }
+        }, 10);
+      }
+    }
   };
 
   const handleTabIndentation = (reverse: boolean) => {
-    // TODO: Implement list indentation logic
+    // TODO: Implement list indentation logic for nested lists
     console.log('Tab indentation:', reverse ? 'reverse' : 'forward');
   };
 
-  const handleBackspace = () => {
-    // TODO: Implement block deletion logic
-    console.log('Backspace handling');
+  const handleBackspace = (e: React.KeyboardEvent) => {
+    const selection = window.getSelection();
+    if (!selection) return;
+
+    const focusedElement = document.activeElement;
+    const blockElement = focusedElement?.closest('[data-block-id]');
+    const currentBlockId = blockElement?.getAttribute('data-block-id');
+    
+    if (currentBlockId) {
+      const currentBlock = blocks.find(b => b.id === currentBlockId);
+      const isAtStart = selection.anchorOffset === 0 && selection.focusOffset === 0;
+      
+      if (currentBlock && isAtStart && currentBlock.content === '') {
+        e.preventDefault();
+        
+        // If it's the only block, keep it
+        if (blocks.length === 1) {
+          return;
+        }
+        
+        // Remove current block and focus previous one
+        const currentIndex = blocks.findIndex(b => b.id === currentBlockId);
+        if (currentIndex > 0) {
+          const newBlocks = blocks.filter(b => b.id !== currentBlockId);
+          setBlocks(newBlocks);
+          
+          const previousBlock = newBlocks[currentIndex - 1];
+          setFocusedBlockId(previousBlock.id);
+          
+          // Focus the previous block
+          setTimeout(() => {
+            const prevBlockElement = blockRefs.current[previousBlock.id];
+            if (prevBlockElement) {
+              const editableElement = prevBlockElement.querySelector('[contenteditable="true"]') as HTMLElement;
+              if (editableElement) {
+                editableElement.focus();
+                // Move cursor to end
+                const range = document.createRange();
+                range.selectNodeContents(editableElement);
+                range.collapse(false);
+                selection.removeAllRanges();
+                selection.addRange(range);
+              }
+            }
+          }, 10);
+        }
+      }
+    }
   };
 
   // Slash command menu items
@@ -164,99 +431,125 @@ export const NotionEditor: React.FC<NotionEditorProps> = ({
       icon: Type,
       label: 'Text',
       description: 'Just start typing with plain text',
-      command: 'paragraph'
+      command: 'paragraph',
+      keywords: ['text', 'paragraph', 'plain']
     },
     {
       icon: Hash,
       label: 'Heading 1',
       description: 'Big section heading',
-      command: 'heading1'
+      command: 'heading1',
+      keywords: ['heading', 'h1', 'title', 'big']
     },
     {
       icon: Hash,
       label: 'Heading 2', 
       description: 'Medium section heading',
-      command: 'heading2'
+      command: 'heading2',
+      keywords: ['heading', 'h2', 'subtitle', 'medium']
     },
     {
       icon: Hash,
       label: 'Heading 3',
       description: 'Small section heading',
-      command: 'heading3'
+      command: 'heading3',
+      keywords: ['heading', 'h3', 'small']
     },
     {
       icon: List,
       label: 'Bulleted list',
       description: 'Create a simple bulleted list',
-      command: 'bulleted_list'
+      command: 'bulleted_list',
+      keywords: ['bullet', 'list', 'unordered', '-']
     },
     {
       icon: ListOrdered,
       label: 'Numbered list',
       description: 'Create a list with numbering',
-      command: 'numbered_list'
+      command: 'numbered_list',
+      keywords: ['number', 'numbered', 'ordered', 'list', '1.']
     },
     {
       icon: ChevronRight,
       label: 'Toggle list',
       description: 'Create a collapsible toggle list',
-      command: 'toggle'
+      command: 'toggle',
+      keywords: ['toggle', 'collapsible', 'dropdown']
     },
     {
       icon: Quote,
       label: 'Quote',
       description: 'Capture a quote',
-      command: 'quote'
+      command: 'quote',
+      keywords: ['quote', 'blockquote', '>']
     },
     {
       icon: Lightbulb,
       label: 'Callout',
       description: 'Make writing stand out',
-      command: 'callout'
+      command: 'callout',
+      keywords: ['callout', 'highlight', 'note', 'info']
     },
     {
       icon: Code,
       label: 'Code',
       description: 'Capture a code snippet',
-      command: 'code'
+      command: 'code',
+      keywords: ['code', 'snippet', 'programming', '```']
     },
     {
       icon: Minus,
       label: 'Divider',
       description: 'Visually divide blocks',
-      command: 'divider'
+      command: 'divider',
+      keywords: ['divider', 'separator', 'hr', '---']
     },
     {
       icon: Table,
       label: 'Table',
       description: 'Create a table',
-      command: 'table'
+      command: 'table',
+      keywords: ['table', 'grid', 'data']
     },
     {
       icon: Image,
       label: 'Image',
       description: 'Insert an image',
-      command: 'image'
+      command: 'image',
+      keywords: ['image', 'photo', 'picture', 'img']
     },
     {
       icon: Video,
       label: 'Video',
       description: 'Insert a video',
-      command: 'video'
+      command: 'video',
+      keywords: ['video', 'movie', 'youtube', 'vimeo']
     },
     {
       icon: Globe,
       label: 'Embed',
       description: 'Embed external content',
-      command: 'embed'
+      command: 'embed',
+      keywords: ['embed', 'external', 'link', 'iframe']
     }
   ];
 
+  // Filter slash commands based on input
+  const filteredCommands = slashCommands.filter(command => {
+    if (!slashFilter) return true;
+    const query = slashFilter.toLowerCase();
+    return (
+      command.label.toLowerCase().includes(query) ||
+      command.keywords.some(keyword => keyword.includes(query))
+    );
+  });
+
   const handleSlashCommand = (command: string) => {
-    if (currentBlockId) {
-      handleBlockTypeChange(currentBlockId, command);
+    if (focusedBlockId) {
+      handleBlockTypeChange(focusedBlockId, command);
     }
     setShowSlashMenu(false);
+    setSlashFilter('');
   };
 
   // Handle paste events for markdown content
@@ -265,37 +558,45 @@ export const NotionEditor: React.FC<NotionEditorProps> = ({
     const pastedText = e.clipboardData.getData('text/plain');
     
     if (pastedText) {
-      const parsed = MarkdownParser.parseToBlocks(pastedText);
-      setBlocks(prevBlocks => [...prevBlocks, ...parsed.blocks]);
-      
-      if (onChange) {
-        const allBlocks = [...blocks, ...parsed.blocks];
-        const markdown = MarkdownParser.blocksToMarkdown(allBlocks);
-        onChange(markdown, allBlocks);
+      // If pasting multiple lines, create multiple blocks
+      const lines = pastedText.split('\n');
+      if (lines.length > 1) {
+        const parsed = MarkdownParser.parseToBlocks(pastedText);
+        setBlocks(prevBlocks => [...prevBlocks, ...parsed.blocks]);
+        
+        if (onChange) {
+          const allBlocks = [...blocks, ...parsed.blocks];
+          const markdown = MarkdownParser.blocksToMarkdown(allBlocks);
+          onChange(markdown, allBlocks);
+        }
+      } else {
+        // Single line paste - insert into current block
+        const selection = window.getSelection();
+        if (selection && selection.rangeCount > 0) {
+          const range = selection.getRangeAt(0);
+          range.deleteContents();
+          range.insertNode(document.createTextNode(pastedText));
+        }
       }
     }
   };
 
-  // Auto-generate initial block if empty
-  useEffect(() => {
-    if (blocks.length === 0 && !readOnly) {
-      setBlocks([{
-        id: `block_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        type: 'paragraph',
-        content: ''
-      }]);
-    }
-  }, [blocks.length, readOnly]);
+  // Handle block focus
+  const handleBlockFocus = (blockId: string) => {
+    setFocusedBlockId(blockId);
+    setCurrentBlockId(blockId);
+  };
 
   return (
     <div className={`notion-editor relative ${className}`}>
       <div
         ref={editorRef}
         className={`
-          min-h-[200px] p-4 rounded-lg border 
-          bg-white dark:bg-gray-900 
-          border-gray-300 dark:border-gray-700
-          focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-opacity-50
+          min-h-[300px] p-6 rounded-xl border transition-all duration-200
+          bg-white dark:bg-siso-bg-alt 
+          border-gray-200 dark:border-siso-border
+          focus-within:ring-2 focus-within:ring-siso-orange/20 focus-within:border-siso-orange/40
+          hover:border-gray-300 dark:hover:border-siso-border-hover
           ${readOnly ? 'cursor-default' : 'cursor-text'}
         `}
         onKeyDown={handleKeyDown}
@@ -303,63 +604,97 @@ export const NotionEditor: React.FC<NotionEditorProps> = ({
         style={{ outline: 'none' }}
       >
         {blocks.length === 0 && !readOnly ? (
-          <div className="text-gray-400 dark:text-gray-500">
+          <div className="text-gray-400 dark:text-siso-text-muted text-lg">
             {placeholder}
           </div>
         ) : (
-          blocks.map((block) => (
-            <BlockRenderer
+          blocks.map((block, index) => (
+            <div 
               key={block.id}
-              block={block}
-              isEditing={!readOnly}
-              onContentChange={handleContentChange}
-              onBlockTypeChange={handleBlockTypeChange}
-              onBlockUpdate={handleBlockUpdate}
-            />
+              data-block-id={block.id}
+              ref={el => {
+                if (el) blockRefs.current[block.id] = el;
+              }}
+              className={`
+                notion-block relative group transition-all duration-150
+                ${focusedBlockId === block.id ? 'ring-1 ring-siso-orange/20 rounded-lg' : ''}
+                ${index > 0 ? 'mt-2' : ''}
+              `}
+              onFocus={() => handleBlockFocus(block.id)}
+            >
+              <BlockRenderer
+                block={block}
+                isEditing={!readOnly}
+                onContentChange={handleContentChange}
+                onBlockTypeChange={handleBlockTypeChange}
+                onBlockUpdate={handleBlockUpdate}
+              />
+            </div>
           ))
         )}
       </div>
 
-      {/* Slash Command Menu */}
+      {/* Enhanced Slash Command Menu */}
       {showSlashMenu && !readOnly && (
         <div
           ref={slashMenuRef}
-          className="absolute z-50 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg py-2 min-w-[300px] max-h-[400px] overflow-y-auto"
+          className="absolute z-50 bg-white dark:bg-siso-bg-alt border border-gray-200 dark:border-siso-border rounded-xl shadow-xl py-2 min-w-[320px] max-h-[400px] overflow-y-auto backdrop-blur-sm"
           style={{
             left: slashMenuPosition.x,
-            top: slashMenuPosition.y + 5
+            top: slashMenuPosition.y + 8
           }}
         >
-          <div className="px-3 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-            Basic blocks
+          <div className="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-siso-text-muted uppercase tracking-wide border-b border-gray-100 dark:border-siso-border">
+            {slashFilter ? `Filtered by "${slashFilter}"` : 'Basic blocks'}
           </div>
-          {slashCommands.map((item) => (
-            <button
-              key={item.command}
-              className="w-full px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
-              onClick={() => handleSlashCommand(item.command)}
-            >
-              <item.icon className="w-4 h-4 mr-3 text-gray-600 dark:text-gray-400" />
-              <div className="flex-1">
-                <div className="text-sm font-medium text-gray-900 dark:text-white">
-                  {item.label}
+          {filteredCommands.length > 0 ? (
+            filteredCommands.map((item) => (
+              <button
+                key={item.command}
+                className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-siso-bg/50 flex items-center transition-colors duration-150 border-l-2 border-transparent hover:border-siso-orange"
+                onClick={() => handleSlashCommand(item.command)}
+              >
+                <div className="flex items-center justify-center w-8 h-8 bg-gray-100 dark:bg-siso-bg rounded-lg mr-3">
+                  <item.icon className="w-4 h-4 text-gray-600 dark:text-siso-text" />
                 </div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">
-                  {item.description}
+                <div className="flex-1">
+                  <div className="text-sm font-medium text-gray-900 dark:text-siso-text-bold">
+                    {item.label}
+                  </div>
+                  <div className="text-xs text-gray-500 dark:text-siso-text-muted">
+                    {item.description}
+                  </div>
                 </div>
-              </div>
-            </button>
-          ))}
+              </button>
+            ))
+          ) : (
+            <div className="px-4 py-6 text-center text-gray-500 dark:text-siso-text-muted">
+              <div className="text-sm">No blocks found</div>
+              <div className="text-xs">Try a different search term</div>
+            </div>
+          )}
         </div>
       )}
 
-      {/* Editor Toolbar (optional) */}
+      {/* Enhanced Editor Toolbar */}
       {!readOnly && (
-        <div className="mt-4 flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
-          <span className="flex items-center">
-            <MoreHorizontal className="w-4 h-4 mr-1" />
-            Type <kbd className="px-1 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">/</kbd> for commands
-          </span>
+        <div className="mt-4 flex items-center justify-between text-sm text-gray-500 dark:text-siso-text-muted">
+          <div className="flex items-center space-x-4">
+            <span className="flex items-center">
+              <MoreHorizontal className="w-4 h-4 mr-1" />
+              Type <kbd className="mx-1 px-2 py-0.5 bg-gray-100 dark:bg-siso-bg rounded text-xs font-mono">/ </kbd> 
+              for commands
+            </span>
+            <span className="flex items-center">
+              <Code className="w-4 h-4 mr-1" />
+              <kbd className="mx-1 px-2 py-0.5 bg-gray-100 dark:bg-siso-bg rounded text-xs font-mono">⌘B</kbd>
+              <kbd className="mx-1 px-2 py-0.5 bg-gray-100 dark:bg-siso-bg rounded text-xs font-mono">⌘I</kbd>
+              for formatting
+            </span>
+          </div>
+          <div className="text-xs">
+            {blocks.length} block{blocks.length !== 1 ? 's' : ''}
+          </div>
         </div>
       )}
     </div>
