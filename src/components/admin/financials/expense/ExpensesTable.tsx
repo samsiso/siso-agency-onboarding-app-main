@@ -124,15 +124,17 @@ export function ExpensesTable({ expenses, isLoading, onDataChange }: ExpensesTab
   const visibleColumns = columns.filter(col => col.visible);
 
   return (
-    <Card data-expenses-table-id="expenses-main-table">
+    <Card data-expenses-table-id="expenses-main-table" className="bg-siso-bg-alt/50 border-siso-border/50">
       <CardHeader>
-        <CardTitle>Expenses</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-siso-text-bold">Expenses</CardTitle>
+        <CardDescription className="text-siso-text-muted">
           Manage your company expenses. Total expenses:{" "}
-          {formatCurrency(
-            expenses.reduce((acc, expense) => acc + expense.amount, 0),
-            "GBP"
-          )}
+          <span className="text-siso-orange font-medium">
+            {formatCurrency(
+              expenses.reduce((acc, expense) => acc + expense.amount, 0),
+              "GBP"
+            )}
+          </span>
         </CardDescription>
       </CardHeader>
       <CardContent>
