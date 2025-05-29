@@ -595,7 +595,7 @@ export const NotionEditor: React.FC<NotionEditorProps> = ({
           min-h-[300px] p-6 rounded-xl border transition-all duration-200
           bg-slate-800/60 backdrop-blur-sm
           border-slate-600/50
-          focus-within:ring-2 focus-within:ring-blue-400/20 focus-within:border-blue-400/40
+          focus-within:ring-2 focus-within:ring-slate-400/20 focus-within:border-slate-400/40
           hover:border-slate-500/70
           ${readOnly ? 'cursor-default' : 'cursor-text'}
         `}
@@ -617,7 +617,7 @@ export const NotionEditor: React.FC<NotionEditorProps> = ({
               }}
               className={`
                 notion-block relative group transition-all duration-150
-                ${focusedBlockId === block.id ? 'ring-1 ring-blue-400/20 rounded-lg' : ''}
+                ${focusedBlockId === block.id ? 'ring-1 ring-slate-400/20 rounded-lg' : ''}
                 ${index > 0 ? 'mt-2' : ''}
               `}
               onFocus={() => handleBlockFocus(block.id)}
@@ -651,7 +651,7 @@ export const NotionEditor: React.FC<NotionEditorProps> = ({
             filteredCommands.map((item) => (
               <button
                 key={item.command}
-                className="w-full px-4 py-3 text-left hover:bg-slate-700/60 flex items-center transition-colors duration-150 border-l-2 border-transparent hover:border-blue-400"
+                className="w-full px-4 py-3 text-left hover:bg-slate-700/60 flex items-center transition-colors duration-150 border-l-2 border-transparent hover:border-slate-400"
                 onClick={() => handleSlashCommand(item.command)}
               >
                 <div className="flex items-center justify-center w-8 h-8 bg-slate-700/60 rounded-lg mr-3">

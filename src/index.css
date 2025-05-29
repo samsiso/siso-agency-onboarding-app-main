@@ -730,7 +730,7 @@ th:hover .header-column-menu {
 
 /* Enhanced Notion Editor Styles */
 .notion-editor-enhanced {
-  @apply bg-gradient-to-br from-slate-900/90 via-blue-900/50 to-slate-900/90;
+  @apply bg-gradient-to-br from-slate-900/90 via-slate-800/50 to-slate-900/90;
 }
 
 .notion-editor-enhanced .notion-editor {
@@ -753,7 +753,7 @@ th:hover .header-column-menu {
 }
 
 .notion-editor-enhanced [contenteditable="true"]:focus {
-  @apply ring-1 ring-blue-400/30 shadow-none bg-slate-700/30 rounded-md;
+  @apply ring-1 ring-slate-400/30 shadow-none bg-slate-700/30 rounded-md;
 }
 
 .notion-editor-enhanced [contenteditable="true"]:empty:before {
@@ -774,7 +774,7 @@ th:hover .header-column-menu {
 }
 
 .notion-editor-enhanced .notion-block[data-type="quote"] {
-  @apply border-l-4 border-blue-400 pl-4 bg-blue-500/10 py-2 rounded-r-lg;
+  @apply border-l-4 border-slate-400 pl-4 bg-slate-700/20 py-2 rounded-r-lg;
 }
 
 .notion-editor-enhanced .notion-block[data-type="code"] {
@@ -782,7 +782,7 @@ th:hover .header-column-menu {
 }
 
 .notion-editor-enhanced .notion-block[data-type="callout"] {
-  @apply bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-400/30 rounded-lg p-4;
+  @apply bg-gradient-to-r from-slate-700/20 to-slate-600/20 border border-slate-500/30 rounded-lg p-4;
 }
 
 .notion-editor-enhanced ul {
@@ -791,7 +791,7 @@ th:hover .header-column-menu {
 
 .notion-editor-enhanced ul li::before {
   content: '•';
-  @apply text-blue-400 font-bold mr-3;
+  @apply text-slate-300 font-bold mr-3;
 }
 
 .notion-editor-enhanced ol {
@@ -805,7 +805,7 @@ th:hover .header-column-menu {
 
 .notion-editor-enhanced ol li::before {
   content: counter(list-counter) '.';
-  @apply text-blue-400 font-semibold mr-3;
+  @apply text-slate-300 font-semibold mr-3;
 }
 
 /* Slash command menu styling */
