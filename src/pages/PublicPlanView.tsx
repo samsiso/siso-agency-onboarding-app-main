@@ -182,6 +182,66 @@ Email: hello@sisoagency.com`
     },
     created_at: new Date(Date.now() - 86400000).toISOString(),
     view_count: 8
+  },
+  'test': {
+    title: 'Test Project Plan',
+    company: 'SISO Agency',
+    sections: {
+      overview: `This is a test project plan created to demonstrate the SISO Agency client presentation system. This plan showcases how professional project proposals are presented to clients with comprehensive details, timelines, and pricing information.
+
+The test plan includes all the essential components of a professional project proposal, including detailed feature lists, development timelines, pricing structure, and clear next steps for client engagement.`,
+      features: [
+        'Custom Project Planning',
+        'Professional Documentation',
+        'Interactive Presentations',
+        'Real-time Collaboration',
+        'Progress Tracking',
+        'Client Communication Portal',
+        'Document Version Control',
+        'Team Management Tools',
+        'Analytics Dashboard',
+        'Mobile-responsive Design',
+        'Secure Client Access',
+        'Export & Sharing Options'
+      ],
+      timeline: `Phase 1: Discovery & Planning (1 week)
+Phase 2: Design & Prototyping (2 weeks)
+Phase 3: Development & Implementation (4 weeks)
+Phase 4: Testing & Quality Assurance (1 week)
+Phase 5: Deployment & Launch (1 week)
+
+Total Duration: 9 weeks`,
+      pricing: `Development Cost: $25,000
+Includes:
+• Complete project implementation
+• Professional design & branding
+• Quality assurance testing
+• Documentation & training
+• 3 months of post-launch support
+• Source code delivery
+
+Payment Terms:
+• 30% upfront ($7,500)
+• 40% at midpoint milestone ($10,000)
+• 30% upon completion ($7,500)`,
+      contact: `Ready to start your test project?
+
+📧 Email: hello@sisoagency.com
+📞 Phone: +1 (555) 123-4567
+🌐 Website: www.sisoagency.com
+💬 Live Chat: Available on our website
+
+Next Steps:
+1. Schedule a discovery call to discuss requirements
+2. Review and approve project specifications
+3. Sign contract and begin development
+4. Regular progress updates and milestone reviews
+5. Launch and celebrate your success!
+
+We're excited to work with you on this test project and demonstrate the quality and professionalism that SISO Agency brings to every client engagement.`
+    },
+    created_at: new Date().toISOString(),
+    view_count: 1
   }
 };
 
