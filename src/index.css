@@ -32,6 +32,7 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
+    --siso-border-hover: #3A3A3A;
   }
 
   .dark {
@@ -725,4 +726,83 @@ th:hover .header-column-menu {
 
 .animate-slide-down {
   animation: slideDown 0.3s ease-out;
+}
+
+/* Enhanced Notion Editor Styles */
+.notion-editor-enhanced {
+  @apply bg-transparent;
+}
+
+.notion-editor-enhanced .notion-editor {
+  @apply bg-transparent border-0 shadow-none;
+}
+
+.notion-editor-enhanced .notion-block {
+  @apply transition-all duration-150;
+}
+
+.notion-editor-enhanced .notion-block:hover {
+  @apply bg-siso-bg-alt/30 rounded-lg;
+}
+
+.notion-editor-enhanced [contenteditable="true"] {
+  @apply text-siso-text bg-transparent border-0 outline-none;
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+.notion-editor-enhanced [contenteditable="true"]:focus {
+  @apply ring-0 shadow-none bg-transparent;
+}
+
+.notion-editor-enhanced h1 {
+  @apply text-3xl font-bold text-siso-text-bold mb-4 mt-6;
+}
+
+.notion-editor-enhanced h2 {
+  @apply text-2xl font-semibold text-siso-text-bold mb-3 mt-5;
+}
+
+.notion-editor-enhanced h3 {
+  @apply text-xl font-medium text-siso-text-bold mb-2 mt-4;
+}
+
+.notion-editor-enhanced .notion-block[data-type="quote"] {
+  @apply border-l-4 border-siso-orange pl-4 bg-siso-orange/5 py-2 rounded-r-lg;
+}
+
+.notion-editor-enhanced .notion-block[data-type="code"] {
+  @apply bg-siso-bg-alt border border-siso-border rounded-lg p-4 font-mono text-sm;
+}
+
+.notion-editor-enhanced .notion-block[data-type="callout"] {
+  @apply bg-gradient-to-r from-siso-orange/10 to-siso-red/10 border border-siso-orange/30 rounded-lg p-4;
+}
+
+.notion-editor-enhanced ul {
+  @apply list-none space-y-1;
+}
+
+.notion-editor-enhanced ul li::before {
+  content: '•';
+  @apply text-siso-orange font-bold mr-3;
+}
+
+.notion-editor-enhanced ol {
+  @apply list-none space-y-1;
+}
+
+.notion-editor-enhanced ol li {
+  @apply relative;
+  counter-increment: list-counter;
+}
+
+.notion-editor-enhanced ol li::before {
+  content: counter(list-counter) '.';
+  @apply text-siso-orange font-semibold mr-3;
+}
+
+/* Slash command menu styling */
+.notion-editor-enhanced .slash-menu {
+  @apply bg-siso-bg-alt border border-siso-border shadow-2xl;
 }

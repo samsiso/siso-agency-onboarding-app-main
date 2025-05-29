@@ -84,10 +84,10 @@ export function CreatePlanDialog({ open, onOpenChange }: CreatePlanDialogProps) 
   const [rawContent, setRawContent] = useState('');
   const [formattedContent, setFormattedContent] = useState('');
   const [contentBlocks, setContentBlocks] = useState<NotionBlock[]>([]);
-  const [formattedSections, setFormattedSections] = useState<any>({});
-  const [isCreating, setIsCreating] = useState(false);
+  const [formattedSections, setFormattedSections] = useState<Record<string, any>>({});
   const [generatedUrl, setGeneratedUrl] = useState('');
-  const [editMode, setEditMode] = useState<'raw' | 'notion'>('raw');
+  const [isCreating, setIsCreating] = useState(false);
+  const [editMode, setEditMode] = useState<'raw' | 'notion'>('notion');
   const { toast } = useToast();
 
   const handleAutoFormat = () => {
@@ -181,7 +181,7 @@ export function CreatePlanDialog({ open, onOpenChange }: CreatePlanDialogProps) 
     setContentBlocks([]);
     setFormattedSections({});
     setGeneratedUrl('');
-    setEditMode('raw');
+    setEditMode('notion');
   };
 
   const sectionIcons = {
@@ -202,42 +202,75 @@ export function CreatePlanDialog({ open, onOpenChange }: CreatePlanDialogProps) 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto bg-gray-900 border-gray-800">
-        <DialogHeader>
-          <DialogTitle className="flex items-center text-white">
-            <Wand2 className="mr-2 h-5 w-5 text-purple-400" />
-            Create Shareable App Plan
-          </DialogTitle>
+      <DialogContent className="max-w-7xl max-h-[95vh] overflow-hidden bg-siso-bg border-siso-border shadow-2xl">
+        <DialogHeader className="border-b border-siso-border pb-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-siso-orange/20 rounded-xl border border-siso-orange/30">
+                <Wand2 className="h-6 w-6 text-siso-orange" />
+              </div>
+              <div>
+                <DialogTitle className="text-2xl font-bold text-siso-text-bold">
+                  Create Shareable App Plan
+                </DialogTitle>
+                <p className="text-siso-text-muted text-sm mt-1">
+                  Create beautiful, professional project proposals with our Notion-style editor
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <Button
+                onClick={handleCreatePlan}
+                disabled={isCreating || !title.trim() || !formattedContent.trim()}
+                className="bg-siso-orange hover:bg-siso-orange/90 text-white font-medium px-6 py-2 h-10"
+              >
+                {isCreating ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    <Save className="mr-2 h-4 w-4" />
+                    Publish Plan
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
         </DialogHeader>
 
         {generatedUrl ? (
-          // Success state - show generated URL
-          <div className="space-y-6">
-            <Card className="border-green-500/20 bg-green-500/5">
+          // Success state - show generated URL with premium styling
+          <div className="p-8 space-y-6">
+            <Card className="border-green-500/30 bg-gradient-to-br from-green-500/10 to-emerald-500/10">
               <CardHeader>
-                <CardTitle className="text-green-400 flex items-center">
-                  <Share2 className="mr-2 h-5 w-5" />
-                  Plan Created Successfully!
+                <CardTitle className="text-green-400 flex items-center text-xl">
+                  <Share2 className="mr-3 h-6 w-6" />
+                  Plan Published Successfully! ✨
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label className="text-white">Shareable URL:</Label>
-                  <div className="flex items-center space-x-2 mt-2">
+              <CardContent className="space-y-6">
+                <div className="bg-siso-bg-alt rounded-xl p-6 border border-siso-border">
+                  <Label className="text-siso-text-bold text-sm font-semibold mb-3 block">
+                    Shareable URL:
+                  </Label>
+                  <div className="flex items-center space-x-3">
                     <Input 
                       value={generatedUrl} 
                       readOnly 
-                      className="bg-gray-800 border-gray-700 text-white"
+                      className="bg-siso-bg border-siso-border text-siso-text font-mono text-sm"
                     />
-                    <Button onClick={copyUrl} variant="outline">
+                    <Button onClick={copyUrl} variant="outline" className="border-siso-border hover:bg-siso-bg-alt">
                       <Copy className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
-                <div className="flex space-x-2">
+                
+                <div className="flex flex-wrap gap-3">
                   <Button 
                     onClick={() => window.open(generatedUrl, '_blank')}
-                    className="bg-purple-600 hover:bg-purple-700"
+                    className="bg-siso-orange hover:bg-siso-orange/90 text-white"
                   >
                     <Eye className="mr-2 w-4 h-4" />
                     Preview Plan
@@ -247,170 +280,96 @@ export function CreatePlanDialog({ open, onOpenChange }: CreatePlanDialogProps) 
                       resetForm();
                       onOpenChange(false);
                     }} 
-                    variant="outline"
+                    variant="outline" 
+                    className="border-siso-border hover:bg-siso-bg-alt"
                   >
                     Close
                   </Button>
                   <Button 
                     onClick={resetForm} 
                     variant="ghost"
+                    className="hover:bg-siso-bg-alt text-siso-text"
                   >
-                    Create Another
+                    Create Another Plan
                   </Button>
                 </div>
               </CardContent>
             </Card>
           </div>
         ) : (
-          // Form state - create new plan
-          <Tabs defaultValue="input" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3 bg-gray-800">
-              <TabsTrigger value="input" className="text-white data-[state=active]:bg-purple-600">
-                Input Content
-              </TabsTrigger>
-              <TabsTrigger value="preview" className="text-white data-[state=active]:bg-purple-600">
-                Preview
-              </TabsTrigger>
-              <TabsTrigger value="sections" className="text-white data-[state=active]:bg-purple-600">
-                Formatted Sections
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="input" className="space-y-6">
-              <div className="space-y-4">
-                <div>
-                  <Label className="text-white">Plan Title</Label>
-                  <Input
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="e.g., E-commerce App Development Plan"
-                    className="bg-gray-800 border-gray-700 text-white"
-                  />
+          // Main Notion-like editor interface
+          <div className="flex-1 overflow-hidden">
+            {/* Title Section */}
+            <div className="px-8 py-6 border-b border-siso-border bg-siso-bg-alt/50">
+              <Input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="✨ Untitled Plan"
+                className="text-3xl font-bold bg-transparent border-none text-siso-text-bold placeholder:text-siso-text-muted/60 focus:ring-0 shadow-none p-0 h-auto"
+                style={{ fontSize: '2rem', lineHeight: '2.5rem' }}
+              />
+              <div className="flex items-center space-x-4 mt-4 text-sm text-siso-text-muted">
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                  <span>Ready to edit</span>
                 </div>
-
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <Label className="text-white">Content</Label>
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        type="button"
-                        variant={editMode === 'raw' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setEditMode('raw')}
-                      >
-                        <FileText className="w-4 h-4 mr-2" />
-                        Raw Text
-                      </Button>
-                      <Button
-                        type="button"
-                        variant={editMode === 'notion' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setEditMode('notion')}
-                      >
-                        <Type className="w-4 h-4 mr-2" />
-                        Rich Editor
-                      </Button>
-                    </div>
-                  </div>
-
-                  {editMode === 'raw' ? (
-                    <Textarea
-                      value={rawContent}
-                      onChange={(e) => setRawContent(e.target.value)}
-                      placeholder="Paste your ChatGPT content here..."
-                      className="h-96 bg-gray-800 border-gray-700 text-white resize-none"
-                    />
-                  ) : (
-                    <NotionEditor
-                      initialContent={rawContent}
-                      onChange={handleNotionChange}
-                      placeholder="Start typing your plan content..."
-                      className="min-h-96"
-                    />
-                  )}
+                <div className="flex items-center space-x-2">
+                  <Type className="w-4 h-4 text-siso-orange" />
+                  <span>Rich text editor</span>
                 </div>
-
-                <div className="flex items-center space-x-4">
-                  {editMode === 'raw' && (
-                    <Button
-                      type="button"
-                      onClick={handleAutoFormat}
-                      variant="outline"
-                      className="text-white border-gray-600 hover:bg-gray-800"
-                    >
-                      <Wand2 className="mr-2 h-4 w-4" />
-                      Auto-Format Sections
-                    </Button>
-                  )}
-                  
-                  <Button
-                    onClick={handleCreatePlan}
-                    disabled={isCreating || !title.trim() || (!rawContent.trim() && !formattedContent.trim())}
-                    className="bg-purple-600 hover:bg-purple-700"
-                  >
-                    {isCreating ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                        Creating...
-                      </>
-                    ) : (
-                      <>
-                        <Save className="mr-2 h-4 w-4" />
-                        Create Plan
-                      </>
-                    )}
-                  </Button>
+                <div className="flex items-center space-x-2">
+                  <Wand2 className="w-4 h-4 text-siso-orange" />
+                  <span>Auto-formatting enabled</span>
                 </div>
               </div>
-            </TabsContent>
+            </div>
 
-            <TabsContent value="preview" className="space-y-4">
-              <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-                <h3 className="text-xl font-bold text-white mb-4">{title || 'Plan Preview'}</h3>
-                {editMode === 'notion' && formattedContent ? (
-                  <NotionRenderer content={formattedContent} />
-                ) : rawContent ? (
-                  <div className="text-gray-300 whitespace-pre-wrap">
-                    {rawContent}
-                  </div>
-                ) : (
-                  <div className="text-gray-500 italic">No content to preview</div>
-                )}
+            {/* Notion Editor */}
+            <div className="flex-1 overflow-y-auto" style={{ height: 'calc(95vh - 220px)' }}>
+              <div className="px-8 py-6">
+                <NotionEditor
+                  initialContent={rawContent}
+                  onChange={handleNotionChange}
+                  placeholder="🎯 Start writing your project plan...
+
+✨ Try these formatting shortcuts:
+• Type '# ' for a heading
+• Type '- ' for a bullet list  
+• Type '> ' for a quote
+• Type '```' for code
+• Type '/' for more options
+
+Transform your ideas into a professional client presentation!"
+                  className="min-h-[600px] notion-editor-enhanced"
+                />
               </div>
-            </TabsContent>
+            </div>
 
-            <TabsContent value="sections" className="space-y-4">
-              {Object.keys(formattedSections).length > 0 ? (
-                <div className="space-y-4">
-                  {Object.entries(formattedSections).map(([sectionKey, content]) => {
-                    const Icon = sectionIcons[sectionKey] || FileText;
-                    
-                    return (
-                      <Card key={sectionKey} className="border-gray-700 bg-gray-800/50">
-                        <CardHeader className="pb-3">
-                          <CardTitle className="flex items-center text-white text-lg">
-                            <Icon className="mr-2 h-5 w-5 text-purple-400" />
-                            {sectionTitles[sectionKey] || sectionKey}
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="text-gray-300 whitespace-pre-wrap text-sm leading-relaxed">
-                            {content as string}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
+            {/* Enhanced bottom toolbar */}
+            <div className="px-8 py-4 border-t border-siso-border bg-siso-bg-alt/30">
+              <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center space-x-6 text-siso-text-muted">
+                  <div className="flex items-center space-x-2">
+                    <FileText className="w-4 h-4 text-siso-orange" />
+                    <span>Professional formatting</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Share2 className="w-4 h-4 text-siso-orange" />
+                    <span>Client-ready presentation</span>
+                  </div>
                 </div>
-              ) : (
-                <div className="text-center py-12">
-                  <AlertCircle className="w-12 h-12 text-gray-500 mx-auto mb-4" />
-                  <p className="text-gray-400">No sections detected yet</p>
-                  <p className="text-gray-500 text-sm">Use the "Auto-Format Sections" button to analyze your content</p>
+                <div className="flex items-center space-x-3">
+                  <span className="text-siso-text-muted">
+                    {title.trim() ? '✓ Title added' : 'Add a title to continue'}
+                  </span>
+                  <span className="text-siso-text-muted">•</span>
+                  <span className="text-siso-text-muted">
+                    {formattedContent.trim() ? '✓ Content ready' : 'Start writing content'}
+                  </span>
                 </div>
-              )}
-            </TabsContent>
-          </Tabs>
+              </div>
+            </div>
+          </div>
         )}
       </DialogContent>
     </Dialog>
