@@ -83,18 +83,21 @@ export function AdminSidebarLogo({
         className="flex items-center"
       >
         <img 
-          src="/images/siso-logo.svg" 
+          src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png" 
           alt="SISO AGENCY" 
-          className="w-9 h-9 dark:invert-0" 
+          className="w-9 h-9" 
         />
         {expanded && (
           <motion.span
             initial={{ opacity: 0, width: 0 }}
             animate={{ opacity: 1, width: "auto" }}
             transition={{ duration: 0.3, delay: 0.1 }}
-            className="ml-2.5 font-semibold text-xl"
+            className="ml-2.5 font-semibold text-lg whitespace-nowrap"
           >
-            SISO <span className="font-extrabold bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">ADMIN</span>
+            SISO{" "}
+            <span className="font-extrabold bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">
+              ADMIN
+            </span>
           </motion.span>
         )}
       </motion.div>

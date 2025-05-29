@@ -1,4 +1,3 @@
-
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -92,7 +91,7 @@ export const AdminSidebarNavigation = ({ collapsed, onItemClick, visible }: Navi
               key={index}
               className={cn(
                 "space-y-1",
-                section.type === 'section' && "border-b border-purple-900/20 pb-2"
+                section.type === 'section' && "border-b border-slate-600/30 pb-2"
               )}
             >
               <SidebarSection
