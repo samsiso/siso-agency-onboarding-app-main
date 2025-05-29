@@ -593,10 +593,10 @@ export const NotionEditor: React.FC<NotionEditorProps> = ({
         ref={editorRef}
         className={`
           min-h-[300px] p-6 rounded-xl border transition-all duration-200
-          bg-white dark:bg-siso-bg-alt 
-          border-gray-200 dark:border-siso-border
+          bg-siso-bg-alt 
+          border-siso-border
           focus-within:ring-2 focus-within:ring-siso-orange/20 focus-within:border-siso-orange/40
-          hover:border-gray-300 dark:hover:border-siso-border-hover
+          hover:border-siso-border-hover
           ${readOnly ? 'cursor-default' : 'cursor-text'}
         `}
         onKeyDown={handleKeyDown}
@@ -604,7 +604,7 @@ export const NotionEditor: React.FC<NotionEditorProps> = ({
         style={{ outline: 'none' }}
       >
         {blocks.length === 0 && !readOnly ? (
-          <div className="text-gray-400 dark:text-siso-text-muted text-lg">
+          <div className="text-siso-text-muted text-lg">
             {placeholder}
           </div>
         ) : (
@@ -638,37 +638,37 @@ export const NotionEditor: React.FC<NotionEditorProps> = ({
       {showSlashMenu && !readOnly && (
         <div
           ref={slashMenuRef}
-          className="absolute z-50 bg-white dark:bg-siso-bg-alt border border-gray-200 dark:border-siso-border rounded-xl shadow-xl py-2 min-w-[320px] max-h-[400px] overflow-y-auto backdrop-blur-sm"
+          className="absolute z-50 bg-siso-bg-alt border border-siso-border rounded-xl shadow-xl py-2 min-w-[320px] max-h-[400px] overflow-y-auto backdrop-blur-sm"
           style={{
             left: slashMenuPosition.x,
             top: slashMenuPosition.y + 8
           }}
         >
-          <div className="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-siso-text-muted uppercase tracking-wide border-b border-gray-100 dark:border-siso-border">
+          <div className="px-4 py-2 text-xs font-semibold text-siso-text-muted uppercase tracking-wide border-b border-siso-border">
             {slashFilter ? `Filtered by "${slashFilter}"` : 'Basic blocks'}
           </div>
           {filteredCommands.length > 0 ? (
             filteredCommands.map((item) => (
               <button
                 key={item.command}
-                className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-siso-bg/50 flex items-center transition-colors duration-150 border-l-2 border-transparent hover:border-siso-orange"
+                className="w-full px-4 py-3 text-left hover:bg-siso-bg/50 flex items-center transition-colors duration-150 border-l-2 border-transparent hover:border-siso-orange"
                 onClick={() => handleSlashCommand(item.command)}
               >
-                <div className="flex items-center justify-center w-8 h-8 bg-gray-100 dark:bg-siso-bg rounded-lg mr-3">
-                  <item.icon className="w-4 h-4 text-gray-600 dark:text-siso-text" />
+                <div className="flex items-center justify-center w-8 h-8 bg-siso-bg rounded-lg mr-3">
+                  <item.icon className="w-4 h-4 text-siso-text" />
                 </div>
                 <div className="flex-1">
-                  <div className="text-sm font-medium text-gray-900 dark:text-siso-text-bold">
+                  <div className="text-sm font-medium text-siso-text-bold">
                     {item.label}
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-siso-text-muted">
+                  <div className="text-xs text-siso-text-muted">
                     {item.description}
                   </div>
                 </div>
               </button>
             ))
           ) : (
-            <div className="px-4 py-6 text-center text-gray-500 dark:text-siso-text-muted">
+            <div className="px-4 py-6 text-center text-siso-text-muted">
               <div className="text-sm">No blocks found</div>
               <div className="text-xs">Try a different search term</div>
             </div>
@@ -678,17 +678,17 @@ export const NotionEditor: React.FC<NotionEditorProps> = ({
 
       {/* Enhanced Editor Toolbar */}
       {!readOnly && (
-        <div className="mt-4 flex items-center justify-between text-sm text-gray-500 dark:text-siso-text-muted">
+        <div className="mt-4 flex items-center justify-between text-sm text-siso-text-muted">
           <div className="flex items-center space-x-4">
             <span className="flex items-center">
               <MoreHorizontal className="w-4 h-4 mr-1" />
-              Type <kbd className="mx-1 px-2 py-0.5 bg-gray-100 dark:bg-siso-bg rounded text-xs font-mono">/ </kbd> 
+              Type <kbd className="mx-1 px-2 py-0.5 bg-siso-bg rounded text-xs font-mono">/ </kbd> 
               for commands
             </span>
             <span className="flex items-center">
               <Code className="w-4 h-4 mr-1" />
-              <kbd className="mx-1 px-2 py-0.5 bg-gray-100 dark:bg-siso-bg rounded text-xs font-mono">⌘B</kbd>
-              <kbd className="mx-1 px-2 py-0.5 bg-gray-100 dark:bg-siso-bg rounded text-xs font-mono">⌘I</kbd>
+              <kbd className="mx-1 px-2 py-0.5 bg-siso-bg rounded text-xs font-mono">⌘B</kbd>
+              <kbd className="mx-1 px-2 py-0.5 bg-siso-bg rounded text-xs font-mono">⌘I</kbd>
               for formatting
             </span>
           </div>
