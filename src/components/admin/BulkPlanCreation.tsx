@@ -149,20 +149,20 @@ export const BulkPlanCreation = () => {
   const selectedTemplateData = templates.find(t => t.id === selectedTemplate);
 
   return (
-    <Card className="border-blue-500/20 bg-gradient-to-br from-slate-900/90 via-blue-900/50 to-slate-900/90 backdrop-blur-sm shadow-xl rounded-xl">
+    <Card className="border-siso-border bg-gradient-to-br from-siso-bg/90 via-siso-bg-alt/50 to-siso-bg/90 backdrop-blur-sm shadow-xl rounded-xl">
       <CardHeader className="pb-8">
         <div className="flex items-center justify-between">
           <div className="space-y-3">
-            <CardTitle className="flex items-center text-white text-2xl font-bold">
-              <Users className="mr-4 h-7 w-7 text-blue-400" />
+            <CardTitle className="flex items-center text-siso-text-bold text-2xl font-bold">
+              <Users className="mr-4 h-7 w-7 text-siso-orange" />
               Bulk Create Plans
             </CardTitle>
-            <p className="text-slate-200 text-base max-w-2xl leading-relaxed">
+            <p className="text-siso-text text-base max-w-2xl leading-relaxed">
               Efficiently generate multiple user plans from existing templates. Perfect for onboarding multiple clients with consistent service offerings.
             </p>
           </div>
           {templates.length > 0 && (
-            <Badge variant="outline" className="text-blue-400 border-blue-400/50 bg-blue-500/10 px-4 py-2">
+            <Badge variant="outline" className="text-siso-orange border-siso-orange/50 bg-siso-orange/10 px-4 py-2">
               {templates.length} template{templates.length !== 1 ? 's' : ''} available
             </Badge>
           )}
@@ -173,34 +173,34 @@ export const BulkPlanCreation = () => {
         {/* Template Selection */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <Label className="text-white font-semibold text-lg flex items-center">
-              <FileText className="w-5 h-5 mr-3 text-blue-400" />
+            <Label className="text-siso-text-bold font-semibold text-lg flex items-center">
+              <FileText className="w-5 h-5 mr-3 text-siso-orange" />
               Select Template
             </Label>
             {selectedTemplateData && (
               <div className="flex items-center space-x-3 text-sm">
-                <span className="text-slate-200 font-medium">${selectedTemplateData.estimated_cost}</span>
-                <span className="text-slate-400">•</span>
-                <span className="text-slate-200 font-medium">{selectedTemplateData.estimated_days} days</span>
+                <span className="text-siso-text font-medium">${selectedTemplateData.estimated_cost}</span>
+                <span className="text-siso-text-muted">•</span>
+                <span className="text-siso-text font-medium">{selectedTemplateData.estimated_days} days</span>
               </div>
             )}
           </div>
           
           <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
-            <SelectTrigger className="bg-slate-800/60 border-slate-600/50 text-white hover:bg-slate-700/60 transition-all duration-300 h-12 rounded-lg shadow-lg">
+            <SelectTrigger className="bg-siso-bg-alt/60 border-siso-border text-siso-text hover:bg-siso-bg/60 transition-all duration-300 h-12 rounded-lg shadow-lg">
               <SelectValue placeholder="Choose a template to bulk create from..." />
             </SelectTrigger>
-            <SelectContent className="bg-slate-800/95 border-slate-600/50 backdrop-blur-md rounded-lg">
+            <SelectContent className="bg-siso-bg-alt/95 border-siso-border backdrop-blur-md rounded-lg">
               {templates.length === 0 ? (
-                <SelectItem value="none" disabled className="text-slate-400">
+                <SelectItem value="none" disabled className="text-siso-text-muted">
                   No templates available
                 </SelectItem>
               ) : (
                 templates.map((template) => (
-                  <SelectItem key={template.id} value={template.id} className="text-white hover:bg-slate-700/60 transition-colors duration-200">
+                  <SelectItem key={template.id} value={template.id} className="text-siso-text hover:bg-siso-bg/60 transition-colors duration-200">
                     <div className="flex items-center justify-between w-full">
                       <span>{template.name}</span>
-                      <Badge variant="secondary" className="ml-3 text-xs bg-slate-700 text-slate-200">
+                      <Badge variant="secondary" className="ml-3 text-xs bg-siso-bg text-siso-text">
                         {template.industry_type}
                       </Badge>
                     </div>
@@ -212,19 +212,19 @@ export const BulkPlanCreation = () => {
           
           {/* Template Preview */}
           {selectedTemplateData && (
-            <div className="bg-slate-800/40 rounded-xl p-6 border border-slate-600/30 shadow-lg backdrop-blur-sm transition-all duration-300 hover:bg-slate-800/60">
+            <div className="bg-siso-bg-alt/40 rounded-xl p-6 border border-siso-border shadow-lg backdrop-blur-sm transition-all duration-300 hover:bg-siso-bg-alt/60">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
                 <div className="space-y-1">
-                  <span className="text-slate-400 font-medium">App Name:</span>
-                  <p className="text-white font-semibold text-base">{selectedTemplateData.app_name || 'Not specified'}</p>
+                  <span className="text-siso-text-muted font-medium">App Name:</span>
+                  <p className="text-siso-text-bold font-semibold text-base">{selectedTemplateData.app_name || 'Not specified'}</p>
                 </div>
                 <div className="space-y-1">
-                  <span className="text-slate-400 font-medium">Industry:</span>
-                  <p className="text-white font-semibold text-base">{selectedTemplateData.industry_type}</p>
+                  <span className="text-siso-text-muted font-medium">Industry:</span>
+                  <p className="text-siso-text-bold font-semibold text-base">{selectedTemplateData.industry_type}</p>
                 </div>
                 <div className="space-y-1">
-                  <span className="text-slate-400 font-medium">Features:</span>
-                  <p className="text-white font-semibold text-base">{selectedTemplateData.features?.length || 0} included</p>
+                  <span className="text-siso-text-muted font-medium">Features:</span>
+                  <p className="text-siso-text-bold font-semibold text-base">{selectedTemplateData.features?.length || 0} included</p>
                 </div>
               </div>
             </div>
@@ -234,12 +234,12 @@ export const BulkPlanCreation = () => {
         {/* Username Input */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <Label className="text-white font-semibold text-lg flex items-center">
-              <Users className="w-5 h-5 mr-3 text-blue-400" />
+            <Label className="text-siso-text-bold font-semibold text-lg flex items-center">
+              <Users className="w-5 h-5 mr-3 text-siso-orange" />
               Enter Usernames
             </Label>
             {usernames.trim() && (
-              <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/40 px-4 py-2">
+              <Badge className="bg-siso-orange/20 text-siso-orange border-siso-orange/40 px-4 py-2">
                 {getUsernameCount()} user{getUsernameCount() !== 1 ? 's' : ''}
               </Badge>
             )}
@@ -249,10 +249,10 @@ export const BulkPlanCreation = () => {
             value={usernames}
             onChange={(e) => setUsernames(e.target.value)}
             placeholder="Enter usernames, one per line:&#10;&#10;john_doe&#10;jane_smith&#10;client_company&#10;..."
-            className="h-40 bg-slate-800/60 border-slate-600/50 text-white placeholder:text-slate-400 resize-none hover:bg-slate-700/60 focus:bg-slate-700/60 transition-all duration-300 rounded-lg shadow-lg"
+            className="h-40 bg-siso-bg-alt/60 border-siso-border text-siso-text placeholder:text-siso-text-muted resize-none hover:bg-siso-bg/60 focus:bg-siso-bg/60 transition-all duration-300 rounded-lg shadow-lg"
           />
           
-          <div className="flex items-center text-sm text-slate-300 space-x-6">
+          <div className="flex items-center text-sm text-siso-text space-x-6">
             <span className="flex items-center">
               <CheckCircle className="w-4 h-4 mr-2 text-green-400" />
               One username per line
@@ -265,22 +265,22 @@ export const BulkPlanCreation = () => {
         </div>
 
         {/* Action Section */}
-        <div className="flex items-center justify-between pt-6 border-t border-slate-700/50">
-          <div className="text-base text-slate-200">
+        <div className="flex items-center justify-between pt-6 border-t border-siso-border">
+          <div className="text-base text-siso-text">
             {selectedTemplate && usernames.trim() ? (
               <span className="flex items-center">
-                <Zap className="w-5 h-5 mr-2 text-blue-400" />
+                <Zap className="w-5 h-5 mr-2 text-siso-orange" />
                 Ready to create {getUsernameCount()} plan{getUsernameCount() !== 1 ? 's' : ''} from "{selectedTemplateData?.name}"
               </span>
             ) : (
-              <span className="text-slate-400">Select a template and add usernames to continue</span>
+              <span className="text-siso-text-muted">Select a template and add usernames to continue</span>
             )}
           </div>
           
           <Button
             onClick={handleCreatePlans}
             disabled={loading || !selectedTemplate || !usernames.trim()}
-            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg hover:shadow-blue-500/25 transition-all duration-300 min-w-[160px] h-12 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-gradient-to-r from-siso-red to-siso-orange hover:from-siso-red/90 hover:to-siso-orange/90 text-white shadow-lg hover:shadow-siso-orange/25 transition-all duration-300 min-w-[160px] h-12 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <>

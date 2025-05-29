@@ -32,23 +32,23 @@ export default function AdminTemplates() {
 
   return (
     <AdminLayout>
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+      <div className="min-h-screen bg-gradient-to-br from-siso-bg via-siso-bg-alt to-siso-bg">
         <div className="container mx-auto px-6 py-12">
           {/* Enhanced Page Header */}
           <div className="mb-12">
-            <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-8 shadow-2xl">
+            <div className="bg-siso-bg-alt/50 backdrop-blur-sm border border-siso-border rounded-2xl p-8 shadow-2xl">
               <AdminPageTitle
                 icon={FileStack}
                 title="Plan Templates"
                 subtitle="Bulk-create or manage your plan templates for efficient client onboarding"
               />
               <div className="mt-6 flex items-center space-x-6 text-sm">
-                <div className="flex items-center text-slate-300">
-                  <div className="w-2 h-2 bg-blue-400 rounded-full mr-3"></div>
+                <div className="flex items-center text-siso-text">
+                  <div className="w-2 h-2 bg-siso-orange rounded-full mr-3"></div>
                   <span>Bulk Creation Tools</span>
                 </div>
-                <div className="flex items-center text-slate-300">
-                  <div className="w-2 h-2 bg-purple-400 rounded-full mr-3"></div>
+                <div className="flex items-center text-siso-text">
+                  <div className="w-2 h-2 bg-siso-red rounded-full mr-3"></div>
                   <span>Shareable Plans Management</span>
                 </div>
               </div>
