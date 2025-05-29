@@ -22,8 +22,27 @@ import {
   Award
 } from 'lucide-react';
 
+// Define types for plan data
+interface PlanData {
+  title: string;
+  company: string;
+  sections: {
+    overview: string;
+    features: string[];
+    timeline: string;
+    pricing: string;
+    contact: string;
+  };
+  created_at: string;
+  view_count: number;
+}
+
+interface MockPlanData {
+  [key: string]: PlanData;
+}
+
 // Mock plan data for demonstration
-const mockPlanData = {
+const mockPlanData: MockPlanData = {
   'juice-bar': {
     title: 'Juice Bar Mobile App Development Plan',
     company: 'SISO Agency',
@@ -183,7 +202,7 @@ export default function PublicPlanView() {
     );
   }
 
-  const sectionIcons = {
+  const sectionIcons: Record<string, any> = {
     overview: FileText,
     features: Sparkles,
     timeline: Calendar,
@@ -191,7 +210,7 @@ export default function PublicPlanView() {
     contact: Phone
   };
 
-  const sectionTitles = {
+  const sectionTitles: Record<string, string> = {
     overview: '📋 Project Overview',
     features: '✨ Key Features',
     timeline: '📅 Timeline & Phases',
@@ -204,7 +223,9 @@ export default function PublicPlanView() {
       {/* Professional Hero Header */}
       <div className="relative bg-gradient-to-r from-orange-500/10 via-red-500/10 to-purple-500/10 border-b border-gray-700/50 overflow-hidden">
         {/* Background Pattern */}
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.02"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-50"></div>
+        <div className="absolute inset-0 opacity-50" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+        }}></div>
         
         <div className="relative max-w-6xl mx-auto px-6 py-12">
           {/* Top Navigation Bar */}
