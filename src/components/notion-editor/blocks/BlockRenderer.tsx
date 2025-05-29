@@ -1,6 +1,8 @@
 import React from 'react';
 import { NotionBlock } from '@/types/notion';
 import { MarkdownParser } from '../parsers/MarkdownParser';
+import { TableBlock } from './TableBlock';
+import { MediaBlock } from './MediaBlock';
 import { 
   FileText, 
   ChevronRight, 
@@ -17,13 +19,15 @@ interface BlockRendererProps {
   isEditing?: boolean;
   onContentChange?: (blockId: string, content: string) => void;
   onBlockTypeChange?: (blockId: string, type: string) => void;
+  onBlockUpdate?: (blockId: string, properties: any) => void;
 }
 
 export const BlockRenderer: React.FC<BlockRendererProps> = ({
   block,
   isEditing = false,
   onContentChange,
-  onBlockTypeChange
+  onBlockTypeChange,
+  onBlockUpdate
 }) => {
   const [isToggleOpen, setIsToggleOpen] = React.useState(!block.properties?.collapsed);
   
@@ -241,6 +245,26 @@ export const BlockRenderer: React.FC<BlockRendererProps> = ({
       case 'divider':
         return (
           <hr className="border-gray-300 dark:border-gray-600 my-6" />
+        );
+
+      case 'table':
+        return (
+          <TableBlock block={block} isEditing={isEditing} onBlockUpdate={onBlockUpdate} />
+        );
+
+      case 'image':
+        return (
+          <MediaBlock block={block} isEditing={isEditing} onBlockUpdate={onBlockUpdate} />
+        );
+
+      case 'video':
+        return (
+          <MediaBlock block={block} isEditing={isEditing} onBlockUpdate={onBlockUpdate} />
+        );
+
+      case 'embed':
+        return (
+          <MediaBlock block={block} isEditing={isEditing} onBlockUpdate={onBlockUpdate} />
         );
 
       default:

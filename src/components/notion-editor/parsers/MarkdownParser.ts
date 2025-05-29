@@ -202,9 +202,47 @@ export class MarkdownParser {
         return `> ${emoji} ${block.content}`;
       case 'toggle':
         return `> ${block.content}`;
+      case 'table':
+        return this.tableToMarkdown(block);
+      case 'image':
+        const imageCaption = block.properties?.caption ? ` "${block.properties.caption}"` : '';
+        return `![${imageCaption}](${block.properties?.url || ''})`;
+      case 'video':
+        return `[Video: ${block.properties?.caption || 'Video'}](${block.properties?.url || ''})`;
+      case 'embed':
+        return `[Embed: ${block.properties?.caption || 'Embedded content'}](${block.properties?.url || ''})`;
       default:
         return block.content;
     }
+  }
+
+  /**
+   * Convert table block to markdown format
+   */
+  private static tableToMarkdown(block: NotionBlock): string {
+    const columns = block.properties?.columns || [];
+    const rows = block.properties?.rows || [];
+    
+    if (columns.length === 0 || rows.length === 0) {
+      return '| Column 1 | Column 2 | Column 3 |\n|----------|----------|----------|';
+    }
+    
+    // Header row
+    const headerRow = '| ' + columns.map(col => col.name).join(' | ') + ' |';
+    
+    // Separator row
+    const separatorRow = '| ' + columns.map(() => '--------').join(' | ') + ' |';
+    
+    // Data rows
+    const dataRows = rows.map(row => {
+      const cells = columns.map(col => {
+        const cellValue = row.cells[col.id] || '';
+        return String(cellValue).replace(/\|/g, '\\|'); // Escape pipes
+      });
+      return '| ' + cells.join(' | ') + ' |';
+    });
+    
+    return [headerRow, separatorRow, ...dataRows].join('\n');
   }
 
   /**

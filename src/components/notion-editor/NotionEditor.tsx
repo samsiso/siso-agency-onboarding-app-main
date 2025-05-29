@@ -13,7 +13,11 @@ import {
   Minus,
   Lightbulb,
   ChevronRight,
-  MoreHorizontal
+  MoreHorizontal,
+  Table,
+  Image,
+  Video,
+  Globe
 } from 'lucide-react';
 
 interface NotionEditorProps {
@@ -68,6 +72,22 @@ export const NotionEditor: React.FC<NotionEditorProps> = ({
     setBlocks(prevBlocks => {
       const updatedBlocks = prevBlocks.map(block =>
         block.id === blockId ? { ...block, type: newType as any } : block
+      );
+      
+      if (onChange) {
+        const markdown = MarkdownParser.blocksToMarkdown(updatedBlocks);
+        onChange(markdown, updatedBlocks);
+      }
+      
+      return updatedBlocks;
+    });
+  }, [onChange]);
+
+  // Handle block property updates
+  const handleBlockUpdate = useCallback((blockId: string, properties: any) => {
+    setBlocks(prevBlocks => {
+      const updatedBlocks = prevBlocks.map(block =>
+        block.id === blockId ? { ...block, properties } : block
       );
       
       if (onChange) {
@@ -205,6 +225,30 @@ export const NotionEditor: React.FC<NotionEditorProps> = ({
       label: 'Divider',
       description: 'Visually divide blocks',
       command: 'divider'
+    },
+    {
+      icon: Table,
+      label: 'Table',
+      description: 'Create a table',
+      command: 'table'
+    },
+    {
+      icon: Image,
+      label: 'Image',
+      description: 'Insert an image',
+      command: 'image'
+    },
+    {
+      icon: Video,
+      label: 'Video',
+      description: 'Insert a video',
+      command: 'video'
+    },
+    {
+      icon: Globe,
+      label: 'Embed',
+      description: 'Embed external content',
+      command: 'embed'
     }
   ];
 
@@ -270,6 +314,7 @@ export const NotionEditor: React.FC<NotionEditorProps> = ({
               isEditing={!readOnly}
               onContentChange={handleContentChange}
               onBlockTypeChange={handleBlockTypeChange}
+              onBlockUpdate={handleBlockUpdate}
             />
           ))
         )}
