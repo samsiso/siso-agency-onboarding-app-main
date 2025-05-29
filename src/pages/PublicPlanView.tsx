@@ -193,10 +193,10 @@ export default function PublicPlanView() {
 
   if (!planData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-siso-bg flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-white mb-4">Plan Not Found</h1>
-          <p className="text-gray-400">The requested plan could not be found.</p>
+          <h1 className="text-2xl font-bold text-siso-text-bold mb-4">Plan Not Found</h1>
+          <p className="text-siso-text-muted">The requested plan could not be found.</p>
         </div>
       </div>
     );
@@ -219,55 +219,55 @@ export default function PublicPlanView() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-      {/* Professional Hero Header */}
-      <div className="relative bg-gradient-to-r from-orange-500/10 via-red-500/10 to-purple-500/10 border-b border-gray-700/50 overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-50" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+    <div className="min-h-screen bg-siso-bg">
+      {/* Premium SISO Hero Header */}
+      <div className="relative bg-gradient-to-r from-siso-red/10 via-siso-orange/10 to-siso-red/5 border-b border-siso-border overflow-hidden">
+        {/* Enhanced Background Pattern */}
+        <div className="absolute inset-0 opacity-30" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23FFA726' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
         }}></div>
         
         <div className="relative max-w-6xl mx-auto px-6 py-12">
-          {/* Top Navigation Bar */}
+          {/* Premium Navigation Bar */}
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center space-x-4">
               <img 
-                src="/images/siso-logo.svg" 
+                src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png" 
                 alt="SISO Agency" 
-                className="h-12 w-12 filter brightness-0 invert"
+                className="h-12 w-12 rounded-xl border border-siso-orange/60 shadow-lg bg-black/40"
               />
               <div>
-                <h3 className="text-xl font-bold text-white">SISO Agency</h3>
-                <p className="text-sm text-orange-400 font-medium">Premium Development Solutions</p>
+                <h3 className="text-xl font-bold text-siso-text-bold">SISO Agency</h3>
+                <p className="text-sm text-siso-orange font-medium">Premium Development Solutions</p>
               </div>
             </div>
             
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 text-sm text-gray-400">
+              <div className="flex items-center space-x-2 text-sm text-siso-text-muted">
                 <Clock className="w-4 h-4" />
                 <span>{planData.view_count} views</span>
               </div>
-              <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30">
+              <Badge className="bg-siso-orange/20 text-siso-orange border-siso-orange/30">
                 <Award className="w-3 h-3 mr-1" />
                 Premium Plan
               </Badge>
             </div>
           </div>
 
-          {/* Hero Content */}
+          {/* Enhanced Hero Content */}
           <div className="max-w-4xl">
-            <div className="flex items-center space-x-2 text-orange-400 text-sm font-medium mb-4">
+            <div className="flex items-center space-x-2 text-siso-orange text-sm font-medium mb-4">
               <Shield className="w-4 h-4" />
               <span>Confidential Project Proposal</span>
             </div>
             
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
+            <h1 className="title-glow text-4xl md:text-5xl font-bold mb-6 leading-tight">
               {planData.title}
             </h1>
             
-            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-8 text-gray-300">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-8 text-siso-text">
               <div className="flex items-center space-x-2">
-                <Users className="w-5 h-5 text-purple-400" />
+                <Users className="w-5 h-5 text-siso-orange" />
                 <span className="font-medium">Expert Development Team</span>
               </div>
               <div className="flex items-center space-x-2">
@@ -281,17 +281,17 @@ export default function PublicPlanView() {
             </div>
           </div>
 
-          {/* Quick Action Bar */}
+          {/* Enhanced Action Bar */}
           <div className="mt-8 flex flex-col sm:flex-row gap-4">
-            <Button size="lg" className="bg-orange-600 hover:bg-orange-700 text-white">
+            <Button className="button-primary">
               <Mail className="mr-2 w-5 h-5" />
               Discuss This Project
             </Button>
-            <Button size="lg" variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800">
+            <Button className="button-secondary">
               <Phone className="mr-2 w-5 h-5" />
               Schedule Call
             </Button>
-            <Button size="lg" variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800">
+            <Button className="button-secondary">
               <ExternalLink className="mr-2 w-5 h-5" />
               View Portfolio
             </Button>
@@ -299,20 +299,20 @@ export default function PublicPlanView() {
         </div>
       </div>
 
-      {/* Enhanced Content */}
+      {/* Premium Content Section */}
       <div className="max-w-6xl mx-auto px-6 py-12">
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Main Content */}
+          {/* Enhanced Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {Object.entries(planData.sections).map(([sectionKey, content]) => {
               const Icon = sectionIcons[sectionKey] || FileText;
               
               return (
-                <Card key={sectionKey} className="border-gray-700/50 bg-gray-800/30 backdrop-blur-sm hover:bg-gray-800/50 transition-all duration-300">
+                <Card key={sectionKey} className="glow-card border-siso-border bg-siso-bg-alt hover:border-siso-border-hover">
                   <CardHeader className="pb-4">
-                    <CardTitle className="flex items-center text-white text-xl">
-                      <div className="p-2 bg-orange-500/20 rounded-lg mr-4">
-                        <Icon className="h-6 w-6 text-orange-400" />
+                    <CardTitle className="flex items-center text-siso-text-bold text-xl">
+                      <div className="p-2 bg-siso-orange/20 rounded-lg mr-4 border border-siso-orange/30">
+                        <Icon className="h-6 w-6 text-siso-orange" />
                       </div>
                       {sectionTitles[sectionKey] || sectionKey}
                     </CardTitle>
@@ -321,14 +321,14 @@ export default function PublicPlanView() {
                     {sectionKey === 'features' && Array.isArray(content) ? (
                       <div className="grid sm:grid-cols-2 gap-3">
                         {(content as string[]).map((feature, index) => (
-                          <div key={index} className="flex items-start text-gray-300">
+                          <div key={index} className="flex items-start text-siso-text">
                             <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 mr-3 flex-shrink-0" />
                             <span className="leading-relaxed">{feature}</span>
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <div className="text-gray-300 whitespace-pre-wrap leading-relaxed text-lg">
+                      <div className="text-siso-text whitespace-pre-wrap leading-relaxed text-lg">
                         {content as string}
                       </div>
                     )}
@@ -338,26 +338,26 @@ export default function PublicPlanView() {
             })}
           </div>
 
-          {/* Sidebar */}
+          {/* Premium Sidebar */}
           <div className="space-y-6">
-            {/* Quick Contact Card */}
-            <Card className="border-orange-500/30 bg-gradient-to-br from-orange-500/10 to-red-500/10 backdrop-blur-sm">
+            {/* Enhanced Contact Card */}
+            <Card className="glow-card border-siso-orange/30 bg-gradient-to-br from-siso-orange/10 to-siso-red/10">
               <CardHeader>
-                <CardTitle className="text-white flex items-center">
-                  <Phone className="mr-2 h-5 w-5 text-orange-400" />
+                <CardTitle className="text-siso-text-bold flex items-center">
+                  <Phone className="mr-2 h-5 w-5 text-siso-orange" />
                   Get Started Today
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-gray-300 text-sm leading-relaxed">
+                <p className="text-siso-text text-sm leading-relaxed">
                   Ready to transform your business with this solution? Let's discuss your specific needs.
                 </p>
                 <div className="space-y-3">
-                  <Button className="w-full bg-orange-600 hover:bg-orange-700">
+                  <Button className="button-primary w-full">
                     <Mail className="mr-2 w-4 h-4" />
                     hello@sisoagency.com
                   </Button>
-                  <Button variant="outline" className="w-full border-gray-600 text-gray-300 hover:bg-gray-800">
+                  <Button className="button-secondary w-full">
                     <Phone className="mr-2 w-4 h-4" />
                     +1 (555) 123-4567
                   </Button>
@@ -365,25 +365,25 @@ export default function PublicPlanView() {
               </CardContent>
             </Card>
 
-            {/* Trust Indicators */}
-            <Card className="border-gray-700/50 bg-gray-800/30 backdrop-blur-sm">
+            {/* Enhanced Trust Indicators */}
+            <Card className="glow-card border-siso-border bg-siso-bg-alt hover:border-siso-border-hover">
               <CardHeader>
-                <CardTitle className="text-white text-lg">Why Choose SISO?</CardTitle>
+                <CardTitle className="text-siso-text-bold text-lg">Why Choose SISO?</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-center space-x-3 text-gray-300">
-                  <Award className="w-5 h-5 text-yellow-400" />
+                <div className="flex items-center space-x-3 text-siso-text">
+                  <Award className="w-5 h-5 text-siso-orange" />
                   <span className="text-sm">5+ Years Experience</span>
                 </div>
-                <div className="flex items-center space-x-3 text-gray-300">
-                  <Users className="w-5 h-5 text-purple-400" />
+                <div className="flex items-center space-x-3 text-siso-text">
+                  <Users className="w-5 h-5 text-siso-orange" />
                   <span className="text-sm">50+ Projects Delivered</span>
                 </div>
-                <div className="flex items-center space-x-3 text-gray-300">
+                <div className="flex items-center space-x-3 text-siso-text">
                   <Shield className="w-5 h-5 text-green-400" />
                   <span className="text-sm">100% Client Satisfaction</span>
                 </div>
-                <div className="flex items-center space-x-3 text-gray-300">
+                <div className="flex items-center space-x-3 text-siso-text">
                   <CheckCircle className="w-5 h-5 text-blue-400" />
                   <span className="text-sm">Post-Launch Support</span>
                 </div>
@@ -393,74 +393,74 @@ export default function PublicPlanView() {
         </div>
       </div>
 
-      {/* Professional Footer */}
-      <footer className="bg-gray-900 border-t border-gray-800">
+      {/* Premium SISO Footer */}
+      <footer className="bg-siso-bg-alt border-t border-siso-border">
         <div className="max-w-6xl mx-auto px-6 py-12">
           <div className="grid md:grid-cols-3 gap-8">
-            {/* Company Info */}
+            {/* Enhanced Company Info */}
             <div className="space-y-4">
               <div className="flex items-center space-x-3">
                 <img 
-                  src="/images/siso-logo.svg" 
+                  src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png" 
                   alt="SISO Agency" 
-                  className="h-10 w-10 filter brightness-0 invert"
+                  className="h-10 w-10 rounded-xl border border-siso-orange/60 shadow-lg bg-black/40"
                 />
                 <div>
-                  <h3 className="text-lg font-bold text-white">SISO Agency</h3>
-                  <p className="text-sm text-orange-400">Premium Development Solutions</p>
+                  <h3 className="text-lg font-bold text-siso-text-bold">SISO Agency</h3>
+                  <p className="text-sm text-siso-orange">Premium Development Solutions</p>
                 </div>
               </div>
-              <p className="text-gray-400 text-sm leading-relaxed">
+              <p className="text-siso-text-muted text-sm leading-relaxed">
                 We build exceptional digital experiences that drive business growth. 
                 From mobile apps to complex web platforms, we deliver solutions that exceed expectations.
               </p>
             </div>
 
-            {/* Contact */}
+            {/* Enhanced Contact */}
             <div className="space-y-4">
-              <h4 className="text-white font-semibold">Get In Touch</h4>
+              <h4 className="text-siso-text-bold font-semibold">Get In Touch</h4>
               <div className="space-y-3 text-sm">
-                <div className="flex items-center space-x-3 text-gray-400">
-                  <Mail className="w-4 h-4 text-orange-400" />
+                <div className="flex items-center space-x-3 text-siso-text">
+                  <Mail className="w-4 h-4 text-siso-orange" />
                   <span>hello@sisoagency.com</span>
                 </div>
-                <div className="flex items-center space-x-3 text-gray-400">
-                  <Phone className="w-4 h-4 text-orange-400" />
+                <div className="flex items-center space-x-3 text-siso-text">
+                  <Phone className="w-4 h-4 text-siso-orange" />
                   <span>+1 (555) 123-4567</span>
                 </div>
-                <div className="flex items-center space-x-3 text-gray-400">
-                  <Globe className="w-4 h-4 text-orange-400" />
+                <div className="flex items-center space-x-3 text-siso-text">
+                  <Globe className="w-4 h-4 text-siso-orange" />
                   <span>www.sisoagency.com</span>
                 </div>
               </div>
             </div>
 
-            {/* CTA */}
+            {/* Enhanced CTA */}
             <div className="space-y-4">
-              <h4 className="text-white font-semibold">Ready to Start?</h4>
-              <p className="text-gray-400 text-sm">
+              <h4 className="text-siso-text-bold font-semibold">Ready to Start?</h4>
+              <p className="text-siso-text-muted text-sm">
                 Let's discuss how we can bring your vision to life with cutting-edge technology.
               </p>
-              <Button className="bg-orange-600 hover:bg-orange-700 text-white">
+              <Button className="button-primary">
                 <ArrowRight className="mr-2 w-4 h-4" />
                 Schedule Consultation
               </Button>
             </div>
           </div>
 
-          {/* Bottom Bar */}
-          <div className="mt-8 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-500 text-sm">
+          {/* Enhanced Bottom Bar */}
+          <div className="mt-8 pt-8 border-t border-siso-border flex flex-col md:flex-row justify-between items-center">
+            <p className="text-siso-text-muted text-sm">
               © 2025 SISO Agency. All rights reserved. | Premium Development Solutions
             </p>
             <div className="flex items-center space-x-4 mt-4 md:mt-0">
-              <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
+              <Button variant="ghost" size="sm" className="text-siso-text-muted hover:text-siso-orange">
                 <Linkedin className="w-4 h-4" />
               </Button>
-              <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
+              <Button variant="ghost" size="sm" className="text-siso-text-muted hover:text-siso-orange">
                 <Twitter className="w-4 h-4" />
               </Button>
-              <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
+              <Button variant="ghost" size="sm" className="text-siso-text-muted hover:text-siso-orange">
                 <Globe className="w-4 h-4" />
               </Button>
             </div>
