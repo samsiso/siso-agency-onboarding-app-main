@@ -730,11 +730,11 @@ th:hover .header-column-menu {
 
 /* Enhanced Notion Editor Styles */
 .notion-editor-enhanced {
-  @apply bg-transparent;
+  @apply bg-siso-bg-alt;
 }
 
 .notion-editor-enhanced .notion-editor {
-  @apply bg-transparent border-0 shadow-none;
+  @apply bg-siso-bg-alt border border-siso-border shadow-lg rounded-xl;
 }
 
 .notion-editor-enhanced .notion-block {
@@ -742,17 +742,23 @@ th:hover .header-column-menu {
 }
 
 .notion-editor-enhanced .notion-block:hover {
-  @apply bg-siso-bg-alt/30 rounded-lg;
+  @apply bg-siso-bg/50 rounded-lg;
 }
 
 .notion-editor-enhanced [contenteditable="true"] {
-  @apply text-siso-text bg-transparent border-0 outline-none;
+  @apply text-siso-text bg-siso-bg-alt border-0 outline-none;
   line-height: 1.6;
   font-size: 16px;
+  min-height: 1.5em;
 }
 
 .notion-editor-enhanced [contenteditable="true"]:focus {
-  @apply ring-0 shadow-none bg-transparent;
+  @apply ring-1 ring-siso-orange/30 shadow-none bg-siso-bg-alt rounded-md;
+}
+
+.notion-editor-enhanced [contenteditable="true"]:empty:before {
+  content: attr(data-placeholder);
+  @apply text-siso-text-muted pointer-events-none;
 }
 
 .notion-editor-enhanced h1 {
@@ -772,7 +778,7 @@ th:hover .header-column-menu {
 }
 
 .notion-editor-enhanced .notion-block[data-type="code"] {
-  @apply bg-siso-bg-alt border border-siso-border rounded-lg p-4 font-mono text-sm;
+  @apply bg-siso-bg border border-siso-border rounded-lg p-4 font-mono text-sm;
 }
 
 .notion-editor-enhanced .notion-block[data-type="callout"] {
