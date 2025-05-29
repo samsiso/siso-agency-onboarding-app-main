@@ -593,10 +593,10 @@ export const NotionEditor: React.FC<NotionEditorProps> = ({
         ref={editorRef}
         className={`
           min-h-[300px] p-6 rounded-xl border transition-all duration-200
-          bg-siso-bg-alt 
-          border-siso-border
-          focus-within:ring-2 focus-within:ring-siso-orange/20 focus-within:border-siso-orange/40
-          hover:border-siso-border-hover
+          bg-slate-800/60 backdrop-blur-sm
+          border-slate-600/50
+          focus-within:ring-2 focus-within:ring-blue-400/20 focus-within:border-blue-400/40
+          hover:border-slate-500/70
           ${readOnly ? 'cursor-default' : 'cursor-text'}
         `}
         onKeyDown={handleKeyDown}
@@ -604,7 +604,7 @@ export const NotionEditor: React.FC<NotionEditorProps> = ({
         style={{ outline: 'none' }}
       >
         {blocks.length === 0 && !readOnly ? (
-          <div className="text-siso-text-muted text-lg">
+          <div className="text-slate-400 text-lg">
             {placeholder}
           </div>
         ) : (
@@ -617,7 +617,7 @@ export const NotionEditor: React.FC<NotionEditorProps> = ({
               }}
               className={`
                 notion-block relative group transition-all duration-150
-                ${focusedBlockId === block.id ? 'ring-1 ring-siso-orange/20 rounded-lg' : ''}
+                ${focusedBlockId === block.id ? 'ring-1 ring-blue-400/20 rounded-lg' : ''}
                 ${index > 0 ? 'mt-2' : ''}
               `}
               onFocus={() => handleBlockFocus(block.id)}
@@ -638,37 +638,37 @@ export const NotionEditor: React.FC<NotionEditorProps> = ({
       {showSlashMenu && !readOnly && (
         <div
           ref={slashMenuRef}
-          className="absolute z-50 bg-siso-bg-alt border border-siso-border rounded-xl shadow-xl py-2 min-w-[320px] max-h-[400px] overflow-y-auto backdrop-blur-sm"
+          className="absolute z-50 bg-slate-800/95 border border-slate-600/50 rounded-xl shadow-2xl py-2 min-w-[320px] max-h-[400px] overflow-y-auto backdrop-blur-md"
           style={{
             left: slashMenuPosition.x,
             top: slashMenuPosition.y + 8
           }}
         >
-          <div className="px-4 py-2 text-xs font-semibold text-siso-text-muted uppercase tracking-wide border-b border-siso-border">
+          <div className="px-4 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wide border-b border-slate-600/50">
             {slashFilter ? `Filtered by "${slashFilter}"` : 'Basic blocks'}
           </div>
           {filteredCommands.length > 0 ? (
             filteredCommands.map((item) => (
               <button
                 key={item.command}
-                className="w-full px-4 py-3 text-left hover:bg-siso-bg/50 flex items-center transition-colors duration-150 border-l-2 border-transparent hover:border-siso-orange"
+                className="w-full px-4 py-3 text-left hover:bg-slate-700/60 flex items-center transition-colors duration-150 border-l-2 border-transparent hover:border-blue-400"
                 onClick={() => handleSlashCommand(item.command)}
               >
-                <div className="flex items-center justify-center w-8 h-8 bg-siso-bg rounded-lg mr-3">
-                  <item.icon className="w-4 h-4 text-siso-text" />
+                <div className="flex items-center justify-center w-8 h-8 bg-slate-700/60 rounded-lg mr-3">
+                  <item.icon className="w-4 h-4 text-slate-200" />
                 </div>
                 <div className="flex-1">
-                  <div className="text-sm font-medium text-siso-text-bold">
+                  <div className="text-sm font-medium text-white">
                     {item.label}
                   </div>
-                  <div className="text-xs text-siso-text-muted">
+                  <div className="text-xs text-slate-400">
                     {item.description}
                   </div>
                 </div>
               </button>
             ))
           ) : (
-            <div className="px-4 py-6 text-center text-siso-text-muted">
+            <div className="px-4 py-6 text-center text-slate-400">
               <div className="text-sm">No blocks found</div>
               <div className="text-xs">Try a different search term</div>
             </div>
@@ -678,17 +678,17 @@ export const NotionEditor: React.FC<NotionEditorProps> = ({
 
       {/* Enhanced Editor Toolbar */}
       {!readOnly && (
-        <div className="mt-4 flex items-center justify-between text-sm text-siso-text-muted">
+        <div className="mt-4 flex items-center justify-between text-sm text-slate-400">
           <div className="flex items-center space-x-4">
             <span className="flex items-center">
               <MoreHorizontal className="w-4 h-4 mr-1" />
-              Type <kbd className="mx-1 px-2 py-0.5 bg-siso-bg rounded text-xs font-mono">/ </kbd> 
+              Type <kbd className="mx-1 px-2 py-0.5 bg-slate-700/60 rounded text-xs font-mono">/ </kbd> 
               for commands
             </span>
             <span className="flex items-center">
               <Code className="w-4 h-4 mr-1" />
-              <kbd className="mx-1 px-2 py-0.5 bg-siso-bg rounded text-xs font-mono">⌘B</kbd>
-              <kbd className="mx-1 px-2 py-0.5 bg-siso-bg rounded text-xs font-mono">⌘I</kbd>
+              <kbd className="mx-1 px-2 py-0.5 bg-slate-700/60 rounded text-xs font-mono">⌘B</kbd>
+              <kbd className="mx-1 px-2 py-0.5 bg-slate-700/60 rounded text-xs font-mono">⌘I</kbd>
               for formatting
             </span>
           </div>

@@ -329,18 +329,12 @@ export function CreatePlanDialog({ open, onOpenChange }: CreatePlanDialogProps) 
               <div className="px-8 py-6">
                 <NotionEditor
                   initialContent={rawContent}
-                  onChange={handleNotionChange}
-                  placeholder="🎯 Start writing your project plan...
-
-✨ Try these formatting shortcuts:
-• Type '# ' for a heading
-• Type '- ' for a bullet list  
-• Type '> ' for a quote
-• Type '```' for code
-• Type '/' for more options
-
-Transform your ideas into a professional client presentation!"
-                  className="min-h-[600px] notion-editor-enhanced"
+                  onChange={(content, blocks) => {
+                    setRawContent(content);
+                    setContentBlocks(blocks);
+                  }}
+                  placeholder="Start writing your app plan... Type '/' for commands"
+                  className="notion-editor-enhanced"
                 />
               </div>
             </div>
