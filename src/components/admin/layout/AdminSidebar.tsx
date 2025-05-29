@@ -92,7 +92,7 @@ export const Sidebar = () => {
           <Button
             variant="ghost"
             size="icon"
-            className="fixed top-4 right-4 z-50 bg-slate-800/80 backdrop-blur-sm border border-slate-600/50"
+            className="fixed top-4 right-4 z-50 bg-neutral-900/80 backdrop-blur-sm border border-neutral-700/50"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             <AnimatePresence mode="wait" initial={false}>
@@ -124,8 +124,8 @@ export const Sidebar = () => {
         variants={sidebarVariants}
         className={`
           fixed top-0 h-screen overflow-y-auto
-          bg-slate-800/95 backdrop-blur-sm
-          border-r border-slate-600/50 shadow-xl
+          bg-neutral-900/95 backdrop-blur-sm
+          border-r border-neutral-700/50 shadow-xl
           ${isMobile ? 'left-0 z-40' : ''}
         `}
         onMouseEnter={handleMouseEnter}

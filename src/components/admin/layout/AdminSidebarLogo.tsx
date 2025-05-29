@@ -9,7 +9,7 @@ const logoVariants = cva("transition-all", {
   variants: {
     expanded: {
       true: "w-40 justify-start",
-      false: "w-10 justify-center",
+      false: "w-16 justify-center",
     },
   },
   defaultVariants: {
@@ -70,6 +70,7 @@ export function AdminSidebarLogo({
       className={cn(
         "flex items-center px-4 py-1.5 min-h-14",
         logoVariants({ expanded }),
+        !expanded && "px-2",
         className
       )}
       onClick={handleToggleCollapse}
@@ -80,12 +81,18 @@ export function AdminSidebarLogo({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="flex items-center"
+        className={cn(
+          "flex items-center",
+          !expanded && "justify-center w-full"
+        )}
       >
         <img 
           src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png" 
           alt="SISO AGENCY" 
-          className="w-9 h-9" 
+          className={cn(
+            "w-9 h-9",
+            !expanded && "mx-auto"
+          )} 
         />
         {expanded && (
           <motion.span
