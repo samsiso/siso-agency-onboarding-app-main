@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FinancialTransaction } from "@/utils/financial";
 import { getExpensesByCategory, SOFTWARE_CATEGORIES } from "@/utils/financial/expenseCategories"; 
@@ -32,26 +31,26 @@ export function SoftwareExpenseStats({ expenses }: SoftwareExpenseStatsProps) {
   // Calculate total software expense
   const totalSoftwareExpense = softwareExpenses.reduce((sum, item) => sum + item.value, 0);
   
-  // Colors for the pie chart
+  // Colors for the pie chart - SISO theme colors
   const COLORS = [
-    '#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', 
-    '#82ca9d', '#ffc658', '#8dd1e1', '#a4de6c', '#d0ed57'
+    '#FFA726', '#FF5722', '#FF8A65', '#FFCC80', '#FFB74D', 
+    '#FF7043', '#FFAB40', '#FFB300', '#FF6F00', '#E65100'
   ];
 
   return (
-    <Card>
+    <Card className="bg-siso-bg-alt border-siso-border">
       <CardHeader>
-        <CardTitle className="text-lg">Software Expense Breakdown</CardTitle>
+        <CardTitle className="text-lg text-siso-text-bold">Software Expense Breakdown</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="flex justify-between items-center mb-4">
           <div>
-            <p className="text-sm text-muted-foreground">Total Software Expenses</p>
-            <p className="text-2xl font-bold">{formatCurrency(totalSoftwareExpense, "GBP")}</p>
+            <p className="text-sm text-siso-text-muted">Total Software Expenses</p>
+            <p className="text-2xl font-bold text-siso-text-bold">{formatCurrency(totalSoftwareExpense, "GBP")}</p>
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Categories</p>
-            <p className="text-lg">{softwareExpenses.length}</p>
+            <p className="text-sm text-siso-text-muted">Categories</p>
+            <p className="text-lg text-siso-text-bold">{softwareExpenses.length}</p>
           </div>
         </div>
         
@@ -64,7 +63,7 @@ export function SoftwareExpenseStats({ expenses }: SoftwareExpenseStatsProps) {
                 cy="50%"
                 labelLine={false}
                 outerRadius={80}
-                fill="#8884d8"
+                fill="#FFA726"
                 dataKey="value"
                 label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
               >
@@ -74,8 +73,16 @@ export function SoftwareExpenseStats({ expenses }: SoftwareExpenseStatsProps) {
               </Pie>
               <Tooltip 
                 formatter={(value) => formatCurrency(value as number, "GBP")} 
+                contentStyle={{ 
+                  backgroundColor: '#1C1C1E', 
+                  border: '1px solid #FFA726', 
+                  borderRadius: '8px',
+                  color: '#FFFFFF'
+                }}
               />
-              <Legend />
+              <Legend 
+                wrapperStyle={{ color: '#FFFFFF' }}
+              />
             </PieChart>
           </ResponsiveContainer>
         </div>
@@ -88,11 +95,11 @@ export function SoftwareExpenseStats({ expenses }: SoftwareExpenseStatsProps) {
                   className="w-3 h-3 rounded-full mr-2" 
                   style={{ backgroundColor: COLORS[index % COLORS.length] }} 
                 />
-                <span className="text-sm">{category.name}</span>
+                <span className="text-sm text-siso-text">{category.name}</span>
               </div>
-              <div className="text-sm font-medium">
+              <div className="text-sm font-medium text-siso-text-bold">
                 {formatCurrency(category.value, "GBP")}
-                <span className="text-xs text-muted-foreground ml-1">({category.count})</span>
+                <span className="text-xs text-siso-text-muted ml-1">({category.count})</span>
               </div>
             </div>
           ))}

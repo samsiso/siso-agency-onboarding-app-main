@@ -144,8 +144,8 @@ export default function AdminPayments() {
 
   return (
     <AdminLayout>
-      {/* Accent color: purple background for financials; only 1 title */}
-      <div className="px-6 py-8 max-w-7xl mx-auto min-h-screen bg-gradient-to-br from-purple-100 via-purple-50 to-white rounded-lg">
+      {/* SISO Theme: Dark background with orange accents */}
+      <div className="px-6 py-8 max-w-7xl mx-auto min-h-screen bg-gradient-to-br from-siso-bg via-siso-bg-alt to-siso-bg rounded-lg">
         <AdminPageTitle
           icon={Wallet}
           title="Financial Management"
@@ -154,18 +154,17 @@ export default function AdminPayments() {
         {/* SINGLE header and buttons section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
           <div>
-            <p className="text-2xl font-bold tracking-tight text-purple-900">Financial Management</p>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-2xl font-bold tracking-tight text-siso-text-bold">Financial Management</p>
+            <p className="text-sm text-siso-text mt-1">
               Manage your expenses and revenue
             </p>
           </div>
           <div className="flex items-center gap-2">
             {!expensesExist && showBulkImport && (
               <Button
-                variant="destructive"
+                className="mt-2 md:mt-0 font-bold bg-gradient-to-r from-siso-red to-siso-orange hover:from-siso-red/90 hover:to-siso-orange/90 text-white"
                 onClick={handleBulkImportAllExpenses}
                 disabled={isLoading}
-                className="mt-2 md:mt-0 font-bold"
               >
                 <Import className="h-4 w-4 mr-2" />
                 {isLoading ? "Importing Expenses..." : "Bulk Import All Expenses"}
@@ -177,7 +176,7 @@ export default function AdminPayments() {
                   variant="secondary" 
                   onClick={handleSeedExpenses} 
                   disabled={isLoading || isSeeding}
-                  className="mt-2 md:mt-0"
+                  className="mt-2 md:mt-0 bg-siso-bg-alt hover:bg-siso-bg border-siso-border text-siso-text-bold"
                 >
                   {isSeeding ? "Adding Expenses..." : "Add Sample Expenses"}
                 </Button>
@@ -188,10 +187,10 @@ export default function AdminPayments() {
         </div>
         
         {upcomingExpenses.length > 0 && (
-          <Card className="mb-6 bg-amber-900/20 border border-amber-400/50">
+          <Card className="mb-6 bg-siso-orange/20 border border-siso-orange/50 backdrop-blur-sm">
             <div className="p-4 flex items-center">
-              <AlertCircle className="h-5 w-5 text-amber-400 mr-2" />
-              <span className="text-amber-200 font-medium">
+              <AlertCircle className="h-5 w-5 text-siso-orange mr-2" />
+              <span className="text-siso-text-bold font-medium">
                 {`£${upcomingExpensesTotal.toFixed(2)} in upcoming expenses due in the next 7 days`}
               </span>
             </div>
@@ -199,11 +198,11 @@ export default function AdminPayments() {
         )}
 
         <Tabs defaultValue="dashboard" className="mt-6" onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-4 w-full max-w-md">
-            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-            <TabsTrigger value="expenses">Expenses</TabsTrigger>
-            <TabsTrigger value="revenue">Revenue</TabsTrigger>
-            <TabsTrigger value="pipeline">Pipeline</TabsTrigger>
+          <TabsList className="grid grid-cols-4 w-full max-w-md bg-siso-bg-alt border-siso-border">
+            <TabsTrigger value="dashboard" className="data-[state=active]:bg-siso-orange data-[state=active]:text-white">Dashboard</TabsTrigger>
+            <TabsTrigger value="expenses" className="data-[state=active]:bg-siso-orange data-[state=active]:text-white">Expenses</TabsTrigger>
+            <TabsTrigger value="revenue" className="data-[state=active]:bg-siso-orange data-[state=active]:text-white">Revenue</TabsTrigger>
+            <TabsTrigger value="pipeline" className="data-[state=active]:bg-siso-orange data-[state=active]:text-white">Pipeline</TabsTrigger>
           </TabsList>
           <TabsContent value="dashboard" className="mt-6">
             <FinancialsDashboard />

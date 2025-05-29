@@ -1,4 +1,3 @@
-
 import { GlowEffect } from '@/components/ui/glow-effect';
 import { CreditCard } from 'lucide-react';
 
@@ -11,23 +10,23 @@ export function ExpenseCreditCard({ currentCosts, predictedCosts }: ExpenseCredi
   return (
     <div className="relative h-[200px] w-full">
       <GlowEffect
-        colors={['#9b87f5', '#7E69AB', '#6E59A5', '#8B5CF6']}
+        colors={['#FFA726', '#FF5722', '#FF8A65', '#FFCC80']}
         mode="static"
         blur="medium"
       />
-      <div className="relative h-full w-full rounded-lg bg-black/80 backdrop-blur-xl p-6 text-white border border-white/10">
+      <div className="relative h-full w-full rounded-lg bg-siso-bg-alt/90 backdrop-blur-xl p-6 text-white border border-siso-orange/20">
         <div className="flex justify-between items-start mb-8">
           <div>
-            <h3 className="text-lg font-medium mb-1">Total App Cost</h3>
-            <p className="text-3xl font-bold">£{currentCosts.toFixed(2)}</p>
+            <h3 className="text-lg font-medium mb-1 text-siso-text">Total App Cost</h3>
+            <p className="text-3xl font-bold text-siso-text-bold">£{currentCosts.toFixed(2)}</p>
           </div>
-          <CreditCard className="h-8 w-8 text-white/80" />
+          <CreditCard className="h-8 w-8 text-siso-orange" />
         </div>
         
         {predictedCosts && predictedCosts > 0 && (
-          <div className="border-t border-white/10 pt-4">
-            <p className="text-sm text-white/70 mb-1">Predicted Additional Costs</p>
-            <p className="text-xl font-semibold">£{predictedCosts.toFixed(2)}</p>
+          <div className="border-t border-siso-orange/20 pt-4">
+            <p className="text-sm text-siso-text-muted mb-1">Predicted Additional Costs</p>
+            <p className="text-xl font-semibold text-siso-orange">£{predictedCosts.toFixed(2)}</p>
           </div>
         )}
 
@@ -39,7 +38,7 @@ export function ExpenseCreditCard({ currentCosts, predictedCosts }: ExpenseCredi
             aria-label="Logo"
             width="70"
             height="70"
-            className="h-8 w-8"
+            className="h-8 w-8 text-siso-orange"
             fill="none"
           >
             <path

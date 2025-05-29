@@ -66,13 +66,13 @@ export function FinancialsDashboard() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h2 className="text-2xl font-semibold">Financial Overview</h2>
+        <h2 className="text-2xl font-semibold text-siso-text-bold">Financial Overview</h2>
         <Tabs defaultValue="month" value={period} onValueChange={setPeriod} className="w-[400px]">
-          <TabsList className="grid grid-cols-4">
-            <TabsTrigger value="month">Month</TabsTrigger>
-            <TabsTrigger value="quarter">Quarter</TabsTrigger>
-            <TabsTrigger value="year">Year</TabsTrigger>
-            <TabsTrigger value="all">All Time</TabsTrigger>
+          <TabsList className="grid grid-cols-4 bg-siso-bg-alt border-siso-border">
+            <TabsTrigger value="month" className="data-[state=active]:bg-siso-orange data-[state=active]:text-white">Month</TabsTrigger>
+            <TabsTrigger value="quarter" className="data-[state=active]:bg-siso-orange data-[state=active]:text-white">Quarter</TabsTrigger>
+            <TabsTrigger value="year" className="data-[state=active]:bg-siso-orange data-[state=active]:text-white">Year</TabsTrigger>
+            <TabsTrigger value="all" className="data-[state=active]:bg-siso-orange data-[state=active]:text-white">All Time</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
@@ -85,55 +85,55 @@ export function FinancialsDashboard() {
           />
         </div>
         
-        <Card>
+        <Card className="bg-siso-bg-alt border-siso-border">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+            <CardTitle className="text-sm font-medium text-siso-text">Total Revenue</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold text-siso-text-bold">
               {isLoading ? (
-                <div className="h-6 w-24 bg-muted animate-pulse rounded" />
+                <div className="h-6 w-24 bg-siso-bg animate-pulse rounded" />
               ) : (
                 formatCurrency(totalRevenue, 'GBP')
               )}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-siso-text-muted mt-1">
               From {revenues.length} transactions
             </p>
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="bg-siso-bg-alt border-siso-border">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Net Profit</CardTitle>
+            <CardTitle className="text-sm font-medium text-siso-text">Net Profit</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className={`text-2xl font-bold ${netProfit >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+            <div className={`text-2xl font-bold ${netProfit >= 0 ? 'text-green-400' : 'text-red-400'}`}>
               {isLoading ? (
-                <div className="h-6 w-24 bg-muted animate-pulse rounded" />
+                <div className="h-6 w-24 bg-siso-bg animate-pulse rounded" />
               ) : (
                 formatCurrency(netProfit, 'GBP')
               )}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-siso-text-muted mt-1">
               {netProfit >= 0 ? 'Profit' : 'Loss'}
             </p>
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="bg-siso-bg-alt border-siso-border">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Profit Margin</CardTitle>
+            <CardTitle className="text-sm font-medium text-siso-text">Profit Margin</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className={`text-2xl font-bold ${profitMargin >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+            <div className={`text-2xl font-bold ${profitMargin >= 0 ? 'text-green-400' : 'text-red-400'}`}>
               {isLoading ? (
-                <div className="h-6 w-24 bg-muted animate-pulse rounded" />
+                <div className="h-6 w-24 bg-siso-bg animate-pulse rounded" />
               ) : (
                 `${profitMargin.toFixed(1)}%`
               )}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-siso-text-muted mt-1">
               {profitMargin >= 20 ? 'Healthy' : profitMargin >= 0 ? 'Moderate' : 'Negative'}
             </p>
           </CardContent>
@@ -141,9 +141,9 @@ export function FinancialsDashboard() {
       </div>
       
       <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
-        <Card className="col-span-1">
+        <Card className="col-span-1 bg-siso-bg-alt border-siso-border">
           <CardHeader>
-            <CardTitle>Revenue vs. Expenses</CardTitle>
+            <CardTitle className="text-siso-text-bold">Revenue vs. Expenses</CardTitle>
           </CardHeader>
           <CardContent>
             <AreaChart data={filteredTransactions.map(t => ({
