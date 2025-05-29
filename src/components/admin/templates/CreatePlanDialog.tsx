@@ -15,9 +15,13 @@ import {
   Sparkles, 
   FileText, 
   Share2,
-  AlertCircle
+  AlertCircle,
+  Type
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { NotionEditor } from '@/components/notion-editor/NotionEditor';
+import { NotionRenderer } from '@/components/notion-editor/NotionRenderer';
+import { NotionBlock } from '@/types/notion';
 
 interface CreatePlanDialogProps {
   open: boolean;
@@ -78,9 +82,12 @@ const detectSections = (content: string) => {
 export function CreatePlanDialog({ open, onOpenChange }: CreatePlanDialogProps) {
   const [title, setTitle] = useState('');
   const [rawContent, setRawContent] = useState('');
+  const [formattedContent, setFormattedContent] = useState('');
+  const [contentBlocks, setContentBlocks] = useState<NotionBlock[]>([]);
   const [formattedSections, setFormattedSections] = useState<any>({});
   const [isCreating, setIsCreating] = useState(false);
   const [generatedUrl, setGeneratedUrl] = useState('');
+  const [editMode, setEditMode] = useState<'raw' | 'notion'>('raw');
   const { toast } = useToast();
 
   const handleAutoFormat = () => {
@@ -102,8 +109,16 @@ export function CreatePlanDialog({ open, onOpenChange }: CreatePlanDialogProps) 
     });
   };
 
+  // Handle NotionEditor changes
+  const handleNotionChange = (markdown: string, blocks: NotionBlock[]) => {
+    setFormattedContent(markdown);
+    setContentBlocks(blocks);
+  };
+
   const handleCreatePlan = async () => {
-    if (!title.trim() || !rawContent.trim()) {
+    const contentToSave = editMode === 'notion' ? formattedContent : rawContent;
+    
+    if (!title.trim() || !contentToSave.trim()) {
       toast({
         variant: "destructive",
         title: "Missing information",
@@ -116,11 +131,13 @@ export function CreatePlanDialog({ open, onOpenChange }: CreatePlanDialogProps) 
     
     try {
       // TODO: Replace with actual API call when database is ready
-      // const newPlan = await planTemplatesApi.create({
-      //   title,
-      //   raw_content: rawContent,
-      //   status: 'active'
-      // });
+      // Save both the raw content and the notion blocks if available
+      const planData = {
+        title,
+        raw_content: contentToSave,
+        notion_blocks: editMode === 'notion' ? contentBlocks : null,
+        status: 'active'
+      };
       
       // Mock plan creation for now
       const mockSlug = title.toLowerCase()
@@ -160,8 +177,11 @@ export function CreatePlanDialog({ open, onOpenChange }: CreatePlanDialogProps) 
   const resetForm = () => {
     setTitle('');
     setRawContent('');
+    setFormattedContent('');
+    setContentBlocks([]);
     setFormattedSections({});
     setGeneratedUrl('');
+    setEditMode('raw');
   };
 
   const sectionIcons = {
@@ -182,7 +202,7 @@ export function CreatePlanDialog({ open, onOpenChange }: CreatePlanDialogProps) 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-gray-900 border-gray-800">
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto bg-gray-900 border-gray-800">
         <DialogHeader>
           <DialogTitle className="flex items-center text-white">
             <Wand2 className="mr-2 h-5 w-5 text-purple-400" />
@@ -242,115 +262,151 @@ export function CreatePlanDialog({ open, onOpenChange }: CreatePlanDialogProps) 
             </Card>
           </div>
         ) : (
-          // Creation form
-          <Tabs defaultValue="create" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 bg-gray-800">
-              <TabsTrigger value="create" className="text-white data-[state=active]:bg-gray-700">
-                Create Plan
+          // Form state - create new plan
+          <Tabs defaultValue="input" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-3 bg-gray-800">
+              <TabsTrigger value="input" className="text-white data-[state=active]:bg-purple-600">
+                Input Content
               </TabsTrigger>
-              <TabsTrigger value="preview" className="text-white data-[state=active]:bg-gray-700">
+              <TabsTrigger value="preview" className="text-white data-[state=active]:bg-purple-600">
                 Preview
+              </TabsTrigger>
+              <TabsTrigger value="sections" className="text-white data-[state=active]:bg-purple-600">
+                Formatted Sections
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="create" className="space-y-6 mt-6">
+            <TabsContent value="input" className="space-y-6">
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="title" className="text-white">Plan Title</Label>
+                  <Label className="text-white">Plan Title</Label>
                   <Input
-                    id="title"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="e.g., E-commerce App Development Plan"
-                    className="mt-2 bg-gray-800 border-gray-700 text-white placeholder:text-gray-400"
+                    className="bg-gray-800 border-gray-700 text-white"
                   />
                 </div>
 
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <Label className="text-white">Paste ChatGPT/AI Content</Label>
-                    <Button 
-                      onClick={handleAutoFormat}
-                      variant="outline"
-                      size="sm"
-                      disabled={!rawContent.trim()}
-                    >
-                      <Wand2 className="mr-2 w-4 h-4" />
-                      Auto-Format
-                    </Button>
+                    <Label className="text-white">Content</Label>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        type="button"
+                        variant={editMode === 'raw' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setEditMode('raw')}
+                      >
+                        <FileText className="w-4 h-4 mr-2" />
+                        Raw Text
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={editMode === 'notion' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setEditMode('notion')}
+                      >
+                        <Type className="w-4 h-4 mr-2" />
+                        Rich Editor
+                      </Button>
+                    </div>
                   </div>
-                  <Textarea
-                    value={rawContent}
-                    onChange={(e) => setRawContent(e.target.value)}
-                    placeholder="Paste your ChatGPT content here...
 
-The system will auto-detect:
-• Project Overview sections
-• Feature lists
-• Timeline/phases  
-• Pricing information
-• Next steps/contact info"
-                    className="h-64 bg-gray-800 border-gray-700 text-white placeholder:text-gray-400"
-                  />
-                  <p className="text-xs text-gray-400 mt-2">
-                    Tip: Include sections like "Project Overview", "Features", "Timeline", etc. for best auto-formatting
-                  </p>
+                  {editMode === 'raw' ? (
+                    <Textarea
+                      value={rawContent}
+                      onChange={(e) => setRawContent(e.target.value)}
+                      placeholder="Paste your ChatGPT content here..."
+                      className="h-96 bg-gray-800 border-gray-700 text-white resize-none"
+                    />
+                  ) : (
+                    <NotionEditor
+                      initialContent={rawContent}
+                      onChange={handleNotionChange}
+                      placeholder="Start typing your plan content..."
+                      className="min-h-96"
+                    />
+                  )}
                 </div>
 
-                <div className="flex justify-end space-x-2">
-                  <Button 
-                    onClick={() => onOpenChange(false)} 
-                    variant="ghost"
-                    className="text-gray-400"
-                  >
-                    Cancel
-                  </Button>
-                  <Button 
+                <div className="flex items-center space-x-4">
+                  {editMode === 'raw' && (
+                    <Button
+                      type="button"
+                      onClick={handleAutoFormat}
+                      variant="outline"
+                      className="text-white border-gray-600 hover:bg-gray-800"
+                    >
+                      <Wand2 className="mr-2 h-4 w-4" />
+                      Auto-Format Sections
+                    </Button>
+                  )}
+                  
+                  <Button
                     onClick={handleCreatePlan}
-                    disabled={isCreating || !title.trim() || !rawContent.trim()}
+                    disabled={isCreating || !title.trim() || (!rawContent.trim() && !formattedContent.trim())}
                     className="bg-purple-600 hover:bg-purple-700"
                   >
-                    <Save className="mr-2 w-4 h-4" />
-                    {isCreating ? 'Creating...' : 'Create & Generate URL'}
+                    {isCreating ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Creating...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="mr-2 h-4 w-4" />
+                        Create Plan
+                      </>
+                    )}
                   </Button>
                 </div>
               </div>
             </TabsContent>
 
-            <TabsContent value="preview" className="space-y-6 mt-6">
-              {Object.keys(formattedSections).length === 0 ? (
-                <Card className="border-gray-700 bg-gray-800/50">
-                  <CardContent className="py-12 text-center">
-                    <Wand2 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-white font-medium mb-2">No formatted content yet</h3>
-                    <p className="text-gray-400 mb-4">
-                      Add content and click "Auto-Format" to see the preview
-                    </p>
-                  </CardContent>
-                </Card>
-              ) : (
-                <div className="space-y-6">
-                  <div className="text-center">
-                    <h2 className="text-2xl font-bold text-white mb-2">{title || 'Your App Plan'}</h2>
-                    <Badge variant="outline" className="text-purple-400 border-purple-400">
-                      Preview Mode
-                    </Badge>
+            <TabsContent value="preview" className="space-y-4">
+              <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                <h3 className="text-xl font-bold text-white mb-4">{title || 'Plan Preview'}</h3>
+                {editMode === 'notion' && formattedContent ? (
+                  <NotionRenderer content={formattedContent} />
+                ) : rawContent ? (
+                  <div className="text-gray-300 whitespace-pre-wrap">
+                    {rawContent}
                   </div>
-                  
-                  {Object.entries(formattedSections).map(([sectionKey, content]) => (
-                    <Card key={sectionKey} className="border-gray-700 bg-gray-800/50">
-                      <CardHeader>
-                        <CardTitle className="text-white">
-                          {sectionTitles[sectionKey] || sectionKey}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-gray-300 whitespace-pre-wrap">
-                          {content as string}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                ) : (
+                  <div className="text-gray-500 italic">No content to preview</div>
+                )}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="sections" className="space-y-4">
+              {Object.keys(formattedSections).length > 0 ? (
+                <div className="space-y-4">
+                  {Object.entries(formattedSections).map(([sectionKey, content]) => {
+                    const Icon = sectionIcons[sectionKey] || FileText;
+                    
+                    return (
+                      <Card key={sectionKey} className="border-gray-700 bg-gray-800/50">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="flex items-center text-white text-lg">
+                            <Icon className="mr-2 h-5 w-5 text-purple-400" />
+                            {sectionTitles[sectionKey] || sectionKey}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="text-gray-300 whitespace-pre-wrap text-sm leading-relaxed">
+                            {content as string}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <AlertCircle className="w-12 h-12 text-gray-500 mx-auto mb-4" />
+                  <p className="text-gray-400">No sections detected yet</p>
+                  <p className="text-gray-500 text-sm">Use the "Auto-Format Sections" button to analyze your content</p>
                 </div>
               )}
             </TabsContent>
