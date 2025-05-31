@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,14 @@ export default function PublicPortfolio() {
   const { items, loading } = usePortfolioData();
   const [selectedProject, setSelectedProject] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Set page title for portfolio
+  useEffect(() => {
+    document.title = 'Portfolio | SISO AGENCY';
+    return () => {
+      document.title = 'SISO AGENCY';
+    };
+  }, []);
 
   const portfolioEntries = adaptPortfolioToLeaderboard(items);
 
