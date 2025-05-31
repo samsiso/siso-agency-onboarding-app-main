@@ -75,10 +75,12 @@ export const PortfolioLeaderboardTable = ({ projectData, onProjectClick }: Portf
   };
 
   const handleProjectClick = (entry: any) => {
-    if (entry.live_url) {
-      window.open(entry.live_url, '_blank', 'noopener,noreferrer');
-    }
     onProjectClick(entry);
+  };
+
+  const handleViewLiveClick = (entry: any, e: React.MouseEvent) => {
+    e.stopPropagation();
+    window.open(entry.live_url, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -159,10 +161,7 @@ export const PortfolioLeaderboardTable = ({ projectData, onProjectClick }: Portf
                 
                 <TableCell className="text-center">
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      window.open(entry.live_url, '_blank', 'noopener,noreferrer');
-                    }}
+                    onClick={(e) => handleViewLiveClick(entry, e)}
                     className="px-4 py-2 bg-siso-orange hover:bg-siso-orange/90 text-black text-sm font-medium rounded-lg transition-colors"
                   >
                     View Live

@@ -5,11 +5,13 @@ import { Button } from "@/components/ui/button";
 import { usePortfolioData } from '@/hooks/usePortfolioData';
 import { adaptPortfolioToLeaderboard } from '@/components/portfolio/PortfolioLeaderboardAdapter';
 import { PortfolioLeaderboardTable } from '@/components/portfolio/PortfolioLeaderboardTable';
+import { ProjectDetailsModal } from '@/components/portfolio/ProjectDetailsModal';
 import CountUp from 'react-countup';
 
 export default function PublicPortfolio() {
   const { items, loading } = usePortfolioData();
   const [selectedProject, setSelectedProject] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const portfolioEntries = adaptPortfolioToLeaderboard(items);
 
@@ -21,6 +23,12 @@ export default function PublicPortfolio() {
 
   const handleProjectClick = (project: any) => {
     setSelectedProject(project);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedProject(null);
   };
 
   if (loading) {
@@ -242,6 +250,13 @@ export default function PublicPortfolio() {
             </Card>
           </motion.div>
         </div>
+
+        {/* Project Details Modal */}
+        <ProjectDetailsModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          project={selectedProject}
+        />
       </div>
     </>
   );
