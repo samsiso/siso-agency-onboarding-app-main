@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trophy, ExternalLink, Zap, Users, TrendingUp, Code, Database, Palette, Globe } from 'lucide-react';
+import { Trophy, ExternalLink, Zap, Users, TrendingUp, Code, Database, Palette, Globe, Package, PoundSterling, Award } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { LeaderboardEntry } from '@/components/leaderboard/types';
 
@@ -91,19 +91,59 @@ export const PortfolioLeaderboardTable = ({ projectData, onProjectClick }: Portf
     return { icon: Code, color: 'text-gray-400 bg-gray-400/10' };
   };
 
-  const getBusinessMetrics = (projectName: string, value: number) => {
+  const getAgencyValueMetrics = (projectName: string, ourPrice: number) => {
     const metrics = {
-      'Gritness Gym': { users: '1.2K', growth: '+40%', performance: '98%' },
-      'OPTIMAL CONSTRUCTION': { users: '5.8K', growth: '+125%', performance: '99%' },
-      'UbahCryp': { users: '8.5K', growth: '+220%', performance: '99.9%' },
-      'Elementree': { users: '2.1K', growth: '+60%', performance: '97%' },
-      'Trojan MMA': { users: '890', growth: '+35%', performance: '96%' },
-      'Lets Go': { users: '10K+', growth: '+180%', performance: '98%' },
-      'Mu Shin': { users: '1.5K', growth: '+95%', performance: '99%' },
-      '5 Star Hire': { users: '3.2K', growth: '+75%', performance: '98%' },
-      'NM Construction': { users: '2.8K', growth: '+85%', performance: '97%' }
+      'Gritness Gym': { 
+        features: 12, 
+        rrp: ourPrice * 8, // £995 vs £7,960 RRP
+        benefit: '+£6K/month upsells via app' 
+      },
+      'OPTIMAL CONSTRUCTION': { 
+        features: 18, 
+        rrp: ourPrice * 6, // £15,000 vs £90,000 RRP
+        benefit: '£50K+/year savings through processes' 
+      },
+      'UbahCryp': { 
+        features: 24, 
+        rrp: 120000, // £6,000 vs £120,000 quoted by others
+        benefit: 'Advanced crypto platform in 3 weeks' 
+      },
+      'Elementree': { 
+        features: 8, 
+        rrp: ourPrice * 7, // £498 vs £3,486 RRP
+        benefit: 'Record month turnover via loyalty scheme' 
+      },
+      'Trojan MMA': { 
+        features: 10, 
+        rrp: ourPrice * 6, // £498 vs £2,988 RRP
+        benefit: 'Complete MMA management solution' 
+      },
+      'Lets Go': { 
+        features: 15, 
+        rrp: 5000, // £750 vs £5,000 quoted by others
+        benefit: 'Social platform in record time' 
+      },
+      'Mu Shin': { 
+        features: 14, 
+        rrp: 7500, // £2,490 vs £7,500 (2 years) by other dev
+        benefit: 'Training platform in 3 weeks vs 2 years' 
+      },
+      '5 Star Hire': { 
+        features: 11, 
+        rrp: ourPrice * 8, // £498 vs £3,984 RRP
+        benefit: 'Premium rental booking system' 
+      },
+      'NM Construction': { 
+        features: 9, 
+        rrp: ourPrice * 7, // £1,250 vs £8,750 RRP
+        benefit: 'Professional showcase & lead generation' 
+      }
     };
-    return metrics[projectName as keyof typeof metrics] || { users: '1K+', growth: '+50%', performance: '98%' };
+    return metrics[projectName as keyof typeof metrics] || { 
+      features: 8, 
+      rrp: ourPrice * 6, 
+      benefit: 'Custom solution at fraction of agency cost' 
+    };
   };
 
   const getProjectDescription = (projectName: string) => {
@@ -133,8 +173,10 @@ export const PortfolioLeaderboardTable = ({ projectData, onProjectClick }: Portf
   return (
     <div className="space-y-4">
       {projectData.map((entry, index) => {
-        const metrics = getBusinessMetrics(entry.project_name, entry.estimated_value);
+        const metrics = getAgencyValueMetrics(entry.project_name, entry.estimated_value);
         const isTopThree = index < 3;
+        const savings = metrics.rrp - entry.estimated_value;
+        const savingsMultiplier = Math.round(metrics.rrp / entry.estimated_value);
         
         return (
           <motion.div
@@ -185,6 +227,9 @@ export const PortfolioLeaderboardTable = ({ projectData, onProjectClick }: Portf
                       <span className="text-siso-orange font-bold text-lg">
                         £{entry.estimated_value.toLocaleString()}
                       </span>
+                      <span className="text-green-400 text-xs font-medium px-2 py-1 bg-green-400/10 rounded-lg border border-green-400/20">
+                        {savingsMultiplier}x SAVINGS
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -225,7 +270,30 @@ export const PortfolioLeaderboardTable = ({ projectData, onProjectClick }: Portf
                 </div>
               </div>
               
-              {/* Bottom Section: Progress + Metrics */}
+              {/* Agency Value Proposition Section */}
+              <div className="mb-4 p-4 bg-gradient-to-r from-siso-orange/10 via-siso-red/5 to-siso-orange/10 rounded-lg border border-siso-orange/20">
+                <h4 className="text-sm font-medium text-siso-orange mb-2">Agency Value Delivered</h4>
+                <p className="text-gray-300 text-sm mb-3">{metrics.benefit}</p>
+                <div className="flex items-center gap-6 text-xs">
+                  <div className="flex items-center gap-1">
+                    <Package className="w-3.5 h-3.5 text-blue-400" />
+                    <span className="text-gray-400">Features:</span>
+                    <span className="text-blue-400 font-medium">{metrics.features}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <PoundSterling className="w-3.5 h-3.5 text-red-400" />
+                    <span className="text-gray-400">Others quote:</span>
+                    <span className="text-red-400 font-medium">£{metrics.rrp.toLocaleString()}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Award className="w-3.5 h-3.5 text-green-400" />
+                    <span className="text-gray-400">Client saved:</span>
+                    <span className="text-green-400 font-medium">£{savings.toLocaleString()}</span>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Bottom Section: Progress */}
               <div className="flex items-center justify-between">
                 {/* Progress Bar */}
                 <div className="flex items-center gap-3">
@@ -239,23 +307,10 @@ export const PortfolioLeaderboardTable = ({ projectData, onProjectClick }: Portf
                   <span className="text-xs text-gray-300 font-medium">{entry.completion_percentage}%</span>
                 </div>
                 
-                {/* Business Metrics */}
-                <div className="flex items-center gap-6 text-xs">
-                  <div className="flex items-center gap-1">
-                    <Users className="w-3.5 h-3.5 text-blue-400" />
-                    <span className="text-gray-400">Users:</span>
-                    <span className="text-blue-400 font-medium">{metrics.users}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <TrendingUp className="w-3.5 h-3.5 text-green-400" />
-                    <span className="text-gray-400">Growth:</span>
-                    <span className="text-green-400 font-medium">{metrics.growth}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Zap className="w-3.5 h-3.5 text-yellow-400" />
-                    <span className="text-gray-400">Uptime:</span>
-                    <span className="text-yellow-400 font-medium">{metrics.performance}</span>
-                  </div>
+                {/* Value Highlight */}
+                <div className="text-right">
+                  <div className="text-xs text-gray-400">Total Client Investment</div>
+                  <div className="text-lg font-bold text-siso-orange">£{entry.estimated_value.toLocaleString()}</div>
                 </div>
               </div>
             </div>
