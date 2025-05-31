@@ -21,12 +21,33 @@ export const adaptPortfolioToLeaderboard = (portfolioItems: PortfolioItem[]): Le
       return basePoints + (highlights.length * 50);
     };
 
-    // Calculate estimated value based on project complexity
-    const getEstimatedValue = (technologies: string[], highlights: string[]) => {
-      const techMultiplier = technologies.length * 500;
-      const featureMultiplier = highlights.length * 200;
-      const baseValue = 2000;
-      return baseValue + techMultiplier + featureMultiplier;
+    // Real client pricing values - accurate project costs
+    const getEstimatedValue = (projectTitle: string, clientName: string) => {
+      // Match by client name or project title for accurate pricing
+      const projectPricing: { [key: string]: number } = {
+        // By client name (normalized)
+        'gritness': 995,
+        'nm construction': 1250,
+        'optimal construction': 15000,
+        'ubahcryp': 6000,
+        'elementree': 498,
+        'trojan mma': 498,
+        'lets go': 750,
+        'mu shin': 2490,
+        '5 star hire': 498,
+        // By project title variations
+        'gritness gym': 995
+      };
+
+      // Normalize strings for case-insensitive matching
+      const normalizeKey = (str: string) => str.toLowerCase().trim();
+      
+      // Try to match by client name first, then project title
+      const normalizedClient = normalizeKey(clientName);
+      const normalizedTitle = normalizeKey(projectTitle);
+      
+      const price = projectPricing[normalizedClient] || projectPricing[normalizedTitle] || 2000;
+      return price;
     };
 
     // Map development status to completion percentage
@@ -47,7 +68,7 @@ export const adaptPortfolioToLeaderboard = (portfolioItems: PortfolioItem[]): Le
       rank: index + 1,
       level: Math.ceil((index + 1) / 2), // Simple level calculation
       streak_days: Math.floor(Math.random() * 100), // Mock data
-      siso_tokens: getEstimatedValue(item.technologies, item.highlights),
+      siso_tokens: getEstimatedValue(item.title, item.client_name),
       updated_at: new Date().toISOString(),
       contribution_count: item.highlights.length,
       referral_count: item.technologies.length,
@@ -71,7 +92,7 @@ export const adaptPortfolioToLeaderboard = (portfolioItems: PortfolioItem[]): Le
       technologies: item.technologies,
       development_status: item.development_status,
       completion_percentage: getCompletionPercentage(item.development_status),
-      estimated_value: getEstimatedValue(item.technologies, item.highlights)
+      estimated_value: getEstimatedValue(item.title, item.client_name)
     } as LeaderboardEntry & {
       project_name: string;
       live_url: string;
