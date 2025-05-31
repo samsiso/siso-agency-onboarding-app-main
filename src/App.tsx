@@ -23,6 +23,7 @@ import AdminOutreach from './pages/AdminOutreach';
 import AdminTemplates from './pages/AdminTemplates';
 import AdminTeams from './pages/AdminTeams';
 import Portfolio from './pages/Portfolio';
+import PublicPortfolio from './pages/PublicPortfolio';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminClients from './pages/AdminClients';
 import AdminPayments from './pages/AdminPayments';
@@ -68,6 +69,7 @@ function App() {
         {/* Public routes */}
         <Route path="/" element={<Index />} />
         <Route path="/auth" element={<Auth />} />
+        <Route path="/portfolio" element={<PublicPortfolio />} />
         <Route path="/onboarding-chat" element={<OnboardingChat />} />
         <Route path="/thankyou" element={<ThankYou />} />
         <Route path="/thankyou-plan" element={<ThankYouPlan />} />
@@ -126,7 +128,7 @@ function App() {
         
         <Route path="/my-projects" element={<AuthGuard><MyProjects /></AuthGuard>} />
         <Route path="/plan-builder" element={<AuthGuard><Communication /></AuthGuard>} />
-        <Route path="/portfolio" element={<AuthGuard><Portfolio /></AuthGuard>} />
+        <Route path="/admin/portfolio" element={<AuthGuard><Portfolio /></AuthGuard>} />
         
         {/* Financial Routes */}
         <Route path="/financial/payments" element={<AuthGuard><PaymentsPage /></AuthGuard>} />
