@@ -63,7 +63,7 @@ export default function PublicPortfolio() {
       <div className="min-h-screen bg-black text-white">
         <div className="container mx-auto px-4 py-16">
           
-          {/* Clean Minimal Header */}
+          {/* Enhanced Header with SISO Explanation */}
           <div className="text-center mb-24">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -73,18 +73,31 @@ export default function PublicPortfolio() {
               <img 
                 src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png" 
                 alt="SISO Agency" 
-                className="w-16 h-16 mx-auto mb-8"
+                className="w-20 h-20 mx-auto mb-8"
               />
               
-              <h1 className="text-6xl md:text-7xl font-bold text-white mb-6">
+              <h1 className="text-6xl md:text-7xl font-bold text-white mb-4">
                 SISO AGENCY
               </h1>
               
-              <div className="w-24 h-0.5 bg-siso-orange mx-auto mb-6"></div>
+              <div className="w-24 h-0.5 bg-siso-orange mx-auto mb-8"></div>
               
-              <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-                Premium digital solutions for ambitious businesses.
-              </p>
+              <div className="max-w-4xl mx-auto mb-8">
+                <h2 className="text-2xl md:text-3xl font-semibold text-white mb-6">
+                  Scalable Intelligence Systems Operator
+                </h2>
+                
+                <p className="text-xl text-gray-300 leading-relaxed mb-6">
+                  We specialize in <span className="text-siso-orange font-semibold">making scalable intelligence systems</span> and 
+                  <span className="text-siso-orange font-semibold"> operating them for businesses</span> that want to leverage 
+                  cutting-edge technology for growth and innovation.
+                </p>
+                
+                <p className="text-lg text-gray-400">
+                  From AI-powered platforms to comprehensive digital solutions, 
+                  we build and manage intelligent systems that scale with your business.
+                </p>
+              </div>
             </motion.div>
           </div>
 
@@ -163,7 +176,7 @@ export default function PublicPortfolio() {
             </motion.div>
           </div>
 
-          {/* Clean Professional Leaderboard */}
+          {/* Enhanced Professional Leaderboard */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
@@ -173,12 +186,17 @@ export default function PublicPortfolio() {
             <Card className="border border-gray-800 bg-black">
               <CardHeader className="border-b border-gray-800 py-8">
                 <CardTitle className="text-center">
-                  <div className="flex items-center justify-center gap-3 mb-2">
+                  <div className="flex items-center justify-center gap-3 mb-3">
                     <div className="w-1 h-8 bg-siso-orange"></div>
-                    <h2 className="text-2xl font-bold text-white">Client Projects</h2>
+                    <h2 className="text-3xl font-bold text-white">Client Project Portfolio</h2>
                     <div className="w-1 h-8 bg-siso-orange"></div>
                   </div>
-                  <p className="text-sm text-gray-400 font-normal">Live portfolio showcase</p>
+                  <p className="text-lg text-gray-300 mb-2">
+                    Live applications and platforms we've built and operate
+                  </p>
+                  <p className="text-sm text-gray-400 font-normal">
+                    Ranked by complexity, scale, and business impact • {totalProjects} active projects
+                  </p>
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-0">

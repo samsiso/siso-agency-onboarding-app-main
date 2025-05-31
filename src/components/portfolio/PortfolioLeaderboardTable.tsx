@@ -1,4 +1,5 @@
 import React from 'react';
+import { Trophy } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { LeaderboardEntry } from '@/components/leaderboard/types';
 import { motion } from 'framer-motion';
@@ -27,10 +28,50 @@ export const PortfolioLeaderboardTable = ({ projectData, onProjectClick }: Portf
   };
 
   const getRankBadge = (position: number) => {
-    if (position < 3) {
-      return <div className="w-8 h-8 bg-siso-orange rounded-full flex items-center justify-center text-black text-sm font-bold">{position + 1}</div>;
+    switch (position) {
+      case 0:
+        return (
+          <div className="flex items-center justify-center">
+            <Trophy className="h-6 w-6 text-yellow-500" />
+            <span className="ml-2 text-yellow-500 font-bold">#1</span>
+          </div>
+        );
+      case 1:
+        return (
+          <div className="flex items-center justify-center">
+            <Trophy className="h-6 w-6 text-gray-300" />
+            <span className="ml-2 text-gray-300 font-bold">#2</span>
+          </div>
+        );
+      case 2:
+        return (
+          <div className="flex items-center justify-center">
+            <Trophy className="h-6 w-6 text-amber-600" />
+            <span className="ml-2 text-amber-600 font-bold">#3</span>
+          </div>
+        );
+      default:
+        return (
+          <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center text-gray-400 text-sm font-medium">
+            {position + 1}
+          </div>
+        );
     }
-    return <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center text-gray-400 text-sm font-medium">{position + 1}</div>;
+  };
+
+  const getProjectDescription = (projectName: string) => {
+    const descriptions = {
+      'Gritness Gym': 'Modern fitness platform with class scheduling and membership management',
+      'NM Construction': 'Professional construction company website with project showcases',
+      'OPTIMAL CONSTRUCTION': 'Building maintenance and construction services platform',
+      'UbahCryp': 'Advanced cryptocurrency trading platform with real-time data',
+      'Elementree': 'Modern restaurant website with online ordering system',
+      'Trojan MMA': 'Mixed Martial Arts gym with class schedules and training programs',
+      'Lets Go': 'Social networking and event planning application',
+      'Mu Shin': 'Self-defense training platform with video courses',
+      '5 Star Hire': 'Premium car rental service with booking system'
+    };
+    return descriptions[projectName as keyof typeof descriptions] || 'Custom digital solution';
   };
 
   const handleProjectClick = (entry: any) => {
@@ -45,10 +86,12 @@ export const PortfolioLeaderboardTable = ({ projectData, onProjectClick }: Portf
       <Table>
         <TableHeader>
           <TableRow className="border-b border-gray-800">
-            <TableHead className="w-[80px] text-center text-gray-400 font-medium">#</TableHead>
+            <TableHead className="w-[100px] text-center text-gray-400 font-medium">Rank</TableHead>
             <TableHead className="text-gray-400 font-medium">Project</TableHead>
             <TableHead className="text-center text-gray-400 font-medium">Client</TableHead>
             <TableHead className="text-center text-gray-400 font-medium">Status</TableHead>
+            <TableHead className="text-center text-gray-400 font-medium">Progress</TableHead>
+            <TableHead className="text-center text-gray-400 font-medium">Technologies</TableHead>
             <TableHead className="text-center text-gray-400 font-medium">Value</TableHead>
             <TableHead className="text-center text-gray-400 font-medium">Action</TableHead>
           </TableRow>
@@ -61,7 +104,11 @@ export const PortfolioLeaderboardTable = ({ projectData, onProjectClick }: Portf
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.05 }}
-                className="border-b border-gray-900 hover:bg-gray-900/50 cursor-pointer transition-colors duration-200"
+                className={`border-b border-gray-900 hover:bg-gray-900/50 cursor-pointer transition-colors duration-200 ${
+                  index === 0 ? 'bg-yellow-500/5' : 
+                  index === 1 ? 'bg-gray-500/5' : 
+                  index === 2 ? 'bg-amber-600/5' : ''
+                }`}
                 onClick={() => handleProjectClick(entry)}
               >
                 <TableCell className="text-center">
@@ -75,7 +122,7 @@ export const PortfolioLeaderboardTable = ({ projectData, onProjectClick }: Portf
                     </div>
                     <div>
                       <p className="text-white font-semibold">{entry.project_name}</p>
-                      <p className="text-sm text-gray-500 max-w-[200px] truncate">{entry.profile?.bio}</p>
+                      <p className="text-sm text-gray-500 max-w-[200px] truncate">{getProjectDescription(entry.project_name)}</p>
                     </div>
                   </div>
                 </TableCell>
@@ -86,6 +133,24 @@ export const PortfolioLeaderboardTable = ({ projectData, onProjectClick }: Portf
                 
                 <TableCell className="text-center">
                   {getStatusBadge(entry.development_status)}
+                </TableCell>
+                
+                <TableCell className="text-center">
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-16 h-2 bg-gray-700 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-siso-orange to-siso-red transition-all duration-300"
+                        style={{ width: `${entry.completion_percentage}%` }}
+                      />
+                    </div>
+                    <span className="text-xs text-gray-400">{entry.completion_percentage}%</span>
+                  </div>
+                </TableCell>
+                
+                <TableCell className="text-center">
+                  <div className="flex items-center justify-center gap-1">
+                    <span className="text-sm text-gray-400">{entry.technologies.length} techs</span>
+                  </div>
                 </TableCell>
                 
                 <TableCell className="text-center">
