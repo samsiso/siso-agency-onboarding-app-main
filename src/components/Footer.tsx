@@ -42,16 +42,16 @@ const Footer: React.FC = () => {
 
         {/* Social media icons */}
         <div className="flex flex-wrap justify-center space-x-4 sm:space-x-6 mb-6 sm:mb-8">
-          <a href="#" aria-label="Twitter" className="text-siso-text-muted hover:text-siso-red transition-colors p-1.5 sm:p-2">
+          <a href="https://x.com/sisoofficial" target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="text-siso-text-muted hover:text-siso-red transition-colors p-1.5 sm:p-2">
             <Twitter size={isMobile ? 20 : 24} />
           </a>
-          <a href="#" aria-label="LinkedIn" className="text-siso-text-muted hover:text-siso-red transition-colors p-1.5 sm:p-2">
+          <a href="https://www.linkedin.com/in/shaan-sisodia-a10ba0194/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-siso-text-muted hover:text-siso-red transition-colors p-1.5 sm:p-2">
             <Linkedin size={isMobile ? 20 : 24} />
           </a>
-          <a href="#" aria-label="Instagram" className="text-siso-text-muted hover:text-siso-red transition-colors p-1.5 sm:p-2">
+          <a href="https://www.instagram.com/siso.agency/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-siso-text-muted hover:text-siso-red transition-colors p-1.5 sm:p-2">
             <Instagram size={isMobile ? 20 : 24} />
           </a>
-          <a href="#" aria-label="YouTube" className="text-siso-text-muted hover:text-siso-red transition-colors p-1.5 sm:p-2">
+          <a href="https://www.youtube.com/@SISOAGENCY" target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="text-siso-text-muted hover:text-siso-red transition-colors p-1.5 sm:p-2">
             <Youtube size={isMobile ? 20 : 24} />
           </a>
         </div>
