@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { PortfolioItem, PortfolioCategory } from '@/types/portfolio';
@@ -157,9 +156,82 @@ const defaultCategories: PortfolioCategory[] = [
 export const usePortfolioData = () => {
   const [items, setItems] = useState<PortfolioItem[]>(defaultProjects);
   const [categories, setCategories] = useState<PortfolioCategory[]>(defaultCategories);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  // Since we're using static data for now, we'll just return it directly
+  useEffect(() => {
+    const fetchPortfolioData = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch portfolio items from Supabase
+        const { data: portfolioData, error: portfolioError } = await supabase
+          .from('portfolio_items')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        // Fetch categories from Supabase
+        const { data: categoriesData, error: categoriesError } = await supabase
+          .from('portfolio_categories')
+          .select('*')
+          .order('name', { ascending: true });
+
+        if (portfolioError) {
+          console.warn('Portfolio fetch error:', portfolioError);
+          // Use default data if database fetch fails
+          setItems(defaultProjects);
+        } else if (portfolioData && portfolioData.length > 0) {
+          // Transform Supabase data to match PortfolioItem interface
+          const transformedItems: PortfolioItem[] = portfolioData.map(item => ({
+            id: item.id,
+            title: item.title || 'Untitled Project',
+            description: item.description || 'No description available',
+            technologies: Array.isArray(item.technologies) ? item.technologies : ['React', 'Tailwind CSS'],
+            live_url: item.live_url || '#',
+            client_name: item.client_name || 'Client',
+            development_status: item.development_status || 'completed',
+            highlights: Array.isArray(item.highlights) ? item.highlights : ['Custom Development'],
+            user_id: item.user_id || '1',
+            image_url: item.image_url || '/placeholder.svg',
+            category_id: item.category_id
+          }));
+          setItems(transformedItems);
+        } else {
+          // Use default data if no items found in database
+          setItems(defaultProjects);
+        }
+
+        if (categoriesError) {
+          console.warn('Categories fetch error:', categoriesError);
+          setCategories(defaultCategories);
+        } else if (categoriesData && categoriesData.length > 0) {
+          const transformedCategories: PortfolioCategory[] = categoriesData.map(cat => ({
+            id: cat.id,
+            name: cat.name,
+            slug: cat.slug
+          }));
+          setCategories(transformedCategories);
+        } else {
+          setCategories(defaultCategories);
+        }
+
+      } catch (error) {
+        console.error('Error fetching portfolio data:', error);
+        toast({
+          title: "Data Loading",
+          description: "Using cached portfolio data. Some information may not be current.",
+          variant: "default"
+        });
+        // Fallback to default data
+        setItems(defaultProjects);
+        setCategories(defaultCategories);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPortfolioData();
+  }, [toast]);
+
   return { items, categories, loading };
 };
