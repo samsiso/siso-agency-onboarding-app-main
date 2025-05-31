@@ -16,6 +16,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useClientData } from '@/hooks/useClientData';
+import { useAuthSession } from '@/hooks/useAuthSession';
 
 interface SidebarFooterProps {
   collapsed: boolean;
@@ -25,6 +27,8 @@ interface SidebarFooterProps {
 export const SidebarFooter = ({ collapsed, onProfileOpen }: SidebarFooterProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+  const { data: clientData, isLoading: clientLoading } = useClientData();
+  const { user } = useAuthSession();
 
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
@@ -34,6 +38,44 @@ export const SidebarFooter = ({ collapsed, onProfileOpen }: SidebarFooterProps) 
   const navigateTo = (path: string) => {
     navigate(path);
     setIsOpen(false);
+  };
+
+  // Generate initials from client data or user email
+  const getInitials = () => {
+    if (clientData?.company_name) {
+      return clientData.company_name
+        .split(' ')
+        .map(word => word.charAt(0))
+        .join('')
+        .toUpperCase()
+        .slice(0, 2);
+    }
+    if (clientData?.contact_name) {
+      return clientData.contact_name
+        .split(' ')
+        .map(word => word.charAt(0))
+        .join('')
+        .toUpperCase()
+        .slice(0, 2);
+    }
+    if (user?.email) {
+      return user.email.slice(0, 2).toUpperCase();
+    }
+    return 'U';
+  };
+
+  // Get display name for the user
+  const getDisplayName = () => {
+    if (clientData?.company_name) return clientData.company_name;
+    if (clientData?.contact_name) return clientData.contact_name;
+    if (user?.email) return user.email.split('@')[0];
+    return 'User';
+  };
+
+  // Get user type label
+  const getUserTypeLabel = () => {
+    if (clientData) return 'Client';
+    return 'User';
   };
 
   return (
@@ -59,14 +101,16 @@ export const SidebarFooter = ({ collapsed, onProfileOpen }: SidebarFooterProps) 
               <Avatar>
                 <AvatarImage src="" />
                 <AvatarFallback className="bg-orange-500/20 text-orange-500">
-                  UC
+                  {clientLoading ? '...' : getInitials()}
                 </AvatarFallback>
               </Avatar>
               
               {!collapsed && (
                 <div className="flex flex-col items-start">
-                  <span className="text-sm font-medium text-siso-text">ubahcrypto</span>
-                  <span className="text-xs text-siso-text-muted">Client</span>
+                  <span className="text-sm font-medium text-siso-text">
+                    {clientLoading ? 'Loading...' : getDisplayName()}
+                  </span>
+                  <span className="text-xs text-siso-text-muted">{getUserTypeLabel()}</span>
                 </div>
               )}
             </div>

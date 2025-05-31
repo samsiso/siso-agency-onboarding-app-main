@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { ClientSidebarNavigation } from "./ClientSidebarNavigation";
 import { 
@@ -23,12 +22,16 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useSelectedProject } from "@/hooks/useSelectedProject";
+import { useClientData } from "@/hooks/useClientData";
+import { useAuthSession } from "@/hooks/useAuthSession";
 
 export function ClientDashboardSidebar() {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { data: currentProject } = useProjects();
   const { projects, selectProject } = useSelectedProject();
+  const { data: clientData, isLoading: clientLoading } = useClientData();
+  const { user } = useAuthSession();
   
   // Function to handle project selection
   const handleProjectSelect = (projectId: string) => {
@@ -42,6 +45,44 @@ export function ClientDashboardSidebar() {
       case "completed": return "bg-blue-500/20 text-blue-400 border-blue-500/20";
       default: return "bg-gray-500/20 text-gray-400 border-gray-500/20";
     }
+  };
+
+  // Generate initials from client data or user email
+  const getInitials = () => {
+    if (clientData?.company_name) {
+      return clientData.company_name
+        .split(' ')
+        .map(word => word.charAt(0))
+        .join('')
+        .toUpperCase()
+        .slice(0, 2);
+    }
+    if (clientData?.contact_name) {
+      return clientData.contact_name
+        .split(' ')
+        .map(word => word.charAt(0))
+        .join('')
+        .toUpperCase()
+        .slice(0, 2);
+    }
+    if (user?.email) {
+      return user.email.slice(0, 2).toUpperCase();
+    }
+    return 'U';
+  };
+
+  // Get display name for the user
+  const getDisplayName = () => {
+    if (clientData?.company_name) return clientData.company_name;
+    if (clientData?.contact_name) return clientData.contact_name;
+    if (user?.email) return user.email.split('@')[0];
+    return 'User';
+  };
+
+  // Get user type label
+  const getUserTypeLabel = () => {
+    if (clientData) return 'Client';
+    return 'User';
   };
   
   return (
@@ -150,7 +191,7 @@ export function ClientDashboardSidebar() {
             <ClientSidebarNavigation collapsed={!sidebarOpen} onItemClick={() => {}} visible={true} />
           </div>
           
-          {/* User Dropdown - Updated with Profile & Settings */}
+          {/* Dynamic User Dropdown - No more hardcoded "ubahcrypto" */}
           <div className="p-4 border-t border-siso-border">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -158,11 +199,15 @@ export function ClientDashboardSidebar() {
                   <div className="flex items-center gap-3">
                     <Avatar className="h-8 w-8 border border-siso-border">
                       <AvatarImage src="" />
-                      <AvatarFallback className="bg-siso-bg-alt text-siso-orange">UC</AvatarFallback>
+                      <AvatarFallback className="bg-siso-bg-alt text-siso-orange">
+                        {clientLoading ? '...' : getInitials()}
+                      </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col items-start text-left">
-                      <span className="text-sm font-medium text-siso-text">ubahcrypto</span>
-                      <span className="text-xs text-siso-text-muted">Client</span>
+                      <span className="text-sm font-medium text-siso-text">
+                        {clientLoading ? 'Loading...' : getDisplayName()}
+                      </span>
+                      <span className="text-xs text-siso-text-muted">{getUserTypeLabel()}</span>
                     </div>
                     <ChevronDown className="ml-auto h-4 w-4 opacity-50" />
                   </div>
