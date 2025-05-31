@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { GridBackground } from "@/components/ui/glowing-card";
 import { usePortfolioData } from '@/hooks/usePortfolioData';
 import { adaptPortfolioToLeaderboard } from '@/components/portfolio/PortfolioLeaderboardAdapter';
 import { PortfolioLeaderboardTable } from '@/components/portfolio/PortfolioLeaderboardTable';
@@ -216,38 +217,35 @@ export default function PublicPortfolio() {
             </Card>
           </motion.div>
 
-          {/* Clean Professional CTA */}
+          {/* Enhanced Glowing CTA */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
             className="text-center"
           >
-            <Card className="bg-black border border-siso-orange/30">
-              <CardContent className="py-16 px-8">
-                <h3 className="text-3xl font-bold text-white mb-4">
-                  Ready to Start Your Project?
-                </h3>
-                <p className="text-gray-400 mb-8 max-w-xl mx-auto">
-                  Join our client portfolio. Let's build something exceptional together.
-                </p>
-                <div className="flex items-center justify-center gap-4">
-                  <Button 
-                    className="bg-siso-orange hover:bg-siso-orange/90 text-black font-medium px-8 py-3"
-                    onClick={() => window.open('mailto:siso@sisoinnovatorshub.io', '_blank')}
-                  >
-                    Start Project
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="border-gray-600 text-gray-300 hover:bg-gray-900 px-8 py-3"
-                    onClick={() => window.open('/auth', '_blank')}
-                  >
-                    View Platform
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <GridBackground
+              title="Ready to Start Your Project?"
+              description="Join our client portfolio. Let's build something exceptional together with cutting-edge scalable intelligence systems."
+              showAvailability={true}
+              className="max-w-4xl mx-auto"
+            >
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <Button 
+                  className="bg-siso-orange hover:bg-siso-orange/90 text-black font-medium px-8 py-3 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                  onClick={() => window.open('mailto:siso@sisoinnovatorshub.io', '_blank')}
+                >
+                  Start Your Project
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="border-siso-orange/50 text-siso-orange hover:bg-siso-orange/10 hover:border-siso-orange px-8 py-3 text-lg transition-all duration-300"
+                  onClick={() => window.open('/auth', '_blank')}
+                >
+                  View Platform
+                </Button>
+              </div>
+            </GridBackground>
           </motion.div>
         </div>
 
