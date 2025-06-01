@@ -55,7 +55,7 @@ export function MainProjectCard() {
       >
         <Card 
           className="bg-black/30 backdrop-blur-sm border border-white/10 shadow-lg hover:border-orange-500/40 cursor-pointer transition-all duration-300"
-          onClick={() => navigate('/plan-builder')}
+          onClick={() => navigate('/onboarding')}
         >
           <CardContent className="p-6">
             <div className="flex flex-col md:flex-row gap-6 items-center">
@@ -79,7 +79,7 @@ export function MainProjectCard() {
                     className="bg-orange-600 hover:bg-orange-700 text-white"
                     onClick={(e) => {
                       e.stopPropagation();
-                      navigate('/plan-builder');
+                      navigate('/onboarding');
                     }}
                   >
                     <Plus className="mr-2 h-4 w-4" />

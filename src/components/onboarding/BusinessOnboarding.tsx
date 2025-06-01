@@ -22,6 +22,14 @@ interface BusinessInfo {
   industry: string;
   targetAudience: string;
   completedAt: string;
+  // Enhanced client data
+  contactName?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  companySize?: string;
+  budget?: string;
+  timeline?: string;
+  communicationPreference?: 'chat' | 'voice' | 'phone';
 }
 
 export function BusinessOnboarding() {
@@ -295,14 +303,29 @@ export function BusinessOnboarding() {
     const businessData: BusinessInfo = {
       businessName: formData.businessName,
       appPurpose: formData.appPurpose,
-      industry: formData.industry,
-      targetAudience: formData.targetAudience,
+      industry: formData.industry || 'Not specified',
+      targetAudience: formData.targetAudience || 'Not specified',
       completedAt: new Date().toISOString(),
+      // Enhanced client data
+      communicationPreference: communicationMethod || 'chat',
     };
 
     try {
-      // Save to localStorage
+      // Save to localStorage for immediate use
       localStorage.setItem('business-onboarding-data', JSON.stringify(businessData));
+      
+      // Also save as client data for wider platform use
+      localStorage.setItem('client-profile', JSON.stringify({
+        company_name: businessData.businessName,
+        project_description: businessData.appPurpose,
+        industry: businessData.industry,
+        target_audience: businessData.targetAudience,
+        communication_preference: businessData.communicationPreference,
+        onboarding_completed: true,
+        onboarding_date: businessData.completedAt,
+        contact_name: businessData.businessName, // Will be enhanced later
+        status: 'onboarded'
+      }));
       
       // Mark the onboarding task as completed
       const completedTasks = JSON.parse(localStorage.getItem('workflow-completed-tasks') || '[]');
@@ -326,12 +349,21 @@ export function BusinessOnboarding() {
                 <p className="text-sm text-gray-300 mb-3">
                   Your business information has been saved. Ready for the next step?
                 </p>
-                <Button 
-                  onClick={() => navigate('/home')}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white"
-                >
-                  Back to Dashboard
-                </Button>
+                <div className="space-y-2">
+                  <Button 
+                    onClick={() => navigate('/plan-builder')}
+                    className="w-full bg-orange-600 hover:bg-orange-700 text-white"
+                  >
+                    Next: Define App Requirements →
+                  </Button>
+                  <Button 
+                    onClick={() => navigate('/home')}
+                    variant="outline"
+                    className="w-full border-white/20 text-gray-300 hover:bg-white/10"
+                  >
+                    Back to Dashboard
+                  </Button>
+                </div>
               </div>
             </div>
           )
