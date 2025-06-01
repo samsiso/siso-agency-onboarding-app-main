@@ -372,71 +372,108 @@ export function RealTaskManager({
                   exit={{ opacity: 0, scale: 0.95, x: 20 }}
                   transition={{ duration: 0.2, delay: index * 0.1 }}
                   className={cn(
-                    "flex items-center gap-3 px-3 py-3 rounded-lg border transition-all duration-200 hover:shadow-sm",
+                    "group relative flex items-center gap-4 p-4 rounded-xl border transition-all duration-300 hover:shadow-lg hover:scale-[1.01]",
                     isCompleted 
-                      ? "bg-green-50/10 border-green-500/30" 
-                      : getPriorityColor(task.priority)
+                      ? "bg-gradient-to-r from-green-500/10 to-emerald-500/5 border-green-500/30 shadow-green-500/10" 
+                      : "bg-gradient-to-r from-black/40 to-gray-900/20 border-white/10 hover:border-orange-500/40 hover:shadow-orange-500/10"
                   )}
                 >
+                  {/* Priority indicator */}
+                  <div className={cn(
+                    "absolute left-0 top-0 bottom-0 w-1 rounded-l-xl transition-all duration-300",
+                    task.priority === 'high' && !isCompleted && "bg-red-500",
+                    task.priority === 'medium' && !isCompleted && "bg-yellow-500", 
+                    task.priority === 'low' && !isCompleted && "bg-blue-500",
+                    isCompleted && "bg-green-500"
+                  )} />
+                  
                   <div className="relative">
                     <Checkbox
                       id={task.id}
                       checked={isCompleted}
                       onCheckedChange={(checked) => handleToggleTask(task.id, !!checked)}
-                      className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600 h-4 w-4"
-                      disabled={true} // Always disabled for workflow tasks
+                      className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600 h-5 w-5 transition-all duration-200"
+                      disabled={true}
                     />
                     {!isCompleted && (
-                      <div className="absolute -top-1 -right-1 h-2 w-2 bg-orange-500 rounded-full animate-pulse" 
+                      <div className="absolute -top-1 -right-1 h-2 w-2 bg-orange-500 rounded-full animate-pulse shadow-lg" 
                            title="Complete the actual step to check this off" />
                     )}
                   </div>
                   
-                  <TaskIcon className={cn(
-                    "h-4 w-4 shrink-0",
-                    isCompleted ? "text-green-500" : "text-orange-500"
-                  )} />
-                  
-                  <div className="flex-1">
-                    <label
-                      htmlFor={task.id}
-                      className={cn(
-                        "text-sm font-medium cursor-pointer transition-all duration-200 select-none",
-                        isCompleted 
-                          ? "text-green-400 line-through" 
-                          : "text-white"
-                      )}
-                    >
-                      {task.text}
-                    </label>
-                    
-                    <div className="flex items-center gap-2 mt-1">
-                      {task.priority === 'high' && !isCompleted && (
-                        <span className="text-xs text-red-400 font-medium">High Priority</span>
-                      )}
-                      <span className="text-xs text-gray-500 capitalize">{task.category}</span>
-                      <span className="text-xs text-gray-500">• {task.description}</span>
-                      {!isCompleted && (
-                        <span className="text-xs text-orange-400">• Action required</span>
-                      )}
-                    </div>
+                  <div className={cn(
+                    "p-3 rounded-xl shadow-sm transition-all duration-300 group-hover:shadow-md",
+                    isCompleted ? "bg-green-500/20 border border-green-400/30" : "bg-orange-500/20 border border-orange-400/30"
+                  )}>
+                    <TaskIcon className={cn(
+                      "h-5 w-5 transition-colors duration-200",
+                      isCompleted ? "text-green-400" : "text-orange-400"
+                    )} />
                   </div>
                   
-                  <div className="flex items-center gap-2">
-                    {!isCompleted && (
-                      <Button
-                        onClick={() => handleTaskAction(task)}
-                        size="sm"
-                        variant="ghost"
-                        className="h-7 px-2 text-xs text-orange-400 hover:text-orange-300 hover:bg-orange-500/10"
-                      >
-                        {task.actionText}
-                        <ArrowRight className="h-3 w-3 ml-1" />
-                      </Button>
-                    )}
-                    {isCompleted && (
-                      <div className="text-xs text-green-400 font-medium">✓ Done</div>
-                    )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <label
+                          htmlFor={task.id}
+                          className={cn(
+                            "text-sm font-semibold cursor-pointer transition-all duration-200 select-none block",
+                            isCompleted 
+                              ? "text-green-400 line-through" 
+                              : "text-white group-hover:text-orange-200"
+                          )}
+                        >
+                          {task.text}
+                        </label>
+                        
+                        <p className={cn(
+                          "text-xs mt-1 transition-colors duration-200",
+                          isCompleted ? "text-green-300/70" : "text-gray-400 group-hover:text-gray-300"
+                        )}>
+                          {task.description}
+                        </p>
+                        
+                        <div className="flex items-center gap-3 mt-2">
+                          {task.priority === 'high' && !isCompleted && (
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-500/20 text-red-400 border border-red-500/30">
+                              High Priority
+                            </span>
+                          )}
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-500/20 text-gray-400 border border-gray-500/30 capitalize">
+                            {task.category}
+                          </span>
+                          {!isCompleted && (
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-500/20 text-orange-400 border border-orange-500/30">
+                              Action Required
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        {!isCompleted && (
+                          <Button
+                            onClick={() => handleTaskAction(task)}
+                            size="sm"
+                            className={cn(
+                              "h-8 px-3 text-xs font-medium transition-all duration-200",
+                              "bg-orange-600/90 hover:bg-orange-600 text-white",
+                              "border border-orange-500/50 hover:border-orange-400",
+                              "shadow-sm hover:shadow-md group-hover:scale-105"
+                            )}
+                          >
+                            {task.actionText}
+                            <ArrowRight className="h-3 w-3 ml-1" />
+                          </Button>
+                        )}
+                        {isCompleted && (
+                          <div className="flex items-center gap-1 px-3 py-1 bg-green-500/20 border border-green-500/30 rounded-lg">
+                            <CheckCircle className="h-3 w-3 text-green-400" />
+                            <span className="text-xs font-medium text-green-400">Done</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </motion.div>
               );
