@@ -18,6 +18,7 @@ import { ProjectProgressCards } from '@/components/dashboard/ProjectProgressCard
 import { RealTaskManager } from '@/components/tasks/RealTaskManager';
 import { useMainUserProject } from '@/hooks/useUserProjects';
 import { AlertCircle } from 'lucide-react';
+import { DataViewer } from '@/components/debug/DataViewer';
 
 export default function Home() {
   const { user } = useAuthSession();
@@ -36,6 +37,11 @@ export default function Home() {
         
         {/* Stats Row */}
         <StatsRow />
+        
+        {/* DEBUG: Data Viewer - TEMPORARY */}
+        <div className="mb-4">
+          <DataViewer />
+        </div>
         
         {/* Task Manager - Moved to top for better priority */}
         <div className="mb-4">
