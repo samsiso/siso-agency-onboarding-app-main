@@ -43,9 +43,9 @@ const getAllWorkflowTasks = (navigate: (path: string) => void): WorkflowTask[] =
     priority: 'high' as const,
     category: 'onboarding',
     icon: User,
-    actionText: 'Start Now',
+    actionText: 'Start Chat',
     action: () => navigate('/onboarding'),
-    description: 'Set up your business profile and requirements',
+    description: 'Chat with AI to set up your business profile and requirements',
     batch: 1
   },
   {
