@@ -9,6 +9,8 @@ interface SavedData {
   workflowTasks?: string[];
   planBuilder?: any;
   userProject?: any;
+  generatedAppPlans?: any[];
+  latestAppPlan?: any;
   lastUpdated?: string;
 }
 
@@ -47,6 +49,18 @@ export const checkAllSavedData = (): SavedData => {
     const projectData = localStorage.getItem('user-project-data');
     if (projectData) {
       result.userProject = JSON.parse(projectData);
+    }
+    
+    // Check generated app plans (NEW)
+    const appPlans = localStorage.getItem('generated-app-plans');
+    if (appPlans) {
+      result.generatedAppPlans = JSON.parse(appPlans);
+    }
+    
+    // Check latest app plan (NEW)
+    const latestPlan = localStorage.getItem('latest-app-plan');
+    if (latestPlan) {
+      result.latestAppPlan = JSON.parse(latestPlan);
     }
     
     result.lastUpdated = new Date().toISOString();
@@ -93,6 +107,21 @@ export const getDataSummary = (): string => {
   
   if (data.userProject) {
     summary.push(`✅ User Project: Available`);
+  }
+  
+  // NEW: App Plan tracking
+  if (data.latestAppPlan) {
+    const plan = data.latestAppPlan;
+    summary.push(`🤖 AI App Plan: ${plan.businessName || 'Generated'}`);
+    summary.push(`   📊 Features: ${plan.features?.length || 0} planned`);
+    summary.push(`   💰 Cost: ${plan.costBreakdown?.total ? `£${plan.costBreakdown.total.toLocaleString()}` : 'TBD'}`);
+    summary.push(`   ⏱️ Timeline: ${plan.totalTimelineWeeks || 'TBD'} weeks`);
+    summary.push(`   🎯 Confidence: ${plan.confidence || 0}%`);
+    summary.push(`   📅 Generated: ${plan.generatedAt ? new Date(plan.generatedAt).toLocaleString() : 'Unknown'}`);
+  }
+  
+  if (data.generatedAppPlans && data.generatedAppPlans.length > 1) {
+    summary.push(`🗂️ Total App Plans: ${data.generatedAppPlans.length} versions`);
   }
   
   if (summary.length === 0) {
