@@ -204,7 +204,45 @@ export function RealTaskManager({
     if (savedCompleted) {
       setCompletedTasks(new Set(JSON.parse(savedCompleted)));
     }
+    
+    // Check for actual completion states
+    checkActualCompletionStates();
   }, []);
+
+  // Refresh completion states when hasProjects changes
+  useEffect(() => {
+    checkActualCompletionStates();
+  }, [hasProjects]);
+
+  // Check if tasks are actually completed based on real data
+  const checkActualCompletionStates = () => {
+    const actuallyCompleted = new Set<string>();
+    
+    // Check if business onboarding is complete
+    const businessData = localStorage.getItem('business-onboarding-data');
+    if (businessData) {
+      const data = JSON.parse(businessData);
+      if (data.businessName && data.appPurpose && data.completedAt) {
+        actuallyCompleted.add('workflow-1');
+      }
+    }
+    
+    // Check if plan builder has been used (example check)
+    const planData = localStorage.getItem('plan-builder-data');
+    if (planData) {
+      actuallyCompleted.add('workflow-2');
+    }
+    
+    // Check if project has been created
+    const projectData = localStorage.getItem('user-project-data');
+    if (projectData || hasProjects) {
+      actuallyCompleted.add('workflow-3');
+    }
+    
+    // Update the completed tasks state with actual completion data
+    setCompletedTasks(actuallyCompleted);
+    localStorage.setItem('workflow-completed-tasks', JSON.stringify([...actuallyCompleted]));
+  };
 
   // Save completed tasks to localStorage
   const saveCompletedTasks = (completed: Set<string>) => {
@@ -213,34 +251,22 @@ export function RealTaskManager({
 
   const handleToggleTask = (taskId: string, completed: boolean) => {
     if (taskId.startsWith('workflow-')) {
-      const newCompleted = new Set(completedTasks);
-      if (completed) {
-        newCompleted.add(taskId);
-        toast({
-          title: "Task completed! 🎉",
-          description: "Great progress! Keep going to unlock the next batch."
-        });
-      } else {
-        newCompleted.delete(taskId);
-      }
-      setCompletedTasks(newCompleted);
-      saveCompletedTasks(newCompleted);
+      // Don't allow manual toggling of workflow tasks
+      toast({
+        title: "Complete the actual step",
+        description: "Please click the action button to complete this task properly."
+      });
       return;
     }
   };
 
   const handleTaskAction = (task: WorkflowTask) => {
-    // Mark as completed and navigate
-    const newCompleted = new Set(completedTasks);
-    newCompleted.add(task.id);
-    setCompletedTasks(newCompleted);
-    saveCompletedTasks(newCompleted);
-    
     toast({
-      title: "Task started! 🚀",
-      description: `You're being taken to ${task.text.toLowerCase()}`
+      title: "Starting task! 🚀",
+      description: `Taking you to ${task.text.toLowerCase()}`
     });
     
+    // Navigate to the task
     task.action();
   };
 
@@ -310,7 +336,18 @@ export function RealTaskManager({
         <div className="space-y-2">
           <div className="flex justify-between text-xs text-gray-400">
             <span>Batch Progress</span>
-            <span>{Math.round((batchProgress.currentBatchProgress / batchProgress.currentBatchTotal) * 100)}%</span>
+            <div className="flex items-center gap-2">
+              <span>{Math.round((batchProgress.currentBatchProgress / batchProgress.currentBatchTotal) * 100)}%</span>
+              <Button
+                onClick={checkActualCompletionStates}
+                size="sm"
+                variant="ghost"
+                className="h-5 w-5 p-0 text-gray-400 hover:text-orange-400"
+                title="Refresh completion status"
+              >
+                <ArrowRight className="h-3 w-3" />
+              </Button>
+            </div>
           </div>
           <div className="w-full bg-gray-700 rounded-full h-2">
             <div 
@@ -341,12 +378,19 @@ export function RealTaskManager({
                       : getPriorityColor(task.priority)
                   )}
                 >
-                  <Checkbox
-                    id={task.id}
-                    checked={isCompleted}
-                    onCheckedChange={(checked) => handleToggleTask(task.id, !!checked)}
-                    className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600 h-4 w-4"
-                  />
+                  <div className="relative">
+                    <Checkbox
+                      id={task.id}
+                      checked={isCompleted}
+                      onCheckedChange={(checked) => handleToggleTask(task.id, !!checked)}
+                      className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600 h-4 w-4"
+                      disabled={true} // Always disabled for workflow tasks
+                    />
+                    {!isCompleted && (
+                      <div className="absolute -top-1 -right-1 h-2 w-2 bg-orange-500 rounded-full animate-pulse" 
+                           title="Complete the actual step to check this off" />
+                    )}
+                  </div>
                   
                   <TaskIcon className={cn(
                     "h-4 w-4 shrink-0",
@@ -372,6 +416,9 @@ export function RealTaskManager({
                       )}
                       <span className="text-xs text-gray-500 capitalize">{task.category}</span>
                       <span className="text-xs text-gray-500">• {task.description}</span>
+                      {!isCompleted && (
+                        <span className="text-xs text-orange-400">• Action required</span>
+                      )}
                     </div>
                   </div>
                   
@@ -386,6 +433,9 @@ export function RealTaskManager({
                         {task.actionText}
                         <ArrowRight className="h-3 w-3 ml-1" />
                       </Button>
+                    )}
+                    {isCompleted && (
+                      <div className="text-xs text-green-400 font-medium">✓ Done</div>
                     )}
                   </div>
                 </motion.div>

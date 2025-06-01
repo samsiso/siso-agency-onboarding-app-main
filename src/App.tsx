@@ -57,6 +57,7 @@ import UserFlowFeedbackPage from './pages/projects/UserFlowFeedbackPage';
 import UserFlowNodesPage from './pages/projects/UserFlowNodesPage';
 import UserFlowCodePage from './pages/projects/UserFlowCodePage';
 import ProjectOnboardingPage from './pages/ProjectOnboardingPage';
+import { BusinessOnboarding } from './components/onboarding/BusinessOnboarding';
 
 function App() {
   return (
@@ -71,6 +72,7 @@ function App() {
         <Route path="/auth" element={<Auth />} />
         <Route path="/portfolio" element={<PublicPortfolio />} />
         <Route path="/onboarding-chat" element={<OnboardingChat />} />
+        <Route path="/onboarding" element={<AuthGuard><BusinessOnboarding /></AuthGuard>} />
         <Route path="/thankyou" element={<ThankYou />} />
         <Route path="/thankyou-plan" element={<ThankYouPlan />} />
         {/* Shareable app plans route - must come before generic plan route */}
