@@ -9,8 +9,9 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { WelcomeHeader } from '@/components/dashboard/WelcomeHeader';
 import { StatsRow } from '@/components/dashboard/StatsRow';
+import { QuickActionsGrid } from '@/components/dashboard/QuickActionsGrid';
 import { MainProjectCard } from '@/components/dashboard/MainProjectCard';
-import { NotificationsCard } from '@/components/dashboard/NotificationsCard';
+import { EnhancedActivityFeed } from '@/components/dashboard/EnhancedActivityFeed';
 import { HelpSupportCard } from '@/components/dashboard/HelpSupportCard';
 import { PlanBuilderCard } from '@/components/dashboard/PlanBuilderCard';
 import { ProjectHeader } from '@/components/projects/details/ProjectHeader';
@@ -45,6 +46,9 @@ export default function Home() {
             {/* Dynamic Project Content - Shows user's projects or create project message */}
             <MainProjectCard />
             
+            {/* Quick Actions Grid - Common agency operations */}
+            <QuickActionsGrid />
+            
             {/* Real Task Manager - Connected to Database */}
             <RealTaskManager 
               title="Your Tasks Today"
@@ -55,7 +59,7 @@ export default function Home() {
           
           {/* Right Column - Notifications & Help */}
           <div className="space-y-4">
-            <NotificationsCard />
+            <EnhancedActivityFeed />
             <HelpSupportCard />
           </div>
         </div>
