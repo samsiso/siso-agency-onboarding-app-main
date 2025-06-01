@@ -54,21 +54,21 @@ export function MainProjectCard() {
         className="mb-6"
       >
         <Card 
-          className="border border-siso-orange/20 bg-gradient-to-br from-black/40 to-siso-orange/5 hover:border-siso-orange/40 cursor-pointer transition-all duration-300"
+          className="bg-black/30 backdrop-blur-sm border border-white/10 shadow-lg hover:border-orange-500/40 cursor-pointer transition-all duration-300"
           onClick={() => navigate('/plan-builder')}
         >
           <CardContent className="p-6">
             <div className="flex flex-col md:flex-row gap-6 items-center">
               <div className="md:w-1/4 flex-shrink-0 flex justify-center md:justify-start">
-                <div className="h-24 w-24 rounded-full bg-gradient-to-br from-siso-orange/20 to-siso-red/10 flex items-center justify-center ring-4 ring-siso-orange/20">
-                  <FolderPlus size={42} className="text-siso-orange" />
+                <div className="h-24 w-24 rounded-full bg-gradient-to-br from-orange-500/20 to-red-500/10 flex items-center justify-center ring-4 ring-orange-500/20">
+                  <FolderPlus size={42} className="text-orange-500" />
                 </div>
               </div>
               
               <div className="md:w-3/4 space-y-4 text-center md:text-left">
                 <div>
                   <h2 className="text-2xl font-bold text-white">Create Your First Project</h2>
-                  <p className="text-siso-text-muted text-sm">
+                  <p className="text-gray-300 text-sm">
                     {clientData ? `Welcome ${clientData.company_name || clientData.contact_name}! ` : ''}
                     Get started by creating your first project with SISO Agency.
                   </p>
@@ -76,7 +76,7 @@ export function MainProjectCard() {
                 
                 <div className="flex flex-col sm:flex-row gap-3">
                   <Button 
-                    className="bg-siso-orange hover:bg-siso-red text-white"
+                    className="bg-orange-600 hover:bg-orange-700 text-white"
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate('/plan-builder');
@@ -88,7 +88,7 @@ export function MainProjectCard() {
                   {clientData && (
                     <Button 
                       variant="outline"
-                      className="border-siso-border text-siso-text hover:bg-siso-bg-alt"
+                      className="border-white/20 text-gray-300 hover:bg-white/10"
                       onClick={(e) => {
                         e.stopPropagation();
                         navigate('/client-dashboard');

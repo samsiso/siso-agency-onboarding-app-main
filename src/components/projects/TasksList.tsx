@@ -1,98 +1,86 @@
-
 import React, { useState } from 'react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { TaskList } from '@/components/admin/tasks/TaskList';
-import { TaskCategory } from '@/types/task.types';
-import { Chip } from '@/components/ui/chip';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card } from '@/components/ui/card';
-import { ActiveTasksView } from './ActiveTasksView';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-
-const taskCategories: TaskCategory[] = [
-  'main', 
-  'weekly', 
-  'daily', 
-  'siso_app_dev', 
-  'onboarding_app',
-  'instagram'
-];
-
-const formatCategoryName = (category: string) => {
-  return category
-    .split('_')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-};
+import { RealTaskManager } from '@/components/tasks/RealTaskManager';
+import { useUserPreferences } from '@/hooks/useLocalStorage';
 
 interface TasksListProps {
   viewMode: "table" | "cards";
 }
 
 export function TasksList({ viewMode }: TasksListProps) {
-  const [selectedCategory, setSelectedCategory] = useState<TaskCategory>('main');
-  const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
+  const { preferences, updatePreference } = useUserPreferences();
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Use persistent preferences
+  const filter = preferences.taskFilter || 'all';
+  
+  const handleFilterChange = (value: 'all' | 'active' | 'completed') => {
+    updatePreference('taskFilter', value);
+  };
   
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-          <Select 
-            value={selectedCategory} 
-            onValueChange={(value) => setSelectedCategory(value as TaskCategory)}
-          >
-            <SelectTrigger className="w-full sm:w-[200px]">
-              <SelectValue placeholder="Select category" />
-            </SelectTrigger>
-            <SelectContent>
-              {taskCategories.map(category => (
-                <SelectItem key={category} value={category}>
-                  {formatCategoryName(category)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          
           <div className="relative w-full sm:w-auto">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
               placeholder="Search tasks..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 w-full sm:w-[250px] bg-black/20"
+              className="pl-10 w-full sm:w-[250px] bg-white/90"
             />
           </div>
         </div>
         
-        <Tabs value={filter} onValueChange={(value) => setFilter(value as 'all' | 'active' | 'completed')}>
-          <TabsList>
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="active">Active</TabsTrigger>
-            <TabsTrigger value="completed">Completed</TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <div className="flex items-center gap-3">
+          <Tabs value={filter} onValueChange={handleFilterChange}>
+            <TabsList>
+              <TabsTrigger value="all">All</TabsTrigger>
+              <TabsTrigger value="active">Active</TabsTrigger>
+              <TabsTrigger value="completed">Completed</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
       </div>
       
-      {viewMode === "table" ? (
-        <div>
-          <div className="flex items-center gap-2 mb-4">
-            <h2 className="text-xl font-semibold">
-              {formatCategoryName(selectedCategory)} Tasks
-            </h2>
-            <Chip variant="outline" size="sm" className="bg-purple-100 text-purple-800 border-purple-200">
-              {selectedCategory}
-            </Chip>
-          </div>
-          
-          <Card className="p-4 bg-black/30 border border-siso-text/10">
-            <TaskList category={selectedCategory} />
-          </Card>
-        </div>
-      ) : (
-        <ActiveTasksView />
-      )}
+      {/* Simple Task Layout - Like Dashboard */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        <RealTaskManager 
+          title="All Your Tasks"
+          className="h-fit"
+          showAddTask={true}
+          maxTasks={10}
+          filterType="all"
+        />
+        <RealTaskManager 
+          title="High Priority"
+          className="h-fit"
+          showAddTask={false}
+          maxTasks={5}
+          filterType="high-priority"
+        />
+        <RealTaskManager 
+          title="Due Soon"
+          className="h-fit"
+          showAddTask={false}
+          maxTasks={5}
+          filterType="due-soon"
+        />
+      </div>
+      
+      {/* Full Task List */}
+      <div className="mt-8">
+        <RealTaskManager 
+          title="Complete Task List"
+          className="w-full"
+          showAddTask={true}
+          maxTasks={50}
+          filterType="all"
+        />
+      </div>
     </div>
   );
-}
+} 

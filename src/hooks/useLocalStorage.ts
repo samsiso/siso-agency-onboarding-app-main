@@ -1,77 +1,54 @@
-import { useState, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
-// Enhanced local storage hook with better error handling
-export function useLocalStorage<T>(
-  key: string,
-  initialValue: T
-): [T, (value: T | ((val: T) => T)) => void] {
-  // State to store our value
+/**
+ * Custom hook for localStorage persistence
+ * Automatically saves and loads data from localStorage
+ */
+export function useLocalStorage<T>(key: string, initialValue: T) {
+  // Get from local storage then parse stored json or return initialValue
   const [storedValue, setStoredValue] = useState<T>(() => {
-    // Don't try to access localStorage during SSR or when unavailable
-    if (typeof window === 'undefined') {
-      return initialValue;
-    }
-    
     try {
-      // Safely check if localStorage is available and accessible
-      if (!isLocalStorageAvailable()) {
-        return initialValue;
-      }
-      
-      // Get from local storage by key
       const item = window.localStorage.getItem(key);
-      // Parse stored json or if none return initialValue
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
-      // If any error occurs, return initialValue
-      console.warn(`Could not read "${key}" from localStorage:`, error);
+      console.warn(`Error reading localStorage key "${key}":`, error);
       return initialValue;
     }
   });
 
-  // Return a wrapped version of useState's setter function that
-  // persists the new value to localStorage.
-  const setValue = useCallback((value: T | ((val: T) => T)) => {
+  // Return a wrapped version of useState's setter function that persists the new value to localStorage
+  const setValue = (value: T | ((val: T) => T)) => {
     try {
-      // Allow value to be a function so we have same API as useState
-      const valueToStore =
-        value instanceof Function ? value(storedValue) : value;
-      // Save state
+      // Allow value to be a function so we have the same API as useState
+      const valueToStore = value instanceof Function ? value(storedValue) : value;
       setStoredValue(valueToStore);
-      
-      // Only attempt to use localStorage if it's available
-      if (typeof window !== 'undefined' && isLocalStorageAvailable()) {
-        // Use try-catch for the actual storage operation
-        try {
-          window.localStorage.setItem(key, JSON.stringify(valueToStore));
-        } catch (storageError) {
-          console.warn(`Could not save "${key}" to localStorage:`, storageError);
-          // Continue with the state update but don't break if storage fails
-        }
-      }
+      window.localStorage.setItem(key, JSON.stringify(valueToStore));
     } catch (error) {
-      console.error('Error updating state:', error);
-      // Still update state even if there was an error with localStorage
+      console.warn(`Error setting localStorage key "${key}":`, error);
     }
-  }, [key, storedValue]);
+  };
 
-  return [storedValue, setValue];
+  return [storedValue, setValue] as const;
 }
 
-// Helper function to safely check if localStorage is available and accessible
-function isLocalStorageAvailable(): boolean {
-  try {
-    // Try to access localStorage with a test key
-    if (!window.localStorage) {
-      return false;
-    }
-    
-    const testKey = '__storage_test__';
-    window.localStorage.setItem(testKey, testKey);
-    window.localStorage.removeItem(testKey);
-    return true;
-  } catch (e) {
-    // Any errors indicate localStorage is not fully available
-    return false;
-  }
+/**
+ * Hook for persisting user preferences
+ */
+export function useUserPreferences() {
+  const [preferences, setPreferences] = useLocalStorage('user-preferences', {
+    taskViewMode: 'horizontal' as 'horizontal' | 'vertical' | 'kanban' | 'legacy',
+    taskFilter: 'all' as 'all' | 'active' | 'completed',
+    taskCategory: 'main' as string,
+    compactTaskColumns: 2,
+    showTaskQuotes: true
+  });
+
+  const updatePreference = <K extends keyof typeof preferences>(
+    key: K, 
+    value: typeof preferences[K]
+  ) => {
+    setPreferences(prev => ({ ...prev, [key]: value }));
+  };
+
+  return { preferences, updatePreference };
 }

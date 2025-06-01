@@ -1,4 +1,3 @@
-
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Bell, Calendar, FileText, MessageSquare } from 'lucide-react';
@@ -41,7 +40,7 @@ export function NotificationsCard() {
     >
       <Card className="border-siso-border bg-black/30 hover:border-siso-orange/30 transition-all duration-300 h-full">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-lg font-semibold flex items-center gap-2">
+          <CardTitle className="text-lg font-semibold flex items-center gap-2 text-white">
             <Bell className="h-5 w-5 text-siso-orange" />
             Recent Notifications
             <Badge 

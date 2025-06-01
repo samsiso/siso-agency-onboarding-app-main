@@ -16,13 +16,14 @@ import { PlanBuilderCard } from '@/components/dashboard/PlanBuilderCard';
 import { ProjectHeader } from '@/components/projects/details/ProjectHeader';
 import { ProjectMetricsDashboard } from '@/components/projects/details/ProjectMetricsDashboard';
 import { ProjectProgressCards } from '@/components/dashboard/ProjectProgressCards';
-import { useProjects } from '@/hooks/useProjects';
+import { RealTaskManager } from '@/components/tasks/RealTaskManager';
+import { useMainUserProject } from '@/hooks/useUserProjects';
 import { AlertCircle } from 'lucide-react';
 
 export default function Home() {
   const { user } = useAuthSession();
   const { isAdmin } = useAdminCheck();
-  const { data: project, isLoading, error } = useProjects();
+  const { project, hasProjects, loading, error } = useMainUserProject();
   
   return (
     <DashboardLayout>
@@ -34,41 +35,65 @@ export default function Home() {
         {/* Welcome Header */}
         <WelcomeHeader />
         
-        {/* Project Header */}
-        <div className="mb-6">
-          {isLoading ? (
-            <div className="animate-pulse space-y-8">
-              <div className="h-64 bg-black/20 rounded-lg" />
-            </div>
-          ) : error ? (
-            <div className="flex flex-col items-center justify-center p-8 text-center rounded-lg bg-black/30 border border-white/10">
-              <AlertCircle className="h-12 w-12 text-[#ea384c] mb-4" />
-              <h3 className="text-xl font-semibold text-white mb-2">
-                Failed to Load Project
-              </h3>
-              <p className="text-gray-400 mb-4 max-w-md">
-                {error instanceof Error ? error.message : 'There was an error loading your project'}
-              </p>
-            </div>
-          ) : project ? (
-            <>
-              <ProjectHeader
-                name={project.name}
-                description={project.description}
-                status={project.status}
-                created_at={project.created_at}
-              />
-              <div className="mt-6">
-                <ProjectMetricsDashboard projectId={project.id} />
-              </div>
-              
-              {/* Project Progress Cards - Added here */}
-              <ProjectProgressCards />
-            </>
-          ) : null}
+        {/* Main Dashboard Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          {/* Left Column - Main Project & Tasks */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Dynamic Project Content - Shows user's projects or create project message */}
+            <MainProjectCard />
+            
+            {/* Real Task Manager - Connected to Database */}
+            <RealTaskManager 
+              title="Your Tasks Today"
+              maxTasks={3}
+              showAddTask={true}
+            />
+          </div>
+          
+          {/* Right Column - Notifications & Help */}
+          <div className="space-y-6">
+            <NotificationsCard />
+            <HelpSupportCard />
+          </div>
         </div>
         
-        {/* Main Content */}
+        {/* Project Details - Only show if user has projects */}
+        {hasProjects && project && (
+          <div className="mb-6">
+            {loading ? (
+              <div className="animate-pulse space-y-8">
+                <div className="h-64 bg-black/20 rounded-lg" />
+              </div>
+            ) : error ? (
+              <div className="flex flex-col items-center justify-center p-8 text-center rounded-lg bg-black/30 border border-white/10">
+                <AlertCircle className="h-12 w-12 text-[#ea384c] mb-4" />
+                <h3 className="text-xl font-semibold text-white mb-2">
+                  Failed to Load Project Details
+                </h3>
+                <p className="text-gray-400 mb-4 max-w-md">
+                  {error instanceof Error ? error.message : 'There was an error loading your project details'}
+                </p>
+              </div>
+            ) : (
+              <>
+                <ProjectHeader
+                  name={project.name}
+                  description={project.description || 'No description available'}
+                  status={project.status}
+                  created_at={project.created_at}
+                />
+                <div className="mt-6">
+                  <ProjectMetricsDashboard projectId={project.id} />
+                </div>
+                
+                {/* Project Progress Cards */}
+                <ProjectProgressCards />
+              </>
+            )}
+          </div>
+        )}
+        
+        {/* Additional Content Grid */}
         <div className="space-y-6 mt-6">
           {/* Additional Cards with new layout */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -76,13 +101,10 @@ export default function Home() {
               <LeaderboardPreviewCard />
             </div>
             <div className="lg:col-span-1 order-1 lg:order-2 space-y-6">
-              <NotificationsCard />
-              <HelpSupportCard />
+              {/* Plan Builder Card moved to right column */}
+              <PlanBuilderCard />
             </div>
           </div>
-          
-          {/* Plan Builder Card */}
-          <PlanBuilderCard />
         </div>
         
         {/* Admin Access Card - Only shown to admin users */}

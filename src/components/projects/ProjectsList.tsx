@@ -1,15 +1,16 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Search, Plus } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import React, { useState, useEffect } from 'react';
+import { ProjectCard } from './ProjectCard';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
+import { Input } from '@/components/ui/input';
+import { Search, Plus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from 'react-router-dom';
 import { useUser } from '@/hooks/useUser';
-import { ProjectCard } from '@/components/projects/ProjectCard';
-import { ProjectsEmptyState } from '@/components/projects/ProjectsEmptyState';
+import { useToast } from '@/hooks/use-toast';
+import { useUserProjects } from '@/hooks/useUserProjects';
+import { Skeleton } from '@/components/ui/skeleton';
 
-interface Plan {
+interface EnhancedProject {
   id: string;
   app_name: string;
   company_name: string | null;
@@ -19,128 +20,129 @@ interface Plan {
   features: string[];
   status: string;
   created_at: string;
-}
-
-interface ProjectTask {
-  title: string;
-  due_date: string;
-}
-
-interface EnhancedProject extends Plan {
   completion_percentage: number;
-  due_date: string;
-  tasks: ProjectTask[];
+  due_date?: string;
+  tasks?: Array<{
+    title: string;
+    due_date: string;
+  }>;
   logo?: string;
 }
 
 export function ProjectsList() {
-  const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useUser();
+  const { data: userProjects, isLoading, error } = useUserProjects();
   
-  // Hardcoded UbahCrypt project
-  const ubahCryptProject: EnhancedProject = {
-    id: "ubah-123",
-    app_name: "UbahCrypt",
-    company_name: "SISO AGENCY",
-    username: "admin",
-    estimated_cost: 12500,
-    estimated_days: 45,
-    features: ["Crypto Exchange", "NFT Marketplace", "Token Management", "Wallet Integration"],
-    status: "in_progress",
-    created_at: new Date().toISOString(),
-    completion_percentage: 65,
+  // Transform user projects to enhanced project format
+  const enhancedProjects: EnhancedProject[] = (userProjects || []).map(project => ({
+    id: project.id,
+    app_name: project.name,
+    company_name: "Your Project",
+    username: user?.email?.split('@')[0] || "user",
+    estimated_cost: 5000, // Default estimate
+    estimated_days: 30, // Default estimate
+    features: ["Custom App", "User Dashboard", "Admin Panel", "Mobile Responsive"],
+    status: project.status,
+    created_at: project.created_at,
+    completion_percentage: project.completion_percentage,
     due_date: new Date(Date.now() + 86400000 * 30).toISOString(), // 30 days from now
     tasks: [
       {
-        title: "Review Smart Contract",
-        due_date: new Date(Date.now() + 86400000 * 2).toISOString(), // 2 days from now
+        title: "Project Planning",
+        due_date: new Date(Date.now() + 86400000 * 7).toISOString(), // 7 days from now
       },
       {
-        title: "Approve UI Designs",
-        due_date: new Date().toISOString(), // Today
+        title: "Development Phase",
+        due_date: new Date(Date.now() + 86400000 * 21).toISOString(), // 21 days from now
       },
       {
-        title: "Test Token Distribution",
-        due_date: new Date(Date.now() + 86400000 * 5).toISOString(), // 5 days from now
+        title: "Testing & Launch",
+        due_date: new Date(Date.now() + 86400000 * 30).toISOString(), // 30 days from now
       }
     ],
     logo: "/images/siso-logo.svg"
-  };
-  
-  useEffect(() => {
-    async function fetchProjects() {
-      try {
-        setIsLoading(true);
-        if (!user) return;
-        
-        const { data, error } = await supabase
-          .from('plans')
-          .select('*')
-          .order('created_at', { ascending: false });
-          
-        if (error) {
-          throw error;
-        }
-        
-        // Simulate loading
-        const timer = setTimeout(() => {
-          setIsLoading(false);
-        }, 800);
-        
-        return () => clearTimeout(timer);
-      } catch (error) {
-        console.error('Error fetching projects:', error);
-        toast({
-          title: 'Error fetching projects',
-          description: 'Please try again later',
-          variant: 'destructive',
-        });
-      }
-    }
-    
-    fetchProjects();
-  }, [user, toast]);
+  }));
 
   const handleCreateNew = () => {
-    navigate('/projects/new');
+    navigate('/plan-builder');
   };
   
-  const showProject = !searchQuery || 
-    ubahCryptProject.app_name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    (ubahCryptProject.company_name && ubahCryptProject.company_name.toLowerCase().includes(searchQuery.toLowerCase()));
-  
-  return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-siso-text" />
-          <Input
-            placeholder="Search projects..."
-            className="pl-9 bg-black/30 border-siso-text/10 focus-visible:ring-siso-orange/50"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+  const filteredProjects = enhancedProjects.filter(project => 
+    !searchQuery || 
+    project.app_name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    (project.company_name && project.company_name.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
+  if (isLoading) {
+    return (
+      <div className="p-6 space-y-6">
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+          <Skeleton className="h-8 w-32" />
+          <Skeleton className="h-10 w-40" />
         </div>
+        <Skeleton className="h-10 w-full" />
+        <div className="grid grid-cols-1 gap-4">
+          <Skeleton className="h-48 w-full" />
+          <Skeleton className="h-48 w-full" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <h3 className="text-xl font-semibold text-white mb-2">Error loading projects</h3>
+        <p className="text-siso-text mb-6">There was an issue fetching your projects. Please try again.</p>
         <Button 
           onClick={handleCreateNew} 
           className="bg-siso-orange hover:bg-siso-orange/80 text-white"
         >
           <Plus className="mr-2 h-4 w-4" />
-          New Project
+          Create New Project
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-6 space-y-6">
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+        <h1 className="text-2xl font-bold text-white">My Projects</h1>
+        <Button 
+          onClick={handleCreateNew} 
+          className="bg-siso-orange hover:bg-siso-orange/80 text-white"
+        >
+          <Plus className="mr-2 h-4 w-4" />
+          Create New Project
         </Button>
       </div>
       
-      {isLoading ? (
-        <div className="space-y-4">
-          <div className="animate-pulse bg-black/30 border border-siso-text/10 rounded-lg p-6 h-64" />
-        </div>
-      ) : !showProject ? (
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+        <Input
+          type="text"
+          placeholder="Search projects..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-10 bg-black/30 border-siso-text/20 text-white placeholder-gray-400"
+        />
+      </div>
+      
+      {filteredProjects.length === 0 ? (
         <div className="text-center py-12">
-          <h3 className="text-xl font-semibold text-white mb-2">No projects found</h3>
-          <p className="text-siso-text mb-6">Try a different search term or create a new project.</p>
+          <h3 className="text-xl font-semibold text-white mb-2">
+            {enhancedProjects.length === 0 ? "No projects yet" : "No projects found"}
+          </h3>
+          <p className="text-siso-text mb-6">
+            {enhancedProjects.length === 0 
+              ? "Create your first project to get started with SISO Agency."
+              : "Try a different search term or create a new project."
+            }
+          </p>
           <Button 
             onClick={handleCreateNew} 
             className="bg-siso-orange hover:bg-siso-orange/80 text-white"
@@ -151,7 +153,9 @@ export function ProjectsList() {
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4">
-          <ProjectCard key={ubahCryptProject.id} project={ubahCryptProject} />
+          {filteredProjects.map((project) => (
+            <ProjectCard key={project.id} project={project} />
+          ))}
           
           <div className="mt-8 border-t border-siso-text/10 pt-8">
             <div className="text-center">

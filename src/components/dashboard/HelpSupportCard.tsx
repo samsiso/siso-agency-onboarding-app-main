@@ -1,4 +1,3 @@
-
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { HelpCircle, Book, MessageSquare, FileText, ArrowRight } from 'lucide-react';
@@ -16,7 +15,7 @@ export function HelpSupportCard() {
     >
       <Card className="border-siso-border bg-black/30 hover:border-siso-orange/30 transition-all duration-300 h-full">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-lg font-semibold flex items-center">
+          <CardTitle className="text-lg font-semibold flex items-center text-white">
             <HelpCircle className="mr-2 h-5 w-5 text-siso-orange" />
             Help & Support
           </CardTitle>
