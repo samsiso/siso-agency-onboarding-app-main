@@ -8,6 +8,7 @@ import { Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { WelcomeHeader } from '@/components/dashboard/WelcomeHeader';
+import { StatsRow } from '@/components/dashboard/StatsRow';
 import { MainProjectCard } from '@/components/dashboard/MainProjectCard';
 import { NotificationsCard } from '@/components/dashboard/NotificationsCard';
 import { HelpSupportCard } from '@/components/dashboard/HelpSupportCard';
@@ -34,23 +35,26 @@ export default function Home() {
         {/* Welcome Header */}
         <WelcomeHeader />
         
+        {/* Stats Row */}
+        <StatsRow />
+        
         {/* Main Dashboard Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
           {/* Left Column - Main Project & Tasks */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-4">
             {/* Dynamic Project Content - Shows user's projects or create project message */}
             <MainProjectCard />
             
             {/* Real Task Manager - Connected to Database */}
             <RealTaskManager 
               title="Your Tasks Today"
-              maxTasks={3}
+              maxTasks={4}
               showAddTask={true}
             />
           </div>
           
           {/* Right Column - Notifications & Help */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             <NotificationsCard />
             <HelpSupportCard />
           </div>
@@ -93,7 +97,7 @@ export default function Home() {
         )}
         
         {/* Additional Content Grid */}
-        <div className="space-y-6 mt-6">
+        <div className="space-y-4 mt-4">
           {/* Plan Builder Card */}
           <div className="flex justify-end">
             <div className="w-full lg:w-1/3">
