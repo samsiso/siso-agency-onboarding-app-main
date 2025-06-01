@@ -12,7 +12,6 @@ import { StatsRow } from '@/components/dashboard/StatsRow';
 import { MainProjectCard } from '@/components/dashboard/MainProjectCard';
 import { EnhancedActivityFeed } from '@/components/dashboard/EnhancedActivityFeed';
 import { HelpSupportCard } from '@/components/dashboard/HelpSupportCard';
-import { PlanBuilderCard } from '@/components/dashboard/PlanBuilderCard';
 import { ProjectHeader } from '@/components/projects/details/ProjectHeader';
 import { ProjectMetricsDashboard } from '@/components/projects/details/ProjectMetricsDashboard';
 import { ProjectProgressCards } from '@/components/dashboard/ProjectProgressCards';
@@ -49,16 +48,13 @@ export default function Home() {
         
         {/* Main Dashboard Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
-          {/* Left Column - Main Project, Help & Support, Plan Builder */}
+          {/* Left Column - Main Project and Help & Support */}
           <div className="lg:col-span-2 space-y-4">
             {/* Dynamic Project Content - Shows user's projects or create project message */}
             <MainProjectCard />
             
             {/* Help & Support Card */}
             <HelpSupportCard />
-            
-            {/* Plan Builder Card */}
-            <PlanBuilderCard />
           </div>
           
           {/* Right Column - Activity Feed */}
