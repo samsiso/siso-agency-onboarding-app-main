@@ -10,7 +10,6 @@ import { motion } from 'framer-motion';
 import { WelcomeHeader } from '@/components/dashboard/WelcomeHeader';
 import { MainProjectCard } from '@/components/dashboard/MainProjectCard';
 import { NotificationsCard } from '@/components/dashboard/NotificationsCard';
-import { LeaderboardPreviewCard } from '@/components/dashboard/LeaderboardPreviewCard';
 import { HelpSupportCard } from '@/components/dashboard/HelpSupportCard';
 import { PlanBuilderCard } from '@/components/dashboard/PlanBuilderCard';
 import { ProjectHeader } from '@/components/projects/details/ProjectHeader';
@@ -95,13 +94,9 @@ export default function Home() {
         
         {/* Additional Content Grid */}
         <div className="space-y-6 mt-6">
-          {/* Additional Cards with new layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 order-2 lg:order-1">
-              <LeaderboardPreviewCard />
-            </div>
-            <div className="lg:col-span-1 order-1 lg:order-2 space-y-6">
-              {/* Plan Builder Card moved to right column */}
+          {/* Plan Builder Card */}
+          <div className="flex justify-end">
+            <div className="w-full lg:w-1/3">
               <PlanBuilderCard />
             </div>
           </div>
