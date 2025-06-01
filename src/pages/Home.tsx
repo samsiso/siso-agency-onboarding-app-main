@@ -39,25 +39,27 @@ export default function Home() {
         {/* Stats Row */}
         <StatsRow />
         
+        {/* Task Manager - Moved to top for better priority */}
+        <div className="mb-4">
+          <RealTaskManager 
+            title="Your Tasks Today"
+            maxTasks={5}
+            showAddTask={true}
+          />
+        </div>
+        
         {/* Main Dashboard Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
-          {/* Left Column - Main Project & Tasks */}
+          {/* Left Column - Main Project & Quick Actions */}
           <div className="lg:col-span-2 space-y-4">
             {/* Dynamic Project Content - Shows user's projects or create project message */}
             <MainProjectCard />
             
-            {/* Quick Actions Grid - Common agency operations */}
+            {/* Quick Actions Grid - Common client operations */}
             <QuickActionsGrid />
-            
-            {/* Real Task Manager - Connected to Database */}
-            <RealTaskManager 
-              title="Your Tasks Today"
-              maxTasks={4}
-              showAddTask={true}
-            />
           </div>
           
-          {/* Right Column - Notifications & Help */}
+          {/* Right Column - Activity & Help */}
           <div className="space-y-4">
             <EnhancedActivityFeed />
             <HelpSupportCard />
