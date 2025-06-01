@@ -153,7 +153,7 @@ export function BusinessOnboarding() {
                 <Button 
                   variant="outline" 
                   className="w-full border-white/20 text-gray-300"
-                  onClick={() => navigate('/')}
+                  onClick={() => navigate('/home')}
                 >
                   Back to Dashboard
                 </Button>
@@ -327,7 +327,7 @@ export function BusinessOnboarding() {
                   Your business information has been saved. Ready for the next step?
                 </p>
                 <Button 
-                  onClick={() => navigate('/')}
+                  onClick={() => navigate('/home')}
                   className="w-full bg-green-600 hover:bg-green-700 text-white"
                 >
                   Back to Dashboard
@@ -371,7 +371,7 @@ export function BusinessOnboarding() {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/home')}
           className="text-gray-300 hover:text-white hover:bg-white/10"
         >
           <ArrowLeft size={20} />
@@ -380,7 +380,7 @@ export function BusinessOnboarding() {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/home')}
           className="text-gray-300 hover:text-white hover:bg-white/10"
         >
           <X size={20} />
