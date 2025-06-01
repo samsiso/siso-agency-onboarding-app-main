@@ -9,7 +9,6 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { WelcomeHeader } from '@/components/dashboard/WelcomeHeader';
 import { StatsRow } from '@/components/dashboard/StatsRow';
-import { QuickActionsGrid } from '@/components/dashboard/QuickActionsGrid';
 import { MainProjectCard } from '@/components/dashboard/MainProjectCard';
 import { EnhancedActivityFeed } from '@/components/dashboard/EnhancedActivityFeed';
 import { HelpSupportCard } from '@/components/dashboard/HelpSupportCard';
@@ -50,19 +49,21 @@ export default function Home() {
         
         {/* Main Dashboard Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
-          {/* Left Column - Main Project & Quick Actions */}
+          {/* Left Column - Main Project, Help & Support, Plan Builder */}
           <div className="lg:col-span-2 space-y-4">
             {/* Dynamic Project Content - Shows user's projects or create project message */}
             <MainProjectCard />
             
-            {/* Quick Actions Grid - Common client operations */}
-            <QuickActionsGrid />
+            {/* Help & Support Card */}
+            <HelpSupportCard />
+            
+            {/* Plan Builder Card */}
+            <PlanBuilderCard />
           </div>
           
-          {/* Right Column - Activity & Help */}
+          {/* Right Column - Activity Feed */}
           <div className="space-y-4">
             <EnhancedActivityFeed />
-            <HelpSupportCard />
           </div>
         </div>
         
@@ -101,16 +102,6 @@ export default function Home() {
             )}
           </div>
         )}
-        
-        {/* Additional Content Grid */}
-        <div className="space-y-4 mt-4">
-          {/* Plan Builder Card */}
-          <div className="flex justify-end">
-            <div className="w-full lg:w-1/3">
-              <PlanBuilderCard />
-            </div>
-          </div>
-        </div>
         
         {/* Admin Access Card - Only shown to admin users */}
         {isAdmin && (
