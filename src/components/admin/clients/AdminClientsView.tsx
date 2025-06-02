@@ -50,10 +50,16 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
   });
   
   const statsTotalClients = clients.length;
-  const statsProjectValue = useMemo(
-    () => clients.reduce((acc, curr) => acc + (curr.estimated_price || 0), 0),
-    [clients]
-  );
+  const statsProjectValue = useMemo(() => {
+    const total = clients.reduce((acc, curr) => {
+      const price = curr.estimated_price || 0;
+      console.log(`Client: ${curr.business_name}, Price: ${price}`);
+      return acc + price;
+    }, 0);
+    console.log('Total calculated project value:', total);
+    console.log('All clients data:', clients.map(c => ({ name: c.business_name, price: c.estimated_price })));
+    return total;
+  }, [clients]);
 
   // Adapter for view preference
   const handleViewPreferenceChange = (updates: Partial<ClientViewPreference>) => {

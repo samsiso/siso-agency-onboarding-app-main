@@ -1,4 +1,3 @@
-
 import React from "react";
 import { DollarSign, Users } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,6 +9,9 @@ interface DashboardStatsProps {
 }
 
 export function DashboardStats({ totalClients, totalProjectValue }: DashboardStatsProps) {
+  // Debug log to see what values we're getting
+  console.log('DashboardStats received:', { totalClients, totalProjectValue });
+
   const stats = [
     {
       label: "Total Clients",
@@ -19,7 +21,9 @@ export function DashboardStats({ totalClients, totalProjectValue }: DashboardSta
     },
     {
       label: "Total Project Value",
-      value: totalProjectValue.toLocaleString("en-US", { style: "currency", currency: "USD" }),
+      value: totalProjectValue > 0 
+        ? totalProjectValue.toLocaleString("en-GB", { style: "currency", currency: "GBP" })
+        : "£0.00",
       icon: DollarSign,
       color: "bg-gradient-to-tr from-orange-400/70 to-orange-700/80 text-white",
     },
