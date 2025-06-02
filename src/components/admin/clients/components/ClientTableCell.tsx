@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { ClientData } from '@/types/client.types';
@@ -8,6 +7,7 @@ import { TodosCell } from './table-cells/TodosCell';
 import { LinkCell } from './table-cells/LinkCell';
 import { DateCell } from './table-cells/DateCell';
 import { DollarSign } from 'lucide-react';
+import { ProgressCell } from './table-cells/ProgressCell';
 
 interface ClientTableCellProps {
   client: ClientData;
@@ -49,10 +49,19 @@ export function ClientTableCell({
       case 'full_name':
         return (
           <div className="flex flex-col space-y-0.5" title={client.full_name || ''} onDoubleClick={onDoubleClick}>
-            <span className="font-medium text-foreground">{client.full_name || 'Unknown'}</span>
-            {client.email && <span className="block text-xs text-muted-foreground">{client.email}</span>}
+            <span className="font-medium text-gray-100">{client.full_name || 'Unknown'}</span>
           </div>
         );
+
+      case 'business_name':
+        return (
+          <div onDoubleClick={onDoubleClick}>
+            <span className="text-gray-200">{client.business_name || '-'}</span>
+          </div>
+        );
+
+      case 'progress':
+        return <ProgressCell progress={client.progress || 'Not Started'} />;
 
       case 'status':
         return <StatusCell status={client.status} />;
@@ -67,9 +76,9 @@ export function ClientTableCell({
         return <LinkCell url={client.development_url} label="View Site" />;
 
       case 'estimated_price':
-        if (!client.estimated_price) return <span>-</span>;
+        if (!client.estimated_price) return <span className="text-gray-400">-</span>;
         return (
-          <span className="flex items-center">
+          <span className="flex items-center text-gray-200">
             <DollarSign className="h-4 w-4" />
             {client.estimated_price.toLocaleString()}
           </span>

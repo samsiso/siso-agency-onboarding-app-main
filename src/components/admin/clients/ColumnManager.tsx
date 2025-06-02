@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { SlidersHorizontal, CheckCircle, Circle, Plus, Pin, PinOff } from 'lucide-react';
@@ -57,6 +56,7 @@ export function ColumnManager({
       const defaultVisible = [
         'full_name', 
         'business_name', 
+        'progress',
         'status', 
         'project_name', 
         'updated_at'

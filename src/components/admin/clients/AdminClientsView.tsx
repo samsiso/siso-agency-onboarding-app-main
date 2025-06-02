@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from 'react';
 import { ClientsEnhancedTable } from './ClientsEnhancedTable';
 import { ClientsCardGrid } from './ClientsCardGrid';
@@ -12,8 +11,8 @@ import { ClientsHeader } from './ClientsHeader';
 const defaultViewPreference: ClientViewPreference = {
   columns: [
     { key: 'full_name', label: 'Name', visible: true, width: 180, pinned: true },
-    { key: 'email', label: 'Email', visible: true, width: 220 },
     { key: 'business_name', label: 'Business', visible: true, width: 180 },
+    { key: 'progress', label: 'Progress', visible: true, width: 150 },
     { key: 'status', label: 'Status', visible: true, width: 120, pinned: true },
     { key: 'project_name', label: 'Project', visible: true, width: 180 },
     { key: 'estimated_price', label: 'Balance', visible: true, width: 120 },

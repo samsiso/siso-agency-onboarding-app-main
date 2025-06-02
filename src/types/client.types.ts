@@ -1,4 +1,3 @@
-
 export interface ClientDocument {
   id: string;
   client_id: string;
@@ -21,6 +20,7 @@ export interface ClientData {
   phone: string | null;
   avatar_url: string | null;
   status: string;
+  progress?: string | null;
   current_step: number;
   total_steps: number;
   completed_steps: string[];
