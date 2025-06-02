@@ -1,5 +1,5 @@
 import React from "react";
-import { DollarSign, Users } from "lucide-react";
+import { Users, PoundSterling } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
@@ -17,32 +17,36 @@ export function DashboardStats({ totalClients, totalProjectValue }: DashboardSta
       label: "Total Clients",
       value: totalClients,
       icon: Users,
-      color: "bg-gradient-to-tr from-blue-500/60 to-blue-800/80 text-white",
+      iconColor: "text-blue-600",
+      bgColor: "bg-blue-50",
     },
     {
       label: "Total Project Value",
       value: totalProjectValue > 0 
         ? totalProjectValue.toLocaleString("en-GB", { style: "currency", currency: "GBP" })
         : "£0.00",
-      icon: DollarSign,
-      color: "bg-gradient-to-tr from-orange-400/70 to-orange-700/80 text-white",
+      icon: PoundSterling,
+      iconColor: "text-green-600", 
+      bgColor: "bg-green-50",
     },
   ];
 
   return (
-    <div className="flex flex-wrap gap-4">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       {stats.map((stat) => (
-        <Card key={stat.label} className={cn(
-          "flex-1 min-w-[180px] p-0 border-none shadow-md transition hover:scale-105 duration-200",
-          stat.color
-        )}>
-          <CardContent className="flex items-center gap-4 py-5">
-            <div className="rounded-full bg-white/20 p-2">
-              <stat.icon className="w-7 h-7" />
-            </div>
-            <div>
-              <div className="font-bold text-xl">{stat.value}</div>
-              <div className="text-sm opacity-80">{stat.label}</div>
+        <Card key={stat.label} className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-600 mb-1">{stat.label}</p>
+                <p className="text-2xl font-semibold text-gray-900">{stat.value}</p>
+              </div>
+              <div className={cn(
+                "p-3 rounded-lg",
+                stat.bgColor
+              )}>
+                <stat.icon className={cn("w-6 h-6", stat.iconColor)} />
+              </div>
             </div>
           </CardContent>
         </Card>

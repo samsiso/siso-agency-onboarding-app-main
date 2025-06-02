@@ -36,6 +36,18 @@ export function useClientsList(params: ClientsListParams = {}): ClientsListRespo
     try {
       setLoading(true);
       
+      // TEMPORARY: Force sample data for testing pipeline calculation
+      console.log('FORCE LOADING SAMPLE DATA FOR PIPELINE TESTING');
+      const filteredSampleClients = applySampleDataFilters(sampleClients, { searchQuery, statusFilter });
+      console.log('Sample clients loaded:', filteredSampleClients.length);
+      console.log('Sample clients with prices:', filteredSampleClients.map(c => ({ name: c.business_name, price: c.estimated_price })));
+      setClients(filteredSampleClients);
+      setTotalCount(filteredSampleClients.length);
+      setLoading(false);
+      return;
+
+      // COMMENTED OUT FOR TESTING - Database logic below
+      /*
       // Start building the query
       let query = supabase
         .from('client_onboarding')
@@ -144,6 +156,7 @@ export function useClientsList(params: ClientsListParams = {}): ClientsListRespo
 
       setClients(processedClients);
       setTotalCount(count || 0);
+      */
     } catch (err) {
       console.error('Unexpected error fetching clients:', err);
       // Fall back to sample data

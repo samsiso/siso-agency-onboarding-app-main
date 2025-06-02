@@ -658,3 +658,16 @@ The portfolio now tells a compelling story: "Choose SISO for premium solutions a
 - Plan: Create implementation strategy
 - Execute: Apply changes
 - Review: Test and refine
+
+## 🎯 **Current Focus: Execute Phase 4.3 - Pipeline Value Calculation Debugging**
+
+### **💰 Pipeline Value Debugging - January 25, 2025**
+- **Issue**: Total project value not displaying correctly in dashboard stats
+- **Expected Value**: £20,747 (249 + 0 + 15000 + 5000 + 0 + 249 + 249)
+- **Changes Made**:
+  - ✅ Updated DashboardStats currency format from USD to GBP (£)
+  - ✅ Added detailed console logging in AdminClientsView for total calculation
+  - ✅ Added client-by-client price logging to identify calculation issues
+  - ✅ Added debugging to DashboardStats component to verify received values
+- **Testing**: Navigate to http://localhost:8081/admin/clients and check browser console
+- **Sample Data Total**: Should display £20,747 from 13 clients with pricing data

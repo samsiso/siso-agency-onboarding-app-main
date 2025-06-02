@@ -7,6 +7,7 @@ import { useClientsList } from '@/hooks/client';
 import { DashboardStats } from './DashboardStats';
 import { PriorityListing } from './PriorityListing';
 import { ClientsHeader } from './ClientsHeader';
+import { notionSpacing } from '@/lib/design-tokens';
 
 const defaultViewPreference: ClientViewPreference = {
   columns: [
@@ -75,50 +76,55 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Dashboard stats */}
-      <DashboardStats
-        totalClients={statsTotalClients}
-        totalProjectValue={statsProjectValue}
-      />
-      {/* Priority Clients */}
-      <PriorityListing limit={3} />
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="space-y-6">
+          {/* Dashboard stats */}
+          <DashboardStats
+            totalClients={statsTotalClients}
+            totalProjectValue={statsProjectValue}
+          />
+          
+          {/* Priority Clients */}
+          <PriorityListing limit={3} />
 
-      {/* Controls with ClientsHeader */}
-      <ClientsHeader
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        statusFilter={statusFilter}
-        onStatusFilterChange={setStatusFilter}
-        viewPreference={viewPreference}
-        onViewPreferenceChange={handleViewPreferenceChange}
-        onAddClient={() => {}}
-        onRefetch={handleRefetch}
-        viewMode={viewMode}
-        setViewMode={setViewMode}
-      />
-
-      {/* Content View (Table or Cards) */}
-      <div>
-        {viewMode === "table" ? (
-          <ClientsEnhancedTable
+          {/* Controls with ClientsHeader */}
+          <ClientsHeader
             searchQuery={searchQuery}
-            statusFilter={statusFilter}
             onSearchChange={setSearchQuery}
-            onStatusFilterChange={setStatusFilter}
-            viewMode={viewMode}
-            setViewMode={setViewMode}
-          />
-        ) : (
-          <ClientsCardGrid
-            searchQuery={searchQuery}
             statusFilter={statusFilter}
-            sortColumn={viewPreference.sortColumn}
-            sortDirection={viewPreference.sortDirection}
+            onStatusFilterChange={setStatusFilter}
+            viewPreference={viewPreference}
+            onViewPreferenceChange={handleViewPreferenceChange}
+            onAddClient={() => {}}
+            onRefetch={handleRefetch}
             viewMode={viewMode}
             setViewMode={setViewMode}
           />
-        )}
+
+          {/* Content View (Table or Cards) */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            {viewMode === "table" ? (
+              <ClientsEnhancedTable
+                searchQuery={searchQuery}
+                statusFilter={statusFilter}
+                onSearchChange={setSearchQuery}
+                onStatusFilterChange={setStatusFilter}
+                viewMode={viewMode}
+                setViewMode={setViewMode}
+              />
+            ) : (
+              <ClientsCardGrid
+                searchQuery={searchQuery}
+                statusFilter={statusFilter}
+                sortColumn={viewPreference.sortColumn}
+                sortDirection={viewPreference.sortDirection}
+                viewMode={viewMode}
+                setViewMode={setViewMode}
+              />
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
