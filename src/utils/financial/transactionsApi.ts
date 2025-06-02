@@ -169,3 +169,36 @@ export async function createTransaction(transaction: Omit<FinancialTransaction, 
     return false;
   }
 }
+
+export async function updateTransaction(id: string, updates: Partial<FinancialTransaction>): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from("financial_transactions")
+      .update(updates)
+      .eq("id", id);
+
+    if (error) {
+      console.error("Error updating transaction:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update the transaction",
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    toast({
+      title: "Success",
+      description: "Transaction updated successfully",
+    });
+    return true;
+  } catch (err) {
+    console.error("Unexpected error updating transaction:", err);
+    toast({
+      title: "Error",
+      description: "An unexpected error occurred",
+      variant: "destructive"
+    });
+    return false;
+  }
+}

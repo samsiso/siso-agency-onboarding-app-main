@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { FinancialTransaction, deleteTransaction } from "@/utils/financial";
+import { FinancialTransaction, deleteTransaction, updateTransaction } from "@/utils/financial";
 import { Input } from "@/components/ui/input";
 import { useExpensesTableData } from "@/hooks/useExpensesTableData";
 import { formatCurrency } from "@/lib/formatters";
@@ -30,7 +30,7 @@ interface ExpensesTableProps {
 
 export function ExpensesTable({ expenses, isLoading, onDataChange }: ExpensesTableProps) {
   const [viewDetailsId, setViewDetailsId] = useState<string | null>(null);
-  const [editMode, setEditMode] = useState<boolean>(false);
+  const [editMode, setEditMode] = useState<boolean>(true);
   
   const {
     searchQuery,
@@ -97,21 +97,16 @@ export function ExpensesTable({ expenses, isLoading, onDataChange }: ExpensesTab
   // Handle updating an expense
   const handleUpdateExpense = async (expenseId: string, field: string, value: any) => {
     try {
-      // Here you would actually update the expense in your database
-      console.log(`Updating expense ${expenseId}, setting ${field} to ${value}`);
-      // For now, just refresh the data
-      await onDataChange();
-      
-      // Show success toast
-      toast({
-        title: "Expense updated",
-        description: "The expense has been successfully updated.",
-      });
+      const updates = { [field]: value };
+      const success = await updateTransaction(expenseId, updates);
+      if (success) {
+        await onDataChange();
+      }
     } catch (error) {
       toast({
         title: "Error updating expense",
         description: "There was a problem updating the expense.",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
