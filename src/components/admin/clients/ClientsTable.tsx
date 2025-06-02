@@ -99,8 +99,7 @@ export function ClientsTable({
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="space-y-6">
-        {/* Removed <ClientsHeader /> - no duplicate bar! */}
+      <div className="h-full flex flex-col">
         {selectedClients.length > 0 && (
           <BulkActionsBar
             selectedCount={selectedClients.length}
@@ -111,11 +110,11 @@ export function ClientsTable({
           />
         )}
         
-        <div ref={tableContainerRef} className="relative rounded-lg overflow-hidden border border-gray-800/30 bg-gray-900/40 shadow-lg backdrop-blur-sm">
+        <div ref={tableContainerRef} className="flex-1 relative rounded-lg overflow-hidden border border-gray-700 bg-gray-900/60 shadow-lg backdrop-blur-sm">
           <ScrollableTable pinnedColumns={pinnedColumns}>
             <Table ref={tableElementRef} className={cn(
               tableStyles(),
-              "backdrop-blur-sm [&_th]:bg-gray-900/95 [&_th]:text-gray-100 [&_td]:bg-transparent [&_tr:hover]:bg-gray-800/30 [&_tr:nth-child(even)]:bg-gray-900/20"
+              "backdrop-blur-sm [&_th]:bg-gray-900/95 [&_th]:text-gray-100 [&_th]:border-gray-700 [&_td]:bg-transparent [&_td]:border-gray-800 [&_tr:hover]:bg-gray-800/50 [&_tr:nth-child(even)]:bg-gray-900/30"
             )}>
               <ClientTableHeader
                 visibleColumns={visibleColumns}
@@ -143,11 +142,14 @@ export function ClientsTable({
           </ScrollableTable>
         </div>
 
-        <ClientTablePagination
-          page={page}
-          totalPages={totalPages}
-          onPageChange={setPage}
-        />
+        <div className="mt-4">
+          <ClientTablePagination
+            page={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+        </div>
+        
         <ClientAddForm 
           open={isAddClientOpen} 
           onOpenChange={setIsAddClientOpen} 

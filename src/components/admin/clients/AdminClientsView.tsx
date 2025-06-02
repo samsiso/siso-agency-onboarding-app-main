@@ -76,8 +76,8 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-black">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="space-y-6">
           {/* Dashboard stats */}
           <DashboardStats
@@ -102,27 +102,29 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
             setViewMode={setViewMode}
           />
 
-          {/* Content View (Table or Cards) */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            {viewMode === "table" ? (
-              <ClientsEnhancedTable
-                searchQuery={searchQuery}
-                statusFilter={statusFilter}
-                onSearchChange={setSearchQuery}
-                onStatusFilterChange={setStatusFilter}
-                viewMode={viewMode}
-                setViewMode={setViewMode}
-              />
-            ) : (
-              <ClientsCardGrid
-                searchQuery={searchQuery}
-                statusFilter={statusFilter}
-                sortColumn={viewPreference.sortColumn}
-                sortDirection={viewPreference.sortDirection}
-                viewMode={viewMode}
-                setViewMode={setViewMode}
-              />
-            )}
+          {/* Content View (Table or Cards) - Full Height */}
+          <div className="bg-gray-900 rounded-lg border border-gray-800 h-[calc(100vh-24rem)] flex flex-col">
+            <div className="flex-1 overflow-hidden">
+              {viewMode === "table" ? (
+                <ClientsEnhancedTable
+                  searchQuery={searchQuery}
+                  statusFilter={statusFilter}
+                  onSearchChange={setSearchQuery}
+                  onStatusFilterChange={setStatusFilter}
+                  viewMode={viewMode}
+                  setViewMode={setViewMode}
+                />
+              ) : (
+                <ClientsCardGrid
+                  searchQuery={searchQuery}
+                  statusFilter={statusFilter}
+                  sortColumn={viewPreference.sortColumn}
+                  sortDirection={viewPreference.sortDirection}
+                  viewMode={viewMode}
+                  setViewMode={setViewMode}
+                />
+              )}
+            </div>
           </div>
         </div>
       </div>

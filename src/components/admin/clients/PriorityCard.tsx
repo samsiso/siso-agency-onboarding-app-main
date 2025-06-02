@@ -14,20 +14,20 @@ interface PriorityCardProps {
 export function PriorityCard({ client, onClick }: PriorityCardProps) {
   return (
     <Card 
-      className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group"
+      className="bg-gray-900/50 border border-orange-500/30 hover:border-orange-500/50 transition-all duration-200 cursor-pointer group backdrop-blur-sm"
       onClick={onClick}
     >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+            <h3 className="font-semibold text-white group-hover:text-orange-300 transition-colors">
               {client.business_name || client.full_name}
             </h3>
-            <p className="text-sm text-gray-600 mt-1">{client.project_name || 'No project name'}</p>
+            <p className="text-sm text-gray-400 mt-1">{client.project_name || 'No project name'}</p>
           </div>
           <Badge 
-            variant="secondary" 
-            className="bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100"
+            variant="outline" 
+            className="bg-orange-500/20 text-orange-300 border-orange-500/30 hover:bg-orange-500/30"
           >
             Priority
           </Badge>
@@ -44,10 +44,10 @@ export function PriorityCard({ client, onClick }: PriorityCardProps) {
           </div>
           
           <div className="flex items-start gap-2">
-            <AlertTriangle className="h-4 w-4 text-orange-500 mt-0.5 flex-shrink-0" />
+            <AlertTriangle className="h-4 w-4 text-orange-400 mt-0.5 flex-shrink-0" />
             <div>
-              <p className="text-sm font-medium text-gray-900">Requires immediate attention</p>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm font-medium text-white">Requires immediate attention</p>
+              <p className="text-sm text-gray-400 mt-1">
                 {client.todos && client.todos.length > 0
                   ? `${client.todos.length} pending tasks`
                   : 'No pending tasks'}
@@ -61,7 +61,7 @@ export function PriorityCard({ client, onClick }: PriorityCardProps) {
         <Button 
           variant="ghost" 
           size="sm" 
-          className="ml-auto text-blue-600 hover:text-blue-700 hover:bg-blue-50 transition-colors"
+          className="ml-auto text-orange-300 hover:text-orange-200 hover:bg-orange-500/20 transition-colors"
           onClick={(e) => {
             e.stopPropagation();
             onClick?.();
