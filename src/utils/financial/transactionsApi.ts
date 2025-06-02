@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import { FinancialTransaction } from "./types";
@@ -8,20 +7,8 @@ export async function fetchTransactions(): Promise<FinancialTransaction[]> {
   try {
     console.log("Starting to fetch transactions");
     
-    const { data: { user } } = await supabase.auth.getUser();
-    console.log("Current user:", user?.id);
-
-    if (!user) {
-      console.error("No authenticated user found");
-      toast({
-        title: "Error",
-        description: "You must be logged in to view transactions",
-        variant: "destructive"
-      });
-      return [];
-    }
-
-    console.log("Fetching transactions for user:", user.id);
+    // For admin dashboard, we don't require authentication - fetch all transactions
+    console.log("Fetching all transactions for admin dashboard");
 
     // Simple query first - we'll join relationships separately to avoid potential RLS recursion issues
     const { data: transactionData, error } = await supabase

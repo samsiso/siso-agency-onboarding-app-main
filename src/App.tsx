@@ -31,6 +31,7 @@ import AdminDailyPlanner from './pages/AdminDailyPlanner';
 import ClientDetailPage from './pages/ClientDetailPage';
 import AdminTasks from './pages/AdminTasks';
 import AdminSettings from './pages/AdminSettings';
+import AdminPrompts from './pages/AdminPrompts';
 import { TeamMemberTasksView } from './components/admin/tasks/TeamMemberTasksView';
 import TeamMemberTasksPage from './pages/TeamMemberTasksPage';
 import ClientDashboard from "./pages/ClientDashboard";
@@ -83,8 +84,10 @@ function App() {
         
         {/* Admin routes - using adminOnly prop to enforce admin access */}
         <Route path="/admin" element={<AuthGuard adminOnly={true}><AdminDashboard /></AuthGuard>} />
+        <Route path="/admin/dashboard" element={<AuthGuard adminOnly={true}><AdminDashboard /></AuthGuard>} />
         <Route path="/admin/clients" element={<AuthGuard adminOnly={true}><AdminClients /></AuthGuard>} />
         <Route path="/admin/clients/:clientId" element={<AuthGuard adminOnly={true}><ClientDetailPage /></AuthGuard>} />
+        <Route path="/admin/prompts" element={<AuthGuard adminOnly={true}><AdminPrompts /></AuthGuard>} />
         <Route path="/admin/outreach" element={<AuthGuard adminOnly={true}><AdminOutreach /></AuthGuard>} />
         <Route path="/admin/templates" element={<AuthGuard adminOnly={true}><AdminTemplates /></AuthGuard>} />
         <Route path="/admin/teams" element={<AuthGuard adminOnly={true}><AdminTeams /></AuthGuard>} />

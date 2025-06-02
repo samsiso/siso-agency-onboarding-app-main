@@ -4,9 +4,9 @@ export const sampleClients: ClientData[] = [
   {
     id: '1',
     full_name: 'Nick Merson',
-    email: null,
+    email: 'nick@gritness.com',
     business_name: 'Gritness',
-    phone: null,
+    phone: '+44 7123 456789',
     avatar_url: null,
     status: 'Not contacted',
     progress: 'In Progress',
@@ -16,10 +16,10 @@ export const sampleClients: ClientData[] = [
     created_at: '2025-01-25T00:00:00Z',
     updated_at: '2025-01-25T00:00:00Z',
     website_url: 'https://gritnessgym.vercel.app/',
-    professional_role: 'Owner',
-    bio: 'Gym',
-    project_name: 'Gritness',
-    company_niche: 'Gym',
+    professional_role: 'Gym Owner & Personal Trainer',
+    bio: 'Experienced fitness trainer specializing in strength training and conditioning. Founded Gritness to provide accessible fitness solutions.',
+    project_name: 'Gritness Fitness Platform',
+    company_niche: 'Fitness & Health',
     development_url: 'https://gritnessgym.vercel.app/',
     mvp_build_status: 'In Progress',
     notion_plan_url: 'https://sprout-draw-9ec.notion.site/Gym-Client-1b549797be6880a9a8bbdae7bd70e8d7?pvs=4',
@@ -29,15 +29,41 @@ export const sampleClients: ClientData[] = [
     start_date: '2025-01-21T00:00:00Z',
     estimated_completion_date: '2025-04-01T00:00:00Z',
     contact_name: 'Nick Merson',
-    next_steps: 'Continue development',
-    priority: 'high'
+    next_steps: 'Implement booking system and payment integration',
+    key_research: 'Fitness app market analysis, competitor study of MyFitnessPal and ClassPass',
+    priority: 'high',
+    todos: [
+      {
+        id: '1',
+        text: 'Complete payment gateway integration',
+        completed: false,
+        priority: 'high',
+        due_date: '2025-02-15',
+        assigned_to: 'Dev Team'
+      },
+      {
+        id: '2',
+        text: 'Implement class booking system',
+        completed: false,
+        priority: 'medium',
+        due_date: '2025-02-20',
+        assigned_to: 'Frontend Dev'
+      },
+      {
+        id: '3',
+        text: 'Create trainer profiles',
+        completed: true,
+        priority: 'medium',
+        assigned_to: 'Designer'
+      }
+    ]
   },
   {
     id: '2',
     full_name: 'Nick Merson',
-    email: null,
+    email: 'nick@nmconstruction.co.uk',
     business_name: 'NM Construction',
-    phone: null,
+    phone: '+44 7987 654321',
     avatar_url: null,
     status: 'Contacted',
     progress: 'In Progress',
@@ -47,10 +73,10 @@ export const sampleClients: ClientData[] = [
     created_at: '2025-01-25T00:00:00Z',
     updated_at: '2025-01-25T00:00:00Z',
     website_url: 'https://nm-construction.vercel.app/',
-    professional_role: 'Owner',
-    bio: 'Construction',
-    project_name: 'NM Construction',
-    company_niche: 'Construction',
+    professional_role: 'Construction Company Owner',
+    bio: 'Established construction business specializing in residential and commercial projects across London.',
+    project_name: 'NM Construction Website',
+    company_niche: 'Construction & Building',
     development_url: 'https://nm-construction.vercel.app/',
     mvp_build_status: 'In Progress',
     notion_plan_url: 'https://sprout-draw-9ec.notion.site/APP-PLAN-1c149797be6880eb9ddcea624886102e?pvs=4',
@@ -60,15 +86,33 @@ export const sampleClients: ClientData[] = [
     start_date: '2025-01-03T00:00:00Z',
     estimated_completion_date: null,
     contact_name: 'Nick Merson',
-    next_steps: 'Requirements gathering',
-    priority: 'medium'
+    next_steps: 'Finalize requirements and project scope',
+    key_research: 'Construction industry web presence best practices, lead generation optimization',
+    priority: 'medium',
+    todos: [
+      {
+        id: '4',
+        text: 'Gather detailed requirements',
+        completed: true,
+        priority: 'high',
+        assigned_to: 'Project Manager'
+      },
+      {
+        id: '5',
+        text: 'Create project timeline',
+        completed: false,
+        priority: 'medium',
+        due_date: '2025-02-10',
+        assigned_to: 'Project Manager'
+      }
+    ]
   },
   {
     id: '3',
     full_name: 'Nick Merson',
-    email: null,
+    email: 'nick@optimalconstruction.co.uk',
     business_name: 'OPTIMAL CONSTRUCTION',
-    phone: null,
+    phone: '+44 7456 123789',
     avatar_url: null,
     status: 'Waiting on client',
     progress: 'In Progress',
@@ -78,10 +122,10 @@ export const sampleClients: ClientData[] = [
     created_at: '2025-01-25T00:00:00Z',
     updated_at: '2025-01-25T00:00:00Z',
     website_url: 'https://optimal-building-maintenance.vercel.app/',
-    professional_role: 'Owner',
-    bio: 'Construction',
-    project_name: 'OPTIMAL CONSTRUCTION',
-    company_niche: 'Construction',
+    professional_role: 'Construction Company Director',
+    bio: 'Premium construction and maintenance services for high-end residential and commercial properties.',
+    project_name: 'Optimal Construction Platform',
+    company_niche: 'Premium Construction & Maintenance',
     development_url: 'https://optimal-building-maintenance.vercel.app/',
     mvp_build_status: 'In Progress',
     notion_plan_url: 'https://sprout-draw-9ec.notion.site/Optimal-Construction-App-Plan-1c449797be688094a7f4caed01d5c992?pvs=4',
@@ -91,15 +135,34 @@ export const sampleClients: ClientData[] = [
     start_date: '2025-01-03T00:00:00Z',
     estimated_completion_date: null,
     contact_name: 'Nick Merson',
-    next_steps: 'Client feedback review',
-    priority: 'high'
+    next_steps: 'Review client feedback on design mockups',
+    key_research: 'Premium construction market positioning, luxury brand aesthetics analysis',
+    priority: 'high',
+    todos: [
+      {
+        id: '6',
+        text: 'Review client feedback on designs',
+        completed: false,
+        priority: 'high',
+        due_date: '2025-02-05',
+        assigned_to: 'Design Team'
+      },
+      {
+        id: '7',
+        text: 'Implement design revisions',
+        completed: false,
+        priority: 'medium',
+        due_date: '2025-02-12',
+        assigned_to: 'Frontend Dev'
+      }
+    ]
   },
   {
     id: '4',
     full_name: 'SISO',
-    email: null,
+    email: 'hello@ubahcryp.com',
     business_name: 'UbahCryp',
-    phone: null,
+    phone: '+44 7321 987654',
     avatar_url: null,
     status: 'Feedback from app',
     progress: 'Completed',
@@ -109,10 +172,10 @@ export const sampleClients: ClientData[] = [
     created_at: '2025-01-25T00:00:00Z',
     updated_at: '2025-01-25T00:00:00Z',
     website_url: 'https://ubahcrypcom.vercel.app/',
-    professional_role: 'Founder',
-    bio: 'Web3 Trading',
-    project_name: 'UbahCryp',
-    company_niche: 'Web3 Trading',
+    professional_role: 'Cryptocurrency Trading Platform Founder',
+    bio: 'Blockchain enthusiast and trader with expertise in DeFi protocols and cryptocurrency market analysis.',
+    project_name: 'UbahCryp Trading Platform',
+    company_niche: 'Web3 & Cryptocurrency Trading',
     development_url: 'https://ubahcrypcom.vercel.app/',
     mvp_build_status: 'Completed',
     notion_plan_url: 'https://sprout-draw-9ec.notion.site/APP-PLAN-1c349797be6880a18876de37e53f1c61?pvs=4',
@@ -122,15 +185,40 @@ export const sampleClients: ClientData[] = [
     start_date: '2025-03-21T00:00:00Z',
     estimated_completion_date: '2025-03-20T00:00:00Z',
     contact_name: 'SISO',
-    next_steps: 'Maintenance & support',
-    priority: 'high'
+    next_steps: 'Ongoing maintenance and feature enhancement',
+    key_research: 'Cryptocurrency exchange UI/UX patterns, regulatory compliance requirements',
+    priority: 'high',
+    todos: [
+      {
+        id: '8',
+        text: 'Deploy to production',
+        completed: true,
+        priority: 'high',
+        assigned_to: 'DevOps'
+      },
+      {
+        id: '9',
+        text: 'Setup monitoring and analytics',
+        completed: true,
+        priority: 'medium',
+        assigned_to: 'Backend Dev'
+      },
+      {
+        id: '10',
+        text: 'Client training session',
+        completed: false,
+        priority: 'medium',
+        due_date: '2025-02-01',
+        assigned_to: 'Project Manager'
+      }
+    ]
   },
   {
     id: '5',
     full_name: 'ALJ',
-    email: null,
+    email: 'hello@elementree.co.uk',
     business_name: 'Elementree',
-    phone: null,
+    phone: '+44 7654 321987',
     avatar_url: null,
     status: 'Not contacted',
     progress: 'In Progress',
@@ -140,10 +228,10 @@ export const sampleClients: ClientData[] = [
     created_at: '2025-01-25T00:00:00Z',
     updated_at: '2025-01-25T00:00:00Z',
     website_url: 'https://elementree.vercel.app/',
-    professional_role: 'Owner',
-    bio: 'Restaurant',
-    project_name: 'Elementree',
-    company_niche: 'Restaurant',
+    professional_role: 'Restaurant Owner & Chef',
+    bio: 'Passionate chef running a modern fusion restaurant focused on sustainable and locally-sourced ingredients.',
+    project_name: 'Elementree Restaurant Platform',
+    company_niche: 'Restaurant & Food Service',
     development_url: 'https://elementree.vercel.app/',
     mvp_build_status: 'In Progress',
     notion_plan_url: 'https://sprout-draw-9ec.notion.site/Elementree-Client-1be49797be688097a460d838c4db0178?pvs=4',
@@ -153,15 +241,34 @@ export const sampleClients: ClientData[] = [
     start_date: null,
     estimated_completion_date: null,
     contact_name: 'ALJ',
-    next_steps: 'Continue development',
-    priority: 'medium'
+    next_steps: 'Implement online ordering and reservation system',
+    key_research: 'Restaurant POS system integrations, food delivery platform APIs',
+    priority: 'medium',
+    todos: [
+      {
+        id: '11',
+        text: 'Design menu management system',
+        completed: false,
+        priority: 'high',
+        due_date: '2025-02-08',
+        assigned_to: 'Backend Dev'
+      },
+      {
+        id: '12',
+        text: 'Integrate payment processing',
+        completed: false,
+        priority: 'high',
+        due_date: '2025-02-15',
+        assigned_to: 'Full Stack Dev'
+      }
+    ]
   },
   {
     id: '6',
     full_name: 'IBBY',
-    email: null,
+    email: 'info@trojanmma.co.uk',
     business_name: 'Trojan MMA',
-    phone: null,
+    phone: '+44 7789 654123',
     avatar_url: null,
     status: 'Not contacted',
     progress: 'In Progress',
@@ -171,10 +278,10 @@ export const sampleClients: ClientData[] = [
     created_at: '2025-01-25T00:00:00Z',
     updated_at: '2025-01-25T00:00:00Z',
     website_url: 'https://trojan-mma.vercel.app/',
-    professional_role: 'Owner',
-    bio: 'MMA GYM',
-    project_name: 'Trojan MMA',
-    company_niche: 'MMA GYM',
+    professional_role: 'MMA Gym Owner & Head Coach',
+    bio: 'Professional MMA coach with 15+ years experience training fighters at all levels from amateur to professional.',
+    project_name: 'Trojan MMA Training Platform',
+    company_niche: 'Mixed Martial Arts & Combat Sports',
     development_url: 'https://trojan-mma.vercel.app/',
     mvp_build_status: 'In Progress',
     notion_plan_url: 'https://sprout-draw-9ec.notion.site/Trojan-MMA-Client-1bd49797be688012965cf72cea1aa939?pvs=4',
@@ -184,8 +291,34 @@ export const sampleClients: ClientData[] = [
     start_date: null,
     estimated_completion_date: '2025-03-27T00:00:00Z',
     contact_name: 'IBBY',
-    next_steps: 'Initial contact',
-    priority: 'medium'
+    next_steps: 'Initial consultation and requirements gathering',
+    key_research: 'MMA gym management software, fighter training tracking systems',
+    priority: 'medium',
+    todos: [
+      {
+        id: '13',
+        text: 'Schedule initial client meeting',
+        completed: false,
+        priority: 'high',
+        due_date: '2025-02-03',
+        assigned_to: 'Sales Team'
+      },
+      {
+        id: '14',
+        text: 'Prepare project proposal',
+        completed: false,
+        priority: 'medium',
+        due_date: '2025-02-05',
+        assigned_to: 'Project Manager'
+      },
+      {
+        id: '15',
+        text: 'Research competitor websites',
+        completed: true,
+        priority: 'low',
+        assigned_to: 'Research Team'
+      }
+    ]
   },
   {
     id: '7',

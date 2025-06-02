@@ -1,9 +1,8 @@
-
 import { 
   LayoutDashboard, Users, MessageSquare, UserCheck,
   ListTodo, CalendarClock, CreditCard, Settings,
   ClipboardList, Building2, UserCog, FileText,
-  ScrollText
+  ScrollText, Zap, Bot, Database
 } from 'lucide-react';
 import { MenuSection } from './types';
 
@@ -51,6 +50,23 @@ export const getAdminMenuSections = (): MenuSection[] => {
     },
     {
       type: 'section',
+      title: 'Automation Tools',
+      icon: Zap,
+      items: [
+        {
+          href: '/admin/prompts',
+          icon: Database,
+          label: 'Prompt Manager',
+        },
+        {
+          href: '/admin/templates',
+          icon: FileText,
+          label: 'Templates',
+        }
+      ]
+    },
+    {
+      type: 'section',
       title: 'Business Tools',
       icon: ScrollText,
       items: [
@@ -63,11 +79,6 @@ export const getAdminMenuSections = (): MenuSection[] => {
           href: '/admin/payments',
           icon: CreditCard,
           label: 'Financials',
-        },
-        {
-          href: '/admin/templates',
-          icon: FileText,
-          label: 'Templates',
         }
       ]
     },

@@ -1,161 +1,340 @@
 import React from 'react';
 import { ClientData } from '@/types/client.types';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { CalendarCheck, FileText, Clock, DollarSign, Users, AlertTriangle } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Building, 
+  Globe, 
+  DollarSign, 
+  Calendar, 
+  User, 
+  Briefcase,
+  Target,
+  Clock,
+  FileText,
+  ExternalLink,
+  CheckCircle,
+  AlertCircle,
+  PlayCircle,
+  TrendingUp,
+  Zap
+} from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
 
 interface ClientProjectOverviewProps {
   client: ClientData;
 }
 
 export function ClientProjectOverview({ client }: ClientProjectOverviewProps) {
-  const completionPercentage = client.total_steps ? 
-    Math.round((client.current_step / client.total_steps) * 100) : 0;
-
-  // This would typically come from the database, hardcoding for the demonstration
-  const projectStatus = {
-    timeline: { status: 'on-track', description: 'Project is currently on schedule' },
-    budget: { status: 'warning', description: 'Budget is 15% over projection' },
-    team: { status: 'success', description: 'All team members assigned' },
-    deliverables: { status: 'pending', description: '2 deliverables awaiting client approval' }
+  const getProgressColor = (progress: string) => {
+    switch (progress?.toLowerCase()) {
+      case 'completed': return 'bg-gradient-to-r from-orange-500/20 to-amber-500/20 text-orange-300 border-orange-500/40 shadow-orange-500/20';
+      case 'in progress': return 'bg-gradient-to-r from-orange-500/20 to-amber-500/20 text-orange-300 border-orange-500/40 shadow-orange-500/20';
+      case 'mvp building': return 'bg-gradient-to-r from-orange-500/20 to-amber-500/20 text-orange-300 border-orange-500/40 shadow-orange-500/20';
+      case 'mvp built': return 'bg-gradient-to-r from-orange-500/20 to-amber-500/20 text-orange-300 border-orange-500/40 shadow-orange-500/20';
+      case 'production': return 'bg-gradient-to-r from-orange-500/20 to-amber-500/20 text-orange-300 border-orange-500/40 shadow-orange-500/20';
+      case 'in development': return 'bg-gradient-to-r from-orange-500/20 to-amber-500/20 text-orange-300 border-orange-500/40 shadow-orange-500/20';
+      default: return 'bg-gradient-to-r from-gray-500/20 to-slate-500/20 text-gray-300 border-gray-500/40 shadow-gray-500/20';
+    }
   };
 
-  // Project vitals would also come from the database in a real implementation
-  const projectVitals = {
-    startDate: client.start_date ? new Date(client.start_date).toLocaleDateString() : 'Not started',
-    estimatedCompletionDate: client.estimated_completion_date ? 
-      new Date(client.estimated_completion_date).toLocaleDateString() : 'Not set',
-    price: client.estimated_price ? `$${client.estimated_price.toLocaleString()}` : 'Not set',
-    paymentStatus: client.payment_status || 'Not specified',
-    nextMilestone: 'Wireframe Approval',
-    nextMilestoneDate: '2023-06-15'
+  const getStatusIcon = (progress: string) => {
+    switch (progress?.toLowerCase()) {
+      case 'completed': return <CheckCircle className="w-4 h-4" />;
+      case 'in progress': return <PlayCircle className="w-4 h-4" />;
+      case 'mvp building': return <AlertCircle className="w-4 h-4" />;
+      case 'mvp built': return <CheckCircle className="w-4 h-4" />;
+      case 'production': return <CheckCircle className="w-4 h-4" />;
+      case 'in development': return <PlayCircle className="w-4 h-4" />;
+      default: return <Clock className="w-4 h-4" />;
+    }
   };
 
   return (
-    <div className="space-y-6">
-      <Card className="bg-gray-900/50 border-gray-700/30">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-gray-100">Project Overview</CardTitle>
-          <CardDescription className="text-gray-400">
-            Summary of {client.project_name || 'the project'} for {client.full_name || client.business_name}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="text-lg font-medium mb-2 text-gray-200">Project Completion</h3>
-              <div className="flex items-center gap-4 mb-2">
-                <Progress value={completionPercentage} className="h-2" />
-                <span className="text-sm font-medium text-gray-300">{completionPercentage}%</span>
-              </div>
-              
-              <h3 className="text-lg font-medium mt-4 mb-2 text-gray-200">Project Status</h3>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-400">Timeline</span>
-                  <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    projectStatus.timeline.status === 'on-track' ? 'bg-blue-900/60 text-blue-300 border border-blue-700/30' :
-                    projectStatus.timeline.status === 'warning' ? 'bg-yellow-900/60 text-yellow-300 border border-yellow-700/30' :
-                    projectStatus.timeline.status === 'success' ? 'bg-green-900/60 text-green-300 border border-green-700/30' :
-                    'bg-gray-800/60 text-gray-300 border border-gray-700/30'
-                  }`}>
-                    {projectStatus.timeline.status}
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-400">Budget</span>
-                  <div className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-900/60 text-yellow-300 border border-yellow-700/30">
-                    {projectStatus.budget.status}
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-400">Team</span>
-                  <div className="px-2 py-1 rounded-full text-xs font-medium bg-green-900/60 text-green-300 border border-green-700/30">
-                    {projectStatus.team.status}
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-400">Deliverables</span>
-                  <div className="px-2 py-1 rounded-full text-xs font-medium bg-gray-800/60 text-gray-300 border border-gray-700/30">
-                    {projectStatus.deliverables.status}
-                  </div>
-                </div>
-              </div>
+    <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+      {/* Business Information */}
+      <Card className="bg-gradient-to-br from-gray-900/60 to-black/40 border-orange-500/30 shadow-xl shadow-orange-500/10 hover:shadow-orange-500/20 transition-all duration-300 backdrop-blur-sm">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-3 text-white text-lg">
+            <div className="p-2 bg-orange-500/20 rounded-lg backdrop-blur-sm border border-orange-400/30">
+              <Building className="w-5 h-5 text-orange-400" />
             </div>
+            <span className="bg-gradient-to-r from-orange-400 to-amber-400 bg-clip-text text-transparent">
+              Business Information
+            </span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="p-4 bg-orange-800/20 rounded-lg border border-orange-700/30">
+            <p className="text-sm text-orange-200/80 font-medium mb-1">Business Name</p>
+            <p className="font-semibold text-white text-lg">{client.business_name || 'Not specified'}</p>
+          </div>
+          <div className="p-4 bg-orange-800/20 rounded-lg border border-orange-700/30">
+            <p className="text-sm text-orange-200/80 font-medium mb-1">Contact Person</p>
+            <p className="font-semibold text-white">{client.full_name || 'Not specified'}</p>
+          </div>
+          <div className="p-4 bg-orange-800/20 rounded-lg border border-orange-700/30">
+            <p className="text-sm text-orange-200/80 font-medium mb-1">Industry</p>
+            <p className="font-semibold text-white">{client.company_niche || 'Not specified'}</p>
+          </div>
+          <div className="p-4 bg-orange-800/20 rounded-lg border border-orange-700/30">
+            <p className="text-sm text-orange-200/80 font-medium mb-1">Professional Role</p>
+            <p className="font-semibold text-white">{client.professional_role || client.bio || 'Not specified'}</p>
+          </div>
+        </CardContent>
+      </Card>
 
-            <div>
-              <h3 className="text-lg font-medium mb-2 text-gray-200">Project Vitals</h3>
-              <div className="grid grid-cols-1 gap-2">
-                <div className="flex items-center gap-2">
-                  <CalendarCheck className="h-4 w-4 text-gray-400" />
-                  <span className="text-sm font-medium text-gray-300">Start Date:</span>
-                  <span className="text-sm text-gray-400">{projectVitals.startDate}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-gray-400" />
-                  <span className="text-sm font-medium text-gray-300">Estimated Completion:</span>
-                  <span className="text-sm text-gray-400">{projectVitals.estimatedCompletionDate}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <DollarSign className="h-4 w-4 text-gray-400" />
-                  <span className="text-sm font-medium text-gray-300">Project Value:</span>
-                  <span className="text-sm text-gray-400">{projectVitals.price}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-gray-400" />
-                  <span className="text-sm font-medium text-gray-300">Payment Status:</span>
-                  <span className="text-sm text-gray-400">{projectVitals.paymentStatus}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4 text-gray-400" />
-                  <span className="text-sm font-medium text-gray-300">Next Milestone:</span>
-                  <span className="text-sm text-gray-400">{projectVitals.nextMilestone} ({projectVitals.nextMilestoneDate})</span>
-                </div>
-              </div>
+      {/* Project Details */}
+      <Card className="bg-gradient-to-br from-gray-900/60 to-black/40 border-orange-500/30 shadow-xl shadow-orange-500/10 hover:shadow-orange-500/20 transition-all duration-300 backdrop-blur-sm">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-3 text-white text-lg">
+            <div className="p-2 bg-orange-500/20 rounded-lg backdrop-blur-sm border border-orange-400/30">
+              <Briefcase className="w-5 h-5 text-orange-400" />
+            </div>
+            <span className="bg-gradient-to-r from-orange-400 to-amber-400 bg-clip-text text-transparent">
+              Project Details
+            </span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="p-4 bg-orange-800/20 rounded-lg border border-orange-700/30">
+            <p className="text-sm text-orange-200/80 font-medium mb-1">Project Name</p>
+            <p className="font-semibold text-white text-lg">{client.project_name || 'Not specified'}</p>
+          </div>
+          <div className="p-4 bg-orange-800/20 rounded-lg border border-orange-700/30">
+            <p className="text-sm text-orange-200/80 font-medium mb-2">Progress Status</p>
+            <Badge className={`border shadow-sm ${getProgressColor(client.progress || 'Not Started')}`}>
+              <span className="flex items-center gap-1.5 font-medium">
+                {getStatusIcon(client.progress || 'Not Started')}
+                {client.progress || 'Not Started'}
+              </span>
+            </Badge>
+          </div>
+          <div className="p-4 bg-orange-800/20 rounded-lg border border-orange-700/30">
+            <p className="text-sm text-orange-200/80 font-medium mb-2">Current Phase</p>
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-semibold text-white">
+                Step {client.current_step || 0} of {client.total_steps || 10}
+              </span>
+              <span className="text-sm text-orange-300 font-medium">
+                {Math.round(((client.current_step || 0) / (client.total_steps || 10)) * 100)}%
+              </span>
+            </div>
+            <div className="w-full bg-orange-900/40 rounded-full h-3 border border-orange-800/50">
+              <div 
+                className="bg-gradient-to-r from-orange-500 to-amber-500 h-3 rounded-full transition-all duration-500 shadow-lg shadow-orange-500/30" 
+                style={{ width: `${((client.current_step || 0) / (client.total_steps || 10)) * 100}%` }}
+              ></div>
             </div>
           </div>
+          <div className="p-4 bg-orange-800/20 rounded-lg border border-orange-700/30">
+            <p className="text-sm text-orange-200/80 font-medium mb-1">MVP Build Status</p>
+            <p className="font-semibold text-white">{client.mvp_build_status || 'Not started'}</p>
+          </div>
+        </CardContent>
+      </Card>
 
-          {projectStatus.budget.status === 'warning' && (
-            <Alert className="mt-6 border-yellow-700/40 bg-yellow-900/20 text-yellow-300">
-              <AlertTriangle className="h-4 w-4 text-yellow-400" />
-              <AlertTitle className="text-yellow-300">Budget Warning</AlertTitle>
-              <AlertDescription className="text-yellow-400">
-                {projectStatus.budget.description}
-              </AlertDescription>
-            </Alert>
+      {/* Financial Information */}
+      <Card className="bg-gradient-to-br from-gray-900/60 to-black/40 border-orange-500/30 shadow-xl shadow-orange-500/10 hover:shadow-orange-500/20 transition-all duration-300 backdrop-blur-sm">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-3 text-white text-lg">
+            <div className="p-2 bg-orange-500/20 rounded-lg backdrop-blur-sm border border-orange-400/30">
+              <DollarSign className="w-5 h-5 text-orange-400" />
+            </div>
+            <span className="bg-gradient-to-r from-orange-400 to-amber-400 bg-clip-text text-transparent">
+              Financial Information
+            </span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="p-4 bg-orange-800/20 rounded-lg border border-orange-700/30">
+            <p className="text-sm text-orange-200/80 font-medium mb-1">Project Value</p>
+            <p className="font-semibold text-3xl text-orange-400 font-mono">
+              {client.estimated_price 
+                ? `£${client.estimated_price.toLocaleString()}` 
+                : '£0'
+              }
+            </p>
+          </div>
+          <div className="p-4 bg-orange-800/20 rounded-lg border border-orange-700/30">
+            <p className="text-sm text-orange-200/80 font-medium mb-2">Payment Status</p>
+            <Badge 
+              variant={client.payment_status === 'Confirmed' ? 'default' : 'outline'}
+              className="bg-orange-500/20 text-orange-300 border-orange-500/40"
+            >
+              {client.payment_status || 'Not Invoiced'}
+            </Badge>
+          </div>
+          <div className="p-4 bg-orange-800/20 rounded-lg border border-orange-700/30">
+            <p className="text-sm text-orange-200/80 font-medium mb-2">Priority Level</p>
+            <Badge 
+              variant={client.priority === 'high' ? 'destructive' : 'secondary'}
+              className={client.priority === 'high' 
+                ? 'bg-red-500/20 text-red-300 border-red-500/40' 
+                : 'bg-orange-500/20 text-orange-300 border-orange-500/40'
+              }
+            >
+              <Zap className="w-3 h-3 mr-1" />
+              {client.priority || 'Medium'}
+            </Badge>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Timeline Information */}
+      <Card className="bg-gradient-to-br from-gray-900/60 to-black/40 border-orange-500/30 shadow-xl shadow-orange-500/10 hover:shadow-orange-500/20 transition-all duration-300 backdrop-blur-sm">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-3 text-white text-lg">
+            <div className="p-2 bg-orange-500/20 rounded-lg backdrop-blur-sm border border-orange-400/30">
+              <Calendar className="w-5 h-5 text-orange-400" />
+            </div>
+            <span className="bg-gradient-to-r from-orange-400 to-amber-400 bg-clip-text text-transparent">
+              Timeline
+            </span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="p-4 bg-orange-800/20 rounded-lg border border-orange-700/30">
+            <p className="text-sm text-orange-200/80 font-medium mb-1">Created</p>
+            <p className="font-semibold text-white">
+              {formatDistanceToNow(new Date(client.created_at), { addSuffix: true })}
+            </p>
+          </div>
+          <div className="p-4 bg-orange-800/20 rounded-lg border border-orange-700/30">
+            <p className="text-sm text-orange-200/80 font-medium mb-1">Last Updated</p>
+            <p className="font-semibold text-white">
+              {formatDistanceToNow(new Date(client.updated_at), { addSuffix: true })}
+            </p>
+          </div>
+          {client.initial_contact_date && (
+            <div className="p-4 bg-orange-800/20 rounded-lg border border-orange-700/30">
+              <p className="text-sm text-orange-200/80 font-medium mb-1">Initial Contact</p>
+              <p className="font-semibold text-white">
+                {formatDistanceToNow(new Date(client.initial_contact_date), { addSuffix: true })}
+              </p>
+            </div>
+          )}
+          {client.start_date && (
+            <div className="p-4 bg-orange-800/20 rounded-lg border border-orange-700/30">
+              <p className="text-sm text-orange-200/80 font-medium mb-1">Project Started</p>
+              <p className="font-semibold text-white">
+                {formatDistanceToNow(new Date(client.start_date), { addSuffix: true })}
+              </p>
+            </div>
           )}
         </CardContent>
       </Card>
-      
-      <Tabs defaultValue="description">
-        <TabsList className="bg-gray-800/50 border-gray-700/30">
-          <TabsTrigger value="description" className="data-[state=active]:bg-gray-700 data-[state=active]:text-gray-100 text-gray-400">Description</TabsTrigger>
-          <TabsTrigger value="notes" className="data-[state=active]:bg-gray-700 data-[state=active]:text-gray-100 text-gray-400">Notes</TabsTrigger>
-          <TabsTrigger value="requirements" className="data-[state=active]:bg-gray-700 data-[state=active]:text-gray-100 text-gray-400">Requirements</TabsTrigger>
-        </TabsList>
-        <TabsContent value="description" className="p-4 border border-gray-700/30 rounded-md mt-2 bg-gray-900/30">
-          <p className="text-sm text-gray-400">
-            {client.bio || 'No project description available. Add details about the project scope, objectives, and key deliverables here.'}
-          </p>
-        </TabsContent>
-        <TabsContent value="notes" className="p-4 border border-gray-700/30 rounded-md mt-2 bg-gray-900/30">
-          <p className="text-sm text-gray-400">
-            Client prefers communication via email. Initial consultation suggested a focus on mobile-first design.
-            Follow-up meeting scheduled for next week to review wireframes.
-          </p>
-        </TabsContent>
-        <TabsContent value="requirements" className="p-4 border border-gray-700/30 rounded-md mt-2 bg-gray-900/30">
-          <ul className="list-disc pl-5 text-sm text-gray-400 space-y-1">
-            <li>Responsive design for all devices</li>
-            <li>Integration with payment gateway</li>
-            <li>Custom CMS for content management</li>
-            <li>SEO optimization</li>
-            <li>Social media integration</li>
-          </ul>
-        </TabsContent>
-      </Tabs>
+
+      {/* Links & Resources */}
+      <Card className="bg-gradient-to-br from-gray-900/60 to-black/40 border-orange-500/30 shadow-xl shadow-orange-500/10 hover:shadow-orange-500/20 transition-all duration-300 backdrop-blur-sm">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-3 text-white text-lg">
+            <div className="p-2 bg-orange-500/20 rounded-lg backdrop-blur-sm border border-orange-400/30">
+              <Globe className="w-5 h-5 text-orange-400" />
+            </div>
+            <span className="bg-gradient-to-r from-orange-400 to-amber-400 bg-clip-text text-transparent">
+              Links & Resources
+            </span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {client.website_url && (
+            <div className="p-4 bg-orange-800/20 rounded-lg border border-orange-700/30 hover:bg-orange-800/30 transition-colors">
+              <p className="text-sm text-orange-200/80 font-medium mb-2">Live Website</p>
+              <a 
+                href={client.website_url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-orange-300 hover:text-orange-200 transition-colors font-medium"
+              >
+                <ExternalLink className="w-4 h-4" />
+                Visit Site
+              </a>
+            </div>
+          )}
+          {client.development_url && (
+            <div className="p-4 bg-orange-800/20 rounded-lg border border-orange-700/30 hover:bg-orange-800/30 transition-colors">
+              <p className="text-sm text-orange-200/80 font-medium mb-2">Development URL</p>
+              <a 
+                href={client.development_url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-orange-300 hover:text-orange-200 transition-colors font-medium"
+              >
+                <ExternalLink className="w-4 h-4" />
+                Dev Site
+              </a>
+            </div>
+          )}
+          {client.notion_plan_url && (
+            <div className="p-4 bg-orange-800/20 rounded-lg border border-orange-700/30 hover:bg-orange-800/30 transition-colors">
+              <p className="text-sm text-orange-200/80 font-medium mb-2">Project Plan</p>
+              <a 
+                href={client.notion_plan_url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-orange-300 hover:text-orange-200 transition-colors font-medium"
+              >
+                <FileText className="w-4 h-4" />
+                Notion Plan
+              </a>
+            </div>
+          )}
+          {!client.website_url && !client.development_url && !client.notion_plan_url && (
+            <div className="p-4 bg-orange-800/20 rounded-lg border border-orange-700/30 text-center">
+              <p className="text-orange-200/60 text-sm">No links available yet</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Tasks & Next Steps */}
+      <Card className="bg-gradient-to-br from-gray-900/60 to-black/40 border-orange-500/30 shadow-xl shadow-orange-500/10 hover:shadow-orange-500/20 transition-all duration-300 backdrop-blur-sm">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-3 text-white text-lg">
+            <div className="p-2 bg-orange-500/20 rounded-lg backdrop-blur-sm border border-orange-400/30">
+              <Target className="w-5 h-5 text-orange-400" />
+            </div>
+            <span className="bg-gradient-to-r from-orange-400 to-amber-400 bg-clip-text text-transparent">
+              Tasks & Next Steps
+            </span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="p-4 bg-orange-800/20 rounded-lg border border-orange-700/30">
+            <p className="text-sm text-orange-200/80 font-medium mb-1">Open Tasks</p>
+            <div className="flex items-center gap-2">
+              <p className="font-semibold text-white text-xl">
+                {client.todos?.length || 0}
+              </p>
+              <span className="text-orange-300 text-sm font-medium">pending tasks</span>
+            </div>
+          </div>
+          {client.next_steps && (
+            <div className="p-4 bg-orange-800/20 rounded-lg border border-orange-700/30">
+              <p className="text-sm text-orange-200/80 font-medium mb-1">Next Steps</p>
+              <p className="font-semibold text-white">{client.next_steps}</p>
+            </div>
+          )}
+          {client.key_research && (
+            <div className="p-4 bg-orange-800/20 rounded-lg border border-orange-700/30">
+              <p className="text-sm text-orange-200/80 font-medium mb-1">Key Research</p>
+              <p className="font-semibold text-white">{client.key_research}</p>
+            </div>
+          )}
+          <div className="p-4 bg-orange-800/20 rounded-lg border border-orange-700/30">
+            <p className="text-sm text-orange-200/80 font-medium mb-2">Completed Steps</p>
+            <div className="flex flex-wrap gap-2">
+              {client.completed_steps?.map((step, index) => (
+                <Badge key={index} variant="outline" className="text-xs bg-orange-500/10 text-orange-300 border-orange-500/30">
+                  <CheckCircle className="w-3 h-3 mr-1" />
+                  {step}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

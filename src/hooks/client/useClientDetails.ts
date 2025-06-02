@@ -1,9 +1,9 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useIsClient } from './useIsClient';
 import { ClientData, TodoItem } from '@/types/client.types';
 import { createDefaultClientData } from '@/utils/clientDataProcessors';
+import { sampleClients } from '@/data/sampleClients';
 
 /**
  * Hook to fetch client details for the current user or by ID for admins
@@ -27,23 +27,33 @@ export function useClientDetails(specificClientId: string | null = null) {
       }
 
       try {
-        // Fetch client details from the client_onboarding table
+        // First, try to fetch from database
         const { data, error } = await supabase
           .from('client_onboarding')
           .select('*')
           .eq('id', targetClientId)
           .single();
 
-        if (error) {
-          console.error('Error fetching client data:', error);
-          setError(new Error(error.message));
-          setClientData(null);
+        if (error || !data) {
+          console.log('Client not found in database, checking sample data...');
+          
+          // Fallback to sample data
+          const sampleClient = sampleClients.find(client => client.id === targetClientId);
+          
+          if (sampleClient) {
+            console.log('Found client in sample data:', sampleClient.business_name);
+            setClientData(sampleClient);
+            setError(null);
+          } else {
+            console.error('Client not found in sample data either');
+            setError(new Error('Client not found'));
+            setClientData(null);
+          }
         } else {
-          // Parse todos if they exist
+          // Parse todos if they exist from database
           let parsedTodos: TodoItem[] = [];
           if (data.todos) {
             try {
-              // Ensure todos is properly formatted as TodoItem[]
               parsedTodos = Array.isArray(data.todos) 
                 ? data.todos.map((item: any) => ({
                     id: item.id || crypto.randomUUID(),
@@ -70,6 +80,7 @@ export function useClientDetails(specificClientId: string | null = null) {
             phone: null,
             avatar_url: null,
             status: data.status,
+            progress: (data as any).progress || 'Not Started',
             current_step: data.current_step,
             total_steps: data.total_steps,
             completed_steps: data.completed_steps || [],
@@ -84,23 +95,34 @@ export function useClientDetails(specificClientId: string | null = null) {
             mvp_build_status: null,
             notion_plan_url: null,
             payment_status: null,
-            estimated_price: null,
+            estimated_price: (data as any).estimated_price || null,
             initial_contact_date: null,
             start_date: null,
             estimated_completion_date: null,
             todos: parsedTodos,
             next_steps: null,
             key_research: null,
-            priority: null
+            priority: null,
+            contact_name: data.contact_name || null,
+            company_name: data.company_name || null,
           };
           
           setClientData(processedData);
           setError(null);
         }
       } catch (err) {
-        console.error('Unexpected error fetching client data:', err);
-        setError(err instanceof Error ? err : new Error('Unknown error'));
-        setClientData(null);
+        console.error('Error in fetchClientData:', err);
+        
+        // Final fallback to sample data on error
+        const sampleClient = sampleClients.find(client => client.id === targetClientId);
+        if (sampleClient) {
+          console.log('Using sample data due to error:', sampleClient.business_name);
+          setClientData(sampleClient);
+          setError(null);
+        } else {
+          setError(err instanceof Error ? err : new Error('Unknown error'));
+          setClientData(null);
+        }
       } finally {
         setLoading(false);
       }

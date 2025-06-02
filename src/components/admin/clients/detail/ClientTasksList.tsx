@@ -1,252 +1,211 @@
-
 import React from 'react';
 import { ClientData } from '@/types/client.types';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
-import { 
-  Clock, CalendarCheck, AlertCircle, AlertTriangle, Plus, 
-  ChevronDown, MoreHorizontal, User, Calendar 
-} from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { CheckCircle, Clock, AlertCircle, User, Calendar, TrendingUp } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
 
 interface ClientTasksListProps {
   client: ClientData;
 }
 
 export function ClientTasksList({ client }: ClientTasksListProps) {
-  // In a real implementation, these would be fetched from the database
-  const tasks = {
-    active: [
-      {
-        id: 1,
-        title: 'Finalize homepage design',
-        description: 'Complete the UI for the homepage based on client feedback',
-        due_date: '2023-06-20',
-        priority: 'high',
-        assigned_to: 'Michael Chen',
-        status: 'in_progress'
-      },
-      {
-        id: 2,
-        title: 'API integration for product catalog',
-        description: 'Connect to client\'s product API and implement data sync',
-        due_date: '2023-06-25',
-        priority: 'medium',
-        assigned_to: 'Sarah Williams',
-        status: 'pending'
-      },
-      {
-        id: 3,
-        title: 'Setup payment gateway',
-        description: 'Integrate Stripe and implement checkout flow',
-        due_date: '2023-07-05',
-        priority: 'high',
-        assigned_to: 'David Kim',
-        status: 'pending'
-      }
-    ],
-    completed: [
-      {
-        id: 4,
-        title: 'Initial project setup',
-        description: 'Create repository and setup development environment',
-        due_date: '2023-05-10',
-        priority: 'high',
-        assigned_to: 'Sarah Williams',
-        status: 'completed'
-      },
-      {
-        id: 5,
-        title: 'Wireframe design',
-        description: 'Create wireframes for all main pages',
-        due_date: '2023-05-20',
-        priority: 'medium',
-        assigned_to: 'Michael Chen',
-        status: 'completed'
-      }
-    ]
-  };
+  const todos = client.todos || [];
+  const completedTasks = todos.filter(todo => todo.completed);
+  const pendingTasks = todos.filter(todo => !todo.completed);
 
-  const getPriorityBadge = (priority: string) => {
-    switch(priority) {
-      case 'high':
-        return <Badge variant="outline" className="bg-red-100 text-red-800 hover:bg-red-100 border-red-200">High</Badge>;
-      case 'medium':
-        return <Badge variant="outline" className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100 border-yellow-200">Medium</Badge>;
-      case 'low':
-        return <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-100 border-green-200">Low</Badge>;
-      default:
-        return <Badge variant="outline">Unknown</Badge>;
+  const getPriorityColor = (priority: string) => {
+    switch (priority?.toLowerCase()) {
+      case 'high': return 'bg-gradient-to-r from-red-500/20 to-pink-500/20 text-red-300 border-red-500/40 shadow-red-500/20';
+      case 'medium': return 'bg-gradient-to-r from-orange-500/20 to-amber-500/20 text-orange-300 border-orange-500/40 shadow-orange-500/20';
+      case 'low': return 'bg-gradient-to-r from-gray-500/20 to-slate-500/20 text-gray-300 border-gray-500/40 shadow-gray-500/20';
+      default: return 'bg-gradient-to-r from-orange-500/20 to-amber-500/20 text-orange-300 border-orange-500/40 shadow-orange-500/20';
     }
   };
 
-  const getStatusIcon = (status: string) => {
-    switch(status) {
-      case 'completed':
-        return <CalendarCheck className="h-4 w-4 text-green-600" />;
-      case 'in_progress':
-        return <Clock className="h-4 w-4 text-blue-600" />;
-      case 'pending':
-        return <AlertCircle className="h-4 w-4 text-muted-foreground" />;
-      case 'overdue':
-        return <AlertTriangle className="h-4 w-4 text-red-600" />;
-      default:
-        return <AlertCircle className="h-4 w-4 text-muted-foreground" />;
+  const getPriorityIcon = (priority: string) => {
+    switch (priority?.toLowerCase()) {
+      case 'high': return <AlertCircle className="w-4 h-4" />;
+      case 'medium': return <Clock className="w-4 h-4" />;
+      case 'low': return <CheckCircle className="w-4 h-4" />;
+      default: return <Clock className="w-4 h-4" />;
     }
   };
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <div className="flex justify-between items-center">
-          <div>
-            <CardTitle>Project Tasks</CardTitle>
-            <CardDescription>
-              Tasks and to-do items for {client.project_name || 'this project'}
-            </CardDescription>
-          </div>
-          <Button size="sm" className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            Add Task
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent className="p-0">
-        <Tabs defaultValue="active">
-          <div className="border-b px-6">
-            <TabsList className="bg-transparent -mb-px">
-              <TabsTrigger 
-                value="active" 
-                className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:shadow-none data-[state=active]:border-primary data-[state=active]:text-primary"
-              >
-                Active ({tasks.active.length})
-              </TabsTrigger>
-              <TabsTrigger 
-                value="completed" 
-                className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:shadow-none data-[state=active]:border-primary data-[state=active]:text-primary"
-              >
-                Completed ({tasks.completed.length})
-              </TabsTrigger>
-            </TabsList>
-          </div>
-          
-          <TabsContent value="active" className="p-0 m-0">
-            <div className="divide-y">
-              {tasks.active.map((task) => (
-                <div key={task.id} className="p-4 hover:bg-muted/20">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-3">
-                      <Checkbox id={`task-${task.id}`} />
-                      <div>
-                        <label 
-                          htmlFor={`task-${task.id}`}
-                          className="font-medium cursor-pointer flex items-center gap-2"
-                        >
-                          {task.title}
-                          {getPriorityBadge(task.priority)}
-                        </label>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {task.description}
-                        </p>
-                        <div className="flex flex-wrap gap-3 mt-2">
-                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                            <Calendar className="h-3.5 w-3.5" />
-                            Due: {new Date(task.due_date).toLocaleDateString()}
-                          </div>
-                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                            <User className="h-3.5 w-3.5" />
-                            {task.assigned_to}
-                          </div>
-                          <div className="flex items-center gap-1 text-xs">
-                            {getStatusIcon(task.status)}
-                            <span className={task.status === 'in_progress' ? 'text-blue-600' : 'text-muted-foreground'}>
-                              {task.status === 'in_progress' ? 'In Progress' : 
-                                task.status === 'pending' ? 'Not Started' : 
-                                task.status === 'completed' ? 'Completed' : 'Unknown'}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
+    <div className="space-y-8">
+      {/* Black & Orange Task Summary */}
+      <div className="grid gap-6 md:grid-cols-3">
+        <Card className="bg-gradient-to-br from-gray-900/60 to-black/40 border-orange-500/30 shadow-lg shadow-orange-500/10 hover:shadow-orange-500/20 transition-all duration-300">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-orange-500/20 rounded-xl backdrop-blur-sm border border-orange-400/30">
+                <Clock className="w-6 h-6 text-orange-400" />
+              </div>
+              <div>
+                <p className="text-sm text-orange-200/80 font-medium">Pending Tasks</p>
+                <p className="text-3xl font-bold text-white mt-1">{pendingTasks.length}</p>
+                <div className="flex items-center gap-1 mt-1">
+                  <TrendingUp className="w-3 h-3 text-orange-400" />
+                  <span className="text-xs text-orange-300">Active</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-gray-900/60 to-black/40 border-orange-500/30 shadow-lg shadow-orange-500/10 hover:shadow-orange-500/20 transition-all duration-300">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-orange-500/20 rounded-xl backdrop-blur-sm border border-orange-400/30">
+                <CheckCircle className="w-6 h-6 text-orange-400" />
+              </div>
+              <div>
+                <p className="text-sm text-orange-200/80 font-medium">Completed</p>
+                <p className="text-3xl font-bold text-white mt-1">{completedTasks.length}</p>
+                <div className="flex items-center gap-1 mt-1">
+                  <CheckCircle className="w-3 h-3 text-orange-400" />
+                  <span className="text-xs text-orange-300">Done</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-gray-900/60 to-black/40 border-orange-500/30 shadow-lg shadow-orange-500/10 hover:shadow-orange-500/20 transition-all duration-300">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-orange-500/20 rounded-xl backdrop-blur-sm border border-orange-400/30">
+                <AlertCircle className="w-6 h-6 text-orange-400" />
+              </div>
+              <div>
+                <p className="text-sm text-orange-200/80 font-medium">Total Tasks</p>
+                <p className="text-3xl font-bold text-white mt-1">{todos.length}</p>
+                <div className="flex items-center gap-1 mt-1">
+                  <TrendingUp className="w-3 h-3 text-orange-400" />
+                  <span className="text-xs text-orange-300">Overall</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Black & Orange Pending Tasks */}
+      {pendingTasks.length > 0 && (
+        <Card className="bg-gradient-to-br from-gray-900/60 to-black/40 border-orange-700/50 shadow-xl backdrop-blur-sm">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-3 text-white text-xl">
+              <div className="p-2 bg-orange-500/20 rounded-lg backdrop-blur-sm border border-orange-400/30">
+                <Clock className="w-5 h-5 text-orange-400" />
+              </div>
+              <span className="bg-gradient-to-r from-orange-400 to-amber-400 bg-clip-text text-transparent">
+                Pending Tasks ({pendingTasks.length})
+              </span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {pendingTasks.map((todo) => (
+              <div key={todo.id} className="group p-5 bg-gradient-to-r from-gray-800/60 to-black/40 rounded-xl border border-orange-700/30 backdrop-blur-sm hover:border-orange-600/50 transition-all duration-300 hover:shadow-lg hover:shadow-orange-900/20">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-3">
+                      <h3 className="font-semibold text-white text-lg group-hover:text-orange-200 transition-colors">
+                        {todo.text}
+                      </h3>
+                      <Badge className={`border shadow-sm ${getPriorityColor(todo.priority || 'medium')}`}>
+                        <span className="flex items-center gap-1.5 font-medium">
+                          {getPriorityIcon(todo.priority || 'medium')}
+                          {todo.priority || 'Medium'}
+                        </span>
+                      </Badge>
                     </div>
                     
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>Edit Task</DropdownMenuItem>
-                        <DropdownMenuItem>Mark as Complete</DropdownMenuItem>
-                        <DropdownMenuItem>Change Assignee</DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-destructive">Delete Task</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="completed" className="p-0 m-0">
-            <div className="divide-y">
-              {tasks.completed.map((task) => (
-                <div key={task.id} className="p-4 hover:bg-muted/20">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-3">
-                      <Checkbox id={`task-${task.id}`} checked={true} />
-                      <div>
-                        <label 
-                          htmlFor={`task-${task.id}`}
-                          className="font-medium cursor-pointer text-muted-foreground line-through flex items-center gap-2"
-                        >
-                          {task.title}
-                          {getPriorityBadge(task.priority)}
-                        </label>
-                        <p className="text-sm text-muted-foreground mt-1 line-through">
-                          {task.description}
-                        </p>
-                        <div className="flex flex-wrap gap-3 mt-2">
-                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                            <Calendar className="h-3.5 w-3.5" />
-                            Due: {new Date(task.due_date).toLocaleDateString()}
-                          </div>
-                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                            <User className="h-3.5 w-3.5" />
-                            {task.assigned_to}
-                          </div>
-                          <div className="flex items-center gap-1 text-xs text-green-600">
-                            <CalendarCheck className="h-3.5 w-3.5" />
-                            <span>Completed</span>
-                          </div>
+                    <div className="flex items-center gap-6 text-sm text-gray-300">
+                      {todo.assigned_to && (
+                        <div className="flex items-center gap-2 px-3 py-1.5 bg-orange-900/20 rounded-lg backdrop-blur-sm border border-orange-600/30">
+                          <User className="w-4 h-4 text-orange-400" />
+                          <span className="font-medium text-orange-300">{todo.assigned_to}</span>
                         </div>
-                      </div>
+                      )}
+                      {todo.due_date && (
+                        <div className="flex items-center gap-2 px-3 py-1.5 bg-orange-900/20 rounded-lg backdrop-blur-sm border border-orange-600/30">
+                          <Calendar className="w-4 h-4 text-orange-400" />
+                          <span className="font-medium text-orange-300">
+                            Due {formatDistanceToNow(new Date(todo.due_date), { addSuffix: true })}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
-              ))}
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Black & Orange Completed Tasks */}
+      {completedTasks.length > 0 && (
+        <Card className="bg-gradient-to-br from-gray-900/60 to-black/40 border-orange-700/50 shadow-xl backdrop-blur-sm">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-3 text-white text-xl">
+              <div className="p-2 bg-orange-500/20 rounded-lg backdrop-blur-sm border border-orange-400/30">
+                <CheckCircle className="w-5 h-5 text-orange-400" />
+              </div>
+              <span className="bg-gradient-to-r from-orange-400 to-amber-400 bg-clip-text text-transparent">
+                Completed Tasks ({completedTasks.length})
+              </span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {completedTasks.map((todo) => (
+              <div key={todo.id} className="group p-5 bg-gradient-to-r from-gray-800/60 to-black/40 rounded-xl border border-orange-700/30 backdrop-blur-sm opacity-90 hover:opacity-100 transition-all duration-300">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-3">
+                      <CheckCircle className="w-5 h-5 text-orange-400 flex-shrink-0" />
+                      <h3 className="font-semibold text-white line-through decoration-orange-500/50 text-lg">
+                        {todo.text}
+                      </h3>
+                      <Badge variant="outline" className="text-orange-300 border-orange-500/40 bg-orange-500/10 shadow-orange-500/20">
+                        ✓ Completed
+                      </Badge>
+                    </div>
+                    
+                    <div className="flex items-center gap-6 text-sm text-gray-400">
+                      {todo.assigned_to && (
+                        <div className="flex items-center gap-2 px-3 py-1.5 bg-orange-700/20 rounded-lg backdrop-blur-sm border border-orange-600/30">
+                          <User className="w-4 h-4 text-orange-400" />
+                          <span className="font-medium text-orange-300">{todo.assigned_to}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Black & Orange No Tasks Message */}
+      {todos.length === 0 && (
+        <Card className="bg-gradient-to-br from-gray-900/60 to-black/40 border-orange-700/50 shadow-xl backdrop-blur-sm">
+          <CardContent className="p-12 text-center">
+            <div className="mb-6">
+              <div className="inline-flex p-4 bg-orange-600/20 rounded-2xl backdrop-blur-sm border border-orange-500/30">
+                <Clock className="w-12 h-12 text-orange-400" />
+              </div>
             </div>
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-      <CardFooter className="flex justify-between border-t pt-4">
-        <Button variant="outline" size="sm">
-          Filter Tasks <ChevronDown className="h-4 w-4 ml-1" />
-        </Button>
-        <Button variant="link" size="sm">
-          View All Tasks
-        </Button>
-      </CardFooter>
-    </Card>
+            <h3 className="text-xl font-semibold text-white mb-3">No Tasks Yet</h3>
+            <p className="text-gray-400 max-w-md mx-auto leading-relaxed">
+              Tasks and todos will appear here as they are created for this client. 
+              Start by adding your first task to track project progress.
+            </p>
+          </CardContent>
+        </Card>
+      )}
+    </div>
   );
 }

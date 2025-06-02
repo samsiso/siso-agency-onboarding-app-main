@@ -103,7 +103,7 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
           />
 
           {/* Content View (Table or Cards) - Full Height */}
-          <div className="bg-gray-900 rounded-lg border border-gray-800 h-[calc(100vh-24rem)] flex flex-col">
+          <div className="bg-gray-900 rounded-lg border border-gray-800 h-[calc(100vh-16rem)] flex flex-col">
             <div className="flex-1 overflow-hidden">
               {viewMode === "table" ? (
                 <ClientsEnhancedTable
