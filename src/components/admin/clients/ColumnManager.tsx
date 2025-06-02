@@ -54,7 +54,6 @@ export function ColumnManager({
     const defaultColumns = columns.map(col => {
       // Default visible columns
       const defaultVisible = [
-        'full_name', 
         'business_name', 
         'progress',
         'status', 
@@ -63,7 +62,7 @@ export function ColumnManager({
       ].includes(col.key);
       
       const defaultPinned = [
-        'full_name',
+        'business_name',
         'status'
       ].includes(col.key);
       

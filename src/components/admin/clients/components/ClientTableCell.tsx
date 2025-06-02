@@ -46,17 +46,10 @@ export function ClientTableCell({
 
   const renderContent = () => {
     switch (columnKey) {
-      case 'full_name':
-        return (
-          <div className="flex flex-col space-y-0.5" title={client.full_name || ''} onDoubleClick={onDoubleClick}>
-            <span className="font-medium text-gray-100">{client.full_name || 'Unknown'}</span>
-          </div>
-        );
-
       case 'business_name':
         return (
-          <div onDoubleClick={onDoubleClick}>
-            <span className="text-gray-200">{client.business_name || '-'}</span>
+          <div className="flex flex-col space-y-0.5" title={client.business_name || ''} onDoubleClick={onDoubleClick}>
+            <span className="font-medium text-gray-100">{client.business_name || 'Unknown Business'}</span>
           </div>
         );
 
