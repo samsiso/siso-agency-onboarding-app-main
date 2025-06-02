@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { 
@@ -68,20 +67,20 @@ export function ClientsHeader({
       <div className="flex flex-row gap-4 items-center justify-between">
         <div className="flex gap-2 flex-1">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
             <Input
               placeholder="Search clients..."
               value={searchQuery}
               onChange={handleSearchInputChange}
-              className="pl-9 border-border/50 bg-card/50 shadow-sm"
+              className="pl-9 border-gray-700/50 bg-gray-900/60 shadow-sm text-gray-100 placeholder:text-gray-400 focus:border-gray-600 focus:bg-gray-900/80"
             />
           </div>
           <Select value={statusFilter} onValueChange={handleStatusChange}>
-            <SelectTrigger className="w-40 border-border/50 bg-card/50 shadow-sm">
-              <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
+            <SelectTrigger className="w-40 border-gray-700/50 bg-gray-900/60 shadow-sm text-gray-100 focus:border-gray-600">
+              <Filter className="h-4 w-4 mr-2 text-gray-400" />
               <SelectValue placeholder="Status" />
             </SelectTrigger>
-            <SelectContent className="bg-background/90 text-foreground shadow-lg border-border/50 z-50">
+            <SelectContent className="bg-gray-900/95 text-gray-100 shadow-xl border-gray-700/50 z-50">
               <SelectItem value="all">All Statuses</SelectItem>
               <SelectItem value="active">Active</SelectItem>
               <SelectItem value="pending">Pending</SelectItem>

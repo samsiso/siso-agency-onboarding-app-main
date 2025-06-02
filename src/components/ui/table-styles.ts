@@ -1,4 +1,3 @@
-
 import { cva } from "class-variance-authority";
 
 export const tableStyles = cva(
@@ -46,13 +45,14 @@ export const tableCellStyles = cva(
 
 export const tableRowStyles = cva(
   [
-    "border-b border-border/10",
-    "outline-none focus-within:bg-blue-50/5 focus-within:outline-blue-500/20"
+    "border-b border-gray-800/20",
+    "outline-none focus-within:bg-gray-800/20 focus-within:outline-gray-600/30",
+    "transition-colors duration-200"
   ].join(" "),
   {
     variants: {
       interactive: {
-        true: "cursor-pointer hover:bg-muted/10",
+        true: "cursor-pointer hover:bg-gray-800/30",
         false: ""
       }
     },

@@ -1,4 +1,3 @@
-
 import React, { useRef } from 'react';
 import { Table } from '@/components/ui/table';
 import { ClientViewPreference } from '@/types/client.types';
@@ -112,11 +111,11 @@ export function ClientsTable({
           />
         )}
         
-        <div ref={tableContainerRef} className="relative rounded-lg overflow-hidden border border-border/30 bg-background/30 shadow-sm backdrop-blur-sm">
+        <div ref={tableContainerRef} className="relative rounded-lg overflow-hidden border border-gray-800/30 bg-gray-900/40 shadow-lg backdrop-blur-sm">
           <ScrollableTable pinnedColumns={pinnedColumns}>
             <Table ref={tableElementRef} className={cn(
               tableStyles(),
-              "backdrop-blur-sm [&_th]:bg-background/95 [&_td]:bg-transparent"
+              "backdrop-blur-sm [&_th]:bg-gray-900/95 [&_th]:text-gray-100 [&_td]:bg-transparent [&_tr:hover]:bg-gray-800/30 [&_tr:nth-child(even)]:bg-gray-900/20"
             )}>
               <ClientTableHeader
                 visibleColumns={visibleColumns}

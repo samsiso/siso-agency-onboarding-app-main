@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect } from 'react';
 import { ClientColumnPreference } from '@/types/client.types';
 import { cn } from '@/lib/utils';
@@ -53,17 +52,17 @@ export function ScrollableTable({ children, pinnedColumns, className }: Scrollab
   const pinnedWidth = pinnedColumns.reduce((sum, col) => sum + (col.width || 150), 0);
 
   return (
-    <div className="relative rounded-md border overflow-hidden border-border/30 bg-background/30 shadow-sm backdrop-blur-sm">
+    <div className="relative rounded-md border overflow-hidden border-gray-800/30 bg-gray-900/50 shadow-lg backdrop-blur-sm">
       {leftShadowVisible && (
         <div 
-          className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background/90 to-transparent z-10 pointer-events-none"
+          className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-gray-900/90 to-transparent z-10 pointer-events-none"
           style={{ transform: 'translate3d(0,0,0)', willChange: 'opacity' }}
         />
       )}
 
       {rightShadowVisible && (
         <div 
-          className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background/90 to-transparent z-10 pointer-events-none"
+          className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-gray-900/90 to-transparent z-10 pointer-events-none"
           style={{ transform: 'translate3d(0,0,0)', willChange: 'opacity' }}
         />
       )}
@@ -95,7 +94,7 @@ export function ScrollableTable({ children, pinnedColumns, className }: Scrollab
           {pinnedColumns.length > 0 && (
             <div
               className={cn(
-                "absolute top-0 left-0 bottom-0 border-r border-border/30 shadow-[4px_0_8px_rgba(0,0,0,0.1)]",
+                "absolute top-0 left-0 bottom-0 border-r border-gray-700/30 shadow-[4px_0_8px_rgba(0,0,0,0.3)]",
                 "transition-all duration-150",
                 isScrolled && "top-[var(--header-height)]"
               )}
@@ -109,7 +108,7 @@ export function ScrollableTable({ children, pinnedColumns, className }: Scrollab
 
           {isScrolled && (
             <div
-              className="sticky top-0 left-0 right-0 z-30 bg-background/95 border-b border-border/30 shadow-sm backdrop-blur-md"
+              className="sticky top-0 left-0 right-0 z-30 bg-gray-900/95 border-b border-gray-700/30 shadow-lg backdrop-blur-md"
               style={{
                 height: `${headerHeight}px`,
                 transform: 'translate3d(0,0,0)',
