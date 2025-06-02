@@ -35,7 +35,7 @@ interface AdminClientsViewProps {
 export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
   const [statusFilter, setStatusFilter] = useState('all');
   const [viewPreference, setViewPreference] = useLocalStorage<ClientViewPreference>(
-    'client_view_preference',
+    'client_view_preference_v2',
     defaultViewPreference
   );
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
