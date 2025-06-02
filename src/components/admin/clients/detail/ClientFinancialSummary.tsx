@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ClientData } from '@/types/client.types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -63,13 +62,13 @@ export function ClientFinancialSummary({ client }: ClientFinancialSummaryProps) 
   const getStatusBadge = (status: string) => {
     switch(status) {
       case 'paid':
-        return <Badge className="bg-green-100 text-green-800 hover:bg-green-100 border-green-200">Paid</Badge>;
+        return <Badge className="bg-green-900/60 text-green-300 hover:bg-green-900/80 border-green-700/30">Paid</Badge>;
       case 'pending':
-        return <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100 border-yellow-200">Pending</Badge>;
+        return <Badge className="bg-yellow-900/60 text-yellow-300 hover:bg-yellow-900/80 border-yellow-700/30">Pending</Badge>;
       case 'overdue':
-        return <Badge className="bg-red-100 text-red-800 hover:bg-red-100 border-red-200">Overdue</Badge>;
+        return <Badge className="bg-red-900/60 text-red-300 hover:bg-red-900/80 border-red-700/30">Overdue</Badge>;
       default:
-        return <Badge variant="outline">Unknown</Badge>;
+        return <Badge variant="outline" className="border-gray-600 text-gray-300">Unknown</Badge>;
     }
   };
 
@@ -79,68 +78,68 @@ export function ClientFinancialSummary({ client }: ClientFinancialSummaryProps) 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
+        <Card className="bg-gray-900/50 border-gray-700/30">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="text-sm font-medium text-gray-400">
               Total Project Value
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${financials.totalValue.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground mt-1">Full contract amount</p>
+            <div className="text-2xl font-bold text-gray-100">${financials.totalValue.toLocaleString()}</div>
+            <p className="text-xs text-gray-500 mt-1">Full contract amount</p>
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="bg-gray-900/50 border-gray-700/30">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="text-sm font-medium text-gray-400">
               Invoiced Amount
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${financials.invoiced.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-gray-100">${financials.invoiced.toLocaleString()}</div>
             <div className="flex items-center gap-2 mt-1">
               <Progress value={invoicePercentage} className="h-2" />
-              <span className="text-xs text-muted-foreground">{Math.round(invoicePercentage)}%</span>
+              <span className="text-xs text-gray-500">{Math.round(invoicePercentage)}%</span>
             </div>
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="bg-gray-900/50 border-gray-700/30">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="text-sm font-medium text-gray-400">
               Amount Paid
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${financials.paid.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-gray-100">${financials.paid.toLocaleString()}</div>
             <div className="flex items-center gap-2 mt-1">
               <Progress value={paidPercentage} className="h-2" />
-              <span className="text-xs text-muted-foreground">{Math.round(paidPercentage)}%</span>
+              <span className="text-xs text-gray-500">{Math.round(paidPercentage)}%</span>
             </div>
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="bg-gray-900/50 border-gray-700/30">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="text-sm font-medium text-gray-400">
               Outstanding Balance
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold text-gray-100">
               ${(financials.invoiced - financials.paid).toLocaleString()}
             </div>
             <div className="flex items-center gap-1 mt-1">
               {financials.overdue > 0 ? (
                 <>
-                  <ArrowUpRight className="h-4 w-4 text-red-600" />
-                  <span className="text-xs text-red-600">${financials.overdue.toLocaleString()} overdue</span>
+                  <ArrowUpRight className="h-4 w-4 text-red-400" />
+                  <span className="text-xs text-red-400">${financials.overdue.toLocaleString()} overdue</span>
                 </>
               ) : (
                 <>
-                  <ArrowDownRight className="h-4 w-4 text-green-600" />
-                  <span className="text-xs text-green-600">No overdue payments</span>
+                  <ArrowDownRight className="h-4 w-4 text-green-400" />
+                  <span className="text-xs text-green-400">No overdue payments</span>
                 </>
               )}
             </div>
@@ -149,50 +148,50 @@ export function ClientFinancialSummary({ client }: ClientFinancialSummaryProps) 
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2 bg-gray-900/50 border-gray-700/30">
           <CardHeader className="pb-2">
             <div className="flex justify-between items-center">
-              <CardTitle>Invoices</CardTitle>
+              <CardTitle className="text-gray-100">Invoices</CardTitle>
               <Button size="sm" className="h-8 gap-1">
                 <Plus className="h-4 w-4" /> New Invoice
               </Button>
             </div>
-            <CardDescription>
+            <CardDescription className="text-gray-400">
               Invoice history for this client
             </CardDescription>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="border-t">
+            <div className="border-t border-gray-700/30">
               {financials.invoices.map((invoice) => (
                 <div 
                   key={invoice.id}
-                  className="flex items-center justify-between py-3 px-6 border-b last:border-b-0 hover:bg-muted/20"
+                  className="flex items-center justify-between py-3 px-6 border-b border-gray-700/30 last:border-b-0 hover:bg-gray-800/30"
                 >
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-medium">{invoice.id}</span>
+                      <span className="font-medium text-gray-200">{invoice.id}</span>
                       {getStatusBadge(invoice.status)}
                     </div>
-                    <div className="text-xs text-muted-foreground mt-1">
+                    <div className="text-xs text-gray-500 mt-1">
                       Issued: {new Date(invoice.date).toLocaleDateString()} | 
                       Due: {new Date(invoice.dueDate).toLocaleDateString()}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="font-medium">${invoice.amount.toLocaleString()}</span>
-                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                      <Download className="h-4 w-4" />
+                    <span className="font-medium text-gray-200">${invoice.amount.toLocaleString()}</span>
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-gray-700/50">
+                      <Download className="h-4 w-4 text-gray-400" />
                     </Button>
                   </div>
                 </div>
               ))}
             </div>
           </CardContent>
-          <CardFooter className="flex justify-between border-t pt-4">
-            <Button variant="outline" size="sm" className="gap-1">
+          <CardFooter className="flex justify-between border-t border-gray-700/30 pt-4">
+            <Button variant="outline" size="sm" className="gap-1 border-gray-600 text-gray-200 hover:bg-gray-800">
               <Filter className="h-4 w-4" /> Filter
             </Button>
-            <Button variant="link" size="sm">
+            <Button variant="link" size="sm" className="text-gray-400 hover:text-gray-200">
               View All Invoices
             </Button>
           </CardFooter>

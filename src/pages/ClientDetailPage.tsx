@@ -269,15 +269,15 @@ export default function ClientDetailPage() {
         <ClientDetailHeader client={clientData} />
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
-          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 mb-6">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="timeline">Timeline</TabsTrigger>
-            <TabsTrigger value="interactions">Interactions</TabsTrigger>
-            <TabsTrigger value="tasks">Tasks</TabsTrigger>
-            <TabsTrigger value="financials">Financials</TabsTrigger>
+          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 mb-6 bg-gray-800/50 border-gray-700/30">
+            <TabsTrigger value="overview" className="data-[state=active]:bg-gray-700 data-[state=active]:text-gray-100 text-gray-400">Overview</TabsTrigger>
+            <TabsTrigger value="timeline" className="data-[state=active]:bg-gray-700 data-[state=active]:text-gray-100 text-gray-400">Timeline</TabsTrigger>
+            <TabsTrigger value="interactions" className="data-[state=active]:bg-gray-700 data-[state=active]:text-gray-100 text-gray-400">Interactions</TabsTrigger>
+            <TabsTrigger value="tasks" className="data-[state=active]:bg-gray-700 data-[state=active]:text-gray-100 text-gray-400">Tasks</TabsTrigger>
+            <TabsTrigger value="financials" className="data-[state=active]:bg-gray-700 data-[state=active]:text-gray-100 text-gray-400">Financials</TabsTrigger>
             {/* <TabsTrigger value="team">Team</TabsTrigger> */}
-            <TabsTrigger value="documents">Documents</TabsTrigger>
-            <TabsTrigger value="changelog">Changelog</TabsTrigger>
+            <TabsTrigger value="documents" className="data-[state=active]:bg-gray-700 data-[state=active]:text-gray-100 text-gray-400">Documents</TabsTrigger>
+            <TabsTrigger value="changelog" className="data-[state=active]:bg-gray-700 data-[state=active]:text-gray-100 text-gray-400">Changelog</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-4">

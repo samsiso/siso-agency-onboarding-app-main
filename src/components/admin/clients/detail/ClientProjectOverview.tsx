@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ClientData } from '@/types/client.types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -36,50 +35,50 @@ export function ClientProjectOverview({ client }: ClientProjectOverviewProps) {
 
   return (
     <div className="space-y-6">
-      <Card>
+      <Card className="bg-gray-900/50 border-gray-700/30">
         <CardHeader className="pb-3">
-          <CardTitle>Project Overview</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-gray-100">Project Overview</CardTitle>
+          <CardDescription className="text-gray-400">
             Summary of {client.project_name || 'the project'} for {client.full_name || client.business_name}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <h3 className="text-lg font-medium mb-2">Project Completion</h3>
+              <h3 className="text-lg font-medium mb-2 text-gray-200">Project Completion</h3>
               <div className="flex items-center gap-4 mb-2">
                 <Progress value={completionPercentage} className="h-2" />
-                <span className="text-sm font-medium">{completionPercentage}%</span>
+                <span className="text-sm font-medium text-gray-300">{completionPercentage}%</span>
               </div>
               
-              <h3 className="text-lg font-medium mt-4 mb-2">Project Status</h3>
+              <h3 className="text-lg font-medium mt-4 mb-2 text-gray-200">Project Status</h3>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm">Timeline</span>
+                  <span className="text-sm text-gray-400">Timeline</span>
                   <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    projectStatus.timeline.status === 'on-track' ? 'bg-blue-100 text-blue-800' :
-                    projectStatus.timeline.status === 'warning' ? 'bg-yellow-100 text-yellow-800' :
-                    projectStatus.timeline.status === 'success' ? 'bg-green-100 text-green-800' :
-                    'bg-gray-100 text-gray-800'
+                    projectStatus.timeline.status === 'on-track' ? 'bg-blue-900/60 text-blue-300 border border-blue-700/30' :
+                    projectStatus.timeline.status === 'warning' ? 'bg-yellow-900/60 text-yellow-300 border border-yellow-700/30' :
+                    projectStatus.timeline.status === 'success' ? 'bg-green-900/60 text-green-300 border border-green-700/30' :
+                    'bg-gray-800/60 text-gray-300 border border-gray-700/30'
                   }`}>
                     {projectStatus.timeline.status}
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm">Budget</span>
-                  <div className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                  <span className="text-sm text-gray-400">Budget</span>
+                  <div className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-900/60 text-yellow-300 border border-yellow-700/30">
                     {projectStatus.budget.status}
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm">Team</span>
-                  <div className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  <span className="text-sm text-gray-400">Team</span>
+                  <div className="px-2 py-1 rounded-full text-xs font-medium bg-green-900/60 text-green-300 border border-green-700/30">
                     {projectStatus.team.status}
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm">Deliverables</span>
-                  <div className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                  <span className="text-sm text-gray-400">Deliverables</span>
+                  <div className="px-2 py-1 rounded-full text-xs font-medium bg-gray-800/60 text-gray-300 border border-gray-700/30">
                     {projectStatus.deliverables.status}
                   </div>
                 </div>
@@ -87,42 +86,42 @@ export function ClientProjectOverview({ client }: ClientProjectOverviewProps) {
             </div>
 
             <div>
-              <h3 className="text-lg font-medium mb-2">Project Vitals</h3>
+              <h3 className="text-lg font-medium mb-2 text-gray-200">Project Vitals</h3>
               <div className="grid grid-cols-1 gap-2">
                 <div className="flex items-center gap-2">
-                  <CalendarCheck className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">Start Date:</span>
-                  <span className="text-sm">{projectVitals.startDate}</span>
+                  <CalendarCheck className="h-4 w-4 text-gray-400" />
+                  <span className="text-sm font-medium text-gray-300">Start Date:</span>
+                  <span className="text-sm text-gray-400">{projectVitals.startDate}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">Estimated Completion:</span>
-                  <span className="text-sm">{projectVitals.estimatedCompletionDate}</span>
+                  <Clock className="h-4 w-4 text-gray-400" />
+                  <span className="text-sm font-medium text-gray-300">Estimated Completion:</span>
+                  <span className="text-sm text-gray-400">{projectVitals.estimatedCompletionDate}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <DollarSign className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">Project Value:</span>
-                  <span className="text-sm">{projectVitals.price}</span>
+                  <DollarSign className="h-4 w-4 text-gray-400" />
+                  <span className="text-sm font-medium text-gray-300">Project Value:</span>
+                  <span className="text-sm text-gray-400">{projectVitals.price}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">Payment Status:</span>
-                  <span className="text-sm">{projectVitals.paymentStatus}</span>
+                  <FileText className="h-4 w-4 text-gray-400" />
+                  <span className="text-sm font-medium text-gray-300">Payment Status:</span>
+                  <span className="text-sm text-gray-400">{projectVitals.paymentStatus}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">Next Milestone:</span>
-                  <span className="text-sm">{projectVitals.nextMilestone} ({projectVitals.nextMilestoneDate})</span>
+                  <Users className="h-4 w-4 text-gray-400" />
+                  <span className="text-sm font-medium text-gray-300">Next Milestone:</span>
+                  <span className="text-sm text-gray-400">{projectVitals.nextMilestone} ({projectVitals.nextMilestoneDate})</span>
                 </div>
               </div>
             </div>
           </div>
 
           {projectStatus.budget.status === 'warning' && (
-            <Alert className="mt-6 border-yellow-200 bg-yellow-50 text-yellow-800">
-              <AlertTriangle className="h-4 w-4" />
-              <AlertTitle>Budget Warning</AlertTitle>
-              <AlertDescription>
+            <Alert className="mt-6 border-yellow-700/40 bg-yellow-900/20 text-yellow-300">
+              <AlertTriangle className="h-4 w-4 text-yellow-400" />
+              <AlertTitle className="text-yellow-300">Budget Warning</AlertTitle>
+              <AlertDescription className="text-yellow-400">
                 {projectStatus.budget.description}
               </AlertDescription>
             </Alert>
@@ -131,24 +130,24 @@ export function ClientProjectOverview({ client }: ClientProjectOverviewProps) {
       </Card>
       
       <Tabs defaultValue="description">
-        <TabsList>
-          <TabsTrigger value="description">Description</TabsTrigger>
-          <TabsTrigger value="notes">Notes</TabsTrigger>
-          <TabsTrigger value="requirements">Requirements</TabsTrigger>
+        <TabsList className="bg-gray-800/50 border-gray-700/30">
+          <TabsTrigger value="description" className="data-[state=active]:bg-gray-700 data-[state=active]:text-gray-100 text-gray-400">Description</TabsTrigger>
+          <TabsTrigger value="notes" className="data-[state=active]:bg-gray-700 data-[state=active]:text-gray-100 text-gray-400">Notes</TabsTrigger>
+          <TabsTrigger value="requirements" className="data-[state=active]:bg-gray-700 data-[state=active]:text-gray-100 text-gray-400">Requirements</TabsTrigger>
         </TabsList>
-        <TabsContent value="description" className="p-4 border rounded-md mt-2">
-          <p className="text-sm text-muted-foreground">
+        <TabsContent value="description" className="p-4 border border-gray-700/30 rounded-md mt-2 bg-gray-900/30">
+          <p className="text-sm text-gray-400">
             {client.bio || 'No project description available. Add details about the project scope, objectives, and key deliverables here.'}
           </p>
         </TabsContent>
-        <TabsContent value="notes" className="p-4 border rounded-md mt-2">
-          <p className="text-sm text-muted-foreground">
+        <TabsContent value="notes" className="p-4 border border-gray-700/30 rounded-md mt-2 bg-gray-900/30">
+          <p className="text-sm text-gray-400">
             Client prefers communication via email. Initial consultation suggested a focus on mobile-first design.
             Follow-up meeting scheduled for next week to review wireframes.
           </p>
         </TabsContent>
-        <TabsContent value="requirements" className="p-4 border rounded-md mt-2">
-          <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
+        <TabsContent value="requirements" className="p-4 border border-gray-700/30 rounded-md mt-2 bg-gray-900/30">
+          <ul className="list-disc pl-5 text-sm text-gray-400 space-y-1">
             <li>Responsive design for all devices</li>
             <li>Integration with payment gateway</li>
             <li>Custom CMS for content management</li>
