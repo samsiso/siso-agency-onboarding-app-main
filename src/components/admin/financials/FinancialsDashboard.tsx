@@ -10,7 +10,7 @@ import { ExpenseCreditCard } from "./ExpenseCreditCard";
 export function FinancialsDashboard() {
   const [transactions, setTransactions] = useState<FinancialTransaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [period, setPeriod] = useState("month");
+  const [period, setPeriod] = useState("all");
   
   // Load transactions
   useEffect(() => {
@@ -67,7 +67,7 @@ export function FinancialsDashboard() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h2 className="text-2xl font-semibold text-siso-text-bold">Financial Overview</h2>
-        <Tabs defaultValue="month" value={period} onValueChange={setPeriod} className="w-[400px]">
+        <Tabs defaultValue="all" value={period} onValueChange={setPeriod} className="w-[400px]">
           <TabsList className="grid grid-cols-4 bg-siso-bg-alt border-siso-border">
             <TabsTrigger value="month" className="data-[state=active]:bg-siso-orange data-[state=active]:text-white">Month</TabsTrigger>
             <TabsTrigger value="quarter" className="data-[state=active]:bg-siso-orange data-[state=active]:text-white">Quarter</TabsTrigger>
