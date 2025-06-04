@@ -1,17 +1,16 @@
-
+import React from 'react';
 import { cn } from "@/lib/utils";
 
-interface MessageLoadingProps extends React.HTMLAttributes<HTMLDivElement> {}
+interface MessageLoadingProps {
+  className?: string;
+}
 
-export function MessageLoading({ className, ...props }: MessageLoadingProps) {
+export function MessageLoading({ className }: MessageLoadingProps) {
   return (
-    <div
-      className={cn("flex items-center gap-2", className)}
-      {...props}
-    >
-      <div className="w-2 h-2 bg-siso-orange/50 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-      <div className="w-2 h-2 bg-siso-orange/50 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-      <div className="w-2 h-2 bg-siso-orange/50 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+    <div className={cn("flex items-center space-x-1", className)}>
+      <div className="w-2 h-2 rounded-full bg-current animate-bounce" style={{ animationDelay: "0ms" }} />
+      <div className="w-2 h-2 rounded-full bg-current animate-bounce" style={{ animationDelay: "150ms" }} />
+      <div className="w-2 h-2 rounded-full bg-current animate-bounce" style={{ animationDelay: "300ms" }} />
     </div>
   );
 }

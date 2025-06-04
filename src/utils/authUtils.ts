@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export const signOut = async () => {
@@ -35,10 +34,20 @@ export const handleAuthCallback = async () => {
 
         // Using safer access pattern with direct property check
         const hasCompletedOnboarding = profile && profile.onboarding_completed === true;
+        
+        // Check if user has any projects
+        const { data: projects } = await supabase
+          .from('projects')
+          .select('id')
+          .eq('user_id', session.user.id)
+          .limit(1);
+        
+        // Determine if user is new - hasn't completed onboarding or has no projects
+        const isNewUser = !hasCompletedOnboarding || (projects && projects.length === 0);
           
-        if (!hasCompletedOnboarding) {
-          console.log('Redirecting to social onboarding...');
-          window.location.replace('/onboarding/social');
+        if (isNewUser) {
+          console.log('Redirecting to onboarding chat...');
+          window.location.replace('/onboarding-chat');
         } else {
           console.log('Onboarding completed, redirecting to profile');
           window.location.replace('/profile');

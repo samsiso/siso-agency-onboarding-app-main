@@ -28,7 +28,7 @@ export const SidebarFooter = ({ collapsed, onProfileOpen }: SidebarFooterProps) 
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   const { data: clientData, isLoading: clientLoading } = useClientData();
-  const { user } = useAuthSession();
+  const { user, handleSignOut } = useAuthSession();
 
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
@@ -135,7 +135,10 @@ export const SidebarFooter = ({ collapsed, onProfileOpen }: SidebarFooterProps) 
           
           <DropdownMenuSeparator className="bg-siso-border" />
           
-          <DropdownMenuItem className="text-siso-text cursor-pointer">
+          <DropdownMenuItem 
+            className="text-siso-text cursor-pointer"
+            onClick={handleSignOut}
+          >
             <LogOut className="mr-2 h-4 w-4" />
             <span>Logout</span>
           </DropdownMenuItem>

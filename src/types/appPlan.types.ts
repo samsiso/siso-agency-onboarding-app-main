@@ -8,14 +8,14 @@ export interface AppPlanInput {
   appPurpose: string;
   industry: string;
   targetAudience: string;
-  communicationPreference?: 'chat' | 'voice' | 'phone';
-  additionalRequirements?: string;
+  communicationPreference?: 'email' | 'phone' | 'chat' | 'voice';
   budget?: string;
   timeline?: string;
+  moreInfo?: string;
 }
 
 export interface TechnicalRequirements {
-  platform: 'native-ios' | 'native-android' | 'cross-platform' | 'web-app' | 'hybrid';
+  platform: 'web' | 'mobile' | 'cross-platform';
   techStack: {
     frontend: string[];
     backend: string[];
@@ -68,6 +68,17 @@ export interface UIUXPlan {
   accessibility: string[];
 }
 
+export interface IndustryResearch {
+  industryTrends: string[];
+  keyCompetitors: string[];
+  userBehaviors: string[];
+  marketGrowth: string;
+  technologicalFactors: string[];
+  recommendations: string[];
+  opportunityAreas: string[];
+  challengesToAddress: string[];
+}
+
 export interface GeneratedAppPlan {
   id: string;
   clientId: string;
@@ -98,14 +109,15 @@ export interface GeneratedAppPlan {
   version: string;
   confidence: number; // 0-100 AI confidence score
   status: 'draft' | 'reviewed' | 'approved' | 'implemented';
+  industryResearch?: IndustryResearch;
 }
 
 export interface AppPlanGenerationOptions {
-  model: 'gpt-4' | 'gpt-3.5' | 'claude' | 'gemini' | 'custom';
-  includeMarketAnalysis: boolean;
-  includeCostEstimates: boolean;
-  includeWireframes: boolean;
-  detailLevel: 'basic' | 'detailed' | 'comprehensive';
+  model: string;
+  includeMarketAnalysis?: boolean;
+  includeCostEstimates?: boolean;
+  includeWireframes?: boolean;
+  detailLevel: 'brief' | 'standard' | 'detailed';
   focusAreas: ('technical' | 'business' | 'design' | 'marketing')[];
 }
 

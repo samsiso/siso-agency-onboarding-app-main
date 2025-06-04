@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { ClientsEnhancedTable } from './ClientsEnhancedTable';
+import { AirtableClientsTable } from './AirtableClientsTable';
 import { ClientsCardGrid } from './ClientsCardGrid';
 import { ClientViewPreference } from '@/types/client.types';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -106,13 +106,11 @@ export function AdminClientsView({ isAdmin }: AdminClientsViewProps) {
           <div className="bg-gray-900 rounded-lg border border-gray-800 h-[calc(100vh-16rem)] flex flex-col">
             <div className="flex-1 overflow-hidden">
               {viewMode === "table" ? (
-                <ClientsEnhancedTable
+                <AirtableClientsTable
                   searchQuery={searchQuery}
                   statusFilter={statusFilter}
                   onSearchChange={setSearchQuery}
                   onStatusFilterChange={setStatusFilter}
-                  viewMode={viewMode}
-                  setViewMode={setViewMode}
                 />
               ) : (
                 <ClientsCardGrid

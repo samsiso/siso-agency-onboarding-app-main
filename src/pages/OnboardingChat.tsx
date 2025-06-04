@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bot, User, X, ArrowLeft, Send } from 'lucide-react';
@@ -8,6 +7,9 @@ import { MessageLoading } from '@/components/ui/message-loading';
 import { useOnboardingAuth } from '@/hooks/useOnboardingAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { SisoIcon } from '@/components/ui/icons/SisoIcon';
+import { BusinessDataInput } from '@/components/app-plan/BusinessDataForm';
+import { appPlanAgent } from '@/services/appPlanAgent';
+import { useToast } from '@/hooks/use-toast';
 
 interface Message {
   id: string;
@@ -21,22 +23,65 @@ const OnboardingChat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [currentStep, setCurrentStep] = useState<'name' | 'company' | 'industry' | 'app_idea' | 'social' | 'complete'>('name');
+  const [currentStep, setCurrentStep] = useState<'name' | 'company' | 'industry' | 'app_purpose' | 'target_audience' | 'desired_features' | 'budget' | 'timeline' | 'additional_requirements' | 'generating_plan' | 'complete'>('name');
   const [formData, setFormData] = useState({
     name: '',
     company: '',
     industry: '',
-    app_idea: '',
-    linkedin: '',
-    twitter: '',
-    website: ''
+    app_purpose: '',
+    target_audience: '',
+    desired_features: '',
+    budget: '',
+    timeline: '',
+    additional_requirements: '',
   });
   const [waitingForUserInput, setWaitingForUserInput] = useState(false);
   const [showTypingIndicator, setShowTypingIndicator] = useState(false);
+  const [isGeneratingPlan, setIsGeneratingPlan] = useState(false);
+  const [generationStage, setGenerationStage] = useState('');
+  const [generationProgress, setGenerationProgress] = useState(0);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { userId, isLoading: authLoading } = useOnboardingAuth();
+  const { toast } = useToast();
+
+  // Industry options for suggestions
+  const industries = [
+    'Retail & E-commerce',
+    'Health & Fitness',
+    'Finance & Banking',
+    'Education & Learning',
+    'Food & Beverage',
+    'Travel & Hospitality',
+    'Real Estate & Property',
+    'Software & Technology',
+    'Media & Entertainment',
+    'Professional Services',
+    'Manufacturing',
+    'Healthcare',
+    'Non-profit & Charity'
+  ];
+
+  // Timeline options
+  const timelineOptions = [
+    '1-2 months',
+    '3-4 months',
+    '5-6 months',
+    '6-12 months',
+    'Over 12 months',
+    'Flexible'
+  ];
+
+  // Budget ranges
+  const budgetRanges = [
+    'Under £10,000',
+    '£10,000 - £25,000',
+    '£25,000 - £50,000',
+    '£50,000 - £100,000',
+    '£100,000+',
+    'Flexible'
+  ];
 
   // Initialize the chat with welcome message
   useEffect(() => {
@@ -49,7 +94,7 @@ const OnboardingChat = () => {
       const welcomeMessage = {
         id: '1',
         role: 'assistant' as const,
-        content: "👋 Hi there! I'm SISO, your personal assistant. I'll help you get started with our platform by asking a few quick questions."
+        content: "👋 Hi there! I'm SISO, your personal assistant. I'll help you get started with our platform by asking a few quick questions to build your app plan."
       };
       
       setMessages([welcomeMessage]);
@@ -79,6 +124,67 @@ const OnboardingChat = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, showTypingIndicator]);
+
+  // Simulate progress for the app plan generation process
+  useEffect(() => {
+    if (isGeneratingPlan) {
+      // First stage: Industry research (0-40%)
+      const timer1 = setTimeout(() => {
+        setGenerationStage('Researching industry trends and market data');
+        setGenerationProgress(10);
+      }, 300);
+      
+      const timer2 = setTimeout(() => {
+        setGenerationProgress(20);
+      }, 1200);
+      
+      const timer3 = setTimeout(() => {
+        setGenerationProgress(30);
+      }, 2000);
+      
+      // Second stage: Analyzing requirements (40-70%)
+      const timer4 = setTimeout(() => {
+        setGenerationStage('Analyzing requirements and identifying features');
+        setGenerationProgress(40);
+      }, 3000);
+      
+      const timer5 = setTimeout(() => {
+        setGenerationProgress(50);
+      }, 4000);
+      
+      const timer6 = setTimeout(() => {
+        setGenerationProgress(60);
+      }, 5000);
+      
+      // Third stage: Generating plan (70-90%)
+      const timer7 = setTimeout(() => {
+        setGenerationStage('Creating app plan with tailored features');
+        setGenerationProgress(70);
+      }, 6000);
+      
+      const timer8 = setTimeout(() => {
+        setGenerationProgress(80);
+      }, 7000);
+      
+      // Final stage: Finalizing (90-95%)
+      const timer9 = setTimeout(() => {
+        setGenerationStage('Finalizing and preparing results');
+        setGenerationProgress(90);
+      }, 8000);
+
+      return () => {
+        clearTimeout(timer1);
+        clearTimeout(timer2);
+        clearTimeout(timer3);
+        clearTimeout(timer4);
+        clearTimeout(timer5);
+        clearTimeout(timer6);
+        clearTimeout(timer7);
+        clearTimeout(timer8);
+        clearTimeout(timer9);
+      };
+    }
+  }, [isGeneratingPlan]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -135,7 +241,22 @@ const OnboardingChat = () => {
         const assistantMessage = {
           id: Date.now().toString(),
           role: 'assistant' as const,
-          content: `Great! What industry is ${message} in?`,
+          content: `Great! What industry is ${message} in? (Choose from options or type your own)`,
+          actionComponent: (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {industries.slice(0, 6).map((industry) => (
+                <Button 
+                  key={industry}
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => handleIndustrySelect(industry)}
+                  className="bg-black/30 border-siso-text/20 text-white"
+                >
+                  {industry}
+                </Button>
+              ))}
+            </div>
+          ),
           requiresAction: true
         };
         
@@ -145,8 +266,12 @@ const OnboardingChat = () => {
       }, 1000);
     }
     else if (currentStep === 'industry') {
-      // Save the industry and move to app idea step
-      setFormData(prev => ({ ...prev, industry: message }));
+      // Handle industry selection
+      handleIndustrySelect(message);
+    }
+    else if (currentStep === 'app_purpose') {
+      // Save the app purpose and move to target audience step
+      setFormData(prev => ({ ...prev, app_purpose: message }));
       
       // Show typing indicator
       setShowTypingIndicator(true);
@@ -157,18 +282,18 @@ const OnboardingChat = () => {
         const assistantMessage = {
           id: Date.now().toString(),
           role: 'assistant' as const,
-          content: "Tell me briefly about the app or solution you're looking to build:",
+          content: "Who is the target audience for your app?",
           requiresAction: true
         };
         
         setMessages(prev => [...prev, assistantMessage]);
-        setCurrentStep('app_idea');
+        setCurrentStep('target_audience');
         setWaitingForUserInput(true);
       }, 1000);
     }
-    else if (currentStep === 'app_idea') {
-      // Save the app idea and move to social links step
-      setFormData(prev => ({ ...prev, app_idea: message }));
+    else if (currentStep === 'target_audience') {
+      // Save the target audience and move to desired features step
+      setFormData(prev => ({ ...prev, target_audience: message }));
       
       // Show typing indicator
       setShowTypingIndicator(true);
@@ -179,150 +304,253 @@ const OnboardingChat = () => {
         const assistantMessage = {
           id: Date.now().toString(),
           role: 'assistant' as const,
-          content: "Let's connect! Would you like to share any social or professional links? (Optional - just type 'skip' to continue without adding links)",
-          requiresAction: true,
-          actionComponent: (
-            <div className="mt-3 w-full space-y-3">
-              <div className="flex items-center space-x-2">
-                <span className="text-siso-text w-24">LinkedIn:</span>
-                <input 
-                  placeholder="Your LinkedIn URL"
-                  value={formData.linkedin}
-                  onChange={(e) => handleInputChange('linkedin', e.target.value)}
-                  className="w-full bg-black/30 border border-siso-text/20 text-white rounded px-3 py-2"
-                />
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="text-siso-text w-24">Twitter:</span>
-                <input 
-                  placeholder="Your Twitter URL"
-                  value={formData.twitter}
-                  onChange={(e) => handleInputChange('twitter', e.target.value)}
-                  className="w-full bg-black/30 border border-siso-text/20 text-white rounded px-3 py-2"
-                />
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="text-siso-text w-24">Website:</span>
-                <input 
-                  placeholder="Your Website URL"
-                  value={formData.website}
-                  onChange={(e) => handleInputChange('website', e.target.value)}
-                  className="w-full bg-black/30 border border-siso-text/20 text-white rounded px-3 py-2"
-                />
-              </div>
-              <div className="mt-2 flex justify-end">
-                <Button 
-                  onClick={() => handleSocialSubmit()}
-                  className="bg-gradient-to-r from-siso-red to-siso-orange text-white"
-                >
-                  Continue
-                </Button>
-              </div>
-            </div>
-          )
+          content: "What specific features would you like in your app? (Separate with commas)",
+          requiresAction: true
         };
         
         setMessages(prev => [...prev, assistantMessage]);
-        setCurrentStep('social');
-        
-        // Only set waiting for user input if they type "skip" - otherwise they'll use the form
-        if (message.toLowerCase() === 'skip') {
-          setWaitingForUserInput(true);
-        }
+        setCurrentStep('desired_features');
+        setWaitingForUserInput(true);
       }, 1000);
     }
-    else if (currentStep === 'social' && message.toLowerCase() === 'skip') {
-      // Handle skip option for social links
-      handleFinalSubmit();
-    }
-  };
-
-  const handleSocialSubmit = async () => {
-    // User has filled out the social links form and clicked continue
-    setWaitingForUserInput(false);
-    
-    // Process the social links and complete onboarding
-    handleFinalSubmit();
-  };
-
-  const handleFinalSubmit = async () => {
-    // Save data to Supabase
-    setLoading(true);
-    
-    try {
-      const { error } = await supabase.from('onboarding').insert({
-        name: formData.name,
-        organization: formData.company,
-        app_idea: formData.app_idea,
-        user_id: userId,
-        social_links: {
-          linkedin: formData.linkedin,
-          twitter: formData.twitter,
-          website: formData.website
-        }
-      });
-      
-      if (error) throw error;
+    else if (currentStep === 'desired_features') {
+      // Save the desired features and move to budget step
+      setFormData(prev => ({ ...prev, desired_features: message }));
       
       // Show typing indicator
       setShowTypingIndicator(true);
       
-      // Send completion message after delay
+      // Send next message after delay
       setTimeout(() => {
         setShowTypingIndicator(false);
-        
-        // Add assistant message to chat
         const assistantMessage = {
           id: Date.now().toString(),
           role: 'assistant' as const,
-          content: `Thanks for sharing! Based on what you've told me, we can build an MVP for your ${formData.app_idea} at no cost initially. Would you like to proceed?`,
+          content: "What's your budget range for this project?",
           actionComponent: (
-            <div className="mt-4 grid grid-cols-1 gap-4">
-              <div className="border rounded-lg p-4 bg-black/20 border-siso-text/10">
-                <h3 className="font-semibold text-lg text-siso-text-bold mb-2">Free MVP Plan</h3>
-                <ul className="space-y-2 mb-4">
-                  <li className="flex items-start">
-                    <span className="inline-block w-5 h-5 bg-gradient-to-r from-siso-red to-siso-orange rounded-full mr-2 shrink-0" />
-                    <span>Full development of core features</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="inline-block w-5 h-5 bg-gradient-to-r from-siso-red to-siso-orange rounded-full mr-2 shrink-0" />
-                    <span>Modern, responsive design</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="inline-block w-5 h-5 bg-gradient-to-r from-siso-red to-siso-orange rounded-full mr-2 shrink-0" />
-                    <span>Build completed in 2-4 weeks</span>
-                  </li>
-                </ul>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {budgetRanges.map((budget) => (
                 <Button 
-                  onClick={() => navigate('/thankyou-plan')}
-                  className="w-full bg-gradient-to-r from-siso-red to-siso-orange text-white"
+                  key={budget}
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => handleBudgetSelect(budget)}
+                  className="bg-black/30 border-siso-text/20 text-white"
                 >
-                  Get Started
+                  {budget}
                 </Button>
-              </div>
+              ))}
             </div>
-          )
+          ),
+          requiresAction: true
         };
         
         setMessages(prev => [...prev, assistantMessage]);
-        setCurrentStep('complete');
+        setCurrentStep('budget');
+        setWaitingForUserInput(true);
       }, 1000);
+    }
+    else if (currentStep === 'budget') {
+      // Handle budget selection
+      handleBudgetSelect(message);
+    }
+    else if (currentStep === 'timeline') {
+      // Handle timeline selection
+      handleTimelineSelect(message);
+    }
+    else if (currentStep === 'additional_requirements') {
+      // Save additional requirements and generate app plan
+      setFormData(prev => ({ ...prev, additional_requirements: message }));
+      
+      // Show typing indicator
+      setShowTypingIndicator(true);
+      
+      // Send next message after delay
+      setTimeout(() => {
+        setShowTypingIndicator(false);
+        const assistantMessage = {
+          id: Date.now().toString(),
+          role: 'assistant' as const,
+          content: "Thanks for providing all the information! I'll now generate an app plan based on your requirements."
+        };
+        
+        setMessages(prev => [...prev, assistantMessage]);
+        setCurrentStep('generating_plan');
+        
+        // Start generating the app plan
+        generateAppPlan();
+      }, 1000);
+    }
+  };
+
+  const handleIndustrySelect = (industry: string) => {
+    // Save the industry and move to app purpose step
+    setFormData(prev => ({ ...prev, industry }));
+    
+    // Show typing indicator
+    setShowTypingIndicator(true);
+    
+    // Send next message after delay
+    setTimeout(() => {
+      setShowTypingIndicator(false);
+      const assistantMessage = {
+        id: Date.now().toString(),
+        role: 'assistant' as const,
+        content: `Thank you! Now, please describe the main purpose of your app. What problem will it solve?`,
+        requiresAction: true
+      };
+      
+      setMessages(prev => [...prev, assistantMessage]);
+      setCurrentStep('app_purpose');
+      setWaitingForUserInput(true);
+    }, 1000);
+  };
+
+  const handleBudgetSelect = (budget: string) => {
+    // Save the budget and move to timeline step
+    setFormData(prev => ({ ...prev, budget }));
+    
+    // Show typing indicator
+    setShowTypingIndicator(true);
+    
+    // Send next message after delay
+    setTimeout(() => {
+      setShowTypingIndicator(false);
+      const assistantMessage = {
+        id: Date.now().toString(),
+        role: 'assistant' as const,
+        content: "What's your timeline for developing this app?",
+        actionComponent: (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {timelineOptions.map((timeline) => (
+              <Button 
+                key={timeline}
+                variant="outline" 
+                size="sm"
+                onClick={() => handleTimelineSelect(timeline)}
+                className="bg-black/30 border-siso-text/20 text-white"
+              >
+                {timeline}
+              </Button>
+            ))}
+          </div>
+        ),
+        requiresAction: true
+      };
+      
+      setMessages(prev => [...prev, assistantMessage]);
+      setCurrentStep('timeline');
+      setWaitingForUserInput(true);
+    }, 1000);
+  };
+
+  const handleTimelineSelect = (timeline: string) => {
+    // Save the timeline and move to additional requirements step
+    setFormData(prev => ({ ...prev, timeline }));
+    
+    // Show typing indicator
+    setShowTypingIndicator(true);
+    
+    // Send next message after delay
+    setTimeout(() => {
+      setShowTypingIndicator(false);
+      const assistantMessage = {
+        id: Date.now().toString(),
+        role: 'assistant' as const,
+        content: "Any additional requirements or constraints we should know about? (Type 'none' if there aren't any)",
+        requiresAction: true
+      };
+      
+      setMessages(prev => [...prev, assistantMessage]);
+      setCurrentStep('additional_requirements');
+      setWaitingForUserInput(true);
+    }, 1000);
+  };
+
+  const generateAppPlan = async () => {
+    setIsGeneratingPlan(true);
+    setGenerationProgress(5);
+    setGenerationStage('Initiating generation process');
+    
+    // Convert the form data to the format expected by the app plan generator
+    const businessData: BusinessDataInput = {
+      businessName: formData.company,
+      appPurpose: formData.app_purpose,
+      industry: formData.industry,
+      targetAudience: formData.target_audience,
+      desiredFeatures: formData.desired_features,
+      budget: formData.budget,
+      timeline: formData.timeline,
+      additionalRequirements: formData.additional_requirements
+    };
+    
+    try {
+      // Save onboarding data to Supabase
+      const { error: saveError } = await supabase.from('onboarding').insert({
+        name: formData.name,
+        organization: formData.company,
+        app_idea: formData.app_purpose,
+        user_id: userId,
+        industry: formData.industry,
+        target_audience: formData.target_audience,
+        desired_features: formData.desired_features,
+        budget: formData.budget,
+        timeline: formData.timeline,
+        additional_requirements: formData.additional_requirements
+      });
+      
+      if (saveError) throw saveError;
+
+      // Generate the app plan
+      const plan = await appPlanAgent.generatePlan(businessData);
+      
+      // Set generation complete
+      setGenerationProgress(100);
+      setGenerationStage('Generation complete!');
+      
+      // Show plan generation completion message
+      const assistantMessage = {
+        id: Date.now().toString(),
+        role: 'assistant' as const,
+        content: `Great news! I've generated an app plan for ${formData.company} based on your requirements. You can view and customize it now.`,
+        actionComponent: (
+          <div className="mt-4 flex justify-center">
+            <Button 
+              onClick={() => navigate('/app-plan')}
+              className="bg-gradient-to-r from-siso-red to-siso-orange text-white"
+            >
+              View Your App Plan
+            </Button>
+          </div>
+        )
+      };
+      
+      setMessages(prev => [...prev, assistantMessage]);
+      setCurrentStep('complete');
+      
+      toast({
+        title: "App Plan Generated",
+        description: "Your app plan has been successfully generated.",
+      });
       
     } catch (error) {
-      console.error('Error saving onboarding data:', error);
+      console.error('Error generating app plan:', error);
       
-      // Show error message
       const errorMessage = {
         id: Date.now().toString(),
         role: 'assistant' as const,
-        content: "I'm sorry, there was an error saving your information. Please try again."
+        content: "I'm sorry, there was an error generating your app plan. Please try again or contact support."
       };
       
       setMessages(prev => [...prev, errorMessage]);
       
+      toast({
+        title: "Error",
+        description: "There was a problem generating your app plan.",
+        variant: "destructive"
+      });
     } finally {
-      setLoading(false);
+      setIsGeneratingPlan(false);
     }
   };
 
@@ -330,16 +558,15 @@ const OnboardingChat = () => {
     navigate('/');
   };
 
-  if (authLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-gradient-to-b from-black via-siso-bg to-black">
-        <div className="w-10 h-10 border-4 border-siso-orange/50 border-t-siso-orange rounded-full animate-spin" />
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-black via-siso-bg to-black">
+      {/* Show loading spinner while auth is loading, but don't block rendering */}
+      {authLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-50">
+          <div className="w-10 h-10 border-4 border-siso-orange/50 border-t-siso-orange rounded-full animate-spin" />
+        </div>
+      )}
+      
       {/* Header */}
       <header className="p-4 border-b border-siso-text/10 flex items-center justify-between bg-black/30 backdrop-blur-sm fixed top-0 left-0 right-0 z-10">
         <Button
@@ -362,6 +589,32 @@ const OnboardingChat = () => {
       
       {/* Main chat container */}
       <main className="flex-1 max-w-2xl w-full mx-auto px-4 pt-20 pb-6">
+        {/* App Plan Generation Progress */}
+        {isGeneratingPlan && (
+          <div className="mb-6 bg-black/40 border border-siso-text/10 rounded-lg p-4">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="animate-pulse">
+                <SisoIcon className="w-5 h-5 text-siso-orange" />
+              </div>
+              <h3 className="text-sm font-medium text-white">{generationStage}</h3>
+            </div>
+            <div className="space-y-2">
+              <div className="w-full h-2 bg-black/50 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-siso-red to-siso-orange rounded-full transition-all duration-300"
+                  style={{ width: `${generationProgress}%` }}
+                />
+              </div>
+              <div className="flex justify-between text-xs text-siso-text/70">
+                <span>Research</span>
+                <span>Analysis</span>
+                <span>Generation</span>
+                <span>Finalize</span>
+              </div>
+            </div>
+          </div>
+        )}
+        
         {/* Chat messages */}
         <div className="flex-1 space-y-4 py-4">
           <AnimatePresence>
@@ -488,11 +741,11 @@ const OnboardingChat = () => {
       {currentStep === 'complete' && (
         <div className="text-center mt-4 pb-6">
           <Button 
-            onClick={() => navigate('/thankyou-plan')} 
+            onClick={() => navigate('/app-plan')} 
             variant="outline" 
             className="text-siso-text border-siso-text/30 hover:bg-siso-text/10"
           >
-            Continue to Next Step
+            View App Plan Details
           </Button>
         </div>
       )}

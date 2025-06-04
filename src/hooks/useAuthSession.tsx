@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -91,6 +90,23 @@ export const useAuthSession = () => {
           const adminStatus = await checkIsAdmin();
           setIsAdmin(adminStatus);
           
+          // Check if user has completed onboarding
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+          
+          // Check if user has any projects
+          const { data: projects } = await supabase
+            .from('projects')
+            .select('id')
+            .eq('user_id', session.user.id)
+            .limit(1);
+          
+          // Determine if user is new - they haven't completed onboarding or have no projects
+          const isNewUser = !profile?.onboarding_completed || (projects && projects.length === 0);
+          
           // Redirect admin users to the admin dashboard
           if (adminStatus) {
             toast({
@@ -98,7 +114,17 @@ export const useAuthSession = () => {
               description: "Redirecting to admin dashboard."
             });
             navigate('/admin', { replace: true });
-          } else {
+          } 
+          // Redirect new users to onboarding
+          else if (isNewUser) {
+            toast({
+              title: "Welcome to SISO!",
+              description: "Let's get you set up with your first project."
+            });
+            navigate('/onboarding-chat', { replace: true });
+          }
+          // Redirect existing users to home
+          else {
             toast({
               title: "Successfully signed in",
               description: "Welcome to SISO Resource Hub!",

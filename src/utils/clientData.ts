@@ -1,5 +1,7 @@
 // Utility functions for managing client data throughout the platform
 
+import { AppPlanInput } from '@/types/appPlan.types';
+
 export interface ClientProfile {
   company_name: string;
   project_description: string;
@@ -18,13 +20,67 @@ export interface ClientProfile {
   timeline?: string;
 }
 
+/**
+ * Interface for business onboarding data
+ */
 export interface BusinessOnboardingData {
   businessName: string;
   appPurpose: string;
   industry: string;
   targetAudience: string;
-  completedAt: string;
-  communicationPreference?: 'chat' | 'voice' | 'phone';
+  communicationPreference?: 'email' | 'phone' | 'chat' | 'voice';
+  budget?: string;
+  timeline?: string;
+  moreInfo?: string;
+}
+
+/**
+ * Storage key for business onboarding data
+ */
+const BUSINESS_DATA_KEY = 'business-onboarding-data';
+
+/**
+ * Save business onboarding data to localStorage
+ */
+export function saveBusinessOnboardingData(data: AppPlanInput | BusinessOnboardingData): void {
+  try {
+    localStorage.setItem(BUSINESS_DATA_KEY, JSON.stringify(data));
+    console.log('Business data saved successfully:', data.businessName);
+  } catch (error) {
+    console.error('Error saving business data:', error);
+  }
+}
+
+/**
+ * Get business onboarding data from localStorage
+ */
+export function getBusinessOnboardingData(): BusinessOnboardingData | null {
+  try {
+    const data = localStorage.getItem(BUSINESS_DATA_KEY);
+    return data ? JSON.parse(data) : null;
+  } catch (error) {
+    console.error('Error retrieving business data:', error);
+    return null;
+  }
+}
+
+/**
+ * Clear business onboarding data from localStorage
+ */
+export function clearBusinessOnboardingData(): void {
+  try {
+    localStorage.removeItem(BUSINESS_DATA_KEY);
+    console.log('Business data cleared successfully');
+  } catch (error) {
+    console.error('Error clearing business data:', error);
+  }
+}
+
+/**
+ * Check if business onboarding data exists
+ */
+export function hasBusinessOnboardingData(): boolean {
+  return !!getBusinessOnboardingData();
 }
 
 /**
@@ -36,19 +92,6 @@ export const getClientProfile = (): ClientProfile | null => {
     return data ? JSON.parse(data) : null;
   } catch (error) {
     console.error('Error reading client profile:', error);
-    return null;
-  }
-};
-
-/**
- * Get the business onboarding data from localStorage
- */
-export const getBusinessOnboardingData = (): BusinessOnboardingData | null => {
-  try {
-    const data = localStorage.getItem('business-onboarding-data');
-    return data ? JSON.parse(data) : null;
-  } catch (error) {
-    console.error('Error reading business onboarding data:', error);
     return null;
   }
 };

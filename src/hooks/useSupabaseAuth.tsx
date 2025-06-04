@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -35,10 +34,28 @@ export const useSupabaseAuth = () => {
 
         // Handle profile data safely
         const hasCompletedOnboarding = profile && profile.onboarding_completed === true;
+        
+        // Check if user has any projects
+        const { data: projects } = await supabase
+          .from('projects')
+          .select('id')
+          .eq('user_id', data.user.id)
+          .limit(1);
+        
+        // Determine if user is new - hasn't completed onboarding or has no projects
+        const isNewUser = !hasCompletedOnboarding || (projects && projects.length === 0);
 
-        if (!hasCompletedOnboarding) {
-          navigate('/onboarding/social');
+        if (isNewUser) {
+          toast({
+            title: "Welcome to SISO!",
+            description: "Let's get you set up with your first project."
+          });
+          navigate('/onboarding-chat');
         } else {
+          toast({
+            title: "Successfully signed in",
+            description: "Welcome back to SISO!"
+          });
           navigate('/profile');
         }
       }
