@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -212,6 +211,16 @@ export default function Auth() {
             <a href="/privacy" className="text-siso-red hover:text-siso-orange transition-colors">
               Privacy Policy
             </a>
+          </div>
+
+          <div className="mt-4 text-center">
+            <Button 
+              variant="outline" 
+              onClick={() => window.location.href = '/testing'}
+              className="bg-black/30 border-white/20 text-white hover:bg-black/50"
+            >
+              🧪 Access AI Testing Dashboard
+            </Button>
           </div>
         </div>
       </div>

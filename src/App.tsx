@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { ErrorBoundary } from 'react-error-boundary';
 import Index from './pages/Index';
 import TestPage from './pages/TestPage';
 import Auth from './pages/Auth';
@@ -45,6 +46,9 @@ import ProjectDetailsPage from './pages/ProjectDetailsPage';
 import ResourcesPage from './pages/resources/ResourcesPage';
 import TimelinePage from './pages/TimelinePage';
 import Communication from './pages/Communication';
+import AppPlan from './pages/AppPlan';
+import AppPlanTestingDashboard from '@/components/debug/AppPlanTestingDashboard';
+import DebugPage from './pages/debug';
 
 // Financial & Account section
 import PaymentsPage from './pages/financial/PaymentsPage';
@@ -60,114 +64,153 @@ import UserFlowCodePage from './pages/projects/UserFlowCodePage';
 import ProjectOnboardingPage from './pages/ProjectOnboardingPage';
 import { BusinessOnboarding } from './components/onboarding/BusinessOnboarding';
 
+function ErrorFallback({error, resetErrorBoundary}: {error: Error, resetErrorBoundary: () => void}) {
+  return (
+    <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="text-center space-y-4">
+        <h2 className="text-2xl font-bold text-white">Something went wrong</h2>
+        <p className="text-gray-400">There was an error loading this page</p>
+        <button 
+          onClick={resetErrorBoundary}
+          className="px-4 py-2 bg-[#ea384c] text-white rounded hover:bg-[#d42c47]"
+        >
+          Try again
+        </button>
+        <div className="mt-4">
+          <a 
+            href="/testing" 
+            className="text-[#ea384c] hover:underline"
+          >
+            🧪 Access AI Testing Dashboard
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function App() {
   return (
     <>
       <Toaster />
-      <Routes>
-        {/* Test route for diagnosis */}
-        <Route path="/test" element={<TestPage />} />
-        
-        {/* Public routes */}
-        <Route path="/" element={<Index />} />
-        <Route path="/auth" element={<Auth />} />
-        <Route path="/portfolio" element={<PublicPortfolio />} />
-        <Route path="/onboarding-chat" element={<OnboardingChat />} />
-        <Route path="/onboarding" element={<AuthGuard><BusinessOnboarding /></AuthGuard>} />
-        <Route path="/thankyou" element={<ThankYou />} />
-        <Route path="/thankyou-plan" element={<ThankYouPlan />} />
-        {/* Shareable app plans route - must come before generic plan route */}
-        <Route path="/plan/share/:slug" element={<PublicPlanView />} />
-        {/* User-specific plans route */}
-        <Route path="/plan/:username" element={<Plan />} />
-        <Route path="/decora-plan" element={<DecoraPlan />} />
-        
-        {/* Admin routes - using adminOnly prop to enforce admin access */}
-        <Route path="/admin" element={<AuthGuard adminOnly={true}><AdminDashboard /></AuthGuard>} />
-        <Route path="/admin/dashboard" element={<AuthGuard adminOnly={true}><AdminDashboard /></AuthGuard>} />
-        <Route path="/admin/clients" element={<AuthGuard adminOnly={true}><AdminClients /></AuthGuard>} />
-        <Route path="/admin/clients/:clientId" element={<AuthGuard adminOnly={true}><ClientDetailPage /></AuthGuard>} />
-        <Route path="/admin/prompts" element={<AuthGuard adminOnly={true}><AdminPrompts /></AuthGuard>} />
-        <Route path="/admin/outreach" element={<AuthGuard adminOnly={true}><AdminOutreach /></AuthGuard>} />
-        <Route path="/admin/templates" element={<AuthGuard adminOnly={true}><AdminTemplates /></AuthGuard>} />
-        <Route path="/admin/teams" element={<AuthGuard adminOnly={true}><AdminTeams /></AuthGuard>} />
-        <Route path="/admin/payments" element={<AuthGuard adminOnly={true}><AdminPayments /></AuthGuard>} />
-        <Route path="/admin/daily-planner" element={<AuthGuard adminOnly={true}><AdminDailyPlanner /></AuthGuard>} />
-        <Route path="/admin/tasks" element={<AuthGuard adminOnly={true}><AdminTasks /></AuthGuard>} />
-        <Route path="/admin/tasks/:memberId" element={<AuthGuard adminOnly={true}><TeamMemberTasksPage /></AuthGuard>} />
-        <Route path="/admin/settings" element={<AuthGuard adminOnly={true}><AdminSettings /></AuthGuard>} />
-        <Route path="/admin/plans/create" element={<AuthGuard adminOnly={true}><AdminPlans /></AuthGuard>} />
-        <Route path="/admin/plans/:planId/edit" element={<AuthGuard adminOnly={true}><AdminPlans /></AuthGuard>} />
-        <Route path="/admin/wireframes" element={<AuthGuard adminOnly={true}><AdminWireframes /></AuthGuard>} />
-        <Route path="/admin/wireframes/:projectId" element={<AuthGuard adminOnly={true}><AdminWireframes /></AuthGuard>} />
-        <Route path="/admin/userflow" element={<AuthGuard adminOnly={true}><AdminUserFlow /></AuthGuard>} />
-        <Route path="/admin/userflow/:projectId" element={<AuthGuard adminOnly={true}><UserFlow /></AuthGuard>} />
-        
-        {/* Protected Dashboard Routes */}
-        <Route path="/home" element={<AuthGuard><Home /></AuthGuard>} />
-        <Route path="/dashboard" element={<AuthGuard><Home /></AuthGuard>} />
-        
-        {/* Protected Project Routes */}
-        <Route path="/projects" element={<AuthGuard><ProjectsAndTasksPage /></AuthGuard>} />
-        <Route path="/projects/tasks" element={<AuthGuard><ProjectsAndTasksPage /></AuthGuard>} />
-        <Route path="/projects/timeline" element={<AuthGuard><TimelinePage /></AuthGuard>} />
-        <Route path="/projects/plan-features" element={<AuthGuard><ProjectDetailsPage /></AuthGuard>} />
-        <Route path="/projects/new" element={<AuthGuard><ProjectOnboardingPage /></AuthGuard>} />
-        
-        {/* Key route order - specific routes must come before the generic routes */}
-        <Route path="/projects/:id/userflow" element={<AuthGuard><UserFlow /></AuthGuard>} />
-        <Route path="/projects/:projectId/userflow/feedback" element={<AuthGuard><UserFlowFeedbackPage /></AuthGuard>} />
-        <Route path="/projects/:projectId/userflow/nodes" element={<AuthGuard><UserFlowNodesPage /></AuthGuard>} />
-        <Route path="/projects/:projectId/userflow/code" element={<AuthGuard><UserFlowCodePage /></AuthGuard>} />
-        
-        {/* Redirect routes for compatibility */}
-        <Route path="/projects/:id/feedback-log" element={<AuthGuard><Navigate to={`/projects/${window.location.pathname.split('/')[2]}/userflow/feedback`} replace /></AuthGuard>} />
-        
-        {/* Handle both wireframe (singular) and wireframes (plural) routes */}
-        <Route path="/projects/:id/wireframe" element={<AuthGuard><ProjectDetailsPage tab="wireframes" /></AuthGuard>} />
-        <Route path="/projects/:id/wireframes" element={<AuthGuard><ProjectDetailsPage tab="wireframes" /></AuthGuard>} />
-        
-        <Route path="/projects/:id/market-research/:documentId" element={<AuthGuard><ProjectDetailsPage /></AuthGuard>} />
-        <Route path="/projects/:id" element={<AuthGuard><ProjectDetailsPage /></AuthGuard>} />
-        <Route path="/projects/:id/:tab" element={<AuthGuard><ProjectDetailsPage /></AuthGuard>} />
-        
-        <Route path="/my-projects" element={<AuthGuard><MyProjects /></AuthGuard>} />
-        <Route path="/plan-builder" element={<AuthGuard><Communication /></AuthGuard>} />
-        <Route path="/admin/portfolio" element={<AuthGuard><Portfolio /></AuthGuard>} />
-        
-        {/* Financial Routes */}
-        <Route path="/financial/payments" element={<AuthGuard><PaymentsPage /></AuthGuard>} />
-        <Route path="/financial/leaderboards" element={<AuthGuard><LeaderboardPage /></AuthGuard>} />
-        
-        {/* Account & Resources Routes */}
-        <Route path="/profile" element={<AuthGuard><FinancialProfilePage /></AuthGuard>} />
-        <Route path="/resources" element={<AuthGuard><ResourcesPage /></AuthGuard>} />
-        <Route path="/resources/documents" element={<AuthGuard><DocumentLibraryPage /></AuthGuard>} />
-        
-        {/* Redirect legacy routes */}
-        <Route path="/financial/profile" element={<AuthGuard><Navigate to="/profile" replace /></AuthGuard>} />
-        <Route path="/help" element={<AuthGuard><Navigate to="/resources" replace /></AuthGuard>} />
-        <Route path="/settings" element={<AuthGuard><Navigate to="/profile" replace /></AuthGuard>} />
-        <Route path="/resources/help" element={<AuthGuard><Navigate to="/resources" replace /></AuthGuard>} />
-        <Route path="/resources/help/getting-started" element={<AuthGuard><ResourcesPage /></AuthGuard>} />
-        <Route path="/resources/help/documentation" element={<AuthGuard><ResourcesPage /></AuthGuard>} />
-        <Route path="/resources/help/faq" element={<AuthGuard><ResourcesPage /></AuthGuard>} />
-        
-        {/* Client App Details Route */}
-        <Route path="/client-app/:clientId" element={<AuthGuard><ClientAppDetailsPage /></AuthGuard>} />
-        
-        {/* Legacy Financial Routes (redirected for backward compatibility) */}
-        <Route path="/payments" element={<AuthGuard><PaymentsPage /></AuthGuard>} />
-        <Route path="/economy/earn" element={<AuthGuard><HowToEarn /></AuthGuard>} />
-        <Route path="/economy/leaderboards" element={<AuthGuard><LeaderboardPage /></AuthGuard>} />
-        
-        {/* Client Dashboard Routes - accessible to all authenticated users but with conditional content */}
-        <Route path="/client-dashboard" element={<AuthGuard><ClientDashboard /></AuthGuard>} />
-        <Route path="/client-dashboard/documents" element={<AuthGuard><ClientDocumentsPage /></AuthGuard>} />
-        <Route path="/client-dashboard/tasks" element={<AuthGuard><ClientTasksPage /></AuthGuard>} />
-        <Route path="/client-dashboard/status" element={<AuthGuard><ClientStatusPage /></AuthGuard>} />
-        <Route path="/client-dashboard/support" element={<AuthGuard><ClientSupportPage /></AuthGuard>} />
-      </Routes>
+      <ErrorBoundary 
+        FallbackComponent={ErrorFallback}
+        onReset={() => window.location.reload()}
+      >
+        <Routes>
+          {/* Test route for diagnosis */}
+          <Route path="/test" element={<TestPage />} />
+          
+          {/* Public routes */}
+          <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/portfolio" element={<PublicPortfolio />} />
+          <Route path="/onboarding-chat" element={<OnboardingChat />} />
+          <Route path="/onboarding" element={<AuthGuard><BusinessOnboarding /></AuthGuard>} />
+          <Route path="/thankyou" element={<ThankYou />} />
+          <Route path="/thankyou-plan" element={<ThankYouPlan />} />
+          {/* Shareable app plans route - must come before generic plan route */}
+          <Route path="/plan/share/:slug" element={<PublicPlanView />} />
+          {/* User-specific plans route */}
+          <Route path="/plan/:username" element={<Plan />} />
+          <Route path="/decora-plan" element={<DecoraPlan />} />
+
+          {/* App Plan Generator Route */}
+          <Route path="/app-plan" element={<AuthGuard><AppPlan /></AuthGuard>} />
+          
+          {/* Admin routes - using adminOnly prop to enforce admin access */}
+          <Route path="/admin" element={<AuthGuard adminOnly={true}><AdminDashboard /></AuthGuard>} />
+          <Route path="/admin/dashboard" element={<AuthGuard adminOnly={true}><AdminDashboard /></AuthGuard>} />
+          <Route path="/admin/clients" element={<AuthGuard adminOnly={true}><AdminClients /></AuthGuard>} />
+          <Route path="/admin/clients/:clientId" element={<AuthGuard adminOnly={true}><ClientDetailPage /></AuthGuard>} />
+          <Route path="/admin/prompts" element={<AuthGuard adminOnly={true}><AdminPrompts /></AuthGuard>} />
+          <Route path="/admin/outreach" element={<AuthGuard adminOnly={true}><AdminOutreach /></AuthGuard>} />
+          <Route path="/admin/templates" element={<AuthGuard adminOnly={true}><AdminTemplates /></AuthGuard>} />
+          <Route path="/admin/teams" element={<AuthGuard adminOnly={true}><AdminTeams /></AuthGuard>} />
+          <Route path="/admin/payments" element={<AuthGuard adminOnly={true}><AdminPayments /></AuthGuard>} />
+          <Route path="/admin/daily-planner" element={<AuthGuard adminOnly={true}><AdminDailyPlanner /></AuthGuard>} />
+          <Route path="/admin/tasks" element={<AuthGuard adminOnly={true}><AdminTasks /></AuthGuard>} />
+          <Route path="/admin/tasks/:memberId" element={<AuthGuard adminOnly={true}><TeamMemberTasksPage /></AuthGuard>} />
+          <Route path="/admin/settings" element={<AuthGuard adminOnly={true}><AdminSettings /></AuthGuard>} />
+          <Route path="/admin/plans/create" element={<AuthGuard adminOnly={true}><AdminPlans /></AuthGuard>} />
+          <Route path="/admin/plans/:planId/edit" element={<AuthGuard adminOnly={true}><AdminPlans /></AuthGuard>} />
+          <Route path="/admin/wireframes" element={<AuthGuard adminOnly={true}><AdminWireframes /></AuthGuard>} />
+          <Route path="/admin/wireframes/:projectId" element={<AuthGuard adminOnly={true}><AdminWireframes /></AuthGuard>} />
+          <Route path="/admin/userflow" element={<AuthGuard adminOnly={true}><AdminUserFlow /></AuthGuard>} />
+          <Route path="/admin/userflow/:projectId" element={<AuthGuard adminOnly={true}><UserFlow /></AuthGuard>} />
+          
+          {/* Protected Dashboard Routes */}
+          <Route path="/home" element={<AuthGuard><Home /></AuthGuard>} />
+          <Route path="/dashboard" element={<AuthGuard><Home /></AuthGuard>} />
+          
+          {/* Protected Project Routes */}
+          <Route path="/projects" element={<AuthGuard><ProjectsAndTasksPage /></AuthGuard>} />
+          <Route path="/projects/tasks" element={<AuthGuard><ProjectsAndTasksPage /></AuthGuard>} />
+          <Route path="/projects/timeline" element={<AuthGuard><TimelinePage /></AuthGuard>} />
+          <Route path="/projects/plan-features" element={<AuthGuard><ProjectDetailsPage /></AuthGuard>} />
+          <Route path="/projects/new" element={<AuthGuard><ProjectOnboardingPage /></AuthGuard>} />
+          
+          {/* Key route order - specific routes must come before the generic routes */}
+          <Route path="/projects/:id/userflow" element={<AuthGuard><UserFlow /></AuthGuard>} />
+          <Route path="/projects/:projectId/userflow/feedback" element={<AuthGuard><UserFlowFeedbackPage /></AuthGuard>} />
+          <Route path="/projects/:projectId/userflow/nodes" element={<AuthGuard><UserFlowNodesPage /></AuthGuard>} />
+          <Route path="/projects/:projectId/userflow/code" element={<AuthGuard><UserFlowCodePage /></AuthGuard>} />
+          
+          {/* Redirect routes for compatibility */}
+          <Route path="/projects/:id/feedback-log" element={<AuthGuard><Navigate to={`/projects/${window.location.pathname.split('/')[2]}/userflow/feedback`} replace /></AuthGuard>} />
+          
+          {/* Handle both wireframe (singular) and wireframes (plural) routes */}
+          <Route path="/projects/:id/wireframe" element={<AuthGuard><ProjectDetailsPage tab="wireframes" /></AuthGuard>} />
+          <Route path="/projects/:id/wireframes" element={<AuthGuard><ProjectDetailsPage tab="wireframes" /></AuthGuard>} />
+          
+          <Route path="/projects/:id/market-research/:documentId" element={<AuthGuard><ProjectDetailsPage /></AuthGuard>} />
+          <Route path="/projects/:id" element={<AuthGuard><ProjectDetailsPage /></AuthGuard>} />
+          <Route path="/projects/:id/:tab" element={<AuthGuard><ProjectDetailsPage /></AuthGuard>} />
+          
+          <Route path="/my-projects" element={<AuthGuard><MyProjects /></AuthGuard>} />
+          <Route path="/plan-builder" element={<AuthGuard><Communication /></AuthGuard>} />
+          <Route path="/admin/portfolio" element={<AuthGuard><Portfolio /></AuthGuard>} />
+          
+          {/* Financial Routes */}
+          <Route path="/financial/payments" element={<AuthGuard><PaymentsPage /></AuthGuard>} />
+          <Route path="/financial/leaderboards" element={<AuthGuard><LeaderboardPage /></AuthGuard>} />
+          
+          {/* Account & Resources Routes */}
+          <Route path="/profile" element={<AuthGuard><FinancialProfilePage /></AuthGuard>} />
+          <Route path="/resources" element={<AuthGuard><ResourcesPage /></AuthGuard>} />
+          <Route path="/resources/documents" element={<AuthGuard><DocumentLibraryPage /></AuthGuard>} />
+          
+          {/* Redirect legacy routes */}
+          <Route path="/financial/profile" element={<AuthGuard><Navigate to="/profile" replace /></AuthGuard>} />
+          <Route path="/help" element={<AuthGuard><Navigate to="/resources" replace /></AuthGuard>} />
+          <Route path="/settings" element={<AuthGuard><Navigate to="/profile" replace /></AuthGuard>} />
+          <Route path="/resources/help" element={<AuthGuard><Navigate to="/resources" replace /></AuthGuard>} />
+          <Route path="/resources/help/getting-started" element={<AuthGuard><ResourcesPage /></AuthGuard>} />
+          <Route path="/resources/help/documentation" element={<AuthGuard><ResourcesPage /></AuthGuard>} />
+          <Route path="/resources/help/faq" element={<AuthGuard><ResourcesPage /></AuthGuard>} />
+          
+          {/* Client App Details Route */}
+          <Route path="/client-app/:clientId" element={<AuthGuard><ClientAppDetailsPage /></AuthGuard>} />
+          
+          {/* Legacy Financial Routes (redirected for backward compatibility) */}
+          <Route path="/payments" element={<AuthGuard><PaymentsPage /></AuthGuard>} />
+          <Route path="/economy/earn" element={<AuthGuard><HowToEarn /></AuthGuard>} />
+          <Route path="/economy/leaderboards" element={<AuthGuard><LeaderboardPage /></AuthGuard>} />
+          
+          {/* Client Dashboard Routes - accessible to all authenticated users but with conditional content */}
+          <Route path="/client-dashboard" element={<AuthGuard><ClientDashboard /></AuthGuard>} />
+          <Route path="/client-dashboard/documents" element={<AuthGuard><ClientDocumentsPage /></AuthGuard>} />
+          <Route path="/client-dashboard/tasks" element={<AuthGuard><ClientTasksPage /></AuthGuard>} />
+          <Route path="/client-dashboard/status" element={<AuthGuard><ClientStatusPage /></AuthGuard>} />
+          <Route path="/client-dashboard/support" element={<AuthGuard><ClientSupportPage /></AuthGuard>} />
+
+          {/* Testing Dashboard Route */}
+          <Route path="/testing" element={<AppPlanTestingDashboard />} />
+          
+          {/* Debug Dashboard Route */}
+          <Route path="/debug" element={<DebugPage />} />
+        </Routes>
+      </ErrorBoundary>
     </>
   );
 }

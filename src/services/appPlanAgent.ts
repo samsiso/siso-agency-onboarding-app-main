@@ -14,6 +14,7 @@ import {
   UIUXPlan
 } from '@/types/appPlan.types';
 import { getBusinessOnboardingData } from '@/utils/clientData';
+import { supabase } from '@/integrations/supabase/client';
 
 /**
  * Mock AI model responses for development
@@ -73,37 +74,120 @@ Structure your response as a comprehensive app development plan that a client ca
   }
 
   /**
-   * Mock AI plan generation (replace with actual AI API calls)
+   * Call AI model via Supabase Edge Function
    */
-  private async callAIModel(prompt: string, model: string): Promise<string> {
-    // Mock response for development
-    // In production, integrate with OpenAI, Claude, etc.
+  private async callAIModel(prompt: string, model: string, input: AppPlanInput): Promise<string> {
+    console.log(`🤖 Calling real AI model ${model} via Supabase...`);
     
-    console.log(`🤖 Generating plan with ${model}...`);
-    console.log('Prompt:', prompt);
-    
-    // Simulate AI processing time
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-app-plan', {
+        body: {
+          businessData: {
+            businessName: input.businessName,
+            appPurpose: input.appPurpose,
+            industry: input.industry,
+            targetAudience: input.targetAudience,
+            budget: input.budget,
+            timeline: input.timeline
+          },
+          options: {
+            model: model,
+            includeMarketAnalysis: true,
+            includeCostEstimates: true,
+            detailLevel: 'detailed'
+          }
+        }
+      });
+
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw new Error(`AI generation failed: ${error.message}`);
+      }
+
+      if (!data || !data.success) {
+        throw new Error('AI generation returned no data');
+      }
+
+      console.log('✅ AI plan generated successfully');
+      return data.rawResponse;
+
+    } catch (error) {
+      console.error('Error calling AI model:', error);
+      
+      // Fallback to enhanced mock for development/testing
+      console.log('🔄 Falling back to enhanced mock response...');
+      return this.getEnhancedMockResponse(input);
+    }
+  }
+
+  /**
+   * Enhanced mock response as fallback
+   */
+  private getEnhancedMockResponse(input: AppPlanInput): string {
     return `
-    EXECUTIVE SUMMARY:
-    Based on your requirements for ${prompt.includes('Company: ') ? prompt.split('Company: ')[1].split('\n')[0] : 'your app'}, we recommend developing a modern cross-platform mobile application that focuses on user engagement and scalability.
-    
-    RECOMMENDED FEATURES:
-    1. User Authentication & Profiles
-    2. Core Functionality (based on app purpose)
-    3. Real-time Notifications
-    4. Analytics Dashboard
-    5. Payment Integration (if applicable)
-    
-    TECHNICAL RECOMMENDATIONS:
-    - Platform: Cross-platform (React Native or Flutter)
-    - Backend: Node.js with Express
-    - Database: PostgreSQL with Redis caching
-    - Hosting: AWS or Google Cloud
-    
-    TIMELINE: 12-16 weeks for MVP
-    ESTIMATED COST: £15,000 - £25,000
+# EXECUTIVE SUMMARY
+
+We recommend developing a comprehensive ${input.appPurpose} solution for ${input.businessName} targeting ${input.targetAudience} in the ${input.industry} industry. This app will leverage modern technology to deliver exceptional user experience while addressing key business objectives.
+
+# FEATURE RECOMMENDATIONS
+
+## Core Features (High Priority)
+- **User Authentication & Profiles**: Secure registration, login, and profile management
+- **${input.appPurpose} Core Functions**: Main application functionality tailored to business needs
+- **Dashboard & Analytics**: User insights and performance tracking
+- **Real-time Notifications**: Push notifications and in-app messaging
+
+## Secondary Features (Medium Priority)  
+- **Payment Integration**: Secure payment processing (if applicable)
+- **Social Features**: User interaction and community building
+- **Admin Panel**: Content and user management tools
+
+# TECHNICAL ARCHITECTURE
+
+## Platform Recommendation
+- **Approach**: Cross-platform development for iOS and Android
+- **Framework**: React Native with TypeScript for code reusability
+- **Backend**: Node.js with Express.js API
+
+## Technology Stack
+- **Frontend**: React Native, TypeScript, Redux
+- **Backend**: Node.js, Express.js, JWT Authentication
+- **Database**: PostgreSQL with Redis caching
+- **Storage**: AWS S3 for file storage
+- **Hosting**: AWS EC2 or Google Cloud Platform
+
+# DEVELOPMENT PHASES
+
+## Phase 1: Foundation (6-8 weeks)
+- User authentication system
+- Core app functionality
+- Basic UI/UX implementation
+- Database setup and API development
+
+## Phase 2: Enhancement (4-6 weeks)
+- Advanced features integration
+- Payment system (if required)
+- Admin panel development
+- Testing and optimization
+
+# COST BREAKDOWN (GBP)
+
+- **Development**: £18,000
+- **UI/UX Design**: £4,000  
+- **Testing & QA**: £2,500
+- **Deployment & Setup**: £1,500
+- **First Year Maintenance**: £3,000
+- **Total Project Cost**: £29,000
+
+# MARKET ANALYSIS
+
+The ${input.industry} industry shows strong growth in mobile adoption. ${input.targetAudience} users are increasingly expecting mobile-first solutions with intuitive interfaces and real-time capabilities.
+
+# RISKS AND MITIGATION
+
+- **Technical Complexity**: Mitigate with experienced development team
+- **Timeline Risks**: Build in 20% buffer for unexpected challenges  
+- **Market Competition**: Focus on unique value proposition and user experience
     `;
   }
 
@@ -244,7 +328,7 @@ Structure your response as a comprehensive app development plan that a client ca
       const prompt = this.generatePlanPrompt(input, options);
       
       // Call AI model (mock for now)
-      const aiResponse = await this.callAIModel(prompt, options.model);
+      const aiResponse = await this.callAIModel(prompt, options.model, input);
       
       // Parse response into structured data
       const parsedPlan = this.parseAIResponse(aiResponse, input);

@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { MessageLoading } from '@/components/ui/message-loading';
 import { toast } from '@/hooks/use-toast';
 import { SisoIcon } from '@/components/ui/icons/SisoIcon';
+import { autoTriggerSystem } from '@/services/autoTriggerSystem';
 
 interface Message {
   id: string;
@@ -334,6 +335,29 @@ export function BusinessOnboarding() {
         localStorage.setItem('workflow-completed-tasks', JSON.stringify(completedTasks));
       }
 
+      // 🚀 TRIGGER AUTOMATIC APP PLAN GENERATION
+      console.log('🤖 Triggering automatic app plan generation...');
+      
+      // Configure auto-trigger for this session
+      autoTriggerSystem.configure({
+        enabled: true,
+        delay: 2000, // 2 second delay
+        showProgress: true,
+        redirectAfterGeneration: false, // Don't redirect automatically
+        redirectUrl: '/app-plan'
+      });
+
+      // Trigger the auto-generation
+      const triggerResult = await autoTriggerSystem.checkAndTrigger();
+      
+      if (triggerResult) {
+        toast({
+          title: '🤖 AI Agent Activated',
+          description: 'Generating your comprehensive app plan in the background...',
+          duration: 5000
+        });
+      }
+
       setShowTypingIndicator(true);
       
       setTimeout(() => {
@@ -341,15 +365,25 @@ export function BusinessOnboarding() {
         const completionMessage = {
           id: Date.now().toString(),
           role: 'assistant' as const,
-          content: `Excellent! I've saved your business information. ${businessData.businessName} sounds like a great project! 🎉`,
+          content: `Excellent! I've saved your business information. ${businessData.businessName} sounds like a great project! 🎉
+
+${triggerResult ? '🤖 I\'m also generating a comprehensive app plan for you using AI. This will be ready in about 30-60 seconds!' : ''}`,
           actionComponent: (
             <div className="mt-4 space-y-3">
               <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
                 <h3 className="font-medium text-green-400 mb-2">✅ Step 1 Complete!</h3>
                 <p className="text-sm text-gray-300 mb-3">
-                  Your business information has been saved. Ready for the next step?
+                  Your business information has been saved. {triggerResult ? 'AI is generating your app plan automatically!' : 'Ready for the next step?'}
                 </p>
                 <div className="space-y-2">
+                  {triggerResult && (
+                    <Button 
+                      onClick={() => navigate('/app-plan')}
+                      className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+                    >
+                      🤖 View AI App Plan Generator →
+                    </Button>
+                  )}
                   <Button 
                     onClick={() => navigate('/plan-builder')}
                     className="w-full bg-orange-600 hover:bg-orange-700 text-white"
@@ -379,6 +413,7 @@ export function BusinessOnboarding() {
       }, 1000);
 
     } catch (error) {
+      console.error('Error in onboarding completion:', error);
       toast({
         title: 'Error saving information',
         description: 'Please try again',

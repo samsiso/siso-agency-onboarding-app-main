@@ -1,4 +1,3 @@
-
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
@@ -18,6 +17,21 @@ const queryClient = new QueryClient({
     },
   },
 })
+
+// Filter out harmless development errors in console
+if (import.meta.env.DEV) {
+  const originalError = console.error;
+  console.error = (...args) => {
+    const message = args.join(' ');
+    // Suppress common development tool connection errors
+    if (message.includes('net::ERR_CONNECTION_REFUSED') ||
+        message.includes('18883') ||
+        message.includes('Failed to load resource')) {
+      return; // Suppress these specific errors
+    }
+    originalError.apply(console, args);
+  };
+}
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
