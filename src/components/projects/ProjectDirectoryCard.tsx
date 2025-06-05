@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Bitcoin, ExternalLink, GitBranch, Code, Server } from 'lucide-react';
+import { Bitcoin, ExternalLink, GitBranch, Code, Server, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -37,7 +36,7 @@ export function ProjectDirectoryCard({
           blur="medium"
         />
         <Card 
-          onClick={() => navigate('/plan-builder')}
+          onClick={() => navigate('/onboarding-chat')}
           className="relative p-12 flex flex-col items-center justify-center gap-8 cursor-pointer bg-black/80 backdrop-blur-xl border border-[#ea384c]/20 hover:border-[#ea384c]/50 transition-all duration-300"
         >
           <div className="h-40 w-40 rounded-full bg-gradient-to-r from-[#ea384c] to-black flex items-center justify-center">
@@ -49,9 +48,11 @@ export function ProjectDirectoryCard({
               Begin your blockchain journey by creating a new cryptocurrency project
             </p>
             <Button 
-              className="mt-6 bg-gradient-to-r from-[#ea384c] to-black hover:opacity-90 px-8 py-6 text-lg"
+              className="w-full bg-gradient-to-r from-siso-red to-siso-orange text-white"
+              onClick={() => navigate('/onboarding-chat')}
             >
-              Create Project
+              Start Building
+              <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
         </Card>
@@ -124,21 +125,21 @@ export function ProjectDirectoryCard({
                   <Code size={16} />
                   <span>Smart Contract</span>
                 </div>
-                <Progress value={80} className="h-2" indicatorClassName="bg-[#ea384c]" />
+                <Progress value={80} className="h-2" indicatorColor="#ea384c" />
               </div>
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-siso-text">
                   <Server size={16} />
                   <span>Backend Integration</span>
                 </div>
-                <Progress value={65} className="h-2" indicatorClassName="bg-[#ea384c]" />
+                <Progress value={65} className="h-2" indicatorColor="#ea384c" />
               </div>
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-siso-text">
                   <GitBranch size={16} />
                   <span>Testing</span>
                 </div>
-                <Progress value={45} className="h-2" indicatorClassName="bg-[#ea384c]" />
+                <Progress value={45} className="h-2" indicatorColor="#ea384c" />
               </div>
             </div>
             

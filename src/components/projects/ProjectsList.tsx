@@ -67,7 +67,7 @@ export function ProjectsList() {
   }));
 
   const handleCreateNew = () => {
-    navigate('/plan-builder');
+    navigate('/onboarding-chat');
   };
   
   const filteredProjects = enhancedProjects.filter(project => 
@@ -113,10 +113,12 @@ export function ProjectsList() {
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <h1 className="text-2xl font-bold text-white">My Projects</h1>
         <Button 
-          onClick={handleCreateNew} 
-          className="bg-siso-orange hover:bg-siso-orange/80 text-white"
+          className="w-full bg-gradient-to-r from-siso-red to-siso-orange text-white"
+          onClick={() => {
+            navigate('/onboarding-chat');
+          }}
         >
-          <Plus className="mr-2 h-4 w-4" />
+          <Plus className="w-4 h-4 mr-2" />
           Create New Project
         </Button>
       </div>
@@ -164,11 +166,12 @@ export function ProjectsList() {
                 Create a new project and our SISO Assistant will help you bring your ideas to life.
               </p>
               <Button 
-                onClick={handleCreateNew} 
-                className="bg-siso-orange hover:bg-siso-orange/80 text-white"
-                size="lg"
+                className="w-full bg-gradient-to-r from-siso-red to-siso-orange text-white"
+                onClick={() => {
+                  navigate('/onboarding-chat');
+                }}
               >
-                <Plus className="mr-2 h-4 w-4" />
+                <Plus className="w-4 h-4 mr-2" />
                 Create New Project
               </Button>
             </div>

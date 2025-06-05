@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import {
   KanbanBoard,
@@ -49,7 +48,7 @@ const clientTasks = [
     },
     status: { name: "Awaiting Your Action", color: "#FF0000" },
     actionButton: "Review Now",
-    actionLink: "/plan-builder"
+    actionLink: "/onboarding-chat"
   },
   {
     id: "3",

@@ -30,7 +30,7 @@ export function PlanBuilderCard() {
             </p>
             <Button 
               className="w-full max-w-md bg-gradient-to-r from-siso-red to-siso-orange hover:opacity-90 text-lg py-6 text-white font-medium shadow-md"
-              onClick={() => navigate('/plan-builder')}
+              onClick={() => navigate('/onboarding-chat')}
             >
               Start Building
               <ArrowRight className="ml-2 h-5 w-5" />

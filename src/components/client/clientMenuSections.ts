@@ -1,4 +1,3 @@
-
 import {
   LayoutDashboard,
   ListTodo,
@@ -30,7 +29,7 @@ export const clientMenuSections = [
         label: 'Active Tasks',
       },
       {
-        href: '/plan-builder',
+        href: '/onboarding-chat',
         icon: MessageSquare,
         label: 'SISO Assistant',
       },

@@ -24,7 +24,7 @@ export const getMenuSections = (): MenuSection[] => {
           label: 'Active Tasks',
         },
         {
-          href: '/plan-builder',
+          href: '/onboarding-chat',
           icon: MessageSquare,
           label: 'SISO Assistant',
         },

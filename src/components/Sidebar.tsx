@@ -297,7 +297,7 @@ export const Sidebar = () => {
                 <DropdownMenuItem 
                   className="flex items-center gap-2 cursor-pointer text-siso-orange hover:text-siso-red hover:bg-black/20"
                   onClick={() => {
-                    navigate('/plan-builder');
+                    navigate('/onboarding-chat');
                     setIsProjectMenuOpen(false);
                     ignoreMouseLeaveUntil.current = Date.now() + 2000;
                   }}
