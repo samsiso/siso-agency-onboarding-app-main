@@ -27,15 +27,16 @@ const OnboardingChat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [currentStep, setCurrentStep] = useState<'communication' | 'company' | 'industry' | 'description' | 'website' | 'research' | 'research_complete' | 'app_plan' | 'complete'>('communication');
+  const [currentStep, setCurrentStep] = useState<'communication' | 'company' | 'description' | 'website' | 'website_input' | 'research' | 'research_complete' | 'app_plan' | 'complete'>('communication');
   const [communicationMethod, setCommunicationMethod] = useState<'chat' | 'voice' | 'phone'>('chat');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [formData, setFormData] = useState({
     company: '',
-    industry: '',
+    industry: 'General Business',
     description: '',
-    website: ''
+    website: '',
+    websiteType: ''
   });
   const [waitingForUserInput, setWaitingForUserInput] = useState(false);
   const [showTypingIndicator, setShowTypingIndicator] = useState(false);
@@ -193,55 +194,55 @@ const OnboardingChat = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, showTypingIndicator]);
 
-  // Research phase simulation
+  // Research phase simulation with specific scraping messages
   useEffect(() => {
     if (isResearching) {
+      // Add immediate loading message to chat
+      const loadingMessage = {
+        id: Date.now().toString(),
+        role: 'assistant' as const,
+        content: '🔍 **Research in Progress...**',
+        actionComponent: (
+          <div className="mt-3 flex items-center gap-3 p-3 bg-orange-500/10 border border-orange-500/30 rounded-lg">
+            <Loader2 className="w-5 h-5 text-orange-500 animate-spin" />
+            <div className="w-3 h-3 bg-red-500 rounded-full animate-bounce"></div>
+            <div className="w-2 h-2 bg-yellow-500 rounded-full animate-ping"></div>
+            <span className="text-orange-400 font-medium">Analyzing your business data...</span>
+          </div>
+        )
+      };
+      
+      setMessages(prev => [...prev, loadingMessage]);
+      
       const stages = [
-        'Analyzing your company website and online presence...',
-        'Researching industry trends and market data...',
-        'Identifying competitors and market opportunities...',
-        'Analyzing technology trends in your industry...',
-        'Compiling research findings...'
+        formData.website && formData.website !== 'none' ? `Scraping ${formData.company} ${formData.websiteType === 'website' ? 'website' : 'social media'} content...` : `Analyzing ${formData.company} business information...`,
+        `Researching industry trends and market data...`,
+        `Identifying competitors and market opportunities...`,
+        `Analyzing technology trends and best practices...`,
+        `Compiling research findings and insights...`
       ];
       
       stages.forEach((stage, index) => {
         setTimeout(() => {
           setGenerationStage(stage);
           setGenerationProgress(20 + (index * 15));
-        }, (index + 1) * 1000); // Faster timing: 1 second per stage
+        }, (index + 1) * 1000); // 1 second per stage
       });
       
       setTimeout(() => {
         setIsResearching(false);
         setResearchComplete(true);
         setGenerationProgress(100);
-        setGenerationStage('Research complete!');
+        setGenerationStage('✅ Research complete!');
         
-        const researchCompleteMessage = {
-          id: Date.now().toString(),
-          role: 'assistant' as const,
-          content: `Research complete! I've analyzed ${formData.company}, your industry trends, competitors, and technology opportunities.`,
-          actionComponent: (
-            <div className="mt-4 space-y-3">
-              <div className="flex items-center gap-2 text-green-400 mb-2">
-                <CheckCircle className="h-5 w-5" />
-                <span>Research Completed Successfully</span>
-              </div>
-              <Button
-                onClick={viewResearchResults}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
-              >
-                <Search className="h-4 w-4" />
-                View Research Results
-              </Button>
-            </div>
-          )
-        };
+        // Auto-start app plan generation after a brief pause with continued loading animation
+        setTimeout(() => {
+          startAppPlanGeneration();
+        }, 2000);
         
-        setMessages(prev => [...prev, researchCompleteMessage]);
-      }, 6000); // Total 6 seconds instead of 10
+      }, 6000); // Total 6 seconds for research
     }
-  }, [isResearching, formData.company, formData.industry]);
+  }, [isResearching, formData.company, formData.website, formData.websiteType]);
 
   // App plan generation simulation with enhanced multi-stage research
   useEffect(() => {
@@ -296,16 +297,24 @@ const OnboardingChat = () => {
                 </div>
                 
                 <Button
-                  onClick={() => window.open(`/app-plan/${savedPlan.username}`, '_blank')}
+                  onClick={() => {
+                    if (savedPlan?.username) {
+                      navigate(`/app-plan/${savedPlan.username}`);
+                    } else {
+                      navigate('/app-plan');
+                    }
+                  }}
                   className="w-full bg-gradient-to-r from-siso-red to-siso-orange text-white flex items-center gap-2 py-3 text-lg font-medium"
                 >
                   <ExternalLink className="h-5 w-5" />
                   View Your Complete App Plan
                 </Button>
                 
-                <p className="text-xs text-gray-400 text-center">
-                  Plan URL: {window.location.origin}/app-plan/{savedPlan.username}
-                </p>
+                {savedPlan?.username && (
+                  <p className="text-xs text-gray-400 text-center">
+                    Plan URL: {window.location.origin}/app-plan/{savedPlan.username}
+                  </p>
+                )}
               </div>
             )
           };
@@ -364,25 +373,7 @@ const OnboardingChat = () => {
         const assistantMessage = {
           id: Date.now().toString(),
           role: 'assistant' as const,
-          content: `Thanks! What industry is ${message} in?`,
-          requiresAction: true
-        };
-        
-        setMessages(prev => [...prev, assistantMessage]);
-        setCurrentStep('industry');
-        setWaitingForUserInput(true);
-      }, 1000);
-    } 
-    else if (currentStep === 'industry') {
-      setFormData(prev => ({ ...prev, industry: message }));
-      
-      setShowTypingIndicator(true);
-      setTimeout(() => {
-        setShowTypingIndicator(false);
-        const assistantMessage = {
-          id: Date.now().toString(),
-          role: 'assistant' as const,
-          content: `Perfect! In one sentence, what does ${formData.company} do?`,
+          content: `Great! In one sentence, what does ${message} do?`,
           requiresAction: true
         };
         
@@ -400,137 +391,129 @@ const OnboardingChat = () => {
         const assistantMessage = {
           id: Date.now().toString(),
           role: 'assistant' as const,
-          content: `Great! Do you have a website or social media I can research? (Enter URL or type 'none')`,
-          requiresAction: true
-        };
-        
-        setMessages(prev => [...prev, assistantMessage]);
-        setCurrentStep('website');
-        setWaitingForUserInput(true);
-      }, 1000);
-    }
-    else if (currentStep === 'website') {
-      setFormData(prev => ({ ...prev, website: message }));
-      
-      setShowTypingIndicator(true);
-      setTimeout(() => {
-        setShowTypingIndicator(false);
-        const assistantMessage = {
-          id: Date.now().toString(),
-          role: 'assistant' as const,
-          content: `Perfect! I have all the information I need. Now I'll research ${formData.company} and your industry to create the best possible app plan.`,
+          content: `Perfect! Do you have any online presence I can research?`,
           actionComponent: (
-            <div className="mt-4">
-              <Button 
-                onClick={startResearch}
-                className="w-full bg-gradient-to-r from-siso-red to-siso-orange text-white flex items-center gap-2"
+            <div className="mt-4 space-y-3">
+              <p className="text-sm text-gray-300 mb-3">Select your online presence:</p>
+              
+              <Button
+                onClick={() => handleWebsiteChoice('website')}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
               >
-                <Search className="h-4 w-4" />
-                Start Research
+                <ExternalLink className="h-4 w-4" />
+                I have a website
+              </Button>
+              
+              <Button
+                onClick={() => handleWebsiteChoice('instagram')}
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white flex items-center gap-2"
+              >
+                <MessageSquare className="h-4 w-4" />
+                I have Instagram/Social Media
+              </Button>
+              
+              <Button
+                onClick={() => handleWebsiteChoice('none')}
+                className="w-full bg-gray-600 hover:bg-gray-700 text-white flex items-center gap-2"
+              >
+                <X className="h-4 w-4" />
+                No online presence yet
               </Button>
             </div>
           )
         };
         
         setMessages(prev => [...prev, assistantMessage]);
+        setCurrentStep('website');
         setWaitingForUserInput(false);
       }, 1000);
     }
+    else if (currentStep === 'website_input') {
+      // Handle the URL input
+      setFormData(prev => ({ ...prev, website: message }));
+      
+      setShowTypingIndicator(true);
+      setTimeout(() => {
+        setShowTypingIndicator(false);
+        const startMessage = {
+          id: Date.now().toString(),
+          role: 'assistant' as const,
+          content: `Perfect! I have all the information I need. Starting research on ${formData.company} and ${formData.websiteType === 'website' ? 'your website' : 'your social media'} now...`
+        };
+        
+        setMessages(prev => [...prev, startMessage]);
+        
+        // Start research automatically
+        setTimeout(() => {
+          setIsResearching(true);
+          setGenerationProgress(5);
+          setGenerationStage('Initializing research process...');
+          setCurrentStep('research');
+        }, 1000);
+      }, 500);
+    }
   };
 
-  const startResearch = () => {
-    // Add immediate loading message
-    const loadingMessage = {
+  const handleWebsiteChoice = (choice: 'website' | 'instagram' | 'none') => {
+    const choiceText = choice === 'website' ? 'I have a website' : 
+                     choice === 'instagram' ? 'I have Instagram/Social Media' : 
+                     'No online presence yet';
+    
+    const userMessage = {
       id: Date.now().toString(),
-      role: 'assistant' as const,
-      content: `Perfect! Starting research on ${formData.company} and the ${formData.industry} industry now...`
+      role: 'user' as const,
+      content: choiceText
     };
     
-    setMessages(prev => [...prev, loadingMessage]);
-    setIsResearching(true);
-    setGenerationProgress(5);
-    setGenerationStage('Initializing research process...');
-    setCurrentStep('research');
-  };
-
-  const viewResearchResults = () => {
-    const researchMessage = {
-      id: Date.now().toString(),
-      role: 'assistant' as const,
-      content: "Here's what I discovered during my research:",
-      actionComponent: (
-        <div className="mt-4 space-y-4">
-          <div className="bg-black/20 border border-siso-text/10 rounded-lg p-4 text-sm space-y-3">
-            <div>
-              <h4 className="text-siso-orange font-semibold mb-2">🏭 Industry Analysis</h4>
-              <p className="text-gray-300">• {formData.industry} market is growing at 15% annually</p>
-              <p className="text-gray-300">• Key trends: Mobile-first approach, AI integration, data analytics</p>
-              <p className="text-gray-300">• Major competitors identified with gaps in mobile solutions</p>
-            </div>
-            
-            <div>
-              <h4 className="text-siso-orange font-semibold mb-2">🏢 Company Analysis</h4>
-              <p className="text-gray-300">• {formData.company} has strong online presence</p>
-              <p className="text-gray-300">• Target audience: Small to medium businesses</p>
-              <p className="text-gray-300">• Opportunity for digital transformation app</p>
-            </div>
-            
-            <div>
-              <h4 className="text-siso-orange font-semibold mb-2">💻 Technology Recommendations</h4>
-              <p className="text-gray-300">• React Native for cross-platform mobile app</p>
-              <p className="text-gray-300">• Cloud-based backend with real-time features</p>
-              <p className="text-gray-300">• Integration with existing business tools</p>
-              <p className="text-gray-300">• AI-powered analytics dashboard</p>
-            </div>
-            
-            <div>
-              <h4 className="text-siso-orange font-semibold mb-2">📈 Market Opportunity</h4>
-              <p className="text-gray-300">• 73% of businesses in {formData.industry} need better mobile solutions</p>
-              <p className="text-gray-300">• Average app development ROI: 300% within 12 months</p>
-              <p className="text-gray-300">• Recommended features based on industry standards</p>
-            </div>
-          </div>
-          
-          <Button 
-            onClick={startAppPlanGeneration}
-            className="w-full bg-gradient-to-r from-siso-red to-siso-orange text-white flex items-center gap-2"
-          >
-            <Zap className="h-4 w-4" />
-            Generate My Custom App Plan
-          </Button>
-        </div>
-      )
-    };
+    setMessages(prev => [...prev, userMessage]);
+    setFormData(prev => ({ ...prev, websiteType: choice }));
     
-    setMessages(prev => [...prev, researchMessage]);
-    setCurrentStep('research_complete');
+    if (choice === 'none') {
+      // If no online presence, start research immediately
+      setTimeout(() => {
+        const startMessage = {
+          id: Date.now().toString(),
+          role: 'assistant' as const,
+          content: `Perfect! I have all the information I need. Starting research on ${formData.company} now...`
+        };
+        
+        setMessages(prev => [...prev, startMessage]);
+        
+        // Start research automatically
+        setTimeout(() => {
+          setIsResearching(true);
+          setGenerationProgress(5);
+          setGenerationStage('Initializing research process...');
+          setCurrentStep('research');
+        }, 1000);
+      }, 500);
+    } else {
+      // If they have website or social media, ask for the URL
+      setTimeout(() => {
+        const urlRequestMessage = {
+          id: Date.now().toString(),
+          role: 'assistant' as const,
+          content: choice === 'website' 
+            ? 'Great! Please enter your website URL:' 
+            : 'Perfect! Please enter your Instagram handle or social media URL:',
+          requiresAction: true
+        };
+        
+        setMessages(prev => [...prev, urlRequestMessage]);
+        setCurrentStep('website_input');
+        setWaitingForUserInput(true);
+      }, 500);
+    }
   };
 
   const startAppPlanGeneration = async () => {
-    // Add immediate loading message
-    const loadingMessage = {
-      id: Date.now().toString(),
-      role: 'assistant' as const,
-      content: `Excellent! Now I'll create a custom app plan for ${formData.company} based on our research findings...`
-    };
-    
-    setMessages(prev => [...prev, loadingMessage]);
+    // Don't add a separate message, just continue the loading state
     setIsGeneratingPlan(true);
-    setGenerationProgress(5);
-    setGenerationStage('Initializing app plan generation...');
+    setGenerationProgress(10); // Continue from where research left off
+    setGenerationStage('Building your app development plan...');
     setCurrentStep('app_plan');
     
-    const businessData: BusinessDataInput = {
-      businessName: formData.company,
-      appPurpose: formData.description,
-      industry: formData.industry,
-      targetAudience: 'Businesses in ' + formData.industry,
-      desiredFeatures: 'Based on industry research',
-      budget: 'To be determined',
-      timeline: 'Standard development timeline',
-      additionalRequirements: 'Website: ' + formData.website
-    };
-    
+    // Save basic onboarding data to database (optional)
     try {
       if (userId) {
         const { error: saveError } = await supabase.from('onboarding').insert({
@@ -547,21 +530,12 @@ const OnboardingChat = () => {
           console.warn('Error saving onboarding data:', saveError);
         }
       }
-
-      await appPlanAgent.generatePlan(businessData);
-      
-      toast({
-        title: "App Plan Generated",
-        description: "Your custom app plan is ready to view.",
-      });
-      
     } catch (error) {
-      console.error('Error generating app plan:', error);
-      toast({
-        title: "Plan Generated",
-        description: "Your app plan has been created based on our research.",
-      });
+      console.warn('Error saving onboarding data:', error);
     }
+    
+    // The enhanced research system will now take over via the useEffect that monitors isGeneratingPlan
+    // This will trigger the 6-stage enhanced research process and completion message
   };
 
   const handleInputSubmit = (e: React.FormEvent) => {
@@ -605,39 +579,40 @@ const OnboardingChat = () => {
       
       {/* Main chat container */}
       <main className="flex-1 max-w-2xl w-full mx-auto px-4 pt-20 pb-24">
-        {/* Progress indicators with enhanced loading icons */}
-        {(isResearching || isGeneratingPlan) && (
-          <div className="mb-6 bg-black/40 border border-siso-text/10 rounded-lg p-4">
+        {/* Progress indicators with BRIGHT VISIBLE loading icons */}
+        {(isResearching || isGeneratingPlan || researchComplete) && (
+          <div className="mb-6 bg-gray-900/80 border border-orange-500/30 rounded-lg p-4 shadow-xl">
             <div className="flex items-center gap-3 mb-2">
               <div className="flex items-center gap-2">
-                <Loader2 className="w-5 h-5 text-siso-orange animate-spin" />
+                <Loader2 className="w-6 h-6 text-orange-500 animate-spin" />
                 <div className="animate-pulse">
-                  <SisoIcon className="w-5 h-5 text-siso-orange" />
+                  <div className="w-6 h-6 bg-orange-500 rounded-full animate-bounce"></div>
                 </div>
+                <div className="w-2 h-2 bg-red-500 rounded-full animate-ping"></div>
               </div>
-              <h3 className="text-sm font-medium text-white">{generationStage}</h3>
+              <h3 className="text-lg font-bold text-orange-400">{generationStage}</h3>
             </div>
-            <div className="space-y-2">
-              <div className="w-full h-2 bg-black/50 rounded-full overflow-hidden">
+            <div className="space-y-3">
+              <div className="w-full h-3 bg-gray-800 rounded-full overflow-hidden border border-orange-500/20">
                 <div 
-                  className="h-full bg-gradient-to-r from-siso-red to-siso-orange rounded-full transition-all duration-300"
+                  className="h-full bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 rounded-full transition-all duration-500 animate-pulse"
                   style={{ width: `${generationProgress}%` }}
                 />
               </div>
-              <div className="flex justify-between text-xs text-siso-text/70">
+              <div className="flex justify-between text-sm font-medium text-orange-300">
                 {isResearching ? (
                   <>
-                    <span>Company</span>
-                    <span>Industry</span>
-                    <span>Competitors</span>
-                    <span>Tech</span>
+                    <span>🔍 Scraping</span>
+                    <span>📊 Industry</span>
+                    <span>🏢 Competitors</span>
+                    <span>⚡ Analysis</span>
                   </>
                 ) : (
                   <>
-                    <span>Research</span>
-                    <span>Analysis</span>
-                    <span>Features</span>
-                    <span>Plan</span>
+                    <span>✅ Research</span>
+                    <span>🛠️ Features</span>
+                    <span>📋 Planning</span>
+                    <span>🎉 Complete</span>
                   </>
                 )}
               </div>
