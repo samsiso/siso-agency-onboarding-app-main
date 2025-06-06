@@ -118,6 +118,9 @@ function App() {
           {/* App Plan Generator Route */}
           <Route path="/app-plan" element={<AuthGuard><AppPlan /></AuthGuard>} />
           
+          {/* Dynamic App Plan Routes - username-based saved plans */}
+          <Route path="/app-plan/:username" element={<AppPlan />} />
+          
           {/* Admin routes - using adminOnly prop to enforce admin access */}
           <Route path="/admin" element={<AuthGuard adminOnly={true}><AdminDashboard /></AuthGuard>} />
           <Route path="/admin/dashboard" element={<AuthGuard adminOnly={true}><AdminDashboard /></AuthGuard>} />

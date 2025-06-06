@@ -11,6 +11,9 @@ import { BusinessDataInput } from '@/components/app-plan/BusinessDataForm';
 import { appPlanAgent } from '@/services/appPlanAgent';
 import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
+import { Progress } from '@/components/ui/progress';
+import { useAuthSession } from '@/hooks/useAuthSession';
+import { saveAppPlan, type AppPlanData, type SavedAppPlan } from '@/services/appPlanService';
 
 interface Message {
   id: string;
@@ -24,8 +27,8 @@ const OnboardingChat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [currentStep, setCurrentStep] = useState<'welcome' | 'company' | 'industry' | 'description' | 'website' | 'research' | 'research_complete' | 'app_plan' | 'complete'>('welcome');
-  const [communicationMethod, setCommunicationMethod] = useState<'chat' | 'voice' | 'phone' | null>(null);
+  const [currentStep, setCurrentStep] = useState<'communication' | 'company' | 'industry' | 'description' | 'website' | 'research' | 'research_complete' | 'app_plan' | 'complete'>('communication');
+  const [communicationMethod, setCommunicationMethod] = useState<'chat' | 'voice' | 'phone'>('chat');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [formData, setFormData] = useState({
@@ -42,6 +45,7 @@ const OnboardingChat = () => {
   const [generationProgress, setGenerationProgress] = useState(0);
   const [generationStage, setGenerationStage] = useState('');
   const [researchResults, setResearchResults] = useState('');
+  const [savedAppPlan, setSavedAppPlan] = useState<SavedAppPlan | null>(null);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -203,8 +207,8 @@ const OnboardingChat = () => {
       stages.forEach((stage, index) => {
         setTimeout(() => {
           setGenerationStage(stage);
-          setGenerationProgress((index + 1) * 20);
-        }, index * 2000);
+          setGenerationProgress(20 + (index * 15));
+        }, (index + 1) * 1000); // Faster timing: 1 second per stage
       });
       
       setTimeout(() => {
@@ -212,30 +216,6 @@ const OnboardingChat = () => {
         setResearchComplete(true);
         setGenerationProgress(100);
         setGenerationStage('Research complete!');
-        
-        // Simulate research results
-        setResearchResults(`
-**Industry Analysis:**
-• ${formData.industry} market is growing at 15% annually
-• Key trends: Mobile-first approach, AI integration, data analytics
-• Major competitors identified with gaps in mobile solutions
-
-**Company Analysis:**
-• ${formData.company} has strong online presence
-• Target audience: Small to medium businesses
-• Opportunity for digital transformation app
-
-**Technology Recommendations:**
-• React Native for cross-platform mobile app
-• Cloud-based backend with real-time features
-• Integration with existing business tools
-• AI-powered analytics dashboard
-
-**Market Opportunity:**
-• 73% of businesses in ${formData.industry} need better mobile solutions
-• Average app development ROI: 300% within 12 months
-• Recommended features based on industry standards
-        `);
         
         const researchCompleteMessage = {
           id: Date.now().toString(),
@@ -259,7 +239,7 @@ const OnboardingChat = () => {
         };
         
         setMessages(prev => [...prev, researchCompleteMessage]);
-      }, 10000);
+      }, 6000); // Total 6 seconds instead of 10
     }
   }, [isResearching, formData.company, formData.industry]);
 
@@ -276,41 +256,122 @@ const OnboardingChat = () => {
       stages.forEach((stage, index) => {
         setTimeout(() => {
           setGenerationStage(stage);
-          setGenerationProgress((index + 1) * 25);
-        }, index * 2500);
+          setGenerationProgress(20 + (index * 20));
+        }, (index + 1) * 1500); // Faster timing: 1.5 seconds per stage
       });
       
-      setTimeout(() => {
+      setTimeout(async () => {
         setIsGeneratingPlan(false);
         setGenerationProgress(100);
         setGenerationStage('App plan complete!');
         
-        const planCompleteMessage = {
-          id: Date.now().toString(),
-          role: 'assistant' as const,
-          content: `Your custom app plan is ready! I've created a comprehensive development roadmap specifically for ${formData.company} based on our research.`,
-          actionComponent: (
-            <div className="mt-4 space-y-3">
-              <div className="flex items-center gap-2 text-green-400 mb-2">
-                <CheckCircle className="h-5 w-5" />
-                <span>App Plan Generated Successfully</span>
+        // Save the app plan to the database
+        try {
+          const appPlanData: AppPlanData = {
+            company: formData.company,
+            industry: formData.industry,
+            description: formData.description,
+            website: formData.website,
+            researchResults: {
+              industryAnalysis: [
+                `${formData.industry} market is growing at 15% annually`,
+                'Key trends: Mobile-first approach, AI integration, data analytics',
+                'Major competitors identified with gaps in mobile solutions'
+              ],
+              companyAnalysis: [
+                `${formData.company} has strong online presence`,
+                'Target audience: Small to medium businesses',
+                'Opportunity for digital transformation app'
+              ],
+              techRecommendations: [
+                'React Native for cross-platform mobile app',
+                'Cloud-based backend with real-time features',
+                'Integration with existing business tools',
+                'AI-powered analytics dashboard'
+              ],
+              marketOpportunities: [
+                `73% of businesses in ${formData.industry} need better mobile solutions`,
+                'Average app development ROI: 300% within 12 months',
+                'Recommended features based on industry standards'
+              ]
+            }
+          };
+          
+          const savedPlan = await saveAppPlan(appPlanData);
+          setSavedAppPlan(savedPlan);
+          
+          const planCompleteMessage = {
+            id: Date.now().toString(),
+            role: 'assistant' as const,
+            content: `Your custom app plan is ready! I've created a comprehensive development roadmap specifically for ${formData.company} based on our research.`,
+            actionComponent: (
+              <div className="mt-4 space-y-3">
+                <div className="flex items-center gap-2 text-green-400 mb-2">
+                  <CheckCircle className="h-5 w-5" />
+                  <span>App Plan Generated Successfully</span>
+                </div>
+                <div className="bg-black/20 border border-siso-text/10 rounded-lg p-3 text-sm">
+                  <p className="text-gray-300 mb-2">Your plan has been saved with custom URL:</p>
+                  <p className="text-siso-orange font-mono text-xs break-all">
+                    {window.location.origin}/app-plan/{savedPlan.username}
+                  </p>
+                </div>
+                <Button
+                  onClick={() => navigate(`/app-plan/${savedPlan.username}`)}
+                  className="w-full bg-gradient-to-r from-siso-red to-siso-orange text-white flex items-center gap-2"
+                >
+                  <Zap className="h-4 w-4" />
+                  View Your Custom App Plan
+                  <ExternalLink className="h-4 w-4" />
+                </Button>
               </div>
-              <Button
-                onClick={() => navigate('/app-plan')}
-                className="w-full bg-gradient-to-r from-siso-red to-siso-orange text-white flex items-center gap-2"
-              >
-                <Zap className="h-4 w-4" />
-                View Your App Plan
-              </Button>
-            </div>
-          )
-        };
+            )
+          };
+          
+          setMessages(prev => [...prev, planCompleteMessage]);
+          
+          toast({
+            title: "App Plan Saved!",
+            description: `Your plan is saved at: /app-plan/${savedPlan.username}`,
+          });
+          
+        } catch (error) {
+          console.error('Error saving app plan:', error);
+          
+          // Fallback to original flow if save fails
+          const planCompleteMessage = {
+            id: Date.now().toString(),
+            role: 'assistant' as const,
+            content: `Your custom app plan is ready! I've created a comprehensive development roadmap specifically for ${formData.company} based on our research.`,
+            actionComponent: (
+              <div className="mt-4 space-y-3">
+                <div className="flex items-center gap-2 text-green-400 mb-2">
+                  <CheckCircle className="h-5 w-5" />
+                  <span>App Plan Generated Successfully</span>
+                </div>
+                <Button
+                  onClick={() => navigate('/app-plan')}
+                  className="w-full bg-gradient-to-r from-siso-red to-siso-orange text-white flex items-center gap-2"
+                >
+                  <Zap className="h-4 w-4" />
+                  View Your Custom App Plan
+                </Button>
+              </div>
+            )
+          };
+          
+          setMessages(prev => [...prev, planCompleteMessage]);
+          
+          toast({
+            title: "App Plan Generated",
+            description: "Your app plan is ready to view.",
+          });
+        }
         
-        setMessages(prev => [...prev, planCompleteMessage]);
         setCurrentStep('complete');
-      }, 10000);
+      }, 7000); // Total 7 seconds instead of 10
     }
-  }, [isGeneratingPlan, formData.company]);
+  }, [isGeneratingPlan, formData.company, formData.industry, formData.description, formData.website, navigate, toast]);
 
   const handleChatSubmit = async (message: string) => {
     if (!message.trim() || loading) return;
@@ -410,8 +471,17 @@ const OnboardingChat = () => {
   };
 
   const startResearch = () => {
+    // Add immediate loading message
+    const loadingMessage = {
+      id: Date.now().toString(),
+      role: 'assistant' as const,
+      content: `Perfect! Starting research on ${formData.company} and the ${formData.industry} industry now...`
+    };
+    
+    setMessages(prev => [...prev, loadingMessage]);
     setIsResearching(true);
-    setGenerationProgress(0);
+    setGenerationProgress(5);
+    setGenerationStage('Initializing research process...');
     setCurrentStep('research');
   };
 
@@ -419,15 +489,46 @@ const OnboardingChat = () => {
     const researchMessage = {
       id: Date.now().toString(),
       role: 'assistant' as const,
-      content: researchResults,
+      content: "Here's what I discovered during my research:",
       actionComponent: (
-        <div className="mt-4">
+        <div className="mt-4 space-y-4">
+          <div className="bg-black/20 border border-siso-text/10 rounded-lg p-4 text-sm space-y-3">
+            <div>
+              <h4 className="text-siso-orange font-semibold mb-2">🏭 Industry Analysis</h4>
+              <p className="text-gray-300">• {formData.industry} market is growing at 15% annually</p>
+              <p className="text-gray-300">• Key trends: Mobile-first approach, AI integration, data analytics</p>
+              <p className="text-gray-300">• Major competitors identified with gaps in mobile solutions</p>
+            </div>
+            
+            <div>
+              <h4 className="text-siso-orange font-semibold mb-2">🏢 Company Analysis</h4>
+              <p className="text-gray-300">• {formData.company} has strong online presence</p>
+              <p className="text-gray-300">• Target audience: Small to medium businesses</p>
+              <p className="text-gray-300">• Opportunity for digital transformation app</p>
+            </div>
+            
+            <div>
+              <h4 className="text-siso-orange font-semibold mb-2">💻 Technology Recommendations</h4>
+              <p className="text-gray-300">• React Native for cross-platform mobile app</p>
+              <p className="text-gray-300">• Cloud-based backend with real-time features</p>
+              <p className="text-gray-300">• Integration with existing business tools</p>
+              <p className="text-gray-300">• AI-powered analytics dashboard</p>
+            </div>
+            
+            <div>
+              <h4 className="text-siso-orange font-semibold mb-2">📈 Market Opportunity</h4>
+              <p className="text-gray-300">• 73% of businesses in {formData.industry} need better mobile solutions</p>
+              <p className="text-gray-300">• Average app development ROI: 300% within 12 months</p>
+              <p className="text-gray-300">• Recommended features based on industry standards</p>
+            </div>
+          </div>
+          
           <Button 
             onClick={startAppPlanGeneration}
             className="w-full bg-gradient-to-r from-siso-red to-siso-orange text-white flex items-center gap-2"
           >
             <Zap className="h-4 w-4" />
-            Generate My App Plan
+            Generate My Custom App Plan
           </Button>
         </div>
       )
@@ -438,8 +539,17 @@ const OnboardingChat = () => {
   };
 
   const startAppPlanGeneration = async () => {
+    // Add immediate loading message
+    const loadingMessage = {
+      id: Date.now().toString(),
+      role: 'assistant' as const,
+      content: `Excellent! Now I'll create a custom app plan for ${formData.company} based on our research findings...`
+    };
+    
+    setMessages(prev => [...prev, loadingMessage]);
     setIsGeneratingPlan(true);
-    setGenerationProgress(0);
+    setGenerationProgress(5);
+    setGenerationStage('Initializing app plan generation...');
     setCurrentStep('app_plan');
     
     const businessData: BusinessDataInput = {
