@@ -280,207 +280,232 @@ export default function AppPlan() {
   if (isViewingSharedPlan && savedPlan) {
     return (
       <MainLayout>
-        <div className="container max-w-5xl py-6 space-y-6">
-          <div className="flex items-center gap-2 mb-6">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={() => navigate(-1)}
-              className="rounded-full"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <div className="flex-1">
-              <h1 className="text-2xl font-bold text-white">{savedPlan.app_name}</h1>
-              <p className="text-gray-400">{savedPlan.company_name}</p>
+        <div className="min-h-screen bg-black">
+          <div className="container max-w-6xl py-8 space-y-8">
+            {/* Header Section */}
+            <div className="flex items-center gap-4 mb-8">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => navigate(-1)}
+                className="rounded-full bg-gray-900 hover:bg-gray-800 text-white"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-2">
+                  <h1 className="text-3xl font-bold text-white">{savedPlan.app_name}</h1>
+                  <Badge variant="outline" className="bg-green-500/20 text-green-400 border-green-500/50 px-3 py-1">
+                    {savedPlan.status}
+                  </Badge>
+                </div>
+                <p className="text-xl text-gray-300">{savedPlan.company_name}</p>
+                <p className="text-gray-400 mt-1">{savedPlan.description}</p>
+              </div>
             </div>
-            <Badge variant="outline" className="bg-green-500/10 text-green-400 border-green-500/30">
-              {savedPlan.status}
-            </Badge>
-          </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* App Plan Features */}
-            <div className="lg:col-span-2">
-              <Card className="bg-black/20 border-gray-700">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <FileText className="h-5 w-5 text-orange-500" />
-                    App Features & Development Plan
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {savedPlan.features && savedPlan.features.length > 0 ? (
-                    <div className="space-y-4">
-                      {/* Essential Features Section */}
-                      <div>
-                        <div className="flex items-center gap-2 mb-3">
-                          <Badge className="bg-red-500/20 text-red-300 border-red-500/30">
-                            Essential Features
-                          </Badge>
-                          <span className="text-sm text-gray-400">Must-have for core functionality</span>
-                        </div>
-                        <div className="space-y-3">
-                          {savedPlan.features.slice(0, Math.ceil(savedPlan.features.length * 0.6)).map((feature, index) => (
-                            <div key={index} className="p-4 bg-gradient-to-r from-red-950/20 to-orange-950/20 rounded-lg border border-red-500/20">
-                              <div className="flex items-start justify-between">
-                                <div className="flex-1">
-                                  <h4 className="text-white font-medium mb-2 flex items-center gap-2">
-                                    <CheckCircle className="h-4 w-4 text-red-400" />
-                                    {feature}
-                                  </h4>
-                                  <p className="text-sm text-gray-300 mb-2">
-                                    {getFeatureDescription(feature, savedPlan.company_name, 'essential')}
-                                  </p>
-                                  <div className="flex items-center gap-3 text-xs text-gray-400">
-                                    <span>High Priority</span>
-                                    <span>•</span>
-                                    <span>{getFeatureCategory(feature)}</span>
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+              {/* Main Features Section */}
+              <div className="lg:col-span-3 space-y-8">
+                <Card className="bg-black border-gray-800">
+                  <CardHeader className="pb-6">
+                    <CardTitle className="text-white flex items-center gap-3 text-2xl">
+                      <FileText className="h-6 w-6 text-orange-500" />
+                      App Features & Development Plan
+                    </CardTitle>
+                    <p className="text-gray-400 text-lg">Comprehensive feature breakdown for your business app</p>
+                  </CardHeader>
+                  <CardContent className="space-y-8">
+                    {savedPlan.features && savedPlan.features.length > 0 ? (
+                      <div className="space-y-8">
+                        {/* Essential Features Section */}
+                        <div>
+                          <div className="flex items-center gap-3 mb-6">
+                            <div className="bg-gradient-to-r from-red-500 to-orange-500 rounded-lg p-3">
+                              <CheckCircle className="h-6 w-6 text-white" />
+                            </div>
+                            <div>
+                              <h3 className="text-xl font-bold text-white">Essential Features</h3>
+                              <p className="text-gray-400">Must-have for core functionality</p>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-1 gap-4">
+                            {savedPlan.features.slice(0, Math.ceil(savedPlan.features.length * 0.6)).map((feature, index) => (
+                              <div key={index} className="group relative bg-black border-2 border-transparent bg-gradient-to-r from-red-500/20 via-orange-500/20 to-red-500/20 rounded-xl p-6 hover:from-red-500/30 hover:via-orange-500/30 hover:to-red-500/30 transition-all duration-300">
+                                <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-orange-500 rounded-xl opacity-20 group-hover:opacity-30 transition-opacity duration-300"></div>
+                                <div className="relative">
+                                  <div className="flex items-start gap-4">
+                                    <div className="bg-gradient-to-r from-red-500 to-orange-500 rounded-lg p-2 flex-shrink-0">
+                                      <CheckCircle className="h-5 w-5 text-white" />
+                                    </div>
+                                    <div className="flex-1">
+                                      <h4 className="text-white font-semibold text-lg mb-2">{feature}</h4>
+                                      <p className="text-gray-300 mb-3 leading-relaxed">
+                                        {getFeatureDescription(feature, savedPlan.company_name, 'essential')}
+                                      </p>
+                                      <div className="flex items-center gap-3">
+                                        <Badge className="bg-red-500/20 text-red-300 border-red-500/50 px-3 py-1">
+                                          High Priority
+                                        </Badge>
+                                        <span className="text-gray-400">•</span>
+                                        <span className="text-gray-400 text-sm">{getFeatureCategory(feature)}</span>
+                                      </div>
+                                    </div>
                                   </div>
                                 </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Recommended Features Section */}
+                        {savedPlan.features.length > 3 && (
+                          <div>
+                            <div className="flex items-center gap-3 mb-6">
+                              <div className="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg p-3">
+                                <CheckCircle className="h-6 w-6 text-white" />
+                              </div>
+                              <div>
+                                <h3 className="text-xl font-bold text-white">Recommended Features</h3>
+                                <p className="text-gray-400">Enhance user experience & functionality</p>
                               </div>
                             </div>
-                          ))}
-                        </div>
+                            <div className="grid grid-cols-1 gap-4">
+                              {savedPlan.features.slice(Math.ceil(savedPlan.features.length * 0.6), -2).map((feature, index) => (
+                                <div key={index} className="group relative bg-black border-2 border-transparent bg-gradient-to-r from-blue-500/20 via-cyan-500/20 to-blue-500/20 rounded-xl p-6 hover:from-blue-500/30 hover:via-cyan-500/30 hover:to-blue-500/30 transition-all duration-300">
+                                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl opacity-20 group-hover:opacity-30 transition-opacity duration-300"></div>
+                                  <div className="relative">
+                                    <div className="flex items-start gap-4">
+                                      <div className="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg p-2 flex-shrink-0">
+                                        <CheckCircle className="h-5 w-5 text-white" />
+                                      </div>
+                                      <div className="flex-1">
+                                        <h4 className="text-white font-semibold text-lg mb-2">{feature}</h4>
+                                        <p className="text-gray-300 mb-3 leading-relaxed">
+                                          {getFeatureDescription(feature, savedPlan.company_name, 'recommended')}
+                                        </p>
+                                        <div className="flex items-center gap-3">
+                                          <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/50 px-3 py-1">
+                                            Medium Priority
+                                          </Badge>
+                                          <span className="text-gray-400">•</span>
+                                          <span className="text-gray-400 text-sm">{getFeatureCategory(feature)}</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Additional Features Section */}
+                        {savedPlan.features.length > 5 && (
+                          <div>
+                            <div className="flex items-center gap-3 mb-6">
+                              <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-3">
+                                <CheckCircle className="h-6 w-6 text-white" />
+                              </div>
+                              <div>
+                                <h3 className="text-xl font-bold text-white">Additional Features</h3>
+                                <p className="text-gray-400">Future enhancements & advanced capabilities</p>
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-1 gap-4">
+                              {savedPlan.features.slice(-2).map((feature, index) => (
+                                <div key={index} className="group relative bg-black border-2 border-transparent bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-purple-500/20 rounded-xl p-6 hover:from-purple-500/30 hover:via-pink-500/30 hover:to-purple-500/30 transition-all duration-300">
+                                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl opacity-20 group-hover:opacity-30 transition-opacity duration-300"></div>
+                                  <div className="relative">
+                                    <div className="flex items-start gap-4">
+                                      <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-2 flex-shrink-0">
+                                        <CheckCircle className="h-5 w-5 text-white" />
+                                      </div>
+                                      <div className="flex-1">
+                                        <h4 className="text-white font-semibold text-lg mb-2">{feature}</h4>
+                                        <p className="text-gray-300 mb-3 leading-relaxed">
+                                          {getFeatureDescription(feature, savedPlan.company_name, 'additional')}
+                                        </p>
+                                        <div className="flex items-center gap-3">
+                                          <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/50 px-3 py-1">
+                                            Low Priority
+                                          </Badge>
+                                          <span className="text-gray-400">•</span>
+                                          <span className="text-gray-400 text-sm">{getFeatureCategory(feature)}</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
+                    ) : (
+                      <div className="text-center py-12">
+                        <p className="text-gray-400 text-lg">No features defined yet.</p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
 
-                      {/* Recommended Features Section */}
-                      {savedPlan.features.length > 3 && (
-                        <div>
-                          <div className="flex items-center gap-2 mb-3">
-                            <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30">
-                              Recommended Features  
-                            </Badge>
-                            <span className="text-sm text-gray-400">Enhance user experience & functionality</span>
-                          </div>
-                          <div className="space-y-3">
-                            {savedPlan.features.slice(Math.ceil(savedPlan.features.length * 0.6), -2).map((feature, index) => (
-                              <div key={index} className="p-4 bg-gradient-to-r from-blue-950/20 to-indigo-950/20 rounded-lg border border-blue-500/20">
-                                <div className="flex items-start justify-between">
-                                  <div className="flex-1">
-                                    <h4 className="text-white font-medium mb-2 flex items-center gap-2">
-                                      <CheckCircle className="h-4 w-4 text-blue-400" />
-                                      {feature}
-                                    </h4>
-                                    <p className="text-sm text-gray-300 mb-2">
-                                      {getFeatureDescription(feature, savedPlan.company_name, 'recommended')}
-                                    </p>
-                                    <div className="flex items-center gap-3 text-xs text-gray-400">
-                                      <span>Medium Priority</span>
-                                      <span>•</span>
-                                      <span>{getFeatureCategory(feature)}</span>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Additional Features Section */}
-                      {savedPlan.features.length > 5 && (
-                        <div>
-                          <div className="flex items-center gap-2 mb-3">
-                            <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30">
-                              Additional Features
-                            </Badge>
-                            <span className="text-sm text-gray-400">Future enhancements & advanced capabilities</span>
-                          </div>
-                          <div className="space-y-3">
-                            {savedPlan.features.slice(-2).map((feature, index) => (
-                              <div key={index} className="p-4 bg-gradient-to-r from-purple-950/20 to-violet-950/20 rounded-lg border border-purple-500/20">
-                                <div className="flex items-start justify-between">
-                                  <div className="flex-1">
-                                    <h4 className="text-white font-medium mb-2 flex items-center gap-2">
-                                      <CheckCircle className="h-4 w-4 text-purple-400" />
-                                      {feature}
-                                    </h4>
-                                    <p className="text-sm text-gray-300 mb-2">
-                                      {getFeatureDescription(feature, savedPlan.company_name, 'additional')}
-                                    </p>
-                                    <div className="flex items-center gap-3 text-xs text-gray-400">
-                                      <span>Low Priority</span>
-                                      <span>•</span>
-                                      <span>{getFeatureCategory(feature)}</span>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+              {/* Sidebar */}
+              <div className="space-y-6">
+                <Card className="bg-black border-gray-800">
+                  <CardHeader>
+                    <CardTitle className="text-white text-xl">Plan Overview</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <FileText className="h-5 w-5 text-orange-400" />
+                      <div>
+                        <p className="text-sm text-gray-400">Features</p>
+                        <p className="text-white font-semibold text-lg">{savedPlan.features?.length || 0} features</p>
+                      </div>
                     </div>
-                  ) : (
-                    <p className="text-gray-400">No features defined yet.</p>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
+                    
+                    <div className="flex items-center gap-3">
+                      <CheckCircle className="h-5 w-5 text-green-400" />
+                      <div>
+                        <p className="text-sm text-gray-400">Status</p>
+                        <p className="text-white font-semibold capitalize">{savedPlan.status}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
 
-            {/* Plan Details Sidebar */}
-            <div className="space-y-6">
-              <Card className="bg-black/20 border-gray-700">
-                <CardHeader>
-                  <CardTitle className="text-white text-lg">Plan Overview</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <DollarSign className="h-5 w-5 text-green-400" />
+                <Card className="bg-black border-gray-800">
+                  <CardHeader>
+                    <CardTitle className="text-white text-xl">Company Info</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
                     <div>
-                      <p className="text-sm text-gray-400">Estimated Cost</p>
-                      <p className="text-white font-semibold">${savedPlan.estimated_cost?.toLocaleString() || 'TBD'}</p>
+                      <p className="text-sm text-gray-400 mb-1">Company</p>
+                      <p className="text-white font-medium">{savedPlan.company_name}</p>
                     </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-3">
-                    <Clock className="h-5 w-5 text-blue-400" />
+                    
                     <div>
-                      <p className="text-sm text-gray-400">Timeline</p>
-                      <p className="text-white font-semibold">{savedPlan.estimated_days || 'TBD'} days</p>
+                      <p className="text-sm text-gray-400 mb-1">Description</p>
+                      <p className="text-gray-300 text-sm leading-relaxed">{savedPlan.description}</p>
                     </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-3">
-                    <FileText className="h-5 w-5 text-purple-400" />
+                    
                     <div>
-                      <p className="text-sm text-gray-400">Features</p>
-                      <p className="text-white font-semibold">{savedPlan.features?.length || 0} features</p>
+                      <p className="text-sm text-gray-400 mb-1">Created</p>
+                      <p className="text-white text-sm">{new Date(savedPlan.created_at).toLocaleDateString()}</p>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
 
-              <Card className="bg-black/20 border-gray-700">
-                <CardHeader>
-                  <CardTitle className="text-white text-lg">Company Info</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div>
-                    <p className="text-sm text-gray-400">Company</p>
-                    <p className="text-white">{savedPlan.company_name}</p>
-                  </div>
-                  
-                  <div>
-                    <p className="text-sm text-gray-400">Description</p>
-                    <p className="text-white text-sm">{savedPlan.description}</p>
-                  </div>
-                  
-                  <div>
-                    <p className="text-sm text-gray-400">Created</p>
-                    <p className="text-white text-sm">{new Date(savedPlan.created_at).toLocaleDateString()}</p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Button 
-                onClick={() => navigate('/onboarding-chat')}
-                className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white"
-              >
-                <MessageSquare className="h-4 w-4 mr-2" />
-                Create Your Own Plan
-              </Button>
+                <Button 
+                  onClick={() => navigate('/onboarding-chat')}
+                  className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white py-3 text-lg font-medium"
+                >
+                  <MessageSquare className="h-5 w-5 mr-2" />
+                  Create Your Own Plan
+                </Button>
+              </div>
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bot, User, X, ArrowLeft, Send, Mic, Phone, MessageSquare, MicOff, CheckCircle, Search, Zap, ExternalLink } from 'lucide-react';
+import { Bot, User, X, ArrowLeft, Send, Mic, Phone, MessageSquare, MicOff, CheckCircle, Search, Zap, ExternalLink, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { MessageLoading } from '@/components/ui/message-loading';
@@ -243,135 +243,103 @@ const OnboardingChat = () => {
     }
   }, [isResearching, formData.company, formData.industry]);
 
-  // App plan generation simulation
+  // App plan generation simulation with enhanced multi-stage research
   useEffect(() => {
     if (isGeneratingPlan) {
       const stages = [
-        'Creating custom app features based on research...',
-        'Calculating development costs and timeline...',
-        'Designing app architecture and user flow...',
-        'Finalizing your personalized app plan...'
+        'Conducting initial market research and industry analysis...',
+        'Analyzing competitor landscape and market opportunities...',
+        'Performing refined research and strategic positioning...',
+        'Evaluating user experience and technical requirements...',
+        'Generating comprehensive app development plan...',
+        'Finalizing research-backed feature recommendations...'
       ];
       
       stages.forEach((stage, index) => {
         setTimeout(() => {
           setGenerationStage(stage);
-          setGenerationProgress(20 + (index * 20));
-        }, (index + 1) * 1500); // Faster timing: 1.5 seconds per stage
+          setGenerationProgress(15 + (index * 14)); // More granular progress: 15, 29, 43, 57, 71, 85
+        }, (index + 1) * 2000); // Longer timing: 2 seconds per stage for comprehensive research
       });
       
       setTimeout(async () => {
         setIsGeneratingPlan(false);
         setGenerationProgress(100);
-        setGenerationStage('App plan complete!');
+        setGenerationStage('Research-driven app plan complete!');
         
-        // Save the app plan to the database
+        // Save the app plan to the database with enhanced research
         try {
-          const appPlanData: AppPlanData = {
+          const savedPlan = await saveAppPlan({
             company: formData.company,
             industry: formData.industry,
             description: formData.description,
-            website: formData.website,
-            researchResults: {
-              industryAnalysis: [
-                `${formData.industry} market is growing at 15% annually`,
-                'Key trends: Mobile-first approach, AI integration, data analytics',
-                'Major competitors identified with gaps in mobile solutions'
-              ],
-              companyAnalysis: [
-                `${formData.company} has strong online presence`,
-                'Target audience: Small to medium businesses',
-                'Opportunity for digital transformation app'
-              ],
-              techRecommendations: [
-                'React Native for cross-platform mobile app',
-                'Cloud-based backend with real-time features',
-                'Integration with existing business tools',
-                'AI-powered analytics dashboard'
-              ],
-              marketOpportunities: [
-                `73% of businesses in ${formData.industry} need better mobile solutions`,
-                'Average app development ROI: 300% within 12 months',
-                'Recommended features based on industry standards'
-              ]
-            }
-          };
+            website: formData.website
+          });
           
-          const savedPlan = await saveAppPlan(appPlanData);
-          setSavedAppPlan(savedPlan);
+          console.log('App plan saved with research data:', savedPlan);
           
-          const planCompleteMessage = {
+          // Add completion message with enhanced research info and clear action button
+          const completionMessage: Message = {
             id: Date.now().toString(),
-            role: 'assistant' as const,
-            content: `Your custom app plan is ready! I've created a comprehensive development roadmap specifically for ${formData.company} based on our research.`,
+            role: 'assistant',
+            content: `🎉 **Your comprehensive app plan is ready!**\n\nI've conducted extensive research across ${stages.length} phases including market analysis, competitor research, and strategic positioning. Your plan includes:\n\n✅ **Research-backed features** tailored to ${formData.industry}\n✅ **Competitive analysis** and market positioning\n✅ **Technical recommendations** based on industry best practices\n✅ **Strategic insights** for ${formData.company}`,
             actionComponent: (
               <div className="mt-4 space-y-3">
-                <div className="flex items-center gap-2 text-green-400 mb-2">
-                  <CheckCircle className="h-5 w-5" />
-                  <span>App Plan Generated Successfully</span>
-                </div>
-                <div className="bg-black/20 border border-siso-text/10 rounded-lg p-3 text-sm">
-                  <p className="text-gray-300 mb-2">Your plan has been saved with custom URL:</p>
-                  <p className="text-siso-orange font-mono text-xs break-all">
-                    {window.location.origin}/app-plan/{savedPlan.username}
+                <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
+                  <div className="flex items-center gap-2 text-green-400 mb-2">
+                    <CheckCircle className="h-5 w-5" />
+                    <span className="font-semibold">App Plan Generated Successfully!</span>
+                  </div>
+                  <p className="text-sm text-gray-300 mb-3">
+                    Your research-driven app development plan is ready to view with all findings and recommendations.
                   </p>
                 </div>
+                
                 <Button
-                  onClick={() => navigate(`/app-plan/${savedPlan.username}`)}
-                  className="w-full bg-gradient-to-r from-siso-red to-siso-orange text-white flex items-center gap-2"
+                  onClick={() => window.open(`/app-plan/${savedPlan.username}`, '_blank')}
+                  className="w-full bg-gradient-to-r from-siso-red to-siso-orange text-white flex items-center gap-2 py-3 text-lg font-medium"
                 >
-                  <Zap className="h-4 w-4" />
-                  View Your Custom App Plan
-                  <ExternalLink className="h-4 w-4" />
+                  <ExternalLink className="h-5 w-5" />
+                  View Your Complete App Plan
                 </Button>
+                
+                <p className="text-xs text-gray-400 text-center">
+                  Plan URL: {window.location.origin}/app-plan/{savedPlan.username}
+                </p>
               </div>
             )
           };
           
-          setMessages(prev => [...prev, planCompleteMessage]);
-          
-          toast({
-            title: "App Plan Saved!",
-            description: `Your plan is saved at: /app-plan/${savedPlan.username}`,
-          });
+          setMessages(prev => [...prev, completionMessage]);
           
         } catch (error) {
-          console.error('Error saving app plan:', error);
+          console.error('Failed to save app plan:', error);
           
-          // Fallback to original flow if save fails
-          const planCompleteMessage = {
+          // Fallback message if save fails
+          const fallbackMessage: Message = {
             id: Date.now().toString(),
-            role: 'assistant' as const,
-            content: `Your custom app plan is ready! I've created a comprehensive development roadmap specifically for ${formData.company} based on our research.`,
+            role: 'assistant',
+            content: `🎉 **Your app plan has been generated!**\n\nI've conducted comprehensive research and created a detailed plan for ${formData.company}. The plan includes research-backed features, competitive analysis, and strategic recommendations.`,
             actionComponent: (
-              <div className="mt-4 space-y-3">
-                <div className="flex items-center gap-2 text-green-400 mb-2">
-                  <CheckCircle className="h-5 w-5" />
-                  <span>App Plan Generated Successfully</span>
-                </div>
+              <div className="mt-4">
                 <Button
                   onClick={() => navigate('/app-plan')}
                   className="w-full bg-gradient-to-r from-siso-red to-siso-orange text-white flex items-center gap-2"
                 >
-                  <Zap className="h-4 w-4" />
+                  <ExternalLink className="h-4 w-4" />
                   View Your Custom App Plan
                 </Button>
               </div>
             )
           };
           
-          setMessages(prev => [...prev, planCompleteMessage]);
-          
-          toast({
-            title: "App Plan Generated",
-            description: "Your app plan is ready to view.",
-          });
+          setMessages(prev => [...prev, fallbackMessage]);
         }
         
         setCurrentStep('complete');
-      }, 7000); // Total 7 seconds instead of 10
+      }, 13000); // Total time: 13 seconds for comprehensive research
     }
-  }, [isGeneratingPlan, formData.company, formData.industry, formData.description, formData.website, navigate, toast]);
+  }, [isGeneratingPlan, formData]);
 
   const handleChatSubmit = async (message: string) => {
     if (!message.trim() || loading) return;
@@ -637,12 +605,15 @@ const OnboardingChat = () => {
       
       {/* Main chat container */}
       <main className="flex-1 max-w-2xl w-full mx-auto px-4 pt-20 pb-24">
-        {/* Progress indicators */}
+        {/* Progress indicators with enhanced loading icons */}
         {(isResearching || isGeneratingPlan) && (
           <div className="mb-6 bg-black/40 border border-siso-text/10 rounded-lg p-4">
             <div className="flex items-center gap-3 mb-2">
-              <div className="animate-pulse">
-                <SisoIcon className="w-5 h-5 text-siso-orange" />
+              <div className="flex items-center gap-2">
+                <Loader2 className="w-5 h-5 text-siso-orange animate-spin" />
+                <div className="animate-pulse">
+                  <SisoIcon className="w-5 h-5 text-siso-orange" />
+                </div>
               </div>
               <h3 className="text-sm font-medium text-white">{generationStage}</h3>
             </div>
@@ -663,9 +634,9 @@ const OnboardingChat = () => {
                   </>
                 ) : (
                   <>
+                    <span>Research</span>
+                    <span>Analysis</span>
                     <span>Features</span>
-                    <span>Costs</span>
-                    <span>Architecture</span>
                     <span>Plan</span>
                   </>
                 )}
