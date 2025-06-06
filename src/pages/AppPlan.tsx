@@ -307,18 +307,43 @@ export default function AppPlan() {
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
               {/* Main Features Section */}
               <div className="lg:col-span-3 space-y-8">
-                <Card className="bg-black border-gray-800">
-                  <CardHeader className="pb-6">
-                    <CardTitle className="text-white flex items-center gap-3 text-2xl">
-                      <FileText className="h-6 w-6 text-orange-500" />
-                      App Features & Development Plan
+                {/* Executive Summary Section */}
+                <Card className="bg-black border-gray-800 mb-6">
+                  <CardHeader>
+                    <CardTitle className="text-white text-2xl flex items-center gap-3">
+                      <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-lg p-3">
+                        <FileText className="h-6 w-6 text-white" />
+                      </div>
+                      Executive Summary
                     </CardTitle>
-                    <p className="text-gray-400 text-lg">Comprehensive feature breakdown for your business app</p>
                   </CardHeader>
-                  <CardContent className="space-y-8">
+                  <CardContent className="space-y-4">
+                    <div className="bg-gray-900/50 rounded-lg p-6 border border-gray-700">
+                      <h4 className="text-lg font-semibold text-white mb-3">Understanding {savedPlan.company_name}</h4>
+                      <p className="text-gray-300 leading-relaxed mb-4">
+                        {savedPlan.company_name} operates in the dynamic sector of {savedPlan.description}. 
+                        Our comprehensive analysis reveals significant opportunities for digital transformation 
+                        that will enhance operational efficiency, improve customer engagement, and drive sustainable growth.
+                      </p>
+                      <p className="text-gray-300 leading-relaxed">
+                        This custom application is designed to address the specific needs of {savedPlan.company_name}, 
+                        providing a competitive advantage through innovative features and seamless user experience. 
+                        Our research-driven approach ensures every feature delivers measurable business value.
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Features Section */}
+                <Card className="bg-black border-gray-800">
+                  <CardHeader>
+                    <CardTitle className="text-white text-2xl">📱 App Features & Development Plan</CardTitle>
+                    <p className="text-gray-400">Comprehensive feature breakdown for your business app</p>
+                  </CardHeader>
+                  <CardContent>
                     {savedPlan.features && savedPlan.features.length > 0 ? (
                       <div className="space-y-8">
-                        {/* Essential Features Section */}
+                        {/* Essential Features - First 3 features */}
                         <div>
                           <div className="flex items-center gap-3 mb-6">
                             <div className="bg-gradient-to-r from-red-500 to-orange-500 rounded-lg p-3">
@@ -330,7 +355,7 @@ export default function AppPlan() {
                             </div>
                           </div>
                           <div className="grid grid-cols-1 gap-4">
-                            {savedPlan.features.slice(0, Math.ceil(savedPlan.features.length * 0.6)).map((feature, index) => (
+                            {savedPlan.features.slice(0, 3).map((feature, index) => (
                               <div key={index} className="group relative bg-black border-2 border-transparent bg-gradient-to-r from-red-500/20 via-orange-500/20 to-red-500/20 rounded-xl p-6 hover:from-red-500/30 hover:via-orange-500/30 hover:to-red-500/30 transition-all duration-300">
                                 <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-orange-500 rounded-xl opacity-20 group-hover:opacity-30 transition-opacity duration-300"></div>
                                 <div className="relative">
@@ -358,7 +383,7 @@ export default function AppPlan() {
                           </div>
                         </div>
 
-                        {/* Recommended Features Section */}
+                        {/* Recommended Features - Features 4-5 (and more if available) */}
                         {savedPlan.features.length > 3 && (
                           <div>
                             <div className="flex items-center gap-3 mb-6">
@@ -371,7 +396,7 @@ export default function AppPlan() {
                               </div>
                             </div>
                             <div className="grid grid-cols-1 gap-4">
-                              {savedPlan.features.slice(Math.ceil(savedPlan.features.length * 0.6), -2).map((feature, index) => (
+                              {savedPlan.features.slice(3).map((feature, index) => (
                                 <div key={index} className="group relative bg-black border-2 border-transparent bg-gradient-to-r from-blue-500/20 via-cyan-500/20 to-blue-500/20 rounded-xl p-6 hover:from-blue-500/30 hover:via-cyan-500/30 hover:to-blue-500/30 transition-all duration-300">
                                   <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl opacity-20 group-hover:opacity-30 transition-opacity duration-300"></div>
                                   <div className="relative">
@@ -386,7 +411,7 @@ export default function AppPlan() {
                                         </p>
                                         <div className="flex items-center gap-3">
                                           <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/50 px-3 py-1">
-                                            Medium Priority
+                                            {index < 2 ? 'Medium Priority' : 'Low Priority'}
                                           </Badge>
                                           <span className="text-gray-400">•</span>
                                           <span className="text-gray-400 text-sm">{getFeatureCategory(feature)}</span>
@@ -400,47 +425,128 @@ export default function AppPlan() {
                           </div>
                         )}
 
-                        {/* Additional Features Section */}
-                        {savedPlan.features.length > 5 && (
-                          <div>
-                            <div className="flex items-center gap-3 mb-6">
-                              <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-3">
-                                <CheckCircle className="h-6 w-6 text-white" />
-                              </div>
-                              <div>
-                                <h3 className="text-xl font-bold text-white">Additional Features</h3>
-                                <p className="text-gray-400">Future enhancements & advanced capabilities</p>
-                              </div>
+                        {/* Research Documentation Section */}
+                        <div className="mt-8">
+                          <div className="flex items-center gap-3 mb-6">
+                            <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-3">
+                              <BarChart3 className="h-6 w-6 text-white" />
                             </div>
-                            <div className="grid grid-cols-1 gap-4">
-                              {savedPlan.features.slice(-2).map((feature, index) => (
-                                <div key={index} className="group relative bg-black border-2 border-transparent bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-purple-500/20 rounded-xl p-6 hover:from-purple-500/30 hover:via-pink-500/30 hover:to-purple-500/30 transition-all duration-300">
-                                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl opacity-20 group-hover:opacity-30 transition-opacity duration-300"></div>
-                                  <div className="relative">
-                                    <div className="flex items-start gap-4">
-                                      <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-2 flex-shrink-0">
-                                        <CheckCircle className="h-5 w-5 text-white" />
-                                      </div>
-                                      <div className="flex-1">
-                                        <h4 className="text-white font-semibold text-lg mb-2">{feature}</h4>
-                                        <p className="text-gray-300 mb-3 leading-relaxed">
-                                          {getFeatureDescription(feature, savedPlan.company_name, 'additional')}
-                                        </p>
-                                        <div className="flex items-center gap-3">
-                                          <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/50 px-3 py-1">
-                                            Low Priority
-                                          </Badge>
-                                          <span className="text-gray-400">•</span>
-                                          <span className="text-gray-400 text-sm">{getFeatureCategory(feature)}</span>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
+                            <div>
+                              <h3 className="text-xl font-bold text-white">Research & Analysis</h3>
+                              <p className="text-gray-400">Comprehensive market and technical research</p>
                             </div>
                           </div>
-                        )}
+
+                          <div className="space-y-4">
+                            {/* Industry Analysis */}
+                            <details className="group bg-gray-900/50 rounded-lg border border-gray-700">
+                              <summary className="p-4 cursor-pointer hover:bg-gray-800/50 transition-colors">
+                                <div className="flex items-center gap-3">
+                                  <div className="bg-purple-500 rounded-full p-1">
+                                    <Search className="h-4 w-4 text-white" />
+                                  </div>
+                                  <span className="text-white font-medium">Industry Analysis</span>
+                                  <span className="text-gray-400 text-sm ml-auto">Click to expand</span>
+                                </div>
+                              </summary>
+                              <div className="p-4 pt-0 space-y-2">
+                                {savedPlan.research_results?.industryAnalysis ? (
+                                  savedPlan.research_results.industryAnalysis.map((item, index) => (
+                                    <p key={index} className="text-gray-300">• {item}</p>
+                                  ))
+                                ) : (
+                                  <>
+                                    <p className="text-gray-300">• Market research shows strong growth potential in the {savedPlan.description} sector</p>
+                                    <p className="text-gray-300">• Digital transformation is accelerating across all business sizes</p>
+                                    <p className="text-gray-300">• Mobile-first approach is essential for competitive advantage</p>
+                                    <p className="text-gray-300">• Customer expectations for digital experiences continue to rise</p>
+                                  </>
+                                )}
+                              </div>
+                            </details>
+
+                            {/* Technical Recommendations */}
+                            <details className="group bg-gray-900/50 rounded-lg border border-gray-700">
+                              <summary className="p-4 cursor-pointer hover:bg-gray-800/50 transition-colors">
+                                <div className="flex items-center gap-3">
+                                  <div className="bg-blue-500 rounded-full p-1">
+                                    <FileText className="h-4 w-4 text-white" />
+                                  </div>
+                                  <span className="text-white font-medium">Technical Recommendations</span>
+                                  <span className="text-gray-400 text-sm ml-auto">Click to expand</span>
+                                </div>
+                              </summary>
+                              <div className="p-4 pt-0 space-y-2">
+                                {savedPlan.research_results?.techRecommendations ? (
+                                  savedPlan.research_results.techRecommendations.map((item, index) => (
+                                    <p key={index} className="text-gray-300">• {item}</p>
+                                  ))
+                                ) : (
+                                  <>
+                                    <p className="text-gray-300">• React/TypeScript for modern, maintainable web development</p>
+                                    <p className="text-gray-300">• Progressive Web App (PWA) for mobile optimization</p>
+                                    <p className="text-gray-300">• Cloud-hosted solution for scalability and reliability</p>
+                                    <p className="text-gray-300">• API-first architecture for future integrations</p>
+                                  </>
+                                )}
+                              </div>
+                            </details>
+
+                            {/* Market Opportunities */}
+                            <details className="group bg-gray-900/50 rounded-lg border border-gray-700">
+                              <summary className="p-4 cursor-pointer hover:bg-gray-800/50 transition-colors">
+                                <div className="flex items-center gap-3">
+                                  <div className="bg-green-500 rounded-full p-1">
+                                    <BarChart3 className="h-4 w-4 text-white" />
+                                  </div>
+                                  <span className="text-white font-medium">Market Opportunities</span>
+                                  <span className="text-gray-400 text-sm ml-auto">Click to expand</span>
+                                </div>
+                              </summary>
+                              <div className="p-4 pt-0 space-y-2">
+                                {savedPlan.research_results?.marketOpportunities ? (
+                                  savedPlan.research_results.marketOpportunities.map((item, index) => (
+                                    <p key={index} className="text-gray-300">• {item}</p>
+                                  ))
+                                ) : (
+                                  <>
+                                    <p className="text-gray-300">• Growing demand for digital solutions in traditional industries</p>
+                                    <p className="text-gray-300">• Opportunity to differentiate through superior user experience</p>
+                                    <p className="text-gray-300">• Potential for operational efficiency improvements of 25-40%</p>
+                                    <p className="text-gray-300">• Integration opportunities with existing business tools</p>
+                                  </>
+                                )}
+                              </div>
+                            </details>
+
+                            {/* Company Analysis */}
+                            <details className="group bg-gray-900/50 rounded-lg border border-gray-700">
+                              <summary className="p-4 cursor-pointer hover:bg-gray-800/50 transition-colors">
+                                <div className="flex items-center gap-3">
+                                  <div className="bg-orange-500 rounded-full p-1">
+                                    <ExternalLink className="h-4 w-4 text-white" />
+                                  </div>
+                                  <span className="text-white font-medium">{savedPlan.company_name} Specific Analysis</span>
+                                  <span className="text-gray-400 text-sm ml-auto">Click to expand</span>
+                                </div>
+                              </summary>
+                              <div className="p-4 pt-0 space-y-2">
+                                {savedPlan.research_results?.companyAnalysis ? (
+                                  savedPlan.research_results.companyAnalysis.map((item, index) => (
+                                    <p key={index} className="text-gray-300">• {item}</p>
+                                  ))
+                                ) : (
+                                  <>
+                                    <p className="text-gray-300">• {savedPlan.company_name} is well-positioned for digital growth</p>
+                                    <p className="text-gray-300">• Custom application will streamline current business operations</p>
+                                    <p className="text-gray-300">• Enhanced customer engagement through dedicated digital platform</p>
+                                    <p className="text-gray-300">• Strategic advantage through technology adoption ahead of competitors</p>
+                                  </>
+                                )}
+                              </div>
+                            </details>
+                          </div>
+                        </div>
                       </div>
                     ) : (
                       <div className="text-center py-12">

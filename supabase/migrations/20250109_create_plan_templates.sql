@@ -1,5 +1,11 @@
+-- Add research_results column to existing plans table
+ALTER TABLE plans ADD COLUMN IF NOT EXISTS research_results JSONB DEFAULT '{}';
+
+-- Update comment to reflect new column
+COMMENT ON COLUMN plans.research_results IS 'AI-generated research data including industry analysis, company analysis, tech recommendations, and market opportunities';
+
 -- Create plan_templates table for shareable app plans
-CREATE TABLE plan_templates (
+CREATE TABLE IF NOT EXISTS plan_templates (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title VARCHAR(255) NOT NULL,
   slug VARCHAR(255) UNIQUE NOT NULL,
