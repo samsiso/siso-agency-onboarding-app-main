@@ -73,6 +73,7 @@ import PartnerDashboard from './pages/dashboard/PartnerDashboard';
 import DashboardLayout from './components/dashboard/DashboardLayout';
 import { PartnerAuthGuard } from './components/auth/PartnerAuthGuard';
 import { PartnerLeaderboard } from './components/dashboard/PartnerLeaderboard';
+import { ComingSoonSection } from './components/dashboard/ComingSoonSection';
 
 function ErrorFallback({error, resetErrorBoundary}: {error: Error, resetErrorBoundary: () => void}) {
   return (
@@ -127,7 +128,7 @@ function App() {
           {/* Partner Dashboard Routes */}
           <Route path="/dashboard" element={<PartnerAuthGuard><DashboardLayout /></PartnerAuthGuard>}>
             <Route index element={<PartnerDashboard />} />
-            <Route path="coming-soon" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">Coming Soon Features</h1><p className="text-gray-400 mt-2">Exciting new features are being developed. Stay tuned!</p></div>} />
+            <Route path="coming-soon" element={<div className="p-6"><ComingSoonSection /></div>} />
             <Route path="education" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">Education Hub</h1><p className="text-gray-400 mt-2">Learning resources and training materials coming soon.</p></div>} />
             <Route path="templates" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">Templates</h1><p className="text-gray-400 mt-2">Ready-to-use templates for your projects.</p></div>} />
             <Route path="app-plan-generator" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">App Plan Generator</h1><p className="text-gray-400 mt-2">AI-powered app planning tool coming soon.</p></div>} />

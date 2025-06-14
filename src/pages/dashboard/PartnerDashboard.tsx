@@ -12,12 +12,19 @@ import {
   Clock,
   CheckCircle,
   AlertCircle,
-  Star
+  Star,
+  Rocket,
+  Zap,
+  FileText,
+  BarChart3
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { ComingSoonSection } from '@/components/dashboard/ComingSoonSection';
+import { PartnerLeaderboard } from '@/components/dashboard/PartnerLeaderboard';
+import { cn } from '@/lib/utils';
 
 interface DashboardStats {
   totalEarnings: number;
@@ -116,37 +123,46 @@ const PartnerDashboard = () => {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-3 sm:p-4 lg:p-6 space-y-6 sm:space-y-8">
       {/* Welcome Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <div className="flex items-center justify-between mb-2">
-          <h1 className="text-3xl font-bold text-white">Welcome back, John!</h1>
-          <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 space-y-2 sm:space-y-0">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white">Welcome back, John!</h1>
+          <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30 self-start sm:self-auto">
             {stats.currentTier}
           </Badge>
         </div>
-        <p className="text-gray-400">Here's what's happening with your partnership today.</p>
+        <p className="text-sm sm:text-base text-gray-400">Here's what's happening with your partnership today.</p>
+      </motion.div>
+
+      {/* Coming Soon Section - Featured prominently */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.1 }}
+      >
+        <ComingSoonSection />
       </motion.div>
 
       {/* Stats Grid */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+        transition={{ duration: 0.6, delay: 0.2 }}
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
       >
         {/* Total Earnings */}
         <Card className="bg-gray-800 border-gray-700">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-400">Total Earnings</CardTitle>
-            <DollarSign className="h-4 w-4 text-green-400" />
+            <CardTitle className="text-xs sm:text-sm font-medium text-gray-400">Total Earnings</CardTitle>
+            <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-green-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">£{stats.totalEarnings.toLocaleString()}</div>
+            <div className="text-xl sm:text-2xl font-bold text-white">£{stats.totalEarnings.toLocaleString()}</div>
             <div className="flex items-center text-xs text-green-400 mt-1">
               <ArrowUpRight className="w-3 h-3 mr-1" />
               +12% from last month
@@ -157,11 +173,11 @@ const PartnerDashboard = () => {
         {/* Monthly Earnings */}
         <Card className="bg-gray-800 border-gray-700">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-400">This Month</CardTitle>
-            <Calendar className="h-4 w-4 text-orange-400" />
+            <CardTitle className="text-xs sm:text-sm font-medium text-gray-400">This Month</CardTitle>
+            <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-orange-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">£{stats.monthlyEarnings.toLocaleString()}</div>
+            <div className="text-xl sm:text-2xl font-bold text-white">£{stats.monthlyEarnings.toLocaleString()}</div>
             <div className="flex items-center text-xs text-orange-400 mt-1">
               <ArrowUpRight className="w-3 h-3 mr-1" />
               +8% from last month
@@ -172,11 +188,11 @@ const PartnerDashboard = () => {
         {/* Active Referrals */}
         <Card className="bg-gray-800 border-gray-700">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-400">Active Referrals</CardTitle>
-            <Users className="h-4 w-4 text-blue-400" />
+            <CardTitle className="text-xs sm:text-sm font-medium text-gray-400">Active Referrals</CardTitle>
+            <Users className="h-4 w-4 sm:h-5 sm:w-5 text-blue-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">{stats.activeReferrals}</div>
+            <div className="text-xl sm:text-2xl font-bold text-white">{stats.activeReferrals}</div>
             <div className="flex items-center text-xs text-blue-400 mt-1">
               <Clock className="w-3 h-3 mr-1" />
               In progress
@@ -187,147 +203,153 @@ const PartnerDashboard = () => {
         {/* Conversion Rate */}
         <Card className="bg-gray-800 border-gray-700">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-400">Conversion Rate</CardTitle>
-            <TrendingUp className="h-4 w-4 text-purple-400" />
+            <CardTitle className="text-xs sm:text-sm font-medium text-gray-400">Conversion Rate</CardTitle>
+            <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-purple-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">{stats.conversionRate}%</div>
+            <div className="text-xl sm:text-2xl font-bold text-white">{stats.conversionRate}%</div>
             <div className="flex items-center text-xs text-purple-400 mt-1">
               <ArrowUpRight className="w-3 h-3 mr-1" />
-              Above average
+              +5% from last month
             </div>
           </CardContent>
         </Card>
       </motion.div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent Activity */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="lg:col-span-2"
-        >
-          <Card className="bg-gray-800 border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-white">Recent Activity</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {recentActivity.map((activity, index) => (
-                <motion.div
-                  key={activity.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.4, delay: index * 0.1 }}
-                  className="flex items-center gap-4 p-3 rounded-lg bg-gray-700/50 hover:bg-gray-700 transition-colors"
-                >
-                  <div className={`p-2 rounded-full bg-gray-600 ${getStatusColor(activity.status)}`}>
-                    {getActivityIcon(activity.type)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-white font-medium truncate">{activity.title}</h4>
-                      {activity.amount && (
-                        <span className="text-green-400 font-semibold">+£{activity.amount}</span>
-                      )}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+        {/* Left Column - Recent Activity & Progress */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Recent Activity */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            <Card className="bg-gray-800 border-gray-700">
+              <CardHeader>
+                <CardTitle className="text-lg sm:text-xl text-white flex items-center">
+                  <Clock className="h-5 w-5 sm:h-6 sm:w-6 mr-2 text-orange-500" />
+                  Recent Activity
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {recentActivity.map((activity) => (
+                  <div key={activity.id} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-700/50 transition-colors">
+                    <div className={cn(
+                      'w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0',
+                      getStatusColor(activity.status)
+                    )}>
+                      {getActivityIcon(activity.type)}
                     </div>
-                    <p className="text-gray-400 text-sm truncate">{activity.description}</p>
-                    <p className="text-gray-500 text-xs">{activity.timestamp}</p>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                        <h4 className="text-sm sm:text-base font-medium text-white truncate">
+                          {activity.title}
+                        </h4>
+                        {activity.amount && (
+                          <span className="text-sm font-bold text-green-400 mt-1 sm:mt-0">
+                            +£{activity.amount}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs sm:text-sm text-gray-400 mt-1">
+                        {activity.description}
+                      </p>
+                      <span className="text-xs text-gray-500 mt-1 block">
+                        {activity.timestamp}
+                      </span>
+                    </div>
                   </div>
-                </motion.div>
-              ))}
-              <Button variant="outline" className="w-full border-gray-600 text-gray-300 hover:bg-gray-700">
-                View All Activity
-              </Button>
-            </CardContent>
-          </Card>
-        </motion.div>
+                ))}
+              </CardContent>
+            </Card>
+          </motion.div>
 
-        {/* Tier Progress & Quick Actions */}
+          {/* Tier Progress */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            <Card className="bg-gray-800 border-gray-700">
+              <CardHeader>
+                <CardTitle className="text-lg sm:text-xl text-white flex items-center">
+                  <Target className="h-5 w-5 sm:h-6 sm:w-6 mr-2 text-orange-500" />
+                  Progress to Gold Partner
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2">
+                  <span className="text-sm text-gray-400">Current Progress</span>
+                  <span className="text-sm font-medium text-white">{stats.nextTierProgress}% Complete</span>
+                </div>
+                <Progress value={stats.nextTierProgress} className="h-2 sm:h-3" />
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+                  <div className="text-center p-3 bg-gray-700/50 rounded-lg">
+                    <div className="text-lg sm:text-xl font-bold text-white">{stats.completedReferrals}</div>
+                    <div className="text-xs sm:text-sm text-gray-400">Completed</div>
+                  </div>
+                  <div className="text-center p-3 bg-gray-700/50 rounded-lg">
+                    <div className="text-lg sm:text-xl font-bold text-orange-400">3</div>
+                    <div className="text-xs sm:text-sm text-gray-400">Needed</div>
+                  </div>
+                  <div className="text-center p-3 bg-gray-700/50 rounded-lg">
+                    <div className="text-lg sm:text-xl font-bold text-green-400">£500</div>
+                    <div className="text-xs sm:text-sm text-gray-400">Bonus</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+
+        {/* Right Column - Leaderboard */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="space-y-6"
+          transition={{ duration: 0.6, delay: 0.5 }}
+          className="lg:col-span-1"
         >
-          {/* Tier Progress */}
-          <Card className="bg-gray-800 border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <Star className="w-5 h-5 text-orange-400" />
-                Tier Progress
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-orange-400">{stats.currentTier}</div>
-                <div className="text-sm text-gray-400">Current Tier</div>
-              </div>
-              
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Progress to Gold</span>
-                  <span className="text-white">{stats.nextTierProgress}%</span>
-                </div>
-                <Progress value={stats.nextTierProgress} className="h-2" />
-              </div>
-              
-              <div className="text-xs text-gray-400 text-center">
-                2 more successful referrals to reach Gold Partner
-              </div>
-              
-              <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white">
-                View Tier Benefits
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Quick Actions */}
-          <Card className="bg-gray-800 border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-white">Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
-                Submit New Referral
-              </Button>
-              <Button variant="outline" className="w-full border-gray-600 text-gray-300 hover:bg-gray-700">
-                Download Resources
-              </Button>
-              <Button variant="outline" className="w-full border-gray-600 text-gray-300 hover:bg-gray-700">
-                Contact Support
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Coming Soon Features */}
-          <Card className="bg-gradient-to-br from-orange-500/10 to-orange-600/5 border-orange-500/30">
-            <CardHeader>
-              <CardTitle className="text-orange-400">Coming Soon</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm text-gray-300">
-                  <Target className="w-4 h-4 text-orange-400" />
-                  Goal Tracking & Analytics
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-300">
-                  <Award className="w-4 h-4 text-orange-400" />
-                  Achievement System
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-300">
-                  <Users className="w-4 h-4 text-orange-400" />
-                  Team Collaboration Tools
-                </div>
-              </div>
-              <Button variant="outline" className="w-full border-orange-500/30 text-orange-400 hover:bg-orange-500/10">
-                Learn More
-              </Button>
-            </CardContent>
-          </Card>
+          <PartnerLeaderboard />
         </motion.div>
       </div>
+
+      {/* Quick Actions */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.6 }}
+      >
+        <Card className="bg-gray-800 border-gray-700">
+          <CardHeader>
+            <CardTitle className="text-lg sm:text-xl text-white flex items-center">
+              <Zap className="h-5 w-5 sm:h-6 sm:w-6 mr-2 text-orange-500" />
+              Quick Actions
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+              <Button className="bg-orange-600 hover:bg-orange-700 text-white h-12 sm:h-14 text-sm sm:text-base">
+                <Users className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                New Referral
+              </Button>
+              <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-700 h-12 sm:h-14 text-sm sm:text-base">
+                <FileText className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                View Templates
+              </Button>
+              <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-700 h-12 sm:h-14 text-sm sm:text-base">
+                <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                Analytics
+              </Button>
+              <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-700 h-12 sm:h-14 text-sm sm:text-base">
+                <Award className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                Achievements
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 };
