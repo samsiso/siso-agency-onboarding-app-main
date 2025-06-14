@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { PartnerBreadcrumbs } from './PartnerBreadcrumbs';
 import { 
   Menu, 
   X, 
@@ -430,7 +431,10 @@ const DashboardLayout = () => {
 
         {/* Page Content */}
         <main className="flex-1 overflow-auto">
-          <Outlet />
+          <div className="p-6">
+            <PartnerBreadcrumbs />
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

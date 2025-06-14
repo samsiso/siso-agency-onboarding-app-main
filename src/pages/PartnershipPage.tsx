@@ -884,7 +884,7 @@ const PartnershipPage = memo(() => {
                     <CardContent className="p-0">
                       <button
                         onClick={() => setExpandedFaq(expandedFaq === index ? null : index)}
-                        className="w-full p-6 text-left flex justify-between items-center hover:bg-gray-700/30 transition-colors duration-200"
+                        className="w-full p-6 text-left flex justify-between items-center hover:bg-gray-700/30 transition-colors duration-200 min-h-[64px] touch-manipulation"
                       >
                         <h3 className="text-lg font-semibold text-white">{faq.question}</h3>
                         {expandedFaq === index ? (
@@ -993,7 +993,7 @@ const PartnershipPage = memo(() => {
                       id="expectedVolume"
                       value={formData.expectedVolume}
                       onChange={(e) => setFormData({...formData, expectedVolume: e.target.value})}
-                      className="bg-gray-700 border-gray-600 text-white"
+                      className="bg-gray-700 border-gray-600 text-white min-h-[48px] text-base"
                       placeholder="e.g., 2-3 businesses per month"
                       required
                     />
@@ -1003,7 +1003,7 @@ const PartnershipPage = memo(() => {
                     type="submit"
                     size="lg"
                     disabled={isSubmitting}
-                    className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white py-4 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white py-4 text-lg disabled:opacity-50 disabled:cursor-not-allowed min-h-[56px] touch-manipulation"
                   >
                     {isSubmitting ? 'Submitting...' : 'Submit Application'}
                     <ArrowRight className="w-5 h-5 ml-2" />
