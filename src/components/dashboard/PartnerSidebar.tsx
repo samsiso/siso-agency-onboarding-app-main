@@ -10,7 +10,8 @@ import {
   User, 
   X,
   Target,
-  Users
+  Users,
+  Trophy
 } from 'lucide-react';
 
 interface PartnerSidebarProps {
@@ -20,6 +21,7 @@ interface PartnerSidebarProps {
 
 const navigationItems = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
+  { name: 'Leaderboard', href: '/dashboard/leaderboard', icon: Trophy },
   { name: 'Coming Soon', href: '/dashboard/coming-soon', icon: Clock },
   { name: 'Education Hub', href: '/dashboard/education', icon: GraduationCap },
   { name: 'Templates', href: '/dashboard/templates', icon: FileText },

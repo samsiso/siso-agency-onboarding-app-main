@@ -72,6 +72,7 @@ import PartnerPasswordReset from './pages/auth/PartnerPasswordReset';
 import PartnerDashboard from './pages/dashboard/PartnerDashboard';
 import DashboardLayout from './components/dashboard/DashboardLayout';
 import { PartnerAuthGuard } from './components/auth/PartnerAuthGuard';
+import { PartnerLeaderboard } from './components/dashboard/PartnerLeaderboard';
 
 function ErrorFallback({error, resetErrorBoundary}: {error: Error, resetErrorBoundary: () => void}) {
   return (
@@ -136,7 +137,7 @@ function App() {
             {/* Legacy routes for backward compatibility */}
             <Route path="referrals" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">Referrals - Coming Soon</h1></div>} />
             <Route path="earnings" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">Earnings - Coming Soon</h1></div>} />
-            <Route path="leaderboard" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">Leaderboard - Coming Soon</h1></div>} />
+            <Route path="leaderboard" element={<PartnerLeaderboard />} />
             <Route path="resources" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">Resources - Coming Soon</h1></div>} />
             <Route path="goals" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">Goals & Targets - Coming Soon</h1></div>} />
             <Route path="achievements" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">Achievements - Coming Soon</h1></div>} />

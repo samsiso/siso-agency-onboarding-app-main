@@ -25,6 +25,12 @@ export const usePartnerNavigation = () => {
       description: 'Overview of your partner performance'
     },
     { 
+      name: 'Leaderboard', 
+      href: '/dashboard/leaderboard', 
+      icon: 'Trophy',
+      description: 'See how you rank against other partners'
+    },
+    { 
       name: 'Coming Soon', 
       href: '/dashboard/coming-soon', 
       icon: 'Clock',
