@@ -84,6 +84,7 @@
     "react-router-dom": "^6.26.2",
     "react-tsparticles": "^2.12.2",
     "reactflow": "^11.11.4",
+    "reaviz": "^16.0.4",
     "recharts": "^2.12.7",
     "sonner": "^1.5.0",
     "tailwind-merge": "^2.5.2",

@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useUser } from '@/hooks/useUser';
 import { motion } from 'framer-motion';
 import { AdminPageTitle } from '@/components/admin/layout/AdminPageTitle';
+import AdvancedNormalizedIncidentReport from '@/components/ui/advanced-normalized-incident-report';
 
 export default function AdminDashboard() {
   const { isAdmin, isLoading } = useAdminCheck();
@@ -57,6 +58,17 @@ export default function AdminDashboard() {
           subtitle="Welcome to your admin panel — view statistics, quick actions, and more"
         />
         <StatsOverview />
+        
+        {/* Incident Report Section */}
+        <motion.div 
+          className="flex justify-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+        >
+          <AdvancedNormalizedIncidentReport />
+        </motion.div>
+        
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <motion.div 
             className="lg:col-span-2 space-y-6"

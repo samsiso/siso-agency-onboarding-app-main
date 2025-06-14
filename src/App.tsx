@@ -70,7 +70,6 @@ import PartnerLogin from './pages/auth/PartnerLogin';
 import PartnerRegister from './pages/auth/PartnerRegister';
 import PartnerPasswordReset from './pages/auth/PartnerPasswordReset';
 import PartnerDashboard from './pages/dashboard/PartnerDashboard';
-import DashboardLayout from './components/dashboard/DashboardLayout';
 import { PartnerAuthGuard } from './components/auth/PartnerAuthGuard';
 import { PartnerLeaderboard } from './components/dashboard/PartnerLeaderboard';
 import { ComingSoonSection } from './components/dashboard/ComingSoonSection';
@@ -125,25 +124,23 @@ function App() {
           <Route path="/auth/register" element={<PartnerRegister />} />
           <Route path="/auth/reset-password" element={<PartnerPasswordReset />} />
           
-          {/* Partner Dashboard Routes */}
-          <Route path="/dashboard" element={<PartnerAuthGuard><DashboardLayout /></PartnerAuthGuard>}>
-            <Route index element={<PartnerDashboard />} />
-            <Route path="coming-soon" element={<div className="p-6"><ComingSoonSection /></div>} />
-            <Route path="education" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">Education Hub</h1><p className="text-gray-400 mt-2">Learning resources and training materials coming soon.</p></div>} />
-            <Route path="templates" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">Templates</h1><p className="text-gray-400 mt-2">Ready-to-use templates for your projects.</p></div>} />
-            <Route path="app-plan-generator" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">App Plan Generator</h1><p className="text-gray-400 mt-2">AI-powered app planning tool coming soon.</p></div>} />
-            <Route path="pipeline" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">Pipeline</h1><p className="text-gray-400 mt-2">Track your referral pipeline and progress.</p></div>} />
-            <Route path="profile" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">Profile Settings</h1><p className="text-gray-400 mt-2">Manage your partner profile and preferences.</p></div>} />
-            
-            {/* Legacy routes for backward compatibility */}
-            <Route path="referrals" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">Referrals - Coming Soon</h1></div>} />
-            <Route path="earnings" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">Earnings - Coming Soon</h1></div>} />
-            <Route path="leaderboard" element={<PartnerLeaderboard />} />
-            <Route path="resources" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">Resources - Coming Soon</h1></div>} />
-            <Route path="goals" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">Goals & Targets - Coming Soon</h1></div>} />
-            <Route path="achievements" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">Achievements - Coming Soon</h1></div>} />
-            <Route path="settings" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">Settings - Coming Soon</h1></div>} />
-          </Route>
+          {/* Partner Dashboard Routes - Using AffiliateLayout directly */}
+          <Route path="/dashboard" element={<PartnerAuthGuard><PartnerDashboard /></PartnerAuthGuard>} />
+          <Route path="/dashboard/coming-soon" element={<PartnerAuthGuard><div className="p-6"><ComingSoonSection /></div></PartnerAuthGuard>} />
+          <Route path="/dashboard/education" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">Education Hub</h1><p className="text-gray-400 mt-2">Learning resources and training materials coming soon.</p></div></PartnerAuthGuard>} />
+          <Route path="/dashboard/templates" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">Templates</h1><p className="text-gray-400 mt-2">Ready-to-use templates for your projects.</p></div></PartnerAuthGuard>} />
+          <Route path="/dashboard/app-plan-generator" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">App Plan Generator</h1><p className="text-gray-400 mt-2">AI-powered app planning tool coming soon.</p></div></PartnerAuthGuard>} />
+          <Route path="/dashboard/pipeline" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">Pipeline</h1><p className="text-gray-400 mt-2">Track your referral pipeline and progress.</p></div></PartnerAuthGuard>} />
+          <Route path="/dashboard/profile" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">Profile Settings</h1><p className="text-gray-400 mt-2">Manage your partner profile and preferences.</p></div></PartnerAuthGuard>} />
+          
+          {/* Legacy routes for backward compatibility */}
+          <Route path="/dashboard/referrals" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">Referrals - Coming Soon</h1></div></PartnerAuthGuard>} />
+          <Route path="/dashboard/earnings" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">Earnings - Coming Soon</h1></div></PartnerAuthGuard>} />
+          <Route path="/dashboard/leaderboard" element={<PartnerAuthGuard><PartnerLeaderboard /></PartnerAuthGuard>} />
+          <Route path="/dashboard/resources" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">Resources - Coming Soon</h1></div></PartnerAuthGuard>} />
+          <Route path="/dashboard/goals" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">Goals & Targets - Coming Soon</h1></div></PartnerAuthGuard>} />
+          <Route path="/dashboard/achievements" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">Achievements - Coming Soon</h1></div></PartnerAuthGuard>} />
+          <Route path="/dashboard/settings" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">Settings - Coming Soon</h1></div></PartnerAuthGuard>} />
           <Route path="/partner-dashboard" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard/partner" element={<Navigate to="/dashboard" replace />} />
           

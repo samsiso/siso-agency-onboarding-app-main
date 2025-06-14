@@ -136,10 +136,13 @@ const CommissionCalculator = memo(() => {
                     max={2490}
                     min={249}
                     step={50}
-                    className="w-full [&>*]:h-6 [&>*]:w-6 [&_[role=slider]]:h-6 [&_[role=slider]]:w-6 
+                    className="w-full touch-manipulation
+                      [&>*]:h-8 [&>*]:w-8 md:[&>*]:h-6 md:[&>*]:w-6 
+                      [&_[role=slider]]:h-8 [&_[role=slider]]:w-8 md:[&_[role=slider]]:h-6 md:[&_[role=slider]]:w-6 
                       [&_[role=slider]]:border-2 [&_[role=slider]]:border-orange-500 
                       [&_[role=slider]]:bg-white [&_[role=slider]]:shadow-lg
-                      [&_.slider-track]:h-2 [&_.slider-range]:bg-orange-500"
+                      [&_.slider-track]:h-3 md:[&_.slider-track]:h-2 [&_.slider-range]:bg-orange-500
+                      cursor-pointer [&_[role=slider]]:cursor-grab [&_[role=slider]:active]:cursor-grabbing"
                   />
                   <div className="flex justify-between text-sm text-gray-400">
                     <span>£249 (Minimum)</span>
@@ -159,10 +162,13 @@ const CommissionCalculator = memo(() => {
                     max={10}
                     min={1}
                     step={1}
-                    className="w-full [&>*]:h-6 [&>*]:w-6 [&_[role=slider]]:h-6 [&_[role=slider]]:w-6 
+                    className="w-full touch-manipulation
+                      [&>*]:h-8 [&>*]:w-8 md:[&>*]:h-6 md:[&>*]:w-6 
+                      [&_[role=slider]]:h-8 [&_[role=slider]]:w-8 md:[&_[role=slider]]:h-6 md:[&_[role=slider]]:w-6 
                       [&_[role=slider]]:border-2 [&_[role=slider]]:border-green-500 
                       [&_[role=slider]]:bg-white [&_[role=slider]]:shadow-lg
-                      [&_.slider-track]:h-2 [&_.slider-range]:bg-green-500"
+                      [&_.slider-track]:h-3 md:[&_.slider-track]:h-2 [&_.slider-range]:bg-green-500
+                      cursor-pointer [&_[role=slider]]:cursor-grab [&_[role=slider]:active]:cursor-grabbing"
                   />
                   <div className="flex justify-between text-sm text-gray-400">
                     <span>1 deal</span>

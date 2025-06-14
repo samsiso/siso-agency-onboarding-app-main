@@ -111,55 +111,52 @@ LLM agents rely on *rich but concise* context. We will:
 - **AI Agents**: _Automated PR reviewer & type generator_
 
 ## 🛠️ Detailed Task Breakdown for AI-Assisted Execution
-Below is a **45-step** sequence that smart AI agents (Cursor delegates, GitHub Copilot, Supabase CLI bots) and human developers will follow to deliver the full refactor. Each step is atomic and should generate a single PR or merge request.
+Below is a **42-step** sequence that smart AI agents (Cursor delegates, GitHub Copilot, Supabase CLI bots) and human developers will follow. Each step should correspond to a single focused PR.
 
-1. **Create Supabase branch `refactor-sprint-1`.**
-2. **Generate ERD** using `supabase db schemas graphql` → export `docs/db/erd.png`.
+1. **Create Supabase branch `refactor-sprint-1`** and add branch-naming convention to `CONTRIBUTING.md`.
+2. **Generate ERD** (`docs/db/erd.png`) via `supabase db schemas graphql`.
 3. **Draft `docs/db/standards.md`** – naming, casing, timestamps, RLS philosophy.
-4. **Scaffold `docs/codebase/structure.md`** – domain layout, examples.
-5. **Create `docs/templates/domain-README.md`** – template for per-domain readmes.
-6. **Enable RLS globally**: loop through tables → `ENABLE ROW LEVEL SECURITY` migration.
-7. **Create default deny policies** for every table.
-8. **Write helper SQL function `current_user_id()` for policy shortcuts.**
-9. **Add `created_at`, `updated_at`, `deleted_at` columns** to legacy tables.
-10. **Create trigger `handle_timestamps()`** and attach to all tables.
-11. **Write `deleted_at` RLS filter policy** (select only not deleted).
-12. **Introduce Postgres enum `task_status`** (+ TS regen) & migrate columns.
-13. **Repeat for other enums (`plan_stage`, `payment_status`).**
-14. **Add missing foreign keys** with `ON DELETE CASCADE` where safe.
-15. **Audit indexes** → add B-tree on `foreign_key_id`, `created_at`, enums.
-16. **Add GIN index for JSON/text search columns (e.g., `metadata`).**
-17. **Split tables into new `onboarding` schema** – migrate `onboarding_*` tables.
-18. **Create `projects` schema** – move project, task, timeline tables.
-19. **Move analytics/time-series tables into `analytics` schema**.
-20. **Regenerate Supabase types (`supabase gen types typescript`).**
-21. **Add barrel `src/domains/onboarding/index.ts`** exporting hooks & types.
-22. **Move React onboarding components to `src/domains/onboarding/components`.**
-23. **Refactor imports using VSCode rename + ESLint autofix.**
-24. **Insert README.md into onboarding domain** using template.
-25. **Repeat 21–24 for `projects` domain.**
-26. **Create `common/components` for shared UI – move Button, Modal, etc.**
-27. **Add path aliases in `tsconfig.json` (`@/domains/*`).**
-28. **Fix Jest/Vite alias config.**
-29. **Run `eslint --fix` and `tsc --noEmit` to ensure type safety.**
-30. **Implement CI Step: `sqlfluff lint .` on PRs.**
-31. **Implement CI Step: `supabase db reset --linked` dry-run migrations.**
-32. **Implement CI Step: `npm run test` for unit tests.**
-33. **Create seed scripts (`supabase db seed`) for local dev.**
-34. **Add `docs/db/changelog.md` and populate Sprint 1 changes.**
-35. **Write ADR-001: "Adopt Domain-Driven Schemas".**
-36. **Write ADR-002: "Soft Delete & RLS Pattern".**
-37. **Generate OpenAPI spec for custom REST endpoints → `docs/api/openapi.yaml`.**
-38. **Document Supabase Edge Functions architecture in `docs/adr/edge-functions.md`.**
-39. **Implement audit log table + Edge Function Slack webhook.**
-40. **Set up Postgres `NOTIFY` triggers for realtime dashboards.**
-41. **Create Timescale extension for analytics schema (if needed).**
-42. **Benchmark critical queries with `EXPLAIN ANALYZE` & update indexes.**
-43. **Run load tests (k6) to reach <200 ms P95 latency goal.**
-44. **Merge Sprint 1 branch → release note in `docs/releases/2025-refactor-sprint-1.md`.**
-45. **Update roadmap & backlog, start `refactor-sprint-2` branch.**
+4. **Scaffold `docs/codebase/structure.md`** – domain layout, path aliases.
+5. **Create `docs/templates/domain-README.md`** – template for per-domain docs.
+6. **Enable RLS globally** and add default-deny policies (single migration file).
+7. **Create helper function `current_user_id()`** for policy shortcuts.
+8. **Add audit timestamp columns** (`created_at`, `updated_at`, `deleted_at`).
+9. **Create trigger `handle_timestamps()`** and attach to all tables.
+10. **Implement soft-delete select policy** (`deleted_at IS NULL`).
+11. **Migrate primary keys to UUID** (`gen_random_uuid()`) where still serial.
+12. **Introduce enums (`task_status`, `plan_stage`, `payment_status`)** and migrate columns.
+13. **Add missing foreign keys** with appropriate `ON DELETE` behaviour.
+14. **Create indexes** on FK columns & `created_at`.
+15. **Add `GIN / GIN-Trgm` indexes** for JSON / text search fields.
+16. **Create new schema `onboarding`** and migrate related tables.
+17. **Create new schema `projects`** and migrate project/task tables.
+18. **Create new schema `analytics`** and move time-series tables.
+19. **Regenerate TypeScript types** (`supabase gen types typescript`).
+20. **Add `npm run typegen:watch`** script to auto-regenerate types after migrations.
+21. **Move React onboarding code to `src/domains/onboarding`** and add barrel export.
+22. **Repeat step 21 for `projects` domain**.
+23. **Create `src/common/components`** and move global UI elements.
+24. **Configure path aliases** in `tsconfig.json`, Jest, Vite, and ESLint.
+25. **Run `eslint --fix` and `tsc --noEmit`** to ensure type safety.
+26. **Add pre-commit hooks** with `lint-staged` (ESLint + prettier + tsc).
+27. **Create seed scripts** using `supabase db seed` for local dev & CI.
+28. **Add `docs/db/changelog.md`** and log Sprint 1 changes.
+29. **Set up GitHub Actions CI**: `sqlfluff lint`, `supabase db reset --linked`, tests, typecheck.
+30. **Write ADR-001: “Domain-Driven Schemas”.**
+31. **Write ADR-002: “Soft Delete & RLS Pattern”.**
+32. **Write ADR-003: “UUID Primary Keys”.**
+33. **Generate OpenAPI spec** for custom REST endpoints → `docs/api/openapi.yaml`.
+34. **Document Edge Functions architecture** in `docs/adr/edge-functions.md`.
+35. **Implement audit log table** + Edge Function Slack webhook.
+36. **Set up Postgres `NOTIFY` triggers** for realtime dashboards.
+37. **Benchmark critical queries** with `EXPLAIN ANALYZE` & update indexes.
+38. **Run load tests** (k6) to reach <200 ms P95 latency goal.
+39. **Schedule nightly Supabase Advisor run** & alert on drift/perf notices.
+40. **Publish release notes** `docs/releases/2025-refactor-sprint-1.md`.
+41. **Merge Sprint 1 branch into `main`** after approvals & green CI.
+42. **Update roadmap & open `refactor-sprint-2` branch**.
 
-> Each step should contain clear acceptance criteria in the PR description so AI code reviewers can auto-approve when tests pass.
+> _Each PR must include acceptance criteria so automated reviewers can safely merge when checks pass._
 
 ---
 

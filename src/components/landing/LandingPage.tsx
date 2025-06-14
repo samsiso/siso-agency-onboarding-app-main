@@ -11,9 +11,7 @@ const WhyChooseSection = lazy(() => import('./sections/WhyChooseSection').then(m
   default: memo(m.WhyChooseSection)
 })));
 
-const PortfolioSection = lazy(() => import('./sections/PortfolioSection').then(m => ({
-  default: memo(m.PortfolioSection)
-})));
+
 
 const LandingPage = () => {
   console.log('[LandingPage] Rendering landing page');
@@ -82,14 +80,7 @@ const LandingPage = () => {
           </Suspense>
         </ErrorBoundary>
 
-        <ErrorBoundary
-          fallback={<div>Error loading portfolio section</div>}
-          onError={(error) => console.error('[LandingPage] Error in PortfolioSection:', error)}
-        >
-          <Suspense fallback={<LoadingFallback />}>
-            <PortfolioSection />
-          </Suspense>
-        </ErrorBoundary>
+
 
         <Footer />
       </div>

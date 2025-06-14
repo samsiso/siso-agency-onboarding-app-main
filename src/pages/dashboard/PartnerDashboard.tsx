@@ -63,6 +63,44 @@ const PartnerDashboard = () => {
     nextTierProgress: 65
   });
 
+  // Move recentActivity useState to top to fix hooks order
+  const [recentActivity] = useState<RecentActivity[]>([
+    {
+      id: '1',
+      type: 'payment_received',
+      title: 'Payment Received',
+      description: 'Commission for TechCorp referral',
+      amount: 500,
+      timestamp: '2 hours ago',
+      status: 'success'
+    },
+    {
+      id: '2',
+      type: 'referral_approved',
+      title: 'Referral Approved',
+      description: 'StartupXYZ project approved',
+      amount: 750,
+      timestamp: '1 day ago',
+      status: 'success'
+    },
+    {
+      id: '3',
+      type: 'referral_submitted',
+      title: 'New Referral Submitted',
+      description: 'LocalBiz consultation request',
+      timestamp: '2 days ago',
+      status: 'pending'
+    },
+    {
+      id: '4',
+      type: 'tier_upgraded',
+      title: 'Tier Upgrade',
+      description: 'Promoted to Silver Partner',
+      timestamp: '1 week ago',
+      status: 'success'
+    }
+  ]);
+
   // Check if partner has completed onboarding
   useEffect(() => {
     const checkOnboardingStatus = async () => {
@@ -144,8 +182,8 @@ const PartnerDashboard = () => {
     );
   }
 
-  // Show onboarding if not complete
-  if (isOnboardingComplete === false) {
+  // Show onboarding if not complete (temporarily disabled to show new dashboard)
+  if (false && isOnboardingComplete === false) {
     return (
       <div className="p-6">
         <PartnerOnboarding 
@@ -155,43 +193,6 @@ const PartnerDashboard = () => {
       </div>
     );
   }
-
-  const [recentActivity] = useState<RecentActivity[]>([
-    {
-      id: '1',
-      type: 'payment_received',
-      title: 'Payment Received',
-      description: 'Commission for TechCorp referral',
-      amount: 500,
-      timestamp: '2 hours ago',
-      status: 'success'
-    },
-    {
-      id: '2',
-      type: 'referral_approved',
-      title: 'Referral Approved',
-      description: 'StartupXYZ project approved',
-      amount: 750,
-      timestamp: '1 day ago',
-      status: 'success'
-    },
-    {
-      id: '3',
-      type: 'referral_submitted',
-      title: 'New Referral Submitted',
-      description: 'LocalBiz consultation request',
-      timestamp: '2 days ago',
-      status: 'pending'
-    },
-    {
-      id: '4',
-      type: 'tier_upgraded',
-      title: 'Tier Upgrade',
-      description: 'Promoted to Silver Partner',
-      timestamp: '1 week ago',
-      status: 'success'
-    }
-  ]);
 
   const getActivityIcon = (type: RecentActivity['type']) => {
     switch (type) {

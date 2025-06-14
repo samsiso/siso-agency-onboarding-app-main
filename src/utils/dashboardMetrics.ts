@@ -4,6 +4,8 @@
  * instead of fake/static data
  */
 
+import { AppPlan } from '@/types/appPlan.types';
+
 export interface UserProgress {
   onboardingProgress: number;
   activeTasks: number;
@@ -179,4 +181,244 @@ export const getTrendData = (type: 'setup' | 'tasks' | 'project' | 'timeline', p
     default:
       return undefined;
   }
+};
+
+/**
+ * Enhanced metrics calculation with visual progress indicators
+ */
+export const getEnhancedDashboardMetrics = () => {
+  const onboardingProgress = getOnboardingProgress();
+  const businessData = localStorage.getItem('business-onboarding-data');
+  const appPlanData = localStorage.getItem('app-plan-data');
+  const completedTasks = JSON.parse(localStorage.getItem('workflow-completed-tasks') || '[]');
+  
+  let parsedBusinessData = null;
+  let parsedAppPlan = null;
+  
+  try {
+    parsedBusinessData = businessData ? JSON.parse(businessData) : null;
+    parsedAppPlan = appPlanData ? JSON.parse(appPlanData) : null;
+  } catch (error) {
+    console.warn('Error parsing dashboard data:', error);
+  }
+
+  // Enhanced progress tracking
+  const progressStages = [
+    {
+      id: 'onboarding',
+      name: 'Business Onboarding',
+      completed: parsedBusinessData?.completedAt ? true : false,
+      progress: onboardingProgress,
+      description: 'Share your business information',
+      icon: '📋',
+      color: 'blue'
+    },
+    {
+      id: 'app_plan',
+      name: 'AI App Plan',
+      completed: parsedAppPlan ? true : false,
+      progress: parsedAppPlan ? 100 : 0,
+      description: 'AI-generated development plan',
+      icon: '🤖',
+      color: 'purple'
+    },
+    {
+      id: 'requirements',
+      name: 'Requirements Review',
+      completed: completedTasks.includes('workflow-2'),
+      progress: completedTasks.includes('workflow-2') ? 100 : 0,
+      description: 'Finalize app specifications',
+      icon: '✅',
+      color: 'green'
+    },
+    {
+      id: 'development',
+      name: 'Development Phase',
+      completed: completedTasks.includes('workflow-3'),
+      progress: completedTasks.includes('workflow-3') ? 100 : 0,
+      description: 'App development in progress',
+      icon: '⚡',
+      color: 'orange'
+    },
+    {
+      id: 'testing',
+      name: 'Testing & QA',
+      completed: completedTasks.includes('workflow-4'),
+      progress: completedTasks.includes('workflow-4') ? 100 : 0,
+      description: 'Quality assurance testing',
+      icon: '🔍',
+      color: 'indigo'
+    },
+    {
+      id: 'deployment',
+      name: 'Launch Ready',
+      completed: completedTasks.includes('workflow-5'),
+      progress: completedTasks.includes('workflow-5') ? 100 : 0,
+      description: 'Ready for deployment',
+      icon: '🚀',
+      color: 'emerald'
+    }
+  ];
+
+  // Calculate overall project progress
+  const completedStages = progressStages.filter(stage => stage.completed).length;
+  const overallProgress = Math.round((completedStages / progressStages.length) * 100);
+
+  // Enhanced metrics
+  const metrics = {
+    overallProgress,
+    completedStages,
+    totalStages: progressStages.length,
+    progressStages,
+    nextStage: progressStages.find(stage => !stage.completed),
+    
+    // Client engagement metrics
+    engagementScore: calculateEngagementScore(parsedBusinessData, parsedAppPlan, completedTasks),
+    
+    // Timeline metrics
+    timelineMetrics: calculateTimelineMetrics(parsedBusinessData, completedTasks),
+    
+    // Achievement badges
+    achievements: calculateAchievements(parsedBusinessData, parsedAppPlan, completedTasks)
+  };
+
+  return metrics;
+};
+
+/**
+ * Calculate client engagement score based on activity
+ */
+const calculateEngagementScore = (businessData: any, appPlan: any, completedTasks: string[]): number => {
+  let score = 0;
+  
+  // Base engagement from onboarding completion
+  if (businessData?.completedAt) score += 25;
+  
+  // Engagement from app plan generation
+  if (appPlan) score += 25;
+  
+  // Task completion engagement
+  score += Math.min(completedTasks.length * 8, 40);
+  
+  // Recency bonus (completed tasks in last 7 days)
+  const recentTasks = completedTasks.filter(task => {
+    // This would check timestamp in real implementation
+    return true; // Placeholder
+  });
+  
+  if (recentTasks.length > 0) score += 10;
+  
+  return Math.min(score, 100);
+};
+
+/**
+ * Calculate timeline metrics for project tracking
+ */
+const calculateTimelineMetrics = (businessData: any, completedTasks: string[]) => {
+  const startDate = businessData?.completedAt ? new Date(businessData.completedAt) : new Date();
+  const now = new Date();
+  const daysElapsed = Math.floor((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+  
+  // Estimate completion based on current progress
+  const estimatedTotalDays = 14; // 2 week standard project
+  const progressPercentage = (completedTasks.length / 6) * 100; // 6 total workflow stages
+  const estimatedDaysRemaining = Math.max(0, estimatedTotalDays - daysElapsed);
+  
+  return {
+    daysElapsed,
+    estimatedDaysRemaining,
+    onTrack: daysElapsed <= estimatedTotalDays * 0.8, // On track if within 80% of timeline
+    projectStartDate: startDate.toISOString(),
+    estimatedCompletionDate: new Date(startDate.getTime() + estimatedTotalDays * 24 * 60 * 60 * 1000).toISOString()
+  };
+};
+
+/**
+ * Calculate achievement badges for gamification
+ */
+const calculateAchievements = (businessData: any, appPlan: any, completedTasks: string[]) => {
+  const achievements = [];
+  
+  if (businessData?.completedAt) {
+    achievements.push({
+      id: 'first_steps',
+      name: 'First Steps',
+      description: 'Completed business onboarding',
+      icon: '🌟',
+      unlockedAt: businessData.completedAt,
+      color: 'blue'
+    });
+  }
+  
+  if (appPlan) {
+    achievements.push({
+      id: 'ai_powered',
+      name: 'AI Powered',
+      description: 'Generated AI app plan',
+      icon: '🤖',
+      unlockedAt: new Date().toISOString(),
+      color: 'purple'
+    });
+  }
+  
+  if (completedTasks.length >= 3) {
+    achievements.push({
+      id: 'momentum_builder',
+      name: 'Momentum Builder',
+      description: 'Completed 3+ project milestones',
+      icon: '⚡',
+      unlockedAt: new Date().toISOString(),
+      color: 'orange'
+    });
+  }
+  
+  if (completedTasks.length >= 5) {
+    achievements.push({
+      id: 'almost_there',
+      name: 'Almost There',
+      description: 'Nearing project completion',
+      icon: '🎯',
+      unlockedAt: new Date().toISOString(),
+      color: 'green'
+    });
+  }
+  
+  return achievements;
+};
+
+/**
+ * Get personalized dashboard greeting based on progress
+ */
+export const getDashboardGreeting = () => {
+  const metrics = getEnhancedDashboardMetrics();
+  const businessData = localStorage.getItem('business-onboarding-data');
+  let companyName = 'there';
+  
+  try {
+    const data = businessData ? JSON.parse(businessData) : null;
+    companyName = data?.businessName || 'there';
+  } catch (error) {
+    console.warn('Error parsing business data for greeting:', error);
+  }
+  
+  const hour = new Date().getHours();
+  const timeGreeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  
+  let statusMessage = '';
+  if (metrics.overallProgress === 0) {
+    statusMessage = "Let's get your project started!";
+  } else if (metrics.overallProgress < 50) {
+    statusMessage = "Great progress so far!";
+  } else if (metrics.overallProgress < 80) {
+    statusMessage = "You're making excellent progress!";
+  } else {
+    statusMessage = "Almost ready to launch!";
+  }
+  
+  return {
+    greeting: `${timeGreeting}, ${companyName}!`,
+    statusMessage,
+    progressPercentage: metrics.overallProgress,
+    nextAction: metrics.nextStage?.description || 'All stages completed!'
+  };
 }; 
