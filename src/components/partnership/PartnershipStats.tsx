@@ -1,7 +1,8 @@
 import { memo, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, DollarSign, TrendingUp, Award } from 'lucide-react';
+import { Users, DollarSign, TrendingUp, Award, Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { usePartnerStats } from '@/hooks/usePartnerStats';
 
 interface StatCardProps {
   icon: React.ElementType;
@@ -71,35 +72,76 @@ const StatCard = memo(({ icon: Icon, label, value, trend, index }: StatCardProps
 StatCard.displayName = 'StatCard';
 
 const PartnershipStats = memo(() => {
-  const stats = [
+  const { stats, isLoading, error } = usePartnerStats();
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <section id="stats" className="min-h-[90vh] flex items-center px-4 bg-gray-800/20">
+        <div className="container mx-auto max-w-6xl w-full">
+          <div className="flex items-center justify-center">
+            <div className="flex items-center space-x-3 text-orange-500">
+              <Loader2 className="w-8 h-8 animate-spin" />
+              <span className="text-xl font-medium">Loading partnership statistics...</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <section id="stats" className="min-h-[90vh] flex items-center px-4 bg-gray-800/20">
+        <div className="container mx-auto max-w-6xl w-full">
+          <div className="text-center space-y-4">
+            <div className="text-red-400 text-xl font-medium">
+              Failed to load statistics
+            </div>
+            <p className="text-gray-400">{error}</p>
+            <button 
+              onClick={() => window.location.reload()}
+              className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Use real statistics data
+  const statsData = stats ? [
     {
       icon: Users,
       label: "Active Partners",
-      value: "247",
+      value: stats.activePartners.toString(),
       trend: "+18% this month"
     },
     {
       icon: DollarSign,
       label: "Total Paid Out",
-      value: "£47,285",
+      value: `£${stats.totalCommissionsPaid.toFixed(2)}`,
       trend: "+23% this month"
     },
     {
       icon: Award,
       label: "Successful Projects",
-      value: "186",
+      value: stats.successfulProjects.toString(),
       trend: "+15% this month"
     },
     {
       icon: TrendingUp,
-      label: "Avg Monthly Earnings",
-      value: "£892",
+      label: "Avg Commission",
+      value: `£${stats.averageCommission.toFixed(2)}`,
       trend: "+12% this month"
     }
-  ];
+  ] : [];
 
   return (
-    <section className="min-h-[90vh] flex items-center px-4 bg-gray-800/20">
+    <section id="stats" className="min-h-[90vh] flex items-center px-4 bg-gray-800/20">
       <div className="container mx-auto max-w-6xl w-full">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -117,10 +159,24 @@ const PartnershipStats = memo(() => {
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat, index) => (
+          {statsData.map((stat, index) => (
             <StatCard key={stat.label} {...stat} index={index} />
           ))}
         </div>
+
+        {/* Real-time data indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+          className="mt-8 text-center"
+        >
+          <div className="inline-flex items-center space-x-2 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-full">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span className="text-green-400 text-sm font-medium">Live Data - Updated Every 5 Minutes</span>
+          </div>
+        </motion.div>
       </div>
     </section>
   );

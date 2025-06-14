@@ -15,11 +15,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import PartnershipStats from '@/components/partnership/PartnershipStats';
 import CommissionCalculator from '@/components/partnership/CommissionCalculator';
+import { usePartnerApplication } from '@/hooks/usePartnerApplication';
+import { toast } from 'sonner';
 
 const PartnershipPage = memo(() => {
   const navigate = useNavigate();
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [activeSection, setActiveSection] = useState('hero');
+  const { submitApplication, isSubmitting } = usePartnerApplication();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -38,27 +41,60 @@ const PartnershipPage = memo(() => {
   });
 
   const handleApplyNow = () => {
-    // Navigate to auth page with partner context
-    navigate('/auth', { 
-      state: { 
-        userType: 'partner',
-        returnTo: '/partner-dashboard',
-        source: 'partnership-landing'
-      }
-    });
+    // Scroll to application form instead of navigating away
+    const element = document.getElementById('application');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+      setActiveSection('application');
+    }
   };
 
-  const handleSubmitApplication = (e: React.FormEvent) => {
+  const handleSubmitApplication = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Navigate to auth page with application data
-    navigate('/auth', { 
-      state: { 
-        userType: 'partner',
-        returnTo: '/partner-dashboard',
-        source: 'partnership-application',
-        formData: formData
+    
+    try {
+      // Transform form data to match API expectations
+      const applicationData = {
+        full_name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        experience: formData.experience,
+        network_description: formData.network,
+        expected_monthly_volume: formData.expectedVolume,
+        status: 'pending' as const
+      };
+
+      const success = await submitApplication(applicationData);
+      
+      if (success) {
+        // Reset form
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          experience: '',
+          network: '',
+          expectedVolume: ''
+        });
+
+        // Show success message and redirect after delay
+        toast.success('Application submitted successfully! We will contact you within 24 hours.');
+        
+        // Optional: Navigate to a confirmation page or dashboard after delay
+        setTimeout(() => {
+          navigate('/auth', { 
+            state: { 
+              userType: 'partner',
+              returnTo: '/partner-dashboard',
+              source: 'partnership-application-success'
+            }
+          });
+        }, 3000);
       }
-    });
+    } catch (error) {
+      console.error('Error submitting application:', error);
+      toast.error('Failed to submit application. Please try again.');
+    }
   };
 
   // Navigation sections
@@ -231,6 +267,36 @@ const PartnershipPage = memo(() => {
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-black via-gray-900 to-black overflow-x-hidden">
+      {/* Scroll Progress Bar */}
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-1 bg-orange-500 transform-origin-left z-50"
+        style={{ scaleX }}
+      />
+
+      {/* Sticky Navigation */}
+      <motion.nav
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        className="fixed top-4 left-1/2 transform -translate-x-1/2 z-40 bg-gray-900/95 backdrop-blur-md 
+          border border-gray-700/50 rounded-full px-4 py-2 shadow-2xl hidden lg:block"
+      >
+        <div className="flex items-center gap-2">
+          {navigationSections.map((section) => (
+            <button
+              key={section.id}
+              onClick={() => scrollToSection(section.id)}
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-all duration-200 whitespace-nowrap
+                ${activeSection === section.id 
+                  ? 'bg-orange-500 text-white' 
+                  : 'text-gray-400 hover:text-orange-400 hover:bg-gray-800/50'
+                }`}
+            >
+              {section.label}
+            </button>
+          ))}
+        </div>
+      </motion.nav>
+
       {/* CSS for gradient animation */}
       <style>{`
         @keyframes gradientShift {
@@ -276,7 +342,7 @@ const PartnershipPage = memo(() => {
 
       <div className="relative z-10">
         {/* CLEAN PROFESSIONAL HERO SECTION */}
-        <section className="relative min-h-screen flex items-center justify-center px-4 bg-gradient-to-b from-gray-900 to-black">
+        <section id="hero" className="relative min-h-screen flex items-center justify-center px-4 bg-gradient-to-b from-gray-900 to-black">
           {/* Subtle background accent */}
           <div className="absolute inset-0">
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] 
@@ -426,7 +492,7 @@ const PartnershipPage = memo(() => {
         <PartnershipStats />
 
         {/* Enhanced Value Proposition Section */}
-        <section className="relative min-h-[80vh] flex items-center px-4 overflow-hidden">
+        <section id="benefits" className="relative min-h-[80vh] flex items-center px-4 overflow-hidden">
           {/* Section background with dynamic elements */}
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-900/30 to-transparent" />
           <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-orange-500/5 rounded-full blur-3xl animate-pulse" />
@@ -536,7 +602,7 @@ const PartnershipPage = memo(() => {
         </section>
 
         {/* How It Works Section */}
-        <section className="min-h-[70vh] flex items-center px-4 bg-gray-800/30">
+        <section id="process" className="min-h-[70vh] flex items-center px-4 bg-gray-800/30">
           <div className="container mx-auto max-w-6xl w-full">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -599,7 +665,7 @@ const PartnershipPage = memo(() => {
         <CommissionCalculator />
 
         {/* Target Client Types Section */}
-        <section className="py-16 px-4 bg-gray-800/30">
+        <section id="clients" className="py-16 px-4 bg-gray-800/30">
           <div className="container mx-auto max-w-6xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -653,7 +719,7 @@ const PartnershipPage = memo(() => {
         </section>
 
         {/* Testimonials Section */}
-        <section className="py-16 px-4">
+        <section id="testimonials" className="py-16 px-4">
           <div className="container mx-auto max-w-6xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -703,7 +769,7 @@ const PartnershipPage = memo(() => {
         </section>
 
         {/* FAQ Section */}
-        <section className="py-16 px-4 bg-gray-800/30">
+        <section id="faq" className="py-16 px-4 bg-gray-800/30">
           <div className="container mx-auto max-w-4xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
