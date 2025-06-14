@@ -1,5 +1,5 @@
-import { memo, useState, useEffect } from 'react';
-import { motion, useScroll, useSpring, AnimatePresence } from 'framer-motion';
+import { memo, useState, useEffect, useRef } from 'react';
+import { motion, useScroll, useSpring, AnimatePresence, useInView, useMotionValue, useTransform } from 'framer-motion';
 import { 
   ArrowRight, Users, DollarSign, Shield, Zap, Calculator, CheckCircle, 
   Search, Code, Phone, Mail, ChevronDown, ChevronUp, Star, Award,
@@ -365,32 +365,102 @@ const PartnershipPage = memo(() => {
         }
       `}</style>
 
-      {/* Enhanced Background Effects */}
+      {/* Enhanced Background Effects with Advanced Animations */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        {/* Main gradient orbs */}
-        <div className="absolute top-1/4 -left-1/4 w-[400px] md:w-[800px] h-[400px] md:h-[800px] 
-          bg-gradient-to-r from-orange-500/20 via-orange-400/15 to-red-500/10 rounded-full 
-          filter blur-[100px] md:blur-[140px] animate-pulse"
+        {/* Main gradient orbs with parallax */}
+        <motion.div 
+          className="absolute top-1/4 -left-1/4 w-[400px] md:w-[800px] h-[400px] md:h-[800px] 
+            bg-gradient-to-r from-orange-500/20 via-orange-400/15 to-red-500/10 rounded-full 
+            filter blur-[100px] md:blur-[140px]"
+          animate={{ 
+            x: [0, 50, 0],
+            y: [0, -30, 0],
+            scale: [1, 1.1, 1],
+            opacity: [0.8, 1, 0.8]
+          }}
+          transition={{ 
+            duration: 8, 
+            repeat: Infinity, 
+            ease: "easeInOut" 
+          }}
         />
-        <div className="absolute bottom-1/4 -right-1/4 w-[400px] md:w-[800px] h-[400px] md:h-[800px] 
-          bg-gradient-to-l from-orange-600/25 via-amber-500/15 to-yellow-500/10 rounded-full 
-          filter blur-[100px] md:blur-[140px] animate-pulse"
+        <motion.div 
+          className="absolute bottom-1/4 -right-1/4 w-[400px] md:w-[800px] h-[400px] md:h-[800px] 
+            bg-gradient-to-l from-orange-600/25 via-amber-500/15 to-yellow-500/10 rounded-full 
+            filter blur-[100px] md:blur-[140px]"
+          animate={{ 
+            x: [0, -40, 0],
+            y: [0, 40, 0],
+            scale: [1, 0.9, 1],
+            opacity: [0.7, 1, 0.7]
+          }}
+          transition={{ 
+            duration: 10, 
+            repeat: Infinity, 
+            ease: "easeInOut",
+            delay: 2
+          }}
         />
         
-        {/* Additional floating orbs */}
-        <div className="absolute top-1/2 left-1/2 w-[200px] md:w-[400px] h-[200px] md:h-[400px] 
-          bg-gradient-to-br from-orange-400/10 to-red-400/5 rounded-full 
-          filter blur-[60px] md:blur-[80px] animate-bounce"
-          style={{ animationDuration: '6s' }}
+        {/* Floating particles with complex animations */}
+        <motion.div 
+          className="absolute top-1/2 left-1/2 w-[200px] md:w-[400px] h-[200px] md:h-[400px] 
+            bg-gradient-to-br from-orange-400/10 to-red-400/5 rounded-full 
+            filter blur-[60px] md:blur-[80px]"
+          animate={{ 
+            x: [0, 100, -50, 0],
+            y: [0, -80, 60, 0],
+            rotate: [0, 180, 360],
+            scale: [1, 1.3, 0.8, 1]
+          }}
+          transition={{ 
+            duration: 12, 
+            repeat: Infinity, 
+            ease: "easeInOut" 
+          }}
         />
-        <div className="absolute top-3/4 left-1/4 w-[150px] md:w-[300px] h-[150px] md:h-[300px] 
-          bg-gradient-to-tr from-amber-500/15 to-orange-500/10 rounded-full 
-          filter blur-[50px] md:blur-[70px] animate-pulse"
-          style={{ animationDuration: '4s' }}
+        <motion.div 
+          className="absolute top-3/4 left-1/4 w-[150px] md:w-[300px] h-[150px] md:h-[300px] 
+            bg-gradient-to-tr from-amber-500/15 to-orange-500/10 rounded-full 
+            filter blur-[50px] md:blur-[70px]"
+          animate={{ 
+            x: [0, -60, 80, 0],
+            y: [0, 40, -20, 0],
+            scale: [1, 0.7, 1.2, 1],
+            opacity: [0.6, 1, 0.4, 0.6]
+          }}
+          transition={{ 
+            duration: 9, 
+            repeat: Infinity, 
+            ease: "easeInOut",
+            delay: 1
+          }}
         />
         
-        {/* Particle effect overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-orange-500/5 to-transparent opacity-50" />
+        {/* Additional floating elements */}
+        <motion.div 
+          className="absolute top-1/3 right-1/3 w-[100px] md:w-[200px] h-[100px] md:h-[200px] 
+            bg-gradient-to-bl from-orange-300/8 to-red-300/4 rounded-full 
+            filter blur-[40px] md:blur-[60px]"
+          animate={{ 
+            x: [0, 70, -30, 0],
+            y: [0, -50, 30, 0],
+            scale: [1, 1.4, 0.9, 1]
+          }}
+          transition={{ 
+            duration: 7, 
+            repeat: Infinity, 
+            ease: "easeInOut",
+            delay: 3
+          }}
+        />
+        
+        {/* Particle effect overlay with subtle animation */}
+        <motion.div 
+          className="absolute inset-0 bg-gradient-to-b from-transparent via-orange-500/5 to-transparent"
+          animate={{ opacity: [0.3, 0.7, 0.3] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        />
       </div>
 
       <div className="relative z-10">
@@ -1077,33 +1147,98 @@ const PartnershipPage = memo(() => {
               </p>
             </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {clientTypes.map((client, index) => (
                 <motion.div
                   key={client.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, y: 30, rotateX: -15 }}
+                  whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  transition={{ 
+                    duration: 0.6, 
+                    delay: index * 0.15,
+                    type: "spring",
+                    stiffness: 100
+                  }}
+                  whileHover={{ 
+                    y: -12,
+                    rotateX: 5,
+                    rotateY: 5,
+                    scale: 1.02,
+                    transition: { duration: 0.3 }
+                  }}
+                  className="group perspective-1000"
                 >
-                  <Card className="h-full bg-gray-800/50 border-gray-700 hover:border-orange-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/10">
-                    <CardContent className="p-6 space-y-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-orange-500/20 to-orange-600/20 rounded-lg flex items-center justify-center">
-                          <client.icon className="w-5 h-5 text-orange-500" />
-                        </div>
-                        <h3 className="text-lg font-semibold text-white">{client.title}</h3>
+                  <Card className="h-full bg-gradient-to-br from-gray-800/80 via-gray-800/60 to-gray-900/80 
+                    border border-gray-700/50 hover:border-orange-500/60 transition-all duration-500 
+                    hover:shadow-2xl hover:shadow-orange-500/25 relative overflow-hidden
+                    group-hover:bg-gradient-to-br group-hover:from-gray-800/90 group-hover:via-gray-700/70 group-hover:to-gray-900/90">
+                    
+                    {/* Animated background gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-orange-500/0 via-orange-500/0 to-orange-500/0 
+                      group-hover:from-orange-500/10 group-hover:via-orange-500/5 group-hover:to-orange-500/10 
+                      transition-all duration-500" />
+                    
+                    {/* Floating particles effect */}
+                    <div className="absolute top-4 right-4 w-2 h-2 bg-orange-400/30 rounded-full 
+                      group-hover:bg-orange-400/60 transition-all duration-500 group-hover:animate-pulse" />
+                    <div className="absolute bottom-6 left-6 w-1 h-1 bg-orange-300/20 rounded-full 
+                      group-hover:bg-orange-300/50 transition-all duration-700 group-hover:animate-pulse" 
+                      style={{ animationDelay: '0.5s' }} />
+                    
+                    <CardContent className="relative p-8 space-y-6">
+                      <div className="flex items-center gap-4">
+                        <motion.div 
+                          className="w-14 h-14 bg-gradient-to-br from-orange-500/20 via-orange-600/30 to-red-500/20 
+                            rounded-xl flex items-center justify-center group-hover:from-orange-500/40 
+                            group-hover:via-orange-600/50 group-hover:to-red-500/40 transition-all duration-500
+                            shadow-lg shadow-orange-500/20 group-hover:shadow-orange-500/40
+                            border border-orange-500/20 group-hover:border-orange-500/40"
+                          whileHover={{ 
+                            rotate: [0, -10, 10, 0],
+                            scale: 1.1,
+                            transition: { duration: 0.6 }
+                          }}
+                        >
+                          <client.icon className="w-7 h-7 text-orange-400 group-hover:text-orange-300 transition-colors duration-300" />
+                        </motion.div>
+                        <h3 className="text-xl font-bold text-white group-hover:text-orange-100 transition-colors duration-300">
+                          {client.title}
+                        </h3>
                       </div>
-                      <p className="text-gray-400 text-sm">{client.description}</p>
-                      <div className="space-y-2">
-                        <div className="flex justify-between">
-                          <span className="text-gray-400 text-sm">Project Range:</span>
-                          <span className="text-white text-sm font-semibold">{client.priceRange}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-400 text-sm">Your Commission:</span>
-                          <span className="text-orange-500 text-sm font-semibold">{client.commission}</span>
-                        </div>
+                      
+                      <p className="text-gray-400 group-hover:text-gray-300 transition-colors duration-300 leading-relaxed">
+                        {client.description}
+                      </p>
+                      
+                      <div className="space-y-3 pt-4 border-t border-gray-700/50 group-hover:border-gray-600/50 transition-colors duration-300">
+                        <motion.div 
+                          className="flex justify-between items-center"
+                          whileHover={{ x: 5 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <span className="text-gray-400 text-sm group-hover:text-gray-300 transition-colors duration-300">
+                            Project Range:
+                          </span>
+                          <span className="text-white text-sm font-bold bg-gray-700/50 px-3 py-1 rounded-full
+                            group-hover:bg-gray-600/50 transition-all duration-300">
+                            {client.priceRange}
+                          </span>
+                        </motion.div>
+                        <motion.div 
+                          className="flex justify-between items-center"
+                          whileHover={{ x: 5 }}
+                          transition={{ duration: 0.2, delay: 0.1 }}
+                        >
+                          <span className="text-gray-400 text-sm group-hover:text-gray-300 transition-colors duration-300">
+                            Your Commission:
+                          </span>
+                          <span className="text-orange-400 text-sm font-bold bg-orange-500/20 px-3 py-1 rounded-full
+                            group-hover:text-orange-300 group-hover:bg-orange-500/30 transition-all duration-300
+                            border border-orange-500/30 group-hover:border-orange-500/50">
+                            {client.commission}
+                          </span>
+                        </motion.div>
                       </div>
                     </CardContent>
                   </Card>
@@ -1131,30 +1266,116 @@ const PartnershipPage = memo(() => {
               </p>
             </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {testimonials.map((testimonial, index) => (
                 <motion.div
                   key={testimonial.name}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, y: 40, rotateY: -15, scale: 0.9 }}
+                  whileInView={{ opacity: 1, y: 0, rotateY: 0, scale: 1 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  transition={{ 
+                    duration: 0.7, 
+                    delay: index * 0.2,
+                    type: "spring",
+                    stiffness: 80
+                  }}
+                  whileHover={{ 
+                    y: -15,
+                    rotateY: 5,
+                    scale: 1.03,
+                    transition: { duration: 0.4 }
+                  }}
+                  className="group perspective-1000"
                 >
-                  <Card className="h-full bg-gray-800/50 border-gray-700 hover:border-orange-500/50 transition-all duration-300">
-                    <CardContent className="p-6 space-y-4">
-                      <div className="flex items-center gap-1 mb-2">
+                  <Card className="h-full bg-gradient-to-br from-gray-800/90 via-gray-800/70 to-gray-900/90 
+                    border border-gray-700/50 hover:border-orange-500/60 transition-all duration-500 
+                    hover:shadow-2xl hover:shadow-orange-500/30 relative overflow-hidden
+                    group-hover:bg-gradient-to-br group-hover:from-gray-800/95 group-hover:via-gray-700/75 group-hover:to-gray-900/95">
+                    
+                    {/* Animated quote background */}
+                    <div className="absolute top-4 right-4 text-6xl text-orange-500/10 font-serif leading-none
+                      group-hover:text-orange-500/20 transition-all duration-500 select-none">"</div>
+                    
+                    {/* Glow effect */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-orange-500/0 via-orange-500/0 to-orange-500/0 
+                      group-hover:from-orange-500/5 group-hover:via-orange-500/10 group-hover:to-orange-500/5 
+                      transition-all duration-500" />
+                    
+                    <CardContent className="relative p-8 space-y-6">
+                      {/* Enhanced star rating */}
+                      <motion.div 
+                        className="flex items-center gap-1 mb-4"
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        transition={{ delay: index * 0.2 + 0.3 }}
+                      >
                         {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="w-4 h-4 fill-orange-500 text-orange-500" />
+                          <motion.div
+                            key={i}
+                            initial={{ scale: 0, rotate: -180 }}
+                            whileInView={{ scale: 1, rotate: 0 }}
+                            transition={{ 
+                              delay: index * 0.2 + 0.4 + i * 0.1,
+                              type: "spring",
+                              stiffness: 200
+                            }}
+                            whileHover={{ 
+                              scale: 1.2,
+                              rotate: 360,
+                              transition: { duration: 0.3 }
+                            }}
+                          >
+                            <Star className="w-5 h-5 fill-orange-500 text-orange-500 drop-shadow-lg" />
+                          </motion.div>
                         ))}
-                      </div>
-                      <blockquote className="text-gray-300 italic">"{testimonial.quote}"</blockquote>
-                      <div className="flex justify-between items-center pt-4 border-t border-gray-700">
-                        <div>
-                          <div className="text-white font-semibold">{testimonial.name}</div>
-                          <div className="text-gray-400 text-sm">{testimonial.role}</div>
+                      </motion.div>
+                      
+                      {/* Enhanced quote */}
+                      <motion.blockquote 
+                        className="text-gray-300 italic text-lg leading-relaxed group-hover:text-gray-200 
+                          transition-colors duration-300 relative z-10"
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        transition={{ delay: index * 0.2 + 0.5 }}
+                      >
+                        "{testimonial.quote}"
+                      </motion.blockquote>
+                      
+                      {/* Enhanced author section */}
+                      <motion.div 
+                        className="flex justify-between items-center pt-6 border-t border-gray-700/50 
+                          group-hover:border-gray-600/50 transition-colors duration-300"
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.2 + 0.6 }}
+                      >
+                        <div className="space-y-1">
+                          <motion.div 
+                            className="text-white font-bold text-lg group-hover:text-orange-100 transition-colors duration-300"
+                            whileHover={{ x: 5 }}
+                          >
+                            {testimonial.name}
+                          </motion.div>
+                          <motion.div 
+                            className="text-gray-400 text-sm group-hover:text-gray-300 transition-colors duration-300"
+                            whileHover={{ x: 5 }}
+                          >
+                            {testimonial.role}
+                          </motion.div>
                         </div>
-                        <div className="text-orange-500 font-semibold">{testimonial.earnings}</div>
-                      </div>
+                        <motion.div 
+                          className="text-orange-400 font-bold text-xl bg-orange-500/20 px-4 py-2 rounded-full
+                            group-hover:text-orange-300 group-hover:bg-orange-500/30 transition-all duration-300
+                            border border-orange-500/30 group-hover:border-orange-500/50 shadow-lg"
+                          whileHover={{ 
+                            scale: 1.1,
+                            rotate: [0, -5, 5, 0],
+                            transition: { duration: 0.4 }
+                          }}
+                        >
+                          {testimonial.earnings}
+                        </motion.div>
+                      </motion.div>
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -1192,22 +1413,45 @@ const PartnershipPage = memo(() => {
                 >
                   <Card className="bg-gray-800/50 border-gray-700 hover:border-orange-500/50 transition-all duration-300">
                     <CardContent className="p-0">
-                      <button
+                      <motion.button
                         onClick={() => setExpandedFaq(expandedFaq === index ? null : index)}
-                        className="w-full p-6 text-left flex justify-between items-center hover:bg-gray-700/30 transition-colors duration-200 min-h-[64px] touch-manipulation"
+                        className="w-full p-6 text-left flex justify-between items-center hover:bg-gray-700/30 
+                          transition-colors duration-300 min-h-[64px] touch-manipulation group"
+                        whileHover={{ x: 5 }}
+                        whileTap={{ scale: 0.98 }}
                       >
-                        <h3 className="text-lg font-semibold text-white">{faq.question}</h3>
-                        {expandedFaq === index ? (
-                          <ChevronUp className="w-5 h-5 text-orange-500" />
-                        ) : (
-                          <ChevronDown className="w-5 h-5 text-orange-500" />
+                        <h3 className="text-lg font-semibold text-white group-hover:text-orange-100 transition-colors duration-300">
+                          {faq.question}
+                        </h3>
+                        <motion.div
+                          animate={{ rotate: expandedFaq === index ? 180 : 0 }}
+                          transition={{ duration: 0.3, ease: "easeInOut" }}
+                          whileHover={{ scale: 1.1 }}
+                        >
+                          <ChevronDown className="w-5 h-5 text-orange-500 group-hover:text-orange-400 transition-colors duration-300" />
+                        </motion.div>
+                      </motion.button>
+                      <AnimatePresence>
+                        {expandedFaq === index && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                            className="overflow-hidden"
+                          >
+                            <motion.div 
+                              className="px-6 pb-6 text-gray-300 leading-relaxed"
+                              initial={{ y: -10 }}
+                              animate={{ y: 0 }}
+                              exit={{ y: -10 }}
+                              transition={{ duration: 0.2, delay: 0.1 }}
+                            >
+                              {faq.answer}
+                            </motion.div>
+                          </motion.div>
                         )}
-                      </button>
-                      {expandedFaq === index && (
-                        <div className="px-6 pb-6 text-gray-300">
-                          {faq.answer}
-                        </div>
-                      )}
+                      </AnimatePresence>
                     </CardContent>
                   </Card>
                 </motion.div>

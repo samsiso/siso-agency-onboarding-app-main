@@ -28,6 +28,7 @@ import { PartnerOnboarding } from '@/components/dashboard/PartnerOnboarding';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { AffiliateLayout } from '@/components/dashboard/AffiliateLayout';
 
 interface DashboardStats {
   totalEarnings: number;
@@ -221,20 +222,21 @@ const PartnerDashboard = () => {
   };
 
   return (
-    <div className="p-3 sm:p-4 lg:p-6 space-y-6 sm:space-y-8">
-      {/* Welcome Header */}
+    <AffiliateLayout 
+      title="Partner Dashboard"
+      subtitle="Here's what's happening with your partnership today"
+    >
+      <div className="space-y-6 sm:space-y-8">
+      {/* Current Tier Badge */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
+        className="flex justify-end"
       >
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 space-y-2 sm:space-y-0">
-          <h1 className="text-2xl sm:text-3xl font-bold text-white">Welcome back, John!</h1>
-          <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30 self-start sm:self-auto">
-            {stats.currentTier}
-          </Badge>
-        </div>
-        <p className="text-sm sm:text-base text-gray-400">Here's what's happening with your partnership today.</p>
+        <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30">
+          {stats.currentTier}
+        </Badge>
       </motion.div>
 
       {/* Coming Soon Section - Featured prominently */}
@@ -448,7 +450,8 @@ const PartnerDashboard = () => {
           </CardContent>
         </Card>
       </motion.div>
-    </div>
+      </div>
+    </AffiliateLayout>
   );
 };
 
